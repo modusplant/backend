@@ -18,7 +18,7 @@ public interface TermEntityMapper {
     @BeanMapping(ignoreByDefault = true)
     default TermEntity createTermEntity(Term term) {
         return map(term, TermEntity.builder().build());
-    };
+    }
 
     @BeanMapping(ignoreByDefault = true)
     default TermEntity updateTermEntity(Term term, @Context TermJpaRepository termRepository) {
