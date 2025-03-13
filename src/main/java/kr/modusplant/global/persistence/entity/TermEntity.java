@@ -28,7 +28,7 @@ public class TermEntity {
     private UUID uuid;
 
     @Setter
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String name;
 
     @Setter

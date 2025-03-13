@@ -32,14 +32,14 @@ public class SiteMemberAuthEntity {
     @BatchSize(size = 10)
     private SiteMemberEntity activeMember;
 
-    @ManyToOne
+    @OneToOne
     @MapsId
     @JoinColumn(name = SNAKE_ORIGINAL_MEMBER_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @BatchSize(size = 10)
     private SiteMemberEntity originalMember;
 
     @Setter
-    @Column(unique = true, nullable = false, length = 80)
+    @Column(nullable = false, length = 80)
     private String email;
 
     @Setter
