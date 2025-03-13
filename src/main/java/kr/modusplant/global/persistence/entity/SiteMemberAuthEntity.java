@@ -67,7 +67,6 @@ public class SiteMemberAuthEntity {
     @Column(name = SNAKE_LOCKOUT_UNTIL, nullable = false)
     private LocalDateTime lockoutUntil;
 
-    @Setter
     @Column(name = SNAKE_LAST_MODIFIED_AT, nullable = false)
     @LastModifiedDate
     private LocalDateTime lastModifiedAt;
