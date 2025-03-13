@@ -6,12 +6,13 @@ import kr.modusplant.global.persistence.repository.supers.UuidPrimaryKeyReposito
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface TermJpaRepository extends CreatedAtAndLastModifiedAtRepository<TermEntity>, UuidPrimaryKeyRepository<TermEntity>, JpaRepository<TermEntity, UUID> {
-    Optional<TermEntity> findByName(String name);
+    List<TermEntity> findByVersion(String version);
 
-    Optional<TermEntity> findByVersion(String version);
+    Optional<TermEntity> findByName(String name);
 }
