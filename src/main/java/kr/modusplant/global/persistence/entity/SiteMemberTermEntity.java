@@ -1,6 +1,7 @@
 package kr.modusplant.global.persistence.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,7 +17,7 @@ import static kr.modusplant.global.vo.SnakeCaseWord.*;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = SNAKE_SITE_MEMBER_TERM)
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SiteMemberTermEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
