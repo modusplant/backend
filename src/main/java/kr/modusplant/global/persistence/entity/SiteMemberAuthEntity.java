@@ -2,6 +2,7 @@ package kr.modusplant.global.persistence.entity;
 
 import jakarta.persistence.*;
 import kr.modusplant.global.enums.AuthProvider;
+import kr.modusplant.global.persistence.annotation.DefaultValue;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -59,6 +60,7 @@ public class SiteMemberAuthEntity {
 
     @Setter
     @Column(name = SNAKE_FAILED_ATTEMPT, nullable = false)
+    @DefaultValue
     private Integer failedAttempt;
 
     @Setter

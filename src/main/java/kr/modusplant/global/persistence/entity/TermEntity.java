@@ -1,6 +1,7 @@
 package kr.modusplant.global.persistence.entity;
 
 import jakarta.persistence.*;
+import kr.modusplant.global.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,6 +38,7 @@ public class TermEntity {
 
     @Setter
     @Column(name = VER, nullable = false, length = 10)
+    @DefaultValue
     private String version;
 
     @Column(name = SNAKE_CREATED_AT, nullable = false)
