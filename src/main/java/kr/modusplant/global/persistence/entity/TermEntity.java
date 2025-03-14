@@ -13,6 +13,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static kr.modusplant.global.util.VersionUtils.createVersion;
 import static kr.modusplant.global.vo.CamelCaseWord.TERM;
 import static kr.modusplant.global.vo.CamelCaseWord.VER;
 import static kr.modusplant.global.vo.SnakeCaseWord.*;
@@ -52,6 +53,20 @@ public class TermEntity {
     @Version
     @Column(name = SNAKE_VER_NUM, nullable = false)
     private Long versionNumber;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.version == null) {
+            this.version = createVersion(1, 0, 0);
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        if (this.version == null) {
+            this.version = createVersion(1, 0, 0);
+        }
+    }
 
     public TermEntity(String name, String content, String version) {
         this.name = name;
