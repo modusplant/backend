@@ -1,6 +1,7 @@
 package kr.modusplant.global.persistence.entity;
 
 import jakarta.persistence.*;
+import kr.modusplant.global.persistence.annotation.DefaultValue;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,18 +36,22 @@ public class SiteMemberEntity {
 
     @Setter
     @Column(name = SNAKE_IS_ACTIVE, nullable = false)
+    @DefaultValue
     private Boolean isActive;
 
     @Setter
     @Column(name = SNAKE_IS_DISABLED_BY_LINKING, nullable = false)
+    @DefaultValue
     private Boolean isDisabledByLinking;
 
     @Setter
     @Column(name = SNAKE_IS_BANNED, nullable = false)
+    @DefaultValue
     private Boolean isBanned;
 
     @Setter
     @Column(name = SNAKE_IS_DELETED, nullable = false)
+    @DefaultValue
     private Boolean isDeleted;
 
     @Setter

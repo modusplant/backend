@@ -2,6 +2,7 @@ package kr.modusplant.global.persistence.entity;
 
 import jakarta.persistence.*;
 import kr.modusplant.global.enums.Role;
+import kr.modusplant.global.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,7 @@ public class SiteMemberRoleEntity {
     @Setter
     @Column(nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
+    @DefaultValue
     private Role role;
 
     public SiteMemberRoleEntity(Role role) {
