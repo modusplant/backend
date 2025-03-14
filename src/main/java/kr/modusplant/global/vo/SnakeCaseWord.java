@@ -15,7 +15,7 @@ public final class SnakeCaseWord {
     public static final String SNAKE_IS_ACTIVE = "is_active";
     public static final String SNAKE_IS_BANNED = "is_banned";
     public static final String SNAKE_IS_DELETED = "is_deleted";
-    public static final String SNAKE_IS_DISABLED_BY_LINKING = "is_active";
+    public static final String SNAKE_IS_DISABLED_BY_LINKING = "is_disabled_by_linking";
     public static final String SNAKE_LAST_MODIFIED_AT = "last_modified_at";
     public static final String SNAKE_LOCKOUT_REFRESH_AT = "lockout_refresh_at";
     public static final String SNAKE_LOCKOUT_UNTIL = "lockout_until";
