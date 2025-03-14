@@ -14,6 +14,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 
+import static kr.modusplant.global.vo.Reference.NOTATION_ENTITY;
+
 @Configuration
 @EnableJpaAuditing
 public class JpaConfig {
@@ -44,7 +46,7 @@ public class JpaConfig {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
         em.setJpaVendorAdapter(jpaVendorAdapter());
-        em.setPackagesToScan("kr.modusplant.global.persistence.entity");
+        em.setPackagesToScan(NOTATION_ENTITY);
         return em;
     }
 
