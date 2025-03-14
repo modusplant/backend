@@ -3,10 +3,10 @@ package kr.modusplant.global.persistence.entity;
 import jakarta.persistence.*;
 import kr.modusplant.global.enums.AuthProvider;
 import kr.modusplant.global.persistence.annotation.DefaultValue;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.BatchSize;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -20,7 +20,7 @@ import static kr.modusplant.global.vo.SnakeCaseWord.*;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = SNAKE_SITE_MEMBER_AUTH)
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SiteMemberAuthEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
