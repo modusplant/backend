@@ -71,6 +71,38 @@ public class SiteMemberEntity {
     @Column(name = SNAKE_VER_NUM, nullable = false)
     private Long versionNumber;
 
+    @PrePersist
+    public void prePersist() {
+        if (this.isActive == null) {
+            this.isActive = true;
+        }
+        if (this.isDisabledByLinking == null) {
+            this.isDisabledByLinking = false;
+        }
+        if (this.isBanned == null) {
+            this.isBanned = false;
+        }
+        if (this.isDeleted == null) {
+            this.isDeleted = false;
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        if (this.isActive == null) {
+            this.isActive = true;
+        }
+        if (this.isDisabledByLinking == null) {
+            this.isDisabledByLinking = false;
+        }
+        if (this.isBanned == null) {
+            this.isBanned = false;
+        }
+        if (this.isDeleted == null) {
+            this.isDeleted = false;
+        }
+    }
+
     public SiteMemberEntity(String nickname, LocalDate birthDate, Boolean isActive, Boolean isDisabledByLinking, Boolean isBanned, Boolean isDeleted, LocalDateTime loggedInAt) {
         this.nickname = nickname;
         this.birthDate = birthDate;

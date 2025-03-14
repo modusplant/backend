@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.UUID;
 
+import static kr.modusplant.global.enums.Role.ROLE_USER;
 import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_SITE_MEMBER_ROLE;
 
 @Entity
@@ -29,6 +30,20 @@ public class SiteMemberRoleEntity {
     @Enumerated(EnumType.STRING)
     @DefaultValue
     private Role role;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.role == null) {
+            this.role = ROLE_USER;
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        if (this.role == null) {
+            this.role = ROLE_USER;
+        }
+    }
 
     public SiteMemberRoleEntity(Role role) {
         this.role = role;

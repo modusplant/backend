@@ -77,6 +77,20 @@ public class SiteMemberAuthEntity {
     @Column(name = SNAKE_VER_NUM, nullable = false)
     private Long versionNumber;
 
+    @PrePersist
+    public void prePersist() {
+        if (this.failedAttempt == null) {
+            this.failedAttempt = 0;
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        if (this.failedAttempt == null) {
+            this.failedAttempt = 0;
+        }
+    }
+
     public SiteMemberAuthEntity(SiteMemberEntity activeMember, SiteMemberEntity originalMember, String email, String pw, AuthProvider provider, String providerId, Integer failedAttempt, LocalDateTime lockoutRefreshAt, LocalDateTime lockoutUntil) {
         this.activeMember = activeMember;
         this.originalMember = originalMember;
