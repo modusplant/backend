@@ -5,7 +5,6 @@ import kr.modusplant.global.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -29,15 +28,12 @@ public class TermEntity {
     @Column(nullable = false)
     private UUID uuid;
 
-    @Setter
     @Column(unique = true, nullable = false)
     private String name;
 
-    @Setter
     @Column(nullable = false, length = 60000)
     private String content;
 
-    @Setter
     @Column(name = VER, nullable = false, length = 10)
     @DefaultValue
     private String version;
@@ -68,7 +64,8 @@ public class TermEntity {
         }
     }
 
-    public TermEntity(String name, String content, String version) {
+    public TermEntity(UUID uuid, String name, String content, String version) {
+        this.uuid = uuid;
         this.name = name;
         this.content = content;
         this.version = version;
@@ -79,9 +76,15 @@ public class TermEntity {
     }
 
     public static final class TermEntityBuilder {
+        private UUID uuid;
         private String name;
         private String content;
         private String version;
+
+        public TermEntityBuilder uuid(final UUID uuid) {
+            this.uuid = uuid;
+            return this;
+        }
 
         public TermEntityBuilder name(final String name) {
             this.name = name;
@@ -98,15 +101,16 @@ public class TermEntity {
             return this;
         }
 
-        public TermEntityBuilder termEntity(final TermEntity clause) {
-            this.name = clause.getName();
-            this.content = clause.getContent();
-            this.version = clause.getVersion();
+        public TermEntityBuilder termEntity(final TermEntity term) {
+            this.uuid = term.getUuid();
+            this.name = term.getName();
+            this.content = term.getContent();
+            this.version = term.getVersion();
             return this;
         }
 
         public TermEntity build() {
-            return new TermEntity(this.name, this.content, this.version);
+            return new TermEntity(this.uuid, this.name, this.content, this.version);
         }
     }
 }

@@ -6,7 +6,6 @@ import kr.modusplant.global.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.UUID;
@@ -25,7 +24,6 @@ public class SiteMemberRoleEntity {
     @Column(nullable = false)
     private UUID uuid;
 
-    @Setter
     @Column(nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     @DefaultValue
@@ -45,7 +43,8 @@ public class SiteMemberRoleEntity {
         }
     }
 
-    public SiteMemberRoleEntity(Role role) {
+    public SiteMemberRoleEntity(UUID uuid, Role role) {
+        this.uuid = uuid;
         this.role = role;
     }
 
@@ -54,7 +53,13 @@ public class SiteMemberRoleEntity {
     }
 
     public static final class SiteMemberRoleEntityBuilder {
+        private UUID uuid;
         private Role role;
+
+        public SiteMemberRoleEntityBuilder uuid(final UUID uuid) {
+            this.uuid = uuid;
+            return this;
+        }
 
         public SiteMemberRoleEntityBuilder role(final Role role) {
             this.role = role;
@@ -62,12 +67,13 @@ public class SiteMemberRoleEntity {
         }
 
         public SiteMemberRoleEntityBuilder memberRoleEntity(final SiteMemberRoleEntity memberRole) {
+            this.uuid = memberRole.getUuid();
             this.role = memberRole.getRole();
             return this;
         }
 
         public SiteMemberRoleEntity build() {
-            return new SiteMemberRoleEntity(this.role);
+            return new SiteMemberRoleEntity(this.uuid, this.role);
         }
     }
 }

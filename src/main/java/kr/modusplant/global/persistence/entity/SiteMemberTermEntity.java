@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -24,15 +23,12 @@ public class SiteMemberTermEntity {
     @Column(nullable = false)
     private UUID uuid;
 
-    @Setter
     @Column(name = SNAKE_AGREED_TOU_VER, nullable = false, length = 10)
     private String agreedTermsOfUseVersion;
 
-    @Setter
     @Column(name = SNAKE_AGREED_PRIV_POLI_VER, nullable = false, length = 10)
     private String agreedPrivacyPolicyVersion;
 
-    @Setter
     @Column(name = SNAKE_AGREED_AD_INFO_RECE_VER, nullable = false, length = 10)
     private String agreedAdInfoReceivingVersion;
 
@@ -44,7 +40,8 @@ public class SiteMemberTermEntity {
     @Column(name = SNAKE_VER_NUM, nullable = false)
     private Long versionNumber;
 
-    public SiteMemberTermEntity(String agreedTermsOfUseVersion, String agreedPrivacyPolicyVersion, String agreedAdInfoReceivingVersion) {
+    public SiteMemberTermEntity(UUID uuid, String agreedTermsOfUseVersion, String agreedPrivacyPolicyVersion, String agreedAdInfoReceivingVersion) {
+        this.uuid = uuid;
         this.agreedTermsOfUseVersion = agreedTermsOfUseVersion;
         this.agreedPrivacyPolicyVersion = agreedPrivacyPolicyVersion;
         this.agreedAdInfoReceivingVersion = agreedAdInfoReceivingVersion;
@@ -55,9 +52,15 @@ public class SiteMemberTermEntity {
     }
 
     public static final class SiteMemberTermEntityBuilder {
+        private UUID uuid;
         private String agreedTermsOfUseVersion;
         private String agreedPrivacyPolicyVersion;
         private String agreedAdInfoReceivingVersion;
+
+        public SiteMemberTermEntityBuilder uuid(final UUID uuid) {
+            this.uuid = uuid;
+            return this;
+        }
 
         public SiteMemberTermEntityBuilder agreedTermsOfUseVersion(final String agreedTermsOfUseVersion) {
             this.agreedTermsOfUseVersion = agreedTermsOfUseVersion;
@@ -74,15 +77,16 @@ public class SiteMemberTermEntity {
             return this;
         }
 
-        public SiteMemberTermEntityBuilder memberTermEntity(final SiteMemberTermEntity memberClause) {
-            this.agreedTermsOfUseVersion = memberClause.getAgreedTermsOfUseVersion();
-            this.agreedPrivacyPolicyVersion = memberClause.getAgreedPrivacyPolicyVersion();
-            this.agreedAdInfoReceivingVersion = memberClause.getAgreedAdInfoReceivingVersion();
+        public SiteMemberTermEntityBuilder memberTermEntity(final SiteMemberTermEntity memberTerm) {
+            this.uuid = memberTerm.getUuid();
+            this.agreedTermsOfUseVersion = memberTerm.getAgreedTermsOfUseVersion();
+            this.agreedPrivacyPolicyVersion = memberTerm.getAgreedPrivacyPolicyVersion();
+            this.agreedAdInfoReceivingVersion = memberTerm.getAgreedAdInfoReceivingVersion();
             return this;
         }
 
         public SiteMemberTermEntity build() {
-            return new SiteMemberTermEntity(this.agreedTermsOfUseVersion, this.agreedPrivacyPolicyVersion, this.agreedAdInfoReceivingVersion);
+            return new SiteMemberTermEntity(this.uuid, this.agreedTermsOfUseVersion, this.agreedPrivacyPolicyVersion, this.agreedAdInfoReceivingVersion);
         }
     }
 }

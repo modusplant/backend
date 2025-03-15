@@ -85,7 +85,7 @@ public class SiteMemberServiceImpl implements SiteMemberService {
     @Transactional
     public SiteMember update(SiteMember member) {
         validateNotFoundEntity(member.getUuid());
-        return memberEntityMapper.toSiteMember(memberRepository.save(memberEntityMapper.updateSiteMemberEntity(member, memberRepository)));
+        return memberEntityMapper.toSiteMember(memberRepository.save(memberEntityMapper.updateSiteMemberEntity(member)));
     }
 
     @Override
