@@ -22,7 +22,18 @@ public interface SiteMemberAuthEntityMapper {
     @BeanMapping(ignoreByDefault = true)
     default SiteMemberAuthEntity createSiteMemberAuthEntity(SiteMemberAuth memberAuth,
                                                             @Context SiteMemberJpaRepository memberRepository) {
-        return map(memberAuth, SiteMemberAuthEntity.builder().build(), memberRepository);
+        return SiteMemberAuthEntity.builder()
+                .activeMember(memberRepository.findByUuid(memberAuth.getActiveMemberUuid())
+                        .orElseThrow(() -> new EntityNotFoundWithUuidException(memberAuth.getUuid(), SiteMemberEntity.class)))
+                .originalMember(memberRepository.findByUuid(memberAuth.getOriginalMemberUuid())
+                        .orElseThrow(() -> new EntityNotFoundWithUuidException(memberAuth.getUuid(), SiteMemberEntity.class)))
+                .email(memberAuth.getEmail())
+                .pw(memberAuth.getPw())
+                .provider(memberAuth.getProvider())
+                .providerId(memberAuth.getProviderId())
+                .failedAttempt(memberAuth.getFailedAttempt())
+                .lockoutRefreshAt(memberAuth.getLockoutRefreshAt())
+                .lockoutUntil(memberAuth.getLockoutUntil()).build();
     }
 
     @BeanMapping(ignoreByDefault = true)

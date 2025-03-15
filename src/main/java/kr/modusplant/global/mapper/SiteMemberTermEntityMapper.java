@@ -14,7 +14,10 @@ import static kr.modusplant.global.util.MapperUtils.map;
 public interface SiteMemberTermEntityMapper {
     @BeanMapping(ignoreByDefault = true)
     default SiteMemberTermEntity createSiteMemberTermEntity(SiteMemberTerm memberTerm) {
-        return map(memberTerm, SiteMemberTermEntity.builder().build());
+        return SiteMemberTermEntity.builder()
+                .agreedTermsOfUseVersion(memberTerm.getAgreedTermsOfUseVersion())
+                .agreedPrivacyPolicyVersion(memberTerm.getAgreedPrivacyPolicyVersion())
+                .agreedAdInfoReceivingVersion(memberTerm.getAgreedAdInfoReceivingVersion()).build();
     }
 
     @BeanMapping(ignoreByDefault = true)
