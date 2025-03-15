@@ -5,7 +5,6 @@ import kr.modusplant.global.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -27,35 +26,28 @@ public class SiteMemberEntity {
     @Column(nullable = false)
     private UUID uuid;
 
-    @Setter
     @Column(nullable = false, length = 40)
     private String nickname;
 
-    @Setter
     @Column(name = SNAKE_BIRTH_DATE, nullable = false)
     private LocalDate birthDate;
 
-    @Setter
     @Column(name = SNAKE_IS_ACTIVE, nullable = false)
     @DefaultValue
     private Boolean isActive;
 
-    @Setter
     @Column(name = SNAKE_IS_DISABLED_BY_LINKING, nullable = false)
     @DefaultValue
     private Boolean isDisabledByLinking;
 
-    @Setter
     @Column(name = SNAKE_IS_BANNED, nullable = false)
     @DefaultValue
     private Boolean isBanned;
 
-    @Setter
     @Column(name = SNAKE_IS_DELETED, nullable = false)
     @DefaultValue
     private Boolean isDeleted;
 
-    @Setter
     @Column(name = SNAKE_LOGGED_IN_AT, nullable = false)
     private LocalDateTime loggedInAt;
 
@@ -103,7 +95,8 @@ public class SiteMemberEntity {
         }
     }
 
-    public SiteMemberEntity(String nickname, LocalDate birthDate, Boolean isActive, Boolean isDisabledByLinking, Boolean isBanned, Boolean isDeleted, LocalDateTime loggedInAt) {
+    public SiteMemberEntity(UUID uuid, String nickname, LocalDate birthDate, Boolean isActive, Boolean isDisabledByLinking, Boolean isBanned, Boolean isDeleted, LocalDateTime loggedInAt) {
+        this.uuid = uuid;
         this.nickname = nickname;
         this.birthDate = birthDate;
         this.isActive = isActive;
@@ -118,6 +111,7 @@ public class SiteMemberEntity {
     }
 
     public static final class SiteMemberEntityBuilder {
+        private UUID uuid;
         private String nickname;
         private LocalDate birthDate;
         private Boolean isActive;
@@ -125,6 +119,11 @@ public class SiteMemberEntity {
         private Boolean isBanned;
         private Boolean isDeleted;
         private LocalDateTime loggedInAt;
+
+        public SiteMemberEntityBuilder uuid(final UUID uuid) {
+            this.uuid = uuid;
+            return this;
+        }
 
         public SiteMemberEntityBuilder nickname(final String nickname) {
             this.nickname = nickname;
@@ -162,6 +161,7 @@ public class SiteMemberEntity {
         }
 
         public SiteMemberEntityBuilder memberEntity(final SiteMemberEntity member) {
+            this.uuid = member.getUuid();
             this.nickname = member.getNickname();
             this.birthDate = member.getBirthDate();
             this.isActive = member.getIsActive();
@@ -173,7 +173,7 @@ public class SiteMemberEntity {
         }
 
         public SiteMemberEntity build() {
-            return new SiteMemberEntity(this.nickname, this.birthDate, this.isActive, this.isDisabledByLinking, this.isBanned, this.isDeleted, this.loggedInAt);
+            return new SiteMemberEntity(this.uuid, this.nickname, this.birthDate, this.isActive, this.isDisabledByLinking, this.isBanned, this.isDeleted, this.loggedInAt);
         }
     }
 }

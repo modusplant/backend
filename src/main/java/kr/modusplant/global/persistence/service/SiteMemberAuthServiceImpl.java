@@ -95,7 +95,7 @@ public class SiteMemberAuthServiceImpl implements SiteMemberAuthService {
     public SiteMemberAuth update(SiteMemberAuth memberAuth) {
         UUID uuid = memberAuth.getUuid();
         validateNotFoundEntity(uuid);
-        return memberAuthEntityMapper.toSiteMemberAuth(memberAuthRepository.save(memberAuthEntityMapper.updateSiteMemberAuthEntity(memberAuth, memberAuthRepository, memberRepository)));
+        return memberAuthEntityMapper.toSiteMemberAuth(memberAuthRepository.save(memberAuthEntityMapper.updateSiteMemberAuthEntity(memberAuth, memberRepository)));
     }
 
     @Override

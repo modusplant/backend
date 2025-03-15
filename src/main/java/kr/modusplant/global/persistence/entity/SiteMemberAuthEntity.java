@@ -6,7 +6,6 @@ import kr.modusplant.global.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -28,44 +27,35 @@ public class SiteMemberAuthEntity {
     private UUID uuid;
 
     @ManyToOne
-    @Setter
     @MapsId
     @JoinColumn(name = SNAKE_ACTIVE_MEMBER_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity activeMember;
 
     @OneToOne
-    @Setter
     @MapsId
     @JoinColumn(name = SNAKE_ORIGINAL_MEMBER_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity originalMember;
 
-    @Setter
     @Column(nullable = false, length = 80)
     private String email;
 
-    @Setter
     @Column(nullable = false, length = 64)
     private String pw;
 
-    @Setter
     @Column(name = PROVIDER, nullable = false)
     @Enumerated(value = EnumType.STRING)
     private AuthProvider provider;
 
-    @Setter
     @Column(name = SNAKE_PROVIDER_ID, nullable = false)
     private String providerId;
 
-    @Setter
     @Column(name = SNAKE_FAILED_ATTEMPT, nullable = false)
     @DefaultValue
     private Integer failedAttempt;
 
-    @Setter
     @Column(name = SNAKE_LOCKOUT_REFRESH_AT, nullable = false)
     private LocalDateTime lockoutRefreshAt;
 
-    @Setter
     @Column(name = SNAKE_LOCKOUT_UNTIL, nullable = false)
     private LocalDateTime lockoutUntil;
 
@@ -91,7 +81,8 @@ public class SiteMemberAuthEntity {
         }
     }
 
-    public SiteMemberAuthEntity(SiteMemberEntity activeMember, SiteMemberEntity originalMember, String email, String pw, AuthProvider provider, String providerId, Integer failedAttempt, LocalDateTime lockoutRefreshAt, LocalDateTime lockoutUntil) {
+    public SiteMemberAuthEntity(UUID uuid, SiteMemberEntity activeMember, SiteMemberEntity originalMember, String email, String pw, AuthProvider provider, String providerId, Integer failedAttempt, LocalDateTime lockoutRefreshAt, LocalDateTime lockoutUntil) {
+        this.uuid = uuid;
         this.activeMember = activeMember;
         this.originalMember = originalMember;
         this.email = email;
@@ -108,6 +99,7 @@ public class SiteMemberAuthEntity {
     }
 
     public static final class SiteMemberAuthEntityBuilder {
+        private UUID uuid;
         private SiteMemberEntity activeMember;
         private SiteMemberEntity originalMember;
         private String email;
@@ -117,6 +109,11 @@ public class SiteMemberAuthEntity {
         private Integer failedAttempt;
         private LocalDateTime lockoutRefreshAt;
         private LocalDateTime lockoutUntil;
+
+        public SiteMemberAuthEntityBuilder uuid(final UUID uuid) {
+            this.uuid = uuid;
+            return this;
+        }
 
         public SiteMemberAuthEntityBuilder activeMember(final SiteMemberEntity activeMember) {
             this.activeMember = activeMember;
@@ -164,6 +161,7 @@ public class SiteMemberAuthEntity {
         }
 
         public SiteMemberAuthEntityBuilder memberAuthEntity(final SiteMemberAuthEntity memberAuth) {
+            this.uuid = memberAuth.getUuid();
             this.activeMember = memberAuth.getActiveMember();
             this.originalMember = memberAuth.getOriginalMember();
             this.email = memberAuth.getEmail();
@@ -177,7 +175,7 @@ public class SiteMemberAuthEntity {
         }
 
         public SiteMemberAuthEntity build() {
-            return new SiteMemberAuthEntity(this.activeMember, this.originalMember, this.email, this.pw, this.provider, this.providerId, this.failedAttempt, this.lockoutRefreshAt, this.lockoutUntil);
+            return new SiteMemberAuthEntity(this.uuid, this.activeMember, this.originalMember, this.email, this.pw, this.provider, this.providerId, this.failedAttempt, this.lockoutRefreshAt, this.lockoutUntil);
         }
     }
 }

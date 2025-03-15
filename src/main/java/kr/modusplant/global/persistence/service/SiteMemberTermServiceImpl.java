@@ -63,7 +63,7 @@ public class SiteMemberTermServiceImpl implements SiteMemberTermService {
     @Transactional
     public SiteMemberTerm update(SiteMemberTerm memberTerm) {
         validateNotFoundEntity(memberTerm.getUuid());
-        return memberTermEntityMapper.toSiteMemberTerm(memberTermRepository.save(memberTermEntityMapper.updateSiteMemberTermEntity(memberTerm, memberTermRepository)));
+        return memberTermEntityMapper.toSiteMemberTerm(memberTermRepository.save(memberTermEntityMapper.updateSiteMemberTermEntity(memberTerm)));
     }
 
     @Override
