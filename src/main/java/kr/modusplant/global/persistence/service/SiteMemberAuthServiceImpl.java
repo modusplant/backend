@@ -64,6 +64,11 @@ public class SiteMemberAuthServiceImpl implements SiteMemberAuthService {
     }
 
     @Override
+    public List<SiteMemberAuth> getByProviderAndProviderId(AuthProvider provider, String providerId) {
+        return memberAuthRepository.findByProviderAndProviderId(provider, providerId).stream().map(memberAuthEntityMapper::toSiteMemberAuth).toList();
+    }
+
+    @Override
     public List<SiteMemberAuth> getByFailedAttempt(Integer failedAttempt) {
         return memberAuthRepository.findByFailedAttempt(failedAttempt).stream().map(memberAuthEntityMapper::toSiteMemberAuth).toList();
     }
