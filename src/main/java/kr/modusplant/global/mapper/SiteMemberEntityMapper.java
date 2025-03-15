@@ -14,7 +14,14 @@ import static kr.modusplant.global.util.MapperUtils.map;
 public interface SiteMemberEntityMapper {
     @BeanMapping(ignoreByDefault = true)
     default SiteMemberEntity createSiteMemberEntity(SiteMember member) {
-        return map(member, SiteMemberEntity.builder().build());
+        return SiteMemberEntity.builder()
+                .nickname(member.getNickname())
+                .birthDate(member.getBirthDate())
+                .isActive(member.getIsActive())
+                .isDisabledByLinking(member.getIsDisabledByLinking())
+                .isBanned(member.getIsBanned())
+                .isDeleted(member.getIsDeleted())
+                .loggedInAt(member.getLoggedInAt()).build();
     }
 
     @BeanMapping(ignoreByDefault = true)

@@ -17,7 +17,10 @@ import static kr.modusplant.global.vo.ExceptionMessage.NOT_FOUND_ENTITY;
 public interface TermEntityMapper {
     @BeanMapping(ignoreByDefault = true)
     default TermEntity createTermEntity(Term term) {
-        return map(term, TermEntity.builder().build());
+        return TermEntity.builder()
+                .name(term.getName())
+                .content(term.getContent())
+                .version(term.getVersion()).build();
     }
 
     @BeanMapping(ignoreByDefault = true)
