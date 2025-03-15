@@ -12,37 +12,37 @@ import kr.modusplant.global.persistence.entity.TermEntity;
 import kr.modusplant.global.persistence.repository.SiteMemberJpaRepository;
 
 public abstract class MapperUtils {
-    public static SiteMemberEntity map(SiteMember siteMember, SiteMemberEntity siteMemberEntity) {
-        siteMemberEntity.setNickname(siteMember.getNickname());
-        siteMemberEntity.setBirthDate(siteMember.getBirthDate());
-        siteMemberEntity.setIsActive(siteMember.getIsActive());
-        siteMemberEntity.setIsDisabledByLinking(siteMember.getIsDisabledByLinking());
-        siteMemberEntity.setIsBanned(siteMember.getIsBanned());
-        siteMemberEntity.setIsDeleted(siteMember.getIsDeleted());
-        siteMemberEntity.setLoggedInAt(siteMember.getLoggedInAt());
-        return siteMemberEntity;
+    public static SiteMemberEntity map(SiteMember member, SiteMemberEntity memberEntity) {
+        memberEntity.setNickname(member.getNickname());
+        memberEntity.setBirthDate(member.getBirthDate());
+        memberEntity.setIsActive(member.getIsActive());
+        memberEntity.setIsDisabledByLinking(member.getIsDisabledByLinking());
+        memberEntity.setIsBanned(member.getIsBanned());
+        memberEntity.setIsDeleted(member.getIsDeleted());
+        memberEntity.setLoggedInAt(member.getLoggedInAt());
+        return memberEntity;
     }
 
-    public static SiteMemberAuthEntity map(SiteMemberAuth memberTerm, SiteMemberAuthEntity memberAuthEntity, SiteMemberJpaRepository memberRepository) {
-        memberAuthEntity.setActiveMember(memberRepository.findByUuid(memberTerm.getActiveMemberUuid())
-                .orElseThrow(() -> new EntityNotFoundWithUuidException(memberTerm.getUuid(), SiteMemberEntity.class)));
-        memberAuthEntity.setOriginalMember(memberRepository.findByUuid(memberTerm.getOriginalMemberUuid())
-                .orElseThrow(() -> new EntityNotFoundWithUuidException(memberTerm.getUuid(), SiteMemberEntity.class)));
-        memberAuthEntity.setEmail(memberTerm.getEmail());
-        memberAuthEntity.setPw(memberTerm.getPw());
-        memberAuthEntity.setProvider(memberTerm.getProvider());
-        memberAuthEntity.setProviderId(memberTerm.getProviderId());
-        memberAuthEntity.setFailedAttempt(memberTerm.getFailedAttempt());
-        memberAuthEntity.setLockoutRefreshAt(memberTerm.getLockoutRefreshAt());
-        memberAuthEntity.setLockoutUntil(memberTerm.getLockoutUntil());
+    public static SiteMemberAuthEntity map(SiteMemberAuth memberAuth, SiteMemberAuthEntity memberAuthEntity, SiteMemberJpaRepository memberRepository) {
+        memberAuthEntity.setActiveMember(memberRepository.findByUuid(memberAuth.getActiveMemberUuid())
+                .orElseThrow(() -> new EntityNotFoundWithUuidException(memberAuth.getUuid(), SiteMemberEntity.class)));
+        memberAuthEntity.setOriginalMember(memberRepository.findByUuid(memberAuth.getOriginalMemberUuid())
+                .orElseThrow(() -> new EntityNotFoundWithUuidException(memberAuth.getUuid(), SiteMemberEntity.class)));
+        memberAuthEntity.setEmail(memberAuth.getEmail());
+        memberAuthEntity.setPw(memberAuth.getPw());
+        memberAuthEntity.setProvider(memberAuth.getProvider());
+        memberAuthEntity.setProviderId(memberAuth.getProviderId());
+        memberAuthEntity.setFailedAttempt(memberAuth.getFailedAttempt());
+        memberAuthEntity.setLockoutRefreshAt(memberAuth.getLockoutRefreshAt());
+        memberAuthEntity.setLockoutUntil(memberAuth.getLockoutUntil());
         return memberAuthEntity;
     }
 
-    public static SiteMemberTermEntity map(SiteMemberTerm memberAuth, SiteMemberTermEntity memberAuthEntity) {
-        memberAuthEntity.setAgreedTermsOfUseVersion(memberAuth.getAgreedTermsOfUseVersion());
-        memberAuthEntity.setAgreedPrivacyPolicyVersion(memberAuth.getAgreedPrivacyPolicyVersion());
-        memberAuthEntity.setAgreedAdInfoReceivingVersion(memberAuth.getAgreedAdInfoReceivingVersion());
-        return memberAuthEntity;
+    public static SiteMemberTermEntity map(SiteMemberTerm memberTerm, SiteMemberTermEntity memberTermEntity) {
+        memberTermEntity.setAgreedTermsOfUseVersion(memberTerm.getAgreedTermsOfUseVersion());
+        memberTermEntity.setAgreedPrivacyPolicyVersion(memberTerm.getAgreedPrivacyPolicyVersion());
+        memberTermEntity.setAgreedAdInfoReceivingVersion(memberTerm.getAgreedAdInfoReceivingVersion());
+        return memberTermEntity;
     }
 
     public static TermEntity map(Term term, TermEntity termEntity) {
