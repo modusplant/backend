@@ -28,12 +28,12 @@ public class SiteMemberAuthEntity {
 
     @ManyToOne
     @MapsId
-    @JoinColumn(name = SNAKE_ACTIVE_MEMBER_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = SNAKE_ACT_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity activeMember;
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = SNAKE_ORIGINAL_MEMBER_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = SNAKE_ORI_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity originalMember;
 
     @Column(nullable = false, length = 80)
