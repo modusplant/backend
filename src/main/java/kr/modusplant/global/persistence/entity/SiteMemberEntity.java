@@ -29,7 +29,7 @@ public class SiteMemberEntity {
     @Column(nullable = false, length = 40)
     private String nickname;
 
-    @Column(name = SNAKE_BIRTH_DATE, nullable = false)
+    @Column(name = SNAKE_BIRTH_DATE)
     private LocalDate birthDate;
 
     @Column(name = SNAKE_IS_ACTIVE, nullable = false)
@@ -48,7 +48,7 @@ public class SiteMemberEntity {
     @DefaultValue
     private Boolean isDeleted;
 
-    @Column(name = SNAKE_LOGGED_IN_AT, nullable = false)
+    @Column(name = SNAKE_LOGGED_IN_AT)
     private LocalDateTime loggedInAt;
 
     @Column(name = SNAKE_CREATED_AT, nullable = false)

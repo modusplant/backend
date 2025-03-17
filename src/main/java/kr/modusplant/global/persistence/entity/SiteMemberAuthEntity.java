@@ -39,24 +39,24 @@ public class SiteMemberAuthEntity {
     @Column(nullable = false, length = 80)
     private String email;
 
-    @Column(nullable = false, length = 64)
+    @Column(length = 64)
     private String pw;
 
     @Column(name = PROVIDER, nullable = false)
     @Enumerated(value = EnumType.STRING)
     private AuthProvider provider;
 
-    @Column(name = SNAKE_PROVIDER_ID, nullable = false)
+    @Column(name = SNAKE_PROVIDER_ID)
     private String providerId;
 
     @Column(name = SNAKE_FAILED_ATTEMPT, nullable = false)
     @DefaultValue
     private Integer failedAttempt;
 
-    @Column(name = SNAKE_LOCKOUT_REFRESH_AT, nullable = false)
+    @Column(name = SNAKE_LOCKOUT_REFRESH_AT)
     private LocalDateTime lockoutRefreshAt;
 
-    @Column(name = SNAKE_LOCKOUT_UNTIL, nullable = false)
+    @Column(name = SNAKE_LOCKOUT_UNTIL)
     private LocalDateTime lockoutUntil;
 
     @Column(name = SNAKE_LAST_MODIFIED_AT, nullable = false)
