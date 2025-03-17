@@ -19,9 +19,12 @@ import static kr.modusplant.global.vo.SnakeCaseWord.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SiteMemberTermEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(nullable = false)
     private UUID uuid;
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "uuid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private SiteMemberEntity member;
 
     @Column(name = SNAKE_AGREED_TOU_VER, nullable = false, length = 10)
     private String agreedTermsOfUseVersion;
@@ -40,8 +43,8 @@ public class SiteMemberTermEntity {
     @Column(name = SNAKE_VER_NUM, nullable = false)
     private Long versionNumber;
 
-    public SiteMemberTermEntity(UUID uuid, String agreedTermsOfUseVersion, String agreedPrivacyPolicyVersion, String agreedAdInfoReceivingVersion) {
-        this.uuid = uuid;
+    public SiteMemberTermEntity(SiteMemberEntity member, String agreedTermsOfUseVersion, String agreedPrivacyPolicyVersion, String agreedAdInfoReceivingVersion) {
+        this.member = member;
         this.agreedTermsOfUseVersion = agreedTermsOfUseVersion;
         this.agreedPrivacyPolicyVersion = agreedPrivacyPolicyVersion;
         this.agreedAdInfoReceivingVersion = agreedAdInfoReceivingVersion;
@@ -52,13 +55,13 @@ public class SiteMemberTermEntity {
     }
 
     public static final class SiteMemberTermEntityBuilder {
-        private UUID uuid;
+        private SiteMemberEntity member;
         private String agreedTermsOfUseVersion;
         private String agreedPrivacyPolicyVersion;
         private String agreedAdInfoReceivingVersion;
 
-        public SiteMemberTermEntityBuilder uuid(final UUID uuid) {
-            this.uuid = uuid;
+        public SiteMemberTermEntityBuilder member(final SiteMemberEntity member) {
+            this.member = member;
             return this;
         }
 
@@ -78,7 +81,7 @@ public class SiteMemberTermEntity {
         }
 
         public SiteMemberTermEntityBuilder memberTermEntity(final SiteMemberTermEntity memberTerm) {
-            this.uuid = memberTerm.getUuid();
+            this.member = memberTerm.getMember();
             this.agreedTermsOfUseVersion = memberTerm.getAgreedTermsOfUseVersion();
             this.agreedPrivacyPolicyVersion = memberTerm.getAgreedPrivacyPolicyVersion();
             this.agreedAdInfoReceivingVersion = memberTerm.getAgreedAdInfoReceivingVersion();
@@ -86,7 +89,7 @@ public class SiteMemberTermEntity {
         }
 
         public SiteMemberTermEntity build() {
-            return new SiteMemberTermEntity(this.uuid, this.agreedTermsOfUseVersion, this.agreedPrivacyPolicyVersion, this.agreedAdInfoReceivingVersion);
+            return new SiteMemberTermEntity(this.member, this.agreedTermsOfUseVersion, this.agreedPrivacyPolicyVersion, this.agreedAdInfoReceivingVersion);
         }
     }
 }
