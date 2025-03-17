@@ -20,9 +20,12 @@ import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_SITE_MEMBER_ROLE;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SiteMemberRoleEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(nullable = false)
     private UUID uuid;
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "uuid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private SiteMemberEntity member;
 
     @Column(nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
@@ -43,8 +46,8 @@ public class SiteMemberRoleEntity {
         }
     }
 
-    public SiteMemberRoleEntity(UUID uuid, Role role) {
-        this.uuid = uuid;
+    public SiteMemberRoleEntity(SiteMemberEntity member, Role role) {
+        this.member = member;
         this.role = role;
     }
 
@@ -53,11 +56,11 @@ public class SiteMemberRoleEntity {
     }
 
     public static final class SiteMemberRoleEntityBuilder {
-        private UUID uuid;
+        private SiteMemberEntity member;
         private Role role;
 
-        public SiteMemberRoleEntityBuilder uuid(final UUID uuid) {
-            this.uuid = uuid;
+        public SiteMemberRoleEntityBuilder member(final SiteMemberEntity member) {
+            this.member = member;
             return this;
         }
 
@@ -67,13 +70,13 @@ public class SiteMemberRoleEntity {
         }
 
         public SiteMemberRoleEntityBuilder memberRoleEntity(final SiteMemberRoleEntity memberRole) {
-            this.uuid = memberRole.getUuid();
+            this.member = memberRole.getMember();
             this.role = memberRole.getRole();
             return this;
         }
 
         public SiteMemberRoleEntity build() {
-            return new SiteMemberRoleEntity(this.uuid, this.role);
+            return new SiteMemberRoleEntity(this.member, this.role);
         }
     }
 }

@@ -8,6 +8,7 @@ import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import kr.modusplant.global.mapper.SiteMemberRoleEntityMapper;
 import kr.modusplant.global.mapper.SiteMemberRoleEntityMapperImpl;
 import kr.modusplant.global.persistence.entity.SiteMemberRoleEntity;
+import kr.modusplant.global.persistence.repository.SiteMemberJpaRepository;
 import kr.modusplant.global.persistence.repository.SiteMemberRoleJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -25,6 +26,7 @@ import java.util.UUID;
 public class SiteMemberRoleServiceImpl implements SiteMemberRoleService {
 
     private final SiteMemberRoleJpaRepository memberRoleRepository;
+    private final SiteMemberJpaRepository memberRepository;
     private final SiteMemberRoleEntityMapper memberRoleEntityMapper = new SiteMemberRoleEntityMapperImpl();
 
     @Override
@@ -54,7 +56,7 @@ public class SiteMemberRoleServiceImpl implements SiteMemberRoleService {
     @Transactional
     public SiteMemberRole update(SiteMemberRole memberRole) {
         validateNotFoundEntity(memberRole.getUuid());
-        return memberRoleEntityMapper.toSiteMemberRole(memberRoleRepository.save(memberRoleEntityMapper.updateSiteMemberRoleEntity(memberRole)));
+        return memberRoleEntityMapper.toSiteMemberRole(memberRoleRepository.save(memberRoleEntityMapper.updateSiteMemberRoleEntity(memberRole, memberRepository)));
     }
 
     @Override

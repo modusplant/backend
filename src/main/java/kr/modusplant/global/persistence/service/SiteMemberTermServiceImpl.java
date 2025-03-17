@@ -7,6 +7,7 @@ import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import kr.modusplant.global.mapper.SiteMemberTermEntityMapper;
 import kr.modusplant.global.mapper.SiteMemberTermEntityMapperImpl;
 import kr.modusplant.global.persistence.entity.SiteMemberTermEntity;
+import kr.modusplant.global.persistence.repository.SiteMemberJpaRepository;
 import kr.modusplant.global.persistence.repository.SiteMemberTermJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -24,6 +25,7 @@ import java.util.UUID;
 public class SiteMemberTermServiceImpl implements SiteMemberTermService {
 
     private final SiteMemberTermJpaRepository memberTermRepository;
+    private final SiteMemberJpaRepository memberRepository;
     private final SiteMemberTermEntityMapper memberTermEntityMapper = new SiteMemberTermEntityMapperImpl();
 
     @Override
@@ -63,7 +65,7 @@ public class SiteMemberTermServiceImpl implements SiteMemberTermService {
     @Transactional
     public SiteMemberTerm update(SiteMemberTerm memberTerm) {
         validateNotFoundEntity(memberTerm.getUuid());
-        return memberTermEntityMapper.toSiteMemberTerm(memberTermRepository.save(memberTermEntityMapper.updateSiteMemberTermEntity(memberTerm)));
+        return memberTermEntityMapper.toSiteMemberTerm(memberTermRepository.save(memberTermEntityMapper.updateSiteMemberTermEntity(memberTerm, memberRepository)));
     }
 
     @Override
