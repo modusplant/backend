@@ -26,15 +26,10 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     @Test
     void findByUuidTest() {
         // given
-        SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
+        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
-                .memberAuthEntity(memberAuth)
-                .activeMember(member)
-                .originalMember(member)
-                .build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
 
         // then
         assertThat(memberAuthRepository.findByUuid(memberAuth.getUuid()).orElseThrow()).isEqualTo(memberAuth);
@@ -44,15 +39,10 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     @Test
     void findByActiveMemberTest() {
         // given
-        SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
+        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
-                .memberAuthEntity(memberAuth)
-                .activeMember(member)
-                .originalMember(member)
-                .build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
 
         // then
         assertThat(memberAuthRepository.findByActiveMember(memberAuth.getActiveMember()).getFirst()).isEqualTo(memberAuth);
@@ -62,15 +52,10 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     @Test
     void findByOriginalMemberTest() {
         // given
-        SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
+        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
-                .memberAuthEntity(memberAuth)
-                .activeMember(member)
-                .originalMember(member)
-                .build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
 
         // then
         assertThat(memberAuthRepository.findByUuid(memberAuth.getUuid()).orElseThrow()).isEqualTo(memberAuth);
@@ -80,15 +65,10 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     @Test
     void findByEmailTest() {
         // given
-        SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
+        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
-                .memberAuthEntity(memberAuth)
-                .activeMember(member)
-                .originalMember(member)
-                .build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
 
         // then
         assertThat(memberAuthRepository.findByEmail(memberAuth.getEmail()).getFirst()).isEqualTo(memberAuth);
@@ -98,15 +78,10 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     @Test
     void findByProviderTest() {
         // given
-        SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
+        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
-                .memberAuthEntity(memberAuth)
-                .activeMember(member)
-                .originalMember(member)
-                .build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
 
         // then
         assertThat(memberAuthRepository.findByProvider(memberAuth.getProvider()).getFirst()).isEqualTo(memberAuth);
@@ -116,15 +91,10 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     @Test
     void findByProviderIdTest() {
         // given
-        SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
+        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
-                .memberAuthEntity(memberAuth)
-                .activeMember(member)
-                .originalMember(member)
-                .build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
 
         // then
         assertThat(memberAuthRepository.findByProviderId(memberAuth.getProviderId()).getFirst()).isEqualTo(memberAuth);
@@ -134,15 +104,10 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     @Test
     void findByFailedAttemptTest() {
         // given
-        SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
+        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
-                .memberAuthEntity(memberAuth)
-                .activeMember(member)
-                .originalMember(member)
-                .build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
 
         // then
         assertThat(memberAuthRepository.findByFailedAttempt(memberAuth.getFailedAttempt()).getFirst()).isEqualTo(memberAuth);
@@ -152,15 +117,10 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     @Test
     void findByLastModifiedAtTest() {
         // given
-        SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
+        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
-                .memberAuthEntity(memberAuth)
-                .activeMember(member)
-                .originalMember(member)
-                .build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
 
         // then
         assertThat(memberAuthRepository.findByLastModifiedAt(memberAuth.getLastModifiedAt()).getFirst()).isEqualTo(memberAuth);
@@ -170,13 +130,8 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     @Test
     void deleteByUuidTest() {
         // given
-        SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
-        memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
-                .memberAuthEntity(memberAuth)
-                .activeMember(member)
-                .originalMember(member)
-                .build());
+        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
 
         // when
         memberAuthRepository.deleteByUuid(memberAuth.getUuid());
@@ -189,16 +144,10 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     @Test
     void existsByUuidTest() {
         // given
-        SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
-        memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
-                .memberAuthEntity(memberAuth)
-                .activeMember(member)
-                .originalMember(member)
-                .build());
+        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        memberAuthRepository.save(memberAuth);
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
 
         // then
         assertThat(memberAuthRepository.existsByUuid(memberAuth.getUuid())).isEqualTo(true);
