@@ -16,4 +16,24 @@ public class Term {
     private final String content;
 
     private final String version;
+
+    public static class TermBuilder {
+        private UUID uuid;
+        private String name;
+        private String content;
+        private String version;
+
+        TermBuilder term(Term term) {
+            this.uuid = term.getUuid();
+            this.name = term.getName();
+            this.content = term.getContent();
+            this.version = term.getVersion();
+            return this;
+        }
+
+        @Generated
+        public Term build() {
+            return new Term(this.uuid, this.name, this.content, this.version);
+        }
+    }
 }

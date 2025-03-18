@@ -30,4 +30,35 @@ public class SiteMemberAuth {
     private final LocalDateTime lockoutRefreshAt;
 
     private final LocalDateTime lockoutUntil;
+
+    public static class SiteMemberAuthBuilder {
+        private UUID uuid;
+        private UUID activeMemberUuid;
+        private UUID originalMemberUuid;
+        private String email;
+        private String pw;
+        private AuthProvider provider;
+        private String providerId;
+        private Integer failedAttempt;
+        private LocalDateTime lockoutRefreshAt;
+        private LocalDateTime lockoutUntil;
+
+        public SiteMemberAuthBuilder memberAuth(SiteMemberAuth memberAuth) {
+            this.uuid = memberAuth.getUuid();
+            this.activeMemberUuid = memberAuth.getActiveMemberUuid();
+            this.originalMemberUuid = memberAuth.getOriginalMemberUuid();
+            this.email = memberAuth.getEmail();
+            this.pw = memberAuth.getPw();
+            this.provider = memberAuth.getProvider();
+            this.providerId = memberAuth.getProviderId();
+            this.failedAttempt = memberAuth.getFailedAttempt();
+            this.lockoutRefreshAt = memberAuth.getLockoutRefreshAt();
+            this.lockoutUntil = memberAuth.getLockoutUntil();
+            return this;
+        }
+
+        public SiteMemberAuth build() {
+            return new SiteMemberAuth(this.uuid, this.activeMemberUuid, this.originalMemberUuid, this.email, this.pw, this.provider, this.providerId, this.failedAttempt, this.lockoutRefreshAt, this.lockoutUntil);
+        }
+    }
 }
