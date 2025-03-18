@@ -1,5 +1,9 @@
 package kr.modusplant.api.crud.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.modusplant.api.crud.model.external.GoogleUserInfo;
 import kr.modusplant.api.crud.model.external.KakaoUserInfo;
 import kr.modusplant.api.crud.model.external.OAuthToken;
@@ -14,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+@Tag(name="Social Login API", description = "소셜 로그인 API")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -21,6 +26,13 @@ public class SocialAuthController {
 
     private final SocialAuthService socialAuthService;
 
+    @Operation(summary = "카카오 소셜 로그인 API", description = "카카오 인가코드를 받아 로그인합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Succeeded : Kakao Login"),
+            @ApiResponse(responseCode = "400", description = "Bad Request: Invalid client input data"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid or missing authentication credentials"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error: An unexpected error occurred on the Authorization server")
+    })
     @PostMapping("/kakao/social-login")
     public ResponseEntity<SingleDataResponse<?>> kakaoSocialLogin(@RequestBody SocialLoginRequest request) {
         System.out.println("api");
@@ -45,6 +57,13 @@ public class SocialAuthController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "구글 소셜 로그인 API", description = "구글 인가코드를 받아 로그인합니다.<br> 구글 인가코드를 url에서 추출할 경우 '%2F'는 '/'로 대체해야 합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Succeeded : Google Login"),
+            @ApiResponse(responseCode = "400", description = "Bad Request: Invalid client input data"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid or missing authentication credentials"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error: An unexpected error occurred on the Authorization server")
+    })
     @PostMapping("/google/social-login")
     public ResponseEntity<SingleDataResponse<?>> googleSocialLogin(@RequestBody SocialLoginRequest request) {
 
