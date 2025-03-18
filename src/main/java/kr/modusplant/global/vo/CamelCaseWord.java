@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 public final class CamelCaseWord {
     public static final String ACTIVE_MEMBER = "activeMember";
     public static final String ACTIVE_MEMBER_UUID = "activeMemberUuid";
+    public static final String MEMBER = "member";
     public static final String NAME = "name";
     public static final String ORIGINAL_MEMBER = "originalMember";
     public static final String ORIGINAL_MEMBER_UUID = "originalMemberUuid";
