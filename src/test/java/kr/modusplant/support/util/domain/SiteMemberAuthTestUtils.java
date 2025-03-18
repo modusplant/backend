@@ -21,11 +21,13 @@ public interface SiteMemberAuthTestUtils {
             .email("Test3gOogleUsser@gmail.com")
             .pw(new BCryptPasswordEncoder().encode("testPw12@"))
             .provider(AuthProvider.GOOGLE)
+            .providerId("639796866968871286823")
             .build();
 
     SiteMemberAuth memberAuthKakaoUser = SiteMemberAuth.builder()
             .email("test2KaKao4Uzer@kakao.com")
             .pw(new BCryptPasswordEncoder().encode("ttEst^*Password1"))
             .provider(AuthProvider.KAKAO)
+            .providerId("9348634889")
             .build();
 }
