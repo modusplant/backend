@@ -31,7 +31,7 @@ public class SiteMemberAuthEntity {
     private SiteMemberEntity activeMember;
 
     @OneToOne
-    @JoinColumn(name = SNAKE_ORI_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(unique = true, name = SNAKE_ORI_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity originalMember;
 
     @Column(nullable = false, length = 80)
