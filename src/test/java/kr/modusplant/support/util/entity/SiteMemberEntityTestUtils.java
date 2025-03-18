@@ -1,40 +1,38 @@
 package kr.modusplant.support.util.entity;
 
 import kr.modusplant.global.persistence.entity.SiteMemberEntity;
+import kr.modusplant.support.util.domain.SiteMemberTestUtils;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-public interface SiteMemberEntityTestUtils {
+public interface SiteMemberEntityTestUtils extends SiteMemberTestUtils {
     default SiteMemberEntity createMemberBasicAdminEntity() {
         return SiteMemberEntity.builder()
-                .nickname("관리자")
-                .birthDate(LocalDate.of(2000, 1, 1))
-                .loggedInAt(LocalDateTime.now())
+                .nickname(memberBasicAdmin.getNickname())
+                .birthDate(memberBasicAdmin.getBirthDate())
+                .loggedInAt(memberBasicAdmin.getLoggedInAt())
                 .build();
     }
 
     default SiteMemberEntity createMemberBasicUserEntity() {
         return SiteMemberEntity.builder()
-                .nickname("일반 유저")
-                .birthDate(LocalDate.of(2000, 1, 1))
-                .loggedInAt(LocalDateTime.now().plusDays(1))
+                .nickname(memberBasicUser.getNickname())
+                .birthDate(memberBasicUser.getBirthDate())
+                .loggedInAt(memberBasicUser.getLoggedInAt())
                 .build();
     }
 
     default SiteMemberEntity createMemberGoogleUserEntity() {
         return SiteMemberEntity.builder()
-                .nickname("구글 유저")
-                .birthDate(LocalDate.of(2000, 1, 1))
-                .loggedInAt(LocalDateTime.now().plusDays(2))
+                .nickname(memberGoogleUser.getNickname())
+                .birthDate(memberGoogleUser.getBirthDate())
+                .loggedInAt(memberGoogleUser.getLoggedInAt())
                 .build();
     }
 
     default SiteMemberEntity createMemberKakaoUserEntity() {
         return SiteMemberEntity.builder()
-                .nickname("카카오 유저")
-                .birthDate(LocalDate.of(2000, 1, 1))
-                .loggedInAt(LocalDateTime.now().plusDays(3))
+                .nickname(memberKakaoUser.getNickname())
+                .birthDate(memberKakaoUser.getBirthDate())
+                .loggedInAt(memberKakaoUser.getLoggedInAt())
                 .build();
     }
 }
