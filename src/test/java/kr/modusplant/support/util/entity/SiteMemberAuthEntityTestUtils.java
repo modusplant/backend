@@ -1,42 +1,36 @@
 package kr.modusplant.support.util.entity;
 
-import kr.modusplant.global.enums.AuthProvider;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
 import static kr.modusplant.global.persistence.entity.SiteMemberAuthEntity.SiteMemberAuthEntityBuilder;
 import static kr.modusplant.global.persistence.entity.SiteMemberAuthEntity.builder;
+import static kr.modusplant.support.util.domain.SiteMemberAuthTestUtils.*;
 
 public interface SiteMemberAuthEntityTestUtils extends SiteMemberEntityTestUtils {
 
     default SiteMemberAuthEntityBuilder createMemberAuthBasicAdminEntityBuilder() {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         return builder()
-                .email("testAdmin1@gmail.com")
-                .pw(encoder.encode("testPw12@"))
-                .provider(AuthProvider.BASIC);
+                .email(memberAuthBasicAdmin.getEmail())
+                .pw(memberAuthBasicAdmin.getPw())
+                .provider(memberAuthBasicAdmin.getProvider());
     }
 
     default SiteMemberAuthEntityBuilder createMemberAuthBasicUserEntityBuilder() {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         return builder()
-                .email("TestBasicUser2@naver.com")
-                .pw(encoder.encode("Test!Pw14@"))
-                .provider(AuthProvider.BASIC);
+                .email(memberAuthBasicUser.getEmail())
+                .pw(memberAuthBasicUser.getPw())
+                .provider(memberAuthBasicUser.getProvider());
     }
 
     default SiteMemberAuthEntityBuilder createMemberAuthGoogleUserEntityBuilder() {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         return builder()
-                .email("Test3gOogleUsser@gmail.com")
-                .pw(encoder.encode("testPw12@"))
-                .provider(AuthProvider.GOOGLE);
+                .email(memberAuthGoogleUser.getEmail())
+                .pw(memberAuthGoogleUser.getPw())
+                .provider(memberAuthGoogleUser.getProvider());
     }
 
     default SiteMemberAuthEntityBuilder createMemberAuthKakaoUserEntityBuilder() {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         return builder()
-                .email("test2KaKao4Uzer@kakao.com")
-                .pw(encoder.encode("ttEst^*Password1"))
-                .provider(AuthProvider.KAKAO);
+                .email(memberAuthKakaoUser.getEmail())
+                .pw(memberAuthKakaoUser.getPw())
+                .provider(memberAuthKakaoUser.getProvider());
     }
 }

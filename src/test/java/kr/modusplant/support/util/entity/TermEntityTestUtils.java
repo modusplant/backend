@@ -1,31 +1,30 @@
 package kr.modusplant.support.util.entity;
 
 import kr.modusplant.global.persistence.entity.TermEntity;
+import kr.modusplant.support.util.domain.TermTestUtils;
 
-import static kr.modusplant.global.util.VersionUtils.createVersion;
-
-public interface TermEntityTestUtils {
+public interface TermEntityTestUtils extends TermTestUtils {
     default TermEntity createTermsOfUseEntity() {
         return TermEntity.builder()
-                .name("이용약관")
-                .content("이용약관 내용")
-                .version(createVersion(1, 0, 0))
+                .name(termsOfUse.getName())
+                .content(termsOfUse.getContent())
+                .version(termsOfUse.getVersion())
                 .build();
     }
 
     default TermEntity createPrivacyPolicyEntity() {
         return TermEntity.builder()
-                .name("개인정보처리방침")
-                .content("개인정보처리방침 내용")
-                .version(createVersion(1, 0, 2))
+                .name(privacyPolicy.getName())
+                .content(privacyPolicy.getContent())
+                .version(privacyPolicy.getVersion())
                 .build();
     }
 
     default TermEntity createAdInfoReceivingEntity() {
         return TermEntity.builder()
-                .name("광고성 정보 수신")
-                .content("광고성 정보 수신 내용")
-                .version(createVersion(1, 0, 4))
+                .name(adInfoReceiving.getName())
+                .content(adInfoReceiving.getContent())
+                .version(adInfoReceiving.getVersion())
                 .build();
     }
 }

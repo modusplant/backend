@@ -2,25 +2,26 @@ package kr.modusplant.support.util.entity;
 
 import kr.modusplant.global.persistence.entity.SiteMemberTermEntity;
 
-import static kr.modusplant.global.util.VersionUtils.createVersion;
+import static kr.modusplant.support.util.domain.SiteMemberTermTestUtils.memberTermAdmin;
+import static kr.modusplant.support.util.domain.SiteMemberTermTestUtils.memberTermUser;
 
 public interface SiteMemberTermEntityTestUtils extends SiteMemberEntityTestUtils {
 
     default SiteMemberTermEntity createMemberTermAdminEntity() {
         return SiteMemberTermEntity.builder()
                 .member(createMemberBasicAdminEntity())
-                .agreedTermsOfUseVersion(createVersion(1, 0, 0))
-                .agreedPrivacyPolicyVersion(createVersion(1, 0, 2))
-                .agreedAdInfoReceivingVersion(createVersion(1, 0, 4))
+                .agreedTermsOfUseVersion(memberTermAdmin.getAgreedTermsOfUseVersion())
+                .agreedPrivacyPolicyVersion(memberTermAdmin.getAgreedPrivacyPolicyVersion())
+                .agreedAdInfoReceivingVersion(memberTermAdmin.getAgreedAdInfoReceivingVersion())
                 .build();
     }
 
     default SiteMemberTermEntity createMemberTermUserEntity() {
         return SiteMemberTermEntity.builder()
                 .member(createMemberBasicUserEntity())
-                .agreedTermsOfUseVersion(createVersion(1, 0, 0))
-                .agreedPrivacyPolicyVersion(createVersion(1, 0, 1))
-                .agreedAdInfoReceivingVersion(createVersion(1, 0, 3))
+                .agreedTermsOfUseVersion(memberTermUser.getAgreedTermsOfUseVersion())
+                .agreedPrivacyPolicyVersion(memberTermUser.getAgreedPrivacyPolicyVersion())
+                .agreedAdInfoReceivingVersion(memberTermUser.getAgreedAdInfoReceivingVersion())
                 .build();
     }
 }
