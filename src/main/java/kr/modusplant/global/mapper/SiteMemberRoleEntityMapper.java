@@ -10,8 +10,8 @@ import org.mapstruct.Mapper;
 @Mapper
 public interface SiteMemberRoleEntityMapper {
     @BeanMapping
-    default SiteMemberRoleEntity createSiteMemberRoleEntity(SiteMemberRole memberRole) {
-        return SiteMemberRoleEntity.builder().role(memberRole.getRole()).build();
+    default SiteMemberRoleEntity createSiteMemberRoleEntity(SiteMemberRole memberRole, @Context SiteMemberJpaRepository memberRepository) {
+        return SiteMemberRoleEntity.builder().member(memberRepository.findByUuid(memberRole.getUuid()).orElseThrow()).role(memberRole.getRole()).build();
     }
 
     @BeanMapping
