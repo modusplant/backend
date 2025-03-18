@@ -157,6 +157,7 @@ public class SocialAuthService {
 
     private SiteMemberAuth createSiteMemberAuth(UUID memberUuid, AuthProvider provider, String id, String email) {
         SiteMemberAuth siteMemberAuth = SiteMemberAuth.builder()
+                .uuid(UUID.randomUUID())
                 .activeMemberUuid(memberUuid)
                 .originalMemberUuid(memberUuid)
                 .email(email)
