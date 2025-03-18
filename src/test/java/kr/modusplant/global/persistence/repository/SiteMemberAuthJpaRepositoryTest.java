@@ -14,12 +14,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
 
     private final SiteMemberAuthJpaRepository memberAuthRepository;
-    private final SiteMemberJpaRepository memberJpaRepository;
+    private final SiteMemberJpaRepository memberRepository;
 
     @Autowired
-    SiteMemberAuthJpaRepositoryTest(SiteMemberAuthJpaRepository memberAuthRepository, SiteMemberJpaRepository memberJpaRepository) {
+    SiteMemberAuthJpaRepositoryTest(SiteMemberAuthJpaRepository memberAuthRepository, SiteMemberJpaRepository memberRepository) {
         this.memberAuthRepository = memberAuthRepository;
-        this.memberJpaRepository = memberJpaRepository;
+        this.memberRepository = memberRepository;
     }
 
     @DisplayName("uuid로 회원 인증 찾기")
@@ -27,7 +27,7 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     void findByUuidTest() {
         // given
         SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberJpaRepository.save(memberAuth.getActiveMember());
+        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
 
         // when
         memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
@@ -45,7 +45,7 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     void findByActiveMemberTest() {
         // given
         SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberJpaRepository.save(memberAuth.getActiveMember());
+        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
 
         // when
         memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
@@ -63,7 +63,7 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     void findByOriginalMemberTest() {
         // given
         SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberJpaRepository.save(memberAuth.getActiveMember());
+        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
 
         // when
         memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
@@ -81,7 +81,7 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     void findByEmailTest() {
         // given
         SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberJpaRepository.save(memberAuth.getActiveMember());
+        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
 
         // when
         memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
@@ -99,7 +99,7 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     void findByProviderTest() {
         // given
         SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberJpaRepository.save(memberAuth.getActiveMember());
+        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
 
         // when
         memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
@@ -117,7 +117,7 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     void findByProviderIdTest() {
         // given
         SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberJpaRepository.save(memberAuth.getActiveMember());
+        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
 
         // when
         memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
@@ -135,7 +135,7 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     void findByFailedAttemptTest() {
         // given
         SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberJpaRepository.save(memberAuth.getActiveMember());
+        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
 
         // when
         memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
@@ -153,7 +153,7 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     void findByLastModifiedAtTest() {
         // given
         SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberJpaRepository.save(memberAuth.getActiveMember());
+        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
 
         // when
         memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
@@ -171,7 +171,7 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     void deleteByUuidTest() {
         // given
         SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberJpaRepository.save(memberAuth.getActiveMember());
+        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
         memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
                 .memberAuthEntity(memberAuth)
                 .activeMember(member)
@@ -190,7 +190,7 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     void existsByUuidTest() {
         // given
         SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntity();
-        SiteMemberEntity member = memberJpaRepository.save(memberAuth.getActiveMember());
+        SiteMemberEntity member = memberRepository.save(memberAuth.getActiveMember());
         memberAuth = memberAuthRepository.save(SiteMemberAuthEntity.builder()
                 .memberAuthEntity(memberAuth)
                 .activeMember(member)

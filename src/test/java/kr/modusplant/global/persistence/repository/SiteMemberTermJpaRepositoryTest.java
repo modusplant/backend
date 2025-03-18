@@ -14,12 +14,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
 
     private final SiteMemberTermJpaRepository memberTermRepository;
-    private final SiteMemberJpaRepository memberJpaRepository;
+    private final SiteMemberJpaRepository memberRepository;
 
     @Autowired
-    SiteMemberTermJpaRepositoryTest(SiteMemberTermJpaRepository memberTermRepository, SiteMemberJpaRepository memberJpaRepository) {
+    SiteMemberTermJpaRepositoryTest(SiteMemberTermJpaRepository memberTermRepository, SiteMemberJpaRepository memberRepository) {
         this.memberTermRepository = memberTermRepository;
-        this.memberJpaRepository = memberJpaRepository;
+        this.memberRepository = memberRepository;
     }
 
     @DisplayName("uuid로 회원 약관 찾기")
@@ -27,7 +27,7 @@ class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
     void findByUuidTest() {
         // given
         SiteMemberTermEntity memberTerm = createMemberTermUserEntity();
-        SiteMemberEntity member = memberJpaRepository.save(memberTerm.getMember());
+        SiteMemberEntity member = memberRepository.save(memberTerm.getMember());
 
         // when
         memberTerm = memberTermRepository.save(SiteMemberTermEntity.builder()
@@ -44,7 +44,7 @@ class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
     void findByAgreedTermsOfUseVersionTest() {
         // given
         SiteMemberTermEntity memberTerm = createMemberTermUserEntity();
-        SiteMemberEntity member = memberJpaRepository.save(memberTerm.getMember());
+        SiteMemberEntity member = memberRepository.save(memberTerm.getMember());
 
         // when
         memberTerm = memberTermRepository.save(SiteMemberTermEntity.builder()
@@ -61,7 +61,7 @@ class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
     void findByAgreedPrivacyPolicyVersionTest() {
         // given
         SiteMemberTermEntity memberTerm = createMemberTermUserEntity();
-        SiteMemberEntity member = memberJpaRepository.save(memberTerm.getMember());
+        SiteMemberEntity member = memberRepository.save(memberTerm.getMember());
 
         // when
         memberTerm = memberTermRepository.save(SiteMemberTermEntity.builder()
@@ -78,7 +78,7 @@ class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
     void findByAgreedAdInfoReceivingVersionTest() {
         // given
         SiteMemberTermEntity memberTerm = createMemberTermUserEntity();
-        SiteMemberEntity member = memberJpaRepository.save(memberTerm.getMember());
+        SiteMemberEntity member = memberRepository.save(memberTerm.getMember());
 
         // when
         memberTerm = memberTermRepository.save(SiteMemberTermEntity.builder()
@@ -95,7 +95,7 @@ class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
     void findByLastModifiedAtTest() {
         // given
         SiteMemberTermEntity memberTerm = createMemberTermUserEntity();
-        SiteMemberEntity member = memberJpaRepository.save(memberTerm.getMember());
+        SiteMemberEntity member = memberRepository.save(memberTerm.getMember());
 
         // when
         memberTerm = memberTermRepository.save(SiteMemberTermEntity.builder()
@@ -112,7 +112,7 @@ class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
     void deleteByUuidTest() {
         // given
         SiteMemberTermEntity memberTerm = createMemberTermUserEntity();
-        SiteMemberEntity member = memberJpaRepository.save(memberTerm.getMember());
+        SiteMemberEntity member = memberRepository.save(memberTerm.getMember());
         memberTerm = memberTermRepository.save(SiteMemberTermEntity.builder()
                 .memberTermEntity(memberTerm)
                 .member(member)
@@ -130,7 +130,7 @@ class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
     void existsByUuidTest() {
         // given
         SiteMemberTermEntity memberTerm = createMemberTermUserEntity();
-        SiteMemberEntity member = memberJpaRepository.save(memberTerm.getMember());
+        SiteMemberEntity member = memberRepository.save(memberTerm.getMember());
         memberTerm = memberTermRepository.save(SiteMemberTermEntity.builder()
                 .memberTermEntity(memberTerm)
                 .member(member)
