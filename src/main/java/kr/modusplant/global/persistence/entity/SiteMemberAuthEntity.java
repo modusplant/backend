@@ -6,6 +6,8 @@ import kr.modusplant.global.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -64,6 +66,18 @@ public class SiteMemberAuthEntity {
     @Version
     @Column(name = SNAKE_VER_NUM, nullable = false)
     private Long versionNumber;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SiteMemberAuthEntity that)) return false;
+        return new EqualsBuilder().append(getOriginalMember(), that.getOriginalMember()).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(getOriginalMember()).toHashCode();
+    }
 
     @PrePersist
     public void prePersist() {

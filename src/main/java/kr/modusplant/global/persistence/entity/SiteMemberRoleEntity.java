@@ -6,6 +6,8 @@ import kr.modusplant.global.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.UUID;
@@ -31,6 +33,18 @@ public class SiteMemberRoleEntity {
     @Enumerated(EnumType.STRING)
     @DefaultValue
     private Role role;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SiteMemberRoleEntity that)) return false;
+        return new EqualsBuilder().append(getMember(), that.getMember()).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(getMember()).toHashCode();
+    }
 
     @PrePersist
     public void prePersist() {
