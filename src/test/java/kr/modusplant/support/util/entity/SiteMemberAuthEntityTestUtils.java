@@ -24,13 +24,15 @@ public interface SiteMemberAuthEntityTestUtils extends SiteMemberEntityTestUtils
         return builder()
                 .email(memberAuthGoogleUser.getEmail())
                 .pw(memberAuthGoogleUser.getPw())
-                .provider(memberAuthGoogleUser.getProvider());
+                .provider(memberAuthGoogleUser.getProvider())
+                .providerId(memberAuthGoogleUser.getProviderId());
     }
 
     default SiteMemberAuthEntityBuilder createMemberAuthKakaoUserEntityBuilder() {
         return builder()
                 .email(memberAuthKakaoUser.getEmail())
                 .pw(memberAuthKakaoUser.getPw())
-                .provider(memberAuthKakaoUser.getProvider());
+                .provider(memberAuthKakaoUser.getProvider())
+                .providerId(memberAuthKakaoUser.getProviderId());
     }
 }
