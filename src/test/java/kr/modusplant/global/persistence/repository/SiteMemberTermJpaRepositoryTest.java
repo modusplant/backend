@@ -1,6 +1,5 @@
 package kr.modusplant.global.persistence.repository;
 
-import kr.modusplant.global.persistence.entity.SiteMemberEntity;
 import kr.modusplant.global.persistence.entity.SiteMemberTermEntity;
 import kr.modusplant.support.context.RepositoryOnlyContext;
 import kr.modusplant.support.util.entity.SiteMemberTermEntityTestUtils;
@@ -14,12 +13,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
 
     private final SiteMemberTermJpaRepository memberTermRepository;
-    private final SiteMemberJpaRepository memberRepository;
 
     @Autowired
-    SiteMemberTermJpaRepositoryTest(SiteMemberTermJpaRepository memberTermRepository, SiteMemberJpaRepository memberRepository) {
+    SiteMemberTermJpaRepositoryTest(SiteMemberTermJpaRepository memberTermRepository) {
         this.memberTermRepository = memberTermRepository;
-        this.memberRepository = memberRepository;
     }
 
     @DisplayName("uuid로 회원 약관 찾기")
@@ -27,13 +24,9 @@ class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
     void findByUuidTest() {
         // given
         SiteMemberTermEntity memberTerm = createMemberTermUserEntity();
-        SiteMemberEntity member = memberRepository.save(memberTerm.getMember());
 
         // when
-        memberTerm = memberTermRepository.save(SiteMemberTermEntity.builder()
-                .memberTermEntity(memberTerm)
-                .member(member)
-                .build());
+        memberTerm = memberTermRepository.save(memberTerm);
 
         // then
         assertThat(memberTermRepository.findByUuid(memberTerm.getUuid()).orElseThrow()).isEqualTo(memberTerm);
@@ -44,13 +37,9 @@ class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
     void findByAgreedTermsOfUseVersionTest() {
         // given
         SiteMemberTermEntity memberTerm = createMemberTermUserEntity();
-        SiteMemberEntity member = memberRepository.save(memberTerm.getMember());
 
         // when
-        memberTerm = memberTermRepository.save(SiteMemberTermEntity.builder()
-                .memberTermEntity(memberTerm)
-                .member(member)
-                .build());
+        memberTerm = memberTermRepository.save(memberTerm);
 
         // then
         assertThat(memberTermRepository.findByAgreedTermsOfUseVersion(memberTerm.getAgreedTermsOfUseVersion()).getFirst()).isEqualTo(memberTerm);
@@ -61,13 +50,9 @@ class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
     void findByAgreedPrivacyPolicyVersionTest() {
         // given
         SiteMemberTermEntity memberTerm = createMemberTermUserEntity();
-        SiteMemberEntity member = memberRepository.save(memberTerm.getMember());
 
         // when
-        memberTerm = memberTermRepository.save(SiteMemberTermEntity.builder()
-                .memberTermEntity(memberTerm)
-                .member(member)
-                .build());
+        memberTerm = memberTermRepository.save(memberTerm);
 
         // then
         assertThat(memberTermRepository.findByAgreedPrivacyPolicyVersion(memberTerm.getAgreedPrivacyPolicyVersion()).getFirst()).isEqualTo(memberTerm);
@@ -78,13 +63,9 @@ class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
     void findByAgreedAdInfoReceivingVersionTest() {
         // given
         SiteMemberTermEntity memberTerm = createMemberTermUserEntity();
-        SiteMemberEntity member = memberRepository.save(memberTerm.getMember());
 
         // when
-        memberTerm = memberTermRepository.save(SiteMemberTermEntity.builder()
-                .memberTermEntity(memberTerm)
-                .member(member)
-                .build());
+        memberTerm = memberTermRepository.save(memberTerm);
 
         // then
         assertThat(memberTermRepository.findByAgreedAdInfoReceivingVersion(memberTerm.getAgreedAdInfoReceivingVersion()).getFirst()).isEqualTo(memberTerm);
@@ -95,13 +76,9 @@ class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
     void findByLastModifiedAtTest() {
         // given
         SiteMemberTermEntity memberTerm = createMemberTermUserEntity();
-        SiteMemberEntity member = memberRepository.save(memberTerm.getMember());
 
         // when
-        memberTerm = memberTermRepository.save(SiteMemberTermEntity.builder()
-                .memberTermEntity(memberTerm)
-                .member(member)
-                .build());
+        memberTerm = memberTermRepository.save(memberTerm);
 
         // then
         assertThat(memberTermRepository.findByLastModifiedAt(memberTerm.getLastModifiedAt()).getFirst()).isEqualTo(memberTerm);
@@ -112,11 +89,7 @@ class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
     void deleteByUuidTest() {
         // given
         SiteMemberTermEntity memberTerm = createMemberTermUserEntity();
-        SiteMemberEntity member = memberRepository.save(memberTerm.getMember());
-        memberTerm = memberTermRepository.save(SiteMemberTermEntity.builder()
-                .memberTermEntity(memberTerm)
-                .member(member)
-                .build());
+        memberTerm = memberTermRepository.save(memberTerm);
 
         // when
         memberTermRepository.deleteByUuid(memberTerm.getUuid());
@@ -130,14 +103,9 @@ class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
     void existsByUuidTest() {
         // given
         SiteMemberTermEntity memberTerm = createMemberTermUserEntity();
-        SiteMemberEntity member = memberRepository.save(memberTerm.getMember());
-        memberTerm = memberTermRepository.save(SiteMemberTermEntity.builder()
-                .memberTermEntity(memberTerm)
-                .member(member)
-                .build());
 
         // when
-        memberTermRepository.save(memberTerm);
+        memberTerm = memberTermRepository.save(memberTerm);
 
         // then
         assertThat(memberTermRepository.existsByUuid(memberTerm.getUuid())).isEqualTo(true);
