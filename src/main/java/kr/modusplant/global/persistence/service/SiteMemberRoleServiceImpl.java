@@ -49,7 +49,7 @@ public class SiteMemberRoleServiceImpl implements SiteMemberRoleService {
     @Transactional
     public SiteMemberRole insert(SiteMemberRole memberRole) {
         validateExistedEntity(memberRole.getUuid());
-        return memberRoleEntityMapper.toSiteMemberRole(memberRoleRepository.save(memberRoleEntityMapper.createSiteMemberRoleEntity(memberRole)));
+        return memberRoleEntityMapper.toSiteMemberRole(memberRoleRepository.save(memberRoleEntityMapper.createSiteMemberRoleEntity(memberRole, memberRepository)));
     }
 
     @Override
