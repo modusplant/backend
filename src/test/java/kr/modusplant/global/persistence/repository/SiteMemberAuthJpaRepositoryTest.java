@@ -3,7 +3,7 @@ package kr.modusplant.global.persistence.repository;
 import kr.modusplant.global.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.global.persistence.entity.SiteMemberEntity;
 import kr.modusplant.support.context.RepositoryOnlyContext;
-import kr.modusplant.support.util.SiteMemberAuthEntityTestUtils;
+import kr.modusplant.support.util.entity.SiteMemberAuthEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

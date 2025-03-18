@@ -1,4 +1,4 @@
-package kr.modusplant.support.util;
+package kr.modusplant.support.util.entity;
 
 import kr.modusplant.global.enums.Role;
 import kr.modusplant.global.persistence.entity.SiteMemberRoleEntity;

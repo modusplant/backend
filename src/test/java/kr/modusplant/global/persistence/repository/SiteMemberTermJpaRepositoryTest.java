@@ -1,9 +1,9 @@
 package kr.modusplant.global.persistence.repository;
 
-import kr.modusplant.global.persistence.entity.SiteMemberTermEntity;
 import kr.modusplant.global.persistence.entity.SiteMemberEntity;
+import kr.modusplant.global.persistence.entity.SiteMemberTermEntity;
 import kr.modusplant.support.context.RepositoryOnlyContext;
-import kr.modusplant.support.util.SiteMemberTermEntityTestUtils;
+import kr.modusplant.support.util.entity.SiteMemberTermEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
