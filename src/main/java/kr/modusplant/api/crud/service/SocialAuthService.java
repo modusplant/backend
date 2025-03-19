@@ -2,7 +2,6 @@ package kr.modusplant.api.crud.service;
 
 import kr.modusplant.api.crud.model.external.GoogleUserInfo;
 import kr.modusplant.api.crud.model.external.KakaoUserInfo;
-import kr.modusplant.api.crud.model.external.OAuthToken;
 import kr.modusplant.global.domain.model.SiteMember;
 import kr.modusplant.global.domain.model.SiteMemberAuth;
 import kr.modusplant.global.domain.model.SiteMemberRole;
@@ -49,7 +48,7 @@ public class SocialAuthService {
     private String GOOGLE_REDIRECT_URI;
 
 
-    public OAuthToken getKakaoToken(String code) {
+    public String getKakaoAccessToken(String code) {
         restClient = RestClient.builder()
                 .baseUrl("https://kauth.kakao.com")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -70,10 +69,11 @@ public class SocialAuthService {
                 .onStatus(this::isErrorStatus, (request, response) -> {
                     throw new OAuthException((HttpStatus) response.getStatusCode());
                 })
-                .body(OAuthToken.class);
+                .body(Map.class)
+                .get("access_token").toString();
     }
 
-    public OAuthToken getGoogleToken(String code) {
+    public String getGoogleAccessToken(String code) {
         restClient = RestClient.builder()
                 .baseUrl("https://oauth2.googleapis.com")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -95,7 +95,8 @@ public class SocialAuthService {
                 .onStatus(this::isErrorStatus, (request, response) -> {
                     throw new OAuthException((HttpStatus) response.getStatusCode());
                 })
-                .body(OAuthToken.class);
+                .body(Map.class)
+                .get("access_token").toString();
     }
 
     public KakaoUserInfo getKakaoUserInfo(String accessToken) {

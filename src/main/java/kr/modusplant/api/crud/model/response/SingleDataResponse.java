@@ -1,7 +1,6 @@
 package kr.modusplant.api.crud.model.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 @Getter

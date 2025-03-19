@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.modusplant.api.crud.model.external.GoogleUserInfo;
 import kr.modusplant.api.crud.model.external.KakaoUserInfo;
-import kr.modusplant.api.crud.model.external.OAuthToken;
 import kr.modusplant.api.crud.model.request.SocialLoginRequest;
 import kr.modusplant.api.crud.model.response.SingleDataResponse;
 import kr.modusplant.api.crud.model.response.TokenResponse;
@@ -35,14 +34,11 @@ public class SocialAuthController {
     })
     @PostMapping("/kakao/social-login")
     public ResponseEntity<SingleDataResponse<?>> kakaoSocialLogin(@RequestBody SocialLoginRequest request) {
-        System.out.println("api");
-        System.out.println(request.getCode());
-
         /* 소셜 로그인 */
         // Kakao Token 발급
-        OAuthToken kakaoToken = socialAuthService.getKakaoToken(request.getCode());
+        String kakaoAccessToken = socialAuthService.getKakaoAccessToken(request.getCode());
         // Kakao 사용자 정보 가져오기
-        KakaoUserInfo kakaoUserInfo = socialAuthService.getKakaoUserInfo(kakaoToken.getAccess_token());
+        KakaoUserInfo kakaoUserInfo = socialAuthService.getKakaoUserInfo(kakaoAccessToken);
         // 사용자 생성 및 조회
         SiteMember siteMember = socialAuthService.findOrCreateMember(AuthProvider.KAKAO, String.valueOf(kakaoUserInfo.getId()),kakaoUserInfo.getKakaoAccount().getEmail(),kakaoUserInfo.getKakaoAccount().getProfile().getNickname());
 
@@ -69,9 +65,9 @@ public class SocialAuthController {
 
         /* 소셜 로그인 */
         // Google Token 발급
-        OAuthToken googleToken = socialAuthService.getGoogleToken(request.getCode());
+        String googleAccessToken = socialAuthService.getGoogleAccessToken(request.getCode());
         // Google 사용자 정보 가져오기
-        GoogleUserInfo googleUserInfo = socialAuthService.getGoogleUserInfo(googleToken.getAccess_token());
+        GoogleUserInfo googleUserInfo = socialAuthService.getGoogleUserInfo(googleAccessToken);
         // 사용자 생성 및 조회
         SiteMember siteMember = socialAuthService.findOrCreateMember(AuthProvider.GOOGLE,googleUserInfo.getId(),googleUserInfo.getEmail(),googleUserInfo.getNickname());
 
