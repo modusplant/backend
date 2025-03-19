@@ -37,7 +37,6 @@ dependencies {
 	testAnnotationProcessor 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.withType(JavaCompile).configureEach {
