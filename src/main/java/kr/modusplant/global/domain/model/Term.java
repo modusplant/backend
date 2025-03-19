@@ -31,7 +31,6 @@ public class Term {
             return this;
         }
 
-        @Generated
         public Term build() {
             return new Term(this.uuid, this.name, this.content, this.version);
         }
