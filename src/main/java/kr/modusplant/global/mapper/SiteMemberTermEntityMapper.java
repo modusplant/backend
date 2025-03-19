@@ -9,6 +9,7 @@ import org.mapstruct.*;
 import java.util.UUID;
 
 import static kr.modusplant.global.vo.CamelCaseWord.MEMBER;
+import static kr.modusplant.global.vo.CamelCaseWord.MEMBER_TERM;
 
 @Mapper
 public interface SiteMemberTermEntityMapper {
@@ -31,6 +32,7 @@ public interface SiteMemberTermEntityMapper {
     }
 
     @Mapping(source = MEMBER, target = "uuid", qualifiedByName = "toUuid")
+    @Mapping(target = MEMBER_TERM, ignore = true)
     SiteMemberTerm toSiteMemberTerm(SiteMemberTermEntity memberTermEntity);
 
     @Named("toUuid")

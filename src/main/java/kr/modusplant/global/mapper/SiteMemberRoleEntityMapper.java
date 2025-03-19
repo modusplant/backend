@@ -9,6 +9,7 @@ import org.mapstruct.*;
 import java.util.UUID;
 
 import static kr.modusplant.global.vo.CamelCaseWord.MEMBER;
+import static kr.modusplant.global.vo.CamelCaseWord.MEMBER_ROLE;
 
 @Mapper
 public interface SiteMemberRoleEntityMapper {
@@ -27,6 +28,7 @@ public interface SiteMemberRoleEntityMapper {
     }
 
     @Mapping(source = MEMBER, target = "uuid", qualifiedByName = "toUuid")
+    @Mapping(target = MEMBER_ROLE, ignore = true)
     SiteMemberRole toSiteMemberRole(SiteMemberRoleEntity memberRoleEntity);
 
     @Named("toUuid")
