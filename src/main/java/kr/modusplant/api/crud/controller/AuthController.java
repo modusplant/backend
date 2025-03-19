@@ -7,6 +7,8 @@ import io.jsonwebtoken.security.Keys;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import kr.modusplant.api.crud.model.request.EmailRequest;
 import kr.modusplant.api.crud.model.request.VerifyEmailRequest;
@@ -40,7 +42,10 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Bad Request: Invalid input data.")
     })
     @PostMapping("/members/verify-email/send")
-    public ResponseEntity<SingleDataResponse> verify(@RequestBody @Valid EmailRequest request) {
+    public ResponseEntity<SingleDataResponse> verify(
+            @RequestBody @Valid EmailRequest request,
+            HttpServletResponse httpResponse
+    ) {
         String email = request.getEmail();
         // 인증코드 생성
         String verifyCode = generateVerifyCode();
@@ -54,13 +59,11 @@ public class AuthController {
         metadata.put("status", 200);
         metadata.put("message", "OK: Succeeded");
 
-        Map<String, Object> data = new HashMap<>();
-        data.put("accessToken", "Bearer " + accessToken);   // Authorization 헤더 미사용 시 Bearer 제거
-
         SingleDataResponse response = new SingleDataResponse<>();
         response.setMetadata(metadata);
-        response.setData(data);
 
+        // JWT AccessToken 설정
+        setHttpOnlyCookie(accessToken, httpResponse);
         return ResponseEntity.ok(response);
     }
 
@@ -70,10 +73,13 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Bad Request: Invalid input data.")
     })
     @PostMapping("/members/verify-email")
-    public ResponseEntity<SingleDataResponse> verifyEmail(@RequestBody VerifyEmailRequest verifyEmailRequest) {
+    public ResponseEntity<SingleDataResponse> verifyEmail(
+            @RequestBody VerifyEmailRequest verifyEmailRequest,
+            @CookieValue(value = "Authorization", required = false) String accessToken
+    ) {
 
         // JwtToken 에 담긴 데이터 조회 테스트용
-        validateVerifyAccessToken(verifyEmailRequest.getAccessToken(), verifyEmailRequest.getVerifyCode());
+        validateVerifyAccessToken(accessToken, verifyEmailRequest.getVerifyCode());
 
         Map<String, Object> metadata = new HashMap<>();
         metadata.put("status", HttpStatus.OK.value());
@@ -143,5 +149,15 @@ public class AuthController {
             code.append(characters.charAt(index));
         }
         return code.toString();
+    }
+
+    public void setHttpOnlyCookie(String accessToken, HttpServletResponse httpResponse) {
+        Cookie accessTokenCookie = new Cookie("Authorization", accessToken);
+        accessTokenCookie.setHttpOnly(true); // HTTP-Only 설정: JavaScript에서 접근 불가
+        accessTokenCookie.setSecure(false);  // Secure 설정
+        accessTokenCookie.setPath("/");    // 모든 경로에서 유효
+        accessTokenCookie.setMaxAge(5 * 60); // 유효 기간: 5분 (Access 토큰의 유효 기간과 동일)
+        accessTokenCookie.setAttribute("SameSite", "Strict");
+        httpResponse.addCookie(accessTokenCookie);
     }
 }
