@@ -4,6 +4,9 @@ import kr.modusplant.global.domain.model.Term;
 import kr.modusplant.global.persistence.entity.TermEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+import static kr.modusplant.global.vo.CamelCaseWord.TERM;
 
 @Mapper
 public interface TermEntityMapper {
@@ -24,5 +27,6 @@ public interface TermEntityMapper {
                 .version(term.getVersion()).build();
     }
 
+    @Mapping(target = TERM, ignore = true)
     Term toTerm(TermEntity TermEntity);
 }
