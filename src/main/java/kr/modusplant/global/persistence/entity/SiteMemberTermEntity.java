@@ -34,7 +34,7 @@ public class SiteMemberTermEntity {
     @Column(name = SNAKE_AGREED_PRIV_POLI_VER, nullable = false, length = 10)
     private String agreedPrivacyPolicyVersion;
 
-    @Column(name = SNAKE_AGREED_AD_INFO_RECE_VER, nullable = false, length = 10)
+    @Column(name = SNAKE_AGREED_AD_INFO_RECE_VER, length = 10)
     private String agreedAdInfoReceivingVersion;
 
     @Column(name = SNAKE_LAST_MODIFIED_AT, nullable = false)
