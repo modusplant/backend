@@ -23,7 +23,7 @@ public class Term {
         private String content;
         private String version;
 
-        TermBuilder term(Term term) {
+        public TermBuilder term(Term term) {
             this.uuid = term.getUuid();
             this.name = term.getName();
             this.content = term.getContent();
