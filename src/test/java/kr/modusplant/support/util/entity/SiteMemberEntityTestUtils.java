@@ -12,11 +12,29 @@ public interface SiteMemberEntityTestUtils extends SiteMemberTestUtils {
                 .build();
     }
 
+    default SiteMemberEntity createMemberBasicAdminEntityWithUuid() {
+        return SiteMemberEntity.builder()
+                .uuid(memberBasicAdminWithUuid.getUuid())
+                .nickname(memberBasicAdminWithUuid.getNickname())
+                .birthDate(memberBasicAdminWithUuid.getBirthDate())
+                .loggedInAt(memberBasicAdminWithUuid.getLoggedInAt())
+                .build();
+    }
+
     default SiteMemberEntity createMemberBasicUserEntity() {
         return SiteMemberEntity.builder()
                 .nickname(memberBasicUser.getNickname())
                 .birthDate(memberBasicUser.getBirthDate())
                 .loggedInAt(memberBasicUser.getLoggedInAt())
+                .build();
+    }
+
+    default SiteMemberEntity createMemberBasicUserEntityWithUuid() {
+        return SiteMemberEntity.builder()
+                .uuid(memberBasicUserWithUuid.getUuid())
+                .nickname(memberBasicUserWithUuid.getNickname())
+                .birthDate(memberBasicUserWithUuid.getBirthDate())
+                .loggedInAt(memberBasicUserWithUuid.getLoggedInAt())
                 .build();
     }
 
@@ -28,11 +46,29 @@ public interface SiteMemberEntityTestUtils extends SiteMemberTestUtils {
                 .build();
     }
 
+    default SiteMemberEntity createMemberGoogleUserEntityWithUuid() {
+        return SiteMemberEntity.builder()
+                .uuid(memberGoogleUserWithUuid.getUuid())
+                .nickname(memberGoogleUserWithUuid.getNickname())
+                .birthDate(memberGoogleUserWithUuid.getBirthDate())
+                .loggedInAt(memberGoogleUserWithUuid.getLoggedInAt())
+                .build();
+    }
+
     default SiteMemberEntity createMemberKakaoUserEntity() {
         return SiteMemberEntity.builder()
                 .nickname(memberKakaoUser.getNickname())
                 .birthDate(memberKakaoUser.getBirthDate())
                 .loggedInAt(memberKakaoUser.getLoggedInAt())
+                .build();
+    }
+
+    default SiteMemberEntity createMemberKakaoUserEntityWithUuid() {
+        return SiteMemberEntity.builder()
+                .uuid(memberKakaoUserWithUuid.getUuid())
+                .nickname(memberKakaoUserWithUuid.getNickname())
+                .birthDate(memberKakaoUserWithUuid.getBirthDate())
+                .loggedInAt(memberKakaoUserWithUuid.getLoggedInAt())
                 .build();
     }
 }

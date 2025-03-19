@@ -12,6 +12,15 @@ public interface TermEntityTestUtils extends TermTestUtils {
                 .build();
     }
 
+    default TermEntity createTermsOfUseEntityWithUuid() {
+        return TermEntity.builder()
+                .uuid(termsOfUseWithUuid.getUuid())
+                .name(termsOfUseWithUuid.getName())
+                .content(termsOfUseWithUuid.getContent())
+                .version(termsOfUseWithUuid.getVersion())
+                .build();
+    }
+
     default TermEntity createPrivacyPolicyEntity() {
         return TermEntity.builder()
                 .name(privacyPolicy.getName())
@@ -20,11 +29,29 @@ public interface TermEntityTestUtils extends TermTestUtils {
                 .build();
     }
 
+    default TermEntity createPrivacyPolicyEntityWithUuid() {
+        return TermEntity.builder()
+                .uuid(privacyPolicyWithUuid.getUuid())
+                .name(privacyPolicyWithUuid.getName())
+                .content(privacyPolicyWithUuid.getContent())
+                .version(privacyPolicyWithUuid.getVersion())
+                .build();
+    }
+
     default TermEntity createAdInfoReceivingEntity() {
         return TermEntity.builder()
                 .name(adInfoReceiving.getName())
                 .content(adInfoReceiving.getContent())
                 .version(adInfoReceiving.getVersion())
+                .build();
+    }
+
+    default TermEntity createAdInfoReceivingEntityWithUuid() {
+        return TermEntity.builder()
+                .uuid(adInfoReceivingWithUuid.getUuid())
+                .name(adInfoReceivingWithUuid.getName())
+                .content(adInfoReceivingWithUuid.getContent())
+                .version(adInfoReceivingWithUuid.getVersion())
                 .build();
     }
 }
