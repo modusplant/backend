@@ -50,6 +50,7 @@ public interface SiteMemberAuthEntityMapper {
 
     @Mapping(source = ACTIVE_MEMBER, target = ACTIVE_MEMBER_UUID, qualifiedByName = "toActiveMemberUuid")
     @Mapping(source = ORIGINAL_MEMBER, target = ORIGINAL_MEMBER_UUID, qualifiedByName = "toOriginalMemberUuid")
+    @Mapping(target = MEMBER_AUTH, ignore = true)
     SiteMemberAuth toSiteMemberAuth(SiteMemberAuthEntity memberAuthEntity);
 
     @Named("toActiveMemberUuid")
