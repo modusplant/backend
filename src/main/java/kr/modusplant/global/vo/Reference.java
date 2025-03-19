@@ -7,4 +7,5 @@ import lombok.NoArgsConstructor;
 public final class Reference {
     public static final String NOTATION_ENTITY = "kr.modusplant.global.persistence.entity";
     public static final String NOTATION_REPOSITORY = "kr.modusplant.global.persistence.repository";
+    public static final String NOTATION_SERVICE_IMPL = "kr.modusplant.global.persistence.service";
 }
