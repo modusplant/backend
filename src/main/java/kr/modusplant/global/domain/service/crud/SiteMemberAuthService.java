@@ -24,4 +24,6 @@ public interface SiteMemberAuthService extends UuidCrudService<SiteMemberAuth> {
     List<SiteMemberAuth> getByFailedAttempt(Integer failedAttempt);
 
     Optional<SiteMemberAuth> getByOriginalMember(SiteMember originalMember);
+
+    Optional<SiteMemberAuth> getByEmailAndProvider(String email, AuthProvider provider);
 }

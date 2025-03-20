@@ -29,4 +29,6 @@ public interface SiteMemberAuthJpaRepository extends LastModifiedAtRepository<Si
     List<SiteMemberAuthEntity> findByFailedAttempt(Integer failedAttempt);
 
     Optional<SiteMemberAuthEntity> findByOriginalMember(SiteMemberEntity originalMember);
+
+    Optional<SiteMemberAuthEntity> findByEmailAndProvider(String email, AuthProvider provider);
 }

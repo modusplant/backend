@@ -88,6 +88,12 @@ public class SiteMemberAuthServiceImpl implements SiteMemberAuthService {
     }
 
     @Override
+    public Optional<SiteMemberAuth> getByEmailAndProvider(String email, AuthProvider provider) {
+        Optional<SiteMemberAuthEntity> memberAuthOrEmpty = memberAuthRepository.findByEmailAndProvider(email, provider);
+        return memberAuthOrEmpty.isEmpty() ? Optional.empty() : Optional.of(memberAuthEntityMapper.toSiteMemberAuth(memberAuthOrEmpty.orElseThrow()));
+    }
+
+    @Override
     @Transactional
     public SiteMemberAuth insert(SiteMemberAuth memberAuth) {
         UUID uuid = memberAuth.getUuid();
