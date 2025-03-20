@@ -183,6 +183,29 @@ class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemb
         assertThat(memberAuthService.getByProviderId(memberAuth.getProviderId()).getFirst()).isEqualTo(memberAuth);
     }
 
+    @DisplayName("provider와 providerId로 회원 인증 찾기")
+    @Test
+    void getByProviderAndProviderIdTest() {
+        // given
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        SiteMember member = memberMapper.toSiteMember(memberEntity);
+        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
+        SiteMemberAuth memberAuth = memberAuthMapper.toSiteMemberAuth(memberAuthEntity);
+
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.save(memberEntity)).willReturn(memberEntity);
+        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.empty());
+        given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
+        given(memberAuthRepository.findByProviderAndProviderId(memberAuthEntity.getProvider(), memberAuthEntity.getProviderId())).willReturn(List.of(memberAuthEntity));
+
+        // when
+        memberService.insert(member);
+        memberAuth = memberAuthService.insert(memberAuth);
+
+        // then
+        assertThat(memberAuthService.getByProviderAndProviderId(memberAuth.getProvider(), memberAuth.getProviderId()).getFirst()).isEqualTo(memberAuth);
+    }
+
     @DisplayName("failedAttempt로 회원 인증 찾기")
     @Test
     void getByFailedAttemptTest() {
