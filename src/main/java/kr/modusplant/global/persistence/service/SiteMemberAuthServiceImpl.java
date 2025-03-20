@@ -49,11 +49,6 @@ public class SiteMemberAuthServiceImpl implements SiteMemberAuthService {
     }
 
     @Override
-    public List<SiteMemberAuth> getByPw(String pw) {
-        return memberAuthRepository.findByPw(pw).stream().map(memberAuthEntityMapper::toSiteMemberAuth).toList();
-    }
-
-    @Override
     public List<SiteMemberAuth> getByProvider(AuthProvider provider) {
         return memberAuthRepository.findByProvider(provider).stream().map(memberAuthEntityMapper::toSiteMemberAuth).toList();
     }

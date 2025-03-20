@@ -13,8 +13,6 @@ public interface SiteMemberAuthService extends UuidCrudService<SiteMemberAuth> {
 
     List<SiteMemberAuth> getByEmail(String email);
 
-    List<SiteMemberAuth> getByPw(String pw);
-
     List<SiteMemberAuth> getByProvider(AuthProvider provider);
 
     List<SiteMemberAuth> getByProviderId(String providerId);
