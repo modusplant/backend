@@ -123,7 +123,7 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
 
         // then
-        assertThat(memberAuthRepository.findByProviderAndProviderId(memberAuth.getProvider(), memberAuth.getProviderId()).getFirst()).isEqualTo(memberAuth);
+        assertThat(memberAuthRepository.findByProviderAndProviderId(memberAuth.getProvider(), memberAuth.getProviderId()).orElseThrow()).isEqualTo(memberAuth);
     }
 
     @DisplayName("failedAttempt로 회원 인증 찾기")
