@@ -47,7 +47,7 @@ class SiteMemberRoleServiceImplTest implements SiteMemberRoleTestUtils, SiteMemb
         this.memberRepository = memberRepository;
     }
 
-    @DisplayName("uuid로 회원 역할 찾기")
+    @DisplayName("uuid로 회원 역할 얻기")
     @Test
     void getByUuidTest() {
         // given
@@ -69,7 +69,7 @@ class SiteMemberRoleServiceImplTest implements SiteMemberRoleTestUtils, SiteMemb
         assertThat(memberRoleService.getByUuid(memberRole.getUuid()).orElseThrow()).isEqualTo(memberRole);
     }
 
-    @DisplayName("role로 회원 역할 찾기")
+    @DisplayName("role로 회원 역할 얻기")
     @Test
     void getByRoleTest() {
         // given
@@ -92,9 +92,9 @@ class SiteMemberRoleServiceImplTest implements SiteMemberRoleTestUtils, SiteMemb
         assertThat(memberRoleService.getByRole(memberRoleEntity.getRole()).getFirst()).isEqualTo(memberRole);
     }
 
-    @DisplayName("uuid로 회원 역할 삭제")
+    @DisplayName("uuid로 회원 역할 제거")
     @Test
-    void deleteByUuidTest() {
+    void removeByUuidTest() {
         // given
         SiteMemberRoleEntity memberRoleEntity = createMemberRoleUserEntityWithUuid();
         SiteMemberEntity memberEntity = memberRoleEntity.getMember();

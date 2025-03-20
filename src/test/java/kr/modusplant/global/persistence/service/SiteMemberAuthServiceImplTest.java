@@ -46,7 +46,7 @@ class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemb
         this.memberRepository = memberRepository;
     }
 
-    @DisplayName("uuid로 회원 인증 찾기")
+    @DisplayName("uuid로 회원 인증 얻기")
     @Test
     void getByUuidTest() {
         // given
@@ -68,7 +68,7 @@ class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemb
         assertThat(memberAuthService.getByUuid(memberAuth.getUuid()).orElseThrow()).isEqualTo(memberAuth);
     }
 
-    @DisplayName("activeMemberUuid로 회원 인증 찾기")
+    @DisplayName("activeMemberUuid로 회원 인증 얻기")
     @Test
     void getByActiveMemberUuidTest() {
         // given
@@ -91,7 +91,7 @@ class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemb
         assertThat(memberAuthService.getByActiveMember(member).getFirst()).isEqualTo(memberAuth);
     }
 
-    @DisplayName("originalMemberUuid로 회원 인증 찾기")
+    @DisplayName("originalMemberUuid로 회원 인증 얻기")
     @Test
     void getByOriginalMemberUuidTest() {
         // given
@@ -114,7 +114,7 @@ class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemb
         assertThat(memberAuthService.getByOriginalMember(member).orElseThrow()).isEqualTo(memberAuth);
     }
 
-    @DisplayName("email로 회원 인증 찾기")
+    @DisplayName("email로 회원 인증 얻기")
     @Test
     void getByEmailTest() {
         // given
@@ -137,7 +137,7 @@ class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemb
         assertThat(memberAuthService.getByEmail(memberAuth.getEmail()).getFirst()).isEqualTo(memberAuth);
     }
 
-    @DisplayName("provider로 회원 인증 찾기")
+    @DisplayName("provider로 회원 인증 얻기")
     @Test
     void getByProviderTest() {
         // given
@@ -160,7 +160,7 @@ class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemb
         assertThat(memberAuthService.getByProvider(memberAuth.getProvider()).getFirst()).isEqualTo(memberAuth);
     }
 
-    @DisplayName("providerId로 회원 인증 찾기")
+    @DisplayName("providerId로 회원 인증 얻기")
     @Test
     void getByProviderIdTest() {
         // given
@@ -183,7 +183,7 @@ class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemb
         assertThat(memberAuthService.getByProviderId(memberAuth.getProviderId()).getFirst()).isEqualTo(memberAuth);
     }
 
-    @DisplayName("email과 provider로 회원 인증 찾기")
+    @DisplayName("email과 provider로 회원 인증 얻기")
     @Test
     void getByEmailAndProviderTest() {
         // given
@@ -206,7 +206,7 @@ class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemb
         assertThat(memberAuthService.getByEmailAndProvider(memberAuth.getEmail(), memberAuth.getProvider()).orElseThrow()).isEqualTo(memberAuth);
     }
 
-    @DisplayName("provider와 providerId로 회원 인증 찾기")
+    @DisplayName("provider와 providerId로 회원 인증 얻기")
     @Test
     void getByProviderAndProviderIdTest() {
         // given
@@ -229,7 +229,7 @@ class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemb
         assertThat(memberAuthService.getByProviderAndProviderId(memberAuth.getProvider(), memberAuth.getProviderId()).orElseThrow()).isEqualTo(memberAuth);
     }
 
-    @DisplayName("failedAttempt로 회원 인증 찾기")
+    @DisplayName("failedAttempt로 회원 인증 얻기")
     @Test
     void getByFailedAttemptTest() {
         // given
@@ -252,9 +252,9 @@ class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemb
         assertThat(memberAuthService.getByFailedAttempt(memberAuth.getFailedAttempt()).getFirst()).isEqualTo(memberAuth);
     }
 
-    @DisplayName("uuid로 회원 인증 삭제")
+    @DisplayName("uuid로 회원 인증 제거")
     @Test
-    void deleteByUuidTest() {
+    void removeByUuidTest() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         SiteMember member = memberMapper.toSiteMember(memberEntity);

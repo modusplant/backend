@@ -47,7 +47,7 @@ class SiteMemberTermServiceImplTest implements SiteMemberTermTestUtils, SiteMemb
         this.memberRepository = memberRepository;
     }
 
-    @DisplayName("uuid로 회원 약관 찾기")
+    @DisplayName("uuid로 회원 약관 얻기")
     @Test
     void getByUuidTest() {
         // given
@@ -69,7 +69,7 @@ class SiteMemberTermServiceImplTest implements SiteMemberTermTestUtils, SiteMemb
         assertThat(memberTermService.getByUuid(memberTerm.getUuid()).orElseThrow()).isEqualTo(memberTerm);
     }
 
-    @DisplayName("agreedTermsOfUseVersion으로 회원 약관 찾기")
+    @DisplayName("agreedTermsOfUseVersion으로 회원 약관 얻기")
     @Test
     void getByAgreedTermsOfUseVersionTest() {
         // given
@@ -92,7 +92,7 @@ class SiteMemberTermServiceImplTest implements SiteMemberTermTestUtils, SiteMemb
         assertThat(memberTermService.getByAgreedTermsOfUseVersion(memberTermEntity.getAgreedTermsOfUseVersion()).getFirst()).isEqualTo(memberTerm);
     }
 
-    @DisplayName("agreedPrivacyPolicyVersion으로 회원 약관 찾기")
+    @DisplayName("agreedPrivacyPolicyVersion으로 회원 약관 얻기")
     @Test
     void getByOriginalMemberUuidTest() {
         // given
@@ -115,7 +115,7 @@ class SiteMemberTermServiceImplTest implements SiteMemberTermTestUtils, SiteMemb
         assertThat(memberTermService.getByAgreedPrivacyPolicyVersion(memberTermEntity.getAgreedPrivacyPolicyVersion()).getFirst()).isEqualTo(memberTerm);
     }
 
-    @DisplayName("agreedAdInfoReceivingVersion으로 회원 약관 찾기")
+    @DisplayName("agreedAdInfoReceivingVersion으로 회원 약관 얻기")
     @Test
     void getByEmailTest() {
         // given
@@ -138,9 +138,9 @@ class SiteMemberTermServiceImplTest implements SiteMemberTermTestUtils, SiteMemb
         assertThat(memberTermService.getByAgreedAdInfoReceivingVersion(memberTerm.getAgreedAdInfoReceivingVersion()).getFirst()).isEqualTo(memberTerm);
     }
 
-    @DisplayName("uuid로 회원 약관 삭제")
+    @DisplayName("uuid로 회원 약관 제거")
     @Test
-    void deleteByUuidTest() {
+    void removeByUuidTest() {
         // given
         SiteMemberTermEntity memberTermEntity = createMemberTermUserEntityWithUuid();
         SiteMemberEntity memberEntity = memberTermEntity.getMember();

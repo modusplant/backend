@@ -34,7 +34,7 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         this.memberRepository = memberRepository;
     }
 
-    @DisplayName("uuid로 회원 찾기")
+    @DisplayName("uuid로 회원 얻기")
     @Test
     void getByUuidTest() {
         // given
@@ -51,7 +51,7 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByUuid(member.getUuid()).orElseThrow()).isEqualTo(member);
     }
 
-    @DisplayName("nickname으로 회원 찾기")
+    @DisplayName("nickname으로 회원 얻기")
     @Test
     void getByNicknameTest() {
         // given
@@ -69,7 +69,7 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByNickname(memberEntity.getNickname()).getFirst()).isEqualTo(member);
     }
 
-    @DisplayName("birthDate으로 회원 찾기")
+    @DisplayName("birthDate으로 회원 얻기")
     @Test
     void getByBirthDateTest() {
         // given
@@ -87,7 +87,7 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByBirthDate(memberEntity.getBirthDate()).getFirst()).isEqualTo(member);
     }
 
-    @DisplayName("isActive으로 회원 찾기")
+    @DisplayName("isActive으로 회원 얻기")
     @Test
     void getByIsActiveTest() {
         // given
@@ -105,7 +105,7 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByIsActive(memberEntity.getIsActive()).getFirst()).isEqualTo(member);
     }
 
-    @DisplayName("isDisabledByLinking으로 회원 찾기")
+    @DisplayName("isDisabledByLinking으로 회원 얻기")
     @Test
     void getByIsDisabledByLinkingTest() {
         // given
@@ -123,7 +123,7 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByIsDisabledByLinking(memberEntity.getIsDisabledByLinking()).getFirst()).isEqualTo(member);
     }
 
-    @DisplayName("isBanned로 회원 찾기")
+    @DisplayName("isBanned로 회원 얻기")
     @Test
     void getByIsBannedTest() {
         // given
@@ -141,7 +141,7 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByIsBanned(memberEntity.getIsBanned()).getFirst()).isEqualTo(member);
     }
 
-    @DisplayName("isDeleted로 회원 찾기")
+    @DisplayName("isDeleted로 회원 얻기")
     @Test
     void getByIsDeletedTest() {
         // given
@@ -159,7 +159,7 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByIsDeleted(memberEntity.getIsDeleted()).getFirst()).isEqualTo(member);
     }
 
-    @DisplayName("loggedInAt으로 회원 찾기")
+    @DisplayName("loggedInAt으로 회원 얻기")
     @Test
     void getByLoggedInAtTest() {
         // given
@@ -177,9 +177,9 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByLoggedInAt(memberEntity.getLoggedInAt()).getFirst()).isEqualTo(member);
     }
 
-    @DisplayName("uuid로 회원 삭제")
+    @DisplayName("uuid로 회원 제거")
     @Test
-    void deleteByUuidTest() {
+    void removeByUuidTest() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntity();
         SiteMember member = memberMapper.toSiteMember(memberEntity);
