@@ -219,14 +219,14 @@ class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemb
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
         given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.empty());
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
-        given(memberAuthRepository.findByProviderAndProviderId(memberAuthEntity.getProvider(), memberAuthEntity.getProviderId())).willReturn(List.of(memberAuthEntity));
+        given(memberAuthRepository.findByProviderAndProviderId(memberAuthEntity.getProvider(), memberAuthEntity.getProviderId())).willReturn(Optional.of(memberAuthEntity));
 
         // when
         memberService.insert(member);
         memberAuth = memberAuthService.insert(memberAuth);
 
         // then
-        assertThat(memberAuthService.getByProviderAndProviderId(memberAuth.getProvider(), memberAuth.getProviderId()).getFirst()).isEqualTo(memberAuth);
+        assertThat(memberAuthService.getByProviderAndProviderId(memberAuth.getProvider(), memberAuth.getProviderId()).orElseThrow()).isEqualTo(memberAuth);
     }
 
     @DisplayName("failedAttempt로 회원 인증 찾기")

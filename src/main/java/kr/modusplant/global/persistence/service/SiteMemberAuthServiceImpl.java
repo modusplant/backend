@@ -59,11 +59,6 @@ public class SiteMemberAuthServiceImpl implements SiteMemberAuthService {
     }
 
     @Override
-    public List<SiteMemberAuth> getByProviderAndProviderId(AuthProvider provider, String providerId) {
-        return memberAuthRepository.findByProviderAndProviderId(provider, providerId).stream().map(memberAuthEntityMapper::toSiteMemberAuth).toList();
-    }
-
-    @Override
     public List<SiteMemberAuth> getByFailedAttempt(Integer failedAttempt) {
         return memberAuthRepository.findByFailedAttempt(failedAttempt).stream().map(memberAuthEntityMapper::toSiteMemberAuth).toList();
     }
@@ -85,6 +80,12 @@ public class SiteMemberAuthServiceImpl implements SiteMemberAuthService {
     @Override
     public Optional<SiteMemberAuth> getByEmailAndProvider(String email, AuthProvider provider) {
         Optional<SiteMemberAuthEntity> memberAuthOrEmpty = memberAuthRepository.findByEmailAndProvider(email, provider);
+        return memberAuthOrEmpty.isEmpty() ? Optional.empty() : Optional.of(memberAuthEntityMapper.toSiteMemberAuth(memberAuthOrEmpty.orElseThrow()));
+    }
+
+    @Override
+    public Optional<SiteMemberAuth> getByProviderAndProviderId(AuthProvider provider, String providerId) {
+        Optional<SiteMemberAuthEntity> memberAuthOrEmpty = memberAuthRepository.findByProviderAndProviderId(provider, providerId);
         return memberAuthOrEmpty.isEmpty() ? Optional.empty() : Optional.of(memberAuthEntityMapper.toSiteMemberAuth(memberAuthOrEmpty.orElseThrow()));
     }
 
