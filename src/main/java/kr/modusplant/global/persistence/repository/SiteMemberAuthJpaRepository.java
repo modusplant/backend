@@ -18,8 +18,6 @@ public interface SiteMemberAuthJpaRepository extends LastModifiedAtRepository<Si
 
     List<SiteMemberAuthEntity> findByEmail(String email);
 
-    List<SiteMemberAuthEntity> findByPw(String pw);
-
     List<SiteMemberAuthEntity> findByProvider(AuthProvider provider);
 
     List<SiteMemberAuthEntity> findByProviderId(String providerId);
