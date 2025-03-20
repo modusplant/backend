@@ -49,11 +49,6 @@ public class SiteMemberAuthServiceImpl implements SiteMemberAuthService {
     }
 
     @Override
-    public List<SiteMemberAuth> getByPw(String pw) {
-        return memberAuthRepository.findByPw(pw).stream().map(memberAuthEntityMapper::toSiteMemberAuth).toList();
-    }
-
-    @Override
     public List<SiteMemberAuth> getByProvider(AuthProvider provider) {
         return memberAuthRepository.findByProvider(provider).stream().map(memberAuthEntityMapper::toSiteMemberAuth).toList();
     }
@@ -61,11 +56,6 @@ public class SiteMemberAuthServiceImpl implements SiteMemberAuthService {
     @Override
     public List<SiteMemberAuth> getByProviderId(String providerId) {
         return memberAuthRepository.findByProviderId(providerId).stream().map(memberAuthEntityMapper::toSiteMemberAuth).toList();
-    }
-
-    @Override
-    public List<SiteMemberAuth> getByProviderAndProviderId(AuthProvider provider, String providerId) {
-        return memberAuthRepository.findByProviderAndProviderId(provider, providerId).stream().map(memberAuthEntityMapper::toSiteMemberAuth).toList();
     }
 
     @Override
@@ -84,6 +74,18 @@ public class SiteMemberAuthServiceImpl implements SiteMemberAuthService {
         Optional<SiteMemberAuthEntity> memberAuthOrEmpty = memberAuthRepository.findByOriginalMember(
                 memberRepository.findByUuid(originalMember.getUuid())
                         .orElseThrow(() -> new EntityNotFoundWithUuidException(originalMember.getUuid(), SiteMemberEntity.class)));
+        return memberAuthOrEmpty.isEmpty() ? Optional.empty() : Optional.of(memberAuthEntityMapper.toSiteMemberAuth(memberAuthOrEmpty.orElseThrow()));
+    }
+
+    @Override
+    public Optional<SiteMemberAuth> getByEmailAndProvider(String email, AuthProvider provider) {
+        Optional<SiteMemberAuthEntity> memberAuthOrEmpty = memberAuthRepository.findByEmailAndProvider(email, provider);
+        return memberAuthOrEmpty.isEmpty() ? Optional.empty() : Optional.of(memberAuthEntityMapper.toSiteMemberAuth(memberAuthOrEmpty.orElseThrow()));
+    }
+
+    @Override
+    public Optional<SiteMemberAuth> getByProviderAndProviderId(AuthProvider provider, String providerId) {
+        Optional<SiteMemberAuthEntity> memberAuthOrEmpty = memberAuthRepository.findByProviderAndProviderId(provider, providerId);
         return memberAuthOrEmpty.isEmpty() ? Optional.empty() : Optional.of(memberAuthEntityMapper.toSiteMemberAuth(memberAuthOrEmpty.orElseThrow()));
     }
 
