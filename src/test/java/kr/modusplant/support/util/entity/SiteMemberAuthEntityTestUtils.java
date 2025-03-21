@@ -39,7 +39,6 @@ public interface SiteMemberAuthEntityTestUtils extends SiteMemberEntityTestUtils
     default SiteMemberAuthEntityBuilder createMemberAuthGoogleUserEntityBuilder() {
         return builder()
                 .email(memberAuthGoogleUser.getEmail())
-                .pw(memberAuthGoogleUser.getPw())
                 .provider(memberAuthGoogleUser.getProvider())
                 .providerId(memberAuthGoogleUser.getProviderId());
     }
@@ -48,7 +47,6 @@ public interface SiteMemberAuthEntityTestUtils extends SiteMemberEntityTestUtils
         return builder()
                 .uuid(memberAuthGoogleUserWithUuid.getUuid())
                 .email(memberAuthGoogleUserWithUuid.getEmail())
-                .pw(memberAuthGoogleUserWithUuid.getPw())
                 .provider(memberAuthGoogleUserWithUuid.getProvider())
                 .providerId(memberAuthGoogleUserWithUuid.getProviderId());
     }
@@ -56,7 +54,6 @@ public interface SiteMemberAuthEntityTestUtils extends SiteMemberEntityTestUtils
     default SiteMemberAuthEntityBuilder createMemberAuthKakaoUserEntityBuilder() {
         return builder()
                 .email(memberAuthKakaoUser.getEmail())
-                .pw(memberAuthKakaoUser.getPw())
                 .provider(memberAuthKakaoUser.getProvider())
                 .providerId(memberAuthKakaoUser.getProviderId());
     }
@@ -65,7 +62,6 @@ public interface SiteMemberAuthEntityTestUtils extends SiteMemberEntityTestUtils
         return builder()
                 .uuid(memberAuthKakaoUserWithUuid.getUuid())
                 .email(memberAuthKakaoUserWithUuid.getEmail())
-                .pw(memberAuthKakaoUserWithUuid.getPw())
                 .provider(memberAuthKakaoUserWithUuid.getProvider())
                 .providerId(memberAuthKakaoUserWithUuid.getProviderId());
     }
