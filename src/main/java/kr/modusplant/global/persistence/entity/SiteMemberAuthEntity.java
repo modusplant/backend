@@ -14,7 +14,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.CamelCaseWord.PROVIDER;
 import static kr.modusplant.global.vo.SnakeCaseWord.*;
 
 @Entity
@@ -29,11 +28,11 @@ public class SiteMemberAuthEntity {
     private UUID uuid;
 
     @ManyToOne
-    @JoinColumn(name = SNAKE_ACT_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(nullable = false, name = SNAKE_ACT_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity activeMember;
 
     @OneToOne
-    @JoinColumn(unique = true, name = SNAKE_ORI_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(nullable = false, unique = true, name = SNAKE_ORI_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity originalMember;
 
     @Column(nullable = false, length = 80)
@@ -42,7 +41,7 @@ public class SiteMemberAuthEntity {
     @Column(length = 64)
     private String pw;
 
-    @Column(name = PROVIDER, nullable = false)
+    @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private AuthProvider provider;
 
