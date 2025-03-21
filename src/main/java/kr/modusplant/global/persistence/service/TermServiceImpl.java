@@ -64,7 +64,6 @@ public class TermServiceImpl implements TermService {
     @Transactional
     public Term update(Term term) {
         validateNotFoundTermUuid(term.getUuid());
-        validateExistedName(term.getName());
         return termEntityMapper.toTerm(termRepository.save(termEntityMapper.updateTermEntity(term)));
     }
 
