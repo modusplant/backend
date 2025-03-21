@@ -76,13 +76,16 @@ public class SiteMemberTermServiceImpl implements SiteMemberTermService {
     }
 
     private void validateExistedEntity(UUID uuid) {
+        if (uuid == null) {
+            return;
+        }
         if (memberTermRepository.findByUuid(uuid).isPresent()) {
             throw new EntityExistsWithUuidException(uuid, SiteMemberTermEntity.class);
         }
     }
 
     private void validateNotFoundEntity(UUID uuid) {
-        if (memberTermRepository.findByUuid(uuid).isEmpty()) {
+        if (uuid == null || memberTermRepository.findByUuid(uuid).isEmpty()) {
             throw new EntityNotFoundWithUuidException(uuid, SiteMemberTermEntity.class);
         }
     }

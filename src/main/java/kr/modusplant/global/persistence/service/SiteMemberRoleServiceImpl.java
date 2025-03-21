@@ -67,13 +67,16 @@ public class SiteMemberRoleServiceImpl implements SiteMemberRoleService {
     }
 
     private void validateExistedEntity(UUID uuid) {
+        if (uuid == null) {
+            return;
+        }
         if (memberRoleRepository.findByUuid(uuid).isPresent()) {
             throw new EntityExistsWithUuidException(uuid, SiteMemberRoleEntity.class);
         }
     }
 
     private void validateNotFoundEntity(UUID uuid) {
-        if (memberRoleRepository.findByUuid(uuid).isEmpty()) {
+        if (uuid == null || memberRoleRepository.findByUuid(uuid).isEmpty()) {
             throw new EntityNotFoundWithUuidException(uuid, SiteMemberRoleEntity.class);
         }
     }

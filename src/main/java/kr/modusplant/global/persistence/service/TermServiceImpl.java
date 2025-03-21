@@ -69,13 +69,16 @@ public class TermServiceImpl implements TermService {
     }
 
     private void validateExistedEntity(UUID uuid) {
+        if (uuid == null) {
+            return;
+        }
         if (termRepository.findByUuid(uuid).isPresent()) {
             throw new EntityExistsWithUuidException(uuid, TermEntity.class);
         }
     }
 
     private void validateNotFoundEntity(UUID uuid) {
-        if (termRepository.findByUuid(uuid).isEmpty()) {
+        if (uuid == null || termRepository.findByUuid(uuid).isEmpty()) {
             throw new EntityNotFoundWithUuidException(uuid, TermEntity.class);
         }
     }
