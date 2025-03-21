@@ -60,7 +60,7 @@ public class SiteMemberRoleEntity {
         }
     }
 
-    public SiteMemberRoleEntity(SiteMemberEntity member, Role role) {
+    private SiteMemberRoleEntity(SiteMemberEntity member, Role role) {
         this.member = member;
         this.role = role;
     }
