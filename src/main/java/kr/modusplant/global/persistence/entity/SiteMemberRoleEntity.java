@@ -26,7 +26,7 @@ public class SiteMemberRoleEntity {
 
     @OneToOne
     @MapsId
-    @JoinColumn(nullable = false, name = "uuid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(nullable = false, name = "uuid", updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity member;
 
     @Column(nullable = false, length = 20)

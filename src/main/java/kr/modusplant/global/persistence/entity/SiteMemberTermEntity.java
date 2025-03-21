@@ -25,7 +25,7 @@ public class SiteMemberTermEntity {
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = "uuid", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "uuid", nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity member;
 
     @Column(name = SNAKE_AGREED_TOU_VER, nullable = false, length = 10)
