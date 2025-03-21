@@ -1,7 +1,6 @@
 package kr.modusplant.global.mapper;
 
 import kr.modusplant.global.domain.model.SiteMemberAuth;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import kr.modusplant.global.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.global.persistence.entity.SiteMemberEntity;
 import kr.modusplant.global.persistence.repository.SiteMemberJpaRepository;
@@ -17,10 +16,8 @@ public interface SiteMemberAuthEntityMapper {
     default SiteMemberAuthEntity createSiteMemberAuthEntity(SiteMemberAuth memberAuth,
                                                             @Context SiteMemberJpaRepository memberRepository) {
         return SiteMemberAuthEntity.builder()
-                .activeMember(memberRepository.findByUuid(memberAuth.getActiveMemberUuid())
-                        .orElseThrow(() -> new EntityNotFoundWithUuidException(memberAuth.getUuid(), SiteMemberEntity.class)))
-                .originalMember(memberRepository.findByUuid(memberAuth.getOriginalMemberUuid())
-                        .orElseThrow(() -> new EntityNotFoundWithUuidException(memberAuth.getUuid(), SiteMemberEntity.class)))
+                .activeMember(memberRepository.findByUuid(memberAuth.getActiveMemberUuid()).orElseThrow())
+                .originalMember(memberRepository.findByUuid(memberAuth.getOriginalMemberUuid()).orElseThrow())
                 .email(memberAuth.getEmail())
                 .pw(memberAuth.getPw())
                 .provider(memberAuth.getProvider())
@@ -35,10 +32,8 @@ public interface SiteMemberAuthEntityMapper {
                                                             @Context SiteMemberJpaRepository memberRepository) {
         return SiteMemberAuthEntity.builder()
                 .uuid(memberAuth.getUuid())
-                .activeMember(memberRepository.findByUuid(memberAuth.getActiveMemberUuid())
-                        .orElseThrow(() -> new EntityNotFoundWithUuidException(memberAuth.getUuid(), SiteMemberEntity.class)))
-                .originalMember(memberRepository.findByUuid(memberAuth.getOriginalMemberUuid())
-                        .orElseThrow(() -> new EntityNotFoundWithUuidException(memberAuth.getUuid(), SiteMemberEntity.class)))
+                .activeMember(memberRepository.findByUuid(memberAuth.getActiveMemberUuid()).orElseThrow())
+                .originalMember(memberRepository.findByUuid(memberAuth.getOriginalMemberUuid()).orElseThrow())
                 .email(memberAuth.getEmail())
                 .pw(memberAuth.getPw())
                 .provider(memberAuth.getProvider())

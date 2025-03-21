@@ -1,5 +1,7 @@
 package kr.modusplant.global.persistence.service;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.global.domain.model.SiteMember;
 import kr.modusplant.global.domain.model.SiteMemberAuth;
 import kr.modusplant.global.domain.service.crud.SiteMemberAuthService;
@@ -20,6 +22,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
+import static kr.modusplant.global.vo.CamelCaseWord.ACTIVE_MEMBER_UUID;
+import static kr.modusplant.global.vo.CamelCaseWord.ORIGINAL_MEMBER_UUID;
+import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
+import static kr.modusplant.global.vo.ExceptionMessage.NOT_FOUND_ENTITY;
 
 @Service
 @Primary
@@ -92,14 +100,18 @@ public class SiteMemberAuthServiceImpl implements SiteMemberAuthService {
     @Override
     @Transactional
     public SiteMemberAuth insert(SiteMemberAuth memberAuth) {
+        validateNotFoundMemberUuid(ACTIVE_MEMBER_UUID, memberAuth.getActiveMemberUuid());
+        validateNotFoundMemberUuid(ORIGINAL_MEMBER_UUID, memberAuth.getOriginalMemberUuid());
         validateExistedMemberAuthUuid(memberAuth.getUuid());
-        validateExistedMemberUuid(memberAuth.getOriginalMemberUuid());
+        validateExistedMemberAuthOriginalMemberUuid(memberAuth.getOriginalMemberUuid());
         return memberAuthEntityMapper.toSiteMemberAuth(memberAuthRepository.save(memberAuthEntityMapper.createSiteMemberAuthEntity(memberAuth, memberRepository)));
     }
 
     @Override
     @Transactional
     public SiteMemberAuth update(SiteMemberAuth memberAuth) {
+        validateNotFoundMemberUuid(ACTIVE_MEMBER_UUID, memberAuth.getActiveMemberUuid());
+        validateNotFoundMemberUuid(ORIGINAL_MEMBER_UUID, memberAuth.getOriginalMemberUuid());
         validateNotFoundMemberAuthUuid(memberAuth.getUuid());
         return memberAuthEntityMapper.toSiteMemberAuth(memberAuthRepository.save(memberAuthEntityMapper.updateSiteMemberAuthEntity(memberAuth, memberRepository)));
     }
@@ -111,6 +123,12 @@ public class SiteMemberAuthServiceImpl implements SiteMemberAuthService {
         memberAuthRepository.deleteByUuid(uuid);
     }
 
+    private void validateNotFoundMemberUuid(String name, UUID uuid) {
+        if (uuid == null || memberRepository.findByUuid(uuid).isEmpty()) {
+            throw new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY, name, uuid, SiteMemberEntity.class));
+        }
+    }
+
     private void validateExistedMemberAuthUuid(UUID uuid) {
         if (uuid == null) {
             return;
@@ -120,9 +138,9 @@ public class SiteMemberAuthServiceImpl implements SiteMemberAuthService {
         }
     }
 
-    private void validateExistedMemberUuid(UUID uuid) {
-        if (memberRepository.findByUuid(uuid).isPresent()) {
-            throw new EntityExistsWithUuidException(uuid, SiteMemberEntity.class);
+    private void validateExistedMemberAuthOriginalMemberUuid(UUID uuid) {
+        if (memberAuthRepository.findByOriginalMember(memberRepository.findByUuid(uuid).orElseThrow()).isPresent()) {
+            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY, ORIGINAL_MEMBER_UUID, uuid, SiteMemberAuthEntity.class));
         }
     }
 
