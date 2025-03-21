@@ -93,7 +93,7 @@ public class SiteMemberAuthEntity {
         }
     }
 
-    public SiteMemberAuthEntity(UUID uuid, SiteMemberEntity activeMember, SiteMemberEntity originalMember, String email, String pw, AuthProvider provider, String providerId, Integer failedAttempt, LocalDateTime lockoutRefreshAt, LocalDateTime lockoutUntil) {
+    private SiteMemberAuthEntity(UUID uuid, SiteMemberEntity activeMember, SiteMemberEntity originalMember, String email, String pw, AuthProvider provider, String providerId, Integer failedAttempt, LocalDateTime lockoutRefreshAt, LocalDateTime lockoutUntil) {
         this.uuid = uuid;
         this.activeMember = activeMember;
         this.originalMember = originalMember;

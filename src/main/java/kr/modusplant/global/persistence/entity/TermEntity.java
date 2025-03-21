@@ -78,7 +78,7 @@ public class TermEntity {
         }
     }
 
-    public TermEntity(UUID uuid, String name, String content, String version) {
+    private TermEntity(UUID uuid, String name, String content, String version) {
         this.uuid = uuid;
         this.name = name;
         this.content = content;

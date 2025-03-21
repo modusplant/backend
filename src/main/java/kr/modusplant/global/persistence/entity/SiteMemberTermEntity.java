@@ -57,7 +57,7 @@ public class SiteMemberTermEntity {
         return new HashCodeBuilder(17, 37).append(getMember()).toHashCode();
     }
 
-    public SiteMemberTermEntity(SiteMemberEntity member, String agreedTermsOfUseVersion, String agreedPrivacyPolicyVersion, String agreedAdInfoReceivingVersion) {
+    private SiteMemberTermEntity(SiteMemberEntity member, String agreedTermsOfUseVersion, String agreedPrivacyPolicyVersion, String agreedAdInfoReceivingVersion) {
         this.member = member;
         this.agreedTermsOfUseVersion = agreedTermsOfUseVersion;
         this.agreedPrivacyPolicyVersion = agreedPrivacyPolicyVersion;
