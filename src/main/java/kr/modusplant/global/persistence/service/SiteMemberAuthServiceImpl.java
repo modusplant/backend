@@ -122,9 +122,6 @@ public class SiteMemberAuthServiceImpl implements SiteMemberAuthService {
     }
 
     private void validateExistedMemberUuid(UUID uuid) {
-        if (uuid == null) {
-            return;
-        }
         if (memberRepository.findByUuid(uuid).isPresent()) {
             throw new EntityExistsWithUuidException(uuid, SiteMemberEntity.class);
         }
