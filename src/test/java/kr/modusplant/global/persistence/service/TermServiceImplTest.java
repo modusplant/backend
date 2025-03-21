@@ -41,7 +41,7 @@ class TermServiceImplTest implements TermTestUtils, TermEntityTestUtils {
         TermEntity termEntity = createTermsOfUseEntity();
         Term term = termMapper.toTerm(termEntity);
 
-        given(termRepository.findByUuid(termEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(termEntity));
+        given(termRepository.findByUuid(termEntity.getUuid())).willReturn(Optional.of(termEntity));
         given(termRepository.save(termEntity)).willReturn(termEntity);
 
         // when
@@ -91,11 +91,11 @@ class TermServiceImplTest implements TermTestUtils, TermEntityTestUtils {
     @Test
     void removeByUuidTest() {
         // given
-        TermEntity termEntity = createTermsOfUseEntity();
+        TermEntity termEntity = createTermsOfUseEntityWithUuid();
         Term term = termMapper.toTerm(termEntity);
 
         given(termRepository.findByUuid(term.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(termEntity));
-        given(termRepository.save(termEntity)).willReturn(termEntity);
+        given(termRepository.save(createTermsOfUseEntity())).willReturn(termEntity);
         given(termRepository.findAll()).willReturn(emptyList());
         willDoNothing().given(termRepository).deleteByUuid(term.getUuid());
 

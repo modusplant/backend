@@ -113,13 +113,16 @@ public class SiteMemberAuthServiceImpl implements SiteMemberAuthService {
     }
 
     private void validateExistedEntity(UUID uuid) {
+        if (uuid == null) {
+            return;
+        }
         if (memberAuthRepository.findByUuid(uuid).isPresent()) {
             throw new EntityExistsWithUuidException(uuid, SiteMemberAuthEntity.class);
         }
     }
 
     private void validateNotFoundEntity(UUID uuid) {
-        if (memberAuthRepository.findByUuid(uuid).isEmpty()) {
+        if (uuid == null || memberAuthRepository.findByUuid(uuid).isEmpty()) {
             throw new EntityNotFoundWithUuidException(uuid, SiteMemberAuthEntity.class);
         }
     }

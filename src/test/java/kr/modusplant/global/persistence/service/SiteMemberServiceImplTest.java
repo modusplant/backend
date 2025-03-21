@@ -41,7 +41,7 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         SiteMemberEntity memberEntity = createMemberBasicUserEntity();
         SiteMember member = memberMapper.toSiteMember(memberEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
 
         // when
@@ -181,11 +181,11 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
     @Test
     void removeByUuidTest() {
         // given
-        SiteMemberEntity memberEntity = createMemberBasicUserEntity();
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         SiteMember member = memberMapper.toSiteMember(memberEntity);
 
         given(memberRepository.findByUuid(member.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
-        given(memberRepository.save(memberEntity)).willReturn(memberEntity);
+        given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
         given(memberRepository.findAll()).willReturn(emptyList());
         willDoNothing().given(memberRepository).deleteByUuid(member.getUuid());
 
