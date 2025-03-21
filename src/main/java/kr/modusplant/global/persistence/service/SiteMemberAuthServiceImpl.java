@@ -101,7 +101,6 @@ public class SiteMemberAuthServiceImpl implements SiteMemberAuthService {
     @Transactional
     public SiteMemberAuth update(SiteMemberAuth memberAuth) {
         validateNotFoundMemberAuthUuid(memberAuth.getUuid());
-        validateExistedMemberUuid(memberAuth.getOriginalMemberUuid());
         return memberAuthEntityMapper.toSiteMemberAuth(memberAuthRepository.save(memberAuthEntityMapper.updateSiteMemberAuthEntity(memberAuth, memberRepository)));
     }
 
