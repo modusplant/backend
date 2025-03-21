@@ -30,7 +30,7 @@ public class TermEntity {
     @Column(nullable = false)
     private UUID uuid;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false, length = 60000)
