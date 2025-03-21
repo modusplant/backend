@@ -1,11 +1,13 @@
 package kr.modusplant.global.persistence.service;
 
+import kr.modusplant.global.domain.model.SiteMember;
 import kr.modusplant.global.domain.model.SiteMemberTerm;
 import kr.modusplant.global.domain.service.crud.SiteMemberTermService;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import kr.modusplant.global.mapper.SiteMemberTermEntityMapper;
 import kr.modusplant.global.mapper.SiteMemberTermEntityMapperImpl;
+import kr.modusplant.global.persistence.entity.SiteMemberEntity;
 import kr.modusplant.global.persistence.entity.SiteMemberTermEntity;
 import kr.modusplant.global.persistence.repository.SiteMemberJpaRepository;
 import kr.modusplant.global.persistence.repository.SiteMemberTermJpaRepository;
@@ -55,8 +57,15 @@ public class SiteMemberTermServiceImpl implements SiteMemberTermService {
     }
 
     @Override
+    public Optional<SiteMemberTerm> getByMember(SiteMember member) {
+        Optional<SiteMemberTermEntity> memberTermOrEmpty = memberTermRepository.findByUuid(member.getUuid());
+        return memberTermOrEmpty.isEmpty() ? Optional.empty() : Optional.of(memberTermEntityMapper.toSiteMemberTerm(memberTermOrEmpty.orElseThrow()));
+    }
+
+    @Override
     @Transactional
     public SiteMemberTerm insert(SiteMemberTerm memberTerm) {
+        validateNotFoundMemberUuid(memberTerm.getUuid());
         validateExistedMemberTermUuid(memberTerm.getUuid());
         return memberTermEntityMapper.toSiteMemberTerm(memberTermRepository.save(memberTermEntityMapper.createSiteMemberTermEntity(memberTerm, memberRepository)));
     }
@@ -64,6 +73,7 @@ public class SiteMemberTermServiceImpl implements SiteMemberTermService {
     @Override
     @Transactional
     public SiteMemberTerm update(SiteMemberTerm memberTerm) {
+        validateNotFoundMemberUuid(memberTerm.getUuid());
         validateNotFoundMemberTermUuid(memberTerm.getUuid());
         return memberTermEntityMapper.toSiteMemberTerm(memberTermRepository.save(memberTermEntityMapper.updateSiteMemberTermEntity(memberTerm, memberRepository)));
     }
@@ -75,10 +85,13 @@ public class SiteMemberTermServiceImpl implements SiteMemberTermService {
         memberTermRepository.deleteByUuid(uuid);
     }
 
-    private void validateExistedMemberTermUuid(UUID uuid) {
-        if (uuid == null) {
-            return;
+    private void validateNotFoundMemberUuid(UUID uuid) {
+        if (uuid == null || memberRepository.findByUuid(uuid).isEmpty()) {
+            throw new EntityExistsWithUuidException(uuid, SiteMemberEntity.class);
         }
+    }
+
+    private void validateExistedMemberTermUuid(UUID uuid) {
         if (memberTermRepository.findByUuid(uuid).isPresent()) {
             throw new EntityExistsWithUuidException(uuid, SiteMemberTermEntity.class);
         }
