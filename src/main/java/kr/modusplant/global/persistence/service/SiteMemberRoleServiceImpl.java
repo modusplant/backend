@@ -48,25 +48,25 @@ public class SiteMemberRoleServiceImpl implements SiteMemberRoleService {
     @Override
     @Transactional
     public SiteMemberRole insert(SiteMemberRole memberRole) {
-        validateExistedEntity(memberRole.getUuid());
+        validateExistedMemberRoleUuid(memberRole.getUuid());
         return memberRoleEntityMapper.toSiteMemberRole(memberRoleRepository.save(memberRoleEntityMapper.createSiteMemberRoleEntity(memberRole, memberRepository)));
     }
 
     @Override
     @Transactional
     public SiteMemberRole update(SiteMemberRole memberRole) {
-        validateNotFoundEntity(memberRole.getUuid());
+        validateNotFoundMemberRoleUuid(memberRole.getUuid());
         return memberRoleEntityMapper.toSiteMemberRole(memberRoleRepository.save(memberRoleEntityMapper.updateSiteMemberRoleEntity(memberRole, memberRepository)));
     }
 
     @Override
     @Transactional
     public void removeByUuid(UUID uuid) {
-        validateNotFoundEntity(uuid);
+        validateNotFoundMemberRoleUuid(uuid);
         memberRoleRepository.deleteByUuid(uuid);
     }
 
-    private void validateExistedEntity(UUID uuid) {
+    private void validateExistedMemberRoleUuid(UUID uuid) {
         if (uuid == null) {
             return;
         }
@@ -75,7 +75,7 @@ public class SiteMemberRoleServiceImpl implements SiteMemberRoleService {
         }
     }
 
-    private void validateNotFoundEntity(UUID uuid) {
+    private void validateNotFoundMemberRoleUuid(UUID uuid) {
         if (uuid == null || memberRoleRepository.findByUuid(uuid).isEmpty()) {
             throw new EntityNotFoundWithUuidException(uuid, SiteMemberRoleEntity.class);
         }

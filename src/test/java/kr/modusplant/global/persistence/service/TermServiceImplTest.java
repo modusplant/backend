@@ -42,6 +42,7 @@ class TermServiceImplTest implements TermTestUtils, TermEntityTestUtils {
         Term term = termMapper.toTerm(termEntity);
 
         given(termRepository.findByUuid(termEntity.getUuid())).willReturn(Optional.of(termEntity));
+        given(termRepository.findByName(termEntity.getName())).willReturn(Optional.empty());
         given(termRepository.save(termEntity)).willReturn(termEntity);
 
         // when
@@ -59,8 +60,8 @@ class TermServiceImplTest implements TermTestUtils, TermEntityTestUtils {
         Term term = termMapper.toTerm(termEntity);
 
         given(termRepository.findByUuid(termEntity.getUuid())).willReturn(Optional.empty());
+        given(termRepository.findByName(termEntity.getName())).willReturn(Optional.empty()).willReturn(Optional.of(termEntity));
         given(termRepository.save(termEntity)).willReturn(termEntity);
-        given(termRepository.findByName(termEntity.getName())).willReturn(Optional.of(termEntity));
 
         // when
         term = termService.insert(term);
@@ -77,6 +78,7 @@ class TermServiceImplTest implements TermTestUtils, TermEntityTestUtils {
         Term term = termMapper.toTerm(termEntity);
 
         given(termRepository.findByUuid(termEntity.getUuid())).willReturn(Optional.empty());
+        given(termRepository.findByName(termEntity.getName())).willReturn(Optional.empty());
         given(termRepository.save(termEntity)).willReturn(termEntity);
         given(termRepository.findByVersion(termEntity.getVersion())).willReturn(List.of(termEntity));
 
@@ -95,6 +97,7 @@ class TermServiceImplTest implements TermTestUtils, TermEntityTestUtils {
         Term term = termMapper.toTerm(termEntity);
 
         given(termRepository.findByUuid(term.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(termEntity));
+        given(termRepository.findByName(termEntity.getName())).willReturn(Optional.empty());
         given(termRepository.save(createTermsOfUseEntity())).willReturn(termEntity);
         given(termRepository.findAll()).willReturn(emptyList());
         willDoNothing().given(termRepository).deleteByUuid(term.getUuid());

@@ -92,27 +92,27 @@ public class SiteMemberAuthServiceImpl implements SiteMemberAuthService {
     @Override
     @Transactional
     public SiteMemberAuth insert(SiteMemberAuth memberAuth) {
-        UUID uuid = memberAuth.getUuid();
-        validateExistedEntity(uuid);
+        validateExistedMemberAuthUuid(memberAuth.getUuid());
+        validateExistedMemberUuid(memberAuth.getOriginalMemberUuid());
         return memberAuthEntityMapper.toSiteMemberAuth(memberAuthRepository.save(memberAuthEntityMapper.createSiteMemberAuthEntity(memberAuth, memberRepository)));
     }
 
     @Override
     @Transactional
     public SiteMemberAuth update(SiteMemberAuth memberAuth) {
-        UUID uuid = memberAuth.getUuid();
-        validateNotFoundEntity(uuid);
+        validateNotFoundMemberAuthUuid(memberAuth.getUuid());
+        validateExistedMemberUuid(memberAuth.getOriginalMemberUuid());
         return memberAuthEntityMapper.toSiteMemberAuth(memberAuthRepository.save(memberAuthEntityMapper.updateSiteMemberAuthEntity(memberAuth, memberRepository)));
     }
 
     @Override
     @Transactional
     public void removeByUuid(UUID uuid) {
-        validateNotFoundEntity(uuid);
+        validateNotFoundMemberAuthUuid(uuid);
         memberAuthRepository.deleteByUuid(uuid);
     }
 
-    private void validateExistedEntity(UUID uuid) {
+    private void validateExistedMemberAuthUuid(UUID uuid) {
         if (uuid == null) {
             return;
         }
@@ -121,7 +121,16 @@ public class SiteMemberAuthServiceImpl implements SiteMemberAuthService {
         }
     }
 
-    private void validateNotFoundEntity(UUID uuid) {
+    private void validateExistedMemberUuid(UUID uuid) {
+        if (uuid == null) {
+            return;
+        }
+        if (memberRepository.findByUuid(uuid).isPresent()) {
+            throw new EntityExistsWithUuidException(uuid, SiteMemberEntity.class);
+        }
+    }
+
+    private void validateNotFoundMemberAuthUuid(UUID uuid) {
         if (uuid == null || memberAuthRepository.findByUuid(uuid).isEmpty()) {
             throw new EntityNotFoundWithUuidException(uuid, SiteMemberAuthEntity.class);
         }
