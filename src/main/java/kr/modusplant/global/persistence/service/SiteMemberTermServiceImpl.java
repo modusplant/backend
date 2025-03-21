@@ -57,25 +57,25 @@ public class SiteMemberTermServiceImpl implements SiteMemberTermService {
     @Override
     @Transactional
     public SiteMemberTerm insert(SiteMemberTerm memberTerm) {
-        validateExistedEntity(memberTerm.getUuid());
+        validateExistedMemberTermUuid(memberTerm.getUuid());
         return memberTermEntityMapper.toSiteMemberTerm(memberTermRepository.save(memberTermEntityMapper.createSiteMemberTermEntity(memberTerm, memberRepository)));
     }
 
     @Override
     @Transactional
     public SiteMemberTerm update(SiteMemberTerm memberTerm) {
-        validateNotFoundEntity(memberTerm.getUuid());
+        validateNotFoundMemberTermUuid(memberTerm.getUuid());
         return memberTermEntityMapper.toSiteMemberTerm(memberTermRepository.save(memberTermEntityMapper.updateSiteMemberTermEntity(memberTerm, memberRepository)));
     }
 
     @Override
     @Transactional
     public void removeByUuid(UUID uuid) {
-        validateNotFoundEntity(uuid);
+        validateNotFoundMemberTermUuid(uuid);
         memberTermRepository.deleteByUuid(uuid);
     }
 
-    private void validateExistedEntity(UUID uuid) {
+    private void validateExistedMemberTermUuid(UUID uuid) {
         if (uuid == null) {
             return;
         }
@@ -84,7 +84,7 @@ public class SiteMemberTermServiceImpl implements SiteMemberTermService {
         }
     }
 
-    private void validateNotFoundEntity(UUID uuid) {
+    private void validateNotFoundMemberTermUuid(UUID uuid) {
         if (uuid == null || memberTermRepository.findByUuid(uuid).isEmpty()) {
             throw new EntityNotFoundWithUuidException(uuid, SiteMemberTermEntity.class);
         }
