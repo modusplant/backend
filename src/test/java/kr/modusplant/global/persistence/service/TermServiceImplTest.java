@@ -38,7 +38,7 @@ class TermServiceImplTest implements TermTestUtils, TermEntityTestUtils {
     @Test
     void getByUuidTest() {
         // given
-        TermEntity termEntity = createTermsOfUseEntityWithUuid();
+        TermEntity termEntity = createTermsOfUseEntity();
         Term term = termMapper.toTerm(termEntity);
 
         given(termRepository.findByUuid(termEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(termEntity));
