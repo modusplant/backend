@@ -28,10 +28,10 @@ import static kr.modusplant.global.vo.SnakeCaseWord.*;
 public class TermEntity {
     @Id
     @UuidGenerator
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private UUID uuid;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private String name;
 
     @Column(nullable = false, length = 60000)
@@ -41,7 +41,7 @@ public class TermEntity {
     @DefaultValue
     private String version;
 
-    @Column(name = SNAKE_CREATED_AT, nullable = false)
+    @Column(name = SNAKE_CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 

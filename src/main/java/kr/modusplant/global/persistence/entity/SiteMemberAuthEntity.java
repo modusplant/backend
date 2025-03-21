@@ -25,7 +25,7 @@ import static kr.modusplant.global.vo.SnakeCaseWord.*;
 public class SiteMemberAuthEntity {
     @Id
     @UuidGenerator
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private UUID uuid;
 
     @ManyToOne
@@ -33,7 +33,7 @@ public class SiteMemberAuthEntity {
     private SiteMemberEntity activeMember;
 
     @OneToOne
-    @JoinColumn(nullable = false, unique = true, name = SNAKE_ORI_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(nullable = false, unique = true, updatable = false, name = SNAKE_ORI_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity originalMember;
 
     @Column(nullable = false, length = 80)
@@ -42,7 +42,7 @@ public class SiteMemberAuthEntity {
     @Column(length = 64)
     private String pw;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     @Enumerated(value = EnumType.STRING)
     private AuthProvider provider;
 

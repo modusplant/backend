@@ -26,7 +26,7 @@ import static kr.modusplant.global.vo.SnakeCaseWord.*;
 public class SiteMemberEntity {
     @Id
     @UuidGenerator
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private UUID uuid;
 
     @Column(nullable = false, length = 40)
@@ -54,7 +54,7 @@ public class SiteMemberEntity {
     @Column(name = SNAKE_LOGGED_IN_AT)
     private LocalDateTime loggedInAt;
 
-    @Column(name = SNAKE_CREATED_AT, nullable = false)
+    @Column(name = SNAKE_CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 
