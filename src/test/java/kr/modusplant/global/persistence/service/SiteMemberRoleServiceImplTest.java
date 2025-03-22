@@ -4,6 +4,7 @@ import kr.modusplant.global.domain.model.SiteMember;
 import kr.modusplant.global.domain.model.SiteMemberRole;
 import kr.modusplant.global.domain.service.crud.SiteMemberRoleService;
 import kr.modusplant.global.domain.service.crud.SiteMemberService;
+import kr.modusplant.global.enums.Role;
 import kr.modusplant.global.mapper.SiteMemberEntityMapper;
 import kr.modusplant.global.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.global.mapper.SiteMemberRoleEntityMapper;
@@ -90,6 +91,34 @@ class SiteMemberRoleServiceImplTest implements SiteMemberRoleTestUtils, SiteMemb
 
         // then
         assertThat(memberRoleService.getByRole(memberRoleEntity.getRole()).getFirst()).isEqualTo(memberRole);
+    }
+
+    @DisplayName("회원 역할 갱신")
+    @Test
+    void updateTest() {
+        // given
+        Role updatedRole = Role.ROLE_ADMIN;
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        SiteMember member = memberMapper.toSiteMember(memberEntity);
+        SiteMemberRoleEntity memberRoleEntity = createMemberRoleUserEntityWithUuid();
+        SiteMemberRoleEntity updatedMemberRoleEntity = SiteMemberRoleEntity.builder().memberRoleEntity(memberRoleEntity).role(updatedRole).build();
+        SiteMemberRole memberRole = memberRoleMapper.toSiteMemberRole(memberRoleEntity);
+        SiteMemberRole updatedMemberRole = memberRoleMapper.toSiteMemberRole(updatedMemberRoleEntity);
+
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.save(memberEntity)).willReturn(memberEntity);
+        given(memberRoleRepository.findByUuid(memberRole.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(updatedMemberRoleEntity));
+        given(memberRoleRepository.save(memberRoleEntity)).willReturn(memberRoleEntity);
+        given(memberRoleRepository.save(updatedMemberRoleEntity)).willReturn(updatedMemberRoleEntity);
+        given(memberRoleRepository.findByRole(updatedRole)).willReturn(List.of(updatedMemberRoleEntity));
+
+        // when
+        memberService.insert(member);
+        memberRoleService.insert(memberRole);
+        memberRoleService.update(updatedMemberRole);
+
+        // then
+        assertThat(memberRoleService.getByRole(updatedRole).getFirst()).isEqualTo(updatedMemberRole);
     }
 
     @DisplayName("uuid로 회원 역할 제거")

@@ -89,6 +89,28 @@ class TermServiceImplTest implements TermTestUtils, TermEntityTestUtils {
         assertThat(termService.getByVersion(termEntity.getVersion()).getFirst()).isEqualTo(term);
     }
 
+    @DisplayName("약관 갱신")
+    @Test
+    void updateTest() {
+        // given
+        String updatedContent = "갱신된 컨텐츠";
+        TermEntity termEntity = createTermsOfUseEntityWithUuid();
+        Term term = termMapper.toTerm(termEntity);
+        TermEntity updatedTermEntity = TermEntity.builder().termEntity(termEntity).content(updatedContent).build();
+        Term updatedTerm = termMapper.toTerm(updatedTermEntity);
+
+        given(termRepository.findByUuid(termEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(termEntity));
+        given(termRepository.save(termEntity)).willReturn(termEntity).willReturn(updatedTermEntity);
+        given(termRepository.findByName(updatedTermEntity.getName())).willReturn(Optional.empty()).willReturn(Optional.of(updatedTermEntity));
+
+        // when
+        termService.insert(term);
+        termService.update(updatedTerm);
+
+        // then
+        assertThat(termService.getByName(updatedTermEntity.getName()).orElseThrow().getContent()).isEqualTo(updatedContent);
+    }
+
     @DisplayName("uuid로 회원 제거")
     @Test
     void removeByUuidTest() {
