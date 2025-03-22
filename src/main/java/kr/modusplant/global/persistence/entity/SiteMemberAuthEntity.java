@@ -28,11 +28,11 @@ public class SiteMemberAuthEntity {
     @Column(nullable = false, updatable = false)
     private UUID uuid;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(nullable = false, name = SNAKE_ACT_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity activeMember;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(nullable = false, unique = true, updatable = false, name = SNAKE_ORI_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity originalMember;
 

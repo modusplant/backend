@@ -23,7 +23,7 @@ public class SiteMemberTermEntity {
     @Id
     private UUID uuid;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @MapsId
     @JoinColumn(name = "uuid", nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity member;
