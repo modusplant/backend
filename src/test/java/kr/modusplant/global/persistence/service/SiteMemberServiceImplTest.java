@@ -177,6 +177,28 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByLoggedInAt(memberEntity.getLoggedInAt()).getFirst()).isEqualTo(member);
     }
 
+    @DisplayName("회원 갱신")
+    @Test
+    void updateTest() {
+        // given
+        String updatedNickname = "갱신된 닉네임";
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        SiteMember member = memberMapper.toSiteMember(memberEntity);
+        SiteMemberEntity updatedMemberEntity = SiteMemberEntity.builder().memberEntity(memberEntity).nickname(updatedNickname).build();
+        SiteMember updatedMember = memberMapper.toSiteMember(updatedMemberEntity);
+
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.save(memberEntity)).willReturn(memberEntity).willReturn(updatedMemberEntity);
+        given(memberRepository.findByNickname(updatedNickname)).willReturn(List.of(updatedMemberEntity));
+
+        // when
+        memberService.insert(member);
+        memberService.update(updatedMember);
+
+        // then
+        assertThat(memberService.getByNickname(updatedNickname).getFirst()).isEqualTo(updatedMember);
+    }
+
     @DisplayName("uuid로 회원 제거")
     @Test
     void removeByUuidTest() {

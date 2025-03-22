@@ -261,6 +261,34 @@ class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemb
         assertThat(memberAuthService.getByFailedAttempt(memberAuth.getFailedAttempt()).getFirst()).isEqualTo(memberAuth);
     }
 
+    @DisplayName("회원 인증 갱신")
+    @Test
+    void updateTest() {
+        // given
+        String updatedEmail = "updatedEmail1@naver.com";
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        SiteMember member = memberMapper.toSiteMember(memberEntity);
+        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
+        SiteMemberAuthEntity updatedMemberAuthEntity = SiteMemberAuthEntity.builder().memberAuthEntity(memberAuthEntity).email(updatedEmail).build();
+        SiteMemberAuth memberAuth = memberAuthMapper.toSiteMemberAuth(memberAuthEntity);
+        SiteMemberAuth updatedMemberAuth = memberAuthMapper.toSiteMemberAuth(updatedMemberAuthEntity);
+
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.save(memberEntity)).willReturn(memberEntity);
+        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberAuthEntity));
+        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty());
+        given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity).willReturn(updatedMemberAuthEntity);
+        given(memberAuthRepository.findByEmail(updatedEmail)).willReturn(List.of(updatedMemberAuthEntity));
+
+        // when
+        memberService.insert(member);
+        memberAuthService.insert(memberAuth);
+        memberAuthService.update(updatedMemberAuth);
+
+        // then
+        assertThat(memberAuthService.getByEmail(updatedEmail).getFirst()).isEqualTo(updatedMemberAuth);
+    }
+
     @DisplayName("uuid로 회원 인증 제거")
     @Test
     void removeByUuidTest() {

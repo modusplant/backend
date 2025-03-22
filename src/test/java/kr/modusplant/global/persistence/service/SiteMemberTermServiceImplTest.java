@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.Collections.emptyList;
+import static kr.modusplant.global.util.VersionUtils.createVersion;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -136,6 +137,34 @@ class SiteMemberTermServiceImplTest implements SiteMemberTermTestUtils, SiteMemb
 
         // then
         assertThat(memberTermService.getByAgreedAdInfoReceivingVersion(memberTerm.getAgreedAdInfoReceivingVersion()).getFirst()).isEqualTo(memberTerm);
+    }
+
+    @DisplayName("회원 약관 갱신")
+    @Test
+    void updateTest() {
+        // given
+        String updatedAgreedTermsOfUseVersion = createVersion(1, 0, 1);
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        SiteMember member = memberMapper.toSiteMember(memberEntity);
+        SiteMemberTermEntity memberTermEntity = createMemberTermUserEntityWithUuid();
+        SiteMemberTermEntity updatedMemberTermEntity = SiteMemberTermEntity.builder().memberTermEntity(memberTermEntity).agreedTermsOfUseVersion(updatedAgreedTermsOfUseVersion).build();
+        SiteMemberTerm memberTerm = memberTermMapper.toSiteMemberTerm(memberTermEntity);
+        SiteMemberTerm updatedMemberTerm = memberTermMapper.toSiteMemberTerm(updatedMemberTermEntity);
+
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.save(memberEntity)).willReturn(memberEntity);
+        given(memberTermRepository.findByUuid(memberTerm.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(updatedMemberTermEntity));
+        given(memberTermRepository.save(memberTermEntity)).willReturn(memberTermEntity);
+        given(memberTermRepository.save(updatedMemberTermEntity)).willReturn(updatedMemberTermEntity);
+        given(memberTermRepository.findByAgreedTermsOfUseVersion(updatedAgreedTermsOfUseVersion)).willReturn(List.of(updatedMemberTermEntity));
+
+        // when
+        memberService.insert(member);
+        memberTermService.insert(memberTerm);
+        memberTermService.update(updatedMemberTerm);
+
+        // then
+        assertThat(memberTermService.getByAgreedTermsOfUseVersion(updatedAgreedTermsOfUseVersion).getFirst()).isEqualTo(updatedMemberTerm);
     }
 
     @DisplayName("uuid로 회원 약관 제거")
