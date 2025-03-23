@@ -34,7 +34,7 @@ class TermServiceImplTest implements TermTestUtils, TermEntityTestUtils {
         this.termRepository = termRepository;
     }
 
-    @DisplayName("uuid로 회원 얻기")
+    @DisplayName("uuid로 약관 얻기")
     @Test
     void getByUuidTest() {
         // given
@@ -52,7 +52,7 @@ class TermServiceImplTest implements TermTestUtils, TermEntityTestUtils {
         assertThat(termService.getByUuid(term.getUuid()).orElseThrow()).isEqualTo(term);
     }
 
-    @DisplayName("name으로 회원 얻기")
+    @DisplayName("name으로 약관 얻기")
     @Test
     void getByNameTest() {
         // given
@@ -70,7 +70,7 @@ class TermServiceImplTest implements TermTestUtils, TermEntityTestUtils {
         assertThat(termService.getByName(termEntity.getName()).orElseThrow()).isEqualTo(term);
     }
 
-    @DisplayName("version으로 회원 얻기")
+    @DisplayName("version으로 약관 얻기")
     @Test
     void getByVersionTest() {
         // given
@@ -111,7 +111,7 @@ class TermServiceImplTest implements TermTestUtils, TermEntityTestUtils {
         assertThat(termService.getByName(updatedTermEntity.getName()).orElseThrow().getContent()).isEqualTo(updatedContent);
     }
 
-    @DisplayName("uuid로 회원 제거")
+    @DisplayName("uuid로 약관 제거")
     @Test
     void removeByUuidTest() {
         // given
