@@ -53,7 +53,11 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 tasks.named('test') {
+	testClassesDirs = sourceSets.test.output.classesDirs
+	classpath = sourceSets.test.runtimeClasspath
+
 	useJUnitPlatform()
+
 	finalizedBy tasks.named('jacocoTestReport')
 }
 
@@ -79,6 +83,8 @@ afterEvaluate {
 tasks.register('testCoverage', Test) {
 	group = 'verification'
 	description = 'Runs the unit tests with coverage'
+	testClassesDirs = sourceSets.test.output.classesDirs
+	classpath = sourceSets.test.runtimeClasspath
 
 	dependsOn(':test', ':jacocoTestReport')
 
