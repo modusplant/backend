@@ -78,7 +78,7 @@ public class SiteMemberRoleServiceImpl implements SiteMemberRoleService {
 
     private void validateNotFoundMemberUuid(UUID uuid) {
         if (uuid == null || memberRepository.findByUuid(uuid).isEmpty()) {
-            throw new EntityExistsWithUuidException(uuid, SiteMemberEntity.class);
+            throw new EntityNotFoundWithUuidException(uuid, SiteMemberEntity.class);
         }
     }
 
