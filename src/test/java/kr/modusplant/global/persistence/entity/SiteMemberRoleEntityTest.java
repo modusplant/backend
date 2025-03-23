@@ -34,4 +34,22 @@ class SiteMemberRoleEntityTest implements SiteMemberRoleEntityTestUtils {
         // then
         assertThat(memberRole.getRole()).isEqualTo(Role.ROLE_ADMIN);
     }
+
+    @DisplayName("회원 역할 PreUpdate")
+    @Test
+    void preUpdate() {
+        // given
+        SiteMemberEntity member = SiteMemberEntity.builder().memberEntity(createMemberBasicUserEntity()).build();
+        SiteMemberRoleEntity memberRoleEntity = SiteMemberRoleEntity.builder().member(member).build();
+        entityManager.persist(memberRoleEntity);
+        entityManager.flush();
+        entityManager.detach(memberRoleEntity);
+
+        // when
+        memberRoleEntity = SiteMemberRoleEntity.builder().member(member).role(null).build();
+        entityManager.persist(memberRoleEntity);
+
+        // then
+        assertThat(memberRoleEntity.getRole()).isEqualTo(Role.ROLE_USER);
+    }
 }
