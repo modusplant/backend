@@ -46,7 +46,7 @@ public class SiteMemberAuthEntity {
     @Enumerated(value = EnumType.STRING)
     private AuthProvider provider;
 
-    @Column(name = SNAKE_PROVIDER_ID)
+    @Column(unique = true, name = SNAKE_PROVIDER_ID)
     private String providerId;
 
     @Column(name = SNAKE_FAILED_ATTEMPT, nullable = false)
