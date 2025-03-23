@@ -54,7 +54,7 @@ tasks.withType(JavaCompile).configureEach {
 
 tasks.named('test') {
 	useJUnitPlatform()
-	finalizedBy jacocoTestReport
+	finalizedBy tasks.named('jacocoTestReport')
 }
 
 tasks.named('jacocoTestReport') {
@@ -62,4 +62,25 @@ tasks.named('jacocoTestReport') {
 		html.required = true
 		xml.required = false
 	}
+}
+
+afterEvaluate {
+	tasks.named('jacocoTestReport') {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+					'**/generated/**',     // Exclude generated classes
+					'**/*_*',              // Exclude MapStruct-generated classes
+					'**/*Builder.*',       // Exclude builders
+			])
+		}))
+	}
+}
+
+tasks.register('testCoverage', Test) {
+	group = 'verification'
+	description = 'Runs the unit tests with coverage'
+
+	dependsOn(':test', ':jacocoTestReport')
+
+	tasks.named('jacocoTestReport').get().mustRunAfter(tasks.named('test'))
 }
