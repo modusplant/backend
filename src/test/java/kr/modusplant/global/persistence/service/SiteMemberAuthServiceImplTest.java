@@ -1,9 +1,13 @@
 package kr.modusplant.global.persistence.service;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.global.domain.model.SiteMember;
 import kr.modusplant.global.domain.model.SiteMemberAuth;
 import kr.modusplant.global.domain.service.crud.SiteMemberAuthService;
 import kr.modusplant.global.domain.service.crud.SiteMemberService;
+import kr.modusplant.global.error.EntityExistsWithUuidException;
+import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import kr.modusplant.global.mapper.SiteMemberAuthEntityMapper;
 import kr.modusplant.global.mapper.SiteMemberAuthEntityMapperImpl;
 import kr.modusplant.global.mapper.SiteMemberEntityMapper;
@@ -23,9 +27,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static java.util.Collections.emptyList;
+import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
+import static kr.modusplant.global.vo.CamelCaseWord.ACTIVE_MEMBER_UUID;
+import static kr.modusplant.global.vo.CamelCaseWord.ORIGINAL_MEMBER_UUID;
+import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
+import static kr.modusplant.global.vo.ExceptionMessage.NOT_FOUND_ENTITY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
@@ -261,6 +272,62 @@ class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemb
         assertThat(memberAuthService.getByFailedAttempt(memberAuth.getFailedAttempt()).getFirst()).isEqualTo(memberAuth);
     }
 
+    @DisplayName("회원 인증 삽입 간 검증")
+    @Test
+    void validateDuringInsertTest() {
+        // given
+        SiteMemberEntity activeMemberEntity = createMemberBasicUserEntityWithUuid();
+        UUID activeMemberEntityUuid = activeMemberEntity.getUuid();
+        SiteMemberEntity originalMemberEntity = SiteMemberEntity.builder().memberEntity(activeMemberEntity).uuid(UUID.randomUUID()).build();
+        UUID originalMemberEntityUuid = originalMemberEntity.getUuid();
+        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(activeMemberEntity).originalMember(originalMemberEntity).build();
+        UUID memberAuthEntityUuid = memberAuthEntity.getUuid();
+        SiteMemberAuth memberAuth = memberAuthMapper.toSiteMemberAuth(memberAuthEntity);
+
+        // Not Found activeMember 검증
+        // given & when
+        given(memberRepository.findByUuid(activeMemberEntityUuid)).willReturn(Optional.empty());
+
+        // then
+        EntityNotFoundException notFoundException = assertThrows(EntityNotFoundException.class,
+                () -> memberAuthService.insert(memberAuth));
+        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
+                NOT_FOUND_ENTITY, ACTIVE_MEMBER_UUID, activeMemberEntityUuid, SiteMemberEntity.class));
+
+        // Not Found originalMember 검증
+        // given & when
+        given(memberRepository.findByUuid(activeMemberEntityUuid)).willReturn(Optional.of(activeMemberEntity));
+        given(memberRepository.findByUuid(originalMemberEntityUuid)).willReturn(Optional.empty());
+
+        // then
+        notFoundException = assertThrows(EntityNotFoundException.class,
+                () -> memberAuthService.insert(memberAuth));
+        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
+                NOT_FOUND_ENTITY, ORIGINAL_MEMBER_UUID, originalMemberEntityUuid, SiteMemberEntity.class));
+
+        // Existed memberAuth 검증
+        // given & when
+        given(memberRepository.findByUuid(originalMemberEntityUuid)).willReturn(Optional.of(originalMemberEntity));
+        given(memberAuthRepository.findByUuid(memberAuthEntityUuid)).willReturn(Optional.of(memberAuthEntity));
+
+        // then
+        EntityExistsException existsException = assertThrows(EntityExistsWithUuidException.class,
+                () -> memberAuthService.insert(memberAuth));
+        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
+                EXISTED_ENTITY, "uuid", memberAuthEntityUuid, SiteMemberAuthEntity.class));
+
+        // Existed originalMember 검증
+        // given & when
+        given(memberAuthRepository.findByUuid(memberAuthEntityUuid)).willReturn(Optional.empty());
+        given(memberAuthRepository.findByOriginalMember(originalMemberEntity)).willReturn(Optional.of(memberAuthEntity));
+
+        // then
+        existsException = assertThrows(EntityExistsException.class,
+                () -> memberAuthService.insert(memberAuth));
+        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
+                EXISTED_ENTITY, ORIGINAL_MEMBER_UUID, originalMemberEntityUuid, SiteMemberAuthEntity.class));
+    }
+
     @DisplayName("회원 인증 갱신")
     @Test
     void updateTest() {
@@ -289,6 +356,51 @@ class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemb
         assertThat(memberAuthService.getByEmail(updatedEmail).getFirst()).isEqualTo(updatedMemberAuth);
     }
 
+    @DisplayName("회원 인증 갱신 간 검증")
+    @Test
+    void validateDuringUpdateTest() {
+        // given
+        SiteMemberEntity activeMemberEntity = createMemberBasicUserEntityWithUuid();
+        UUID activeMemberEntityUuid = activeMemberEntity.getUuid();
+        SiteMemberEntity originalMemberEntity = SiteMemberEntity.builder().memberEntity(activeMemberEntity).uuid(UUID.randomUUID()).build();
+        UUID originalMemberEntityUuid = originalMemberEntity.getUuid();
+        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(activeMemberEntity).originalMember(originalMemberEntity).build();
+        UUID memberAuthEntityUuid = memberAuthEntity.getUuid();
+        SiteMemberAuth memberAuth = memberAuthMapper.toSiteMemberAuth(memberAuthEntity);
+
+        // Not Found activeMember 검증
+        // given & when
+        given(memberRepository.findByUuid(activeMemberEntityUuid)).willReturn(Optional.empty());
+
+        // then
+        EntityNotFoundException notFoundException = assertThrows(EntityNotFoundException.class,
+                () -> memberAuthService.update(memberAuth));
+        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
+                NOT_FOUND_ENTITY, ACTIVE_MEMBER_UUID, activeMemberEntityUuid, SiteMemberEntity.class));
+
+        // Not Found originalMember 검증
+        // given & when
+        given(memberRepository.findByUuid(activeMemberEntityUuid)).willReturn(Optional.of(activeMemberEntity));
+        given(memberRepository.findByUuid(originalMemberEntityUuid)).willReturn(Optional.empty());
+
+        // then
+        notFoundException = assertThrows(EntityNotFoundException.class,
+                () -> memberAuthService.update(memberAuth));
+        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
+                NOT_FOUND_ENTITY, ORIGINAL_MEMBER_UUID, originalMemberEntityUuid, SiteMemberEntity.class));
+
+        // Not Found memberAuth 검증
+        // given & when
+        given(memberRepository.findByUuid(originalMemberEntityUuid)).willReturn(Optional.of(originalMemberEntity));
+        given(memberAuthRepository.findByUuid(memberAuthEntityUuid)).willReturn(Optional.empty());
+
+        // then
+        notFoundException = assertThrows(EntityNotFoundWithUuidException.class,
+                () -> memberAuthService.update(memberAuth));
+        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
+                NOT_FOUND_ENTITY, "uuid", memberAuthEntityUuid, SiteMemberAuthEntity.class));
+    }
+
     @DisplayName("uuid로 회원 인증 제거")
     @Test
     void removeByUuidTest() {
@@ -313,5 +425,23 @@ class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemb
 
         // then
         assertThat(memberAuthService.getAll()).isEmpty();
+    }
+
+    @DisplayName("uuid로 회원 인증 제거 간 검증")
+    @Test
+    void validateDuringRemoveByUuidTest() {
+        // given & when
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
+        UUID memberAuthEntityUuid = memberAuthEntity.getUuid();
+
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
+        given(memberAuthRepository.findByUuid(memberAuthEntityUuid)).willReturn(Optional.empty());
+
+        // then
+        EntityNotFoundException notFoundException = assertThrows(EntityNotFoundWithUuidException.class,
+                () -> memberAuthService.removeByUuid(memberAuthEntityUuid));
+        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
+                NOT_FOUND_ENTITY, "uuid", memberAuthEntityUuid, SiteMemberAuthEntity.class));
     }
 }

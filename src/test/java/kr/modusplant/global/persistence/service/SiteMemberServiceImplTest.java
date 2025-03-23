@@ -2,6 +2,8 @@ package kr.modusplant.global.persistence.service;
 
 import kr.modusplant.global.domain.model.SiteMember;
 import kr.modusplant.global.domain.service.crud.SiteMemberService;
+import kr.modusplant.global.error.EntityExistsWithUuidException;
+import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import kr.modusplant.global.mapper.SiteMemberEntityMapper;
 import kr.modusplant.global.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.global.persistence.entity.SiteMemberEntity;
@@ -15,9 +17,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static java.util.Collections.emptyList;
+import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
+import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
+import static kr.modusplant.global.vo.ExceptionMessage.NOT_FOUND_ENTITY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
@@ -177,6 +184,23 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByLoggedInAt(memberEntity.getLoggedInAt()).getFirst()).isEqualTo(member);
     }
 
+    @DisplayName("회원 삽입 간 검증")
+    @Test
+    void validateDuringInsertTest() {
+        // given & when
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        UUID memberEntityUuid = memberEntity.getUuid();
+        SiteMember member = memberMapper.toSiteMember(memberEntity);
+
+        given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.of(memberEntity));
+
+        // then
+        EntityExistsWithUuidException existsException = assertThrows(EntityExistsWithUuidException.class,
+                () -> memberService.insert(member));
+        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
+                EXISTED_ENTITY, "uuid", memberEntityUuid, SiteMemberEntity.class));
+    }
+
     @DisplayName("회원 갱신")
     @Test
     void updateTest() {
@@ -199,6 +223,23 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByNickname(updatedNickname).getFirst()).isEqualTo(updatedMember);
     }
 
+    @DisplayName("회원 갱신 간 검증")
+    @Test
+    void validateDuringUpdateTest() {
+        // given & when
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        UUID memberEntityUuid = memberEntity.getUuid();
+        SiteMember member = memberMapper.toSiteMember(memberEntity);
+
+        given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.empty());
+
+        // then
+        EntityNotFoundWithUuidException existsException = assertThrows(EntityNotFoundWithUuidException.class,
+                () -> memberService.update(member));
+        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
+                NOT_FOUND_ENTITY, "uuid", memberEntityUuid, SiteMemberEntity.class));
+    }
+
     @DisplayName("uuid로 회원 제거")
     @Test
     void removeByUuidTest() {
@@ -217,5 +258,21 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
 
         // then
         assertThat(memberService.getAll()).isEmpty();
+    }
+
+    @DisplayName("uuid로 회원 제거 간 검증")
+    @Test
+    void validateDuringRemoveByUuidTest() {
+        // given & when
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        UUID memberEntityUuid = memberEntity.getUuid();
+
+        given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.empty());
+
+        // then
+        EntityNotFoundWithUuidException existsException = assertThrows(EntityNotFoundWithUuidException.class,
+                () -> memberService.removeByUuid(memberEntityUuid));
+        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
+                NOT_FOUND_ENTITY, "uuid", memberEntityUuid, SiteMemberEntity.class));
     }
 }
