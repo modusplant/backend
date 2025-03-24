@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: modusplant
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: public
+        jdbc:
+          batch_size: 50
+          batch_versioned_data: true
+        order_inserts: true
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/local_plant
+    username: admin
+    password: 1plamod!
+mail-api:
+  key: 0bb14368f6a91837a38b0feccf1aef23
+  secret-key: 4aab68361b6e44e0248b45550f9ee0a4
