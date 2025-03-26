@@ -15,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -45,14 +44,12 @@ class SocialAuthServiceIntegrationTest {
         String nickname = "test";
         SiteMember existedMember = siteMemberService.insert(
                 SiteMember.builder()
-                .uuid(UUID.randomUUID())
                 .nickname(nickname)
                 .loggedInAt(LocalDateTime.now())
                 .build());
 
         SiteMemberAuth existedMemberAuth = siteMemberAuthService.insert(
                 SiteMemberAuth.builder()
-                        .uuid(UUID.randomUUID())
                         .activeMemberUuid(existedMember.getUuid())
                         .originalMemberUuid(existedMember.getUuid())
                         .email(email)
