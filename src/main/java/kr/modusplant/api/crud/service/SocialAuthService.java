@@ -132,9 +132,7 @@ public class SocialAuthService {
     @Transactional
     public SiteMember findOrCreateMember(AuthProvider provider,String id, String email, String nickname) {
         // provider와 provider_id로 site_member_auth 사용자 조회
-        Optional<SiteMemberAuth> existedMemberAuth = siteMemberAuthService.getByProviderAndProviderId(provider,id)
-                .stream()
-                .findFirst();
+        Optional<SiteMemberAuth> existedMemberAuth = siteMemberAuthService.getByProviderAndProviderId(provider,id);
 
         // 신규 멤버 저장 및 멤버 반환
         return existedMemberAuth.map(siteMemberAuth -> {
