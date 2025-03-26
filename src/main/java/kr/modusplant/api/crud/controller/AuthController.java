@@ -15,6 +15,7 @@ import kr.modusplant.api.crud.model.request.VerifyEmailRequest;
 import kr.modusplant.api.crud.model.response.SingleDataResponse;
 import kr.modusplant.api.crud.service.MailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,8 @@ public class AuthController {
     private final MailService mailService;
 
     // 비밀키 설정
-    private static final String SECRET_KEY = "modusplant0fwskslsoi021jscsmakdnkwlqdjskdjdksaldndwoqpwo";
+    @Value("${mail-api.jwt-secret-key}")
+    private String JWT_SECRET_KEY;
 
     @Operation(
             summary = "본인인증 메일 전송 API",
@@ -95,7 +97,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    // TODO : JWT Util 구현완료 시 옮기는것을 예상하고 작업 중
+    // TODO : JWT Util or Provider 구현완료 시 옮기는것을 예상하고 작업 중
     public String generateVerifyAccessToken(String email, String verifyCode) {
         // 만료 시간 설정
         Date now = new Date();
@@ -107,10 +109,11 @@ public class AuthController {
                 .claim("verifyCode", verifyCode)
                 .setIssuedAt(now)
                 .setExpiration(expirationDate)
-                .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
+                .signWith(Keys.hmacShaKeyFor(JWT_SECRET_KEY.getBytes()))
                 .compact();
     }
 
+    // TODO : Spring Security 적용 후 필터에서 쿠키 검증로직 추가된 후 테스트 필요
     public void validateVerifyAccessToken(String jwtToken, String verifyCode) {
         if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
             jwtToken = jwtToken.substring(7);
@@ -119,17 +122,17 @@ public class AuthController {
         try {
             // JWT 토큰 파싱
             Claims claims = Jwts.parser()
-                    .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
+                    .setSigningKey(Keys.hmacShaKeyFor(JWT_SECRET_KEY.getBytes()))
                     .build()
                     .parseClaimsJws(jwtToken)
                     .getBody();
 
             // JWT 토큰 검증
             String payloadEmail = claims.get("email", String.class);
-            String payloadverifyCode = claims.get("verifyCode", String.class);
+            String payloadVerifyCode = claims.get("verifyCode", String.class);
 
             // 발급된 인증코드와 메일 인증코드 일치 검증
-            if (!verifyCode.equals(payloadverifyCode)) {
+            if (!verifyCode.equals(payloadVerifyCode)) {
                 throw new RuntimeException("Invalid verification code");
             }
         } catch (ExpiredJwtException e) {
