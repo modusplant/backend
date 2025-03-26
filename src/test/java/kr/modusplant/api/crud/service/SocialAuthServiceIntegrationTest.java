@@ -59,7 +59,7 @@ class SocialAuthServiceIntegrationTest {
 
         SiteMemberRole existedMemberRole = siteMemberRoleService.insert(
                 SiteMemberRole.builder()
-                        .uuid(UUID.randomUUID())
+                        .uuid(existedMember.getUuid())
                         .role(Role.ROLE_USER)
                         .build());
 
