@@ -6,13 +6,13 @@ import com.mailjet.client.MailjetRequest;
 import com.mailjet.client.MailjetResponse;
 import com.mailjet.client.errors.MailjetException;
 import com.mailjet.client.resource.Emailv31;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class MailService {
     @Value("${mail-api.key}")
@@ -20,8 +20,6 @@ public class MailService {
 
     @Value("${mail-api.secret-key}")
     private String API_SECRET_KEY;
-
-    Logger logger = LoggerFactory.getLogger(MailService.class);
 
     public MailjetResponse callSendVerifyEmail(String email, String verifyCode) {
         // ClientOptions 생성
@@ -68,7 +66,7 @@ public class MailService {
         } catch (MailjetException e) {
             throw new RuntimeException(e.getMessage());
         }
-        logger.info("Mail Send Address : {}, Send Status : {} ", email, response.getStatus());
+        log.info("Mail Send Address : {}, Send Status : {} ", email, response.getStatus());
         return response;
     }
 }
