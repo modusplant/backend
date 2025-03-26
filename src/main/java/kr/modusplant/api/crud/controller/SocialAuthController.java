@@ -40,7 +40,7 @@ public class SocialAuthController {
         // Kakao 사용자 정보 가져오기
         KakaoUserInfo kakaoUserInfo = socialAuthService.getKakaoUserInfo(kakaoAccessToken);
         // 사용자 생성 및 조회
-        SiteMember siteMember = socialAuthService.findOrCreateMember(AuthProvider.KAKAO, String.valueOf(kakaoUserInfo.getId()),kakaoUserInfo.getKakaoAccount().getEmail(),kakaoUserInfo.getKakaoAccount().getProfile().getNickname());
+        SiteMember siteMember = socialAuthService.findOrCreateMember(AuthProvider.KAKAO, kakaoUserInfo.getKakaoId(),kakaoUserInfo.getKakaoEmail(),kakaoUserInfo.getKakaoNickname());
 
         /* JWT */
         // JWT 예시
