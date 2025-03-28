@@ -1,7 +1,6 @@
 package kr.modusplant.api.controller;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,6 +11,7 @@ import kr.modusplant.global.domain.model.SiteMember;
 import kr.modusplant.global.domain.model.SiteMemberAuth;
 import kr.modusplant.global.domain.model.SiteMemberTerm;
 import kr.modusplant.global.domain.model.Term;
+import kr.modusplant.global.enums.AuthProvider;
 import kr.modusplant.global.persistence.service.SiteMemberAuthServiceImpl;
 import kr.modusplant.global.persistence.service.SiteMemberServiceImpl;
 import kr.modusplant.global.persistence.service.SiteMemberTermServiceImpl;
@@ -23,6 +23,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -30,7 +31,7 @@ import java.util.*;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-public class SignUpController {
+public class NormalSignUpController {
 
     private final TermServiceImpl termService;
     private final SiteMemberTermServiceImpl siteMemberTermService;
@@ -75,18 +76,6 @@ public class SignUpController {
         }
     }
 
-//    @Operation(
-//            summary = "일반 회원가입 API",
-//            description = "클라이언트가 전달한 정보로 일반 회원가입을 합니다."
-//    )
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "OK: Succeeded"),
-//            @ApiResponse(responseCode = "500", description = "Internal Server Error: fail to sign up")
-//    })
-//    public ResponseEntity<Map<String, Object>> checkEmail(@RequestBody String email) {
-//        //
-//    }
-
     @Operation(
             summary = "일반 회원가입 API",
             description = "클라이언트가 전달한 정보로 일반 회원가입 합니다."
@@ -114,7 +103,7 @@ public class SignUpController {
             }
 
         } catch (Exception e) {
-            String exceptionMessage = "error while saving member";
+            String exceptionMessage = "";
 
             switch (e) {
                 case JsonParseException jsonParseException -> exceptionMessage = "parsing json string failed";
@@ -124,8 +113,7 @@ public class SignUpController {
                         exceptionMessage = "invalid table or column name";
                 case DataIntegrityViolationException dataIntegrityViolationException ->
                         exceptionMessage = "data constraints validated";
-                default -> {
-                }
+                default -> exceptionMessage = "error while saving member";
             }
 
             Response<Map<String, Object>> errorResponse = Response.createWithoutData(500, exceptionMessage);
@@ -146,25 +134,30 @@ public class SignUpController {
         return Map.of(mapKey, term);
     }
 
+    @Transactional
     private void insertMember(NormalSignUpRequest memberData) {
+        SiteMember siteMember = SiteMember.builder()
+                .nickname(memberData.nickname())
+                .build();
+        SiteMember savedMember = siteMemberService.insert(siteMember);
+
+        SiteMemberAuth siteMemberAuth = SiteMemberAuth.builder()
+                .uuid(savedMember.getUuid())
+                .activeMemberUuid(savedMember.getUuid())
+                .originalMemberUuid(savedMember.getUuid())
+                .email(memberData.email())
+//                .pw(passwordEncoder.encode(requestNode.get("pw")))
+                .pw(memberData.pw())
+                .provider(AuthProvider.BASIC)
+                .build();
+        siteMemberAuthService.insert(siteMemberAuth);
+
         SiteMemberTerm siteMemberTerm = SiteMemberTerm.builder()
+                .uuid(savedMember.getUuid())
                 .agreedTermsOfUseVersion(memberData.agreedTermsOfUseVerion())
                 .agreedPrivacyPolicyVersion(memberData.agreedPrivacyPolicyVerion())
                 .agreedAdInfoReceivingVersion(memberData.agreedAdInfoRecevingVerion())
                 .build();
-
-        SiteMemberAuth siteMemberAuth = SiteMemberAuth.builder()
-                .email(memberData.email())
-//                .pw(passwordEncoder.encode(requestNode.get("pw")))
-                .pw(memberData.pw())
-                .build();
-
-        SiteMember siteMember = SiteMember.builder()
-                .nickname(memberData.nickname())
-                .build();
-
-        siteMemberService.insert(siteMember);
-        siteMemberAuthService.insert(siteMemberAuth);
         siteMemberTermService.insert(siteMemberTerm);
     }
 }
