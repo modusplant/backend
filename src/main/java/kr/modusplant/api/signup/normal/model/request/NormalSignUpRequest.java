@@ -1,4 +1,4 @@
-package kr.modusplant.api.model.request;
+package kr.modusplant.api.signup.normal.model.request;
 
 public record NormalSignUpRequest(
         String email,

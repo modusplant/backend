@@ -1,12 +1,12 @@
-package kr.modusplant.api.controller;
+package kr.modusplant.api.signup.normal.controller;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import kr.modusplant.api.model.request.NormalSignUpRequest;
-import kr.modusplant.api.model.response.Response;
+import kr.modusplant.api.signup.normal.model.request.NormalSignUpRequest;
+import kr.modusplant.api.signup.normal.model.response.Response;
 import kr.modusplant.global.domain.model.SiteMember;
 import kr.modusplant.global.domain.model.SiteMemberAuth;
 import kr.modusplant.global.domain.model.SiteMemberTerm;
