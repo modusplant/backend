@@ -79,6 +79,28 @@ class SiteMemberRoleServiceImplTest implements SiteMemberRoleTestUtils, SiteMemb
         assertThat(memberRoleService.getByUuid(memberRole.getUuid()).orElseThrow()).isEqualTo(memberRole);
     }
 
+    @DisplayName("member로 회원 역할 얻기")
+    @Test
+    void getByMemberTest() {
+        // given
+        SiteMemberRoleEntity memberRoleEntity = createMemberRoleUserEntityWithUuid();
+        SiteMemberEntity memberEntity = memberRoleEntity.getMember();
+        SiteMember member = memberMapper.toSiteMember(memberEntity);
+        SiteMemberRole memberRole = memberRoleMapper.toSiteMemberRole(memberRoleEntity);
+
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.save(memberEntity)).willReturn(memberEntity);
+        given(memberRoleRepository.findByUuid(memberRole.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberRoleEntity));
+        given(memberRoleRepository.save(memberRoleEntity)).willReturn(memberRoleEntity);
+
+        // when
+        memberService.insert(member);
+        memberRole = memberRoleService.insert(memberRole);
+
+        // then
+        assertThat(memberRoleService.getByMember(member).orElseThrow()).isEqualTo(memberRole);
+    }
+
     @DisplayName("role로 회원 역할 얻기")
     @Test
     void getByRoleTest() {
@@ -100,6 +122,30 @@ class SiteMemberRoleServiceImplTest implements SiteMemberRoleTestUtils, SiteMemb
 
         // then
         assertThat(memberRoleService.getByRole(memberRoleEntity.getRole()).getFirst()).isEqualTo(memberRole);
+    }
+
+    @DisplayName("빈 회원 역할 얻기")
+    @Test
+    void getOptionalEmptyTest() {
+        // given
+        SiteMemberRoleEntity memberRoleEntity = createMemberRoleUserEntityWithUuid();
+        UUID uuid = memberRoleEntity.getUuid();
+        SiteMemberEntity memberEntity = memberRoleEntity.getMember();
+        SiteMember member = memberMapper.toSiteMember(memberEntity);
+
+        // getByUuid
+        // given & when
+        given(memberRoleRepository.findByUuid(uuid)).willReturn(Optional.empty());
+
+        // then
+        assertThat(memberRoleService.getByUuid(uuid)).isEmpty();
+
+        // getByMember
+        // given & when
+        given(memberRoleRepository.findByMember(memberEntity)).willReturn(Optional.empty());
+
+        // then
+        assertThat(memberRoleService.getByMember(member)).isEmpty();
     }
 
     @DisplayName("회원 역할 삽입 간 검증")
