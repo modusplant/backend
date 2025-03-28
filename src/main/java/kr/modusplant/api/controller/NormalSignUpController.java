@@ -97,7 +97,7 @@ public class NormalSignUpController {
                 return ResponseEntity.ok(successResponse);
 
             } else {
-                Response<Map<String, Object>> errorResponse = Response.createWithoutData(400, "pw and pw_ckeck not equivalent");
+                Response<Map<String, Object>> errorResponse = Response.createWithoutData(400, "pw and pw_check not equivalent");
 
                 return ResponseEntity.ok(errorResponse);
             }
