@@ -32,6 +32,19 @@ class SiteMemberRoleJpaRepositoryTest implements SiteMemberRoleEntityTestUtils {
         assertThat(memberRoleRepository.findByUuid(memberRole.getUuid()).orElseThrow()).isEqualTo(memberRole);
     }
 
+    @DisplayName("member로 회원 역할 찾기")
+    @Test
+    void findByMemberTest() {
+        // given
+        SiteMemberRoleEntity memberRole = createMemberRoleUserEntity();
+
+        // when
+        memberRoleRepository.save(memberRole);
+
+        // then
+        assertThat(memberRoleRepository.findByMember(memberRole.getMember()).orElseThrow()).isEqualTo(memberRole);
+    }
+
     @DisplayName("role로 회원 역할 찾기")
     @Test
     void findByRoleTest() {

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -26,11 +27,11 @@ import static kr.modusplant.global.vo.SnakeCaseWord.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TermEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(nullable = false)
+    @UuidGenerator
+    @Column(nullable = false, updatable = false)
     private UUID uuid;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false, updatable = false)
     private String name;
 
     @Column(nullable = false, length = 60000)
@@ -40,7 +41,7 @@ public class TermEntity {
     @DefaultValue
     private String version;
 
-    @Column(name = SNAKE_CREATED_AT, nullable = false)
+    @Column(name = SNAKE_CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 
@@ -78,7 +79,7 @@ public class TermEntity {
         }
     }
 
-    public TermEntity(UUID uuid, String name, String content, String version) {
+    private TermEntity(UUID uuid, String name, String content, String version) {
         this.uuid = uuid;
         this.name = name;
         this.content = content;

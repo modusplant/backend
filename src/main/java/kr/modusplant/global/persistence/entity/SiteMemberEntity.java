@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -24,8 +25,8 @@ import static kr.modusplant.global.vo.SnakeCaseWord.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SiteMemberEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(nullable = false)
+    @UuidGenerator
+    @Column(nullable = false, updatable = false)
     private UUID uuid;
 
     @Column(nullable = false, length = 40)
@@ -53,7 +54,7 @@ public class SiteMemberEntity {
     @Column(name = SNAKE_LOGGED_IN_AT)
     private LocalDateTime loggedInAt;
 
-    @Column(name = SNAKE_CREATED_AT, nullable = false)
+    @Column(name = SNAKE_CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 
@@ -109,7 +110,7 @@ public class SiteMemberEntity {
         }
     }
 
-    public SiteMemberEntity(UUID uuid, String nickname, LocalDate birthDate, Boolean isActive, Boolean isDisabledByLinking, Boolean isBanned, Boolean isDeleted, LocalDateTime loggedInAt) {
+    private SiteMemberEntity(UUID uuid, String nickname, LocalDate birthDate, Boolean isActive, Boolean isDisabledByLinking, Boolean isBanned, Boolean isDeleted, LocalDateTime loggedInAt) {
         this.uuid = uuid;
         this.nickname = nickname;
         this.birthDate = birthDate;

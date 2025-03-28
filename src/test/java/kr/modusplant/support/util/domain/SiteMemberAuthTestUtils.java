@@ -41,7 +41,6 @@ public interface SiteMemberAuthTestUtils {
 
     SiteMemberAuth memberAuthGoogleUser = SiteMemberAuth.builder()
             .email("Test3gOogleUsser@gmail.com")
-            .pw(new BCryptPasswordEncoder().encode("testPw12@"))
             .provider(AuthProvider.GOOGLE)
             .providerId("639796866968871286823")
             .build();
@@ -51,14 +50,12 @@ public interface SiteMemberAuthTestUtils {
             .activeMemberUuid(memberGoogleUserWithUuid.getUuid())
             .originalMemberUuid(memberGoogleUserWithUuid.getUuid())
             .email(memberAuthGoogleUser.getEmail())
-            .pw(memberAuthGoogleUser.getPw())
             .provider(memberAuthGoogleUser.getProvider())
             .providerId(memberAuthGoogleUser.getProviderId())
             .build();
 
     SiteMemberAuth memberAuthKakaoUser = SiteMemberAuth.builder()
             .email("test2KaKao4Uzer@kakao.com")
-            .pw(new BCryptPasswordEncoder().encode("ttEst^*Password1"))
             .provider(AuthProvider.KAKAO)
             .providerId("9348634889")
             .build();
@@ -68,7 +65,6 @@ public interface SiteMemberAuthTestUtils {
             .activeMemberUuid(memberKakaoUserWithUuid.getUuid())
             .originalMemberUuid(memberKakaoUserWithUuid.getUuid())
             .email(memberAuthKakaoUser.getEmail())
-            .pw(memberAuthKakaoUser.getPw())
             .provider(memberAuthKakaoUser.getProvider())
             .providerId(memberAuthKakaoUser.getProviderId())
             .build();

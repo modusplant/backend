@@ -23,9 +23,9 @@ public class SiteMemberTermEntity {
     @Id
     private UUID uuid;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @MapsId
-    @JoinColumn(name = "uuid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "uuid", nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity member;
 
     @Column(name = SNAKE_AGREED_TOU_VER, nullable = false, length = 10)
@@ -57,7 +57,7 @@ public class SiteMemberTermEntity {
         return new HashCodeBuilder(17, 37).append(getMember()).toHashCode();
     }
 
-    public SiteMemberTermEntity(SiteMemberEntity member, String agreedTermsOfUseVersion, String agreedPrivacyPolicyVersion, String agreedAdInfoReceivingVersion) {
+    private SiteMemberTermEntity(SiteMemberEntity member, String agreedTermsOfUseVersion, String agreedPrivacyPolicyVersion, String agreedAdInfoReceivingVersion) {
         this.member = member;
         this.agreedTermsOfUseVersion = agreedTermsOfUseVersion;
         this.agreedPrivacyPolicyVersion = agreedPrivacyPolicyVersion;

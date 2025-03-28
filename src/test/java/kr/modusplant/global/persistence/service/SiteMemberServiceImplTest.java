@@ -2,6 +2,8 @@ package kr.modusplant.global.persistence.service;
 
 import kr.modusplant.global.domain.model.SiteMember;
 import kr.modusplant.global.domain.service.crud.SiteMemberService;
+import kr.modusplant.global.error.EntityExistsWithUuidException;
+import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import kr.modusplant.global.mapper.SiteMemberEntityMapper;
 import kr.modusplant.global.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.global.persistence.entity.SiteMemberEntity;
@@ -15,9 +17,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static java.util.Collections.emptyList;
+import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
+import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
+import static kr.modusplant.global.vo.ExceptionMessage.NOT_FOUND_ENTITY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
@@ -34,14 +41,14 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         this.memberRepository = memberRepository;
     }
 
-    @DisplayName("uuid로 회원 찾기")
+    @DisplayName("uuid로 회원 얻기")
     @Test
     void getByUuidTest() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntity();
         SiteMember member = memberMapper.toSiteMember(memberEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
 
         // when
@@ -51,7 +58,7 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByUuid(member.getUuid()).orElseThrow()).isEqualTo(member);
     }
 
-    @DisplayName("nickname으로 회원 찾기")
+    @DisplayName("nickname으로 회원 얻기")
     @Test
     void getByNicknameTest() {
         // given
@@ -69,7 +76,7 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByNickname(memberEntity.getNickname()).getFirst()).isEqualTo(member);
     }
 
-    @DisplayName("birthDate으로 회원 찾기")
+    @DisplayName("birthDate으로 회원 얻기")
     @Test
     void getByBirthDateTest() {
         // given
@@ -87,7 +94,7 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByBirthDate(memberEntity.getBirthDate()).getFirst()).isEqualTo(member);
     }
 
-    @DisplayName("isActive으로 회원 찾기")
+    @DisplayName("isActive으로 회원 얻기")
     @Test
     void getByIsActiveTest() {
         // given
@@ -105,7 +112,7 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByIsActive(memberEntity.getIsActive()).getFirst()).isEqualTo(member);
     }
 
-    @DisplayName("isDisabledByLinking으로 회원 찾기")
+    @DisplayName("isDisabledByLinking으로 회원 얻기")
     @Test
     void getByIsDisabledByLinkingTest() {
         // given
@@ -123,7 +130,7 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByIsDisabledByLinking(memberEntity.getIsDisabledByLinking()).getFirst()).isEqualTo(member);
     }
 
-    @DisplayName("isBanned로 회원 찾기")
+    @DisplayName("isBanned로 회원 얻기")
     @Test
     void getByIsBannedTest() {
         // given
@@ -141,7 +148,7 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByIsBanned(memberEntity.getIsBanned()).getFirst()).isEqualTo(member);
     }
 
-    @DisplayName("isDeleted로 회원 찾기")
+    @DisplayName("isDeleted로 회원 얻기")
     @Test
     void getByIsDeletedTest() {
         // given
@@ -159,7 +166,7 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByIsDeleted(memberEntity.getIsDeleted()).getFirst()).isEqualTo(member);
     }
 
-    @DisplayName("loggedInAt으로 회원 찾기")
+    @DisplayName("loggedInAt으로 회원 얻기")
     @Test
     void getByLoggedInAtTest() {
         // given
@@ -177,15 +184,71 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByLoggedInAt(memberEntity.getLoggedInAt()).getFirst()).isEqualTo(member);
     }
 
-    @DisplayName("uuid로 회원 삭제")
+    @DisplayName("회원 삽입 간 검증")
     @Test
-    void deleteByUuidTest() {
+    void validateDuringInsertTest() {
+        // given & when
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        UUID memberEntityUuid = memberEntity.getUuid();
+        SiteMember member = memberMapper.toSiteMember(memberEntity);
+
+        given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.of(memberEntity));
+
+        // then
+        EntityExistsWithUuidException existsException = assertThrows(EntityExistsWithUuidException.class,
+                () -> memberService.insert(member));
+        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
+                EXISTED_ENTITY, "uuid", memberEntityUuid, SiteMemberEntity.class));
+    }
+
+    @DisplayName("회원 갱신")
+    @Test
+    void updateTest() {
         // given
-        SiteMemberEntity memberEntity = createMemberBasicUserEntity();
+        String updatedNickname = "갱신된 닉네임";
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        SiteMember member = memberMapper.toSiteMember(memberEntity);
+        SiteMemberEntity updatedMemberEntity = SiteMemberEntity.builder().memberEntity(memberEntity).nickname(updatedNickname).build();
+        SiteMember updatedMember = memberMapper.toSiteMember(updatedMemberEntity);
+
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.save(memberEntity)).willReturn(memberEntity).willReturn(updatedMemberEntity);
+        given(memberRepository.findByNickname(updatedNickname)).willReturn(List.of(updatedMemberEntity));
+
+        // when
+        memberService.insert(member);
+        memberService.update(updatedMember);
+
+        // then
+        assertThat(memberService.getByNickname(updatedNickname).getFirst()).isEqualTo(updatedMember);
+    }
+
+    @DisplayName("회원 갱신 간 검증")
+    @Test
+    void validateDuringUpdateTest() {
+        // given & when
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        UUID memberEntityUuid = memberEntity.getUuid();
+        SiteMember member = memberMapper.toSiteMember(memberEntity);
+
+        given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.empty());
+
+        // then
+        EntityNotFoundWithUuidException existsException = assertThrows(EntityNotFoundWithUuidException.class,
+                () -> memberService.update(member));
+        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
+                NOT_FOUND_ENTITY, "uuid", memberEntityUuid, SiteMemberEntity.class));
+    }
+
+    @DisplayName("uuid로 회원 제거")
+    @Test
+    void removeByUuidTest() {
+        // given
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         SiteMember member = memberMapper.toSiteMember(memberEntity);
 
         given(memberRepository.findByUuid(member.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
-        given(memberRepository.save(memberEntity)).willReturn(memberEntity);
+        given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
         given(memberRepository.findAll()).willReturn(emptyList());
         willDoNothing().given(memberRepository).deleteByUuid(member.getUuid());
 
@@ -195,5 +258,21 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
 
         // then
         assertThat(memberService.getAll()).isEmpty();
+    }
+
+    @DisplayName("uuid로 회원 제거 간 검증")
+    @Test
+    void validateDuringRemoveByUuidTest() {
+        // given & when
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        UUID memberEntityUuid = memberEntity.getUuid();
+
+        given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.empty());
+
+        // then
+        EntityNotFoundWithUuidException existsException = assertThrows(EntityNotFoundWithUuidException.class,
+                () -> memberService.removeByUuid(memberEntityUuid));
+        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
+                NOT_FOUND_ENTITY, "uuid", memberEntityUuid, SiteMemberEntity.class));
     }
 }

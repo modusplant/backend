@@ -24,9 +24,9 @@ public class SiteMemberRoleEntity {
     @Id
     private UUID uuid;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @MapsId
-    @JoinColumn(name = "uuid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(nullable = false, name = "uuid", updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity member;
 
     @Column(nullable = false, length = 20)
@@ -60,7 +60,7 @@ public class SiteMemberRoleEntity {
         }
     }
 
-    public SiteMemberRoleEntity(SiteMemberEntity member, Role role) {
+    private SiteMemberRoleEntity(SiteMemberEntity member, Role role) {
         this.member = member;
         this.role = role;
     }

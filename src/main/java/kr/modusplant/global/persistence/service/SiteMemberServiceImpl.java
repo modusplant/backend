@@ -77,32 +77,35 @@ public class SiteMemberServiceImpl implements SiteMemberService {
     @Override
     @Transactional
     public SiteMember insert(SiteMember member) {
-        validateExistedEntity(member.getUuid());
+        validateExistedMemberUuid(member.getUuid());
         return memberEntityMapper.toSiteMember(memberRepository.save(memberEntityMapper.createSiteMemberEntity(member)));
     }
 
     @Override
     @Transactional
     public SiteMember update(SiteMember member) {
-        validateNotFoundEntity(member.getUuid());
+        validateNotFoundMemberUuid(member.getUuid());
         return memberEntityMapper.toSiteMember(memberRepository.save(memberEntityMapper.updateSiteMemberEntity(member)));
     }
 
     @Override
     @Transactional
     public void removeByUuid(UUID uuid) {
-        validateNotFoundEntity(uuid);
+        validateNotFoundMemberUuid(uuid);
         memberRepository.deleteByUuid(uuid);
     }
 
-    private void validateExistedEntity(UUID uuid) {
+    private void validateExistedMemberUuid(UUID uuid) {
+        if (uuid == null) {
+            return;
+        }
         if (memberRepository.findByUuid(uuid).isPresent()) {
             throw new EntityExistsWithUuidException(uuid, SiteMemberEntity.class);
         }
     }
 
-    private void validateNotFoundEntity(UUID uuid) {
-        if (memberRepository.findByUuid(uuid).isEmpty()) {
+    private void validateNotFoundMemberUuid(UUID uuid) {
+        if (uuid == null || memberRepository.findByUuid(uuid).isEmpty()) {
             throw new EntityNotFoundWithUuidException(uuid, SiteMemberEntity.class);
         }
     }

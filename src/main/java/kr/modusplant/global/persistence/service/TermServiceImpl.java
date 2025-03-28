@@ -1,5 +1,6 @@
 package kr.modusplant.global.persistence.service;
 
+import jakarta.persistence.EntityExistsException;
 import kr.modusplant.global.domain.model.Term;
 import kr.modusplant.global.domain.service.crud.TermService;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
@@ -16,6 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
+import static kr.modusplant.global.vo.CamelCaseWord.NAME;
+import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
 
 @Service
 @Primary
@@ -50,32 +55,42 @@ public class TermServiceImpl implements TermService {
     @Override
     @Transactional
     public Term insert(Term term) {
-        validateExistedEntity(term.getUuid());
+        validateExistedTermUuid(term.getUuid());
+        validateExistedName(term.getName());
         return termEntityMapper.toTerm(termRepository.save(termEntityMapper.createTermEntity(term)));
     }
 
     @Override
     @Transactional
     public Term update(Term term) {
-        validateNotFoundEntity(term.getUuid());
+        validateNotFoundTermUuid(term.getUuid());
         return termEntityMapper.toTerm(termRepository.save(termEntityMapper.updateTermEntity(term)));
     }
 
     @Override
     @Transactional
     public void removeByUuid(UUID uuid) {
-        validateNotFoundEntity(uuid);
+        validateNotFoundTermUuid(uuid);
         termRepository.deleteByUuid(uuid);
     }
 
-    private void validateExistedEntity(UUID uuid) {
+    private void validateExistedTermUuid(UUID uuid) {
+        if (uuid == null) {
+            return;
+        }
         if (termRepository.findByUuid(uuid).isPresent()) {
             throw new EntityExistsWithUuidException(uuid, TermEntity.class);
         }
     }
 
-    private void validateNotFoundEntity(UUID uuid) {
-        if (termRepository.findByUuid(uuid).isEmpty()) {
+    private void validateExistedName(String name) {
+        if (termRepository.findByName(name).isPresent()) {
+            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY, NAME, name, TermEntity.class));
+        }
+    }
+
+    private void validateNotFoundTermUuid(UUID uuid) {
+        if (uuid == null || termRepository.findByUuid(uuid).isEmpty()) {
             throw new EntityNotFoundWithUuidException(uuid, TermEntity.class);
         }
     }

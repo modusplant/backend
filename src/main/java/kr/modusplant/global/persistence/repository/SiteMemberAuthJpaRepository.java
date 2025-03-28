@@ -18,15 +18,15 @@ public interface SiteMemberAuthJpaRepository extends LastModifiedAtRepository<Si
 
     List<SiteMemberAuthEntity> findByEmail(String email);
 
-    List<SiteMemberAuthEntity> findByPw(String pw);
-
     List<SiteMemberAuthEntity> findByProvider(AuthProvider provider);
 
     List<SiteMemberAuthEntity> findByProviderId(String providerId);
 
-    List<SiteMemberAuthEntity> findByProviderAndProviderId(AuthProvider provider, String providerId);
-
     List<SiteMemberAuthEntity> findByFailedAttempt(Integer failedAttempt);
 
     Optional<SiteMemberAuthEntity> findByOriginalMember(SiteMemberEntity originalMember);
+
+    Optional<SiteMemberAuthEntity> findByEmailAndProvider(String email, AuthProvider provider);
+
+    Optional<SiteMemberAuthEntity> findByProviderAndProviderId(AuthProvider provider, String providerId);
 }
