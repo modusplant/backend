@@ -184,6 +184,20 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         assertThat(memberService.getByLoggedInAt(memberEntity.getLoggedInAt()).getFirst()).isEqualTo(member);
     }
 
+    @DisplayName("빈 회원 얻기")
+    @Test
+    void getOptionalEmptyTest() {
+        // given
+        UUID uuid = memberBasicUserWithUuid.getUuid();
+
+        // getByUuid
+        // given & when
+        given(memberRepository.findByUuid(uuid)).willReturn(Optional.empty());
+
+        // then
+        assertThat(memberService.getByUuid(uuid)).isEmpty();
+    }
+
     @DisplayName("회원 삽입 간 검증")
     @Test
     void validateDuringInsertTest() {
