@@ -6,6 +6,8 @@ import kr.modusplant.global.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.UUID;
@@ -22,15 +24,27 @@ public class SiteMemberRoleEntity {
     @Id
     private UUID uuid;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @MapsId
-    @JoinColumn(name = "uuid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(nullable = false, name = "uuid", updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity member;
 
     @Column(nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     @DefaultValue
     private Role role;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SiteMemberRoleEntity that)) return false;
+        return new EqualsBuilder().append(getMember(), that.getMember()).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(getMember()).toHashCode();
+    }
 
     @PrePersist
     public void prePersist() {
@@ -46,7 +60,7 @@ public class SiteMemberRoleEntity {
         }
     }
 
-    public SiteMemberRoleEntity(SiteMemberEntity member, Role role) {
+    private SiteMemberRoleEntity(SiteMemberEntity member, Role role) {
         this.member = member;
         this.role = role;
     }

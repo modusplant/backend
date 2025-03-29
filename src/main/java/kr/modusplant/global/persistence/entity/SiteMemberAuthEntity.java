@@ -6,13 +6,15 @@ import kr.modusplant.global.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.CamelCaseWord.PROVIDER;
 import static kr.modusplant.global.vo.SnakeCaseWord.*;
 
 @Entity
@@ -22,16 +24,16 @@ import static kr.modusplant.global.vo.SnakeCaseWord.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SiteMemberAuthEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(nullable = false)
+    @UuidGenerator
+    @Column(nullable = false, updatable = false)
     private UUID uuid;
 
-    @ManyToOne
-    @JoinColumn(name = SNAKE_ACT_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
+    @JoinColumn(nullable = false, name = SNAKE_ACT_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity activeMember;
 
-    @OneToOne
-    @JoinColumn(name = SNAKE_ORI_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
+    @JoinColumn(nullable = false, unique = true, updatable = false, name = SNAKE_ORI_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity originalMember;
 
     @Column(nullable = false, length = 80)
@@ -40,11 +42,11 @@ public class SiteMemberAuthEntity {
     @Column(length = 64)
     private String pw;
 
-    @Column(name = PROVIDER, nullable = false)
+    @Column(nullable = false, updatable = false)
     @Enumerated(value = EnumType.STRING)
     private AuthProvider provider;
 
-    @Column(name = SNAKE_PROVIDER_ID)
+    @Column(unique = true, updatable = false, name = SNAKE_PROVIDER_ID)
     private String providerId;
 
     @Column(name = SNAKE_FAILED_ATTEMPT, nullable = false)
@@ -65,6 +67,18 @@ public class SiteMemberAuthEntity {
     @Column(name = SNAKE_VER_NUM, nullable = false)
     private Long versionNumber;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SiteMemberAuthEntity that)) return false;
+        return new EqualsBuilder().append(getOriginalMember(), that.getOriginalMember()).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(getOriginalMember()).toHashCode();
+    }
+
     @PrePersist
     public void prePersist() {
         if (this.failedAttempt == null) {
@@ -79,7 +93,7 @@ public class SiteMemberAuthEntity {
         }
     }
 
-    public SiteMemberAuthEntity(UUID uuid, SiteMemberEntity activeMember, SiteMemberEntity originalMember, String email, String pw, AuthProvider provider, String providerId, Integer failedAttempt, LocalDateTime lockoutRefreshAt, LocalDateTime lockoutUntil) {
+    private SiteMemberAuthEntity(UUID uuid, SiteMemberEntity activeMember, SiteMemberEntity originalMember, String email, String pw, AuthProvider provider, String providerId, Integer failedAttempt, LocalDateTime lockoutRefreshAt, LocalDateTime lockoutUntil) {
         this.uuid = uuid;
         this.activeMember = activeMember;
         this.originalMember = originalMember;

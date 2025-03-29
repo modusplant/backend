@@ -16,4 +16,23 @@ public class SiteMemberTerm {
     private final String agreedPrivacyPolicyVersion;
 
     private final String agreedAdInfoReceivingVersion;
+
+    public static class SiteMemberTermBuilder {
+        private UUID uuid;
+        private String agreedTermsOfUseVersion;
+        private String agreedPrivacyPolicyVersion;
+        private String agreedAdInfoReceivingVersion;
+
+        public SiteMemberTermBuilder memberTerm(SiteMemberTerm memberTerm) {
+            this.uuid = memberTerm.getUuid();
+            this.agreedTermsOfUseVersion = memberTerm.getAgreedTermsOfUseVersion();
+            this.agreedPrivacyPolicyVersion = memberTerm.getAgreedPrivacyPolicyVersion();
+            this.agreedAdInfoReceivingVersion = memberTerm.getAgreedAdInfoReceivingVersion();
+            return this;
+        }
+
+        public SiteMemberTerm build() {
+            return new SiteMemberTerm(this.uuid, this.agreedTermsOfUseVersion, this.agreedPrivacyPolicyVersion, this.agreedAdInfoReceivingVersion);
+        }
+    }
 }

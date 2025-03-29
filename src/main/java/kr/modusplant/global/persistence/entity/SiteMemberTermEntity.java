@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -21,9 +23,9 @@ public class SiteMemberTermEntity {
     @Id
     private UUID uuid;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @MapsId
-    @JoinColumn(name = "uuid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "uuid", nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity member;
 
     @Column(name = SNAKE_AGREED_TOU_VER, nullable = false, length = 10)
@@ -32,7 +34,7 @@ public class SiteMemberTermEntity {
     @Column(name = SNAKE_AGREED_PRIV_POLI_VER, nullable = false, length = 10)
     private String agreedPrivacyPolicyVersion;
 
-    @Column(name = SNAKE_AGREED_AD_INFO_RECE_VER, nullable = false, length = 10)
+    @Column(name = SNAKE_AGREED_AD_INFO_RECE_VER, length = 10)
     private String agreedAdInfoReceivingVersion;
 
     @Column(name = SNAKE_LAST_MODIFIED_AT, nullable = false)
@@ -43,7 +45,19 @@ public class SiteMemberTermEntity {
     @Column(name = SNAKE_VER_NUM, nullable = false)
     private Long versionNumber;
 
-    public SiteMemberTermEntity(SiteMemberEntity member, String agreedTermsOfUseVersion, String agreedPrivacyPolicyVersion, String agreedAdInfoReceivingVersion) {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SiteMemberTermEntity that)) return false;
+        return new EqualsBuilder().append(getMember(), that.getMember()).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(getMember()).toHashCode();
+    }
+
+    private SiteMemberTermEntity(SiteMemberEntity member, String agreedTermsOfUseVersion, String agreedPrivacyPolicyVersion, String agreedAdInfoReceivingVersion) {
         this.member = member;
         this.agreedTermsOfUseVersion = agreedTermsOfUseVersion;
         this.agreedPrivacyPolicyVersion = agreedPrivacyPolicyVersion;

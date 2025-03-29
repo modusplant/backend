@@ -1,11 +1,15 @@
 package kr.modusplant.global.mapper;
 
 import kr.modusplant.global.domain.model.SiteMemberTerm;
+import kr.modusplant.global.persistence.entity.SiteMemberEntity;
 import kr.modusplant.global.persistence.entity.SiteMemberTermEntity;
 import kr.modusplant.global.persistence.repository.SiteMemberJpaRepository;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Context;
-import org.mapstruct.Mapper;
+import org.mapstruct.*;
+
+import java.util.UUID;
+
+import static kr.modusplant.global.vo.CamelCaseWord.MEMBER;
+import static kr.modusplant.global.vo.CamelCaseWord.MEMBER_TERM;
 
 @Mapper
 public interface SiteMemberTermEntityMapper {
@@ -27,5 +31,12 @@ public interface SiteMemberTermEntityMapper {
                 .agreedAdInfoReceivingVersion(memberTerm.getAgreedAdInfoReceivingVersion()).build();
     }
 
+    @Mapping(source = MEMBER, target = "uuid", qualifiedByName = "toUuid")
+    @Mapping(target = MEMBER_TERM, ignore = true)
     SiteMemberTerm toSiteMemberTerm(SiteMemberTermEntity memberTermEntity);
+
+    @Named("toUuid")
+    default UUID toUuid(SiteMemberEntity member) {
+        return member.getUuid();
+    }
 }

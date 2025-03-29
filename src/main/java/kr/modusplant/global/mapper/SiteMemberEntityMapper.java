@@ -4,6 +4,9 @@ import kr.modusplant.global.domain.model.SiteMember;
 import kr.modusplant.global.persistence.entity.SiteMemberEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+import static kr.modusplant.global.vo.CamelCaseWord.MEMBER;
 
 @Mapper
 public interface SiteMemberEntityMapper {
@@ -32,5 +35,6 @@ public interface SiteMemberEntityMapper {
                 .loggedInAt(member.getLoggedInAt()).build();
     }
 
+    @Mapping(target = MEMBER, ignore = true)
     SiteMember toSiteMember(SiteMemberEntity siteMemberEntity);
 }

@@ -1,5 +1,6 @@
 package kr.modusplant.global.persistence.service;
 
+import kr.modusplant.global.domain.model.SiteMember;
 import kr.modusplant.global.domain.model.SiteMemberRole;
 import kr.modusplant.global.domain.service.crud.SiteMemberRoleService;
 import kr.modusplant.global.enums.Role;
@@ -7,6 +8,7 @@ import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import kr.modusplant.global.mapper.SiteMemberRoleEntityMapper;
 import kr.modusplant.global.mapper.SiteMemberRoleEntityMapperImpl;
+import kr.modusplant.global.persistence.entity.SiteMemberEntity;
 import kr.modusplant.global.persistence.entity.SiteMemberRoleEntity;
 import kr.modusplant.global.persistence.repository.SiteMemberJpaRepository;
 import kr.modusplant.global.persistence.repository.SiteMemberRoleJpaRepository;
@@ -46,34 +48,48 @@ public class SiteMemberRoleServiceImpl implements SiteMemberRoleService {
     }
 
     @Override
+    public Optional<SiteMemberRole> getByMember(SiteMember member) {
+        Optional<SiteMemberRoleEntity> memberRoleOrEmpty = memberRoleRepository.findByUuid(member.getUuid());
+        return memberRoleOrEmpty.isEmpty() ? Optional.empty() : Optional.of(memberRoleEntityMapper.toSiteMemberRole(memberRoleOrEmpty.orElseThrow()));
+    }
+
+    @Override
     @Transactional
     public SiteMemberRole insert(SiteMemberRole memberRole) {
-        validateExistedEntity(memberRole.getUuid());
+        validateNotFoundMemberUuid(memberRole.getUuid());
+        validateExistedMemberRoleUuid(memberRole.getUuid());
         return memberRoleEntityMapper.toSiteMemberRole(memberRoleRepository.save(memberRoleEntityMapper.createSiteMemberRoleEntity(memberRole, memberRepository)));
     }
 
     @Override
     @Transactional
     public SiteMemberRole update(SiteMemberRole memberRole) {
-        validateNotFoundEntity(memberRole.getUuid());
+        validateNotFoundMemberUuid(memberRole.getUuid());
+        validateNotFoundMemberRoleUuid(memberRole.getUuid());
         return memberRoleEntityMapper.toSiteMemberRole(memberRoleRepository.save(memberRoleEntityMapper.updateSiteMemberRoleEntity(memberRole, memberRepository)));
     }
 
     @Override
     @Transactional
     public void removeByUuid(UUID uuid) {
-        validateNotFoundEntity(uuid);
+        validateNotFoundMemberRoleUuid(uuid);
         memberRoleRepository.deleteByUuid(uuid);
     }
 
-    private void validateExistedEntity(UUID uuid) {
+    private void validateNotFoundMemberUuid(UUID uuid) {
+        if (uuid == null || memberRepository.findByUuid(uuid).isEmpty()) {
+            throw new EntityNotFoundWithUuidException(uuid, SiteMemberEntity.class);
+        }
+    }
+
+    private void validateExistedMemberRoleUuid(UUID uuid) {
         if (memberRoleRepository.findByUuid(uuid).isPresent()) {
             throw new EntityExistsWithUuidException(uuid, SiteMemberRoleEntity.class);
         }
     }
 
-    private void validateNotFoundEntity(UUID uuid) {
-        if (memberRoleRepository.findByUuid(uuid).isEmpty()) {
+    private void validateNotFoundMemberRoleUuid(UUID uuid) {
+        if (uuid == null || memberRoleRepository.findByUuid(uuid).isEmpty()) {
             throw new EntityNotFoundWithUuidException(uuid, SiteMemberRoleEntity.class);
         }
     }
