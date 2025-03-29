@@ -1,4 +1,4 @@
-package kr.modusplant.api.crud.controller;
+package kr.modusplant.api.auth.email.controller;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -10,10 +10,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import kr.modusplant.api.crud.model.request.EmailRequest;
-import kr.modusplant.api.crud.model.request.VerifyEmailRequest;
-import kr.modusplant.api.crud.model.response.SingleDataResponse;
-import kr.modusplant.api.crud.service.MailService;
+import kr.modusplant.api.auth.email.model.request.EmailRequest;
+import kr.modusplant.api.auth.email.model.request.VerifyEmailRequest;
+import kr.modusplant.api.auth.email.model.response.SingleDataResponse;
+import kr.modusplant.api.auth.email.service.MailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package kr.modusplant.api.crud.model.request;
+package kr.modusplant.api.auth.email.model.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;

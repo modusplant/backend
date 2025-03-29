@@ -1,4 +1,4 @@
-package kr.modusplant.api.crud.model.response;
+package kr.modusplant.api.auth.email.model.response;
 
 import lombok.Getter;
 import lombok.Setter;
