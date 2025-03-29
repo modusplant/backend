@@ -48,7 +48,7 @@ public class SocialAuthController {
         TokenResponse token = new TokenResponse();
         token.setAccessToken(accessToken);
 
-        SingleDataResponse<TokenResponse> response = SingleDataResponse.success(200,"OK: Succeeded", token);
+        DataResponse<TokenResponse> response = DataResponse.of(200,"OK: Succeeded", token);
 
         return ResponseEntity.ok(response);
     }
@@ -76,7 +76,7 @@ public class SocialAuthController {
         TokenResponse token = new TokenResponse();
         token.setAccessToken(accessToken);
 
-        SingleDataResponse<TokenResponse> response = SingleDataResponse.success(200,"OK: Succeeded", token);
+        DataResponse<TokenResponse> response = DataResponse.of(200,"OK: Succeeded", token);
 
         return ResponseEntity.ok(response);
     }
