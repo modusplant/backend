@@ -1,4 +1,4 @@
-package kr.modusplant.api.crud.model.external;
+package kr.modusplant.api.signup.social.model.external;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

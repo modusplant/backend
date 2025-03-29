@@ -1,4 +1,4 @@
-package kr.modusplant.api.crud.service;
+package kr.modusplant.api.signup.social.service;
 
 import kr.modusplant.global.domain.model.SiteMember;
 import kr.modusplant.global.domain.model.SiteMemberAuth;

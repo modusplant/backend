@@ -1,7 +1,7 @@
-package kr.modusplant.api.crud.service;
+package kr.modusplant.api.signup.social.service;
 
-import kr.modusplant.api.crud.model.external.GoogleUserInfo;
-import kr.modusplant.api.crud.model.external.KakaoUserInfo;
+import kr.modusplant.api.signup.social.model.external.GoogleUserInfo;
+import kr.modusplant.api.signup.social.model.external.KakaoUserInfo;
 import kr.modusplant.global.domain.model.SiteMember;
 import kr.modusplant.global.domain.model.SiteMemberAuth;
 import kr.modusplant.global.domain.model.SiteMemberRole;

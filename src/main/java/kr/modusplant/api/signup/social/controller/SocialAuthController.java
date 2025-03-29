@@ -1,15 +1,15 @@
-package kr.modusplant.api.crud.controller;
+package kr.modusplant.api.signup.social.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.modusplant.api.crud.model.external.GoogleUserInfo;
-import kr.modusplant.api.crud.model.external.KakaoUserInfo;
-import kr.modusplant.api.crud.model.request.SocialLoginRequest;
-import kr.modusplant.api.crud.model.response.SingleDataResponse;
-import kr.modusplant.api.crud.model.response.TokenResponse;
-import kr.modusplant.api.crud.service.SocialAuthService;
+import kr.modusplant.api.signup.social.model.external.GoogleUserInfo;
+import kr.modusplant.api.signup.social.model.external.KakaoUserInfo;
+import kr.modusplant.api.signup.social.model.request.SocialLoginRequest;
+import kr.modusplant.api.signup.social.service.SocialAuthService;
+import kr.modusplant.api.signup.social.model.response.TokenResponse;
+import kr.modusplant.global.app.servlet.response.DataResponse;
 import kr.modusplant.global.domain.model.SiteMember;
 import kr.modusplant.global.enums.AuthProvider;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ public class SocialAuthController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error: An unexpected error occurred on the Authorization server")
     })
     @PostMapping("/kakao/social-login")
-    public ResponseEntity<SingleDataResponse<?>> kakaoSocialLogin(@RequestBody SocialLoginRequest request) {
+    public ResponseEntity<DataResponse<?>> kakaoSocialLogin(@RequestBody SocialLoginRequest request) {
         /* 소셜 로그인 */
         // Kakao Token 발급
         String kakaoAccessToken = socialAuthService.getKakaoAccessToken(request.getCode());
@@ -61,7 +61,7 @@ public class SocialAuthController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error: An unexpected error occurred on the Authorization server")
     })
     @PostMapping("/google/social-login")
-    public ResponseEntity<SingleDataResponse<?>> googleSocialLogin(@RequestBody SocialLoginRequest request) {
+    public ResponseEntity<DataResponse<?>> googleSocialLogin(@RequestBody SocialLoginRequest request) {
 
         /* 소셜 로그인 */
         // Google Token 발급
