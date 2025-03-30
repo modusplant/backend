@@ -11,18 +11,17 @@ import kr.modusplant.global.domain.model.SiteMember;
 import kr.modusplant.global.domain.model.SiteMemberAuth;
 import kr.modusplant.global.domain.model.SiteMemberTerm;
 import kr.modusplant.global.domain.model.Term;
+import kr.modusplant.global.domain.service.crud.SiteMemberAuthService;
+import kr.modusplant.global.domain.service.crud.SiteMemberService;
+import kr.modusplant.global.domain.service.crud.SiteMemberTermService;
+import kr.modusplant.global.domain.service.crud.TermService;
 import kr.modusplant.global.enums.AuthProvider;
-import kr.modusplant.global.persistence.service.SiteMemberAuthServiceImpl;
-import kr.modusplant.global.persistence.service.SiteMemberServiceImpl;
-import kr.modusplant.global.persistence.service.SiteMemberTermServiceImpl;
-import kr.modusplant.global.persistence.service.TermServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,10 +32,10 @@ import java.util.*;
 @RequiredArgsConstructor
 public class NormalSignUpController {
 
-    private final TermServiceImpl termService;
-    private final SiteMemberTermServiceImpl siteMemberTermService;
-    private final SiteMemberAuthServiceImpl siteMemberAuthService;
-    private final SiteMemberServiceImpl siteMemberService;
+    private final TermService termService;
+    private final SiteMemberTermService siteMemberTermService;
+    private final SiteMemberAuthService siteMemberAuthService;
+    private final SiteMemberService siteMemberService;
 //    private final PasswordEncoder passwordEncoder;
 
     @Operation(
