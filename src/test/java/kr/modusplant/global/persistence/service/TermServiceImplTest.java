@@ -99,6 +99,29 @@ class TermServiceImplTest implements TermTestUtils, TermEntityTestUtils {
         assertThat(termService.getByVersion(termEntity.getVersion()).getFirst()).isEqualTo(term);
     }
 
+    @DisplayName("빈 약관 얻기")
+    @Test
+    void getOptionalEmptyTest() {
+        // given
+        TermEntity termEntity = createTermsOfUseEntity();
+        UUID uuid = termEntity.getUuid();
+        String name = termEntity.getName();
+
+        // getByUuid
+        // given & when
+        given(termRepository.findByUuid(uuid)).willReturn(Optional.empty());
+
+        // then
+        assertThat(termService.getByUuid(uuid)).isEmpty();
+
+        // getByName
+        // given & when
+        given(termRepository.findByName(name)).willReturn(Optional.empty());
+
+        // then
+        assertThat(termService.getByName(name)).isEmpty();
+    }
+
     @DisplayName("약관 삽입 간 검증")
     @Test
     void validateDuringInsertTest() {

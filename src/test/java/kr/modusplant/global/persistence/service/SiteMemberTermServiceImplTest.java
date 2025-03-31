@@ -79,6 +79,28 @@ class SiteMemberTermServiceImplTest implements SiteMemberTermTestUtils, SiteMemb
         assertThat(memberTermService.getByUuid(memberTerm.getUuid()).orElseThrow()).isEqualTo(memberTerm);
     }
 
+    @DisplayName("member로 회원 약관 얻기")
+    @Test
+    void getByMemberTest() {
+        // given
+        SiteMemberTermEntity memberTermEntity = createMemberTermUserEntityWithUuid();
+        SiteMemberEntity memberEntity = memberTermEntity.getMember();
+        SiteMember member = memberMapper.toSiteMember(memberEntity);
+        SiteMemberTerm memberTerm = memberTermMapper.toSiteMemberTerm(memberTermEntity);
+
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.save(memberEntity)).willReturn(memberEntity);
+        given(memberTermRepository.findByUuid(memberTerm.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberTermEntity));
+        given(memberTermRepository.save(memberTermEntity)).willReturn(memberTermEntity);
+
+        // when
+        memberService.insert(member);
+        memberTerm = memberTermService.insert(memberTerm);
+
+        // then
+        assertThat(memberTermService.getByMember(member).orElseThrow()).isEqualTo(memberTerm);
+    }
+
     @DisplayName("agreedTermsOfUseVersion으로 회원 약관 얻기")
     @Test
     void getByAgreedTermsOfUseVersionTest() {
@@ -146,6 +168,30 @@ class SiteMemberTermServiceImplTest implements SiteMemberTermTestUtils, SiteMemb
 
         // then
         assertThat(memberTermService.getByAgreedAdInfoReceivingVersion(memberTerm.getAgreedAdInfoReceivingVersion()).getFirst()).isEqualTo(memberTerm);
+    }
+
+    @DisplayName("빈 회원 약관 얻기")
+    @Test
+    void getOptionalEmptyTest() {
+        // given
+        SiteMemberTermEntity memberTermEntity = createMemberTermUserEntityWithUuid();
+        UUID uuid = memberTermEntity.getUuid();
+        SiteMemberEntity memberEntity = memberTermEntity.getMember();
+        SiteMember member = memberMapper.toSiteMember(memberEntity);
+
+        // getByUuid
+        // given & when
+        given(memberTermRepository.findByUuid(uuid)).willReturn(Optional.empty());
+
+        // then
+        assertThat(memberTermService.getByUuid(uuid)).isEmpty();
+
+        // getByMember
+        // given & when
+        given(memberTermRepository.findByMember(memberEntity)).willReturn(Optional.empty());
+
+        // then
+        assertThat(memberTermService.getByMember(member)).isEmpty();
     }
 
     @DisplayName("회원 약관 삽입 간 검증")

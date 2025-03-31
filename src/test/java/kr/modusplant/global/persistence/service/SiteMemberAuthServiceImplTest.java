@@ -6,6 +6,7 @@ import kr.modusplant.global.domain.model.SiteMember;
 import kr.modusplant.global.domain.model.SiteMemberAuth;
 import kr.modusplant.global.domain.service.crud.SiteMemberAuthService;
 import kr.modusplant.global.domain.service.crud.SiteMemberService;
+import kr.modusplant.global.enums.AuthProvider;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import kr.modusplant.global.mapper.SiteMemberAuthEntityMapper;
@@ -270,6 +271,48 @@ class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemb
 
         // then
         assertThat(memberAuthService.getByFailedAttempt(memberAuth.getFailedAttempt()).getFirst()).isEqualTo(memberAuth);
+    }
+
+    @DisplayName("빈 회원 인증 얻기")
+    @Test
+    void getOptionalEmptyTest() {
+        // given
+        SiteMemberAuth memberAuth = memberAuthBasicUserWithUuid;
+        UUID uuid = memberAuth.getUuid();
+        UUID originalMemberUuid = memberAuth.getOriginalMemberUuid();
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        String email = memberAuth.getEmail();
+        AuthProvider provider = memberAuth.getProvider();
+        String providerId = memberAuth.getProviderId();
+
+        // getByUuid
+        // given & when
+        given(memberAuthRepository.findByUuid(uuid)).willReturn(Optional.empty());
+
+        // then
+        assertThat(memberAuthService.getByUuid(uuid)).isEmpty();
+
+        // getByOriginalMember
+        // given & when
+        given(memberRepository.findByUuid(originalMemberUuid)).willReturn(Optional.of(memberEntity));
+        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty());
+
+        // then
+        assertThat(memberAuthService.getByOriginalMember(memberBasicUserWithUuid)).isEmpty();
+
+        // getByEmailAndProvider
+        // given & when
+        given(memberAuthRepository.findByEmailAndProvider(email, provider)).willReturn(Optional.empty());
+
+        // then
+        assertThat(memberAuthService.getByEmailAndProvider(email, provider)).isEmpty();
+
+        // getByProviderAndProviderId
+        // given & when
+        given(memberAuthRepository.findByProviderAndProviderId(provider, providerId)).willReturn(Optional.empty());
+
+        // then
+        assertThat(memberAuthService.getByProviderAndProviderId(provider, providerId)).isEmpty();
     }
 
     @DisplayName("회원 인증 삽입 간 검증")
