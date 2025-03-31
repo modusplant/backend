@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import kr.modusplant.api.signup.normal.model.request.NormalSignUpRequest;
-import kr.modusplant.api.signup.normal.model.response.Response;
+import kr.modusplant.global.app.servlet.response.DataResponse;
 import kr.modusplant.global.domain.model.SiteMember;
 import kr.modusplant.global.domain.model.SiteMemberAuth;
 import kr.modusplant.global.domain.model.SiteMemberTerm;
@@ -47,7 +47,7 @@ public class NormalSignUpController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error: Fail to fetch data")
     })
     @GetMapping("/api/terms")
-    public ResponseEntity<Response<?>> sendTerms(){
+    public ResponseEntity<DataResponse<?>> sendTerms(){
 
         try {
             List<Map<String, Object>> termMapList = termService.getAll()
@@ -62,9 +62,9 @@ public class NormalSignUpController {
                     .map(this::createTermMap)
                     .toList();
 
-            Response<List<Map<String, Object>>> successResponse = Response.createWithData(200, "terms info successfully fetched", termMapList);
+            DataResponse<List<Map<String, Object>>> successDataResponse = DataResponse.of(200, "terms info successfully fetched", termMapList);
 
-            return ResponseEntity.ok(successResponse);
+            return ResponseEntity.ok(successDataResponse);
 
         } catch (Exception e) {
             log.info("Exception occurs in sendTerms. Content: ", e);
@@ -76,9 +76,9 @@ public class NormalSignUpController {
                 exceptionMessage = "invalid database state";
             }
 
-            Response<List<Map<String, Object>>> errorResponse = Response.createWithoutData(500, exceptionMessage);
+            DataResponse<Void> errorDataResponse = DataResponse.of(500, exceptionMessage);
 
-            return ResponseEntity.ok(errorResponse);
+            return ResponseEntity.ok(errorDataResponse);
         }
     }
 
@@ -91,21 +91,21 @@ public class NormalSignUpController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error: fail to sign up")
     })
     @PostMapping("/api/members/register")
-    public ResponseEntity<Response<Map<String, Object>>> saveMember(@RequestBody NormalSignUpRequest memberData) {
+    public ResponseEntity<DataResponse<Void>> saveMember(@RequestBody NormalSignUpRequest memberData) {
         log.info("SignUpData: {}", memberData);
 
         try {
 
             if(memberData.pw().equals(memberData.pw_check())) {
                 insertMember(memberData);
-                Response<Map<String, Object>> successResponse = Response.createWithoutData(200, "sign up successfully");
+                DataResponse<Void> successDataResponse = DataResponse.of(200, "sign up successfully");
 
-                return ResponseEntity.ok(successResponse);
+                return ResponseEntity.ok(successDataResponse);
 
             } else {
-                Response<Map<String, Object>> errorResponse = Response.createWithoutData(400, "pw and pw_check not equivalent");
+                DataResponse<Void> errorDataResponse = DataResponse.of(400, "pw and pw_check not equivalent");
 
-                return ResponseEntity.ok(errorResponse);
+                return ResponseEntity.ok(errorDataResponse);
             }
 
         } catch (Exception e) {
@@ -122,9 +122,9 @@ public class NormalSignUpController {
                 default -> exceptionMessage = "error while saving member";
             }
 
-            Response<Map<String, Object>> errorResponse = Response.createWithoutData(500, exceptionMessage);
+            DataResponse<Void> errorDataResponse = DataResponse.of(500, exceptionMessage);
 
-            return ResponseEntity.ok(errorResponse);
+            return ResponseEntity.ok(errorDataResponse);
         }
 
     }
