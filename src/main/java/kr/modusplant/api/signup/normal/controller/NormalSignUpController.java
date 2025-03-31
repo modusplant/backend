@@ -52,6 +52,13 @@ public class NormalSignUpController {
         try {
             List<Map<String, Object>> termMapList = termService.getAll()
                     .stream()
+                    .filter(term -> {
+                        String termKey = term.getName();
+
+                        return termKey.equals("이용약관") ||
+                                termKey.equals("개인정보처리방침") ||
+                                termKey.equals("광고성 정보 수신");
+                    })
                     .map(this::createTermMap)
                     .toList();
 
