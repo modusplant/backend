@@ -51,4 +51,22 @@ public class GlobalExceptionHandlerUnitTest {
         assertEquals(URI.create("about:blank"), problemDetail.getType());
         assertEquals("required property missing, invalid format, constraint violation, etc", problemDetail.getDetail());
     }
+
+    @Test
+    void handleValidationException_WithEmptyFieldErrors_returnProblemDetail() {
+        // given
+        MethodArgumentNotValidException ex = mock(MethodArgumentNotValidException.class);
+        BindingResult bindingResult = mock(BindingResult.class);
+
+        given(ex.getBindingResult()).willReturn(bindingResult);
+        given(bindingResult.getFieldErrors()).willReturn(List.of());
+
+        // when
+        ResponseEntity<ProblemDetail> response = globalExceptionHandler.handleValidationException(ex);
+        ProblemDetail problemDetail = response.getBody();
+
+        // then
+        assertNotNull(problemDetail);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), problemDetail.getStatus());
+    }
 }
