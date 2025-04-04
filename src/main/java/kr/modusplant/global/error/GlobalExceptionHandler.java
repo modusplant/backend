@@ -5,11 +5,15 @@ import kr.modusplant.global.app.servlet.response.DataResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -46,4 +50,26 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
+
+    // 검증로직 실패 시 예외 처리
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ProblemDetail> handleValidationException(MethodArgumentNotValidException ex) {
+        List<String> errors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error ->
+                    "Field name: " + error.getField() +
+                    ", default message: " + error.getDefaultMessage())
+                .toList();
+
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problemDetail.setTitle("Invalid client data");
+        problemDetail.setType(URI.create("about:blank"));
+        problemDetail.setDetail("required property missing, invalid format, constraint violation, etc");
+        problemDetail.setProperty("fieldErrorList", errors);
+
+        return ResponseEntity.ok(problemDetail);
+    }
+
+    //
 }
