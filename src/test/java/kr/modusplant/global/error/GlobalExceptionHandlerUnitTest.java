@@ -106,4 +106,19 @@ public class GlobalExceptionHandlerUnitTest {
         assertNotNull(Objects.requireNonNull(problemDetail.getProperties()).get("error path"));
         assertEquals("value cannot be deserialized to expected type", problemDetail.getDetail());
     }
+
+    @Test void handleMalformedJsonException_givenUnrecognizedPropertyException_thenReturnProblemDetail() {
+        // given
+        UnrecognizedPropertyException upx = new UnrecognizedPropertyException(null, null, null, null, null, null);
+        HttpInputMessage inputMessage = mock(HttpInputMessage.class);
+        HttpMessageNotReadableException ex = new HttpMessageNotReadableException("error", upx, inputMessage);
+
+        // when
+        ResponseEntity<ProblemDetail> response = globalExceptionHandler.handleMalformedJsonException(ex);
+        ProblemDetail problemDetail = response.getBody();
+
+        // then
+        assertNotNull(problemDetail);
+        assertEquals("body has property that target class do not know", problemDetail.getDetail());
+    }
 }
