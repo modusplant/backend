@@ -1,6 +1,7 @@
 package kr.modusplant.global.error;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -91,13 +92,16 @@ public class GlobalExceptionHandlerUnitTest {
 
     @Test
     public void handleMalformedJsonException_givenInvalidFormatException_thenReturnProblemDetail() {
+        // given
         InvalidFormatException ifx = new InvalidFormatException(null, "Invalid format", "value", Integer.class);
         HttpInputMessage inputMessage = mock(HttpInputMessage.class);
         HttpMessageNotReadableException ex = new HttpMessageNotReadableException("error", ifx, inputMessage);
 
+        // when
         ResponseEntity<ProblemDetail> response = globalExceptionHandler.handleMalformedJsonException(ex);
         ProblemDetail problemDetail = response.getBody();
 
+        // then
         assertNotNull(problemDetail);
         assertNotNull(Objects.requireNonNull(problemDetail.getProperties()).get("error path"));
         assertEquals("value cannot be deserialized to expected type", problemDetail.getDetail());
