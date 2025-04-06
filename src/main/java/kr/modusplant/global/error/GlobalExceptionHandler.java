@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -90,8 +91,8 @@ public class GlobalExceptionHandler {
             }
             case UnrecognizedPropertyException upx -> {
                 problemDetail.setDetail("body has property that target class do not know");
-                problemDetail.setProperty("unknown field", upx.getPropertyName());
-                problemDetail.setProperty("known fields", upx.getKnownPropertyIds());
+                Optional.ofNullable(upx.getPropertyName()).ifPresent(value -> problemDetail.setProperty("unknown field", value));
+                Optional.ofNullable(upx.getKnownPropertyIds()).ifPresent(value -> problemDetail.setProperty("known fields", value));
             }
             case JsonMappingException jmx -> {
                 String failPoint = getFailLocation(jmx);
