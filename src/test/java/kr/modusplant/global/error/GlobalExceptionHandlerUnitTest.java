@@ -1,9 +1,11 @@
 package kr.modusplant.global.error;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -84,5 +87,19 @@ public class GlobalExceptionHandlerUnitTest {
         assertNotNull(problemDetail);
         assertEquals("Invalid body format", problemDetail.getTitle());
         assertEquals(HttpStatus.BAD_REQUEST.value(), problemDetail.getStatus());
+    }
+
+    @Test
+    public void handleMalformedJsonException_givenInvalidFormatException_thenReturnProblemDetail() {
+        InvalidFormatException ifx = new InvalidFormatException(null, "Invalid format", "value", Integer.class);
+        HttpInputMessage inputMessage = mock(HttpInputMessage.class);
+        HttpMessageNotReadableException ex = new HttpMessageNotReadableException("error", ifx, inputMessage);
+
+        ResponseEntity<ProblemDetail> response = globalExceptionHandler.handleMalformedJsonException(ex);
+        ProblemDetail problemDetail = response.getBody();
+
+        assertNotNull(problemDetail);
+        assertNotNull(Objects.requireNonNull(problemDetail.getProperties()).get("error path"));
+        assertEquals("value cannot be deserialized to expected type", problemDetail.getDetail());
     }
 }
