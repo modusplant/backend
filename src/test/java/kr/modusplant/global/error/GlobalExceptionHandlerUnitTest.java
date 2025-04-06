@@ -7,6 +7,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -67,6 +68,21 @@ public class GlobalExceptionHandlerUnitTest {
 
         // then
         assertNotNull(problemDetail);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), problemDetail.getStatus());
+    }
+
+    @Test
+    public void handleMalformedJsonException_givenValidCondition_thenReturnProblemDetail() {
+        // given
+        HttpMessageNotReadableException ex = mock(HttpMessageNotReadableException.class);
+
+        // when
+        ResponseEntity<ProblemDetail> response = globalExceptionHandler.handleMalformedJsonException(ex);
+        ProblemDetail problemDetail = response.getBody();
+
+        // then
+        assertNotNull(problemDetail);
+        assertEquals("Invalid body format", problemDetail.getTitle());
         assertEquals(HttpStatus.BAD_REQUEST.value(), problemDetail.getStatus());
     }
 }
