@@ -1,5 +1,8 @@
 package kr.modusplant.global.error;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import jakarta.servlet.http.HttpServletRequest;
 import kr.modusplant.global.app.servlet.response.DataResponse;
 import org.slf4j.Logger;
@@ -7,14 +10,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -64,12 +68,55 @@ public class GlobalExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problemDetail.setTitle("Invalid client data");
-        problemDetail.setType(URI.create("about:blank"));
         problemDetail.setDetail("required property missing, invalid format, constraint violation, etc");
         problemDetail.setProperty("fieldErrorList", errors);
 
         return ResponseEntity.ok(problemDetail);
     }
 
-    //
+    // JSON 매핑 요청 처리
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ProblemDetail> handleMalformedJsonException(HttpMessageNotReadableException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problemDetail.setTitle("Invalid body format");
+
+        Throwable cause = ex.getCause();
+
+        switch (cause) {
+            case InvalidFormatException ifx -> {
+                String failPoint = getFailLocation(ifx);
+                problemDetail.setDetail("value cannot be deserialized to expected type");
+                problemDetail.setProperty("error path", failPoint);
+            }
+            case UnrecognizedPropertyException upx -> {
+                problemDetail.setDetail("body has property that target class do not know");
+                problemDetail.setProperty("unknown field", upx.getPropertyName());
+                problemDetail.setProperty("known fields", upx.getKnownPropertyIds());
+            }
+            case JsonMappingException jmx -> {
+                String failPoint = getFailLocation(jmx);
+                problemDetail.setDetail("parsing body and Java object failed");
+                problemDetail.setProperty("error path", failPoint);
+
+            }
+            case null, default -> problemDetail.setDetail("malformed request body");
+        }
+
+        return ResponseEntity.ok(problemDetail);
+    }
+
+    private <T extends JsonMappingException> String getFailLocation(T ex) {
+        return ex.getPath().stream()
+                .map(path -> {
+                    if(path.getFieldName() != null) {
+                        return path.getFieldName();
+                    } else if (path.getIndex() >= 0) {
+                        return "[" + path.getIndex() + "]";
+                    }
+                    return "";
+                })
+                .filter(str -> !str.isEmpty())
+                .collect(Collectors.joining("."))
+                .replace(".[", "[");
+    }
 }
