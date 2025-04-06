@@ -53,7 +53,7 @@ public class GlobalExceptionHandlerUnitTest {
     }
 
     @Test
-    void handleValidationException_WithEmptyFieldErrors_returnProblemDetail() {
+    public void handleValidationException_givenEmptyFieldErrors_thenReturnProblemDetail() {
         // given
         MethodArgumentNotValidException ex = mock(MethodArgumentNotValidException.class);
         BindingResult bindingResult = mock(BindingResult.class);
