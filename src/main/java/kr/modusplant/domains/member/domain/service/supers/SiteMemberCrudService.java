@@ -1,7 +1,14 @@
+<<<<<<<< HEAD:src/main/java/kr/modusplant/domains/member/domain/service/supers/SiteMemberCrudService.java
 package kr.modusplant.domains.member.domain.service.supers;
 
 import kr.modusplant.domains.commons.domain.supers.UuidCrudService;
 import kr.modusplant.domains.member.domain.model.SiteMember;
+========
+package kr.modusplant.api.crud.member.domain.service;
+
+import kr.modusplant.api.crud.common.domain.supers.UuidCrudService;
+import kr.modusplant.api.crud.member.domain.model.SiteMember;
+>>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/main/java/kr/modusplant/api/crud/member/domain/service/SiteMemberService.java
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:src/main/java/kr/modusplant/domains/member/domain/service/SiteMemberTermCrudServiceImpl.java
 package kr.modusplant.domains.member.domain.service;
 
 import kr.modusplant.domains.member.domain.model.SiteMember;
@@ -8,6 +9,21 @@ import kr.modusplant.domains.member.mapper.SiteMemberTermEntityMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberTermEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberTermCrudJpaRepository;
+========
+package kr.modusplant.api.crud.member.persistence.service;
+
+import kr.modusplant.api.crud.member.domain.model.SiteMember;
+import kr.modusplant.api.crud.member.domain.model.SiteMemberTerm;
+import kr.modusplant.api.crud.member.domain.service.SiteMemberTermService;
+import kr.modusplant.api.crud.member.mapper.SiteMemberTermEntityMapper;
+import kr.modusplant.api.crud.member.mapper.SiteMemberTermEntityMapperImpl;
+import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
+import kr.modusplant.api.crud.member.persistence.entity.SiteMemberTermEntity;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberTermJpaRepository;
+import kr.modusplant.global.error.EntityExistsWithUuidException;
+import kr.modusplant.global.error.EntityNotFoundWithUuidException;
+>>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/main/java/kr/modusplant/api/crud/member/persistence/service/SiteMemberTermServiceImpl.java
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,12 @@
+<<<<<<<< HEAD:src/test/java/kr/modusplant/domains/term/common/util/domain/TermTestUtils.java
 package kr.modusplant.domains.term.common.util.domain;
 
 import kr.modusplant.domains.term.domain.model.Term;
+========
+package kr.modusplant.api.crud.term.common.util.domain;
+
+import kr.modusplant.api.crud.term.domain.model.Term;
+>>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/test/java/kr/modusplant/api/crud/term/common/util/domain/TermTestUtils.java
 
 import java.util.UUID;
 

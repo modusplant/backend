@@ -1,6 +1,12 @@
+<<<<<<<< HEAD:src/main/java/kr/modusplant/domains/member/domain/model/SiteMemberAuth.java
 package kr.modusplant.domains.member.domain.model;
 
 import kr.modusplant.domains.member.enums.AuthProvider;
+========
+package kr.modusplant.api.crud.member.domain.model;
+
+import kr.modusplant.api.crud.member.enums.AuthProvider;
+>>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/main/java/kr/modusplant/api/crud/member/domain/model/SiteMemberAuth.java
 import lombok.*;
 
 import java.time.LocalDateTime;

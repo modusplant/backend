@@ -1,9 +1,18 @@
+<<<<<<<< HEAD:src/test/java/kr/modusplant/domains/term/mapper/TermEntityMapperTest.java
 package kr.modusplant.domains.term.mapper;
 
 import kr.modusplant.domains.term.common.util.domain.TermTestUtils;
 import kr.modusplant.domains.term.common.util.entity.TermEntityTestUtils;
 import kr.modusplant.domains.term.persistence.entity.TermEntity;
 import kr.modusplant.domains.term.persistence.repository.TermCrudJpaRepository;
+========
+package kr.modusplant.api.crud.term.mapper;
+
+import kr.modusplant.api.crud.term.common.util.domain.TermTestUtils;
+import kr.modusplant.api.crud.term.common.util.entity.TermEntityTestUtils;
+import kr.modusplant.api.crud.term.persistence.entity.TermEntity;
+import kr.modusplant.api.crud.term.persistence.repository.TermJpaRepository;
+>>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/test/java/kr/modusplant/api/crud/term/mapper/TermEntityMapperTest.java
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

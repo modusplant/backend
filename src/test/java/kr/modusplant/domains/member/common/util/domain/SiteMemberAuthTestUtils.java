@@ -1,11 +1,23 @@
+<<<<<<<< HEAD:src/test/java/kr/modusplant/domains/member/common/util/domain/SiteMemberAuthTestUtils.java
 package kr.modusplant.domains.member.common.util.domain;
 
 import kr.modusplant.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.domains.member.enums.AuthProvider;
+========
+package kr.modusplant.api.crud.member.common.util.domain;
+
+import kr.modusplant.api.crud.member.domain.model.SiteMemberAuth;
+import kr.modusplant.api.crud.member.enums.AuthProvider;
+>>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/test/java/kr/modusplant/api/crud/member/common/util/domain/SiteMemberAuthTestUtils.java
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.UUID;
 
+<<<<<<<< HEAD:src/test/java/kr/modusplant/domains/member/common/util/domain/SiteMemberAuthTestUtils.java
+========
+import static kr.modusplant.api.crud.member.common.util.domain.SiteMemberTestUtils.*;
+
+>>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/test/java/kr/modusplant/api/crud/member/common/util/domain/SiteMemberAuthTestUtils.java
 public interface SiteMemberAuthTestUtils {
     SiteMemberAuth memberAuthBasicAdmin = SiteMemberAuth.builder()
             .email("testAdmin1@gmail.com")

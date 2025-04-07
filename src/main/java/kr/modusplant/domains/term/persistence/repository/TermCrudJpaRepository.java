@@ -1,6 +1,12 @@
+<<<<<<<< HEAD:src/main/java/kr/modusplant/domains/term/persistence/repository/TermCrudJpaRepository.java
 package kr.modusplant.domains.term.persistence.repository;
 
 import kr.modusplant.domains.term.persistence.entity.TermEntity;
+========
+package kr.modusplant.api.crud.term.persistence.repository;
+
+import kr.modusplant.api.crud.term.persistence.entity.TermEntity;
+>>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/main/java/kr/modusplant/api/crud/term/persistence/repository/TermJpaRepository.java
 import kr.modusplant.global.persistence.repository.supers.CreatedAtAndLastModifiedAtRepository;
 import kr.modusplant.global.persistence.repository.supers.UuidPrimaryKeyRepository;
 import org.springframework.data.jpa.repository.JpaRepository;

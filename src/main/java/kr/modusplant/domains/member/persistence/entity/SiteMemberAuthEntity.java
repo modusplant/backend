@@ -1,7 +1,14 @@
+<<<<<<<< HEAD:src/main/java/kr/modusplant/domains/member/persistence/entity/SiteMemberAuthEntity.java
 package kr.modusplant.domains.member.persistence.entity;
 
 import jakarta.persistence.*;
 import kr.modusplant.domains.member.enums.AuthProvider;
+========
+package kr.modusplant.api.crud.member.persistence.entity;
+
+import jakarta.persistence.*;
+import kr.modusplant.api.crud.member.enums.AuthProvider;
+>>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/main/java/kr/modusplant/api/crud/member/persistence/entity/SiteMemberAuthEntity.java
 import kr.modusplant.global.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;

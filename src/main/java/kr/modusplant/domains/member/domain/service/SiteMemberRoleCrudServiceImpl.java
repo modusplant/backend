@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:src/main/java/kr/modusplant/domains/member/domain/service/SiteMemberRoleCrudServiceImpl.java
 package kr.modusplant.domains.member.domain.service;
 
 import kr.modusplant.domains.member.domain.model.SiteMember;
@@ -9,6 +10,22 @@ import kr.modusplant.domains.member.persistence.entity.SiteMemberRoleEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleCrudJpaRepository;
 import kr.modusplant.global.enums.Role;
+========
+package kr.modusplant.api.crud.member.persistence.service;
+
+import kr.modusplant.api.crud.member.domain.model.SiteMember;
+import kr.modusplant.api.crud.member.domain.model.SiteMemberRole;
+import kr.modusplant.api.crud.member.domain.service.SiteMemberRoleService;
+import kr.modusplant.api.crud.member.mapper.SiteMemberRoleEntityMapper;
+import kr.modusplant.api.crud.member.mapper.SiteMemberRoleEntityMapperImpl;
+import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
+import kr.modusplant.api.crud.member.persistence.entity.SiteMemberRoleEntity;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberRoleJpaRepository;
+import kr.modusplant.global.enums.Role;
+import kr.modusplant.global.error.EntityExistsWithUuidException;
+import kr.modusplant.global.error.EntityNotFoundWithUuidException;
+>>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/main/java/kr/modusplant/api/crud/member/persistence/service/SiteMemberRoleServiceImpl.java
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;

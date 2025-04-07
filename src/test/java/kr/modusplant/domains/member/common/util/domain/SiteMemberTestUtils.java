@@ -1,6 +1,12 @@
+<<<<<<<< HEAD:src/test/java/kr/modusplant/domains/member/common/util/domain/SiteMemberTestUtils.java
 package kr.modusplant.domains.member.common.util.domain;
 
 import kr.modusplant.domains.member.domain.model.SiteMember;
+========
+package kr.modusplant.api.crud.member.common.util.domain;
+
+import kr.modusplant.api.crud.member.domain.model.SiteMember;
+>>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/test/java/kr/modusplant/api/crud/member/common/util/domain/SiteMemberTestUtils.java
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

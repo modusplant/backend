@@ -1,8 +1,16 @@
+<<<<<<<< HEAD:src/main/java/kr/modusplant/domains/member/persistence/repository/SiteMemberAuthCrudJpaRepository.java
 package kr.modusplant.domains.member.persistence.repository;
 
 import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
+========
+package kr.modusplant.api.crud.member.persistence.repository;
+
+import kr.modusplant.api.crud.member.enums.AuthProvider;
+import kr.modusplant.api.crud.member.persistence.entity.SiteMemberAuthEntity;
+import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
+>>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/main/java/kr/modusplant/api/crud/member/persistence/repository/SiteMemberAuthJpaRepository.java
 import kr.modusplant.global.persistence.repository.supers.LastModifiedAtRepository;
 import kr.modusplant.global.persistence.repository.supers.UuidPrimaryKeyRepository;
 import org.springframework.data.jpa.repository.JpaRepository;

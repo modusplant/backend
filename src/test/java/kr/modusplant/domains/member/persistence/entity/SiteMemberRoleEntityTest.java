@@ -1,6 +1,12 @@
+<<<<<<<< HEAD:src/test/java/kr/modusplant/domains/member/persistence/entity/SiteMemberRoleEntityTest.java
 package kr.modusplant.domains.member.persistence.entity;
 
 import kr.modusplant.domains.member.common.util.entity.SiteMemberRoleEntityTestUtils;
+========
+package kr.modusplant.api.crud.member.persistence.entity;
+
+import kr.modusplant.api.crud.member.common.util.entity.SiteMemberRoleEntityTestUtils;
+>>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/test/java/kr/modusplant/api/crud/member/persistence/entity/SiteMemberRoleEntityTest.java
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import kr.modusplant.global.enums.Role;
 import org.junit.jupiter.api.DisplayName;

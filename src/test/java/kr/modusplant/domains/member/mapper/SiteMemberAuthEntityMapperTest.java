@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:src/test/java/kr/modusplant/domains/member/mapper/SiteMemberAuthEntityMapperTest.java
 package kr.modusplant.domains.member.mapper;
 
 import kr.modusplant.domains.member.common.util.domain.SiteMemberAuthTestUtils;
@@ -7,6 +8,17 @@ import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthCrudJpaRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
+========
+package kr.modusplant.api.crud.member.mapper;
+
+import kr.modusplant.api.crud.member.common.util.domain.SiteMemberAuthTestUtils;
+import kr.modusplant.api.crud.member.common.util.entity.SiteMemberAuthEntityTestUtils;
+import kr.modusplant.api.crud.member.domain.model.SiteMemberAuth;
+import kr.modusplant.api.crud.member.persistence.entity.SiteMemberAuthEntity;
+import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberAuthJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
+>>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/test/java/kr/modusplant/api/crud/member/mapper/SiteMemberAuthEntityMapperTest.java
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

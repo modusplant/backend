@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/main/java/kr/modusplant/domains/term/persistence/entity/TermEntity.java
 package kr.modusplant.domains.term.persistence.entity;
+========
+package kr.modusplant.api.crud.term.persistence.entity;
+>>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/main/java/kr/modusplant/api/crud/term/persistence/entity/TermEntity.java
 
 import jakarta.persistence.*;
 import kr.modusplant.global.persistence.annotation.DefaultValue;

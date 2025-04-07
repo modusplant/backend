@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/main/java/kr/modusplant/domains/member/persistence/entity/SiteMemberTermEntity.java
 package kr.modusplant.domains.member.persistence.entity;
+========
+package kr.modusplant.api.crud.member.persistence.entity;
+>>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/main/java/kr/modusplant/api/crud/member/persistence/entity/SiteMemberTermEntity.java
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
