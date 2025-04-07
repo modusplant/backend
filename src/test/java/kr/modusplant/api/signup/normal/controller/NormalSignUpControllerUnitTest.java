@@ -1,16 +1,16 @@
 package kr.modusplant.api.signup.normal.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.modusplant.api.crud.member.common.util.domain.SiteMemberAuthTestUtils;
+import kr.modusplant.api.crud.member.common.util.domain.SiteMemberTermTestUtils;
+import kr.modusplant.api.crud.member.common.util.domain.SiteMemberTestUtils;
+import kr.modusplant.api.crud.member.domain.service.SiteMemberAuthService;
+import kr.modusplant.api.crud.member.domain.service.SiteMemberService;
+import kr.modusplant.api.crud.member.domain.service.SiteMemberTermService;
+import kr.modusplant.api.crud.member.enums.AuthProvider;
+import kr.modusplant.api.crud.term.common.util.domain.TermTestUtils;
+import kr.modusplant.api.crud.term.domain.service.TermService;
 import kr.modusplant.api.signup.normal.model.request.NormalSignUpRequest;
-import kr.modusplant.global.domain.service.crud.SiteMemberAuthService;
-import kr.modusplant.global.domain.service.crud.SiteMemberService;
-import kr.modusplant.global.domain.service.crud.SiteMemberTermService;
-import kr.modusplant.global.domain.service.crud.TermService;
-import kr.modusplant.global.enums.AuthProvider;
-import kr.modusplant.support.util.domain.SiteMemberAuthTestUtils;
-import kr.modusplant.support.util.domain.SiteMemberTermTestUtils;
-import kr.modusplant.support.util.domain.SiteMemberTestUtils;
-import kr.modusplant.support.util.domain.TermTestUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,9 +23,11 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.argThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)

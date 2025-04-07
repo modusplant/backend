@@ -4,17 +4,20 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.modusplant.api.crud.member.domain.model.SiteMember;
+import kr.modusplant.api.crud.member.enums.AuthProvider;
 import kr.modusplant.api.signup.social.model.external.GoogleUserInfo;
 import kr.modusplant.api.signup.social.model.external.KakaoUserInfo;
 import kr.modusplant.api.signup.social.model.request.SocialLoginRequest;
-import kr.modusplant.api.signup.social.service.SocialAuthService;
 import kr.modusplant.api.signup.social.model.response.TokenResponse;
+import kr.modusplant.api.signup.social.service.SocialAuthService;
 import kr.modusplant.global.app.servlet.response.DataResponse;
-import kr.modusplant.global.domain.model.SiteMember;
-import kr.modusplant.global.enums.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @Tag(name="Social Login API", description = "소셜 로그인 API")

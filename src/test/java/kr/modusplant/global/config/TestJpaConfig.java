@@ -2,8 +2,8 @@ package kr.modusplant.global.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
@@ -16,9 +16,9 @@ import javax.sql.DataSource;
 
 import static kr.modusplant.global.vo.Reference.NOTATION_ALL;
 
-@Configuration
+@TestConfiguration
 @EnableJpaAuditing
-public class JpaConfig {
+public class TestJpaConfig {
 
     @Value("${spring.datasource.driverClassName}")
     private String driverClassName;

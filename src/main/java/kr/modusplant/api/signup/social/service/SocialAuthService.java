@@ -1,14 +1,14 @@
 package kr.modusplant.api.signup.social.service;
 
+import kr.modusplant.api.crud.member.domain.model.SiteMember;
+import kr.modusplant.api.crud.member.domain.model.SiteMemberAuth;
+import kr.modusplant.api.crud.member.domain.model.SiteMemberRole;
+import kr.modusplant.api.crud.member.domain.service.SiteMemberAuthService;
+import kr.modusplant.api.crud.member.domain.service.SiteMemberRoleService;
+import kr.modusplant.api.crud.member.domain.service.SiteMemberService;
+import kr.modusplant.api.crud.member.enums.AuthProvider;
 import kr.modusplant.api.signup.social.model.external.GoogleUserInfo;
 import kr.modusplant.api.signup.social.model.external.KakaoUserInfo;
-import kr.modusplant.global.domain.model.SiteMember;
-import kr.modusplant.global.domain.model.SiteMemberAuth;
-import kr.modusplant.global.domain.model.SiteMemberRole;
-import kr.modusplant.global.domain.service.crud.SiteMemberAuthService;
-import kr.modusplant.global.domain.service.crud.SiteMemberRoleService;
-import kr.modusplant.global.domain.service.crud.SiteMemberService;
-import kr.modusplant.global.enums.AuthProvider;
 import kr.modusplant.global.enums.Role;
 import kr.modusplant.global.error.OAuthException;
 import lombok.RequiredArgsConstructor;

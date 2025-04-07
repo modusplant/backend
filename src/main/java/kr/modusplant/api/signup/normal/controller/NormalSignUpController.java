@@ -5,17 +5,17 @@ import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import kr.modusplant.api.crud.member.domain.model.SiteMember;
+import kr.modusplant.api.crud.member.domain.model.SiteMemberAuth;
+import kr.modusplant.api.crud.member.domain.model.SiteMemberTerm;
+import kr.modusplant.api.crud.member.domain.service.SiteMemberAuthService;
+import kr.modusplant.api.crud.member.domain.service.SiteMemberService;
+import kr.modusplant.api.crud.member.domain.service.SiteMemberTermService;
+import kr.modusplant.api.crud.member.enums.AuthProvider;
+import kr.modusplant.api.crud.term.domain.model.Term;
+import kr.modusplant.api.crud.term.domain.service.TermService;
 import kr.modusplant.api.signup.normal.model.request.NormalSignUpRequest;
 import kr.modusplant.global.app.servlet.response.DataResponse;
-import kr.modusplant.global.domain.model.SiteMember;
-import kr.modusplant.global.domain.model.SiteMemberAuth;
-import kr.modusplant.global.domain.model.SiteMemberTerm;
-import kr.modusplant.global.domain.model.Term;
-import kr.modusplant.global.domain.service.crud.SiteMemberAuthService;
-import kr.modusplant.global.domain.service.crud.SiteMemberService;
-import kr.modusplant.global.domain.service.crud.SiteMemberTermService;
-import kr.modusplant.global.domain.service.crud.TermService;
-import kr.modusplant.global.enums.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -23,9 +23,13 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
