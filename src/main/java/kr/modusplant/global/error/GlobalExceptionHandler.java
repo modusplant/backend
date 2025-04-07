@@ -72,7 +72,7 @@ public class GlobalExceptionHandler {
         problemDetail.setDetail("required property missing, invalid format, constraint violation, etc");
         problemDetail.setProperty("fieldErrorList", errors);
 
-        return ResponseEntity.ok(problemDetail);
+        return ResponseEntity.badRequest().body(problemDetail);
     }
 
     // JSON 매핑 요청 처리
@@ -103,7 +103,7 @@ public class GlobalExceptionHandler {
             case null, default -> problemDetail.setDetail("malformed request body");
         }
 
-        return ResponseEntity.ok(problemDetail);
+        return ResponseEntity.badRequest().body(problemDetail);
     }
 
     private <T extends JsonMappingException> String getFailLocation(T ex) {

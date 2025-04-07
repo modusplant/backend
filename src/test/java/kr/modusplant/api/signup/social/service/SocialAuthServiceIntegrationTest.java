@@ -1,12 +1,12 @@
 package kr.modusplant.api.signup.social.service;
 
-import kr.modusplant.global.domain.model.SiteMember;
-import kr.modusplant.global.domain.model.SiteMemberAuth;
-import kr.modusplant.global.domain.model.SiteMemberRole;
-import kr.modusplant.global.domain.service.crud.SiteMemberAuthService;
-import kr.modusplant.global.domain.service.crud.SiteMemberRoleService;
-import kr.modusplant.global.domain.service.crud.SiteMemberService;
-import kr.modusplant.global.enums.AuthProvider;
+import kr.modusplant.api.crud.member.domain.model.SiteMember;
+import kr.modusplant.api.crud.member.domain.model.SiteMemberAuth;
+import kr.modusplant.api.crud.member.domain.model.SiteMemberRole;
+import kr.modusplant.api.crud.member.domain.service.SiteMemberAuthService;
+import kr.modusplant.api.crud.member.domain.service.SiteMemberRoleService;
+import kr.modusplant.api.crud.member.domain.service.SiteMemberService;
+import kr.modusplant.api.crud.member.enums.AuthProvider;
 import kr.modusplant.global.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @Transactional
