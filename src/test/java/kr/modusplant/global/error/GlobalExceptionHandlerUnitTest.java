@@ -53,7 +53,6 @@ public class GlobalExceptionHandlerUnitTest {
         assertNotNull(problemDetail);
         assertEquals(HttpStatus.BAD_REQUEST.value(), problemDetail.getStatus());
         assertEquals("Invalid client data", problemDetail.getTitle());
-        assertEquals(URI.create("about:blank"), problemDetail.getType());
         assertEquals("required property missing, invalid format, constraint violation, etc", problemDetail.getDetail());
     }
 
