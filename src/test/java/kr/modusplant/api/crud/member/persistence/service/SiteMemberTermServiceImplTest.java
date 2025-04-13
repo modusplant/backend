@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static java.util.Collections.emptyList;
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 import static kr.modusplant.global.util.VersionUtils.createVersion;
 import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
@@ -292,21 +291,21 @@ class SiteMemberTermServiceImplTest implements SiteMemberTermTestUtils, SiteMemb
         SiteMemberEntity memberEntity = memberTermEntity.getMember();
         SiteMember member = memberMapper.toSiteMember(memberEntity);
         SiteMemberTerm memberTerm = memberTermMapper.toSiteMemberTerm(memberTermEntity);
+        UUID uuid = memberTerm.getUuid();
 
         given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberTermRepository.findByUuid(memberTerm.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberTermEntity));
+        given(memberTermRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberTermEntity)).willReturn(Optional.empty());
         given(memberTermRepository.save(memberTermEntity)).willReturn(memberTermEntity);
-        given(memberTermRepository.findAll()).willReturn(emptyList());
-        willDoNothing().given(memberTermRepository).deleteByUuid(memberTerm.getUuid());
+        willDoNothing().given(memberTermRepository).deleteByUuid(uuid);
 
         // when
         memberService.insert(member);
-        memberTerm = memberTermService.insert(memberTerm);
-        memberTermService.removeByUuid(memberTerm.getUuid());
+        memberTermService.insert(memberTerm);
+        memberTermService.removeByUuid(uuid);
 
         // then
-        assertThat(memberTermService.getAll()).isEmpty();
+        assertThat(memberTermService.getByUuid(uuid)).isEmpty();
     }
 
     @DisplayName("uuid로 회원 역할 제거 간 검증")
