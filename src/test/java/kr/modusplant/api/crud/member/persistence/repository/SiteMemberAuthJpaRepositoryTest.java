@@ -8,6 +8,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
@@ -158,12 +160,13 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
         // given
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
         SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
+        UUID uuid = memberAuth.getUuid();
 
         // when
-        memberAuthRepository.deleteByUuid(memberAuth.getUuid());
+        memberAuthRepository.deleteByUuid(uuid);
 
         // then
-        assertThat(memberAuthRepository.findAll()).isEmpty();
+        assertThat(memberAuthRepository.findByUuid(uuid)).isEmpty();
     }
 
     @DisplayName("uuid로 회원 인증 확인")

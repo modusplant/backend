@@ -7,6 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
@@ -63,12 +65,13 @@ class SiteMemberRoleJpaRepositoryTest implements SiteMemberRoleEntityTestUtils {
     void deleteByUuidTest() {
         // given
         SiteMemberRoleEntity memberRole = memberRoleRepository.save(createMemberRoleUserEntity());
+        UUID uuid = memberRole.getUuid();
 
         // when
-        memberRoleRepository.deleteByUuid(memberRole.getUuid());
+        memberRoleRepository.deleteByUuid(uuid);
 
         // then
-        assertThat(memberRoleRepository.findAll()).isEmpty();
+        assertThat(memberRoleRepository.findByUuid(uuid)).isEmpty();
     }
 
     @DisplayName("uuid로 회원 역할 확인")
