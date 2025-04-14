@@ -57,8 +57,8 @@ public class NormalSignUpControllerUnitTest {
 
                 // then
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.metadata.status").value(200))
-                .andExpect(jsonPath("$.metadata.message").exists())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").exists())
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data[*].termsOfUse").exists())
                 .andExpect(jsonPath("$.data[*].privacyPolicy").exists())
@@ -81,8 +81,8 @@ public class NormalSignUpControllerUnitTest {
 
                 // then
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.metadata.status").value(200))
-                .andExpect(jsonPath("$.metadata.message").exists());
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").exists());
     }
 
     @Test
@@ -102,8 +102,8 @@ public class NormalSignUpControllerUnitTest {
 
                 // then
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.metadata.status").value(400))
-                .andExpect(jsonPath("$.metadata.message").exists());
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").exists());
     }
 
     private void setupServiceStubbing() {
