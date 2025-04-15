@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static java.util.Collections.emptyList;
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
 import static kr.modusplant.global.vo.ExceptionMessage.NOT_FOUND_ENTITY;
@@ -260,18 +259,18 @@ class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntity
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         SiteMember member = memberMapper.toSiteMember(memberEntity);
+        UUID uuid = member.getUuid();
 
-        given(memberRepository.findByUuid(member.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity)).willReturn(Optional.empty());
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
-        given(memberRepository.findAll()).willReturn(emptyList());
-        willDoNothing().given(memberRepository).deleteByUuid(member.getUuid());
+        willDoNothing().given(memberRepository).deleteByUuid(uuid);
 
         // when
-        member = memberService.insert(member);
-        memberService.removeByUuid(member.getUuid());
+        memberService.insert(member);
+        memberService.removeByUuid(uuid);
 
         // then
-        assertThat(memberService.getAll()).isEmpty();
+        assertThat(memberService.getByUuid(uuid)).isEmpty();
     }
 
     @DisplayName("uuid로 회원 제거 간 검증")

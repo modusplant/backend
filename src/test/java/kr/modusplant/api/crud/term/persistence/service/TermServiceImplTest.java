@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static java.util.Collections.emptyList;
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 import static kr.modusplant.global.vo.CamelCaseWord.NAME;
 import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
@@ -196,19 +195,19 @@ class TermServiceImplTest implements TermTestUtils, TermEntityTestUtils {
         // given
         TermEntity termEntity = createTermsOfUseEntityWithUuid();
         Term term = termMapper.toTerm(termEntity);
+        UUID uuid = term.getUuid();
 
-        given(termRepository.findByUuid(term.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(termEntity));
+        given(termRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(termEntity)).willReturn(Optional.empty());
         given(termRepository.findByName(termEntity.getName())).willReturn(Optional.empty());
         given(termRepository.save(createTermsOfUseEntity())).willReturn(termEntity);
-        given(termRepository.findAll()).willReturn(emptyList());
-        willDoNothing().given(termRepository).deleteByUuid(term.getUuid());
+        willDoNothing().given(termRepository).deleteByUuid(uuid);
 
         // when
-        term = termService.insert(term);
-        termService.removeByUuid(term.getUuid());
+        termService.insert(term);
+        termService.removeByUuid(uuid);
 
         // then
-        assertThat(termService.getAll()).isEmpty();
+        assertThat(termService.getByUuid(uuid)).isEmpty();
     }
 
     @DisplayName("uuid로 약관 제거 간 검증")

@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static java.util.Collections.emptyList;
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 import static kr.modusplant.global.vo.CamelCaseWord.ACTIVE_MEMBER_UUID;
 import static kr.modusplant.global.vo.CamelCaseWord.ORIGINAL_MEMBER_UUID;
@@ -452,22 +451,22 @@ class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemb
         SiteMember member = memberMapper.toSiteMember(memberEntity);
         SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
         SiteMemberAuth memberAuth = memberAuthMapper.toSiteMemberAuth(memberAuthEntity);
+        UUID uuid = memberAuth.getUuid();
 
         given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberAuthEntity));
+        given(memberAuthRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberAuthEntity)).willReturn(Optional.empty());
         given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty()).willReturn(Optional.of(memberAuthEntity));
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
-        given(memberAuthRepository.findAll()).willReturn(emptyList());
         willDoNothing().given(memberAuthRepository).deleteByUuid(memberAuthEntity.getUuid());
 
         // when
         memberService.insert(member);
-        memberAuth = memberAuthService.insert(memberAuth);
-        memberAuthService.removeByUuid(memberAuth.getUuid());
+        memberAuthService.insert(memberAuth);
+        memberAuthService.removeByUuid(uuid);
 
         // then
-        assertThat(memberAuthService.getAll()).isEmpty();
+        assertThat(memberAuthService.getByUuid(uuid)).isEmpty();
     }
 
     @DisplayName("uuid로 회원 인증 제거 간 검증")
