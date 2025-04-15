@@ -101,7 +101,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.CONFLICT.value(), errorResponse.getMetadata().status());
-        assertEquals("resource not available", errorResponse.getMetadata().message());
+        assertEquals("resource is not available", errorResponse.getMetadata().message());
     }
 
     @Test
