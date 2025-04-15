@@ -1,27 +1,32 @@
 package kr.modusplant.global.error;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import jakarta.servlet.http.HttpServletRequest;
+import kr.modusplant.global.app.servlet.response.DataResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,8 +34,75 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class GlobalExceptionHandlerUnitTest {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @InjectMocks
     private GlobalExceptionHandler globalExceptionHandler;
+
+    @Test
+    public void handleRuntimeException_givenValidCondition_thenReturnMap() {
+        // given
+        RuntimeException ex = mock(RuntimeException.class);
+        HttpServletRequest servletRequest = mock(HttpServletRequest.class);
+
+        // when
+        ResponseEntity<Map<String, Object>> response = globalExceptionHandler.handleRuntimeException(servletRequest, ex);
+        Map<String, Object> responseBody = response.getBody();
+        assertNotNull(responseBody);
+        Map<String, Object> metadata = objectMapper.convertValue(responseBody.get("metaData"), new TypeReference<>() {});
+
+        // then
+        assertInstanceOf(Map.class, metadata);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), metadata.get("status"));
+        assertNotNull(metadata.get("message"));
+
+    }
+
+    @Test
+    public void handleGenericException_givenValidCondition_thenReturnMap() {
+        // given
+        HttpServletRequest servletRequest = mock(HttpServletRequest.class);
+        Exception ex = mock(Exception.class);
+
+        // when
+        ResponseEntity<Map<String, Object>> response = globalExceptionHandler.handleGenericException(servletRequest, ex);
+        Map<String, Object> errorResponse = response.getBody();
+
+        // then
+        assertNotNull(errorResponse);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.get("status"));
+        assertNotNull(errorResponse.get("message"));
+    }
+
+    @Test
+    public void handleIllegalArgumentException_givenValidCondition_thenReturnProblemDetail() {
+        // given
+        IllegalArgumentException ex = mock(IllegalArgumentException.class);
+
+        // when
+        ResponseEntity<ProblemDetail> response = globalExceptionHandler.handleIllegalArgumentException(ex);
+        ProblemDetail problemDetail = response.getBody();
+
+        // then
+        assertNotNull(problemDetail);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), problemDetail.getStatus());
+        assertEquals("Invalid method argument", problemDetail.getTitle());
+    }
+
+    @Test
+    public void handleIllegalStateException_givenValidCondition_thenReturnProblemDetail() {
+        // given
+        IllegalStateException ex = mock(IllegalStateException.class);
+
+        // when
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleIllegalStateException(ex);
+        DataResponse<Void> errorResponse = response.getBody();
+
+        // then
+        assertNotNull(errorResponse);
+        assertEquals(HttpStatus.CONFLICT.value(), errorResponse.getMetadata().status());
+        assertEquals("resource not available", errorResponse.getMetadata().message());
+    }
 
     @Test
     public void handleValidationException_givenValidCondition_thenReturnProblemDetail() {
