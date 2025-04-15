@@ -93,48 +93,26 @@ public class GlobalExceptionHandler {
 
     // JSON 매핑 요청 처리
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ProblemDetail> handleMalformedJsonException(HttpMessageNotReadableException ex) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        problemDetail.setTitle("Invalid body format");
+    public ResponseEntity<DataResponse<Void>> handleMalformedJsonException(HttpMessageNotReadableException ex) {
 
         Throwable cause = ex.getCause();
         DataResponse<Void> errorResponse;
 
         switch (cause) {
-            case InvalidFormatException ifx -> {
-                String failPoint = getFailLocation(ifx);
-                problemDetail.setDetail("value cannot be deserialized to expected type");
-                problemDetail.setProperty("error path", failPoint);
+            case InvalidFormatException ignored -> {
+                errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "value cannot be deserialized to expected type");
             }
-            case UnrecognizedPropertyException upx -> {
-                problemDetail.setDetail("body has property that target class do not know");
-                Optional.ofNullable(upx.getPropertyName()).ifPresent(value -> problemDetail.setProperty("unknown field", value));
-                Optional.ofNullable(upx.getKnownPropertyIds()).ifPresent(value -> problemDetail.setProperty("known fields", value));
+            case UnrecognizedPropertyException ignored -> {
+                errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "body has property that target class do not know");
             }
-            case JsonMappingException jmx -> {
-                String failPoint = getFailLocation(jmx);
-                problemDetail.setDetail("parsing body and Java object failed");
-                problemDetail.setProperty("error path", failPoint);
-
+            case JsonMappingException ignored -> {
+                errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "parsing body and Java object failed");
             }
-            case null, default -> problemDetail.setDetail("malformed request body");
+            case null, default -> {
+                errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "malformed request body");
+            }
         }
 
-        return ResponseEntity.badRequest().body(problemDetail);
-    }
-
-    private <T extends JsonMappingException> String getFailLocation(T ex) {
-        return ex.getPath().stream()
-                .map(path -> {
-                    if(path.getFieldName() != null) {
-                        return path.getFieldName();
-                    } else if (path.getIndex() >= 0) {
-                        return "[" + path.getIndex() + "]";
-                    }
-                    return "";
-                })
-                .filter(str -> !str.isEmpty())
-                .collect(Collectors.joining("."))
-                .replace(".[", "[");
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 }
