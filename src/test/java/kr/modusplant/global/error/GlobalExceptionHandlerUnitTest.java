@@ -108,42 +108,36 @@ public class GlobalExceptionHandlerUnitTest {
     public void handleValidationException_givenValidCondition_thenReturnProblemDetail() {
         // given
         MethodArgumentNotValidException ex = mock(MethodArgumentNotValidException.class);
-        BindingResult bindingResult = mock(BindingResult.class);
 
         List<FieldError> fieldErrorList = new ArrayList<>();
         fieldErrorList.add(new FieldError("SiteMemberEntity", "isActive", "isActive must not be null"));
         fieldErrorList.add(new FieldError("SiteMemberEntity", "nickname", "nickname must not be null"));
 
-        given(ex.getBindingResult()).willReturn(bindingResult);
-        given(bindingResult.getFieldErrors()).willReturn(fieldErrorList);
-
         // when
-        ResponseEntity<ProblemDetail> response = globalExceptionHandler.handleValidationException(ex);
-        ProblemDetail problemDetail = response.getBody();
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleValidationException(ex);
+        DataResponse<Void> errorResponse = response.getBody();
 
         // then
-        assertNotNull(problemDetail);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), problemDetail.getStatus());
-        assertEquals("Invalid client data", problemDetail.getTitle());
-        assertEquals("required property missing, invalid format, constraint violation, etc", problemDetail.getDetail());
+        assertNotNull(errorResponse);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
+        assertEquals("Invalid client data", errorResponse.getMessage());
+        assertNull(errorResponse.getData());
     }
 
     @Test
     public void handleValidationException_givenEmptyFieldErrors_thenReturnProblemDetail() {
         // given
         MethodArgumentNotValidException ex = mock(MethodArgumentNotValidException.class);
-        BindingResult bindingResult = mock(BindingResult.class);
-
-        given(ex.getBindingResult()).willReturn(bindingResult);
-        given(bindingResult.getFieldErrors()).willReturn(List.of());
 
         // when
-        ResponseEntity<ProblemDetail> response = globalExceptionHandler.handleValidationException(ex);
-        ProblemDetail problemDetail = response.getBody();
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleValidationException(ex);
+        DataResponse<Void> errorResponse = response.getBody();
 
         // then
-        assertNotNull(problemDetail);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), problemDetail.getStatus());
+        assertNotNull(errorResponse);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
+        assertEquals("Invalid client data", errorResponse.getMessage());
+        assertNull(errorResponse.getData());
     }
 
     @Test
