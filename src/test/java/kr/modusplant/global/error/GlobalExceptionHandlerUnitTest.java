@@ -80,13 +80,13 @@ public class GlobalExceptionHandlerUnitTest {
         IllegalArgumentException ex = mock(IllegalArgumentException.class);
 
         // when
-        ResponseEntity<ProblemDetail> response = globalExceptionHandler.handleIllegalArgumentException(ex);
-        ProblemDetail problemDetail = response.getBody();
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleIllegalArgumentException(ex);
+        DataResponse<Void> errorResponse = response.getBody();
 
         // then
-        assertNotNull(problemDetail);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), problemDetail.getStatus());
-        assertEquals("Invalid method argument", problemDetail.getTitle());
+        assertNotNull(errorResponse);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
+        assertEquals("Invalid method argument", errorResponse.getMessage());
     }
 
     @Test
