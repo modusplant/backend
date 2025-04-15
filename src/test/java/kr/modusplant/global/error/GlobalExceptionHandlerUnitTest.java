@@ -152,13 +152,14 @@ public class GlobalExceptionHandlerUnitTest {
         HttpMessageNotReadableException ex = mock(HttpMessageNotReadableException.class);
 
         // when
-        ResponseEntity<ProblemDetail> response = globalExceptionHandler.handleMalformedJsonException(ex);
-        ProblemDetail problemDetail = response.getBody();
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleMalformedJsonException(ex);
+        DataResponse<Void> errorResponse = response.getBody();
 
         // then
-        assertNotNull(problemDetail);
-        assertEquals("Invalid body format", problemDetail.getTitle());
-        assertEquals(HttpStatus.BAD_REQUEST.value(), problemDetail.getStatus());
+        assertNotNull(errorResponse);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
+        assertEquals("malformed request body", errorResponse.getMessage());
+        assertNull(errorResponse.getData());
     }
 
     @Test
@@ -169,13 +170,14 @@ public class GlobalExceptionHandlerUnitTest {
         HttpMessageNotReadableException ex = new HttpMessageNotReadableException("error", ifx, inputMessage);
 
         // when
-        ResponseEntity<ProblemDetail> response = globalExceptionHandler.handleMalformedJsonException(ex);
-        ProblemDetail problemDetail = response.getBody();
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleMalformedJsonException(ex);
+        DataResponse<Void> errorResponse = response.getBody();
 
         // then
-        assertNotNull(problemDetail);
-        assertNotNull(Objects.requireNonNull(problemDetail.getProperties()).get("error path"));
-        assertEquals("value cannot be deserialized to expected type", problemDetail.getDetail());
+        assertNotNull(errorResponse);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
+        assertEquals("value cannot be deserialized to expected type", errorResponse.getMessage());
+        assertNull(errorResponse.getData());
     }
 
     @Test void handleMalformedJsonException_givenUnrecognizedPropertyException_thenReturnProblemDetail() {
@@ -185,11 +187,13 @@ public class GlobalExceptionHandlerUnitTest {
         HttpMessageNotReadableException ex = new HttpMessageNotReadableException("error", upx, inputMessage);
 
         // when
-        ResponseEntity<ProblemDetail> response = globalExceptionHandler.handleMalformedJsonException(ex);
-        ProblemDetail problemDetail = response.getBody();
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleMalformedJsonException(ex);
+        DataResponse<Void> errorResponse = response.getBody();
 
         // then
-        assertNotNull(problemDetail);
-        assertEquals("body has property that target class do not know", problemDetail.getDetail());
+        assertNotNull(errorResponse);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
+        assertEquals("body has property that target class do not know", errorResponse.getMessage());
+        assertNull(errorResponse.getData());
     }
 }
