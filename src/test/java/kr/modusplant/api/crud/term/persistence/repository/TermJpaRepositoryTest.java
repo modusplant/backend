@@ -7,6 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
@@ -89,12 +91,13 @@ class TermJpaRepositoryTest implements TermEntityTestUtils {
     void deleteByUuidTest() {
         // given
         TermEntity term = termRepository.save(createTermsOfUseEntity());
+        UUID uuid = term.getUuid();
 
         // when
-        termRepository.deleteByUuid(term.getUuid());
+        termRepository.deleteByUuid(uuid);
 
         // then
-        assertThat(termRepository.findAll()).isEmpty();
+        assertThat(termRepository.findByUuid(uuid)).isEmpty();
     }
 
     @DisplayName("uuid로 약관 확인")

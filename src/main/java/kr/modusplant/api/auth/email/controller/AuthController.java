@@ -12,8 +12,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import kr.modusplant.api.auth.email.model.request.EmailRequest;
 import kr.modusplant.api.auth.email.model.request.VerifyEmailRequest;
-import kr.modusplant.api.auth.email.model.response.SingleDataResponse;
 import kr.modusplant.api.auth.email.service.MailService;
+import kr.modusplant.global.app.servlet.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -44,7 +44,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Bad Request: Invalid input data.")
     })
     @PostMapping("/members/verify-email/send")
-    public ResponseEntity<SingleDataResponse> verify(
+    public ResponseEntity<DataResponse<?>> verify(
             @RequestBody @Valid EmailRequest request,
             HttpServletResponse httpResponse
     ) {
@@ -57,16 +57,9 @@ public class AuthController {
         // TODO : 메일 발송
         mailService.callSendVerifyEmail(email, verifyCode);
 
-        Map<String, Object> metadata = new HashMap<>();
-        metadata.put("status", 200);
-        metadata.put("message", "OK: Succeeded");
-
-        SingleDataResponse response = new SingleDataResponse<>();
-        response.setMetadata(metadata);
-
         // JWT AccessToken 설정
         setHttpOnlyCookie(accessToken, httpResponse);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(DataResponse.of(200, "OK: Succeeded"));
     }
 
     @Operation(summary = "본인인증 메일 검증 API", description = "회원가입 시 본인인증 코드를 검증합니다.")
@@ -75,7 +68,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Bad Request: Invalid input data.")
     })
     @PostMapping("/members/verify-email")
-    public ResponseEntity<SingleDataResponse> verifyEmail(
+    public ResponseEntity<DataResponse<?>> verifyEmail(
             @RequestBody VerifyEmailRequest verifyEmailRequest,
             @CookieValue(value = "Authorization", required = false) String accessToken
     ) {
@@ -83,18 +76,12 @@ public class AuthController {
         // JwtToken 에 담긴 데이터 조회 테스트용
         validateVerifyAccessToken(accessToken, verifyEmailRequest.getVerifyCode());
 
-        Map<String, Object> metadata = new HashMap<>();
-        metadata.put("status", HttpStatus.OK.value());
-        metadata.put("message", "OK: Succeeded");
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("hasEmailAuth", true);
-
-        SingleDataResponse response = new SingleDataResponse<>();
-        response.setMetadata(metadata);
-        response.setData(data);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(DataResponse.of(
+                HttpStatus.OK.value(),
+                "OK: Succeeded",
+                (Map<String, Object>) new HashMap<String, Object>() {{
+                    put("hasEmailAuth", true);
+                }}));
     }
 
     // TODO : JWT Util or Provider 구현완료 시 옮기는것을 예상하고 작업 중

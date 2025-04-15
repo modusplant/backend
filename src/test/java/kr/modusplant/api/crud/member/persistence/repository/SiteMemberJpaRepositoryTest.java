@@ -7,6 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
@@ -154,12 +156,13 @@ class SiteMemberJpaRepositoryTest implements SiteMemberEntityTestUtils {
     void deleteByUuidTest() {
         // given
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
+        UUID uuid = member.getUuid();
 
         // when
-        memberRepository.deleteByUuid(member.getUuid());
+        memberRepository.deleteByUuid(uuid);
 
         // then
-        assertThat(memberRepository.findAll()).isEmpty();
+        assertThat(memberRepository.findByUuid(uuid)).isEmpty();
     }
 
     @DisplayName("uuid로 회원 확인")
