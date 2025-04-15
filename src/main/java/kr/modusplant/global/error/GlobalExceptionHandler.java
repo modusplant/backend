@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleRuntimeException(HttpServletRequest request, RuntimeException ex) {
         Map<String, Object> metaData = new HashMap<>();
         metaData.put("status", HttpStatus.BAD_REQUEST.value());
-        metaData.put("message", ex.getMessage());
+        metaData.put("message", Optional.ofNullable(ex.getMessage()).orElse("An unexpected error occurred"));
 
         Map<String, Object> response = new HashMap<>();
         response.put("metaData", metaData);
