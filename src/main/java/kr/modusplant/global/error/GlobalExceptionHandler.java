@@ -58,21 +58,9 @@ public class GlobalExceptionHandler {
 
     // 검증로직 실패 시 예외 처리
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ProblemDetail> handleValidationException(MethodArgumentNotValidException ex) {
-        List<String> errors = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(error ->
-                    "Field name: " + error.getField() +
-                    ", default message: " + error.getDefaultMessage())
-                .toList();
-
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        problemDetail.setTitle("Invalid client data");
-        problemDetail.setDetail("required property missing, invalid format, constraint violation, etc");
-        problemDetail.setProperty("fieldErrorList", errors);
-
-        return ResponseEntity.badRequest().body(problemDetail);
+    public ResponseEntity<DataResponse<Void>> handleValidationException(MethodArgumentNotValidException ex) {
+        DataResponse<Void> errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "Invalid client data");
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
     // 메서드의 인자가 무효한 값일 경우 처리
