@@ -3,7 +3,7 @@ package kr.modusplant.api.crud.member.mapper;
 import kr.modusplant.api.crud.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.api.crud.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberCrudJpaRepository;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,11 +14,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RepositoryOnlyContext
 class SiteMemberEntityMapperTest implements SiteMemberTestUtils, SiteMemberEntityTestUtils {
 
-    private final SiteMemberJpaRepository memberRepository;
+    private final SiteMemberCrudJpaRepository memberRepository;
     private final SiteMemberEntityMapper memberMapper =  new SiteMemberEntityMapperImpl();
 
     @Autowired
-    SiteMemberEntityMapperTest(SiteMemberJpaRepository memberRepository) {
+    SiteMemberEntityMapperTest(SiteMemberCrudJpaRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
 

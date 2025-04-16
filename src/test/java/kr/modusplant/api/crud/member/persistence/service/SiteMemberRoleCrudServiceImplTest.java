@@ -9,16 +9,16 @@ import kr.modusplant.api.crud.member.common.util.entity.SiteMemberEntityTestUtil
 import kr.modusplant.api.crud.member.common.util.entity.SiteMemberRoleEntityTestUtils;
 import kr.modusplant.api.crud.member.domain.model.SiteMember;
 import kr.modusplant.api.crud.member.domain.model.SiteMemberRole;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberRoleService;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberRoleCrudService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberCrudService;
 import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapper;
 import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.api.crud.member.mapper.SiteMemberRoleEntityMapper;
 import kr.modusplant.api.crud.member.mapper.SiteMemberRoleEntityMapperImpl;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberRoleEntity;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberRoleJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberRoleCrudJpaRepository;
 import kr.modusplant.global.enums.Role;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
@@ -39,17 +39,17 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
 @CrudServiceOnlyContext
-class SiteMemberRoleServiceImplTest implements SiteMemberRoleTestUtils, SiteMemberRoleEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils {
+class SiteMemberRoleCrudServiceImplTest implements SiteMemberRoleTestUtils, SiteMemberRoleEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils {
 
-    private final SiteMemberRoleService memberRoleService;
-    private final SiteMemberService memberService;
-    private final SiteMemberRoleJpaRepository memberRoleRepository;
-    private final SiteMemberJpaRepository memberRepository;
+    private final SiteMemberRoleCrudService memberRoleService;
+    private final SiteMemberCrudService memberService;
+    private final SiteMemberRoleCrudJpaRepository memberRoleRepository;
+    private final SiteMemberCrudJpaRepository memberRepository;
     private final SiteMemberRoleEntityMapper memberRoleMapper = new SiteMemberRoleEntityMapperImpl();
     private final SiteMemberEntityMapper memberMapper = new SiteMemberEntityMapperImpl();
 
     @Autowired
-    SiteMemberRoleServiceImplTest(SiteMemberRoleService memberRoleService, SiteMemberService memberService, SiteMemberRoleJpaRepository memberRoleRepository, SiteMemberJpaRepository memberRepository) {
+    SiteMemberRoleCrudServiceImplTest(SiteMemberRoleCrudService memberRoleService, SiteMemberCrudService memberService, SiteMemberRoleCrudJpaRepository memberRoleRepository, SiteMemberCrudJpaRepository memberRepository) {
         this.memberRoleService = memberRoleService;
         this.memberService = memberService;
         this.memberRoleRepository = memberRoleRepository;

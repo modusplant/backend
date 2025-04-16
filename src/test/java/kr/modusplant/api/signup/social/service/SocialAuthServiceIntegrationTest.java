@@ -3,9 +3,9 @@ package kr.modusplant.api.signup.social.service;
 import kr.modusplant.api.crud.member.domain.model.SiteMember;
 import kr.modusplant.api.crud.member.domain.model.SiteMemberAuth;
 import kr.modusplant.api.crud.member.domain.model.SiteMemberRole;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberAuthService;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberRoleService;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberAuthCrudService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberRoleCrudService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberCrudService;
 import kr.modusplant.api.crud.member.enums.AuthProvider;
 import kr.modusplant.global.enums.Role;
 import org.junit.jupiter.api.DisplayName;
@@ -27,13 +27,13 @@ class SocialAuthServiceIntegrationTest {
     private SocialAuthService socialAuthService;
 
     @Autowired
-    private SiteMemberService siteMemberService;
+    private SiteMemberCrudService siteMemberCrudService;
 
     @Autowired
-    private SiteMemberAuthService siteMemberAuthService;
+    private SiteMemberAuthCrudService siteMemberAuthCrudService;
 
     @Autowired
-    private SiteMemberRoleService siteMemberRoleService;
+    private SiteMemberRoleCrudService siteMemberRoleCrudService;
 
     @Test
     @DisplayName("이미 존재하는 사용자라면, 사용자 정보를 조회한다")
@@ -43,13 +43,13 @@ class SocialAuthServiceIntegrationTest {
         String id = "968788539145693243421";
         String email = "test@example.com";
         String nickname = "test";
-        SiteMember existedMember = siteMemberService.insert(
+        SiteMember existedMember = siteMemberCrudService.insert(
                 SiteMember.builder()
                 .nickname(nickname)
                 .loggedInAt(LocalDateTime.now())
                 .build());
 
-        SiteMemberAuth existedMemberAuth = siteMemberAuthService.insert(
+        SiteMemberAuth existedMemberAuth = siteMemberAuthCrudService.insert(
                 SiteMemberAuth.builder()
                         .activeMemberUuid(existedMember.getUuid())
                         .originalMemberUuid(existedMember.getUuid())
@@ -58,7 +58,7 @@ class SocialAuthServiceIntegrationTest {
                         .providerId(id)
                         .build());
 
-        SiteMemberRole existedMemberRole = siteMemberRoleService.insert(
+        SiteMemberRole existedMemberRole = siteMemberRoleCrudService.insert(
                 SiteMemberRole.builder()
                         .uuid(existedMember.getUuid())
                         .role(Role.ROLE_USER)
@@ -90,14 +90,14 @@ class SocialAuthServiceIntegrationTest {
         assertEquals(nickname, result.getNickname());
         assertNotNull(result.getUuid());
 
-        SiteMemberAuth siteMemberAuth = siteMemberAuthService.getByProviderAndProviderId(provider,id)
+        SiteMemberAuth siteMemberAuth = siteMemberAuthCrudService.getByProviderAndProviderId(provider,id)
                 .stream()
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("SiteMemberAuth not found"));
         assertEquals(email, siteMemberAuth.getEmail());
         assertEquals(result.getUuid(),siteMemberAuth.getActiveMemberUuid());
 
-        SiteMemberRole siteMemberRole = siteMemberRoleService.getByUuid(result.getUuid())
+        SiteMemberRole siteMemberRole = siteMemberRoleCrudService.getByUuid(result.getUuid())
                 .orElseThrow(() -> new AssertionError("SiteMemberRole not found"));
         assertEquals(Role.ROLE_USER, siteMemberRole.getRole());
         assertEquals(result.getUuid(), siteMemberRole.getUuid());

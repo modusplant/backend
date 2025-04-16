@@ -4,14 +4,14 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.api.crud.member.domain.model.SiteMember;
 import kr.modusplant.api.crud.member.domain.model.SiteMemberAuth;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberAuthService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberAuthCrudService;
 import kr.modusplant.api.crud.member.enums.AuthProvider;
 import kr.modusplant.api.crud.member.mapper.SiteMemberAuthEntityMapper;
 import kr.modusplant.api.crud.member.mapper.SiteMemberAuthEntityMapperImpl;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberAuthJpaRepository;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberAuthCrudJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberCrudJpaRepository;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import lombok.RequiredArgsConstructor;
@@ -33,10 +33,10 @@ import static kr.modusplant.global.vo.ExceptionMessage.NOT_FOUND_ENTITY;
 @Primary
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class SiteMemberAuthServiceImpl implements SiteMemberAuthService {
+public class SiteMemberAuthCrudServiceImpl implements SiteMemberAuthCrudService {
 
-    private final SiteMemberAuthJpaRepository memberAuthRepository;
-    private final SiteMemberJpaRepository memberRepository;
+    private final SiteMemberAuthCrudJpaRepository memberAuthRepository;
+    private final SiteMemberCrudJpaRepository memberRepository;
     private final SiteMemberAuthEntityMapper memberAuthEntityMapper = new SiteMemberAuthEntityMapperImpl();
 
     @Override

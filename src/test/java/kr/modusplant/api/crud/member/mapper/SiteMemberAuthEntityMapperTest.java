@@ -5,8 +5,8 @@ import kr.modusplant.api.crud.member.common.util.entity.SiteMemberAuthEntityTest
 import kr.modusplant.api.crud.member.domain.model.SiteMemberAuth;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberAuthJpaRepository;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberAuthCrudJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberCrudJpaRepository;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,12 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RepositoryOnlyContext
 class SiteMemberAuthEntityMapperTest implements SiteMemberAuthTestUtils, SiteMemberAuthEntityTestUtils {
 
-    private final SiteMemberAuthJpaRepository memberAuthRepository;
-    private final SiteMemberJpaRepository memberRepository;
+    private final SiteMemberAuthCrudJpaRepository memberAuthRepository;
+    private final SiteMemberCrudJpaRepository memberRepository;
     private final SiteMemberAuthEntityMapper memberAuthMapper = new SiteMemberAuthEntityMapperImpl();
 
     @Autowired
-    SiteMemberAuthEntityMapperTest(SiteMemberAuthJpaRepository memberAuthRepository, SiteMemberJpaRepository memberRepository) {
+    SiteMemberAuthEntityMapperTest(SiteMemberAuthCrudJpaRepository memberAuthRepository, SiteMemberCrudJpaRepository memberRepository) {
         this.memberAuthRepository = memberAuthRepository;
         this.memberRepository = memberRepository;
     }

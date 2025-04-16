@@ -1,11 +1,11 @@
 package kr.modusplant.api.crud.member.domain.service;
 
 import kr.modusplant.api.crud.member.domain.model.SiteMember;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberCrudService;
 import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapper;
 import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberCrudJpaRepository;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +23,9 @@ import java.util.UUID;
 @Primary
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class SiteMemberServiceImpl implements SiteMemberService {
+public class SiteMemberCrudServiceImpl implements SiteMemberCrudService {
 
-    private final SiteMemberJpaRepository memberRepository;
+    private final SiteMemberCrudJpaRepository memberRepository;
     private final SiteMemberEntityMapper memberEntityMapper = new SiteMemberEntityMapperImpl();
 
     @Override

@@ -12,12 +12,12 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
-class TermJpaRepositoryTest implements TermEntityTestUtils {
+class TermCrudJpaRepositoryTest implements TermEntityTestUtils {
 
-    private final TermJpaRepository termRepository;
+    private final TermCrudJpaRepository termRepository;
 
     @Autowired
-    TermJpaRepositoryTest(TermJpaRepository termRepository) {
+    TermCrudJpaRepositoryTest(TermCrudJpaRepository termRepository) {
         this.termRepository = termRepository;
     }
 
