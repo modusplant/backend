@@ -2,13 +2,13 @@ package kr.modusplant.api.crud.member.domain.service;
 
 import kr.modusplant.api.crud.member.domain.model.SiteMember;
 import kr.modusplant.api.crud.member.domain.model.SiteMemberTerm;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberTermService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberTermCrudService;
 import kr.modusplant.api.crud.member.mapper.SiteMemberTermEntityMapper;
 import kr.modusplant.api.crud.member.mapper.SiteMemberTermEntityMapperImpl;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberTermEntity;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberTermJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberTermCrudJpaRepository;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +24,10 @@ import java.util.UUID;
 @Primary
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class SiteMemberTermServiceImpl implements SiteMemberTermService {
+public class SiteMemberTermCrudServiceImpl implements SiteMemberTermCrudService {
 
-    private final SiteMemberTermJpaRepository memberTermRepository;
-    private final SiteMemberJpaRepository memberRepository;
+    private final SiteMemberTermCrudJpaRepository memberTermRepository;
+    private final SiteMemberCrudJpaRepository memberRepository;
     private final SiteMemberTermEntityMapper memberTermEntityMapper = new SiteMemberTermEntityMapperImpl();
 
     @Override

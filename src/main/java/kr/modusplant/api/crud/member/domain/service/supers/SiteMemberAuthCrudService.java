@@ -8,7 +8,7 @@ import kr.modusplant.api.crud.member.enums.AuthProvider;
 import java.util.List;
 import java.util.Optional;
 
-public interface SiteMemberAuthService extends UuidCrudService<SiteMemberAuth> {
+public interface SiteMemberAuthCrudService extends UuidCrudService<SiteMemberAuth> {
     List<SiteMemberAuth> getByActiveMember(SiteMember activeMember);
 
     List<SiteMemberAuth> getByEmail(String email);

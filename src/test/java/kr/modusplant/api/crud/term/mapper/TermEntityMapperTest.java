@@ -3,7 +3,7 @@ package kr.modusplant.api.crud.term.mapper;
 import kr.modusplant.api.crud.term.common.util.domain.TermTestUtils;
 import kr.modusplant.api.crud.term.common.util.entity.TermEntityTestUtils;
 import kr.modusplant.api.crud.term.persistence.entity.TermEntity;
-import kr.modusplant.api.crud.term.persistence.repository.TermJpaRepository;
+import kr.modusplant.api.crud.term.persistence.repository.TermCrudJpaRepository;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,11 +14,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RepositoryOnlyContext
 class TermEntityMapperTest implements TermTestUtils, TermEntityTestUtils {
 
-    private final TermJpaRepository termRepository;
+    private final TermCrudJpaRepository termRepository;
     private final TermEntityMapper termMapper = new TermEntityMapperImpl();
 
     @Autowired
-    TermEntityMapperTest(TermJpaRepository termRepository) {
+    TermEntityMapperTest(TermCrudJpaRepository termRepository) {
         this.termRepository = termRepository;
     }
 

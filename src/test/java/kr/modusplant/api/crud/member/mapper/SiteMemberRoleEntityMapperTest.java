@@ -5,8 +5,8 @@ import kr.modusplant.api.crud.member.common.util.entity.SiteMemberRoleEntityTest
 import kr.modusplant.api.crud.member.domain.model.SiteMemberRole;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberRoleEntity;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberRoleJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberRoleCrudJpaRepository;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,12 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RepositoryOnlyContext
 class SiteMemberRoleEntityMapperTest implements SiteMemberRoleTestUtils, SiteMemberRoleEntityTestUtils {
 
-    private final SiteMemberRoleJpaRepository memberRoleRepository;
-    private final SiteMemberJpaRepository memberRepository;
+    private final SiteMemberRoleCrudJpaRepository memberRoleRepository;
+    private final SiteMemberCrudJpaRepository memberRepository;
     private final SiteMemberRoleEntityMapper memberRoleMapper = new SiteMemberRoleEntityMapperImpl();
 
     @Autowired
-    SiteMemberRoleEntityMapperTest(SiteMemberRoleJpaRepository memberRoleRepository, SiteMemberJpaRepository memberRepository) {
+    SiteMemberRoleEntityMapperTest(SiteMemberRoleCrudJpaRepository memberRoleRepository, SiteMemberCrudJpaRepository memberRepository) {
         this.memberRoleRepository = memberRoleRepository;
         this.memberRepository = memberRepository;
     }

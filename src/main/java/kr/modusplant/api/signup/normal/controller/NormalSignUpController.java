@@ -8,12 +8,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import kr.modusplant.api.crud.member.domain.model.SiteMember;
 import kr.modusplant.api.crud.member.domain.model.SiteMemberAuth;
 import kr.modusplant.api.crud.member.domain.model.SiteMemberTerm;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberAuthService;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberService;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberTermService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberAuthCrudService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberCrudService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberTermCrudService;
 import kr.modusplant.api.crud.member.enums.AuthProvider;
 import kr.modusplant.api.crud.term.domain.model.Term;
-import kr.modusplant.api.crud.term.domain.service.supers.TermService;
+import kr.modusplant.api.crud.term.domain.service.supers.TermCrudService;
 import kr.modusplant.api.signup.normal.model.request.NormalSignUpRequest;
 import kr.modusplant.global.app.servlet.response.DataResponse;
 import lombok.RequiredArgsConstructor;
@@ -36,10 +36,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class NormalSignUpController {
 
-    private final TermService termService;
-    private final SiteMemberTermService siteMemberTermService;
-    private final SiteMemberAuthService siteMemberAuthService;
-    private final SiteMemberService siteMemberService;
+    private final TermCrudService termCrudService;
+    private final SiteMemberTermCrudService siteMemberTermCrudService;
+    private final SiteMemberAuthCrudService siteMemberAuthCrudService;
+    private final SiteMemberCrudService siteMemberCrudService;
 //    private final PasswordEncoder passwordEncoder;
 
     @Operation(
@@ -54,7 +54,7 @@ public class NormalSignUpController {
     public ResponseEntity<DataResponse<?>> sendTerms(){
 
         try {
-            List<Map<String, Object>> termMapList = termService.getAll()
+            List<Map<String, Object>> termMapList = termCrudService.getAll()
                     .stream()
                     .filter(term -> {
                         String termKey = term.getName();
@@ -149,7 +149,7 @@ public class NormalSignUpController {
         SiteMember siteMember = SiteMember.builder()
                 .nickname(memberData.nickname())
                 .build();
-        SiteMember savedMember = siteMemberService.insert(siteMember);
+        SiteMember savedMember = siteMemberCrudService.insert(siteMember);
 
         SiteMemberAuth siteMemberAuth = SiteMemberAuth.builder()
                 .uuid(savedMember.getUuid())
@@ -160,7 +160,7 @@ public class NormalSignUpController {
                 .pw(memberData.pw())
                 .provider(AuthProvider.BASIC)
                 .build();
-        siteMemberAuthService.insert(siteMemberAuth);
+        siteMemberAuthCrudService.insert(siteMemberAuth);
 
         SiteMemberTerm siteMemberTerm = SiteMemberTerm.builder()
                 .uuid(savedMember.getUuid())
@@ -168,6 +168,6 @@ public class NormalSignUpController {
                 .agreedPrivacyPolicyVersion(memberData.agreedPrivacyPolicyVerion())
                 .agreedAdInfoReceivingVersion(memberData.agreedAdInfoRecevingVerion())
                 .build();
-        siteMemberTermService.insert(siteMemberTerm);
+        siteMemberTermCrudService.insert(siteMemberTerm);
     }
 }

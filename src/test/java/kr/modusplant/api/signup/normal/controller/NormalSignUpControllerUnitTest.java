@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.api.crud.member.common.util.domain.SiteMemberAuthTestUtils;
 import kr.modusplant.api.crud.member.common.util.domain.SiteMemberTermTestUtils;
 import kr.modusplant.api.crud.member.common.util.domain.SiteMemberTestUtils;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberAuthService;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberService;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberTermService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberAuthCrudService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberCrudService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberTermCrudService;
 import kr.modusplant.api.crud.member.enums.AuthProvider;
 import kr.modusplant.api.crud.term.common.util.domain.TermTestUtils;
-import kr.modusplant.api.crud.term.domain.service.supers.TermService;
+import kr.modusplant.api.crud.term.domain.service.supers.TermCrudService;
 import kr.modusplant.api.signup.normal.model.request.NormalSignUpRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,18 +38,18 @@ public class NormalSignUpControllerUnitTest {
     @Autowired
     private ObjectMapper objectMapper;
     @MockitoBean
-    private TermService termService;
+    private TermCrudService termCrudService;
     @MockitoBean
-    private SiteMemberService siteMemberService;
+    private SiteMemberCrudService siteMemberCrudService;
     @MockitoBean
-    private SiteMemberAuthService siteMemberAuthService;
+    private SiteMemberAuthCrudService siteMemberAuthCrudService;
     @MockitoBean
-    private SiteMemberTermService siteMemberTermService;
+    private SiteMemberTermCrudService siteMemberTermCrudService;
 
     @Test
     public void sendTerms_givenRequestingTerm_thenReturn200WithTerm() throws Exception {
         // given
-        given(termService.getAll())
+        given(termCrudService.getAll())
                 .willReturn(List.of(TermTestUtils.termsOfUseWithUuid, TermTestUtils.privacyPolicyWithUuid, TermTestUtils.adInfoReceivingWithUuid));
 
         // when
@@ -109,13 +109,13 @@ public class NormalSignUpControllerUnitTest {
     private void setupServiceStubbing() {
         UUID consistentMemberUuid = SiteMemberTestUtils.memberBasicUserWithUuid.getUuid();
 
-        given(siteMemberService
+        given(siteMemberCrudService
                 .insert(argThat(member ->
                         member != null &&
                                 member.getNickname() != null)))
                 .willReturn(SiteMemberTestUtils.memberBasicUserWithUuid);
 
-        given(siteMemberAuthService
+        given(siteMemberAuthCrudService
                 .insert(argThat(auth ->
                     auth != null &&
                             auth.getActiveMemberUuid().equals(consistentMemberUuid) &&
@@ -123,7 +123,7 @@ public class NormalSignUpControllerUnitTest {
                             auth.getProvider().equals(AuthProvider.BASIC))))
                 .willReturn(SiteMemberAuthTestUtils.memberAuthBasicUserWithUuid);
 
-        given(siteMemberTermService
+        given(siteMemberTermCrudService
                 .insert(argThat(memberTerm ->
                     memberTerm != null &&
                             memberTerm.getUuid().equals(consistentMemberUuid))))

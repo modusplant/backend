@@ -3,9 +3,9 @@ package kr.modusplant.api.signup.social.service;
 import kr.modusplant.api.crud.member.domain.model.SiteMember;
 import kr.modusplant.api.crud.member.domain.model.SiteMemberAuth;
 import kr.modusplant.api.crud.member.domain.model.SiteMemberRole;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberAuthService;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberRoleService;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberAuthCrudService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberRoleCrudService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberCrudService;
 import kr.modusplant.api.crud.member.enums.AuthProvider;
 import kr.modusplant.api.signup.social.model.external.GoogleUserInfo;
 import kr.modusplant.api.signup.social.model.external.KakaoUserInfo;
@@ -31,9 +31,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class SocialAuthService {
-    private final SiteMemberService siteMemberService;
-    private final SiteMemberAuthService siteMemberAuthService;
-    private final SiteMemberRoleService siteMemberRoleService;
+    private final SiteMemberCrudService siteMemberCrudService;
+    private final SiteMemberAuthCrudService siteMemberAuthCrudService;
+    private final SiteMemberRoleCrudService siteMemberRoleCrudService;
     private RestClient restClient;
 
     @Value("${kakao.api-key}")
@@ -132,11 +132,11 @@ public class SocialAuthService {
     @Transactional
     public SiteMember findOrCreateMember(AuthProvider provider,String id, String email, String nickname) {
         // provider와 provider_id로 site_member_auth 사용자 조회
-        Optional<SiteMemberAuth> existedMemberAuth = siteMemberAuthService.getByProviderAndProviderId(provider,id);
+        Optional<SiteMemberAuth> existedMemberAuth = siteMemberAuthCrudService.getByProviderAndProviderId(provider,id);
 
         // 신규 멤버 저장 및 멤버 반환
         return existedMemberAuth.map(siteMemberAuth -> {
-            return siteMemberService.getByUuid(siteMemberAuth.getActiveMemberUuid()).get();
+            return siteMemberCrudService.getByUuid(siteMemberAuth.getActiveMemberUuid()).get();
         }).orElseGet(() -> {
             SiteMember savedMember = createSiteMember(nickname);
             createSiteMemberAuth(savedMember.getUuid(),provider,id,email);
@@ -150,7 +150,7 @@ public class SocialAuthService {
                 .nickname(nickname)
                 .loggedInAt(LocalDateTime.now())
                 .build();
-        return siteMemberService.insert(siteMember);
+        return siteMemberCrudService.insert(siteMember);
     }
 
     private SiteMemberAuth createSiteMemberAuth(UUID memberUuid, AuthProvider provider, String id, String email) {
@@ -161,7 +161,7 @@ public class SocialAuthService {
                 .provider(provider)
                 .providerId(id)
                 .build();
-        return siteMemberAuthService.insert(siteMemberAuth);
+        return siteMemberAuthCrudService.insert(siteMemberAuth);
     }
 
     private SiteMemberRole createSiteMemberRole(UUID memberUuid) {
@@ -169,7 +169,7 @@ public class SocialAuthService {
                 .uuid(memberUuid)
                 .role(Role.ROLE_USER)
                 .build();
-        return siteMemberRoleService.insert(siteMemberRole);
+        return siteMemberRoleCrudService.insert(siteMemberRole);
     }
 
     private boolean isErrorStatus(HttpStatusCode status) {

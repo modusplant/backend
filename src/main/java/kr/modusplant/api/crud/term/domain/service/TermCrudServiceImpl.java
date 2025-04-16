@@ -2,11 +2,11 @@ package kr.modusplant.api.crud.term.domain.service;
 
 import jakarta.persistence.EntityExistsException;
 import kr.modusplant.api.crud.term.domain.model.Term;
-import kr.modusplant.api.crud.term.domain.service.supers.TermService;
+import kr.modusplant.api.crud.term.domain.service.supers.TermCrudService;
 import kr.modusplant.api.crud.term.mapper.TermEntityMapper;
 import kr.modusplant.api.crud.term.mapper.TermEntityMapperImpl;
 import kr.modusplant.api.crud.term.persistence.entity.TermEntity;
-import kr.modusplant.api.crud.term.persistence.repository.TermJpaRepository;
+import kr.modusplant.api.crud.term.persistence.repository.TermCrudJpaRepository;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +26,8 @@ import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
 @Primary
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class TermServiceImpl implements TermService {
-    private final TermJpaRepository termRepository;
+public class TermCrudServiceImpl implements TermCrudService {
+    private final TermCrudJpaRepository termRepository;
     private final TermEntityMapper termEntityMapper = new TermEntityMapperImpl();
 
     @Override

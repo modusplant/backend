@@ -4,11 +4,11 @@ import kr.modusplant.api.crud.common.context.CrudServiceOnlyContext;
 import kr.modusplant.api.crud.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.api.crud.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.api.crud.member.domain.model.SiteMember;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberCrudService;
 import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapper;
 import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberCrudJpaRepository;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import org.junit.jupiter.api.DisplayName;
@@ -28,14 +28,14 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
 @CrudServiceOnlyContext
-class SiteMemberServiceImplTest implements SiteMemberTestUtils, SiteMemberEntityTestUtils {
+class SiteMemberCrudServiceImplTest implements SiteMemberTestUtils, SiteMemberEntityTestUtils {
 
-    private final SiteMemberService memberService;
-    private final SiteMemberJpaRepository memberRepository;
+    private final SiteMemberCrudService memberService;
+    private final SiteMemberCrudJpaRepository memberRepository;
     private final SiteMemberEntityMapper memberMapper = new SiteMemberEntityMapperImpl();
 
     @Autowired
-    SiteMemberServiceImplTest(SiteMemberService memberService, SiteMemberJpaRepository memberRepository) {
+    SiteMemberCrudServiceImplTest(SiteMemberCrudService memberService, SiteMemberCrudJpaRepository memberRepository) {
         this.memberService = memberService;
         this.memberRepository = memberRepository;
     }
