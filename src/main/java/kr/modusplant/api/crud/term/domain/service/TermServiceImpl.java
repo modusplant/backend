@@ -1,8 +1,8 @@
-package kr.modusplant.api.crud.term.persistence.service;
+package kr.modusplant.api.crud.term.domain.service;
 
 import jakarta.persistence.EntityExistsException;
 import kr.modusplant.api.crud.term.domain.model.Term;
-import kr.modusplant.api.crud.term.domain.service.TermService;
+import kr.modusplant.api.crud.term.domain.service.supers.TermService;
 import kr.modusplant.api.crud.term.mapper.TermEntityMapper;
 import kr.modusplant.api.crud.term.mapper.TermEntityMapperImpl;
 import kr.modusplant.api.crud.term.persistence.entity.TermEntity;
