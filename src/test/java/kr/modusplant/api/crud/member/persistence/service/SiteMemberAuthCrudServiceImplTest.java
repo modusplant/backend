@@ -9,8 +9,8 @@ import kr.modusplant.api.crud.member.common.util.entity.SiteMemberAuthEntityTest
 import kr.modusplant.api.crud.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.api.crud.member.domain.model.SiteMember;
 import kr.modusplant.api.crud.member.domain.model.SiteMemberAuth;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberAuthService;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberAuthCrudService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberCrudService;
 import kr.modusplant.api.crud.member.enums.AuthProvider;
 import kr.modusplant.api.crud.member.mapper.SiteMemberAuthEntityMapper;
 import kr.modusplant.api.crud.member.mapper.SiteMemberAuthEntityMapperImpl;
@@ -18,8 +18,8 @@ import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapper;
 import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberAuthJpaRepository;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberAuthCrudJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberCrudJpaRepository;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import org.junit.jupiter.api.DisplayName;
@@ -41,17 +41,17 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
 @CrudServiceOnlyContext
-class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemberAuthEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils {
+class SiteMemberAuthCrudServiceImplTest implements SiteMemberAuthTestUtils, SiteMemberAuthEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils {
 
-    private final SiteMemberAuthService memberAuthService;
-    private final SiteMemberService memberService;
-    private final SiteMemberAuthJpaRepository memberAuthRepository;
-    private final SiteMemberJpaRepository memberRepository;
+    private final SiteMemberAuthCrudService memberAuthService;
+    private final SiteMemberCrudService memberService;
+    private final SiteMemberAuthCrudJpaRepository memberAuthRepository;
+    private final SiteMemberCrudJpaRepository memberRepository;
     private final SiteMemberAuthEntityMapper memberAuthMapper = new SiteMemberAuthEntityMapperImpl();
     private final SiteMemberEntityMapper memberMapper = new SiteMemberEntityMapperImpl();
 
     @Autowired
-    SiteMemberAuthServiceImplTest(SiteMemberAuthService memberAuthService, SiteMemberService memberService, SiteMemberAuthJpaRepository memberAuthRepository, SiteMemberJpaRepository memberRepository) {
+    SiteMemberAuthCrudServiceImplTest(SiteMemberAuthCrudService memberAuthService, SiteMemberCrudService memberService, SiteMemberAuthCrudJpaRepository memberAuthRepository, SiteMemberCrudJpaRepository memberRepository) {
         this.memberAuthService = memberAuthService;
         this.memberService = memberService;
         this.memberAuthRepository = memberAuthRepository;

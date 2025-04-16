@@ -9,16 +9,16 @@ import kr.modusplant.api.crud.member.common.util.entity.SiteMemberEntityTestUtil
 import kr.modusplant.api.crud.member.common.util.entity.SiteMemberTermEntityTestUtils;
 import kr.modusplant.api.crud.member.domain.model.SiteMember;
 import kr.modusplant.api.crud.member.domain.model.SiteMemberTerm;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberService;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberTermService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberCrudService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberTermCrudService;
 import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapper;
 import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.api.crud.member.mapper.SiteMemberTermEntityMapper;
 import kr.modusplant.api.crud.member.mapper.SiteMemberTermEntityMapperImpl;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberTermEntity;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberTermJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberTermCrudJpaRepository;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import org.junit.jupiter.api.DisplayName;
@@ -39,17 +39,17 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
 @CrudServiceOnlyContext
-class SiteMemberTermServiceImplTest implements SiteMemberTermTestUtils, SiteMemberTermEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils {
+class SiteMemberTermCrudServiceImplTest implements SiteMemberTermTestUtils, SiteMemberTermEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils {
 
-    private final SiteMemberTermService memberTermService;
-    private final SiteMemberService memberService;
-    private final SiteMemberTermJpaRepository memberTermRepository;
-    private final SiteMemberJpaRepository memberRepository;
+    private final SiteMemberTermCrudService memberTermService;
+    private final SiteMemberCrudService memberService;
+    private final SiteMemberTermCrudJpaRepository memberTermRepository;
+    private final SiteMemberCrudJpaRepository memberRepository;
     private final SiteMemberTermEntityMapper memberTermMapper = new SiteMemberTermEntityMapperImpl();
     private final SiteMemberEntityMapper memberMapper = new SiteMemberEntityMapperImpl();
 
     @Autowired
-    SiteMemberTermServiceImplTest(SiteMemberTermService memberTermService, SiteMemberService memberService, SiteMemberTermJpaRepository memberTermRepository, SiteMemberJpaRepository memberRepository) {
+    SiteMemberTermCrudServiceImplTest(SiteMemberTermCrudService memberTermService, SiteMemberCrudService memberService, SiteMemberTermCrudJpaRepository memberTermRepository, SiteMemberCrudJpaRepository memberRepository) {
         this.memberTermService = memberTermService;
         this.memberService = memberService;
         this.memberTermRepository = memberTermRepository;

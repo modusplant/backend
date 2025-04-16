@@ -2,13 +2,13 @@ package kr.modusplant.api.crud.member.domain.service;
 
 import kr.modusplant.api.crud.member.domain.model.SiteMember;
 import kr.modusplant.api.crud.member.domain.model.SiteMemberRole;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberRoleService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberRoleCrudService;
 import kr.modusplant.api.crud.member.mapper.SiteMemberRoleEntityMapper;
 import kr.modusplant.api.crud.member.mapper.SiteMemberRoleEntityMapperImpl;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberRoleEntity;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberRoleJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberRoleCrudJpaRepository;
 import kr.modusplant.global.enums.Role;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
@@ -25,10 +25,10 @@ import java.util.UUID;
 @Primary
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class SiteMemberRoleServiceImpl implements SiteMemberRoleService {
+public class SiteMemberRoleCrudServiceImpl implements SiteMemberRoleCrudService {
 
-    private final SiteMemberRoleJpaRepository memberRoleRepository;
-    private final SiteMemberJpaRepository memberRepository;
+    private final SiteMemberRoleCrudJpaRepository memberRoleRepository;
+    private final SiteMemberCrudJpaRepository memberRepository;
     private final SiteMemberRoleEntityMapper memberRoleEntityMapper = new SiteMemberRoleEntityMapperImpl();
 
     @Override
