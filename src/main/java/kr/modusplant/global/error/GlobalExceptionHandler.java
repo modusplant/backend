@@ -43,12 +43,9 @@ public class GlobalExceptionHandler {
 
     // 그 외 모든 Exception 처리
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGenericException(HttpServletRequest request, Exception ex) {
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        errorResponse.put("message", "Internal Server Error: " + ex.getMessage());
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    public ResponseEntity<DataResponse<Void>> handleGenericException(HttpServletRequest request, Exception ex) {
+        DataResponse<Void> errorResponse = DataResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error occurred");
+        return ResponseEntity.internalServerError().body(errorResponse);
     }
 
     // 검증로직 실패 시 예외 처리
