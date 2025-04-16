@@ -12,5 +12,5 @@ import static kr.modusplant.domains.commons.vo.Reference.NOTATION_DOMAINS;
         basePackages = NOTATION_DOMAINS,
         includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Service.class)
 )
-public abstract class ScanCrudService {
+public abstract class ScanDomainService {
 }

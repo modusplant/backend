@@ -1,8 +1,6 @@
 package kr.modusplant.domains.member.domain.service;
 
-import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityNotFoundException;
-import kr.modusplant.domains.common.context.CrudServiceOnlyContext;
+import kr.modusplant.domains.common.context.DomainServiceOnlyContext;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTermTestUtils;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
@@ -19,8 +17,6 @@ import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberTermEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberTermCrudJpaRepository;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,16 +25,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 import static kr.modusplant.global.util.VersionUtils.createVersion;
-import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
-import static kr.modusplant.global.vo.ExceptionMessage.NOT_FOUND_ENTITY;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
-@CrudServiceOnlyContext
+@DomainServiceOnlyContext
 class SiteMemberTermCrudServiceImplTest implements SiteMemberTermTestUtils, SiteMemberTermEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils {
 
     private final SiteMemberTermCrudService memberTermService;
@@ -65,9 +57,9 @@ class SiteMemberTermCrudServiceImplTest implements SiteMemberTermTestUtils, Site
         SiteMember member = memberMapper.toSiteMember(memberEntity);
         SiteMemberTerm memberTerm = memberTermMapper.toSiteMemberTerm(memberTermEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberTermRepository.findByUuid(memberTerm.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberTermEntity));
+        given(memberTermRepository.findByUuid(memberTerm.getUuid())).willReturn(Optional.of(memberTermEntity));
         given(memberTermRepository.save(memberTermEntity)).willReturn(memberTermEntity);
 
         // when
@@ -87,9 +79,9 @@ class SiteMemberTermCrudServiceImplTest implements SiteMemberTermTestUtils, Site
         SiteMember member = memberMapper.toSiteMember(memberEntity);
         SiteMemberTerm memberTerm = memberTermMapper.toSiteMemberTerm(memberTermEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberTermRepository.findByUuid(memberTerm.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberTermEntity));
+        given(memberTermRepository.findByUuid(memberTerm.getUuid())).willReturn(Optional.of(memberTermEntity));
         given(memberTermRepository.save(memberTermEntity)).willReturn(memberTermEntity);
 
         // when
@@ -109,9 +101,9 @@ class SiteMemberTermCrudServiceImplTest implements SiteMemberTermTestUtils, Site
         SiteMember member = memberMapper.toSiteMember(memberEntity);
         SiteMemberTerm memberTerm = memberTermMapper.toSiteMemberTerm(memberTermEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberTermRepository.findByUuid(memberTerm.getUuid())).willReturn(Optional.empty());
+        given(memberTermRepository.findByUuid(memberTerm.getUuid())).willReturn(Optional.of(memberTermEntity));
         given(memberTermRepository.save(memberTermEntity)).willReturn(memberTermEntity);
         given(memberTermRepository.findByAgreedTermsOfUseVersion(memberTermEntity.getAgreedTermsOfUseVersion())).willReturn(List.of(memberTermEntity));
 
@@ -132,9 +124,9 @@ class SiteMemberTermCrudServiceImplTest implements SiteMemberTermTestUtils, Site
         SiteMember member = memberMapper.toSiteMember(memberEntity);
         SiteMemberTerm memberTerm = memberTermMapper.toSiteMemberTerm(memberTermEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberTermRepository.findByUuid(memberTerm.getUuid())).willReturn(Optional.empty());
+        given(memberTermRepository.findByUuid(memberTerm.getUuid())).willReturn(Optional.of(memberTermEntity));
         given(memberTermRepository.save(memberTermEntity)).willReturn(memberTermEntity);
         given(memberTermRepository.findByAgreedPrivacyPolicyVersion(memberTermEntity.getAgreedPrivacyPolicyVersion())).willReturn(List.of(memberTermEntity));
 
@@ -155,9 +147,9 @@ class SiteMemberTermCrudServiceImplTest implements SiteMemberTermTestUtils, Site
         SiteMember member = memberMapper.toSiteMember(memberEntity);
         SiteMemberTerm memberTerm = memberTermMapper.toSiteMemberTerm(memberTermEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberTermRepository.findByUuid(memberTerm.getUuid())).willReturn(Optional.empty());
+        given(memberTermRepository.findByUuid(memberTerm.getUuid())).willReturn(Optional.of(memberTermEntity));
         given(memberTermRepository.save(memberTermEntity)).willReturn(memberTermEntity);
         given(memberTermRepository.findByAgreedAdInfoReceivingVersion(memberTermEntity.getAgreedAdInfoReceivingVersion())).willReturn(List.of(memberTermEntity));
 
@@ -174,8 +166,8 @@ class SiteMemberTermCrudServiceImplTest implements SiteMemberTermTestUtils, Site
     void getOptionalEmptyTest() {
         // given
         SiteMemberTermEntity memberTermEntity = createMemberTermUserEntityWithUuid();
-        UUID uuid = memberTermEntity.getUuid();
         SiteMemberEntity memberEntity = memberTermEntity.getMember();
+        UUID uuid = memberEntity.getUuid();
         SiteMember member = memberMapper.toSiteMember(memberEntity);
 
         // getByUuid
@@ -193,37 +185,6 @@ class SiteMemberTermCrudServiceImplTest implements SiteMemberTermTestUtils, Site
         assertThat(memberTermService.getByMember(member)).isEmpty();
     }
 
-    @DisplayName("회원 약관 삽입 간 검증")
-    @Test
-    void validateDuringInsertTest() {
-        // given
-        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        UUID memberEntityUuid = memberEntity.getUuid();
-        SiteMemberTermEntity memberTermEntity = SiteMemberTermEntity.builder().member(memberEntity).build();
-        SiteMemberTerm memberTerm = memberTermMapper.toSiteMemberTerm(memberTermEntity);
-
-        // Not Found member 검증
-        // given & when
-        given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.empty());
-
-        // then
-        EntityNotFoundException notFoundException = assertThrows(EntityNotFoundWithUuidException.class,
-                () -> memberTermService.insert(memberTerm));
-        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY, "uuid", memberEntityUuid, SiteMemberEntity.class));
-
-        // Existed memberTerm 검증
-        // given & when
-        given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.of(memberEntity));
-        given(memberTermRepository.findByUuid(memberEntityUuid)).willReturn(Optional.of(memberTermEntity));
-
-        // then
-        EntityExistsException existsException = assertThrows(EntityExistsWithUuidException.class,
-                () -> memberTermService.insert(memberTerm));
-        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                EXISTED_ENTITY, "uuid", memberEntityUuid, SiteMemberTermEntity.class));
-    }
-
     @DisplayName("회원 약관 갱신")
     @Test
     void updateTest() {
@@ -236,11 +197,10 @@ class SiteMemberTermCrudServiceImplTest implements SiteMemberTermTestUtils, Site
         SiteMemberTerm memberTerm = memberTermMapper.toSiteMemberTerm(memberTermEntity);
         SiteMemberTerm updatedMemberTerm = memberTermMapper.toSiteMemberTerm(updatedMemberTermEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberTermRepository.findByUuid(memberTerm.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(updatedMemberTermEntity));
+        given(memberTermRepository.findByUuid(memberTerm.getUuid())).willReturn(Optional.of(memberTermEntity));
         given(memberTermRepository.save(memberTermEntity)).willReturn(memberTermEntity);
-        given(memberTermRepository.save(updatedMemberTermEntity)).willReturn(updatedMemberTermEntity);
         given(memberTermRepository.findByAgreedTermsOfUseVersion(updatedAgreedTermsOfUseVersion)).willReturn(List.of(updatedMemberTermEntity));
 
         // when
@@ -250,37 +210,6 @@ class SiteMemberTermCrudServiceImplTest implements SiteMemberTermTestUtils, Site
 
         // then
         assertThat(memberTermService.getByAgreedTermsOfUseVersion(updatedAgreedTermsOfUseVersion).getFirst()).isEqualTo(updatedMemberTerm);
-    }
-
-    @DisplayName("회원 약관 갱신 간 검증")
-    @Test
-    void validateDuringUpdateTest() {
-        // given
-        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        UUID memberEntityUuid = memberEntity.getUuid();
-        SiteMemberTermEntity memberTermEntity = SiteMemberTermEntity.builder().member(memberEntity).build();
-        SiteMemberTerm memberTerm = memberTermMapper.toSiteMemberTerm(memberTermEntity);
-
-        // Not Found member 검증
-        // given & when
-        given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.empty());
-
-        // then
-        EntityNotFoundException notFoundException = assertThrows(EntityNotFoundWithUuidException.class,
-                () -> memberTermService.update(memberTerm));
-        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY, "uuid", memberEntityUuid, SiteMemberEntity.class));
-
-        // Not Found memberTerm 검증
-        // given & when
-        given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.of(memberEntity));
-        given(memberTermRepository.findByUuid(memberEntityUuid)).willReturn(Optional.empty());
-
-        // then
-        notFoundException = assertThrows(EntityNotFoundWithUuidException.class,
-                () -> memberTermService.update(memberTerm));
-        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY, "uuid", memberEntityUuid, SiteMemberTermEntity.class));
     }
 
     @DisplayName("uuid로 회원 약관 제거")
@@ -293,9 +222,9 @@ class SiteMemberTermCrudServiceImplTest implements SiteMemberTermTestUtils, Site
         SiteMemberTerm memberTerm = memberTermMapper.toSiteMemberTerm(memberTermEntity);
         UUID uuid = memberTerm.getUuid();
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberTermRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberTermEntity)).willReturn(Optional.empty());
+        given(memberTermRepository.findByUuid(memberTerm.getUuid())).willReturn(Optional.empty());
         given(memberTermRepository.save(memberTermEntity)).willReturn(memberTermEntity);
         willDoNothing().given(memberTermRepository).deleteByUuid(uuid);
 
@@ -306,21 +235,5 @@ class SiteMemberTermCrudServiceImplTest implements SiteMemberTermTestUtils, Site
 
         // then
         assertThat(memberTermService.getByUuid(uuid)).isEmpty();
-    }
-
-    @DisplayName("uuid로 회원 역할 제거 간 검증")
-    @Test
-    void validateDuringRemoveByUuidTest() {
-        // given & when
-        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        UUID memberEntityUuid = memberEntity.getUuid();
-
-        given(memberTermRepository.findByUuid(memberEntityUuid)).willReturn(Optional.empty());
-
-        // then
-        EntityNotFoundException notFoundException = assertThrows(EntityNotFoundWithUuidException.class,
-                () -> memberTermService.removeByUuid(memberEntityUuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY, "uuid", memberEntityUuid, SiteMemberTermEntity.class));
     }
 }

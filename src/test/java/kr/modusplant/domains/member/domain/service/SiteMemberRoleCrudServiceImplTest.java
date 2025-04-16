@@ -1,8 +1,6 @@
 package kr.modusplant.domains.member.domain.service;
 
-import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityNotFoundException;
-import kr.modusplant.domains.common.context.CrudServiceOnlyContext;
+import kr.modusplant.domains.common.context.DomainServiceOnlyContext;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberRoleTestUtils;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
@@ -20,8 +18,6 @@ import kr.modusplant.domains.member.persistence.entity.SiteMemberRoleEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleCrudJpaRepository;
 import kr.modusplant.global.enums.Role;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +26,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
-import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
-import static kr.modusplant.global.vo.ExceptionMessage.NOT_FOUND_ENTITY;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
-@CrudServiceOnlyContext
+@DomainServiceOnlyContext
 class SiteMemberRoleCrudServiceImplTest implements SiteMemberRoleTestUtils, SiteMemberRoleEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils {
 
     private final SiteMemberRoleCrudService memberRoleService;
@@ -65,9 +57,9 @@ class SiteMemberRoleCrudServiceImplTest implements SiteMemberRoleTestUtils, Site
         SiteMember member = memberMapper.toSiteMember(memberEntity);
         SiteMemberRole memberRole = memberRoleMapper.toSiteMemberRole(memberRoleEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberRoleRepository.findByUuid(memberRole.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberRoleEntity));
+        given(memberRoleRepository.findByUuid(memberRole.getUuid())).willReturn(Optional.of(memberRoleEntity));
         given(memberRoleRepository.save(memberRoleEntity)).willReturn(memberRoleEntity);
 
         // when
@@ -87,9 +79,9 @@ class SiteMemberRoleCrudServiceImplTest implements SiteMemberRoleTestUtils, Site
         SiteMember member = memberMapper.toSiteMember(memberEntity);
         SiteMemberRole memberRole = memberRoleMapper.toSiteMemberRole(memberRoleEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberRoleRepository.findByUuid(memberRole.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberRoleEntity));
+        given(memberRoleRepository.findByUuid(memberRole.getUuid())).willReturn(Optional.of(memberRoleEntity));
         given(memberRoleRepository.save(memberRoleEntity)).willReturn(memberRoleEntity);
 
         // when
@@ -109,9 +101,9 @@ class SiteMemberRoleCrudServiceImplTest implements SiteMemberRoleTestUtils, Site
         SiteMember member = memberMapper.toSiteMember(memberEntity);
         SiteMemberRole memberRole = memberRoleMapper.toSiteMemberRole(memberRoleEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberRoleRepository.findByUuid(memberRole.getUuid())).willReturn(Optional.empty());
+        given(memberRoleRepository.findByUuid(memberRole.getUuid())).willReturn(Optional.of(memberRoleEntity));
         given(memberRoleRepository.save(memberRoleEntity)).willReturn(memberRoleEntity);
         given(memberRoleRepository.findByRole(memberRoleEntity.getRole())).willReturn(List.of(memberRoleEntity));
 
@@ -147,37 +139,6 @@ class SiteMemberRoleCrudServiceImplTest implements SiteMemberRoleTestUtils, Site
         assertThat(memberRoleService.getByMember(member)).isEmpty();
     }
 
-    @DisplayName("회원 역할 삽입 간 검증")
-    @Test
-    void validateDuringInsertTest() {
-        // given
-        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        UUID memberEntityUuid = memberEntity.getUuid();
-        SiteMemberRoleEntity memberRoleEntity = SiteMemberRoleEntity.builder().member(memberEntity).build();
-        SiteMemberRole memberRole = memberRoleMapper.toSiteMemberRole(memberRoleEntity);
-
-        // Not Found member 검증
-        // given & when
-        given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.empty());
-
-        // then
-        EntityNotFoundException notFoundException = assertThrows(EntityNotFoundWithUuidException.class,
-                () -> memberRoleService.insert(memberRole));
-        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY, "uuid", memberEntityUuid, SiteMemberEntity.class));
-
-        // Existed memberRole 검증
-        // given & when
-        given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.of(memberEntity));
-        given(memberRoleRepository.findByUuid(memberEntityUuid)).willReturn(Optional.of(memberRoleEntity));
-
-        // then
-        EntityExistsException existsException = assertThrows(EntityExistsWithUuidException.class,
-                () -> memberRoleService.insert(memberRole));
-        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                EXISTED_ENTITY, "uuid", memberEntityUuid, SiteMemberRoleEntity.class));
-    }
-
     @DisplayName("회원 역할 갱신")
     @Test
     void updateTest() {
@@ -190,11 +151,10 @@ class SiteMemberRoleCrudServiceImplTest implements SiteMemberRoleTestUtils, Site
         SiteMemberRole memberRole = memberRoleMapper.toSiteMemberRole(memberRoleEntity);
         SiteMemberRole updatedMemberRole = memberRoleMapper.toSiteMemberRole(updatedMemberRoleEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberRoleRepository.findByUuid(memberRole.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(updatedMemberRoleEntity));
+        given(memberRoleRepository.findByUuid(memberRole.getUuid())).willReturn(Optional.of(memberRoleEntity));
         given(memberRoleRepository.save(memberRoleEntity)).willReturn(memberRoleEntity);
-        given(memberRoleRepository.save(updatedMemberRoleEntity)).willReturn(updatedMemberRoleEntity);
         given(memberRoleRepository.findByRole(updatedRole)).willReturn(List.of(updatedMemberRoleEntity));
 
         // when
@@ -204,37 +164,6 @@ class SiteMemberRoleCrudServiceImplTest implements SiteMemberRoleTestUtils, Site
 
         // then
         assertThat(memberRoleService.getByRole(updatedRole).getFirst()).isEqualTo(updatedMemberRole);
-    }
-
-    @DisplayName("회원 역할 갱신 간 검증")
-    @Test
-    void validateDuringUpdateTest() {
-        // given
-        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        UUID memberEntityUuid = memberEntity.getUuid();
-        SiteMemberRoleEntity memberRoleEntity = SiteMemberRoleEntity.builder().member(memberEntity).build();
-        SiteMemberRole memberRole = memberRoleMapper.toSiteMemberRole(memberRoleEntity);
-
-        // Not Found member 검증
-        // given & when
-        given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.empty());
-
-        // then
-        EntityNotFoundException notFoundException = assertThrows(EntityNotFoundWithUuidException.class,
-                () -> memberRoleService.update(memberRole));
-        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY, "uuid", memberEntityUuid, SiteMemberEntity.class));
-
-        // Not Found memberRole 검증
-        // given & when
-        given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.of(memberEntity));
-        given(memberRoleRepository.findByUuid(memberEntityUuid)).willReturn(Optional.empty());
-
-        // then
-        notFoundException = assertThrows(EntityNotFoundWithUuidException.class,
-                () -> memberRoleService.update(memberRole));
-        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY, "uuid", memberEntityUuid, SiteMemberRoleEntity.class));
     }
 
     @DisplayName("uuid로 회원 역할 제거")
@@ -247,9 +176,9 @@ class SiteMemberRoleCrudServiceImplTest implements SiteMemberRoleTestUtils, Site
         SiteMemberRole memberRole = memberRoleMapper.toSiteMemberRole(memberRoleEntity);
         UUID uuid = memberRole.getUuid();
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberRoleRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberRoleEntity)).willReturn(Optional.empty());
+        given(memberRoleRepository.findByUuid(memberRole.getUuid())).willReturn(Optional.empty());
         given(memberRoleRepository.save(memberRoleEntity)).willReturn(memberRoleEntity);
         willDoNothing().given(memberRoleRepository).deleteByUuid(uuid);
 
@@ -260,21 +189,5 @@ class SiteMemberRoleCrudServiceImplTest implements SiteMemberRoleTestUtils, Site
 
         // then
         assertThat(memberRoleService.getByUuid(uuid)).isEmpty();
-    }
-
-    @DisplayName("uuid로 회원 역할 제거 간 검증")
-    @Test
-    void validateDuringRemoveByUuidTest() {
-        // given & when
-        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        UUID memberEntityUuid = memberEntity.getUuid();
-
-        given(memberRoleRepository.findByUuid(memberEntityUuid)).willReturn(Optional.empty());
-
-        // then
-        EntityNotFoundException notFoundException = assertThrows(EntityNotFoundWithUuidException.class,
-                () -> memberRoleService.removeByUuid(memberEntityUuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY, "uuid", memberEntityUuid, SiteMemberRoleEntity.class));
     }
 }

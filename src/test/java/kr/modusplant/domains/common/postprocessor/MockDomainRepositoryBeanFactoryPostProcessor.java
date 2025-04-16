@@ -17,7 +17,7 @@ import java.util.Objects;
 import static kr.modusplant.domains.commons.vo.Reference.NOTATION_DOMAINS;
 
 @NonNullApi
-public class MockCrudRepositoryBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
+public class MockDomainRepositoryBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {

@@ -5,12 +5,9 @@ import kr.modusplant.domains.member.domain.model.SiteMemberTerm;
 import kr.modusplant.domains.member.domain.service.supers.SiteMemberTermCrudService;
 import kr.modusplant.domains.member.mapper.SiteMemberTermEntityMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberTermEntityMapperImpl;
-import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberTermEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberTermCrudJpaRepository;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -25,7 +22,6 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class SiteMemberTermCrudServiceImpl implements SiteMemberTermCrudService {
-
     private final SiteMemberTermCrudJpaRepository memberTermRepository;
     private final SiteMemberCrudJpaRepository memberRepository;
     private final SiteMemberTermEntityMapper memberTermEntityMapper = new SiteMemberTermEntityMapperImpl();
@@ -65,41 +61,18 @@ public class SiteMemberTermCrudServiceImpl implements SiteMemberTermCrudService 
     @Override
     @Transactional
     public SiteMemberTerm insert(SiteMemberTerm memberTerm) {
-        validateNotFoundMemberUuid(memberTerm.getUuid());
-        validateExistedMemberTermUuid(memberTerm.getUuid());
         return memberTermEntityMapper.toSiteMemberTerm(memberTermRepository.save(memberTermEntityMapper.createSiteMemberTermEntity(memberTerm, memberRepository)));
     }
 
     @Override
     @Transactional
     public SiteMemberTerm update(SiteMemberTerm memberTerm) {
-        validateNotFoundMemberUuid(memberTerm.getUuid());
-        validateNotFoundMemberTermUuid(memberTerm.getUuid());
         return memberTermEntityMapper.toSiteMemberTerm(memberTermRepository.save(memberTermEntityMapper.updateSiteMemberTermEntity(memberTerm, memberRepository)));
     }
 
     @Override
     @Transactional
     public void removeByUuid(UUID uuid) {
-        validateNotFoundMemberTermUuid(uuid);
         memberTermRepository.deleteByUuid(uuid);
-    }
-
-    private void validateNotFoundMemberUuid(UUID uuid) {
-        if (uuid == null || memberRepository.findByUuid(uuid).isEmpty()) {
-            throw new EntityNotFoundWithUuidException(uuid, SiteMemberEntity.class);
-        }
-    }
-
-    private void validateExistedMemberTermUuid(UUID uuid) {
-        if (memberTermRepository.findByUuid(uuid).isPresent()) {
-            throw new EntityExistsWithUuidException(uuid, SiteMemberTermEntity.class);
-        }
-    }
-
-    private void validateNotFoundMemberTermUuid(UUID uuid) {
-        if (uuid == null || memberTermRepository.findByUuid(uuid).isEmpty()) {
-            throw new EntityNotFoundWithUuidException(uuid, SiteMemberTermEntity.class);
-        }
     }
 }
