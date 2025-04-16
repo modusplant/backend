@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.domain.service;
 
-import kr.modusplant.domains.common.context.CrudServiceOnlyContext;
+import kr.modusplant.domains.common.context.DomainServiceOnlyContext;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.domain.model.SiteMember;
@@ -9,8 +9,6 @@ import kr.modusplant.domains.member.mapper.SiteMemberEntityMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +17,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
-import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
-import static kr.modusplant.global.vo.ExceptionMessage.NOT_FOUND_ENTITY;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
-@CrudServiceOnlyContext
+@DomainServiceOnlyContext
 class SiteMemberCrudServiceImplTest implements SiteMemberTestUtils, SiteMemberEntityTestUtils {
 
     private final SiteMemberCrudService memberService;
@@ -197,23 +191,6 @@ class SiteMemberCrudServiceImplTest implements SiteMemberTestUtils, SiteMemberEn
         assertThat(memberService.getByUuid(uuid)).isEmpty();
     }
 
-    @DisplayName("회원 삽입 간 검증")
-    @Test
-    void validateDuringInsertTest() {
-        // given & when
-        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        UUID memberEntityUuid = memberEntity.getUuid();
-        SiteMember member = memberMapper.toSiteMember(memberEntity);
-
-        given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.of(memberEntity));
-
-        // then
-        EntityExistsWithUuidException existsException = assertThrows(EntityExistsWithUuidException.class,
-                () -> memberService.insert(member));
-        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                EXISTED_ENTITY, "uuid", memberEntityUuid, SiteMemberEntity.class));
-    }
-
     @DisplayName("회원 갱신")
     @Test
     void updateTest() {
@@ -236,23 +213,6 @@ class SiteMemberCrudServiceImplTest implements SiteMemberTestUtils, SiteMemberEn
         assertThat(memberService.getByNickname(updatedNickname).getFirst()).isEqualTo(updatedMember);
     }
 
-    @DisplayName("회원 갱신 간 검증")
-    @Test
-    void validateDuringUpdateTest() {
-        // given & when
-        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        UUID memberEntityUuid = memberEntity.getUuid();
-        SiteMember member = memberMapper.toSiteMember(memberEntity);
-
-        given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.empty());
-
-        // then
-        EntityNotFoundWithUuidException existsException = assertThrows(EntityNotFoundWithUuidException.class,
-                () -> memberService.update(member));
-        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY, "uuid", memberEntityUuid, SiteMemberEntity.class));
-    }
-
     @DisplayName("uuid로 회원 제거")
     @Test
     void removeByUuidTest() {
@@ -271,21 +231,5 @@ class SiteMemberCrudServiceImplTest implements SiteMemberTestUtils, SiteMemberEn
 
         // then
         assertThat(memberService.getByUuid(uuid)).isEmpty();
-    }
-
-    @DisplayName("uuid로 회원 제거 간 검증")
-    @Test
-    void validateDuringRemoveByUuidTest() {
-        // given & when
-        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        UUID memberEntityUuid = memberEntity.getUuid();
-
-        given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.empty());
-
-        // then
-        EntityNotFoundWithUuidException existsException = assertThrows(EntityNotFoundWithUuidException.class,
-                () -> memberService.removeByUuid(memberEntityUuid));
-        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY, "uuid", memberEntityUuid, SiteMemberEntity.class));
     }
 }

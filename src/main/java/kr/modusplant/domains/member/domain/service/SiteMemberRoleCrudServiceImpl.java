@@ -5,13 +5,10 @@ import kr.modusplant.domains.member.domain.model.SiteMemberRole;
 import kr.modusplant.domains.member.domain.service.supers.SiteMemberRoleCrudService;
 import kr.modusplant.domains.member.mapper.SiteMemberRoleEntityMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberRoleEntityMapperImpl;
-import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberRoleEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleCrudJpaRepository;
 import kr.modusplant.global.enums.Role;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -56,41 +53,18 @@ public class SiteMemberRoleCrudServiceImpl implements SiteMemberRoleCrudService 
     @Override
     @Transactional
     public SiteMemberRole insert(SiteMemberRole memberRole) {
-        validateNotFoundMemberUuid(memberRole.getUuid());
-        validateExistedMemberRoleUuid(memberRole.getUuid());
         return memberRoleEntityMapper.toSiteMemberRole(memberRoleRepository.save(memberRoleEntityMapper.createSiteMemberRoleEntity(memberRole, memberRepository)));
     }
 
     @Override
     @Transactional
     public SiteMemberRole update(SiteMemberRole memberRole) {
-        validateNotFoundMemberUuid(memberRole.getUuid());
-        validateNotFoundMemberRoleUuid(memberRole.getUuid());
         return memberRoleEntityMapper.toSiteMemberRole(memberRoleRepository.save(memberRoleEntityMapper.updateSiteMemberRoleEntity(memberRole, memberRepository)));
     }
 
     @Override
     @Transactional
     public void removeByUuid(UUID uuid) {
-        validateNotFoundMemberRoleUuid(uuid);
         memberRoleRepository.deleteByUuid(uuid);
-    }
-
-    private void validateNotFoundMemberUuid(UUID uuid) {
-        if (uuid == null || memberRepository.findByUuid(uuid).isEmpty()) {
-            throw new EntityNotFoundWithUuidException(uuid, SiteMemberEntity.class);
-        }
-    }
-
-    private void validateExistedMemberRoleUuid(UUID uuid) {
-        if (memberRoleRepository.findByUuid(uuid).isPresent()) {
-            throw new EntityExistsWithUuidException(uuid, SiteMemberRoleEntity.class);
-        }
-    }
-
-    private void validateNotFoundMemberRoleUuid(UUID uuid) {
-        if (uuid == null || memberRoleRepository.findByUuid(uuid).isEmpty()) {
-            throw new EntityNotFoundWithUuidException(uuid, SiteMemberRoleEntity.class);
-        }
     }
 }

@@ -1,8 +1,6 @@
 package kr.modusplant.domains.member.domain.service;
 
-import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityNotFoundException;
-import kr.modusplant.domains.common.context.CrudServiceOnlyContext;
+import kr.modusplant.domains.common.context.DomainServiceOnlyContext;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberAuthTestUtils;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
@@ -20,8 +18,6 @@ import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthCrudJpaRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,17 +26,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
-import static kr.modusplant.global.vo.CamelCaseWord.ACTIVE_MEMBER_UUID;
-import static kr.modusplant.global.vo.CamelCaseWord.ORIGINAL_MEMBER_UUID;
-import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
-import static kr.modusplant.global.vo.ExceptionMessage.NOT_FOUND_ENTITY;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
-@CrudServiceOnlyContext
+@DomainServiceOnlyContext
 class SiteMemberAuthCrudServiceImplTest implements SiteMemberAuthTestUtils, SiteMemberAuthEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils {
 
     private final SiteMemberAuthCrudService memberAuthService;
@@ -67,10 +57,9 @@ class SiteMemberAuthCrudServiceImplTest implements SiteMemberAuthTestUtils, Site
         SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
         SiteMemberAuth memberAuth = memberAuthMapper.toSiteMemberAuth(memberAuthEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberAuthEntity));
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty()).willReturn(Optional.of(memberAuthEntity));
+        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.of(memberAuthEntity));
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
 
         // when
@@ -90,10 +79,9 @@ class SiteMemberAuthCrudServiceImplTest implements SiteMemberAuthTestUtils, Site
         SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
         SiteMemberAuth memberAuth = memberAuthMapper.toSiteMemberAuth(memberAuthEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.empty());
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty()).willReturn(Optional.of(memberAuthEntity));
+        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.of(memberAuthEntity));
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
         given(memberAuthRepository.findByActiveMember(memberEntity)).willReturn(List.of(memberAuthEntity));
 
@@ -114,11 +102,11 @@ class SiteMemberAuthCrudServiceImplTest implements SiteMemberAuthTestUtils, Site
         SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
         SiteMemberAuth memberAuth = memberAuthMapper.toSiteMemberAuth(memberAuthEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.empty());
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty()).willReturn(Optional.of(memberAuthEntity));
+        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.of(memberAuthEntity));
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
+        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.of(memberAuthEntity));
 
         // when
         memberService.insert(member);
@@ -137,10 +125,9 @@ class SiteMemberAuthCrudServiceImplTest implements SiteMemberAuthTestUtils, Site
         SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
         SiteMemberAuth memberAuth = memberAuthMapper.toSiteMemberAuth(memberAuthEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.empty());
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty()).willReturn(Optional.of(memberAuthEntity));
+        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.of(memberAuthEntity));
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
         given(memberAuthRepository.findByEmail(memberAuthEntity.getEmail())).willReturn(List.of(memberAuthEntity));
 
@@ -161,10 +148,9 @@ class SiteMemberAuthCrudServiceImplTest implements SiteMemberAuthTestUtils, Site
         SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
         SiteMemberAuth memberAuth = memberAuthMapper.toSiteMemberAuth(memberAuthEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.empty());
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty()).willReturn(Optional.of(memberAuthEntity));
+        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.of(memberAuthEntity));
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
         given(memberAuthRepository.findByProvider(memberAuthEntity.getProvider())).willReturn(List.of(memberAuthEntity));
 
@@ -185,10 +171,9 @@ class SiteMemberAuthCrudServiceImplTest implements SiteMemberAuthTestUtils, Site
         SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
         SiteMemberAuth memberAuth = memberAuthMapper.toSiteMemberAuth(memberAuthEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.empty());
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty()).willReturn(Optional.of(memberAuthEntity));
+        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.of(memberAuthEntity));
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
         given(memberAuthRepository.findByProviderId(memberAuthEntity.getProviderId())).willReturn(List.of(memberAuthEntity));
 
@@ -209,10 +194,9 @@ class SiteMemberAuthCrudServiceImplTest implements SiteMemberAuthTestUtils, Site
         SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
         SiteMemberAuth memberAuth = memberAuthMapper.toSiteMemberAuth(memberAuthEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.empty());
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty()).willReturn(Optional.of(memberAuthEntity));
+        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.of(memberAuthEntity));
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
         given(memberAuthRepository.findByEmailAndProvider(memberAuthEntity.getEmail(), memberAuthEntity.getProvider())).willReturn(Optional.of(memberAuthEntity));
 
@@ -233,10 +217,9 @@ class SiteMemberAuthCrudServiceImplTest implements SiteMemberAuthTestUtils, Site
         SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
         SiteMemberAuth memberAuth = memberAuthMapper.toSiteMemberAuth(memberAuthEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.empty());
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty()).willReturn(Optional.of(memberAuthEntity));
+        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.of(memberAuthEntity));
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
         given(memberAuthRepository.findByProviderAndProviderId(memberAuthEntity.getProvider(), memberAuthEntity.getProviderId())).willReturn(Optional.of(memberAuthEntity));
 
@@ -257,10 +240,9 @@ class SiteMemberAuthCrudServiceImplTest implements SiteMemberAuthTestUtils, Site
         SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
         SiteMemberAuth memberAuth = memberAuthMapper.toSiteMemberAuth(memberAuthEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.empty());
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty()).willReturn(Optional.of(memberAuthEntity));
+        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.of(memberAuthEntity));
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
         given(memberAuthRepository.findByFailedAttempt(memberAuthEntity.getFailedAttempt())).willReturn(List.of(memberAuthEntity));
 
@@ -314,62 +296,6 @@ class SiteMemberAuthCrudServiceImplTest implements SiteMemberAuthTestUtils, Site
         assertThat(memberAuthService.getByProviderAndProviderId(provider, providerId)).isEmpty();
     }
 
-    @DisplayName("회원 인증 삽입 간 검증")
-    @Test
-    void validateDuringInsertTest() {
-        // given
-        SiteMemberEntity activeMemberEntity = createMemberBasicUserEntityWithUuid();
-        UUID activeMemberEntityUuid = activeMemberEntity.getUuid();
-        SiteMemberEntity originalMemberEntity = SiteMemberEntity.builder().memberEntity(activeMemberEntity).uuid(UUID.randomUUID()).build();
-        UUID originalMemberEntityUuid = originalMemberEntity.getUuid();
-        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(activeMemberEntity).originalMember(originalMemberEntity).build();
-        UUID memberAuthEntityUuid = memberAuthEntity.getUuid();
-        SiteMemberAuth memberAuth = memberAuthMapper.toSiteMemberAuth(memberAuthEntity);
-
-        // Not Found activeMember 검증
-        // given & when
-        given(memberRepository.findByUuid(activeMemberEntityUuid)).willReturn(Optional.empty());
-
-        // then
-        EntityNotFoundException notFoundException = assertThrows(EntityNotFoundException.class,
-                () -> memberAuthService.insert(memberAuth));
-        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY, ACTIVE_MEMBER_UUID, activeMemberEntityUuid, SiteMemberEntity.class));
-
-        // Not Found originalMember 검증
-        // given & when
-        given(memberRepository.findByUuid(activeMemberEntityUuid)).willReturn(Optional.of(activeMemberEntity));
-        given(memberRepository.findByUuid(originalMemberEntityUuid)).willReturn(Optional.empty());
-
-        // then
-        notFoundException = assertThrows(EntityNotFoundException.class,
-                () -> memberAuthService.insert(memberAuth));
-        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY, ORIGINAL_MEMBER_UUID, originalMemberEntityUuid, SiteMemberEntity.class));
-
-        // Existed memberAuth 검증
-        // given & when
-        given(memberRepository.findByUuid(originalMemberEntityUuid)).willReturn(Optional.of(originalMemberEntity));
-        given(memberAuthRepository.findByUuid(memberAuthEntityUuid)).willReturn(Optional.of(memberAuthEntity));
-
-        // then
-        EntityExistsException existsException = assertThrows(EntityExistsWithUuidException.class,
-                () -> memberAuthService.insert(memberAuth));
-        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                EXISTED_ENTITY, "uuid", memberAuthEntityUuid, SiteMemberAuthEntity.class));
-
-        // Existed originalMember 검증
-        // given & when
-        given(memberAuthRepository.findByUuid(memberAuthEntityUuid)).willReturn(Optional.empty());
-        given(memberAuthRepository.findByOriginalMember(originalMemberEntity)).willReturn(Optional.of(memberAuthEntity));
-
-        // then
-        existsException = assertThrows(EntityExistsException.class,
-                () -> memberAuthService.insert(memberAuth));
-        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                EXISTED_ENTITY, ORIGINAL_MEMBER_UUID, originalMemberEntityUuid, SiteMemberAuthEntity.class));
-    }
-
     @DisplayName("회원 인증 갱신")
     @Test
     void updateTest() {
@@ -382,11 +308,10 @@ class SiteMemberAuthCrudServiceImplTest implements SiteMemberAuthTestUtils, Site
         SiteMemberAuth memberAuth = memberAuthMapper.toSiteMemberAuth(memberAuthEntity);
         SiteMemberAuth updatedMemberAuth = memberAuthMapper.toSiteMemberAuth(updatedMemberAuthEntity);
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberAuthEntity));
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty());
-        given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity).willReturn(updatedMemberAuthEntity);
+        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.of(memberAuthEntity));
+        given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
         given(memberAuthRepository.findByEmail(updatedEmail)).willReturn(List.of(updatedMemberAuthEntity));
 
         // when
@@ -396,51 +321,6 @@ class SiteMemberAuthCrudServiceImplTest implements SiteMemberAuthTestUtils, Site
 
         // then
         assertThat(memberAuthService.getByEmail(updatedEmail).getFirst()).isEqualTo(updatedMemberAuth);
-    }
-
-    @DisplayName("회원 인증 갱신 간 검증")
-    @Test
-    void validateDuringUpdateTest() {
-        // given
-        SiteMemberEntity activeMemberEntity = createMemberBasicUserEntityWithUuid();
-        UUID activeMemberEntityUuid = activeMemberEntity.getUuid();
-        SiteMemberEntity originalMemberEntity = SiteMemberEntity.builder().memberEntity(activeMemberEntity).uuid(UUID.randomUUID()).build();
-        UUID originalMemberEntityUuid = originalMemberEntity.getUuid();
-        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(activeMemberEntity).originalMember(originalMemberEntity).build();
-        UUID memberAuthEntityUuid = memberAuthEntity.getUuid();
-        SiteMemberAuth memberAuth = memberAuthMapper.toSiteMemberAuth(memberAuthEntity);
-
-        // Not Found activeMember 검증
-        // given & when
-        given(memberRepository.findByUuid(activeMemberEntityUuid)).willReturn(Optional.empty());
-
-        // then
-        EntityNotFoundException notFoundException = assertThrows(EntityNotFoundException.class,
-                () -> memberAuthService.update(memberAuth));
-        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY, ACTIVE_MEMBER_UUID, activeMemberEntityUuid, SiteMemberEntity.class));
-
-        // Not Found originalMember 검증
-        // given & when
-        given(memberRepository.findByUuid(activeMemberEntityUuid)).willReturn(Optional.of(activeMemberEntity));
-        given(memberRepository.findByUuid(originalMemberEntityUuid)).willReturn(Optional.empty());
-
-        // then
-        notFoundException = assertThrows(EntityNotFoundException.class,
-                () -> memberAuthService.update(memberAuth));
-        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY, ORIGINAL_MEMBER_UUID, originalMemberEntityUuid, SiteMemberEntity.class));
-
-        // Not Found memberAuth 검증
-        // given & when
-        given(memberRepository.findByUuid(originalMemberEntityUuid)).willReturn(Optional.of(originalMemberEntity));
-        given(memberAuthRepository.findByUuid(memberAuthEntityUuid)).willReturn(Optional.empty());
-
-        // then
-        notFoundException = assertThrows(EntityNotFoundWithUuidException.class,
-                () -> memberAuthService.update(memberAuth));
-        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY, "uuid", memberAuthEntityUuid, SiteMemberAuthEntity.class));
     }
 
     @DisplayName("uuid로 회원 인증 제거")
@@ -453,11 +333,10 @@ class SiteMemberAuthCrudServiceImplTest implements SiteMemberAuthTestUtils, Site
         SiteMemberAuth memberAuth = memberAuthMapper.toSiteMemberAuth(memberAuthEntity);
         UUID uuid = memberAuth.getUuid();
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity)).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberAuthEntity)).willReturn(Optional.empty());
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty()).willReturn(Optional.of(memberAuthEntity));
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
+        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.empty());
         willDoNothing().given(memberAuthRepository).deleteByUuid(memberAuthEntity.getUuid());
 
         // when
@@ -467,23 +346,5 @@ class SiteMemberAuthCrudServiceImplTest implements SiteMemberAuthTestUtils, Site
 
         // then
         assertThat(memberAuthService.getByUuid(uuid)).isEmpty();
-    }
-
-    @DisplayName("uuid로 회원 인증 제거 간 검증")
-    @Test
-    void validateDuringRemoveByUuidTest() {
-        // given & when
-        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
-        UUID memberAuthEntityUuid = memberAuthEntity.getUuid();
-
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
-        given(memberAuthRepository.findByUuid(memberAuthEntityUuid)).willReturn(Optional.empty());
-
-        // then
-        EntityNotFoundException notFoundException = assertThrows(EntityNotFoundWithUuidException.class,
-                () -> memberAuthService.removeByUuid(memberAuthEntityUuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY, "uuid", memberAuthEntityUuid, SiteMemberAuthEntity.class));
     }
 }
