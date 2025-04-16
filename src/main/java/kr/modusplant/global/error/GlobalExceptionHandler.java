@@ -33,17 +33,12 @@ public class GlobalExceptionHandler {
 
     // RuntimeException 처리
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, Object>> handleRuntimeException(HttpServletRequest request, RuntimeException ex) {
-        Map<String, Object> metaData = new HashMap<>();
-        metaData.put("status", HttpStatus.BAD_REQUEST.value());
-        metaData.put("message", Optional.ofNullable(ex.getMessage()).orElse("An unexpected error occurred"));
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("metaData", metaData);
+    public ResponseEntity<DataResponse<Void>> handleRuntimeException(HttpServletRequest request, RuntimeException ex) {
+        DataResponse<Void> errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "An unexpected error occurred");
 
         logger.error(ex.getMessage(), ex);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
     // 그 외 모든 Exception 처리
