@@ -1,8 +1,6 @@
 package kr.modusplant.domains.term.domain.service;
 
-import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityNotFoundException;
-import kr.modusplant.domains.common.context.CrudServiceOnlyContext;
+import kr.modusplant.domains.common.context.DomainServiceOnlyContext;
 import kr.modusplant.domains.term.common.util.domain.TermTestUtils;
 import kr.modusplant.domains.term.common.util.entity.TermEntityTestUtils;
 import kr.modusplant.domains.term.domain.model.Term;
@@ -11,8 +9,6 @@ import kr.modusplant.domains.term.mapper.TermEntityMapper;
 import kr.modusplant.domains.term.mapper.TermEntityMapperImpl;
 import kr.modusplant.domains.term.persistence.entity.TermEntity;
 import kr.modusplant.domains.term.persistence.repository.TermCrudJpaRepository;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +17,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
-import static kr.modusplant.global.vo.CamelCaseWord.NAME;
-import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
-import static kr.modusplant.global.vo.ExceptionMessage.NOT_FOUND_ENTITY;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
-@CrudServiceOnlyContext
+@DomainServiceOnlyContext
 class TermCrudServiceImplTest implements TermTestUtils, TermEntityTestUtils {
 
     private final TermCrudService termCrudService;
@@ -50,9 +41,8 @@ class TermCrudServiceImplTest implements TermTestUtils, TermEntityTestUtils {
         TermEntity termEntity = createTermsOfUseEntity();
         Term term = termMapper.toTerm(termEntity);
 
-        given(termRepository.findByUuid(termEntity.getUuid())).willReturn(Optional.of(termEntity));
-        given(termRepository.findByName(termEntity.getName())).willReturn(Optional.empty());
         given(termRepository.save(termEntity)).willReturn(termEntity);
+        given(termRepository.findByUuid(termEntity.getUuid())).willReturn(Optional.of(termEntity));
 
         // when
         term = termCrudService.insert(term);
@@ -68,9 +58,8 @@ class TermCrudServiceImplTest implements TermTestUtils, TermEntityTestUtils {
         TermEntity termEntity = createTermsOfUseEntity();
         Term term = termMapper.toTerm(termEntity);
 
-        given(termRepository.findByUuid(termEntity.getUuid())).willReturn(Optional.empty());
-        given(termRepository.findByName(termEntity.getName())).willReturn(Optional.empty()).willReturn(Optional.of(termEntity));
         given(termRepository.save(termEntity)).willReturn(termEntity);
+        given(termRepository.findByName(termEntity.getName())).willReturn(Optional.of(termEntity));
 
         // when
         term = termCrudService.insert(term);
@@ -86,8 +75,6 @@ class TermCrudServiceImplTest implements TermTestUtils, TermEntityTestUtils {
         TermEntity termEntity = createTermsOfUseEntity();
         Term term = termMapper.toTerm(termEntity);
 
-        given(termRepository.findByUuid(termEntity.getUuid())).willReturn(Optional.empty());
-        given(termRepository.findByName(termEntity.getName())).willReturn(Optional.empty());
         given(termRepository.save(termEntity)).willReturn(termEntity);
         given(termRepository.findByVersion(termEntity.getVersion())).willReturn(List.of(termEntity));
 
@@ -121,35 +108,6 @@ class TermCrudServiceImplTest implements TermTestUtils, TermEntityTestUtils {
         assertThat(termCrudService.getByName(name)).isEmpty();
     }
 
-    @DisplayName("약관 삽입 간 검증")
-    @Test
-    void validateDuringInsertTest() {
-        // given
-        TermEntity termEntity = createTermsOfUseEntityWithUuid();
-        UUID termEntityUuid = termEntity.getUuid();
-        Term term = termMapper.toTerm(termEntity);
-
-        // Existed uuid 검증
-        // given & when
-        given(termRepository.findByUuid(termEntityUuid)).willReturn(Optional.of(termEntity));
-
-        // then
-        EntityExistsException existsException = assertThrows(EntityExistsWithUuidException.class,
-                () -> termCrudService.insert(term));
-        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                EXISTED_ENTITY, "uuid", termEntityUuid, TermEntity.class));
-
-        // Existed name 검증
-        // given & when
-        given(termRepository.findByUuid(termEntityUuid)).willReturn(Optional.empty());
-        given(termRepository.findByName(termEntity.getName())).willReturn(Optional.of(termEntity));
-
-        // then
-        existsException = assertThrows(EntityExistsException.class, () -> termCrudService.insert(term));
-        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                EXISTED_ENTITY, NAME, termEntity.getName(), TermEntity.class));
-    }
-
     @DisplayName("약관 갱신")
     @Test
     void updateTest() {
@@ -160,9 +118,8 @@ class TermCrudServiceImplTest implements TermTestUtils, TermEntityTestUtils {
         TermEntity updatedTermEntity = TermEntity.builder().termEntity(termEntity).content(updatedContent).build();
         Term updatedTerm = termMapper.toTerm(updatedTermEntity);
 
-        given(termRepository.findByUuid(termEntity.getUuid())).willReturn(Optional.empty()).willReturn(Optional.of(termEntity));
         given(termRepository.save(termEntity)).willReturn(termEntity).willReturn(updatedTermEntity);
-        given(termRepository.findByName(updatedTermEntity.getName())).willReturn(Optional.empty()).willReturn(Optional.of(updatedTermEntity));
+        given(termRepository.findByName(updatedTermEntity.getName())).willReturn(Optional.of(updatedTermEntity));
 
         // when
         termCrudService.insert(term);
@@ -170,23 +127,6 @@ class TermCrudServiceImplTest implements TermTestUtils, TermEntityTestUtils {
 
         // then
         assertThat(termCrudService.getByName(updatedTermEntity.getName()).orElseThrow().getContent()).isEqualTo(updatedContent);
-    }
-
-    @DisplayName("약관 갱신 간 검증")
-    @Test
-    void validateDuringUpdateTest() {
-        // given & when
-        TermEntity termEntity = createTermsOfUseEntityWithUuid();
-        UUID termEntityUuid = termEntity.getUuid();
-        Term term = termMapper.toTerm(termEntity);
-
-        given(termRepository.findByUuid(termEntityUuid)).willReturn(Optional.empty());
-
-        // then
-        EntityNotFoundException existsException = assertThrows(EntityNotFoundWithUuidException.class,
-                () -> termCrudService.update(term));
-        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY, "uuid", termEntityUuid, TermEntity.class));
     }
 
     @DisplayName("uuid로 약관 제거")
@@ -197,9 +137,8 @@ class TermCrudServiceImplTest implements TermTestUtils, TermEntityTestUtils {
         Term term = termMapper.toTerm(termEntity);
         UUID uuid = term.getUuid();
 
-        given(termRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(termEntity)).willReturn(Optional.empty());
-        given(termRepository.findByName(termEntity.getName())).willReturn(Optional.empty());
         given(termRepository.save(createTermsOfUseEntity())).willReturn(termEntity);
+        given(termRepository.findByUuid(uuid)).willReturn(Optional.empty());
         willDoNothing().given(termRepository).deleteByUuid(uuid);
 
         // when
@@ -208,21 +147,5 @@ class TermCrudServiceImplTest implements TermTestUtils, TermEntityTestUtils {
 
         // then
         assertThat(termCrudService.getByUuid(uuid)).isEmpty();
-    }
-
-    @DisplayName("uuid로 약관 제거 간 검증")
-    @Test
-    void validateDuringRemoveByUuidTest() {
-        // given & when
-        TermEntity termEntity = createTermsOfUseEntityWithUuid();
-        UUID termEntityUuid = termEntity.getUuid();
-
-        given(termRepository.findByUuid(termEntityUuid)).willReturn(Optional.empty());
-
-        // then
-        EntityNotFoundException existsException = assertThrows(EntityNotFoundWithUuidException.class,
-                () -> termCrudService.removeByUuid(termEntityUuid));
-        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY, "uuid", termEntityUuid, TermEntity.class));
     }
 }

@@ -6,8 +6,6 @@ import kr.modusplant.domains.member.mapper.SiteMemberEntityMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -77,36 +75,18 @@ public class SiteMemberCrudServiceImpl implements SiteMemberCrudService {
     @Override
     @Transactional
     public SiteMember insert(SiteMember member) {
-        validateExistedMemberUuid(member.getUuid());
         return memberEntityMapper.toSiteMember(memberRepository.save(memberEntityMapper.createSiteMemberEntity(member)));
     }
 
     @Override
     @Transactional
     public SiteMember update(SiteMember member) {
-        validateNotFoundMemberUuid(member.getUuid());
         return memberEntityMapper.toSiteMember(memberRepository.save(memberEntityMapper.updateSiteMemberEntity(member)));
     }
 
     @Override
     @Transactional
     public void removeByUuid(UUID uuid) {
-        validateNotFoundMemberUuid(uuid);
         memberRepository.deleteByUuid(uuid);
-    }
-
-    private void validateExistedMemberUuid(UUID uuid) {
-        if (uuid == null) {
-            return;
-        }
-        if (memberRepository.findByUuid(uuid).isPresent()) {
-            throw new EntityExistsWithUuidException(uuid, SiteMemberEntity.class);
-        }
-    }
-
-    private void validateNotFoundMemberUuid(UUID uuid) {
-        if (uuid == null || memberRepository.findByUuid(uuid).isEmpty()) {
-            throw new EntityNotFoundWithUuidException(uuid, SiteMemberEntity.class);
-        }
     }
 }
