@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:src/main/java/kr/modusplant/domains/member/domain/service/SiteMemberAuthCrudServiceImpl.java
 package kr.modusplant.domains.member.domain.service;
 
 import kr.modusplant.domains.member.domain.model.SiteMember;
@@ -10,6 +11,23 @@ import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthCrudJpaRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
+========
+package kr.modusplant.api.crud.member.domain.service;
+
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
+import kr.modusplant.api.crud.member.domain.model.SiteMember;
+import kr.modusplant.api.crud.member.domain.model.SiteMemberAuth;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberAuthService;
+import kr.modusplant.api.crud.member.enums.AuthProvider;
+import kr.modusplant.api.crud.member.mapper.SiteMemberAuthEntityMapper;
+import kr.modusplant.api.crud.member.mapper.SiteMemberAuthEntityMapperImpl;
+import kr.modusplant.api.crud.member.persistence.entity.SiteMemberAuthEntity;
+import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberAuthJpaRepository;
+import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
+import kr.modusplant.global.error.EntityExistsWithUuidException;
+>>>>>>>> 4cc54db (MP-145 :truck: Rename: 서비스 및 서비스 구현체 파일 이동):src/main/java/kr/modusplant/domains/member/domain/service/supers/SiteMemberAuthServiceImpl.java
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
