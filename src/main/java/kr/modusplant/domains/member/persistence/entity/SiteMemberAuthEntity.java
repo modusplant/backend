@@ -67,6 +67,30 @@ public class SiteMemberAuthEntity {
     @Column(name = SNAKE_VER_NUM, nullable = false)
     private Long versionNumber;
 
+    public void updateActiveMember(SiteMemberEntity activeMember) {
+        this.activeMember = activeMember;
+    }
+
+    public void updateEmail(String email) {
+        this.email = email;
+    }
+
+    public void updatePw(String pw) {
+        this.pw = pw;
+    }
+
+    public void updateFailedAttempt(Integer failedAttempt) {
+        this.failedAttempt = failedAttempt;
+    }
+
+    public void updateLockoutRefreshAt(LocalDateTime lockoutRefreshAt) {
+        this.lockoutRefreshAt = lockoutRefreshAt;
+    }
+
+    public void updateLockoutUntil(LocalDateTime lockoutUntil) {
+        this.lockoutUntil = lockoutUntil;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

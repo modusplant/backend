@@ -53,6 +53,14 @@ public class TermEntity {
     @Column(name = SNAKE_VER_NUM, nullable = false)
     private Long versionNumber;
 
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+    public void updateVersion(String version) {
+        this.version = version;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
