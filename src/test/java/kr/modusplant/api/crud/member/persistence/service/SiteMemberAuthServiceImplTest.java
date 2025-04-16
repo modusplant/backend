@@ -9,8 +9,8 @@ import kr.modusplant.api.crud.member.common.util.entity.SiteMemberAuthEntityTest
 import kr.modusplant.api.crud.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.api.crud.member.domain.model.SiteMember;
 import kr.modusplant.api.crud.member.domain.model.SiteMemberAuth;
-import kr.modusplant.api.crud.member.domain.service.SiteMemberAuthService;
-import kr.modusplant.api.crud.member.domain.service.SiteMemberService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberAuthService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberService;
 import kr.modusplant.api.crud.member.enums.AuthProvider;
 import kr.modusplant.api.crud.member.mapper.SiteMemberAuthEntityMapper;
 import kr.modusplant.api.crud.member.mapper.SiteMemberAuthEntityMapperImpl;

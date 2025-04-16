@@ -9,8 +9,8 @@ import kr.modusplant.api.crud.member.common.util.entity.SiteMemberEntityTestUtil
 import kr.modusplant.api.crud.member.common.util.entity.SiteMemberTermEntityTestUtils;
 import kr.modusplant.api.crud.member.domain.model.SiteMember;
 import kr.modusplant.api.crud.member.domain.model.SiteMemberTerm;
-import kr.modusplant.api.crud.member.domain.service.SiteMemberService;
-import kr.modusplant.api.crud.member.domain.service.SiteMemberTermService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberTermService;
 import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapper;
 import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.api.crud.member.mapper.SiteMemberTermEntityMapper;

@@ -6,7 +6,7 @@ import kr.modusplant.api.crud.common.context.CrudServiceOnlyContext;
 import kr.modusplant.api.crud.term.common.util.domain.TermTestUtils;
 import kr.modusplant.api.crud.term.common.util.entity.TermEntityTestUtils;
 import kr.modusplant.api.crud.term.domain.model.Term;
-import kr.modusplant.api.crud.term.domain.service.TermService;
+import kr.modusplant.api.crud.term.domain.service.supers.TermService;
 import kr.modusplant.api.crud.term.mapper.TermEntityMapper;
 import kr.modusplant.api.crud.term.mapper.TermEntityMapperImpl;
 import kr.modusplant.api.crud.term.persistence.entity.TermEntity;

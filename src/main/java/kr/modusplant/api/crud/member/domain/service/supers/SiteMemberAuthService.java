@@ -1,4 +1,4 @@
-package kr.modusplant.api.crud.member.domain.service;
+package kr.modusplant.api.crud.member.domain.service.supers;
 
 import kr.modusplant.api.crud.common.domain.supers.UuidCrudService;
 import kr.modusplant.api.crud.member.domain.model.SiteMember;

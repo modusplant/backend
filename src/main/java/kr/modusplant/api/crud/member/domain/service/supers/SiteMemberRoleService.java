@@ -1,7 +1,6 @@
-package kr.modusplant.api.crud.member.domain.service;
+package kr.modusplant.api.crud.member.domain.service.supers;
 
 import kr.modusplant.api.crud.member.domain.model.SiteMemberRole;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberCrudService;
 import kr.modusplant.global.enums.Role;
 
 import java.util.List;
