@@ -1,8 +1,13 @@
 package kr.modusplant.domains.common.context;
 
 <<<<<<<< HEAD:src/test/java/kr/modusplant/domains/common/context/DomainServiceOnlyContext.java
+<<<<<<<< HEAD:src/test/java/kr/modusplant/domains/common/context/DomainServiceOnlyContext.java
 import kr.modusplant.domains.common.postprocessor.MockDomainRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.domains.common.scan.ScanDomainService;
+========
+import kr.modusplant.domains.common.postprocessor.MockCrudRepositoryBeanFactoryPostProcessor;
+import kr.modusplant.domains.common.scan.ScanCrudService;
+>>>>>>>> d0b5343 (MP-145 :truck: Rename: modules 및 domains 분리):src/test/java/kr/modusplant/domains/common/context/CrudServiceOnlyContext.java
 ========
 import kr.modusplant.domains.common.postprocessor.MockCrudRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.domains.common.scan.ScanCrudService;
