@@ -63,13 +63,14 @@ public class GlobalExceptionHandlerUnitTest {
         Exception ex = mock(Exception.class);
 
         // when
-        ResponseEntity<Map<String, Object>> response = globalExceptionHandler.handleGenericException(servletRequest, ex);
-        Map<String, Object> errorResponse = response.getBody();
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleGenericException(servletRequest, ex);
+        DataResponse<Void> errorResponse = response.getBody();
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.get("status"));
-        assertNotNull(errorResponse.get("message"));
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
+        assertNotNull(errorResponse.getMessage());
+        assertNull(errorResponse.getData());
     }
 
     @Test
