@@ -46,16 +46,14 @@ public class GlobalExceptionHandlerUnitTest {
         HttpServletRequest servletRequest = mock(HttpServletRequest.class);
 
         // when
-        ResponseEntity<Map<String, Object>> response = globalExceptionHandler.handleRuntimeException(servletRequest, ex);
-        Map<String, Object> responseBody = response.getBody();
-        assertNotNull(responseBody);
-        Map<String, Object> metadata = objectMapper.convertValue(responseBody.get("metaData"), new TypeReference<>() {});
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleRuntimeException(servletRequest, ex);
+        DataResponse<Void> errorResponse = response.getBody();
 
         // then
-        assertInstanceOf(Map.class, metadata);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), metadata.get("status"));
-        assertNotNull(metadata.get("message"));
-
+        assertNotNull(errorResponse);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
+        assertNotNull(errorResponse.getMessage());
+        assertNull(errorResponse.getData());
     }
 
     @Test
