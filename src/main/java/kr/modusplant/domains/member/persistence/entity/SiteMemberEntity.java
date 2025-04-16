@@ -66,6 +66,30 @@ public class SiteMemberEntity {
     @Column(name = SNAKE_VER_NUM, nullable = false)
     private Long versionNumber;
 
+    public void updateBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public void updateActive(Boolean active) {
+        isActive = active;
+    }
+
+    public void updateDisabledByLinking(Boolean disabledByLinking) {
+        isDisabledByLinking = disabledByLinking;
+    }
+
+    public void updateBanned(Boolean banned) {
+        isBanned = banned;
+    }
+
+    public void updateDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    public void updateLoggedInAt(LocalDateTime loggedInAt) {
+        this.loggedInAt = loggedInAt;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

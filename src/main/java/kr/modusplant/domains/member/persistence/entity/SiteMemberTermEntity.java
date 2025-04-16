@@ -45,6 +45,18 @@ public class SiteMemberTermEntity {
     @Column(name = SNAKE_VER_NUM, nullable = false)
     private Long versionNumber;
 
+    public void updateAgreedTermsOfUseVersion(String agreedTermsOfUseVersion) {
+        this.agreedTermsOfUseVersion = agreedTermsOfUseVersion;
+    }
+
+    public void updateAgreedPrivacyPolicyVersion(String agreedPrivacyPolicyVersion) {
+        this.agreedPrivacyPolicyVersion = agreedPrivacyPolicyVersion;
+    }
+
+    public void updateAgreedAdInfoReceivingVersion(String agreedAdInfoReceivingVersion) {
+        this.agreedAdInfoReceivingVersion = agreedAdInfoReceivingVersion;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
