@@ -1,10 +1,10 @@
-package kr.modusplant.api.crud.member.persistence.service;
+package kr.modusplant.api.crud.member.domain.service;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.api.crud.member.domain.model.SiteMember;
 import kr.modusplant.api.crud.member.domain.model.SiteMemberAuth;
-import kr.modusplant.api.crud.member.domain.service.SiteMemberAuthService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberAuthService;
 import kr.modusplant.api.crud.member.enums.AuthProvider;
 import kr.modusplant.api.crud.member.mapper.SiteMemberAuthEntityMapper;
 import kr.modusplant.api.crud.member.mapper.SiteMemberAuthEntityMapperImpl;

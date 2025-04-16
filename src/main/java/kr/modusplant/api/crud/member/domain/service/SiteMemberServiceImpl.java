@@ -1,7 +1,7 @@
-package kr.modusplant.api.crud.member.persistence.service;
+package kr.modusplant.api.crud.member.domain.service;
 
 import kr.modusplant.api.crud.member.domain.model.SiteMember;
-import kr.modusplant.api.crud.member.domain.service.SiteMemberService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberService;
 import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapper;
 import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;

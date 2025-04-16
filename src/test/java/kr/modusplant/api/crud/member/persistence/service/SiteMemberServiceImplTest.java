@@ -4,7 +4,7 @@ import kr.modusplant.api.crud.common.context.CrudServiceOnlyContext;
 import kr.modusplant.api.crud.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.api.crud.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.api.crud.member.domain.model.SiteMember;
-import kr.modusplant.api.crud.member.domain.service.SiteMemberService;
+import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberService;
 import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapper;
 import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
