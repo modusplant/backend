@@ -1,0 +1,9 @@
+package kr.modusplant.domains.commons.vo;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Reference {
+    public static final String NOTATION_DOMAINS = "kr.modusplant.domains";
+}
