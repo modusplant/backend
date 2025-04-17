@@ -1,0 +1,47 @@
+package kr.modusplant.modules.jwt.controller;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.modusplant.modules.jwt.dto.TokenPair;
+import kr.modusplant.modules.jwt.model.response.TokenResponse;
+import kr.modusplant.global.app.servlet.response.DataResponse;
+import kr.modusplant.modules.jwt.domain.service.TokenService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+
+@Tag(name="Token API", description = "JWT API")
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api")
+public class TokenController {
+    private final TokenService tokenService;
+
+    // 토큰 갱신
+    @Operation(summary = "ACCESS TOKEN 토큰 갱신 API", description = "REFRESH TOKEN을 받아 처리합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Succeeded : JWT 발급 완료")
+    })
+    @PostMapping("/auth/token/refresh")
+    public ResponseEntity<DataResponse<?>> refreshToken(@CookieValue("refresh_token")String refreshToken) {
+
+        TokenPair tokenPair = tokenService.reissueToken(refreshToken);
+
+        TokenResponse tokenResponse = new TokenResponse(tokenPair.getAccessToken());
+        DataResponse<TokenResponse> response = DataResponse.of(200,"OK: Succeeded", tokenResponse);
+        String refreshCookie = setRefreshTokenCookie(tokenPair.getRefreshToken());
+
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie).body(response);
+    }
+
+
+    private String setRefreshTokenCookie(String refreshToken) {
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken).build();
+        return refreshCookie.toString();
+    }
+}
