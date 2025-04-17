@@ -1,0 +1,227 @@
+package kr.modusplant.modules.jwt.domain.service;
+
+import kr.modusplant.domains.member.domain.model.SiteMember;
+import kr.modusplant.domains.member.domain.model.SiteMemberRole;
+import kr.modusplant.domains.member.domain.service.supers.SiteMemberCrudService;
+import kr.modusplant.domains.member.domain.service.supers.SiteMemberRoleCrudService;
+import kr.modusplant.modules.jwt.domain.model.RefreshToken;
+import kr.modusplant.modules.jwt.domain.service.supers.RefreshTokenCrudService;
+import kr.modusplant.modules.jwt.dto.TokenPair;
+import kr.modusplant.global.enums.Role;
+import kr.modusplant.modules.jwt.error.InvalidTokenException;
+import kr.modusplant.modules.jwt.error.TokenDataNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.Instant;
+import java.util.*;
+
+import static kr.modusplant.global.vo.CamelCaseWord.MEMBER_UUID;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class TokenServiceTest {
+    @InjectMocks
+    private TokenService tokenService;
+    @Mock
+    private TokenProvider tokenProvider;
+    @Mock
+    private SiteMemberCrudService siteMemberService;
+    @Mock
+    private SiteMemberRoleCrudService siteMemberRoleService;
+    @Mock
+    private RefreshTokenCrudService refreshTokenCrudService;
+    @Mock
+    private TokenValidationService tokenValidationService;
+
+    private UUID memberUuid;
+    private String nickname;
+    private Role role;
+    private UUID deviceId;
+    private String accessToken;
+    private String refreshToken;
+    private Map<String,String> claims;
+    private Date issuedAt;
+    private Date expiredAt;
+
+    @BeforeEach
+    void setUp() {
+        memberUuid = UUID.randomUUID();
+        nickname = "testUser";
+        role = Role.ROLE_USER;
+        deviceId = UUID.fromString("378c0ca1-b67f-4ae7-a43b-e6cf583b7667");
+        accessToken = "access-token";
+        refreshToken = "refresh-token";
+        claims = Map.of(
+                "nickname", nickname,
+                "role", role.getValue()
+        );
+        issuedAt = Date.from(Instant.now());
+        expiredAt = Date.from(Instant.now().plusSeconds(3600));
+    }
+
+    @Test
+    @DisplayName("토큰 생성 성공 테스트")
+    void issueTokenSuccess() {
+        // given
+        willDoNothing().given(tokenValidationService).validateNotFoundMemberUuid(MEMBER_UUID, memberUuid);
+        given(tokenValidationService.validateExistedDeviceId(deviceId)).willReturn(false);
+
+        given(tokenProvider.generateAccessToken(memberUuid, claims)).willReturn(accessToken);
+        given(tokenProvider.generateRefreshToken(memberUuid)).willReturn(refreshToken);
+        given(tokenProvider.getIssuedAtFromToken(refreshToken)).willReturn(issuedAt);
+        given(tokenProvider.getExpirationFromToken(refreshToken)).willReturn(expiredAt);
+
+        given(refreshTokenCrudService.insert(any())).willAnswer(invocation -> invocation.getArgument(0));
+
+        // when
+        TokenPair tokenPair = tokenService.issueToken(memberUuid, nickname, role, deviceId);
+
+        // then
+        assertNotNull(tokenPair);
+        assertEquals(accessToken, tokenPair.getAccessToken());
+        assertEquals(refreshToken, tokenPair.getRefreshToken());
+
+        verify(tokenValidationService).validateNotFoundMemberUuid(MEMBER_UUID, memberUuid);
+        verify(tokenValidationService).validateExistedDeviceId(deviceId);
+        verify(tokenProvider).generateAccessToken(eq(memberUuid), anyMap());
+        verify(tokenProvider).generateRefreshToken(memberUuid);
+        verify(refreshTokenCrudService).insert(any(RefreshToken.class));
+    }
+
+    @Test
+    @DisplayName("토큰 생성 실패 테스트 : device id 존재")
+    void issueTokenThrowInvalidTokenWhenDeviceIdExists() {
+        // given
+        willDoNothing().given(tokenValidationService).validateNotFoundMemberUuid(MEMBER_UUID, memberUuid);
+        given(tokenValidationService.validateExistedDeviceId(deviceId)).willReturn(true);
+
+        // then
+        assertThrows(InvalidTokenException.class,
+                () -> tokenService.issueToken(memberUuid, nickname, role, deviceId));
+    }
+
+    @Test
+    @DisplayName("토큰 갱신 성공 테스트")
+    void reissueTokenSuccess() {
+        // given
+        SiteMember siteMember = mock(SiteMember.class);
+        given(siteMember.getNickname()).willReturn(nickname);
+        SiteMemberRole siteMemberRole = mock(SiteMemberRole.class);
+        given(siteMemberRole.getRole()).willReturn(role);
+        String newAccessToken = "new-access-token";
+
+        given(tokenProvider.validateToken(refreshToken)).willReturn(true);
+        given(tokenValidationService.validateNotFoundRefreshToken(refreshToken)).willReturn(false);
+        given(tokenProvider.getMemberUuidFromToken(refreshToken)).willReturn(memberUuid);
+        given(siteMemberService.getByUuid(memberUuid)).willReturn(Optional.of(siteMember));
+        given(siteMemberRoleService.getByMember(siteMember)).willReturn(Optional.of(siteMemberRole));
+        given(tokenProvider.generateAccessToken(memberUuid, claims)).willReturn(newAccessToken);
+
+        // when
+        TokenPair result = tokenService.reissueToken(refreshToken);
+
+        // then
+        assertNotEquals(accessToken, result.getAccessToken());
+        assertEquals(refreshToken, result.getRefreshToken());
+    }
+
+    @Test
+    @DisplayName("토큰 갱신 실패 테스트 : refresh token 만료")
+    void reissueTokenFailWhenRefreshTokenExpired() {
+        // given
+        given(tokenProvider.validateToken(refreshToken)).willReturn(false);
+        // then
+        assertThrows(InvalidTokenException.class, () -> tokenService.reissueToken(refreshToken));
+    }
+
+    @Test
+    @DisplayName("토큰 갱신 실패 테스트 : refresh token 조회 불가")
+    void reissueTokenFailWhenRefreshTokenNotFoundInDB() {
+        // given
+        given(tokenProvider.validateToken(refreshToken)).willReturn(true);
+        given(tokenValidationService.validateNotFoundRefreshToken(refreshToken)).willReturn(true);
+        // then
+        assertThrows(InvalidTokenException.class, () -> tokenService.reissueToken(refreshToken));
+    }
+
+    @Test
+    @DisplayName("토큰 갱신 실패 테스트 : SiteMember 조회 불가")
+    void reissueTokenFailWhenSiteMemberNotFound() {
+        // given
+        given(tokenProvider.validateToken(refreshToken)).willReturn(true);
+        given(tokenValidationService.validateNotFoundRefreshToken(refreshToken)).willReturn(false);
+        given(tokenProvider.getMemberUuidFromToken(refreshToken)).willReturn(memberUuid);
+        given(siteMemberService.getByUuid(memberUuid)).willReturn(Optional.empty());
+
+        // then
+        assertThrows(TokenDataNotFoundException.class, () -> tokenService.reissueToken(refreshToken));
+    }
+
+    @Test
+    @DisplayName("토큰 갱신 실패 테스트 : SiteMemberRole 조회 불가")
+    void reissueTokenFailWhenSiteMemberRoleNotFound() {
+        // given
+        SiteMember siteMember = mock(SiteMember.class);
+
+        given(tokenProvider.validateToken(refreshToken)).willReturn(true);
+        given(tokenValidationService.validateNotFoundRefreshToken(refreshToken)).willReturn(false);
+        given(tokenProvider.getMemberUuidFromToken(refreshToken)).willReturn(memberUuid);
+        given(siteMemberService.getByUuid(memberUuid)).willReturn(Optional.of(siteMember));
+        given(siteMemberRoleService.getByMember(siteMember)).willReturn(Optional.empty());
+
+        // then
+        assertThrows(TokenDataNotFoundException.class, () -> tokenService.reissueToken(refreshToken));
+    }
+
+    @Test
+    @DisplayName("토큰 삭제 성공 테스트")
+    void removeTokenSuccess() {
+        // given
+        RefreshToken mockRefreshToken = RefreshToken.builder()
+                .uuid(UUID.randomUUID())
+                .deviceId(deviceId)
+                .memberUuid(memberUuid)
+                .refreshToken(refreshToken)
+                .build();
+
+        given(tokenProvider.validateToken(refreshToken)).willReturn(true);
+        given(tokenValidationService.validateNotFoundRefreshToken(refreshToken)).willReturn(false);
+        given(tokenProvider.getMemberUuidFromToken(refreshToken)).willReturn(memberUuid);
+        given(refreshTokenCrudService.getByRefreshToken(refreshToken)).willReturn(Optional.of(mockRefreshToken));
+        given(refreshTokenCrudService.getByMemberUuidAndDeviceId(memberUuid, deviceId)).willReturn(Optional.of(mockRefreshToken));
+        willDoNothing().given(tokenValidationService).validateNotFoundTokenUuid(mockRefreshToken.getUuid());
+
+        // when
+        tokenService.removeToken(refreshToken);
+
+        // then
+        verify(refreshTokenCrudService).removeByUuid(mockRefreshToken.getUuid());
+    }
+
+    @Test
+    @DisplayName("토큰 삭제 실패 테스트 : refresh token 조회 불가")
+    void removeTokenNotFoundEarlyExit() {
+        // given
+        given(tokenProvider.validateToken(refreshToken)).willReturn(true);
+        given(tokenValidationService.validateNotFoundRefreshToken(refreshToken)).willReturn(true);
+
+        // when
+        tokenService.removeToken(refreshToken);
+
+        // then
+        assertDoesNotThrow(() -> tokenService.removeToken(refreshToken));
+        verify(refreshTokenCrudService, never()).removeByUuid(any());
+    }
+
+}
