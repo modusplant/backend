@@ -27,4 +27,10 @@ public final class SnakeCaseWord {
     public static final String SNAKE_SITE_MEMBER_ROLE = "site_member_role";
     public static final String SNAKE_SITE_MEMBER_TERM = "site_member_term";
     public static final String SNAKE_VER_NUM = "ver_num";
+    public static final String SNAKE_MEMB_UUID = "memb_uuid";
+    public static final String SNAKE_DEVICE_ID = "device_id";
+    public static final String SNAKE_REFRESH_TOKEN = "refresh_token";
+    public static final String SNAKE_ISSUED_AT = "issued_at";
+    public static final String SNAKE_EXPIRED_AT = "expired_at";
+    public static final String SNAKE_FK_TOKEN_MEMB_UUID = "fk_token_memb_uuid";
 }
