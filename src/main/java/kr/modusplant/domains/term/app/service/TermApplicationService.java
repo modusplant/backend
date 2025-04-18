@@ -20,7 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TermApplicationService {
 
-    private final TermApplicationValidationHelper applicationValidationHelper;
+    private final TermApplicationValidationHelper validationHelper;
     private final TermRepository termRepository;
     private final TermAppInfraMapper termAppInfraMapper = new TermAppInfraMapperImpl();
 
@@ -49,7 +49,7 @@ public class TermApplicationService {
 
     @Transactional
     public TermResponse update(TermUpdateRequest termUpdateRequest, UUID uuid) {
-        applicationValidationHelper.validateNotFoundUuid(uuid);
+        validationHelper.validateNotFoundUuid(uuid);
         TermEntity termEntity = termRepository.findByUuid(uuid).orElseThrow();
         termEntity.updateContent(termUpdateRequest.content());
         termEntity.updateVersion(termUpdateRequest.version());
