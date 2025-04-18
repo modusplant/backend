@@ -24,9 +24,16 @@ spring:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
 
-# Default Swagger configuration
+# Swagger configuration
 springdoc:
   api-docs:
     enabled: true
   swagger-ui:
     enabled: true
+
+# JWT configuration
+jwt:
+  iss: https://app.modusplant.kr
+  aud: https://www.modusplant.kr
+  access_duration: 1800000      # 30분
+  refresh_duration: 604800000   # 7일
