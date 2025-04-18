@@ -1,8 +1,8 @@
-package kr.modusplant.domains.term.domain.service;
+package kr.modusplant.domains.term.app.service;
 
 import jakarta.persistence.EntityExistsException;
 import kr.modusplant.domains.term.persistence.entity.TermEntity;
-import kr.modusplant.domains.term.persistence.repository.TermCrudJpaRepository;
+import kr.modusplant.domains.term.persistence.repository.TermRepository;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +18,11 @@ import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class TermValidationService {
+public class TermApplicationValidationHelper {
 
-    private final TermCrudJpaRepository termRepository;
+    private final TermRepository termRepository;
 
-    public void validateExistedTermUuid(UUID uuid) {
+    public void validateExistedUuid(UUID uuid) {
         if (uuid == null) {
             return;
         }
@@ -37,7 +37,7 @@ public class TermValidationService {
         }
     }
 
-    public void validateNotFoundTermUuid(UUID uuid) {
+    public void validateNotFoundUuid(UUID uuid) {
         if (uuid == null || termRepository.findByUuid(uuid).isEmpty()) {
             throw new EntityNotFoundWithUuidException(uuid, TermEntity.class);
         }

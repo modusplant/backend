@@ -1,0 +1,63 @@
+package kr.modusplant.domains.term.app.service;
+
+import kr.modusplant.domains.term.app.http.request.TermInsertRequest;
+import kr.modusplant.domains.term.app.http.request.TermUpdateRequest;
+import kr.modusplant.domains.term.app.http.response.TermResponse;
+import kr.modusplant.domains.term.mapper.TermAppInfraMapper;
+import kr.modusplant.domains.term.mapper.TermAppInfraMapperImpl;
+import kr.modusplant.domains.term.persistence.entity.TermEntity;
+import kr.modusplant.domains.term.persistence.repository.TermRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+public class TermApplicationService {
+
+    private final TermApplicationValidationHelper applicationValidationHelper;
+    private final TermRepository termRepository;
+    private final TermAppInfraMapper termAppInfraMapper = new TermAppInfraMapperImpl();
+
+    public List<TermResponse> getAll() {
+        return termRepository.findAll().stream().map(termAppInfraMapper::toTermResponse).toList();
+    }
+
+    public List<TermResponse> getByVersion(String version) {
+        return termRepository.findByVersion(version).stream().map(termAppInfraMapper::toTermResponse).toList();
+    }
+
+    public Optional<TermResponse> getByUuid(UUID uuid) {
+        Optional<TermEntity> termOrEmpty = termRepository.findByUuid(uuid);
+        return termOrEmpty.isEmpty() ? Optional.empty() : Optional.of(termAppInfraMapper.toTermResponse(termOrEmpty.orElseThrow()));
+    }
+
+    public Optional<TermResponse> getByName(String name) {
+        Optional<TermEntity> termOrEmpty = termRepository.findByName(name);
+        return termOrEmpty.isEmpty() ? Optional.empty() : Optional.of(termAppInfraMapper.toTermResponse(termOrEmpty.orElseThrow()));
+    }
+
+    @Transactional
+    public TermResponse insert(TermInsertRequest termInsertRequest) {
+        return termAppInfraMapper.toTermResponse(termRepository.save(termAppInfraMapper.toTermEntity(termInsertRequest)));
+    }
+
+    @Transactional
+    public TermResponse update(TermUpdateRequest termUpdateRequest, UUID uuid) {
+        applicationValidationHelper.validateNotFoundUuid(uuid);
+        TermEntity termEntity = termRepository.findByUuid(uuid).orElseThrow();
+        termEntity.updateContent(termUpdateRequest.content());
+        termEntity.updateVersion(termUpdateRequest.version());
+        return termAppInfraMapper.toTermResponse(termRepository.save(termEntity));
+    }
+
+    @Transactional
+    public void removeByUuid(UUID uuid) {
+        termRepository.deleteByUuid(uuid);
+    }
+}

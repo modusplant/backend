@@ -3,10 +3,11 @@ package kr.modusplant.domains.term.domain.service;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.domains.common.context.DomainServiceOnlyContext;
-import kr.modusplant.domains.term.common.util.domain.TermTestUtils;
+import kr.modusplant.domains.term.app.service.TermApplicationValidationHelper;
+import kr.modusplant.domains.term.common.app.http.response.TermResponseTestUtils;
 import kr.modusplant.domains.term.common.util.entity.TermEntityTestUtils;
 import kr.modusplant.domains.term.persistence.entity.TermEntity;
-import kr.modusplant.domains.term.persistence.repository.TermCrudJpaRepository;
+import kr.modusplant.domains.term.persistence.repository.TermRepository;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import org.junit.jupiter.api.DisplayName;
@@ -25,20 +26,20 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @DomainServiceOnlyContext
-class TermValidationServiceTest implements TermTestUtils, TermEntityTestUtils {
+class TermApplicationValidationHelperTest implements TermResponseTestUtils, TermEntityTestUtils {
 
-    private final TermValidationService termValidationService;
-    private final TermCrudJpaRepository termRepository;
+    private final TermApplicationValidationHelper termApplicationValidationHelper;
+    private final TermRepository termRepository;
 
     @Autowired
-    TermValidationServiceTest(TermValidationService termValidationService, TermCrudJpaRepository termRepository) {
-        this.termValidationService = termValidationService;
+    TermApplicationValidationHelperTest(TermApplicationValidationHelper termApplicationValidationHelper, TermRepository termRepository) {
+        this.termApplicationValidationHelper = termApplicationValidationHelper;
         this.termRepository = termRepository;
     }
 
     @DisplayName("존재하는 약관 UUID 검증")
     @Test
-    void validateExistedTermUuidTest() {
+    void validateExistedUuidTest() {
         // given
         TermEntity termEntity = createTermsOfUseEntityWithUuid();
         UUID termEntityUuid = termEntity.getUuid();
@@ -48,7 +49,7 @@ class TermValidationServiceTest implements TermTestUtils, TermEntityTestUtils {
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsWithUuidException.class,
-                () -> termValidationService.validateExistedTermUuid(termEntityUuid));
+                () -> termApplicationValidationHelper.validateExistedUuid(termEntityUuid));
         assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
                 EXISTED_ENTITY, "uuid", termEntityUuid, TermEntity.class));
     }
@@ -66,14 +67,14 @@ class TermValidationServiceTest implements TermTestUtils, TermEntityTestUtils {
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
-                () -> termValidationService.validateExistedName(termEntity.getName()));
+                () -> termApplicationValidationHelper.validateExistedName(termEntity.getName()));
         assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
                 EXISTED_ENTITY, NAME, termEntity.getName(), TermEntity.class));
     }
 
     @DisplayName("존재하지 않는 약관 UUID 검증")
     @Test
-    void validateNotFoundTermUuidTest() {
+    void validateNotFoundUuidTest() {
         // given & when
         TermEntity termEntity = createTermsOfUseEntityWithUuid();
         UUID termEntityUuid = termEntity.getUuid();
@@ -82,7 +83,7 @@ class TermValidationServiceTest implements TermTestUtils, TermEntityTestUtils {
 
         // then
         EntityNotFoundException existsException = assertThrows(EntityNotFoundWithUuidException.class,
-                () -> termValidationService.validateNotFoundTermUuid(termEntityUuid));
+                () -> termApplicationValidationHelper.validateNotFoundUuid(termEntityUuid));
         assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
                 NOT_FOUND_ENTITY, "uuid", termEntityUuid, TermEntity.class));
     }

@@ -15,14 +15,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
-class SiteMemberTermEntityMapperTest implements SiteMemberTermTestUtils, SiteMemberTermEntityTestUtils {
+class SiteMemberTermAppInfraMapperTest implements SiteMemberTermTestUtils, SiteMemberTermEntityTestUtils {
 
     private final SiteMemberTermCrudJpaRepository memberTermRepository;
     private final SiteMemberCrudJpaRepository memberRepository;
     private final SiteMemberTermEntityMapper memberTermMapper = new SiteMemberTermEntityMapperImpl();
 
     @Autowired
-    SiteMemberTermEntityMapperTest(SiteMemberTermCrudJpaRepository memberTermRepository, SiteMemberCrudJpaRepository memberRepository) {
+    SiteMemberTermAppInfraMapperTest(SiteMemberTermCrudJpaRepository memberTermRepository, SiteMemberCrudJpaRepository memberRepository) {
         this.memberTermRepository = memberTermRepository;
         this.memberRepository = memberRepository;
     }

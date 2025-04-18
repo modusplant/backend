@@ -12,8 +12,8 @@ import kr.modusplant.domains.member.domain.service.supers.SiteMemberAuthCrudServ
 import kr.modusplant.domains.member.domain.service.supers.SiteMemberCrudService;
 import kr.modusplant.domains.member.domain.service.supers.SiteMemberTermCrudService;
 import kr.modusplant.domains.member.enums.AuthProvider;
-import kr.modusplant.domains.term.domain.model.Term;
-import kr.modusplant.domains.term.domain.service.supers.TermCrudService;
+import kr.modusplant.domains.term.app.http.response.TermResponse;
+import kr.modusplant.domains.term.app.service.TermApplicationService;
 import kr.modusplant.global.app.servlet.response.DataResponse;
 import kr.modusplant.modules.signup.normal.model.request.NormalSignUpRequest;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class NormalSignUpController {
 
-    private final TermCrudService termCrudService;
+    private final TermApplicationService termApplicationService;
     private final SiteMemberTermCrudService siteMemberTermCrudService;
     private final SiteMemberAuthCrudService siteMemberAuthCrudService;
     private final SiteMemberCrudService siteMemberCrudService;
@@ -54,10 +54,10 @@ public class NormalSignUpController {
     public ResponseEntity<DataResponse<?>> sendTerms(){
 
         try {
-            List<Map<String, Object>> termMapList = termCrudService.getAll()
+            List<Map<String, Object>> termMapList = termApplicationService.getAll()
                     .stream()
                     .filter(term -> {
-                        String termKey = term.getName();
+                        String termKey = term.name();
 
                         return termKey.equals("이용약관") ||
                                 termKey.equals("개인정보처리방침") ||
@@ -133,8 +133,8 @@ public class NormalSignUpController {
 
     }
 
-    private Map<String, Object> createTermMap(Term term) {
-        String mapKey = switch (term.getName()) {
+    private Map<String, Object> createTermMap(TermResponse term) {
+        String mapKey = switch (term.name()) {
             case ("개인정보처리방침") -> "privacyPolicy";
             case ("이용약관") -> "termsOfUse";
             case ("광고성 정보 수신") -> "adInfoReceiving";
