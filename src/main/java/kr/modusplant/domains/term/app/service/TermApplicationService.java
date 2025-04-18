@@ -44,6 +44,7 @@ public class TermApplicationService {
 
     @Transactional
     public TermResponse insert(TermInsertRequest termInsertRequest) {
+        validationHelper.validateExistedName(termInsertRequest.name());
         return termAppInfraMapper.toTermResponse(termRepository.save(termAppInfraMapper.toTermEntity(termInsertRequest)));
     }
 
@@ -58,6 +59,7 @@ public class TermApplicationService {
 
     @Transactional
     public void removeByUuid(UUID uuid) {
+        validationHelper.validateNotFoundUuid(uuid);
         termRepository.deleteByUuid(uuid);
     }
 }

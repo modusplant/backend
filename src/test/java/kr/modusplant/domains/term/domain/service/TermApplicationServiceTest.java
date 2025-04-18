@@ -60,7 +60,7 @@ class TermApplicationServiceTest implements TermRequestTestUtils, TermResponseTe
         TermEntity returnedTermEntity = createTermsOfUseEntityWithUuid();
 
         given(termRepository.save(termEntity)).willReturn(returnedTermEntity);
-        given(termRepository.findByName(termsOfUseResponseWithUuid.name())).willReturn(Optional.of(returnedTermEntity));
+        given(termRepository.findByName(termsOfUseResponseWithUuid.name())).willReturn(Optional.empty()).willReturn(Optional.of(returnedTermEntity));
 
         // when
         TermResponse termResponse = termApplicationService.insert(termsOfUseInsertRequest);
@@ -77,6 +77,7 @@ class TermApplicationServiceTest implements TermRequestTestUtils, TermResponseTe
         TermEntity returnedTermEntity = createTermsOfUseEntityWithUuid();
 
         given(termRepository.save(termEntity)).willReturn(returnedTermEntity);
+        given(termRepository.findByName(termEntity.getName())).willReturn(Optional.empty());
         given(termRepository.findByVersion(termsOfUseResponseWithUuid.version())).willReturn(List.of(returnedTermEntity));
 
         // when
@@ -120,7 +121,7 @@ class TermApplicationServiceTest implements TermRequestTestUtils, TermResponseTe
 
         given(termRepository.save(termEntity)).willReturn(termEntity).willReturn(updatedTermEntity);
         given(termRepository.findByUuid(uuid)).willReturn(Optional.of(termEntity));
-        given(termRepository.findByName(updatedTermEntity.getName())).willReturn(Optional.of(updatedTermEntity));
+        given(termRepository.findByName(updatedTermEntity.getName())).willReturn(Optional.empty()).willReturn(Optional.of(updatedTermEntity));
 
         // when
         termApplicationService.insert(termsOfUseInsertRequest);
@@ -138,7 +139,8 @@ class TermApplicationServiceTest implements TermRequestTestUtils, TermResponseTe
         TermEntity termEntity = termAppInfraMapper.toTermEntity(termsOfUseInsertRequest);
 
         given(termRepository.save(termEntity)).willReturn(termEntity);
-        given(termRepository.findByUuid(uuid)).willReturn(Optional.empty());
+        given(termRepository.findByUuid(uuid)).willReturn(Optional.of(termEntity)).willReturn(Optional.empty());
+        given(termRepository.findByName(termEntity.getName())).willReturn(Optional.empty());
         willDoNothing().given(termRepository).deleteByUuid(uuid);
 
         // when
