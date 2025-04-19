@@ -1,10 +1,11 @@
 package kr.modusplant.modules.auth.social.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import kr.modusplant.modules.auth.social.dto.supers.SocialUserInfo;
 import lombok.Getter;
 
 @Getter
-public class KakaoUserInfo {
+public class KakaoUserInfo implements SocialUserInfo {
     private Long id;
     @JsonProperty("kakao_account")
     private KakaoAccount kakaoAccount;
@@ -22,15 +23,18 @@ public class KakaoUserInfo {
         private String nickname;
     }
 
-    public String getKakaoId() {
+    @Override
+    public String getId() {
         return this.id.toString();
     }
 
-    public String getKakaoEmail() {
+    @Override
+    public String getEmail() {
         return this.kakaoAccount.getEmail();
     }
 
-    public String getKakaoNickname() {
+    @Override
+    public String getNickname() {
         return this.kakaoAccount.getProfile().getNickname();
     }
 }
