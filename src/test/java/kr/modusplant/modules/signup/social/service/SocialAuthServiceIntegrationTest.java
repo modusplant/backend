@@ -3,6 +3,7 @@ package kr.modusplant.modules.signup.social.service;
 import kr.modusplant.domains.member.domain.model.SiteMember;
 import kr.modusplant.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.domains.member.domain.model.SiteMemberRole;
+import kr.modusplant.domains.member.domain.service.SiteMemberSocialAuthService;
 import kr.modusplant.domains.member.domain.service.supers.SiteMemberAuthCrudService;
 import kr.modusplant.domains.member.domain.service.supers.SiteMemberCrudService;
 import kr.modusplant.domains.member.domain.service.supers.SiteMemberRoleCrudService;
@@ -24,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class SocialAuthServiceIntegrationTest {
 
     @Autowired
-    private SocialAuthService socialAuthService;
+    private SiteMemberSocialAuthService siteMemberSocialAuthService;
 
     @Autowired
     private SiteMemberCrudService siteMemberCrudService;
@@ -65,7 +66,7 @@ class SocialAuthServiceIntegrationTest {
                         .build());
 
         // when
-        SiteMember result = socialAuthService.findOrCreateMember(provider, id, email, nickname);
+        SiteMember result = siteMemberSocialAuthService.findOrCreateMember(provider, id, email, nickname);
 
         // Then
         assertNotNull(result);
@@ -83,7 +84,7 @@ class SocialAuthServiceIntegrationTest {
         String nickname = "test";
 
         // When
-        SiteMember result = socialAuthService.findOrCreateMember(provider, id, email, nickname);
+        SiteMember result = siteMemberSocialAuthService.findOrCreateMember(provider, id, email, nickname);
 
         // Then
         assertNotNull(result);
