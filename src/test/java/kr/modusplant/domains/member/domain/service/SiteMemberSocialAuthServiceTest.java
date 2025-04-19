@@ -3,6 +3,7 @@ package kr.modusplant.domains.member.domain.service;
 import kr.modusplant.domains.member.domain.model.SiteMember;
 import kr.modusplant.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.domains.member.domain.model.SiteMemberRole;
+import kr.modusplant.domains.member.domain.model.SiteMemberWithRole;
 import kr.modusplant.domains.member.domain.service.supers.SiteMemberAuthCrudService;
 import kr.modusplant.domains.member.domain.service.supers.SiteMemberCrudService;
 import kr.modusplant.domains.member.domain.service.supers.SiteMemberRoleCrudService;
@@ -66,35 +67,37 @@ class SiteMemberSocialAuthServiceTest {
                         .build());
 
         // when
-        SiteMember result = siteMemberSocialAuthService.findOrCreateMember(provider, id, email, nickname);
+        SiteMemberWithRole result = siteMemberSocialAuthService.findOrCreateMember(provider, id, email, nickname);
 
         // Then
         assertNotNull(result);
-        assertEquals(existedMember.getUuid(), result.getUuid());
-        assertEquals(existedMemberAuth.getActiveMemberUuid(), result.getUuid());
-        assertEquals(existedMemberRole.getUuid(), result.getUuid());
+        assertEquals(existedMember.getUuid(), result.member().getUuid());
+        assertEquals(existedMemberAuth.getActiveMemberUuid(), result.member().getUuid());
+        assertEquals(existedMemberRole.getUuid(), result.role().getUuid());
+        assertEquals(result.member().getUuid(), result.role().getUuid());
     }
 
     @Test
     void findOrCreateMemberWhenMemberDoesNotExists() {
         // When
-        SiteMember result = siteMemberSocialAuthService.findOrCreateMember(provider, id, email, nickname);
+        SiteMemberWithRole result = siteMemberSocialAuthService.findOrCreateMember(provider, id, email, nickname);
 
         // Then
         assertNotNull(result);
-        assertEquals(nickname, result.getNickname());
-        assertNotNull(result.getUuid());
+        assertEquals(nickname, result.member().getNickname());
+        assertNotNull(result.member().getUuid());
 
         SiteMemberAuth siteMemberAuth = siteMemberAuthCrudService.getByProviderAndProviderId(provider,id)
                 .stream()
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("SiteMemberAuth not found"));
         assertEquals(email, siteMemberAuth.getEmail());
-        assertEquals(result.getUuid(),siteMemberAuth.getActiveMemberUuid());
+        assertEquals(result.member().getUuid(),siteMemberAuth.getActiveMemberUuid());
 
-        SiteMemberRole siteMemberRole = siteMemberRoleCrudService.getByUuid(result.getUuid())
+        SiteMemberRole siteMemberRole = siteMemberRoleCrudService.getByUuid(result.member().getUuid())
                 .orElseThrow(() -> new AssertionError("SiteMemberRole not found"));
         assertEquals(Role.ROLE_USER, siteMemberRole.getRole());
-        assertEquals(result.getUuid(), siteMemberRole.getUuid());
+        assertEquals(result.role().getUuid(), siteMemberRole.getUuid());
+        assertEquals(result.member().getUuid(), result.role().getUuid());
     }
 }

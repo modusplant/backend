@@ -3,6 +3,7 @@ package kr.modusplant.domains.member.domain.service;
 import kr.modusplant.domains.member.domain.model.SiteMember;
 import kr.modusplant.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.domains.member.domain.model.SiteMemberRole;
+import kr.modusplant.domains.member.domain.model.SiteMemberWithRole;
 import kr.modusplant.domains.member.domain.service.supers.SiteMemberAuthCrudService;
 import kr.modusplant.domains.member.domain.service.supers.SiteMemberCrudService;
 import kr.modusplant.domains.member.domain.service.supers.SiteMemberRoleCrudService;
@@ -24,18 +25,20 @@ public class SiteMemberSocialAuthService {
     private final SiteMemberRoleCrudService siteMemberRoleCrudService;
 
     @Transactional
-    public SiteMember findOrCreateMember(AuthProvider provider, String id, String email, String nickname) {
+    public SiteMemberWithRole findOrCreateMember(AuthProvider provider, String id, String email, String nickname) {
         // provider와 provider_id로 site_member_auth 사용자 조회
         Optional<SiteMemberAuth> existedMemberAuth = siteMemberAuthCrudService.getByProviderAndProviderId(provider,id);
 
         // 신규 멤버 저장 및 멤버 반환
         return existedMemberAuth.map(siteMemberAuth -> {
-            return siteMemberCrudService.getByUuid(siteMemberAuth.getActiveMemberUuid()).get();
+            SiteMember savedMember = siteMemberCrudService.getByUuid(siteMemberAuth.getActiveMemberUuid()).get();
+            SiteMemberRole savedMemberRole = siteMemberRoleCrudService.getByMember(savedMember).get();
+            return new SiteMemberWithRole(savedMember,savedMemberRole);
         }).orElseGet(() -> {
             SiteMember savedMember = createSiteMember(nickname);
             createSiteMemberAuth(savedMember.getUuid(),provider,id,email);
-            createSiteMemberRole(savedMember.getUuid());
-            return savedMember;
+            SiteMemberRole savedMemberRole = createSiteMemberRole(savedMember.getUuid());
+            return new SiteMemberWithRole(savedMember, savedMemberRole);
         });
     }
 
