@@ -1,9 +1,8 @@
-package kr.modusplant.modules.signup.social.service;
+package kr.modusplant.domains.member.domain.service;
 
 import kr.modusplant.domains.member.domain.model.SiteMember;
 import kr.modusplant.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.domains.member.domain.model.SiteMemberRole;
-import kr.modusplant.domains.member.domain.service.SiteMemberSocialAuthService;
 import kr.modusplant.domains.member.domain.service.supers.SiteMemberAuthCrudService;
 import kr.modusplant.domains.member.domain.service.supers.SiteMemberCrudService;
 import kr.modusplant.domains.member.domain.service.supers.SiteMemberRoleCrudService;
@@ -22,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @Transactional
-class SocialAuthServiceIntegrationTest {
+class SiteMemberSocialAuthServiceTest {
 
     @Autowired
     private SiteMemberSocialAuthService siteMemberSocialAuthService;
@@ -36,14 +35,15 @@ class SocialAuthServiceIntegrationTest {
     @Autowired
     private SiteMemberRoleCrudService siteMemberRoleCrudService;
 
+    private final AuthProvider provider = AuthProvider.GOOGLE;
+    private final String id = "968788539145693243421";
+    private final String email = "test@example.com";
+    private final String nickname = "test";
+
     @Test
     @DisplayName("이미 존재하는 사용자라면, 사용자 정보를 조회한다")
     void findOrCreateMemberWhenMemberExists() {
         // Given
-        AuthProvider provider = AuthProvider.GOOGLE;
-        String id = "968788539145693243421";
-        String email = "test@example.com";
-        String nickname = "test";
         SiteMember existedMember = siteMemberCrudService.insert(
                 SiteMember.builder()
                 .nickname(nickname)
@@ -77,12 +77,6 @@ class SocialAuthServiceIntegrationTest {
 
     @Test
     void findOrCreateMemberWhenMemberDoesNotExists() {
-        // Given
-        AuthProvider provider = AuthProvider.GOOGLE;
-        String id = "968788539145693243421";
-        String email = "test@example.com";
-        String nickname = "test";
-
         // When
         SiteMember result = siteMemberSocialAuthService.findOrCreateMember(provider, id, email, nickname);
 
@@ -102,6 +96,5 @@ class SocialAuthServiceIntegrationTest {
                 .orElseThrow(() -> new AssertionError("SiteMemberRole not found"));
         assertEquals(Role.ROLE_USER, siteMemberRole.getRole());
         assertEquals(result.getUuid(), siteMemberRole.getUuid());
-
     }
 }
