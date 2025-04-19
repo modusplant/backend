@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.modusplant.domains.member.domain.model.SiteMember;
+import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.global.app.servlet.response.DataResponse;
 import kr.modusplant.modules.auth.social.model.response.TokenResponse;
 import kr.modusplant.modules.auth.social.model.request.SocialLoginRequest;
@@ -34,9 +35,8 @@ public class SocialAuthController {
     })
     @PostMapping("/kakao/social-login")
     public ResponseEntity<DataResponse<?>> kakaoSocialLogin(@RequestBody SocialLoginRequest request) {
-        SiteMember siteMember = socialAuthApplicationService.kakaoLogin(request.getCode());
+        SiteMember siteMember = socialAuthApplicationService.handleSocialLogin(AuthProvider.KAKAO, request.getCode());
 
-        /* JWT */
         // JWT 예시
         String accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         TokenResponse token = new TokenResponse();
@@ -56,7 +56,7 @@ public class SocialAuthController {
     })
     @PostMapping("/google/social-login")
     public ResponseEntity<DataResponse<?>> googleSocialLogin(@RequestBody SocialLoginRequest request) {
-        SiteMember siteMember = socialAuthApplicationService.googleLogin(request.getCode());
+        SiteMember siteMember = socialAuthApplicationService.handleSocialLogin(AuthProvider.GOOGLE, request.getCode());
 
         // JWT 예시
         String accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
@@ -67,6 +67,4 @@ public class SocialAuthController {
 
         return ResponseEntity.ok(response);
     }
-
-
 }
