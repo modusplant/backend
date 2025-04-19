@@ -1,6 +1,6 @@
 package kr.modusplant.modules.auth.social.service;
 
-import kr.modusplant.domains.member.domain.model.SiteMember;
+import kr.modusplant.domains.member.domain.model.SiteMemberWithRole;
 import kr.modusplant.domains.member.domain.service.SiteMemberSocialAuthService;
 import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.modules.auth.social.dto.supers.SocialUserInfo;
@@ -15,7 +15,7 @@ public class SocialAuthApplicationService {
     private final KakaoAuthClient kakaoAuthClient;
     private final GoogleAuthClient googleAuthClient;
 
-    public SiteMember handleSocialLogin(AuthProvider provider, String code) {
+    public SiteMemberWithRole handleSocialLogin(AuthProvider provider, String code) {
         // 소셜 토큰 발급
         String socialAccessToken = getClient(provider).getAccessToken(code);
         // 소셜 사용자 정보 가져오기
