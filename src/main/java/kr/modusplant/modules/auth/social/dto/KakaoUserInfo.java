@@ -1,4 +1,4 @@
-package kr.modusplant.modules.auth.social.app.dto;
+package kr.modusplant.modules.auth.social.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import kr.modusplant.modules.auth.social.app.dto.supers.SocialUserInfo;
