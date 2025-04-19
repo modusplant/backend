@@ -4,13 +4,18 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import kr.modusplant.domains.member.domain.model.SiteMemberWithRole;
 import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.global.app.servlet.response.DataResponse;
-import kr.modusplant.modules.auth.social.model.response.TokenResponse;
 import kr.modusplant.modules.auth.social.model.request.SocialLoginRequest;
 import kr.modusplant.modules.auth.social.service.SocialAuthApplicationService;
+import kr.modusplant.modules.jwt.domain.service.TokenService;
+import kr.modusplant.modules.jwt.dto.TokenPair;
+import kr.modusplant.modules.jwt.model.response.TokenResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SocialAuthController {
 
     private final SocialAuthApplicationService socialAuthApplicationService;
+    private final TokenService tokenService;
 
     @Operation(summary = "카카오 소셜 로그인 API", description = "카카오 인가코드를 받아 로그인합니다.")
     @ApiResponses(value = {
@@ -34,17 +40,16 @@ public class SocialAuthController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error: An unexpected error occurred on the Authorization server")
     })
     @PostMapping("/kakao/social-login")
-    public ResponseEntity<DataResponse<?>> kakaoSocialLogin(@RequestBody SocialLoginRequest request) {
-        SiteMemberWithRole siteMemberWithRole = socialAuthApplicationService.handleSocialLogin(AuthProvider.KAKAO, request.getCode());
+    public ResponseEntity<DataResponse<?>> kakaoSocialLogin(@Valid @RequestBody SocialLoginRequest request) {
+        SiteMemberWithRole member = socialAuthApplicationService.handleSocialLogin(AuthProvider.KAKAO, request.getCode());
 
-        // JWT 예시
-        String accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
-        TokenResponse token = new TokenResponse();
-        token.setAccessToken(accessToken);
+        TokenPair tokenPair = tokenService.issueToken(member.getMemberUuid(),member.getNickname(),member.getRole(),request.getDeviceId());
 
+        TokenResponse token = new TokenResponse(tokenPair.getAccessToken());
         DataResponse<TokenResponse> response = DataResponse.of(200,"OK: Succeeded", token);
+        String refreshCookie = setRefreshTokenCookie(tokenPair.getRefreshToken());
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie).body(response);
     }
 
     @Operation(summary = "구글 소셜 로그인 API", description = "구글 인가코드를 받아 로그인합니다.<br> 구글 인가코드를 url에서 추출할 경우 '%2F'는 '/'로 대체해야 합니다.")
@@ -55,16 +60,20 @@ public class SocialAuthController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error: An unexpected error occurred on the Authorization server")
     })
     @PostMapping("/google/social-login")
-    public ResponseEntity<DataResponse<?>> googleSocialLogin(@RequestBody SocialLoginRequest request) {
-        SiteMemberWithRole siteMemberWithRole = socialAuthApplicationService.handleSocialLogin(AuthProvider.GOOGLE, request.getCode());
+    public ResponseEntity<DataResponse<?>> googleSocialLogin(@Valid @RequestBody SocialLoginRequest request) {
+        SiteMemberWithRole member = socialAuthApplicationService.handleSocialLogin(AuthProvider.GOOGLE, request.getCode());
 
-        // JWT 예시
-        String accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
-        TokenResponse token = new TokenResponse();
-        token.setAccessToken(accessToken);
+        TokenPair tokenPair = tokenService.issueToken(member.getMemberUuid(),member.getNickname(),member.getRole(),request.getDeviceId());
 
+        TokenResponse token = new TokenResponse(tokenPair.getAccessToken());
         DataResponse<TokenResponse> response = DataResponse.of(200,"OK: Succeeded", token);
+        String refreshCookie = setRefreshTokenCookie(tokenPair.getRefreshToken());
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie).body(response);
+    }
+
+    private String setRefreshTokenCookie(String refreshToken) {
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken).build();
+        return refreshCookie.toString();
     }
 }
