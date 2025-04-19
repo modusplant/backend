@@ -1,7 +1,7 @@
 package kr.modusplant.modules.auth.social.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import kr.modusplant.modules.auth.social.app.dto.supers.SocialUserInfo;
+import kr.modusplant.modules.auth.social.dto.supers.SocialUserInfo;
 import lombok.Getter;
 
 @Getter
