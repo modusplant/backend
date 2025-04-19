@@ -1,4 +1,4 @@
-package kr.modusplant.modules.signup.social.model.external;
+package kr.modusplant.modules.auth.social.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

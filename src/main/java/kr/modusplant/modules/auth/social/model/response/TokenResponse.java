@@ -1,4 +1,4 @@
-package kr.modusplant.modules.signup.social.model.response;
+package kr.modusplant.modules.auth.social.model.response;
 
 import lombok.Getter;
 import lombok.Setter;

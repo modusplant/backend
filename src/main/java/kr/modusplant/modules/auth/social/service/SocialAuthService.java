@@ -1,19 +1,11 @@
-package kr.modusplant.modules.signup.social.service;
+package kr.modusplant.modules.auth.social.service;
 
-import kr.modusplant.domains.member.app.http.request.SiteMemberAuthInsertRequest;
-import kr.modusplant.domains.member.app.http.request.SiteMemberInsertRequest;
-import kr.modusplant.domains.member.app.http.request.SiteMemberRoleInsertRequest;
-import kr.modusplant.domains.member.app.http.response.SiteMemberAuthResponse;
-import kr.modusplant.domains.member.app.http.response.SiteMemberResponse;
-import kr.modusplant.domains.member.app.http.response.SiteMemberRoleResponse;
-import kr.modusplant.domains.member.app.service.SiteMemberApplicationService;
-import kr.modusplant.domains.member.app.service.SiteMemberAuthApplicationService;
-import kr.modusplant.domains.member.app.service.SiteMemberRoleApplicationService;
-import kr.modusplant.domains.member.enums.AuthProvider;
-import kr.modusplant.global.enums.Role;
 import kr.modusplant.global.error.OAuthException;
 import kr.modusplant.modules.signup.social.model.external.GoogleUserInfo;
 import kr.modusplant.modules.signup.social.model.external.KakaoUserInfo;
+import kr.modusplant.modules.auth.social.error.OAuthException;
+import kr.modusplant.modules.auth.social.dto.KakaoUserInfo;
+import kr.modusplant.modules.auth.social.dto.GoogleUserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -26,6 +18,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,9 +26,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class SocialAuthService {
-    private final SiteMemberApplicationService memberApplicationService;
-    private final SiteMemberAuthApplicationService memberAuthApplicationService;
-    private final SiteMemberRoleApplicationService memberRoleApplicationService;
+    private final SiteMemberCrudService siteMemberCrudService;
+    private final SiteMemberAuthCrudService siteMemberAuthCrudService;
+    private final SiteMemberRoleCrudService siteMemberRoleCrudService;
     private RestClient restClient;
 
     @Value("${kakao.api-key}")
@@ -132,34 +125,46 @@ public class SocialAuthService {
     }
 
     @Transactional
-    public SiteMemberResponse findOrCreateMember(AuthProvider provider,String id, String email, String nickname) {
+    public SiteMember findOrCreateMember(AuthProvider provider,String id, String email, String nickname) {
         // provider와 provider_id로 site_member_auth 사용자 조회
-        Optional<SiteMemberAuthResponse> existedMemberAuth = memberAuthApplicationService.getByProviderAndProviderId(provider,id);
+        Optional<SiteMemberAuth> existedMemberAuth = siteMemberAuthCrudService.getByProviderAndProviderId(provider,id);
 
         // 신규 멤버 저장 및 멤버 반환
         return existedMemberAuth.map(siteMemberAuth -> {
-            return memberApplicationService.getByUuid(siteMemberAuth.activeMemberUuid()).get();
+            return siteMemberCrudService.getByUuid(siteMemberAuth.getActiveMemberUuid()).get();
         }).orElseGet(() -> {
-            SiteMemberResponse savedMember = createSiteMember(nickname);
-            createSiteMemberAuth(savedMember.uuid(),provider,id,email);
-            createSiteMemberRole(savedMember.uuid());
+            SiteMember savedMember = createSiteMember(nickname);
+            createSiteMemberAuth(savedMember.getUuid(),provider,id,email);
+            createSiteMemberRole(savedMember.getUuid());
             return savedMember;
         });
     }
 
-    private SiteMemberResponse createSiteMember(String nickname) {
-        SiteMemberInsertRequest siteMember = new SiteMemberInsertRequest(nickname);
-        return memberApplicationService.insert(siteMember);
+    private SiteMember createSiteMember(String nickname) {
+        SiteMember siteMember = SiteMember.builder()
+                .nickname(nickname)
+                .loggedInAt(LocalDateTime.now())
+                .build();
+        return siteMemberCrudService.insert(siteMember);
     }
 
-    private SiteMemberAuthResponse createSiteMemberAuth(UUID memberUuid, AuthProvider provider, String id, String email) {
-        SiteMemberAuthInsertRequest siteMemberAuth = new SiteMemberAuthInsertRequest(memberUuid, email, null, provider, id);
-        return memberAuthApplicationService.insert(siteMemberAuth);
+    private SiteMemberAuth createSiteMemberAuth(UUID memberUuid, AuthProvider provider, String id, String email) {
+        SiteMemberAuth siteMemberAuth = SiteMemberAuth.builder()
+                .activeMemberUuid(memberUuid)
+                .originalMemberUuid(memberUuid)
+                .email(email)
+                .provider(provider)
+                .providerId(id)
+                .build();
+        return siteMemberAuthCrudService.insert(siteMemberAuth);
     }
 
-    private SiteMemberRoleResponse createSiteMemberRole(UUID memberUuid) {
-        SiteMemberRoleInsertRequest siteMemberRole = new SiteMemberRoleInsertRequest(memberUuid, Role.ROLE_USER);
-        return memberRoleApplicationService.insert(siteMemberRole);
+    private SiteMemberRole createSiteMemberRole(UUID memberUuid) {
+        SiteMemberRole siteMemberRole = SiteMemberRole.builder()
+                .uuid(memberUuid)
+                .role(Role.ROLE_USER)
+                .build();
+        return siteMemberRoleCrudService.insert(siteMemberRole);
     }
 
     private boolean isErrorStatus(HttpStatusCode status) {
