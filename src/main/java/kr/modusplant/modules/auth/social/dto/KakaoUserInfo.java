@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/main/java/kr/modusplant/modules/auth/social/app/dto/KakaoUserInfo.java
 package kr.modusplant.modules.auth.social.app.dto;
+========
+package kr.modusplant.modules.auth.social.dto;
+>>>>>>>> f2cf09f (MP-151 :truck: Rename: 소셜 로그인 파일 이동):src/main/java/kr/modusplant/modules/auth/social/dto/KakaoUserInfo.java
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import kr.modusplant.modules.auth.social.app.dto.supers.SocialUserInfo;
