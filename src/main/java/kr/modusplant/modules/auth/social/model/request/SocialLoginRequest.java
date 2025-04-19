@@ -1,4 +1,4 @@
-package kr.modusplant.modules.signup.social.model.request;
+package kr.modusplant.modules.auth.social.model.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

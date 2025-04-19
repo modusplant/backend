@@ -2,6 +2,7 @@ package kr.modusplant.global.error;
 
 import jakarta.servlet.http.HttpServletRequest;
 import kr.modusplant.global.app.servlet.response.DataResponse;
+import kr.modusplant.modules.auth.social.error.OAuthException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
