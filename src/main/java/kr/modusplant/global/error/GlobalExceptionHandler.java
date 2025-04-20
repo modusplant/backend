@@ -5,25 +5,15 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import jakarta.servlet.http.HttpServletRequest;
 import kr.modusplant.global.app.servlet.response.DataResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // OAuthException 처리
     @ExceptionHandler(OAuthException.class)
@@ -35,8 +25,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<DataResponse<Void>> handleRuntimeException(HttpServletRequest request, RuntimeException ex) {
         DataResponse<Void> errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "An unexpected error occurred");
-
-        logger.error(ex.getMessage(), ex);
 
         return ResponseEntity.badRequest().body(errorResponse);
     }
