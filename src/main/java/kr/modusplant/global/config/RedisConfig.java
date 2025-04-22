@@ -1,6 +1,5 @@
 package kr.modusplant.global.config;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectMapper.*;
@@ -30,7 +29,6 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
-        // config.setPassword("password");     // Redis 비밀번호 설정
         return new LettuceConnectionFactory(config);
     }
 
@@ -54,7 +52,7 @@ public class RedisConfig {
         ObjectMapper objectMapper = new ObjectMapper()
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .activateDefaultTyping(typeValidator, DefaultTyping.NON_FINAL_AND_ENUMS, JsonTypeInfo.As.PROPERTY)
+                .activateDefaultTyping(typeValidator, DefaultTyping.NON_FINAL_AND_ENUMS)
                 .registerModule(new JavaTimeModule());
 
         GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
