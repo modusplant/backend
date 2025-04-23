@@ -37,4 +37,13 @@ public class DataResponse<T> {
         response.message = RESPONSE_MESSAGE_200;
         return response;
     }
+
+    public static <T> DataResponse<T> ok(T data) {
+        DataResponse<T> response = new DataResponse<>();
+        response.status = HttpStatus.OK.value();
+        response.message = RESPONSE_MESSAGE_200;
+        response.data = data;
+        return response;
+    }
+
 }
