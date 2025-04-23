@@ -1,14 +1,7 @@
-<<<<<<<< HEAD:src/test/java/kr/modusplant/domains/member/persistence/repository/SiteMemberRoleCrudJpaRepositoryTest.java
 package kr.modusplant.domains.member.persistence.repository;
 
 import kr.modusplant.domains.member.common.util.entity.SiteMemberRoleEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberRoleEntity;
-========
-package kr.modusplant.api.crud.member.persistence.repository;
-
-import kr.modusplant.api.crud.member.common.util.entity.SiteMemberRoleEntityTestUtils;
-import kr.modusplant.api.crud.member.persistence.entity.SiteMemberRoleEntity;
->>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/test/java/kr/modusplant/api/crud/member/persistence/repository/SiteMemberRoleJpaRepositoryTest.java
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

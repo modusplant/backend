@@ -57,20 +57,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
-    // 메서드의 인자가 무효한 값일 경우 처리
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<DataResponse<Void>> handleIllegalArgumentException(IllegalArgumentException ex) {
-        DataResponse<Void> errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "Invalid method argument");
-        return ResponseEntity.badRequest().body(errorResponse);
-    }
-
-    // 호출된 메서드가 정상적으로 작동할 수 없는 경우 처리
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<DataResponse<Void>> handleIllegalStateException(IllegalStateException ex) {
-        DataResponse<Void> errorResponse = DataResponse.of(HttpStatus.CONFLICT.value(), "resource is not available");
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
-    }
-
     // JSON 매핑 요청 처리
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<DataResponse<Void>> handleMalformedJsonException(HttpMessageNotReadableException ex) {

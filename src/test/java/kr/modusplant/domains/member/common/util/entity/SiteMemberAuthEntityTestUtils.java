@@ -1,16 +1,8 @@
-<<<<<<<< HEAD:src/test/java/kr/modusplant/domains/member/common/util/entity/SiteMemberAuthEntityTestUtils.java
 package kr.modusplant.domains.member.common.util.entity;
 
 import static kr.modusplant.domains.member.common.util.domain.SiteMemberAuthTestUtils.*;
 import static kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity.SiteMemberAuthEntityBuilder;
 import static kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity.builder;
-========
-package kr.modusplant.api.crud.member.common.util.entity;
-
-import static kr.modusplant.api.crud.member.common.util.domain.SiteMemberAuthTestUtils.*;
-import static kr.modusplant.api.crud.member.persistence.entity.SiteMemberAuthEntity.SiteMemberAuthEntityBuilder;
-import static kr.modusplant.api.crud.member.persistence.entity.SiteMemberAuthEntity.builder;
->>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/test/java/kr/modusplant/api/crud/member/common/util/entity/SiteMemberAuthEntityTestUtils.java
 
 public interface SiteMemberAuthEntityTestUtils extends SiteMemberEntityTestUtils {
 

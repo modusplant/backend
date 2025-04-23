@@ -1,12 +1,6 @@
-<<<<<<<< HEAD:src/test/java/kr/modusplant/domains/member/common/util/domain/SiteMemberTermTestUtils.java
 package kr.modusplant.domains.member.common.util.domain;
 
 import kr.modusplant.domains.member.domain.model.SiteMemberTerm;
-========
-package kr.modusplant.api.crud.member.common.util.domain;
-
-import kr.modusplant.api.crud.member.domain.model.SiteMemberTerm;
->>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/test/java/kr/modusplant/api/crud/member/common/util/domain/SiteMemberTermTestUtils.java
 
 import static kr.modusplant.global.util.VersionUtils.createVersion;
 

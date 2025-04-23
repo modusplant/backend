@@ -1,18 +1,9 @@
-<<<<<<<< HEAD:src/main/java/kr/modusplant/domains/member/mapper/SiteMemberTermEntityMapper.java
 package kr.modusplant.domains.member.mapper;
 
 import kr.modusplant.domains.member.domain.model.SiteMemberTerm;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberTermEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
-========
-package kr.modusplant.api.crud.member.mapper;
-
-import kr.modusplant.api.crud.member.domain.model.SiteMemberTerm;
-import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.api.crud.member.persistence.entity.SiteMemberTermEntity;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
->>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/main/java/kr/modusplant/api/crud/member/mapper/SiteMemberTermEntityMapper.java
 import org.mapstruct.*;
 
 import java.util.UUID;

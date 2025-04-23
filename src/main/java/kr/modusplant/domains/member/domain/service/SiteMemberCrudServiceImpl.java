@@ -1,4 +1,3 @@
-<<<<<<<< HEAD:src/main/java/kr/modusplant/domains/member/domain/service/SiteMemberCrudServiceImpl.java
 package kr.modusplant.domains.member.domain.service;
 
 import kr.modusplant.domains.member.domain.model.SiteMember;
@@ -7,18 +6,6 @@ import kr.modusplant.domains.member.mapper.SiteMemberEntityMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
-========
-package kr.modusplant.api.crud.member.persistence.service;
-
-import kr.modusplant.api.crud.member.domain.model.SiteMember;
-import kr.modusplant.api.crud.member.domain.service.SiteMemberService;
-import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapper;
-import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapperImpl;
-import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
->>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/main/java/kr/modusplant/api/crud/member/persistence/service/SiteMemberServiceImpl.java
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,3 @@
-<<<<<<<< HEAD:src/test/java/kr/modusplant/domains/member/domain/service/SiteMemberAuthCrudServiceImplTest.java
 package kr.modusplant.domains.member.domain.service;
 
 import kr.modusplant.domains.common.context.DomainServiceOnlyContext;
@@ -19,32 +18,6 @@ import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthCrudJpaRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
-========
-package kr.modusplant.api.crud.member.persistence.service;
-
-import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityNotFoundException;
-import kr.modusplant.api.crud.common.context.CrudServiceOnlyContext;
-import kr.modusplant.api.crud.member.common.util.domain.SiteMemberAuthTestUtils;
-import kr.modusplant.api.crud.member.common.util.domain.SiteMemberTestUtils;
-import kr.modusplant.api.crud.member.common.util.entity.SiteMemberAuthEntityTestUtils;
-import kr.modusplant.api.crud.member.common.util.entity.SiteMemberEntityTestUtils;
-import kr.modusplant.api.crud.member.domain.model.SiteMember;
-import kr.modusplant.api.crud.member.domain.model.SiteMemberAuth;
-import kr.modusplant.api.crud.member.domain.service.SiteMemberAuthService;
-import kr.modusplant.api.crud.member.domain.service.SiteMemberService;
-import kr.modusplant.api.crud.member.enums.AuthProvider;
-import kr.modusplant.api.crud.member.mapper.SiteMemberAuthEntityMapper;
-import kr.modusplant.api.crud.member.mapper.SiteMemberAuthEntityMapperImpl;
-import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapper;
-import kr.modusplant.api.crud.member.mapper.SiteMemberEntityMapperImpl;
-import kr.modusplant.api.crud.member.persistence.entity.SiteMemberAuthEntity;
-import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberAuthJpaRepository;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
->>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/test/java/kr/modusplant/api/crud/member/persistence/service/SiteMemberAuthServiceImplTest.java
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,13 +30,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
-<<<<<<<< HEAD:src/test/java/kr/modusplant/domains/member/domain/service/SiteMemberAuthCrudServiceImplTest.java
 @DomainServiceOnlyContext
 class SiteMemberAuthCrudServiceImplTest implements SiteMemberAuthTestUtils, SiteMemberAuthEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils {
-========
-@CrudServiceOnlyContext
-class SiteMemberAuthServiceImplTest implements SiteMemberAuthTestUtils, SiteMemberAuthEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils {
->>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/test/java/kr/modusplant/api/crud/member/persistence/service/SiteMemberAuthServiceImplTest.java
 
     private final SiteMemberAuthCrudService memberAuthService;
     private final SiteMemberCrudService memberService;

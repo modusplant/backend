@@ -1,12 +1,6 @@
-<<<<<<<< HEAD:src/main/java/kr/modusplant/domains/member/persistence/repository/SiteMemberCrudJpaRepository.java
 package kr.modusplant.domains.member.persistence.repository;
 
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-========
-package kr.modusplant.api.crud.member.persistence.repository;
-
-import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
->>>>>>>> 8263f89 (MP-92 :goal_net: Catch: 응답 구조 상태코드 수정):src/main/java/kr/modusplant/api/crud/member/persistence/repository/SiteMemberJpaRepository.java
 import kr.modusplant.global.persistence.repository.supers.CreatedAtAndLastModifiedAtRepository;
 import kr.modusplant.global.persistence.repository.supers.UuidPrimaryKeyRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
