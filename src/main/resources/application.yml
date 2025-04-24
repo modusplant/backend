@@ -24,14 +24,14 @@ spring:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
 
-# Swagger configuration
+# Default Swagger configuration
 springdoc:
   api-docs:
     enabled: true
   swagger-ui:
     enabled: true
 
-# JWT configuration
+# JWT
 jwt:
   iss: https://app.modusplant.kr
   aud: https://www.modusplant.kr
