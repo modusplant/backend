@@ -1,20 +1,17 @@
 package kr.modusplant.domains.term.app.controller;
 
-import kr.modusplant.domains.term.app.http.request.TermUpdateRequest;
 import kr.modusplant.domains.term.app.http.request.TermInsertRequest;
+import kr.modusplant.domains.term.app.http.request.TermUpdateRequest;
 import kr.modusplant.domains.term.app.http.response.TermResponse;
 import kr.modusplant.domains.term.app.service.TermApplicationService;
 import kr.modusplant.global.app.servlet.response.DataResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import static kr.modusplant.global.vo.ResponseMessage.RESPONSE_MESSAGE_200;
 
 @RestController
 @RequestMapping("/api/crud/terms")
@@ -24,12 +21,12 @@ public class TermController {
 
     @GetMapping
     public ResponseEntity<DataResponse<List<TermResponse>>> getAllTerms() {
-        return ResponseEntity.ok().body(DataResponse.of(HttpStatus.OK.value(), RESPONSE_MESSAGE_200, termApplicationService.getAll()));
+        return ResponseEntity.ok().body(DataResponse.ok(termApplicationService.getAll()));
     }
 
     @GetMapping("/version/{version}")
     public ResponseEntity<DataResponse<List<TermResponse>>> getTermsByVersion(@PathVariable String version) {
-        return ResponseEntity.ok().body(DataResponse.of(HttpStatus.OK.value(), RESPONSE_MESSAGE_200, termApplicationService.getByVersion(version)));
+        return ResponseEntity.ok().body(DataResponse.ok(termApplicationService.getByVersion(version)));
     }
 
     @GetMapping("/{uuid}")
@@ -38,7 +35,7 @@ public class TermController {
         if (optionalTermResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
         }
-        return ResponseEntity.ok().body(DataResponse.of(HttpStatus.OK.value(), RESPONSE_MESSAGE_200, optionalTermResponse.orElseThrow()));
+        return ResponseEntity.ok().body(DataResponse.ok(optionalTermResponse.orElseThrow()));
     }
 
     @GetMapping("/name/{name}")
@@ -47,17 +44,17 @@ public class TermController {
         if (optionalTermResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
         }
-        return ResponseEntity.ok().body(DataResponse.of(HttpStatus.OK.value(), RESPONSE_MESSAGE_200, optionalTermResponse.orElseThrow()));
+        return ResponseEntity.ok().body(DataResponse.ok(optionalTermResponse.orElseThrow()));
     }
 
     @PostMapping
     public ResponseEntity<DataResponse<TermResponse>> insertTerm(@RequestBody TermInsertRequest termInsertRequest) {
-        return ResponseEntity.ok().body(DataResponse.of(HttpStatus.OK.value(), RESPONSE_MESSAGE_200, termApplicationService.insert(termInsertRequest)));
+        return ResponseEntity.ok().body(DataResponse.ok(termApplicationService.insert(termInsertRequest)));
     }
 
     @PostMapping("/{uuid}")
     public ResponseEntity<DataResponse<?>> updateTerm(@RequestBody TermUpdateRequest termUpdateRequest, @RequestParam UUID uuid) {
-        return ResponseEntity.ok().body(DataResponse.of(HttpStatus.OK.value(), RESPONSE_MESSAGE_200, termApplicationService.update(termUpdateRequest, uuid)));
+        return ResponseEntity.ok().body(DataResponse.ok(termApplicationService.update(termUpdateRequest, uuid)));
     }
 
     @DeleteMapping("/{uuid}")
