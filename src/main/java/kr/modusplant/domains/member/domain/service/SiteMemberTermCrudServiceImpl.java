@@ -1,5 +1,3 @@
-<<<<<<<< HEAD:src/main/java/kr/modusplant/domains/member/domain/service/SiteMemberTermCrudServiceImpl.java
-<<<<<<<< HEAD:src/main/java/kr/modusplant/domains/member/domain/service/SiteMemberTermCrudServiceImpl.java
 package kr.modusplant.domains.member.domain.service;
 
 import kr.modusplant.domains.member.domain.model.SiteMember;
@@ -10,23 +8,6 @@ import kr.modusplant.domains.member.mapper.SiteMemberTermEntityMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberTermEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberTermCrudJpaRepository;
-========
-========
->>>>>>>> 4cc54db (MP-145 :truck: Rename: 서비스 및 서비스 구현체 파일 이동):src/main/java/kr/modusplant/api/crud/member/domain/service/SiteMemberTermServiceImpl.java
-package kr.modusplant.api.crud.member.domain.service;
-
-import kr.modusplant.api.crud.member.domain.model.SiteMember;
-import kr.modusplant.api.crud.member.domain.model.SiteMemberTerm;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberTermService;
-import kr.modusplant.api.crud.member.mapper.SiteMemberTermEntityMapper;
-import kr.modusplant.api.crud.member.mapper.SiteMemberTermEntityMapperImpl;
-import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.api.crud.member.persistence.entity.SiteMemberTermEntity;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberTermJpaRepository;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
->>>>>>>> 4cc54db (MP-145 :truck: Rename: 서비스 및 서비스 구현체 파일 이동):src/main/java/kr/modusplant/domains/member/domain/service/supers/SiteMemberTermServiceImpl.java
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;

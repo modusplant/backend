@@ -1,5 +1,3 @@
-<<<<<<<< HEAD:src/main/java/kr/modusplant/domains/member/domain/service/SiteMemberRoleCrudServiceImpl.java
-<<<<<<<< HEAD:src/main/java/kr/modusplant/domains/member/domain/service/SiteMemberRoleCrudServiceImpl.java
 package kr.modusplant.domains.member.domain.service;
 
 import kr.modusplant.domains.member.domain.model.SiteMember;
@@ -10,21 +8,6 @@ import kr.modusplant.domains.member.mapper.SiteMemberRoleEntityMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberRoleEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleCrudJpaRepository;
-========
-========
->>>>>>>> 4cc54db (MP-145 :truck: Rename: 서비스 및 서비스 구현체 파일 이동):src/main/java/kr/modusplant/api/crud/member/domain/service/SiteMemberRoleServiceImpl.java
-package kr.modusplant.api.crud.member.domain.service;
-
-import kr.modusplant.api.crud.member.domain.model.SiteMember;
-import kr.modusplant.api.crud.member.domain.model.SiteMemberRole;
-import kr.modusplant.api.crud.member.domain.service.supers.SiteMemberRoleService;
-import kr.modusplant.api.crud.member.mapper.SiteMemberRoleEntityMapper;
-import kr.modusplant.api.crud.member.mapper.SiteMemberRoleEntityMapperImpl;
-import kr.modusplant.api.crud.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.api.crud.member.persistence.entity.SiteMemberRoleEntity;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberJpaRepository;
-import kr.modusplant.api.crud.member.persistence.repository.SiteMemberRoleJpaRepository;
->>>>>>>> 4cc54db (MP-145 :truck: Rename: 서비스 및 서비스 구현체 파일 이동):src/main/java/kr/modusplant/domains/member/domain/service/supers/SiteMemberRoleServiceImpl.java
 import kr.modusplant.global.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;

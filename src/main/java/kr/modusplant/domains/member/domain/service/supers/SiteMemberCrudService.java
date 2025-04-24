@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:src/main/java/kr/modusplant/domains/member/domain/service/supers/SiteMemberCrudService.java
 package kr.modusplant.domains.member.domain.service.supers;
-========
-package kr.modusplant.api.crud.member.domain.service.supers;
->>>>>>>> 4cc54db (MP-145 :truck: Rename: 서비스 및 서비스 구현체 파일 이동):src/main/java/kr/modusplant/domains/member/domain/service/supers/supers/SiteMemberService.java
 
 import kr.modusplant.domains.commons.domain.supers.UuidCrudService;
 import kr.modusplant.domains.member.domain.model.SiteMember;
