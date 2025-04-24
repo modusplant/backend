@@ -6,8 +6,8 @@ import kr.modusplant.domains.member.domain.service.supers.SiteMemberTermCrudServ
 import kr.modusplant.domains.member.mapper.SiteMemberTermEntityMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberTermEntityMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberTermEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberTermCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberTermRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -22,8 +22,8 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class SiteMemberTermCrudServiceImpl implements SiteMemberTermCrudService {
-    private final SiteMemberTermCrudJpaRepository memberTermRepository;
-    private final SiteMemberCrudJpaRepository memberRepository;
+    private final SiteMemberTermRepository memberTermRepository;
+    private final SiteMemberRepository memberRepository;
     private final SiteMemberTermEntityMapper memberTermEntityMapper = new SiteMemberTermEntityMapperImpl();
 
     @Override

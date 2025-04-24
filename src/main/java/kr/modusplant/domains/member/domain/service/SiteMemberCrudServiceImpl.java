@@ -5,7 +5,7 @@ import kr.modusplant.domains.member.domain.service.supers.SiteMemberCrudService;
 import kr.modusplant.domains.member.mapper.SiteMemberEntityMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SiteMemberCrudServiceImpl implements SiteMemberCrudService {
 
-    private final SiteMemberCrudJpaRepository memberRepository;
+    private final SiteMemberRepository memberRepository;
     private final SiteMemberEntityMapper memberEntityMapper = new SiteMemberEntityMapperImpl();
 
     @Override

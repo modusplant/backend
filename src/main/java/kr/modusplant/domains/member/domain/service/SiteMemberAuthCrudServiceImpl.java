@@ -8,8 +8,8 @@ import kr.modusplant.domains.member.mapper.SiteMemberAuthEntityMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberAuthEntityMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthCrudJpaRepository;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -26,8 +26,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SiteMemberAuthCrudServiceImpl implements SiteMemberAuthCrudService {
 
-    private final SiteMemberAuthCrudJpaRepository memberAuthRepository;
-    private final SiteMemberCrudJpaRepository memberRepository;
+    private final SiteMemberAuthRepository memberAuthRepository;
+    private final SiteMemberRepository memberRepository;
     private final SiteMemberAuthEntityMapper memberAuthEntityMapper = new SiteMemberAuthEntityMapperImpl();
 
     @Override

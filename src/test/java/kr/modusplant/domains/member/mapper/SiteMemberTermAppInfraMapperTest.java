@@ -5,8 +5,8 @@ import kr.modusplant.domains.member.common.util.entity.SiteMemberTermEntityTestU
 import kr.modusplant.domains.member.domain.model.SiteMemberTerm;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberTermEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberTermCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberTermRepository;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,12 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RepositoryOnlyContext
 class SiteMemberTermAppInfraMapperTest implements SiteMemberTermTestUtils, SiteMemberTermEntityTestUtils {
 
-    private final SiteMemberTermCrudJpaRepository memberTermRepository;
-    private final SiteMemberCrudJpaRepository memberRepository;
+    private final SiteMemberTermRepository memberTermRepository;
+    private final SiteMemberRepository memberRepository;
     private final SiteMemberTermEntityMapper memberTermMapper = new SiteMemberTermEntityMapperImpl();
 
     @Autowired
-    SiteMemberTermAppInfraMapperTest(SiteMemberTermCrudJpaRepository memberTermRepository, SiteMemberCrudJpaRepository memberRepository) {
+    SiteMemberTermAppInfraMapperTest(SiteMemberTermRepository memberTermRepository, SiteMemberRepository memberRepository) {
         this.memberTermRepository = memberTermRepository;
         this.memberRepository = memberRepository;
     }

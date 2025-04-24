@@ -15,8 +15,8 @@ import kr.modusplant.domains.member.mapper.SiteMemberRoleEntityMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberRoleEntityMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberRoleEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleRepository;
 import kr.modusplant.global.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,13 +35,13 @@ class SiteMemberRoleCrudServiceImplTest implements SiteMemberRoleTestUtils, Site
 
     private final SiteMemberRoleCrudService memberRoleService;
     private final SiteMemberCrudService memberService;
-    private final SiteMemberRoleCrudJpaRepository memberRoleRepository;
-    private final SiteMemberCrudJpaRepository memberRepository;
+    private final SiteMemberRoleRepository memberRoleRepository;
+    private final SiteMemberRepository memberRepository;
     private final SiteMemberRoleEntityMapper memberRoleMapper = new SiteMemberRoleEntityMapperImpl();
     private final SiteMemberEntityMapper memberMapper = new SiteMemberEntityMapperImpl();
 
     @Autowired
-    SiteMemberRoleCrudServiceImplTest(SiteMemberRoleCrudService memberRoleService, SiteMemberCrudService memberService, SiteMemberRoleCrudJpaRepository memberRoleRepository, SiteMemberCrudJpaRepository memberRepository) {
+    SiteMemberRoleCrudServiceImplTest(SiteMemberRoleCrudService memberRoleService, SiteMemberCrudService memberService, SiteMemberRoleRepository memberRoleRepository, SiteMemberRepository memberRepository) {
         this.memberRoleService = memberRoleService;
         this.memberService = memberService;
         this.memberRoleRepository = memberRoleRepository;

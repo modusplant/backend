@@ -2,8 +2,8 @@ package kr.modusplant.domains.member.domain.service;
 
 import jakarta.persistence.EntityExistsException;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthCrudJpaRepository;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,8 @@ import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class SiteMemberAuthValidationService {
-    private final SiteMemberCrudJpaRepository memberRepository;
-    private final SiteMemberAuthCrudJpaRepository memberAuthRepository;
+    private final SiteMemberRepository memberRepository;
+    private final SiteMemberAuthRepository memberAuthRepository;
 
     public void validateExistedMemberAuthUuid(UUID uuid) {
         if (uuid == null) {

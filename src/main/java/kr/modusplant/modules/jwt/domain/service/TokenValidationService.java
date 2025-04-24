@@ -2,7 +2,7 @@ package kr.modusplant.modules.jwt.domain.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.modules.jwt.domain.service.supers.RefreshTokenCrudService;
 import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
 import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenJpaRepository;
@@ -23,7 +23,7 @@ public class TokenValidationService {
 
     private final RefreshTokenCrudService refreshTokenCrudService;
     private final RefreshTokenJpaRepository tokenRepository;
-    private final SiteMemberCrudJpaRepository memberRepository;
+    private final SiteMemberRepository memberRepository;
 
     public boolean validateNotFoundRefreshToken(String refreshToken) {
         return refreshTokenCrudService.getByRefreshToken(refreshToken).isEmpty();

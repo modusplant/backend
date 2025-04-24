@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.domain.service;
 
 import kr.modusplant.domains.member.persistence.entity.SiteMemberTermEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberTermCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberTermRepository;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class SiteMemberTermValidationService {
-    private final SiteMemberTermCrudJpaRepository memberTermRepository;
+    private final SiteMemberTermRepository memberTermRepository;
 
     public void validateExistedMemberTermUuid(UUID uuid) {
         if (memberTermRepository.findByUuid(uuid).isPresent()) {

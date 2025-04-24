@@ -8,7 +8,7 @@ import kr.modusplant.domains.member.domain.model.SiteMember;
 import kr.modusplant.domains.member.mapper.SiteMemberEntityMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import org.junit.jupiter.api.DisplayName;
@@ -28,11 +28,11 @@ import static org.mockito.BDDMockito.given;
 @DomainServiceOnlyContext
 class SiteMemberValidationServiceTest implements SiteMemberTestUtils, SiteMemberEntityTestUtils {
     private final SiteMemberValidationService memberValidationService;
-    private final SiteMemberCrudJpaRepository memberRepository;
+    private final SiteMemberRepository memberRepository;
     private final SiteMemberEntityMapper memberMapper = new SiteMemberEntityMapperImpl();
 
     @Autowired
-    SiteMemberValidationServiceTest(SiteMemberValidationService memberValidationService, SiteMemberCrudJpaRepository memberRepository) {
+    SiteMemberValidationServiceTest(SiteMemberValidationService memberValidationService, SiteMemberRepository memberRepository) {
         this.memberValidationService = memberValidationService;
         this.memberRepository = memberRepository;
     }

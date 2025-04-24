@@ -3,7 +3,7 @@ package kr.modusplant.domains.member.mapper;
 import kr.modusplant.domains.member.domain.model.SiteMemberRole;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberRoleEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import org.mapstruct.*;
 
 import java.util.UUID;
@@ -14,14 +14,14 @@ import static kr.modusplant.global.vo.CamelCaseWord.MEMBER_ROLE;
 @Mapper
 public interface SiteMemberRoleEntityMapper {
     @BeanMapping
-    default SiteMemberRoleEntity createSiteMemberRoleEntity(SiteMemberRole memberRole, @Context SiteMemberCrudJpaRepository memberRepository) {
+    default SiteMemberRoleEntity createSiteMemberRoleEntity(SiteMemberRole memberRole, @Context SiteMemberRepository memberRepository) {
         return SiteMemberRoleEntity.builder()
                 .member(memberRepository.findByUuid(memberRole.getUuid()).orElseThrow())
                 .role(memberRole.getRole()).build();
     }
 
     @BeanMapping
-    default SiteMemberRoleEntity updateSiteMemberRoleEntity(SiteMemberRole memberRole, @Context SiteMemberCrudJpaRepository memberRepository) {
+    default SiteMemberRoleEntity updateSiteMemberRoleEntity(SiteMemberRole memberRole, @Context SiteMemberRepository memberRepository) {
         return SiteMemberRoleEntity.builder()
                 .member(memberRepository.findByUuid(memberRole.getUuid()).orElseThrow())
                 .role(memberRole.getRole()).build();

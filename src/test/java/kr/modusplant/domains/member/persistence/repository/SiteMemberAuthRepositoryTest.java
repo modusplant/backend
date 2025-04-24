@@ -13,13 +13,13 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
-class SiteMemberAuthCrudJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
+class SiteMemberAuthRepositoryTest implements SiteMemberAuthEntityTestUtils {
 
-    private final SiteMemberAuthCrudJpaRepository memberAuthRepository;
-    private final SiteMemberCrudJpaRepository memberRepository;
+    private final SiteMemberAuthRepository memberAuthRepository;
+    private final SiteMemberRepository memberRepository;
 
     @Autowired
-    SiteMemberAuthCrudJpaRepositoryTest(SiteMemberAuthCrudJpaRepository memberAuthRepository, SiteMemberCrudJpaRepository memberRepository) {
+    SiteMemberAuthRepositoryTest(SiteMemberAuthRepository memberAuthRepository, SiteMemberRepository memberRepository) {
         this.memberAuthRepository = memberAuthRepository;
         this.memberRepository = memberRepository;
     }

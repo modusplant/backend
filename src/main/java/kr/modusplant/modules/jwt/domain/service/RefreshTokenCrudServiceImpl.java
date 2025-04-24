@@ -1,6 +1,6 @@
 package kr.modusplant.modules.jwt.domain.service;
 
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.modules.jwt.domain.service.supers.RefreshTokenCrudService;
 import kr.modusplant.modules.jwt.mapper.entity.RefreshTokenEntityMapper;
@@ -23,7 +23,7 @@ import java.util.UUID;
 public class RefreshTokenCrudServiceImpl implements RefreshTokenCrudService {
 
     private final RefreshTokenJpaRepository tokenRepository;
-    private final SiteMemberCrudJpaRepository memberRepository;
+    private final SiteMemberRepository memberRepository;
     private final RefreshTokenEntityMapper refreshTokenEntityMapper;
 
     @Override

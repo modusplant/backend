@@ -15,8 +15,8 @@ import kr.modusplant.domains.member.mapper.SiteMemberTermEntityMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberTermEntityMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberTermEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberTermCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberTermRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,13 +35,13 @@ class SiteMemberTermCrudServiceImplTest implements SiteMemberTermTestUtils, Site
 
     private final SiteMemberTermCrudService memberTermService;
     private final SiteMemberCrudService memberService;
-    private final SiteMemberTermCrudJpaRepository memberTermRepository;
-    private final SiteMemberCrudJpaRepository memberRepository;
+    private final SiteMemberTermRepository memberTermRepository;
+    private final SiteMemberRepository memberRepository;
     private final SiteMemberTermEntityMapper memberTermMapper = new SiteMemberTermEntityMapperImpl();
     private final SiteMemberEntityMapper memberMapper = new SiteMemberEntityMapperImpl();
 
     @Autowired
-    SiteMemberTermCrudServiceImplTest(SiteMemberTermCrudService memberTermService, SiteMemberCrudService memberService, SiteMemberTermCrudJpaRepository memberTermRepository, SiteMemberCrudJpaRepository memberRepository) {
+    SiteMemberTermCrudServiceImplTest(SiteMemberTermCrudService memberTermService, SiteMemberCrudService memberService, SiteMemberTermRepository memberTermRepository, SiteMemberRepository memberRepository) {
         this.memberTermService = memberTermService;
         this.memberService = memberService;
         this.memberTermRepository = memberTermRepository;

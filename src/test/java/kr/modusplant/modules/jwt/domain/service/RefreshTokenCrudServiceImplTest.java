@@ -7,7 +7,7 @@ import kr.modusplant.domains.member.domain.service.supers.SiteMemberCrudService;
 import kr.modusplant.domains.member.mapper.SiteMemberEntityMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.modules.jwt.common.util.domain.RefreshTokenTestUtils;
 import kr.modusplant.modules.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
@@ -43,7 +43,7 @@ class RefreshTokenCrudServiceImplTest implements RefreshTokenTestUtils, RefreshT
     private RefreshTokenJpaRepository tokenRepository;
 
     @Mock
-    private SiteMemberCrudJpaRepository memberRepository;
+    private SiteMemberRepository memberRepository;
 
     @Spy
     private final RefreshTokenEntityMapper tokenMapper = new RefreshTokenEntityMapperImpl();

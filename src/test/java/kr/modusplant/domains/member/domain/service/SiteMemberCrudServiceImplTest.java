@@ -8,7 +8,7 @@ import kr.modusplant.domains.member.domain.service.supers.SiteMemberCrudService;
 import kr.modusplant.domains.member.mapper.SiteMemberEntityMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +25,11 @@ import static org.mockito.BDDMockito.willDoNothing;
 class SiteMemberCrudServiceImplTest implements SiteMemberTestUtils, SiteMemberEntityTestUtils {
 
     private final SiteMemberCrudService memberService;
-    private final SiteMemberCrudJpaRepository memberRepository;
+    private final SiteMemberRepository memberRepository;
     private final SiteMemberEntityMapper memberMapper = new SiteMemberEntityMapperImpl();
 
     @Autowired
-    SiteMemberCrudServiceImplTest(SiteMemberCrudService memberService, SiteMemberCrudJpaRepository memberRepository) {
+    SiteMemberCrudServiceImplTest(SiteMemberCrudService memberService, SiteMemberRepository memberRepository) {
         this.memberService = memberService;
         this.memberRepository = memberRepository;
     }

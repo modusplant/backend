@@ -14,10 +14,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RepositoryOnlyContext
 class SiteMemberTermRepositoryTest implements SiteMemberTermEntityTestUtils {
 
-    private final SiteMemberTermCrudJpaRepository memberTermRepository;
+    private final SiteMemberTermRepository memberTermRepository;
 
     @Autowired
-    SiteMemberTermRepositoryTest(SiteMemberTermCrudJpaRepository memberTermRepository) {
+    SiteMemberTermRepositoryTest(SiteMemberTermRepository memberTermRepository) {
         this.memberTermRepository = memberTermRepository;
     }
 

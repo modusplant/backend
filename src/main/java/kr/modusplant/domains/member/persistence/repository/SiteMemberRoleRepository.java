@@ -10,6 +10,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface SiteMemberRoleCrudJpaRepository extends SiteMemberUuidPrimaryKeyRepository<SiteMemberRoleEntity>, JpaRepository<SiteMemberRoleEntity, UUID> {
+public interface SiteMemberRoleRepository extends SiteMemberUuidPrimaryKeyRepository<SiteMemberRoleEntity>, JpaRepository<SiteMemberRoleEntity, UUID> {
     List<SiteMemberRoleEntity> findByRole(Role role);
 }

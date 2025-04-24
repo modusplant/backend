@@ -7,7 +7,7 @@ import kr.modusplant.domains.member.domain.model.SiteMember;
 import kr.modusplant.domains.member.mapper.SiteMemberEntityMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import kr.modusplant.modules.jwt.common.util.domain.RefreshTokenTestUtils;
 import kr.modusplant.modules.jwt.common.util.entity.RefreshTokenEntityTestUtils;
@@ -41,7 +41,7 @@ class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenE
     @Mock
     private RefreshTokenJpaRepository tokenRepository;
     @Mock
-    private SiteMemberCrudJpaRepository memberRepository;
+    private SiteMemberRepository memberRepository;
     @InjectMocks
     private TokenValidationService tokenValidationService;
     @Spy

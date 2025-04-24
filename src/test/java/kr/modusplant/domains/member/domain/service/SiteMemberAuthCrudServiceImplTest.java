@@ -16,8 +16,8 @@ import kr.modusplant.domains.member.mapper.SiteMemberEntityMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberEntityMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthCrudJpaRepository;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,13 +35,13 @@ class SiteMemberAuthCrudServiceImplTest implements SiteMemberAuthTestUtils, Site
 
     private final SiteMemberAuthCrudService memberAuthService;
     private final SiteMemberCrudService memberService;
-    private final SiteMemberAuthCrudJpaRepository memberAuthRepository;
-    private final SiteMemberCrudJpaRepository memberRepository;
+    private final SiteMemberAuthRepository memberAuthRepository;
+    private final SiteMemberRepository memberRepository;
     private final SiteMemberAuthEntityMapper memberAuthMapper = new SiteMemberAuthEntityMapperImpl();
     private final SiteMemberEntityMapper memberMapper = new SiteMemberEntityMapperImpl();
 
     @Autowired
-    SiteMemberAuthCrudServiceImplTest(SiteMemberAuthCrudService memberAuthService, SiteMemberCrudService memberService, SiteMemberAuthCrudJpaRepository memberAuthRepository, SiteMemberCrudJpaRepository memberRepository) {
+    SiteMemberAuthCrudServiceImplTest(SiteMemberAuthCrudService memberAuthService, SiteMemberCrudService memberService, SiteMemberAuthRepository memberAuthRepository, SiteMemberRepository memberRepository) {
         this.memberAuthService = memberAuthService;
         this.memberService = memberService;
         this.memberAuthRepository = memberAuthRepository;

@@ -3,7 +3,7 @@ package kr.modusplant.modules.jwt.mapper.entity;
 import kr.modusplant.modules.jwt.common.util.domain.RefreshTokenTestUtils;
 import kr.modusplant.modules.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
 import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenJpaRepository;
@@ -17,12 +17,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @RepositoryOnlyContext
 class RefreshTokenEntityMapperTest implements RefreshTokenTestUtils, RefreshTokenEntityTestUtils {
 
-    private final SiteMemberCrudJpaRepository memberRepository;
+    private final SiteMemberRepository memberRepository;
     private final RefreshTokenJpaRepository refreshTokenRepository;
     private final RefreshTokenEntityMapper refreshTokenMapper = new RefreshTokenEntityMapperImpl();
 
     @Autowired
-    RefreshTokenEntityMapperTest(SiteMemberCrudJpaRepository memberRepository, RefreshTokenJpaRepository refreshTokenRepository) {
+    RefreshTokenEntityMapperTest(SiteMemberRepository memberRepository, RefreshTokenJpaRepository refreshTokenRepository) {
         this.memberRepository = memberRepository;
         this.refreshTokenRepository = refreshTokenRepository;
     }

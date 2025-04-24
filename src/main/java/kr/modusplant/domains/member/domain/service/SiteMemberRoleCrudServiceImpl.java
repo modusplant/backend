@@ -6,8 +6,8 @@ import kr.modusplant.domains.member.domain.service.supers.SiteMemberRoleCrudServ
 import kr.modusplant.domains.member.mapper.SiteMemberRoleEntityMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberRoleEntityMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberRoleEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleRepository;
 import kr.modusplant.global.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -24,8 +24,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SiteMemberRoleCrudServiceImpl implements SiteMemberRoleCrudService {
 
-    private final SiteMemberRoleCrudJpaRepository memberRoleRepository;
-    private final SiteMemberCrudJpaRepository memberRepository;
+    private final SiteMemberRoleRepository memberRoleRepository;
+    private final SiteMemberRepository memberRepository;
     private final SiteMemberRoleEntityMapper memberRoleEntityMapper = new SiteMemberRoleEntityMapperImpl();
 
     @Override

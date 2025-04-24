@@ -9,8 +9,8 @@ import kr.modusplant.domains.member.common.util.entity.SiteMemberAuthEntityTestU
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthCrudJpaRepository;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import org.junit.jupiter.api.DisplayName;
@@ -32,11 +32,11 @@ import static org.mockito.BDDMockito.given;
 class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, SiteMemberAuthEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils {
 
     private final SiteMemberAuthValidationService memberAuthValidationService;
-    private final SiteMemberAuthCrudJpaRepository memberAuthRepository;
-    private final SiteMemberCrudJpaRepository memberRepository;
+    private final SiteMemberAuthRepository memberAuthRepository;
+    private final SiteMemberRepository memberRepository;
 
     @Autowired
-    SiteMemberAuthValidationServiceTest(SiteMemberAuthValidationService memberAuthValidationService, SiteMemberAuthCrudJpaRepository memberAuthRepository, SiteMemberCrudJpaRepository memberRepository) {
+    SiteMemberAuthValidationServiceTest(SiteMemberAuthValidationService memberAuthValidationService, SiteMemberAuthRepository memberAuthRepository, SiteMemberRepository memberRepository) {
         this.memberAuthValidationService = memberAuthValidationService;
         this.memberAuthRepository = memberAuthRepository;
         this.memberRepository = memberRepository;

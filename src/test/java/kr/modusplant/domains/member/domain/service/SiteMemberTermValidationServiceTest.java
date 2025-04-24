@@ -12,8 +12,8 @@ import kr.modusplant.domains.member.mapper.SiteMemberTermEntityMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberTermEntityMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberTermEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberTermCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberTermRepository;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import org.junit.jupiter.api.DisplayName;
@@ -33,12 +33,12 @@ import static org.mockito.BDDMockito.given;
 @DomainServiceOnlyContext
 class SiteMemberTermValidationServiceTest implements SiteMemberTermTestUtils, SiteMemberTermEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils {
     private final SiteMemberTermValidationService memberTermValidationService;
-    private final SiteMemberTermCrudJpaRepository memberTermRepository;
-    private final SiteMemberCrudJpaRepository memberRepository;
+    private final SiteMemberTermRepository memberTermRepository;
+    private final SiteMemberRepository memberRepository;
     private final SiteMemberTermEntityMapper memberTermMapper = new SiteMemberTermEntityMapperImpl();
 
     @Autowired
-    SiteMemberTermValidationServiceTest(SiteMemberTermValidationService memberTermValidationService, SiteMemberTermCrudJpaRepository memberTermRepository, SiteMemberCrudJpaRepository memberRepository) {
+    SiteMemberTermValidationServiceTest(SiteMemberTermValidationService memberTermValidationService, SiteMemberTermRepository memberTermRepository, SiteMemberRepository memberRepository) {
         this.memberTermValidationService = memberTermValidationService;
         this.memberTermRepository = memberTermRepository;
         this.memberRepository = memberRepository;

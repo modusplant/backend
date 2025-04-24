@@ -3,7 +3,7 @@ package kr.modusplant.domains.member.mapper;
 import kr.modusplant.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import org.mapstruct.*;
 
 import java.util.UUID;
@@ -14,7 +14,7 @@ import static kr.modusplant.global.vo.CamelCaseWord.*;
 public interface SiteMemberAuthEntityMapper {
     @BeanMapping(ignoreByDefault = true)
     default SiteMemberAuthEntity createSiteMemberAuthEntity(SiteMemberAuth memberAuth,
-                                                            @Context SiteMemberCrudJpaRepository memberRepository) {
+                                                            @Context SiteMemberRepository memberRepository) {
         return SiteMemberAuthEntity.builder()
                 .activeMember(memberRepository.findByUuid(memberAuth.getActiveMemberUuid()).orElseThrow())
                 .originalMember(memberRepository.findByUuid(memberAuth.getOriginalMemberUuid()).orElseThrow())
@@ -29,7 +29,7 @@ public interface SiteMemberAuthEntityMapper {
 
     @BeanMapping(ignoreByDefault = true)
     default SiteMemberAuthEntity updateSiteMemberAuthEntity(SiteMemberAuth memberAuth,
-                                                            @Context SiteMemberCrudJpaRepository memberRepository) {
+                                                            @Context SiteMemberRepository memberRepository) {
         return SiteMemberAuthEntity.builder()
                 .uuid(memberAuth.getUuid())
                 .activeMember(memberRepository.findByUuid(memberAuth.getActiveMemberUuid()).orElseThrow())
