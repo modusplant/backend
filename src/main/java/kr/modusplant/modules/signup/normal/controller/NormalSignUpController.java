@@ -13,9 +13,9 @@ import kr.modusplant.domains.member.domain.service.supers.SiteMemberCrudService;
 import kr.modusplant.domains.member.domain.service.supers.SiteMemberTermCrudService;
 import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.domains.term.domain.model.Term;
-import kr.modusplant.domains.term.domain.service.supers.TermCrudService;
 import kr.modusplant.global.app.servlet.response.DataResponse;
 import kr.modusplant.modules.signup.normal.model.request.NormalSignUpRequest;
+import kr.modusplant.modules.signup.normal.service.NormalSignUpApplicationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -36,7 +36,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class NormalSignUpController {
 
-    private final TermCrudService termCrudService;
+    private final NormalSignUpApplicationService normalSignUpApplicationService;
+
     private final SiteMemberTermCrudService siteMemberTermCrudService;
     private final SiteMemberAuthCrudService siteMemberAuthCrudService;
     private final SiteMemberCrudService siteMemberCrudService;
@@ -55,19 +56,10 @@ public class NormalSignUpController {
 
         try {
 
-            List<Map<String, Object>> terms = termCrudService.getAll()
-                    .stream()
-                    .filter(term -> {
-                        String termKey = term.getName();
+            List<Term> terms = normalSignUpApplicationService.getAllTerms();
+            List<Map<String, Object>> termMapList = normalSignUpApplicationService.createTermMapList(terms);
 
-                        return termKey.equals("이용약관") ||
-                                termKey.equals("개인정보처리방침") ||
-                                termKey.equals("광고성 정보 수신");
-                    })
-                    .map(this::createTermMap)
-                    .toList();
-
-            DataResponse<List<Map<String, Object>>> successDataResponse = DataResponse.of(200, "terms info successfully fetched", terms);
+            DataResponse<List<Map<String, Object>>> successDataResponse = DataResponse.of(200, "terms info successfully fetched", termMapList);
 
             return ResponseEntity.ok(successDataResponse);
 
@@ -132,17 +124,6 @@ public class NormalSignUpController {
             return ResponseEntity.ok(errorDataResponse);
         }
 
-    }
-
-    private Map<String, Object> createTermMap(Term term) {
-        String mapKey = switch (term.getName()) {
-            case ("개인정보처리방침") -> "privacyPolicy";
-            case ("이용약관") -> "termsOfUse";
-            case ("광고성 정보 수신") -> "adInfoReceiving";
-            default -> "unKnownTerm";
-        };
-
-        return Map.of(mapKey, term);
     }
 
     @Transactional
