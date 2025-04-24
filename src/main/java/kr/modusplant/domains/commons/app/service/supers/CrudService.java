@@ -1,4 +1,4 @@
-package kr.modusplant.domains.commons.domain.supers;
+package kr.modusplant.domains.commons.app.service.supers;
 
 import java.util.List;
 

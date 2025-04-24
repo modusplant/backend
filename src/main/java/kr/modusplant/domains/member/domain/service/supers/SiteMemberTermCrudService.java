@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.domain.service.supers;
 
-import kr.modusplant.domains.commons.domain.supers.UuidCrudService;
+import kr.modusplant.domains.commons.app.service.supers.UuidCrudService;
 import kr.modusplant.domains.member.domain.model.SiteMember;
 import kr.modusplant.domains.member.domain.model.SiteMemberTerm;
 

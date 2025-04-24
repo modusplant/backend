@@ -1,6 +1,6 @@
 package kr.modusplant.domains.term.domain.service.supers;
 
-import kr.modusplant.domains.commons.domain.supers.UuidCrudService;
+import kr.modusplant.domains.commons.app.service.supers.UuidCrudService;
 import kr.modusplant.domains.term.domain.model.Term;
 
 import java.util.List;

@@ -54,7 +54,8 @@ public class NormalSignUpController {
     public ResponseEntity<DataResponse<?>> sendTerms(){
 
         try {
-            List<Map<String, Object>> termMapList = termCrudService.getAll()
+
+            List<Map<String, Object>> terms = termCrudService.getAll()
                     .stream()
                     .filter(term -> {
                         String termKey = term.getName();
@@ -66,7 +67,7 @@ public class NormalSignUpController {
                     .map(this::createTermMap)
                     .toList();
 
-            DataResponse<List<Map<String, Object>>> successDataResponse = DataResponse.of(200, "terms info successfully fetched", termMapList);
+            DataResponse<List<Map<String, Object>>> successDataResponse = DataResponse.of(200, "terms info successfully fetched", terms);
 
             return ResponseEntity.ok(successDataResponse);
 
