@@ -31,14 +31,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @DomainServiceOnlyContext
-class SiteMemberTermApplicationValidationHelperTest implements SiteMemberTermTestUtils, SiteMemberTermEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils {
+class SiteMemberTermValidationServiceTest implements SiteMemberTermTestUtils, SiteMemberTermEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils {
     private final SiteMemberTermValidationService memberTermValidationService;
     private final SiteMemberTermCrudJpaRepository memberTermRepository;
     private final SiteMemberCrudJpaRepository memberRepository;
     private final SiteMemberTermEntityMapper memberTermMapper = new SiteMemberTermEntityMapperImpl();
 
     @Autowired
-    SiteMemberTermApplicationValidationHelperTest(SiteMemberTermValidationService memberTermValidationService, SiteMemberTermCrudJpaRepository memberTermRepository, SiteMemberCrudJpaRepository memberRepository) {
+    SiteMemberTermValidationServiceTest(SiteMemberTermValidationService memberTermValidationService, SiteMemberTermCrudJpaRepository memberTermRepository, SiteMemberCrudJpaRepository memberRepository) {
         this.memberTermValidationService = memberTermValidationService;
         this.memberTermRepository = memberTermRepository;
         this.memberRepository = memberRepository;

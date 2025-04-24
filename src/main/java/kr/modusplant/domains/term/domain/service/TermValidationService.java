@@ -1,4 +1,4 @@
-package kr.modusplant.domains.term.app.service;
+package kr.modusplant.domains.term.domain.service;
 
 import jakarta.persistence.EntityExistsException;
 import kr.modusplant.domains.term.persistence.entity.TermEntity;
@@ -18,7 +18,7 @@ import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class TermApplicationValidationHelper {
+public class TermValidationService {
 
     private final TermRepository termRepository;
 

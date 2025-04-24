@@ -3,7 +3,6 @@ package kr.modusplant.domains.term.domain.service;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.domains.common.context.DomainServiceOnlyContext;
-import kr.modusplant.domains.term.app.service.TermApplicationValidationHelper;
 import kr.modusplant.domains.term.common.app.http.response.TermResponseTestUtils;
 import kr.modusplant.domains.term.common.util.entity.TermEntityTestUtils;
 import kr.modusplant.domains.term.persistence.entity.TermEntity;
@@ -26,14 +25,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @DomainServiceOnlyContext
-class TermApplicationValidationHelperTest implements TermResponseTestUtils, TermEntityTestUtils {
+class TermValidationServiceTest implements TermResponseTestUtils, TermEntityTestUtils {
 
-    private final TermApplicationValidationHelper termApplicationValidationHelper;
+    private final TermValidationService termValidationService;
     private final TermRepository termRepository;
 
     @Autowired
-    TermApplicationValidationHelperTest(TermApplicationValidationHelper termApplicationValidationHelper, TermRepository termRepository) {
-        this.termApplicationValidationHelper = termApplicationValidationHelper;
+    TermValidationServiceTest(TermValidationService termValidationService, TermRepository termRepository) {
+        this.termValidationService = termValidationService;
         this.termRepository = termRepository;
     }
 
@@ -49,7 +48,7 @@ class TermApplicationValidationHelperTest implements TermResponseTestUtils, Term
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsWithUuidException.class,
-                () -> termApplicationValidationHelper.validateExistedUuid(termEntityUuid));
+                () -> termValidationService.validateExistedUuid(termEntityUuid));
         assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
                 EXISTED_ENTITY, "uuid", termEntityUuid, TermEntity.class));
     }
@@ -67,7 +66,7 @@ class TermApplicationValidationHelperTest implements TermResponseTestUtils, Term
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
-                () -> termApplicationValidationHelper.validateExistedName(termEntity.getName()));
+                () -> termValidationService.validateExistedName(termEntity.getName()));
         assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
                 EXISTED_ENTITY, NAME, termEntity.getName(), TermEntity.class));
     }
@@ -83,7 +82,7 @@ class TermApplicationValidationHelperTest implements TermResponseTestUtils, Term
 
         // then
         EntityNotFoundException existsException = assertThrows(EntityNotFoundWithUuidException.class,
-                () -> termApplicationValidationHelper.validateNotFoundUuid(termEntityUuid));
+                () -> termValidationService.validateNotFoundUuid(termEntityUuid));
         assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
                 NOT_FOUND_ENTITY, "uuid", termEntityUuid, TermEntity.class));
     }

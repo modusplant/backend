@@ -3,6 +3,7 @@ package kr.modusplant.domains.term.app.service;
 import kr.modusplant.domains.term.app.http.request.TermInsertRequest;
 import kr.modusplant.domains.term.app.http.request.TermUpdateRequest;
 import kr.modusplant.domains.term.app.http.response.TermResponse;
+import kr.modusplant.domains.term.domain.service.TermValidationService;
 import kr.modusplant.domains.term.mapper.TermAppInfraMapper;
 import kr.modusplant.domains.term.mapper.TermAppInfraMapperImpl;
 import kr.modusplant.domains.term.persistence.entity.TermEntity;
@@ -20,7 +21,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TermApplicationService {
 
-    private final TermApplicationValidationHelper validationHelper;
+    private final TermValidationService validationService;
     private final TermRepository termRepository;
     private final TermAppInfraMapper termAppInfraMapper = new TermAppInfraMapperImpl();
 
@@ -44,13 +45,13 @@ public class TermApplicationService {
 
     @Transactional
     public TermResponse insert(TermInsertRequest termInsertRequest) {
-        validationHelper.validateExistedName(termInsertRequest.name());
+        validationService.validateExistedName(termInsertRequest.name());
         return termAppInfraMapper.toTermResponse(termRepository.save(termAppInfraMapper.toTermEntity(termInsertRequest)));
     }
 
     @Transactional
     public TermResponse update(TermUpdateRequest termUpdateRequest, UUID uuid) {
-        validationHelper.validateNotFoundUuid(uuid);
+        validationService.validateNotFoundUuid(uuid);
         TermEntity termEntity = termRepository.findByUuid(uuid).orElseThrow();
         termEntity.updateContent(termUpdateRequest.content());
         termEntity.updateVersion(termUpdateRequest.version());
@@ -59,7 +60,7 @@ public class TermApplicationService {
 
     @Transactional
     public void removeByUuid(UUID uuid) {
-        validationHelper.validateNotFoundUuid(uuid);
+        validationService.validateNotFoundUuid(uuid);
         termRepository.deleteByUuid(uuid);
     }
 }
