@@ -53,8 +53,8 @@ public class TermController {
     }
 
     @PostMapping("/{uuid}")
-    public ResponseEntity<DataResponse<?>> updateTerm(@RequestBody TermUpdateRequest termUpdateRequest, @RequestParam UUID uuid) {
-        return ResponseEntity.ok().body(DataResponse.ok(termApplicationService.update(termUpdateRequest, uuid)));
+    public ResponseEntity<DataResponse<?>> updateTerm(@RequestBody TermUpdateRequest termUpdateRequest) {
+        return ResponseEntity.ok().body(DataResponse.ok(termApplicationService.update(termUpdateRequest)));
     }
 
     @DeleteMapping("/{uuid}")

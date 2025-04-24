@@ -50,7 +50,8 @@ public class TermApplicationService {
     }
 
     @Transactional
-    public TermResponse update(TermUpdateRequest termUpdateRequest, UUID uuid) {
+    public TermResponse update(TermUpdateRequest termUpdateRequest) {
+        UUID uuid = termUpdateRequest.uuid();
         validationService.validateNotFoundUuid(uuid);
         TermEntity termEntity = termRepository.findByUuid(uuid).orElseThrow();
         termEntity.updateContent(termUpdateRequest.content());

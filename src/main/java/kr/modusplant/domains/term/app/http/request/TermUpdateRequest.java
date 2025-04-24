@@ -1,4 +1,6 @@
 package kr.modusplant.domains.term.app.http.request;
 
-public record TermUpdateRequest(String content, String version) {
+import java.util.UUID;
+
+public record TermUpdateRequest(UUID uuid, String content, String version) {
 }
