@@ -12,5 +12,5 @@ public interface TermAppInfraMapper {
     @Mapping(target = "uuid", ignore = true)
     TermEntity toTermEntity(TermInsertRequest termInsertRequest);
 
-    TermResponse toTermResponse(TermEntity TermEntity);
+    TermResponse toTermResponse(TermEntity termEntity);
 }
