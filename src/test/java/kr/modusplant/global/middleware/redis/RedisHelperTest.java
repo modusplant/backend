@@ -1,5 +1,6 @@
-package kr.modusplant.global.util;
+package kr.modusplant.global.middleware.redis;
 
+import kr.modusplant.global.middleware.redis.RedisHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,21 +10,20 @@ import java.time.Duration;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class RedisUtilTest {
+class RedisHelperTest {
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisHelper redisHelper;
 
     @Test
     void testSetAndGetString() {
         String stringKey = "test:string";
         String stringValue = "stringValue";
 
-        redisUtil.setString(stringKey, stringValue, Duration.ofSeconds(10));
+        redisHelper.setString(stringKey, stringValue, Duration.ofSeconds(10));
 
-        Optional<String> result = redisUtil.getString(stringKey);
+        Optional<String> result = redisHelper.getString(stringKey);
         assertThat(result).isPresent().contains(stringValue);
     }
 
@@ -32,9 +32,9 @@ class RedisUtilTest {
         String objectKey = "test:object";
         TestDto objectValue = new TestDto("John",30);
 
-        redisUtil.setObject(objectKey, objectValue, Duration.ofSeconds(10));
+        redisHelper.setObject(objectKey, objectValue, Duration.ofSeconds(10));
 
-        Optional<TestDto> result = redisUtil.getObject(objectKey, TestDto.class);
+        Optional<TestDto> result = redisHelper.getObject(objectKey, TestDto.class);
         assertThat(result).isPresent();
         assertThat(result.get().getName()).isEqualTo(objectValue.getName());
         assertThat(result.get().getAge()).isEqualTo(objectValue.getAge());
@@ -45,11 +45,11 @@ class RedisUtilTest {
         String deleteKey = "test:delete";
         String deleteValue = "deleteValue";
 
-        redisUtil.setString(deleteKey,deleteValue, Duration.ofSeconds(10));
-        assertThat(redisUtil.exists(deleteKey)).isTrue();
+        redisHelper.setString(deleteKey,deleteValue, Duration.ofSeconds(10));
+        assertThat(redisHelper.exists(deleteKey)).isTrue();
 
-        redisUtil.delete(deleteKey);
-        assertThat(redisUtil.exists(deleteKey)).isFalse();
+        redisHelper.delete(deleteKey);
+        assertThat(redisHelper.exists(deleteKey)).isFalse();
     }
 
     @Test
@@ -57,15 +57,15 @@ class RedisUtilTest {
         String expireKey = "test:expire";
         String expireValue = "expireValue";
 
-        redisUtil.setString(expireKey, expireValue, Duration.ofSeconds(5));
+        redisHelper.setString(expireKey, expireValue, Duration.ofSeconds(5));
         Thread.sleep(2000);
 
-        Optional<Duration> ttl = redisUtil.getTTL(expireKey);
+        Optional<Duration> ttl = redisHelper.getTTL(expireKey);
         assertThat(ttl).isPresent();
         assertThat(ttl.get().getSeconds()).isLessThan(5).isGreaterThan(1);
 
-        redisUtil.expire(expireKey, Duration.ofSeconds(10));
-        Optional<Duration> ttl2 = redisUtil.getTTL(expireKey);
+        redisHelper.expire(expireKey, Duration.ofSeconds(10));
+        Optional<Duration> ttl2 = redisHelper.getTTL(expireKey);
         assertThat(ttl2).isPresent();
         assertThat(ttl2.get().getSeconds()).isGreaterThan(5);
     }

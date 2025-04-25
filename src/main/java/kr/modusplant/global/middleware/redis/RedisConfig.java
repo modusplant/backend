@@ -1,4 +1,4 @@
-package kr.modusplant.global.config;
+package kr.modusplant.global.middleware.redis;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
