@@ -4,3 +4,6 @@ spring:
     properties:
       hibernate:
         default_schema: ${DB_MAIN_SCHEMA}
+security:
+  debug:
+    enabled: false
