@@ -1,6 +1,5 @@
 package kr.modusplant.global.advice;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,19 +12,13 @@ import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 public class GlobalExceptionHandlerUnitTest {
-
-    private final ObjectMapper ㄴㄴobjectMapper = new ObjectMapper();
 
     @InjectMocks
     private GlobalExceptionHandler globalExceptionHandler;
@@ -98,10 +91,6 @@ public class GlobalExceptionHandlerUnitTest {
     public void handleValidationException_givenValidCondition_thenReturnProblemDetail() {
         // given
         MethodArgumentNotValidException ex = mock(MethodArgumentNotValidException.class);
-
-        List<FieldError> fieldErrorList = new ArrayList<>();
-        fieldErrorList.add(new FieldError("SiteMemberEntity", "isActive", "isActive must not be null"));
-        fieldErrorList.add(new FieldError("SiteMemberEntity", "nickname", "nickname must not be null"));
 
         // when
         ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleValidationException(ex);
