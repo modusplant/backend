@@ -42,29 +42,13 @@ public class NormalSignUpController {
     @GetMapping("/api/terms")
     public ResponseEntity<DataResponse<?>> sendTerms(){
 
-        try {
-
             List<Term> terms = normalSignUpApplicationService.getAllTerms();
             List<Map<String, Object>> termMapList = normalSignUpApplicationService.createTermMapList(terms);
 
-            DataResponse<List<Map<String, Object>>> successDataResponse = DataResponse.of(200, "terms info successfully fetched", termMapList);
+            DataResponse<List<Map<String, Object>>> successDataResponse =
+                    DataResponse.of(200, "terms info successfully fetched", termMapList);
 
             return ResponseEntity.ok(successDataResponse);
-
-        } catch (Exception e) {
-            log.info("Exception occurs in sendTerms. Content: ", e);
-
-            String exceptionMessage = "error while getting data";
-            if(e instanceof EmptyResultDataAccessException) {
-                exceptionMessage = "error related to SQL";
-            } else if (e instanceof IllegalStateException) {
-                exceptionMessage = "invalid database state";
-            }
-
-            DataResponse<Void> errorDataResponse = DataResponse.of(500, exceptionMessage);
-
-            return ResponseEntity.ok(errorDataResponse);
-        }
     }
 
     @Operation(
@@ -78,29 +62,10 @@ public class NormalSignUpController {
     @PostMapping("/api/members/register")
     public ResponseEntity<DataResponse<Void>> saveMember(@RequestBody NormalSignUpRequest memberData) {
 
-        try {
-                normalSignUpApplicationService.insertMember(memberData);
-                DataResponse<Void> successDataResponse = DataResponse.of(200, "sign up successfully");
+        normalSignUpApplicationService.insertMember(memberData);
+        DataResponse<Void> successDataResponse = DataResponse.of(200, "sign up successfully");
 
-                return ResponseEntity.ok(successDataResponse);
-        } catch (Exception e) {
-            String exceptionMessage = "";
-
-            switch (e) {
-                case JsonParseException jsonParseException -> exceptionMessage = "parsing json string failed";
-                case UnrecognizedPropertyException unrecognizedPropertyException ->
-                        exceptionMessage = "json property not found";
-                case InvalidDataAccessResourceUsageException invalidDataAccessResourceUsageException ->
-                        exceptionMessage = "invalid table or column name";
-                case DataIntegrityViolationException dataIntegrityViolationException ->
-                        exceptionMessage = "data constraints validated";
-                default -> exceptionMessage = "error while saving member";
-            }
-
-            DataResponse<Void> errorDataResponse = DataResponse.of(500, exceptionMessage);
-
-            return ResponseEntity.ok(errorDataResponse);
-        }
+        return ResponseEntity.ok(successDataResponse);
 
     }
 
