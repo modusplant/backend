@@ -1,4 +1,4 @@
-package kr.modusplant.global.util;
+package kr.modusplant.global.middleware.redis;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class RedisUtil {
+public class RedisHelper {
     private final StringRedisTemplate stringRedisTemplate;
     private final RedisTemplate<String, Object> redisTemplate;
 
