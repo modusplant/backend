@@ -16,8 +16,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
-import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
-import static kr.modusplant.global.vo.ExceptionMessage.NOT_FOUND_ENTITY;
+import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
+import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -47,7 +47,7 @@ class SiteMemberValidationServiceTest implements SiteMemberTestUtils, SiteMember
         EntityExistsWithUuidException existsException = assertThrows(EntityExistsWithUuidException.class,
                 () -> memberValidationService.validateExistedUuid(memberEntity.getUuid()));
         assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                EXISTED_ENTITY, "uuid", memberEntityUuid, SiteMemberEntity.class));
+                EXISTED_ENTITY.getValue(), "uuid", memberEntityUuid, SiteMemberEntity.class));
     }
 
     @DisplayName("존재하지 않는 회원 UUID 검증")
@@ -64,6 +64,6 @@ class SiteMemberValidationServiceTest implements SiteMemberTestUtils, SiteMember
         EntityNotFoundException notFoundException = assertThrows(EntityNotFoundWithUuidException.class,
                 () -> memberValidationService.validateNotFoundUuid(memberEntityUuid));
         assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY, "uuid", memberEntityUuid, SiteMemberEntity.class));
+                NOT_FOUND_ENTITY.getValue(), "uuid", memberEntityUuid, SiteMemberEntity.class));
     }
 }

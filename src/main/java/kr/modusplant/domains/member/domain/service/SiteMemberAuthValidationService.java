@@ -14,7 +14,7 @@ import java.util.UUID;
 
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 import static kr.modusplant.global.vo.CamelCaseWord.ORIGINAL_MEMBER_UUID;
-import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
+import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
 
 @Service
 @Transactional(readOnly = true)
@@ -34,7 +34,7 @@ public class SiteMemberAuthValidationService {
 
     public void validateExistedOriginalMemberUuid(UUID uuid) {
         if (memberAuthRepository.findByOriginalMember(memberRepository.findByUuid(uuid).orElseThrow()).isPresent()) {
-            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY, ORIGINAL_MEMBER_UUID, uuid, SiteMemberAuthEntity.class));
+            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), ORIGINAL_MEMBER_UUID, uuid, SiteMemberAuthEntity.class));
         }
     }
 

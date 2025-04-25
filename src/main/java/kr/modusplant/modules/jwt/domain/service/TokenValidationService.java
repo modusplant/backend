@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
-import static kr.modusplant.global.vo.ExceptionMessage.NOT_FOUND_ENTITY;
+import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
 
 @Service
 @Transactional(readOnly = true)
@@ -35,7 +35,7 @@ public class TokenValidationService {
 
     public void validateNotFoundMemberUuid(String name, UUID memberUuid) {
         if (memberUuid == null || memberRepository.findByUuid(memberUuid).isEmpty()) {
-            throw new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY, name, memberUuid, SiteMemberEntity.class));
+            throw new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), name, memberUuid, SiteMemberEntity.class));
         }
     }
 

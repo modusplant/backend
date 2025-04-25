@@ -13,7 +13,7 @@ import java.util.UUID;
 
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 import static kr.modusplant.global.vo.CamelCaseWord.NAME;
-import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
+import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
 
 @Service
 @Transactional(readOnly = true)
@@ -33,7 +33,7 @@ public class TermValidationService {
 
     public void validateExistedName(String name) {
         if (termRepository.findByName(name).isPresent()) {
-            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY, NAME, name, TermEntity.class));
+            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), NAME, name, TermEntity.class));
         }
     }
 
