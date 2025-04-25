@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-import static kr.modusplant.global.vo.ResponseMessage.RESPONSE_MESSAGE_200;
+import static kr.modusplant.global.enums.ResponseMessage.RESPONSE_MESSAGE_200;
 
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -34,14 +34,14 @@ public class DataResponse<T> {
     public static DataResponse<Void> ok() {
         DataResponse<Void> response = new DataResponse<>();
         response.status = HttpStatus.OK.value();
-        response.message = RESPONSE_MESSAGE_200;
+        response.message = RESPONSE_MESSAGE_200.getValue();
         return response;
     }
 
     public static <T> DataResponse<T> ok(T data) {
         DataResponse<T> response = new DataResponse<>();
         response.status = HttpStatus.OK.value();
-        response.message = RESPONSE_MESSAGE_200;
+        response.message = RESPONSE_MESSAGE_200.getValue();
         response.data = data;
         return response;
     }
