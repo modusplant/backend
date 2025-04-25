@@ -79,16 +79,10 @@ public class NormalSignUpController {
     public ResponseEntity<DataResponse<Void>> saveMember(@RequestBody NormalSignUpRequest memberData) {
 
         try {
-            if(memberData.pw().equals(memberData.pw_check())) {
                 normalSignUpApplicationService.insertMember(memberData);
                 DataResponse<Void> successDataResponse = DataResponse.of(200, "sign up successfully");
 
                 return ResponseEntity.ok(successDataResponse);
-            } else {
-                DataResponse<Void> errorDataResponse = DataResponse.of(400, "pw and pw_check not equivalent");
-
-                return ResponseEntity.ok(errorDataResponse);
-            }
         } catch (Exception e) {
             String exceptionMessage = "";
 
