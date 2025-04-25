@@ -1,4 +1,4 @@
-package kr.modusplant.global.persistence.repository.supers;
+package kr.modusplant.domains.commons.persistence.repository.supers;
 
 import java.util.Optional;
 import java.util.UUID;
