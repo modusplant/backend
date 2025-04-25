@@ -31,7 +31,7 @@ class SiteMemberAuthAppInfraMapperTest implements SiteMemberAuthRequestTestUtils
     void toSiteMemberAuthResponseTest() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
+        SiteMemberAuthEntity memberAuthEntity = this.createMemberAuthBasicUserEntityBuilder().originalMember(memberEntity).activeMember(memberEntity).build();
 
         // when
         SiteMemberAuthResponse memberAuthResponse = memberAuthMapper.toMemberAuthResponse(memberAuthEntity);

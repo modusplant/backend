@@ -4,5 +4,5 @@ import kr.modusplant.domains.member.enums.AuthProvider;
 
 import java.util.UUID;
 
-public record SiteMemberAuthResponse(UUID uuid, UUID activeMemberUuid, UUID originalMemberUuid, String email, AuthProvider provider) {
+public record SiteMemberAuthResponse(UUID originalMemberUuid, UUID activeMemberUuid, String email, AuthProvider provider) {
 }

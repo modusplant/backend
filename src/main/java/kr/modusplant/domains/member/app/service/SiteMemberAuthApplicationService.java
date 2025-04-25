@@ -10,6 +10,7 @@ import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.domains.member.mapper.SiteMemberAuthAppInfraMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberAuthAppInfraMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
+import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,8 +39,8 @@ public class SiteMemberAuthApplicationService implements UuidCrudApplicationServ
         return memberAuthRepository.findAll().stream().map(memberAuthAppInfraMapper::toMemberAuthResponse).toList();
     }
 
-    public List<SiteMemberAuthResponse> getByActiveMemberUuid(UUID activeMemberUuid) {
-        return memberAuthRepository.findByActiveMember(memberRepository.findByUuid(activeMemberUuid)
+    public List<SiteMemberAuthResponse> getByActiveMember(SiteMemberEntity activeMemberEntity) {
+        return memberAuthRepository.findByActiveMember(memberRepository.findByUuid(activeMemberEntity.getUuid())
                 .orElseThrow()).stream().map(memberAuthAppInfraMapper::toMemberAuthResponse).toList();
     }
 
@@ -59,17 +60,16 @@ public class SiteMemberAuthApplicationService implements UuidCrudApplicationServ
         return memberAuthRepository.findByFailedAttempt(failedAttempt).stream().map(memberAuthAppInfraMapper::toMemberAuthResponse).toList();
     }
 
-    @Override
     public Optional<SiteMemberAuthResponse> getByUuid(UUID uuid) {
         Optional<SiteMemberAuthEntity> memberAuthOrEmpty = memberAuthRepository.findByUuid(uuid);
         return memberAuthOrEmpty.isEmpty() ? Optional.empty() : Optional.of(memberAuthAppInfraMapper.toMemberAuthResponse(memberAuthOrEmpty.orElseThrow()));
     }
 
-    public Optional<SiteMemberAuthResponse> getByOriginalMemberUuid(UUID originalMemberUuid) {
-        Optional<SiteMemberAuthEntity> memberAuthOrEmpty = memberAuthRepository.findByOriginalMember(
-                memberRepository.findByUuid(originalMemberUuid).orElseThrow());
+    public Optional<SiteMemberAuthResponse> getByOriginalMember(SiteMemberEntity memberEntity) {
+        Optional<SiteMemberAuthEntity> memberAuthOrEmpty = memberAuthRepository.findByOriginalMember(memberEntity);
         return memberAuthOrEmpty.isEmpty() ? Optional.empty() : Optional.of(memberAuthAppInfraMapper.toMemberAuthResponse(memberAuthOrEmpty.orElseThrow()));
     }
+
 
     public Optional<SiteMemberAuthResponse> getByEmailAndProvider(String email, AuthProvider provider) {
         Optional<SiteMemberAuthEntity> memberAuthOrEmpty = memberAuthRepository.findByEmailAndProvider(email, provider);

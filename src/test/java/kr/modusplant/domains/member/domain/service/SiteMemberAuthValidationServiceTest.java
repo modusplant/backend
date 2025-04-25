@@ -11,7 +11,6 @@ import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,10 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
-import static kr.modusplant.global.vo.CamelCaseWord.ORIGINAL_MEMBER_UUID;
 import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
 import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
+import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
+import static kr.modusplant.global.vo.CamelCaseWord.ORIGINAL_MEMBER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -42,27 +41,6 @@ class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, Si
         this.memberRepository = memberRepository;
     }
 
-    @DisplayName("존재하는 회원 인증 UUID 검증")
-    @Test
-    void validateExistedUuidTest() {
-        // given
-        SiteMemberEntity activeMemberEntity = createMemberBasicUserEntityWithUuid();
-        SiteMemberEntity originalMemberEntity = SiteMemberEntity.builder().memberEntity(activeMemberEntity).uuid(UUID.randomUUID()).build();
-        UUID originalMemberEntityUuid = originalMemberEntity.getUuid();
-        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(activeMemberEntity).originalMember(originalMemberEntity).build();
-        UUID memberAuthEntityUuid = memberAuthEntity.getUuid();
-
-        // when
-        given(memberRepository.findByUuid(originalMemberEntityUuid)).willReturn(Optional.of(originalMemberEntity));
-        given(memberAuthRepository.findByUuid(memberAuthEntityUuid)).willReturn(Optional.of(memberAuthEntity));
-
-        // then
-        EntityExistsException existsException = assertThrows(EntityExistsWithUuidException.class,
-                () -> memberAuthValidationService.validateExistedUuid(memberAuthEntityUuid));
-        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                EXISTED_ENTITY.getValue(), "uuid", memberAuthEntityUuid, SiteMemberAuthEntity.class));
-    }
-
     @DisplayName("존재하는 회원 인증 최초 회원 UUID 검증")
     @Test
     void validateExistedOriginalMemberUuidTest() {
@@ -70,7 +48,7 @@ class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, Si
         SiteMemberEntity activeMemberEntity = createMemberBasicUserEntityWithUuid();
         SiteMemberEntity originalMemberEntity = SiteMemberEntity.builder().memberEntity(activeMemberEntity).uuid(UUID.randomUUID()).build();
         UUID originalMemberEntityUuid = originalMemberEntity.getUuid();
-        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(activeMemberEntity).originalMember(originalMemberEntity).build();
+        SiteMemberAuthEntity memberAuthEntity = this.createMemberAuthBasicUserEntityBuilder().originalMember(originalMemberEntity).activeMember(activeMemberEntity).build();
 
         // when
         given(memberRepository.findByUuid(originalMemberEntityUuid)).willReturn(Optional.of(originalMemberEntity));
@@ -90,7 +68,7 @@ class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, Si
         SiteMemberEntity activeMemberEntity = createMemberBasicUserEntityWithUuid();
         SiteMemberEntity originalMemberEntity = SiteMemberEntity.builder().memberEntity(activeMemberEntity).uuid(UUID.randomUUID()).build();
         UUID originalMemberEntityUuid = originalMemberEntity.getUuid();
-        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(activeMemberEntity).originalMember(originalMemberEntity).build();
+        SiteMemberAuthEntity memberAuthEntity = this.createMemberAuthBasicUserEntityBuilder().originalMember(originalMemberEntity).activeMember(activeMemberEntity).build();
         UUID memberAuthEntityUuid = memberAuthEntity.getUuid();
 
         // when

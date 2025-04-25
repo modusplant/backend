@@ -31,7 +31,7 @@ class SiteMemberAuthRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
 
         // then
         assertThat(memberAuthRepository.findByUuid(memberAuth.getUuid()).orElseThrow()).isEqualTo(memberAuth);
@@ -44,7 +44,7 @@ class SiteMemberAuthRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
 
         // then
         assertThat(memberAuthRepository.findByActiveMember(memberAuth.getActiveMember()).getFirst()).isEqualTo(memberAuth);
@@ -57,7 +57,7 @@ class SiteMemberAuthRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
 
         // then
         assertThat(memberAuthRepository.findByUuid(memberAuth.getUuid()).orElseThrow()).isEqualTo(memberAuth);
@@ -70,7 +70,7 @@ class SiteMemberAuthRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
 
         // then
         assertThat(memberAuthRepository.findByEmail(memberAuth.getEmail()).getFirst()).isEqualTo(memberAuth);
@@ -83,7 +83,7 @@ class SiteMemberAuthRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
 
         // then
         assertThat(memberAuthRepository.findByProvider(memberAuth.getProvider()).getFirst()).isEqualTo(memberAuth);
@@ -96,7 +96,7 @@ class SiteMemberAuthRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
 
         // then
         assertThat(memberAuthRepository.findByProviderId(memberAuth.getProviderId()).getFirst()).isEqualTo(memberAuth);
@@ -109,7 +109,7 @@ class SiteMemberAuthRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
 
         // then
         assertThat(memberAuthRepository.findByEmailAndProvider(memberAuth.getEmail(), memberAuth.getProvider()).orElseThrow()).isEqualTo(memberAuth);
@@ -122,7 +122,7 @@ class SiteMemberAuthRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
 
         // then
         assertThat(memberAuthRepository.findByProviderAndProviderId(memberAuth.getProvider(), memberAuth.getProviderId()).orElseThrow()).isEqualTo(memberAuth);
@@ -135,7 +135,7 @@ class SiteMemberAuthRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
 
         // then
         assertThat(memberAuthRepository.findByFailedAttempt(memberAuth.getFailedAttempt()).getFirst()).isEqualTo(memberAuth);
@@ -148,7 +148,7 @@ class SiteMemberAuthRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
 
         // then
         assertThat(memberAuthRepository.findByLastModifiedAt(memberAuth.getLastModifiedAt()).getFirst()).isEqualTo(memberAuth);
@@ -159,7 +159,7 @@ class SiteMemberAuthRepositoryTest implements SiteMemberAuthEntityTestUtils {
     void deleteByUuidTest() {
         // given
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
         UUID uuid = memberAuth.getUuid();
 
         // when
@@ -176,7 +176,7 @@ class SiteMemberAuthRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
 
         // then
         assertThat(memberAuthRepository.existsByUuid(memberAuth.getUuid())).isEqualTo(true);

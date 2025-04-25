@@ -48,7 +48,7 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
     void getByUuidTest() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
+        SiteMemberAuthEntity memberAuthEntity = this.createMemberAuthBasicUserEntityBuilder().originalMember(memberEntity).activeMember(memberEntity).build();
         UUID uuid = memberEntity.getUuid();
 
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
@@ -65,12 +65,12 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
         assertThat(memberAuthService.getByUuid(memberAuthResponse.originalMemberUuid()).orElseThrow()).isEqualTo(memberAuthResponse);
     }
 
-    @DisplayName("activeMemberUuid로 회원 인증 얻기")
+    @DisplayName("activeMember로 회원 인증 얻기")
     @Test
-    void getByActiveMemberUuidTest() {
+    void getByActiveMemberTest() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
+        SiteMemberAuthEntity memberAuthEntity = this.createMemberAuthBasicUserEntityBuilder().originalMember(memberEntity).activeMember(memberEntity).build();
         UUID uuid = memberEntity.getUuid();
 
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
@@ -85,7 +85,7 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
         SiteMemberAuthResponse memberAuthResponse = memberAuthService.insert(memberAuthBasicUserInsertRequest);
 
         // then
-        assertThat(memberAuthService.getByActiveMemberUuid(memberAuthResponse.activeMemberUuid()).getFirst()).isEqualTo(memberAuthResponse);
+        assertThat(memberAuthService.getByActiveMember(memberEntity).getFirst()).isEqualTo(memberAuthResponse);
     }
 
     @DisplayName("originalMemberUuid로 회원 인증 얻기")
@@ -93,7 +93,7 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
     void getByOriginalMemberUuidTest() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
+        SiteMemberAuthEntity memberAuthEntity = this.createMemberAuthBasicUserEntityBuilder().originalMember(memberEntity).activeMember(memberEntity).build();
         UUID uuid = memberEntity.getUuid();
 
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
@@ -107,7 +107,7 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
         SiteMemberAuthResponse memberAuthResponse = memberAuthService.insert(memberAuthBasicUserInsertRequest);
 
         // then
-        assertThat(memberAuthService.getByOriginalMemberUuid(memberAuthResponse.originalMemberUuid()).orElseThrow()).isEqualTo(memberAuthResponse);
+        assertThat(memberAuthService.getByOriginalMember(memberEntity).orElseThrow()).isEqualTo(memberAuthResponse);
     }
 
     @DisplayName("email로 회원 인증 얻기")
@@ -115,7 +115,7 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
     void getByEmailTest() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
+        SiteMemberAuthEntity memberAuthEntity = this.createMemberAuthBasicUserEntityBuilder().originalMember(memberEntity).activeMember(memberEntity).build();
         UUID uuid = memberEntity.getUuid();
 
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
@@ -138,7 +138,7 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
     void getByProviderTest() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
+        SiteMemberAuthEntity memberAuthEntity = this.createMemberAuthBasicUserEntityBuilder().originalMember(memberEntity).activeMember(memberEntity).build();
         UUID uuid = memberEntity.getUuid();
 
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
@@ -161,7 +161,7 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
     void getByProviderIdTest() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
+        SiteMemberAuthEntity memberAuthEntity = this.createMemberAuthBasicUserEntityBuilder().originalMember(memberEntity).activeMember(memberEntity).build();
         UUID uuid = memberEntity.getUuid();
 
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
@@ -184,7 +184,7 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
     void getByEmailAndProviderTest() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
+        SiteMemberAuthEntity memberAuthEntity = this.createMemberAuthBasicUserEntityBuilder().originalMember(memberEntity).activeMember(memberEntity).build();
 
         given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
@@ -205,7 +205,7 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
     void getByProviderAndProviderIdTest() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
+        SiteMemberAuthEntity memberAuthEntity = this.createMemberAuthBasicUserEntityBuilder().originalMember(memberEntity).activeMember(memberEntity).build();
         UUID uuid = memberEntity.getUuid();
 
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
@@ -228,7 +228,7 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
     void getByFailedAttemptTest() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
+        SiteMemberAuthEntity memberAuthEntity = this.createMemberAuthBasicUserEntityBuilder().originalMember(memberEntity).activeMember(memberEntity).build();
         UUID uuid = memberEntity.getUuid();
 
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
@@ -251,8 +251,7 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
     void getOptionalEmptyTest() {
         // given
         SiteMemberAuth memberAuth = memberAuthBasicUserWithUuid;
-        UUID uuid = memberAuth.getUuid();
-        UUID originalMemberUuid = memberAuth.getOriginalMemberUuid();
+        UUID uuid = memberAuth.getOriginalMemberUuid();
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         String email = memberAuth.getEmail();
         AuthProvider provider = memberAuth.getProvider();
@@ -267,11 +266,11 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
 
         // getByOriginalMember
         // given & when
-        given(memberRepository.findByUuid(originalMemberUuid)).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
         given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty());
 
         // then
-        assertThat(memberAuthService.getByOriginalMemberUuid(memberEntity.getUuid())).isEmpty();
+        assertThat(memberAuthService.getByOriginalMember(memberEntity)).isEmpty();
 
         // getByEmailAndProvider
         // given & when
@@ -294,7 +293,7 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
         // given
         String updatedEmail = "updatedEmail1@naver.com";
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
+        SiteMemberAuthEntity memberAuthEntity = this.createMemberAuthBasicUserEntityBuilder().originalMember(memberEntity).activeMember(memberEntity).build();
         SiteMemberAuthEntity updatedMemberAuthEntity = SiteMemberAuthEntity.builder().memberAuthEntity(memberAuthEntity).email(updatedEmail).build();
         UUID uuid = memberEntity.getUuid();
 
@@ -319,7 +318,7 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
     void removeByUuidTest() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityWithUuidBuilder().activeMember(memberEntity).originalMember(memberEntity).build();
+        SiteMemberAuthEntity memberAuthEntity = this.createMemberAuthBasicUserEntityBuilder().originalMember(memberEntity).activeMember(memberEntity).build();
         UUID uuid = memberEntity.getUuid();
 
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));

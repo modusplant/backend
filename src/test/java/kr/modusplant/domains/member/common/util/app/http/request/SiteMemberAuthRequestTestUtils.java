@@ -7,13 +7,13 @@ import kr.modusplant.domains.member.common.util.domain.SiteMemberAuthTestUtils;
 public interface SiteMemberAuthRequestTestUtils extends SiteMemberAuthTestUtils {
     SiteMemberAuthInsertRequest memberAuthBasicUserInsertRequest = new SiteMemberAuthInsertRequest(memberAuthBasicUserWithUuid.getOriginalMemberUuid(), memberAuthBasicUser.getEmail(), memberAuthBasicUser.getPw(), memberAuthBasicUser.getProvider(), memberAuthBasicUser.getProviderId());
 
-    SiteMemberAuthUpdateRequest memberAuthBasicUserUpdateRequest = new SiteMemberAuthUpdateRequest(memberAuthBasicUserWithUuid.getActiveMemberUuid(), memberAuthBasicUserWithUuid.getOriginalMemberUuid(), memberAuthBasicUser.getEmail(), memberAuthBasicUser.getPw());
+    SiteMemberAuthUpdateRequest memberAuthBasicUserUpdateRequest = new SiteMemberAuthUpdateRequest(memberAuthBasicUserWithUuid.getOriginalMemberUuid(), memberAuthBasicUserWithUuid.getActiveMemberUuid(), memberAuthBasicUser.getEmail(), memberAuthBasicUser.getPw());
 
     SiteMemberAuthInsertRequest memberAuthGoogleUserInsertRequest = new SiteMemberAuthInsertRequest(memberAuthGoogleUserWithUuid.getOriginalMemberUuid(), memberAuthGoogleUser.getEmail(), memberAuthGoogleUser.getPw(), memberAuthGoogleUser.getProvider(), memberAuthGoogleUser.getProviderId());
 
-    SiteMemberAuthUpdateRequest memberAuthGoogleUserUpdateRequest = new SiteMemberAuthUpdateRequest(memberAuthGoogleUserWithUuid.getActiveMemberUuid(), memberAuthGoogleUserWithUuid.getOriginalMemberUuid(), memberAuthGoogleUser.getEmail(), memberAuthGoogleUser.getPw());
+    SiteMemberAuthUpdateRequest memberAuthGoogleUserUpdateRequest = new SiteMemberAuthUpdateRequest(memberAuthGoogleUserWithUuid.getOriginalMemberUuid(), memberAuthGoogleUserWithUuid.getActiveMemberUuid(), memberAuthGoogleUser.getEmail(), memberAuthGoogleUser.getPw());
 
     SiteMemberAuthInsertRequest memberAuthKakaoUserInsertRequest = new SiteMemberAuthInsertRequest(memberAuthKakaoUserWithUuid.getOriginalMemberUuid(), memberAuthKakaoUser.getEmail(), memberAuthKakaoUser.getPw(), memberAuthKakaoUser.getProvider(), memberAuthKakaoUser.getProviderId());
 
-    SiteMemberAuthUpdateRequest memberAuthKakaoUserUpdateRequest = new SiteMemberAuthUpdateRequest(memberAuthKakaoUserWithUuid.getActiveMemberUuid(), memberAuthKakaoUserWithUuid.getOriginalMemberUuid(), memberAuthKakaoUser.getEmail(), memberAuthKakaoUser.getPw());
+    SiteMemberAuthUpdateRequest memberAuthKakaoUserUpdateRequest = new SiteMemberAuthUpdateRequest(memberAuthKakaoUserWithUuid.getOriginalMemberUuid(), memberAuthKakaoUserWithUuid.getActiveMemberUuid(), memberAuthKakaoUser.getEmail(), memberAuthKakaoUser.getPw());
 }
