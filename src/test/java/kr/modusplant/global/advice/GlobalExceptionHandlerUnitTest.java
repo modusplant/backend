@@ -1,4 +1,4 @@
-package kr.modusplant.global.error;
+package kr.modusplant.global.advice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
