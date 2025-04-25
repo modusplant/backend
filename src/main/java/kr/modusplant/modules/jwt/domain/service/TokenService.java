@@ -1,13 +1,13 @@
 package kr.modusplant.modules.jwt.domain.service;
 
-import kr.modusplant.domains.member.domain.model.SiteMember;
-import kr.modusplant.domains.member.domain.model.SiteMemberRole;
-import kr.modusplant.domains.member.domain.service.supers.SiteMemberCrudService;
-import kr.modusplant.domains.member.domain.service.supers.SiteMemberRoleCrudService;
-import kr.modusplant.modules.jwt.domain.model.RefreshToken;
-import kr.modusplant.modules.jwt.domain.service.supers.RefreshTokenCrudService;
-import kr.modusplant.modules.jwt.dto.TokenPair;
+import kr.modusplant.domains.member.app.http.response.SiteMemberResponse;
+import kr.modusplant.domains.member.app.http.response.SiteMemberRoleResponse;
+import kr.modusplant.domains.member.app.service.SiteMemberApplicationService;
+import kr.modusplant.domains.member.app.service.SiteMemberRoleApplicationService;
 import kr.modusplant.global.enums.Role;
+import kr.modusplant.modules.jwt.domain.model.RefreshToken;
+import kr.modusplant.modules.jwt.domain.service.supers.RefreshTokenApplicationService;
+import kr.modusplant.modules.jwt.dto.TokenPair;
 import kr.modusplant.modules.jwt.error.InvalidTokenException;
 import kr.modusplant.modules.jwt.error.TokenDataNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +23,9 @@ import static kr.modusplant.global.vo.CamelCaseWord.MEMBER_UUID;
 @RequiredArgsConstructor
 public class TokenService {
     private final TokenProvider tokenProvider;
-    private final SiteMemberCrudService siteMemberService;
-    private final SiteMemberRoleCrudService siteMemberRoleService;
-    private final RefreshTokenCrudService refreshTokenCrudService;
+    private final SiteMemberApplicationService memberApplicationService;
+    private final SiteMemberRoleApplicationService memberRoleApplicationService;
+    private final RefreshTokenApplicationService refreshTokenCrudService;
     private final TokenValidationService tokenValidationService;
 
     // 토큰 생성
@@ -70,14 +70,14 @@ public class TokenService {
 
         // access token 재발급
         UUID memberUuid = tokenProvider.getMemberUuidFromToken(refreshToken);
-        SiteMember siteMember = siteMemberService.getByUuid(memberUuid)
+        SiteMemberResponse siteMember = memberApplicationService.getByUuid(memberUuid)
                 .orElseThrow(() -> new TokenDataNotFoundException("Failed to find Site member"));
-        SiteMemberRole siteMemberRole = siteMemberRoleService.getByMember(siteMember)
+        SiteMemberRoleResponse siteMemberRole = memberRoleApplicationService.getByUuid(memberUuid)
                 .orElseThrow(() -> new TokenDataNotFoundException("Failed to find Site member role"));
 
         Map<String,String> claims = new HashMap<>();
-        claims.put("nickname",siteMember.getNickname());
-        claims.put("role",siteMemberRole.getRole().getValue());
+        claims.put("nickname",siteMember.nickname());
+        claims.put("role",siteMemberRole.role().getValue());
         String accessToken = tokenProvider.generateAccessToken(memberUuid,claims);
 
         return TokenPair.builder()

@@ -23,7 +23,7 @@ public class SiteMemberAuthValidationService {
     private final SiteMemberRepository memberRepository;
     private final SiteMemberAuthRepository memberAuthRepository;
 
-    public void validateExistedMemberAuthUuid(UUID uuid) {
+    public void validateExistedUuid(UUID uuid) {
         if (uuid == null) {
             return;
         }
@@ -32,13 +32,13 @@ public class SiteMemberAuthValidationService {
         }
     }
 
-    public void validateExistedMemberAuthOriginalMemberUuid(UUID uuid) {
+    public void validateExistedOriginalMemberUuid(UUID uuid) {
         if (memberAuthRepository.findByOriginalMember(memberRepository.findByUuid(uuid).orElseThrow()).isPresent()) {
             throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY, ORIGINAL_MEMBER_UUID, uuid, SiteMemberAuthEntity.class));
         }
     }
 
-    public void validateNotFoundMemberAuthUuid(UUID uuid) {
+    public void validateNotFoundOriginalMemberUuid(UUID uuid) {
         if (uuid == null || memberAuthRepository.findByUuid(uuid).isEmpty()) {
             throw new EntityNotFoundWithUuidException(uuid, SiteMemberAuthEntity.class);
         }

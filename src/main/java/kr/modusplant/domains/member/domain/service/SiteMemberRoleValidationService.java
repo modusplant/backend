@@ -16,13 +16,13 @@ import java.util.UUID;
 public class SiteMemberRoleValidationService {
     private final SiteMemberRoleRepository memberRoleRepository;
 
-    public void validateExistedMemberRoleUuid(UUID uuid) {
+    public void validateExistedUuid(UUID uuid) {
         if (memberRoleRepository.findByUuid(uuid).isPresent()) {
             throw new EntityExistsWithUuidException(uuid, SiteMemberRoleEntity.class);
         }
     }
 
-    public void validateNotFoundMemberRoleUuid(UUID uuid) {
+    public void validateNotFoundUuid(UUID uuid) {
         if (uuid == null || memberRoleRepository.findByUuid(uuid).isEmpty()) {
             throw new EntityNotFoundWithUuidException(uuid, SiteMemberRoleEntity.class);
         }

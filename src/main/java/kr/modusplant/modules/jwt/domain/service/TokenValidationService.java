@@ -3,10 +3,10 @@ package kr.modusplant.modules.jwt.domain.service;
 import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.modules.jwt.domain.service.supers.RefreshTokenCrudService;
+import kr.modusplant.global.error.EntityNotFoundWithUuidException;
+import kr.modusplant.modules.jwt.domain.service.supers.RefreshTokenApplicationService;
 import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
 import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenJpaRepository;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +21,7 @@ import static kr.modusplant.global.vo.ExceptionMessage.NOT_FOUND_ENTITY;
 @RequiredArgsConstructor
 public class TokenValidationService {
 
-    private final RefreshTokenCrudService refreshTokenCrudService;
+    private final RefreshTokenApplicationService refreshTokenCrudService;
     private final RefreshTokenJpaRepository tokenRepository;
     private final SiteMemberRepository memberRepository;
 

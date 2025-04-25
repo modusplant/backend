@@ -2,8 +2,8 @@ package kr.modusplant.domains.term.domain.service;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
-import kr.modusplant.domains.common.context.DomainServiceOnlyContext;
-import kr.modusplant.domains.term.common.app.http.response.TermResponseTestUtils;
+import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.term.common.util.app.http.response.TermResponseTestUtils;
 import kr.modusplant.domains.term.common.util.entity.TermEntityTestUtils;
 import kr.modusplant.domains.term.persistence.entity.TermEntity;
 import kr.modusplant.domains.term.persistence.repository.TermRepository;
@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
-@DomainServiceOnlyContext
+@DomainsServiceOnlyContext
 class TermValidationServiceTest implements TermResponseTestUtils, TermEntityTestUtils {
 
     private final TermValidationService termValidationService;

@@ -1,8 +1,8 @@
 package kr.modusplant.domains.term.mapper;
 
 import kr.modusplant.domains.term.app.http.response.TermResponse;
-import kr.modusplant.domains.term.common.app.http.request.TermRequestTestUtils;
-import kr.modusplant.domains.term.common.app.http.response.TermResponseTestUtils;
+import kr.modusplant.domains.term.common.util.app.http.request.TermRequestTestUtils;
+import kr.modusplant.domains.term.common.util.app.http.response.TermResponseTestUtils;
 import kr.modusplant.domains.term.common.util.entity.TermEntityTestUtils;
 import kr.modusplant.domains.term.persistence.entity.TermEntity;
 import kr.modusplant.global.context.RepositoryOnlyContext;
@@ -20,7 +20,7 @@ class TermAppInfraMapperTest implements TermRequestTestUtils, TermResponseTestUt
     @Test
     void toTermResponseTest() {
         // given
-        TermEntity termEntity = createTermsOfUseEntity();
+        TermEntity termEntity = createTermsOfUseEntityWithUuid();
 
         // when
         TermResponse termResponse = termAppInfraMapper.toTermResponse(termEntity);

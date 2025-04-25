@@ -2,7 +2,7 @@ package kr.modusplant.domains.member.domain.service;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
-import kr.modusplant.domains.common.context.DomainServiceOnlyContext;
+import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberAuthTestUtils;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
-@DomainServiceOnlyContext
+@DomainsServiceOnlyContext
 class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, SiteMemberAuthEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils {
 
     private final SiteMemberAuthValidationService memberAuthValidationService;
@@ -44,7 +44,7 @@ class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, Si
 
     @DisplayName("존재하는 회원 인증 UUID 검증")
     @Test
-    void validateExistedMemberAuthUuidTest() {
+    void validateExistedUuidTest() {
         // given
         SiteMemberEntity activeMemberEntity = createMemberBasicUserEntityWithUuid();
         SiteMemberEntity originalMemberEntity = SiteMemberEntity.builder().memberEntity(activeMemberEntity).uuid(UUID.randomUUID()).build();
@@ -58,14 +58,14 @@ class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, Si
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsWithUuidException.class,
-                () -> memberAuthValidationService.validateExistedMemberAuthUuid(memberAuthEntityUuid));
+                () -> memberAuthValidationService.validateExistedUuid(memberAuthEntityUuid));
         assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
                 EXISTED_ENTITY, "uuid", memberAuthEntityUuid, SiteMemberAuthEntity.class));
     }
 
     @DisplayName("존재하는 회원 인증 최초 회원 UUID 검증")
     @Test
-    void validateExistedMemberAuthOriginalMemberUuidTest() {
+    void validateExistedOriginalMemberUuidTest() {
         // given
         SiteMemberEntity activeMemberEntity = createMemberBasicUserEntityWithUuid();
         SiteMemberEntity originalMemberEntity = SiteMemberEntity.builder().memberEntity(activeMemberEntity).uuid(UUID.randomUUID()).build();
@@ -78,14 +78,14 @@ class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, Si
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
-                () -> memberAuthValidationService.validateExistedMemberAuthOriginalMemberUuid(originalMemberEntityUuid));
+                () -> memberAuthValidationService.validateExistedOriginalMemberUuid(originalMemberEntityUuid));
         assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
                 EXISTED_ENTITY, ORIGINAL_MEMBER_UUID, originalMemberEntityUuid, SiteMemberAuthEntity.class));
     }
 
     @DisplayName("존재하지 않는 회원 인증 UUID 검증")
     @Test
-    void validateNotFoundMemberAuthUuidTest() {
+    void validateNotFoundOriginalMemberUuidTest() {
         // given
         SiteMemberEntity activeMemberEntity = createMemberBasicUserEntityWithUuid();
         SiteMemberEntity originalMemberEntity = SiteMemberEntity.builder().memberEntity(activeMemberEntity).uuid(UUID.randomUUID()).build();
@@ -99,7 +99,7 @@ class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, Si
 
         // then
         EntityNotFoundException notFoundException = assertThrows(EntityNotFoundWithUuidException.class,
-                () -> memberAuthValidationService.validateNotFoundMemberAuthUuid(memberAuthEntityUuid));
+                () -> memberAuthValidationService.validateNotFoundOriginalMemberUuid(memberAuthEntityUuid));
         assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
                 NOT_FOUND_ENTITY, "uuid", memberAuthEntityUuid, SiteMemberAuthEntity.class));
     }

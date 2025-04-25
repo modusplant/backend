@@ -16,13 +16,13 @@ import java.util.UUID;
 public class SiteMemberTermValidationService {
     private final SiteMemberTermRepository memberTermRepository;
 
-    public void validateExistedMemberTermUuid(UUID uuid) {
+    public void validateExistedUuid(UUID uuid) {
         if (memberTermRepository.findByUuid(uuid).isPresent()) {
             throw new EntityExistsWithUuidException(uuid, SiteMemberTermEntity.class);
         }
     }
 
-    public void validateNotFoundMemberTermUuid(UUID uuid) {
+    public void validateNotFoundUuid(UUID uuid) {
         if (uuid == null || memberTermRepository.findByUuid(uuid).isEmpty()) {
             throw new EntityNotFoundWithUuidException(uuid, SiteMemberTermEntity.class);
         }

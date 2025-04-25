@@ -1,12 +1,13 @@
 package kr.modusplant.domains.member.mapper;
 
-import kr.modusplant.domains.member.common.util.domain.SiteMemberTermTestUtils;
+import kr.modusplant.domains.member.app.http.request.SiteMemberTermInsertRequest;
+import kr.modusplant.domains.member.app.http.response.SiteMemberTermResponse;
+import kr.modusplant.domains.member.common.util.app.http.request.SiteMemberTermRequestTestUtils;
+import kr.modusplant.domains.member.common.util.app.http.response.SiteMemberTermResponseTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberTermEntityTestUtils;
-import kr.modusplant.domains.member.domain.model.SiteMemberTerm;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberTermEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberTermRepository;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,42 +16,39 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
-class SiteMemberTermAppInfraMapperTest implements SiteMemberTermTestUtils, SiteMemberTermEntityTestUtils {
+class SiteMemberTermAppInfraMapperTest implements SiteMemberTermRequestTestUtils, SiteMemberTermResponseTestUtils, SiteMemberTermEntityTestUtils {
 
-    private final SiteMemberTermRepository memberTermRepository;
     private final SiteMemberRepository memberRepository;
-    private final SiteMemberTermEntityMapper memberTermMapper = new SiteMemberTermEntityMapperImpl();
+    private final SiteMemberTermAppInfraMapper memberTermMapper = new SiteMemberTermAppInfraMapperImpl();
 
     @Autowired
-    SiteMemberTermAppInfraMapperTest(SiteMemberTermRepository memberTermRepository, SiteMemberRepository memberRepository) {
-        this.memberTermRepository = memberTermRepository;
+    SiteMemberTermAppInfraMapperTest(SiteMemberRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
 
-    @DisplayName("매퍼 적용 후 일관된 회원 약관 엔터티 확인")
+    @DisplayName("엔터티를 응답으로 전환")
     @Test
-    void checkConsistentEntity() {
+    void toSiteMemberTermResponseTest() {
         // given
-        SiteMemberTermEntity memberTermEntity = createMemberTermUserEntity();
+        SiteMemberTermEntity memberTermEntity = createMemberTermUserEntityWithUuid();
 
         // when
-        memberTermEntity = memberTermRepository.save(memberTermEntity);
+        SiteMemberTermResponse memberTermResponse = memberTermMapper.toMemberTermResponse(memberTermEntity);
 
         // then
-        assertThat(memberTermEntity).isEqualTo(memberTermMapper.updateSiteMemberTermEntity(memberTermMapper.toSiteMemberTerm(memberTermEntity), memberRepository));
+        assertThat(memberTermResponse).isEqualTo(memberTermUserResponse);
     }
 
-    @DisplayName("매퍼 적용 후 일관된 회원 약관 도메인 확인")
+    @DisplayName("요청을 엔터티로 전환")
     @Test
-    void checkConsistentDomain() {
+    void toSiteMemberTermEntityTest() {
         // given
         SiteMemberEntity memberEntity = memberRepository.save(createMemberBasicUserEntity());
-        SiteMemberTermEntity memberTermEntity = SiteMemberTermEntity.builder().memberTermEntity(createMemberTermUserEntity()).member(memberEntity).build();
 
         // when
-        SiteMemberTerm memberTerm = memberTermMapper.toSiteMemberTerm(memberTermEntity);
+        SiteMemberTermEntity memberTermEntity = memberTermMapper.toMemberTermEntity(new SiteMemberTermInsertRequest(memberEntity.getUuid(), memberTermUser.getAgreedTermsOfUseVersion(), memberTermUser.getAgreedPrivacyPolicyVersion(), memberTermUser.getAgreedAdInfoReceivingVersion()), memberRepository);
 
         // then
-        assertThat(memberTerm).isEqualTo(memberTermMapper.toSiteMemberTerm(memberTermMapper.createSiteMemberTermEntity(memberTerm, memberRepository)));
+        assertThat(memberTermEntity.getAgreedTermsOfUseVersion()).isEqualTo(memberTermUser.getAgreedTermsOfUseVersion());
     }
 }

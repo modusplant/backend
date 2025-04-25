@@ -16,7 +16,7 @@ import java.util.UUID;
 public class SiteMemberValidationService {
     private final SiteMemberRepository memberRepository;
 
-    public void validateExistedMemberUuid(UUID uuid) {
+    public void validateExistedUuid(UUID uuid) {
         if (uuid == null) {
             return;
         }
@@ -25,7 +25,7 @@ public class SiteMemberValidationService {
         }
     }
 
-    public void validateNotFoundMemberUuid(UUID uuid) {
+    public void validateNotFoundUuid(UUID uuid) {
         if (uuid == null || memberRepository.findByUuid(uuid).isEmpty()) {
             throw new EntityNotFoundWithUuidException(uuid, SiteMemberEntity.class);
         }
