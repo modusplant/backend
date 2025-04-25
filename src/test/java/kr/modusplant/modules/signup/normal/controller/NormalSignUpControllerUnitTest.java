@@ -10,7 +10,7 @@ import kr.modusplant.domains.member.domain.service.supers.SiteMemberTermCrudServ
 import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.domains.term.common.util.domain.TermTestUtils;
 import kr.modusplant.domains.term.domain.service.supers.TermCrudService;
-import kr.modusplant.modules.signup.normal.app.http.request.NormalSignUpRequest;
+import kr.modusplant.modules.auth.normal.app.http.request.NormalSignUpRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

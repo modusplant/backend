@@ -1,9 +1,9 @@
-package kr.modusplant.modules.signup.normal.mapper.domain;
+package kr.modusplant.modules.auth.normal.mapper.domain;
 
 import kr.modusplant.domains.member.domain.model.SiteMember;
 import kr.modusplant.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.domains.member.enums.AuthProvider;
-import kr.modusplant.modules.signup.normal.app.http.request.NormalSignUpRequest;
+import kr.modusplant.modules.auth.normal.app.http.request.NormalSignUpRequest;
 import org.mapstruct.*;
 
 @Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL,

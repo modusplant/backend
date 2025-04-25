@@ -1,4 +1,4 @@
-package kr.modusplant.modules.signup.normal.app.http.request;
+package kr.modusplant.modules.auth.normal.app.http.request;
 
 public record NormalSignUpRequest(
         String email,
