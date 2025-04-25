@@ -69,7 +69,7 @@ public class NormalSignUpControllerUnitTest {
     public void saveMember_givenValidInput_thenReturn200() throws Exception {
         // given
         NormalSignUpRequest validData = new NormalSignUpRequest(
-                "akdnjs0308@gmail.com", "userPw2!", "userPw2!",
+                "akdnjs0308@gmail.com", "userPw2!",
                 "테스트닉네임", "v1.0.0", "v1.0.0", "v1.0.0");
         String testRequestBody = objectMapper.writeValueAsString(validData);
         setupServiceStubbing();
@@ -82,27 +82,6 @@ public class NormalSignUpControllerUnitTest {
                 // then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.message").exists());
-    }
-
-    @Test
-    public void saveMember_givenInvalidInput_thenReturn400() throws Exception {
-        // given
-        NormalSignUpRequest invalidData = new NormalSignUpRequest(
-                "akdnjs0308@gmail.com", "userPw2!", "wrongPw",
-                "테스트닉네임", "v1.0.0", "v1.0.0", "v1.0.0");
-        String testRequestBody = objectMapper.writeValueAsString(invalidData);
-        setupServiceStubbing();
-
-        // when
-        mockMvc.perform(post("/api/members/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(testRequestBody).characterEncoding("UTF-8")
-                )
-
-                // then
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.message").exists());
     }
 
