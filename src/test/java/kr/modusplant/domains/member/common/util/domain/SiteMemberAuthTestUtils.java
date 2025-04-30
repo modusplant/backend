@@ -4,8 +4,6 @@ import kr.modusplant.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.domains.member.enums.AuthProvider;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.UUID;
-
 public interface SiteMemberAuthTestUtils {
     SiteMemberAuth memberAuthBasicAdmin = SiteMemberAuth.builder()
             .email("testAdmin1@gmail.com")
@@ -14,7 +12,6 @@ public interface SiteMemberAuthTestUtils {
             .build();
 
     SiteMemberAuth memberAuthBasicAdminWithUuid = SiteMemberAuth.builder()
-            .uuid(UUID.fromString("ff4ca1cb-e518-47e4-8344-2fa81f28a031"))
             .activeMemberUuid(SiteMemberTestUtils.memberBasicAdminWithUuid.getUuid())
             .originalMemberUuid(SiteMemberTestUtils.memberBasicAdminWithUuid.getUuid())
             .email(memberAuthBasicAdmin.getEmail())
@@ -29,7 +26,6 @@ public interface SiteMemberAuthTestUtils {
             .build();
 
     SiteMemberAuth memberAuthBasicUserWithUuid = SiteMemberAuth.builder()
-            .uuid(UUID.fromString("913ee77a-cec5-4b3e-9e95-60a7dc33a721"))
             .activeMemberUuid(SiteMemberTestUtils.memberBasicUserWithUuid.getUuid())
             .originalMemberUuid(SiteMemberTestUtils.memberBasicUserWithUuid.getUuid())
             .email(memberAuthBasicUser.getEmail())
@@ -44,7 +40,6 @@ public interface SiteMemberAuthTestUtils {
             .build();
 
     SiteMemberAuth memberAuthGoogleUserWithUuid = SiteMemberAuth.builder()
-            .uuid(UUID.fromString("69c9a086-4c78-47cb-b4d5-84f9922e9031"))
             .activeMemberUuid(SiteMemberTestUtils.memberGoogleUserWithUuid.getUuid())
             .originalMemberUuid(SiteMemberTestUtils.memberGoogleUserWithUuid.getUuid())
             .email(memberAuthGoogleUser.getEmail())
@@ -59,7 +54,6 @@ public interface SiteMemberAuthTestUtils {
             .build();
 
     SiteMemberAuth memberAuthKakaoUserWithUuid = SiteMemberAuth.builder()
-            .uuid(UUID.fromString("cd523717-70fd-4353-955e-28b802e1970d"))
             .activeMemberUuid(SiteMemberTestUtils.memberKakaoUserWithUuid.getUuid())
             .originalMemberUuid(SiteMemberTestUtils.memberKakaoUserWithUuid.getUuid())
             .email(memberAuthKakaoUser.getEmail())

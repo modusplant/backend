@@ -1,13 +1,17 @@
 package kr.modusplant.modules.signup.normal.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.domains.member.common.util.domain.SiteMemberAuthTestUtils;
-import kr.modusplant.domains.member.common.util.domain.SiteMemberTermTestUtils;
+import kr.modusplant.domains.member.app.service.SiteMemberApplicationService;
+import kr.modusplant.domains.member.app.service.SiteMemberAuthApplicationService;
+import kr.modusplant.domains.member.app.service.SiteMemberTermApplicationService;
+import kr.modusplant.domains.member.common.util.app.http.response.SiteMemberAuthResponseTestUtils;
+import kr.modusplant.domains.member.common.util.app.http.response.SiteMemberResponseTestUtils;
+import kr.modusplant.domains.member.common.util.app.http.response.SiteMemberTermResponseTestUtils;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
-import kr.modusplant.domains.member.domain.service.supers.SiteMemberAuthCrudService;
-import kr.modusplant.domains.member.domain.service.supers.SiteMemberCrudService;
-import kr.modusplant.domains.member.domain.service.supers.SiteMemberTermCrudService;
 import kr.modusplant.domains.member.enums.AuthProvider;
+import kr.modusplant.domains.term.app.service.TermApplicationService;
+import kr.modusplant.domains.term.common.util.app.http.response.TermResponseTestUtils;
+import kr.modusplant.modules.signup.normal.model.request.NormalSignUpRequest;
 import kr.modusplant.domains.term.common.util.domain.TermTestUtils;
 import kr.modusplant.domains.term.domain.service.supers.TermCrudService;
 import kr.modusplant.modules.auth.normal.app.http.request.NormalSignUpRequest;
@@ -31,26 +35,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
-public class NormalSignUpControllerUnitTest {
+public class NormalSignUpControllerUnitTest implements SiteMemberResponseTestUtils, SiteMemberAuthResponseTestUtils, SiteMemberTermResponseTestUtils {
 
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
     @MockitoBean
-    private TermCrudService termCrudService;
+    private TermApplicationService termApplicationService;
     @MockitoBean
-    private SiteMemberCrudService siteMemberCrudService;
+    private SiteMemberApplicationService siteMemberApplicationService;
     @MockitoBean
-    private SiteMemberAuthCrudService siteMemberAuthCrudService;
+    private SiteMemberAuthApplicationService siteMemberAuthApplicationService;
     @MockitoBean
-    private SiteMemberTermCrudService siteMemberTermCrudService;
+    private SiteMemberTermApplicationService siteMemberTermApplicationService;
 
     @Test
     public void sendTerms_givenRequestingTerm_thenReturn200WithTerm() throws Exception {
         // given
-        given(termCrudService.getAll())
-                .willReturn(List.of(TermTestUtils.termsOfUseWithUuid, TermTestUtils.privacyPolicyWithUuid, TermTestUtils.adInfoReceivingWithUuid));
+        given(termApplicationService.getAll())
+                .willReturn(List.of(TermResponseTestUtils.termsOfUseResponse));
 
         // when
         mockMvc.perform(get("/api/terms"))
@@ -88,24 +92,23 @@ public class NormalSignUpControllerUnitTest {
     private void setupServiceStubbing() {
         UUID consistentMemberUuid = SiteMemberTestUtils.memberBasicUserWithUuid.getUuid();
 
-        given(siteMemberCrudService
+        given(siteMemberApplicationService
                 .insert(argThat(member ->
                         member != null &&
-                                member.getNickname() != null)))
-                .willReturn(SiteMemberTestUtils.memberBasicUserWithUuid);
+                                member.nickname() != null)))
+                .willReturn(memberBasicUserResponse);
 
-        given(siteMemberAuthCrudService
+        given(siteMemberAuthApplicationService
                 .insert(argThat(auth ->
                     auth != null &&
-                            auth.getActiveMemberUuid().equals(consistentMemberUuid) &&
-                            auth.getOriginalMemberUuid().equals(consistentMemberUuid) &&
-                            auth.getProvider().equals(AuthProvider.BASIC))))
-                .willReturn(SiteMemberAuthTestUtils.memberAuthBasicUserWithUuid);
+                            auth.originalMemberUuid().equals(consistentMemberUuid) &&
+                            auth.provider().equals(AuthProvider.BASIC))))
+                .willReturn(memberAuthBasicUserResponse);
 
-        given(siteMemberTermCrudService
+        given(siteMemberTermApplicationService
                 .insert(argThat(memberTerm ->
                     memberTerm != null &&
-                            memberTerm.getUuid().equals(consistentMemberUuid))))
-                .willReturn(SiteMemberTermTestUtils.memberTermUserWithUuid);
+                            memberTerm.uuid().equals(consistentMemberUuid))))
+                .willReturn(memberTermUserResponse);
     }
 }

@@ -1,16 +1,21 @@
 package kr.modusplant.global.app.servlet.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
+
+import static kr.modusplant.global.enums.ResponseMessage.RESPONSE_MESSAGE_200;
 
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DataResponse<T> {
     private int status;
     private String message;
     private T data;
 
-    // 팩토리 메서드
     public static <T> DataResponse<T> of(int status, String message, T data) {
         DataResponse<T> response = new DataResponse<>();
         response.status = status;
@@ -25,4 +30,20 @@ public class DataResponse<T> {
         response.message = message;
         return response;
     }
+
+    public static DataResponse<Void> ok() {
+        DataResponse<Void> response = new DataResponse<>();
+        response.status = HttpStatus.OK.value();
+        response.message = RESPONSE_MESSAGE_200.getValue();
+        return response;
+    }
+
+    public static <T> DataResponse<T> ok(T data) {
+        DataResponse<T> response = new DataResponse<>();
+        response.status = HttpStatus.OK.value();
+        response.message = RESPONSE_MESSAGE_200.getValue();
+        response.data = data;
+        return response;
+    }
+
 }

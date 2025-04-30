@@ -1,13 +1,14 @@
 package kr.modusplant.modules.jwt.domain.service;
 
-import kr.modusplant.domains.member.domain.model.SiteMember;
-import kr.modusplant.domains.member.domain.model.SiteMemberRole;
-import kr.modusplant.domains.member.domain.service.supers.SiteMemberCrudService;
-import kr.modusplant.domains.member.domain.service.supers.SiteMemberRoleCrudService;
-import kr.modusplant.modules.jwt.domain.model.RefreshToken;
-import kr.modusplant.modules.jwt.domain.service.supers.RefreshTokenCrudService;
-import kr.modusplant.modules.jwt.dto.TokenPair;
+import kr.modusplant.domains.member.app.http.response.SiteMemberResponse;
+import kr.modusplant.domains.member.app.service.SiteMemberApplicationService;
+import kr.modusplant.domains.member.app.service.SiteMemberRoleApplicationService;
+import kr.modusplant.domains.member.common.util.app.http.response.SiteMemberRoleResponseTestUtils;
+import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.global.enums.Role;
+import kr.modusplant.modules.jwt.domain.model.RefreshToken;
+import kr.modusplant.modules.jwt.domain.service.supers.RefreshTokenApplicationService;
+import kr.modusplant.modules.jwt.dto.TokenPair;
 import kr.modusplant.modules.jwt.error.InvalidTokenException;
 import kr.modusplant.modules.jwt.error.TokenDataNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +20,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import static kr.modusplant.global.vo.CamelCaseWord.MEMBER_UUID;
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,17 +34,17 @@ import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class TokenServiceTest {
+class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberRoleResponseTestUtils {
     @InjectMocks
     private TokenService tokenService;
     @Mock
     private TokenProvider tokenProvider;
     @Mock
-    private SiteMemberCrudService siteMemberService;
+    private SiteMemberApplicationService siteMemberService;
     @Mock
-    private SiteMemberRoleCrudService siteMemberRoleService;
+    private SiteMemberRoleApplicationService siteMemberRoleService;
     @Mock
-    private RefreshTokenCrudService refreshTokenCrudService;
+    private RefreshTokenApplicationService refreshTokenApplicationService;
     @Mock
     private TokenValidationService tokenValidationService;
 
@@ -82,7 +86,7 @@ class TokenServiceTest {
         given(tokenProvider.getIssuedAtFromToken(refreshToken)).willReturn(issuedAt);
         given(tokenProvider.getExpirationFromToken(refreshToken)).willReturn(expiredAt);
 
-        given(refreshTokenCrudService.insert(any())).willAnswer(invocation -> invocation.getArgument(0));
+        given(refreshTokenApplicationService.insert(any())).willAnswer(invocation -> invocation.getArgument(0));
 
         // when
         TokenPair tokenPair = tokenService.issueToken(memberUuid, nickname, role, deviceId);
@@ -96,7 +100,7 @@ class TokenServiceTest {
         verify(tokenValidationService).validateExistedDeviceId(deviceId);
         verify(tokenProvider).generateAccessToken(eq(memberUuid), anyMap());
         verify(tokenProvider).generateRefreshToken(memberUuid);
-        verify(refreshTokenCrudService).insert(any(RefreshToken.class));
+        verify(refreshTokenApplicationService).insert(any(RefreshToken.class));
     }
 
     @Test
@@ -115,17 +119,15 @@ class TokenServiceTest {
     @DisplayName("토큰 갱신 성공 테스트")
     void reissueTokenSuccess() {
         // given
-        SiteMember siteMember = mock(SiteMember.class);
-        given(siteMember.getNickname()).willReturn(nickname);
-        SiteMemberRole siteMemberRole = mock(SiteMemberRole.class);
-        given(siteMemberRole.getRole()).willReturn(role);
+        SiteMemberResponse siteMemberResponse = mock(SiteMemberResponse.class);
+        given(siteMemberResponse.nickname()).willReturn(nickname);
         String newAccessToken = "new-access-token";
 
         given(tokenProvider.validateToken(refreshToken)).willReturn(true);
         given(tokenValidationService.validateNotFoundRefreshToken(refreshToken)).willReturn(false);
         given(tokenProvider.getMemberUuidFromToken(refreshToken)).willReturn(memberUuid);
-        given(siteMemberService.getByUuid(memberUuid)).willReturn(Optional.of(siteMember));
-        given(siteMemberRoleService.getByMember(siteMember)).willReturn(Optional.of(siteMemberRole));
+        given(siteMemberService.getByUuid(memberUuid)).willReturn(Optional.of(siteMemberResponse));
+        given(siteMemberRoleService.getByUuid(memberUuid)).willReturn(Optional.of(memberRoleUserResponse));
         given(tokenProvider.generateAccessToken(memberUuid, claims)).willReturn(newAccessToken);
 
         // when
@@ -172,13 +174,12 @@ class TokenServiceTest {
     @DisplayName("토큰 갱신 실패 테스트 : SiteMemberRole 조회 불가")
     void reissueTokenFailWhenSiteMemberRoleNotFound() {
         // given
-        SiteMember siteMember = mock(SiteMember.class);
+        SiteMemberResponse siteMemberResponse = mock(SiteMemberResponse.class);
 
         given(tokenProvider.validateToken(refreshToken)).willReturn(true);
         given(tokenValidationService.validateNotFoundRefreshToken(refreshToken)).willReturn(false);
         given(tokenProvider.getMemberUuidFromToken(refreshToken)).willReturn(memberUuid);
-        given(siteMemberService.getByUuid(memberUuid)).willReturn(Optional.of(siteMember));
-        given(siteMemberRoleService.getByMember(siteMember)).willReturn(Optional.empty());
+        given(siteMemberService.getByUuid(memberUuid)).willReturn(Optional.of(siteMemberResponse));
 
         // then
         assertThrows(TokenDataNotFoundException.class, () -> tokenService.reissueToken(refreshToken));
@@ -198,15 +199,15 @@ class TokenServiceTest {
         given(tokenProvider.validateToken(refreshToken)).willReturn(true);
         given(tokenValidationService.validateNotFoundRefreshToken(refreshToken)).willReturn(false);
         given(tokenProvider.getMemberUuidFromToken(refreshToken)).willReturn(memberUuid);
-        given(refreshTokenCrudService.getByRefreshToken(refreshToken)).willReturn(Optional.of(mockRefreshToken));
-        given(refreshTokenCrudService.getByMemberUuidAndDeviceId(memberUuid, deviceId)).willReturn(Optional.of(mockRefreshToken));
+        given(refreshTokenApplicationService.getByRefreshToken(refreshToken)).willReturn(Optional.of(mockRefreshToken));
+        given(refreshTokenApplicationService.getByMemberUuidAndDeviceId(memberUuid, deviceId)).willReturn(Optional.of(mockRefreshToken));
         willDoNothing().given(tokenValidationService).validateNotFoundTokenUuid(mockRefreshToken.getUuid());
 
         // when
         tokenService.removeToken(refreshToken);
 
         // then
-        verify(refreshTokenCrudService).removeByUuid(mockRefreshToken.getUuid());
+        verify(refreshTokenApplicationService).removeByUuid(mockRefreshToken.getUuid());
     }
 
     @Test
@@ -221,7 +222,7 @@ class TokenServiceTest {
 
         // then
         assertDoesNotThrow(() -> tokenService.removeToken(refreshToken));
-        verify(refreshTokenCrudService, never()).removeByUuid(any());
+        verify(refreshTokenApplicationService, never()).removeByUuid(any());
     }
 
 }

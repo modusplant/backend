@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -24,17 +23,16 @@ import static kr.modusplant.global.vo.SnakeCaseWord.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SiteMemberAuthEntity {
     @Id
-    @UuidGenerator
-    @Column(nullable = false, updatable = false)
     private UUID uuid;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
+    @MapsId
+    @JoinColumn(nullable = false, name = "uuid", updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private SiteMemberEntity originalMember;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(nullable = false, name = SNAKE_ACT_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity activeMember;
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(nullable = false, unique = true, updatable = false, name = SNAKE_ORI_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private SiteMemberEntity originalMember;
 
     @Column(nullable = false, length = 80)
     private String email;
@@ -117,10 +115,9 @@ public class SiteMemberAuthEntity {
         }
     }
 
-    private SiteMemberAuthEntity(UUID uuid, SiteMemberEntity activeMember, SiteMemberEntity originalMember, String email, String pw, AuthProvider provider, String providerId, Integer failedAttempt, LocalDateTime lockoutRefreshAt, LocalDateTime lockoutUntil) {
-        this.uuid = uuid;
-        this.activeMember = activeMember;
+    private SiteMemberAuthEntity(SiteMemberEntity originalMember, SiteMemberEntity activeMember, String email, String pw, AuthProvider provider, String providerId, Integer failedAttempt, LocalDateTime lockoutRefreshAt, LocalDateTime lockoutUntil) {
         this.originalMember = originalMember;
+        this.activeMember = activeMember;
         this.email = email;
         this.pw = pw;
         this.provider = provider;
@@ -135,9 +132,8 @@ public class SiteMemberAuthEntity {
     }
 
     public static final class SiteMemberAuthEntityBuilder {
-        private UUID uuid;
-        private SiteMemberEntity activeMember;
         private SiteMemberEntity originalMember;
+        private SiteMemberEntity activeMember;
         private String email;
         private String pw;
         private AuthProvider provider;
@@ -146,18 +142,13 @@ public class SiteMemberAuthEntity {
         private LocalDateTime lockoutRefreshAt;
         private LocalDateTime lockoutUntil;
 
-        public SiteMemberAuthEntityBuilder uuid(final UUID uuid) {
-            this.uuid = uuid;
+        public SiteMemberAuthEntityBuilder originalMember(final SiteMemberEntity originalMember) {
+            this.originalMember = originalMember;
             return this;
         }
 
         public SiteMemberAuthEntityBuilder activeMember(final SiteMemberEntity activeMember) {
             this.activeMember = activeMember;
-            return this;
-        }
-
-        public SiteMemberAuthEntityBuilder originalMember(final SiteMemberEntity originalMember) {
-            this.originalMember = originalMember;
             return this;
         }
 
@@ -197,9 +188,8 @@ public class SiteMemberAuthEntity {
         }
 
         public SiteMemberAuthEntityBuilder memberAuthEntity(final SiteMemberAuthEntity memberAuth) {
-            this.uuid = memberAuth.getUuid();
-            this.activeMember = memberAuth.getActiveMember();
             this.originalMember = memberAuth.getOriginalMember();
+            this.activeMember = memberAuth.getActiveMember();
             this.email = memberAuth.getEmail();
             this.pw = memberAuth.getPw();
             this.provider = memberAuth.getProvider();
@@ -211,7 +201,7 @@ public class SiteMemberAuthEntity {
         }
 
         public SiteMemberAuthEntity build() {
-            return new SiteMemberAuthEntity(this.uuid, this.activeMember, this.originalMember, this.email, this.pw, this.provider, this.providerId, this.failedAttempt, this.lockoutRefreshAt, this.lockoutUntil);
+            return new SiteMemberAuthEntity(this.originalMember, this.activeMember, this.email, this.pw, this.provider, this.providerId, this.failedAttempt, this.lockoutRefreshAt, this.lockoutUntil);
         }
     }
 }

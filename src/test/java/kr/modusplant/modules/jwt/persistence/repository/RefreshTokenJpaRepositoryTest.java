@@ -1,10 +1,10 @@
 package kr.modusplant.modules.jwt.persistence.repository;
 
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.global.context.RepositoryOnlyContext;
 import kr.modusplant.modules.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
-import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +17,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class RefreshTokenJpaRepositoryTest implements RefreshTokenEntityTestUtils {
 
     private final RefreshTokenJpaRepository refreshTokenRepository;
-    private final SiteMemberCrudJpaRepository memberRepository;
+    private final SiteMemberRepository memberRepository;
 
     @Autowired
-    RefreshTokenJpaRepositoryTest(RefreshTokenJpaRepository refreshTokenRepository, SiteMemberCrudJpaRepository memberRepository) {
+    RefreshTokenJpaRepositoryTest(RefreshTokenJpaRepository refreshTokenRepository, SiteMemberRepository memberRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
         this.memberRepository = memberRepository;
     }

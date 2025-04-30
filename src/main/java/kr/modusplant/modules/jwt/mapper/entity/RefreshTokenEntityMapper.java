@@ -1,10 +1,11 @@
 package kr.modusplant.modules.jwt.mapper.entity;
 
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberCrudJpaRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
 import org.mapstruct.*;
+
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
@@ -15,7 +16,7 @@ import static kr.modusplant.global.vo.CamelCaseWord.*;
 @Mapper
 public interface RefreshTokenEntityMapper {
     @BeanMapping(ignoreByDefault = true)
-    default RefreshTokenEntity createRefreshTokenEntity(RefreshToken refreshToken, @Context SiteMemberCrudJpaRepository memberRepository) {
+    default RefreshTokenEntity createRefreshTokenEntity(RefreshToken refreshToken, @Context SiteMemberRepository memberRepository) {
         return RefreshTokenEntity.builder()
                 .member(memberRepository.findByUuid(refreshToken.getMemberUuid()).orElseThrow())
                 .deviceId(refreshToken.getDeviceId())
@@ -26,7 +27,7 @@ public interface RefreshTokenEntityMapper {
     }
 
     @BeanMapping(ignoreByDefault = true)
-    default RefreshTokenEntity updateRefreshTokenEntity(RefreshToken refreshToken, @Context SiteMemberCrudJpaRepository memberRepository) {
+    default RefreshTokenEntity updateRefreshTokenEntity(RefreshToken refreshToken, @Context SiteMemberRepository memberRepository) {
         return RefreshTokenEntity.builder()
                 .uuid(refreshToken.getUuid())
                 .member(memberRepository.findByUuid(refreshToken.getMemberUuid()).orElseThrow())
