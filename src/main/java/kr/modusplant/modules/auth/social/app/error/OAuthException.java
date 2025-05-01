@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:src/main/java/kr/modusplant/modules/auth/social/app/error/OAuthException.java
 package kr.modusplant.modules.auth.social.app.error;
-========
-package kr.modusplant.modules.auth.social.error;
->>>>>>>> f2cf09f (MP-151 :truck: Rename: 소셜 로그인 파일 이동):src/main/java/kr/modusplant/modules/auth/social/error/OAuthException.java
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
