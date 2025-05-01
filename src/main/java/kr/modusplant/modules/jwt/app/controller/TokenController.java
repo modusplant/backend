@@ -1,13 +1,13 @@
-package kr.modusplant.modules.jwt.controller;
+package kr.modusplant.modules.jwt.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.modusplant.global.app.servlet.response.DataResponse;
-import kr.modusplant.modules.jwt.domain.service.TokenService;
-import kr.modusplant.modules.jwt.dto.TokenPair;
-import kr.modusplant.modules.jwt.model.response.TokenResponse;
+import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
+import kr.modusplant.modules.jwt.app.dto.TokenPair;
+import kr.modusplant.modules.jwt.app.http.response.TokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class TokenController {
-    private final TokenService tokenService;
+    private final TokenApplicationService tokenApplicationService;
 
     // 토큰 갱신
     @Operation(summary = "ACCESS TOKEN 토큰 갱신 API", description = "REFRESH TOKEN을 받아 처리합니다.")
@@ -33,15 +33,13 @@ public class TokenController {
     @PostMapping("/auth/token/refresh")
     public ResponseEntity<DataResponse<?>> refreshToken(@CookieValue("refresh_token")String refreshToken) {
 
-        TokenPair tokenPair = tokenService.reissueToken(refreshToken);
+        TokenPair tokenPair = tokenApplicationService.reissueToken(refreshToken);
 
-        TokenResponse tokenResponse = new TokenResponse(tokenPair.getAccessToken());
-        DataResponse<TokenResponse> response = DataResponse.of(200,"OK: Succeeded", tokenResponse);
+        DataResponse<TokenResponse> response = DataResponse.ok(new TokenResponse(tokenPair.getAccessToken()));
         String refreshCookie = setRefreshTokenCookie(tokenPair.getRefreshToken());
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie).body(response);
     }
-
 
     private String setRefreshTokenCookie(String refreshToken) {
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken).build();

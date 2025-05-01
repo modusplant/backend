@@ -1,4 +1,4 @@
-package kr.modusplant.modules.jwt.domain.service;
+package kr.modusplant.modules.jwt.app.service;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import org.junit.jupiter.api.BeforeEach;
