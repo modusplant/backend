@@ -1,4 +1,4 @@
-package kr.modusplant.modules.jwt.domain.service;
+package kr.modusplant.modules.jwt.app.service;
 
 import kr.modusplant.domains.member.app.service.SiteMemberApplicationService;
 import kr.modusplant.domains.member.common.util.app.http.request.SiteMemberRequestTestUtils;
@@ -29,10 +29,10 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
 @ExtendWith(MockitoExtension.class)
-class RefreshTokenApplicationServiceImplTest implements RefreshTokenTestUtils, RefreshTokenEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils, SiteMemberRequestTestUtils {
+class RefreshTokenApplicationServiceTest implements RefreshTokenTestUtils, RefreshTokenEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils, SiteMemberRequestTestUtils {
 
     @InjectMocks
-    private RefreshTokenApplicationServiceImpl tokenApplicationService;
+    private RefreshTokenApplicationService tokenApplicationService;
 
     @Mock
     private SiteMemberApplicationService memberService;

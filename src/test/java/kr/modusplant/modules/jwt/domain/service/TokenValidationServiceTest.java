@@ -9,7 +9,6 @@ import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import kr.modusplant.modules.jwt.common.util.domain.RefreshTokenTestUtils;
 import kr.modusplant.modules.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
-import kr.modusplant.modules.jwt.domain.service.supers.RefreshTokenApplicationService;
 import kr.modusplant.modules.jwt.mapper.entity.RefreshTokenEntityMapper;
 import kr.modusplant.modules.jwt.mapper.entity.RefreshTokenEntityMapperImpl;
 import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
@@ -35,8 +34,6 @@ import static org.mockito.BDDMockito.given;
 @ExtendWith(MockitoExtension.class)
 class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils {
     @Mock
-    private RefreshTokenApplicationService refreshTokenApplicationService;
-    @Mock
     private RefreshTokenJpaRepository tokenRepository;
     @Mock
     private SiteMemberRepository memberRepository;
@@ -52,7 +49,7 @@ class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenE
         void returnTrueWhenRefreshTokenMissing() {
             // given
             String refreshToken = "refreshToken";
-            given(refreshTokenApplicationService.getByRefreshToken(refreshToken)).willReturn(Optional.empty());
+            given(tokenRepository.findByRefreshToken(refreshToken)).willReturn(Optional.empty());
 
             // when
             boolean result = tokenValidationService.validateNotFoundRefreshToken(refreshToken);
@@ -71,7 +68,7 @@ class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenE
                     .member(memberEntity)
                     .build();
             RefreshToken token = tokenMapper.toRefreshToken(tokenEntity);
-            given(refreshTokenApplicationService.getByRefreshToken(token.getRefreshToken())).willReturn(Optional.of(token));
+            given(tokenRepository.findByRefreshToken(token.getRefreshToken())).willReturn(Optional.of(tokenEntity));
 
             // when
             boolean result = tokenValidationService.validateNotFoundRefreshToken(token.getRefreshToken());
@@ -93,7 +90,7 @@ class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenE
                     .member(memberEntity)
                     .build();
             RefreshToken token = tokenMapper.toRefreshToken(tokenEntity);
-            given(refreshTokenApplicationService.getByDeviceId(token.getDeviceId())).willReturn(Optional.of(token));
+            given(tokenRepository.findByDeviceId(token.getDeviceId())).willReturn(Optional.of(tokenEntity));
 
             // when
             boolean result = tokenValidationService.validateExistedDeviceId(token.getDeviceId());
@@ -107,7 +104,7 @@ class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenE
         void returnFalseIfDeviceIdDoesNotExist() {
             // given
             UUID deviceid = UUID.randomUUID();
-            given(refreshTokenApplicationService.getByDeviceId(deviceid)).willReturn(Optional.empty());
+            given(tokenRepository.findByDeviceId(deviceid)).willReturn(Optional.empty());
 
             // when
             boolean result = tokenValidationService.validateExistedDeviceId(deviceid);
