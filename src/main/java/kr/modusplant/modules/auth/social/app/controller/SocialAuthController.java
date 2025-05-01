@@ -1,18 +1,18 @@
-package kr.modusplant.modules.auth.social.controller;
+package kr.modusplant.modules.auth.social.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import kr.modusplant.domains.member.domain.model.SiteMemberWithRole;
+import kr.modusplant.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.global.app.servlet.response.DataResponse;
-import kr.modusplant.modules.auth.social.model.request.SocialLoginRequest;
-import kr.modusplant.modules.auth.social.service.SocialAuthApplicationService;
-import kr.modusplant.modules.jwt.domain.service.TokenService;
-import kr.modusplant.modules.jwt.dto.TokenPair;
-import kr.modusplant.modules.jwt.model.response.TokenResponse;
+import kr.modusplant.modules.auth.social.app.http.request.SocialLoginRequest;
+import kr.modusplant.modules.auth.social.app.service.SocialAuthApplicationService;
+import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
+import kr.modusplant.modules.jwt.app.dto.TokenPair;
+import kr.modusplant.modules.jwt.app.http.response.TokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SocialAuthController {
 
     private final SocialAuthApplicationService socialAuthApplicationService;
-    private final TokenService tokenService;
+    private final TokenApplicationService tokenApplicationService;
 
     @Operation(summary = "카카오 소셜 로그인 API", description = "카카오 인가코드를 받아 로그인합니다.")
     @ApiResponses(value = {
@@ -41,12 +41,12 @@ public class SocialAuthController {
     })
     @PostMapping("/kakao/social-login")
     public ResponseEntity<DataResponse<?>> kakaoSocialLogin(@Valid @RequestBody SocialLoginRequest request) {
-        SiteMemberWithRole member = socialAuthApplicationService.handleSocialLogin(AuthProvider.KAKAO, request.getCode());
+        JwtUserPayload member = socialAuthApplicationService.handleSocialLogin(AuthProvider.KAKAO, request.getCode());
 
-        TokenPair tokenPair = tokenService.issueToken(member.getMemberUuid(),member.getNickname(),member.getRole(),request.getDeviceId());
+        TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(),member.nickname(),member.role(),request.getDeviceId());
 
         TokenResponse token = new TokenResponse(tokenPair.getAccessToken());
-        DataResponse<TokenResponse> response = DataResponse.of(200,"OK: Succeeded", token);
+        DataResponse<TokenResponse> response = DataResponse.ok(token);
         String refreshCookie = setRefreshTokenCookie(tokenPair.getRefreshToken());
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie).body(response);
@@ -61,12 +61,12 @@ public class SocialAuthController {
     })
     @PostMapping("/google/social-login")
     public ResponseEntity<DataResponse<?>> googleSocialLogin(@Valid @RequestBody SocialLoginRequest request) {
-        SiteMemberWithRole member = socialAuthApplicationService.handleSocialLogin(AuthProvider.GOOGLE, request.getCode());
+        JwtUserPayload member = socialAuthApplicationService.handleSocialLogin(AuthProvider.GOOGLE, request.getCode());
 
-        TokenPair tokenPair = tokenService.issueToken(member.getMemberUuid(),member.getNickname(),member.getRole(),request.getDeviceId());
+        TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(),member.nickname(),member.role(),request.getDeviceId());
 
         TokenResponse token = new TokenResponse(tokenPair.getAccessToken());
-        DataResponse<TokenResponse> response = DataResponse.of(200,"OK: Succeeded", token);
+        DataResponse<TokenResponse> response = DataResponse.ok(token);
         String refreshCookie = setRefreshTokenCookie(tokenPair.getRefreshToken());
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie).body(response);

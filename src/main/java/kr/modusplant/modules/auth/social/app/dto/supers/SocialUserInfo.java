@@ -1,4 +1,4 @@
-package kr.modusplant.modules.auth.social.dto.supers;
+package kr.modusplant.modules.auth.social.app.dto.supers;
 
 public interface SocialUserInfo {
     String getId();

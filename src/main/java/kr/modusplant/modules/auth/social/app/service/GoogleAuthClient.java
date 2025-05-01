@@ -1,8 +1,8 @@
-package kr.modusplant.modules.auth.social.service;
+package kr.modusplant.modules.auth.social.app.service;
 
-import kr.modusplant.modules.auth.social.dto.KakaoUserInfo;
-import kr.modusplant.modules.auth.social.error.OAuthException;
-import kr.modusplant.modules.auth.social.service.supers.SocialAuthClient;
+import kr.modusplant.modules.auth.social.app.dto.GoogleUserInfo;
+import kr.modusplant.modules.auth.social.app.error.OAuthException;
+import kr.modusplant.modules.auth.social.app.service.supers.SocialAuthClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,29 +16,32 @@ import org.springframework.web.client.RestClient;
 import java.util.Map;
 
 @Service
-public class KakaoAuthClient implements SocialAuthClient {
+public class GoogleAuthClient implements SocialAuthClient {
     private RestClient restClient;
-    @Value("${kakao.api-key}")
-    private String KAKAO_API_KEY;
-    @Value("${kakao.redirect-uri}")
-    private String KAKAO_REDIRECT_URI;
+    @Value("${google.api-key}")
+    private String GOOGLE_API_KEY;
+    @Value("${google.secret}")
+    private String GOOGLE_SECRET;
+    @Value("${google.redirect-uri}")
+    private String GOOGLE_REDIRECT_URI;
 
     public String getAccessToken(String code) {
         restClient = RestClient.builder()
-                .baseUrl("https://kauth.kakao.com")
+                .baseUrl("https://oauth2.googleapis.com")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .build();
 
         MultiValueMap<String,String> formData = new LinkedMultiValueMap<>();
         Map.of(
-                "code",code,
-                "client_id",KAKAO_API_KEY,
-                "redirect_uri", KAKAO_REDIRECT_URI,
-                "grant_type", "authorization_code"
+                "code", code,
+                "client_id", GOOGLE_API_KEY,
+                "client_secret", GOOGLE_SECRET,
+                "redirect_uri", GOOGLE_REDIRECT_URI,
+                "grant_type","authorization_code"
         ).forEach(formData::add);
 
         return restClient.post()
-                .uri("/oauth/token")
+                .uri("/token")
                 .body(formData)
                 .retrieve()
                 .onStatus(this::isErrorStatus, (request, response) -> {
@@ -48,19 +51,19 @@ public class KakaoAuthClient implements SocialAuthClient {
                 .get("access_token").toString();
     }
 
-    public KakaoUserInfo getUserInfo(String accessToken) {
+    public GoogleUserInfo getUserInfo(String accessToken) {
         restClient = RestClient.builder()
-                .baseUrl("https://kapi.kakao.com")
+                .baseUrl("https://www.googleapis.com")
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer "+accessToken)
                 .build();
 
         return restClient.get()
-                .uri("/v2/user/me")
+                .uri("/userinfo/v2/me")
                 .retrieve()
                 .onStatus(this::isErrorStatus, (request, response) -> {
                     throw new OAuthException((HttpStatus) response.getStatusCode());
                 })
-                .body(KakaoUserInfo.class);
+                .body(GoogleUserInfo.class);
     }
 
     private boolean isErrorStatus(HttpStatusCode status) {
