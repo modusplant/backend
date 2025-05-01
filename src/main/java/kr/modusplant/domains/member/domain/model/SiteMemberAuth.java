@@ -11,11 +11,9 @@ import java.util.UUID;
 @EqualsAndHashCode
 @Builder(access = AccessLevel.PUBLIC)
 public class SiteMemberAuth {
-    private final UUID uuid;
+    private final UUID originalMemberUuid;
 
     private final UUID activeMemberUuid;
-
-    private final UUID originalMemberUuid;
 
     private final String email;
 
@@ -32,9 +30,8 @@ public class SiteMemberAuth {
     private final LocalDateTime lockoutUntil;
 
     public static class SiteMemberAuthBuilder {
-        private UUID uuid;
-        private UUID activeMemberUuid;
         private UUID originalMemberUuid;
+        private UUID activeMemberUuid;
         private String email;
         private String pw;
         private AuthProvider provider;
@@ -44,9 +41,8 @@ public class SiteMemberAuth {
         private LocalDateTime lockoutUntil;
 
         public SiteMemberAuthBuilder memberAuth(SiteMemberAuth memberAuth) {
-            this.uuid = memberAuth.getUuid();
-            this.activeMemberUuid = memberAuth.getActiveMemberUuid();
             this.originalMemberUuid = memberAuth.getOriginalMemberUuid();
+            this.activeMemberUuid = memberAuth.getActiveMemberUuid();
             this.email = memberAuth.getEmail();
             this.pw = memberAuth.getPw();
             this.provider = memberAuth.getProvider();
@@ -58,7 +54,7 @@ public class SiteMemberAuth {
         }
 
         public SiteMemberAuth build() {
-            return new SiteMemberAuth(this.uuid, this.activeMemberUuid, this.originalMemberUuid, this.email, this.pw, this.provider, this.providerId, this.failedAttempt, this.lockoutRefreshAt, this.lockoutUntil);
+            return new SiteMemberAuth(this.originalMemberUuid, this.activeMemberUuid, this.email, this.pw, this.provider, this.providerId, this.failedAttempt, this.lockoutRefreshAt, this.lockoutUntil);
         }
     }
 }

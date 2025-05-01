@@ -24,7 +24,7 @@ class SiteMemberAuthEntityTest implements SiteMemberAuthEntityTestUtils {
     void prePersist() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).failedAttempt(1).build();
+        SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).failedAttempt(1).build();
 
         // when
         entityManager.persist(memberAuth);
@@ -39,11 +39,11 @@ class SiteMemberAuthEntityTest implements SiteMemberAuthEntityTestUtils {
     void preUpdate() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntityBuilder().activeMember(member).originalMember(member).build();
+        SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build();
         entityManager.persist(memberAuth);
 
         // when
-        entityManager.merge(SiteMemberAuthEntity.builder().memberAuthEntity(memberAuth).failedAttempt(null).build());
+        memberAuth.updateFailedAttempt(null);
         entityManager.flush();
 
         // then

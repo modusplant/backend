@@ -20,7 +20,6 @@ public final class SnakeCaseWord {
     public static final String SNAKE_LOCKOUT_REFRESH_AT = "lockout_refresh_at";
     public static final String SNAKE_LOCKOUT_UNTIL = "lockout_until";
     public static final String SNAKE_LOGGED_IN_AT = "logged_in_at";
-    public static final String SNAKE_ORI_MEMB_UUID = "ori_memb_uuid";
     public static final String SNAKE_PROVIDER_ID = "provider_id";
     public static final String SNAKE_SITE_MEMBER = "site_member";
     public static final String SNAKE_SITE_MEMBER_AUTH = "site_member_auth";

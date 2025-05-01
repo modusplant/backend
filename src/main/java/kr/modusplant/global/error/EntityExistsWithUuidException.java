@@ -5,14 +5,14 @@ import jakarta.persistence.EntityExistsException;
 import java.util.UUID;
 
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
-import static kr.modusplant.global.vo.ExceptionMessage.EXISTED_ENTITY;
+import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
 
 public class EntityExistsWithUuidException extends EntityExistsException {
     public EntityExistsWithUuidException(UUID uuid, Class<?> clazz) {
-        super(getFormattedExceptionMessage(EXISTED_ENTITY, "uuid", uuid, clazz));
+        super(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), "uuid", uuid, clazz));
     }
 
     public EntityExistsWithUuidException(String name, UUID value, Class<?> clazz) {
-        super(getFormattedExceptionMessage(EXISTED_ENTITY, name, value, clazz));
+        super(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), name, value, clazz));
     }
 }

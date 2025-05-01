@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.modusplant.domains.member.domain.model.SiteMember;
+import kr.modusplant.domains.member.app.http.response.SiteMemberResponse;
 import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.global.app.servlet.response.DataResponse;
 import kr.modusplant.modules.signup.social.model.external.GoogleUserInfo;
@@ -43,7 +43,7 @@ public class SocialAuthController {
         // Kakao 사용자 정보 가져오기
         KakaoUserInfo kakaoUserInfo = socialAuthService.getKakaoUserInfo(kakaoAccessToken);
         // 사용자 생성 및 조회
-        SiteMember siteMember = socialAuthService.findOrCreateMember(AuthProvider.KAKAO, kakaoUserInfo.getKakaoId(),kakaoUserInfo.getKakaoEmail(),kakaoUserInfo.getKakaoNickname());
+        SiteMemberResponse siteMember = socialAuthService.findOrCreateMember(AuthProvider.KAKAO, kakaoUserInfo.getKakaoId(),kakaoUserInfo.getKakaoEmail(),kakaoUserInfo.getKakaoNickname());
 
         /* JWT */
         // JWT 예시
@@ -72,7 +72,7 @@ public class SocialAuthController {
         // Google 사용자 정보 가져오기
         GoogleUserInfo googleUserInfo = socialAuthService.getGoogleUserInfo(googleAccessToken);
         // 사용자 생성 및 조회
-        SiteMember siteMember = socialAuthService.findOrCreateMember(AuthProvider.GOOGLE,googleUserInfo.getId(),googleUserInfo.getEmail(),googleUserInfo.getNickname());
+        SiteMemberResponse siteMember = socialAuthService.findOrCreateMember(AuthProvider.GOOGLE,googleUserInfo.getId(),googleUserInfo.getEmail(),googleUserInfo.getNickname());
 
         // JWT 예시
         String accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
