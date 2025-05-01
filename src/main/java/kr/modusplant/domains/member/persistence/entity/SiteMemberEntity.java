@@ -66,24 +66,28 @@ public class SiteMemberEntity {
     @Column(name = SNAKE_VER_NUM, nullable = false)
     private Long versionNumber;
 
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
     public void updateBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
 
-    public void updateActive(Boolean active) {
-        isActive = active;
+    public void updateIsActive(Boolean isActive) {
+        this.isActive = isActive;
     }
 
-    public void updateDisabledByLinking(Boolean disabledByLinking) {
-        isDisabledByLinking = disabledByLinking;
+    public void updateIsDisabledByLinking(Boolean isDisabledByLinking) {
+        this.isDisabledByLinking = isDisabledByLinking;
     }
 
-    public void updateBanned(Boolean banned) {
-        isBanned = banned;
+    public void updateIsBanned(Boolean isBanned) {
+        this.isBanned = isBanned;
     }
 
-    public void updateDeleted(Boolean deleted) {
-        isDeleted = deleted;
+    public void updateIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 
     public void updateLoggedInAt(LocalDateTime loggedInAt) {

@@ -1,6 +1,7 @@
 package kr.modusplant.modules.jwt.dto;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 @Builder

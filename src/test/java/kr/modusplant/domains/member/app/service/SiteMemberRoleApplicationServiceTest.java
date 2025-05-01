@@ -1,0 +1,179 @@
+package kr.modusplant.domains.member.app.service;
+
+import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.member.app.http.request.SiteMemberRoleUpdateRequest;
+import kr.modusplant.domains.member.app.http.response.SiteMemberRoleResponse;
+import kr.modusplant.domains.member.common.util.app.http.request.SiteMemberRequestTestUtils;
+import kr.modusplant.domains.member.common.util.app.http.request.SiteMemberRoleRequestTestUtils;
+import kr.modusplant.domains.member.common.util.app.http.response.SiteMemberResponseTestUtils;
+import kr.modusplant.domains.member.common.util.app.http.response.SiteMemberRoleResponseTestUtils;
+import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
+import kr.modusplant.domains.member.common.util.entity.SiteMemberRoleEntityTestUtils;
+import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
+import kr.modusplant.domains.member.persistence.entity.SiteMemberRoleEntity;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleRepository;
+import kr.modusplant.global.enums.Role;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
+
+@DomainsServiceOnlyContext
+class SiteMemberRoleApplicationServiceTest implements SiteMemberRoleRequestTestUtils, SiteMemberRoleResponseTestUtils, SiteMemberRoleEntityTestUtils, SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityTestUtils {
+
+    private final SiteMemberRoleApplicationService memberRoleService;
+    private final SiteMemberApplicationService memberService;
+    private final SiteMemberRoleRepository memberRoleRepository;
+    private final SiteMemberRepository memberRepository;
+
+    @Autowired
+    SiteMemberRoleApplicationServiceTest(SiteMemberRoleApplicationService memberRoleService, SiteMemberApplicationService memberService, SiteMemberRoleRepository memberRoleRepository, SiteMemberRepository memberRepository) {
+        this.memberRoleService = memberRoleService;
+        this.memberService = memberService;
+        this.memberRoleRepository = memberRoleRepository;
+        this.memberRepository = memberRepository;
+    }
+
+    @DisplayName("uuid로 회원 역할 얻기")
+    @Test
+    void getByUuidTest() {
+        // given
+        SiteMemberRoleEntity memberRoleEntity = createMemberRoleUserEntityWithUuid();
+        SiteMemberEntity memberEntity = memberRoleEntity.getMember();
+        UUID uuid = memberEntity.getUuid();
+
+        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
+        given(memberRoleRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberRoleEntity));
+        given(memberRoleRepository.save(memberRoleEntity)).willReturn(memberRoleEntity);
+
+        // when
+        memberService.insert(memberBasicUserInsertRequest);
+        SiteMemberRoleResponse memberRoleResponse = memberRoleService.insert(memberRoleUserInsertRequest);
+
+        // then
+        assertThat(memberRoleService.getByUuid(memberRoleResponse.uuid()).orElseThrow()).isEqualTo(memberRoleResponse);
+    }
+
+    @DisplayName("member로 회원 역할 얻기")
+    @Test
+    void getByMemberTest() {
+        // given
+        SiteMemberRoleEntity memberRoleEntity = createMemberRoleUserEntityWithUuid();
+        SiteMemberEntity memberEntity = memberRoleEntity.getMember();
+        UUID uuid = memberEntity.getUuid();
+
+        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
+        given(memberRoleRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberRoleEntity));
+        given(memberRoleRepository.save(memberRoleEntity)).willReturn(memberRoleEntity);
+
+        // when
+        memberService.insert(memberBasicUserInsertRequest);
+        SiteMemberRoleResponse memberRoleResponse = memberRoleService.insert(memberRoleUserInsertRequest);
+
+        // then
+        assertThat(memberRoleService.getByMember(memberEntity).orElseThrow()).isEqualTo(memberRoleResponse);
+    }
+
+    @DisplayName("role로 회원 역할 얻기")
+    @Test
+    void getByRoleTest() {
+        // given
+        SiteMemberRoleEntity memberRoleEntity = createMemberRoleUserEntityWithUuid();
+        SiteMemberEntity memberEntity = memberRoleEntity.getMember();
+        UUID uuid = memberEntity.getUuid();
+
+        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
+        given(memberRoleRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberRoleEntity));
+        given(memberRoleRepository.save(memberRoleEntity)).willReturn(memberRoleEntity);
+        given(memberRoleRepository.findByRole(memberRoleEntity.getRole())).willReturn(List.of(memberRoleEntity));
+
+        // when
+        memberService.insert(memberBasicUserInsertRequest);
+        SiteMemberRoleResponse memberRoleResponse = memberRoleService.insert(memberRoleUserInsertRequest);
+
+        // then
+        assertThat(memberRoleService.getByRole(memberRoleResponse.role()).getFirst()).isEqualTo(memberRoleResponse);
+    }
+
+    @DisplayName("빈 회원 역할 얻기")
+    @Test
+    void getOptionalEmptyTest() {
+        // given
+        SiteMemberRoleEntity memberRoleEntity = createMemberRoleUserEntityWithUuid();
+        UUID uuid = memberRoleEntity.getUuid();
+        SiteMemberEntity memberEntity = memberRoleEntity.getMember();
+
+        // getByUuid
+        // given & when
+        given(memberRoleRepository.findByUuid(uuid)).willReturn(Optional.empty());
+
+        // then
+        assertThat(memberRoleService.getByUuid(uuid)).isEmpty();
+
+        // getByMember
+        // given & when
+        given(memberRoleRepository.findByMember(memberEntity)).willReturn(Optional.empty());
+
+        // then
+        assertThat(memberRoleService.getByMember(memberEntity)).isEmpty();
+    }
+
+    @DisplayName("회원 역할 갱신")
+    @Test
+    void updateTest() {
+        // given
+        Role updatedRole = Role.ROLE_ADMIN;
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        SiteMemberRoleEntity memberRoleEntity = createMemberRoleUserEntityWithUuid();
+        SiteMemberRoleEntity updatedMemberRoleEntity = SiteMemberRoleEntity.builder().memberRoleEntity(memberRoleEntity).role(updatedRole).build();
+        UUID uuid = memberEntity.getUuid();
+
+        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
+        given(memberRoleRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberRoleEntity));
+        given(memberRoleRepository.save(memberRoleEntity)).willReturn(memberRoleEntity).willReturn(updatedMemberRoleEntity);
+        given(memberRoleRepository.findByRole(updatedRole)).willReturn(List.of(updatedMemberRoleEntity));
+
+        // when
+        memberService.insert(memberBasicUserInsertRequest);
+        memberRoleService.insert(memberRoleUserInsertRequest);
+        SiteMemberRoleResponse updatedMemberRoleResponse = memberRoleService.update(new SiteMemberRoleUpdateRequest(memberEntity.getUuid(), updatedRole));
+
+        // then
+        assertThat(memberRoleService.getByRole(updatedRole).getFirst()).isEqualTo(updatedMemberRoleResponse);
+    }
+
+    @DisplayName("uuid로 회원 역할 제거")
+    @Test
+    void removeByUuidTest() {
+        // given
+        SiteMemberRoleEntity memberRoleEntity = createMemberRoleUserEntityWithUuid();
+        SiteMemberEntity memberEntity = memberRoleEntity.getMember();
+        UUID uuid = memberEntity.getUuid();
+
+        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
+        given(memberRoleRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberRoleEntity)).willReturn(Optional.empty());
+        given(memberRoleRepository.save(memberRoleEntity)).willReturn(memberRoleEntity);
+        willDoNothing().given(memberRoleRepository).deleteByUuid(uuid);
+
+        // when
+        memberService.insert(memberBasicUserInsertRequest);
+        memberRoleService.insert(memberRoleUserInsertRequest);
+        memberRoleService.removeByUuid(uuid);
+
+        // then
+        assertThat(memberRoleService.getByUuid(uuid)).isEmpty();
+    }
+}
