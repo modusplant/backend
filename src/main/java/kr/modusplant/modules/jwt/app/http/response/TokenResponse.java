@@ -1,4 +1,4 @@
-package kr.modusplant.modules.jwt.model.response;
+package kr.modusplant.modules.jwt.app.http.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
