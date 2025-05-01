@@ -27,4 +27,5 @@ public final class CamelCaseWord {
     public static final String VER = "ver";
     public static final String MEMBER_UUID = "memberUuid";
     public static final String ISSUED_AT = "issuedAt";
+    public static final String MEMBER_AUTH = "memberAuth";
 }
