@@ -1,4 +1,4 @@
-package kr.modusplant.modules.jwt.mapper.entity;
+package kr.modusplant.modules.jwt.mapper;
 
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
@@ -7,7 +7,7 @@ import kr.modusplant.modules.jwt.common.util.domain.RefreshTokenTestUtils;
 import kr.modusplant.modules.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
-import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenJpaRepository;
+import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +15,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RepositoryOnlyContext
-class RefreshTokenEntityMapperTest implements RefreshTokenTestUtils, RefreshTokenEntityTestUtils {
+class RefreshTokenAppInfraMapperTest implements RefreshTokenTestUtils, RefreshTokenEntityTestUtils {
 
     private final SiteMemberRepository memberRepository;
-    private final RefreshTokenJpaRepository refreshTokenRepository;
-    private final RefreshTokenEntityMapper refreshTokenMapper = new RefreshTokenEntityMapperImpl();
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenAppInfraMapper refreshTokenMapper = new RefreshTokenAppInfraMapperImpl();
 
     @Autowired
-    RefreshTokenEntityMapperTest(SiteMemberRepository memberRepository, RefreshTokenJpaRepository refreshTokenRepository) {
+    RefreshTokenAppInfraMapperTest(SiteMemberRepository memberRepository, RefreshTokenRepository refreshTokenRepository) {
         this.memberRepository = memberRepository;
         this.refreshTokenRepository = refreshTokenRepository;
     }
@@ -41,7 +41,7 @@ class RefreshTokenEntityMapperTest implements RefreshTokenTestUtils, RefreshToke
         );
 
         // then
-        assertThat(refreshTokenEntity).isEqualTo(refreshTokenMapper.createRefreshTokenEntity(refreshTokenMapper.toRefreshToken(refreshTokenEntity), memberRepository));
+        assertThat(refreshTokenEntity).isEqualTo(refreshTokenMapper.toRefreshTokenEntity(refreshTokenMapper.toRefreshToken(refreshTokenEntity), memberRepository));
     }
 
     @Test
@@ -59,6 +59,9 @@ class RefreshTokenEntityMapperTest implements RefreshTokenTestUtils, RefreshToke
         RefreshToken refreshToken = refreshTokenMapper.toRefreshToken(refreshTokenEntity);
 
         // then
-        assertThat(refreshToken).isEqualTo(refreshTokenMapper.toRefreshToken(refreshTokenMapper.updateRefreshTokenEntity(refreshToken, memberRepository)));
+        assertThat(refreshToken)
+                .usingRecursiveComparison()
+                .ignoringFields("uuid")
+                .isEqualTo(refreshTokenMapper.toRefreshToken(refreshTokenMapper.toRefreshTokenEntity(refreshToken, memberRepository)));
     }
 }

@@ -14,13 +14,13 @@ import java.util.UUID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RepositoryOnlyContext
-class RefreshTokenJpaRepositoryTest implements RefreshTokenEntityTestUtils {
+class RefreshTokenRepositoryTest implements RefreshTokenEntityTestUtils {
 
-    private final RefreshTokenJpaRepository refreshTokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final SiteMemberRepository memberRepository;
 
     @Autowired
-    RefreshTokenJpaRepositoryTest(RefreshTokenJpaRepository refreshTokenRepository, SiteMemberRepository memberRepository) {
+    RefreshTokenRepositoryTest(RefreshTokenRepository refreshTokenRepository, SiteMemberRepository memberRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
         this.memberRepository = memberRepository;
     }

@@ -32,8 +32,7 @@ public class TokenApplicationService {
     public TokenPair issueToken(UUID memberUuid, String nickname, Role role, UUID deviceId) {
         // memberUuid, deviceId 검증
         tokenValidationService.validateNotFoundMemberUuid(MEMBER_UUID, memberUuid);
-        if (tokenValidationService.validateExistedDeviceId(deviceId))
-            throw new InvalidTokenException("Device Id already exists");
+        tokenValidationService.validateExistedDeviceId(deviceId);
 
         // accessToken , refresh token 생성
         Map<String,String> claims = new HashMap<>();
@@ -65,7 +64,7 @@ public class TokenApplicationService {
         // refresh token 검증
         if(!tokenProvider.validateToken(refreshToken))
             throw new InvalidTokenException("The Refresh Token has expired. Please log in again.");
-        if (tokenValidationService.validateNotFoundRefreshToken(refreshToken))
+        if (refreshTokenApplicationService.checkNotExistedRefreshToken(refreshToken))
             throw new InvalidTokenException("Failed to find Refresh Token");
 
         // access token 재발급
@@ -90,7 +89,7 @@ public class TokenApplicationService {
     public void removeToken(String refreshToken) {
         // 토큰 검증
         tokenProvider.validateToken(refreshToken);
-        if (tokenValidationService.validateNotFoundRefreshToken(refreshToken))
+        if (refreshTokenApplicationService.checkNotExistedRefreshToken(refreshToken))
             return ;
 
         UUID memberUuid = tokenProvider.getMemberUuidFromToken(refreshToken);

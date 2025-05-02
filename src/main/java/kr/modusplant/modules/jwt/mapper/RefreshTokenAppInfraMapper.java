@@ -1,4 +1,4 @@
-package kr.modusplant.modules.jwt.mapper.entity;
+package kr.modusplant.modules.jwt.mapper;
 
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
@@ -14,22 +14,10 @@ import java.util.UUID;
 import static kr.modusplant.global.vo.CamelCaseWord.*;
 
 @Mapper
-public interface RefreshTokenEntityMapper {
+public interface RefreshTokenAppInfraMapper {
     @BeanMapping(ignoreByDefault = true)
-    default RefreshTokenEntity createRefreshTokenEntity(RefreshToken refreshToken, @Context SiteMemberRepository memberRepository) {
+    default RefreshTokenEntity toRefreshTokenEntity(RefreshToken refreshToken, @Context SiteMemberRepository memberRepository) {
         return RefreshTokenEntity.builder()
-                .member(memberRepository.findByUuid(refreshToken.getMemberUuid()).orElseThrow())
-                .deviceId(refreshToken.getDeviceId())
-                .refreshToken(refreshToken.getRefreshToken())
-                .issuedAt(convertToLocalDateTime(refreshToken.getIssuedAt()))
-                .expiredAt(convertToLocalDateTime(refreshToken.getExpiredAt()))
-                .build();
-    }
-
-    @BeanMapping(ignoreByDefault = true)
-    default RefreshTokenEntity updateRefreshTokenEntity(RefreshToken refreshToken, @Context SiteMemberRepository memberRepository) {
-        return RefreshTokenEntity.builder()
-                .uuid(refreshToken.getUuid())
                 .member(memberRepository.findByUuid(refreshToken.getMemberUuid()).orElseThrow())
                 .deviceId(refreshToken.getDeviceId())
                 .refreshToken(refreshToken.getRefreshToken())
@@ -53,7 +41,7 @@ public interface RefreshTokenEntityMapper {
         return dateTime == null ? null : Date.from(dateTime.toInstant(ZoneOffset.UTC));
     }
 
-    default LocalDateTime convertToLocalDateTime(Date date) {
+    private LocalDateTime convertToLocalDateTime(Date date) {
         return LocalDateTime.ofInstant(date.toInstant(), ZoneOffset.UTC);
     }
 }

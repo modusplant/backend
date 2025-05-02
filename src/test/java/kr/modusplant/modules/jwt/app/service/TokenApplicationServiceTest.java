@@ -79,7 +79,7 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
     void issueTokenSuccess() {
         // given
         willDoNothing().given(tokenValidationService).validateNotFoundMemberUuid(MEMBER_UUID, memberUuid);
-        given(tokenValidationService.validateExistedDeviceId(deviceId)).willReturn(false);
+        doNothing().when(tokenValidationService).validateExistedDeviceId(deviceId);
 
         given(tokenProvider.generateAccessToken(memberUuid, claims)).willReturn(accessToken);
         given(tokenProvider.generateRefreshToken(memberUuid)).willReturn(refreshToken);
@@ -108,7 +108,8 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
     void issueTokenThrowInvalidTokenWhenDeviceIdExists() {
         // given
         willDoNothing().given(tokenValidationService).validateNotFoundMemberUuid(MEMBER_UUID, memberUuid);
-        given(tokenValidationService.validateExistedDeviceId(deviceId)).willReturn(true);
+        doThrow(new InvalidTokenException("Device Id already exists"))
+                .when(tokenValidationService).validateExistedDeviceId(deviceId);
 
         // then
         assertThrows(InvalidTokenException.class,
@@ -124,7 +125,7 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
         String newAccessToken = "new-access-token";
 
         given(tokenProvider.validateToken(refreshToken)).willReturn(true);
-        given(tokenValidationService.validateNotFoundRefreshToken(refreshToken)).willReturn(false);
+        given(refreshTokenApplicationService.checkNotExistedRefreshToken(refreshToken)).willReturn(false);
         given(tokenProvider.getMemberUuidFromToken(refreshToken)).willReturn(memberUuid);
         given(siteMemberService.getByUuid(memberUuid)).willReturn(Optional.of(siteMemberResponse));
         given(siteMemberRoleService.getByUuid(memberUuid)).willReturn(Optional.of(memberRoleUserResponse));
@@ -152,7 +153,7 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
     void reissueTokenFailWhenRefreshTokenNotFoundInDB() {
         // given
         given(tokenProvider.validateToken(refreshToken)).willReturn(true);
-        given(tokenValidationService.validateNotFoundRefreshToken(refreshToken)).willReturn(true);
+        given(refreshTokenApplicationService.checkNotExistedRefreshToken(refreshToken)).willReturn(true);
         // then
         assertThrows(InvalidTokenException.class, () -> tokenApplicationService.reissueToken(refreshToken));
     }
@@ -162,7 +163,7 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
     void reissueTokenFailWhenSiteMemberNotFound() {
         // given
         given(tokenProvider.validateToken(refreshToken)).willReturn(true);
-        given(tokenValidationService.validateNotFoundRefreshToken(refreshToken)).willReturn(false);
+        given(refreshTokenApplicationService.checkNotExistedRefreshToken(refreshToken)).willReturn(false);
         given(tokenProvider.getMemberUuidFromToken(refreshToken)).willReturn(memberUuid);
         given(siteMemberService.getByUuid(memberUuid)).willReturn(Optional.empty());
 
@@ -177,7 +178,7 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
         SiteMemberResponse siteMemberResponse = mock(SiteMemberResponse.class);
 
         given(tokenProvider.validateToken(refreshToken)).willReturn(true);
-        given(tokenValidationService.validateNotFoundRefreshToken(refreshToken)).willReturn(false);
+        given(refreshTokenApplicationService.checkNotExistedRefreshToken(refreshToken)).willReturn(false);
         given(tokenProvider.getMemberUuidFromToken(refreshToken)).willReturn(memberUuid);
         given(siteMemberService.getByUuid(memberUuid)).willReturn(Optional.of(siteMemberResponse));
 
@@ -197,7 +198,7 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
                 .build();
 
         given(tokenProvider.validateToken(refreshToken)).willReturn(true);
-        given(tokenValidationService.validateNotFoundRefreshToken(refreshToken)).willReturn(false);
+        given(refreshTokenApplicationService.checkNotExistedRefreshToken(refreshToken)).willReturn(false);
         given(tokenProvider.getMemberUuidFromToken(refreshToken)).willReturn(memberUuid);
         given(refreshTokenApplicationService.getByRefreshToken(refreshToken)).willReturn(Optional.of(mockRefreshToken));
         given(refreshTokenApplicationService.getByMemberUuidAndDeviceId(memberUuid, deviceId)).willReturn(Optional.of(mockRefreshToken));
@@ -215,7 +216,7 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
     void removeTokenNotFoundEarlyExit() {
         // given
         given(tokenProvider.validateToken(refreshToken)).willReturn(true);
-        given(tokenValidationService.validateNotFoundRefreshToken(refreshToken)).willReturn(true);
+        given(refreshTokenApplicationService.checkNotExistedRefreshToken(refreshToken)).willReturn(true);
 
         // when
         tokenApplicationService.removeToken(refreshToken);

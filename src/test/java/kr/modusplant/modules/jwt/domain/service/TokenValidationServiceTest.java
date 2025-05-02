@@ -6,13 +6,14 @@ import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
+import kr.modusplant.modules.jwt.app.error.InvalidTokenException;
 import kr.modusplant.modules.jwt.common.util.domain.RefreshTokenTestUtils;
 import kr.modusplant.modules.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
-import kr.modusplant.modules.jwt.mapper.entity.RefreshTokenEntityMapper;
-import kr.modusplant.modules.jwt.mapper.entity.RefreshTokenEntityMapperImpl;
+import kr.modusplant.modules.jwt.mapper.RefreshTokenAppInfraMapper;
+import kr.modusplant.modules.jwt.mapper.RefreshTokenAppInfraMapperImpl;
 import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
-import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenJpaRepository;
+import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,61 +28,24 @@ import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenEntityTestUtils, SiteMemberTestUtils, SiteMemberEntityTestUtils {
     @Mock
-    private RefreshTokenJpaRepository tokenRepository;
+    private RefreshTokenRepository tokenRepository;
     @Mock
     private SiteMemberRepository memberRepository;
     @InjectMocks
     private TokenValidationService tokenValidationService;
     @Spy
-    private final RefreshTokenEntityMapper tokenMapper = new RefreshTokenEntityMapperImpl();
-
-    @Nested
-    class validateNotFoundRefreshTokenTest {
-        @Test
-        @DisplayName("Refresh Token이 없으면 true 반환")
-        void returnTrueWhenRefreshTokenMissing() {
-            // given
-            String refreshToken = "refreshToken";
-            given(tokenRepository.findByRefreshToken(refreshToken)).willReturn(Optional.empty());
-
-            // when
-            boolean result = tokenValidationService.validateNotFoundRefreshToken(refreshToken);
-
-            // then
-            assertTrue(result);
-        }
-
-        @Test
-        @DisplayName("Refresh Token이 존재하면 false 반환")
-        void returnFalseWhenRefreshTokenExists() {
-            // given
-            SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-            RefreshTokenEntity tokenEntity = createRefreshTokenBasicEntityBuilder()
-                    .uuid(UUID.randomUUID())
-                    .member(memberEntity)
-                    .build();
-            RefreshToken token = tokenMapper.toRefreshToken(tokenEntity);
-            given(tokenRepository.findByRefreshToken(token.getRefreshToken())).willReturn(Optional.of(tokenEntity));
-
-            // when
-            boolean result = tokenValidationService.validateNotFoundRefreshToken(token.getRefreshToken());
-
-            // then
-            assertFalse(result);
-        }
-    }
+    private final RefreshTokenAppInfraMapper tokenMapper = new RefreshTokenAppInfraMapperImpl();
 
     @Nested
     class validateExistedDeviceIdTest {
         @Test
-        @DisplayName("Device Id가 존재하면 true 반환")
+        @DisplayName("Device Id가 존재하면 예외를 던진다")
         void returnTrueIfDeviceIdExists() {
             // given
             SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
@@ -92,25 +56,23 @@ class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenE
             RefreshToken token = tokenMapper.toRefreshToken(tokenEntity);
             given(tokenRepository.findByDeviceId(token.getDeviceId())).willReturn(Optional.of(tokenEntity));
 
-            // when
-            boolean result = tokenValidationService.validateExistedDeviceId(token.getDeviceId());
-
-            // then
-            assertTrue(result);
+            // when & then
+            assertThrows(InvalidTokenException.class, () -> {
+                tokenValidationService.validateExistedDeviceId(token.getDeviceId());
+            });
         }
 
         @Test
-        @DisplayName("Device Id가 존재하지 않으면 false 반환")
+        @DisplayName("Device Id가 존재하지 않으면 예외를 던지지 않는다")
         void returnFalseIfDeviceIdDoesNotExist() {
             // given
             UUID deviceid = UUID.randomUUID();
             given(tokenRepository.findByDeviceId(deviceid)).willReturn(Optional.empty());
 
-            // when
-            boolean result = tokenValidationService.validateExistedDeviceId(deviceid);
-
-            // then
-            assertFalse(result);
+            // when & then
+            assertDoesNotThrow(() -> {
+                tokenValidationService.validateExistedDeviceId(deviceid);
+            });
         }
     }
 
