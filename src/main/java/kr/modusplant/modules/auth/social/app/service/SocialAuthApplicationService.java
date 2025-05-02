@@ -2,6 +2,8 @@ package kr.modusplant.modules.auth.social.app.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.domains.member.domain.model.SiteMemberAuth;
+import kr.modusplant.domains.member.mapper.SiteMemberAuthDomainEntityMapper;
+import kr.modusplant.domains.member.mapper.SiteMemberAuthDomainEntityMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberRoleEntity;
@@ -13,11 +15,11 @@ import kr.modusplant.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.modules.auth.social.app.dto.supers.SocialUserInfo;
 import kr.modusplant.modules.auth.social.app.service.supers.SocialAuthClient;
-import kr.modusplant.modules.auth.social.mapper.entity.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,9 +31,7 @@ public class SocialAuthApplicationService {
     private final SiteMemberRepository memberRepository;
     private final SiteMemberAuthRepository memberAuthRepository;
     private final SiteMemberRoleRepository memberRoleRepository;
-    private final SiteMemberEntityMapper memberEntityMapper = new SiteMemberEntityMapperImpl();
-    private final SiteMemberAuthEntityMapper memberAuthEntityMapper = new SiteMemberAuthEntityMapperImpl();
-    private final SiteMemberRoleEntityMapper memberRoleEntityMapper = new SiteMemberRoleEntityMapperImpl();
+    private final SiteMemberAuthDomainEntityMapper memberAuthEntityMapper = new SiteMemberAuthDomainEntityMapperImpl();
 
     public JwtUserPayload handleSocialLogin(AuthProvider provider, String code) {
         // 소셜 토큰 발급
@@ -62,8 +62,8 @@ public class SocialAuthApplicationService {
             return new JwtUserPayload(memberEntity.getUuid(), memberEntity.getNickname(), role);
         }).orElseGet(() -> {
             SiteMemberEntity memberEntity = createSiteMember(nickname);
-            createSiteMemberAuth(memberEntity.getUuid(),provider,id,email);
-            Role role = createSiteMemberRole(memberEntity.getUuid()).getRole();
+            createSiteMemberAuth(memberEntity,provider,id,email);
+            Role role = createSiteMemberRole(memberEntity).getRole();
             return new JwtUserPayload(memberEntity.getUuid(), memberEntity.getNickname(), role);
         });
     }
@@ -84,15 +84,31 @@ public class SocialAuthApplicationService {
     }
 
     private SiteMemberEntity createSiteMember(String nickname) {
-        return memberRepository.save(memberEntityMapper.toSiteMemberEntity(nickname));
+        SiteMemberEntity memberEntity = SiteMemberEntity.builder()
+                .nickname(nickname)
+                .loggedInAt(LocalDateTime.now())
+                .build();
+        return memberRepository.save(memberEntity);
     }
 
-    private SiteMemberAuthEntity createSiteMemberAuth(UUID memberUuid, AuthProvider provider, String id, String email) {
-        return memberAuthRepository.save(memberAuthEntityMapper.toSiteMemberAuthEntity(memberUuid,provider,id,email,memberRepository));
+    private SiteMemberAuthEntity createSiteMemberAuth(SiteMemberEntity memberEntity, AuthProvider provider, String id, String email) {
+        SiteMemberAuthEntity memberAuthEntity = SiteMemberAuthEntity.builder()
+                .activeMember(memberEntity)
+                .originalMember(memberEntity)
+                .email(email)
+                .provider(provider)
+                .providerId(id)
+                .build();
+
+        return memberAuthRepository.save(memberAuthEntity);
     }
 
-    private SiteMemberRoleEntity createSiteMemberRole(UUID memberUuid) {
-        return memberRoleRepository.save(memberRoleEntityMapper.toSiteMemberRoleEntity(memberUuid, memberRepository));
+    private SiteMemberRoleEntity createSiteMemberRole(SiteMemberEntity memberEntity) {
+        SiteMemberRoleEntity memberRoleEntity = SiteMemberRoleEntity.builder()
+                .member(memberEntity)
+                .role(Role.ROLE_USER).build();
+
+        return memberRoleRepository.save(memberRoleEntity);
     }
 
 }

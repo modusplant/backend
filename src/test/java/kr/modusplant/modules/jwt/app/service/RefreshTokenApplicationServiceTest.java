@@ -9,10 +9,10 @@ import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.modules.jwt.common.util.domain.RefreshTokenTestUtils;
 import kr.modusplant.modules.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
-import kr.modusplant.modules.jwt.mapper.entity.RefreshTokenEntityMapper;
-import kr.modusplant.modules.jwt.mapper.entity.RefreshTokenEntityMapperImpl;
+import kr.modusplant.modules.jwt.mapper.RefreshTokenAppInfraMapper;
+import kr.modusplant.modules.jwt.mapper.RefreshTokenAppInfraMapperImpl;
 import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
-import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenJpaRepository;
+import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,13 +38,13 @@ class RefreshTokenApplicationServiceTest implements RefreshTokenTestUtils, Refre
     private SiteMemberApplicationService memberService;
 
     @Mock
-    private RefreshTokenJpaRepository tokenRepository;
+    private RefreshTokenRepository tokenRepository;
 
     @Mock
     private SiteMemberRepository memberRepository;
 
     @Spy
-    private final RefreshTokenEntityMapper tokenMapper = new RefreshTokenEntityMapperImpl();
+    private final RefreshTokenAppInfraMapper tokenMapper = new RefreshTokenAppInfraMapperImpl();
 
     @Test
     @DisplayName("uuid로 refresh token 조회 테스트")

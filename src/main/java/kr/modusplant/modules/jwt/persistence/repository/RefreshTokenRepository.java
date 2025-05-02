@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface RefreshTokenJpaRepository extends UuidPrimaryKeyRepository<RefreshTokenEntity>,JpaRepository<RefreshTokenEntity, UUID> {
+public interface RefreshTokenRepository extends UuidPrimaryKeyRepository<RefreshTokenEntity>,JpaRepository<RefreshTokenEntity, UUID> {
     Optional<RefreshTokenEntity> findByMemberAndDeviceId(SiteMemberEntity member, UUID deviceId);
 
     Optional<RefreshTokenEntity> findByRefreshToken(String refreshToken);
