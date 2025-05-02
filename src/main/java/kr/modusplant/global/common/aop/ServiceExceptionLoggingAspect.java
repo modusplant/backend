@@ -1,10 +1,10 @@
 package kr.modusplant.global.common.aop;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.MDC;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -22,40 +22,36 @@ import java.util.Arrays;
 @Component
 @Slf4j
 public class ServiceExceptionLoggingAspect {
-    static final ThreadLocal<Boolean> isLogged = new ThreadLocal<>();
 
     @AfterThrowing(
             pointcut = "within(@org.springframework.stereotype.Service *)",
             throwing = "ex"
     )
     public void serviceLogException(JoinPoint joinPoint, Throwable ex) {
+        if ("true".equals(MDC.get("isLogged"))) return;
+
+        if (!ApiLoggingAspect.isSameThread()) {
+            log.warn("[THREAD MISMATCH] 컨트롤러, 서비스 AOP 스레드 불일치");    // TODO : 추후 비동기, 멀티스레드 등의 불일치 해결을 위한 로깅
+        }
         String methodName = joinPoint.getSignature().getName();
         Object[] args = joinPoint.getArgs();
         StackTraceElement location = ex.getStackTrace()[0];
+        String fileName = location.getFileName() != null ? location.getFileName() : "UnknownFile";
+        int lineNumber = location.getLineNumber() >= 0 ? location.getLineNumber() : -1;
+
         String errorLocation = String.format("%s.%s(%s:%d)",
-                location.getClassName(), location.getMethodName(), location.getFileName(), location.getLineNumber());
+                location.getClassName(), location.getMethodName(), fileName, lineNumber);
 
-        HttpServletRequest request = ApiLoggingAspect.requestContext.get();  // REST API 요청(ThreadLocal 사용)
-        if (request != null) {
-            String callerUri = request.getRequestURI();
-            String callerMethod = request.getMethod();
-            String clientIp = request.getRemoteAddr();
+        String traceId = MDC.get("traceId") != null ? MDC.get("traceId") : "N/A";
+        String clientIp = MDC.get("clientIp") != null ? MDC.get("clientIp") : "UNKNOWN";
+        String uri = MDC.get("uri") != null ? MDC.get("uri") : "N/A";
+        String method = MDC.get("method") != null ? MDC.get("method") : "N/A";
 
-            log.error("[BIZ ERROR] method={} | params={} | exception={} | message={} | location={}" +
-                            "[BIZ ERROR - HTTP_REQUEST_INFO] httpMethod={} | uri={} | clientIp={}",
-                    methodName, Arrays.toString(args), ex.getClass().getSimpleName(), ex.getMessage(), errorLocation,
-                    callerUri, callerMethod, clientIp);
-        } else {
-            log.error("[BIZ ERROR] method={} | params={} | exception={} | message={} | location={}",
-                    methodName, Arrays.toString(args), ex.getClass().getSimpleName(), ex.getMessage(), errorLocation);
-        }
+        log.error("[BIZ ERROR] traceId={} | method={} | params={} | exception={} | message={} | location={}\n" +
+                        "[BIZ ERROR - HTTP_REQUEST_INFO] httpMethod={} | uri={} | clientIp={}",
+                traceId, methodName, Arrays.toString(args), ex.getClass().getSimpleName(), ex.getMessage(), errorLocation,
+                uri, method, clientIp);
 
-        if (isLogged.get() != Boolean.TRUE) {
-            isLogged.set(Boolean.TRUE);
-        }
-    }
-
-    public static void clearLoggedStatus() {
-        isLogged.remove();
+        MDC.put("isLogged", "true");
     }
 }
