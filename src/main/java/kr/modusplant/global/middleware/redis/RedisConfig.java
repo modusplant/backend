@@ -18,7 +18,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-
 @Configuration
 public class RedisConfig {
     @Value("${spring.data.redis.host}")
@@ -44,6 +43,18 @@ public class RedisConfig {
         RedisTemplate<String,Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
 
+        StringRedisSerializer stringSerializer = new StringRedisSerializer();
+        GenericJackson2JsonRedisSerializer serializer = createJsonRedisSerializer();
+        redisTemplate.setKeySerializer(stringSerializer);
+        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setHashKeySerializer(stringSerializer);
+        redisTemplate.setHashValueSerializer(serializer);
+
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
+
+    private GenericJackson2JsonRedisSerializer createJsonRedisSerializer() {
         PolymorphicTypeValidator typeValidator = BasicPolymorphicTypeValidator
                 .builder()
                 .allowIfSubType(Object.class)
@@ -51,17 +62,10 @@ public class RedisConfig {
 
         ObjectMapper objectMapper = new ObjectMapper()
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .activateDefaultTyping(typeValidator, DefaultTyping.NON_FINAL_AND_ENUMS)
                 .registerModule(new JavaTimeModule());
 
-        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(serializer);
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(serializer);
-
-        redisTemplate.afterPropertiesSet();
-        return redisTemplate;
+        return new GenericJackson2JsonRedisSerializer(objectMapper);
     }
 }
