@@ -15,6 +15,10 @@ public class RedisHelper {
     private final RedisTemplate<String, Object> redisTemplate;
 
     /** ===== [String 값 저장 ] ===== */
+    public void setString(String key, String value) {
+        stringRedisTemplate.opsForValue().set(key, value);
+    }
+
     public void setString(String key, String value, Duration ttl) {
         stringRedisTemplate.opsForValue().set(key, value, ttl);
     }
@@ -24,6 +28,10 @@ public class RedisHelper {
     }
 
     /** ===== [Object 값 저장] ===== */
+    public void setObject(String key, Object value) {
+        redisTemplate.opsForValue().set(key, value);
+    }
+
     public void setObject(String key, Object value, Duration ttl) {
         redisTemplate.opsForValue().set(key, value, ttl);
     }
