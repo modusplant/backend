@@ -70,6 +70,40 @@ class RedisHelperTest {
         assertThat(ttl2.get().getSeconds()).isGreaterThan(5);
     }
 
+    @Test
+    void testTTLExists() throws InterruptedException {
+        String key = "test:ttl:exists";
+        String value = "someValue";
+
+        redisHelper.setString(key, value, Duration.ofSeconds(5));
+        Thread.sleep(2000);
+
+        Optional<Duration> ttl = redisHelper.getTTL(key);
+        assertThat(ttl).isPresent();
+        assertThat(ttl.get().getSeconds()).isLessThan(5).isGreaterThan(1);
+    }
+
+    @Test
+    void testTTLInfinite() {
+        String key = "test:ttl:infinite";
+        String value = "persistentValue";
+
+        redisHelper.setString(key, value); // 만료 시간 없이 설정
+        Optional<Duration> ttl = redisHelper.getTTL(key);
+
+        assertThat(ttl).isPresent();
+        assertThat(ttl.get().getSeconds()).isEqualTo(999_999_999);
+    }
+
+    @Test
+    void testTTLKeyDoesNotExist() {
+        String key = "test:ttl:nonexistent";
+
+        Optional<Duration> ttl = redisHelper.getTTL(key);
+
+        assertThat(ttl).isEmpty();
+    }
+
 
     static class TestDto implements Serializable {
         private String name;

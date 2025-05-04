@@ -58,6 +58,10 @@ public class RedisHelper {
 
     public Optional<Duration> getTTL(String key) {
         Long expire = redisTemplate.getExpire(key);
+
+        if (expire != null && expire == -1)
+            return Optional.of(Duration.ofSeconds(999_999_999));
+
         return expire != null && expire >= 0
                 ? Optional.of(Duration.ofSeconds(expire))
                 : Optional.empty();
