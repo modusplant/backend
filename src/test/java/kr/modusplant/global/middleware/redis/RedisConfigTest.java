@@ -1,4 +1,4 @@
-package kr.modusplant.config;
+package kr.modusplant.global.middleware.redis;
 
 import kr.modusplant.global.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
