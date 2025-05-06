@@ -33,7 +33,7 @@ public class ApiLoggingAspect {
 
     @Around("within(@org.springframework.web.bind.annotation.RestController *)")
     public Object traceApiCall(ProceedingJoinPoint joinPoint) throws Throwable {
-        THREAD_ID.set(Thread.currentThread().getId());
+        THREAD_ID.set(Thread.currentThread().threadId());
 
         ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = (attrs != null) ? attrs.getRequest() : null;
@@ -58,8 +58,7 @@ public class ApiLoggingAspect {
             log.info("[REST API] traceId={} | method={} | uri={} | handler={} | ip={} | duration:{}ms"
                     , MDC.get("traceId"), MDC.get("method"), MDC.get("uri"), MDC.get("methodName"), MDC.get("clientIp"), durationFormatted);
             if (durationInMs > SLOW_API_THRESHOLD_MS) {
-                log.warn("[SLOW API] traceId={} | method={} | uri={} | handler={} | duration:{}ms"
-                        , MDC.get("traceId"), MDC.get("method"), MDC.get("uri"), MDC.get("methodName"), durationFormatted);
+                log.warn("[SLOW API] traceId={} | duration:{}ms", MDC.get("traceId"), durationFormatted);
             }
 
             return result;
@@ -71,6 +70,6 @@ public class ApiLoggingAspect {
 
     public static boolean isSameThread() {
         Long original = THREAD_ID.get();
-        return original != null && original.equals(Thread.currentThread().getId());
+        return original != null && original.equals(Thread.currentThread().threadId());
     }
 }
