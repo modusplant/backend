@@ -3,8 +3,8 @@ package kr.modusplant.domains.member.persistence.repository;
 import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.commons.persistence.repository.supers.LastModifiedAtRepository;
-import kr.modusplant.domains.commons.persistence.repository.supers.UuidPrimaryKeyRepository;
+import kr.modusplant.domains.common.persistence.repository.supers.LastModifiedAtRepository;
+import kr.modusplant.domains.common.persistence.repository.supers.UuidPrimaryKeyRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

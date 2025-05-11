@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.stereotype.Service;
 
-import static kr.modusplant.domains.commons.vo.Reference.NOTATION_DOMAINS;
+import static kr.modusplant.domains.common.vo.Reference.NOTATION_DOMAINS;
 
 @Configuration
 @ComponentScan(
