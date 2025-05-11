@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_REFRESH_TOKEN;
+
 
 @Tag(name="Token API", description = "JWT API")
 @RestController
@@ -31,7 +33,7 @@ public class TokenController {
             @ApiResponse(responseCode = "200", description = "Succeeded : JWT 발급 완료")
     })
     @PostMapping("/auth/token/refresh")
-    public ResponseEntity<DataResponse<?>> refreshToken(@CookieValue("refresh_token")String refreshToken) {
+    public ResponseEntity<DataResponse<?>> refreshToken(@CookieValue(SNAKE_REFRESH_TOKEN) String refreshToken) {
 
         TokenPair tokenPair = tokenApplicationService.reissueToken(refreshToken);
 
@@ -42,7 +44,7 @@ public class TokenController {
     }
 
     private String setRefreshTokenCookie(String refreshToken) {
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken).build();
+        ResponseCookie refreshCookie = ResponseCookie.from(SNAKE_REFRESH_TOKEN, refreshToken).build();
         return refreshCookie.toString();
     }
 }
