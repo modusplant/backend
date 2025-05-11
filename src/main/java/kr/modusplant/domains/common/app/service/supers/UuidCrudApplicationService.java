@@ -1,4 +1,4 @@
-package kr.modusplant.domains.commons.app.service.supers;
+package kr.modusplant.domains.common.app.service.supers;
 
 import java.util.Optional;
 import java.util.UUID;
