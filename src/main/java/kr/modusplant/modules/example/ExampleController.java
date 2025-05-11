@@ -1,4 +1,4 @@
-package kr.modusplant.domains.example;
+package kr.modusplant.modules.example;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
