@@ -10,7 +10,7 @@ import kr.modusplant.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.modules.jwt.domain.service.TokenValidationService;
 import kr.modusplant.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.modules.jwt.app.error.InvalidTokenException;
-import kr.modusplant.modules.jwt.app.error.TokenDataNotFoundException;
+import kr.modusplant.modules.jwt.app.error.TokenNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -168,7 +168,7 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
         given(siteMemberService.getByUuid(memberUuid)).willReturn(Optional.empty());
 
         // then
-        assertThrows(TokenDataNotFoundException.class, () -> tokenApplicationService.reissueToken(refreshToken));
+        assertThrows(TokenNotFoundException.class, () -> tokenApplicationService.reissueToken(refreshToken));
     }
 
     @Test
@@ -183,7 +183,7 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
         given(siteMemberService.getByUuid(memberUuid)).willReturn(Optional.of(siteMemberResponse));
 
         // then
-        assertThrows(TokenDataNotFoundException.class, () -> tokenApplicationService.reissueToken(refreshToken));
+        assertThrows(TokenNotFoundException.class, () -> tokenApplicationService.reissueToken(refreshToken));
     }
 
     @Test
