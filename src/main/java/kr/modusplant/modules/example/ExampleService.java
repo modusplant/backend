@@ -1,4 +1,4 @@
-package kr.modusplant.domains.example;
+package kr.modusplant.modules.example;
 
 import org.springframework.stereotype.Service;
 
