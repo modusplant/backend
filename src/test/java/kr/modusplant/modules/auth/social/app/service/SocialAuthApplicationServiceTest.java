@@ -3,8 +3,8 @@ package kr.modusplant.modules.auth.social.app.service;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.enums.AuthProvider;
-import kr.modusplant.domains.member.mapper.SiteMemberAuthDomainEntityMapper;
-import kr.modusplant.domains.member.mapper.SiteMemberAuthDomainEntityMapperImpl;
+import kr.modusplant.domains.member.mapper.SiteMemberAuthDomainInfraMapper;
+import kr.modusplant.domains.member.mapper.SiteMemberAuthDomainInfraMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberRoleEntity;
@@ -33,7 +33,7 @@ class SocialAuthApplicationServiceTest implements SiteMemberEntityTestUtils, Sit
     @Autowired
     private SiteMemberRoleRepository memberRoleRepository;
     @Autowired
-    private final SiteMemberAuthDomainEntityMapper memberAuthEntityMapper = new SiteMemberAuthDomainEntityMapperImpl();
+    private final SiteMemberAuthDomainInfraMapper memberAuthEntityMapper = new SiteMemberAuthDomainInfraMapperImpl();
 
     private final AuthProvider provider = AuthProvider.GOOGLE;
     private final String id = "639796866968871286823";
