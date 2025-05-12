@@ -22,8 +22,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_REFRESH_TOKEN;
 
-@Tag(name="Social Login API", description = "소셜 로그인 API")
+@Tag(name = "Social Login API", description = "소셜 로그인 API")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -34,7 +35,7 @@ public class SocialAuthController {
 
     @Operation(summary = "카카오 소셜 로그인 API", description = "카카오 인가코드를 받아 로그인합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Succeeded : Kakao Login"),
+            @ApiResponse(responseCode = "200", description = "OK : Kakao login succeeded"),
             @ApiResponse(responseCode = "400", description = "Bad Request: Invalid client input data"),
             @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid or missing authentication credentials"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error: An unexpected error occurred on the Authorization server")
@@ -43,7 +44,7 @@ public class SocialAuthController {
     public ResponseEntity<DataResponse<?>> kakaoSocialLogin(@Valid @RequestBody SocialLoginRequest request) {
         JwtUserPayload member = socialAuthApplicationService.handleSocialLogin(AuthProvider.KAKAO, request.getCode());
 
-        TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(),member.nickname(),member.role(),request.getDeviceId());
+        TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(), member.nickname(), member.role(), request.getDeviceId());
 
         TokenResponse token = new TokenResponse(tokenPair.getAccessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(token);
@@ -52,9 +53,9 @@ public class SocialAuthController {
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie).body(response);
     }
 
-    @Operation(summary = "구글 소셜 로그인 API", description = "구글 인가코드를 받아 로그인합니다.<br> 구글 인가코드를 url에서 추출할 경우 '%2F'는 '/'로 대체해야 합니다.")
+    @Operation(summary = "구글 소셜 로그인 API", description = "구글 인가코드를 받아 로그인합니다.<br> 구글 인가 코드를 URL에서 추출할 경우 '%2F'는 '/'로 대체해야 합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Succeeded : Google Login"),
+            @ApiResponse(responseCode = "200", description = "OK : Google login succeed"),
             @ApiResponse(responseCode = "400", description = "Bad Request: Invalid client input data"),
             @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid or missing authentication credentials"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error: An unexpected error occurred on the Authorization server")
@@ -63,7 +64,7 @@ public class SocialAuthController {
     public ResponseEntity<DataResponse<?>> googleSocialLogin(@Valid @RequestBody SocialLoginRequest request) {
         JwtUserPayload member = socialAuthApplicationService.handleSocialLogin(AuthProvider.GOOGLE, request.getCode());
 
-        TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(),member.nickname(),member.role(),request.getDeviceId());
+        TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(), member.nickname(), member.role(), request.getDeviceId());
 
         TokenResponse token = new TokenResponse(tokenPair.getAccessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(token);
@@ -73,7 +74,7 @@ public class SocialAuthController {
     }
 
     private String setRefreshTokenCookie(String refreshToken) {
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken).build();
+        ResponseCookie refreshCookie = ResponseCookie.from(SNAKE_REFRESH_TOKEN, refreshToken).build();
         return refreshCookie.toString();
     }
 }
