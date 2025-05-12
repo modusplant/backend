@@ -16,14 +16,15 @@ import kr.modusplant.modules.auth.email.model.request.VerifyEmailRequest;
 import kr.modusplant.modules.auth.email.service.MailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
+
+import static kr.modusplant.global.vo.CamelCaseWord.EMAIL;
+import static kr.modusplant.global.vo.CamelCaseWord.VERIFY_CODE;
 
 @RestController
 @RequiredArgsConstructor
@@ -76,31 +77,33 @@ public class AuthController {
         // JwtToken 에 담긴 데이터 조회 테스트용
         validateVerifyAccessToken(accessToken, verifyEmailRequest.getVerifyCode());
 
-        return ResponseEntity.ok(DataResponse.of(
-                HttpStatus.OK.value(),
-                "OK: Succeeded",
-                (Map<String, Object>) new HashMap<String, Object>() {{
+        return ResponseEntity.ok(
+                DataResponse.ok(new HashMap<>() {{
                     put("hasEmailAuth", true);
                 }}));
     }
 
-    // TODO : JWT Util or Provider 구현완료 시 옮기는것을 예상하고 작업 중
+    // TODO : JWT Util or Provider 구현 완료 시 옮기는 것을 예상하고 작업 중
     public String generateVerifyAccessToken(String email, String verifyCode) {
-        // 만료 시간 설정
+        // 만료 시간 설정 (5분 뒤)
         Date now = new Date();
         Date expirationDate = new Date(now.getTime() + 5 * 60 * 1000);
 
         return Jwts.builder()
-                .setHeaderParam("typ", "JWT")
-                .claim("email", email)
-                .claim("verifyCode", verifyCode)
-                .setIssuedAt(now)
-                .setExpiration(expirationDate)
+                .header()
+                .type("JWT")
+                .and()
+                .claims()
+                .issuedAt(now)
+                .expiration(expirationDate)
+                .add(EMAIL, email)
+                .add(VERIFY_CODE, verifyCode)
+                .and()
                 .signWith(Keys.hmacShaKeyFor(JWT_SECRET_KEY.getBytes()))
                 .compact();
     }
 
-    // TODO : Spring Security 적용 후 필터에서 쿠키 검증로직 추가된 후 테스트 필요
+    // TODO : Spring Security 적용 후 필터에서 쿠키 검증 로직 추가된 후 테스트 필요
     public void validateVerifyAccessToken(String jwtToken, String verifyCode) {
         if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
             jwtToken = jwtToken.substring(7);
@@ -109,14 +112,13 @@ public class AuthController {
         try {
             // JWT 토큰 파싱
             Claims claims = Jwts.parser()
-                    .setSigningKey(Keys.hmacShaKeyFor(JWT_SECRET_KEY.getBytes()))
+                    .verifyWith(Keys.hmacShaKeyFor(JWT_SECRET_KEY.getBytes()))
                     .build()
-                    .parseClaimsJws(jwtToken)
-                    .getBody();
+                    .parseSignedClaims(jwtToken)
+                    .getPayload();
 
             // JWT 토큰 검증
-            String payloadEmail = claims.get("email", String.class);
-            String payloadVerifyCode = claims.get("verifyCode", String.class);
+            String payloadVerifyCode = claims.get(VERIFY_CODE, String.class);
 
             // 발급된 인증코드와 메일 인증코드 일치 검증
             if (!verifyCode.equals(payloadVerifyCode)) {
@@ -147,7 +149,7 @@ public class AuthController {
         accessTokenCookie.setSecure(false);  // Secure 설정
         accessTokenCookie.setPath("/");    // 모든 경로에서 유효
         accessTokenCookie.setMaxAge(5 * 60); // 유효 기간: 5분 (Access 토큰의 유효 기간과 동일)
-        accessTokenCookie.setAttribute("SameSite", "Strict");
+        accessTokenCookie.setAttribute("SameSite", "Lax");
         httpResponse.addCookie(accessTokenCookie);
     }
 }
