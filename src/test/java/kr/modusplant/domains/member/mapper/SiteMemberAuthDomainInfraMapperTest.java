@@ -14,8 +14,8 @@ import java.util.UUID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RepositoryOnlyContext
-class SiteMemberAuthDomainEntityMapperTest {
-    private final SiteMemberAuthDomainEntityMapper mapper = new SiteMemberAuthDomainEntityMapperImpl();
+class SiteMemberAuthDomainInfraMapperTest {
+    private final SiteMemberAuthDomainInfraMapper mapper = new SiteMemberAuthDomainInfraMapperImpl();
 
     @Test
     @DisplayName("SiteMemberAuthEntity → SiteMemberAuth 매핑 테스트")

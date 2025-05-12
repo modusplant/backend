@@ -2,8 +2,8 @@ package kr.modusplant.modules.auth.social.app.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.domains.member.domain.model.SiteMemberAuth;
-import kr.modusplant.domains.member.mapper.SiteMemberAuthDomainEntityMapper;
-import kr.modusplant.domains.member.mapper.SiteMemberAuthDomainEntityMapperImpl;
+import kr.modusplant.domains.member.mapper.SiteMemberAuthDomainInfraMapper;
+import kr.modusplant.domains.member.mapper.SiteMemberAuthDomainInfraMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberRoleEntity;
@@ -36,7 +36,7 @@ public class SocialAuthApplicationService {
     private final SiteMemberRepository memberRepository;
     private final SiteMemberAuthRepository memberAuthRepository;
     private final SiteMemberRoleRepository memberRoleRepository;
-    private final SiteMemberAuthDomainEntityMapper memberAuthEntityMapper = new SiteMemberAuthDomainEntityMapperImpl();
+    private final SiteMemberAuthDomainInfraMapper memberAuthEntityMapper = new SiteMemberAuthDomainInfraMapperImpl();
 
     public JwtUserPayload handleSocialLogin(AuthProvider provider, String code) {
         // 소셜 토큰 발급

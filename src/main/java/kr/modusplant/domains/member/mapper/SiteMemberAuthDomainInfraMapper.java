@@ -10,7 +10,7 @@ import java.util.UUID;
 import static kr.modusplant.global.vo.CamelCaseWord.*;
 
 @Mapper
-public interface SiteMemberAuthDomainEntityMapper {
+public interface SiteMemberAuthDomainInfraMapper {
     @Mapping(source = ACTIVE_MEMBER, target = ACTIVE_MEMBER_UUID, qualifiedByName = "toActiveMemberUuid")
     @Mapping(source = ORIGINAL_MEMBER, target = ORIGINAL_MEMBER_UUID, qualifiedByName = "toOriginalMemberUuid")
     @Mapping(target = MEMBER_AUTH, ignore = true)
