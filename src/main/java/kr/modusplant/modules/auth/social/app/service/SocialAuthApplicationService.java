@@ -11,6 +11,7 @@ import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthReposit
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleRepository;
 import kr.modusplant.global.enums.Role;
+import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import kr.modusplant.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.modules.auth.social.app.dto.supers.SocialUserInfo;
@@ -22,6 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+
+import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
+import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
+import static kr.modusplant.global.vo.CamelCaseWord.MEMBER;
 
 @Service
 @RequiredArgsConstructor
@@ -62,7 +67,7 @@ public class SocialAuthApplicationService {
             return new JwtUserPayload(memberEntity.getUuid(), memberEntity.getNickname(), role);
         }).orElseGet(() -> {
             SiteMemberEntity memberEntity = createSiteMember(nickname);
-            createSiteMemberAuth(memberEntity,provider,id,email);
+            createSiteMemberAuth(memberEntity, provider, id, email);
             Role role = createSiteMemberRole(memberEntity).getRole();
             return new JwtUserPayload(memberEntity.getUuid(), memberEntity.getNickname(), role);
         });
@@ -75,12 +80,13 @@ public class SocialAuthApplicationService {
 
     private SiteMemberEntity getMemberEntityByUuid(UUID uuid) {
         return memberRepository.findByUuid(uuid)
-                .orElseThrow(() -> new EntityNotFoundException("SiteMemberEntity를 찾지 못했습니다."));
+                .orElseThrow(() -> new EntityNotFoundWithUuidException(uuid, SiteMemberEntity.class));
     }
 
     private SiteMemberRoleEntity getMemberRoleEntityByMember(SiteMemberEntity memberEntity) {
         return memberRoleRepository.findByMember(memberEntity)
-                .orElseThrow(() -> new EntityNotFoundException("SiteMemberRoleEntity를 찾지 못했습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(getFormattedExceptionMessage(
+                        NOT_FOUND_ENTITY.getValue(), MEMBER, memberEntity.toString(), SiteMemberRoleEntity.class)));
     }
 
     private SiteMemberEntity createSiteMember(String nickname) {
