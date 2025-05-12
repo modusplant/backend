@@ -28,7 +28,7 @@ public class ServiceExceptionLoggingAspect {
             throwing = "ex"
     )
     public void serviceLogException(JoinPoint joinPoint, Throwable ex) {
-        if ("true".equals(MDC.get("isLogged"))) return;
+        if (Boolean.TRUE.toString().equals(MDC.get("isLogged"))) return;
 
         if (!ApiLoggingAspect.isSameThread()) {
             log.warn("[THREAD MISMATCH] 컨트롤러, 서비스 AOP 스레드 불일치");    // TODO : 추후 비동기, 멀티스레드 등의 불일치 해결을 위한 로깅
@@ -52,6 +52,6 @@ public class ServiceExceptionLoggingAspect {
                     traceId, methodName, Arrays.toString(args), ex.getClass().getSimpleName(), ex.getMessage(), errorLocation,
                     uri, method, clientIp);
         }
-        MDC.put("isLogged", "true");
+        MDC.put("isLogged", Boolean.TRUE.toString());
     }
 }
