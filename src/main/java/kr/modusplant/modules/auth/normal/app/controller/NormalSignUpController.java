@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import kr.modusplant.domains.term.app.http.response.TermResponse;
-import kr.modusplant.domains.term.domain.model.Term;
 import kr.modusplant.global.app.servlet.response.DataResponse;
 import kr.modusplant.modules.auth.normal.app.http.request.NormalSignUpRequest;
 import kr.modusplant.modules.auth.normal.app.service.NormalSignUpApplicationService;
@@ -25,7 +24,6 @@ import java.util.Map;
 public class NormalSignUpController {
 
     private final NormalSignUpApplicationService normalSignUpApplicationService;
-//    private final PasswordEncoder passwordEncoder;
 
     @Operation(
             summary = "이용약관 정보 전달 API",

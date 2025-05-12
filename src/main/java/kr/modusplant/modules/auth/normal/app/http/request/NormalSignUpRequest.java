@@ -4,6 +4,6 @@ public record NormalSignUpRequest(
         String email,
         String pw,
         String nickname,
-        String agreedTermsOfUseVerion,
-        String agreedPrivacyPolicyVerion,
-        String agreedAdInfoRecevingVerion) {}
+        String agreedTermsOfUseVersion,
+        String agreedPrivacyPolicyVersion,
+        String agreedAdInfoReceivingVersion) {}
