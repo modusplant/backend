@@ -24,7 +24,7 @@ public class RedisHelper {
     }
 
     public Optional<String> getString(String key) {
-        return Optional.ofNullable(stringRedisTemplate.opsForValue().get(key));
+        return Optional.of(stringRedisTemplate.opsForValue().get(key));
     }
 
     /** ===== [Object 값 저장] ===== */
@@ -37,10 +37,7 @@ public class RedisHelper {
     }
 
     public <T> Optional<T> getObject(String key, Class<T> clazz) {
-        Object obj = redisTemplate.opsForValue().get(key);
-        if (obj == null)
-            return Optional.empty();
-        return Optional.of(clazz.cast(obj));
+        return Optional.of(clazz.cast(redisTemplate.opsForValue().get(key)));
     }
 
     /** ===== [공통] ===== */
@@ -57,12 +54,14 @@ public class RedisHelper {
     }
 
     public Optional<Duration> getTTL(String key) {
-        Long expire = redisTemplate.getExpire(key);
+        long expire = redisTemplate.getExpire(key);
 
-        if (expire != null && expire == -1)
-            return Optional.of(Duration.ofSeconds(999_999_999));
+        if (expire == -1) {
+            int MAX_DURATION_SECONDS = 999_999_999;
+            return Optional.of(Duration.ofSeconds(MAX_DURATION_SECONDS));
+        }
 
-        return expire != null && expire >= 0
+        return expire >= 0
                 ? Optional.of(Duration.ofSeconds(expire))
                 : Optional.empty();
     }
