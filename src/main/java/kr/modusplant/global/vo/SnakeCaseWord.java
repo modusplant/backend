@@ -32,4 +32,5 @@ public final class SnakeCaseWord {
     public static final String SNAKE_ISSUED_AT = "issued_at";
     public static final String SNAKE_EXPIRED_AT = "expired_at";
     public static final String SNAKE_FK_TOKEN_MEMB_UUID = "fk_token_memb_uuid";
+    public static final String SNAKE_PLANT_GROUP = "plant_group";
 }
