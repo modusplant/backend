@@ -10,4 +10,11 @@ public interface PlantGroupEntityTestUtils extends PlantGroupTestUtils {
                 .category(plantGroup.getCategory())
                 .build();
     }
+
+    default PlantGroupEntity createOtherGroupEntity() {
+        return PlantGroupEntity.builder()
+                .order(otherGroup.getOrder())
+                .category(otherGroup.getCategory())
+                .build();
+    }
 }
