@@ -7,6 +7,7 @@ import lombok.Getter;
 @Getter
 public class KakaoUserInfo implements SocialUserInfo {
     private Long id;
+
     @JsonProperty("kakao_account")
     private KakaoAccount kakaoAccount;
 
@@ -14,6 +15,7 @@ public class KakaoUserInfo implements SocialUserInfo {
     private static class KakaoAccount {
         private Profile profile;
         private String email;
+
         @JsonProperty("is_email_verified")
         private Boolean isEmailVerified;
     }
@@ -25,16 +27,16 @@ public class KakaoUserInfo implements SocialUserInfo {
 
     @Override
     public String getId() {
-        return this.id.toString();
+        return String.valueOf(id);
     }
 
     @Override
     public String getEmail() {
-        return this.kakaoAccount.getEmail();
+        return kakaoAccount.getEmail();
     }
 
     @Override
     public String getNickname() {
-        return this.kakaoAccount.getProfile().getNickname();
+        return kakaoAccount.getProfile().getNickname();
     }
 }

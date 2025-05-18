@@ -9,7 +9,7 @@ import kr.modusplant.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.modules.jwt.domain.service.TokenValidationService;
 import kr.modusplant.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.modules.jwt.app.error.InvalidTokenException;
-import kr.modusplant.modules.jwt.app.error.TokenDataNotFoundException;
+import kr.modusplant.modules.jwt.app.error.TokenNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -70,9 +70,9 @@ public class TokenApplicationService {
         // access token 재발급
         UUID memberUuid = tokenProvider.getMemberUuidFromToken(refreshToken);
         SiteMemberResponse siteMember = memberApplicationService.getByUuid(memberUuid)
-                .orElseThrow(() -> new TokenDataNotFoundException("Failed to find Site member"));
+                .orElseThrow(() -> new TokenNotFoundException("Failed to find Site member"));
         SiteMemberRoleResponse siteMemberRole = memberRoleApplicationService.getByUuid(memberUuid)
-                .orElseThrow(() -> new TokenDataNotFoundException("Failed to find Site member role"));
+                .orElseThrow(() -> new TokenNotFoundException("Failed to find Site member role"));
 
         Map<String,String> claims = new HashMap<>();
         claims.put("nickname",siteMember.nickname());
@@ -95,10 +95,10 @@ public class TokenApplicationService {
         UUID memberUuid = tokenProvider.getMemberUuidFromToken(refreshToken);
         UUID deviceId = refreshTokenApplicationService.getByRefreshToken(refreshToken)
                 .map(RefreshToken::getDeviceId)
-                .orElseThrow(() -> new TokenDataNotFoundException("Failed to find Device ID"));
+                .orElseThrow(() -> new TokenNotFoundException("Failed to find Device ID"));
 
         RefreshToken token = refreshTokenApplicationService.getByMemberUuidAndDeviceId(memberUuid,deviceId)
-                .orElseThrow(() -> new TokenDataNotFoundException("Failed to find Refresh Token"));
+                .orElseThrow(() -> new TokenNotFoundException("Failed to find Refresh Token"));
 
         tokenValidationService.validateNotFoundTokenUuid(token.getUuid());
         refreshTokenApplicationService.removeByUuid(token.getUuid());

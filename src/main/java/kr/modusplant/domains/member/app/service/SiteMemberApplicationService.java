@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.app.service;
 
-import kr.modusplant.domains.commons.app.service.supers.UuidCrudApplicationService;
+import kr.modusplant.domains.common.app.service.supers.UuidCrudApplicationService;
 import kr.modusplant.domains.member.app.http.request.SiteMemberInsertRequest;
 import kr.modusplant.domains.member.app.http.request.SiteMemberUpdateRequest;
 import kr.modusplant.domains.member.app.http.response.SiteMemberResponse;

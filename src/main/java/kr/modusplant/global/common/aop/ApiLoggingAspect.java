@@ -29,24 +29,21 @@ import java.util.UUID;
 @Slf4j
 public class ApiLoggingAspect {
     private static final ThreadLocal<Long> THREAD_ID = new ThreadLocal<>();
-    private static final long SLOW_API_THRESHOLD_MS = 500;     // TODO : SLOW 쿼리 로깅의 기준은 변경가능
+    private static final long SLOW_API_THRESHOLD_MS = 500;     // TODO : SLOW 쿼리 로깅의 기준은 변경 가능
 
     @Around("within(@org.springframework.web.bind.annotation.RestController *)")
     public Object traceApiCall(ProceedingJoinPoint joinPoint) throws Throwable {
         THREAD_ID.set(Thread.currentThread().threadId());
 
         ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = (attrs != null) ? attrs.getRequest() : null;
+        HttpServletRequest request = attrs.getRequest();
 
-        if (request != null) {
-            MDC.put("uri", request.getRequestURI());
-            MDC.put("method", request.getMethod());
-            MDC.put("clientIp", request.getRemoteAddr());
-        }
+        MDC.put("uri", request.getRequestURI());
+        MDC.put("method", request.getMethod());
+        MDC.put("clientIp", request.getRemoteAddr());
         MDC.put("traceId", UUID.randomUUID().toString()); // 추적용 ID
         MDC.put("methodName", joinPoint.getSignature().getName());
-        MDC.put("isLogged", "false"); // 예외 로깅 중복 방지용
-
+        MDC.put("isLogged", Boolean.FALSE.toString()); // 예외 로깅 중복 방지용
 
         long startTime = System.nanoTime();
         try {

@@ -14,7 +14,7 @@ import org.springframework.util.ClassUtils;
 
 import java.util.Objects;
 
-import static kr.modusplant.domains.commons.vo.Reference.NOTATION_DOMAINS;
+import static kr.modusplant.domains.common.vo.Reference.NOTATION_DOMAINS;
 
 @NonNullApi
 public class MockDomainsRepositoryBeanFactoryPostProcessor implements BeanFactoryPostProcessor {

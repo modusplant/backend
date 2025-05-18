@@ -32,4 +32,12 @@ public final class SnakeCaseWord {
     public static final String SNAKE_ISSUED_AT = "issued_at";
     public static final String SNAKE_EXPIRED_AT = "expired_at";
     public static final String SNAKE_FK_TOKEN_MEMB_UUID = "fk_token_memb_uuid";
+    public static final String SNAKE_PLANT_GROUP = "plant_group";
+    public static final String SNAKE_GROUP_ORDER = "group_order";
+    public static final String SNAKE_TIP_POST = "tip_post";
+    public static final String SNAKE_AUTH_MEMB_UUID = "auth_memb_uuid";
+    public static final String SNAKE_CREA_MEMB_UUID = "crea_memb_uuid";
+    public static final String SNAKE_RECOM_NUM = "recom_num";
+    public static final String SNAKE_VIEW_COUNT = "view_count";
+    public static final String SNAKE_UPDATED_AT = "updated_at";
 }
