@@ -60,7 +60,7 @@ public class TermController {
     }
 
     @DeleteMapping("/{uuid}")
-    public ResponseEntity<DataResponse<?>> removeTermByUuid(@RequestParam UUID uuid) {
+    public ResponseEntity<DataResponse<?>> removeTermByUuid(@PathVariable UUID uuid) {
         termApplicationService.removeByUuid(uuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
