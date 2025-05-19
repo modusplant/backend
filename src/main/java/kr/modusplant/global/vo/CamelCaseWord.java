@@ -8,6 +8,7 @@ public final class CamelCaseWord {
     public static final String ACTIVE_MEMBER = "activeMember";
     public static final String ACTIVE_MEMBER_UUID = "activeMemberUuid";
     public static final String BIRTH_DATE = "birthDate";
+    public static final String DATA = "data";
     public static final String EMAIL = "email";
     public static final String EXPIRED_AT = "expiredAt";
     public static final String FAILED_ATTEMPT = "failedAttempt";
