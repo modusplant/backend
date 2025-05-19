@@ -41,7 +41,7 @@ public class TermController {
     }
 
     @GetMapping("/name/{name}")
-    public ResponseEntity<DataResponse<?>> getTermByUuid(@PathVariable String name) {
+    public ResponseEntity<DataResponse<?>> getTermByName(@PathVariable String name) {
         Optional<TermResponse> optionalTermResponse = termApplicationService.getByName(name);
         if (optionalTermResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
