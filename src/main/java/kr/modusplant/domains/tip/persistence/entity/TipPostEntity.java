@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.global.persistence.annotation.DefaultValue;
-import kr.modusplant.global.persistence.annotation.ULID;
+import kr.modusplant.global.persistence.annotation.Ulid;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +28,7 @@ import static kr.modusplant.global.vo.SnakeCaseWord.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TipPostEntity {
     @Id
-    @ULID
+    @Ulid
     @Column(nullable = false, updatable = false)
     private String ulid;
 

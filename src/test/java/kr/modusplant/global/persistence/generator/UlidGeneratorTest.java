@@ -12,8 +12,8 @@ import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ULIDGeneratorTest {
-    private static final ULIDGenerator generator = new ULIDGenerator();
+class UlidGeneratorTest {
+    private static final UlidGenerator generator = new UlidGenerator();
     private static final Pattern ULID_PATTERN = Pattern.compile("^[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{26}$", Pattern.CASE_INSENSITIVE);
 
     @Test
@@ -72,7 +72,7 @@ class ULIDGeneratorTest {
     }
 
     @Test
-    @DisplayName("멀티스레드 환경에서 ULID 생성의 고유성 검증")
+    @DisplayName("멀티스레드 환경에서 Ulid 생성의 고유성 검증")
     void testMultithreadedUlidGeneration() throws ExecutionException, InterruptedException {
         // given
         ExecutorService executorService = Executors.newFixedThreadPool(10);
