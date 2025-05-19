@@ -9,6 +9,7 @@ import kr.modusplant.domains.term.mapper.TermAppInfraMapperImpl;
 import kr.modusplant.domains.term.persistence.entity.TermEntity;
 import kr.modusplant.domains.term.persistence.repository.TermRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Primary
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class TermApplicationService {

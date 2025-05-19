@@ -6,6 +6,7 @@ import kr.modusplant.domains.term.app.http.response.TermResponse;
 import kr.modusplant.domains.term.app.service.TermApplicationService;
 import kr.modusplant.global.app.servlet.response.DataResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
+@Primary
 @RequestMapping("/api/crud/terms")
 @RequiredArgsConstructor
 public class TermController {
