@@ -54,8 +54,8 @@ public class TermController {
         return ResponseEntity.ok().body(DataResponse.ok(termApplicationService.insert(termInsertRequest)));
     }
 
-    @PostMapping("/{uuid}")
-    public ResponseEntity<DataResponse<?>> updateTerm(@RequestBody TermUpdateRequest termUpdateRequest) {
+    @PutMapping
+    public ResponseEntity<DataResponse<TermResponse>> updateTerm(@RequestBody TermUpdateRequest termUpdateRequest) {
         return ResponseEntity.ok().body(DataResponse.ok(termApplicationService.update(termUpdateRequest)));
     }
 
