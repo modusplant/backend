@@ -1,6 +1,7 @@
 package kr.modusplant.domains.tip.persistence.entity;
 
 import jakarta.persistence.*;
+import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.tip.persistence.entity.compositekey.TipCommentCompositeKey;
 import kr.modusplant.global.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
@@ -14,9 +15,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static kr.modusplant.global.vo.SnakeCaseWord.*;
+
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "conv_comm")
+@Table(name = "tip_comm")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @IdClass(TipCommentCompositeKey.class)
@@ -25,29 +28,31 @@ public class TipCommentEntity {
     @Id
     private String postUlid;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @MapsId("postUlid")
-    @JoinColumn(name = "ulid", nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "post_ulid", nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private TipPostEntity postEntity;
 
     @Id
-    @Column(nullable = false, updatable = false)
+    @Column(name = "mate_path", nullable = false, updatable = false)
     private String materializedPath;
 
-    @Column(name = "auth_memb_uuid", nullable = false)
-    private UUID authMemberUuid;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
+    @JoinColumn(name = SNAKE_AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private SiteMemberEntity authMember;
 
-    @Column(name = "crea_memb_uuid", nullable = false)
-    private UUID createMemberUuid;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = SNAKE_CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private SiteMemberEntity createMember;
 
-    @Column(nullable = false, length = 900)
+    @Column(name = "content", nullable = false, length = 900)
     private String content;
 
-    @Column(nullable = false)
+    @Column(name = SNAKE_IS_DELETED, nullable = false)
     @DefaultValue
     private Boolean isDeleted;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 
@@ -77,69 +82,73 @@ public class TipCommentEntity {
         }
     }
 
-    @PreUpdate
-    public void preUpdate() {
-        if (this.isDeleted == null) {
-            this.isDeleted = false;
-        }
-    }
-
-    private TipCommentEntity(TipPostEntity postEntity, String materializedPath, UUID authMemberUuid, UUID createMemberUuid, String content
+    private TipCommentEntity(
+            TipPostEntity postEntity, String materializedPath,
+            SiteMemberEntity authMember, SiteMemberEntity createMember,
+            String content, Boolean isDeleted
     ) {
         this.postEntity = postEntity;
         this.materializedPath = materializedPath;
-        this.authMemberUuid = authMemberUuid;
-        this.createMemberUuid = createMemberUuid;
+        this.authMember = authMember;
+        this.createMember = createMember;
         this.content = content;
+        this.isDeleted = isDeleted;
     }
 
-    public static ConversationCommentEntityBuilder builder() {
-        return new ConversationCommentEntityBuilder();
+    public static TipCommentEntityBuilder builder() {
+        return new TipCommentEntityBuilder();
     }
 
-    public static final class ConversationCommentEntityBuilder {
+    public static final class TipCommentEntityBuilder {
         private TipPostEntity postEntity;
         private String materializedPath;
-        private UUID authMemberUuid;
-        private UUID createMemberUuid;
+        private SiteMemberEntity authMember;
+        private SiteMemberEntity createMember;
         private String content;
+        private Boolean isDeleted;
 
-        public ConversationCommentEntityBuilder postEntity(final TipPostEntity postEntity) {
+        public TipCommentEntityBuilder postEntity(final TipPostEntity postEntity) {
             this.postEntity = postEntity;
             return this;
         }
 
-        public ConversationCommentEntityBuilder materializedPath(final String materializedPath) {
+        public TipCommentEntityBuilder materializedPath(final String materializedPath) {
             this.materializedPath = materializedPath;
             return this;
         }
 
-        public ConversationCommentEntityBuilder authMemberUuid(final UUID authMemberUuid) {
-            this.authMemberUuid = authMemberUuid;
+        public TipCommentEntityBuilder authMember(final SiteMemberEntity authMember) {
+            this.authMember = authMember;
             return this;
         }
 
-        public ConversationCommentEntityBuilder createMemberUuid(final UUID createMemberUuid) {
-            this.createMemberUuid = createMemberUuid;
+        public TipCommentEntityBuilder createMember(final SiteMemberEntity createMember) {
+            this.createMember = createMember;
             return this;
         }
 
-        public ConversationCommentEntityBuilder content(final String content) {
+        public TipCommentEntityBuilder content(final String content) {
             this.content = content;
             return this;
         }
 
-        public ConversationCommentEntityBuilder ConversationCommentEntity(final TipCommentEntity convCommEntity) {
-            this.postEntity = convCommEntity.getPostEntity();
-            this.materializedPath = convCommEntity.getMaterializedPath();
-            this.authMemberUuid = convCommEntity.getAuthMemberUuid();
-            this.createMemberUuid = convCommEntity.getCreateMemberUuid();
-            this.content = convCommEntity.getContent();
+        public TipCommentEntityBuilder isDeleted(final Boolean isDeleted) {
+            this.isDeleted = isDeleted;
+            return this;
+        }
+
+        public TipCommentEntityBuilder TipCommentEntity(final TipCommentEntity tipCommentEntity) {
+            this.postEntity = tipCommentEntity.getPostEntity();
+            this.materializedPath = tipCommentEntity.getMaterializedPath();
+            this.authMember = tipCommentEntity.getAuthMember();
+            this.createMember = tipCommentEntity.getCreateMember();
+            this.content = tipCommentEntity.getContent();
+            this.isDeleted = tipCommentEntity.getIsDeleted();
             return this;
         }
 
         public TipCommentEntity build() {
-            return new TipCommentEntity(this.postEntity, this.materializedPath, this.authMemberUuid, this.createMemberUuid, this.content
+            return new TipCommentEntity(this.postEntity, this.materializedPath, this.authMember, this.createMember, this.content, this.isDeleted
             );
         }
     }
