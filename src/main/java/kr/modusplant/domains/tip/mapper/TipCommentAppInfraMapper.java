@@ -47,7 +47,6 @@ public interface TipCommentAppInfraMapper {
 
     @Named("toTipPostEntity")
     default TipPostEntity toTipPostEntity(String ulid, @Context TipPostRepository tipPostRepository) {
-        System.out.println("mapper is running");
         return tipPostRepository.findByUlid(ulid).orElseThrow();
     }
 }
