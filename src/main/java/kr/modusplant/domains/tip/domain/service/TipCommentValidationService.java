@@ -1,7 +1,5 @@
 package kr.modusplant.domains.tip.domain.service;
 
-import kr.modusplant.domains.conversation.persistence.entity.compositekey.ConvCommentCompositeKey;
-import kr.modusplant.domains.tip.persistence.entity.compositekey.TipCommentCompositeKey;
 import kr.modusplant.domains.tip.persistence.repository.TipCommentRepository;
 import kr.modusplant.global.error.EntityExistsWithPostUlidAndMatePathException;
 import kr.modusplant.global.error.EntityNotFoundWithPostUlidAndMatePathException;
@@ -9,26 +7,29 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class TipCommentValidationService {
-    private final TipCommentRepository TipCommentRepository;
+    private final TipCommentRepository commentRepository;
 
-    public void validateExistence(String postUlid, String matePath) {
-        TipCommentCompositeKey compositeKey = new TipCommentCompositeKey(postUlid, matePath);
+    public void validateFoundTipCommentEntity(String postUlid, String materializedPath) {
+        Optional.ofNullable(postUlid).orElseThrow(() -> new IllegalArgumentException("postUlid is null"));
+        Optional.ofNullable(materializedPath).orElseThrow(() -> new IllegalArgumentException("materializedPath is null"));
 
-        if (TipCommentRepository.findById(compositeKey).isPresent()) {
-            throw new EntityExistsWithPostUlidAndMatePathException();
+        if (commentRepository.findByPostUlidAndMaterializedPath(postUlid, materializedPath).isPresent()) {
+            throw new EntityExistsWithPostUlidAndMatePathException("tip comment entity already exists");
         }
     }
 
-    public void validateNotFoundEntity(String postUlid, String matePath) {
-        TipCommentCompositeKey compositeKey = new TipCommentCompositeKey(postUlid, matePath);
+    public void validateNotFoundTipCommentEntity(String postUlid, String materializedPath) {
+        Optional.ofNullable(postUlid).orElseThrow(() -> new IllegalArgumentException("postUlid is null"));
+        Optional.ofNullable(materializedPath).orElseThrow(() -> new IllegalArgumentException("materializedPath is null"));
 
-        if (postUlid == null || matePath == null ||
-            TipCommentRepository.findById(compositeKey).isEmpty()) {
-            throw new EntityNotFoundWithPostUlidAndMatePathException();
+        if(commentRepository.findByPostUlidAndMaterializedPath(postUlid, materializedPath).isEmpty()) {
+            throw new EntityNotFoundWithPostUlidAndMatePathException("tip comment entity not found");
         }
     }
 }
