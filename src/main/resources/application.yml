@@ -23,6 +23,9 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      ssl:  # Upstash 환경을 위한 ssl 설정
+        enabled: true
 
 # Default Swagger configuration
 springdoc:
