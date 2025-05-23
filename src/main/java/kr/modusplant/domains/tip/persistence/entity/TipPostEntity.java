@@ -50,7 +50,7 @@ public class TipPostEntity {
 
     @Column(name = SNAKE_VIEW_COUNT, nullable = false)
     @DefaultValue
-    private Integer viewCount;
+    private Long viewCount;
 
     @Column(nullable = false, length = 150)
     private String title;
@@ -83,7 +83,7 @@ public class TipPostEntity {
         this.recommendationNumber = recommendationNumber;
     }
 
-    public void updateViewCount(Integer viewCount) {
+    public void updateViewCount(Long viewCount) {
         this.viewCount = viewCount;
     }
 
@@ -117,7 +117,7 @@ public class TipPostEntity {
             this.recommendationNumber = 0;
         }
         if (this.viewCount == null) {
-            this.viewCount = 0;
+            this.viewCount = 0L;
         }
         if (this.isDeleted == null) {
             this.isDeleted = false;
@@ -130,14 +130,14 @@ public class TipPostEntity {
             this.recommendationNumber = 0;
         }
         if (this.viewCount == null) {
-            this.viewCount = 0;
+            this.viewCount = 0L;
         }
         if (this.isDeleted == null) {
             this.isDeleted = false;
         }
     }
 
-    private TipPostEntity(String ulid, PlantGroupEntity group, SiteMemberEntity authMember, SiteMemberEntity createMember, Integer recommendationNumber, Integer viewCount, String title, JsonNode content, Boolean isDeleted) {
+    private TipPostEntity(String ulid, PlantGroupEntity group, SiteMemberEntity authMember, SiteMemberEntity createMember, Integer recommendationNumber, Long viewCount, String title, JsonNode content, Boolean isDeleted) {
         this.ulid = ulid;
         this.group = group;
         this.authMember = authMember;
@@ -159,7 +159,7 @@ public class TipPostEntity {
         private SiteMemberEntity authMember;
         private SiteMemberEntity createMember;
         private Integer recommendationNumber;
-        private Integer viewCount;
+        private Long viewCount;
         private String title;
         private JsonNode content;
         private Boolean isDeleted;
@@ -189,7 +189,7 @@ public class TipPostEntity {
             return this;
         }
 
-        public TipPostEntityBuilder viewCount(final Integer viewCount) {
+        public TipPostEntityBuilder viewCount(final Long viewCount) {
             this.viewCount = viewCount;
             return this;
         }

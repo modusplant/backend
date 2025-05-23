@@ -126,7 +126,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
                 .group(mock(PlantGroupEntity.class)) // 다른 필드도 필요시 같이 mock 처리
                 .createMember(memberEntity)
                 .recommendationNumber(0)
-                .viewCount(0)
+                .viewCount(0L)
                 .title("테스트 제목")
                 .content(mock(JsonNode.class))
                 .isDeleted(false)
@@ -160,7 +160,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
                 .group(mock(PlantGroupEntity.class)) // 다른 필드도 필요시 같이 mock 처리
                 .createMember(memberEntity)
                 .recommendationNumber(0)
-                .viewCount(0)
+                .viewCount(0L)
                 .title("테스트 제목")
                 .content(mock(JsonNode.class))
                 .isDeleted(true)
@@ -182,7 +182,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
                 .group(mock(PlantGroupEntity.class)) // 다른 필드도 필요시 같이 mock 처리
                 .createMember(memberEntity)
                 .recommendationNumber(0)
-                .viewCount(0)
+                .viewCount(0L)
                 .title("테스트 제목")
                 .content(mock(JsonNode.class))
                 .isDeleted(false)

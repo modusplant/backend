@@ -20,7 +20,7 @@ public class TipPost {
 
     private final Integer recommendationNumber;
 
-    private final Integer viewCount;
+    private final Long viewCount;
 
     private final String title;
 
@@ -34,7 +34,7 @@ public class TipPost {
         private UUID authMemberUuid;
         private UUID createMemberUuid;
         private Integer recommendationNumber;
-        private Integer viewCount;
+        private Long viewCount;
         private String title;
         private JsonNode content;
         private Boolean isDeleted;

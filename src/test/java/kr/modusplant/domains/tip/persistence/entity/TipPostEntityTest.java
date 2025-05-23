@@ -33,7 +33,7 @@ class TipPostEntityTest implements TipPostEntityTestUtils {
                 .authMember(member)
                 .createMember(member)
                 .recommendationNumber(1)
-                .viewCount(1)
+                .viewCount(1L)
                 .isDeleted(true)
                 .build();
 
@@ -43,7 +43,7 @@ class TipPostEntityTest implements TipPostEntityTestUtils {
 
         // then
         assertThat(tipPost.getRecommendationNumber()).isEqualTo(1);
-        assertThat(tipPost.getViewCount()).isEqualTo(1);
+        assertThat(tipPost.getViewCount()).isEqualTo(1L);
         assertThat(tipPost.getIsDeleted()).isEqualTo(true);
     }
 
@@ -68,7 +68,7 @@ class TipPostEntityTest implements TipPostEntityTestUtils {
 
         // then
         assertThat(tipPost.getRecommendationNumber()).isEqualTo(0);
-        assertThat(tipPost.getViewCount()).isEqualTo(0);
+        assertThat(tipPost.getViewCount()).isEqualTo(0L);
         assertThat(tipPost.getIsDeleted()).isEqualTo(false);
     }
 }
