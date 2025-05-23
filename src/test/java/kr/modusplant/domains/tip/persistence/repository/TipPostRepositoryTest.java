@@ -1,5 +1,6 @@
 package kr.modusplant.domains.tip.persistence.repository;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.group.common.util.entity.PlantGroupEntityTestUtils;
 import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
 import kr.modusplant.domains.group.persistence.repository.PlantGroupRepository;
@@ -30,6 +31,7 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
     private final TipPostRepository tipPostRepository;
     private final PlantGroupRepository plantGroupRepository;
     private final SiteMemberRepository siteMemberRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     TipPostRepositoryTest(TipPostRepository tipPostRepository, PlantGroupRepository plantGroupRepository, SiteMemberRepository siteMemberRepository) {
@@ -256,6 +258,30 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
 
         // then
         assertThat(tipPostRepository.existsByUlid(tipPostEntity.getUlid())).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("제목+본문 검색어로 게시글 목록 찾기")
+    void searchByTitleOrContentTest() {
+        // given
+        TipPostEntity tipPostEntity = tipPostRepository.save(
+                createTipPostEntityBuilder()
+                        .group(testPlantGroup)
+                        .authMember(testSiteMember)
+                        .createMember(testSiteMember)
+                        .build());
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<TipPostEntity> result1 = tipPostRepository.searchByTitleOrContent("물",pageable);
+        Page<TipPostEntity> result2 = tipPostRepository.searchByTitleOrContent("this",pageable);
+        Page<TipPostEntity> result3 = tipPostRepository.searchByTitleOrContent("erd",pageable);
+
+        // then
+        assertThat(result1.getTotalElements()).isEqualTo(1);
+        assertThat(result2.getTotalElements()).isEqualTo(1);
+        assertThat(result3.getTotalElements()).isEqualTo(0);
+        assertThat(result1.getContent().get(0).getContent().get(1).has("src")).isEqualTo(true);
     }
 
 }
