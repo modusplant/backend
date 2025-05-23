@@ -9,8 +9,7 @@ import jakarta.validation.Valid;
 import kr.modusplant.global.app.servlet.response.DataResponse;
 import kr.modusplant.modules.auth.email.model.request.EmailRequest;
 import kr.modusplant.modules.auth.email.model.request.VerifyEmailRequest;
-import kr.modusplant.modules.auth.email.service.MailService;
-import kr.modusplant.modules.jwt.app.service.TokenProvider;
+import kr.modusplant.modules.auth.email.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +21,7 @@ import java.util.HashMap;
 @RequestMapping("/api")
 public class AuthController {
 
-    private final TokenProvider tokenProvider;
-    private final MailService mailService;
+    private final AuthService authService;
 
     @Operation(
             summary = "본인인증 메일 전송 API",
@@ -38,13 +36,7 @@ public class AuthController {
             @RequestBody @Valid EmailRequest request,
             HttpServletResponse httpResponse
     ) {
-        String email = request.getEmail();
-        // 인증코드 생성
-        String verifyCode = tokenProvider.generateVerifyCode();
-        // JWT 토큰 생성
-        String accessToken = tokenProvider.generateVerifyAccessToken(email, verifyCode);
-
-        mailService.callSendVerifyEmail(email, verifyCode);
+        String accessToken = authService.sendVerifyEmail(request);
 
         // JWT AccessToken 설정
         setHttpOnlyCookie(accessToken, httpResponse);
@@ -61,7 +53,7 @@ public class AuthController {
             @RequestBody VerifyEmailRequest verifyEmailRequest,
             @CookieValue(value = "Authorization", required = false) String accessToken
     ) {
-        tokenProvider.validateVerifyAccessToken(accessToken, verifyEmailRequest.getVerifyCode());
+        authService.verifyEmail(verifyEmailRequest, accessToken);
 
         return ResponseEntity.ok(
                 DataResponse.ok(new HashMap<>() {{
@@ -78,7 +70,7 @@ public class AuthController {
     public ResponseEntity<DataResponse<?>> sendResetPasswordCode(
             @RequestBody @Valid EmailRequest request
     ) {
-
+        authService.sendResetPasswordCode(request);
         return ResponseEntity.ok().body(DataResponse.of(200, "OK: Succeeded"));
     }
 
