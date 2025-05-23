@@ -12,4 +12,6 @@ public interface PlantGroupRepository extends CreatedAtRepository<PlantGroupEnti
     Optional<PlantGroupEntity> findByOrder(Integer order);
 
     Optional<PlantGroupEntity> findByCategory(String category);
+
+    Boolean existsByOrder(Integer order);
 }
