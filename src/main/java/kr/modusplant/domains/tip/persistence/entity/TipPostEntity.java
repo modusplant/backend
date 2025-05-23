@@ -75,12 +75,24 @@ public class TipPostEntity {
     @Column(nullable = false)
     private Long ver;
 
+    public void updateGroup(PlantGroupEntity group) {
+        this.group = group;
+    }
+
     public void updateRecommendationNumber(Integer recommendationNumber) {
         this.recommendationNumber = recommendationNumber;
     }
 
     public void updateViewCount(Integer viewCount) {
         this.viewCount = viewCount;
+    }
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    public void updateContent(JsonNode content) {
+        this.content = content;
     }
 
     public void updateIsDeleted(Boolean isDeleted) {
