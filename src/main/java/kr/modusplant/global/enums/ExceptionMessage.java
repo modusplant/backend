@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum ExceptionMessage {
     EXISTED_ENTITY("Existed entity with the name - value: "),
     NOT_FOUND_ENTITY("Not found entity with the name - value: "),
+    INVALID_INPUT("Invalid input for the field - value: "),
     FOR_THE_CLASS(" for the class ");
 
     private final String value;
