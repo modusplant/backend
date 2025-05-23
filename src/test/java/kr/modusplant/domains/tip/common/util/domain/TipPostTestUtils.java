@@ -6,6 +6,7 @@ import kr.modusplant.domains.group.common.util.domain.PlantGroupTestUtils;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.domains.tip.domain.model.TipPost;
 import kr.modusplant.global.persistence.generator.UlidGenerator;
+import org.hibernate.generator.EventType;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -20,7 +21,7 @@ public interface TipPostTestUtils extends PlantGroupTestUtils, SiteMemberTestUti
             .build();
 
     TipPost tipPostWithUlid = TipPost.builder()
-            .ulid((String) generator.generate(null, null))
+            .ulid(generator.generate(null, null,null, EventType.INSERT))
             .groupOrder(plantGroup.getOrder())
             .authMemberUuid(memberBasicUserWithUuid.getUuid())
             .createMemberUuid(memberBasicUserWithUuid.getUuid())

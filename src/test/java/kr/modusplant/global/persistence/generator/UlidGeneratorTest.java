@@ -1,5 +1,6 @@
 package kr.modusplant.global.persistence.generator;
 
+import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -20,11 +21,10 @@ class UlidGeneratorTest {
     @DisplayName("ULIDGenerator가 올바른 형식의 ULID를 생성하는지 확인")
     void testGenerateUlid() {
         // Given & When
-        Object generated = generator.generate(null, null);
+        String generated = generator.generate(null, null,null, EventType.INSERT);
 
         // Then
-        assertTrue(generated instanceof String);
-        String ulid = (String) generated;
+        String ulid = generated;
         assertTrue(ULID_PATTERN.matcher(ulid).matches());
     }
 
@@ -37,7 +37,7 @@ class UlidGeneratorTest {
         // When
         String[] ulids = new String[count];
         for (int i = 0; i < count; i++) {
-            ulids[i] = (String) generator.generate(null, null);
+            ulids[i] = generator.generate(null, null,null,EventType.INSERT);
         }
 
         // Then
@@ -54,7 +54,7 @@ class UlidGeneratorTest {
 
         // when
         for (int i = 0; i < count; i++) {
-            String ulid = (String) generator.generate(null, null);
+            String ulid = generator.generate(null, null,null,EventType.INSERT);
             ulids.add(ulid);
             Thread.sleep(1);
         }
@@ -101,7 +101,7 @@ class UlidGeneratorTest {
     List<String> generatedUlidList(int count) {
         List<String> ulidList = new ArrayList<>();
         while (count-- > 0) {
-            ulidList.add((String) generator.generate(null, null));
+            ulidList.add(generator.generate(null, null,null,EventType.INSERT));
         }
         return ulidList;
     }

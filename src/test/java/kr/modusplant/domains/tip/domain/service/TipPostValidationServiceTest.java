@@ -10,6 +10,7 @@ import kr.modusplant.domains.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.tip.persistence.repository.TipPostRepository;
 import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import kr.modusplant.global.error.InvalidInputException;
+import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -118,7 +119,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
     void validateAccessibleTipPostTestSuccess() {
         // given
         UUID memberUuid = UUID.randomUUID();
-        String ulid = (String) generator.generate(null, null);
+        String ulid = generator.generate(null,null,null,EventType.INSERT);
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         TipPostEntity tipPostEntity = TipPostEntity.builder()
                 .authMember(memberEntity)
@@ -142,7 +143,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
     @DisplayName("게시글이 존재하지 않을 때 예외 발생")
     void validateAccessibleTipPostNotFoundTest() {
         UUID memberUuid = UUID.randomUUID();
-        String ulid = (String) generator.generate(null, null);
+        String ulid = generator.generate(null, null,null,EventType.INSERT);
         when(tipPostRepository.findByUlid(ulid)).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundWithUlidException.class,
                 () -> tipPostValidationService.validateAccessibleTipPost(ulid,memberUuid));
@@ -152,7 +153,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
     @DisplayName("삭제되지 않은 게시글이 존재하지 않을 때 예외 발생")
     void validateNotFoundUndeletedTipPostTest() {
         UUID memberUuid = UUID.randomUUID();
-        String ulid = (String) generator.generate(null, null);
+        String ulid = generator.generate(null, null,null,EventType.INSERT);
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         TipPostEntity tipPostEntity = TipPostEntity.builder()
                 .authMember(memberEntity)
@@ -174,7 +175,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
     void validateAccessibleTipPostTestFail() {
         // given
         UUID memberUuid = UUID.randomUUID();
-        String ulid = (String) generator.generate(null, null);
+        String ulid = generator.generate(null, null,null,EventType.INSERT);
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         TipPostEntity tipPostEntity = TipPostEntity.builder()
                 .authMember(memberEntity)
@@ -198,7 +199,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
     @Test
     @DisplayName("ULID 존재할 경우 통과")
     void validateNotFoundUlidExists() {
-        String ulid = (String) generator.generate(null, null);
+        String ulid = generator.generate(null, null,null,EventType.INSERT);
         when(tipPostRepository.existsByUlid(ulid)).thenReturn(true);
         assertDoesNotThrow(() -> tipPostValidationService.validateNotFoundUlid(ulid));
     }
@@ -206,7 +207,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
     @Test
     @DisplayName("ULID 존재하지 않을 경우 예외 발생")
     void validateNotFoundUlidNotExists() {
-        String ulid = (String) generator.generate(null, null);
+        String ulid = generator.generate(null, null,null,EventType.INSERT);
         when(tipPostRepository.existsByUlid(ulid)).thenReturn(false);
         assertThrows(EntityNotFoundWithUlidException.class, () -> {
             tipPostValidationService.validateNotFoundUlid(ulid);
