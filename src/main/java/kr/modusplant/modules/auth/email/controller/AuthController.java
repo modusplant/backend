@@ -1,9 +1,5 @@
 package kr.modusplant.modules.auth.email.controller;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -14,27 +10,20 @@ import kr.modusplant.global.app.servlet.response.DataResponse;
 import kr.modusplant.modules.auth.email.model.request.EmailRequest;
 import kr.modusplant.modules.auth.email.model.request.VerifyEmailRequest;
 import kr.modusplant.modules.auth.email.service.MailService;
+import kr.modusplant.modules.jwt.app.service.TokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Random;
-
-import static kr.modusplant.global.vo.CamelCaseWord.EMAIL;
-import static kr.modusplant.global.vo.CamelCaseWord.VERIFY_CODE;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class AuthController {
-    private final MailService mailService;
 
-    // 비밀키 설정
-    @Value("${mail-api.jwt-secret-key}")
-    private String JWT_SECRET_KEY;
+    private final TokenProvider tokenProvider;
+    private final MailService mailService;
 
     @Operation(
             summary = "본인인증 메일 전송 API",
@@ -51,11 +40,10 @@ public class AuthController {
     ) {
         String email = request.getEmail();
         // 인증코드 생성
-        String verifyCode = generateVerifyCode();
+        String verifyCode = tokenProvider.generateVerifyCode();
         // JWT 토큰 생성
-        String accessToken = generateVerifyAccessToken(email, verifyCode);
+        String accessToken = tokenProvider.generateVerifyAccessToken(email, verifyCode);
 
-        // TODO : 메일 발송
         mailService.callSendVerifyEmail(email, verifyCode);
 
         // JWT AccessToken 설정
@@ -73,9 +61,7 @@ public class AuthController {
             @RequestBody VerifyEmailRequest verifyEmailRequest,
             @CookieValue(value = "Authorization", required = false) String accessToken
     ) {
-
-        // JwtToken 에 담긴 데이터 조회 테스트용
-        validateVerifyAccessToken(accessToken, verifyEmailRequest.getVerifyCode());
+        tokenProvider.validateVerifyAccessToken(accessToken, verifyEmailRequest.getVerifyCode());
 
         return ResponseEntity.ok(
                 DataResponse.ok(new HashMap<>() {{
@@ -83,64 +69,17 @@ public class AuthController {
                 }}));
     }
 
-    // TODO : JWT Util or Provider 구현 완료 시 옮기는 것을 예상하고 작업 중
-    public String generateVerifyAccessToken(String email, String verifyCode) {
-        // 만료 시간 설정 (5분 뒤)
-        Date now = new Date();
-        Date expirationDate = new Date(now.getTime() + 5 * 60 * 1000);
+    @Operation(summary = "비밀번호 재설정 요청 API", description = "비밀번호 재설정 시 본인인증 코드를 메일로 발송합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK: Succeeded"),
+            @ApiResponse(responseCode = "400", description = "Bad Request: Invalid input data.")
+    })
+    @PostMapping("/auth/reset-password-request/send")
+    public ResponseEntity<DataResponse<?>> sendResetPasswordCode(
+            @RequestBody @Valid EmailRequest request
+    ) {
 
-        return Jwts.builder()
-                .header()
-                .type("JWT")
-                .and()
-                .claims()
-                .issuedAt(now)
-                .expiration(expirationDate)
-                .add(EMAIL, email)
-                .add(VERIFY_CODE, verifyCode)
-                .and()
-                .signWith(Keys.hmacShaKeyFor(JWT_SECRET_KEY.getBytes()))
-                .compact();
-    }
-
-    // TODO : Spring Security 적용 후 필터에서 쿠키 검증 로직 추가된 후 테스트 필요
-    public void validateVerifyAccessToken(String jwtToken, String verifyCode) {
-        if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
-            jwtToken = jwtToken.substring(7);
-        }
-
-        try {
-            // JWT 토큰 파싱
-            Claims claims = Jwts.parser()
-                    .verifyWith(Keys.hmacShaKeyFor(JWT_SECRET_KEY.getBytes()))
-                    .build()
-                    .parseSignedClaims(jwtToken)
-                    .getPayload();
-
-            // JWT 토큰 검증
-            String payloadVerifyCode = claims.get(VERIFY_CODE, String.class);
-
-            // 발급된 인증코드와 메일 인증코드 일치 검증
-            if (!verifyCode.equals(payloadVerifyCode)) {
-                throw new RuntimeException("Invalid verification code");
-            }
-        } catch (ExpiredJwtException e) {
-            throw new RuntimeException("Expired JWT token");
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
-    }
-
-    public String generateVerifyCode() {
-        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        Random random = new Random();
-
-        StringBuilder code = new StringBuilder();
-        for (int i = 0; i < 6; i++) {
-            int index = random.nextInt(characters.length());
-            code.append(characters.charAt(index));
-        }
-        return code.toString();
+        return ResponseEntity.ok().body(DataResponse.of(200, "OK: Succeeded"));
     }
 
     public void setHttpOnlyCookie(String accessToken, HttpServletResponse httpResponse) {
