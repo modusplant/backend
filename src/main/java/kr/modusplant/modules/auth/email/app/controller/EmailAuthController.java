@@ -7,9 +7,9 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import kr.modusplant.global.app.servlet.response.DataResponse;
-import kr.modusplant.modules.auth.email.app.http.request.EmailRequest;
-import kr.modusplant.modules.auth.email.app.http.request.VerifyEmailRequest;
-import kr.modusplant.modules.auth.email.app.service.AuthService;
+import kr.modusplant.modules.auth.email.model.request.EmailRequest;
+import kr.modusplant.modules.auth.email.model.request.VerifyEmailRequest;
+import kr.modusplant.modules.auth.email.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -72,22 +72,6 @@ public class AuthController {
     ) {
         authService.sendResetPasswordCode(request);
         return ResponseEntity.ok().body(DataResponse.of(200, "OK: Succeeded"));
-    }
-
-    @Operation(summary = "비밀번호 재설정 검증 API", description = "비밀번호 재설정 본인인증 코드를 검증합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK: Succeeded"),
-            @ApiResponse(responseCode = "400", description = "Bad Request: Invalid input data.")
-    })
-    @PostMapping("/auth/reset-password-request/verify")
-    public ResponseEntity<DataResponse<?>> verifyResetPasswordCode(
-            @RequestBody VerifyEmailRequest request
-    ) {
-        authService.verifyResetPasswordCode(request);
-        return ResponseEntity.ok(
-                DataResponse.ok(new HashMap<>() {{
-                    put("hasEmailAuth", true);
-                }}));
     }
 
     public void setHttpOnlyCookie(String accessToken, HttpServletResponse httpResponse) {
