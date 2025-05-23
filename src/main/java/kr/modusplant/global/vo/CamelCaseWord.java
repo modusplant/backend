@@ -30,4 +30,10 @@ public final class CamelCaseWord {
     public static final String TERM = "term";
     public static final String VER = "ver";
     public static final String VERIFY_CODE = "verifyCode";
+    public static final String GROUP = "group";
+    public static final String AUTH_MEMBER = "authMember";
+    public static final String GROUP_ORDER = "groupOrder";
+    public static final String AUTH_MEMBER_UUID = "authMemberUuid";
+    public static final String NICKNAME = "nickname";
+    public static final String CATEGORY = "category";
 }
