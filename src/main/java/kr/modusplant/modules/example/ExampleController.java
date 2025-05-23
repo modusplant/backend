@@ -32,4 +32,10 @@ public class ExampleController {
     public String testErrorController() {
         throw new RuntimeException("컨트롤러에서 예외 발생"); // 예외 발생
     }
+
+    @Operation(summary = "Redis Helper 테스트", description = "Redis 저장소에 RedisHelper 를 사용하여 저장.")
+    @GetMapping("/test-redis")
+    public String testRedisHelper() {
+        return exampleService.testRedisHelper();
+    }
 }
