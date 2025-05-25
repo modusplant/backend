@@ -12,7 +12,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import static kr.modusplant.global.vo.CamelCaseWord.VERIFY_CODE;
+import static kr.modusplant.global.vo.CamelCaseWord.*;
 
 @Slf4j
 @Service
@@ -23,7 +23,22 @@ public class MailService {
     @Value("${mail-api.secret-key}")
     private String API_SECRET_KEY;
 
-    public MailjetResponse callSendVerifyEmail(String email, String verifyCode) {
+    public MailjetResponse callSendEmail(String email, String verifyCode, String type) {
+        int templateId = 0;
+        String subject = null;
+
+        switch (type) {
+            case SIGNUP_VERIFY_EMAIL:   // 회원가입 인증메일 발송
+                templateId = 6747014;
+                subject = "[modus-plant] 회원가입 본인인증 메일입니다.";
+                break;
+            case RESET_PASSWORD_EMAIL:
+                templateId = 7011045; // 비밀번호 재설정 인증메일 발송
+                subject = "[modus-plant] 비밀번호 재설정 메일입니다.";
+                break;
+            default:break;
+        }
+
         // ClientOptions 생성
         ClientOptions clientOptions = ClientOptions.builder()
                 .apiKey(API_KEY)
@@ -52,9 +67,9 @@ public class MailService {
                                                                                 .put("Email", email)
                                                                 )
                                                 )
-                                                .put("TemplateID", 6747014)
+                                                .put("TemplateID", templateId)
                                                 .put("TemplateLanguage", true)
-                                                .put(Emailv31.Message.SUBJECT, "[modus-plant] 회원가입 본인인증 메일입니다.")
+                                                .put(Emailv31.Message.SUBJECT, subject)
                                                 .put(Emailv31.Message.VARS, new JSONObject()
                                                         .put(VERIFY_CODE, verifyCode)
                                                 )
