@@ -9,7 +9,6 @@ import kr.modusplant.domains.tip.error.PostAccessDeniedException;
 import kr.modusplant.domains.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.tip.persistence.repository.TipPostRepository;
 import kr.modusplant.global.error.EntityNotFoundWithUlidException;
-import kr.modusplant.global.error.InvalidInputException;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,7 +48,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
                 allMediaFilesOrder
         );
 
-        assertThrows(InvalidInputException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> tipPostValidationService.validateTipPostRequest(tipPostRequest));
     }
 
@@ -63,7 +62,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
                 allMediaFilesOrder
         );
 
-        assertThrows(InvalidInputException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> tipPostValidationService.validateTipPostRequest(tipPostRequest));
 
     }
@@ -78,7 +77,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
                 imageTextFilesOrder
         );
 
-        assertThrows(InvalidInputException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> tipPostValidationService.validateTipPostRequest(tipPostRequest));
     }
 

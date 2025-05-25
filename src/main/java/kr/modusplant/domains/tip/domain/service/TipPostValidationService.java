@@ -6,7 +6,6 @@ import kr.modusplant.domains.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.tip.persistence.repository.TipPostRepository;
 import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import kr.modusplant.domains.tip.error.PostAccessDeniedException;
-import kr.modusplant.global.error.InvalidInputException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,13 +43,13 @@ public class TipPostValidationService {
 
     private void validateGroupOrder(Integer groupOrder) {
         if (groupOrder == null || groupOrder < 0) {
-            throw new InvalidInputException("groupOrder",groupOrder,Integer.class);
+            throw new IllegalArgumentException("groupOrder must not be null and must be a non-negative integer.");
         }
     }
 
     private void validateTitle(String title) {
         if (title == null || title.isBlank() || title.length() > 150) {
-            throw new InvalidInputException("title",title,String.class);
+            throw new IllegalArgumentException("title must not be null or blank and must be at most 150 characters long.");
         }
     }
 
@@ -58,7 +57,7 @@ public class TipPostValidationService {
         boolean contentEmpty = content == null || content.isEmpty();
         boolean orderInfoEmpty = orderInfo==null || orderInfo.isEmpty();
         if (contentEmpty || orderInfoEmpty || isContentNotValid(content,orderInfo)) {
-            throw new InvalidInputException("content", content, List.class);
+            throw new IllegalArgumentException("Content and orderInfo must not be empty, and their filenames must match in size and order.");
         }
     }
 
