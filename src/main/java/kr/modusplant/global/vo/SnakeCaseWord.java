@@ -47,4 +47,6 @@ public final class SnakeCaseWord {
     public static final String SNAKE_LIKE_COUNT = "like_count";
     public static final String SNAKE_VIEW_COUNT = "view_count";
     public static final String SNAKE_UPDATED_AT = "updated_at";
+    public static final String SNAKE_POST_ULID = "post_ulid";
+    public static final String SNAKE_TIP_LIKE = "tip_like";
 }
