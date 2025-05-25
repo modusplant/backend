@@ -34,13 +34,13 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
     private TipPostValidationService tipPostValidationService;
 
     @Test
-    @DisplayName("팁 게시글 추가 시 TipPostRequest는 유효한 입력")
+    @DisplayName("팁 게시글 추가/수정 시 TipPostRequest는 유효한 입력")
     void validateTipPostInsertRequestTestSuccess() {
-        assertDoesNotThrow(() -> tipPostValidationService.validateTipPostInsertRequest(insertRequestBasicTypes));
+        assertDoesNotThrow(() -> tipPostValidationService.validateTipPostRequest(requestBasicTypes));
     }
 
     @Test
-    @DisplayName("팁 게시글 추가 시 TipPostRequest의 groupOrder가 유효하지 않으면 예외 발생")
+    @DisplayName("팁 게시글 추가/수정 시 TipPostRequest의 groupOrder가 유효하지 않으면 예외 발생")
     void validateTipPostInsertRequestInvalidGroupOrderTest() {
         TipPostRequest tipPostRequest = new TipPostRequest(
                 -1,
@@ -50,13 +50,11 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
         );
 
         assertThrows(InvalidInputException.class,
-                () -> tipPostValidationService.validateTipPostInsertRequest(updateRequestWithTitleAndContentAndOrderInfo));
-        assertThrows(InvalidInputException.class,
-                () -> tipPostValidationService.validateTipPostInsertRequest(tipPostRequest));
+                () -> tipPostValidationService.validateTipPostRequest(tipPostRequest));
     }
 
     @Test
-    @DisplayName("팁 게시글 추가 시 TipPostRequest의 title이 유효하지 않으면 예외 발생")
+    @DisplayName("팁 게시글 추가/수정 시 TipPostRequest의 title이 유효하지 않으면 예외 발생")
     void validateTipPostInsertRequestInvalidTitleTest() {
         TipPostRequest tipPostRequest = new TipPostRequest(
                 2,
@@ -66,14 +64,12 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
         );
 
         assertThrows(InvalidInputException.class,
-                () -> tipPostValidationService.validateTipPostInsertRequest(updateRequestWithGroupOrderAndContentAndOrderInfo));
-        assertThrows(InvalidInputException.class,
-                () -> tipPostValidationService.validateTipPostInsertRequest(tipPostRequest));
+                () -> tipPostValidationService.validateTipPostRequest(tipPostRequest));
 
     }
 
     @Test
-    @DisplayName("팁 게시글 추가 시 TipPostRequest의 Content와 OrderInfo가 유효하지 않으면 예외 발생")
+    @DisplayName("팁 게시글 추가/수정 시 TipPostRequest의 Content와 OrderInfo가 유효하지 않으면 예외 발생")
     void validateTipPostInsertRequestInvalidContentAndOrderInfoTest() {
         TipPostRequest tipPostRequest = new TipPostRequest(
                 1,
@@ -83,35 +79,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
         );
 
         assertThrows(InvalidInputException.class,
-                () -> tipPostValidationService.validateTipPostInsertRequest(updateRequestWithGroupOrderAndTitle));
-        assertThrows(InvalidInputException.class,
-                () -> tipPostValidationService.validateTipPostInsertRequest(tipPostRequest));
-    }
-
-    @Test
-    @DisplayName("팁 게시글 수정 시 TipPostRequest는 유효한 입력")
-    void validateTipPostUpdateRequestTestSuccess() {
-        assertDoesNotThrow(() -> tipPostValidationService.validateTipPostUpdateRequest(updateRequestAllFields));
-        assertDoesNotThrow(() -> tipPostValidationService.validateTipPostUpdateRequest(updateRequestWithGroupOrder));
-        assertDoesNotThrow(() -> tipPostValidationService.validateTipPostUpdateRequest(updateRequestWithTitle));
-        assertDoesNotThrow(() -> tipPostValidationService.validateTipPostUpdateRequest(updateRequestWithContentAndOrderInfo));
-        assertDoesNotThrow(() -> tipPostValidationService.validateTipPostUpdateRequest(updateRequestWithGroupOrderAndTitle));
-        assertDoesNotThrow(() -> tipPostValidationService.validateTipPostUpdateRequest(updateRequestWithGroupOrderAndContentAndOrderInfo));
-        assertDoesNotThrow(() -> tipPostValidationService.validateTipPostUpdateRequest(updateRequestWithTitleAndContentAndOrderInfo));
-    }
-
-    @Test
-    @DisplayName("팁 게시글 수정 시 TipPostRequest의 Content와 OrderInfo 중 1개만 들어오면 예외 발생")
-    void validateTipPostUpdateRequestMissingBetweenContentAndOrderInfoTest() {
-        TipPostRequest tipPostRequest = new TipPostRequest(
-                1,
-                "유용한 팁 모음",
-                allMediaFiles,
-                null
-        );
-
-        assertThrows(InvalidInputException.class,
-                () -> tipPostValidationService.validateTipPostUpdateRequest(tipPostRequest));
+                () -> tipPostValidationService.validateTipPostRequest(tipPostRequest));
     }
 
     @Test

@@ -70,9 +70,9 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
     @DisplayName("전체 팁 게시글 목록 조회하기")
     void getAllTest() throws IOException {
         // given
-        TipPostRequest tipPostRequest1 = insertRequestAllTypes;
-        TipPostRequest tipPostRequest2 = insertRequestAllTypes;
-        TipPostRequest tipPostRequest3 = insertRequestAllTypes;
+        TipPostRequest tipPostRequest1 = requestAllTypes;
+        TipPostRequest tipPostRequest2 = requestAllTypes;
+        TipPostRequest tipPostRequest3 = requestAllTypes;
         tipPostApplicationService.insert(tipPostRequest1,memberUuid);
         tipPostApplicationService.insert(tipPostRequest2,memberUuid);
         tipPostApplicationService.insert(tipPostRequest3,memberUuid);
@@ -102,9 +102,9 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
         PlantGroupEntity group = createOtherGroupEntity();
         plantGroupRepository.save(group);
         Integer groupOrder2 = group.getOrder();
-        TipPostRequest tipPostRequest1 = insertRequestAllTypes;
-        TipPostRequest tipPostRequest2 = insertRequestAllTypes;
-        TipPostRequest tipPostRequest3 = insertRequestBasicTypes;
+        TipPostRequest tipPostRequest1 = requestAllTypes;
+        TipPostRequest tipPostRequest2 = requestAllTypes;
+        TipPostRequest tipPostRequest3 = requestBasicTypes;
         tipPostApplicationService.insert(tipPostRequest1,memberUuid);
         tipPostApplicationService.insert(tipPostRequest2,memberUuid2);
         tipPostApplicationService.insert(tipPostRequest3,memberUuid);
@@ -133,10 +133,10 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
         UUID memberUuid2 = member.getUuid();
         PlantGroupEntity group = createOtherGroupEntity();
         plantGroupRepository.save(group);
-        Integer groupOrder2 = group.getOrder();
-        TipPostRequest tipPostRequest1 = insertRequestAllTypes;
-        TipPostRequest tipPostRequest2 = insertRequestAllTypes;
-        TipPostRequest tipPostRequest3 = insertRequestBasicTypes;
+        group.getOrder();
+        TipPostRequest tipPostRequest1 = requestAllTypes;
+        TipPostRequest tipPostRequest2 = requestAllTypes;
+        TipPostRequest tipPostRequest3 = requestBasicTypes;
         tipPostApplicationService.insert(tipPostRequest1,memberUuid);
         tipPostApplicationService.insert(tipPostRequest2,memberUuid2);
         tipPostApplicationService.insert(tipPostRequest3,memberUuid);
@@ -160,9 +160,9 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
         // given
         PlantGroupEntity group = createOtherGroupEntity();
         plantGroupRepository.save(group);
-        Integer groupOrder2 = group.getOrder();
-        TipPostRequest tipPostRequest1 = insertRequestAllTypes;
-        TipPostRequest tipPostRequest2 = insertRequestBasicTypes;
+        group.getOrder();
+        TipPostRequest tipPostRequest1 = requestAllTypes;
+        TipPostRequest tipPostRequest2 = requestBasicTypes;
         tipPostApplicationService.insert(tipPostRequest1,memberUuid);
         tipPostApplicationService.insert(tipPostRequest2,memberUuid);
         Pageable pageable = PageRequest.of(0, 10);
@@ -186,7 +186,7 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
     void getByUlidTest() throws IOException {
         // given
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        TipPostRequest tipPostRequest = insertRequestAllTypes;
+        TipPostRequest tipPostRequest = requestAllTypes;
         PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(tipPostRequest.groupOrder()).orElseThrow();
         TipPostEntity tipPostEntity = TipPostEntity.builder()
                 .group(plantGroupEntity)
@@ -211,8 +211,10 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
     @DisplayName("특정 팁 게시글 수정하기")
     void updateTest() throws IOException {
         // given
+        PlantGroupEntity group = createOtherGroupEntity();
+        plantGroupRepository.save(group);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        TipPostRequest tipPostRequest = insertRequestAllTypes;
+        TipPostRequest tipPostRequest = requestAllTypes;
         PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(tipPostRequest.groupOrder()).orElseThrow();
         TipPostEntity tipPostEntity = TipPostEntity.builder()
                 .group(plantGroupEntity)
@@ -224,7 +226,7 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
         tipPostRepository.save(tipPostEntity);
 
         // when
-        TipPostRequest tipPostUpdateRequest = updateRequestWithContentAndOrderInfo;
+        TipPostRequest tipPostUpdateRequest = requestBasicTypes;
         tipPostApplicationService.update(tipPostUpdateRequest,tipPostEntity.getUlid(),memberUuid);
 
         // then
@@ -237,7 +239,7 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
     void removeByUlidTest() throws IOException {
         // given
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        TipPostRequest tipPostRequest = insertRequestAllTypes;
+        TipPostRequest tipPostRequest = requestAllTypes;
         PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(tipPostRequest.groupOrder()).orElseThrow();
         TipPostEntity tipPostEntity = TipPostEntity.builder()
                 .group(plantGroupEntity)

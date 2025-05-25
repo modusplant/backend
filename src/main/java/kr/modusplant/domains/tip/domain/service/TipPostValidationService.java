@@ -25,20 +25,14 @@ public class TipPostValidationService {
 
     private final TipPostRepository tipPostRepository;
 
-    public void validateTipPostInsertRequest(TipPostRequest request) {
-        validateGroupOrder(request.groupOrder(),true);
-        validateTitle(request.title(),true);
-        validateContentAndOrderInfo(request.content(),request.orderInfo(),true);
-    }
-
-    public void validateTipPostUpdateRequest(TipPostRequest request) {
-        validateGroupOrder(request.groupOrder(),false);
-        validateTitle(request.title(),false);
-        validateContentAndOrderInfo(request.content(),request.orderInfo(),false);
+    public void validateTipPostRequest(TipPostRequest request) {
+        validateGroupOrder(request.groupOrder());
+        validateTitle(request.title());
+        validateContentAndOrderInfo(request.content(),request.orderInfo());
     }
 
     public void validateAccessibleTipPost(String ulid, UUID memberUuid) {
-        TipPostEntity tipPost = findValidByUuid(ulid);
+        TipPostEntity tipPost = findIfExistsByUlid(ulid);
         validateMemberHasPostAccess(tipPost,memberUuid);
     }
 
@@ -48,39 +42,23 @@ public class TipPostValidationService {
         }
     }
 
-    private void validateGroupOrder(Integer groupOrder, boolean isRequired) {
-        if (groupOrder == null) {
-            if (isRequired)
-                throw new InvalidInputException("groupOrder",null,Integer.class);
-        } else if (groupOrder < 0) {
+    private void validateGroupOrder(Integer groupOrder) {
+        if (groupOrder == null || groupOrder < 0) {
             throw new InvalidInputException("groupOrder",groupOrder,Integer.class);
         }
     }
 
-    private void validateTitle(String title, boolean isRequired) {
-        if (title == null) {
-            if (isRequired)
-                throw new InvalidInputException("title",null,String.class);
-        } else if (title.isBlank() || title.length() > 150) {
+    private void validateTitle(String title) {
+        if (title == null || title.isBlank() || title.length() > 150) {
             throw new InvalidInputException("title",title,String.class);
         }
     }
 
-    private void validateContentAndOrderInfo(List<MultipartFile> content, List<FileOrder> orderInfo, boolean isRequired) {
+    private void validateContentAndOrderInfo(List<MultipartFile> content, List<FileOrder> orderInfo) {
         boolean contentEmpty = content == null || content.isEmpty();
         boolean orderInfoEmpty = orderInfo==null || orderInfo.isEmpty();
-
-        if (isRequired) {
-            if (contentEmpty || orderInfoEmpty || isContentNotValid(content,orderInfo)) {
-                throw new InvalidInputException("content", content, List.class);
-            }
-        } else {
-            if (contentEmpty ^ orderInfoEmpty) {
-                throw new InvalidInputException("A required field is missing");
-            }
-            if (!contentEmpty && !orderInfoEmpty && isContentNotValid(content, orderInfo)) {
-                throw new InvalidInputException("content", content, List.class);
-            }
+        if (contentEmpty || orderInfoEmpty || isContentNotValid(content,orderInfo)) {
+            throw new InvalidInputException("content", content, List.class);
         }
     }
 
@@ -107,7 +85,7 @@ public class TipPostValidationService {
         return !contentFilenames.equals(orderFilenames);
     }
 
-    private TipPostEntity findValidByUuid(String ulid) {
+    private TipPostEntity findIfExistsByUlid(String ulid) {
         if (ulid == null) {
             throw new EntityNotFoundWithUlidException(ulid, TipPostEntity.class);
         }
@@ -116,6 +94,7 @@ public class TipPostValidationService {
                 .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid,TipPostEntity.class));
     }
 
+    // TODO : Spring Security 적용 후 PreAuthorize 고려
     private void validateMemberHasPostAccess(TipPostEntity tipPost, UUID memberUuid) {
         if(!tipPost.getAuthMember().getUuid().equals(memberUuid)) {
             throw new PostAccessDeniedException();

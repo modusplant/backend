@@ -88,51 +88,17 @@ public interface TipPostRequestTestUtils {
 
 
     /* TipPostRequest Utils */
-    TipPostRequest insertRequestAllTypes = new TipPostRequest(
+    TipPostRequest requestAllTypes = new TipPostRequest(
             1,
             "유용한 팁 모음",
             allMediaFiles,
             allMediaFilesOrder
     );
 
-    TipPostRequest insertRequestBasicTypes = new TipPostRequest(
+    TipPostRequest requestBasicTypes = new TipPostRequest(
             2,
             "유용한 식물 기르기 팁",
             basicMediaFiles,
             basicMediaFilesOrder
-    );
-
-    TipPostRequest updateRequestAllFields = new TipPostRequest(
-            3,
-            "유용한 팁",
-            textImageFiles,
-            textImageFilesOrder
-    );
-
-    TipPostRequest updateRequestWithGroupOrder = new TipPostRequest(3,null,null,null);
-
-    TipPostRequest updateRequestWithTitle = new TipPostRequest(null,"식물 오래 잘 기르는 방법",null,null);
-
-    TipPostRequest updateRequestWithContentAndOrderInfo = new TipPostRequest(
-            null,
-            null,
-            duplicatedTextFiles,
-            duplicatedTextFilesOrder
-    );
-
-    TipPostRequest updateRequestWithGroupOrderAndTitle = new TipPostRequest(3,"식물 오래 잘 기르는 방법", null, null);
-
-    TipPostRequest updateRequestWithGroupOrderAndContentAndOrderInfo = new TipPostRequest(
-            3,
-            null,
-            basicMediaFiles,
-            basicMediaFilesOrder
-    );
-
-    TipPostRequest updateRequestWithTitleAndContentAndOrderInfo = new TipPostRequest(
-            null,
-            "식물 오래 잘 기르는 방법",
-            textImageFiles,
-            textImageFilesOrder
     );
 }

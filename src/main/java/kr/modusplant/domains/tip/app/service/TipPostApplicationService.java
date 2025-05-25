@@ -1,6 +1,6 @@
 package kr.modusplant.domains.tip.app.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import kr.modusplant.domains.common.domain.service.MediaContentService;
 import kr.modusplant.domains.group.domain.service.PlantGroupValidationService;
 import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
 import kr.modusplant.domains.group.persistence.repository.PlantGroupRepository;
@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class TipPostApplicationService {
 
@@ -99,37 +100,29 @@ public class TipPostApplicationService {
 
     @Transactional
     public void insert(TipPostRequest tipPostRequest, UUID memberUuid) throws IOException {
-        tipPostValidationService.validateTipPostInsertRequest(tipPostRequest);
+        tipPostValidationService.validateTipPostRequest(tipPostRequest);
         plantGroupValidationService.validateNotFoundOrder(tipPostRequest.groupOrder());
         siteMemberValidationService.validateNotFoundUuid(memberUuid);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        JsonNode content = mediaContentService.saveFilesAndGenerateContentJson(tipPostRequest.content());
         TipPostEntity tipPostEntity = TipPostEntity.builder()
                 .group(plantGroupRepository.findByOrder(tipPostRequest.groupOrder()).orElseThrow())
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(tipPostRequest.title())
-                .content(content)
+                .content(mediaContentService.saveFilesAndGenerateContentJson(tipPostRequest.content()))
                 .build();
         tipPostRepository.save(tipPostEntity);
     }
 
     @Transactional
     public void update(TipPostRequest tipPostRequest, String ulid, UUID memberUuid) throws IOException {
-        tipPostValidationService.validateTipPostUpdateRequest(tipPostRequest);
+        tipPostValidationService.validateTipPostRequest(tipPostRequest);
         tipPostValidationService.validateAccessibleTipPost(ulid, memberUuid);
+        plantGroupValidationService.validateNotFoundOrder(tipPostRequest.groupOrder());
         TipPostEntity tipPostEntity = tipPostRepository.findByUlid(ulid).orElseThrow();
-        if (tipPostRequest.groupOrder() != null) {
-            plantGroupValidationService.validateNotFoundOrder(tipPostRequest.groupOrder());
-            tipPostEntity.updateGroup(plantGroupRepository.findByOrder(tipPostRequest.groupOrder()).orElseThrow());
-        }
-        if (tipPostRequest.title() != null) {
-            tipPostEntity.updateTitle(tipPostRequest.title());
-        }
-        if (tipPostRequest.content() != null && !tipPostRequest.content().isEmpty()) {
-            JsonNode content = mediaContentService.saveFilesAndGenerateContentJson(tipPostRequest.content());
-            tipPostEntity.updateContent(content);
-        }
+        tipPostEntity.updateGroup(plantGroupRepository.findByOrder(tipPostRequest.groupOrder()).orElseThrow());
+        tipPostEntity.updateTitle(tipPostRequest.title());
+        tipPostEntity.updateContent(mediaContentService.saveFilesAndGenerateContentJson(tipPostRequest.content()));
         tipPostRepository.save(tipPostEntity);
     }
 
