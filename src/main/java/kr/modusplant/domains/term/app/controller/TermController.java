@@ -6,6 +6,7 @@ import kr.modusplant.domains.term.app.http.response.TermResponse;
 import kr.modusplant.domains.term.app.service.TermApplicationService;
 import kr.modusplant.global.app.servlet.response.DataResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
+@Primary
 @RequestMapping("/api/crud/terms")
 @RequiredArgsConstructor
 public class TermController {
@@ -39,7 +41,7 @@ public class TermController {
     }
 
     @GetMapping("/name/{name}")
-    public ResponseEntity<DataResponse<?>> getTermByUuid(@PathVariable String name) {
+    public ResponseEntity<DataResponse<?>> getTermByName(@PathVariable String name) {
         Optional<TermResponse> optionalTermResponse = termApplicationService.getByName(name);
         if (optionalTermResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -52,13 +54,13 @@ public class TermController {
         return ResponseEntity.ok().body(DataResponse.ok(termApplicationService.insert(termInsertRequest)));
     }
 
-    @PostMapping("/{uuid}")
-    public ResponseEntity<DataResponse<?>> updateTerm(@RequestBody TermUpdateRequest termUpdateRequest) {
+    @PutMapping
+    public ResponseEntity<DataResponse<TermResponse>> updateTerm(@RequestBody TermUpdateRequest termUpdateRequest) {
         return ResponseEntity.ok().body(DataResponse.ok(termApplicationService.update(termUpdateRequest)));
     }
 
     @DeleteMapping("/{uuid}")
-    public ResponseEntity<DataResponse<?>> removeTermById(@RequestParam UUID uuid) {
+    public ResponseEntity<DataResponse<?>> removeTermByUuid(@PathVariable UUID uuid) {
         termApplicationService.removeByUuid(uuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }

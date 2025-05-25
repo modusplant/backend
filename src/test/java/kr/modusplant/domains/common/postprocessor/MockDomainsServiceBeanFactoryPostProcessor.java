@@ -9,7 +9,7 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import org.springframework.util.ClassUtils;
 
 import java.util.Objects;
@@ -17,17 +17,17 @@ import java.util.Objects;
 import static kr.modusplant.domains.common.vo.Reference.NOTATION_DOMAINS;
 
 @NonNullApi
-public class MockDomainsRepositoryBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
+public class MockDomainsServiceBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false) {
             @Override
             protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
-                return beanDefinition.getMetadata().isInterface() && beanDefinition.getMetadata().hasAnnotation(Repository.class.getName());
+                return beanDefinition.getMetadata().isConcrete() && beanDefinition.getMetadata().hasAnnotation(Service.class.getName());
             }
         };
-        scanner.addIncludeFilter(new AnnotationTypeFilter(Repository.class));
+        scanner.addIncludeFilter(new AnnotationTypeFilter(Service.class));
         ClassLoader classLoader = this.getClass().getClassLoader();
 
         for (BeanDefinition repositoryDef : scanner.findCandidateComponents(NOTATION_DOMAINS)) {
@@ -35,7 +35,7 @@ public class MockDomainsRepositoryBeanFactoryPostProcessor implements BeanFactor
             try {
                 clazz = ClassUtils.forName(Objects.requireNonNull(repositoryDef.getBeanClassName()), classLoader);
             } catch (ClassNotFoundException e) {
-                throw new RuntimeException("Fail to load the repository interface: " + repositoryDef.getBeanClassName());
+                throw new RuntimeException("Fail to load the service class: " + repositoryDef.getBeanClassName());
             }
             String simpleName = clazz.getSimpleName();
             beanFactory.registerSingleton(String.valueOf(simpleName.charAt(0)).toLowerCase() + simpleName.substring(1), Mockito.mock(clazz));

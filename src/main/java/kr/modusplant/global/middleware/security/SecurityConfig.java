@@ -16,6 +16,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -47,6 +50,7 @@ public class SecurityConfig {
     public SecurityFilterChain defaultChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/api/*")
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/terms").permitAll()
                         .requestMatchers("/api/members/*").permitAll()
@@ -71,5 +75,19 @@ public class SecurityConfig {
                         .contentTypeOptions(Customizer.withDefaults())
                 );
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+            CorsConfiguration config = new CorsConfiguration();
+            config.addAllowedOrigin("https://specified-jaquith-modusplant-0c942371.koyeb.app");
+            config.addAllowedMethod("*");
+            config.addAllowedHeader("*");
+            config.setAllowCredentials(true);
+
+            UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+            source.registerCorsConfiguration("/**", config);
+
+            return source;
     }
 }
