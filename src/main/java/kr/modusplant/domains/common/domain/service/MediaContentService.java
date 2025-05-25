@@ -20,6 +20,7 @@ import java.util.*;
 public class MediaContentService {
     private final ObjectMapper objectMapper;
 
+    /* Wasabi 연동 전 임시 구현 : 로컬 저장 경로 지정 */
     private static final String BASE_DIRECTORY = "/uploads/";
     private static final String IMAGE_DIR = "images/";
     private static final String VIDEO_DIR = "video/";
@@ -34,21 +35,22 @@ public class MediaContentService {
 
     public JsonNode saveFilesAndGenerateContentJson(List<MultipartFile> parts) throws IOException {
         ArrayNode contentArray = objectMapper.createArrayNode();
-        int i=1;
+        int order=1;
         for (MultipartFile part:parts) {
-            contentArray.add(convertSinglePartToJson(part,i++));
+            contentArray.add(convertSinglePartToJson(part,order++));
         }
         return contentArray;
     }
 
-    private ObjectNode convertSinglePartToJson(MultipartFile part, int i) throws IOException {
+    private ObjectNode convertSinglePartToJson(MultipartFile part, int order) throws IOException {
         String contentType = part.getContentType();
         String filename = part.getOriginalFilename();
+
         ObjectNode node = objectMapper.createObjectNode();
         node.put("filename",filename);
-        node.put("order",i);
-        String type = contentType.contains("/") ? contentType.split("/")[0] : contentType;
-        type = type.equals("application") ? "file" : type;
+        node.put("order",order);
+
+        String type = extractType(contentType);
         if (type.equals("text")) {
             String text = new String(part.getBytes(), StandardCharsets.UTF_8);
             node.put("type","text");
@@ -63,7 +65,15 @@ public class MediaContentService {
         return node;
     }
 
-    /* Wasabi 적용 전 파일 임의 저장 */
+    private String extractType(String contentType) {
+        if (contentType == null || contentType.isBlank()) {
+            return "unknown";
+        }
+        String type = contentType.contains("/") ? contentType.split("/")[0] : contentType;
+        return type.equals("application") ? "file" : type;
+    }
+
+    /* Wasabi 연동 전 임시 구현 : 파일 로컬 저장 */
     private String saveFileToLocal(MultipartFile part,  String directory, String originalFilename) throws IOException {
         String uploadDirectory = BASE_DIRECTORY + directory;
         File fileDirectory = new File(uploadDirectory);
@@ -87,20 +97,19 @@ public class MediaContentService {
     public JsonNode convertFileSrcToBinaryData(JsonNode content) throws IOException {
         ArrayNode contentArray = (ArrayNode) content;
         for(JsonNode node:contentArray) {
-            if(node.isObject()) {
+            if(node.isObject() && node.has("src")) {
                 ObjectNode objectNode = (ObjectNode) node;
-                if (objectNode.has("src")) {
-                    String src = objectNode.get("src").asText();
-                    byte[] fileBytes = readMediaFileAsBytes(src);
-                    String base64Encoded = Base64.getEncoder().encodeToString(fileBytes);
-                    objectNode.put("data",base64Encoded);
-                    objectNode.remove("src");
-                }
+                String src = objectNode.get("src").asText();
+                byte[] fileBytes = readMediaFileAsBytes(src);
+                String base64Encoded = Base64.getEncoder().encodeToString(fileBytes);
+                objectNode.put("data",base64Encoded);
+                objectNode.remove("src");
             }
         }
         return contentArray;
     }
 
+    /* Wasabi 연동 전 임시 구현 : 파일을 로컬에서 읽음 */
     private byte[] readMediaFileAsBytes(String src) throws IOException {
         Path path = Path.of(src);
         return Files.readAllBytes(path);
