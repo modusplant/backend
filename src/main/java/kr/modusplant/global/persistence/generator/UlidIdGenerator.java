@@ -7,7 +7,7 @@ import org.hibernate.generator.EventType;
 
 import java.util.EnumSet;
 
-public class UlidGenerator implements BeforeExecutionGenerator {
+public class UlidIdGenerator implements BeforeExecutionGenerator {
     @Override
     public String generate(SharedSessionContractImplementor var1, Object var2, Object var3, EventType var4) {
         return UlidCreator.getUlid().toString();

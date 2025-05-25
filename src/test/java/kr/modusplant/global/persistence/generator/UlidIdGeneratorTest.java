@@ -13,12 +13,12 @@ import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UlidGeneratorTest {
-    private static final UlidGenerator generator = new UlidGenerator();
+class UlidIdGeneratorTest {
+    private static final UlidIdGenerator generator = new UlidIdGenerator();
     private static final Pattern ULID_PATTERN = Pattern.compile("^[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{26}$", Pattern.CASE_INSENSITIVE);
 
     @Test
-    @DisplayName("ULIDGenerator가 올바른 형식의 ULID를 생성하는지 확인")
+    @DisplayName("UlidIdGenerator가 올바른 형식의 ULID를 생성하는지 확인")
     void testGenerateUlid() {
         // Given & When
         String generated = generator.generate(null, null,null, EventType.INSERT);
@@ -29,7 +29,7 @@ class UlidGeneratorTest {
     }
 
     @Test
-    @DisplayName("ULIDGenerator가 고유한 값을 생성하는지 확인")
+    @DisplayName("UlidIdGenerator가 고유한 값을 생성하는지 확인")
     void testGenerateUniqueUlids() {
         // Given
         int count = 10000;

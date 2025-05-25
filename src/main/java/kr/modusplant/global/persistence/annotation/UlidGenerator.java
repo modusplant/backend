@@ -1,6 +1,6 @@
 package kr.modusplant.global.persistence.annotation;
 
-import kr.modusplant.global.persistence.generator.UlidGenerator;
+import kr.modusplant.global.persistence.generator.UlidIdGenerator;
 import org.hibernate.annotations.IdGeneratorType;
 
 import java.lang.annotation.Retention;
@@ -12,6 +12,6 @@ import static java.lang.annotation.ElementType.METHOD;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({METHOD,FIELD})
-@IdGeneratorType(UlidGenerator.class)
-public @interface Ulid {
+@IdGeneratorType(UlidIdGenerator.class)
+public @interface UlidGenerator {
 }

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.group.common.util.domain.PlantGroupTestUtils;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.domains.tip.domain.model.TipPost;
-import kr.modusplant.global.persistence.generator.UlidGenerator;
+import kr.modusplant.global.persistence.generator.UlidIdGenerator;
 import org.hibernate.generator.EventType;
 
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.io.UncheckedIOException;
 
 public interface TipPostTestUtils extends PlantGroupTestUtils, SiteMemberTestUtils {
     ObjectMapper objectMapper = new ObjectMapper();
-    UlidGenerator generator = new UlidGenerator();
+    UlidIdGenerator generator = new UlidIdGenerator();
 
     TipPost tipPost = TipPost.builder()
             .title("물 주는 타이밍, 이제 헷갈리지 마세요! 식물별 물 주기 가이드")
