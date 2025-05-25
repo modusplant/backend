@@ -120,6 +120,7 @@ public class TipPostApplicationService {
         tipPostValidationService.validateAccessibleTipPost(ulid, memberUuid);
         plantGroupValidationService.validateNotFoundOrder(tipPostRequest.groupOrder());
         TipPostEntity tipPostEntity = tipPostRepository.findByUlid(ulid).orElseThrow();
+        mediaContentService.deleteFiles(tipPostEntity.getContent());
         tipPostEntity.updateGroup(plantGroupRepository.findByOrder(tipPostRequest.groupOrder()).orElseThrow());
         tipPostEntity.updateTitle(tipPostRequest.title());
         tipPostEntity.updateContent(mediaContentService.saveFilesAndGenerateContentJson(tipPostRequest.content()));
@@ -127,9 +128,10 @@ public class TipPostApplicationService {
     }
 
     @Transactional
-    public void removeByUlid(String ulid, UUID memberUuid) {
+    public void removeByUlid(String ulid, UUID memberUuid) throws IOException {
         tipPostValidationService.validateAccessibleTipPost(ulid,memberUuid);
         TipPostEntity tipPostEntity = tipPostRepository.findByUlid(ulid).orElseThrow();
+        mediaContentService.deleteFiles(tipPostEntity.getContent());
         tipPostEntity.updateIsDeleted(true);
         tipPostRepository.save(tipPostEntity);
     }

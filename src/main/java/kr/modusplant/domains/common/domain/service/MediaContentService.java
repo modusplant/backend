@@ -105,4 +105,25 @@ public class MediaContentService {
         Path path = Path.of(src);
         return Files.readAllBytes(path);
     }
+
+    public void deleteFiles(JsonNode content) throws IOException {
+        for (JsonNode node : content) {
+            if (node.isObject()) {
+                if (node.has("src")) {
+                    String src = node.get("src").asText();
+                    deleteMediaFile(src);
+                }
+            }
+        }
+    }
+
+    /* Wasabi 연동 전 임시 구현 : 로컬 파일 삭제 */
+    private void deleteMediaFile(String src) throws IOException {
+        Path path = Path.of(src);
+        if (Files.exists(path)) {
+            Files.delete(path);
+        } else {
+            System.out.println("파일이 존재하지 않습니다: " + src);
+        }
+    }
 }

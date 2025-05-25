@@ -5,16 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.tip.common.util.http.request.TipPostRequestTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
@@ -22,13 +22,11 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class MediaContentServiceTest implements TipPostRequestTestUtils {
-    @InjectMocks
+    @Autowired
     private MediaContentService mediaContentService;
-
-    @Spy
-    private ObjectMapper objectMapper;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     @DisplayName("멀티파트 데이터를 파일에 저장하고 Json 반환값 받기")
@@ -78,10 +76,7 @@ class MediaContentServiceTest implements TipPostRequestTestUtils {
         assertThat(fileNode.get("src").asText()).contains("/uploads/files/file_");
         assertTrue(savedFile.exists());
 
-        savedImage.delete();
-        savedVideo.delete();
-        savedAudio.delete();
-        savedFile.delete();
+        mediaContentService.deleteFiles(result);
     }
 
     @Test
@@ -115,6 +110,28 @@ class MediaContentServiceTest implements TipPostRequestTestUtils {
         assertFalse(firstNode.has("src"));
         assertTrue(firstNode.has("data"));
         assertThat(firstNode.get("data").asText()).isEqualTo(Base64.getEncoder().encodeToString(jpegData));
+
+        mediaContentService.deleteFiles(content);
     }
+
+    @Test
+    @DisplayName("저장된 파일 경로로 로컬 파일 삭제")
+    void deleteMediafilesTest() throws IOException {
+        // given
+        JsonNode contentJson = mediaContentService.saveFilesAndGenerateContentJson(allMediaFiles);
+
+        // when
+        mediaContentService.deleteFiles(contentJson);
+
+        // then
+        for (JsonNode node : contentJson) {
+            if (node.has("src")) {
+                String src = node.get("src").asText();
+                Path path = Path.of(src);
+                assertThat(Files.exists(path)).isEqualTo(false);
+            }
+        }
+    }
+
 
 }
