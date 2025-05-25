@@ -29,6 +29,9 @@ public class TipPostController {
 
     private final TipPostApplicationService tipPostApplicationService;
 
+    // 임시로 Spring Security 적용 전 인증 우회를 위해 사용
+    // gitignore 처리된 yml 파일에 임의로 값을 추가하여 사용
+    // TODO : Spring Security 적용 후 정상 인증 로직으로 대체할 것
     @Value("${fake-auth-uuid}")
     private UUID memberUuid;
 
@@ -93,9 +96,20 @@ public class TipPostController {
 
     @Operation(summary = "특정 팁 게시글 삭제 API", description = "특정 팁 게시글을 삭제합니다.")
     @DeleteMapping("/{ulid}")
-    public ResponseEntity<DataResponse<Void>> removeTipPostByUlid(@PathVariable String ulid) {
+    public ResponseEntity<DataResponse<Void>> removeTipPostByUlid(@PathVariable String ulid) throws IOException {
         tipPostApplicationService.removeByUlid(ulid,memberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
+    @Operation(summary = "특정 팁 게시글 조회수 조회 API", description = "특정 팁 게시글의 조회수를 조회합니다.")
+    @GetMapping("/{ulid}/views")
+    public ResponseEntity<DataResponse<Long>> countViewCount(@PathVariable String ulid) {
+        return ResponseEntity.ok().body(DataResponse.ok(tipPostApplicationService.countViews(ulid)));
+    }
+
+    @Operation(summary = "특정 팁 게시글 조회수 증가 API", description = "특정 팁 게시글의 조회수를 증가시킵니다.")
+    @PatchMapping("/{ulid}/views")
+    public ResponseEntity<DataResponse<Long>> increaseViewCount(@PathVariable String ulid) {
+        return ResponseEntity.ok().body(DataResponse.ok(tipPostApplicationService.increase(ulid, memberUuid)));
+    }
 }
