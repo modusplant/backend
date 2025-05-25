@@ -31,4 +31,6 @@ public final class CamelCaseWord {
     public static final String TERM = "term";
     public static final String VER = "ver";
     public static final String VERIFY_CODE = "verifyCode";
+    public static final String SIGNUP_VERIFY_EMAIL = "signupVerifyEmail";
+    public static final String RESET_PASSWORD_EMAIL = "resetPasswordEmail";
 }
