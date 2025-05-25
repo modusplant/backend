@@ -6,28 +6,25 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+
+import static kr.modusplant.global.vo.SnakeCaseWord.*;
 
 @Getter
 @Setter
 public class TipPostResponse {
     private String ulid;
-    @JsonProperty("group_order")
+    @JsonProperty(SNAKE_GROUP_ORDER)
     private Integer groupOrder;
     private String category;
-    @JsonProperty("member_uuid")
-    private UUID authMemberUuid;
     private String nickname;
-    @JsonProperty("recommendation_number")
-    private Integer recommendationNumber;
-    @JsonProperty("view_count")
     @JsonProperty(SNAKE_LIKE_COUNT)
     private Integer likeCount;
+    @JsonProperty(SNAKE_VIEW_COUNT)
     private Long viewCount;
     private String title;
     private JsonNode content;
-    @JsonProperty("created_at")
+    @JsonProperty(SNAKE_CREATED_AT)
     private LocalDateTime createdAt;
-    @JsonProperty("updated_at")
+    @JsonProperty(SNAKE_UPDATED_AT)
     private LocalDateTime updatedAt;
 }

@@ -51,7 +51,6 @@ class TipPostAppInfraMapperTest implements TipPostEntityTestUtils, PlantGroupEnt
 
         // then
         assertThat(tipPostResponse.getGroupOrder()).isEqualTo(tipPostEntity.getGroup().getOrder());
-        assertThat(tipPostResponse.getAuthMemberUuid()).isEqualTo(tipPostEntity.getAuthMember().getUuid());
         assertThat(tipPostResponse.getCategory()).isEqualTo(tipPostEntity.getGroup().getCategory());
         assertThat(tipPostResponse.getNickname()).isEqualTo(tipPostEntity.getAuthMember().getNickname());
     }

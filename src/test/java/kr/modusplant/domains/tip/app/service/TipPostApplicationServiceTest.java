@@ -1,6 +1,7 @@
 package kr.modusplant.domains.tip.app.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.modusplant.domains.common.domain.service.MediaContentService;
 import kr.modusplant.domains.group.common.util.entity.PlantGroupEntityTestUtils;
 import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
 import kr.modusplant.domains.group.persistence.repository.PlantGroupRepository;
@@ -29,7 +30,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -88,7 +88,6 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
         assertThat(result.getTotalPages()).isEqualTo(2);
         List<TipPostResponse> posts = result.getContent();
         assertThat(posts.get(0).getCreatedAt()).isAfterOrEqualTo(posts.get(1).getCreatedAt());
-        assertThat(posts.get(0).getAuthMemberUuid()).isEqualTo(memberUuid);
         assertThat(posts.get(0).getGroupOrder()).isEqualTo(groupOrder);
     }
 
@@ -153,8 +152,6 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
         assertThat(result.getTotalPages()).isEqualTo(1);
         List<TipPostResponse> posts = result.getContent();
         assertThat(posts.get(0).getCreatedAt()).isAfterOrEqualTo(posts.get(1).getCreatedAt());
-        assertThat(posts.get(0).getAuthMemberUuid()).isEqualTo(memberUuid2);
-        assertThat(posts.get(1).getAuthMemberUuid()).isEqualTo(memberUuid);
     }
 
     @Test

@@ -17,18 +17,12 @@ public interface TipPostAppInfraMapper {
 
     @Mapping(source = GROUP, target = GROUP_ORDER, qualifiedByName = "toGroupOrder")
     @Mapping(source = GROUP, target = CATEGORY, qualifiedByName = "toCategory")
-    @Mapping(source = AUTH_MEMBER, target = AUTH_MEMBER_UUID, qualifiedByName = "toAuthMemberUuid")
     @Mapping(source = AUTH_MEMBER, target = NICKNAME, qualifiedByName = "toNickname")
     TipPostResponse toTipPostResponse(TipPostEntity tipPostEntity);
 
     @Named("toGroupOrder")
     default Integer toGroupOrder(PlantGroupEntity plantGroupEntity) {
         return plantGroupEntity.getOrder();
-    }
-
-    @Named("toAuthMemberUuid")
-    default UUID toAuthMemberUuid(SiteMemberEntity siteMemberEntity) {
-        return siteMemberEntity.getUuid();
     }
 
     @Named("toCategory")
