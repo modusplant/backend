@@ -44,9 +44,9 @@ public class TipPostEntity {
     @JoinColumn(name = SNAKE_CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity createMember;
 
-    @Column(name = SNAKE_RECOM_NUM, nullable = false)
+    @Column(name = SNAKE_LIKE_COUNT, nullable = false)
     @DefaultValue
-    private Integer recommendationNumber;
+    private Integer likeCount;
 
     @Column(name = SNAKE_VIEW_COUNT, nullable = false)
     @DefaultValue
@@ -79,8 +79,8 @@ public class TipPostEntity {
         this.group = group;
     }
 
-    public void updateRecommendationNumber(Integer recommendationNumber) {
-        this.recommendationNumber = recommendationNumber;
+    public void updateLikeCount(Integer likeCount) {
+        this.likeCount = likeCount;
     }
 
     public void updateViewCount(Long viewCount) {
@@ -113,8 +113,8 @@ public class TipPostEntity {
 
     @PrePersist
     public void prePersist() {
-        if (this.recommendationNumber == null) {
-            this.recommendationNumber = 0;
+        if (this.likeCount == null) {
+            this.likeCount = 0;
         }
         if (this.viewCount == null) {
             this.viewCount = 0L;
@@ -126,8 +126,8 @@ public class TipPostEntity {
 
     @PreUpdate
     public void preUpdate() {
-        if (this.recommendationNumber == null) {
-            this.recommendationNumber = 0;
+        if (this.likeCount == null) {
+            this.likeCount = 0;
         }
         if (this.viewCount == null) {
             this.viewCount = 0L;
@@ -137,12 +137,12 @@ public class TipPostEntity {
         }
     }
 
-    private TipPostEntity(String ulid, PlantGroupEntity group, SiteMemberEntity authMember, SiteMemberEntity createMember, Integer recommendationNumber, Long viewCount, String title, JsonNode content, Boolean isDeleted) {
+    private TipPostEntity(String ulid, PlantGroupEntity group, SiteMemberEntity authMember, SiteMemberEntity createMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isDeleted) {
         this.ulid = ulid;
         this.group = group;
         this.authMember = authMember;
         this.createMember = createMember;
-        this.recommendationNumber = recommendationNumber;
+        this.likeCount = likeCount;
         this.viewCount = viewCount;
         this.title = title;
         this.content = content;
@@ -158,7 +158,7 @@ public class TipPostEntity {
         private PlantGroupEntity group;
         private SiteMemberEntity authMember;
         private SiteMemberEntity createMember;
-        private Integer recommendationNumber;
+        private Integer likeCount;
         private Long viewCount;
         private String title;
         private JsonNode content;
@@ -184,8 +184,8 @@ public class TipPostEntity {
             return this;
         }
 
-        public TipPostEntityBuilder recommendationNumber(final Integer recommendationNumber) {
-            this.recommendationNumber = recommendationNumber;
+        public TipPostEntityBuilder likeCount(final Integer likeCount) {
+            this.likeCount = likeCount;
             return this;
         }
 
@@ -214,7 +214,7 @@ public class TipPostEntity {
             this.group = tipPostEntity.group;
             this.authMember = tipPostEntity.authMember;
             this.createMember = tipPostEntity.createMember;
-            this.recommendationNumber = tipPostEntity.recommendationNumber;
+            this.likeCount = tipPostEntity.likeCount;
             this.viewCount = tipPostEntity.viewCount;
             this.title = tipPostEntity.title;
             this.content = tipPostEntity.content;
@@ -223,7 +223,7 @@ public class TipPostEntity {
         }
 
         public TipPostEntity build() {
-            return new TipPostEntity(this.ulid,this.group,this.authMember,this.createMember,this.recommendationNumber,this.viewCount,this.title,this.content,this.isDeleted);
+            return new TipPostEntity(this.ulid,this.group,this.authMember,this.createMember,this.likeCount,this.viewCount,this.title,this.content,this.isDeleted);
         }
 
     }

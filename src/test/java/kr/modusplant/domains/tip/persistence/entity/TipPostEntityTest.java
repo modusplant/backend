@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @RepositoryOnlyContext
 class TipPostEntityTest implements TipPostEntityTestUtils {
@@ -32,7 +31,7 @@ class TipPostEntityTest implements TipPostEntityTestUtils {
                 .group(plantGroup)
                 .authMember(member)
                 .createMember(member)
-                .recommendationNumber(1)
+                .likeCount(1)
                 .viewCount(1L)
                 .isDeleted(true)
                 .build();
@@ -42,7 +41,7 @@ class TipPostEntityTest implements TipPostEntityTestUtils {
         entityManager.flush();
 
         // then
-        assertThat(tipPost.getRecommendationNumber()).isEqualTo(1);
+        assertThat(tipPost.getLikeCount()).isEqualTo(1);
         assertThat(tipPost.getViewCount()).isEqualTo(1L);
         assertThat(tipPost.getIsDeleted()).isEqualTo(true);
     }
@@ -61,13 +60,13 @@ class TipPostEntityTest implements TipPostEntityTestUtils {
         entityManager.persist(tipPost);
 
         // when
-        tipPost.updateRecommendationNumber(null);
+        tipPost.updateLikeCount(null);
         tipPost.updateViewCount(null);
         tipPost.updateIsDeleted(null);
         entityManager.flush();
 
         // then
-        assertThat(tipPost.getRecommendationNumber()).isEqualTo(0);
+        assertThat(tipPost.getLikeCount()).isEqualTo(0);
         assertThat(tipPost.getViewCount()).isEqualTo(0L);
         assertThat(tipPost.getIsDeleted()).isEqualTo(false);
     }

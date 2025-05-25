@@ -21,6 +21,8 @@ public class TipPostResponse {
     @JsonProperty("recommendation_number")
     private Integer recommendationNumber;
     @JsonProperty("view_count")
+    @JsonProperty(SNAKE_LIKE_COUNT)
+    private Integer likeCount;
     private Long viewCount;
     private String title;
     private JsonNode content;

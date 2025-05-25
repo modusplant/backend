@@ -37,7 +37,7 @@ public final class SnakeCaseWord {
     public static final String SNAKE_TIP_POST = "tip_post";
     public static final String SNAKE_AUTH_MEMB_UUID = "auth_memb_uuid";
     public static final String SNAKE_CREA_MEMB_UUID = "crea_memb_uuid";
-    public static final String SNAKE_RECOM_NUM = "recom_num";
+    public static final String SNAKE_LIKE_COUNT = "like_count";
     public static final String SNAKE_VIEW_COUNT = "view_count";
     public static final String SNAKE_UPDATED_AT = "updated_at";
 }
