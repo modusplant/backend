@@ -35,7 +35,7 @@ public class TipCommentEntity {
 
     @Id
     @Column(name = "mate_path", nullable = false, updatable = false)
-    private String materializedPath;
+    private String path;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = SNAKE_AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
@@ -63,7 +63,7 @@ public class TipCommentEntity {
 
         return new EqualsBuilder()
                 .append(getPostUlid(), that.getPostUlid())
-                .append(getMaterializedPath(), that.getMaterializedPath())
+                .append(getPath(), that.getPath())
                 .isEquals();
     }
 
@@ -71,7 +71,7 @@ public class TipCommentEntity {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(getPostUlid())
-                .append(getMaterializedPath())
+                .append(getPath())
                 .toHashCode();
     }
 
@@ -83,12 +83,12 @@ public class TipCommentEntity {
     }
 
     private TipCommentEntity(
-            TipPostEntity postEntity, String materializedPath,
+            TipPostEntity postEntity, String path,
             SiteMemberEntity authMember, SiteMemberEntity createMember,
             String content, Boolean isDeleted
     ) {
         this.postEntity = postEntity;
-        this.materializedPath = materializedPath;
+        this.path = path;
         this.authMember = authMember;
         this.createMember = createMember;
         this.content = content;
@@ -101,7 +101,7 @@ public class TipCommentEntity {
 
     public static final class TipCommentEntityBuilder {
         private TipPostEntity postEntity;
-        private String materializedPath;
+        private String path;
         private SiteMemberEntity authMember;
         private SiteMemberEntity createMember;
         private String content;
@@ -112,8 +112,8 @@ public class TipCommentEntity {
             return this;
         }
 
-        public TipCommentEntityBuilder materializedPath(final String materializedPath) {
-            this.materializedPath = materializedPath;
+        public TipCommentEntityBuilder path(final String path) {
+            this.path = path;
             return this;
         }
 
@@ -139,7 +139,7 @@ public class TipCommentEntity {
 
         public TipCommentEntityBuilder TipCommentEntity(final TipCommentEntity tipCommentEntity) {
             this.postEntity = tipCommentEntity.getPostEntity();
-            this.materializedPath = tipCommentEntity.getMaterializedPath();
+            this.path = tipCommentEntity.getPath();
             this.authMember = tipCommentEntity.getAuthMember();
             this.createMember = tipCommentEntity.getCreateMember();
             this.content = tipCommentEntity.getContent();
@@ -148,7 +148,7 @@ public class TipCommentEntity {
         }
 
         public TipCommentEntity build() {
-            return new TipCommentEntity(this.postEntity, this.materializedPath, this.authMember, this.createMember, this.content, this.isDeleted
+            return new TipCommentEntity(this.postEntity, this.path, this.authMember, this.createMember, this.content, this.isDeleted
             );
         }
     }

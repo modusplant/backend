@@ -63,11 +63,11 @@ public class TipCommentController {
 
     @GetMapping("/post/{ulid}/path/{path}")
     public ResponseEntity<DataResponse<?>> getByPostAndPath
-            (@PathVariable("ulid") String postUlid, @PathVariable("path") String materializedPath) {
-        String decodedPath = URLDecoder.decode(materializedPath, StandardCharsets.UTF_8);
+            (@PathVariable("ulid") String postUlid, @PathVariable("path") String path) {
+        String decodedPath = URLDecoder.decode(path, StandardCharsets.UTF_8);
 
         Optional<TipCommentResponse> optionalResponse = commentApplicationService
-                .getByPostUlidAndMaterializedPath(postUlid, decodedPath);
+                .getByPostUlidAndPath(postUlid, decodedPath);
 
         return optionalResponse.isPresent() ?
                 ResponseEntity.ok().body(DataResponse.ok(optionalResponse)) :
@@ -83,7 +83,7 @@ public class TipCommentController {
     public ResponseEntity<DataResponse<?>> removeTipComment(@PathVariable("ulid") String postUlid, @PathVariable("path") String path) {
         String decodedPath = URLDecoder.decode(path, StandardCharsets.UTF_8);
 
-        commentApplicationService.removeByPostUlidAndMaterializedPath(postUlid, decodedPath);
+        commentApplicationService.removeByPostUlidAndPath(postUlid, decodedPath);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 }

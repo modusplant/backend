@@ -10,7 +10,7 @@ import java.util.UUID;
 @Builder(access = AccessLevel.PUBLIC)
 public class TipComment {
     private final String postUlid;
-    private final String materializedPath;
+    private final String path;
     private final UUID authMemberUuid;
     private final UUID createMemberUuid;
     private final String content;
@@ -18,7 +18,7 @@ public class TipComment {
 
     public static class ConvCommentBuilder {
         private String postUlid;
-        private String materializedPath;
+        private String path;
         private UUID authMemberUuid;
         private UUID createMemberUuid;
         private String content;
@@ -26,7 +26,7 @@ public class TipComment {
 
         public TipComment.ConvCommentBuilder convComment(TipComment convComment) {
             this.postUlid = convComment.getPostUlid();
-            this.materializedPath = convComment.getMaterializedPath();
+            this.path = convComment.getPath();
             this.authMemberUuid = convComment.getAuthMemberUuid();
             this.createMemberUuid = convComment.getCreateMemberUuid();
             this.content = convComment.getContent();
@@ -35,7 +35,7 @@ public class TipComment {
         }
 
         public TipComment build() {
-            return new TipComment(this.postUlid, this.materializedPath, this.authMemberUuid, this.createMemberUuid, this.content, this.isDeleted);
+            return new TipComment(this.postUlid, this.path, this.authMemberUuid, this.createMemberUuid, this.content, this.isDeleted);
         }
     }
 }

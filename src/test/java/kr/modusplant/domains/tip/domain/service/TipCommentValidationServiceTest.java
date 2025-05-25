@@ -84,15 +84,15 @@ public class TipCommentValidationServiceTest implements
         entityManager.flush();
 
         // when
-        given(commentRepository.findByPostUlidAndMaterializedPath(
-                commentEntity.getPostUlid(), commentEntity.getMaterializedPath()
+        given(commentRepository.findByPostUlidAndPath(
+                commentEntity.getPostUlid(), commentEntity.getPath()
         )).willReturn(Optional.of(commentEntity));
 
         // then
         EntityExistsWithPostUlidAndMatePathException ex = assertThrows(
                 EntityExistsWithPostUlidAndMatePathException.class,
                 () -> commentValidationService.validateFoundTipCommentEntity(
-                        commentEntity.getPostUlid(), commentEntity.getMaterializedPath()
+                        commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );
         assertEquals("tip comment entity already exists", ex.getMessage());
@@ -113,15 +113,15 @@ public class TipCommentValidationServiceTest implements
         entityManager.flush();
 
         // when
-        given(commentRepository.findByPostUlidAndMaterializedPath(
-                commentEntity.getPostUlid(), commentEntity.getMaterializedPath()
+        given(commentRepository.findByPostUlidAndPath(
+                commentEntity.getPostUlid(), commentEntity.getPath()
         )).willReturn(Optional.empty());
 
         // then
         EntityNotFoundWithPostUlidAndMatePathException ex = assertThrows(
                 EntityNotFoundWithPostUlidAndMatePathException.class,
                 () -> commentValidationService.validateNotFoundTipCommentEntity(
-                        commentEntity.getPostUlid(), commentEntity.getMaterializedPath()
+                        commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );
         assertEquals("tip comment entity not found", ex.getMessage());

@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public record TipCommentResponse(
         String postUlid,
-        String materializedPath,
+        String path,
         UUID authMemberUuid,
         UUID createMemberUuid,
         String content

@@ -15,20 +15,20 @@ import java.util.Optional;
 public class TipCommentValidationService {
     private final TipCommentRepository commentRepository;
 
-    public void validateFoundTipCommentEntity(String postUlid, String materializedPath) {
+    public void validateFoundTipCommentEntity(String postUlid, String path) {
         Optional.ofNullable(postUlid).orElseThrow(() -> new IllegalArgumentException("postUlid is null"));
-        Optional.ofNullable(materializedPath).orElseThrow(() -> new IllegalArgumentException("materializedPath is null"));
+        Optional.ofNullable(path).orElseThrow(() -> new IllegalArgumentException("path is null"));
 
-        if (commentRepository.findByPostUlidAndMaterializedPath(postUlid, materializedPath).isPresent()) {
+        if (commentRepository.findByPostUlidAndPath(postUlid, path).isPresent()) {
             throw new EntityExistsWithPostUlidAndMatePathException("tip comment entity already exists");
         }
     }
 
-    public void validateNotFoundTipCommentEntity(String postUlid, String materializedPath) {
+    public void validateNotFoundTipCommentEntity(String postUlid, String path) {
         Optional.ofNullable(postUlid).orElseThrow(() -> new IllegalArgumentException("postUlid is null"));
-        Optional.ofNullable(materializedPath).orElseThrow(() -> new IllegalArgumentException("materializedPath is null"));
+        Optional.ofNullable(path).orElseThrow(() -> new IllegalArgumentException("path is null"));
 
-        if(commentRepository.findByPostUlidAndMaterializedPath(postUlid, materializedPath).isEmpty()) {
+        if(commentRepository.findByPostUlidAndPath(postUlid, path).isEmpty()) {
             throw new EntityNotFoundWithPostUlidAndMatePathException("tip comment entity not found");
         }
     }

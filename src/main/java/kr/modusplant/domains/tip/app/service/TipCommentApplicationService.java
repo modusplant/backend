@@ -62,18 +62,18 @@ public class TipCommentApplicationService {
                 .stream().map(tipCommentAppInfraMapper::toTipCommentResponse).toList();
     }
 
-    public Optional<TipCommentResponse> getByPostUlidAndMaterializedPath(String postUlid, String materializedPath) {
+    public Optional<TipCommentResponse> getByPostUlidAndPath(String postUlid, String path) {
         return Optional.of(
                 tipCommentAppInfraMapper.toTipCommentResponse(
-                        tipCommentRepository.findByPostUlidAndMaterializedPath(postUlid, materializedPath).orElseThrow()
+                        tipCommentRepository.findByPostUlidAndPath(postUlid, path).orElseThrow()
                 ));
     }
 
     @Transactional
     public TipCommentResponse insert(TipCommentInsertRequest commentInsertRequest) {
         String postUlid = commentInsertRequest.postUlid();
-        String materializedPath = commentInsertRequest.materializedPath();
-        tipCommentValidationService.validateFoundTipCommentEntity(postUlid, materializedPath);
+        String path = commentInsertRequest.path();
+        tipCommentValidationService.validateFoundTipCommentEntity(postUlid, path);
 
         TipCommentEntity commentEntity =
                 tipCommentAppInfraMapper.toTipCommentEntity(commentInsertRequest, tipPostRepository, memberRepository);
@@ -83,8 +83,8 @@ public class TipCommentApplicationService {
     }
 
     @Transactional
-    public void removeByPostUlidAndMaterializedPath(String postUlid, String materializedPath) {
-        tipCommentValidationService.validateNotFoundTipCommentEntity(postUlid, materializedPath);
-        tipCommentRepository.deleteByPostUlidAndMaterializedPath(postUlid, materializedPath);
+    public void removeByPostUlidAndPath(String postUlid, String path) {
+        tipCommentValidationService.validateNotFoundTipCommentEntity(postUlid, path);
+        tipCommentRepository.deleteByPostUlidAndPath(postUlid, path);
     }
 }

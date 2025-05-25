@@ -10,7 +10,7 @@ public interface TipCommentInsertRequestTestUtils extends TipCommentEntityTestUt
     default TipCommentInsertRequest createTipCommentInsertRequest(String postUlid, UUID createMemberUuid) {
         TipCommentEntity commentEntity = createTipCommentEntityBuilder().build();
 
-        return new TipCommentInsertRequest(postUlid, commentEntity.getMaterializedPath(),
+        return new TipCommentInsertRequest(postUlid, commentEntity.getPath(),
                 createMemberUuid, commentEntity.getContent());
     }
 }

@@ -76,7 +76,7 @@ public class TipCommentAppInfraMapperTest implements
                 .isEqualTo(commentResponse);
     }
 
-    @DisplayName("삽입 요청을 엔티티로 전환하는 메서드 테스트")
+    @DisplayName("삽입 요청을 엔티티로 전환함")
     @Test
     void toTipCommentEntityTest() {
         // given

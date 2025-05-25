@@ -56,7 +56,7 @@ public class TipCommentRepositoryTest implements
 
     @Test
     @DisplayName("게시글 ulid와 구체화된 경로로 팁 댓글 찾기")
-    void findByPostEntityAndMaterializedPathTest() {
+    void findByPostEntityAndPathTest() {
         // given
         TipCommentEntity commentEntity = createTipCommentEntityBuilder()
                 .postEntity(savedPostEntity)
@@ -67,8 +67,8 @@ public class TipCommentRepositoryTest implements
 
         // when
         TipCommentEntity savedCommentEntity = commentRepository.save(commentEntity);
-        TipCommentEntity result = commentRepository.findByPostUlidAndMaterializedPath(
-                savedCommentEntity.getPostUlid(), savedCommentEntity.getMaterializedPath()).get();
+        TipCommentEntity result = commentRepository.findByPostUlidAndPath(
+                savedCommentEntity.getPostUlid(), savedCommentEntity.getPath()).get();
 
         // then
         assertThat(savedCommentEntity).isEqualTo(result);

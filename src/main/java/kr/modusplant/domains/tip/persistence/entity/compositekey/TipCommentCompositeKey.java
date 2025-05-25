@@ -15,7 +15,7 @@ import java.io.Serializable;
 public class TipCommentCompositeKey implements Serializable {
 
     private final String postUlid;
-    private final String materializedPath;
+    private final String path;
 
     @Override
     public boolean equals(Object o) {
@@ -24,7 +24,7 @@ public class TipCommentCompositeKey implements Serializable {
 
         return new EqualsBuilder()
                 .append(getPostUlid(), that.getPostUlid())
-                .append(getMaterializedPath(), that.getMaterializedPath())
+                .append(getPath(), that.getPath())
                 .isEquals();
     }
 
@@ -32,7 +32,7 @@ public class TipCommentCompositeKey implements Serializable {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(getPostUlid())
-                .append(getMaterializedPath())
+                .append(getPath())
                 .toHashCode();
     }
 
@@ -42,26 +42,26 @@ public class TipCommentCompositeKey implements Serializable {
 
     public static final class TipCommentCompositeKeyBuilder {
         private String postUlid;
-        private String materializedPath;
+        private String path;
 
         public TipCommentCompositeKeyBuilder postUlid(final String postUlid) {
             this.postUlid = postUlid;
             return this;
         }
 
-        public TipCommentCompositeKeyBuilder materializedPath(final String materializedPath) {
-            this.materializedPath = materializedPath;
+        public TipCommentCompositeKeyBuilder path(final String path) {
+            this.path = path;
             return this;
         }
 
         public TipCommentCompositeKeyBuilder TipCommentCompositeKey(final TipCommentCompositeKey compositeKey) {
             this.postUlid = compositeKey.postUlid;
-            this.materializedPath = compositeKey.getMaterializedPath();
+            this.path = compositeKey.getPath();
             return this;
         }
 
         public TipCommentCompositeKey build() {
-            return new TipCommentCompositeKey(this.postUlid, this.materializedPath);
+            return new TipCommentCompositeKey(this.postUlid, this.path);
         }
     }
 }

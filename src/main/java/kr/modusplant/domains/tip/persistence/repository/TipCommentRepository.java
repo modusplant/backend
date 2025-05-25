@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface TipCommentRepository extends JpaRepository<TipCommentEntity, TipCommentCompositeKey> {
 
-    Optional<TipCommentEntity> findByPostUlidAndMaterializedPath(String postUlid, String materializedPath);
+    Optional<TipCommentEntity> findByPostUlidAndPath(String postUlid, String path);
 
     List<TipCommentEntity> findByPostEntity(TipPostEntity postEntity);
 
@@ -23,5 +23,5 @@ public interface TipCommentRepository extends JpaRepository<TipCommentEntity, Ti
 
     List<TipCommentEntity> findByContent(String content);
 
-    void deleteByPostUlidAndMaterializedPath(String postUlid, String materializedPath);
+    void deleteByPostUlidAndPath(String postUlid, String path);
 }

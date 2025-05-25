@@ -157,10 +157,10 @@ public class TipCommentControllerTest implements
         // given
         TipCommentResponse commentResponse =
                 createTipCommentResponse(postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getUuid());
-        String encodedPath = URLEncoder.encode(commentResponse.materializedPath(), StandardCharsets.UTF_8);
+        String encodedPath = URLEncoder.encode(commentResponse.path(), StandardCharsets.UTF_8);
 
         // when
-        given(commentApplicationService.getByPostUlidAndMaterializedPath(postEntity.getUlid(), commentResponse.materializedPath()))
+        given(commentApplicationService.getByPostUlidAndPath(postEntity.getUlid(), commentResponse.path()))
                 .willReturn(Optional.of(commentResponse));
 
         // then
@@ -170,7 +170,7 @@ public class TipCommentControllerTest implements
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.message").exists())
                 .andExpect(jsonPath("$.data.postUlid").value(postEntity.getUlid()))
-                .andExpect(jsonPath("$.data.materializedPath").value(commentResponse.materializedPath()));
+                .andExpect(jsonPath("$.data.path").value(commentResponse.path()));
     }
 
     @DisplayName("댓글 db에 삽입하기")
@@ -195,17 +195,17 @@ public class TipCommentControllerTest implements
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.message").exists())
                 .andExpect(jsonPath("$.data.postUlid").value(postEntity.getUlid()))
-                .andExpect(jsonPath("$.data.materializedPath").value(commentResponse.materializedPath()));
+                .andExpect(jsonPath("$.data.path").value(commentResponse.path()));
     }
 
     @DisplayName("게시글 ulid와 댓글 경로로 댓글 삭제하기")
     @Test
     void removeTipCommentTest() throws Exception {
         // given
-        String encodedPath = URLEncoder.encode(tipCommentWithPostUlidAndMaterializedPath.getMaterializedPath(), StandardCharsets.UTF_8);
+        String encodedPath = URLEncoder.encode(tipCommentWithPostUlidAndPath.getPath(), StandardCharsets.UTF_8);
 
         // when
-        doNothing().when(commentApplicationService).removeByPostUlidAndMaterializedPath(postEntity.getUlid(), tipCommentWithPostUlidAndMaterializedPath.getMaterializedPath());
+        doNothing().when(commentApplicationService).removeByPostUlidAndPath(postEntity.getUlid(), tipCommentWithPostUlidAndPath.getPath());
 
         // then
         mockMvc.perform(delete("/api/crud/tip/comment/{ulid}/{path}", postEntity.getUlid(), encodedPath))

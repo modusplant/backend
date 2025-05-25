@@ -10,7 +10,7 @@ public interface TipCommentResponseTestUtils extends TipCommentEntityTestUtils {
     default TipCommentResponse createTipCommentResponse(String ulid, UUID authMemberUuid, UUID createMemberUuid) {
         TipCommentEntity commentEntity = createTipCommentEntityBuilder().build();
 
-        return new TipCommentResponse(ulid, commentEntity.getMaterializedPath(),
+        return new TipCommentResponse(ulid, commentEntity.getPath(),
                 authMemberUuid, createMemberUuid, commentEntity.getContent());
     }
 }

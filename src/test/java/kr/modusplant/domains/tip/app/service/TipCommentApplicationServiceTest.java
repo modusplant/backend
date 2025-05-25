@@ -39,15 +39,13 @@ public class TipCommentApplicationServiceTest implements
     private final TipCommentRepository commentRepository;
     private final TipPostRepository postRepository;
     private final SiteMemberRepository memberRepository;
-    private final TipCommentValidationService commentValidationService;
 
     @Autowired
     public TipCommentApplicationServiceTest(
-            TipCommentApplicationService commentApplicationService, TipCommentValidationService commentValidationService,
+            TipCommentApplicationService commentApplicationService,
             TipCommentRepository commentRepository, TipPostRepository postRepository,
             SiteMemberRepository memberRepository) {
         this.commentApplicationService = commentApplicationService;
-        this.commentValidationService = commentValidationService;
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
         this.memberRepository = memberRepository;
@@ -169,7 +167,7 @@ public class TipCommentApplicationServiceTest implements
 
     @DisplayName("게시글의 ulid와 댓글 경로로 댓글 가져오기")
     @Test
-    void getByPostUlidAndMaterializedPathTest() {
+    void getByPostUlidAndPathTest() {
         // given
         commentEntity = createTipCommentEntityBuilder()
                 .postEntity(postEntity)
@@ -183,13 +181,13 @@ public class TipCommentApplicationServiceTest implements
         );
 
         // when
-        given(commentRepository.findByPostUlidAndMaterializedPath(
-                commentEntity.getPostEntity().getUlid(), commentEntity.getMaterializedPath()
+        given(commentRepository.findByPostUlidAndPath(
+                commentEntity.getPostEntity().getUlid(), commentEntity.getPath()
         )).willReturn(Optional.of(commentEntity));
 
         // then
-        assertThat(commentApplicationService.getByPostUlidAndMaterializedPath(
-                commentEntity.getPostEntity().getUlid(), commentEntity.getMaterializedPath()
+        assertThat(commentApplicationService.getByPostUlidAndPath(
+                commentEntity.getPostEntity().getUlid(), commentEntity.getPath()
         ))
                 .isEqualTo(Optional.of(commentResponse));
     }
@@ -214,8 +212,8 @@ public class TipCommentApplicationServiceTest implements
         );
 
         // when
-        given(commentRepository.findByPostUlidAndMaterializedPath(
-                postEntity.getUlid(), commentEntity.getMaterializedPath()
+        given(commentRepository.findByPostUlidAndPath(
+                postEntity.getUlid(), commentEntity.getPath()
         )).willReturn(Optional.empty());
         given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(postRepository.findByUlid(postEntity.getUlid())).willReturn(Optional.of(postEntity));
@@ -228,7 +226,7 @@ public class TipCommentApplicationServiceTest implements
 
     @DisplayName("게시글 ulid와 댓글 경로로 댓글 삭제하기")
     @Test
-    void removeByPostUlidAndMaterializedPathTest() {
+    void removeByPostUlidAndPathTest() {
         // given
         commentEntity = createTipCommentEntityBuilder()
                 .postEntity(postEntity)
@@ -238,12 +236,12 @@ public class TipCommentApplicationServiceTest implements
                 .build();
 
         // when
-        given(commentRepository.findByPostUlidAndMaterializedPath(commentEntity.getPostEntity().getUlid(), commentEntity.getMaterializedPath()))
+        given(commentRepository.findByPostUlidAndPath(commentEntity.getPostEntity().getUlid(), commentEntity.getPath()))
                 .willReturn(Optional.of(commentEntity));
         commentApplicationService
-                .removeByPostUlidAndMaterializedPath(commentEntity.getPostEntity().getUlid(), commentEntity.getMaterializedPath());
+                .removeByPostUlidAndPath(commentEntity.getPostEntity().getUlid(), commentEntity.getPath());
 
         // then
-        verify(commentRepository).deleteByPostUlidAndMaterializedPath(commentEntity.getPostEntity().getUlid(), commentEntity.getMaterializedPath());
+        verify(commentRepository).deleteByPostUlidAndPath(commentEntity.getPostEntity().getUlid(), commentEntity.getPath());
     }
 }

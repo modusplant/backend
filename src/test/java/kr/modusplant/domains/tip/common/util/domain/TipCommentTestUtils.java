@@ -11,9 +11,9 @@ public interface TipCommentTestUtils {
             .content("테스트 댓글 내용")
             .build();
 
-    TipComment tipCommentWithPostUlidAndMaterializedPath = TipComment.builder()
+    TipComment tipCommentWithPostUlidAndPath = TipComment.builder()
             .postUlid(tipPostWithUlid.getUlid())
-            .materializedPath("/1/6/2")
+            .path("/1/6/2")
             .authMemberUuid(memberBasicUserWithUuid.getUuid())
             .createMemberUuid(memberBasicUserWithUuid.getUuid())
             .content("테스트 댓글 내용")
