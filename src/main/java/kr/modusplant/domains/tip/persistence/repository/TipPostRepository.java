@@ -8,11 +8,10 @@ import kr.modusplant.domains.tip.persistence.entity.TipPostEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-
 
 @Repository
 public interface TipPostRepository extends UlidPrimaryRepository<TipPostEntity>, CreatedAtAndUpdatedAtRepository<TipPostEntity>, JpaRepository<TipPostEntity,String> {
@@ -44,4 +43,8 @@ public interface TipPostRepository extends UlidPrimaryRepository<TipPostEntity>,
             nativeQuery = true
     )
     Page<TipPostEntity> searchByTitleOrContent(@Param("keyword") String keyword, Pageable pageable);
+
+    @Modifying
+    @Query("UPDATE TipPostEntity t SET t.viewCount = :viewCount WHERE t.ulid = :ulid AND t.viewCount < :viewCount")
+    int updateViewCount(@Param("ulid") String ulid, @Param("viewCount") Long viewCount);
 }
