@@ -60,14 +60,38 @@ class TipPostEntityTest implements TipPostEntityTestUtils {
         entityManager.persist(tipPost);
 
         // when
-        tipPost.updateLikeCount(null);
         tipPost.updateViewCount(null);
         tipPost.updateIsDeleted(null);
         entityManager.flush();
 
         // then
-        assertThat(tipPost.getLikeCount()).isEqualTo(0);
         assertThat(tipPost.getViewCount()).isEqualTo(0L);
         assertThat(tipPost.getIsDeleted()).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("좋아요 수 증가 테스트")
+    void increaseLikeCountTest() {
+        TipPostEntity tipPost = createTipPostEntityBuilder()
+                .likeCount(0)
+                .build();
+
+        tipPost.increaseLikeCount();
+
+        assertThat(tipPost.getLikeCount()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("좋아요 수 감소 테스트")
+    void decreaseLikeCountTest() {
+        TipPostEntity tipPost = createTipPostEntityBuilder()
+                .likeCount(1)
+                .build();
+
+        tipPost.decreaseLikeCount();
+        assertThat(tipPost.getLikeCount()).isEqualTo(0);
+
+        tipPost.decreaseLikeCount();
+        assertThat(tipPost.getLikeCount()).isEqualTo(0);
     }
 }
