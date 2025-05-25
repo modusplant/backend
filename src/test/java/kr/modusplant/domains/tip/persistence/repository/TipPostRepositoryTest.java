@@ -1,6 +1,8 @@
 package kr.modusplant.domains.tip.persistence.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import kr.modusplant.domains.group.common.util.entity.PlantGroupEntityTestUtils;
 import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
 import kr.modusplant.domains.group.persistence.repository.PlantGroupRepository;
@@ -24,7 +26,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @RepositoryOnlyContext
 class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityTestUtils, SiteMemberEntityTestUtils {
@@ -32,6 +33,9 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
     private final PlantGroupRepository plantGroupRepository;
     private final SiteMemberRepository siteMemberRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     TipPostRepositoryTest(TipPostRepository tipPostRepository, PlantGroupRepository plantGroupRepository, SiteMemberRepository siteMemberRepository) {
@@ -282,6 +286,52 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
         assertThat(result2.getTotalElements()).isEqualTo(1);
         assertThat(result3.getTotalElements()).isEqualTo(0);
         assertThat(result1.getContent().get(0).getContent().get(1).has("src")).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("현재 조회수보다 업데이트할 조회수가 더 크면 조회수 수정 성공")
+    void updateViewCountSuccessTest() {
+        // given
+        TipPostEntity tipPostEntity = tipPostRepository.save(
+                createTipPostEntityBuilder()
+                        .group(testPlantGroup)
+                        .authMember(testSiteMember)
+                        .createMember(testSiteMember)
+                        .viewCount(10L)
+                        .build()
+        );
+
+        // when
+        int updatedCount = tipPostRepository.updateViewCount(tipPostEntity.getUlid(),20L);
+
+        // then
+        assertThat(updatedCount).isEqualTo(1);
+        entityManager.clear();
+        TipPostEntity result = tipPostRepository.findByUlid(tipPostEntity.getUlid()).orElseThrow();
+        assertThat(result.getViewCount()).isEqualTo(20L);
+    }
+
+    @Test
+    @DisplayName("현재 조회수보다 업데이트할 조회수가 더 작거나 같으면 조회수 수정 실패")
+    void updateViewCountFailTest() {
+        // given
+        TipPostEntity tipPostEntity = tipPostRepository.save(
+                createTipPostEntityBuilder()
+                        .group(testPlantGroup)
+                        .authMember(testSiteMember)
+                        .createMember(testSiteMember)
+                        .viewCount(10L)
+                        .build()
+        );
+
+        // when
+        int updatedCount = tipPostRepository.updateViewCount(tipPostEntity.getUlid(),5L);
+
+        // then
+        assertThat(updatedCount).isEqualTo(0);
+        entityManager.clear();
+        TipPostEntity result = tipPostRepository.findByUlid(tipPostEntity.getUlid()).orElseThrow();
+        assertThat(result.getViewCount()).isEqualTo(10L);
     }
 
 }
