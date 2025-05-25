@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+import static kr.modusplant.global.vo.EscapedWord.ORDER;
 import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_CREATED_AT;
 import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_PLANT_GROUP;
 
@@ -21,7 +22,7 @@ import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_PLANT_GROUP;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PlantGroupEntity {
     @Id
-    @Column(name = "`order`", nullable = false)
+    @Column(name = ORDER, nullable = false)
     private Integer order;
 
     @Column(unique = true, nullable = false, length = 40)
