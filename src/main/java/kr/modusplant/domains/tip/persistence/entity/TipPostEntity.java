@@ -79,8 +79,12 @@ public class TipPostEntity {
         this.group = group;
     }
 
-    public void updateLikeCount(Integer likeCount) {
-        this.likeCount = likeCount;
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        this.likeCount = Math.max(0, this.likeCount - 1);
     }
 
     public void updateViewCount(Long viewCount) {
@@ -126,9 +130,6 @@ public class TipPostEntity {
 
     @PreUpdate
     public void preUpdate() {
-        if (this.likeCount == null) {
-            this.likeCount = 0;
-        }
         if (this.viewCount == null) {
             this.viewCount = 0L;
         }
