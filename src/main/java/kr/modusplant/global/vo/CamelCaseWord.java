@@ -10,4 +10,6 @@ public final class CamelCaseWord {
     public static final String MEMBER = "member";
     public static final String ORDER = "order";
     public static final String VERIFY_CODE = "verifyCode";
+    public static final String SIGNUP_VERIFY_EMAIL = "signupVerifyEmail";
+    public static final String RESET_PASSWORD_EMAIL = "resetPasswordEmail";
 }
