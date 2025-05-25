@@ -35,6 +35,7 @@ public final class SnakeCaseWord {
     public static final String SNAKE_PLANT_GROUP = "plant_group";
     public static final String SNAKE_GROUP_ORDER = "group_order";
     public static final String SNAKE_TIP_POST = "tip_post";
+    public static final String SNAKE_QNA_POST = "qna_post";
     public static final String SNAKE_CONV_POST = "conv_post";
     public static final String SNAKE_AUTH_MEMB_UUID = "auth_memb_uuid";
     public static final String SNAKE_CREA_MEMB_UUID = "crea_memb_uuid";
