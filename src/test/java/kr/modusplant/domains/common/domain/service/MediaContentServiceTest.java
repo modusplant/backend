@@ -1,4 +1,4 @@
-package kr.modusplant.domains.tip.app.service;
+package kr.modusplant.domains.common.domain.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
