@@ -10,7 +10,7 @@ import kr.modusplant.modules.auth.social.app.error.OAuthException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.mock;
 @ExtendWith(MockitoExtension.class)
 public class GlobalExceptionHandlerUnitTest {
 
-    @InjectMocks
+    @Spy
     private GlobalExceptionHandler globalExceptionHandler;
 
     @DisplayName("Exception 처리")
