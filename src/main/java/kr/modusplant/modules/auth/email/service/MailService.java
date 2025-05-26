@@ -12,6 +12,8 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import static kr.modusplant.global.vo.CamelCaseWord.VERIFY_CODE;
+
 @Slf4j
 @Service
 public class MailService {
@@ -54,13 +56,13 @@ public class MailService {
                                                 .put("TemplateLanguage", true)
                                                 .put(Emailv31.Message.SUBJECT, "[modus-plant] 회원가입 본인인증 메일입니다.")
                                                 .put(Emailv31.Message.VARS, new JSONObject()
-                                                        .put("verifyCode", verifyCode)
+                                                        .put(VERIFY_CODE, verifyCode)
                                                 )
                                 )
                 );
 
         // 요청 전송 및 응답 받기
-        MailjetResponse response = null;
+        MailjetResponse response;
         try {
             response = client.post(request);
         } catch (MailjetException e) {

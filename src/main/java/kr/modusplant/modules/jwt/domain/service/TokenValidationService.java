@@ -4,9 +4,9 @@ import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
-import kr.modusplant.modules.jwt.domain.service.supers.RefreshTokenApplicationService;
+import kr.modusplant.modules.jwt.app.error.InvalidTokenException;
 import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
-import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenJpaRepository;
+import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,17 +20,12 @@ import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class TokenValidationService {
-
-    private final RefreshTokenApplicationService refreshTokenCrudService;
-    private final RefreshTokenJpaRepository tokenRepository;
+    private final RefreshTokenRepository tokenRepository;
     private final SiteMemberRepository memberRepository;
 
-    public boolean validateNotFoundRefreshToken(String refreshToken) {
-        return refreshTokenCrudService.getByRefreshToken(refreshToken).isEmpty();
-    }
-
-    public boolean validateExistedDeviceId(UUID deviceId) {
-        return refreshTokenCrudService.getByDeviceId(deviceId).isPresent();
+    public void validateExistedDeviceId(UUID deviceId) {
+        if (tokenRepository.findByDeviceId(deviceId).isPresent())
+            throw new InvalidTokenException("Device Id already exists");
     }
 
     public void validateNotFoundMemberUuid(String name, UUID memberUuid) {
