@@ -206,6 +206,24 @@ public class GlobalExceptionHandlerUnitTest {
         assertNull(errorResponse.getData());
     }
 
+    @DisplayName("HttpMessageNotReadableException 처리")
+    @Test
+    public void handleHttpMessageNotReadableExceptionTest() {
+        // given
+        HttpInputMessage inputMessage = mock(HttpInputMessage.class);
+        HttpMessageNotReadableException ex = new HttpMessageNotReadableException("", mock(HttpMessageNotReadableException.class), inputMessage);
+
+        // when
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleHttpMessageNotReadableException(ex);
+        DataResponse<Void> errorResponse = response.getBody();
+
+        // then
+        assertNotNull(errorResponse);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
+        assertEquals("Malformed request body", errorResponse.getMessage());
+        assertNull(errorResponse.getData());
+    }
+
     @DisplayName("응답 간 InvalidFormatException 처리")
     @Test
     public void handleInvalidFormatExceptionOnResponseTest() {
@@ -279,6 +297,23 @@ public class GlobalExceptionHandlerUnitTest {
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
         assertEquals("Parsing body and Java object failed", errorResponse.getMessage());
+        assertNull(errorResponse.getData());
+    }
+
+    @DisplayName("HttpMessageNotWritableException 처리")
+    @Test
+    public void handleHttpMessageNotWritableExceptionTest() {
+        // given
+        HttpMessageNotWritableException ex = new HttpMessageNotWritableException("", mock(HttpMessageNotWritableException.class));
+
+        // when
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleHttpMessageNotWritableException(ex);
+        DataResponse<Void> errorResponse = response.getBody();
+
+        // then
+        assertNotNull(errorResponse);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
+        assertEquals("Malformed request body", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 }
