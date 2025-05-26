@@ -20,14 +20,14 @@ public class GlobalExceptionHandler {
 
     // Exception
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<DataResponse<Void>> handleGenericException(HttpServletRequest request, Exception ex) {
+    public ResponseEntity<DataResponse<Void>> handleGenericException(HttpServletRequest ignoredRequest, Exception ignoredEx) {
         DataResponse<Void> errorResponse = DataResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error occurred");
         return ResponseEntity.internalServerError().body(errorResponse);
     }
 
     // RuntimeException
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<DataResponse<Void>> handleRuntimeException(HttpServletRequest request, RuntimeException ex) {
+    public ResponseEntity<DataResponse<Void>> handleRuntimeException(HttpServletRequest ignoredRequest, RuntimeException ignoredEx) {
         DataResponse<Void> errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "An unexpected error occurred");
 
         return ResponseEntity.badRequest().body(errorResponse);
@@ -41,21 +41,21 @@ public class GlobalExceptionHandler {
 
     // 메서드의 인자가 유효하지 않은 값일 경우
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<DataResponse<Void>> handleIllegalArgumentException(IllegalArgumentException ex) {
+    public ResponseEntity<DataResponse<Void>> handleIllegalArgumentException(IllegalArgumentException ignoredEx) {
         DataResponse<Void> errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "Invalid client data");
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
     // 검증이 실패한 경우
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<DataResponse<Void>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<DataResponse<Void>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ignoredEx) {
         DataResponse<Void> errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "Invalid method argument");
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
     // 호출된 메서드가 정상적으로 작동할 수 없는 경우
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<DataResponse<Void>> handleIllegalStateException(IllegalStateException ex) {
+    public ResponseEntity<DataResponse<Void>> handleIllegalStateException(IllegalStateException ignoredEx) {
         DataResponse<Void> errorResponse = DataResponse.of(HttpStatus.CONFLICT.value(), "Not available resource");
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
@@ -68,21 +68,11 @@ public class GlobalExceptionHandler {
         DataResponse<Void> errorResponse;
 
         switch (cause) {
-            case InvalidFormatException ignored -> {
-                errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "Value cannot be deserialized to expected type");
-            }
-            case UnrecognizedPropertyException ignored -> {
-                errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "Body has property that target class do not know");
-            }
-            case JsonMappingException ignored -> {
-                errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "Mapping to body and Java object failed");
-            }
-            case JsonParseException ignored -> {
-                errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "Parsing body and Java object failed");
-            }
-            default -> {
-                errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "Malformed request body");
-            }
+            case InvalidFormatException ignored -> errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "Value cannot be deserialized to expected type");
+            case UnrecognizedPropertyException ignored -> errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "Body has property that target class do not know");
+            case JsonMappingException ignored -> errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "Mapping to body and Java object failed");
+            case JsonParseException ignored -> errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "Parsing body and Java object failed");
+            default -> errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "Malformed request body");
         }
 
         return ResponseEntity.badRequest().body(errorResponse);
@@ -96,24 +86,13 @@ public class GlobalExceptionHandler {
         DataResponse<Void> errorResponse;
 
         switch (cause) {
-            case InvalidFormatException ignored -> {
-                errorResponse = DataResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Value cannot be deserialized to expected type");
-            }
-            case UnrecognizedPropertyException ignored -> {
-                errorResponse = DataResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Body has property that target class do not know");
-            }
-            case JsonMappingException ignored -> {
-                errorResponse = DataResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Mapping to body and Java object failed");
-            }
-            case JsonParseException ignored -> {
-                errorResponse = DataResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Parsing body and Java object failed");
-            }
-            default -> {
-                errorResponse = DataResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Malformed request body");
-            }
+            case InvalidFormatException ignored -> errorResponse = DataResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Value cannot be deserialized to expected type");
+            case UnrecognizedPropertyException ignored -> errorResponse = DataResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Body has property that target class do not know");
+            case JsonMappingException ignored -> errorResponse = DataResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Mapping to body and Java object failed");
+            case JsonParseException ignored -> errorResponse = DataResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Parsing body and Java object failed");
+            default -> errorResponse = DataResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Malformed request body");
         }
 
         return ResponseEntity.internalServerError().body(errorResponse);
     }
-
 }
