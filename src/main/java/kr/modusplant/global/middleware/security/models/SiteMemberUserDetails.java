@@ -4,7 +4,6 @@ import kr.modusplant.domains.member.domain.model.SiteMember;
 import kr.modusplant.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.domains.member.domain.model.SiteMemberRole;
 import kr.modusplant.domains.member.enums.AuthProvider;
-import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +11,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
