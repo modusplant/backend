@@ -2,6 +2,7 @@ package kr.modusplant.domains.temp_like.temp_tip.domain.service;
 
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.domains.temp_like.temp_tip.persistence.repository.TipLikeRepository;
 import kr.modusplant.domains.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.tip.persistence.repository.TipPostRepository;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
@@ -18,15 +19,22 @@ import java.util.UUID;
 public class TipLikeValidationService {
     private final TipPostRepository tipPostRepository;
     private final SiteMemberRepository memberRepository;
+    private final TipLikeRepository tipLikeRepository;
 
     public void validateExistedTipPostAndMember(String tipPostId, UUID memberId) {
-        if (tipPostId == null || memberId == null) return;
+        if (tipPostId == null || memberId == null) {
+            throw new IllegalArgumentException("tipPostId and memberId must not be null");
+        };
 
-        if (!tipPostRepository.existsByUlid(tipPostId)) {
+        if (!tipPostRepository.existsById(tipPostId)) {
             throw new EntityNotFoundWithUlidException(tipPostId, TipPostEntity.class);
         }
-        if (memberRepository.findByUuid(memberId).isPresent()) {
+        if (!memberRepository.existsById(memberId)) {
             throw new EntityExistsWithUuidException(memberId, SiteMemberEntity.class);
         }
+    }
+
+    public boolean validateExistedTipLike(String tipPostId, UUID memberId) {
+        return tipLikeRepository.existsByTipPostIdAndMemberId(tipPostId, memberId);
     }
 }

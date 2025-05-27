@@ -8,6 +8,7 @@ import java.util.UUID;
 @Getter
 @EqualsAndHashCode
 @Builder(access = AccessLevel.PUBLIC)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TipLike {
     private String tipPostId;
     private UUID memberId;
