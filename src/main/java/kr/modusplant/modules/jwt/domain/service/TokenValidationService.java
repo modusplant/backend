@@ -4,7 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
-import kr.modusplant.modules.jwt.app.error.InvalidTokenException;
+import kr.modusplant.modules.jwt.error.InvalidTokenException;
 import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
 import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;

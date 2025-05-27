@@ -6,7 +6,7 @@ import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
-import kr.modusplant.modules.jwt.app.error.InvalidTokenException;
+import kr.modusplant.modules.jwt.error.InvalidTokenException;
 import kr.modusplant.modules.jwt.common.util.domain.RefreshTokenTestUtils;
 import kr.modusplant.modules.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
