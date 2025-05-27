@@ -40,3 +40,4 @@ application-env.yml
 
 ### Generated Objects ###
 **/generated/**
+/uploads/

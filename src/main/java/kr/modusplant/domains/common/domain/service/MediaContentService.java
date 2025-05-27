@@ -22,7 +22,7 @@ public class MediaContentService {
     private final ObjectMapper objectMapper;
 
     /* Wasabi 연동 전 임시 구현 : 로컬 저장 경로 지정 */
-    private static final String BASE_DIRECTORY = "/uploads/";
+    private static final String BASE_DIRECTORY = "uploads/";
     private static final String IMAGE_DIR = "images/";
     private static final String VIDEO_DIR = "video/";
     private static final String AUDIO_DIR = "audio/";
@@ -96,18 +96,19 @@ public class MediaContentService {
     }
 
     public JsonNode convertFileSrcToBinaryData(JsonNode content) throws IOException {
-        ArrayNode contentArray = (ArrayNode) content;
-        for(JsonNode node:contentArray) {
+        ArrayNode newArray = objectMapper.createArrayNode();
+        for(JsonNode node:content) {
+            ObjectNode objectNode = node.deepCopy();
             if(node.isObject() && node.has("src")) {
-                ObjectNode objectNode = (ObjectNode) node;
                 String src = objectNode.get("src").asText();
                 byte[] fileBytes = readMediaFileAsBytes(src);
                 String base64Encoded = Base64.getEncoder().encodeToString(fileBytes);
                 objectNode.put("data",base64Encoded);
                 objectNode.remove("src");
             }
+            newArray.add(objectNode);
         }
-        return contentArray;
+        return newArray;
     }
 
     /* Wasabi 연동 전 임시 구현 : 파일을 로컬에서 읽음 */

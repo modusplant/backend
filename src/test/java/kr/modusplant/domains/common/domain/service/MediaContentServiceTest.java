@@ -49,7 +49,7 @@ class MediaContentServiceTest implements TipPostRequestTestUtils {
         assertThat(imageNode.get("order").asInt()).isEqualTo(2);
         assertThat(imageNode.get("type").asText()).isEqualTo("image");
         assertThat(imageNode.get("filename").asText()).isEqualTo(allMediaFiles.get(1).getOriginalFilename());
-        assertThat(imageNode.get("src").asText()).contains("/uploads/images/image_");
+        assertThat(imageNode.get("src").asText()).contains("uploads/images/image_");
         assertTrue(savedImage.exists());
 
         JsonNode videoNode = result.get(2);
@@ -57,7 +57,7 @@ class MediaContentServiceTest implements TipPostRequestTestUtils {
         assertThat(videoNode.get("order").asInt()).isEqualTo(3);
         assertThat(videoNode.get("type").asText()).isEqualTo("video");
         assertThat(videoNode.get("filename").asText()).isEqualTo(allMediaFiles.get(2).getOriginalFilename());
-        assertThat(videoNode.get("src").asText()).contains("/uploads/video/video_");
+        assertThat(videoNode.get("src").asText()).contains("uploads/video/video_");
         assertTrue(savedVideo.exists());
 
         JsonNode audioNode = result.get(3);
@@ -65,7 +65,7 @@ class MediaContentServiceTest implements TipPostRequestTestUtils {
         assertThat(audioNode.get("order").asInt()).isEqualTo(4);
         assertThat(audioNode.get("type").asText()).isEqualTo("audio");
         assertThat(audioNode.get("filename").asText()).isEqualTo(allMediaFiles.get(3).getOriginalFilename());
-        assertThat(audioNode.get("src").asText()).contains("/uploads/audio/audio_");
+        assertThat(audioNode.get("src").asText()).contains("uploads/audio/audio_");
         assertTrue(savedAudio.exists());
 
         JsonNode fileNode = result.get(4);
@@ -73,7 +73,7 @@ class MediaContentServiceTest implements TipPostRequestTestUtils {
         assertThat(fileNode.get("order").asInt()).isEqualTo(5);
         assertThat(fileNode.get("type").asText()).isEqualTo("file");
         assertThat(fileNode.get("filename").asText()).isEqualTo(allMediaFiles.get(4).getOriginalFilename());
-        assertThat(fileNode.get("src").asText()).contains("/uploads/files/file_");
+        assertThat(fileNode.get("src").asText()).contains("uploads/files/file_");
         assertTrue(savedFile.exists());
 
         mediaContentService.deleteFiles(result);
