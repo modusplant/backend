@@ -57,9 +57,7 @@ class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenE
             given(tokenRepository.findByDeviceId(token.getDeviceId())).willReturn(Optional.of(tokenEntity));
 
             // when & then
-            assertThrows(InvalidTokenException.class, () -> {
-                tokenValidationService.validateExistedDeviceId(token.getDeviceId());
-            });
+            assertThrows(InvalidTokenException.class, () -> tokenValidationService.validateExistedDeviceId(token.getDeviceId()));
         }
 
         @Test
@@ -70,9 +68,7 @@ class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenE
             given(tokenRepository.findByDeviceId(deviceid)).willReturn(Optional.empty());
 
             // when & then
-            assertDoesNotThrow(() -> {
-                tokenValidationService.validateExistedDeviceId(deviceid);
-            });
+            assertDoesNotThrow(() -> tokenValidationService.validateExistedDeviceId(deviceid));
         }
     }
 
