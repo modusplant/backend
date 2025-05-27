@@ -1,4 +1,4 @@
-package kr.modusplant.modules.auth.email.service;
+package kr.modusplant.modules.auth.email.app.service;
 
 import com.mailjet.client.ClientOptions;
 import com.mailjet.client.MailjetClient;
