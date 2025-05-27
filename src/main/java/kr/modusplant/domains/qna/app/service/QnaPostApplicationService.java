@@ -7,7 +7,8 @@ import kr.modusplant.domains.group.persistence.repository.PlantGroupRepository;
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.domains.qna.app.http.request.QnaPostRequest;
+import kr.modusplant.domains.qna.app.http.request.QnaPostInsertRequest;
+import kr.modusplant.domains.qna.app.http.request.QnaPostUpdateRequest;
 import kr.modusplant.domains.qna.app.http.response.QnaPostResponse;
 import kr.modusplant.domains.qna.mapper.QnaPostAppInfraMapper;
 import kr.modusplant.domains.qna.persistence.repository.QnaPostRepository;
@@ -49,7 +50,7 @@ public class QnaPostApplicationService {
     private long ttlMinutes;
 
     public Page<QnaPostResponse> getAll(Pageable pageable) {
-        return qnaPostRepository.findAllByIsDeletedFalseOrderByCreatedAtDesc(pageable).map(entity -> {
+        return qnaPostRepository.findByIsDeletedFalseOrderByCreatedAtDesc(pageable).map(entity -> {
             try {
                 entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
@@ -107,31 +108,31 @@ public class QnaPostApplicationService {
     }
 
     @Transactional
-    public void insert(QnaPostRequest qnaPostRequest, UUID memberUuid) throws IOException {
-        qnaPostValidationService.validateQnaPostRequest(qnaPostRequest);
-        plantGroupValidationService.validateNotFoundOrder(qnaPostRequest.groupOrder());
+    public void insert(QnaPostInsertRequest qnaPostInsertRequest, UUID memberUuid) throws IOException {
+        qnaPostValidationService.validateQnaPostInsertRequest(qnaPostInsertRequest);
+        plantGroupValidationService.validateNotFoundOrder(qnaPostInsertRequest.groupOrder());
         siteMemberValidationService.validateNotFoundUuid(memberUuid);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
         QnaPostEntity qnaPostEntity = QnaPostEntity.builder()
-                .group(plantGroupRepository.findByOrder(qnaPostRequest.groupOrder()).orElseThrow())
+                .group(plantGroupRepository.findByOrder(qnaPostInsertRequest.groupOrder()).orElseThrow())
                 .authMember(siteMember)
                 .createMember(siteMember)
-                .title(qnaPostRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(qnaPostRequest.content()))
+                .title(qnaPostInsertRequest.title())
+                .content(mediaContentService.saveFilesAndGenerateContentJson(qnaPostInsertRequest.content()))
                 .build();
         qnaPostRepository.save(qnaPostEntity);
     }
 
     @Transactional
-    public void update(QnaPostRequest qnaPostRequest, String ulid, UUID memberUuid) throws IOException {
-        qnaPostValidationService.validateQnaPostRequest(qnaPostRequest);
-        qnaPostValidationService.validateAccessibleQnaPost(ulid, memberUuid);
-        plantGroupValidationService.validateNotFoundOrder(qnaPostRequest.groupOrder());
-        QnaPostEntity qnaPostEntity = qnaPostRepository.findByUlid(ulid).orElseThrow();
+    public void update(QnaPostUpdateRequest qnaPostUpdateRequest, UUID memberUuid) throws IOException {
+        qnaPostValidationService.validateQnaPostUpdateRequest(qnaPostUpdateRequest);
+        qnaPostValidationService.validateAccessibleQnaPost(qnaPostUpdateRequest.ulid(), memberUuid);
+        plantGroupValidationService.validateNotFoundOrder(qnaPostUpdateRequest.groupOrder());
+        QnaPostEntity qnaPostEntity = qnaPostRepository.findByUlid(qnaPostUpdateRequest.ulid()).orElseThrow();
         mediaContentService.deleteFiles(qnaPostEntity.getContent());
-        qnaPostEntity.updateGroup(plantGroupRepository.findByOrder(qnaPostRequest.groupOrder()).orElseThrow());
-        qnaPostEntity.updateTitle(qnaPostRequest.title());
-        qnaPostEntity.updateContent(mediaContentService.saveFilesAndGenerateContentJson(qnaPostRequest.content()));
+        qnaPostEntity.updateGroup(plantGroupRepository.findByOrder(qnaPostUpdateRequest.groupOrder()).orElseThrow());
+        qnaPostEntity.updateTitle(qnaPostUpdateRequest.title());
+        qnaPostEntity.updateContent(mediaContentService.saveFilesAndGenerateContentJson(qnaPostUpdateRequest.content()));
         qnaPostRepository.save(qnaPostEntity);
     }
 

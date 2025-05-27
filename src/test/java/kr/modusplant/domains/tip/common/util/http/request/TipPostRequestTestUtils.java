@@ -1,7 +1,7 @@
 package kr.modusplant.domains.tip.common.util.http.request;
 
 import kr.modusplant.domains.tip.app.http.request.FileOrder;
-import kr.modusplant.domains.tip.app.http.request.TipPostRequest;
+import kr.modusplant.domains.tip.app.http.request.TipPostInsertRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -87,15 +87,15 @@ public interface TipPostRequestTestUtils {
     List<FileOrder> duplicatedTextFilesOrder = Arrays.asList(textFileOrder(0,1),imageFileOrder(2),textFileOrder(1,3));
 
 
-    /* TipPostRequest Utils */
-    TipPostRequest requestAllTypes = new TipPostRequest(
+    /* TipPostInsertRequest Utils */
+    TipPostInsertRequest requestAllTypes = new TipPostInsertRequest(
             1,
             "유용한 팁 모음",
             allMediaFiles,
             allMediaFilesOrder
     );
 
-    TipPostRequest requestBasicTypes = new TipPostRequest(
+    TipPostInsertRequest requestBasicTypes = new TipPostInsertRequest(
             2,
             "유용한 식물 기르기 팁",
             basicMediaFiles,

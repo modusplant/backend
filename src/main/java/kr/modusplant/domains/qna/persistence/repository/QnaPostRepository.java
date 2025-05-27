@@ -13,15 +13,19 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface QnaPostRepository extends UlidPrimaryRepository<QnaPostEntity>, CreatedAtAndUpdatedAtRepository<QnaPostEntity>, JpaRepository<QnaPostEntity,String> {
     Page<QnaPostEntity> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
-    Page<QnaPostEntity> findAllByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
+    Page<QnaPostEntity> findByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 
     Page<QnaPostEntity> findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(PlantGroupEntity group, Pageable pageable);
 
     Page<QnaPostEntity> findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(SiteMemberEntity authMember, Pageable pageable);
+
+    Optional<QnaPostEntity> findByUlidAndIsDeletedFalse(String ulid);
 
     @Query(
             value = "SELECT * FROM qna_post p " +

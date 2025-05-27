@@ -7,7 +7,8 @@ import kr.modusplant.domains.group.persistence.repository.PlantGroupRepository;
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.domains.tip.app.http.request.TipPostRequest;
+import kr.modusplant.domains.tip.app.http.request.TipPostInsertRequest;
+import kr.modusplant.domains.tip.app.http.request.TipPostUpdateRequest;
 import kr.modusplant.domains.tip.app.http.response.TipPostResponse;
 import kr.modusplant.domains.tip.domain.service.TipPostValidationService;
 import kr.modusplant.domains.tip.mapper.TipPostAppInfraMapper;
@@ -49,7 +50,7 @@ public class TipPostApplicationService {
     private long ttlMinutes;
 
     public Page<TipPostResponse> getAll(Pageable pageable) {
-        return tipPostRepository.findAllByIsDeletedFalseOrderByCreatedAtDesc(pageable).map(entity -> {
+        return tipPostRepository.findByIsDeletedFalseOrderByCreatedAtDesc(pageable).map(entity -> {
             try {
                 entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
@@ -107,31 +108,31 @@ public class TipPostApplicationService {
     }
 
     @Transactional
-    public void insert(TipPostRequest tipPostRequest, UUID memberUuid) throws IOException {
-        tipPostValidationService.validateTipPostRequest(tipPostRequest);
-        plantGroupValidationService.validateNotFoundOrder(tipPostRequest.groupOrder());
+    public void insert(TipPostInsertRequest tipPostInsertRequest, UUID memberUuid) throws IOException {
+        tipPostValidationService.validateTipPostInsertRequest(tipPostInsertRequest);
+        plantGroupValidationService.validateNotFoundOrder(tipPostInsertRequest.groupOrder());
         siteMemberValidationService.validateNotFoundUuid(memberUuid);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
         TipPostEntity tipPostEntity = TipPostEntity.builder()
-                .group(plantGroupRepository.findByOrder(tipPostRequest.groupOrder()).orElseThrow())
+                .group(plantGroupRepository.findByOrder(tipPostInsertRequest.groupOrder()).orElseThrow())
                 .authMember(siteMember)
                 .createMember(siteMember)
-                .title(tipPostRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(tipPostRequest.content()))
+                .title(tipPostInsertRequest.title())
+                .content(mediaContentService.saveFilesAndGenerateContentJson(tipPostInsertRequest.content()))
                 .build();
         tipPostRepository.save(tipPostEntity);
     }
 
     @Transactional
-    public void update(TipPostRequest tipPostRequest, String ulid, UUID memberUuid) throws IOException {
-        tipPostValidationService.validateTipPostRequest(tipPostRequest);
-        tipPostValidationService.validateAccessibleTipPost(ulid, memberUuid);
-        plantGroupValidationService.validateNotFoundOrder(tipPostRequest.groupOrder());
-        TipPostEntity tipPostEntity = tipPostRepository.findByUlid(ulid).orElseThrow();
+    public void update(TipPostUpdateRequest tipPostUpdateRequest, UUID memberUuid) throws IOException {
+        tipPostValidationService.validateTipPostUpdateRequest(tipPostUpdateRequest);
+        tipPostValidationService.validateAccessibleTipPost(tipPostUpdateRequest.ulid(), memberUuid);
+        plantGroupValidationService.validateNotFoundOrder(tipPostUpdateRequest.groupOrder());
+        TipPostEntity tipPostEntity = tipPostRepository.findByUlid(tipPostUpdateRequest.ulid()).orElseThrow();
         mediaContentService.deleteFiles(tipPostEntity.getContent());
-        tipPostEntity.updateGroup(plantGroupRepository.findByOrder(tipPostRequest.groupOrder()).orElseThrow());
-        tipPostEntity.updateTitle(tipPostRequest.title());
-        tipPostEntity.updateContent(mediaContentService.saveFilesAndGenerateContentJson(tipPostRequest.content()));
+        tipPostEntity.updateGroup(plantGroupRepository.findByOrder(tipPostUpdateRequest.groupOrder()).orElseThrow());
+        tipPostEntity.updateTitle(tipPostUpdateRequest.title());
+        tipPostEntity.updateContent(mediaContentService.saveFilesAndGenerateContentJson(tipPostUpdateRequest.content()));
         tipPostRepository.save(tipPostEntity);
     }
 

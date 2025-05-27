@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -132,7 +133,7 @@ public class MediaContentService {
         if (Files.exists(path)) {
             Files.delete(path);
         } else {
-            System.out.println("파일이 존재하지 않습니다: " + src);
+            throw new FileNotFoundException("파일을 찾을 수 없습니다: " + src);
         }
     }
 }

@@ -1,7 +1,7 @@
 package kr.modusplant.domains.qna.common.util.http.request;
 
 import kr.modusplant.domains.qna.app.http.request.FileOrder;
-import kr.modusplant.domains.qna.app.http.request.QnaPostRequest;
+import kr.modusplant.domains.qna.app.http.request.QnaPostInsertRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -87,15 +87,15 @@ public interface QnaPostRequestTestUtils {
     List<FileOrder> duplicatedTextFilesOrder = Arrays.asList(textFileOrder(0,1),imageFileOrder(2),textFileOrder(1,3));
 
 
-    /* QnaPostRequest Utils */
-    QnaPostRequest requestAllTypes = new QnaPostRequest(
+    /* QnaPostInsertRequest Utils */
+    QnaPostInsertRequest requestAllTypes = new QnaPostInsertRequest(
             1,
             "유용한 팁 모음",
             allMediaFiles,
             allMediaFilesOrder
     );
 
-    QnaPostRequest requestBasicTypes = new QnaPostRequest(
+    QnaPostInsertRequest requestBasicTypes = new QnaPostInsertRequest(
             2,
             "유용한 식물 기르기 팁",
             basicMediaFiles,

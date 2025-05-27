@@ -3,9 +3,8 @@ package kr.modusplant.domains.qna.domain.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.qna.app.http.request.QnaPostRequest;
+import kr.modusplant.domains.qna.app.http.request.QnaPostInsertRequest;
 import kr.modusplant.domains.qna.common.util.http.request.QnaPostRequestTestUtils;
-import kr.modusplant.domains.qna.domain.service.QnaPostValidationService;
 import kr.modusplant.domains.qna.error.PostAccessDeniedException;
 import kr.modusplant.domains.qna.persistence.entity.QnaPostEntity;
 import kr.modusplant.domains.qna.persistence.repository.QnaPostRepository;
@@ -37,13 +36,13 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils {
     @Test
     @DisplayName("팁 게시글 추가/수정 시 QnaPostRequest는 유효한 입력")
     void validateQnaPostInsertRequestTestSuccess() {
-        assertDoesNotThrow(() -> qnaPostValidationService.validateQnaPostRequest(requestBasicTypes));
+        assertDoesNotThrow(() -> qnaPostValidationService.validateQnaPostInsertRequest(requestBasicTypes));
     }
 
     @Test
     @DisplayName("팁 게시글 추가/수정 시 QnaPostRequest의 groupOrder가 유효하지 않으면 예외 발생")
     void validateQnaPostInsertRequestInvalidGroupOrderTest() {
-        QnaPostRequest qnaPostRequest = new QnaPostRequest(
+        QnaPostInsertRequest qnaPostInsertRequest = new QnaPostInsertRequest(
                 -1,
                 "유용한 팁 모음",
                 allMediaFiles,
@@ -51,13 +50,13 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> qnaPostValidationService.validateQnaPostRequest(qnaPostRequest));
+                () -> qnaPostValidationService.validateQnaPostInsertRequest(qnaPostInsertRequest));
     }
 
     @Test
     @DisplayName("팁 게시글 추가/수정 시 QnaPostRequest의 title이 유효하지 않으면 예외 발생")
     void validateQnaPostInsertRequestInvalidTitleTest() {
-        QnaPostRequest qnaPostRequest = new QnaPostRequest(
+        QnaPostInsertRequest qnaPostInsertRequest = new QnaPostInsertRequest(
                 2,
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 allMediaFiles,
@@ -65,14 +64,14 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> qnaPostValidationService.validateQnaPostRequest(qnaPostRequest));
+                () -> qnaPostValidationService.validateQnaPostInsertRequest(qnaPostInsertRequest));
 
     }
 
     @Test
     @DisplayName("팁 게시글 추가/수정 시 QnaPostRequest의 Content와 OrderInfo가 유효하지 않으면 예외 발생")
     void validateQnaPostInsertRequestInvalidContentAndOrderInfoTest() {
-        QnaPostRequest qnaPostRequest = new QnaPostRequest(
+        QnaPostInsertRequest qnaPostInsertRequest = new QnaPostInsertRequest(
                 1,
                 "유용한 팁 모음",
                 textImageFiles,
@@ -80,7 +79,7 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> qnaPostValidationService.validateQnaPostRequest(qnaPostRequest));
+                () -> qnaPostValidationService.validateQnaPostInsertRequest(qnaPostInsertRequest));
     }
 
     @Test
@@ -102,39 +101,18 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils {
                 .build();
 
         // when
-        when(qnaPostRepository.findByUlid(ulid)).thenReturn(Optional.of(qnaPostEntity));
+        when(qnaPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.of(qnaPostEntity));
         when(qnaPostEntity.getAuthMember().getUuid()).thenReturn(memberUuid);
 
         assertDoesNotThrow(() -> qnaPostValidationService.validateAccessibleQnaPost(ulid,memberUuid));
     }
 
     @Test
-    @DisplayName("게시글이 존재하지 않을 때 예외 발생")
+    @DisplayName("삭제되지 않은 게시글이 존재하지 않을 때 예외 발생")
     void validateAccessibleQnaPostNotFoundTest() {
         UUID memberUuid = UUID.randomUUID();
         String ulid = generator.generate(null, null,null,EventType.INSERT);
-        when(qnaPostRepository.findByUlid(ulid)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundWithUlidException.class,
-                () -> qnaPostValidationService.validateAccessibleQnaPost(ulid,memberUuid));
-    }
-
-    @Test
-    @DisplayName("삭제되지 않은 게시글이 존재하지 않을 때 예외 발생")
-    void validateNotFoundUndeletedQnaPostTest() {
-        UUID memberUuid = UUID.randomUUID();
-        String ulid = generator.generate(null, null,null,EventType.INSERT);
-        SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
-        QnaPostEntity qnaPostEntity = QnaPostEntity.builder()
-                .authMember(memberEntity)
-                .group(mock(PlantGroupEntity.class)) // 다른 필드도 필요시 같이 mock 처리
-                .createMember(memberEntity)
-                .likeCount(0)
-                .viewCount(0L)
-                .title("테스트 제목")
-                .content(mock(JsonNode.class))
-                .isDeleted(true)
-                .build();
-        when(qnaPostRepository.findByUlid(ulid)).thenReturn(Optional.of(qnaPostEntity));
+        when(qnaPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundWithUlidException.class,
                 () -> qnaPostValidationService.validateAccessibleQnaPost(ulid,memberUuid));
     }
@@ -158,7 +136,7 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils {
                 .build();
 
         // when
-        when(qnaPostRepository.findByUlid(ulid)).thenReturn(Optional.of(qnaPostEntity));
+        when(qnaPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.of(qnaPostEntity));
         when(qnaPostEntity.getAuthMember().getUuid()).thenReturn(UUID.randomUUID());
 
         assertThrows(PostAccessDeniedException.class,

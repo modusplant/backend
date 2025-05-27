@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -103,7 +104,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, PlantGroupEntit
 
     @Test
     @DisplayName("삭제되지 않은 모든 팁 게시글 찾기(최신순)")
-    void findAllByIsDeletedFalseOrderByCreatedAtDescTest() {
+    void findByIsDeletedFalseOrderByCreatedAtDescTest() {
         // given
         List<ConvPostEntity> convPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createConvPostEntityBuilder()
@@ -118,7 +119,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, PlantGroupEntit
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // when
-        Page<ConvPostEntity> result = convPostRepository.findAllByIsDeletedFalseOrderByCreatedAtDesc(pageable);
+        Page<ConvPostEntity> result = convPostRepository.findByIsDeletedFalseOrderByCreatedAtDesc(pageable);
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(4); // 삭제된 1건 제외
@@ -262,6 +263,36 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, PlantGroupEntit
 
         // then
         assertThat(convPostRepository.existsByUlid(convPostEntity.getUlid())).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("ulid로 삭제되지 않은 게시글 조회")
+    void findByUlidAndIsDeletedFalseTest() {
+        // given
+        ConvPostEntity convPostEntity1 = convPostRepository.save(
+                createConvPostEntityBuilder()
+                        .group(testPlantGroup)
+                        .authMember(testSiteMember)
+                        .createMember(testSiteMember)
+                        .build()
+        );
+        ConvPostEntity convPostEntity2 = convPostRepository.save(
+                createConvPostEntityBuilder()
+                        .group(testPlantGroup)
+                        .authMember(testSiteMember)
+                        .createMember(testSiteMember)
+                        .isDeleted(true)
+                        .build()
+        );
+
+        // when
+        Optional<ConvPostEntity> found = convPostRepository.findByUlidAndIsDeletedFalse(convPostEntity1.getUlid());
+        Optional<ConvPostEntity> notFound = convPostRepository.findByUlidAndIsDeletedFalse(convPostEntity2.getUlid());
+
+        // then
+        assertThat(found).isPresent();
+        assertThat(found.get().getUlid()).isEqualTo(convPostEntity1.getUlid());
+        assertThat(notFound).isEmpty();
     }
 
     @Test

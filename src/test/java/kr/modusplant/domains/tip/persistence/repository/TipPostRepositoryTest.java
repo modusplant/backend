@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -103,7 +104,7 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
 
     @Test
     @DisplayName("삭제되지 않은 모든 팁 게시글 찾기(최신순)")
-    void findAllByIsDeletedFalseOrderByCreatedAtDescTest() {
+    void findByIsDeletedFalseOrderByCreatedAtDescTest() {
         // given
         List<TipPostEntity> tipPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createTipPostEntityBuilder()
@@ -118,7 +119,7 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // when
-        Page<TipPostEntity> result = tipPostRepository.findAllByIsDeletedFalseOrderByCreatedAtDesc(pageable);
+        Page<TipPostEntity> result = tipPostRepository.findByIsDeletedFalseOrderByCreatedAtDesc(pageable);
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(4); // 삭제된 1건 제외
@@ -262,6 +263,36 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
 
         // then
         assertThat(tipPostRepository.existsByUlid(tipPostEntity.getUlid())).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("ulid로 삭제되지 않은 게시글 조회")
+    void findByUlidAndIsDeletedFalseTest() {
+        // given
+        TipPostEntity tipPostEntity1 = tipPostRepository.save(
+                createTipPostEntityBuilder()
+                        .group(testPlantGroup)
+                        .authMember(testSiteMember)
+                        .createMember(testSiteMember)
+                        .build()
+        );
+        TipPostEntity tipPostEntity2 = tipPostRepository.save(
+                createTipPostEntityBuilder()
+                        .group(testPlantGroup)
+                        .authMember(testSiteMember)
+                        .createMember(testSiteMember)
+                        .isDeleted(true)
+                        .build()
+        );
+
+        // when
+        Optional<TipPostEntity> found = tipPostRepository.findByUlidAndIsDeletedFalse(tipPostEntity1.getUlid());
+        Optional<TipPostEntity> notFound = tipPostRepository.findByUlidAndIsDeletedFalse(tipPostEntity2.getUlid());
+
+        // then
+        assertThat(found).isPresent();
+        assertThat(found.get().getUlid()).isEqualTo(tipPostEntity1.getUlid());
+        assertThat(notFound).isEmpty();
     }
 
     @Test

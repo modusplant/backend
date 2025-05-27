@@ -11,7 +11,6 @@ import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.domains.qna.common.util.entity.QnaPostEntityTestUtils;
 import kr.modusplant.domains.qna.persistence.entity.QnaPostEntity;
-import kr.modusplant.domains.qna.persistence.repository.QnaPostRepository;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -104,7 +104,7 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, PlantGroupEntityT
 
     @Test
     @DisplayName("삭제되지 않은 모든 팁 게시글 찾기(최신순)")
-    void findAllByIsDeletedFalseOrderByCreatedAtDescTest() {
+    void findByIsDeletedFalseOrderByCreatedAtDescTest() {
         // given
         List<QnaPostEntity> qnaPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createQnaPostEntityBuilder()
@@ -119,7 +119,7 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, PlantGroupEntityT
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // when
-        Page<QnaPostEntity> result = qnaPostRepository.findAllByIsDeletedFalseOrderByCreatedAtDesc(pageable);
+        Page<QnaPostEntity> result = qnaPostRepository.findByIsDeletedFalseOrderByCreatedAtDesc(pageable);
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(4); // 삭제된 1건 제외
@@ -263,6 +263,37 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, PlantGroupEntityT
 
         // then
         assertThat(qnaPostRepository.existsByUlid(qnaPostEntity.getUlid())).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("ulid로 삭제되지 않은 게시글 조회")
+    void findByUlidAndIsDeletedFalseTest() {
+        // given
+        QnaPostEntity qnaPostEntity1 = qnaPostRepository.save(
+                createQnaPostEntityBuilder()
+                        .group(testPlantGroup)
+                        .authMember(testSiteMember)
+                        .createMember(testSiteMember)
+                        .build()
+        );
+        QnaPostEntity qnaPostEntity2 = qnaPostRepository.save(
+                createQnaPostEntityBuilder()
+                        .group(testPlantGroup)
+                        .authMember(testSiteMember)
+                        .createMember(testSiteMember)
+                        .isDeleted(true)
+                        .build()
+        );
+
+        // when
+        Optional<QnaPostEntity> found = qnaPostRepository.findByUlidAndIsDeletedFalse(qnaPostEntity1.getUlid());
+        Optional<QnaPostEntity> notFound = qnaPostRepository.findByUlidAndIsDeletedFalse(qnaPostEntity2.getUlid());
+
+        // then
+        assertThat(found).isPresent();
+        assertThat(found.get().getUlid()).isEqualTo(qnaPostEntity1.getUlid());
+        assertThat(notFound).isEmpty();
+
     }
 
     @Test

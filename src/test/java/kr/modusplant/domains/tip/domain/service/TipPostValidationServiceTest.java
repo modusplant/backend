@@ -3,7 +3,7 @@ package kr.modusplant.domains.tip.domain.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.tip.app.http.request.TipPostRequest;
+import kr.modusplant.domains.tip.app.http.request.TipPostInsertRequest;
 import kr.modusplant.domains.tip.common.util.http.request.TipPostRequestTestUtils;
 import kr.modusplant.domains.tip.error.PostAccessDeniedException;
 import kr.modusplant.domains.tip.persistence.entity.TipPostEntity;
@@ -35,13 +35,13 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
     @Test
     @DisplayName("팁 게시글 추가/수정 시 TipPostRequest는 유효한 입력")
     void validateTipPostInsertRequestTestSuccess() {
-        assertDoesNotThrow(() -> tipPostValidationService.validateTipPostRequest(requestBasicTypes));
+        assertDoesNotThrow(() -> tipPostValidationService.validateTipPostInsertRequest(requestBasicTypes));
     }
 
     @Test
     @DisplayName("팁 게시글 추가/수정 시 TipPostRequest의 groupOrder가 유효하지 않으면 예외 발생")
     void validateTipPostInsertRequestInvalidGroupOrderTest() {
-        TipPostRequest tipPostRequest = new TipPostRequest(
+        TipPostInsertRequest tipPostInsertRequest = new TipPostInsertRequest(
                 -1,
                 "유용한 팁 모음",
                 allMediaFiles,
@@ -49,13 +49,13 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> tipPostValidationService.validateTipPostRequest(tipPostRequest));
+                () -> tipPostValidationService.validateTipPostInsertRequest(tipPostInsertRequest));
     }
 
     @Test
     @DisplayName("팁 게시글 추가/수정 시 TipPostRequest의 title이 유효하지 않으면 예외 발생")
     void validateTipPostInsertRequestInvalidTitleTest() {
-        TipPostRequest tipPostRequest = new TipPostRequest(
+        TipPostInsertRequest tipPostInsertRequest = new TipPostInsertRequest(
                 2,
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 allMediaFiles,
@@ -63,14 +63,14 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> tipPostValidationService.validateTipPostRequest(tipPostRequest));
+                () -> tipPostValidationService.validateTipPostInsertRequest(tipPostInsertRequest));
 
     }
 
     @Test
     @DisplayName("팁 게시글 추가/수정 시 TipPostRequest의 Content와 OrderInfo가 유효하지 않으면 예외 발생")
     void validateTipPostInsertRequestInvalidContentAndOrderInfoTest() {
-        TipPostRequest tipPostRequest = new TipPostRequest(
+        TipPostInsertRequest tipPostInsertRequest = new TipPostInsertRequest(
                 1,
                 "유용한 팁 모음",
                 textImageFiles,
@@ -78,7 +78,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> tipPostValidationService.validateTipPostRequest(tipPostRequest));
+                () -> tipPostValidationService.validateTipPostInsertRequest(tipPostInsertRequest));
     }
 
     @Test
@@ -100,39 +100,18 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
                 .build();
 
         // when
-        when(tipPostRepository.findByUlid(ulid)).thenReturn(Optional.of(tipPostEntity));
+        when(tipPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.of(tipPostEntity));
         when(tipPostEntity.getAuthMember().getUuid()).thenReturn(memberUuid);
 
         assertDoesNotThrow(() -> tipPostValidationService.validateAccessibleTipPost(ulid,memberUuid));
     }
 
     @Test
-    @DisplayName("게시글이 존재하지 않을 때 예외 발생")
+    @DisplayName("삭제되지 않은 게시글이 존재하지 않을 때 예외 발생")
     void validateAccessibleTipPostNotFoundTest() {
         UUID memberUuid = UUID.randomUUID();
         String ulid = generator.generate(null, null,null,EventType.INSERT);
-        when(tipPostRepository.findByUlid(ulid)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundWithUlidException.class,
-                () -> tipPostValidationService.validateAccessibleTipPost(ulid,memberUuid));
-    }
-
-    @Test
-    @DisplayName("삭제되지 않은 게시글이 존재하지 않을 때 예외 발생")
-    void validateNotFoundUndeletedTipPostTest() {
-        UUID memberUuid = UUID.randomUUID();
-        String ulid = generator.generate(null, null,null,EventType.INSERT);
-        SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
-        TipPostEntity tipPostEntity = TipPostEntity.builder()
-                .authMember(memberEntity)
-                .group(mock(PlantGroupEntity.class)) // 다른 필드도 필요시 같이 mock 처리
-                .createMember(memberEntity)
-                .likeCount(0)
-                .viewCount(0L)
-                .title("테스트 제목")
-                .content(mock(JsonNode.class))
-                .isDeleted(true)
-                .build();
-        when(tipPostRepository.findByUlid(ulid)).thenReturn(Optional.of(tipPostEntity));
+        when(tipPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundWithUlidException.class,
                 () -> tipPostValidationService.validateAccessibleTipPost(ulid,memberUuid));
     }
@@ -156,7 +135,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
                 .build();
 
         // when
-        when(tipPostRepository.findByUlid(ulid)).thenReturn(Optional.of(tipPostEntity));
+        when(tipPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.of(tipPostEntity));
         when(tipPostEntity.getAuthMember().getUuid()).thenReturn(UUID.randomUUID());
 
         assertThrows(PostAccessDeniedException.class,

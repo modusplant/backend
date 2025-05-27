@@ -1,7 +1,8 @@
 package kr.modusplant.domains.tip.domain.service;
 
 import kr.modusplant.domains.tip.app.http.request.FileOrder;
-import kr.modusplant.domains.tip.app.http.request.TipPostRequest;
+import kr.modusplant.domains.tip.app.http.request.TipPostInsertRequest;
+import kr.modusplant.domains.tip.app.http.request.TipPostUpdateRequest;
 import kr.modusplant.domains.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.tip.persistence.repository.TipPostRepository;
 import kr.modusplant.global.error.EntityNotFoundWithUlidException;
@@ -24,7 +25,13 @@ public class TipPostValidationService {
 
     private final TipPostRepository tipPostRepository;
 
-    public void validateTipPostRequest(TipPostRequest request) {
+    public void validateTipPostInsertRequest(TipPostInsertRequest request) {
+        validateGroupOrder(request.groupOrder());
+        validateTitle(request.title());
+        validateContentAndOrderInfo(request.content(),request.orderInfo());
+    }
+
+    public void validateTipPostUpdateRequest(TipPostUpdateRequest request) {
         validateGroupOrder(request.groupOrder());
         validateTitle(request.title());
         validateContentAndOrderInfo(request.content(),request.orderInfo());
@@ -70,7 +77,7 @@ public class TipPostValidationService {
         for(MultipartFile part:content) {
             String fileName = part.getOriginalFilename();
             String contentType = part.getContentType();
-            if (fileName == null || fileName.isEmpty() || contentType == null || contentType.isEmpty()) {
+            if (fileName.isEmpty() || fileName.isBlank() || contentType.isEmpty() || contentType.isBlank()) {
                 return true;
             }
             contentFilenames.add(fileName);
@@ -88,8 +95,7 @@ public class TipPostValidationService {
         if (ulid == null) {
             throw new EntityNotFoundWithUlidException(ulid, TipPostEntity.class);
         }
-        return tipPostRepository.findByUlid(ulid)
-                .filter(tipPost -> !Boolean.TRUE.equals(tipPost.getIsDeleted()))
+        return tipPostRepository.findByUlidAndIsDeletedFalse(ulid)
                 .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid,TipPostEntity.class));
     }
 

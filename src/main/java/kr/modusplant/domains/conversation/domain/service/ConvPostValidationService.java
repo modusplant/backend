@@ -1,7 +1,8 @@
 package kr.modusplant.domains.conversation.domain.service;
 
+import kr.modusplant.domains.conversation.app.http.request.ConvPostInsertRequest;
+import kr.modusplant.domains.conversation.app.http.request.ConvPostUpdateRequest;
 import kr.modusplant.domains.conversation.app.http.request.FileOrder;
-import kr.modusplant.domains.conversation.app.http.request.ConvPostRequest;
 import kr.modusplant.domains.conversation.persistence.entity.ConvPostEntity;
 import kr.modusplant.domains.conversation.persistence.repository.ConvPostRepository;
 import kr.modusplant.global.error.EntityNotFoundWithUlidException;
@@ -24,7 +25,13 @@ public class ConvPostValidationService {
 
     private final ConvPostRepository convPostRepository;
 
-    public void validateConvPostRequest(ConvPostRequest request) {
+    public void validateConvPostInsertRequest(ConvPostInsertRequest request) {
+        validateGroupOrder(request.groupOrder());
+        validateTitle(request.title());
+        validateContentAndOrderInfo(request.content(),request.orderInfo());
+    }
+
+    public void validateConvPostUpdateRequest(ConvPostUpdateRequest request) {
         validateGroupOrder(request.groupOrder());
         validateTitle(request.title());
         validateContentAndOrderInfo(request.content(),request.orderInfo());
@@ -70,7 +77,7 @@ public class ConvPostValidationService {
         for(MultipartFile part:content) {
             String fileName = part.getOriginalFilename();
             String contentType = part.getContentType();
-            if (fileName == null || fileName.isEmpty() || contentType == null || contentType.isEmpty()) {
+            if (fileName.isEmpty() || fileName.isBlank() || contentType.isEmpty() || contentType.isBlank()) {
                 return true;
             }
             contentFilenames.add(fileName);
@@ -88,8 +95,7 @@ public class ConvPostValidationService {
         if (ulid == null) {
             throw new EntityNotFoundWithUlidException(ulid, ConvPostEntity.class);
         }
-        return convPostRepository.findByUlid(ulid)
-                .filter(convPost -> !Boolean.TRUE.equals(convPost.getIsDeleted()))
+        return convPostRepository.findByUlidAndIsDeletedFalse(ulid)
                 .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid,ConvPostEntity.class));
     }
 

@@ -1,7 +1,8 @@
 package kr.modusplant.domains.qna.domain.service;
 
 import kr.modusplant.domains.qna.app.http.request.FileOrder;
-import kr.modusplant.domains.qna.app.http.request.QnaPostRequest;
+import kr.modusplant.domains.qna.app.http.request.QnaPostInsertRequest;
+import kr.modusplant.domains.qna.app.http.request.QnaPostUpdateRequest;
 import kr.modusplant.domains.qna.error.PostAccessDeniedException;
 import kr.modusplant.domains.qna.persistence.repository.QnaPostRepository;
 import kr.modusplant.domains.qna.persistence.entity.QnaPostEntity;
@@ -24,7 +25,13 @@ public class QnaPostValidationService {
 
     private final QnaPostRepository qnaPostRepository;
 
-    public void validateQnaPostRequest(QnaPostRequest request) {
+    public void validateQnaPostInsertRequest(QnaPostInsertRequest request) {
+        validateGroupOrder(request.groupOrder());
+        validateTitle(request.title());
+        validateContentAndOrderInfo(request.content(),request.orderInfo());
+    }
+
+    public void validateQnaPostUpdateRequest(QnaPostUpdateRequest request) {
         validateGroupOrder(request.groupOrder());
         validateTitle(request.title());
         validateContentAndOrderInfo(request.content(),request.orderInfo());
@@ -70,7 +77,7 @@ public class QnaPostValidationService {
         for(MultipartFile part:content) {
             String fileName = part.getOriginalFilename();
             String contentType = part.getContentType();
-            if (fileName == null || fileName.isEmpty() || contentType == null || contentType.isEmpty()) {
+            if (fileName.isEmpty() || fileName.isBlank() || contentType.isEmpty() || contentType.isBlank()) {
                 return true;
             }
             contentFilenames.add(fileName);
@@ -88,8 +95,7 @@ public class QnaPostValidationService {
         if (ulid == null) {
             throw new EntityNotFoundWithUlidException(ulid, QnaPostEntity.class);
         }
-        return qnaPostRepository.findByUlid(ulid)
-                .filter(qnaPost -> !Boolean.TRUE.equals(qnaPost.getIsDeleted()))
+        return qnaPostRepository.findByUlidAndIsDeletedFalse(ulid)
                 .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid,QnaPostEntity.class));
     }
 

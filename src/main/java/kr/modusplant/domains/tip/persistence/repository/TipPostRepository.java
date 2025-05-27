@@ -13,15 +13,19 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface TipPostRepository extends UlidPrimaryRepository<TipPostEntity>, CreatedAtAndUpdatedAtRepository<TipPostEntity>, JpaRepository<TipPostEntity,String> {
     Page<TipPostEntity> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
-    Page<TipPostEntity> findAllByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
+    Page<TipPostEntity> findByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 
     Page<TipPostEntity> findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(PlantGroupEntity group, Pageable pageable);
 
     Page<TipPostEntity> findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(SiteMemberEntity authMember, Pageable pageable);
+
+    Optional<TipPostEntity> findByUlidAndIsDeletedFalse(String ulid);
 
     @Query(
             value = "SELECT * FROM tip_post p " +

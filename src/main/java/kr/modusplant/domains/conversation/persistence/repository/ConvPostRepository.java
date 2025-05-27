@@ -13,15 +13,19 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ConvPostRepository extends UlidPrimaryRepository<ConvPostEntity>, CreatedAtAndUpdatedAtRepository<ConvPostEntity>, JpaRepository<ConvPostEntity,String> {
     Page<ConvPostEntity> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
-    Page<ConvPostEntity> findAllByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
+    Page<ConvPostEntity> findByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 
     Page<ConvPostEntity> findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(PlantGroupEntity group, Pageable pageable);
 
     Page<ConvPostEntity> findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(SiteMemberEntity authMember, Pageable pageable);
+
+    Optional<ConvPostEntity> findByUlidAndIsDeletedFalse(String ulid);
 
     @Query(
             value = "SELECT * FROM conv_post p " +

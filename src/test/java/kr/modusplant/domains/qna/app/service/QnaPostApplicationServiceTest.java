@@ -8,7 +8,8 @@ import kr.modusplant.domains.group.persistence.repository.PlantGroupRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.domains.qna.app.http.request.QnaPostRequest;
+import kr.modusplant.domains.qna.app.http.request.QnaPostInsertRequest;
+import kr.modusplant.domains.qna.app.http.request.QnaPostUpdateRequest;
 import kr.modusplant.domains.qna.app.http.response.QnaPostResponse;
 import kr.modusplant.domains.qna.persistence.entity.QnaPostEntity;
 import kr.modusplant.domains.qna.persistence.repository.QnaPostRepository;
@@ -71,12 +72,12 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
     @DisplayName("전체 팁 게시글 목록 조회하기")
     void getAllTest() throws IOException {
         // given
-        QnaPostRequest qnaPostRequest1 = requestAllTypes;
-        QnaPostRequest qnaPostRequest2 = requestAllTypes;
-        QnaPostRequest qnaPostRequest3 = requestAllTypes;
-        qnaPostApplicationService.insert(qnaPostRequest1,memberUuid);
-        qnaPostApplicationService.insert(qnaPostRequest2,memberUuid);
-        qnaPostApplicationService.insert(qnaPostRequest3,memberUuid);
+        QnaPostInsertRequest qnaPostInsertRequest1 = requestAllTypes;
+        QnaPostInsertRequest qnaPostInsertRequest2 = requestAllTypes;
+        QnaPostInsertRequest qnaPostInsertRequest3 = requestAllTypes;
+        qnaPostApplicationService.insert(qnaPostInsertRequest1,memberUuid);
+        qnaPostApplicationService.insert(qnaPostInsertRequest2,memberUuid);
+        qnaPostApplicationService.insert(qnaPostInsertRequest3,memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
@@ -103,12 +104,12 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
         PlantGroupEntity group = createOtherGroupEntity();
         plantGroupRepository.save(group);
         Integer groupOrder2 = group.getOrder();
-        QnaPostRequest qnaPostRequest1 = requestAllTypes;
-        QnaPostRequest qnaPostRequest2 = requestAllTypes;
-        QnaPostRequest qnaPostRequest3 = requestBasicTypes;
-        qnaPostApplicationService.insert(qnaPostRequest1,memberUuid);
-        qnaPostApplicationService.insert(qnaPostRequest2,memberUuid2);
-        qnaPostApplicationService.insert(qnaPostRequest3,memberUuid);
+        QnaPostInsertRequest qnaPostInsertRequest1 = requestAllTypes;
+        QnaPostInsertRequest qnaPostInsertRequest2 = requestAllTypes;
+        QnaPostInsertRequest qnaPostInsertRequest3 = requestBasicTypes;
+        qnaPostApplicationService.insert(qnaPostInsertRequest1,memberUuid);
+        qnaPostApplicationService.insert(qnaPostInsertRequest2,memberUuid2);
+        qnaPostApplicationService.insert(qnaPostInsertRequest3,memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
@@ -135,12 +136,12 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
         PlantGroupEntity group = createOtherGroupEntity();
         plantGroupRepository.save(group);
         group.getOrder();
-        QnaPostRequest qnaPostRequest1 = requestAllTypes;
-        QnaPostRequest qnaPostRequest2 = requestAllTypes;
-        QnaPostRequest qnaPostRequest3 = requestBasicTypes;
-        qnaPostApplicationService.insert(qnaPostRequest1,memberUuid);
-        qnaPostApplicationService.insert(qnaPostRequest2,memberUuid2);
-        qnaPostApplicationService.insert(qnaPostRequest3,memberUuid);
+        QnaPostInsertRequest qnaPostInsertRequest1 = requestAllTypes;
+        QnaPostInsertRequest qnaPostInsertRequest2 = requestAllTypes;
+        QnaPostInsertRequest qnaPostInsertRequest3 = requestBasicTypes;
+        qnaPostApplicationService.insert(qnaPostInsertRequest1,memberUuid);
+        qnaPostApplicationService.insert(qnaPostInsertRequest2,memberUuid2);
+        qnaPostApplicationService.insert(qnaPostInsertRequest3,memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
@@ -162,10 +163,10 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
         PlantGroupEntity group = createOtherGroupEntity();
         plantGroupRepository.save(group);
         group.getOrder();
-        QnaPostRequest qnaPostRequest1 = requestAllTypes;
-        QnaPostRequest qnaPostRequest2 = requestBasicTypes;
-        qnaPostApplicationService.insert(qnaPostRequest1,memberUuid);
-        qnaPostApplicationService.insert(qnaPostRequest2,memberUuid);
+        QnaPostInsertRequest qnaPostInsertRequest1 = requestAllTypes;
+        QnaPostInsertRequest qnaPostInsertRequest2 = requestBasicTypes;
+        qnaPostApplicationService.insert(qnaPostInsertRequest1,memberUuid);
+        qnaPostApplicationService.insert(qnaPostInsertRequest2,memberUuid);
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
@@ -177,7 +178,7 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
         assertThat(result1.getTotalElements()).isEqualTo(1);
         assertThat(result2.getTotalElements()).isEqualTo(2);
         QnaPostResponse post = result1.getContent().get(0);
-        assertThat(post.getTitle()).isEqualTo(qnaPostRequest2.title());
+        assertThat(post.getTitle()).isEqualTo(qnaPostInsertRequest2.title());
         assertThat(post.getContent().get(1).has("data")).isEqualTo(true);
     }
 
@@ -187,14 +188,14 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
     void getByUlidTest() throws IOException {
         // given
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        QnaPostRequest qnaPostRequest = requestAllTypes;
-        PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(qnaPostRequest.groupOrder()).orElseThrow();
+        QnaPostInsertRequest qnaPostInsertRequest = requestAllTypes;
+        PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(qnaPostInsertRequest.groupOrder()).orElseThrow();
         QnaPostEntity qnaPostEntity = QnaPostEntity.builder()
                 .group(plantGroupEntity)
                 .authMember(siteMember)
                 .createMember(siteMember)
-                .title(qnaPostRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(qnaPostRequest.content()))
+                .title(qnaPostInsertRequest.title())
+                .content(mediaContentService.saveFilesAndGenerateContentJson(qnaPostInsertRequest.content()))
                 .build();
         qnaPostRepository.save(qnaPostEntity);
 
@@ -205,7 +206,7 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
         QnaPostResponse response = result.get();
         assertThat(response.getNickname()).isEqualTo(siteMember.getNickname());
         assertThat(response.getCategory()).isEqualTo(plantGroupEntity.getCategory());
-        assertThat(response.getTitle()).isEqualTo(qnaPostRequest.title());
+        assertThat(response.getTitle()).isEqualTo(qnaPostInsertRequest.title());
     }
 
     @Test
@@ -215,20 +216,26 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
         PlantGroupEntity group = createOtherGroupEntity();
         plantGroupRepository.save(group);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        QnaPostRequest qnaPostRequest = requestAllTypes;
-        PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(qnaPostRequest.groupOrder()).orElseThrow();
+        QnaPostInsertRequest qnaPostInsertRequest = requestAllTypes;
+        PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(qnaPostInsertRequest.groupOrder()).orElseThrow();
         QnaPostEntity qnaPostEntity = QnaPostEntity.builder()
                 .group(plantGroupEntity)
                 .authMember(siteMember)
                 .createMember(siteMember)
-                .title(qnaPostRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(qnaPostRequest.content()))
+                .title(qnaPostInsertRequest.title())
+                .content(mediaContentService.saveFilesAndGenerateContentJson(qnaPostInsertRequest.content()))
                 .build();
         qnaPostRepository.save(qnaPostEntity);
 
         // when
-        QnaPostRequest qnaPostUpdateRequest = requestBasicTypes;
-        qnaPostApplicationService.update(qnaPostUpdateRequest,qnaPostEntity.getUlid(),memberUuid);
+        QnaPostUpdateRequest qnaPostUpdateRequest = new QnaPostUpdateRequest(
+                qnaPostEntity.getUlid(),
+                2,
+                "유용한 식물 기르기 팁",
+                basicMediaFiles,
+                basicMediaFilesOrder
+        );
+        qnaPostApplicationService.update(qnaPostUpdateRequest,memberUuid);
 
         // then
         QnaPostEntity result = qnaPostRepository.findByUlid(qnaPostEntity.getUlid()).orElseThrow();
@@ -240,14 +247,14 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
     void removeByUlidTest() throws IOException {
         // given
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        QnaPostRequest qnaPostRequest = requestAllTypes;
-        PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(qnaPostRequest.groupOrder()).orElseThrow();
+        QnaPostInsertRequest qnaPostInsertRequest = requestAllTypes;
+        PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(qnaPostInsertRequest.groupOrder()).orElseThrow();
         QnaPostEntity qnaPostEntity = QnaPostEntity.builder()
                 .group(plantGroupEntity)
                 .authMember(siteMember)
                 .createMember(siteMember)
-                .title(qnaPostRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(qnaPostRequest.content()))
+                .title(qnaPostInsertRequest.title())
+                .content(mediaContentService.saveFilesAndGenerateContentJson(qnaPostInsertRequest.content()))
                 .build();
         qnaPostRepository.save(qnaPostEntity);
 

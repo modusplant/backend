@@ -8,7 +8,8 @@ import kr.modusplant.domains.group.persistence.repository.PlantGroupRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.domains.tip.app.http.request.TipPostRequest;
+import kr.modusplant.domains.tip.app.http.request.TipPostInsertRequest;
+import kr.modusplant.domains.tip.app.http.request.TipPostUpdateRequest;
 import kr.modusplant.domains.tip.app.http.response.TipPostResponse;
 import kr.modusplant.domains.tip.common.util.entity.TipPostEntityTestUtils;
 import kr.modusplant.domains.tip.common.util.http.request.TipPostRequestTestUtils;
@@ -70,12 +71,12 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
     @DisplayName("전체 팁 게시글 목록 조회하기")
     void getAllTest() throws IOException {
         // given
-        TipPostRequest tipPostRequest1 = requestAllTypes;
-        TipPostRequest tipPostRequest2 = requestAllTypes;
-        TipPostRequest tipPostRequest3 = requestAllTypes;
-        tipPostApplicationService.insert(tipPostRequest1,memberUuid);
-        tipPostApplicationService.insert(tipPostRequest2,memberUuid);
-        tipPostApplicationService.insert(tipPostRequest3,memberUuid);
+        TipPostInsertRequest tipPostInsertRequest1 = requestAllTypes;
+        TipPostInsertRequest tipPostInsertRequest2 = requestAllTypes;
+        TipPostInsertRequest tipPostInsertRequest3 = requestAllTypes;
+        tipPostApplicationService.insert(tipPostInsertRequest1,memberUuid);
+        tipPostApplicationService.insert(tipPostInsertRequest2,memberUuid);
+        tipPostApplicationService.insert(tipPostInsertRequest3,memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
@@ -102,12 +103,12 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
         PlantGroupEntity group = createOtherGroupEntity();
         plantGroupRepository.save(group);
         Integer groupOrder2 = group.getOrder();
-        TipPostRequest tipPostRequest1 = requestAllTypes;
-        TipPostRequest tipPostRequest2 = requestAllTypes;
-        TipPostRequest tipPostRequest3 = requestBasicTypes;
-        tipPostApplicationService.insert(tipPostRequest1,memberUuid);
-        tipPostApplicationService.insert(tipPostRequest2,memberUuid2);
-        tipPostApplicationService.insert(tipPostRequest3,memberUuid);
+        TipPostInsertRequest tipPostInsertRequest1 = requestAllTypes;
+        TipPostInsertRequest tipPostInsertRequest2 = requestAllTypes;
+        TipPostInsertRequest tipPostInsertRequest3 = requestBasicTypes;
+        tipPostApplicationService.insert(tipPostInsertRequest1,memberUuid);
+        tipPostApplicationService.insert(tipPostInsertRequest2,memberUuid2);
+        tipPostApplicationService.insert(tipPostInsertRequest3,memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
@@ -134,12 +135,12 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
         PlantGroupEntity group = createOtherGroupEntity();
         plantGroupRepository.save(group);
         group.getOrder();
-        TipPostRequest tipPostRequest1 = requestAllTypes;
-        TipPostRequest tipPostRequest2 = requestAllTypes;
-        TipPostRequest tipPostRequest3 = requestBasicTypes;
-        tipPostApplicationService.insert(tipPostRequest1,memberUuid);
-        tipPostApplicationService.insert(tipPostRequest2,memberUuid2);
-        tipPostApplicationService.insert(tipPostRequest3,memberUuid);
+        TipPostInsertRequest tipPostInsertRequest1 = requestAllTypes;
+        TipPostInsertRequest tipPostInsertRequest2 = requestAllTypes;
+        TipPostInsertRequest tipPostInsertRequest3 = requestBasicTypes;
+        tipPostApplicationService.insert(tipPostInsertRequest1,memberUuid);
+        tipPostApplicationService.insert(tipPostInsertRequest2,memberUuid2);
+        tipPostApplicationService.insert(tipPostInsertRequest3,memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
@@ -161,10 +162,10 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
         PlantGroupEntity group = createOtherGroupEntity();
         plantGroupRepository.save(group);
         group.getOrder();
-        TipPostRequest tipPostRequest1 = requestAllTypes;
-        TipPostRequest tipPostRequest2 = requestBasicTypes;
-        tipPostApplicationService.insert(tipPostRequest1,memberUuid);
-        tipPostApplicationService.insert(tipPostRequest2,memberUuid);
+        TipPostInsertRequest tipPostInsertRequest1 = requestAllTypes;
+        TipPostInsertRequest tipPostInsertRequest2 = requestBasicTypes;
+        tipPostApplicationService.insert(tipPostInsertRequest1,memberUuid);
+        tipPostApplicationService.insert(tipPostInsertRequest2,memberUuid);
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
@@ -176,7 +177,7 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
         assertThat(result1.getTotalElements()).isEqualTo(1);
         assertThat(result2.getTotalElements()).isEqualTo(2);
         TipPostResponse post = result1.getContent().get(0);
-        assertThat(post.getTitle()).isEqualTo(tipPostRequest2.title());
+        assertThat(post.getTitle()).isEqualTo(tipPostInsertRequest2.title());
         assertThat(post.getContent().get(1).has("data")).isEqualTo(true);
     }
 
@@ -186,14 +187,14 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
     void getByUlidTest() throws IOException {
         // given
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        TipPostRequest tipPostRequest = requestAllTypes;
-        PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(tipPostRequest.groupOrder()).orElseThrow();
+        TipPostInsertRequest tipPostInsertRequest = requestAllTypes;
+        PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(tipPostInsertRequest.groupOrder()).orElseThrow();
         TipPostEntity tipPostEntity = TipPostEntity.builder()
                 .group(plantGroupEntity)
                 .authMember(siteMember)
                 .createMember(siteMember)
-                .title(tipPostRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(tipPostRequest.content()))
+                .title(tipPostInsertRequest.title())
+                .content(mediaContentService.saveFilesAndGenerateContentJson(tipPostInsertRequest.content()))
                 .build();
         tipPostRepository.save(tipPostEntity);
 
@@ -204,7 +205,7 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
         TipPostResponse response = result.get();
         assertThat(response.getNickname()).isEqualTo(siteMember.getNickname());
         assertThat(response.getCategory()).isEqualTo(plantGroupEntity.getCategory());
-        assertThat(response.getTitle()).isEqualTo(tipPostRequest.title());
+        assertThat(response.getTitle()).isEqualTo(tipPostInsertRequest.title());
     }
 
     @Test
@@ -214,20 +215,26 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
         PlantGroupEntity group = createOtherGroupEntity();
         plantGroupRepository.save(group);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        TipPostRequest tipPostRequest = requestAllTypes;
-        PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(tipPostRequest.groupOrder()).orElseThrow();
+        TipPostInsertRequest tipPostInsertRequest = requestAllTypes;
+        PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(tipPostInsertRequest.groupOrder()).orElseThrow();
         TipPostEntity tipPostEntity = TipPostEntity.builder()
                 .group(plantGroupEntity)
                 .authMember(siteMember)
                 .createMember(siteMember)
-                .title(tipPostRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(tipPostRequest.content()))
+                .title(tipPostInsertRequest.title())
+                .content(mediaContentService.saveFilesAndGenerateContentJson(tipPostInsertRequest.content()))
                 .build();
         tipPostRepository.save(tipPostEntity);
 
         // when
-        TipPostRequest tipPostUpdateRequest = requestBasicTypes;
-        tipPostApplicationService.update(tipPostUpdateRequest,tipPostEntity.getUlid(),memberUuid);
+        TipPostUpdateRequest tipPostUpdateRequest = new TipPostUpdateRequest(
+                tipPostEntity.getUlid(),
+                2,
+                "유용한 식물 기르기 팁",
+                basicMediaFiles,
+                basicMediaFilesOrder
+        );
+        tipPostApplicationService.update(tipPostUpdateRequest,memberUuid);
 
         // then
         TipPostEntity result = tipPostRepository.findByUlid(tipPostEntity.getUlid()).orElseThrow();
@@ -239,14 +246,14 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, PlantG
     void removeByUlidTest() throws IOException {
         // given
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        TipPostRequest tipPostRequest = requestAllTypes;
-        PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(tipPostRequest.groupOrder()).orElseThrow();
+        TipPostInsertRequest tipPostInsertRequest = requestAllTypes;
+        PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(tipPostInsertRequest.groupOrder()).orElseThrow();
         TipPostEntity tipPostEntity = TipPostEntity.builder()
                 .group(plantGroupEntity)
                 .authMember(siteMember)
                 .createMember(siteMember)
-                .title(tipPostRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(tipPostRequest.content()))
+                .title(tipPostInsertRequest.title())
+                .content(mediaContentService.saveFilesAndGenerateContentJson(tipPostInsertRequest.content()))
                 .build();
         tipPostRepository.save(tipPostEntity);
 

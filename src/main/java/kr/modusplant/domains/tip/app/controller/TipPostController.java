@@ -3,7 +3,8 @@ package kr.modusplant.domains.tip.app.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.modusplant.domains.tip.app.http.request.FileOrder;
-import kr.modusplant.domains.tip.app.http.request.TipPostRequest;
+import kr.modusplant.domains.tip.app.http.request.TipPostInsertRequest;
+import kr.modusplant.domains.tip.app.http.request.TipPostUpdateRequest;
 import kr.modusplant.domains.tip.app.http.response.TipPostPageResponse;
 import kr.modusplant.domains.tip.app.http.response.TipPostResponse;
 import kr.modusplant.domains.tip.app.service.TipPostApplicationService;
@@ -77,20 +78,20 @@ public class TipPostController {
             @RequestPart List<MultipartFile> content,
             @RequestPart("order_info") List<FileOrder> orderInfo
     ) throws IOException {
-        tipPostApplicationService.insert(new TipPostRequest(groupOrder,title,content,orderInfo),memberUuid);
+        tipPostApplicationService.insert(new TipPostInsertRequest(groupOrder,title,content,orderInfo),memberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
     @Operation(summary = "특정 팁 게시글 수정 API", description = "특정 팁 게시글을 수정합니다.")
     @PutMapping(value = "/{ulid}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> updateTipPost(
-            @RequestPart(value = "group_order", required = false) Integer groupOrder,
-            @RequestPart(required = false) String title,
-            @RequestPart(required = false) List<MultipartFile> content,
-            @RequestPart(value = "order_info", required = false) List<FileOrder> orderInfo,
+            @RequestPart("group_order") Integer groupOrder,
+            @RequestPart String title,
+            @RequestPart List<MultipartFile> content,
+            @RequestPart("order_info") List<FileOrder> orderInfo,
             @PathVariable String ulid
     ) throws IOException {
-        tipPostApplicationService.update(new TipPostRequest(groupOrder,title,content,orderInfo), ulid, memberUuid);
+        tipPostApplicationService.update(new TipPostUpdateRequest(ulid,groupOrder,title,content,orderInfo), memberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

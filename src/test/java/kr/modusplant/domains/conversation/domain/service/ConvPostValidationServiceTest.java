@@ -1,10 +1,10 @@
 package kr.modusplant.domains.conversation.domain.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import kr.modusplant.domains.conversation.app.http.request.ConvPostInsertRequest;
 import kr.modusplant.domains.conversation.common.util.http.request.ConvPostRequestTestUtils;
 import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.conversation.app.http.request.ConvPostRequest;
 import kr.modusplant.domains.conversation.error.PostAccessDeniedException;
 import kr.modusplant.domains.conversation.persistence.entity.ConvPostEntity;
 import kr.modusplant.domains.conversation.persistence.repository.ConvPostRepository;
@@ -36,13 +36,13 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils {
     @Test
     @DisplayName("팁 게시글 추가/수정 시 ConvPostRequest는 유효한 입력")
     void validateConvPostInsertRequestTestSuccess() {
-        assertDoesNotThrow(() -> convPostValidationService.validateConvPostRequest(requestBasicTypes));
+        assertDoesNotThrow(() -> convPostValidationService.validateConvPostInsertRequest(requestBasicTypes));
     }
 
     @Test
     @DisplayName("팁 게시글 추가/수정 시 ConvPostRequest의 groupOrder가 유효하지 않으면 예외 발생")
     void validateConvPostInsertRequestInvalidGroupOrderTest() {
-        ConvPostRequest convPostRequest = new ConvPostRequest(
+        ConvPostInsertRequest convPostInsertRequest = new ConvPostInsertRequest(
                 -1,
                 "유용한 팁 모음",
                 allMediaFiles,
@@ -50,13 +50,13 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> convPostValidationService.validateConvPostRequest(convPostRequest));
+                () -> convPostValidationService.validateConvPostInsertRequest(convPostInsertRequest));
     }
 
     @Test
     @DisplayName("팁 게시글 추가/수정 시 ConvPostRequest의 title이 유효하지 않으면 예외 발생")
     void validateConvPostInsertRequestInvalidTitleTest() {
-        ConvPostRequest convPostRequest = new ConvPostRequest(
+        ConvPostInsertRequest convPostInsertRequest = new ConvPostInsertRequest(
                 2,
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 allMediaFiles,
@@ -64,14 +64,14 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> convPostValidationService.validateConvPostRequest(convPostRequest));
+                () -> convPostValidationService.validateConvPostInsertRequest(convPostInsertRequest));
 
     }
 
     @Test
     @DisplayName("팁 게시글 추가/수정 시 ConvPostRequest의 Content와 OrderInfo가 유효하지 않으면 예외 발생")
     void validateConvPostInsertRequestInvalidContentAndOrderInfoTest() {
-        ConvPostRequest convPostRequest = new ConvPostRequest(
+        ConvPostInsertRequest convPostInsertRequest = new ConvPostInsertRequest(
                 1,
                 "유용한 팁 모음",
                 textImageFiles,
@@ -79,7 +79,7 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils {
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> convPostValidationService.validateConvPostRequest(convPostRequest));
+                () -> convPostValidationService.validateConvPostInsertRequest(convPostInsertRequest));
     }
 
     @Test
@@ -101,39 +101,18 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils {
                 .build();
 
         // when
-        when(convPostRepository.findByUlid(ulid)).thenReturn(Optional.of(convPostEntity));
+        when(convPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.of(convPostEntity));
         when(convPostEntity.getAuthMember().getUuid()).thenReturn(memberUuid);
 
         assertDoesNotThrow(() -> convPostValidationService.validateAccessibleConvPost(ulid,memberUuid));
     }
 
     @Test
-    @DisplayName("게시글이 존재하지 않을 때 예외 발생")
+    @DisplayName("삭제되지 않은 게시글이 존재하지 않을 때 예외 발생")
     void validateAccessibleConvPostNotFoundTest() {
         UUID memberUuid = UUID.randomUUID();
         String ulid = generator.generate(null, null,null,EventType.INSERT);
-        when(convPostRepository.findByUlid(ulid)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundWithUlidException.class,
-                () -> convPostValidationService.validateAccessibleConvPost(ulid,memberUuid));
-    }
-
-    @Test
-    @DisplayName("삭제되지 않은 게시글이 존재하지 않을 때 예외 발생")
-    void validateNotFoundUndeletedConvPostTest() {
-        UUID memberUuid = UUID.randomUUID();
-        String ulid = generator.generate(null, null,null,EventType.INSERT);
-        SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
-        ConvPostEntity convPostEntity = ConvPostEntity.builder()
-                .authMember(memberEntity)
-                .group(mock(PlantGroupEntity.class)) // 다른 필드도 필요시 같이 mock 처리
-                .createMember(memberEntity)
-                .likeCount(0)
-                .viewCount(0L)
-                .title("테스트 제목")
-                .content(mock(JsonNode.class))
-                .isDeleted(true)
-                .build();
-        when(convPostRepository.findByUlid(ulid)).thenReturn(Optional.of(convPostEntity));
+        when(convPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundWithUlidException.class,
                 () -> convPostValidationService.validateAccessibleConvPost(ulid,memberUuid));
     }
@@ -157,7 +136,7 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils {
                 .build();
 
         // when
-        when(convPostRepository.findByUlid(ulid)).thenReturn(Optional.of(convPostEntity));
+        when(convPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.of(convPostEntity));
         when(convPostEntity.getAuthMember().getUuid()).thenReturn(UUID.randomUUID());
 
         assertThrows(PostAccessDeniedException.class,

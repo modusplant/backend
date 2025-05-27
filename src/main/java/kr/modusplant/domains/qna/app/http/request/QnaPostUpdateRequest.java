@@ -4,7 +4,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-public record QnaPostRequest(
+public record QnaPostUpdateRequest(
+        String ulid,
         Integer groupOrder,
         String title,
         List<MultipartFile> content,

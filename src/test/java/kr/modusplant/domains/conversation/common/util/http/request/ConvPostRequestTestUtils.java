@@ -1,7 +1,8 @@
 package kr.modusplant.domains.conversation.common.util.http.request;
 
+import kr.modusplant.domains.conversation.app.http.request.ConvPostInsertRequest;
+import kr.modusplant.domains.conversation.app.http.request.ConvPostUpdateRequest;
 import kr.modusplant.domains.conversation.app.http.request.FileOrder;
-import kr.modusplant.domains.conversation.app.http.request.ConvPostRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -87,15 +88,15 @@ public interface ConvPostRequestTestUtils {
     List<FileOrder> duplicatedTextFilesOrder = Arrays.asList(textFileOrder(0,1),imageFileOrder(2),textFileOrder(1,3));
 
 
-    /* ConvPostRequest Utils */
-    ConvPostRequest requestAllTypes = new ConvPostRequest(
+    /* ConvPostInsertRequest Utils */
+    ConvPostInsertRequest requestAllTypes = new ConvPostInsertRequest(
             1,
             "유용한 팁 모음",
             allMediaFiles,
             allMediaFilesOrder
     );
 
-    ConvPostRequest requestBasicTypes = new ConvPostRequest(
+    ConvPostInsertRequest requestBasicTypes = new ConvPostInsertRequest(
             2,
             "유용한 식물 기르기 팁",
             basicMediaFiles,

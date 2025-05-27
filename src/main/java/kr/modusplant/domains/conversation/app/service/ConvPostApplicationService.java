@@ -1,13 +1,14 @@
 package kr.modusplant.domains.conversation.app.service;
 
 import kr.modusplant.domains.common.domain.service.MediaContentService;
+import kr.modusplant.domains.conversation.app.http.request.ConvPostInsertRequest;
+import kr.modusplant.domains.conversation.app.http.request.ConvPostUpdateRequest;
 import kr.modusplant.domains.group.domain.service.PlantGroupValidationService;
 import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
 import kr.modusplant.domains.group.persistence.repository.PlantGroupRepository;
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.domains.conversation.app.http.request.ConvPostRequest;
 import kr.modusplant.domains.conversation.app.http.response.ConvPostResponse;
 import kr.modusplant.domains.conversation.domain.service.ConvPostValidationService;
 import kr.modusplant.domains.conversation.mapper.ConvPostAppInfraMapper;
@@ -49,7 +50,7 @@ public class ConvPostApplicationService {
     private long ttlMinutes;
 
     public Page<ConvPostResponse> getAll(Pageable pageable) {
-        return convPostRepository.findAllByIsDeletedFalseOrderByCreatedAtDesc(pageable).map(entity -> {
+        return convPostRepository.findByIsDeletedFalseOrderByCreatedAtDesc(pageable).map(entity -> {
             try {
                 entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
@@ -107,31 +108,31 @@ public class ConvPostApplicationService {
     }
 
     @Transactional
-    public void insert(ConvPostRequest convPostRequest, UUID memberUuid) throws IOException {
-        convPostValidationService.validateConvPostRequest(convPostRequest);
-        plantGroupValidationService.validateNotFoundOrder(convPostRequest.groupOrder());
+    public void insert(ConvPostInsertRequest convPostInsertRequest, UUID memberUuid) throws IOException {
+        convPostValidationService.validateConvPostInsertRequest(convPostInsertRequest);
+        plantGroupValidationService.validateNotFoundOrder(convPostInsertRequest.groupOrder());
         siteMemberValidationService.validateNotFoundUuid(memberUuid);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
         ConvPostEntity convPostEntity = ConvPostEntity.builder()
-                .group(plantGroupRepository.findByOrder(convPostRequest.groupOrder()).orElseThrow())
+                .group(plantGroupRepository.findByOrder(convPostInsertRequest.groupOrder()).orElseThrow())
                 .authMember(siteMember)
                 .createMember(siteMember)
-                .title(convPostRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(convPostRequest.content()))
+                .title(convPostInsertRequest.title())
+                .content(mediaContentService.saveFilesAndGenerateContentJson(convPostInsertRequest.content()))
                 .build();
         convPostRepository.save(convPostEntity);
     }
 
     @Transactional
-    public void update(ConvPostRequest convPostRequest, String ulid, UUID memberUuid) throws IOException {
-        convPostValidationService.validateConvPostRequest(convPostRequest);
-        convPostValidationService.validateAccessibleConvPost(ulid, memberUuid);
-        plantGroupValidationService.validateNotFoundOrder(convPostRequest.groupOrder());
-        ConvPostEntity convPostEntity = convPostRepository.findByUlid(ulid).orElseThrow();
+    public void update(ConvPostUpdateRequest convPostUpdateRequest, UUID memberUuid) throws IOException {
+        convPostValidationService.validateConvPostUpdateRequest(convPostUpdateRequest);
+        convPostValidationService.validateAccessibleConvPost(convPostUpdateRequest.ulid(), memberUuid);
+        plantGroupValidationService.validateNotFoundOrder(convPostUpdateRequest.groupOrder());
+        ConvPostEntity convPostEntity = convPostRepository.findByUlid(convPostUpdateRequest.ulid()).orElseThrow();
         mediaContentService.deleteFiles(convPostEntity.getContent());
-        convPostEntity.updateGroup(plantGroupRepository.findByOrder(convPostRequest.groupOrder()).orElseThrow());
-        convPostEntity.updateTitle(convPostRequest.title());
-        convPostEntity.updateContent(mediaContentService.saveFilesAndGenerateContentJson(convPostRequest.content()));
+        convPostEntity.updateGroup(plantGroupRepository.findByOrder(convPostUpdateRequest.groupOrder()).orElseThrow());
+        convPostEntity.updateTitle(convPostUpdateRequest.title());
+        convPostEntity.updateContent(mediaContentService.saveFilesAndGenerateContentJson(convPostUpdateRequest.content()));
         convPostRepository.save(convPostEntity);
     }
 

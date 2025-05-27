@@ -2,8 +2,9 @@ package kr.modusplant.domains.conversation.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.modusplant.domains.conversation.app.http.request.ConvPostUpdateRequest;
 import kr.modusplant.domains.conversation.app.http.request.FileOrder;
-import kr.modusplant.domains.conversation.app.http.request.ConvPostRequest;
+import kr.modusplant.domains.conversation.app.http.request.ConvPostInsertRequest;
 import kr.modusplant.domains.conversation.app.http.response.ConvPostPageResponse;
 import kr.modusplant.domains.conversation.app.http.response.ConvPostResponse;
 import kr.modusplant.domains.conversation.app.service.ConvPostApplicationService;
@@ -77,20 +78,20 @@ public class ConvPostController {
             @RequestPart List<MultipartFile> content,
             @RequestPart("order_info") List<FileOrder> orderInfo
     ) throws IOException {
-        convPostApplicationService.insert(new ConvPostRequest(groupOrder,title,content,orderInfo),memberUuid);
+        convPostApplicationService.insert(new ConvPostInsertRequest(groupOrder,title,content,orderInfo),memberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
     @Operation(summary = "특정 팁 게시글 수정 API", description = "특정 팁 게시글을 수정합니다.")
     @PutMapping(value = "/{ulid}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> updateConvPost(
-            @RequestPart(value = "group_order", required = false) Integer groupOrder,
-            @RequestPart(required = false) String title,
-            @RequestPart(required = false) List<MultipartFile> content,
-            @RequestPart(value = "order_info", required = false) List<FileOrder> orderInfo,
+            @RequestPart("group_order") Integer groupOrder,
+            @RequestPart String title,
+            @RequestPart List<MultipartFile> content,
+            @RequestPart("order_info") List<FileOrder> orderInfo,
             @PathVariable String ulid
     ) throws IOException {
-        convPostApplicationService.update(new ConvPostRequest(groupOrder,title,content,orderInfo), ulid, memberUuid);
+        convPostApplicationService.update(new ConvPostUpdateRequest(ulid,groupOrder,title,content,orderInfo), memberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

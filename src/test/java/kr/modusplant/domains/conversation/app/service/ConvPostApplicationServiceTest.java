@@ -2,6 +2,8 @@ package kr.modusplant.domains.conversation.app.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.common.domain.service.MediaContentService;
+import kr.modusplant.domains.conversation.app.http.request.ConvPostInsertRequest;
+import kr.modusplant.domains.conversation.app.http.request.ConvPostUpdateRequest;
 import kr.modusplant.domains.conversation.common.util.entity.ConvPostEntityTestUtils;
 import kr.modusplant.domains.conversation.common.util.http.request.ConvPostRequestTestUtils;
 import kr.modusplant.domains.group.common.util.entity.PlantGroupEntityTestUtils;
@@ -10,9 +12,7 @@ import kr.modusplant.domains.group.persistence.repository.PlantGroupRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.domains.conversation.app.http.request.ConvPostRequest;
 import kr.modusplant.domains.conversation.app.http.response.ConvPostResponse;
-import kr.modusplant.domains.conversation.app.service.ConvPostApplicationService;
 import kr.modusplant.domains.conversation.persistence.entity.ConvPostEntity;
 import kr.modusplant.domains.conversation.persistence.repository.ConvPostRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,12 +71,12 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, Plant
     @DisplayName("전체 팁 게시글 목록 조회하기")
     void getAllTest() throws IOException {
         // given
-        ConvPostRequest convPostRequest1 = requestAllTypes;
-        ConvPostRequest convPostRequest2 = requestAllTypes;
-        ConvPostRequest convPostRequest3 = requestAllTypes;
-        convPostApplicationService.insert(convPostRequest1,memberUuid);
-        convPostApplicationService.insert(convPostRequest2,memberUuid);
-        convPostApplicationService.insert(convPostRequest3,memberUuid);
+        ConvPostInsertRequest convPostInsertRequest1 = requestAllTypes;
+        ConvPostInsertRequest convPostInsertRequest2 = requestAllTypes;
+        ConvPostInsertRequest convPostInsertRequest3 = requestAllTypes;
+        convPostApplicationService.insert(convPostInsertRequest1,memberUuid);
+        convPostApplicationService.insert(convPostInsertRequest2,memberUuid);
+        convPostApplicationService.insert(convPostInsertRequest3,memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
@@ -103,12 +103,12 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, Plant
         PlantGroupEntity group = createOtherGroupEntity();
         plantGroupRepository.save(group);
         Integer groupOrder2 = group.getOrder();
-        ConvPostRequest convPostRequest1 = requestAllTypes;
-        ConvPostRequest convPostRequest2 = requestAllTypes;
-        ConvPostRequest convPostRequest3 = requestBasicTypes;
-        convPostApplicationService.insert(convPostRequest1,memberUuid);
-        convPostApplicationService.insert(convPostRequest2,memberUuid2);
-        convPostApplicationService.insert(convPostRequest3,memberUuid);
+        ConvPostInsertRequest convPostInsertRequest1 = requestAllTypes;
+        ConvPostInsertRequest convPostInsertRequest2 = requestAllTypes;
+        ConvPostInsertRequest convPostInsertRequest3 = requestBasicTypes;
+        convPostApplicationService.insert(convPostInsertRequest1,memberUuid);
+        convPostApplicationService.insert(convPostInsertRequest2,memberUuid2);
+        convPostApplicationService.insert(convPostInsertRequest3,memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
@@ -135,12 +135,12 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, Plant
         PlantGroupEntity group = createOtherGroupEntity();
         plantGroupRepository.save(group);
         group.getOrder();
-        ConvPostRequest convPostRequest1 = requestAllTypes;
-        ConvPostRequest convPostRequest2 = requestAllTypes;
-        ConvPostRequest convPostRequest3 = requestBasicTypes;
-        convPostApplicationService.insert(convPostRequest1,memberUuid);
-        convPostApplicationService.insert(convPostRequest2,memberUuid2);
-        convPostApplicationService.insert(convPostRequest3,memberUuid);
+        ConvPostInsertRequest convPostInsertRequest1 = requestAllTypes;
+        ConvPostInsertRequest convPostInsertRequest2 = requestAllTypes;
+        ConvPostInsertRequest convPostInsertRequest3 = requestBasicTypes;
+        convPostApplicationService.insert(convPostInsertRequest1,memberUuid);
+        convPostApplicationService.insert(convPostInsertRequest2,memberUuid2);
+        convPostApplicationService.insert(convPostInsertRequest3,memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
@@ -162,10 +162,10 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, Plant
         PlantGroupEntity group = createOtherGroupEntity();
         plantGroupRepository.save(group);
         group.getOrder();
-        ConvPostRequest convPostRequest1 = requestAllTypes;
-        ConvPostRequest convPostRequest2 = requestBasicTypes;
-        convPostApplicationService.insert(convPostRequest1,memberUuid);
-        convPostApplicationService.insert(convPostRequest2,memberUuid);
+        ConvPostInsertRequest convPostInsertRequest1 = requestAllTypes;
+        ConvPostInsertRequest convPostInsertRequest2 = requestBasicTypes;
+        convPostApplicationService.insert(convPostInsertRequest1,memberUuid);
+        convPostApplicationService.insert(convPostInsertRequest2,memberUuid);
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
@@ -177,7 +177,7 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, Plant
         assertThat(result1.getTotalElements()).isEqualTo(1);
         assertThat(result2.getTotalElements()).isEqualTo(2);
         ConvPostResponse post = result1.getContent().get(0);
-        assertThat(post.getTitle()).isEqualTo(convPostRequest2.title());
+        assertThat(post.getTitle()).isEqualTo(convPostInsertRequest2.title());
         assertThat(post.getContent().get(1).has("data")).isEqualTo(true);
     }
 
@@ -187,14 +187,14 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, Plant
     void getByUlidTest() throws IOException {
         // given
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        ConvPostRequest convPostRequest = requestAllTypes;
-        PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(convPostRequest.groupOrder()).orElseThrow();
+        ConvPostInsertRequest convPostInsertRequest = requestAllTypes;
+        PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(convPostInsertRequest.groupOrder()).orElseThrow();
         ConvPostEntity convPostEntity = ConvPostEntity.builder()
                 .group(plantGroupEntity)
                 .authMember(siteMember)
                 .createMember(siteMember)
-                .title(convPostRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(convPostRequest.content()))
+                .title(convPostInsertRequest.title())
+                .content(mediaContentService.saveFilesAndGenerateContentJson(convPostInsertRequest.content()))
                 .build();
         convPostRepository.save(convPostEntity);
 
@@ -205,7 +205,7 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, Plant
         ConvPostResponse response = result.get();
         assertThat(response.getNickname()).isEqualTo(siteMember.getNickname());
         assertThat(response.getCategory()).isEqualTo(plantGroupEntity.getCategory());
-        assertThat(response.getTitle()).isEqualTo(convPostRequest.title());
+        assertThat(response.getTitle()).isEqualTo(convPostInsertRequest.title());
     }
 
     @Test
@@ -215,20 +215,26 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, Plant
         PlantGroupEntity group = createOtherGroupEntity();
         plantGroupRepository.save(group);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        ConvPostRequest convPostRequest = requestAllTypes;
-        PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(convPostRequest.groupOrder()).orElseThrow();
+        ConvPostInsertRequest convPostInsertRequest = requestAllTypes;
+        PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(convPostInsertRequest.groupOrder()).orElseThrow();
         ConvPostEntity convPostEntity = ConvPostEntity.builder()
                 .group(plantGroupEntity)
                 .authMember(siteMember)
                 .createMember(siteMember)
-                .title(convPostRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(convPostRequest.content()))
+                .title(convPostInsertRequest.title())
+                .content(mediaContentService.saveFilesAndGenerateContentJson(convPostInsertRequest.content()))
                 .build();
         convPostRepository.save(convPostEntity);
 
         // when
-        ConvPostRequest convPostUpdateRequest = requestBasicTypes;
-        convPostApplicationService.update(convPostUpdateRequest,convPostEntity.getUlid(),memberUuid);
+        ConvPostUpdateRequest convPostUpdateRequest = new ConvPostUpdateRequest(
+                convPostEntity.getUlid(),
+                2,
+                "유용한 식물 기르기 팁",
+                basicMediaFiles,
+                basicMediaFilesOrder
+        );
+        convPostApplicationService.update(convPostUpdateRequest,memberUuid);
 
         // then
         ConvPostEntity result = convPostRepository.findByUlid(convPostEntity.getUlid()).orElseThrow();
@@ -240,14 +246,14 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, Plant
     void removeByUlidTest() throws IOException {
         // given
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        ConvPostRequest convPostRequest = requestAllTypes;
-        PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(convPostRequest.groupOrder()).orElseThrow();
+        ConvPostInsertRequest convPostInsertRequest = requestAllTypes;
+        PlantGroupEntity plantGroupEntity = plantGroupRepository.findByOrder(convPostInsertRequest.groupOrder()).orElseThrow();
         ConvPostEntity convPostEntity = ConvPostEntity.builder()
                 .group(plantGroupEntity)
                 .authMember(siteMember)
                 .createMember(siteMember)
-                .title(convPostRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(convPostRequest.content()))
+                .title(convPostInsertRequest.title())
+                .content(mediaContentService.saveFilesAndGenerateContentJson(convPostInsertRequest.content()))
                 .build();
         convPostRepository.save(convPostEntity);
 

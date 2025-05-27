@@ -3,7 +3,8 @@ package kr.modusplant.domains.qna.app.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.modusplant.domains.qna.app.http.request.FileOrder;
-import kr.modusplant.domains.qna.app.http.request.QnaPostRequest;
+import kr.modusplant.domains.qna.app.http.request.QnaPostInsertRequest;
+import kr.modusplant.domains.qna.app.http.request.QnaPostUpdateRequest;
 import kr.modusplant.domains.qna.app.http.response.QnaPostPageResponse;
 import kr.modusplant.domains.qna.app.http.response.QnaPostResponse;
 import kr.modusplant.domains.qna.app.service.QnaPostApplicationService;
@@ -77,20 +78,20 @@ public class QnaPostController {
             @RequestPart List<MultipartFile> content,
             @RequestPart("order_info") List<FileOrder> orderInfo
     ) throws IOException {
-        qnaPostApplicationService.insert(new QnaPostRequest(groupOrder,title,content,orderInfo),memberUuid);
+        qnaPostApplicationService.insert(new QnaPostInsertRequest(groupOrder,title,content,orderInfo),memberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
     @Operation(summary = "특정 팁 게시글 수정 API", description = "특정 팁 게시글을 수정합니다.")
     @PutMapping(value = "/{ulid}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> updateQnaPost(
-            @RequestPart(value = "group_order", required = false) Integer groupOrder,
-            @RequestPart(required = false) String title,
-            @RequestPart(required = false) List<MultipartFile> content,
-            @RequestPart(value = "order_info", required = false) List<FileOrder> orderInfo,
+            @RequestPart("group_order") Integer groupOrder,
+            @RequestPart String title,
+            @RequestPart List<MultipartFile> content,
+            @RequestPart("order_info") List<FileOrder> orderInfo,
             @PathVariable String ulid
     ) throws IOException {
-        qnaPostApplicationService.update(new QnaPostRequest(groupOrder,title,content,orderInfo), ulid, memberUuid);
+        qnaPostApplicationService.update(new QnaPostUpdateRequest(ulid, groupOrder,title,content,orderInfo), memberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
