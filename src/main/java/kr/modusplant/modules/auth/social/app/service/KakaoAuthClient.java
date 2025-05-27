@@ -1,7 +1,7 @@
 package kr.modusplant.modules.auth.social.app.service;
 
 import kr.modusplant.modules.auth.social.app.dto.KakaoUserInfo;
-import kr.modusplant.modules.auth.social.app.error.OAuthException;
+import kr.modusplant.modules.auth.social.error.OAuthException;
 import kr.modusplant.modules.auth.social.app.service.supers.SocialAuthClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;

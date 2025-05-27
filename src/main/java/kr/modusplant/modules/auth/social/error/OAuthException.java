@@ -1,4 +1,4 @@
-package kr.modusplant.modules.auth.social.app.error;
+package kr.modusplant.modules.auth.social.error;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
