@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import jakarta.servlet.http.HttpServletRequest;
 import kr.modusplant.global.app.servlet.response.DataResponse;
-import kr.modusplant.modules.auth.social.app.error.OAuthException;
+import kr.modusplant.modules.auth.social.error.OAuthException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
