@@ -1,12 +1,12 @@
-package kr.modusplant.domains.communication.conversation.app.http.response;
+package kr.modusplant.domains.communication.common.app.http.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-public record ConvPostPageResponse<T> (
-        List<T> content,
+public record PostPageResponse<T> (
+        List<T> posts,
         int page,
         int size,
         @JsonProperty("total_elements")
@@ -18,8 +18,8 @@ public record ConvPostPageResponse<T> (
         @JsonProperty("has_previous")
         boolean hasPrevious
 ){
-    public static <T> ConvPostPageResponse<T> from(Page<T> page) {
-        return new ConvPostPageResponse<>(
+    public static <T> PostPageResponse<T> from(Page<T> page) {
+        return new PostPageResponse<>(
                 page.getContent(),
                 page.getNumber(),
                 page.getSize(),

@@ -3,9 +3,9 @@ package kr.modusplant.domains.communication.qna.app.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.modusplant.domains.communication.common.app.http.request.FileOrder;
+import kr.modusplant.domains.communication.common.app.http.response.PostPageResponse;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostInsertRequest;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostUpdateRequest;
-import kr.modusplant.domains.communication.qna.app.http.response.QnaPostPageResponse;
 import kr.modusplant.domains.communication.qna.app.http.response.QnaPostResponse;
 import kr.modusplant.domains.communication.qna.app.service.QnaPostApplicationService;
 import kr.modusplant.global.app.servlet.response.DataResponse;
@@ -38,26 +38,26 @@ public class QnaPostController {
 
     @Operation(summary = "전체 팁 게시글 목록 조회 API", description = "전체 팁 게시글의 목록과 페이지 정보를 조회합니다.")
     @GetMapping("")
-    public ResponseEntity<DataResponse<QnaPostPageResponse>> getAllQnaPosts(Pageable pageable) {
-        return ResponseEntity.ok().body(DataResponse.ok(QnaPostPageResponse.from(qnaPostApplicationService.getAll(pageable))));
+    public ResponseEntity<DataResponse<PostPageResponse>> getAllQnaPosts(Pageable pageable) {
+        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(qnaPostApplicationService.getAll(pageable))));
     }
 
     @Operation(summary = "사이트 회원별 팁 게시글 목록 조회 API", description = "사이트 회원별 팁 게시글의 목록과 페이지 정보를 조회합니다.")
     @GetMapping("/members/{memb_uuid}")
-    public ResponseEntity<DataResponse<QnaPostPageResponse>> getQnaPostsByMember(@PathVariable("memb_uuid") UUID memberUuid, Pageable pageable) {
-        return ResponseEntity.ok().body(DataResponse.ok(QnaPostPageResponse.from(qnaPostApplicationService.getByMemberUuid(memberUuid,pageable))));
+    public ResponseEntity<DataResponse<PostPageResponse>> getQnaPostsByMember(@PathVariable("memb_uuid") UUID memberUuid, Pageable pageable) {
+        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(qnaPostApplicationService.getByMemberUuid(memberUuid,pageable))));
     }
 
     @Operation(summary = "식물 그룹별 팁 게시글 목록 조회 API", description = "식물 그룹별 팁 게시글의 목록과 페이지 정보를 조회합니다.")
     @GetMapping("/plant-groups/{group_id}")
-    public ResponseEntity<DataResponse<QnaPostPageResponse>> getQnaPostsByPlantGroup(@PathVariable("group_id") Integer groupOrder, Pageable pageable) {
-        return ResponseEntity.ok().body(DataResponse.ok(QnaPostPageResponse.from(qnaPostApplicationService.getByGroupOrder(groupOrder,pageable))));
+    public ResponseEntity<DataResponse<PostPageResponse>> getQnaPostsByPlantGroup(@PathVariable("group_id") Integer groupOrder, Pageable pageable) {
+        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(qnaPostApplicationService.getByGroupOrder(groupOrder,pageable))));
     }
 
     @Operation(summary = "제목+본문 검색어로 팁 게시글 목록 조회 API", description = "제목+본문 검색어로 팁 게시글의 목록과 페이지 정보를 조회합니다.")
     @GetMapping("/search")
-    public ResponseEntity<DataResponse<QnaPostPageResponse>> searchQnaPosts(@RequestParam String keyword, Pageable pageable) {
-        return ResponseEntity.ok().body(DataResponse.ok(QnaPostPageResponse.from(qnaPostApplicationService.searchByKeyword(keyword,pageable))));
+    public ResponseEntity<DataResponse<PostPageResponse>> searchQnaPosts(@RequestParam String keyword, Pageable pageable) {
+        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(qnaPostApplicationService.searchByKeyword(keyword,pageable))));
     }
 
     @Operation(summary = "특정 팁 게시글 조회 API", description = "게시글 id로 특정 팁 게시글을 조회합니다.")
