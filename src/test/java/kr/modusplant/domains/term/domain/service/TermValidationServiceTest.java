@@ -16,10 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
-import static kr.modusplant.global.vo.CamelCaseWord.NAME;
 import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
 import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
+import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
+import static kr.modusplant.global.vo.CamelCaseWord.NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
