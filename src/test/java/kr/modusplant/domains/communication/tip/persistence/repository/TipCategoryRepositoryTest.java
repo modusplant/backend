@@ -22,37 +22,28 @@ class TipCategoryRepositoryTest implements TipCategoryEntityTestUtils {
     @DisplayName("order으로 팁 항목 찾기")
     @Test
     void findByOrderTest() {
-        // given
-        TipCategoryEntity tipCategory = createTipCategoryEntity();
-
-        // when
-        tipCategoryRepository.save(tipCategory);
+        // given & when
+        tipCategoryRepository.save(tipCategoryEntity);
 
         // then
-        assertThat(tipCategoryRepository.findByOrder(tipCategory.getOrder()).orElseThrow()).isEqualTo(tipCategory);
+        assertThat(tipCategoryRepository.findByOrder(tipCategory.getOrder()).orElseThrow()).isEqualTo(tipCategoryEntity);
     }
 
     @DisplayName("category로 팁 항목 찾기")
     @Test
     void findByCategoryTest() {
-        // given
-        TipCategoryEntity tipCategory = createTipCategoryEntity();
-
-        // when
-        tipCategoryRepository.save(tipCategory);
+        // given & when
+        tipCategoryRepository.save(tipCategoryEntity);
 
         // then
-        assertThat(tipCategoryRepository.findByCategory(tipCategory.getCategory()).orElseThrow()).isEqualTo(tipCategory);
+        assertThat(tipCategoryRepository.findByCategory(tipCategory.getCategory()).orElseThrow()).isEqualTo(tipCategoryEntity);
     }
 
     @DisplayName("createdAt으로 팁 항목 찾기")
     @Test
     void findByCreatedAtTest() {
-        // given
-        TipCategoryEntity tipCategory = createTipCategoryEntity();
-
-        // when
-        tipCategory = tipCategoryRepository.save(tipCategory);
+        // given & when
+        TipCategoryEntity tipCategory = tipCategoryRepository.save(tipCategoryEntity);
 
         // then
         assertThat(tipCategoryRepository.findByCreatedAt(tipCategory.getCreatedAt()).getFirst()).isEqualTo(tipCategory);
@@ -62,7 +53,7 @@ class TipCategoryRepositoryTest implements TipCategoryEntityTestUtils {
     @Test
     void deleteByOrderTest() {
         // given
-        TipCategoryEntity tipCategory = tipCategoryRepository.save(createTipCategoryEntity());
+        TipCategoryEntity tipCategory = tipCategoryRepository.save(tipCategoryEntity);
         Integer order = tipCategory.getOrder();
 
         // when
@@ -75,11 +66,8 @@ class TipCategoryRepositoryTest implements TipCategoryEntityTestUtils {
     @DisplayName("order로 팁 항목 확인")
     @Test
     void existsByOrderTest() {
-        // given
-        TipCategoryEntity tipCategory = createTipCategoryEntity();
-
-        // when
-        tipCategoryRepository.save(tipCategory);
+        // given & when
+        TipCategoryEntity tipCategory = tipCategoryRepository.save(tipCategoryEntity);
 
         // then
         assertThat(tipCategoryRepository.existsByOrder(tipCategory.getOrder())).isEqualTo(true);
