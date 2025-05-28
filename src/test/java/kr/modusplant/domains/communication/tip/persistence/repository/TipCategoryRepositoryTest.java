@@ -19,7 +19,7 @@ class TipCategoryRepositoryTest implements TipCategoryEntityTestUtils {
         this.tipCategoryRepository = tipCategoryRepository;
     }
 
-    @DisplayName("order으로 팁 항목 찾기")
+    @DisplayName("order로 팁 항목 찾기")
     @Test
     void findByOrderTest() {
         // given & when

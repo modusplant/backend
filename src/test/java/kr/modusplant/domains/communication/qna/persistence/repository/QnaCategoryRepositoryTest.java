@@ -19,7 +19,7 @@ class QnaCategoryRepositoryTest implements QnaCategoryEntityTestUtils {
         this.qnaCategoryRepository = qnaCategoryRepository;
     }
 
-    @DisplayName("order으로 팁 항목 찾기")
+    @DisplayName("order로 Q&A 항목 찾기")
     @Test
     void findByOrderTest() {
         // given & when
@@ -29,7 +29,7 @@ class QnaCategoryRepositoryTest implements QnaCategoryEntityTestUtils {
         assertThat(qnaCategoryRepository.findByOrder(testQnaCategory.getOrder()).orElseThrow()).isEqualTo(testQnaCategoryEntity);
     }
 
-    @DisplayName("category로 팁 항목 찾기")
+    @DisplayName("category로 Q&A 항목 찾기")
     @Test
     void findByCategoryTest() {
         // given & when
@@ -39,7 +39,7 @@ class QnaCategoryRepositoryTest implements QnaCategoryEntityTestUtils {
         assertThat(qnaCategoryRepository.findByCategory(testQnaCategory.getCategory()).orElseThrow()).isEqualTo(testQnaCategoryEntity);
     }
 
-    @DisplayName("createdAt으로 팁 항목 찾기")
+    @DisplayName("createdAt으로 Q&A 항목 찾기")
     @Test
     void findByCreatedAtTest() {
         // given & when
@@ -49,7 +49,7 @@ class QnaCategoryRepositoryTest implements QnaCategoryEntityTestUtils {
         assertThat(qnaCategoryRepository.findByCreatedAt(qnaCategory.getCreatedAt()).getFirst()).isEqualTo(qnaCategory);
     }
 
-    @DisplayName("order로 팁 항목 삭제")
+    @DisplayName("order로 Q&A 항목 삭제")
     @Test
     void deleteByOrderTest() {
         // given
@@ -63,7 +63,7 @@ class QnaCategoryRepositoryTest implements QnaCategoryEntityTestUtils {
         assertThat(qnaCategoryRepository.findByOrder(order)).isEmpty();
     }
 
-    @DisplayName("order로 팁 항목 확인")
+    @DisplayName("order로 Q&A 항목 확인")
     @Test
     void existsByOrderTest() {
         // given & when

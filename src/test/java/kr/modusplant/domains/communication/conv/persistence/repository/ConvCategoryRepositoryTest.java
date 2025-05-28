@@ -20,7 +20,7 @@ class ConvCategoryRepositoryTest implements ConvCategoryEntityTestUtils {
         this.convCategoryRepository = convCategoryRepository;
     }
 
-    @DisplayName("order으로 팁 항목 찾기")
+    @DisplayName("order로 대화 항목 찾기")
     @Test
     void findByOrderTest() {
         // given & when
@@ -30,7 +30,7 @@ class ConvCategoryRepositoryTest implements ConvCategoryEntityTestUtils {
         assertThat(convCategoryRepository.findByOrder(testConvCategory.getOrder()).orElseThrow()).isEqualTo(testConvCategoryEntity);
     }
 
-    @DisplayName("category로 팁 항목 찾기")
+    @DisplayName("category로 대화 항목 찾기")
     @Test
     void findByCategoryTest() {
         // given & when
@@ -40,7 +40,7 @@ class ConvCategoryRepositoryTest implements ConvCategoryEntityTestUtils {
         assertThat(convCategoryRepository.findByCategory(testConvCategory.getCategory()).orElseThrow()).isEqualTo(testConvCategoryEntity);
     }
 
-    @DisplayName("createdAt으로 팁 항목 찾기")
+    @DisplayName("createdAt으로 대화 항목 찾기")
     @Test
     void findByCreatedAtTest() {
         // given & when
@@ -50,7 +50,7 @@ class ConvCategoryRepositoryTest implements ConvCategoryEntityTestUtils {
         assertThat(convCategoryRepository.findByCreatedAt(convCategory.getCreatedAt()).getFirst()).isEqualTo(convCategory);
     }
 
-    @DisplayName("order로 팁 항목 삭제")
+    @DisplayName("order로 대화 항목 삭제")
     @Test
     void deleteByOrderTest() {
         // given
@@ -64,7 +64,7 @@ class ConvCategoryRepositoryTest implements ConvCategoryEntityTestUtils {
         assertThat(convCategoryRepository.findByOrder(order)).isEmpty();
     }
 
-    @DisplayName("order로 팁 항목 확인")
+    @DisplayName("order로 대화 항목 확인")
     @Test
     void existsByOrderTest() {
         // given & when
