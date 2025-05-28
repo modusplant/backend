@@ -1,8 +1,8 @@
 package kr.modusplant.domains.term.persistence.repository;
 
-import kr.modusplant.domains.term.persistence.entity.TermEntity;
 import kr.modusplant.domains.common.persistence.repository.supers.CreatedAtAndLastModifiedAtRepository;
 import kr.modusplant.domains.common.persistence.repository.supers.UuidPrimaryKeyRepository;
+import kr.modusplant.domains.term.persistence.entity.TermEntity;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

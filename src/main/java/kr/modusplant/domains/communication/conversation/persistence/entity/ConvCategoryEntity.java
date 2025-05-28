@@ -11,7 +11,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-import static kr.modusplant.global.vo.SnakeCaseWord.*;
+import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_CONV_CATE;
+import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_CREATED_AT;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
