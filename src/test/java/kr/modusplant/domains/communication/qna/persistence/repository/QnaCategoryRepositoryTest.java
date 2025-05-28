@@ -22,37 +22,28 @@ class QnaCategoryRepositoryTest implements QnaCategoryEntityTestUtils {
     @DisplayName("order으로 팁 항목 찾기")
     @Test
     void findByOrderTest() {
-        // given
-        QnaCategoryEntity qnaCategory = createQnaCategoryEntity();
-
-        // when
-        qnaCategoryRepository.save(qnaCategory);
+        // given & when
+        qnaCategoryRepository.save(qnaCategoryEntity);
 
         // then
-        assertThat(qnaCategoryRepository.findByOrder(qnaCategory.getOrder()).orElseThrow()).isEqualTo(qnaCategory);
+        assertThat(qnaCategoryRepository.findByOrder(qnaCategory.getOrder()).orElseThrow()).isEqualTo(qnaCategoryEntity);
     }
 
     @DisplayName("category로 팁 항목 찾기")
     @Test
     void findByCategoryTest() {
-        // given
-        QnaCategoryEntity qnaCategory = createQnaCategoryEntity();
-
-        // when
-        qnaCategoryRepository.save(qnaCategory);
+        // given & when
+        qnaCategoryRepository.save(qnaCategoryEntity);
 
         // then
-        assertThat(qnaCategoryRepository.findByCategory(qnaCategory.getCategory()).orElseThrow()).isEqualTo(qnaCategory);
+        assertThat(qnaCategoryRepository.findByCategory(qnaCategory.getCategory()).orElseThrow()).isEqualTo(qnaCategoryEntity);
     }
 
     @DisplayName("createdAt으로 팁 항목 찾기")
     @Test
     void findByCreatedAtTest() {
-        // given
-        QnaCategoryEntity qnaCategory = createQnaCategoryEntity();
-
-        // when
-        qnaCategory = qnaCategoryRepository.save(qnaCategory);
+        // given & when
+        QnaCategoryEntity qnaCategory = qnaCategoryRepository.save(qnaCategoryEntity);
 
         // then
         assertThat(qnaCategoryRepository.findByCreatedAt(qnaCategory.getCreatedAt()).getFirst()).isEqualTo(qnaCategory);
@@ -62,7 +53,7 @@ class QnaCategoryRepositoryTest implements QnaCategoryEntityTestUtils {
     @Test
     void deleteByOrderTest() {
         // given
-        QnaCategoryEntity qnaCategory = qnaCategoryRepository.save(createQnaCategoryEntity());
+        QnaCategoryEntity qnaCategory = qnaCategoryRepository.save(qnaCategoryEntity);
         Integer order = qnaCategory.getOrder();
 
         // when
@@ -75,11 +66,8 @@ class QnaCategoryRepositoryTest implements QnaCategoryEntityTestUtils {
     @DisplayName("order로 팁 항목 확인")
     @Test
     void existsByOrderTest() {
-        // given
-        QnaCategoryEntity qnaCategory = createQnaCategoryEntity();
-
-        // when
-        qnaCategoryRepository.save(qnaCategory);
+        // given & when
+        QnaCategoryEntity qnaCategory = qnaCategoryRepository.save(qnaCategoryEntity);
 
         // then
         assertThat(qnaCategoryRepository.existsByOrder(qnaCategory.getOrder())).isEqualTo(true);
