@@ -4,8 +4,8 @@ import kr.modusplant.domains.communication.qna.common.util.domain.QnaCategoryTes
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaCategoryEntity;
 
 public interface QnaCategoryEntityTestUtils extends QnaCategoryTestUtils {
-    QnaCategoryEntity qnaCategoryEntity = QnaCategoryEntity.builder()
-            .order(qnaCategory.getOrder())
-            .category(qnaCategory.getCategory())
+    QnaCategoryEntity testQnaCategoryEntity = QnaCategoryEntity.builder()
+            .order(testQnaCategory.getOrder())
+            .category(testQnaCategory.getCategory())
             .build();
 }

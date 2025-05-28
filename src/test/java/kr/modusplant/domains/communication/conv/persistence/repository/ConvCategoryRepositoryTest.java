@@ -24,27 +24,27 @@ class ConvCategoryRepositoryTest implements ConvCategoryEntityTestUtils {
     @Test
     void findByOrderTest() {
         // given & when
-        convCategoryRepository.save(convCategoryEntity);
+        convCategoryRepository.save(testConvCategoryEntity);
 
         // then
-        assertThat(convCategoryRepository.findByOrder(convCategory.getOrder()).orElseThrow()).isEqualTo(convCategoryEntity);
+        assertThat(convCategoryRepository.findByOrder(testConvCategory.getOrder()).orElseThrow()).isEqualTo(testConvCategoryEntity);
     }
 
     @DisplayName("category로 팁 항목 찾기")
     @Test
     void findByCategoryTest() {
         // given & when
-        convCategoryRepository.save(convCategoryEntity);
+        convCategoryRepository.save(testConvCategoryEntity);
 
         // then
-        assertThat(convCategoryRepository.findByCategory(convCategory.getCategory()).orElseThrow()).isEqualTo(convCategoryEntity);
+        assertThat(convCategoryRepository.findByCategory(testConvCategory.getCategory()).orElseThrow()).isEqualTo(testConvCategoryEntity);
     }
 
     @DisplayName("createdAt으로 팁 항목 찾기")
     @Test
     void findByCreatedAtTest() {
         // given & when
-        ConvCategoryEntity convCategory = convCategoryRepository.save(convCategoryEntity);
+        ConvCategoryEntity convCategory = convCategoryRepository.save(testConvCategoryEntity);
 
         // then
         assertThat(convCategoryRepository.findByCreatedAt(convCategory.getCreatedAt()).getFirst()).isEqualTo(convCategory);
@@ -54,7 +54,7 @@ class ConvCategoryRepositoryTest implements ConvCategoryEntityTestUtils {
     @Test
     void deleteByOrderTest() {
         // given
-        ConvCategoryEntity convCategory = convCategoryRepository.save(convCategoryEntity);
+        ConvCategoryEntity convCategory = convCategoryRepository.save(testConvCategoryEntity);
         Integer order = convCategory.getOrder();
 
         // when
@@ -68,7 +68,7 @@ class ConvCategoryRepositoryTest implements ConvCategoryEntityTestUtils {
     @Test
     void existsByOrderTest() {
         // given & when
-        ConvCategoryEntity convCategory = convCategoryRepository.save(convCategoryEntity);
+        ConvCategoryEntity convCategory = convCategoryRepository.save(testConvCategoryEntity);
 
         // then
         assertThat(convCategoryRepository.existsByOrder(convCategory.getOrder())).isEqualTo(true);

@@ -4,8 +4,8 @@ import kr.modusplant.domains.communication.tip.common.util.domain.TipCategoryTes
 import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
 
 public interface TipCategoryEntityTestUtils extends TipCategoryTestUtils {
-    TipCategoryEntity tipCategoryEntity = TipCategoryEntity.builder()
-            .order(tipCategory.getOrder())
-            .category(tipCategory.getCategory())
+    TipCategoryEntity testTipCategoryEntity = TipCategoryEntity.builder()
+            .order(testTipCategory.getOrder())
+            .category(testTipCategory.getCategory())
             .build();
 }
