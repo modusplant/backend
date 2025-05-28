@@ -21,7 +21,7 @@ import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_TIP_CATE;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TipCategoryEntity {
     @Id
-    @Column(nullable = false, updatable = false)
+    @Column(name = "\"order\"", nullable = false, updatable = false)
     private Integer order;
 
     @Column(nullable = false, updatable = false, unique = true)

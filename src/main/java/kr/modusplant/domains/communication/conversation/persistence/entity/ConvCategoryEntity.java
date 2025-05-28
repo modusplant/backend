@@ -20,7 +20,7 @@ import static kr.modusplant.global.vo.SnakeCaseWord.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ConvCategoryEntity {
     @Id
-    @Column(nullable = false, updatable = false)
+    @Column(name = "\"order\"", nullable = false, updatable = false)
     private Integer order;
 
     @Column(nullable = false, updatable = false, unique = true)
