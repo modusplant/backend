@@ -8,6 +8,7 @@ public final class CamelCaseWord {
     public static final String ACTIVE_MEMBER = "activeMember";
     public static final String ACTIVE_MEMBER_UUID = "activeMemberUuid";
     public static final String BIRTH_DATE = "birthDate";
+    public static final String CATEGORY = "category";
     public static final String DATA = "data";
     public static final String EMAIL = "email";
     public static final String EXPIRED_AT = "expiredAt";
@@ -26,6 +27,7 @@ public final class CamelCaseWord {
     public static final String MEMBER_TERM_ENTITY = "memberTermEntity";
     public static final String MEMBER_UUID = "memberUuid";
     public static final String NAME = "name";
+    public static final String ORDER = "order";
     public static final String ORIGINAL_MEMBER = "originalMember";
     public static final String ORIGINAL_MEMBER_UUID = "originalMemberUuid";
     public static final String TERM = "term";
