@@ -4,5 +4,5 @@ import kr.modusplant.domains.communication.qna.app.http.request.QnaCategoryInser
 import kr.modusplant.domains.communication.qna.common.util.domain.QnaCategoryTestUtils;
 
 public interface QnaCategoryRequestTestUtils extends QnaCategoryTestUtils {
-    QnaCategoryInsertRequest qnaCategoryInsertRequest = new QnaCategoryInsertRequest(qnaCategory.getOrder(), qnaCategory.getCategory());
+    QnaCategoryInsertRequest qnaCategoryTestInsertRequest = new QnaCategoryInsertRequest(qnaCategory.getOrder(), qnaCategory.getCategory());
 }
