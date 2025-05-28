@@ -4,5 +4,5 @@ import kr.modusplant.domains.communication.tip.app.http.response.TipCategoryResp
 import kr.modusplant.domains.communication.tip.common.util.domain.TipCategoryTestUtils;
 
 public interface TipCategoryResponseTestUtils extends TipCategoryTestUtils {
-    TipCategoryResponse tipCategoryResponse = new TipCategoryResponse(tipCategory.getOrder(), tipCategory.getCategory());
+    TipCategoryResponse tipCategoryTestResponse = new TipCategoryResponse(tipCategory.getOrder(), tipCategory.getCategory());
 }

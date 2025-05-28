@@ -4,5 +4,5 @@ import kr.modusplant.domains.communication.tip.app.http.request.TipCategoryInser
 import kr.modusplant.domains.communication.tip.common.util.domain.TipCategoryTestUtils;
 
 public interface TipCategoryRequestTestUtils extends TipCategoryTestUtils {
-    TipCategoryInsertRequest tipCategoryInsertRequest = new TipCategoryInsertRequest(tipCategory.getOrder(), tipCategory.getCategory());
+    TipCategoryInsertRequest tipCategoryTestInsertRequest = new TipCategoryInsertRequest(tipCategory.getOrder(), tipCategory.getCategory());
 }
