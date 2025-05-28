@@ -4,5 +4,5 @@ import kr.modusplant.domains.communication.conv.common.util.domain.ConvCategoryT
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvCategoryInsertRequest;
 
 public interface ConvCategoryRequestTestUtils extends ConvCategoryTestUtils {
-    ConvCategoryInsertRequest convCategoryTestInsertRequest = new ConvCategoryInsertRequest(convCategory.getOrder(), convCategory.getCategory());
+    ConvCategoryInsertRequest testConvCategoryInsertRequest = new ConvCategoryInsertRequest(testConvCategory.getOrder(), testConvCategory.getCategory());
 }
