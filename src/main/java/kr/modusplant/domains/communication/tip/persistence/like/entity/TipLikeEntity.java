@@ -1,8 +1,9 @@
-package kr.modusplant.domains.temp_like.temp_tip.persistence.entity;
+package kr.modusplant.domains.communication.tip.persistence.like.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -12,8 +13,8 @@ import static kr.modusplant.global.vo.SnakeCaseWord.*;
 @Entity
 @Table(name = SNAKE_TIP_LIKE)
 @IdClass(TipLikeId.class)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class TipLikeEntity {
     @Id
     @Column(name = SNAKE_POST_ULID, nullable = false)
