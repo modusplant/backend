@@ -1,14 +1,14 @@
-package kr.modusplant.domains.communication.tip.common.util.http.request;
+package kr.modusplant.domains.communication.qna.common.util.app.http.request;
 
 import kr.modusplant.domains.communication.common.app.http.request.FileOrder;
-import kr.modusplant.domains.communication.tip.app.http.request.TipPostInsertRequest;
+import kr.modusplant.domains.communication.qna.app.http.request.QnaPostInsertRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
 
-public interface TipPostRequestTestUtils {
+public interface QnaPostRequestTestUtils {
     /* MultipartFile, FileOrder Utils */
     MultipartFile textFile0 = new MockMultipartFile("content", "text_0.txt", "text/plain", "This is text for test".getBytes());
     MultipartFile textFile1 = new MockMultipartFile("content", "text_1.txt", "text/plain", "This is text for test".getBytes());
@@ -87,15 +87,15 @@ public interface TipPostRequestTestUtils {
     List<FileOrder> duplicatedTextFilesOrder = Arrays.asList(textFileOrder(0,1),imageFileOrder(2),textFileOrder(1,3));
 
 
-    /* TipPostInsertRequest Utils */
-    TipPostInsertRequest requestAllTypes = new TipPostInsertRequest(
+    /* QnaPostInsertRequest Utils */
+    QnaPostInsertRequest requestAllTypes = new QnaPostInsertRequest(
             1,
             "유용한 팁 모음",
             allMediaFiles,
             allMediaFilesOrder
     );
 
-    TipPostInsertRequest requestBasicTypes = new TipPostInsertRequest(
+    QnaPostInsertRequest requestBasicTypes = new QnaPostInsertRequest(
             2,
             "유용한 식물 기르기 팁",
             basicMediaFiles,

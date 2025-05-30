@@ -1,4 +1,4 @@
-package kr.modusplant.domains.communication.conversation.common.util.http.request;
+package kr.modusplant.domains.communication.conversation.common.util.app.http.request;
 
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostInsertRequest;
 import kr.modusplant.domains.communication.common.app.http.request.FileOrder;
