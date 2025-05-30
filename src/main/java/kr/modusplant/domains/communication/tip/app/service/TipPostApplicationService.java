@@ -4,15 +4,15 @@ import kr.modusplant.domains.common.domain.service.MediaContentService;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostInsertRequest;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostUpdateRequest;
 import kr.modusplant.domains.communication.tip.app.http.response.TipPostResponse;
+import kr.modusplant.domains.communication.tip.domain.service.TipCategoryValidationService;
 import kr.modusplant.domains.communication.tip.mapper.TipPostAppInfraMapper;
 import kr.modusplant.domains.communication.tip.mapper.TipPostAppInfraMapperImpl;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
+import kr.modusplant.domains.communication.tip.persistence.repository.TipCategoryRepository;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipPostViewCountRedisRepository;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipPostViewLockRedisRepository;
-import kr.modusplant.domains.group.domain.service.PlantGroupValidationService;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
-import kr.modusplant.domains.group.persistence.repository.PlantGroupRepository;
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
@@ -36,12 +36,12 @@ import java.util.UUID;
 public class TipPostApplicationService {
 
     private final TipPostValidationService tipPostValidationService;
-    private final PlantGroupValidationService plantGroupValidationService;
+    private final TipCategoryValidationService tipCategoryValidationService;
     private final SiteMemberValidationService siteMemberValidationService;
     private final MediaContentService mediaContentService;
     private final TipPostRepository tipPostRepository;
     private final SiteMemberRepository siteMemberRepository;
-    private final PlantGroupRepository plantGroupRepository;
+    private final TipCategoryRepository tipCategoryRepository;
     private final TipPostViewCountRedisRepository tipPostViewCountRedisRepository;
     private final TipPostViewLockRedisRepository tipPostViewLockRedisRepository;
     private final TipPostAppInfraMapper tipPostAppInfraMapper = new TipPostAppInfraMapperImpl();
@@ -73,8 +73,8 @@ public class TipPostApplicationService {
     }
 
     public Page<TipPostResponse> getByGroupOrder(Integer groupOrder, Pageable pageable) {
-        PlantGroupEntity plantGroup = plantGroupRepository.findByOrder(groupOrder).orElseThrow();
-        return tipPostRepository.findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(plantGroup,pageable).map(entity -> {
+        TipCategoryEntity tipCategory = tipCategoryRepository.findByOrder(groupOrder).orElseThrow();
+        return tipPostRepository.findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(tipCategory,pageable).map(entity -> {
             try {
                 entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
@@ -110,11 +110,11 @@ public class TipPostApplicationService {
     @Transactional
     public void insert(TipPostInsertRequest tipPostInsertRequest, UUID memberUuid) throws IOException {
         tipPostValidationService.validateTipPostInsertRequest(tipPostInsertRequest);
-        plantGroupValidationService.validateNotFoundOrder(tipPostInsertRequest.groupOrder());
+        tipCategoryValidationService.validateNotFoundOrder(tipPostInsertRequest.groupOrder());
         siteMemberValidationService.validateNotFoundUuid(memberUuid);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
         TipPostEntity tipPostEntity = TipPostEntity.builder()
-                .group(plantGroupRepository.findByOrder(tipPostInsertRequest.groupOrder()).orElseThrow())
+                .group(tipCategoryRepository.findByOrder(tipPostInsertRequest.groupOrder()).orElseThrow())
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(tipPostInsertRequest.title())
@@ -127,10 +127,10 @@ public class TipPostApplicationService {
     public void update(TipPostUpdateRequest tipPostUpdateRequest, UUID memberUuid) throws IOException {
         tipPostValidationService.validateTipPostUpdateRequest(tipPostUpdateRequest);
         tipPostValidationService.validateAccessibleTipPost(tipPostUpdateRequest.ulid(), memberUuid);
-        plantGroupValidationService.validateNotFoundOrder(tipPostUpdateRequest.groupOrder());
+        tipCategoryValidationService.validateNotFoundOrder(tipPostUpdateRequest.groupOrder());
         TipPostEntity tipPostEntity = tipPostRepository.findByUlid(tipPostUpdateRequest.ulid()).orElseThrow();
         mediaContentService.deleteFiles(tipPostEntity.getContent());
-        tipPostEntity.updateGroup(plantGroupRepository.findByOrder(tipPostUpdateRequest.groupOrder()).orElseThrow());
+        tipPostEntity.updateGroup(tipCategoryRepository.findByOrder(tipPostUpdateRequest.groupOrder()).orElseThrow());
         tipPostEntity.updateTitle(tipPostUpdateRequest.title());
         tipPostEntity.updateContent(mediaContentService.saveFilesAndGenerateContentJson(tipPostUpdateRequest.content()));
         tipPostRepository.save(tipPostEntity);

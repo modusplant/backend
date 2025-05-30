@@ -3,16 +3,16 @@ package kr.modusplant.domains.communication.conversation.app.service;
 import kr.modusplant.domains.common.domain.service.MediaContentService;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostUpdateRequest;
+import kr.modusplant.domains.communication.conversation.domain.service.ConvCategoryValidationService;
 import kr.modusplant.domains.communication.conversation.domain.service.ConvPostValidationService;
 import kr.modusplant.domains.communication.conversation.mapper.ConvPostAppInfraMapper;
 import kr.modusplant.domains.communication.conversation.mapper.ConvPostAppInfraMapperImpl;
+import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
+import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCategoryRepository;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostRepository;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostViewCountRedisRepository;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostViewLockRedisRepository;
-import kr.modusplant.domains.group.domain.service.PlantGroupValidationService;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
-import kr.modusplant.domains.group.persistence.repository.PlantGroupRepository;
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
@@ -36,12 +36,12 @@ import java.util.UUID;
 public class ConvPostApplicationService {
 
     private final ConvPostValidationService convPostValidationService;
-    private final PlantGroupValidationService plantGroupValidationService;
+    private final ConvCategoryValidationService convCategoryValidationService;
     private final SiteMemberValidationService siteMemberValidationService;
     private final MediaContentService mediaContentService;
     private final ConvPostRepository convPostRepository;
     private final SiteMemberRepository siteMemberRepository;
-    private final PlantGroupRepository plantGroupRepository;
+    private final ConvCategoryRepository convCategoryRepository;
     private final ConvPostViewCountRedisRepository convPostViewCountRedisRepository;
     private final ConvPostViewLockRedisRepository convPostViewLockRedisRepository;
     private final ConvPostAppInfraMapper convPostAppInfraMapper = new ConvPostAppInfraMapperImpl();
@@ -73,8 +73,8 @@ public class ConvPostApplicationService {
     }
 
     public Page<ConvPostResponse> getByGroupOrder(Integer groupOrder, Pageable pageable) {
-        PlantGroupEntity plantGroup = plantGroupRepository.findByOrder(groupOrder).orElseThrow();
-        return convPostRepository.findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(plantGroup,pageable).map(entity -> {
+        ConvCategoryEntity convCategory = convCategoryRepository.findByOrder(groupOrder).orElseThrow();
+        return convPostRepository.findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(convCategory,pageable).map(entity -> {
             try {
                 entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
@@ -110,11 +110,11 @@ public class ConvPostApplicationService {
     @Transactional
     public void insert(ConvPostInsertRequest convPostInsertRequest, UUID memberUuid) throws IOException {
         convPostValidationService.validateConvPostInsertRequest(convPostInsertRequest);
-        plantGroupValidationService.validateNotFoundOrder(convPostInsertRequest.groupOrder());
+        convCategoryValidationService.validateNotFoundOrder(convPostInsertRequest.groupOrder());
         siteMemberValidationService.validateNotFoundUuid(memberUuid);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
         ConvPostEntity convPostEntity = ConvPostEntity.builder()
-                .group(plantGroupRepository.findByOrder(convPostInsertRequest.groupOrder()).orElseThrow())
+                .group(convCategoryRepository.findByOrder(convPostInsertRequest.groupOrder()).orElseThrow())
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(convPostInsertRequest.title())
@@ -127,10 +127,10 @@ public class ConvPostApplicationService {
     public void update(ConvPostUpdateRequest convPostUpdateRequest, UUID memberUuid) throws IOException {
         convPostValidationService.validateConvPostUpdateRequest(convPostUpdateRequest);
         convPostValidationService.validateAccessibleConvPost(convPostUpdateRequest.ulid(), memberUuid);
-        plantGroupValidationService.validateNotFoundOrder(convPostUpdateRequest.groupOrder());
+        convCategoryValidationService.validateNotFoundOrder(convPostUpdateRequest.groupOrder());
         ConvPostEntity convPostEntity = convPostRepository.findByUlid(convPostUpdateRequest.ulid()).orElseThrow();
         mediaContentService.deleteFiles(convPostEntity.getContent());
-        convPostEntity.updateGroup(plantGroupRepository.findByOrder(convPostUpdateRequest.groupOrder()).orElseThrow());
+        convPostEntity.updateGroup(convCategoryRepository.findByOrder(convPostUpdateRequest.groupOrder()).orElseThrow());
         convPostEntity.updateTitle(convPostUpdateRequest.title());
         convPostEntity.updateContent(mediaContentService.saveFilesAndGenerateContentJson(convPostUpdateRequest.content()));
         convPostRepository.save(convPostEntity);

@@ -2,7 +2,7 @@ package kr.modusplant.domains.communication.qna.persistence.repository;
 
 import kr.modusplant.domains.common.persistence.repository.supers.CreatedAtAndUpdatedAtRepository;
 import kr.modusplant.domains.common.persistence.repository.supers.UlidPrimaryRepository;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
+import kr.modusplant.domains.communication.qna.persistence.entity.QnaCategoryEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
 import org.springframework.data.domain.Page;
@@ -21,7 +21,7 @@ public interface QnaPostRepository extends UlidPrimaryRepository<QnaPostEntity>,
 
     Page<QnaPostEntity> findByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 
-    Page<QnaPostEntity> findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(PlantGroupEntity group, Pageable pageable);
+    Page<QnaPostEntity> findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(QnaCategoryEntity group, Pageable pageable);
 
     Page<QnaPostEntity> findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(SiteMemberEntity authMember, Pageable pageable);
 

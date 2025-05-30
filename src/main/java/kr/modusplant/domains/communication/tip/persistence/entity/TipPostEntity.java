@@ -3,7 +3,6 @@ package kr.modusplant.domains.communication.tip.persistence.entity;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.global.persistence.annotation.DefaultValue;
 import kr.modusplant.global.persistence.annotation.UlidGenerator;
@@ -34,7 +33,7 @@ public class TipPostEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = SNAKE_GROUP_ORDER, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private PlantGroupEntity group;
+    private TipCategoryEntity group;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = SNAKE_AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
@@ -75,7 +74,7 @@ public class TipPostEntity {
     @Column(nullable = false)
     private Long ver;
 
-    public void updateGroup(PlantGroupEntity group) {
+    public void updateGroup(TipCategoryEntity group) {
         this.group = group;
     }
 
@@ -138,7 +137,7 @@ public class TipPostEntity {
         }
     }
 
-    private TipPostEntity(String ulid, PlantGroupEntity group, SiteMemberEntity authMember, SiteMemberEntity createMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isDeleted) {
+    private TipPostEntity(String ulid, TipCategoryEntity group, SiteMemberEntity authMember, SiteMemberEntity createMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isDeleted) {
         this.ulid = ulid;
         this.group = group;
         this.authMember = authMember;
@@ -156,7 +155,7 @@ public class TipPostEntity {
 
     public static final class TipPostEntityBuilder {
         private String ulid;
-        private PlantGroupEntity group;
+        private TipCategoryEntity group;
         private SiteMemberEntity authMember;
         private SiteMemberEntity createMember;
         private Integer likeCount;
@@ -170,7 +169,7 @@ public class TipPostEntity {
             return this;
         }
 
-        public TipPostEntityBuilder group(final PlantGroupEntity group) {
+        public TipPostEntityBuilder group(final TipCategoryEntity group) {
             this.group = group;
             return this;
         }

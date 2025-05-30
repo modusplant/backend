@@ -50,7 +50,7 @@ public class ConvPostController {
 
     @Operation(summary = "식물 그룹별 팁 게시글 목록 조회 API", description = "식물 그룹별 팁 게시글의 목록과 페이지 정보를 조회합니다.")
     @GetMapping("/plant-groups/{group_id}")
-    public ResponseEntity<DataResponse<PostPageResponse>> getConvPostsByPlantGroup(@PathVariable("group_id") Integer groupOrder, Pageable pageable) {
+    public ResponseEntity<DataResponse<PostPageResponse>> getConvPostsByConvCategory(@PathVariable("group_id") Integer groupOrder, Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(convPostApplicationService.getByGroupOrder(groupOrder,pageable))));
     }
 

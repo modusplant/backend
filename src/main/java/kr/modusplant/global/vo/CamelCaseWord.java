@@ -38,5 +38,4 @@ public final class CamelCaseWord {
     public static final String GROUP_ORDER = "groupOrder";
     public static final String AUTH_MEMBER_UUID = "authMemberUuid";
     public static final String NICKNAME = "nickname";
-    public static final String CATEGORY = "category";
 }

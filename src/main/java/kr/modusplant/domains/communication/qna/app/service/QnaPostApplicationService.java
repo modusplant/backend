@@ -2,13 +2,13 @@ package kr.modusplant.domains.communication.qna.app.service;
 
 import kr.modusplant.domains.common.domain.service.MediaContentService;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostInsertRequest;
+import kr.modusplant.domains.communication.qna.domain.service.QnaCategoryValidationService;
 import kr.modusplant.domains.communication.qna.mapper.QnaPostAppInfraMapper;
+import kr.modusplant.domains.communication.qna.persistence.entity.QnaCategoryEntity;
+import kr.modusplant.domains.communication.qna.persistence.repository.QnaCategoryRepository;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostRepository;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostViewCountRedisRepository;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostViewLockRedisRepository;
-import kr.modusplant.domains.group.domain.service.PlantGroupValidationService;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
-import kr.modusplant.domains.group.persistence.repository.PlantGroupRepository;
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
@@ -36,12 +36,12 @@ import java.util.UUID;
 public class QnaPostApplicationService {
 
     private final QnaPostValidationService qnaPostValidationService;
-    private final PlantGroupValidationService plantGroupValidationService;
+    private final QnaCategoryValidationService qnaCategoryValidationService;
     private final SiteMemberValidationService siteMemberValidationService;
     private final MediaContentService mediaContentService;
     private final QnaPostRepository qnaPostRepository;
     private final SiteMemberRepository siteMemberRepository;
-    private final PlantGroupRepository plantGroupRepository;
+    private final QnaCategoryRepository qnaCategoryRepository;
     private final QnaPostViewCountRedisRepository qnaPostViewCountRedisRepository;
     private final QnaPostViewLockRedisRepository qnaPostViewLockRedisRepository;
     private final QnaPostAppInfraMapper qnaPostAppInfraMapper = new QnaPostAppInfraMapperImpl();
@@ -73,8 +73,8 @@ public class QnaPostApplicationService {
     }
 
     public Page<QnaPostResponse> getByGroupOrder(Integer groupOrder, Pageable pageable) {
-        PlantGroupEntity plantGroup = plantGroupRepository.findByOrder(groupOrder).orElseThrow();
-        return qnaPostRepository.findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(plantGroup,pageable).map(entity -> {
+        QnaCategoryEntity qnaCategory = qnaCategoryRepository.findByOrder(groupOrder).orElseThrow();
+        return qnaPostRepository.findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(qnaCategory,pageable).map(entity -> {
             try {
                 entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
@@ -110,11 +110,11 @@ public class QnaPostApplicationService {
     @Transactional
     public void insert(QnaPostInsertRequest qnaPostInsertRequest, UUID memberUuid) throws IOException {
         qnaPostValidationService.validateQnaPostInsertRequest(qnaPostInsertRequest);
-        plantGroupValidationService.validateNotFoundOrder(qnaPostInsertRequest.groupOrder());
+        qnaCategoryValidationService.validateNotFoundOrder(qnaPostInsertRequest.groupOrder());
         siteMemberValidationService.validateNotFoundUuid(memberUuid);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
         QnaPostEntity qnaPostEntity = QnaPostEntity.builder()
-                .group(plantGroupRepository.findByOrder(qnaPostInsertRequest.groupOrder()).orElseThrow())
+                .group(qnaCategoryRepository.findByOrder(qnaPostInsertRequest.groupOrder()).orElseThrow())
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(qnaPostInsertRequest.title())
@@ -127,10 +127,10 @@ public class QnaPostApplicationService {
     public void update(QnaPostUpdateRequest qnaPostUpdateRequest, UUID memberUuid) throws IOException {
         qnaPostValidationService.validateQnaPostUpdateRequest(qnaPostUpdateRequest);
         qnaPostValidationService.validateAccessibleQnaPost(qnaPostUpdateRequest.ulid(), memberUuid);
-        plantGroupValidationService.validateNotFoundOrder(qnaPostUpdateRequest.groupOrder());
+        qnaCategoryValidationService.validateNotFoundOrder(qnaPostUpdateRequest.groupOrder());
         QnaPostEntity qnaPostEntity = qnaPostRepository.findByUlid(qnaPostUpdateRequest.ulid()).orElseThrow();
         mediaContentService.deleteFiles(qnaPostEntity.getContent());
-        qnaPostEntity.updateGroup(plantGroupRepository.findByOrder(qnaPostUpdateRequest.groupOrder()).orElseThrow());
+        qnaPostEntity.updateGroup(qnaCategoryRepository.findByOrder(qnaPostUpdateRequest.groupOrder()).orElseThrow());
         qnaPostEntity.updateTitle(qnaPostUpdateRequest.title());
         qnaPostEntity.updateContent(mediaContentService.saveFilesAndGenerateContentJson(qnaPostUpdateRequest.content()));
         qnaPostRepository.save(qnaPostEntity);

@@ -2,8 +2,9 @@ package kr.modusplant.domains.communication.conversation.persistence.repository;
 
 import kr.modusplant.domains.common.persistence.repository.supers.CreatedAtAndUpdatedAtRepository;
 import kr.modusplant.domains.common.persistence.repository.supers.UlidPrimaryRepository;
+import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
+
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +22,7 @@ public interface ConvPostRepository extends UlidPrimaryRepository<ConvPostEntity
 
     Page<ConvPostEntity> findByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 
-    Page<ConvPostEntity> findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(PlantGroupEntity group, Pageable pageable);
+    Page<ConvPostEntity> findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(ConvCategoryEntity group, Pageable pageable);
 
     Page<ConvPostEntity> findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(SiteMemberEntity authMember, Pageable pageable);
 

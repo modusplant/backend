@@ -50,7 +50,7 @@ public class QnaPostController {
 
     @Operation(summary = "식물 그룹별 팁 게시글 목록 조회 API", description = "식물 그룹별 팁 게시글의 목록과 페이지 정보를 조회합니다.")
     @GetMapping("/plant-groups/{group_id}")
-    public ResponseEntity<DataResponse<PostPageResponse>> getQnaPostsByPlantGroup(@PathVariable("group_id") Integer groupOrder, Pageable pageable) {
+    public ResponseEntity<DataResponse<PostPageResponse>> getQnaPostsByQnaCategory(@PathVariable("group_id") Integer groupOrder, Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(qnaPostApplicationService.getByGroupOrder(groupOrder,pageable))));
     }
 
