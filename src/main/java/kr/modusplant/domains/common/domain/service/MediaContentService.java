@@ -19,7 +19,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class MediaContentService {
-    private final ObjectMapper objectMapper;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     /* Wasabi 연동 전 임시 구현 : 로컬 저장 경로 지정 */
     private static final String BASE_DIRECTORY = "uploads/";

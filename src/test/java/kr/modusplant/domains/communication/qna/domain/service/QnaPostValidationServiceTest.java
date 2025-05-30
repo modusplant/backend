@@ -2,8 +2,8 @@ package kr.modusplant.domains.communication.qna.domain.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.communication.qna.common.util.domain.QnaPostTestUtils;
-import kr.modusplant.domains.communication.qna.common.util.http.request.QnaPostRequestTestUtils;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
+import kr.modusplant.domains.communication.qna.common.util.app.http.request.QnaPostRequestTestUtils;
+import kr.modusplant.domains.communication.qna.persistence.entity.QnaCategoryEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostInsertRequest;
 import kr.modusplant.domains.communication.common.error.PostAccessDeniedException;
@@ -91,7 +91,7 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils {
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         QnaPostEntity qnaPostEntity = QnaPostEntity.builder()
                 .authMember(memberEntity)
-                .group(mock(PlantGroupEntity.class)) // 다른 필드도 필요시 같이 mock 처리
+                .group(mock(QnaCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
                 .createMember(memberEntity)
                 .likeCount(0)
                 .viewCount(0L)
@@ -126,7 +126,7 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils {
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         QnaPostEntity qnaPostEntity = QnaPostEntity.builder()
                 .authMember(memberEntity)
-                .group(mock(PlantGroupEntity.class)) // 다른 필드도 필요시 같이 mock 처리
+                .group(mock(QnaCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
                 .createMember(memberEntity)
                 .likeCount(0)
                 .viewCount(0L)

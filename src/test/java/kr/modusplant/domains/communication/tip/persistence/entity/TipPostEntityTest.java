@@ -1,7 +1,6 @@
 package kr.modusplant.domains.communication.tip.persistence.entity;
 
 import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
@@ -26,9 +25,9 @@ class TipPostEntityTest implements TipPostEntityTestUtils {
     void prePersist() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        PlantGroupEntity plantGroup = createPlantGroupEntity();
+        TipCategoryEntity tipCategory = testTipCategoryEntity;
         TipPostEntity tipPost = createTipPostEntityBuilder()
-                .group(plantGroup)
+                .group(tipCategory)
                 .authMember(member)
                 .createMember(member)
                 .likeCount(1)
@@ -51,9 +50,9 @@ class TipPostEntityTest implements TipPostEntityTestUtils {
     void preUpdate() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        PlantGroupEntity plantGroup = createPlantGroupEntity();
+        TipCategoryEntity tipCategory = testTipCategoryEntity;
         TipPostEntity tipPost = createTipPostEntityBuilder()
-                .group(plantGroup)
+                .group(tipCategory)
                 .authMember(member)
                 .createMember(member)
                 .build();

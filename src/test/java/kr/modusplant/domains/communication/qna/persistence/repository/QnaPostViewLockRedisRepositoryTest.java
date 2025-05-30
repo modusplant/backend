@@ -1,6 +1,5 @@
 package kr.modusplant.domains.communication.qna.persistence.repository;
 
-import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostViewLockRedisRepository;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import kr.modusplant.global.persistence.generator.UlidIdGenerator;
 import org.hibernate.generator.EventType;

@@ -2,7 +2,7 @@ package kr.modusplant.domains.common.domain.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.domains.communication.tip.common.util.http.request.TipPostRequestTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipPostRequestTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -3,10 +3,9 @@ package kr.modusplant.domains.communication.tip.persistence.repository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
-import kr.modusplant.domains.group.common.util.entity.PlantGroupEntityTestUtils;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
-import kr.modusplant.domains.group.persistence.repository.PlantGroupRepository;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
@@ -29,9 +28,9 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RepositoryOnlyContext
-class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityTestUtils, SiteMemberEntityTestUtils {
+class TipPostRepositoryTest implements TipPostEntityTestUtils, TipCategoryEntityTestUtils, SiteMemberEntityTestUtils {
     private final TipPostRepository tipPostRepository;
-    private final PlantGroupRepository plantGroupRepository;
+    private final TipCategoryRepository tipCategoryRepository;
     private final SiteMemberRepository siteMemberRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -39,18 +38,18 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
     private EntityManager entityManager;
 
     @Autowired
-    TipPostRepositoryTest(TipPostRepository tipPostRepository, PlantGroupRepository plantGroupRepository, SiteMemberRepository siteMemberRepository) {
+    TipPostRepositoryTest(TipPostRepository tipPostRepository, TipCategoryRepository tipCategoryRepository, SiteMemberRepository siteMemberRepository) {
         this.tipPostRepository = tipPostRepository;
-        this.plantGroupRepository = plantGroupRepository;
+        this.tipCategoryRepository = tipCategoryRepository;
         this.siteMemberRepository = siteMemberRepository;
     }
 
-    private PlantGroupEntity testPlantGroup;
+    private TipCategoryEntity testTipCategory;
     private SiteMemberEntity testSiteMember;
 
     @BeforeEach
     void setUp() {
-        testPlantGroup = plantGroupRepository.save(createPlantGroupEntity());
+        testTipCategory = tipCategoryRepository.save(testTipCategoryEntity);
         testSiteMember = siteMemberRepository.save(createMemberBasicUserEntity());
     }
 
@@ -59,7 +58,7 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
     void findByUlidTest() {
         // given
         TipPostEntity tipPostEntity = createTipPostEntityBuilder()
-                .group(testPlantGroup)
+                .group(testTipCategory)
                 .authMember(testSiteMember)
                 .createMember(testSiteMember)
                 .build();
@@ -78,7 +77,7 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
         // given
         List<TipPostEntity> tipPosts = IntStream.range(0, 10)
                 .mapToObj(i -> createTipPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testTipCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -108,7 +107,7 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
         // given
         List<TipPostEntity> tipPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createTipPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testTipCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -133,13 +132,15 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
     }
 
     @Test
-    @DisplayName("식물 그룹으로 삭제되지 않은 모든 팁 게시글 찾기(최신순)")
+    @DisplayName("카테고리로 삭제되지 않은 모든 팁 게시글 찾기(최신순)")
     void findByGroupAndIsDeletedFalseOrderByCreatedAtDescTest() {
         // given
-        PlantGroupEntity testOtherGroup = plantGroupRepository.save(createOtherGroupEntity());
+        TipCategoryEntity testOtherGroup = tipCategoryRepository.save(
+                TipCategoryEntity.builder().order(2).category("기타").build()
+        );
         List<TipPostEntity> tipPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createTipPostEntityBuilder()
-                        .group(i % 2 == 0 ? testPlantGroup : testOtherGroup)
+                        .group(i % 2 == 0 ? testTipCategory : testOtherGroup)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -150,12 +151,12 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // when
-        Page<TipPostEntity> result = tipPostRepository.findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(testPlantGroup, pageable);
+        Page<TipPostEntity> result = tipPostRepository.findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(testTipCategory, pageable);
 
         // then
-        // i = 0, 2, 4 → testPlantGroup로 생성됨 (0번은 삭제됨)
+        // i = 0, 2, 4 → testTipCategory로 생성됨 (0번은 삭제됨)
         assertThat(result.getTotalElements()).isEqualTo(2);
-        assertThat(result.getContent().stream().allMatch(post -> post.getGroup().equals(testPlantGroup) && !post.getIsDeleted())).isTrue();
+        assertThat(result.getContent().stream().allMatch(post -> post.getGroup().equals(testTipCategory) && !post.getIsDeleted())).isTrue();
 
         List<TipPostEntity> content = result.getContent();
         for (int i = 0; i < content.size() - 1; i++) {
@@ -171,7 +172,7 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
         SiteMemberEntity testSiteMember2 = siteMemberRepository.save(createMemberGoogleUserEntity());
         List<TipPostEntity> tipPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createTipPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testTipCategory)
                         .authMember(i % 2 == 0 ? testSiteMember : testSiteMember2)
                         .createMember(i % 2 == 0 ? testSiteMember : testSiteMember2)
                         .build()
@@ -203,7 +204,7 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
         // when
         TipPostEntity tipPostEntity = tipPostRepository.save(
                 createTipPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testTipCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -219,7 +220,7 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
         // when
         TipPostEntity tipPostEntity = tipPostRepository.save(
                 createTipPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testTipCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -235,7 +236,7 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
         // given
         TipPostEntity tipPostEntity = tipPostRepository.save(
                 createTipPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testTipCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -255,7 +256,7 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
         // when
         TipPostEntity tipPostEntity = tipPostRepository.save(
                 createTipPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testTipCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -271,14 +272,14 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
         // given
         TipPostEntity tipPostEntity1 = tipPostRepository.save(
                 createTipPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testTipCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
         );
         TipPostEntity tipPostEntity2 = tipPostRepository.save(
                 createTipPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testTipCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .isDeleted(true)
@@ -301,7 +302,7 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
         // given
         TipPostEntity tipPostEntity = tipPostRepository.save(
                 createTipPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testTipCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build());
@@ -325,7 +326,7 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
         // given
         TipPostEntity tipPostEntity = tipPostRepository.save(
                 createTipPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testTipCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .viewCount(10L)
@@ -348,7 +349,7 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, PlantGroupEntityT
         // given
         TipPostEntity tipPostEntity = tipPostRepository.save(
                 createTipPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testTipCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .viewCount(10L)

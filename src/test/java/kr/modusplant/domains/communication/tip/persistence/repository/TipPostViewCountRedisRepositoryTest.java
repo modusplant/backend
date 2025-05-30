@@ -1,6 +1,5 @@
 package kr.modusplant.domains.communication.tip.persistence.repository;
 
-import kr.modusplant.domains.communication.tip.persistence.repository.TipPostViewCountRedisRepository;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import kr.modusplant.global.persistence.generator.UlidIdGenerator;
 import org.hibernate.generator.EventType;

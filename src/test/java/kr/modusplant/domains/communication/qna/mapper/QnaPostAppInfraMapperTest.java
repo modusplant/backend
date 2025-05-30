@@ -1,9 +1,9 @@
 package kr.modusplant.domains.communication.qna.mapper;
 
+import kr.modusplant.domains.communication.qna.common.util.entity.QnaCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaPostEntityTestUtils;
-import kr.modusplant.domains.group.common.util.entity.PlantGroupEntityTestUtils;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
-import kr.modusplant.domains.group.persistence.repository.PlantGroupRepository;
+import kr.modusplant.domains.communication.qna.persistence.entity.QnaCategoryEntity;
+import kr.modusplant.domains.communication.qna.persistence.repository.QnaCategoryRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
@@ -18,16 +18,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RepositoryOnlyContext
-class QnaPostAppInfraMapperTest implements QnaPostEntityTestUtils, PlantGroupEntityTestUtils, SiteMemberEntityTestUtils {
+class QnaPostAppInfraMapperTest implements QnaPostEntityTestUtils, QnaCategoryEntityTestUtils, SiteMemberEntityTestUtils {
     private final QnaPostAppInfraMapper qnaPostAppInfraMapper = new QnaPostAppInfraMapperImpl();
     private final SiteMemberRepository siteMemberRepository;
-    private final PlantGroupRepository plantGroupRepository;
+    private final QnaCategoryRepository qnaCategoryRepository;
     private final QnaPostRepository qnaPostRepository;
 
     @Autowired
-    QnaPostAppInfraMapperTest(SiteMemberRepository siteMemberRepository, PlantGroupRepository plantGroupRepository, QnaPostRepository qnaPostRepository){
+    QnaPostAppInfraMapperTest(SiteMemberRepository siteMemberRepository, QnaCategoryRepository qnaCategoryRepository, QnaPostRepository qnaPostRepository){
         this.siteMemberRepository = siteMemberRepository;
-        this.plantGroupRepository = plantGroupRepository;
+        this.qnaCategoryRepository = qnaCategoryRepository;
         this.qnaPostRepository = qnaPostRepository;
     }
 
@@ -35,11 +35,11 @@ class QnaPostAppInfraMapperTest implements QnaPostEntityTestUtils, PlantGroupEnt
     @DisplayName("엔티티를 응답으로 전환")
     void toQnaPostResponseTest() {
         // given
-        PlantGroupEntity plantGroupEntity = plantGroupRepository.save(createPlantGroupEntity());
+        QnaCategoryEntity qnaCategoryEntity = qnaCategoryRepository.save(testQnaCategoryEntity);
         SiteMemberEntity siteMemberEntity = siteMemberRepository.save(createMemberBasicUserEntity());
         QnaPostEntity qnaPostEntity = qnaPostRepository.save(
                 createQnaPostEntityBuilder()
-                        .group(plantGroupEntity)
+                        .group(qnaCategoryEntity)
                         .authMember(siteMemberEntity)
                         .createMember(siteMemberEntity)
                         .build()

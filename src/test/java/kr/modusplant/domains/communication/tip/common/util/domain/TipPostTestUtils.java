@@ -2,7 +2,6 @@ package kr.modusplant.domains.communication.tip.common.util.domain;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.domains.group.common.util.domain.PlantGroupTestUtils;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.domains.communication.tip.domain.model.TipPost;
 import kr.modusplant.global.persistence.generator.UlidIdGenerator;
@@ -11,7 +10,7 @@ import org.hibernate.generator.EventType;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 
-public interface TipPostTestUtils extends PlantGroupTestUtils, SiteMemberTestUtils {
+public interface TipPostTestUtils extends TipCategoryTestUtils, SiteMemberTestUtils {
     ObjectMapper objectMapper = new ObjectMapper();
     UlidIdGenerator generator = new UlidIdGenerator();
 
@@ -22,7 +21,7 @@ public interface TipPostTestUtils extends PlantGroupTestUtils, SiteMemberTestUti
 
     TipPost tipPostWithUlid = TipPost.builder()
             .ulid(generator.generate(null, null,null, EventType.INSERT))
-            .groupOrder(plantGroup.getOrder())
+            .groupOrder(testTipCategory.getOrder())
             .authMemberUuid(memberBasicUserWithUuid.getUuid())
             .createMemberUuid(memberBasicUserWithUuid.getUuid())
             .title("물 주는 타이밍, 이제 헷갈리지 마세요! 식물별 물 주기 가이드")

@@ -1,9 +1,9 @@
 package kr.modusplant.domains.communication.tip.mapper;
 
+import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
-import kr.modusplant.domains.group.common.util.entity.PlantGroupEntityTestUtils;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
-import kr.modusplant.domains.group.persistence.repository.PlantGroupRepository;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
+import kr.modusplant.domains.communication.tip.persistence.repository.TipCategoryRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
@@ -18,16 +18,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RepositoryOnlyContext
-class TipPostAppInfraMapperTest implements TipPostEntityTestUtils, PlantGroupEntityTestUtils, SiteMemberEntityTestUtils {
+class TipPostAppInfraMapperTest implements TipPostEntityTestUtils, TipCategoryEntityTestUtils, SiteMemberEntityTestUtils {
     private final TipPostAppInfraMapper tipPostAppInfraMapper = new TipPostAppInfraMapperImpl();
     private final SiteMemberRepository siteMemberRepository;
-    private final PlantGroupRepository plantGroupRepository;
+    private final TipCategoryRepository tipCategoryRepository;
     private final TipPostRepository tipPostRepository;
 
     @Autowired
-    TipPostAppInfraMapperTest(SiteMemberRepository siteMemberRepository,PlantGroupRepository plantGroupRepository,TipPostRepository tipPostRepository){
+    TipPostAppInfraMapperTest(SiteMemberRepository siteMemberRepository,TipCategoryRepository tipCategoryRepository,TipPostRepository tipPostRepository){
         this.siteMemberRepository = siteMemberRepository;
-        this.plantGroupRepository = plantGroupRepository;
+        this.tipCategoryRepository = tipCategoryRepository;
         this.tipPostRepository = tipPostRepository;
     }
 
@@ -35,11 +35,11 @@ class TipPostAppInfraMapperTest implements TipPostEntityTestUtils, PlantGroupEnt
     @DisplayName("엔티티를 응답으로 전환")
     void toTipPostResponseTest() {
         // given
-        PlantGroupEntity plantGroupEntity = plantGroupRepository.save(createPlantGroupEntity());
+        TipCategoryEntity tipCategoryEntity = tipCategoryRepository.save(testTipCategoryEntity);
         SiteMemberEntity siteMemberEntity = siteMemberRepository.save(createMemberBasicUserEntity());
         TipPostEntity tipPostEntity = tipPostRepository.save(
                 createTipPostEntityBuilder()
-                        .group(plantGroupEntity)
+                        .group(tipCategoryEntity)
                         .authMember(siteMemberEntity)
                         .createMember(siteMemberEntity)
                         .build()

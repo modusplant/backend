@@ -2,8 +2,8 @@ package kr.modusplant.domains.communication.tip.domain.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.communication.tip.common.util.domain.TipPostTestUtils;
-import kr.modusplant.domains.communication.tip.common.util.http.request.TipPostRequestTestUtils;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
+import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipPostRequestTestUtils;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostInsertRequest;
 import kr.modusplant.domains.communication.common.error.PostAccessDeniedException;
@@ -90,7 +90,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         TipPostEntity tipPostEntity = TipPostEntity.builder()
                 .authMember(memberEntity)
-                .group(mock(PlantGroupEntity.class)) // 다른 필드도 필요시 같이 mock 처리
+                .group(mock(TipCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
                 .createMember(memberEntity)
                 .likeCount(0)
                 .viewCount(0L)
@@ -125,7 +125,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         TipPostEntity tipPostEntity = TipPostEntity.builder()
                 .authMember(memberEntity)
-                .group(mock(PlantGroupEntity.class)) // 다른 필드도 필요시 같이 mock 처리
+                .group(mock(TipCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
                 .createMember(memberEntity)
                 .likeCount(0)
                 .viewCount(0L)

@@ -1,7 +1,7 @@
 package kr.modusplant.domains.communication.tip.app.service;
 
+import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
-import kr.modusplant.domains.group.common.util.entity.PlantGroupEntityTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
@@ -30,7 +30,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class TipPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, PlantGroupEntityTestUtils, TipPostEntityTestUtils {
+class TipPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, TipCategoryEntityTestUtils, TipPostEntityTestUtils {
     @Mock
     private TipPostViewCountRedisRepository tipPostViewCountRedisRepository;
     @Mock
@@ -69,7 +69,7 @@ class TipPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, Pl
         // given
         given(tipPostViewCountRedisRepository.read(ulid)).willReturn(null);
         TipPostEntity tipPostEntity = createTipPostEntityBuilder()
-                .group(createPlantGroupEntity())
+                .group(testTipCategoryEntity)
                 .authMember(createMemberBasicAdminEntityWithUuid())
                 .createMember(createMemberBasicAdminEntityWithUuid())
                 .viewCount(55L)

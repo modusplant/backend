@@ -1,9 +1,7 @@
 package kr.modusplant.domains.communication.qna.persistence.entity;
 
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaPostEntityTestUtils;
-//import kr.modusplant.domains.qna.persistence.entity.QnaPostEntity;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,9 +25,9 @@ class QnaPostEntityTest implements QnaPostEntityTestUtils {
     void prePersist() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        PlantGroupEntity plantGroup = createPlantGroupEntity();
+        QnaCategoryEntity qnaCategory = testQnaCategoryEntity;
         QnaPostEntity qnaPost = createQnaPostEntityBuilder()
-                .group(plantGroup)
+                .group(qnaCategory)
                 .authMember(member)
                 .createMember(member)
                 .likeCount(1)
@@ -52,9 +50,9 @@ class QnaPostEntityTest implements QnaPostEntityTestUtils {
     void preUpdate() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        PlantGroupEntity plantGroup = createPlantGroupEntity();
+        QnaCategoryEntity qnaCategory = testQnaCategoryEntity;
         QnaPostEntity qnaPost = createQnaPostEntityBuilder()
-                .group(plantGroup)
+                .group(qnaCategory)
                 .authMember(member)
                 .createMember(member)
                 .build();

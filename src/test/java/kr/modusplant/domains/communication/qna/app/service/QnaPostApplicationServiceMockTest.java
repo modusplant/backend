@@ -1,7 +1,7 @@
 package kr.modusplant.domains.communication.qna.app.service;
 
+import kr.modusplant.domains.communication.qna.common.util.entity.QnaCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaPostEntityTestUtils;
-import kr.modusplant.domains.group.common.util.entity.PlantGroupEntityTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostRepository;
@@ -30,7 +30,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class QnaPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, PlantGroupEntityTestUtils, QnaPostEntityTestUtils {
+class QnaPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, QnaCategoryEntityTestUtils, QnaPostEntityTestUtils {
     @Mock
     private QnaPostViewCountRedisRepository qnaPostViewCountRedisRepository;
     @Mock
@@ -69,7 +69,7 @@ class QnaPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, Pl
         // given
         given(qnaPostViewCountRedisRepository.read(ulid)).willReturn(null);
         QnaPostEntity qnaPostEntity = createQnaPostEntityBuilder()
-                .group(createPlantGroupEntity())
+                .group(testQnaCategoryEntity)
                 .authMember(createMemberBasicAdminEntityWithUuid())
                 .createMember(createMemberBasicAdminEntityWithUuid())
                 .viewCount(55L)

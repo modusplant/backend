@@ -1,6 +1,5 @@
 package kr.modusplant.domains.communication.qna.app.service;
 
-import kr.modusplant.domains.communication.qna.app.service.QnaPostViewCountBackUpScheduler;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostRepository;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostViewCountRedisRepository;
 import kr.modusplant.global.persistence.generator.UlidIdGenerator;
