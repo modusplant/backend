@@ -1,10 +1,10 @@
-package kr.modusplant.domains.communication.conv.domain.service;
+package kr.modusplant.domains.communication.conversation.domain.service;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
-import kr.modusplant.domains.communication.conv.common.util.app.http.response.ConvCategoryResponseTestUtils;
-import kr.modusplant.domains.communication.conv.common.util.entity.ConvCategoryEntityTestUtils;
+import kr.modusplant.domains.communication.conversation.common.util.app.http.response.ConvCategoryResponseTestUtils;
+import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.domain.service.ConvCategoryValidationService;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCategoryRepository;

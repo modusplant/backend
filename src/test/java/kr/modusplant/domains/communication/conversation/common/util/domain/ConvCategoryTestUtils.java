@@ -1,4 +1,4 @@
-package kr.modusplant.domains.communication.conv.common.util.domain;
+package kr.modusplant.domains.communication.conversation.common.util.domain;
 
 import kr.modusplant.domains.communication.conversation.domain.model.ConvCategory;
 

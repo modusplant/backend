@@ -1,10 +1,10 @@
-package kr.modusplant.domains.communication.conv.app.controller;
+package kr.modusplant.domains.communication.conversation.app.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.common.context.DomainsControllerOnlyContext;
-import kr.modusplant.domains.communication.conv.common.util.app.http.request.ConvCategoryRequestTestUtils;
-import kr.modusplant.domains.communication.conv.common.util.app.http.response.ConvCategoryResponseTestUtils;
+import kr.modusplant.domains.communication.conversation.common.util.app.http.request.ConvCategoryRequestTestUtils;
+import kr.modusplant.domains.communication.conversation.common.util.app.http.response.ConvCategoryResponseTestUtils;
 import kr.modusplant.domains.communication.conversation.app.http.response.ConvCategoryResponse;
 import kr.modusplant.domains.communication.conversation.app.service.ConvCategoryApplicationService;
 import org.junit.jupiter.api.DisplayName;
