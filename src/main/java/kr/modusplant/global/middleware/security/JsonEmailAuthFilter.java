@@ -8,8 +8,10 @@ import kr.modusplant.modules.auth.normal.login.app.http.NormalLoginRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.io.IOException;
 
@@ -21,7 +23,7 @@ public class JsonEmailAuthFilter extends AbstractAuthenticationProcessingFilter 
     public JsonEmailAuthFilter(
             ObjectMapper objectMapper,
             AuthenticationManager authManager) {
-        super("/api/auth/login");
+        super(new AntPathRequestMatcher("/api/auth/login", "POST"));
         this.objectMapper = objectMapper;
         this.authManager = authManager;
     }
@@ -29,7 +31,7 @@ public class JsonEmailAuthFilter extends AbstractAuthenticationProcessingFilter 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException {
         NormalLoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), NormalLoginRequest.class);
-        System.out.println("The arrived request" + loginRequest);
+        System.out.println("The arrived request in JsonEmailAuthFilter" + loginRequest);
 
         if (!loginRequest.checkFieldValidation()) {
             throw new IllegalArgumentException("one of email password deviceId missing");
@@ -39,10 +41,14 @@ public class JsonEmailAuthFilter extends AbstractAuthenticationProcessingFilter 
                 loginRequest.email(), loginRequest.password()
         );
 
-        Authentication authentication = authManager.authenticate(requestToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        request.setAttribute("authentication", authentication);
+        Authentication authenticatedToken = authManager.authenticate(requestToken);
 
-        return authentication;
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authenticatedToken);
+        SecurityContextHolder.setContext(context);
+
+        request.setAttribute("authentication", authenticatedToken);
+
+        return authenticatedToken;
     }
 }
