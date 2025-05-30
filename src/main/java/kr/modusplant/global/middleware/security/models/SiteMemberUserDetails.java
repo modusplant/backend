@@ -57,7 +57,7 @@ public class SiteMemberUserDetails implements UserDetails {
             this.isDisabledByLinking = member.getIsDisabledByLinking();
             this.isBanned = member.getIsBanned();
             this.isDeleted = member.getIsDeleted();
-            this.authorities = List.of(new SimpleGrantedAuthority(memberRole.getRole().toString()));
+            this.authorities = List.of(new SimpleGrantedAuthority(memberRole.getRole().name()));
             return this;
         }
 

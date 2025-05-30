@@ -57,7 +57,7 @@ public class SiteMemberUserDetailsService implements UserDetailsService {
                 .isDisabledByLinking(member.getIsDisabledByLinking())
                 .isBanned(member.getIsBanned())
                 .isDeleted(member.getIsDeleted())
-                .authorities(List.of(new SimpleGrantedAuthority(memberRole.getRole().getValue())))
+                .authorities(List.of(new SimpleGrantedAuthority(memberRole.getRole().name())))
                 .build();
     }
 }
