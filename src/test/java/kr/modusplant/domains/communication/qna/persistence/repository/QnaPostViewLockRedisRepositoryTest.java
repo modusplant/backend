@@ -34,7 +34,7 @@ class QnaPostViewLockRedisRepositoryTest {
     private static final UlidIdGenerator generator = new UlidIdGenerator();
     private final String ulid = generator.generate(null,null,null, EventType.INSERT);
     private final UUID memberUuid = UUID.randomUUID();
-    private static final String KEY_FORMAT = "viewCount::qna_post::%s::member::%s::lock";
+    private static final String KEY_FORMAT = "viewCount:qna_post:%s:member:%s:lock";
 
 
     @Test

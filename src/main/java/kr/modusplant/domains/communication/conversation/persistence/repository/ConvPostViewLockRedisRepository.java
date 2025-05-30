@@ -12,8 +12,8 @@ import java.util.UUID;
 public class ConvPostViewLockRedisRepository {
     private final StringRedisTemplate stringRedisTemplate;
 
-    // viewCount::conv_post::{ulid}::member::{member_uuid}::lock
-    private static final String KEY_FORMAT = "viewCount::conv_post::%s::member::%s::lock";
+    // viewCount:conv_post:{ulid}:member:{member_uuid}:lock
+    private static final String KEY_FORMAT = "viewCount:conv_post:%s:member:%s:lock";
 
     public boolean lock(String ulid, UUID memberUuid, long ttlMinutes) {
         String key = generateKey(ulid,memberUuid);

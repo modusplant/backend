@@ -46,7 +46,7 @@ public class ConvPostApplicationService {
     private final ConvPostViewLockRedisRepository convPostViewLockRedisRepository;
     private final ConvPostAppInfraMapper convPostAppInfraMapper = new ConvPostAppInfraMapperImpl();
 
-    @Value("${REDIS_TTL.VIEW_COUNT}")
+    @Value("${redis.ttl.view_count}")
     private long ttlMinutes;
 
     public Page<ConvPostResponse> getAll(Pageable pageable) {
@@ -145,20 +145,20 @@ public class ConvPostApplicationService {
         convPostRepository.save(convPostEntity);
     }
 
-    public Long countViews(String ulid) {
+    public Long readViewCount(String ulid) {
         Long redisViewCount = convPostViewCountRedisRepository.read(ulid);
         if (redisViewCount != null) {
             return redisViewCount;
         }
         Long dbViewCount = convPostRepository.findByUlid(ulid)
-                .map(convPostEntity -> Optional.ofNullable(convPostEntity.getViewCount()).orElse(0L))
+                .map(convPostEntity -> Optional.ofNullable(convPostEntity.getViewCount()).orElseThrow())
                 .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid,String.class));
         convPostViewCountRedisRepository.write(ulid, dbViewCount);
         return dbViewCount;
     }
 
     @Transactional
-    public Long increase(String ulid, UUID memberUuid) {
+    public Long increaseViewCount(String ulid, UUID memberUuid) {
         // 조회수 어뷰징 정책 - 사용자는 게시글 1개당 ttl에 1번 조회수 증가
         if (!convPostViewLockRedisRepository.lock(ulid,memberUuid,ttlMinutes)) {
             return convPostViewCountRedisRepository.read(ulid);

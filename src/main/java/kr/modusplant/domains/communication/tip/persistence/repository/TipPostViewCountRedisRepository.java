@@ -11,8 +11,8 @@ import java.util.Set;
 @Repository
 @RequiredArgsConstructor
 public class TipPostViewCountRedisRepository {
-    // viewCount::tip_post::{ulid}::view_count
-    private static final String KEY_FORMAT = "viewCount::tip_post::%s::view_count";
+    // viewCount:tip_post:{ulid}:view_count
+    private static final String KEY_FORMAT = "viewCount:tip_post:%s:view_count";
 
     private final StringRedisTemplate stringRedisTemplate;
 
@@ -30,7 +30,7 @@ public class TipPostViewCountRedisRepository {
     }
 
     public Map<String, Long> findAll() {
-        Set<String> keys = stringRedisTemplate.keys("viewCount::tip_post::*::view_count");
+        Set<String> keys = stringRedisTemplate.keys("viewCount:tip_post:*:view_count");
         Map<String, Long> result = new HashMap<>();
         if (keys != null) {
             for (String key:keys) {
@@ -38,7 +38,7 @@ public class TipPostViewCountRedisRepository {
                 if (value == null)
                     continue;
                 Long count = Long.valueOf(value);
-                String ulid = extractUlidFormKey(key);
+                String ulid = extractUlidFromKey(key);
                 result.put(ulid,count);
             }
         }
@@ -49,9 +49,9 @@ public class TipPostViewCountRedisRepository {
         return KEY_FORMAT.formatted(ulid);
     }
 
-    private String extractUlidFormKey(String key) {
-        String[] parts = key.split("::");
-        if (parts.length >= 3) {
+    private String extractUlidFromKey(String key) {
+        String[] parts = key.split(":");
+        if (parts.length == 4) {
             return parts[2];
         }
         throw new IllegalArgumentException("Invalid Redis key format: " + key);

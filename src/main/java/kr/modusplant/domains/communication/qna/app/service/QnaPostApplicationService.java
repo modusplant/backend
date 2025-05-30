@@ -46,7 +46,7 @@ public class QnaPostApplicationService {
     private final QnaPostViewLockRedisRepository qnaPostViewLockRedisRepository;
     private final QnaPostAppInfraMapper qnaPostAppInfraMapper = new QnaPostAppInfraMapperImpl();
 
-    @Value("${REDIS_TTL.VIEW_COUNT}")
+    @Value("${redis.ttl.view_count}")
     private long ttlMinutes;
 
     public Page<QnaPostResponse> getAll(Pageable pageable) {
@@ -145,20 +145,20 @@ public class QnaPostApplicationService {
         qnaPostRepository.save(qnaPostEntity);
     }
 
-    public Long countViews(String ulid) {
+    public Long readViewCount(String ulid) {
         Long redisViewCount = qnaPostViewCountRedisRepository.read(ulid);
         if (redisViewCount != null) {
             return redisViewCount;
         }
         Long dbViewCount = qnaPostRepository.findByUlid(ulid)
-                .map(qnaPostEntity -> Optional.ofNullable(qnaPostEntity.getViewCount()).orElse(0L))
+                .map(qnaPostEntity -> Optional.ofNullable(qnaPostEntity.getViewCount()).orElseThrow())
                 .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid,String.class));
         qnaPostViewCountRedisRepository.write(ulid, dbViewCount);
         return dbViewCount;
     }
 
     @Transactional
-    public Long increase(String ulid, UUID memberUuid) {
+    public Long increaseViewCount(String ulid, UUID memberUuid) {
         // 조회수 어뷰징 정책 - 사용자는 게시글 1개당 ttl에 1번 조회수 증가
         if (!qnaPostViewLockRedisRepository.lock(ulid,memberUuid,ttlMinutes)) {
             return qnaPostViewCountRedisRepository.read(ulid);

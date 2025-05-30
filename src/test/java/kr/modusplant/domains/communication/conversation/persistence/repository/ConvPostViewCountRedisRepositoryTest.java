@@ -33,7 +33,7 @@ class ConvPostViewCountRedisRepositoryTest {
 
     private static final UlidIdGenerator generator = new UlidIdGenerator();
     private final String ulid = generator.generate(null,null,null, EventType.INSERT);
-    private static final String KEY_FORMAT = "viewCount::conv_post::%s::view_count";
+    private static final String KEY_FORMAT = "viewCount:conv_post:%s:view_count";
 
     @Test
     @DisplayName("Redis에 값이 있으면 Long으로 변환하여 반환")
@@ -99,7 +99,7 @@ class ConvPostViewCountRedisRepositoryTest {
                 KEY_FORMAT.formatted(ulid),
                 KEY_FORMAT.formatted(ulid2)
         );
-        when(stringRedisTemplate.keys("viewCount::conv_post::*::view_count")).thenReturn(keys);
+        when(stringRedisTemplate.keys("viewCount:conv_post:*:view_count")).thenReturn(keys);
         when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(KEY_FORMAT.formatted(ulid))).thenReturn("10");
         when(valueOperations.get(KEY_FORMAT.formatted(ulid2))).thenReturn("20");

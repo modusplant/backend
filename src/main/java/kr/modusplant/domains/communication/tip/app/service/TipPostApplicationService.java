@@ -46,7 +46,7 @@ public class TipPostApplicationService {
     private final TipPostViewLockRedisRepository tipPostViewLockRedisRepository;
     private final TipPostAppInfraMapper tipPostAppInfraMapper = new TipPostAppInfraMapperImpl();
 
-    @Value("${REDIS_TTL.VIEW_COUNT}")
+    @Value("${redis.ttl.view_count}")
     private long ttlMinutes;
 
     public Page<TipPostResponse> getAll(Pageable pageable) {
@@ -145,20 +145,20 @@ public class TipPostApplicationService {
         tipPostRepository.save(tipPostEntity);
     }
 
-    public Long countViews(String ulid) {
+    public Long readViewCount(String ulid) {
         Long redisViewCount = tipPostViewCountRedisRepository.read(ulid);
         if (redisViewCount != null) {
             return redisViewCount;
         }
         Long dbViewCount = tipPostRepository.findByUlid(ulid)
-                .map(tipPostEntity -> Optional.ofNullable(tipPostEntity.getViewCount()).orElse(0L))
+                .map(tipPostEntity -> Optional.ofNullable(tipPostEntity.getViewCount()).orElseThrow())
                 .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid,String.class));
         tipPostViewCountRedisRepository.write(ulid, dbViewCount);
         return dbViewCount;
     }
 
     @Transactional
-    public Long increase(String ulid, UUID memberUuid) {
+    public Long increaseViewCount(String ulid, UUID memberUuid) {
         // 조회수 어뷰징 정책 - 사용자는 게시글 1개당 ttl에 1번 조회수 증가
         if (!tipPostViewLockRedisRepository.lock(ulid,memberUuid,ttlMinutes)) {
             return tipPostViewCountRedisRepository.read(ulid);

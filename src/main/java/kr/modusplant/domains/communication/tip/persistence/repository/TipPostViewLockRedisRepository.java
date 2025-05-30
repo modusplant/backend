@@ -12,8 +12,8 @@ import java.util.UUID;
 public class TipPostViewLockRedisRepository {
     private final StringRedisTemplate stringRedisTemplate;
 
-    // viewCount::tip_post::{ulid}::member::{member_uuid}::lock
-    private static final String KEY_FORMAT = "viewCount::tip_post::%s::member::%s::lock";
+    // viewCount:tip_post:{ulid}:member:{member_uuid}:lock
+    private static final String KEY_FORMAT = "viewCount:tip_post:%s:member:%s:lock";
 
     public boolean lock(String ulid, UUID memberUuid, long ttlMinutes) {
         String key = generateKey(ulid,memberUuid);

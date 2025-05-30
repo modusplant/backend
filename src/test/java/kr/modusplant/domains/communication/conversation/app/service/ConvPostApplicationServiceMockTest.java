@@ -51,12 +51,12 @@ class ConvPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, P
 
     @Test
     @DisplayName("Redis에 조회수값이 있으면 조회")
-    void countViewsShouldReturnRedisValueWhenRedisHasValueTest() {
+    void readViewCountShouldReturnRedisValueWhenRedisHasValueTest() {
         // given
         given(convPostViewCountRedisRepository.read(ulid)).willReturn(100L);
 
         // when
-        Long result = convPostApplicationService.countViews(ulid);
+        Long result = convPostApplicationService.readViewCount(ulid);
 
         // then
         assertThat(result).isEqualTo(100L);
@@ -65,7 +65,7 @@ class ConvPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, P
 
     @Test
     @DisplayName("Redis에 조회수가 없고 DB에 있으면 DB에서 값을 조회")
-    void countViewsShouldReturnDbValueWhenRedisIsEmptyAndDbHasValueTest() {
+    void readViewCountShouldReturnDbValueWhenRedisIsEmptyAndDbHasValueTest() {
         // given
         given(convPostViewCountRedisRepository.read(ulid)).willReturn(null);
         ConvPostEntity convPostEntity = createConvPostEntityBuilder()
@@ -77,7 +77,7 @@ class ConvPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, P
         given(convPostRepository.findByUlid(ulid)).willReturn(Optional.of(convPostEntity));
 
         // when
-        Long result = convPostApplicationService.countViews(ulid);
+        Long result = convPostApplicationService.readViewCount(ulid);
 
         // then
         assertThat(result).isEqualTo(55L);
@@ -86,25 +86,25 @@ class ConvPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, P
 
     @Test
     @DisplayName("Redis와 DB에 모두 조회수값이 없으면 예외 발생")
-    void countViewsShouldThrowExceptionWhenRedisIsEmptyAndDbEmptyTest() {
+    void readViewCountShouldThrowExceptionWhenRedisIsEmptyAndDbEmptyTest() {
         // given
         given(convPostViewCountRedisRepository.read(ulid)).willReturn(null);
         given(convPostRepository.findByUlid(ulid)).willReturn(Optional.empty());
 
         // when & then
         assertThrows(EntityNotFoundWithUlidException.class,
-                () -> convPostApplicationService.countViews(ulid));
+                () -> convPostApplicationService.readViewCount(ulid));
     }
 
     @Test
     @DisplayName("조회수 락이 걸려있을 때 기존 조회수 가져오기")
-    void increaseWhenLockExistsTest() {
+    void increaseViewCountWhenLockExistsTest() {
         // given
         when(convPostViewLockRedisRepository.lock(ulid,memberUuid,10)).thenReturn(false);
         when(convPostViewCountRedisRepository.read(ulid)).thenReturn(10L);
 
         // when
-        Long result = convPostApplicationService.increase(ulid,memberUuid);
+        Long result = convPostApplicationService.increaseViewCount(ulid,memberUuid);
 
         // then
         verify(convPostViewLockRedisRepository, times(1)).lock(ulid,memberUuid,10);
@@ -115,13 +115,13 @@ class ConvPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, P
 
     @Test
     @DisplayName("조회수 락이 걸려있지 않을 때 조회수 증가")
-    void increaseWhenLockNotExistTest() {
+    void increaseViewCountWhenLockNotExistTest() {
         // given
         when(convPostViewLockRedisRepository.lock(ulid,memberUuid,10)).thenReturn(true);
         when(convPostViewCountRedisRepository.increase(ulid)).thenReturn(11L);
 
         // when
-        Long result = convPostApplicationService.increase(ulid,memberUuid);
+        Long result = convPostApplicationService.increaseViewCount(ulid,memberUuid);
 
         // then
         verify(convPostViewLockRedisRepository,times(1)).lock(ulid,memberUuid,10L);

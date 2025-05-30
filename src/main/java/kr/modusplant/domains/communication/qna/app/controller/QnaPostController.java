@@ -105,12 +105,12 @@ public class QnaPostController {
     @Operation(summary = "특정 팁 게시글 조회수 조회 API", description = "특정 팁 게시글의 조회수를 조회합니다.")
     @GetMapping("/{ulid}/views")
     public ResponseEntity<DataResponse<Long>> countViewCount(@PathVariable String ulid) {
-        return ResponseEntity.ok().body(DataResponse.ok(qnaPostApplicationService.countViews(ulid)));
+        return ResponseEntity.ok().body(DataResponse.ok(qnaPostApplicationService.readViewCount(ulid)));
     }
 
     @Operation(summary = "특정 팁 게시글 조회수 증가 API", description = "특정 팁 게시글의 조회수를 증가시킵니다.")
     @PatchMapping("/{ulid}/views")
     public ResponseEntity<DataResponse<Long>> increaseViewCount(@PathVariable String ulid) {
-        return ResponseEntity.ok().body(DataResponse.ok(qnaPostApplicationService.increase(ulid, memberUuid)));
+        return ResponseEntity.ok().body(DataResponse.ok(qnaPostApplicationService.increaseViewCount(ulid, memberUuid)));
     }
 }
