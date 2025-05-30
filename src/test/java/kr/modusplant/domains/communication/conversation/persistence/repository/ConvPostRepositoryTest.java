@@ -3,10 +3,9 @@ package kr.modusplant.domains.communication.conversation.persistence.repository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvPostEntityTestUtils;
-import kr.modusplant.domains.group.common.util.entity.PlantGroupEntityTestUtils;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
-import kr.modusplant.domains.group.persistence.repository.PlantGroupRepository;
+import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
@@ -29,9 +28,9 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RepositoryOnlyContext
-class ConvPostRepositoryTest implements ConvPostEntityTestUtils, PlantGroupEntityTestUtils, SiteMemberEntityTestUtils {
+class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEntityTestUtils, SiteMemberEntityTestUtils {
     private final ConvPostRepository convPostRepository;
-    private final PlantGroupRepository plantGroupRepository;
+    private final ConvCategoryRepository convCategoryRepository;
     private final SiteMemberRepository siteMemberRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -39,18 +38,18 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, PlantGroupEntit
     private EntityManager entityManager;
 
     @Autowired
-    ConvPostRepositoryTest(ConvPostRepository convPostRepository, PlantGroupRepository plantGroupRepository, SiteMemberRepository siteMemberRepository) {
+    ConvPostRepositoryTest(ConvPostRepository convPostRepository, ConvCategoryRepository convCategoryRepository, SiteMemberRepository siteMemberRepository) {
         this.convPostRepository = convPostRepository;
-        this.plantGroupRepository = plantGroupRepository;
+        this.convCategoryRepository = convCategoryRepository;
         this.siteMemberRepository = siteMemberRepository;
     }
 
-    private PlantGroupEntity testPlantGroup;
+    private ConvCategoryEntity testConvCategory;
     private SiteMemberEntity testSiteMember;
 
     @BeforeEach
     void setUp() {
-        testPlantGroup = plantGroupRepository.save(createPlantGroupEntity());
+        testConvCategory = convCategoryRepository.save(testConvCategoryEntity);
         testSiteMember = siteMemberRepository.save(createMemberBasicUserEntity());
     }
 
@@ -59,7 +58,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, PlantGroupEntit
     void findByUlidTest() {
         // given
         ConvPostEntity convPostEntity = createConvPostEntityBuilder()
-                .group(testPlantGroup)
+                .group(testConvCategory)
                 .authMember(testSiteMember)
                 .createMember(testSiteMember)
                 .build();
@@ -78,7 +77,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, PlantGroupEntit
         // given
         List<ConvPostEntity> convPosts = IntStream.range(0, 10)
                 .mapToObj(i -> createConvPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -108,7 +107,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, PlantGroupEntit
         // given
         List<ConvPostEntity> convPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createConvPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -133,13 +132,14 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, PlantGroupEntit
     }
 
     @Test
-    @DisplayName("식물 그룹으로 삭제되지 않은 모든 팁 게시글 찾기(최신순)")
+    @DisplayName("카테고리로 삭제되지 않은 모든 팁 게시글 찾기(최신순)")
     void findByGroupAndIsDeletedFalseOrderByCreatedAtDescTest() {
         // given
-        PlantGroupEntity testOtherGroup = plantGroupRepository.save(createOtherGroupEntity());
+        ConvCategoryEntity testOtherGroup = convCategoryRepository.save(
+                ConvCategoryEntity.builder().order(2).category("기타").build());
         List<ConvPostEntity> convPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createConvPostEntityBuilder()
-                        .group(i % 2 == 0 ? testPlantGroup : testOtherGroup)
+                        .group(i % 2 == 0 ? testConvCategory : testOtherGroup)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -150,12 +150,12 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, PlantGroupEntit
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // when
-        Page<ConvPostEntity> result = convPostRepository.findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(testPlantGroup, pageable);
+        Page<ConvPostEntity> result = convPostRepository.findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(testConvCategory, pageable);
 
         // then
-        // i = 0, 2, 4 → testPlantGroup로 생성됨 (0번은 삭제됨)
+        // i = 0, 2, 4 → testConvCategory로 생성됨 (0번은 삭제됨)
         assertThat(result.getTotalElements()).isEqualTo(2);
-        assertThat(result.getContent().stream().allMatch(post -> post.getGroup().equals(testPlantGroup) && !post.getIsDeleted())).isTrue();
+        assertThat(result.getContent().stream().allMatch(post -> post.getGroup().equals(testConvCategory) && !post.getIsDeleted())).isTrue();
 
         List<ConvPostEntity> content = result.getContent();
         for (int i = 0; i < content.size() - 1; i++) {
@@ -171,7 +171,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, PlantGroupEntit
         SiteMemberEntity testSiteMember2 = siteMemberRepository.save(createMemberGoogleUserEntity());
         List<ConvPostEntity> convPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createConvPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testConvCategory)
                         .authMember(i % 2 == 0 ? testSiteMember : testSiteMember2)
                         .createMember(i % 2 == 0 ? testSiteMember : testSiteMember2)
                         .build()
@@ -203,7 +203,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, PlantGroupEntit
         // when
         ConvPostEntity convPostEntity = convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -219,7 +219,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, PlantGroupEntit
         // when
         ConvPostEntity convPostEntity = convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -235,7 +235,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, PlantGroupEntit
         // given
         ConvPostEntity convPostEntity = convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -255,7 +255,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, PlantGroupEntit
         // when
         ConvPostEntity convPostEntity = convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -271,14 +271,14 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, PlantGroupEntit
         // given
         ConvPostEntity convPostEntity1 = convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
         );
         ConvPostEntity convPostEntity2 = convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .isDeleted(true)
@@ -301,7 +301,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, PlantGroupEntit
         // given
         ConvPostEntity convPostEntity = convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build());
@@ -325,7 +325,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, PlantGroupEntit
         // given
         ConvPostEntity convPostEntity = convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .viewCount(10L)
@@ -348,7 +348,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, PlantGroupEntit
         // given
         ConvPostEntity convPostEntity = convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(testPlantGroup)
+                        .group(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .viewCount(10L)

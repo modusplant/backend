@@ -1,7 +1,6 @@
 package kr.modusplant.domains.communication.conversation.persistence.entity;
 
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvPostEntityTestUtils;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
@@ -26,9 +25,8 @@ class ConvPostEntityTest implements ConvPostEntityTestUtils {
     void prePersist() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        PlantGroupEntity plantGroup = createPlantGroupEntity();
         ConvPostEntity convPost = createConvPostEntityBuilder()
-                .group(plantGroup)
+                .group(testConvCategoryEntity)
                 .authMember(member)
                 .createMember(member)
                 .likeCount(1)
@@ -51,9 +49,8 @@ class ConvPostEntityTest implements ConvPostEntityTestUtils {
     void preUpdate() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        PlantGroupEntity plantGroup = createPlantGroupEntity();
         ConvPostEntity convPost = createConvPostEntityBuilder()
-                .group(plantGroup)
+                .group(testConvCategoryEntity)
                 .authMember(member)
                 .createMember(member)
                 .build();

@@ -1,9 +1,9 @@
 package kr.modusplant.domains.communication.conversation.mapper;
 
+import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvPostEntityTestUtils;
-import kr.modusplant.domains.group.common.util.entity.PlantGroupEntityTestUtils;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
-import kr.modusplant.domains.group.persistence.repository.PlantGroupRepository;
+import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
+import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCategoryRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
@@ -18,16 +18,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RepositoryOnlyContext
-class ConvPostAppInfraMapperTest implements ConvPostEntityTestUtils, PlantGroupEntityTestUtils, SiteMemberEntityTestUtils {
+class ConvPostAppInfraMapperTest implements ConvPostEntityTestUtils, ConvCategoryEntityTestUtils, SiteMemberEntityTestUtils {
     private final ConvPostAppInfraMapper convPostAppInfraMapper = new ConvPostAppInfraMapperImpl();
     private final SiteMemberRepository siteMemberRepository;
-    private final PlantGroupRepository plantGroupRepository;
+    private final ConvCategoryRepository convCategoryRepository;
     private final ConvPostRepository convPostRepository;
 
     @Autowired
-    ConvPostAppInfraMapperTest(SiteMemberRepository siteMemberRepository, PlantGroupRepository plantGroupRepository, ConvPostRepository convPostRepository){
+    ConvPostAppInfraMapperTest(SiteMemberRepository siteMemberRepository, ConvCategoryRepository convCategoryRepository, ConvPostRepository convPostRepository){
         this.siteMemberRepository = siteMemberRepository;
-        this.plantGroupRepository = plantGroupRepository;
+        this.convCategoryRepository = convCategoryRepository;
         this.convPostRepository = convPostRepository;
     }
 
@@ -35,11 +35,11 @@ class ConvPostAppInfraMapperTest implements ConvPostEntityTestUtils, PlantGroupE
     @DisplayName("엔티티를 응답으로 전환")
     void toConvPostResponseTest() {
         // given
-        PlantGroupEntity plantGroupEntity = plantGroupRepository.save(createPlantGroupEntity());
+        ConvCategoryEntity convCategoryEntity = convCategoryRepository.save(testConvCategoryEntity);
         SiteMemberEntity siteMemberEntity = siteMemberRepository.save(createMemberBasicUserEntity());
         ConvPostEntity convPostEntity = convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(plantGroupEntity)
+                        .group(convCategoryEntity)
                         .authMember(siteMemberEntity)
                         .createMember(siteMemberEntity)
                         .build()

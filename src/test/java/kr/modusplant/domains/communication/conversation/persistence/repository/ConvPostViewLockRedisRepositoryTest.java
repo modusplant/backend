@@ -1,6 +1,5 @@
 package kr.modusplant.domains.communication.conversation.persistence.repository;
 
-import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostViewLockRedisRepository;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import kr.modusplant.global.persistence.generator.UlidIdGenerator;
 import org.hibernate.generator.EventType;

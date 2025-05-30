@@ -1,7 +1,7 @@
 package kr.modusplant.domains.communication.conversation.app.service;
 
+import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvPostEntityTestUtils;
-import kr.modusplant.domains.group.common.util.entity.PlantGroupEntityTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostRepository;
@@ -30,7 +30,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ConvPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, PlantGroupEntityTestUtils, ConvPostEntityTestUtils {
+class ConvPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, ConvCategoryEntityTestUtils, ConvPostEntityTestUtils {
     @Mock
     private ConvPostViewCountRedisRepository convPostViewCountRedisRepository;
     @Mock
@@ -69,7 +69,7 @@ class ConvPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, P
         // given
         given(convPostViewCountRedisRepository.read(ulid)).willReturn(null);
         ConvPostEntity convPostEntity = createConvPostEntityBuilder()
-                .group(createPlantGroupEntity())
+                .group(testConvCategoryEntity)
                 .authMember(createMemberBasicAdminEntityWithUuid())
                 .createMember(createMemberBasicAdminEntityWithUuid())
                 .viewCount(55L)

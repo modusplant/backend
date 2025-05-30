@@ -3,8 +3,8 @@ package kr.modusplant.domains.communication.conversation.domain.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostInsertRequest;
 import kr.modusplant.domains.communication.conversation.common.util.domain.ConvPostTestUtils;
-import kr.modusplant.domains.communication.conversation.common.util.http.request.ConvPostRequestTestUtils;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
+import kr.modusplant.domains.communication.conversation.common.util.app.http.request.ConvPostRequestTestUtils;
+import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.communication.common.error.PostAccessDeniedException;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
@@ -91,7 +91,7 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils {
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         ConvPostEntity convPostEntity = ConvPostEntity.builder()
                 .authMember(memberEntity)
-                .group(mock(PlantGroupEntity.class)) // 다른 필드도 필요시 같이 mock 처리
+                .group(mock(ConvCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
                 .createMember(memberEntity)
                 .likeCount(0)
                 .viewCount(0L)
@@ -126,7 +126,7 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils {
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         ConvPostEntity convPostEntity = ConvPostEntity.builder()
                 .authMember(memberEntity)
-                .group(mock(PlantGroupEntity.class)) // 다른 필드도 필요시 같이 mock 처리
+                .group(mock(ConvCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
                 .createMember(memberEntity)
                 .likeCount(0)
                 .viewCount(0L)
