@@ -39,7 +39,7 @@ public class TipLikeApplicationService {
         TipPostEntity tipPost = tipPostRepository.findById(tipPostId).orElseThrow(() -> new IllegalArgumentException("tip post not found"));
         tipPost.decreaseLikeCount();
 
-        tipLikeRepository.delete(TipLikeEntity.of(tipPostId, memberId));
+        tipLikeRepository.deleteByTipPostIdAndMemberId(tipPostId, memberId);
         return TipLikeResponse.of(tipPost.getLikeCount(), false);
     }
 }

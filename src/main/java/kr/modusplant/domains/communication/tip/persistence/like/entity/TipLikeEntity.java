@@ -13,6 +13,7 @@ import static kr.modusplant.global.vo.SnakeCaseWord.*;
 @Entity
 @Table(name = SNAKE_TIP_LIKE)
 @IdClass(TipLikeId.class)
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class TipLikeEntity {
