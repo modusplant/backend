@@ -4,7 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
-import kr.modusplant.modules.jwt.app.error.InvalidTokenException;
+import kr.modusplant.modules.jwt.error.InvalidTokenException;
 import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
 import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
+import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 
 @Service
 @Transactional(readOnly = true)

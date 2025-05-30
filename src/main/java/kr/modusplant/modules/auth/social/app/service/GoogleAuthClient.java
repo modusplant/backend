@@ -1,8 +1,8 @@
 package kr.modusplant.modules.auth.social.app.service;
 
 import kr.modusplant.modules.auth.social.app.dto.GoogleUserInfo;
-import kr.modusplant.modules.auth.social.app.error.OAuthException;
 import kr.modusplant.modules.auth.social.app.service.supers.SocialAuthClient;
+import kr.modusplant.modules.auth.social.error.OAuthException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

@@ -37,7 +37,8 @@ public class MockDomainsRepositoryBeanFactoryPostProcessor implements BeanFactor
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException("Fail to load the repository interface: " + repositoryDef.getBeanClassName());
             }
-            beanFactory.registerSingleton(clazz.getSimpleName(), Mockito.mock(clazz));
+            String simpleName = clazz.getSimpleName();
+            beanFactory.registerSingleton(String.valueOf(simpleName.charAt(0)).toLowerCase() + simpleName.substring(1), Mockito.mock(clazz));
         }
     }
 }

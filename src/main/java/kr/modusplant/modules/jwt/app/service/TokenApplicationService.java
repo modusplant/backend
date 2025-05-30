@@ -5,11 +5,11 @@ import kr.modusplant.domains.member.app.http.response.SiteMemberRoleResponse;
 import kr.modusplant.domains.member.app.service.SiteMemberApplicationService;
 import kr.modusplant.domains.member.app.service.SiteMemberRoleApplicationService;
 import kr.modusplant.global.enums.Role;
+import kr.modusplant.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.modules.jwt.domain.service.TokenValidationService;
-import kr.modusplant.modules.jwt.app.dto.TokenPair;
-import kr.modusplant.modules.jwt.app.error.InvalidTokenException;
-import kr.modusplant.modules.jwt.app.error.TokenNotFoundException;
+import kr.modusplant.modules.jwt.error.InvalidTokenException;
+import kr.modusplant.modules.jwt.error.TokenNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

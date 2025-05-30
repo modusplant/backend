@@ -6,6 +6,7 @@ import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthReposit
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMess
 import static kr.modusplant.global.vo.CamelCaseWord.ORIGINAL_MEMBER_UUID;
 
 @Service
+@Primary
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class SiteMemberAuthValidationService {

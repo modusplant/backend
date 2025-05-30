@@ -6,10 +6,10 @@ import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
-import kr.modusplant.modules.jwt.app.error.InvalidTokenException;
 import kr.modusplant.modules.jwt.common.util.domain.RefreshTokenTestUtils;
 import kr.modusplant.modules.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
+import kr.modusplant.modules.jwt.error.InvalidTokenException;
 import kr.modusplant.modules.jwt.mapper.RefreshTokenAppInfraMapper;
 import kr.modusplant.modules.jwt.mapper.RefreshTokenAppInfraMapperImpl;
 import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
@@ -28,7 +28,8 @@ import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,9 +58,7 @@ class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenE
             given(tokenRepository.findByDeviceId(token.getDeviceId())).willReturn(Optional.of(tokenEntity));
 
             // when & then
-            assertThrows(InvalidTokenException.class, () -> {
-                tokenValidationService.validateExistedDeviceId(token.getDeviceId());
-            });
+            assertThrows(InvalidTokenException.class, () -> tokenValidationService.validateExistedDeviceId(token.getDeviceId()));
         }
 
         @Test
@@ -70,9 +69,7 @@ class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenE
             given(tokenRepository.findByDeviceId(deviceid)).willReturn(Optional.empty());
 
             // when & then
-            assertDoesNotThrow(() -> {
-                tokenValidationService.validateExistedDeviceId(deviceid);
-            });
+            assertDoesNotThrow(() -> tokenValidationService.validateExistedDeviceId(deviceid));
         }
     }
 

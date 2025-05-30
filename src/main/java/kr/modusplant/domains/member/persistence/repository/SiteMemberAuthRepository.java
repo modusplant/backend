@@ -1,10 +1,11 @@
 package kr.modusplant.domains.member.persistence.repository;
 
+import kr.modusplant.domains.common.persistence.repository.supers.LastModifiedAtRepository;
+import kr.modusplant.domains.common.persistence.repository.supers.UuidPrimaryKeyRepository;
 import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.common.persistence.repository.supers.LastModifiedAtRepository;
-import kr.modusplant.domains.common.persistence.repository.supers.UuidPrimaryKeyRepository;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+@Primary
 public interface SiteMemberAuthRepository extends LastModifiedAtRepository<SiteMemberAuthEntity>, UuidPrimaryKeyRepository<SiteMemberAuthEntity>, JpaRepository<SiteMemberAuthEntity, UUID> {
     List<SiteMemberAuthEntity> findByActiveMember(SiteMemberEntity activeMember);
 

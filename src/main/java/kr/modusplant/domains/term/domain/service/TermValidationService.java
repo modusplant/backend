@@ -6,16 +6,18 @@ import kr.modusplant.domains.term.persistence.repository.TermRepository;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 import static kr.modusplant.global.vo.CamelCaseWord.NAME;
-import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
 
 @Service
+@Primary
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class TermValidationService {
