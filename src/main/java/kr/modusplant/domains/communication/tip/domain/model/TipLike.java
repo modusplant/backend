@@ -1,4 +1,4 @@
-package kr.modusplant.domains.communication.tip.domain.model.like;
+package kr.modusplant.domains.communication.tip.domain.model;
 
 import lombok.*;
 

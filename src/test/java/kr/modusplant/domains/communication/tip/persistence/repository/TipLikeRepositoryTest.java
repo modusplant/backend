@@ -1,8 +1,8 @@
-package kr.modusplant.domains.communication.tip.persistence.like.repository;
+package kr.modusplant.domains.communication.tip.persistence.repository;
 
-import kr.modusplant.domains.communication.tip.common.util.like.entity.TipLikeEntityTestUtils;
-import kr.modusplant.domains.communication.tip.persistence.like.entity.TipLikeEntity;
-import kr.modusplant.domains.communication.tip.persistence.like.entity.TipLikeId;
+import kr.modusplant.domains.communication.tip.common.util.entity.TipLikeEntityTestUtils;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipLikeEntity;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipLikeId;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

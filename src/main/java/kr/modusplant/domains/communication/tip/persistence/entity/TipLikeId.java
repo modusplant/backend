@@ -1,4 +1,4 @@
-package kr.modusplant.domains.communication.tip.persistence.like.entity;
+package kr.modusplant.domains.communication.tip.persistence.entity;
 
 
 import lombok.*;
