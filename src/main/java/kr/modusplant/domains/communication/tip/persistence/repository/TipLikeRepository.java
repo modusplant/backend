@@ -10,6 +10,9 @@ import java.util.UUID;
 
 @Repository
 public interface TipLikeRepository extends JpaRepository<TipLikeEntity, TipLikeId> {
+    // 사용자별 팁 게시글 좋아요 전체 리스트 조회
+    List<TipLikeEntity> findByMemberId(UUID memberId);
+
     // 사용자별 팁 게시글 좋아요 리스트 조회
     List<TipLikeEntity> findByMemberIdAndTipPostIdIn(UUID memberId, List<String> tipPostIds);
 

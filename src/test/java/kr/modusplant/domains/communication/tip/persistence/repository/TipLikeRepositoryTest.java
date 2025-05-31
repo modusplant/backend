@@ -76,6 +76,30 @@ public class TipLikeRepositoryTest implements TipLikeEntityTestUtils {
     }
 
     @Test
+    @DisplayName("사용자별 팁 게시글 좋아요 전체 리스트 조회")
+    void findTipLikesByMemberId() {
+        // given
+        UUID memberId = createMemberBasicUserEntityWithUuid().getUuid();
+        List<String> tipPostIds = List.of(
+                "TEST_TIP_POST_ID_001",
+                "TEST_TIP_POST_ID_002",
+                "TEST_TIP_POST_ID_003"
+        );
+
+        tipLikeRepository.saveAll(List.of(
+                TipLikeEntity.of(tipPostIds.get(0), memberId),
+                TipLikeEntity.of(tipPostIds.get(1), memberId),
+                TipLikeEntity.of(tipPostIds.get(2), memberId)
+        ));
+        tipLikeRepository.flush();
+
+        // when
+        List<TipLikeEntity> tipLikeList = tipLikeRepository.findByMemberId(memberId);
+
+        assertThat(tipLikeList).hasSize(tipPostIds.size());
+    }
+
+    @Test
     @DisplayName("사용자별 팁 게시글 좋아요 리스트 조회")
     void findTipLikesByMemberIdAndPostIds() {
         // given
