@@ -2,8 +2,8 @@ package kr.modusplant.domains.communication.tip.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.modusplant.domains.communication.tip.app.http.like.response.TipLikeResponse;
-import kr.modusplant.domains.communication.tip.app.service.like.TipLikeApplicationService;
+import kr.modusplant.domains.communication.tip.app.http.response.TipLikeResponse;
+import kr.modusplant.domains.communication.tip.app.service.TipLikeApplicationService;
 import kr.modusplant.global.app.servlet.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
