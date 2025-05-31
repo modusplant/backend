@@ -50,7 +50,7 @@ public class TipLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
         TipPostEntity tipPost = createTipPostEntityBuilder()
                 .authMember(member)
                 .createMember(member)
-                .group(createPlantGroupEntity())
+                .group(testTipCategoryEntity)
                 .build();
         tipPostRepository.save(tipPost);
         tipPostId = tipPost.getUlid();
