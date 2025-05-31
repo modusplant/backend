@@ -10,10 +10,10 @@ import java.util.UUID;
 
 @Repository
 public interface QnaLikeRepository extends JpaRepository<QnaLikeEntity, QnaLikeId> {
-    // 사용자별 팁 게시글 좋아요 전체 리스트 조회
+    // 사용자별 Q&A 게시글 좋아요 전체 리스트 조회
     List<QnaLikeEntity> findByMemberId(UUID memberId);
 
-    // 사용자별 팁 게시글 좋아요 리스트 조회
+    // 사용자별 Q&A 게시글 좋아요 리스트 조회
     List<QnaLikeEntity> findByMemberIdAndQnaPostIdIn(UUID memberId, List<String> qnaPostIds);
 
     boolean existsByQnaPostIdAndMemberId(String qnaPostId, UUID memberId);
