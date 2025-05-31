@@ -1,6 +1,6 @@
 package kr.modusplant.domains.communication.tip.app.service;
 
-import kr.modusplant.domains.communication.tip.app.http.response.TipLikeResponse;
+import kr.modusplant.domains.communication.common.app.http.response.LikeResponse;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipLikeEntity;
@@ -63,7 +63,7 @@ public class TipLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
     @DisplayName("좋아요 성공")
     void likeTipPost_success() {
         // when
-        TipLikeResponse response = tipLikeApplicationService.likeTipPost(tipPostId, memberId);
+        LikeResponse response = tipLikeApplicationService.likeTipPost(tipPostId, memberId);
 
         // then
         assertThat(response.liked()).isTrue();
@@ -81,7 +81,7 @@ public class TipLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
         tipLikeApplicationService.likeTipPost(tipPostId, memberId);
 
         // when
-        TipLikeResponse response = tipLikeApplicationService.unlikeTipPost(tipPostId, memberId);
+        LikeResponse response = tipLikeApplicationService.unlikeTipPost(tipPostId, memberId);
 
         // then
         assertThat(response.liked()).isFalse();

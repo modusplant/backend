@@ -2,7 +2,7 @@ package kr.modusplant.domains.communication.tip.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.modusplant.domains.communication.tip.app.http.response.TipLikeResponse;
+import kr.modusplant.domains.communication.common.app.http.response.LikeResponse;
 import kr.modusplant.domains.communication.tip.app.service.TipLikeApplicationService;
 import kr.modusplant.global.app.servlet.response.DataResponse;
 import lombok.RequiredArgsConstructor;
@@ -26,13 +26,13 @@ public class TipLikeController {
 
     @Operation(summary = "팁 게시글 좋아요 API", description = "팁 게시글 좋아요 기능")
     @PostMapping("/{ulid}/like")
-    public ResponseEntity<DataResponse<TipLikeResponse>> likeTipPost(@PathVariable String ulid) {
+    public ResponseEntity<DataResponse<LikeResponse>> likeTipPost(@PathVariable String ulid) {
         return ResponseEntity.ok().body(DataResponse.ok(tipLikeApplicationService.likeTipPost(ulid, memberUuid)));
     }
 
     @Operation(summary = "팁 게시글 좋아요 취소 API", description = "팁 게시글 좋아요 취소 기능")
     @DeleteMapping("/{ulid}/like")
-    public ResponseEntity<DataResponse<TipLikeResponse>> unlikeTipPost(@PathVariable String ulid) {
+    public ResponseEntity<DataResponse<LikeResponse>> unlikeTipPost(@PathVariable String ulid) {
         return ResponseEntity.ok().body(DataResponse.ok(tipLikeApplicationService.unlikeTipPost(ulid, memberUuid)));
     }
 

@@ -1,6 +1,6 @@
 package kr.modusplant.domains.communication.tip.app.service;
 
-import kr.modusplant.domains.communication.tip.app.http.response.TipLikeResponse;
+import kr.modusplant.domains.communication.common.app.http.response.LikeResponse;
 import kr.modusplant.domains.communication.tip.domain.service.TipLikeValidationService;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipLikeEntity;
@@ -20,7 +20,7 @@ public class TipLikeApplicationService {
     private final TipLikeValidationService tipLikeValidationService;
 
     @Transactional
-    public TipLikeResponse likeTipPost(String tipPostId, UUID memberId) {
+    public LikeResponse likeTipPost(String tipPostId, UUID memberId) {
         tipLikeValidationService.validateExistedTipPostAndMember(tipPostId, memberId);
         tipLikeValidationService.validateTipLikeNotExists(tipPostId, memberId);
 
@@ -28,11 +28,11 @@ public class TipLikeApplicationService {
         tipPost.increaseLikeCount();
 
         tipLikeRepository.save(TipLikeEntity.of(tipPostId, memberId));
-        return TipLikeResponse.of(tipPost.getLikeCount(), true);
+        return LikeResponse.of(tipPost.getLikeCount(), true);
     }
 
     @Transactional
-    public TipLikeResponse unlikeTipPost(String tipPostId, UUID memberId) {
+    public LikeResponse unlikeTipPost(String tipPostId, UUID memberId) {
         tipLikeValidationService.validateExistedTipPostAndMember(tipPostId, memberId);
         tipLikeValidationService.validateTipLikeExists(tipPostId, memberId);
 
@@ -40,6 +40,6 @@ public class TipLikeApplicationService {
         tipPost.decreaseLikeCount();
 
         tipLikeRepository.deleteByTipPostIdAndMemberId(tipPostId, memberId);
-        return TipLikeResponse.of(tipPost.getLikeCount(), false);
+        return LikeResponse.of(tipPost.getLikeCount(), false);
     }
 }
