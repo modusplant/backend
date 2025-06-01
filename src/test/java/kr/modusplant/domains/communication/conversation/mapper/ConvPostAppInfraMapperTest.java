@@ -1,15 +1,15 @@
 package kr.modusplant.domains.communication.conversation.mapper;
 
+import kr.modusplant.domains.communication.conversation.app.http.response.ConvPostResponse;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvPostEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
+import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCategoryRepository;
+import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.domains.communication.conversation.app.http.response.ConvPostResponse;
-import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
-import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostRepository;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

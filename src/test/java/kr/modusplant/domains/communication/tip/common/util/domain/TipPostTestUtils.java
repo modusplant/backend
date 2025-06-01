@@ -2,8 +2,8 @@ package kr.modusplant.domains.communication.tip.common.util.domain;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.domains.communication.tip.domain.model.TipPost;
+import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.global.persistence.generator.UlidIdGenerator;
 import org.hibernate.generator.EventType;
 

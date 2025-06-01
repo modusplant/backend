@@ -1,7 +1,7 @@
 package kr.modusplant.domains.communication.conversation.common.util.app.http.request;
 
-import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostInsertRequest;
 import kr.modusplant.domains.communication.common.app.http.request.FileOrder;
+import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostInsertRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 

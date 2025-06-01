@@ -2,11 +2,11 @@ package kr.modusplant.domains.communication.conversation.app.service;
 
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvPostEntityTestUtils;
-import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostRepository;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostViewCountRedisRepository;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostViewLockRedisRepository;
+import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import kr.modusplant.global.persistence.generator.UlidIdGenerator;
 import org.hibernate.generator.EventType;

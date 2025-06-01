@@ -1,8 +1,8 @@
 package kr.modusplant.domains.communication.qna.mapper;
 
 import kr.modusplant.domains.communication.common.mapper.supers.PostAppInfraMapper;
-import kr.modusplant.domains.communication.qna.persistence.entity.QnaCategoryEntity;
 import kr.modusplant.domains.communication.qna.app.http.response.QnaPostResponse;
+import kr.modusplant.domains.communication.qna.persistence.entity.QnaCategoryEntity;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

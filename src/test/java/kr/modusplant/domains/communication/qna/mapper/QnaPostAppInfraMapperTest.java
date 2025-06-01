@@ -1,15 +1,15 @@
 package kr.modusplant.domains.communication.qna.mapper;
 
+import kr.modusplant.domains.communication.qna.app.http.response.QnaPostResponse;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaPostEntityTestUtils;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaCategoryEntity;
+import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaCategoryRepository;
+import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.domains.communication.qna.app.http.response.QnaPostResponse;
-import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
-import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostRepository;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

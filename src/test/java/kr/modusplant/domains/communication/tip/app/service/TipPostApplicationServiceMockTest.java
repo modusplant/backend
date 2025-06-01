@@ -2,11 +2,11 @@ package kr.modusplant.domains.communication.tip.app.service;
 
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
-import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipPostViewCountRedisRepository;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipPostViewLockRedisRepository;
+import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import kr.modusplant.global.persistence.generator.UlidIdGenerator;
 import org.hibernate.generator.EventType;

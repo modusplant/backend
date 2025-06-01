@@ -1,10 +1,10 @@
 package kr.modusplant.domains.communication.conversation.app.service;
 
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.communication.conversation.app.http.response.ConvCategoryResponse;
 import kr.modusplant.domains.communication.conversation.common.util.app.http.request.ConvCategoryRequestTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.app.http.response.ConvCategoryResponseTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCategoryEntityTestUtils;
-import kr.modusplant.domains.communication.conversation.app.http.response.ConvCategoryResponse;
 import kr.modusplant.domains.communication.conversation.mapper.ConvCategoryAppInfraMapper;
 import kr.modusplant.domains.communication.conversation.mapper.ConvCategoryAppInfraMapperImpl;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;

@@ -1,15 +1,15 @@
 package kr.modusplant.domains.communication.tip.mapper;
 
+import kr.modusplant.domains.communication.tip.app.http.response.TipPostResponse;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipCategoryRepository;
+import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.domains.communication.tip.app.http.response.TipPostResponse;
-import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
-import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

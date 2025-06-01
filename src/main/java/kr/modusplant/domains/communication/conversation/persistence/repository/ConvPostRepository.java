@@ -4,7 +4,6 @@ import kr.modusplant.domains.common.persistence.repository.supers.CreatedAtAndUp
 import kr.modusplant.domains.common.persistence.repository.supers.UlidPrimaryRepository;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
-
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,7 +1,7 @@
 package kr.modusplant.domains.communication.qna.persistence.entity;
 
-import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaPostEntityTestUtils;
+import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,14 +1,14 @@
 package kr.modusplant.domains.communication.tip.domain.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import kr.modusplant.domains.communication.tip.common.util.domain.TipPostTestUtils;
-import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipPostRequestTestUtils;
-import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
-import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.communication.tip.app.http.request.TipPostInsertRequest;
 import kr.modusplant.domains.communication.common.error.PostAccessDeniedException;
+import kr.modusplant.domains.communication.tip.app.http.request.TipPostInsertRequest;
+import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipPostRequestTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.domain.TipPostTestUtils;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
+import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +21,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

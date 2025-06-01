@@ -5,6 +5,7 @@ import kr.modusplant.domains.communication.tip.app.http.request.TipPostInsertReq
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostUpdateRequest;
 import kr.modusplant.domains.communication.tip.app.http.response.TipPostResponse;
 import kr.modusplant.domains.communication.tip.domain.service.TipCategoryValidationService;
+import kr.modusplant.domains.communication.tip.domain.service.TipPostValidationService;
 import kr.modusplant.domains.communication.tip.mapper.TipPostAppInfraMapper;
 import kr.modusplant.domains.communication.tip.mapper.TipPostAppInfraMapperImpl;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
@@ -16,7 +17,6 @@ import kr.modusplant.domains.communication.tip.persistence.repository.TipPostVie
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.domains.communication.tip.domain.service.TipPostValidationService;
 import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +24,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 import java.io.IOException;
 import java.util.Optional;

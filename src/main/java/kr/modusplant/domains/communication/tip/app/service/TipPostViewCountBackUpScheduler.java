@@ -1,7 +1,7 @@
 package kr.modusplant.domains.communication.tip.app.service;
 
-import kr.modusplant.domains.communication.tip.persistence.repository.TipPostViewCountRedisRepository;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
+import kr.modusplant.domains.communication.tip.persistence.repository.TipPostViewCountRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

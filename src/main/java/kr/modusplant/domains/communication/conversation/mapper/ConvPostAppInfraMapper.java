@@ -1,9 +1,9 @@
 package kr.modusplant.domains.communication.conversation.mapper;
 
 import kr.modusplant.domains.communication.common.mapper.supers.PostAppInfraMapper;
+import kr.modusplant.domains.communication.conversation.app.http.response.ConvPostResponse;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
-import kr.modusplant.domains.communication.conversation.app.http.response.ConvPostResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

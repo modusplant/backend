@@ -2,8 +2,8 @@ package kr.modusplant.domains.communication.qna.common.util.domain;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.domains.communication.qna.domain.model.QnaPost;
+import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.global.persistence.generator.UlidIdGenerator;
 import org.hibernate.generator.EventType;
 

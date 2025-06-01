@@ -3,8 +3,6 @@ package kr.modusplant.domains.communication.conversation.mapper;
 import kr.modusplant.domains.communication.conversation.common.util.app.http.request.ConvCategoryRequestTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.app.http.response.ConvCategoryResponseTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCategoryEntityTestUtils;
-import kr.modusplant.domains.communication.conversation.mapper.ConvCategoryAppInfraMapper;
-import kr.modusplant.domains.communication.conversation.mapper.ConvCategoryAppInfraMapperImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
