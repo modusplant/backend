@@ -28,7 +28,7 @@ class TipPostViewCountBackUpSchedulerTest {
     private static final UlidIdGenerator generator = new UlidIdGenerator();
 
     @Test
-    @DisplayName("")
+    @DisplayName("Redis 조회 수를 DB와 동기화")
     void syncRedisViewCountToDatabaseTest() {
         // given
         String ulid1 = generator.generate(null,null,null, EventType.INSERT);

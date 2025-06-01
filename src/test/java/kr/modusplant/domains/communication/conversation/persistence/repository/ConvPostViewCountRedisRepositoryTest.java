@@ -90,7 +90,7 @@ class ConvPostViewCountRedisRepositoryTest {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("Redis에서 모든 값을 찾기")
     void findAllTest() {
         // given
         String ulid2 = generator.generate(null,null,null, EventType.INSERT);
