@@ -1,6 +1,7 @@
 package kr.modusplant.domains.common.context;
 
 import kr.modusplant.domains.common.postprocessor.MockDomainsRepositoryBeanFactoryPostProcessor;
+import kr.modusplant.domains.common.postprocessor.MockDomainsSchedulerBeanFactoryPostProcessor;
 import kr.modusplant.domains.common.postprocessor.MockDomainsServiceBeanFactoryPostProcessor;
 import kr.modusplant.global.config.TestJpaConfig;
 import kr.modusplant.global.config.TestRedisConfig;
@@ -28,7 +29,11 @@ import static kr.modusplant.domains.common.vo.Reference.NOTATION_DOMAINS;
         includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Controller.class)
 )
 @AutoConfigureMockMvc(addFilters = false)
-@Import({TestJpaConfig.class, TestRedisConfig.class, MockDomainsRepositoryBeanFactoryPostProcessor.class, MockDomainsServiceBeanFactoryPostProcessor.class})
+@Import({TestJpaConfig.class,
+        TestRedisConfig.class,
+        MockDomainsRepositoryBeanFactoryPostProcessor.class,
+        MockDomainsSchedulerBeanFactoryPostProcessor.class,
+        MockDomainsServiceBeanFactoryPostProcessor.class})
 @ExtendWith(MockitoExtension.class)
 @Execution(ExecutionMode.CONCURRENT)
 public @interface DomainsControllerOnlyContext {
