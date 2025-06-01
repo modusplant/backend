@@ -1,8 +1,8 @@
 package kr.modusplant.global.middleware.redis;
 
+import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -10,7 +10,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@SpringBootTest
+@RepositoryOnlyContext
 class RedisHelperTest {
     @Autowired
     private RedisHelper redisHelper;
