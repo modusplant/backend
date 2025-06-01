@@ -1,7 +1,6 @@
 package kr.modusplant.domains.common.context;
 
 import kr.modusplant.domains.common.postprocessor.MockDomainsRepositoryBeanFactoryPostProcessor;
-import kr.modusplant.domains.common.postprocessor.MockDomainsSchedulerBeanFactoryPostProcessor;
 import kr.modusplant.domains.common.scan.ScanDomainsService;
 import kr.modusplant.global.config.TestJpaConfig;
 import kr.modusplant.global.config.TestRedisConfig;
@@ -23,10 +22,7 @@ import java.lang.annotation.*;
 @Documented
 @SpringBootTest(classes = ScanDomainsService.class)
 @EnableJpaRepositories(excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
-@Import({TestJpaConfig.class,
-        TestRedisConfig.class,
-        MockDomainsRepositoryBeanFactoryPostProcessor.class,
-        MockDomainsSchedulerBeanFactoryPostProcessor.class})
+@Import({TestJpaConfig.class, TestRedisConfig.class, MockDomainsRepositoryBeanFactoryPostProcessor.class})
 @ExtendWith(MockitoExtension.class)
 @Execution(ExecutionMode.CONCURRENT)
 public @interface DomainsServiceOnlyContext {
