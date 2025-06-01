@@ -103,6 +103,8 @@ public class TipPostApplicationService {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
+                    Optional.ofNullable(tipPostViewCountRedisRepository.read(ulid))
+                            .ifPresent(tipPost::updateViewCount);
                     return tipPostAppInfraMapper.toTipPostResponse(tipPost);
                 });
     }

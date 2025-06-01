@@ -103,6 +103,8 @@ public class QnaPostApplicationService {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
+                    Optional.ofNullable(qnaPostViewCountRedisRepository.read(ulid))
+                            .ifPresent(qnaPost::updateViewCount);
                     return qnaPostAppInfraMapper.toQnaPostResponse(qnaPost);
                 });
     }

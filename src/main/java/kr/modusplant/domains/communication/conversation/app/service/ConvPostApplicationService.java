@@ -103,6 +103,8 @@ public class ConvPostApplicationService {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
+                    Optional.ofNullable(convPostViewCountRedisRepository.read(ulid))
+                            .ifPresent(convPost::updateViewCount);
                     return convPostAppInfraMapper.toConvPostResponse(convPost);
                 });
     }
