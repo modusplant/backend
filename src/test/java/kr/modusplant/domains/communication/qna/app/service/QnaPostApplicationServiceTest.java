@@ -7,6 +7,7 @@ import kr.modusplant.domains.communication.qna.common.util.entity.QnaPostEntityT
 import kr.modusplant.domains.communication.qna.common.util.app.http.request.QnaPostRequestTestUtils;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaCategoryEntity;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaCategoryRepository;
+import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostViewCountRedisRepository;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
@@ -50,6 +51,9 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, QnaCat
 
     @Autowired
     private MediaContentService mediaContentService;
+
+    @Autowired
+    private QnaPostViewCountRedisRepository qnaPostViewCountRedisRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -188,6 +192,7 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, QnaCat
                 .content(mediaContentService.saveFilesAndGenerateContentJson(qnaPostInsertRequest.content()))
                 .build();
         qnaPostRepository.save(qnaPostEntity);
+        qnaPostViewCountRedisRepository.write(qnaPostEntity.getUlid(),5L);
 
         // when
         Optional<QnaPostResponse> result = qnaPostApplicationService.getByUlid(qnaPostEntity.getUlid());
@@ -197,6 +202,7 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, QnaCat
         assertThat(response.getNickname()).isEqualTo(siteMember.getNickname());
         assertThat(response.getCategory()).isEqualTo(qnaCategoryEntity.getCategory());
         assertThat(response.getTitle()).isEqualTo(qnaPostInsertRequest.title());
+        assertThat(response.getViewCount()).isEqualTo(5L);
     }
 
     @Test

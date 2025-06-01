@@ -7,6 +7,7 @@ import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityT
 import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipPostRequestTestUtils;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipCategoryRepository;
+import kr.modusplant.domains.communication.tip.persistence.repository.TipPostViewCountRedisRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
@@ -49,6 +50,9 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
 
     @Autowired
     private MediaContentService mediaContentService;
+
+    @Autowired
+    private TipPostViewCountRedisRepository tipPostViewCountRedisRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -189,6 +193,7 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
                 .content(mediaContentService.saveFilesAndGenerateContentJson(tipPostInsertRequest.content()))
                 .build();
         tipPostRepository.save(tipPostEntity);
+        tipPostViewCountRedisRepository.write(tipPostEntity.getUlid(),5L);
 
         // when
         Optional<TipPostResponse> result = tipPostApplicationService.getByUlid(tipPostEntity.getUlid());
@@ -198,6 +203,7 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
         assertThat(response.getNickname()).isEqualTo(siteMember.getNickname());
         assertThat(response.getCategory()).isEqualTo(tipCategoryEntity.getCategory());
         assertThat(response.getTitle()).isEqualTo(tipPostInsertRequest.title());
+        assertThat(response.getViewCount()).isEqualTo(5L);
     }
 
     @Test

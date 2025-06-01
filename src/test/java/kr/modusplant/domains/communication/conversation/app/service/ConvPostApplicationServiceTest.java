@@ -9,6 +9,7 @@ import kr.modusplant.domains.communication.conversation.common.util.entity.ConvP
 import kr.modusplant.domains.communication.conversation.common.util.app.http.request.ConvPostRequestTestUtils;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCategoryRepository;
+import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostViewCountRedisRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
@@ -49,6 +50,9 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
 
     @Autowired
     private MediaContentService mediaContentService;
+
+    @Autowired
+    private ConvPostViewCountRedisRepository convPostViewCountRedisRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -191,6 +195,7 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
                 .content(mediaContentService.saveFilesAndGenerateContentJson(convPostInsertRequest.content()))
                 .build();
         convPostRepository.save(convPostEntity);
+        convPostViewCountRedisRepository.write(convPostEntity.getUlid(),5L);
 
         // when
         Optional<ConvPostResponse> result = convPostApplicationService.getByUlid(convPostEntity.getUlid());
@@ -200,6 +205,7 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
         assertThat(response.getNickname()).isEqualTo(siteMember.getNickname());
         assertThat(response.getCategory()).isEqualTo(convCategoryEntity.getCategory());
         assertThat(response.getTitle()).isEqualTo(convPostInsertRequest.title());
+        assertThat(response.getViewCount()).isEqualTo(5L);
     }
 
     @Test
