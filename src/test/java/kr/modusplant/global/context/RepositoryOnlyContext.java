@@ -3,6 +3,7 @@ package kr.modusplant.global.context;
 import kr.modusplant.ModusplantApplication;
 import kr.modusplant.global.config.TestJpaConfig;
 import kr.modusplant.global.config.TestRedisConfig;
+import kr.modusplant.global.middleware.redis.RedisHelper;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
@@ -22,6 +23,6 @@ import static kr.modusplant.global.vo.Reference.NOTATION_ALL;
 @ContextConfiguration(classes = ModusplantApplication.class)
 @EnableJpaRepositories(basePackages = NOTATION_ALL)
 @Transactional
-@Import({TestJpaConfig.class, TestRedisConfig.class})
+@Import({TestJpaConfig.class, TestRedisConfig.class, RedisHelper.class})
 public @interface RepositoryOnlyContext {
 }
