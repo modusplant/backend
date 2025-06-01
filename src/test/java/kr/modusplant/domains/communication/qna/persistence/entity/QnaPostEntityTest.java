@@ -25,9 +25,8 @@ class QnaPostEntityTest implements QnaPostEntityTestUtils {
     void prePersist() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        QnaCategoryEntity qnaCategory = testQnaCategoryEntity;
         QnaPostEntity qnaPost = createQnaPostEntityBuilder()
-                .group(qnaCategory)
+                .group(testQnaCategoryEntity)
                 .authMember(member)
                 .createMember(member)
                 .likeCount(1)
@@ -50,9 +49,8 @@ class QnaPostEntityTest implements QnaPostEntityTestUtils {
     void preUpdate() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        QnaCategoryEntity qnaCategory = testQnaCategoryEntity;
         QnaPostEntity qnaPost = createQnaPostEntityBuilder()
-                .group(qnaCategory)
+                .group(testQnaCategoryEntity)
                 .authMember(member)
                 .createMember(member)
                 .build();

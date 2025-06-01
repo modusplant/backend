@@ -156,9 +156,8 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils {
     void validateNotFoundUlidNotExists() {
         String ulid = QnaPostTestUtils.generator.generate(null, null,null,EventType.INSERT);
         when(qnaPostRepository.existsByUlid(ulid)).thenReturn(false);
-        assertThrows(EntityNotFoundWithUlidException.class, () -> {
-            qnaPostValidationService.validateNotFoundUlid(ulid);
-        });
+        assertThrows(EntityNotFoundWithUlidException.class, () ->
+                qnaPostValidationService.validateNotFoundUlid(ulid));
     }
 
 }

@@ -156,9 +156,8 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils {
     void validateNotFoundUlidNotExists() {
         String ulid = ConvPostTestUtils.generator.generate(null, null,null,EventType.INSERT);
         when(convPostRepository.existsByUlid(ulid)).thenReturn(false);
-        assertThrows(EntityNotFoundWithUlidException.class, () -> {
-            convPostValidationService.validateNotFoundUlid(ulid);
-        });
+        assertThrows(EntityNotFoundWithUlidException.class, () ->
+                convPostValidationService.validateNotFoundUlid(ulid));
     }
 
 }

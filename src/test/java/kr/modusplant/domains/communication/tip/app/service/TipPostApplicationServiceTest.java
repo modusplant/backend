@@ -1,6 +1,5 @@
 package kr.modusplant.domains.communication.tip.app.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.common.domain.service.MediaContentService;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostInsertRequest;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostUpdateRequest;
@@ -54,9 +53,6 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
     @Autowired
     private TipPostViewCountRedisRepository tipPostViewCountRedisRepository;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     private UUID memberUuid;
     private Integer groupOrder;
 
@@ -75,12 +71,9 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
     @DisplayName("전체 팁 게시글 목록 조회하기")
     void getAllTest() throws IOException {
         // given
-        TipPostInsertRequest tipPostInsertRequest1 = requestAllTypes;
-        TipPostInsertRequest tipPostInsertRequest2 = requestAllTypes;
-        TipPostInsertRequest tipPostInsertRequest3 = requestAllTypes;
-        tipPostApplicationService.insert(tipPostInsertRequest1,memberUuid);
-        tipPostApplicationService.insert(tipPostInsertRequest2,memberUuid);
-        tipPostApplicationService.insert(tipPostInsertRequest3,memberUuid);
+        tipPostApplicationService.insert(requestAllTypes, memberUuid);
+        tipPostApplicationService.insert(requestAllTypes, memberUuid);
+        tipPostApplicationService.insert(requestAllTypes, memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
@@ -101,19 +94,16 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
     @DisplayName("사이트 회원별 팁 게시글 목록 조회하기")
     void getByMemberUuidTest() throws IOException {
         // given
-        SiteMemberEntity member2 = createMemberKakaoUserEntity();
-        siteMemberRepository.save(member2);
-        UUID memberUuid2 = member2.getUuid();
-        TipPostInsertRequest tipPostInsertRequest1 = requestAllTypes;
-        TipPostInsertRequest tipPostInsertRequest2 = requestAllTypes;
-        TipPostInsertRequest tipPostInsertRequest3 = requestAllTypes;
-        tipPostApplicationService.insert(tipPostInsertRequest1,memberUuid);
-        tipPostApplicationService.insert(tipPostInsertRequest2,memberUuid2);
-        tipPostApplicationService.insert(tipPostInsertRequest3,memberUuid);
+        SiteMemberEntity member = createMemberKakaoUserEntity();
+        siteMemberRepository.save(member);
+        UUID memberUuid2 = member.getUuid();
+        tipPostApplicationService.insert(requestAllTypes, memberUuid);
+        tipPostApplicationService.insert(requestAllTypes, memberUuid2);
+        tipPostApplicationService.insert(requestAllTypes, memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
-        Page<TipPostResponse> result = tipPostApplicationService.getByMemberUuid(memberUuid,pageable);
+        Page<TipPostResponse> result = tipPostApplicationService.getByMemberUuid(memberUuid, pageable);
 
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getNumber()).isEqualTo(0);
@@ -132,16 +122,13 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
                 .order(2)
                 .category("기타")
                 .build());
-        TipPostInsertRequest tipPostInsertRequest1 = requestAllTypes;
-        TipPostInsertRequest tipPostInsertRequest2 = requestAllTypes;
-        TipPostInsertRequest tipPostInsertRequest3 = requestBasicTypes;
-        tipPostApplicationService.insert(tipPostInsertRequest1,memberUuid);
-        tipPostApplicationService.insert(tipPostInsertRequest2,memberUuid);
-        tipPostApplicationService.insert(tipPostInsertRequest3,memberUuid);
+        tipPostApplicationService.insert(requestAllTypes, memberUuid);
+        tipPostApplicationService.insert(requestAllTypes, memberUuid);
+        tipPostApplicationService.insert(requestBasicTypes, memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
-        Page<TipPostResponse> result = tipPostApplicationService.getByGroupOrder(groupOrder,pageable);
+        Page<TipPostResponse> result = tipPostApplicationService.getByGroupOrder(groupOrder, pageable);
 
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getNumber()).isEqualTo(0);
@@ -158,22 +145,21 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
         // given
         tipCategoryRepository.save(TipCategoryEntity.builder()
                 .order(2).category("기타").build());
-        TipPostInsertRequest tipPostInsertRequest1 = requestAllTypes;
-        TipPostInsertRequest tipPostInsertRequest2 = requestBasicTypes;
-        tipPostApplicationService.insert(tipPostInsertRequest1,memberUuid);
-        tipPostApplicationService.insert(tipPostInsertRequest2,memberUuid);
+        TipPostInsertRequest tipPostInsertRequest = requestBasicTypes;
+        tipPostApplicationService.insert(requestAllTypes, memberUuid);
+        tipPostApplicationService.insert(tipPostInsertRequest, memberUuid);
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
         String keyword1 = "기르기";
         String keyword2 = "test";
-        Page<TipPostResponse> result1 = tipPostApplicationService.searchByKeyword(keyword1,pageable);
-        Page<TipPostResponse> result2 = tipPostApplicationService.searchByKeyword(keyword2,pageable);
+        Page<TipPostResponse> result1 = tipPostApplicationService.searchByKeyword(keyword1, pageable);
+        Page<TipPostResponse> result2 = tipPostApplicationService.searchByKeyword(keyword2, pageable);
 
         assertThat(result1.getTotalElements()).isEqualTo(1);
         assertThat(result2.getTotalElements()).isEqualTo(2);
-        TipPostResponse post = result1.getContent().get(0);
-        assertThat(post.getTitle()).isEqualTo(tipPostInsertRequest2.title());
+        TipPostResponse post = result1.getContent().getFirst();
+        assertThat(post.getTitle()).isEqualTo(tipPostInsertRequest.title());
         assertThat(post.getContent().get(1).has("data")).isEqualTo(true);
     }
 

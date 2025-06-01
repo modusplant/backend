@@ -1,6 +1,5 @@
 package kr.modusplant.domains.communication.qna.app.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.common.domain.service.MediaContentService;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostInsertRequest;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostUpdateRequest;
@@ -54,9 +53,6 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, QnaCat
     @Autowired
     private QnaPostViewCountRedisRepository qnaPostViewCountRedisRepository;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     private UUID memberUuid;
     private Integer groupOrder;
 
@@ -75,12 +71,9 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, QnaCat
     @DisplayName("전체 팁 게시글 목록 조회하기")
     void getAllTest() throws IOException {
         // given
-        QnaPostInsertRequest qnaPostInsertRequest1 = requestAllTypes;
-        QnaPostInsertRequest qnaPostInsertRequest2 = requestAllTypes;
-        QnaPostInsertRequest qnaPostInsertRequest3 = requestAllTypes;
-        qnaPostApplicationService.insert(qnaPostInsertRequest1,memberUuid);
-        qnaPostApplicationService.insert(qnaPostInsertRequest2,memberUuid);
-        qnaPostApplicationService.insert(qnaPostInsertRequest3,memberUuid);
+        qnaPostApplicationService.insert(requestAllTypes, memberUuid);
+        qnaPostApplicationService.insert(requestAllTypes, memberUuid);
+        qnaPostApplicationService.insert(requestAllTypes, memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
@@ -101,19 +94,16 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, QnaCat
     @DisplayName("사이트 회원별 팁 게시글 목록 조회하기")
     void getByMemberUuidTest() throws IOException {
         // given
-        SiteMemberEntity member2 = createMemberKakaoUserEntity();
-        siteMemberRepository.save(member2);
-        UUID memberUuid2 = member2.getUuid();
-        QnaPostInsertRequest qnaPostInsertRequest1 = requestAllTypes;
-        QnaPostInsertRequest qnaPostInsertRequest2 = requestAllTypes;
-        QnaPostInsertRequest qnaPostInsertRequest3 = requestAllTypes;
-        qnaPostApplicationService.insert(qnaPostInsertRequest1,memberUuid);
-        qnaPostApplicationService.insert(qnaPostInsertRequest2,memberUuid2);
-        qnaPostApplicationService.insert(qnaPostInsertRequest3,memberUuid);
+        SiteMemberEntity member = createMemberKakaoUserEntity();
+        siteMemberRepository.save(member);
+        UUID memberUuid2 = member.getUuid();
+        qnaPostApplicationService.insert(requestAllTypes, memberUuid);
+        qnaPostApplicationService.insert(requestAllTypes, memberUuid2);
+        qnaPostApplicationService.insert(requestAllTypes, memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
-        Page<QnaPostResponse> result = qnaPostApplicationService.getByMemberUuid(memberUuid,pageable);
+        Page<QnaPostResponse> result = qnaPostApplicationService.getByMemberUuid(memberUuid, pageable);
 
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getNumber()).isEqualTo(0);
@@ -130,16 +120,13 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, QnaCat
         // given
         qnaCategoryRepository.save(QnaCategoryEntity.builder()
                         .order(2).category("기타").build());
-        QnaPostInsertRequest qnaPostInsertRequest1 = requestAllTypes;
-        QnaPostInsertRequest qnaPostInsertRequest2 = requestAllTypes;
-        QnaPostInsertRequest qnaPostInsertRequest3 = requestBasicTypes;
-        qnaPostApplicationService.insert(qnaPostInsertRequest1,memberUuid);
-        qnaPostApplicationService.insert(qnaPostInsertRequest2,memberUuid);
-        qnaPostApplicationService.insert(qnaPostInsertRequest3,memberUuid);
+        qnaPostApplicationService.insert(requestAllTypes, memberUuid);
+        qnaPostApplicationService.insert(requestAllTypes, memberUuid);
+        qnaPostApplicationService.insert(requestBasicTypes, memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
-        Page<QnaPostResponse> result = qnaPostApplicationService.getByGroupOrder(groupOrder,pageable);
+        Page<QnaPostResponse> result = qnaPostApplicationService.getByGroupOrder(groupOrder, pageable);
 
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getNumber()).isEqualTo(0);
@@ -156,22 +143,21 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, QnaCat
         // given
         qnaCategoryRepository.save(QnaCategoryEntity.builder()
                 .order(2).category("기타").build());
-        QnaPostInsertRequest qnaPostInsertRequest1 = requestAllTypes;
-        QnaPostInsertRequest qnaPostInsertRequest2 = requestBasicTypes;
-        qnaPostApplicationService.insert(qnaPostInsertRequest1,memberUuid);
-        qnaPostApplicationService.insert(qnaPostInsertRequest2,memberUuid);
+        QnaPostInsertRequest qnaPostInsertRequest = requestBasicTypes;
+        qnaPostApplicationService.insert(requestAllTypes, memberUuid);
+        qnaPostApplicationService.insert(qnaPostInsertRequest, memberUuid);
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
         String keyword1 = "기르기";
         String keyword2 = "test";
-        Page<QnaPostResponse> result1 = qnaPostApplicationService.searchByKeyword(keyword1,pageable);
-        Page<QnaPostResponse> result2 = qnaPostApplicationService.searchByKeyword(keyword2,pageable);
+        Page<QnaPostResponse> result1 = qnaPostApplicationService.searchByKeyword(keyword1, pageable);
+        Page<QnaPostResponse> result2 = qnaPostApplicationService.searchByKeyword(keyword2, pageable);
 
         assertThat(result1.getTotalElements()).isEqualTo(1);
         assertThat(result2.getTotalElements()).isEqualTo(2);
-        QnaPostResponse post = result1.getContent().get(0);
-        assertThat(post.getTitle()).isEqualTo(qnaPostInsertRequest2.title());
+        QnaPostResponse post = result1.getContent().getFirst();
+        assertThat(post.getTitle()).isEqualTo(qnaPostInsertRequest.title());
         assertThat(post.getContent().get(1).has("data")).isEqualTo(true);
     }
 

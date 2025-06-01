@@ -29,32 +29,33 @@ public interface QnaPostTestUtils extends QnaCategoryTestUtils, SiteMemberTestUt
             .build();
 
     static JsonNode createSampleContent() {
-        String json = "[\n" +
-                "  {\n" +
-                "    \"type\": \"text\",\n" +
-                "    \"filename\": \"text_0.txt\",\n" +
-                "    \"order\": 1,\n" +
-                "    \"data\": \"Hello, this is text part 1.\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"type\": \"image\",\n" +
-                "    \"filename\": \"image_0.jpg\",\n" +
-                "    \"order\": 2,\n" +
-                "    \"src\": \"/images/16e94f67-5abc-48d2-95a1-9cb4e78c7890.jpg\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"type\": \"text\",\n" +
-                "    \"filename\": \"text_1.txt\",\n" +
-                "    \"order\": 3,\n" +
-                "    \"value\": \"This is text part 2.\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"type\": \"video\",\n" +
-                "    \"filename\": \"video_0.mp4\",\n" +
-                "    \"order\": 4,\n" +
-                "    \"src\": \"/videos/2a7b8c9d-12e3-45f6-789a-bcde0123f456.mp4\"\n" +
-                "  }\n" +
-                "]";
+        String json = """
+                [
+                  {
+                    "type": "text",
+                    "filename": "text_0.txt",
+                    "order": 1,
+                    "data": "Hello, this is text part 1."
+                  },
+                  {
+                    "type": "image",
+                    "filename": "image_0.jpg",
+                    "order": 2,
+                    "src": "/images/16e94f67-5abc-48d2-95a1-9cb4e78c7890.jpg"
+                  },
+                  {
+                    "type": "text",
+                    "filename": "text_1.txt",
+                    "order": 3,
+                    "value": "This is text part 2."
+                  },
+                  {
+                    "type": "video",
+                    "filename": "video_0.mp4",
+                    "order": 4,
+                    "src": "/videos/2a7b8c9d-12e3-45f6-789a-bcde0123f456.mp4"
+                  }
+                ]""";
 
         try {
             return objectMapper.readTree(json);

@@ -1,6 +1,5 @@
 package kr.modusplant.domains.communication.conversation.persistence.repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCategoryEntityTestUtils;
@@ -32,7 +31,6 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
     private final ConvPostRepository convPostRepository;
     private final ConvCategoryRepository convCategoryRepository;
     private final SiteMemberRepository siteMemberRepository;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -112,7 +110,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
                         .createMember(testSiteMember)
                         .build()
                 ).collect(Collectors.toList());
-        convPosts.get(0).updateIsDeleted(true);
+        convPosts.getFirst().updateIsDeleted(true);
         convPostRepository.saveAll(convPosts);
 
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -122,7 +120,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(4); // 삭제된 1건 제외
-        assertThat(result.getContent().stream().allMatch(post -> !post.getIsDeleted())).isTrue();
+        assertThat(result.getContent().stream().noneMatch(ConvPostEntity::getIsDeleted)).isTrue();
 
         List<ConvPostEntity> content = result.getContent();
         for (int i = 0; i < content.size() - 1; i++) {
@@ -144,7 +142,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
                         .createMember(testSiteMember)
                         .build()
                 ).collect(Collectors.toList());
-        convPosts.get(0).updateIsDeleted(true);
+        convPosts.getFirst().updateIsDeleted(true);
         convPostRepository.saveAll(convPosts);
 
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -176,7 +174,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
                         .createMember(i % 2 == 0 ? testSiteMember : testSiteMember2)
                         .build()
                 ).collect(Collectors.toList());
-        convPosts.get(0).updateIsDeleted(true);
+        convPosts.getFirst().updateIsDeleted(true);
         convPostRepository.saveAll(convPosts);
 
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -291,7 +289,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
 
         // then
         assertThat(found).isPresent();
-        assertThat(found.get().getUlid()).isEqualTo(convPostEntity1.getUlid());
+        assertThat(found.orElseThrow().getUlid()).isEqualTo(convPostEntity1.getUlid());
         assertThat(notFound).isEmpty();
     }
 
@@ -299,7 +297,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
     @DisplayName("제목+본문 검색어로 게시글 목록 찾기")
     void searchByTitleOrContentTest() {
         // given
-        ConvPostEntity convPostEntity = convPostRepository.save(
+        convPostRepository.save(
                 createConvPostEntityBuilder()
                         .group(testConvCategory)
                         .authMember(testSiteMember)
@@ -316,7 +314,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
         assertThat(result1.getTotalElements()).isEqualTo(1);
         assertThat(result2.getTotalElements()).isEqualTo(1);
         assertThat(result3.getTotalElements()).isEqualTo(0);
-        assertThat(result1.getContent().get(0).getContent().get(1).has("src")).isEqualTo(true);
+        assertThat(result1.getContent().getFirst().getContent().get(1).has("src")).isEqualTo(true);
     }
 
     @Test

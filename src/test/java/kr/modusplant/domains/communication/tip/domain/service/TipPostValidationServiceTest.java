@@ -156,9 +156,8 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
     void validateNotFoundUlidNotExists() {
         String ulid = TipPostTestUtils.generator.generate(null, null,null,EventType.INSERT);
         when(tipPostRepository.existsByUlid(ulid)).thenReturn(false);
-        assertThrows(EntityNotFoundWithUlidException.class, () -> {
-            tipPostValidationService.validateNotFoundUlid(ulid);
-        });
+        assertThrows(EntityNotFoundWithUlidException.class, () ->
+                tipPostValidationService.validateNotFoundUlid(ulid));
     }
 
 }

@@ -38,25 +38,25 @@ public class ConvPostController {
 
     @Operation(summary = "전체 팁 게시글 목록 조회 API", description = "전체 팁 게시글의 목록과 페이지 정보를 조회합니다.")
     @GetMapping("")
-    public ResponseEntity<DataResponse<PostPageResponse>> getAllConvPosts(Pageable pageable) {
+    public ResponseEntity<DataResponse<PostPageResponse<?>>> getAllConvPosts(Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(convPostApplicationService.getAll(pageable))));
     }
 
     @Operation(summary = "사이트 회원별 팁 게시글 목록 조회 API", description = "사이트 회원별 팁 게시글의 목록과 페이지 정보를 조회합니다.")
     @GetMapping("/members/{memb_uuid}")
-    public ResponseEntity<DataResponse<PostPageResponse>> getConvPostsByMember(@PathVariable("memb_uuid") UUID memberUuid, Pageable pageable) {
+    public ResponseEntity<DataResponse<PostPageResponse<?>>> getConvPostsByMember(@PathVariable("memb_uuid") UUID memberUuid, Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(convPostApplicationService.getByMemberUuid(memberUuid,pageable))));
     }
 
     @Operation(summary = "식물 그룹별 팁 게시글 목록 조회 API", description = "식물 그룹별 팁 게시글의 목록과 페이지 정보를 조회합니다.")
     @GetMapping("/plant-groups/{group_id}")
-    public ResponseEntity<DataResponse<PostPageResponse>> getConvPostsByConvCategory(@PathVariable("group_id") Integer groupOrder, Pageable pageable) {
+    public ResponseEntity<DataResponse<PostPageResponse<?>>> getConvPostsByConvCategory(@PathVariable("group_id") Integer groupOrder, Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(convPostApplicationService.getByGroupOrder(groupOrder,pageable))));
     }
 
     @Operation(summary = "제목+본문 검색어로 팁 게시글 목록 조회 API", description = "제목+본문 검색어로 팁 게시글의 목록과 페이지 정보를 조회합니다.")
     @GetMapping("/search")
-    public ResponseEntity<DataResponse<PostPageResponse>> searchConvPosts(@RequestParam String keyword, Pageable pageable) {
+    public ResponseEntity<DataResponse<PostPageResponse<?>>> searchConvPosts(@RequestParam String keyword, Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(convPostApplicationService.searchByKeyword(keyword,pageable))));
     }
 

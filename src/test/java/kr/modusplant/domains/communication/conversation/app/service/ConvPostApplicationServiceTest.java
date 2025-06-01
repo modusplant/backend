@@ -1,6 +1,5 @@
 package kr.modusplant.domains.communication.conversation.app.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.common.domain.service.MediaContentService;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostUpdateRequest;
@@ -54,9 +53,6 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
     @Autowired
     private ConvPostViewCountRedisRepository convPostViewCountRedisRepository;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     private UUID memberUuid;
     private Integer groupOrder;
 
@@ -75,12 +71,9 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
     @DisplayName("전체 팁 게시글 목록 조회하기")
     void getAllTest() throws IOException {
         // given
-        ConvPostInsertRequest convPostInsertRequest1 = requestAllTypes;
-        ConvPostInsertRequest convPostInsertRequest2 = requestAllTypes;
-        ConvPostInsertRequest convPostInsertRequest3 = requestAllTypes;
-        convPostApplicationService.insert(convPostInsertRequest1,memberUuid);
-        convPostApplicationService.insert(convPostInsertRequest2,memberUuid);
-        convPostApplicationService.insert(convPostInsertRequest3,memberUuid);
+        convPostApplicationService.insert(requestAllTypes, memberUuid);
+        convPostApplicationService.insert(requestAllTypes, memberUuid);
+        convPostApplicationService.insert(requestAllTypes, memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
@@ -104,16 +97,13 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
         SiteMemberEntity member2 = createMemberKakaoUserEntity();
         siteMemberRepository.save(member2);
         UUID memberUuid2 = member2.getUuid();
-        ConvPostInsertRequest convPostInsertRequest1 = requestAllTypes;
-        ConvPostInsertRequest convPostInsertRequest2 = requestAllTypes;
-        ConvPostInsertRequest convPostInsertRequest3 = requestAllTypes;
-        convPostApplicationService.insert(convPostInsertRequest1,memberUuid);
-        convPostApplicationService.insert(convPostInsertRequest2,memberUuid2);
-        convPostApplicationService.insert(convPostInsertRequest3,memberUuid);
+        convPostApplicationService.insert(requestAllTypes, memberUuid);
+        convPostApplicationService.insert(requestAllTypes, memberUuid2);
+        convPostApplicationService.insert(requestAllTypes, memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
-        Page<ConvPostResponse> result = convPostApplicationService.getByMemberUuid(memberUuid,pageable);
+        Page<ConvPostResponse> result = convPostApplicationService.getByMemberUuid(memberUuid, pageable);
 
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getNumber()).isEqualTo(0);
@@ -132,16 +122,13 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
                 .order(2)
                 .category("기타")
                 .build());
-        ConvPostInsertRequest convPostInsertRequest1 = requestAllTypes;
-        ConvPostInsertRequest convPostInsertRequest2 = requestAllTypes;
-        ConvPostInsertRequest convPostInsertRequest3 = requestBasicTypes;
-        convPostApplicationService.insert(convPostInsertRequest1,memberUuid);
-        convPostApplicationService.insert(convPostInsertRequest2,memberUuid);
-        convPostApplicationService.insert(convPostInsertRequest3,memberUuid);
+        convPostApplicationService.insert(requestAllTypes, memberUuid);
+        convPostApplicationService.insert(requestAllTypes, memberUuid);
+        convPostApplicationService.insert(requestBasicTypes, memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
-        Page<ConvPostResponse> result = convPostApplicationService.getByGroupOrder(groupOrder,pageable);
+        Page<ConvPostResponse> result = convPostApplicationService.getByGroupOrder(groupOrder, pageable);
 
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getNumber()).isEqualTo(0);
@@ -160,21 +147,20 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
                 .order(2)
                 .category("기타")
                 .build());
-        ConvPostInsertRequest convPostInsertRequest1 = requestAllTypes;
         ConvPostInsertRequest convPostInsertRequest2 = requestBasicTypes;
-        convPostApplicationService.insert(convPostInsertRequest1,memberUuid);
-        convPostApplicationService.insert(convPostInsertRequest2,memberUuid);
+        convPostApplicationService.insert(requestAllTypes, memberUuid);
+        convPostApplicationService.insert(convPostInsertRequest2, memberUuid);
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
         String keyword1 = "기르기";
         String keyword2 = "test";
-        Page<ConvPostResponse> result1 = convPostApplicationService.searchByKeyword(keyword1,pageable);
-        Page<ConvPostResponse> result2 = convPostApplicationService.searchByKeyword(keyword2,pageable);
+        Page<ConvPostResponse> result1 = convPostApplicationService.searchByKeyword(keyword1, pageable);
+        Page<ConvPostResponse> result2 = convPostApplicationService.searchByKeyword(keyword2, pageable);
 
         assertThat(result1.getTotalElements()).isEqualTo(1);
         assertThat(result2.getTotalElements()).isEqualTo(2);
-        ConvPostResponse post = result1.getContent().get(0);
+        ConvPostResponse post = result1.getContent().getFirst();
         assertThat(post.getTitle()).isEqualTo(convPostInsertRequest2.title());
         assertThat(post.getContent().get(1).has("data")).isEqualTo(true);
     }

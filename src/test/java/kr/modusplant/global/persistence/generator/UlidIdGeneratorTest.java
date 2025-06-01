@@ -22,10 +22,9 @@ class UlidIdGeneratorTest {
     @DisplayName("UlidIdGenerator가 올바른 형식의 ULID를 생성하는지 확인")
     void testGenerateUlid() {
         // Given & When
-        String generated = generator.generate(null, null,null, EventType.INSERT);
+        String ulid = generator.generate(null, null, null, EventType.INSERT);
 
         // Then
-        String ulid = generated;
         assertTrue(ULID_PATTERN.matcher(ulid).matches());
     }
 

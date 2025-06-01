@@ -1,6 +1,5 @@
 package kr.modusplant.domains.communication.qna.persistence.repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaCategoryEntityTestUtils;
@@ -32,7 +31,6 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
     private final QnaPostRepository qnaPostRepository;
     private final QnaCategoryRepository qnaCategoryRepository;
     private final SiteMemberRepository siteMemberRepository;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -112,7 +110,7 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
                         .createMember(testSiteMember)
                         .build()
                 ).collect(Collectors.toList());
-        qnaPosts.get(0).updateIsDeleted(true);
+        qnaPosts.getFirst().updateIsDeleted(true);
         qnaPostRepository.saveAll(qnaPosts);
 
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -122,7 +120,7 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(4); // 삭제된 1건 제외
-        assertThat(result.getContent().stream().allMatch(post -> !post.getIsDeleted())).isTrue();
+        assertThat(result.getContent().stream().noneMatch(QnaPostEntity::getIsDeleted)).isTrue();
 
         List<QnaPostEntity> content = result.getContent();
         for (int i = 0; i < content.size() - 1; i++) {
@@ -145,7 +143,7 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
                         .createMember(testSiteMember)
                         .build()
                 ).collect(Collectors.toList());
-        qnaPosts.get(0).updateIsDeleted(true);
+        qnaPosts.getFirst().updateIsDeleted(true);
         qnaPostRepository.saveAll(qnaPosts);
 
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -177,7 +175,7 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
                         .createMember(i % 2 == 0 ? testSiteMember : testSiteMember2)
                         .build()
                 ).collect(Collectors.toList());
-        qnaPosts.get(0).updateIsDeleted(true);
+        qnaPosts.getFirst().updateIsDeleted(true);
         qnaPostRepository.saveAll(qnaPosts);
 
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -292,7 +290,7 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
 
         // then
         assertThat(found).isPresent();
-        assertThat(found.get().getUlid()).isEqualTo(qnaPostEntity1.getUlid());
+        assertThat(found.orElseThrow().getUlid()).isEqualTo(qnaPostEntity1.getUlid());
         assertThat(notFound).isEmpty();
 
     }
@@ -301,7 +299,7 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
     @DisplayName("제목+본문 검색어로 게시글 목록 찾기")
     void searchByTitleOrContentTest() {
         // given
-        QnaPostEntity qnaPostEntity = qnaPostRepository.save(
+        qnaPostRepository.save(
                 createQnaPostEntityBuilder()
                         .group(testQnaCategory)
                         .authMember(testSiteMember)
@@ -318,7 +316,7 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
         assertThat(result1.getTotalElements()).isEqualTo(1);
         assertThat(result2.getTotalElements()).isEqualTo(1);
         assertThat(result3.getTotalElements()).isEqualTo(0);
-        assertThat(result1.getContent().get(0).getContent().get(1).has("src")).isEqualTo(true);
+        assertThat(result1.getContent().getFirst().getContent().get(1).has("src")).isEqualTo(true);
     }
 
     @Test
