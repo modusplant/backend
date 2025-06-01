@@ -2,6 +2,8 @@ package kr.modusplant.domains.common.context;
 
 import kr.modusplant.domains.common.postprocessor.MockDomainsRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.domains.common.postprocessor.MockDomainsServiceBeanFactoryPostProcessor;
+import kr.modusplant.global.config.TestJpaConfig;
+import kr.modusplant.global.config.TestRedisConfig;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -26,7 +28,7 @@ import static kr.modusplant.domains.common.vo.Reference.NOTATION_DOMAINS;
         includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Controller.class)
 )
 @AutoConfigureMockMvc(addFilters = false)
-@Import({MockDomainsRepositoryBeanFactoryPostProcessor.class, MockDomainsServiceBeanFactoryPostProcessor.class})
+@Import({TestJpaConfig.class, TestRedisConfig.class, MockDomainsRepositoryBeanFactoryPostProcessor.class, MockDomainsServiceBeanFactoryPostProcessor.class})
 @ExtendWith(MockitoExtension.class)
 @Execution(ExecutionMode.CONCURRENT)
 public @interface DomainsControllerOnlyContext {
