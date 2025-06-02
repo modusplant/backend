@@ -21,7 +21,7 @@ public interface ConvPostRepository extends UlidPrimaryRepository<ConvPostEntity
 
     Page<ConvPostEntity> findByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 
-    Page<ConvPostEntity> findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(ConvCategoryEntity group, Pageable pageable);
+    Page<ConvPostEntity> findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(ConvCategoryEntity category, Pageable pageable);
 
     Page<ConvPostEntity> findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(SiteMemberEntity authMember, Pageable pageable);
 

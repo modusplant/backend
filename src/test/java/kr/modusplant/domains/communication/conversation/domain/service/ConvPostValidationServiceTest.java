@@ -5,10 +5,13 @@ import kr.modusplant.domains.communication.common.error.PostAccessDeniedExceptio
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostInsertRequest;
 import kr.modusplant.domains.communication.conversation.common.util.app.http.request.ConvPostRequestTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.domain.ConvPostTestUtils;
+import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
+import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCategoryRepository;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostRepository;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
+import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;
@@ -27,57 +30,77 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ConvPostValidationServiceTest implements ConvPostRequestTestUtils {
+class ConvPostValidationServiceTest implements ConvPostRequestTestUtils, ConvCategoryEntityTestUtils {
     @Mock
     private ConvPostRepository convPostRepository;
+
+    @Mock
+    private ConvCategoryRepository convCategoryRepository;
+
     @InjectMocks
     private ConvPostValidationService convPostValidationService;
 
     @Test
-    @DisplayName("팁 게시글 추가/수정 시 ConvPostRequest는 유효한 입력")
+    @DisplayName("대화 게시글 추가/수정 시 ConvPostRequest는 유효한 입력")
     void validateConvPostInsertRequestTestSuccess() {
+        // given & when
+        when(convCategoryRepository.findByUuid(requestBasicTypes.categoryUuid())).thenReturn(Optional.of(createTestConvCategoryEntity()));
+
+        // then
         assertDoesNotThrow(() -> convPostValidationService.validateConvPostInsertRequest(requestBasicTypes));
     }
 
     @Test
-    @DisplayName("팁 게시글 추가/수정 시 ConvPostRequest의 groupOrder가 유효하지 않으면 예외 발생")
-    void validateConvPostInsertRequestInvalidGroupOrderTest() {
+    @DisplayName("대화 게시글 추가/수정 시 ConvPostRequest의 categoryUuid가 유효하지 않으면 예외 발생")
+    void validateConvPostInsertRequestInvalidCategoryUuidTest() {
+        // given & when
         ConvPostInsertRequest convPostInsertRequest = new ConvPostInsertRequest(
-                -1,
-                "유용한 팁 모음",
+                UUID.randomUUID(),
+                "유용한 대화 모음",
                 allMediaFiles,
                 allMediaFilesOrder
         );
 
-        assertThrows(IllegalArgumentException.class,
+        when(convCategoryRepository.findByUuid(convPostInsertRequest.categoryUuid())).thenReturn(Optional.empty());
+
+        // then
+        assertThrows(EntityExistsWithUuidException.class,
                 () -> convPostValidationService.validateConvPostInsertRequest(convPostInsertRequest));
     }
 
     @Test
-    @DisplayName("팁 게시글 추가/수정 시 ConvPostRequest의 title이 유효하지 않으면 예외 발생")
+    @DisplayName("대화 게시글 추가/수정 시 ConvPostRequest의 title이 유효하지 않으면 예외 발생")
     void validateConvPostInsertRequestInvalidTitleTest() {
+        // given & when
         ConvPostInsertRequest convPostInsertRequest = new ConvPostInsertRequest(
-                2,
+                UUID.randomUUID(),
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 allMediaFiles,
                 allMediaFilesOrder
         );
 
+        when(convCategoryRepository.findByUuid(convPostInsertRequest.categoryUuid())).thenReturn(Optional.of(createTestConvCategoryEntity()));
+
+        // then
         assertThrows(IllegalArgumentException.class,
                 () -> convPostValidationService.validateConvPostInsertRequest(convPostInsertRequest));
 
     }
 
     @Test
-    @DisplayName("팁 게시글 추가/수정 시 ConvPostRequest의 Content와 OrderInfo가 유효하지 않으면 예외 발생")
+    @DisplayName("대화 게시글 추가/수정 시 ConvPostRequest의 Content와 OrderInfo가 유효하지 않으면 예외 발생")
     void validateConvPostInsertRequestInvalidContentAndOrderInfoTest() {
+        // given & when
         ConvPostInsertRequest convPostInsertRequest = new ConvPostInsertRequest(
-                1,
-                "유용한 팁 모음",
+                UUID.randomUUID(),
+                "유용한 대화 모음",
                 textImageFiles,
                 imageTextFilesOrder
         );
 
+        when(convCategoryRepository.findByUuid(convPostInsertRequest.categoryUuid())).thenReturn(Optional.of(createTestConvCategoryEntity()));
+
+        // then
         assertThrows(IllegalArgumentException.class,
                 () -> convPostValidationService.validateConvPostInsertRequest(convPostInsertRequest));
     }
@@ -91,7 +114,7 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils {
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         ConvPostEntity convPostEntity = ConvPostEntity.builder()
                 .authMember(memberEntity)
-                .group(mock(ConvCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
+                .category(mock(ConvCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
                 .createMember(memberEntity)
                 .likeCount(0)
                 .viewCount(0L)
@@ -126,7 +149,7 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils {
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         ConvPostEntity convPostEntity = ConvPostEntity.builder()
                 .authMember(memberEntity)
-                .group(mock(ConvCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
+                .category(mock(ConvCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
                 .createMember(memberEntity)
                 .likeCount(0)
                 .viewCount(0L)
@@ -146,7 +169,7 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils {
     @Test
     @DisplayName("ULID 존재할 경우 통과")
     void validateNotFoundUlidExists() {
-        String ulid = ConvPostTestUtils.generator.generate(null, null,null,EventType.INSERT);
+        String ulid = ConvPostTestUtils.generator.generate(null, null, null, EventType.INSERT);
         when(convPostRepository.existsByUlid(ulid)).thenReturn(true);
         assertDoesNotThrow(() -> convPostValidationService.validateNotFoundUlid(ulid));
     }
@@ -154,10 +177,22 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils {
     @Test
     @DisplayName("ULID 존재하지 않을 경우 예외 발생")
     void validateNotFoundUlidNotExists() {
-        String ulid = ConvPostTestUtils.generator.generate(null, null,null,EventType.INSERT);
-        when(convPostRepository.existsByUlid(ulid)).thenReturn(false);
+        // null ULID
+        // given & when
+        final String nullUlid = null;
+
+        // then
         assertThrows(EntityNotFoundWithUlidException.class, () ->
-                convPostValidationService.validateNotFoundUlid(ulid));
+                convPostValidationService.validateNotFoundUlid(nullUlid));
+
+        // Not Found ULID
+        // given & when
+        String notFoundUlid = ConvPostTestUtils.generator.generate(null, null, null, EventType.INSERT);
+        when(convPostRepository.existsByUlid(notFoundUlid)).thenReturn(false);
+
+        // then
+        assertThrows(EntityNotFoundWithUlidException.class, () ->
+                convPostValidationService.validateNotFoundUlid(notFoundUlid));
     }
 
 }

@@ -16,6 +16,7 @@ public class ConvPostViewCountRedisRepository {
 
     private final StringRedisTemplate stringRedisTemplate;
 
+    @SuppressWarnings({"ConstantValue", "UnreachableCode"})
     public Long read(String ulid) {
         String result = stringRedisTemplate.opsForValue().get(generatedKey(ulid));
         return result == null ? null : Long.parseLong(result);
@@ -32,15 +33,10 @@ public class ConvPostViewCountRedisRepository {
     public Map<String, Long> findAll() {
         Set<String> keys = stringRedisTemplate.keys("viewCount:conv_post:*:view_count");
         Map<String, Long> result = new HashMap<>();
-        if (keys != null) {
-            for (String key:keys) {
-                String value = stringRedisTemplate.opsForValue().get(key);
-                if (value == null)
-                    continue;
-                Long count = Long.valueOf(value);
-                String ulid = extractUlidFromKey(key);
-                result.put(ulid,count);
-            }
+        for (String key : keys) {
+            String ulid = extractUlidFromKey(key);
+            Long count = Long.valueOf(stringRedisTemplate.opsForValue().get(key));
+            result.put(ulid, count);
         }
         return result;
     }

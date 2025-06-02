@@ -1,16 +1,29 @@
 package kr.modusplant.domains.communication.common.domain.service.supers;
 
 import kr.modusplant.domains.communication.common.app.http.request.FileOrder;
+import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
+import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCategoryRepository;
+import kr.modusplant.global.error.EntityExistsWithUuidException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 public abstract class AbstractPostValidationService {
-    protected void validateGroupOrder(Integer groupOrder) {
-        if (groupOrder == null || groupOrder < 0) {
-            throw new IllegalArgumentException("groupOrder must not be null and must be a non-negative integer.");
+    protected void validateExistedCategoryUuid(UUID categoryUuid, ConvCategoryRepository convCategoryRepository) {
+        if (categoryUuid == null) {
+            return;
+        }
+        if (convCategoryRepository.findByUuid(categoryUuid).isPresent()) {
+            throw new EntityExistsWithUuidException(categoryUuid, ConvCategoryEntity.class);
+        }
+    }
+
+    protected void validateNotFoundCategoryUuid(UUID categoryUuid, ConvCategoryRepository convCategoryRepository) {
+        if (categoryUuid == null || convCategoryRepository.findByUuid(categoryUuid).isEmpty()) {
+            throw new EntityExistsWithUuidException(categoryUuid, ConvCategoryEntity.class);
         }
     }
 

@@ -21,7 +21,7 @@ public interface ConvPostTestUtils extends ConvCategoryTestUtils, SiteMemberTest
 
     ConvPost convPostWithUlid = ConvPost.builder()
             .ulid(generator.generate(null, null,null, EventType.INSERT))
-            .groupOrder(testConvCategory.getOrder())
+            .categoryUuid(testConvCategoryWithUuid.getUuid())
             .authMemberUuid(memberBasicUserWithUuid.getUuid())
             .createMemberUuid(memberBasicUserWithUuid.getUuid())
             .title("물 주는 타이밍, 이제 헷갈리지 마세요! 식물별 물 주기 가이드")

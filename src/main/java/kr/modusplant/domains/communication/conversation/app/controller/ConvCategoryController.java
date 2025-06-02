@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Tag(name = "ConvCategory API", description = "대화 항목 API")
 @RestController
@@ -28,9 +29,19 @@ public class ConvCategoryController {
         return ResponseEntity.ok().body(DataResponse.ok(convCategoryApplicationService.getAll()));
     }
 
+    @Operation(summary = "UUID로 대화 항목 조회 API", description = "UUID에 맞는 대화 항목을 조회합니다.")
+    @GetMapping("/{uuid}")
+    public ResponseEntity<DataResponse<?>> getConvCategoryByUuid(@PathVariable UUID uuid) {
+        Optional<ConvCategoryResponse> optionalConvCategoryResponse = convCategoryApplicationService.getByUuid(uuid);
+        if (optionalConvCategoryResponse.isEmpty()) {
+            return ResponseEntity.ok().body(DataResponse.ok());
+        }
+        return ResponseEntity.ok().body(DataResponse.ok(optionalConvCategoryResponse.orElseThrow()));
+    }
+
     @Operation(summary = "순서로 대화 항목 조회 API", description = "순서에 맞는 대화 항목을 조회합니다.")
-    @GetMapping("/{order}")
-    public ResponseEntity<DataResponse<?>> getConvCategoryByUuid(@PathVariable Integer order) {
+    @GetMapping("/order/{order}")
+    public ResponseEntity<DataResponse<?>> getConvCategoryByOrder(@PathVariable Integer order) {
         Optional<ConvCategoryResponse> optionalConvCategoryResponse = convCategoryApplicationService.getByOrder(order);
         if (optionalConvCategoryResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -54,10 +65,10 @@ public class ConvCategoryController {
         return ResponseEntity.ok().body(DataResponse.ok(convCategoryApplicationService.insert(convCategoryInsertRequest)));
     }
 
-    @Operation(summary = "대화 항목 제거 API", description = "순서로 대화 항목을 제거합니다.")
-    @DeleteMapping("/{order}")
-    public ResponseEntity<DataResponse<?>> removeConvCategoryByUuid(@PathVariable Integer order) {
-        convCategoryApplicationService.removeByOrder(order);
+    @Operation(summary = "대화 항목 제거 API", description = "UUID로 대화 항목을 제거합니다.")
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<DataResponse<?>> removeConvCategoryByUuid(@PathVariable UUID uuid) {
+        convCategoryApplicationService.removeByUuid(uuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 }

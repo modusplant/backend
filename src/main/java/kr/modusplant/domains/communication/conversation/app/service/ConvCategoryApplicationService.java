@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Primary
@@ -28,7 +29,12 @@ public class ConvCategoryApplicationService {
     public List<ConvCategoryResponse> getAll() {
         return convCategoryRepository.findAll().stream().map(convCategoryAppInfraMapper::toConvCategoryResponse).toList();
     }
-    
+
+    public Optional<ConvCategoryResponse> getByUuid(UUID uuid) {
+        Optional<ConvCategoryEntity> convCategoryOrEmpty = convCategoryRepository.findByUuid(uuid);
+        return convCategoryOrEmpty.isEmpty() ? Optional.empty() : Optional.of(convCategoryAppInfraMapper.toConvCategoryResponse(convCategoryOrEmpty.orElseThrow()));
+    }
+
     public Optional<ConvCategoryResponse> getByOrder(Integer order) {
         Optional<ConvCategoryEntity> convCategoryOrEmpty = convCategoryRepository.findByOrder(order);
         return convCategoryOrEmpty.isEmpty() ? Optional.empty() : Optional.of(convCategoryAppInfraMapper.toConvCategoryResponse(convCategoryOrEmpty.orElseThrow()));
@@ -42,12 +48,13 @@ public class ConvCategoryApplicationService {
     @Transactional
     public ConvCategoryResponse insert(ConvCategoryInsertRequest convCategoryInsertRequest) {
         validationService.validateExistedCategory(convCategoryInsertRequest.category());
+        validationService.validateExistedOrder(convCategoryInsertRequest.order());
         return convCategoryAppInfraMapper.toConvCategoryResponse(convCategoryRepository.save(convCategoryAppInfraMapper.toConvCategoryEntity(convCategoryInsertRequest)));
     }
 
     @Transactional
-    public void removeByOrder(Integer order) {
-        validationService.validateNotFoundOrder(order);
-        convCategoryRepository.deleteByOrder(order);
+    public void removeByUuid(UUID uuid) {
+        validationService.validateNotFoundUuid(uuid);
+        convCategoryRepository.deleteByUuid(uuid);
     }
 }

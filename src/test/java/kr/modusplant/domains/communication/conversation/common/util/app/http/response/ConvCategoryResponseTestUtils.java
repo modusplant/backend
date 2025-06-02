@@ -4,5 +4,5 @@ import kr.modusplant.domains.communication.conversation.app.http.response.ConvCa
 import kr.modusplant.domains.communication.conversation.common.util.domain.ConvCategoryTestUtils;
 
 public interface ConvCategoryResponseTestUtils extends ConvCategoryTestUtils {
-    ConvCategoryResponse testConvCategoryResponse = new ConvCategoryResponse(testConvCategory.getOrder(), testConvCategory.getCategory());
+    ConvCategoryResponse testConvCategoryResponse = new ConvCategoryResponse(testConvCategoryWithUuid.getUuid(), testConvCategory.getCategory(), testConvCategory.getOrder());
 }

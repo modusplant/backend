@@ -15,7 +15,7 @@ class ConvCategoryAppInfraMapperTest implements ConvCategoryRequestTestUtils, Co
     @DisplayName("엔터티를 응답으로 전환")
     @Test
     void toConvCategoryResponseTest() {
-        assertThat(convCategoryAppInfraMapper.toConvCategoryResponse(testConvCategoryEntity)).isEqualTo(testConvCategoryResponse);
+        assertThat(convCategoryAppInfraMapper.toConvCategoryResponse(createTestConvCategoryEntityWithUuid())).isEqualTo(testConvCategoryResponse);
     }
 
     @DisplayName("요청을 엔터티로 전환")

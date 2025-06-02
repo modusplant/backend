@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 @Mapper
 public interface ConvCategoryAppInfraMapper {
     @Mapping(target = "convCategoryEntity", ignore = true)
+    @Mapping(target = "uuid", ignore = true)
     ConvCategoryEntity toConvCategoryEntity(ConvCategoryInsertRequest convCategoryInsertRequest);
 
     ConvCategoryResponse toConvCategoryResponse(ConvCategoryEntity convCategoryEntity);

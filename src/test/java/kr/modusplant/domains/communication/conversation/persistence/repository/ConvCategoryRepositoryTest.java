@@ -7,6 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
@@ -19,57 +21,67 @@ class ConvCategoryRepositoryTest implements ConvCategoryEntityTestUtils {
         this.convCategoryRepository = convCategoryRepository;
     }
 
-    @DisplayName("order로 대화 항목 찾기")
+    @DisplayName("UUID로 대화 항목 찾기")
     @Test
-    void findByOrderTest() {
+    void findByUuidTest() {
         // given & when
-        convCategoryRepository.save(testConvCategoryEntity);
+        ConvCategoryEntity entity = convCategoryRepository.save(createTestConvCategoryEntity());
 
         // then
-        assertThat(convCategoryRepository.findByOrder(testConvCategory.getOrder()).orElseThrow()).isEqualTo(testConvCategoryEntity);
+        assertThat(convCategoryRepository.findByUuid(entity.getUuid()).orElseThrow()).isEqualTo(entity);
     }
 
     @DisplayName("category로 대화 항목 찾기")
     @Test
     void findByCategoryTest() {
         // given & when
-        convCategoryRepository.save(testConvCategoryEntity);
+        ConvCategoryEntity entity = convCategoryRepository.save(createTestConvCategoryEntity());
 
         // then
-        assertThat(convCategoryRepository.findByCategory(testConvCategory.getCategory()).orElseThrow()).isEqualTo(testConvCategoryEntity);
+        assertThat(convCategoryRepository.findByCategory(entity.getCategory()).orElseThrow()).isEqualTo(entity);
+    }
+
+    @DisplayName("order로 대화 항목 찾기")
+    @Test
+    void findByOrderTest() {
+        // given & when
+        ConvCategoryEntity entity = convCategoryRepository.save(createTestConvCategoryEntity());
+
+        // then
+        assertThat(convCategoryRepository.findByOrder(entity.getOrder()).orElseThrow()).isEqualTo(entity);
     }
 
     @DisplayName("createdAt으로 대화 항목 찾기")
     @Test
     void findByCreatedAtTest() {
         // given & when
-        ConvCategoryEntity convCategory = convCategoryRepository.save(testConvCategoryEntity);
+        ConvCategoryEntity entity = convCategoryRepository.save(createTestConvCategoryEntity());
 
         // then
-        assertThat(convCategoryRepository.findByCreatedAt(convCategory.getCreatedAt()).getFirst()).isEqualTo(convCategory);
+        assertThat(convCategoryRepository.findByCreatedAt(entity.getCreatedAt()).getFirst()).isEqualTo(entity);
     }
 
-    @DisplayName("order로 대화 항목 삭제")
+    @DisplayName("UUID로 대화 항목 삭제")
     @Test
-    void deleteByOrderTest() {
+    void deleteByUuidTest() {
         // given
-        ConvCategoryEntity convCategory = convCategoryRepository.save(testConvCategoryEntity);
-        Integer order = convCategory.getOrder();
+        ConvCategoryEntity entity = convCategoryRepository.save(createTestConvCategoryEntity());
+        UUID uuid = entity.getUuid();
 
         // when
-        convCategoryRepository.deleteByOrder(order);
+        convCategoryRepository.deleteByUuid(uuid);
 
         // then
-        assertThat(convCategoryRepository.findByOrder(order)).isEmpty();
+        assertThat(convCategoryRepository.findByUuid(uuid)).isEmpty();
     }
 
-    @DisplayName("order로 대화 항목 확인")
+    @DisplayName("UUID로 대화 항목 확인")
     @Test
-    void existsByOrderTest() {
+    void existsByUuidTest() {
         // given & when
-        ConvCategoryEntity convCategory = convCategoryRepository.save(testConvCategoryEntity);
+        ConvCategoryEntity entity = convCategoryRepository.save(createTestConvCategoryEntity());
 
         // then
-        assertThat(convCategoryRepository.existsByOrder(convCategory.getOrder())).isEqualTo(true);
+        assertThat(convCategoryRepository.existsByUuid(entity.getUuid())).isEqualTo(true);
     }
 }

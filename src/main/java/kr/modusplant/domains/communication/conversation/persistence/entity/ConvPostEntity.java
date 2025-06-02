@@ -32,8 +32,8 @@ public class ConvPostEntity {
     private String ulid;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = SNAKE_GROUP_ORDER, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private ConvCategoryEntity group;
+    @JoinColumn(name = SNAKE_CATE_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private ConvCategoryEntity category;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = SNAKE_AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
@@ -74,8 +74,8 @@ public class ConvPostEntity {
     @Column(nullable = false)
     private Long ver;
 
-    public void updateGroup(ConvCategoryEntity group) {
-        this.group = group;
+    public void updateCategory(ConvCategoryEntity category) {
+        this.category = category;
     }
 
     public void increaseLikeCount() {
@@ -137,9 +137,9 @@ public class ConvPostEntity {
         }
     }
 
-    private ConvPostEntity(String ulid, ConvCategoryEntity group, SiteMemberEntity authMember, SiteMemberEntity createMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isDeleted) {
+    private ConvPostEntity(String ulid, ConvCategoryEntity category, SiteMemberEntity authMember, SiteMemberEntity createMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isDeleted) {
         this.ulid = ulid;
-        this.group = group;
+        this.category = category;
         this.authMember = authMember;
         this.createMember = createMember;
         this.likeCount = likeCount;
@@ -155,7 +155,7 @@ public class ConvPostEntity {
 
     public static final class ConvPostEntityBuilder {
         private String ulid;
-        private ConvCategoryEntity group;
+        private ConvCategoryEntity category;
         private SiteMemberEntity authMember;
         private SiteMemberEntity createMember;
         private Integer likeCount;
@@ -169,8 +169,8 @@ public class ConvPostEntity {
             return this;
         }
 
-        public ConvPostEntityBuilder group(final ConvCategoryEntity group) {
-            this.group = group;
+        public ConvPostEntityBuilder category(final ConvCategoryEntity category) {
+            this.category = category;
             return this;
         }
 
@@ -211,7 +211,7 @@ public class ConvPostEntity {
 
         public ConvPostEntityBuilder convPostEntity(final ConvPostEntity convPostEntity) {
             this.ulid = convPostEntity.ulid;
-            this.group = convPostEntity.group;
+            this.category = convPostEntity.category;
             this.authMember = convPostEntity.authMember;
             this.createMember = convPostEntity.createMember;
             this.likeCount = convPostEntity.likeCount;
@@ -223,7 +223,7 @@ public class ConvPostEntity {
         }
 
         public ConvPostEntity build() {
-            return new ConvPostEntity(this.ulid,this.group,this.authMember,this.createMember,this.likeCount,this.viewCount,this.title,this.content,this.isDeleted);
+            return new ConvPostEntity(this.ulid,this.category,this.authMember,this.createMember,this.likeCount,this.viewCount,this.title,this.content,this.isDeleted);
         }
 
     }

@@ -12,7 +12,7 @@ import java.util.UUID;
 public class ConvPost {
     private final String ulid;
 
-    private final Integer groupOrder;
+    private final UUID categoryUuid;
 
     private final UUID authMemberUuid;
 
@@ -30,7 +30,7 @@ public class ConvPost {
 
     public static class ConvPostBuilder {
         private String ulid;
-        private Integer groupOrder;
+        private UUID categoryUuid;
         private UUID authMemberUuid;
         private UUID createMemberUuid;
         private Integer likeCount;
@@ -41,7 +41,7 @@ public class ConvPost {
 
         public ConvPostBuilder convPost(ConvPost convPost) {
             this.ulid = convPost.ulid;
-            this.groupOrder = convPost.groupOrder;
+            this.categoryUuid = convPost.categoryUuid;
             this.authMemberUuid = convPost.authMemberUuid;
             this.createMemberUuid = convPost.createMemberUuid;
             this.likeCount = convPost.likeCount;
@@ -53,7 +53,7 @@ public class ConvPost {
         }
 
         public ConvPost build() {
-            return new ConvPost(this.ulid,this.groupOrder,this.authMemberUuid,this.createMemberUuid,this.likeCount,this.viewCount,this.title,this.content,this.isDeleted);
+            return new ConvPost(this.ulid, this.categoryUuid, this.authMemberUuid, this.createMemberUuid, this.likeCount, this.viewCount, this.title, this.content, this.isDeleted);
         }
     }
 

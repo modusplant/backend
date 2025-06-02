@@ -47,16 +47,16 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
 
     @BeforeEach
     void setUp() {
-        testConvCategory = convCategoryRepository.save(testConvCategoryEntity);
+        testConvCategory = convCategoryRepository.save(createTestConvCategoryEntity());
         testSiteMember = siteMemberRepository.save(createMemberBasicUserEntity());
     }
 
     @Test
-    @DisplayName("ULID로 팁 게시글 찾기")
+    @DisplayName("ULID로 대화 게시글 찾기")
     void findByUlidTest() {
         // given
         ConvPostEntity convPostEntity = createConvPostEntityBuilder()
-                .group(testConvCategory)
+                .category(testConvCategory)
                 .authMember(testSiteMember)
                 .createMember(testSiteMember)
                 .build();
@@ -70,12 +70,12 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
     }
 
     @Test
-    @DisplayName("전체 팁 게시글 찾기(최신순)")
+    @DisplayName("전체 대화 게시글 찾기(최신순)")
     void findAllByOrderByCreatedAtDescTest() {
         // given
         List<ConvPostEntity> convPosts = IntStream.range(0, 10)
                 .mapToObj(i -> createConvPostEntityBuilder()
-                        .group(testConvCategory)
+                        .category(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -100,12 +100,12 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
     }
 
     @Test
-    @DisplayName("삭제되지 않은 모든 팁 게시글 찾기(최신순)")
+    @DisplayName("삭제되지 않은 모든 대화 게시글 찾기(최신순)")
     void findByIsDeletedFalseOrderByCreatedAtDescTest() {
         // given
         List<ConvPostEntity> convPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createConvPostEntityBuilder()
-                        .group(testConvCategory)
+                        .category(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -130,14 +130,14 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
     }
 
     @Test
-    @DisplayName("카테고리로 삭제되지 않은 모든 팁 게시글 찾기(최신순)")
-    void findByGroupAndIsDeletedFalseOrderByCreatedAtDescTest() {
+    @DisplayName("카테고리로 삭제되지 않은 모든 대화 게시글 찾기(최신순)")
+    void findByCategoryAndIsDeletedFalseOrderByCreatedAtDescTest() {
         // given
         ConvCategoryEntity testOtherGroup = convCategoryRepository.save(
                 ConvCategoryEntity.builder().order(2).category("기타").build());
         List<ConvPostEntity> convPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createConvPostEntityBuilder()
-                        .group(i % 2 == 0 ? testConvCategory : testOtherGroup)
+                        .category(i % 2 == 0 ? testConvCategory : testOtherGroup)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -148,12 +148,12 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // when
-        Page<ConvPostEntity> result = convPostRepository.findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(testConvCategory, pageable);
+        Page<ConvPostEntity> result = convPostRepository.findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(testConvCategory, pageable);
 
         // then
         // i = 0, 2, 4 → testConvCategory로 생성됨 (0번은 삭제됨)
         assertThat(result.getTotalElements()).isEqualTo(2);
-        assertThat(result.getContent().stream().allMatch(post -> post.getGroup().equals(testConvCategory) && !post.getIsDeleted())).isTrue();
+        assertThat(result.getContent().stream().allMatch(post -> post.getCategory().equals(testConvCategory) && !post.getIsDeleted())).isTrue();
 
         List<ConvPostEntity> content = result.getContent();
         for (int i = 0; i < content.size() - 1; i++) {
@@ -163,13 +163,13 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
     }
 
     @Test
-    @DisplayName("인가 회원으로 삭제되지 않은 모든 팁 게시글 찾기(최신순)")
+    @DisplayName("인가 회원으로 삭제되지 않은 모든 대화 게시글 찾기(최신순)")
     void findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDescTest() {
         // given
         SiteMemberEntity testSiteMember2 = siteMemberRepository.save(createMemberGoogleUserEntity());
         List<ConvPostEntity> convPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createConvPostEntityBuilder()
-                        .group(testConvCategory)
+                        .category(testConvCategory)
                         .authMember(i % 2 == 0 ? testSiteMember : testSiteMember2)
                         .createMember(i % 2 == 0 ? testSiteMember : testSiteMember2)
                         .build()
@@ -201,7 +201,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
         // when
         ConvPostEntity convPostEntity = convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(testConvCategory)
+                        .category(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -217,7 +217,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
         // when
         ConvPostEntity convPostEntity = convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(testConvCategory)
+                        .category(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -228,12 +228,12 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
     }
 
     @Test
-    @DisplayName("ULID로 팁 게시글 삭제")
+    @DisplayName("ULID로 대화 게시글 삭제")
     void deleteByUlidTest() {
         // given
         ConvPostEntity convPostEntity = convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(testConvCategory)
+                        .category(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -248,12 +248,12 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
     }
 
     @Test
-    @DisplayName("ULID로 팁 게시글 확인")
+    @DisplayName("ULID로 대화 게시글 확인")
     void existsByUlidTest() {
         // when
         ConvPostEntity convPostEntity = convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(testConvCategory)
+                        .category(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -269,14 +269,14 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
         // given
         ConvPostEntity convPostEntity1 = convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(testConvCategory)
+                        .category(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
         );
         ConvPostEntity convPostEntity2 = convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(testConvCategory)
+                        .category(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .isDeleted(true)
@@ -299,7 +299,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
         // given
         convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(testConvCategory)
+                        .category(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build());
@@ -323,7 +323,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
         // given
         ConvPostEntity convPostEntity = convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(testConvCategory)
+                        .category(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .viewCount(10L)
@@ -346,7 +346,7 @@ class ConvPostRepositoryTest implements ConvPostEntityTestUtils, ConvCategoryEnt
         // given
         ConvPostEntity convPostEntity = convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(testConvCategory)
+                        .category(testConvCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .viewCount(10L)
