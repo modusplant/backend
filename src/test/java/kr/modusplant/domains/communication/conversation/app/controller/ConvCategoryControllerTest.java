@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static kr.modusplant.global.vo.CamelCaseWord.DATA;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,6 +62,29 @@ class ConvCategoryControllerTest implements ConvCategoryRequestTestUtils, ConvCa
         ).isEqualTo(testConvCategoryResponseList);
     }
 
+    @DisplayName("UUID로 대화 항목 얻기")
+    @Test
+    void getConvCategoryByUuidTest() throws Exception {
+        // given
+        ObjectMapper objectMapper = new ObjectMapper();
+        UUID uuid = testConvCategoryWithUuid.getUuid();
+
+        when(convCategoryApplicationService.getByUuid(uuid)).thenReturn(Optional.of(testConvCategoryResponse));
+
+        // when
+        Map<String, Object> responseMap = objectMapper.readValue(
+                mockMvc.perform(get("/api/crud/conversation/categories/{uuid}", uuid))
+                        .andExpect(status().isOk())
+                        .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
+                });
+
+        // then
+        assertThat(objectMapper.convertValue(responseMap.get(DATA),
+                new TypeReference<ConvCategoryResponse>() {
+                })
+        ).isEqualTo(testConvCategoryResponse);
+    }
+
     @DisplayName("순서로 대화 항목 얻기")
     @Test
     void getConvCategoryByOrderTest() throws Exception {
@@ -72,7 +96,7 @@ class ConvCategoryControllerTest implements ConvCategoryRequestTestUtils, ConvCa
 
         // when
         Map<String, Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/conversation/categories/{order}", order))
+                mockMvc.perform(get("/api/crud/conversation/categories/order/{order}", order))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -120,7 +144,7 @@ class ConvCategoryControllerTest implements ConvCategoryRequestTestUtils, ConvCa
 
         // order - when
         Map<String, Object> uuidResponseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/conversation/categories/{order}", order))
+                mockMvc.perform(get("/api/crud/conversation/categories/order/{order}", order))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -172,12 +196,12 @@ class ConvCategoryControllerTest implements ConvCategoryRequestTestUtils, ConvCa
     @Test
     void removeConvCategoryByOrderTest() throws Exception {
         // given
-        Integer order = testConvCategory.getOrder();
+        UUID order = testConvCategoryWithUuid.getUuid();
 
-        doNothing().when(convCategoryApplicationService).removeByOrder(order);
+        doNothing().when(convCategoryApplicationService).removeByUuid(order);
 
         // when & then
-        mockMvc.perform(delete("/api/crud/conversation/categories/{order}", order))
+        mockMvc.perform(delete("/api/crud/conversation/categories/{uuid}", order))
                 .andExpect(status().isOk());
     }
 }

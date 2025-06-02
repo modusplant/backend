@@ -54,7 +54,9 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
     private ConvPostViewCountRedisRepository convPostViewCountRedisRepository;
 
     private UUID memberUuid;
-    private Integer groupOrder;
+    private UUID categoryUuid;
+    private ConvPostInsertRequest testRequestAllTypes;
+    private ConvPostInsertRequest testRequestBasicTypes;
 
     @BeforeEach
     void setUp() {
@@ -62,18 +64,21 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
         siteMemberRepository.save(member);
         memberUuid = member.getUuid();
 
-        ConvCategoryEntity convCategory = testConvCategoryEntity;
+        ConvCategoryEntity convCategory = createTestConvCategoryEntity();
         convCategoryRepository.save(convCategory);
-        groupOrder = convCategory.getOrder();
+        categoryUuid = convCategory.getUuid();
+
+        testRequestAllTypes = new ConvPostInsertRequest(categoryUuid, requestAllTypes.title(), requestAllTypes.content(), requestAllTypes.orderInfo());
+        testRequestBasicTypes = new ConvPostInsertRequest(categoryUuid, requestBasicTypes.title(), requestBasicTypes.content(), requestBasicTypes.orderInfo());
     }
 
     @Test
-    @DisplayName("전체 팁 게시글 목록 조회하기")
+    @DisplayName("전체 대화 게시글 목록 조회하기")
     void getAllTest() throws IOException {
         // given
-        convPostApplicationService.insert(requestAllTypes, memberUuid);
-        convPostApplicationService.insert(requestAllTypes, memberUuid);
-        convPostApplicationService.insert(requestAllTypes, memberUuid);
+        convPostApplicationService.insert(testRequestAllTypes, memberUuid);
+        convPostApplicationService.insert(testRequestAllTypes, memberUuid);
+        convPostApplicationService.insert(testRequestAllTypes, memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
@@ -86,20 +91,20 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
         assertThat(result.getTotalPages()).isEqualTo(2);
         List<ConvPostResponse> posts = result.getContent();
         assertThat(posts.get(0).getCreatedAt()).isAfterOrEqualTo(posts.get(1).getCreatedAt());
-        assertThat(posts.get(0).getGroupOrder()).isEqualTo(groupOrder);
+        assertThat(posts.get(0).getCategoryUuid()).isEqualTo(categoryUuid);
     }
 
 
     @Test
-    @DisplayName("사이트 회원별 팁 게시글 목록 조회하기")
+    @DisplayName("사이트 회원별 대화 게시글 목록 조회하기")
     void getByMemberUuidTest() throws IOException {
         // given
         SiteMemberEntity member2 = createMemberKakaoUserEntity();
         siteMemberRepository.save(member2);
         UUID memberUuid2 = member2.getUuid();
-        convPostApplicationService.insert(requestAllTypes, memberUuid);
-        convPostApplicationService.insert(requestAllTypes, memberUuid2);
-        convPostApplicationService.insert(requestAllTypes, memberUuid);
+        convPostApplicationService.insert(testRequestAllTypes, memberUuid);
+        convPostApplicationService.insert(testRequestAllTypes, memberUuid2);
+        convPostApplicationService.insert(testRequestAllTypes, memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
@@ -115,26 +120,22 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
     }
 
     @Test
-    @DisplayName("식물 그룹별 팁 게시글 목록 조회하기")
-    void getByGroupOrderTest() throws IOException {
+    @DisplayName("항목별 대화 게시글 목록 조회하기")
+    void getByCategoryUuidTest() throws IOException {
         // given
-        convCategoryRepository.save(ConvCategoryEntity.builder()
-                .order(2)
-                .category("기타")
-                .build());
-        convPostApplicationService.insert(requestAllTypes, memberUuid);
-        convPostApplicationService.insert(requestAllTypes, memberUuid);
-        convPostApplicationService.insert(requestBasicTypes, memberUuid);
+        convPostApplicationService.insert(testRequestAllTypes, memberUuid);
+        convPostApplicationService.insert(testRequestAllTypes, memberUuid);
+        convPostApplicationService.insert(testRequestBasicTypes, memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
-        Page<ConvPostResponse> result = convPostApplicationService.getByGroupOrder(groupOrder, pageable);
+        Page<ConvPostResponse> result = convPostApplicationService.getByCategoryUuid(categoryUuid, pageable);
 
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getNumber()).isEqualTo(0);
         assertThat(result.getSize()).isEqualTo(2);
-        assertThat(result.getTotalElements()).isEqualTo(2);
-        assertThat(result.getTotalPages()).isEqualTo(1);
+        assertThat(result.getTotalElements()).isEqualTo(3);
+        assertThat(result.getTotalPages()).isEqualTo(2);
         List<ConvPostResponse> posts = result.getContent();
         assertThat(posts.get(0).getCreatedAt()).isAfterOrEqualTo(posts.get(1).getCreatedAt());
     }
@@ -147,8 +148,8 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
                 .order(2)
                 .category("기타")
                 .build());
-        ConvPostInsertRequest convPostInsertRequest2 = requestBasicTypes;
-        convPostApplicationService.insert(requestAllTypes, memberUuid);
+        ConvPostInsertRequest convPostInsertRequest2 = testRequestBasicTypes;
+        convPostApplicationService.insert(testRequestAllTypes, memberUuid);
         convPostApplicationService.insert(convPostInsertRequest2, memberUuid);
         Pageable pageable = PageRequest.of(0, 10);
 
@@ -167,14 +168,14 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
 
 
     @Test
-    @DisplayName("특정 팁 게시글 조회하기")
+    @DisplayName("특정 대화 게시글 조회하기")
     void getByUlidTest() throws IOException {
         // given
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        ConvPostInsertRequest convPostInsertRequest = requestAllTypes;
-        ConvCategoryEntity convCategoryEntity = convCategoryRepository.findByOrder(convPostInsertRequest.groupOrder()).orElseThrow();
+        ConvPostInsertRequest convPostInsertRequest = testRequestAllTypes;
+        ConvCategoryEntity convCategoryEntity = convCategoryRepository.findByUuid(convPostInsertRequest.categoryUuid()).orElseThrow();
         ConvPostEntity convPostEntity = ConvPostEntity.builder()
-                .group(convCategoryEntity)
+                .category(convCategoryEntity)
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(convPostInsertRequest.title())
@@ -195,14 +196,14 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
     }
 
     @Test
-    @DisplayName("특정 팁 게시글 수정하기")
+    @DisplayName("특정 대화 게시글 수정하기")
     void updateTest() throws IOException {
         // given
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        ConvPostInsertRequest convPostInsertRequest = requestAllTypes;
-        ConvCategoryEntity convCategoryEntity = convCategoryRepository.findByOrder(convPostInsertRequest.groupOrder()).orElseThrow();
+        ConvPostInsertRequest convPostInsertRequest = testRequestAllTypes;
+        ConvCategoryEntity convCategoryEntity = convCategoryRepository.findByUuid(convPostInsertRequest.categoryUuid()).orElseThrow();
         ConvPostEntity convPostEntity = ConvPostEntity.builder()
-                .group(convCategoryEntity)
+                .category(convCategoryEntity)
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(convPostInsertRequest.title())
@@ -213,12 +214,12 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
         // when
         ConvPostUpdateRequest convPostUpdateRequest = new ConvPostUpdateRequest(
                 convPostEntity.getUlid(),
-                1,
-                "식물 기르기 팁",
+                convPostEntity.getCategory().getUuid(),
+                "식물 기르기 대화",
                 basicMediaFiles,
                 basicMediaFilesOrder
         );
-        convPostApplicationService.update(convPostUpdateRequest,memberUuid);
+        convPostApplicationService.update(convPostUpdateRequest, memberUuid);
 
         // then
         ConvPostEntity result = convPostRepository.findByUlid(convPostEntity.getUlid()).orElseThrow();
@@ -226,14 +227,14 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
     }
 
     @Test
-    @DisplayName("특정 팁 게시글 삭제하기")
+    @DisplayName("특정 대화 게시글 삭제하기")
     void removeByUlidTest() throws IOException {
         // given
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        ConvPostInsertRequest convPostInsertRequest = requestAllTypes;
-        ConvCategoryEntity convCategoryEntity = convCategoryRepository.findByOrder(convPostInsertRequest.groupOrder()).orElseThrow();
+        ConvPostInsertRequest convPostInsertRequest = testRequestAllTypes;
+        ConvCategoryEntity convCategoryEntity = convCategoryRepository.findByUuid(convPostInsertRequest.categoryUuid()).orElseThrow();
         ConvPostEntity convPostEntity = ConvPostEntity.builder()
-                .group(convCategoryEntity)
+                .category(convCategoryEntity)
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(convPostInsertRequest.title())

@@ -61,7 +61,7 @@ public class ConvPostApplicationService {
 
     public Page<ConvPostResponse> getByMemberUuid(UUID memberUuid, Pageable pageable) {
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        return convPostRepository.findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(siteMember,pageable).map(entity -> {
+        return convPostRepository.findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(siteMember, pageable).map(entity -> {
             try {
                 entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
@@ -71,9 +71,9 @@ public class ConvPostApplicationService {
         });
     }
 
-    public Page<ConvPostResponse> getByGroupOrder(Integer groupOrder, Pageable pageable) {
-        ConvCategoryEntity convCategory = convCategoryRepository.findByOrder(groupOrder).orElseThrow();
-        return convPostRepository.findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(convCategory,pageable).map(entity -> {
+    public Page<ConvPostResponse> getByCategoryUuid(UUID categoryUuid, Pageable pageable) {
+        ConvCategoryEntity convCategory = convCategoryRepository.findByUuid(categoryUuid).orElseThrow();
+        return convPostRepository.findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(convCategory, pageable).map(entity -> {
             try {
                 entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
@@ -84,7 +84,7 @@ public class ConvPostApplicationService {
     }
 
     public Page<ConvPostResponse> searchByKeyword(String keyword, Pageable pageable) {
-        return convPostRepository.searchByTitleOrContent(keyword,pageable).map(entity -> {
+        return convPostRepository.searchByTitleOrContent(keyword, pageable).map(entity -> {
             try {
                 entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
@@ -111,11 +111,11 @@ public class ConvPostApplicationService {
     @Transactional
     public void insert(ConvPostInsertRequest convPostInsertRequest, UUID memberUuid) throws IOException {
         convPostValidationService.validateConvPostInsertRequest(convPostInsertRequest);
-        convCategoryValidationService.validateNotFoundOrder(convPostInsertRequest.groupOrder());
+        convCategoryValidationService.validateNotFoundUuid(convPostInsertRequest.categoryUuid());
         siteMemberValidationService.validateNotFoundUuid(memberUuid);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
         ConvPostEntity convPostEntity = ConvPostEntity.builder()
-                .group(convCategoryRepository.findByOrder(convPostInsertRequest.groupOrder()).orElseThrow())
+                .category(convCategoryRepository.findByUuid(convPostInsertRequest.categoryUuid()).orElseThrow())
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(convPostInsertRequest.title())
@@ -128,10 +128,10 @@ public class ConvPostApplicationService {
     public void update(ConvPostUpdateRequest convPostUpdateRequest, UUID memberUuid) throws IOException {
         convPostValidationService.validateConvPostUpdateRequest(convPostUpdateRequest);
         convPostValidationService.validateAccessibleConvPost(convPostUpdateRequest.ulid(), memberUuid);
-        convCategoryValidationService.validateNotFoundOrder(convPostUpdateRequest.groupOrder());
+        convCategoryValidationService.validateNotFoundUuid(convPostUpdateRequest.categoryUuid());
         ConvPostEntity convPostEntity = convPostRepository.findByUlid(convPostUpdateRequest.ulid()).orElseThrow();
         mediaContentService.deleteFiles(convPostEntity.getContent());
-        convPostEntity.updateGroup(convCategoryRepository.findByOrder(convPostUpdateRequest.groupOrder()).orElseThrow());
+        convPostEntity.updateCategory(convCategoryRepository.findByUuid(convPostUpdateRequest.categoryUuid()).orElseThrow());
         convPostEntity.updateTitle(convPostUpdateRequest.title());
         convPostEntity.updateContent(mediaContentService.saveFilesAndGenerateContentJson(convPostUpdateRequest.content()));
         convPostRepository.save(convPostEntity);
@@ -153,7 +153,7 @@ public class ConvPostApplicationService {
         }
         Long dbViewCount = convPostRepository.findByUlid(ulid)
                 .map(convPostEntity -> Optional.ofNullable(convPostEntity.getViewCount()).orElseThrow())
-                .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid,String.class));
+                .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid, String.class));
         convPostViewCountRedisRepository.write(ulid, dbViewCount);
         return dbViewCount;
     }
@@ -161,7 +161,7 @@ public class ConvPostApplicationService {
     @Transactional
     public Long increaseViewCount(String ulid, UUID memberUuid) {
         // 조회수 어뷰징 정책 - 사용자는 게시글 1개당 ttl에 1번 조회수 증가
-        if (!convPostViewLockRedisRepository.lock(ulid,memberUuid,ttlMinutes)) {
+        if (!convPostViewLockRedisRepository.lock(ulid, memberUuid, ttlMinutes)) {
             return convPostViewCountRedisRepository.read(ulid);
         }
         // 조회수 증가

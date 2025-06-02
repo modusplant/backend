@@ -1,4 +1,6 @@
 package kr.modusplant.domains.communication.conversation.app.http.response;
 
-public record ConvCategoryResponse(Integer order, String category) {
+import java.util.UUID;
+
+public record ConvCategoryResponse(UUID uuid, String category, Integer order) {
 }

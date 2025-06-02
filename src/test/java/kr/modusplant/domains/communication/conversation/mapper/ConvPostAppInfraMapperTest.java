@@ -35,11 +35,11 @@ class ConvPostAppInfraMapperTest implements ConvPostEntityTestUtils, ConvCategor
     @DisplayName("엔티티를 응답으로 전환")
     void toConvPostResponseTest() {
         // given
-        ConvCategoryEntity convCategoryEntity = convCategoryRepository.save(testConvCategoryEntity);
+        ConvCategoryEntity convCategoryEntity = convCategoryRepository.save(createTestConvCategoryEntity());
         SiteMemberEntity siteMemberEntity = siteMemberRepository.save(createMemberBasicUserEntity());
         ConvPostEntity convPostEntity = convPostRepository.save(
                 createConvPostEntityBuilder()
-                        .group(convCategoryEntity)
+                        .category(convCategoryEntity)
                         .authMember(siteMemberEntity)
                         .createMember(siteMemberEntity)
                         .build()
@@ -49,8 +49,8 @@ class ConvPostAppInfraMapperTest implements ConvPostEntityTestUtils, ConvCategor
         ConvPostResponse convPostResponse = convPostAppInfraMapper.toConvPostResponse(convPostEntity);
 
         // then
-        assertThat(convPostResponse.getGroupOrder()).isEqualTo(convPostEntity.getGroup().getOrder());
-        assertThat(convPostResponse.getCategory()).isEqualTo(convPostEntity.getGroup().getCategory());
+        assertThat(convPostResponse.getCategoryUuid()).isEqualTo(convPostEntity.getCategory().getUuid());
+        assertThat(convPostResponse.getCategory()).isEqualTo(convPostEntity.getCategory().getCategory());
         assertThat(convPostResponse.getNickname()).isEqualTo(convPostEntity.getAuthMember().getNickname());
     }
 

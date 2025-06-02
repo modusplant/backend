@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Arrays;
 import java.util.List;
 
-public interface ConvPostRequestTestUtils {
+public interface ConvPostRequestTestUtils extends ConvCategoryRequestTestUtils{
     /* MultipartFile, FileOrder Utils */
     MultipartFile textFile0 = new MockMultipartFile("content", "text_0.txt", "text/plain", "This is text for test".getBytes());
     MultipartFile textFile1 = new MockMultipartFile("content", "text_1.txt", "text/plain", "This is text for test".getBytes());
@@ -89,15 +89,15 @@ public interface ConvPostRequestTestUtils {
 
     /* ConvPostInsertRequest Utils */
     ConvPostInsertRequest requestAllTypes = new ConvPostInsertRequest(
-            1,
-            "유용한 팁 모음",
+            testConvCategoryWithUuid.getUuid(),
+            "유용한 대화 모음",
             allMediaFiles,
             allMediaFilesOrder
     );
 
     ConvPostInsertRequest requestBasicTypes = new ConvPostInsertRequest(
-            2,
-            "유용한 식물 기르기 팁",
+            testConvCategoryWithUuid.getUuid(),
+            "유용한 식물 기르기 대화",
             basicMediaFiles,
             basicMediaFilesOrder
     );

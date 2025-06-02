@@ -21,12 +21,13 @@ class ConvPostEntityTest implements ConvPostEntityTestUtils {
     }
 
     @Test
-    @DisplayName("팁 게시글 PrePersist")
+    @DisplayName("대화 게시글 PrePersist")
     void prePersist() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
+        ConvCategoryEntity convCategoryEntity = entityManager.merge(createTestConvCategoryEntity());
         ConvPostEntity convPost = createConvPostEntityBuilder()
-                .group(testConvCategoryEntity)
+                .category(convCategoryEntity)
                 .authMember(member)
                 .createMember(member)
                 .likeCount(1)
@@ -45,12 +46,12 @@ class ConvPostEntityTest implements ConvPostEntityTestUtils {
     }
 
     @Test
-    @DisplayName("팁 게시글 PreUpdate")
+    @DisplayName("대화 게시글 PreUpdate")
     void preUpdate() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
         ConvPostEntity convPost = createConvPostEntityBuilder()
-                .group(testConvCategoryEntity)
+                .category(createTestConvCategoryEntity())
                 .authMember(member)
                 .createMember(member)
                 .build();
