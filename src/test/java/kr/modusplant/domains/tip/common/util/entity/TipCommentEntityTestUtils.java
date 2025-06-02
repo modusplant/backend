@@ -1,6 +1,6 @@
 package kr.modusplant.domains.tip.common.util.entity;
 
-import kr.modusplant.domains.tip.persistence.entity.TipCommentEntity;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipCommentEntity;
 
 public interface TipCommentEntityTestUtils extends TipPostEntityTestUtils {
 

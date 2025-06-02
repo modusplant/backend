@@ -1,4 +1,4 @@
-package kr.modusplant.domains.tip.persistence.entity;
+package kr.modusplant.domains.communication.tip.persistence.entity;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;

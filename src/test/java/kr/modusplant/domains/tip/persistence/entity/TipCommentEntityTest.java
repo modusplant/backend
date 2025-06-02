@@ -1,10 +1,9 @@
 package kr.modusplant.domains.tip.persistence.entity;
 
+import kr.modusplant.domains.communication.tip.persistence.entity.TipCommentEntity;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
-import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.tip.common.util.domain.TipCommentTestUtils;
-import kr.modusplant.domains.tip.common.util.domain.TipPostTestUtils;
 import kr.modusplant.domains.tip.common.util.entity.TipCommentEntityTestUtils;
 import kr.modusplant.domains.tip.common.util.entity.TipPostEntityTestUtils;
 import kr.modusplant.global.context.RepositoryOnlyContext;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -1,4 +1,4 @@
-package kr.modusplant.domains.tip.domain.model;
+package kr.modusplant.domains.communication.tip.domain.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.*;

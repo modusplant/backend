@@ -1,8 +1,8 @@
-package kr.modusplant.domains.tip.persistence.entity;
+package kr.modusplant.domains.communication.tip.persistence.entity;
 
 import jakarta.persistence.*;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.tip.persistence.entity.compositekey.TipCommentCompositeKey;
+import kr.modusplant.domains.communication.tip.persistence.entity.compositekey.TipCommentCompositeKey;
 import kr.modusplant.global.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,7 +13,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static kr.modusplant.global.vo.SnakeCaseWord.*;
 

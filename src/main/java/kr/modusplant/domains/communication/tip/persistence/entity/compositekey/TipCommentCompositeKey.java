@@ -1,4 +1,4 @@
-package kr.modusplant.domains.tip.persistence.entity.compositekey;
+package kr.modusplant.domains.communication.tip.persistence.entity.compositekey;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

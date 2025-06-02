@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.group.common.util.domain.PlantGroupTestUtils;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
-import kr.modusplant.domains.tip.domain.model.TipPost;
+import kr.modusplant.domains.communication.tip.domain.model.TipPost;
 import kr.modusplant.global.persistence.generator.ULIDGenerator;
 
 import java.io.IOException;

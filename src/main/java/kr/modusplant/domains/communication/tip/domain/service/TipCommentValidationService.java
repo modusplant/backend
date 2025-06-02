@@ -1,6 +1,6 @@
-package kr.modusplant.domains.tip.domain.service;
+package kr.modusplant.domains.communication.tip.domain.service;
 
-import kr.modusplant.domains.tip.persistence.repository.TipCommentRepository;
+import kr.modusplant.domains.communication.tip.persistence.repository.TipCommentRepository;
 import kr.modusplant.global.error.EntityExistsWithPostUlidAndMatePathException;
 import kr.modusplant.global.error.EntityNotFoundWithPostUlidAndMatePathException;
 import lombok.RequiredArgsConstructor;

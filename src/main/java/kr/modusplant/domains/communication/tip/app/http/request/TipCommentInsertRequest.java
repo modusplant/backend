@@ -1,4 +1,4 @@
-package kr.modusplant.domains.tip.app.http.request;
+package kr.modusplant.domains.communication.tip.app.http.request;
 
 import java.util.UUID;
 

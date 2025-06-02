@@ -1,10 +1,10 @@
-package kr.modusplant.domains.tip.persistence.repository;
+package kr.modusplant.domains.communication.tip.persistence.repository;
 
 import kr.modusplant.domains.common.persistence.repository.supers.CreatedAtAndUpdatedAtRepository;
 import kr.modusplant.domains.common.persistence.repository.supers.UlidPrimaryRepository;
 import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.tip.persistence.entity.TipPostEntity;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

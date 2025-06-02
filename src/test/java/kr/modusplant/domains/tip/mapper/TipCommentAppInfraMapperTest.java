@@ -1,18 +1,19 @@
 package kr.modusplant.domains.tip.mapper;
 
+import kr.modusplant.domains.communication.tip.mapper.TipCommentAppInfraMapper;
 import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.domains.tip.app.http.request.TipCommentInsertRequest;
-import kr.modusplant.domains.tip.app.http.response.TipCommentResponse;
+import kr.modusplant.domains.communication.tip.app.http.request.TipCommentInsertRequest;
+import kr.modusplant.domains.communication.tip.app.http.response.TipCommentResponse;
 import kr.modusplant.domains.tip.common.util.app.http.request.TipCommentInsertRequestTestUtils;
 import kr.modusplant.domains.tip.common.util.app.http.response.TipCommentResponseTestUtils;
 import kr.modusplant.domains.tip.common.util.entity.TipCommentEntityTestUtils;
 import kr.modusplant.domains.tip.common.util.entity.TipPostEntityTestUtils;
-import kr.modusplant.domains.tip.persistence.entity.TipCommentEntity;
-import kr.modusplant.domains.tip.persistence.entity.TipPostEntity;
-import kr.modusplant.domains.tip.persistence.repository.TipPostRepository;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipCommentEntity;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
+import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
