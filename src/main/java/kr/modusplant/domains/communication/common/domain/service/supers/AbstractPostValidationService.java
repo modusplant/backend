@@ -1,8 +1,7 @@
 package kr.modusplant.domains.communication.common.domain.service.supers;
 
+import kr.modusplant.domains.common.persistence.repository.supers.UuidPrimaryKeyRepository;
 import kr.modusplant.domains.communication.common.app.http.request.FileOrder;
-import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
-import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCategoryRepository;
 import kr.modusplant.global.error.EntityExistsWithUuidException;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,18 +11,18 @@ import java.util.List;
 import java.util.UUID;
 
 public abstract class AbstractPostValidationService {
-    protected void validateExistedCategoryUuid(UUID categoryUuid, ConvCategoryRepository convCategoryRepository) {
+    protected void validateExistedCategoryUuid(UUID categoryUuid, UuidPrimaryKeyRepository<?> categoryRepository) {
         if (categoryUuid == null) {
             return;
         }
-        if (convCategoryRepository.findByUuid(categoryUuid).isPresent()) {
-            throw new EntityExistsWithUuidException(categoryUuid, ConvCategoryEntity.class);
+        if (categoryRepository.findByUuid(categoryUuid).isPresent()) {
+            throw new EntityExistsWithUuidException(categoryUuid, categoryRepository.getClass());
         }
     }
 
-    protected void validateNotFoundCategoryUuid(UUID categoryUuid, ConvCategoryRepository convCategoryRepository) {
-        if (categoryUuid == null || convCategoryRepository.findByUuid(categoryUuid).isEmpty()) {
-            throw new EntityExistsWithUuidException(categoryUuid, ConvCategoryEntity.class);
+    protected void validateNotFoundCategoryUuid(UUID categoryUuid, UuidPrimaryKeyRepository<?> categoryRepository) {
+        if (categoryUuid == null || categoryRepository.findByUuid(categoryUuid).isEmpty()) {
+            throw new EntityExistsWithUuidException(categoryUuid, categoryRepository.getClass());
         }
     }
 
