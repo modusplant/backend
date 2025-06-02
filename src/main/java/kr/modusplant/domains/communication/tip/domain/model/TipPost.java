@@ -18,9 +18,9 @@ public class TipPost {
 
     private final UUID createMemberUuid;
 
-    private final Integer recommendationNumber;
+    private final Integer likeCount;
 
-    private final Integer viewCount;
+    private final Long viewCount;
 
     private final String title;
 
@@ -33,8 +33,8 @@ public class TipPost {
         private Integer groupOrder;
         private UUID authMemberUuid;
         private UUID createMemberUuid;
-        private Integer recommendationNumber;
-        private Integer viewCount;
+        private Integer likeCount;
+        private Long viewCount;
         private String title;
         private JsonNode content;
         private Boolean isDeleted;
@@ -44,7 +44,7 @@ public class TipPost {
             this.groupOrder = tipPost.groupOrder;
             this.authMemberUuid = tipPost.authMemberUuid;
             this.createMemberUuid = tipPost.createMemberUuid;
-            this.recommendationNumber = tipPost.recommendationNumber;
+            this.likeCount = tipPost.likeCount;
             this.viewCount = tipPost.viewCount;
             this.title = tipPost.title;
             this.content = tipPost.content;
@@ -53,7 +53,7 @@ public class TipPost {
         }
 
         public TipPost build() {
-            return new TipPost(this.ulid,this.groupOrder,this.authMemberUuid,this.createMemberUuid,this.recommendationNumber,this.viewCount,this.title,this.content,this.isDeleted);
+            return new TipPost(this.ulid,this.groupOrder,this.authMemberUuid,this.createMemberUuid,this.likeCount,this.viewCount,this.title,this.content,this.isDeleted);
         }
     }
 

@@ -6,11 +6,11 @@ import kr.modusplant.domains.member.app.service.SiteMemberRoleApplicationService
 import kr.modusplant.domains.member.common.util.app.http.response.SiteMemberRoleResponseTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.global.enums.Role;
+import kr.modusplant.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.modules.jwt.domain.service.TokenValidationService;
-import kr.modusplant.modules.jwt.app.dto.TokenPair;
-import kr.modusplant.modules.jwt.app.error.InvalidTokenException;
-import kr.modusplant.modules.jwt.app.error.TokenNotFoundException;
+import kr.modusplant.modules.jwt.error.InvalidTokenException;
+import kr.modusplant.modules.jwt.error.TokenNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -30,12 +30,12 @@ public class MockDomainsServiceBeanFactoryPostProcessor implements BeanFactoryPo
         scanner.addIncludeFilter(new AnnotationTypeFilter(Service.class));
         ClassLoader classLoader = this.getClass().getClassLoader();
 
-        for (BeanDefinition repositoryDef : scanner.findCandidateComponents(NOTATION_DOMAINS)) {
+        for (BeanDefinition serviceDef : scanner.findCandidateComponents(NOTATION_DOMAINS)) {
             Class<?> clazz;
             try {
-                clazz = ClassUtils.forName(Objects.requireNonNull(repositoryDef.getBeanClassName()), classLoader);
+                clazz = ClassUtils.forName(Objects.requireNonNull(serviceDef.getBeanClassName()), classLoader);
             } catch (ClassNotFoundException e) {
-                throw new RuntimeException("Fail to load the service class: " + repositoryDef.getBeanClassName());
+                throw new RuntimeException("Fail to load the service class: " + serviceDef.getBeanClassName());
             }
             String simpleName = clazz.getSimpleName();
             beanFactory.registerSingleton(String.valueOf(simpleName.charAt(0)).toLowerCase() + simpleName.substring(1), Mockito.mock(clazz));

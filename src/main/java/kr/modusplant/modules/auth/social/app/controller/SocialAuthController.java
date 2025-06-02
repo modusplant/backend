@@ -5,14 +5,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import kr.modusplant.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.global.app.servlet.response.DataResponse;
+import kr.modusplant.global.util.GenerationUtils;
+import kr.modusplant.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.modules.auth.social.app.http.request.SocialLoginRequest;
 import kr.modusplant.modules.auth.social.app.service.SocialAuthApplicationService;
-import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
 import kr.modusplant.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.modules.jwt.app.http.response.TokenResponse;
+import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -44,7 +45,7 @@ public class SocialAuthController {
     public ResponseEntity<DataResponse<?>> kakaoSocialLogin(@Valid @RequestBody SocialLoginRequest request) {
         JwtUserPayload member = socialAuthApplicationService.handleSocialLogin(AuthProvider.KAKAO, request.getCode());
 
-        TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(), member.nickname(), member.role(), request.getDeviceId());
+        TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(), member.nickname(), member.role(), GenerationUtils.generateDeviceId());
 
         TokenResponse token = new TokenResponse(tokenPair.getAccessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(token);
@@ -64,7 +65,7 @@ public class SocialAuthController {
     public ResponseEntity<DataResponse<?>> googleSocialLogin(@Valid @RequestBody SocialLoginRequest request) {
         JwtUserPayload member = socialAuthApplicationService.handleSocialLogin(AuthProvider.GOOGLE, request.getCode());
 
-        TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(), member.nickname(), member.role(), request.getDeviceId());
+        TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(), member.nickname(), member.role(), GenerationUtils.generateDeviceId());
 
         TokenResponse token = new TokenResponse(tokenPair.getAccessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(token);
