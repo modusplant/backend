@@ -1,12 +1,12 @@
-package kr.modusplant.domains.communication.tip.app.service;
+package kr.modusplant.domains.communication.qna.app.service;
 
 import kr.modusplant.domains.communication.common.app.http.response.LikeResponse;
-import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
-import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
-import kr.modusplant.domains.communication.tip.persistence.entity.TipLikeEntity;
-import kr.modusplant.domains.communication.tip.persistence.entity.TipLikeId;
-import kr.modusplant.domains.communication.tip.persistence.repository.TipLikeRepository;
-import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
+import kr.modusplant.domains.communication.qna.common.util.entity.QnaPostEntityTestUtils;
+import kr.modusplant.domains.communication.qna.persistence.entity.QnaLikeEntity;
+import kr.modusplant.domains.communication.qna.persistence.entity.QnaLikeId;
+import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
+import kr.modusplant.domains.communication.qna.persistence.repository.QnaLikeRepository;
+import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
@@ -25,22 +25,22 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest(classes = {TestAopConfig.class})
 @Transactional
-public class TipLikeApplicationServiceTest implements SiteMemberEntityTestUtils, TipPostEntityTestUtils {
+public class QnaLikeApplicationServiceTest implements SiteMemberEntityTestUtils, QnaPostEntityTestUtils {
 
     @Autowired
     private SiteMemberRepository siteMemberRepository;
 
     @Autowired
-    private TipPostRepository tipPostRepository;
+    private QnaPostRepository qnaPostRepository;
 
     @Autowired
-    private TipLikeRepository tipLikeRepository;
+    private QnaLikeRepository qnaLikeRepository;
 
     @Autowired
-    private TipLikeApplicationService tipLikeApplicationService;
+    private QnaLikeApplicationService qnaLikeApplicationService;
 
     private UUID memberId;
-    private String tipPostId;
+    private String qnaPostId;
 
     @BeforeEach
     void setUp() {
@@ -48,67 +48,67 @@ public class TipLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
         siteMemberRepository.save(member);
         memberId = member.getUuid();
 
-        TipPostEntity tipPost = createTipPostEntityBuilder()
+        QnaPostEntity qnaPost = createQnaPostEntityBuilder()
                 .authMember(member)
                 .createMember(member)
-                .group(testTipCategoryEntity)
+                .group(testQnaCategoryEntity)
                 .build();
-        tipPostRepository.save(tipPost);
-        tipPostId = tipPost.getUlid();
+        qnaPostRepository.save(qnaPost);
+        qnaPostId = qnaPost.getUlid();
 
         siteMemberRepository.flush();
-        tipPostRepository.flush();
+        qnaPostRepository.flush();
     }
 
     @Test
     @DisplayName("좋아요 성공")
-    void likeTipPost_success() {
+    void likeQnaPost_success() {
         // when
-        LikeResponse response = tipLikeApplicationService.likeTipPost(tipPostId, memberId);
+        LikeResponse response = qnaLikeApplicationService.likeQnaPost(qnaPostId, memberId);
 
         // then
         assertThat(response.liked()).isTrue();
         assertThat(response.likeCount()).isEqualTo(1);
 
-        TipLikeEntity saved = tipLikeRepository.findById(new TipLikeId(tipPostId, memberId)).orElse(null);
+        QnaLikeEntity saved = qnaLikeRepository.findById(new QnaLikeId(qnaPostId, memberId)).orElse(null);
 
         assertThat(saved).isNotNull();
     }
 
     @Test
     @DisplayName("좋아요 취소 성공")
-    void unlikeTipPost_success() {
+    void unlikeQnaPost_success() {
         // given
-        tipLikeApplicationService.likeTipPost(tipPostId, memberId);
+        qnaLikeApplicationService.likeQnaPost(qnaPostId, memberId);
 
         // when
-        LikeResponse response = tipLikeApplicationService.unlikeTipPost(tipPostId, memberId);
+        LikeResponse response = qnaLikeApplicationService.unlikeQnaPost(qnaPostId, memberId);
 
         // then
         assertThat(response.liked()).isFalse();
         assertThat(response.likeCount()).isEqualTo(0);
-        assertThat(tipLikeRepository.existsByTipPostIdAndMemberId(tipPostId, memberId)).isFalse();
+        assertThat(qnaLikeRepository.existsByQnaPostIdAndMemberId(qnaPostId, memberId)).isFalse();
     }
 
     @Test
     @DisplayName("이미 좋아요 한 게시글을 또 좋아요 시도할 경우 예외 발생")
-    void likeTipPost_duplicateLike_throwsException() {
+    void likeQnaPost_duplicateLike_throwsException() {
         // given
-        tipLikeApplicationService.likeTipPost(tipPostId, memberId);
+        qnaLikeApplicationService.likeQnaPost(qnaPostId, memberId);
 
         // when & then
         assertThatThrownBy(() ->
-                tipLikeApplicationService.likeTipPost(tipPostId, memberId))
+                qnaLikeApplicationService.likeQnaPost(qnaPostId, memberId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("member already liked");
     }
 
     @Test
     @DisplayName("좋아요 하지 않은 게시글을 취소할 경우 예외 발생")
-    void unlikeTipPost_withoutLike_throwsException() {
+    void unlikeQnaPost_withoutLike_throwsException() {
         // when & then
         assertThatThrownBy(() ->
-                tipLikeApplicationService.unlikeTipPost(tipPostId, memberId))
+                qnaLikeApplicationService.unlikeQnaPost(qnaPostId, memberId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("member not liked status");
     }
