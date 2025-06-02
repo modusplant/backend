@@ -1,0 +1,74 @@
+package kr.modusplant.domains.communication.tip.app.controller;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.modusplant.domains.communication.tip.app.http.request.TipCategoryInsertRequest;
+import kr.modusplant.domains.communication.tip.app.http.response.TipCategoryResponse;
+import kr.modusplant.domains.communication.tip.app.service.TipCategoryApplicationService;
+import kr.modusplant.global.app.servlet.response.DataResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Tag(name = "TipCategory API", description = "팁 항목 API")
+@RestController
+@Primary
+@RequestMapping("/api/crud/tip/categories")
+@RequiredArgsConstructor
+public class TipCategoryController {
+    private final TipCategoryApplicationService tipCategoryApplicationService;
+
+    @Operation(summary = "전체 팁 항목 조회 API", description = "전체 팁 항목의 식별자를 비롯하여 이름, 컨텐츠와 버전 정보를 조회합니다.")
+    @GetMapping
+    public ResponseEntity<DataResponse<List<TipCategoryResponse>>> getAllTipCategories() {
+        return ResponseEntity.ok().body(DataResponse.ok(tipCategoryApplicationService.getAll()));
+    }
+
+    @Operation(summary = "UUID로 팁 항목 조회 API", description = "UUID에 맞는 팁 항목을 조회합니다.")
+    @GetMapping("/{uuid}")
+    public ResponseEntity<DataResponse<?>> getTipCategoryByUuid(@PathVariable UUID uuid) {
+        Optional<TipCategoryResponse> optionalTipCategoryResponse = tipCategoryApplicationService.getByUuid(uuid);
+        if (optionalTipCategoryResponse.isEmpty()) {
+            return ResponseEntity.ok().body(DataResponse.ok());
+        }
+        return ResponseEntity.ok().body(DataResponse.ok(optionalTipCategoryResponse.orElseThrow()));
+    }
+
+    @Operation(summary = "순서로 팁 항목 조회 API", description = "순서에 맞는 팁 항목을 조회합니다.")
+    @GetMapping("/order/{order}")
+    public ResponseEntity<DataResponse<?>> getTipCategoryByOrder(@PathVariable Integer order) {
+        Optional<TipCategoryResponse> optionalTipCategoryResponse = tipCategoryApplicationService.getByOrder(order);
+        if (optionalTipCategoryResponse.isEmpty()) {
+            return ResponseEntity.ok().body(DataResponse.ok());
+        }
+        return ResponseEntity.ok().body(DataResponse.ok(optionalTipCategoryResponse.orElseThrow()));
+    }
+
+    @Operation(summary = "항목으로 팁 항목 조회 API", description = "항목에 맞는 팁 항목을 조회합니다.")
+    @GetMapping("/category/{category}")
+    public ResponseEntity<DataResponse<?>> getTipCategoryByName(@PathVariable String category) {
+        Optional<TipCategoryResponse> optionalTipCategoryResponse = tipCategoryApplicationService.getByCategory(category);
+        if (optionalTipCategoryResponse.isEmpty()) {
+            return ResponseEntity.ok().body(DataResponse.ok());
+        }
+        return ResponseEntity.ok().body(DataResponse.ok(optionalTipCategoryResponse.orElseThrow()));
+    }
+
+    @Operation(summary = "팁 항목 삽입 API", description = "순서, 항목 정보로 팁 항목을 삽입합니다.")
+    @PostMapping
+    public ResponseEntity<DataResponse<TipCategoryResponse>> insertTipCategory(@RequestBody TipCategoryInsertRequest tipCategoryInsertRequest) {
+        return ResponseEntity.ok().body(DataResponse.ok(tipCategoryApplicationService.insert(tipCategoryInsertRequest)));
+    }
+
+    @Operation(summary = "팁 항목 제거 API", description = "UUID로 팁 항목을 제거합니다.")
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<DataResponse<?>> removeTipCategoryByUuid(@PathVariable UUID uuid) {
+        tipCategoryApplicationService.removeByUuid(uuid);
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+}
