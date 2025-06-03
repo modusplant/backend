@@ -8,24 +8,31 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
+import java.util.UUID;
+
 import static kr.modusplant.global.vo.CamelCaseWord.*;
 
 @Mapper
 public interface TipPostAppInfraMapper extends PostAppInfraMapper {
 
-    @Mapping(source = GROUP, target = GROUP_ORDER, qualifiedByName = "toGroupOrder")
-    @Mapping(source = GROUP, target = CATEGORY, qualifiedByName = "toCategory")
+    @Mapping(source = CATEGORY, target = CATEGORY, qualifiedByName = "toCategory")
+    @Mapping(source = CATEGORY, target = CATEGORY_UUID, qualifiedByName = "toCategoryUuid")
+    @Mapping(source = CATEGORY, target = CATEGORY_ORDER, qualifiedByName = "toCategoryOrder")
     @Mapping(source = AUTH_MEMBER, target = NICKNAME, qualifiedByName = "toNickname")
     TipPostResponse toTipPostResponse(TipPostEntity tipPostEntity);
-
-    @Named("toGroupOrder")
-    default Integer toGroupOrder(TipCategoryEntity tipCategoryEntity) {
-        return tipCategoryEntity.getOrder();
-    }
 
     @Named("toCategory")
     default String toCategory(TipCategoryEntity tipCategoryEntity) {
         return tipCategoryEntity.getCategory();
     }
 
+    @Named("toCategoryUuid")
+    default UUID toCategoryUuid(TipCategoryEntity tipCategoryEntity) {
+        return tipCategoryEntity.getUuid();
+    }
+
+    @Named("toCategoryOrder")
+    default Integer toCategoryOrder(TipCategoryEntity tipCategoryEntity) {
+        return tipCategoryEntity.getOrder();
+    }
 }

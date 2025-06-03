@@ -69,7 +69,7 @@ class ConvPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, C
         // given
         given(convPostViewCountRedisRepository.read(ulid)).willReturn(null);
         ConvPostEntity convPostEntity = createConvPostEntityBuilder()
-                .group(testConvCategoryEntity)
+                .category(createTestConvCategoryEntity())
                 .authMember(createMemberBasicAdminEntityWithUuid())
                 .createMember(createMemberBasicAdminEntityWithUuid())
                 .viewCount(55L)

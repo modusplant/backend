@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
 import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
@@ -38,10 +39,10 @@ class ConvCategoryValidationServiceTest implements ConvCategoryResponseTestUtils
     @Test
     void validateExistedOrderTest() {
         // given
-        Integer order = testConvCategoryEntity.getOrder();
+        Integer order = createTestConvCategoryEntity().getOrder();
 
         // when
-        given(convCategoryRepository.findByOrder(order)).willReturn(Optional.of(testConvCategoryEntity));
+        given(convCategoryRepository.findByOrder(order)).willReturn(Optional.of(createTestConvCategoryEntity()));
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
@@ -54,12 +55,12 @@ class ConvCategoryValidationServiceTest implements ConvCategoryResponseTestUtils
     @Test
     void validateExistedConvCategoryNameTest() {
         // given
-        Integer order = testConvCategoryEntity.getOrder();
-        String category = testConvCategoryEntity.getCategory();
+        Integer order = createTestConvCategoryEntity().getOrder();
+        String category = createTestConvCategoryEntity().getCategory();
 
         // when
         given(convCategoryRepository.findByOrder(order)).willReturn(Optional.empty());
-        given(convCategoryRepository.findByCategory(category)).willReturn(Optional.of(testConvCategoryEntity));
+        given(convCategoryRepository.findByCategory(category)).willReturn(Optional.of(createTestConvCategoryEntity()));
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
@@ -70,17 +71,17 @@ class ConvCategoryValidationServiceTest implements ConvCategoryResponseTestUtils
 
     @DisplayName("존재하지 않는 순서 검증")
     @Test
-    void validateNotFoundOrderTest() {
+    void validateNotFoundUuidTest() {
         // given
-        Integer order = testConvCategoryEntity.getOrder();
+        UUID uuid = createTestConvCategoryEntity().getUuid();
 
         // when
-        given(convCategoryRepository.findByOrder(order)).willReturn(Optional.empty());
+        given(convCategoryRepository.findByUuid(uuid)).willReturn(Optional.empty());
 
         // then
         EntityNotFoundException existsException = assertThrows(EntityNotFoundException.class,
-                () -> convCategoryValidationService.validateNotFoundOrder(order));
+                () -> convCategoryValidationService.validateNotFoundUuid(uuid));
         assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY.getValue(), ORDER, order, ConvCategoryEntity.class));
+                NOT_FOUND_ENTITY.getValue(), "uuid", uuid, ConvCategoryEntity.class));
     }
 }

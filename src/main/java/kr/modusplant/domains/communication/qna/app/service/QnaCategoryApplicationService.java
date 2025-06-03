@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Primary
@@ -28,7 +29,12 @@ public class QnaCategoryApplicationService {
     public List<QnaCategoryResponse> getAll() {
         return qnaCategoryRepository.findAll().stream().map(qnaCategoryAppInfraMapper::toQnaCategoryResponse).toList();
     }
-    
+
+    public Optional<QnaCategoryResponse> getByUuid(UUID uuid) {
+        Optional<QnaCategoryEntity> qnaCategoryOrEmpty = qnaCategoryRepository.findByUuid(uuid);
+        return qnaCategoryOrEmpty.isEmpty() ? Optional.empty() : Optional.of(qnaCategoryAppInfraMapper.toQnaCategoryResponse(qnaCategoryOrEmpty.orElseThrow()));
+    }
+
     public Optional<QnaCategoryResponse> getByOrder(Integer order) {
         Optional<QnaCategoryEntity> qnaCategoryOrEmpty = qnaCategoryRepository.findByOrder(order);
         return qnaCategoryOrEmpty.isEmpty() ? Optional.empty() : Optional.of(qnaCategoryAppInfraMapper.toQnaCategoryResponse(qnaCategoryOrEmpty.orElseThrow()));
@@ -42,12 +48,13 @@ public class QnaCategoryApplicationService {
     @Transactional
     public QnaCategoryResponse insert(QnaCategoryInsertRequest qnaCategoryInsertRequest) {
         validationService.validateExistedCategory(qnaCategoryInsertRequest.category());
+        validationService.validateExistedOrder(qnaCategoryInsertRequest.order());
         return qnaCategoryAppInfraMapper.toQnaCategoryResponse(qnaCategoryRepository.save(qnaCategoryAppInfraMapper.toQnaCategoryEntity(qnaCategoryInsertRequest)));
     }
 
     @Transactional
-    public void removeByOrder(Integer order) {
-        validationService.validateNotFoundOrder(order);
-        qnaCategoryRepository.deleteByOrder(order);
+    public void removeByUuid(UUID uuid) {
+        validationService.validateNotFoundUuid(uuid);
+        qnaCategoryRepository.deleteByUuid(uuid);
     }
 }

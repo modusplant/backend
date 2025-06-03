@@ -1,5 +1,6 @@
 package kr.modusplant.domains.communication.qna.persistence.repository;
 
+import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaCommentEntityTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaPostEntityTestUtils;
@@ -43,9 +44,9 @@ public class QnaCommentRepositoryTest implements
     @BeforeEach
     void setUp() {
         SiteMemberEntity member = createMemberBasicUserEntity();
-        QnaCategoryEntity category = categoryRepository.save(testQnaCategoryEntity);
+        QnaCategoryEntity category = categoryRepository.save(createTestQnaCategoryEntity());
         QnaPostEntity postEntity = createQnaPostEntityBuilder()
-                .group(category)
+                .category(category)
                 .authMember(member)
                 .createMember(member)
                 .likeCount(1)

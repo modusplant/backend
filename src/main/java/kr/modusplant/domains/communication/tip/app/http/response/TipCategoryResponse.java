@@ -1,4 +1,6 @@
 package kr.modusplant.domains.communication.tip.app.http.response;
 
-public record TipCategoryResponse(Integer order, String category) {
+import java.util.UUID;
+
+public record TipCategoryResponse(UUID uuid, String category, Integer order) {
 }

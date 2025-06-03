@@ -69,7 +69,7 @@ class QnaPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, Qn
         // given
         given(qnaPostViewCountRedisRepository.read(ulid)).willReturn(null);
         QnaPostEntity qnaPostEntity = createQnaPostEntityBuilder()
-                .group(testQnaCategoryEntity)
+                .category(createTestQnaCategoryEntity())
                 .authMember(createMemberBasicAdminEntityWithUuid())
                 .createMember(createMemberBasicAdminEntityWithUuid())
                 .viewCount(55L)

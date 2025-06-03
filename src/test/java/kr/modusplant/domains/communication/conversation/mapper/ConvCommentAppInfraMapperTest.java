@@ -47,9 +47,9 @@ public class ConvCommentAppInfraMapperTest implements
     @BeforeEach
     void setUp() {
         SiteMemberEntity member = createMemberBasicUserEntity();
-        ConvCategoryEntity category = categoryRepository.save(testConvCategoryEntity);
+        ConvCategoryEntity category = categoryRepository.save(createTestConvCategoryEntity());
         ConvPostEntity postEntity = createConvPostEntityBuilder()
-                .group(category)
+                .category(category)
                 .authMember(member)
                 .createMember(member)
                 .likeCount(1)

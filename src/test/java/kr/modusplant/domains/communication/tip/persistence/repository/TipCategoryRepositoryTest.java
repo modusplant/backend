@@ -7,6 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
@@ -19,57 +21,67 @@ class TipCategoryRepositoryTest implements TipCategoryEntityTestUtils {
         this.tipCategoryRepository = tipCategoryRepository;
     }
 
-    @DisplayName("order로 팁 항목 찾기")
+    @DisplayName("UUID로 팁 항목 찾기")
     @Test
-    void findByOrderTest() {
+    void findByUuidTest() {
         // given & when
-        tipCategoryRepository.save(testTipCategoryEntity);
+        TipCategoryEntity entity = tipCategoryRepository.save(createTestTipCategoryEntity());
 
         // then
-        assertThat(tipCategoryRepository.findByOrder(testTipCategory.getOrder()).orElseThrow()).isEqualTo(testTipCategoryEntity);
+        assertThat(tipCategoryRepository.findByUuid(entity.getUuid()).orElseThrow()).isEqualTo(entity);
     }
 
     @DisplayName("category로 팁 항목 찾기")
     @Test
     void findByCategoryTest() {
         // given & when
-        tipCategoryRepository.save(testTipCategoryEntity);
+        TipCategoryEntity entity = tipCategoryRepository.save(createTestTipCategoryEntity());
 
         // then
-        assertThat(tipCategoryRepository.findByCategory(testTipCategory.getCategory()).orElseThrow()).isEqualTo(testTipCategoryEntity);
+        assertThat(tipCategoryRepository.findByCategory(entity.getCategory()).orElseThrow()).isEqualTo(entity);
+    }
+
+    @DisplayName("order로 팁 항목 찾기")
+    @Test
+    void findByOrderTest() {
+        // given & when
+        TipCategoryEntity entity = tipCategoryRepository.save(createTestTipCategoryEntity());
+
+        // then
+        assertThat(tipCategoryRepository.findByOrder(entity.getOrder()).orElseThrow()).isEqualTo(entity);
     }
 
     @DisplayName("createdAt으로 팁 항목 찾기")
     @Test
     void findByCreatedAtTest() {
         // given & when
-        TipCategoryEntity tipCategory = tipCategoryRepository.save(testTipCategoryEntity);
+        TipCategoryEntity entity = tipCategoryRepository.save(createTestTipCategoryEntity());
 
         // then
-        assertThat(tipCategoryRepository.findByCreatedAt(tipCategory.getCreatedAt()).getFirst()).isEqualTo(tipCategory);
+        assertThat(tipCategoryRepository.findByCreatedAt(entity.getCreatedAt()).getFirst()).isEqualTo(entity);
     }
 
-    @DisplayName("order로 팁 항목 삭제")
+    @DisplayName("UUID로 팁 항목 삭제")
     @Test
-    void deleteByOrderTest() {
+    void deleteByUuidTest() {
         // given
-        TipCategoryEntity tipCategory = tipCategoryRepository.save(testTipCategoryEntity);
-        Integer order = tipCategory.getOrder();
+        TipCategoryEntity entity = tipCategoryRepository.save(createTestTipCategoryEntity());
+        UUID uuid = entity.getUuid();
 
         // when
-        tipCategoryRepository.deleteByOrder(order);
+        tipCategoryRepository.deleteByUuid(uuid);
 
         // then
-        assertThat(tipCategoryRepository.findByOrder(order)).isEmpty();
+        assertThat(tipCategoryRepository.findByUuid(uuid)).isEmpty();
     }
 
-    @DisplayName("order로 팁 항목 확인")
+    @DisplayName("UUID로 팁 항목 확인")
     @Test
-    void existsByOrderTest() {
+    void existsByUuidTest() {
         // given & when
-        TipCategoryEntity tipCategory = tipCategoryRepository.save(testTipCategoryEntity);
+        TipCategoryEntity entity = tipCategoryRepository.save(createTestTipCategoryEntity());
 
         // then
-        assertThat(tipCategoryRepository.existsByOrder(tipCategory.getOrder())).isEqualTo(true);
+        assertThat(tipCategoryRepository.existsByUuid(entity.getUuid())).isEqualTo(true);
     }
 }

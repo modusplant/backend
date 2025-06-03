@@ -32,8 +32,8 @@ public class QnaPostEntity {
     private String ulid;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = SNAKE_GROUP_ORDER, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private QnaCategoryEntity group;
+    @JoinColumn(name = SNAKE_CATE_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private QnaCategoryEntity category;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = SNAKE_AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
@@ -74,8 +74,8 @@ public class QnaPostEntity {
     @Column(nullable = false)
     private Long ver;
 
-    public void updateGroup(QnaCategoryEntity group) {
-        this.group = group;
+    public void updateCategory(QnaCategoryEntity category) {
+        this.category = category;
     }
 
     public void increaseLikeCount() {
@@ -137,9 +137,9 @@ public class QnaPostEntity {
         }
     }
 
-    private QnaPostEntity(String ulid, QnaCategoryEntity group, SiteMemberEntity authMember, SiteMemberEntity createMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isDeleted) {
+    private QnaPostEntity(String ulid, QnaCategoryEntity category, SiteMemberEntity authMember, SiteMemberEntity createMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isDeleted) {
         this.ulid = ulid;
-        this.group = group;
+        this.category = category;
         this.authMember = authMember;
         this.createMember = createMember;
         this.likeCount = likeCount;
@@ -155,7 +155,7 @@ public class QnaPostEntity {
 
     public static final class QnaPostEntityBuilder {
         private String ulid;
-        private QnaCategoryEntity group;
+        private QnaCategoryEntity category;
         private SiteMemberEntity authMember;
         private SiteMemberEntity createMember;
         private Integer likeCount;
@@ -169,8 +169,8 @@ public class QnaPostEntity {
             return this;
         }
 
-        public QnaPostEntityBuilder group(final QnaCategoryEntity group) {
-            this.group = group;
+        public QnaPostEntityBuilder category(final QnaCategoryEntity category) {
+            this.category = category;
             return this;
         }
 
@@ -209,9 +209,9 @@ public class QnaPostEntity {
             return this;
         }
 
-        public QnaPostEntityBuilder QnaPostEntity(final QnaPostEntity qnaPostEntity) {
+        public QnaPostEntityBuilder qnaPostEntity(final QnaPostEntity qnaPostEntity) {
             this.ulid = qnaPostEntity.ulid;
-            this.group = qnaPostEntity.group;
+            this.category = qnaPostEntity.category;
             this.authMember = qnaPostEntity.authMember;
             this.createMember = qnaPostEntity.createMember;
             this.likeCount = qnaPostEntity.likeCount;
@@ -223,7 +223,7 @@ public class QnaPostEntity {
         }
 
         public QnaPostEntity build() {
-            return new QnaPostEntity(this.ulid,this.group,this.authMember,this.createMember,this.likeCount,this.viewCount,this.title,this.content,this.isDeleted);
+            return new QnaPostEntity(this.ulid,this.category,this.authMember,this.createMember,this.likeCount,this.viewCount,this.title,this.content,this.isDeleted);
         }
 
     }

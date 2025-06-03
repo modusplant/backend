@@ -5,6 +5,7 @@ import kr.modusplant.domains.communication.common.error.PostAccessDeniedExceptio
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostInsertRequest;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostUpdateRequest;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
+import kr.modusplant.domains.communication.qna.persistence.repository.QnaCategoryRepository;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostRepository;
 import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import lombok.RequiredArgsConstructor;
@@ -13,22 +14,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class QnaPostValidationService extends AbstractPostValidationService {
 
     private final QnaPostRepository qnaPostRepository;
+    private final QnaCategoryRepository qnaCategoryRepository;
 
     public void validateQnaPostInsertRequest(QnaPostInsertRequest request) {
-        validateGroupOrder(request.groupOrder());
+        validateNotFoundCategoryUuid(request.categoryUuid(), qnaCategoryRepository);
         validateTitle(request.title());
         validateContentAndOrderInfo(request.content(),request.orderInfo());
     }
 
     public void validateQnaPostUpdateRequest(QnaPostUpdateRequest request) {
-        validateGroupOrder(request.groupOrder());
+        validateNotFoundCategoryUuid(request.categoryUuid(), qnaCategoryRepository);
         validateTitle(request.title());
         validateContentAndOrderInfo(request.content(),request.orderInfo());
     }

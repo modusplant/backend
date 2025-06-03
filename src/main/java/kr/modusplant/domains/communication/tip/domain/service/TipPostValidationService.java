@@ -5,6 +5,7 @@ import kr.modusplant.domains.communication.common.error.PostAccessDeniedExceptio
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostInsertRequest;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostUpdateRequest;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
+import kr.modusplant.domains.communication.tip.persistence.repository.TipCategoryRepository;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
 import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import lombok.RequiredArgsConstructor;
@@ -19,15 +20,16 @@ import java.util.UUID;
 public class TipPostValidationService extends AbstractPostValidationService {
 
     private final TipPostRepository tipPostRepository;
+    private final TipCategoryRepository tipCategoryRepository;
 
     public void validateTipPostInsertRequest(TipPostInsertRequest request) {
-        validateGroupOrder(request.groupOrder());
+        validateNotFoundCategoryUuid(request.categoryUuid(), tipCategoryRepository);
         validateTitle(request.title());
         validateContentAndOrderInfo(request.content(),request.orderInfo());
     }
 
     public void validateTipPostUpdateRequest(TipPostUpdateRequest request) {
-        validateGroupOrder(request.groupOrder());
+        validateNotFoundCategoryUuid(request.categoryUuid(), tipCategoryRepository);
         validateTitle(request.title());
         validateContentAndOrderInfo(request.content(),request.orderInfo());
     }

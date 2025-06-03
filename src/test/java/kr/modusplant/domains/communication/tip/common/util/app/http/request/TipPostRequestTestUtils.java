@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Arrays;
 import java.util.List;
 
-public interface TipPostRequestTestUtils {
+public interface TipPostRequestTestUtils extends TipCategoryRequestTestUtils{
     /* MultipartFile, FileOrder Utils */
     MultipartFile textFile0 = new MockMultipartFile("content", "text_0.txt", "text/plain", "This is text for test".getBytes());
     MultipartFile textFile1 = new MockMultipartFile("content", "text_1.txt", "text/plain", "This is text for test".getBytes());
@@ -89,14 +89,14 @@ public interface TipPostRequestTestUtils {
 
     /* TipPostInsertRequest Utils */
     TipPostInsertRequest requestAllTypes = new TipPostInsertRequest(
-            1,
+            testTipCategoryWithUuid.getUuid(),
             "유용한 팁 모음",
             allMediaFiles,
             allMediaFilesOrder
     );
 
     TipPostInsertRequest requestBasicTypes = new TipPostInsertRequest(
-            2,
+            testTipCategoryWithUuid.getUuid(),
             "유용한 식물 기르기 팁",
             basicMediaFiles,
             basicMediaFilesOrder

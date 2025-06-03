@@ -56,7 +56,7 @@ public class ConvCommentControllerTest implements
         memberEntity = createMemberBasicUserEntityWithUuid();
         postEntity = createConvPostEntityBuilder()
                 .ulid(convPostWithUlid.getUlid())
-                .group(testConvCategoryEntity)
+                .category(createTestConvCategoryEntityWithUuid())
                 .authMember(memberEntity)
                 .createMember(memberEntity)
                 .likeCount(1)

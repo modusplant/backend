@@ -4,13 +4,14 @@ import jakarta.persistence.EntityManager;
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCommentEntityTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipCommentEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipCategoryRepository;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipCommentRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.tip.common.util.entity.TipPostEntityTestUtils;
 import kr.modusplant.global.error.EntityExistsWithPostUlidAndMatePathException;
 import kr.modusplant.global.error.EntityNotFoundWithPostUlidAndMatePathException;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,16 +40,14 @@ public class TipCommentValidationServiceTest implements
     @Spy
     private final TipCommentRepository commentRepository;
 
-    private final TipCategoryRepository categoryRepository;
     private final EntityManager entityManager;
 
     @Autowired
     public TipCommentValidationServiceTest(
             TipCommentValidationService commentValidationService, TipCommentRepository commentRepository,
-            TipCategoryRepository categoryRepository, EntityManager entityManager) {
+            EntityManager entityManager) {
         this.commentValidationService = commentValidationService;
         this.commentRepository = commentRepository;
-        this.categoryRepository = categoryRepository;
         this.entityManager = entityManager;
     }
 
@@ -58,9 +57,9 @@ public class TipCommentValidationServiceTest implements
     @BeforeEach
     void setUp() {
         memberEntity = createMemberBasicUserEntity();
-//        TipCategoryEntity categoryEntity = categoryRepository.save(testTipCategoryEntity);
+        TipCategoryEntity category = entityManager.merge(createTestTipCategoryEntity());
         postEntity = createTipPostEntityBuilder()
-                .group(testTipCategoryEntity)
+                .category(category)
                 .authMember(memberEntity)
                 .createMember(memberEntity)
                 .likeCount(1)

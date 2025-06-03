@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Arrays;
 import java.util.List;
 
-public interface QnaPostRequestTestUtils {
+public interface QnaPostRequestTestUtils extends QnaCategoryRequestTestUtils {
     /* MultipartFile, FileOrder Utils */
     MultipartFile textFile0 = new MockMultipartFile("content", "text_0.txt", "text/plain", "This is text for test".getBytes());
     MultipartFile textFile1 = new MockMultipartFile("content", "text_1.txt", "text/plain", "This is text for test".getBytes());
@@ -89,15 +89,15 @@ public interface QnaPostRequestTestUtils {
 
     /* QnaPostInsertRequest Utils */
     QnaPostInsertRequest requestAllTypes = new QnaPostInsertRequest(
-            1,
-            "유용한 팁 모음",
+            testQnaCategoryWithUuid.getUuid(),
+            "유용한 Q&A 모음",
             allMediaFiles,
             allMediaFilesOrder
     );
 
     QnaPostInsertRequest requestBasicTypes = new QnaPostInsertRequest(
-            2,
-            "유용한 식물 기르기 팁",
+            testQnaCategoryWithUuid.getUuid(),
+            "유용한 식물 기르기 Q&A",
             basicMediaFiles,
             basicMediaFilesOrder
     );

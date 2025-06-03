@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Tag(name = "QnaCategory API", description = "Q&A 항목 API")
 @RestController
@@ -28,9 +29,19 @@ public class QnaCategoryController {
         return ResponseEntity.ok().body(DataResponse.ok(qnaCategoryApplicationService.getAll()));
     }
 
+    @Operation(summary = "UUID로 Q&A 항목 조회 API", description = "UUID에 맞는 Q&A 항목을 조회합니다.")
+    @GetMapping("/{uuid}")
+    public ResponseEntity<DataResponse<?>> getQnaCategoryByUuid(@PathVariable UUID uuid) {
+        Optional<QnaCategoryResponse> optionalQnaCategoryResponse = qnaCategoryApplicationService.getByUuid(uuid);
+        if (optionalQnaCategoryResponse.isEmpty()) {
+            return ResponseEntity.ok().body(DataResponse.ok());
+        }
+        return ResponseEntity.ok().body(DataResponse.ok(optionalQnaCategoryResponse.orElseThrow()));
+    }
+
     @Operation(summary = "순서로 Q&A 항목 조회 API", description = "순서에 맞는 Q&A 항목을 조회합니다.")
-    @GetMapping("/{order}")
-    public ResponseEntity<DataResponse<?>> getQnaCategoryByUuid(@PathVariable Integer order) {
+    @GetMapping("/order/{order}")
+    public ResponseEntity<DataResponse<?>> getQnaCategoryByOrder(@PathVariable Integer order) {
         Optional<QnaCategoryResponse> optionalQnaCategoryResponse = qnaCategoryApplicationService.getByOrder(order);
         if (optionalQnaCategoryResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -54,10 +65,10 @@ public class QnaCategoryController {
         return ResponseEntity.ok().body(DataResponse.ok(qnaCategoryApplicationService.insert(qnaCategoryInsertRequest)));
     }
 
-    @Operation(summary = "Q&A 항목 제거 API", description = "순서로 Q&A 항목을 제거합니다.")
-    @DeleteMapping("/{order}")
-    public ResponseEntity<DataResponse<?>> removeQnaCategoryByUuid(@PathVariable Integer order) {
-        qnaCategoryApplicationService.removeByOrder(order);
+    @Operation(summary = "Q&A 항목 제거 API", description = "UUID로 Q&A 항목을 제거합니다.")
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<DataResponse<?>> removeQnaCategoryByUuid(@PathVariable UUID uuid) {
+        qnaCategoryApplicationService.removeByUuid(uuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 }

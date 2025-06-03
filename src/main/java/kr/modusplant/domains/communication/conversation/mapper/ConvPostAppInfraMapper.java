@@ -8,23 +8,31 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
+import java.util.UUID;
+
 import static kr.modusplant.global.vo.CamelCaseWord.*;
 
 @Mapper
 public interface ConvPostAppInfraMapper extends PostAppInfraMapper {
 
-    @Mapping(source = GROUP, target = GROUP_ORDER, qualifiedByName = "toGroupOrder")
-    @Mapping(source = GROUP, target = CATEGORY, qualifiedByName = "toCategory")
+    @Mapping(source = CATEGORY, target = CATEGORY, qualifiedByName = "toCategory")
+    @Mapping(source = CATEGORY, target = CATEGORY_UUID, qualifiedByName = "toCategoryUuid")
+    @Mapping(source = CATEGORY, target = CATEGORY_ORDER, qualifiedByName = "toCategoryOrder")
     @Mapping(source = AUTH_MEMBER, target = NICKNAME, qualifiedByName = "toNickname")
     ConvPostResponse toConvPostResponse(ConvPostEntity convPostEntity);
-
-    @Named("toGroupOrder")
-    default Integer toGroupOrder(ConvCategoryEntity convCategoryEntity) {
-        return convCategoryEntity.getOrder();
-    }
 
     @Named("toCategory")
     default String toCategory(ConvCategoryEntity convCategoryEntity) {
         return convCategoryEntity.getCategory();
+    }
+
+    @Named("toCategoryUuid")
+    default UUID toCategoryUuid(ConvCategoryEntity convCategoryEntity) {
+        return convCategoryEntity.getUuid();
+    }
+
+    @Named("toCategoryOrder")
+    default Integer toCategoryOrder(ConvCategoryEntity convCategoryEntity) {
+        return convCategoryEntity.getOrder();
     }
 }

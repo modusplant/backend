@@ -5,10 +5,13 @@ import kr.modusplant.domains.communication.common.error.PostAccessDeniedExceptio
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostInsertRequest;
 import kr.modusplant.domains.communication.qna.common.util.app.http.request.QnaPostRequestTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.domain.QnaPostTestUtils;
+import kr.modusplant.domains.communication.qna.common.util.entity.QnaCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaCategoryEntity;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
+import kr.modusplant.domains.communication.qna.persistence.repository.QnaCategoryRepository;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostRepository;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
+import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;
@@ -27,57 +30,77 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class QnaPostValidationServiceTest implements QnaPostRequestTestUtils {
+class QnaPostValidationServiceTest implements QnaPostRequestTestUtils, QnaCategoryEntityTestUtils {
     @Mock
     private QnaPostRepository qnaPostRepository;
+
+    @Mock
+    private QnaCategoryRepository qnaCategoryRepository;
+
     @InjectMocks
     private QnaPostValidationService qnaPostValidationService;
 
     @Test
-    @DisplayName("팁 게시글 추가/수정 시 QnaPostRequest는 유효한 입력")
+    @DisplayName("Q&A 게시글 추가/수정 시 QnaPostRequest는 유효한 입력")
     void validateQnaPostInsertRequestTestSuccess() {
+        // given & when
+        when(qnaCategoryRepository.findByUuid(requestBasicTypes.categoryUuid())).thenReturn(Optional.of(createTestQnaCategoryEntity()));
+
+        // then
         assertDoesNotThrow(() -> qnaPostValidationService.validateQnaPostInsertRequest(requestBasicTypes));
     }
 
     @Test
-    @DisplayName("팁 게시글 추가/수정 시 QnaPostRequest의 groupOrder가 유효하지 않으면 예외 발생")
-    void validateQnaPostInsertRequestInvalidGroupOrderTest() {
+    @DisplayName("Q&A 게시글 추가/수정 시 QnaPostRequest의 categoryUuid가 유효하지 않으면 예외 발생")
+    void validateQnaPostInsertRequestInvalidCategoryUuidTest() {
+        // given & when
         QnaPostInsertRequest qnaPostInsertRequest = new QnaPostInsertRequest(
-                -1,
-                "유용한 팁 모음",
+                UUID.randomUUID(),
+                "유용한 Q&A 모음",
                 allMediaFiles,
                 allMediaFilesOrder
         );
 
-        assertThrows(IllegalArgumentException.class,
+        when(qnaCategoryRepository.findByUuid(qnaPostInsertRequest.categoryUuid())).thenReturn(Optional.empty());
+
+        // then
+        assertThrows(EntityExistsWithUuidException.class,
                 () -> qnaPostValidationService.validateQnaPostInsertRequest(qnaPostInsertRequest));
     }
 
     @Test
-    @DisplayName("팁 게시글 추가/수정 시 QnaPostRequest의 title이 유효하지 않으면 예외 발생")
+    @DisplayName("Q&A 게시글 추가/수정 시 QnaPostRequest의 title이 유효하지 않으면 예외 발생")
     void validateQnaPostInsertRequestInvalidTitleTest() {
+        // given & when
         QnaPostInsertRequest qnaPostInsertRequest = new QnaPostInsertRequest(
-                2,
+                UUID.randomUUID(),
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 allMediaFiles,
                 allMediaFilesOrder
         );
 
+        when(qnaCategoryRepository.findByUuid(qnaPostInsertRequest.categoryUuid())).thenReturn(Optional.of(createTestQnaCategoryEntity()));
+
+        // then
         assertThrows(IllegalArgumentException.class,
                 () -> qnaPostValidationService.validateQnaPostInsertRequest(qnaPostInsertRequest));
 
     }
 
     @Test
-    @DisplayName("팁 게시글 추가/수정 시 QnaPostRequest의 Content와 OrderInfo가 유효하지 않으면 예외 발생")
+    @DisplayName("Q&A 게시글 추가/수정 시 QnaPostRequest의 Content와 OrderInfo가 유효하지 않으면 예외 발생")
     void validateQnaPostInsertRequestInvalidContentAndOrderInfoTest() {
+        // given & when
         QnaPostInsertRequest qnaPostInsertRequest = new QnaPostInsertRequest(
-                1,
-                "유용한 팁 모음",
+                UUID.randomUUID(),
+                "유용한 Q&A 모음",
                 textImageFiles,
                 imageTextFilesOrder
         );
 
+        when(qnaCategoryRepository.findByUuid(qnaPostInsertRequest.categoryUuid())).thenReturn(Optional.of(createTestQnaCategoryEntity()));
+
+        // then
         assertThrows(IllegalArgumentException.class,
                 () -> qnaPostValidationService.validateQnaPostInsertRequest(qnaPostInsertRequest));
     }
@@ -91,7 +114,7 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils {
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         QnaPostEntity qnaPostEntity = QnaPostEntity.builder()
                 .authMember(memberEntity)
-                .group(mock(QnaCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
+                .category(mock(QnaCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
                 .createMember(memberEntity)
                 .likeCount(0)
                 .viewCount(0L)
@@ -126,7 +149,7 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils {
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         QnaPostEntity qnaPostEntity = QnaPostEntity.builder()
                 .authMember(memberEntity)
-                .group(mock(QnaCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
+                .category(mock(QnaCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
                 .createMember(memberEntity)
                 .likeCount(0)
                 .viewCount(0L)
@@ -146,7 +169,7 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils {
     @Test
     @DisplayName("ULID 존재할 경우 통과")
     void validateNotFoundUlidExists() {
-        String ulid = QnaPostTestUtils.generator.generate(null, null,null,EventType.INSERT);
+        String ulid = QnaPostTestUtils.generator.generate(null, null, null, EventType.INSERT);
         when(qnaPostRepository.existsByUlid(ulid)).thenReturn(true);
         assertDoesNotThrow(() -> qnaPostValidationService.validateNotFoundUlid(ulid));
     }
@@ -154,10 +177,22 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils {
     @Test
     @DisplayName("ULID 존재하지 않을 경우 예외 발생")
     void validateNotFoundUlidNotExists() {
-        String ulid = QnaPostTestUtils.generator.generate(null, null,null,EventType.INSERT);
-        when(qnaPostRepository.existsByUlid(ulid)).thenReturn(false);
+        // null ULID
+        // given & when
+        final String nullUlid = null;
+
+        // then
         assertThrows(EntityNotFoundWithUlidException.class, () ->
-                qnaPostValidationService.validateNotFoundUlid(ulid));
+                qnaPostValidationService.validateNotFoundUlid(nullUlid));
+
+        // Not Found ULID
+        // given & when
+        String notFoundUlid = QnaPostTestUtils.generator.generate(null, null, null, EventType.INSERT);
+        when(qnaPostRepository.existsByUlid(notFoundUlid)).thenReturn(false);
+
+        // then
+        assertThrows(EntityNotFoundWithUlidException.class, () ->
+                qnaPostValidationService.validateNotFoundUlid(notFoundUlid));
     }
 
 }

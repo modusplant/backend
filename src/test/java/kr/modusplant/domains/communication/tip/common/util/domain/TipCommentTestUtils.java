@@ -2,8 +2,8 @@ package kr.modusplant.domains.communication.tip.common.util.domain;
 
 import kr.modusplant.domains.communication.tip.domain.model.TipComment;
 
+import static kr.modusplant.domains.communication.tip.common.util.domain.TipPostTestUtils.tipPostWithUlid;
 import static kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils.memberBasicUserWithUuid;
-import static kr.modusplant.domains.tip.common.util.domain.TipPostTestUtils.tipPostWithUlid;
 
 public interface TipCommentTestUtils {
 

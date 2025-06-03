@@ -15,7 +15,7 @@ class TipCategoryAppInfraMapperTest implements TipCategoryRequestTestUtils, TipC
     @DisplayName("엔터티를 응답으로 전환")
     @Test
     void toTipCategoryResponseTest() {
-        assertThat(tipCategoryAppInfraMapper.toTipCategoryResponse(testTipCategoryEntity)).isEqualTo(testTipCategoryResponse);
+        assertThat(tipCategoryAppInfraMapper.toTipCategoryResponse(createTestTipCategoryEntityWithUuid())).isEqualTo(testTipCategoryResponse);
     }
 
     @DisplayName("요청을 엔터티로 전환")

@@ -61,10 +61,10 @@ public class ConvCommentApplicationServiceTest implements
     @BeforeEach
     void setUp() {
         memberEntity = createMemberBasicUserEntityWithUuid();
-        ConvCategoryEntity category = categoryRepository.save(testConvCategoryEntity);
+        ConvCategoryEntity category = categoryRepository.save(createTestConvCategoryEntityWithUuid());
         postEntity = createConvPostEntityBuilder()
                 .ulid(convPostWithUlid.getUlid())
-                .group(category)
+                .category(category)
                 .authMember(memberEntity)
                 .createMember(memberEntity)
                 .likeCount(1)

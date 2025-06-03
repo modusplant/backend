@@ -25,9 +25,9 @@ class TipPostEntityTest implements TipPostEntityTestUtils {
     void prePersist() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        TipCategoryEntity tipCategory = testTipCategoryEntity;
+        TipCategoryEntity tipCategoryEntity = entityManager.merge(createTestTipCategoryEntity());
         TipPostEntity tipPost = createTipPostEntityBuilder()
-                .group(tipCategory)
+                .category(tipCategoryEntity)
                 .authMember(member)
                 .createMember(member)
                 .likeCount(1)
@@ -50,9 +50,8 @@ class TipPostEntityTest implements TipPostEntityTestUtils {
     void preUpdate() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        TipCategoryEntity tipCategory = testTipCategoryEntity;
         TipPostEntity tipPost = createTipPostEntityBuilder()
-                .group(tipCategory)
+                .category(createTestTipCategoryEntity())
                 .authMember(member)
                 .createMember(member)
                 .build();

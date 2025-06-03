@@ -69,7 +69,7 @@ class TipPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, Ti
         // given
         given(tipPostViewCountRedisRepository.read(ulid)).willReturn(null);
         TipPostEntity tipPostEntity = createTipPostEntityBuilder()
-                .group(testTipCategoryEntity)
+                .category(createTestTipCategoryEntity())
                 .authMember(createMemberBasicAdminEntityWithUuid())
                 .createMember(createMemberBasicAdminEntityWithUuid())
                 .viewCount(55L)

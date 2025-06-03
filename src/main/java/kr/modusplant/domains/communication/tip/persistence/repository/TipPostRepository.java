@@ -21,7 +21,7 @@ public interface TipPostRepository extends UlidPrimaryRepository<TipPostEntity>,
 
     Page<TipPostEntity> findByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 
-    Page<TipPostEntity> findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(TipCategoryEntity group, Pageable pageable);
+    Page<TipPostEntity> findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(TipCategoryEntity category, Pageable pageable);
 
     Page<TipPostEntity> findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(SiteMemberEntity authMember, Pageable pageable);
 

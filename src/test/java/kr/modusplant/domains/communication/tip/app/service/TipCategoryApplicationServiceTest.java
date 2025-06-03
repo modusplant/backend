@@ -1,7 +1,6 @@
 package kr.modusplant.domains.communication.tip.app.service;
 
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
-import kr.modusplant.domains.communication.tip.app.http.response.TipCategoryResponse;
 import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipCategoryRequestTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.app.http.response.TipCategoryResponseTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
@@ -13,7 +12,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -32,21 +33,42 @@ class TipCategoryApplicationServiceTest implements TipCategoryRequestTestUtils, 
         this.tipCategoryRepository = tipCategoryRepository;
     }
 
-    @DisplayName("order로 팁 항목 얻기")
+    @DisplayName("모든 팁 항목 얻기")
     @Test
-    void getByOrderTest() {
+    void getAllTest() {
         // given
         TipCategoryEntity tipCategoryEntity = tipCategoryAppInfraMapper.toTipCategoryEntity(testTipCategoryInsertRequest);
-        TipCategoryEntity returnedTipCategoryEntity = testTipCategoryEntity;
+        TipCategoryEntity returnedTipCategoryEntity = createTestTipCategoryEntityWithUuid();
 
         given(tipCategoryRepository.save(tipCategoryEntity)).willReturn(returnedTipCategoryEntity);
-        given(tipCategoryRepository.findByOrder(testTipCategoryResponse.order())).willReturn(Optional.of(returnedTipCategoryEntity));
+        given(tipCategoryRepository.findAll()).willReturn(List.of(returnedTipCategoryEntity));
+        given(tipCategoryRepository.findByCategory(tipCategoryEntity.getCategory())).willReturn(Optional.empty());
+        given(tipCategoryRepository.findByOrder(tipCategoryEntity.getOrder())).willReturn(Optional.empty());
 
         // when
-        TipCategoryResponse testTipCategoryResponse = tipCategoryApplicationService.insert(testTipCategoryInsertRequest);
+        tipCategoryApplicationService.insert(testTipCategoryInsertRequest);
 
         // then
-        assertThat(tipCategoryApplicationService.getByOrder(testTipCategoryResponse.order()).orElseThrow()).isEqualTo(testTipCategoryResponse);
+        assertThat(tipCategoryApplicationService.getAll()).isEqualTo(List.of(testTipCategoryResponse));
+    }
+
+    @DisplayName("UUID로 팁 항목 얻기")
+    @Test
+    void getByUuidTest() {
+        // given
+        TipCategoryEntity tipCategoryEntity = tipCategoryAppInfraMapper.toTipCategoryEntity(testTipCategoryInsertRequest);
+        TipCategoryEntity returnedTipCategoryEntity = createTestTipCategoryEntityWithUuid();
+
+        given(tipCategoryRepository.save(tipCategoryEntity)).willReturn(returnedTipCategoryEntity);
+        given(tipCategoryRepository.findByUuid(returnedTipCategoryEntity.getUuid())).willReturn(Optional.of(returnedTipCategoryEntity));
+        given(tipCategoryRepository.findByCategory(tipCategoryEntity.getCategory())).willReturn(Optional.empty());
+        given(tipCategoryRepository.findByOrder(tipCategoryEntity.getOrder())).willReturn(Optional.empty());
+
+        // when
+        tipCategoryApplicationService.insert(testTipCategoryInsertRequest);
+
+        // then
+        assertThat(tipCategoryApplicationService.getByUuid(returnedTipCategoryEntity.getUuid()).orElseThrow()).isEqualTo(testTipCategoryResponse);
     }
 
     @DisplayName("category로 팁 항목 얻기")
@@ -54,25 +76,52 @@ class TipCategoryApplicationServiceTest implements TipCategoryRequestTestUtils, 
     void getByNameTest() {
         // given
         TipCategoryEntity tipCategoryEntity = tipCategoryAppInfraMapper.toTipCategoryEntity(testTipCategoryInsertRequest);
-        TipCategoryEntity returnedTipCategoryEntity = testTipCategoryEntity;
+        TipCategoryEntity returnedTipCategoryEntity = createTestTipCategoryEntityWithUuid();
 
         given(tipCategoryRepository.save(tipCategoryEntity)).willReturn(returnedTipCategoryEntity);
         given(tipCategoryRepository.findByCategory(testTipCategoryResponse.category())).willReturn(Optional.empty()).willReturn(Optional.of(returnedTipCategoryEntity));
+        given(tipCategoryRepository.findByOrder(tipCategoryEntity.getOrder())).willReturn(Optional.empty());
 
         // when
-        TipCategoryResponse testTipCategoryResponse = tipCategoryApplicationService.insert(testTipCategoryInsertRequest);
+        tipCategoryApplicationService.insert(testTipCategoryInsertRequest);
 
         // then
-        assertThat(tipCategoryApplicationService.getByCategory(testTipCategoryResponse.category()).orElseThrow()).isEqualTo(testTipCategoryResponse);
+        assertThat(tipCategoryApplicationService.getByCategory(returnedTipCategoryEntity.getCategory()).orElseThrow()).isEqualTo(testTipCategoryResponse);
+    }
+
+    @DisplayName("order로 팁 항목 얻기")
+    @Test
+    void getByOrderTest() {
+        // given
+        TipCategoryEntity tipCategoryEntity = tipCategoryAppInfraMapper.toTipCategoryEntity(testTipCategoryInsertRequest);
+        TipCategoryEntity returnedTipCategoryEntity = createTestTipCategoryEntityWithUuid();
+
+        given(tipCategoryRepository.save(tipCategoryEntity)).willReturn(returnedTipCategoryEntity);
+        given(tipCategoryRepository.findByCategory(tipCategoryEntity.getCategory())).willReturn(Optional.empty());
+        given(tipCategoryRepository.findByOrder(testTipCategoryResponse.order())).willReturn(Optional.empty()).willReturn(Optional.of(returnedTipCategoryEntity));
+
+        // when
+        tipCategoryApplicationService.insert(testTipCategoryInsertRequest);
+
+        // then
+        assertThat(tipCategoryApplicationService.getByOrder(returnedTipCategoryEntity.getOrder()).orElseThrow()).isEqualTo(testTipCategoryResponse);
     }
 
     @DisplayName("빈 팁 항목 얻기")
     @Test
     void getOptionalEmptyTest() {
         // given
-        TipCategoryEntity tipCategoryEntity = testTipCategoryEntity;
+        TipCategoryEntity tipCategoryEntity = createTestTipCategoryEntity();
+        UUID uuid = tipCategoryEntity.getUuid();
         Integer order = tipCategoryEntity.getOrder();
         String category = tipCategoryEntity.getCategory();
+
+        // getByUuid
+        // given & when
+        given(tipCategoryRepository.findByUuid(uuid)).willReturn(Optional.empty());
+
+        // then
+        assertThat(tipCategoryApplicationService.getByUuid(uuid)).isEmpty();
 
         // getByOrder
         // given & when
@@ -89,23 +138,24 @@ class TipCategoryApplicationServiceTest implements TipCategoryRequestTestUtils, 
         assertThat(tipCategoryApplicationService.getByCategory(category)).isEmpty();
     }
 
-    @DisplayName("order로 팁 항목 제거")
+    @DisplayName("UUID로 팁 항목 제거")
     @Test
-    void removeByOrderTest() {
+    void removeByUuidTest() {
         // given
-        Integer order = testTipCategory.getOrder();
+        UUID uuid = testTipCategoryWithUuid.getUuid();
         TipCategoryEntity tipCategoryEntity = tipCategoryAppInfraMapper.toTipCategoryEntity(testTipCategoryInsertRequest);
 
         given(tipCategoryRepository.save(tipCategoryEntity)).willReturn(tipCategoryEntity);
-        given(tipCategoryRepository.findByOrder(order)).willReturn(Optional.of(tipCategoryEntity)).willReturn(Optional.empty());
+        given(tipCategoryRepository.findByUuid(uuid)).willReturn(Optional.of(tipCategoryEntity)).willReturn(Optional.empty());
         given(tipCategoryRepository.findByCategory(tipCategoryEntity.getCategory())).willReturn(Optional.empty());
-        willDoNothing().given(tipCategoryRepository).deleteByOrder(order);
+        given(tipCategoryRepository.findByOrder(tipCategoryEntity.getOrder())).willReturn(Optional.empty());
+        willDoNothing().given(tipCategoryRepository).deleteByUuid(uuid);
 
         // when
         tipCategoryApplicationService.insert(testTipCategoryInsertRequest);
-        tipCategoryApplicationService.removeByOrder(order);
+        tipCategoryApplicationService.removeByUuid(uuid);
 
         // then
-        assertThat(tipCategoryApplicationService.getByOrder(order)).isEmpty();
+        assertThat(tipCategoryApplicationService.getByUuid(uuid)).isEmpty();
     }
 }

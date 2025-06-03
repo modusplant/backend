@@ -61,7 +61,7 @@ public class TipPostApplicationService {
 
     public Page<TipPostResponse> getByMemberUuid(UUID memberUuid, Pageable pageable) {
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        return tipPostRepository.findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(siteMember,pageable).map(entity -> {
+        return tipPostRepository.findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(siteMember, pageable).map(entity -> {
             try {
                 entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
@@ -71,9 +71,9 @@ public class TipPostApplicationService {
         });
     }
 
-    public Page<TipPostResponse> getByGroupOrder(Integer groupOrder, Pageable pageable) {
-        TipCategoryEntity tipCategory = tipCategoryRepository.findByOrder(groupOrder).orElseThrow();
-        return tipPostRepository.findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(tipCategory,pageable).map(entity -> {
+    public Page<TipPostResponse> getByCategoryUuid(UUID categoryUuid, Pageable pageable) {
+        TipCategoryEntity tipCategory = tipCategoryRepository.findByUuid(categoryUuid).orElseThrow();
+        return tipPostRepository.findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(tipCategory, pageable).map(entity -> {
             try {
                 entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
@@ -84,7 +84,7 @@ public class TipPostApplicationService {
     }
 
     public Page<TipPostResponse> searchByKeyword(String keyword, Pageable pageable) {
-        return tipPostRepository.searchByTitleOrContent(keyword,pageable).map(entity -> {
+        return tipPostRepository.searchByTitleOrContent(keyword, pageable).map(entity -> {
             try {
                 entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
@@ -111,11 +111,11 @@ public class TipPostApplicationService {
     @Transactional
     public void insert(TipPostInsertRequest tipPostInsertRequest, UUID memberUuid) throws IOException {
         tipPostValidationService.validateTipPostInsertRequest(tipPostInsertRequest);
-        tipCategoryValidationService.validateNotFoundOrder(tipPostInsertRequest.groupOrder());
+        tipCategoryValidationService.validateNotFoundUuid(tipPostInsertRequest.categoryUuid());
         siteMemberValidationService.validateNotFoundUuid(memberUuid);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
         TipPostEntity tipPostEntity = TipPostEntity.builder()
-                .group(tipCategoryRepository.findByOrder(tipPostInsertRequest.groupOrder()).orElseThrow())
+                .category(tipCategoryRepository.findByUuid(tipPostInsertRequest.categoryUuid()).orElseThrow())
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(tipPostInsertRequest.title())
@@ -128,10 +128,10 @@ public class TipPostApplicationService {
     public void update(TipPostUpdateRequest tipPostUpdateRequest, UUID memberUuid) throws IOException {
         tipPostValidationService.validateTipPostUpdateRequest(tipPostUpdateRequest);
         tipPostValidationService.validateAccessibleTipPost(tipPostUpdateRequest.ulid(), memberUuid);
-        tipCategoryValidationService.validateNotFoundOrder(tipPostUpdateRequest.groupOrder());
+        tipCategoryValidationService.validateNotFoundUuid(tipPostUpdateRequest.categoryUuid());
         TipPostEntity tipPostEntity = tipPostRepository.findByUlid(tipPostUpdateRequest.ulid()).orElseThrow();
         mediaContentService.deleteFiles(tipPostEntity.getContent());
-        tipPostEntity.updateGroup(tipCategoryRepository.findByOrder(tipPostUpdateRequest.groupOrder()).orElseThrow());
+        tipPostEntity.updateCategory(tipCategoryRepository.findByUuid(tipPostUpdateRequest.categoryUuid()).orElseThrow());
         tipPostEntity.updateTitle(tipPostUpdateRequest.title());
         tipPostEntity.updateContent(mediaContentService.saveFilesAndGenerateContentJson(tipPostUpdateRequest.content()));
         tipPostRepository.save(tipPostEntity);
@@ -153,7 +153,7 @@ public class TipPostApplicationService {
         }
         Long dbViewCount = tipPostRepository.findByUlid(ulid)
                 .map(tipPostEntity -> Optional.ofNullable(tipPostEntity.getViewCount()).orElseThrow())
-                .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid,String.class));
+                .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid, String.class));
         tipPostViewCountRedisRepository.write(ulid, dbViewCount);
         return dbViewCount;
     }
@@ -161,7 +161,7 @@ public class TipPostApplicationService {
     @Transactional
     public Long increaseViewCount(String ulid, UUID memberUuid) {
         // 조회수 어뷰징 정책 - 사용자는 게시글 1개당 ttl에 1번 조회수 증가
-        if (!tipPostViewLockRedisRepository.lock(ulid,memberUuid,ttlMinutes)) {
+        if (!tipPostViewLockRedisRepository.lock(ulid, memberUuid, ttlMinutes)) {
             return tipPostViewCountRedisRepository.read(ulid);
         }
         // 조회수 증가

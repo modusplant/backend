@@ -8,11 +8,11 @@ import kr.modusplant.domains.communication.tip.app.service.TipCommentApplication
 import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipCommentInsertRequestTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.app.http.response.TipCommentResponseTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.domain.TipCommentTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.domain.TipPostTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.tip.common.util.domain.TipPostTestUtils;
-import kr.modusplant.domains.tip.common.util.entity.TipPostEntityTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,7 +56,7 @@ public class TipCommentControllerTest implements
         memberEntity = createMemberBasicUserEntityWithUuid();
         postEntity = createTipPostEntityBuilder()
                 .ulid(tipPostWithUlid.getUlid())
-                .group(testTipCategoryEntity)
+                .category(createTestTipCategoryEntityWithUuid())
                 .authMember(memberEntity)
                 .createMember(memberEntity)
                 .likeCount(1)

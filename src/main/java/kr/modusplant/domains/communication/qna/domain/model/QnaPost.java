@@ -12,7 +12,7 @@ import java.util.UUID;
 public class QnaPost {
     private final String ulid;
 
-    private final Integer groupOrder;
+    private final UUID categoryUuid;
 
     private final UUID authMemberUuid;
 
@@ -30,7 +30,7 @@ public class QnaPost {
 
     public static class QnaPostBuilder {
         private String ulid;
-        private Integer groupOrder;
+        private UUID categoryUuid;
         private UUID authMemberUuid;
         private UUID createMemberUuid;
         private Integer likeCount;
@@ -41,7 +41,7 @@ public class QnaPost {
 
         public QnaPostBuilder qnaPost(QnaPost qnaPost) {
             this.ulid = qnaPost.ulid;
-            this.groupOrder = qnaPost.groupOrder;
+            this.categoryUuid = qnaPost.categoryUuid;
             this.authMemberUuid = qnaPost.authMemberUuid;
             this.createMemberUuid = qnaPost.createMemberUuid;
             this.likeCount = qnaPost.likeCount;
@@ -53,7 +53,7 @@ public class QnaPost {
         }
 
         public QnaPost build() {
-            return new QnaPost(this.ulid,this.groupOrder,this.authMemberUuid,this.createMemberUuid,this.likeCount,this.viewCount,this.title,this.content,this.isDeleted);
+            return new QnaPost(this.ulid, this.categoryUuid, this.authMemberUuid, this.createMemberUuid, this.likeCount, this.viewCount, this.title, this.content, this.isDeleted);
         }
     }
 

@@ -1,4 +1,6 @@
 package kr.modusplant.domains.communication.qna.app.http.response;
 
-public record QnaCategoryResponse(Integer order, String category) {
+import java.util.UUID;
+
+public record QnaCategoryResponse(UUID uuid, String category, Integer order) {
 }

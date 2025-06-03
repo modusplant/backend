@@ -12,7 +12,7 @@ import java.util.UUID;
 public class TipPost {
     private final String ulid;
 
-    private final Integer groupOrder;
+    private final UUID categoryUuid;
 
     private final UUID authMemberUuid;
 
@@ -30,7 +30,7 @@ public class TipPost {
 
     public static class TipPostBuilder {
         private String ulid;
-        private Integer groupOrder;
+        private UUID categoryUuid;
         private UUID authMemberUuid;
         private UUID createMemberUuid;
         private Integer likeCount;
@@ -41,7 +41,7 @@ public class TipPost {
 
         public TipPostBuilder tipPost(TipPost tipPost) {
             this.ulid = tipPost.ulid;
-            this.groupOrder = tipPost.groupOrder;
+            this.categoryUuid = tipPost.categoryUuid;
             this.authMemberUuid = tipPost.authMemberUuid;
             this.createMemberUuid = tipPost.createMemberUuid;
             this.likeCount = tipPost.likeCount;
@@ -53,7 +53,7 @@ public class TipPost {
         }
 
         public TipPost build() {
-            return new TipPost(this.ulid,this.groupOrder,this.authMemberUuid,this.createMemberUuid,this.likeCount,this.viewCount,this.title,this.content,this.isDeleted);
+            return new TipPost(this.ulid, this.categoryUuid, this.authMemberUuid, this.createMemberUuid, this.likeCount, this.viewCount, this.title, this.content, this.isDeleted);
         }
     }
 

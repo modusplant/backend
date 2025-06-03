@@ -1,7 +1,6 @@
 package kr.modusplant.domains.communication.conversation.app.service;
 
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
-import kr.modusplant.domains.communication.conversation.app.http.response.ConvCategoryResponse;
 import kr.modusplant.domains.communication.conversation.common.util.app.http.request.ConvCategoryRequestTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.app.http.response.ConvCategoryResponseTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCategoryEntityTestUtils;
@@ -13,7 +12,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -32,21 +33,42 @@ class ConvCategoryApplicationServiceTest implements ConvCategoryRequestTestUtils
         this.convCategoryRepository = convCategoryRepository;
     }
 
-    @DisplayName("order로 대화 항목 얻기")
+    @DisplayName("모든 대화 항목 얻기")
     @Test
-    void getByOrderTest() {
+    void getAllTest() {
         // given
         ConvCategoryEntity convCategoryEntity = convCategoryAppInfraMapper.toConvCategoryEntity(testConvCategoryInsertRequest);
-        ConvCategoryEntity returnedConvCategoryEntity = testConvCategoryEntity;
+        ConvCategoryEntity returnedConvCategoryEntity = createTestConvCategoryEntityWithUuid();
 
         given(convCategoryRepository.save(convCategoryEntity)).willReturn(returnedConvCategoryEntity);
-        given(convCategoryRepository.findByOrder(testConvCategoryResponse.order())).willReturn(Optional.of(returnedConvCategoryEntity));
+        given(convCategoryRepository.findAll()).willReturn(List.of(returnedConvCategoryEntity));
+        given(convCategoryRepository.findByCategory(convCategoryEntity.getCategory())).willReturn(Optional.empty());
+        given(convCategoryRepository.findByOrder(convCategoryEntity.getOrder())).willReturn(Optional.empty());
 
         // when
-        ConvCategoryResponse testConvCategoryResponse = convCategoryApplicationService.insert(testConvCategoryInsertRequest);
+        convCategoryApplicationService.insert(testConvCategoryInsertRequest);
 
         // then
-        assertThat(convCategoryApplicationService.getByOrder(testConvCategoryResponse.order()).orElseThrow()).isEqualTo(testConvCategoryResponse);
+        assertThat(convCategoryApplicationService.getAll()).isEqualTo(List.of(testConvCategoryResponse));
+    }
+
+    @DisplayName("UUID로 대화 항목 얻기")
+    @Test
+    void getByUuidTest() {
+        // given
+        ConvCategoryEntity convCategoryEntity = convCategoryAppInfraMapper.toConvCategoryEntity(testConvCategoryInsertRequest);
+        ConvCategoryEntity returnedConvCategoryEntity = createTestConvCategoryEntityWithUuid();
+
+        given(convCategoryRepository.save(convCategoryEntity)).willReturn(returnedConvCategoryEntity);
+        given(convCategoryRepository.findByUuid(returnedConvCategoryEntity.getUuid())).willReturn(Optional.of(returnedConvCategoryEntity));
+        given(convCategoryRepository.findByCategory(convCategoryEntity.getCategory())).willReturn(Optional.empty());
+        given(convCategoryRepository.findByOrder(convCategoryEntity.getOrder())).willReturn(Optional.empty());
+
+        // when
+        convCategoryApplicationService.insert(testConvCategoryInsertRequest);
+
+        // then
+        assertThat(convCategoryApplicationService.getByUuid(returnedConvCategoryEntity.getUuid()).orElseThrow()).isEqualTo(testConvCategoryResponse);
     }
 
     @DisplayName("category로 대화 항목 얻기")
@@ -54,25 +76,52 @@ class ConvCategoryApplicationServiceTest implements ConvCategoryRequestTestUtils
     void getByNameTest() {
         // given
         ConvCategoryEntity convCategoryEntity = convCategoryAppInfraMapper.toConvCategoryEntity(testConvCategoryInsertRequest);
-        ConvCategoryEntity returnedConvCategoryEntity = testConvCategoryEntity;
+        ConvCategoryEntity returnedConvCategoryEntity = createTestConvCategoryEntityWithUuid();
 
         given(convCategoryRepository.save(convCategoryEntity)).willReturn(returnedConvCategoryEntity);
         given(convCategoryRepository.findByCategory(testConvCategoryResponse.category())).willReturn(Optional.empty()).willReturn(Optional.of(returnedConvCategoryEntity));
+        given(convCategoryRepository.findByOrder(convCategoryEntity.getOrder())).willReturn(Optional.empty());
 
         // when
-        ConvCategoryResponse testConvCategoryResponse = convCategoryApplicationService.insert(testConvCategoryInsertRequest);
+        convCategoryApplicationService.insert(testConvCategoryInsertRequest);
 
         // then
-        assertThat(convCategoryApplicationService.getByCategory(testConvCategoryResponse.category()).orElseThrow()).isEqualTo(testConvCategoryResponse);
+        assertThat(convCategoryApplicationService.getByCategory(returnedConvCategoryEntity.getCategory()).orElseThrow()).isEqualTo(testConvCategoryResponse);
+    }
+
+    @DisplayName("order로 대화 항목 얻기")
+    @Test
+    void getByOrderTest() {
+        // given
+        ConvCategoryEntity convCategoryEntity = convCategoryAppInfraMapper.toConvCategoryEntity(testConvCategoryInsertRequest);
+        ConvCategoryEntity returnedConvCategoryEntity = createTestConvCategoryEntityWithUuid();
+
+        given(convCategoryRepository.save(convCategoryEntity)).willReturn(returnedConvCategoryEntity);
+        given(convCategoryRepository.findByCategory(convCategoryEntity.getCategory())).willReturn(Optional.empty());
+        given(convCategoryRepository.findByOrder(testConvCategoryResponse.order())).willReturn(Optional.empty()).willReturn(Optional.of(returnedConvCategoryEntity));
+
+        // when
+        convCategoryApplicationService.insert(testConvCategoryInsertRequest);
+
+        // then
+        assertThat(convCategoryApplicationService.getByOrder(returnedConvCategoryEntity.getOrder()).orElseThrow()).isEqualTo(testConvCategoryResponse);
     }
 
     @DisplayName("빈 대화 항목 얻기")
     @Test
     void getOptionalEmptyTest() {
         // given
-        ConvCategoryEntity convCategoryEntity = testConvCategoryEntity;
+        ConvCategoryEntity convCategoryEntity = createTestConvCategoryEntity();
+        UUID uuid = convCategoryEntity.getUuid();
         Integer order = convCategoryEntity.getOrder();
         String category = convCategoryEntity.getCategory();
+
+        // getByUuid
+        // given & when
+        given(convCategoryRepository.findByUuid(uuid)).willReturn(Optional.empty());
+
+        // then
+        assertThat(convCategoryApplicationService.getByUuid(uuid)).isEmpty();
 
         // getByOrder
         // given & when
@@ -89,23 +138,24 @@ class ConvCategoryApplicationServiceTest implements ConvCategoryRequestTestUtils
         assertThat(convCategoryApplicationService.getByCategory(category)).isEmpty();
     }
 
-    @DisplayName("order로 대화 항목 제거")
+    @DisplayName("UUID로 대화 항목 제거")
     @Test
-    void removeByOrderTest() {
+    void removeByUuidTest() {
         // given
-        Integer order = testConvCategory.getOrder();
+        UUID uuid = testConvCategoryWithUuid.getUuid();
         ConvCategoryEntity convCategoryEntity = convCategoryAppInfraMapper.toConvCategoryEntity(testConvCategoryInsertRequest);
 
         given(convCategoryRepository.save(convCategoryEntity)).willReturn(convCategoryEntity);
-        given(convCategoryRepository.findByOrder(order)).willReturn(Optional.of(convCategoryEntity)).willReturn(Optional.empty());
+        given(convCategoryRepository.findByUuid(uuid)).willReturn(Optional.of(convCategoryEntity)).willReturn(Optional.empty());
         given(convCategoryRepository.findByCategory(convCategoryEntity.getCategory())).willReturn(Optional.empty());
-        willDoNothing().given(convCategoryRepository).deleteByOrder(order);
+        given(convCategoryRepository.findByOrder(convCategoryEntity.getOrder())).willReturn(Optional.empty());
+        willDoNothing().given(convCategoryRepository).deleteByUuid(uuid);
 
         // when
         convCategoryApplicationService.insert(testConvCategoryInsertRequest);
-        convCategoryApplicationService.removeByOrder(order);
+        convCategoryApplicationService.removeByUuid(uuid);
 
         // then
-        assertThat(convCategoryApplicationService.getByOrder(order)).isEmpty();
+        assertThat(convCategoryApplicationService.getByUuid(uuid)).isEmpty();
     }
 }

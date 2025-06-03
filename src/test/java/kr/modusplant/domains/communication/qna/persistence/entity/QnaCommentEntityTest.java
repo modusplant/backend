@@ -17,12 +17,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class QnaCommentEntityTest implements QnaCommentEntityTestUtils,
         QnaCategoryEntityTestUtils, QnaPostEntityTestUtils {
 
-    private final QnaCategoryRepository categoryRepository;
     private final TestEntityManager entityManager;
 
     @Autowired
-    QnaCommentEntityTest(QnaCategoryRepository categoryRepository, TestEntityManager entityManager) {
-        this.categoryRepository = categoryRepository;
+    QnaCommentEntityTest(TestEntityManager entityManager) {
         this.entityManager = entityManager;}
 
     @DisplayName("소통 팁 댓글 PrePersist")
@@ -30,9 +28,10 @@ public class QnaCommentEntityTest implements QnaCommentEntityTestUtils,
     void prePersist() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        QnaCategoryEntity category = categoryRepository.save(testQnaCategoryEntity);
+        QnaCategoryEntity category = createTestQnaCategoryEntity();
+        entityManager.persist(category);
         QnaPostEntity postEntity = createQnaPostEntityBuilder()
-                .group(category)
+                .category(category)
                 .authMember(member)
                 .createMember(member)
                 .likeCount(1)

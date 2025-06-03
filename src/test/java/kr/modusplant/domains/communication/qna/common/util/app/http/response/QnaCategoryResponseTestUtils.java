@@ -4,5 +4,5 @@ import kr.modusplant.domains.communication.qna.app.http.response.QnaCategoryResp
 import kr.modusplant.domains.communication.qna.common.util.domain.QnaCategoryTestUtils;
 
 public interface QnaCategoryResponseTestUtils extends QnaCategoryTestUtils {
-    QnaCategoryResponse testQnaCategoryResponse = new QnaCategoryResponse(testQnaCategory.getOrder(), testQnaCategory.getCategory());
+    QnaCategoryResponse testQnaCategoryResponse = new QnaCategoryResponse(testQnaCategoryWithUuid.getUuid(), testQnaCategory.getCategory(), testQnaCategory.getOrder());
 }

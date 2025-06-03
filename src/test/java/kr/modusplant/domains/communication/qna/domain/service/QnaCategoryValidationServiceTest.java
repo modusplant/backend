@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
 import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
@@ -38,10 +39,10 @@ class QnaCategoryValidationServiceTest implements QnaCategoryResponseTestUtils, 
     @Test
     void validateExistedOrderTest() {
         // given
-        Integer order = testQnaCategoryEntity.getOrder();
+        Integer order = createTestQnaCategoryEntity().getOrder();
 
         // when
-        given(qnaCategoryRepository.findByOrder(order)).willReturn(Optional.of(testQnaCategoryEntity));
+        given(qnaCategoryRepository.findByOrder(order)).willReturn(Optional.of(createTestQnaCategoryEntity()));
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
@@ -54,12 +55,12 @@ class QnaCategoryValidationServiceTest implements QnaCategoryResponseTestUtils, 
     @Test
     void validateExistedQnaCategoryNameTest() {
         // given
-        Integer order = testQnaCategoryEntity.getOrder();
-        String category = testQnaCategoryEntity.getCategory();
+        Integer order = createTestQnaCategoryEntity().getOrder();
+        String category = createTestQnaCategoryEntity().getCategory();
 
         // when
         given(qnaCategoryRepository.findByOrder(order)).willReturn(Optional.empty());
-        given(qnaCategoryRepository.findByCategory(category)).willReturn(Optional.of(testQnaCategoryEntity));
+        given(qnaCategoryRepository.findByCategory(category)).willReturn(Optional.of(createTestQnaCategoryEntity()));
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
@@ -70,17 +71,17 @@ class QnaCategoryValidationServiceTest implements QnaCategoryResponseTestUtils, 
 
     @DisplayName("존재하지 않는 순서 검증")
     @Test
-    void validateNotFoundOrderTest() {
+    void validateNotFoundUuidTest() {
         // given
-        Integer order = testQnaCategoryEntity.getOrder();
+        UUID uuid = createTestQnaCategoryEntity().getUuid();
 
         // when
-        given(qnaCategoryRepository.findByOrder(order)).willReturn(Optional.empty());
+        given(qnaCategoryRepository.findByUuid(uuid)).willReturn(Optional.empty());
 
         // then
         EntityNotFoundException existsException = assertThrows(EntityNotFoundException.class,
-                () -> qnaCategoryValidationService.validateNotFoundOrder(order));
+                () -> qnaCategoryValidationService.validateNotFoundUuid(uuid));
         assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY.getValue(), ORDER, order, QnaCategoryEntity.class));
+                NOT_FOUND_ENTITY.getValue(), "uuid", uuid, QnaCategoryEntity.class));
     }
 }

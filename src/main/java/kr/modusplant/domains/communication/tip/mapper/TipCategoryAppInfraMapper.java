@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 @Mapper
 public interface TipCategoryAppInfraMapper {
     @Mapping(target = "tipCategoryEntity", ignore = true)
+    @Mapping(target = "uuid", ignore = true)
     TipCategoryEntity toTipCategoryEntity(TipCategoryInsertRequest tipCategoryInsertRequest);
 
     TipCategoryResponse toTipCategoryResponse(TipCategoryEntity tipCategoryEntity);

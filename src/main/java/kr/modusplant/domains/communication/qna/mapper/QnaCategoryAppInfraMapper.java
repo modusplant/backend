@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 @Mapper
 public interface QnaCategoryAppInfraMapper {
     @Mapping(target = "qnaCategoryEntity", ignore = true)
+    @Mapping(target = "uuid", ignore = true)
     QnaCategoryEntity toQnaCategoryEntity(QnaCategoryInsertRequest qnaCategoryInsertRequest);
 
     QnaCategoryResponse toQnaCategoryResponse(QnaCategoryEntity qnaCategoryEntity);

@@ -5,6 +5,7 @@ import kr.modusplant.domains.communication.common.error.PostAccessDeniedExceptio
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostUpdateRequest;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
+import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCategoryRepository;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostRepository;
 import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import lombok.RequiredArgsConstructor;
@@ -19,15 +20,16 @@ import java.util.UUID;
 public class ConvPostValidationService extends AbstractPostValidationService {
 
     private final ConvPostRepository convPostRepository;
+    private final ConvCategoryRepository convCategoryRepository;
 
     public void validateConvPostInsertRequest(ConvPostInsertRequest request) {
-        validateGroupOrder(request.groupOrder());
+        validateNotFoundCategoryUuid(request.categoryUuid(), convCategoryRepository);
         validateTitle(request.title());
         validateContentAndOrderInfo(request.content(),request.orderInfo());
     }
 
     public void validateConvPostUpdateRequest(ConvPostUpdateRequest request) {
-        validateGroupOrder(request.groupOrder());
+        validateNotFoundCategoryUuid(request.categoryUuid(), convCategoryRepository);
         validateTitle(request.title());
         validateContentAndOrderInfo(request.content(),request.orderInfo());
     }

@@ -7,6 +7,7 @@ import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipC
 import kr.modusplant.domains.communication.tip.common.util.app.http.response.TipCommentResponseTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCommentEntityTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipCommentEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
@@ -16,7 +17,6 @@ import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRep
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.domains.tip.common.util.entity.TipPostEntityTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -61,10 +61,10 @@ public class TipCommentApplicationServiceTest implements
     @BeforeEach
     void setUp() {
         memberEntity = createMemberBasicUserEntityWithUuid();
-        TipCategoryEntity category = categoryRepository.save(testTipCategoryEntity);
+        TipCategoryEntity category = categoryRepository.save(createTestTipCategoryEntityWithUuid());
         postEntity = createTipPostEntityBuilder()
                 .ulid(tipPostWithUlid.getUlid())
-                .group(category)
+                .category(category)
                 .authMember(memberEntity)
                 .createMember(memberEntity)
                 .likeCount(1)

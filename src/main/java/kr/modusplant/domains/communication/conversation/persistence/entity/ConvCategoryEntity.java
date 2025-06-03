@@ -6,10 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_CONV_CATE;
 import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_CREATED_AT;
@@ -21,11 +23,15 @@ import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_CREATED_AT;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ConvCategoryEntity {
     @Id
-    @Column(name = "\"order\"", nullable = false, updatable = false)
-    private Integer order;
+    @UuidGenerator
+    @Column(nullable = false, updatable = false)
+    private UUID uuid;
 
     @Column(nullable = false, updatable = false, unique = true)
     private String category;
+
+    @Column(name = "\"order\"", nullable = false, updatable = false, unique = true)
+    private Integer order;
 
     @Column(name = SNAKE_CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
@@ -47,9 +53,10 @@ public class ConvCategoryEntity {
         return new HashCodeBuilder(17, 37).append(getOrder()).toHashCode();
     }
 
-    private ConvCategoryEntity(Integer order, String category) {
-        this.order = order;
+    private ConvCategoryEntity(UUID uuid, String category, Integer order) {
+        this.uuid = uuid;
         this.category = category;
+        this.order = order;
     }
 
     public static ConvCategoryEntityBuilder builder() {
@@ -57,11 +64,12 @@ public class ConvCategoryEntity {
     }
 
     public static final class ConvCategoryEntityBuilder {
-        private Integer order;
+        private UUID uuid;
         private String category;
+        private Integer order;
 
-        public ConvCategoryEntityBuilder order(final Integer order) {
-            this.order = order;
+        public ConvCategoryEntityBuilder uuid(final UUID uuid) {
+            this.uuid = uuid;
             return this;
         }
 
@@ -70,14 +78,20 @@ public class ConvCategoryEntity {
             return this;
         }
 
+        public ConvCategoryEntityBuilder order(final Integer order) {
+            this.order = order;
+            return this;
+        }
+
         public ConvCategoryEntityBuilder convCategoryEntity(final ConvCategoryEntity convCategory) {
-            this.order = convCategory.getOrder();
+            this.uuid = convCategory.getUuid();
             this.category = convCategory.getCategory();
+            this.order = convCategory.getOrder();
             return this;
         }
 
         public ConvCategoryEntity build() {
-            return new ConvCategoryEntity(this.order, this.category);
+            return new ConvCategoryEntity(this.uuid, this.category, this.order);
         }
     }
 }

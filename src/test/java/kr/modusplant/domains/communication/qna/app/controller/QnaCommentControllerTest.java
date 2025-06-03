@@ -56,7 +56,7 @@ public class QnaCommentControllerTest implements
         memberEntity = createMemberBasicUserEntityWithUuid();
         postEntity = createQnaPostEntityBuilder()
                 .ulid(qnaPostWithUlid.getUlid())
-                .group(testQnaCategoryEntity)
+                .category(createTestQnaCategoryEntityWithUuid())
                 .authMember(memberEntity)
                 .createMember(memberEntity)
                 .likeCount(1)

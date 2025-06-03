@@ -35,11 +35,11 @@ class QnaPostAppInfraMapperTest implements QnaPostEntityTestUtils, QnaCategoryEn
     @DisplayName("엔티티를 응답으로 전환")
     void toQnaPostResponseTest() {
         // given
-        QnaCategoryEntity qnaCategoryEntity = qnaCategoryRepository.save(testQnaCategoryEntity);
+        QnaCategoryEntity qnaCategoryEntity = qnaCategoryRepository.save(createTestQnaCategoryEntity());
         SiteMemberEntity siteMemberEntity = siteMemberRepository.save(createMemberBasicUserEntity());
         QnaPostEntity qnaPostEntity = qnaPostRepository.save(
                 createQnaPostEntityBuilder()
-                        .group(qnaCategoryEntity)
+                        .category(qnaCategoryEntity)
                         .authMember(siteMemberEntity)
                         .createMember(siteMemberEntity)
                         .build()
@@ -49,8 +49,8 @@ class QnaPostAppInfraMapperTest implements QnaPostEntityTestUtils, QnaCategoryEn
         QnaPostResponse qnaPostResponse = qnaPostAppInfraMapper.toQnaPostResponse(qnaPostEntity);
 
         // then
-        assertThat(qnaPostResponse.getGroupOrder()).isEqualTo(qnaPostEntity.getGroup().getOrder());
-        assertThat(qnaPostResponse.getCategory()).isEqualTo(qnaPostEntity.getGroup().getCategory());
+        assertThat(qnaPostResponse.getCategoryUuid()).isEqualTo(qnaPostEntity.getCategory().getUuid());
+        assertThat(qnaPostResponse.getCategory()).isEqualTo(qnaPostEntity.getCategory().getCategory());
         assertThat(qnaPostResponse.getNickname()).isEqualTo(qnaPostEntity.getAuthMember().getNickname());
     }
 

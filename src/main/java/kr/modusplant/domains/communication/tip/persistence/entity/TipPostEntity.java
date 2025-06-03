@@ -32,8 +32,8 @@ public class TipPostEntity {
     private String ulid;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = SNAKE_GROUP_ORDER, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private TipCategoryEntity group;
+    @JoinColumn(name = SNAKE_CATE_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private TipCategoryEntity category;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = SNAKE_AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
@@ -74,8 +74,8 @@ public class TipPostEntity {
     @Column(nullable = false)
     private Long ver;
 
-    public void updateGroup(TipCategoryEntity group) {
-        this.group = group;
+    public void updateCategory(TipCategoryEntity category) {
+        this.category = category;
     }
 
     public void increaseLikeCount() {
@@ -137,9 +137,9 @@ public class TipPostEntity {
         }
     }
 
-    private TipPostEntity(String ulid, TipCategoryEntity group, SiteMemberEntity authMember, SiteMemberEntity createMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isDeleted) {
+    private TipPostEntity(String ulid, TipCategoryEntity category, SiteMemberEntity authMember, SiteMemberEntity createMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isDeleted) {
         this.ulid = ulid;
-        this.group = group;
+        this.category = category;
         this.authMember = authMember;
         this.createMember = createMember;
         this.likeCount = likeCount;
@@ -155,7 +155,7 @@ public class TipPostEntity {
 
     public static final class TipPostEntityBuilder {
         private String ulid;
-        private TipCategoryEntity group;
+        private TipCategoryEntity category;
         private SiteMemberEntity authMember;
         private SiteMemberEntity createMember;
         private Integer likeCount;
@@ -169,8 +169,8 @@ public class TipPostEntity {
             return this;
         }
 
-        public TipPostEntityBuilder group(final TipCategoryEntity group) {
-            this.group = group;
+        public TipPostEntityBuilder category(final TipCategoryEntity category) {
+            this.category = category;
             return this;
         }
 
@@ -211,7 +211,7 @@ public class TipPostEntity {
 
         public TipPostEntityBuilder tipPostEntity(final TipPostEntity tipPostEntity) {
             this.ulid = tipPostEntity.ulid;
-            this.group = tipPostEntity.group;
+            this.category = tipPostEntity.category;
             this.authMember = tipPostEntity.authMember;
             this.createMember = tipPostEntity.createMember;
             this.likeCount = tipPostEntity.likeCount;
@@ -223,7 +223,7 @@ public class TipPostEntity {
         }
 
         public TipPostEntity build() {
-            return new TipPostEntity(this.ulid,this.group,this.authMember,this.createMember,this.likeCount,this.viewCount,this.title,this.content,this.isDeleted);
+            return new TipPostEntity(this.ulid,this.category,this.authMember,this.createMember,this.likeCount,this.viewCount,this.title,this.content,this.isDeleted);
         }
 
     }

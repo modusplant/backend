@@ -17,12 +17,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ConvCommentEntityTest implements ConvCommentEntityTestUtils,
         ConvCategoryEntityTestUtils, ConvPostEntityTestUtils {
 
-    private final ConvCategoryRepository categoryRepository;
     private final TestEntityManager entityManager;
 
     @Autowired
-    ConvCommentEntityTest(ConvCategoryRepository categoryRepository, TestEntityManager entityManager) {
-        this.categoryRepository = categoryRepository;
+    ConvCommentEntityTest(TestEntityManager entityManager) {
         this.entityManager = entityManager;}
 
     @DisplayName("소통 팁 댓글 PrePersist")
@@ -30,9 +28,10 @@ public class ConvCommentEntityTest implements ConvCommentEntityTestUtils,
     void prePersist() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        ConvCategoryEntity category = categoryRepository.save(testConvCategoryEntity);
+        ConvCategoryEntity category = createTestConvCategoryEntity();
+        entityManager.persist(category);
         ConvPostEntity postEntity = createConvPostEntityBuilder()
-                .group(category)
+                .category(category)
                 .authMember(member)
                 .createMember(member)
                 .likeCount(1)

@@ -1,4 +1,4 @@
 package kr.modusplant.domains.communication.tip.app.http.request;
 
-public record TipCategoryInsertRequest(Integer order, String category) {
+public record TipCategoryInsertRequest(String category, Integer order) {
 }

@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static kr.modusplant.global.vo.CamelCaseWord.DATA;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,6 +62,29 @@ class QnaCategoryControllerTest implements QnaCategoryRequestTestUtils, QnaCateg
         ).isEqualTo(testQnaCategoryResponseList);
     }
 
+    @DisplayName("UUID로 Q&A 항목 얻기")
+    @Test
+    void getQnaCategoryByUuidTest() throws Exception {
+        // given
+        ObjectMapper objectMapper = new ObjectMapper();
+        UUID uuid = testQnaCategoryWithUuid.getUuid();
+
+        when(qnaCategoryApplicationService.getByUuid(uuid)).thenReturn(Optional.of(testQnaCategoryResponse));
+
+        // when
+        Map<String, Object> responseMap = objectMapper.readValue(
+                mockMvc.perform(get("/api/crud/qna/categories/{uuid}", uuid))
+                        .andExpect(status().isOk())
+                        .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
+                });
+
+        // then
+        assertThat(objectMapper.convertValue(responseMap.get(DATA),
+                new TypeReference<QnaCategoryResponse>() {
+                })
+        ).isEqualTo(testQnaCategoryResponse);
+    }
+
     @DisplayName("순서로 Q&A 항목 얻기")
     @Test
     void getQnaCategoryByOrderTest() throws Exception {
@@ -72,7 +96,7 @@ class QnaCategoryControllerTest implements QnaCategoryRequestTestUtils, QnaCateg
 
         // when
         Map<String, Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/qna/categories/{order}", order))
+                mockMvc.perform(get("/api/crud/qna/categories/order/{order}", order))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -120,7 +144,7 @@ class QnaCategoryControllerTest implements QnaCategoryRequestTestUtils, QnaCateg
 
         // order - when
         Map<String, Object> uuidResponseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/qna/categories/{order}", order))
+                mockMvc.perform(get("/api/crud/qna/categories/order/{order}", order))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -172,12 +196,12 @@ class QnaCategoryControllerTest implements QnaCategoryRequestTestUtils, QnaCateg
     @Test
     void removeQnaCategoryByOrderTest() throws Exception {
         // given
-        Integer order = testQnaCategory.getOrder();
+        UUID order = testQnaCategoryWithUuid.getUuid();
 
-        doNothing().when(qnaCategoryApplicationService).removeByOrder(order);
+        doNothing().when(qnaCategoryApplicationService).removeByUuid(order);
 
         // when & then
-        mockMvc.perform(delete("/api/crud/qna/categories/{order}", order))
+        mockMvc.perform(delete("/api/crud/qna/categories/{uuid}", order))
                 .andExpect(status().isOk());
     }
 }

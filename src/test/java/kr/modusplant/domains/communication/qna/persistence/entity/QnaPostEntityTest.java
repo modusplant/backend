@@ -21,12 +21,13 @@ class QnaPostEntityTest implements QnaPostEntityTestUtils {
     }
 
     @Test
-    @DisplayName("팁 게시글 PrePersist")
+    @DisplayName("Q&A 게시글 PrePersist")
     void prePersist() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
+        QnaCategoryEntity qnaCategoryEntity = entityManager.merge(createTestQnaCategoryEntity());
         QnaPostEntity qnaPost = createQnaPostEntityBuilder()
-                .group(testQnaCategoryEntity)
+                .category(qnaCategoryEntity)
                 .authMember(member)
                 .createMember(member)
                 .likeCount(1)
@@ -45,12 +46,12 @@ class QnaPostEntityTest implements QnaPostEntityTestUtils {
     }
 
     @Test
-    @DisplayName("팁 게시글 PreUpdate")
+    @DisplayName("Q&A 게시글 PreUpdate")
     void preUpdate() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
         QnaPostEntity qnaPost = createQnaPostEntityBuilder()
-                .group(testQnaCategoryEntity)
+                .category(createTestQnaCategoryEntity())
                 .authMember(member)
                 .createMember(member)
                 .build();

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
 import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
@@ -38,10 +39,10 @@ class TipCategoryValidationServiceTest implements TipCategoryResponseTestUtils, 
     @Test
     void validateExistedOrderTest() {
         // given
-        Integer order = testTipCategoryEntity.getOrder();
+        Integer order = createTestTipCategoryEntity().getOrder();
 
         // when
-        given(tipCategoryRepository.findByOrder(order)).willReturn(Optional.of(testTipCategoryEntity));
+        given(tipCategoryRepository.findByOrder(order)).willReturn(Optional.of(createTestTipCategoryEntity()));
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
@@ -54,12 +55,12 @@ class TipCategoryValidationServiceTest implements TipCategoryResponseTestUtils, 
     @Test
     void validateExistedTipCategoryNameTest() {
         // given
-        Integer order = testTipCategoryEntity.getOrder();
-        String category = testTipCategoryEntity.getCategory();
+        Integer order = createTestTipCategoryEntity().getOrder();
+        String category = createTestTipCategoryEntity().getCategory();
 
         // when
         given(tipCategoryRepository.findByOrder(order)).willReturn(Optional.empty());
-        given(tipCategoryRepository.findByCategory(category)).willReturn(Optional.of(testTipCategoryEntity));
+        given(tipCategoryRepository.findByCategory(category)).willReturn(Optional.of(createTestTipCategoryEntity()));
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
@@ -70,17 +71,17 @@ class TipCategoryValidationServiceTest implements TipCategoryResponseTestUtils, 
 
     @DisplayName("존재하지 않는 순서 검증")
     @Test
-    void validateNotFoundOrderTest() {
+    void validateNotFoundUuidTest() {
         // given
-        Integer order = testTipCategoryEntity.getOrder();
+        UUID uuid = createTestTipCategoryEntity().getUuid();
 
         // when
-        given(tipCategoryRepository.findByOrder(order)).willReturn(Optional.empty());
+        given(tipCategoryRepository.findByUuid(uuid)).willReturn(Optional.empty());
 
         // then
         EntityNotFoundException existsException = assertThrows(EntityNotFoundException.class,
-                () -> tipCategoryValidationService.validateNotFoundOrder(order));
+                () -> tipCategoryValidationService.validateNotFoundUuid(uuid));
         assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY.getValue(), ORDER, order, TipCategoryEntity.class));
+                NOT_FOUND_ENTITY.getValue(), "uuid", uuid, TipCategoryEntity.class));
     }
 }

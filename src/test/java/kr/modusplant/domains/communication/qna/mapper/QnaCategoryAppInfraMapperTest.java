@@ -15,7 +15,7 @@ class QnaCategoryAppInfraMapperTest implements QnaCategoryRequestTestUtils, QnaC
     @DisplayName("엔터티를 응답으로 전환")
     @Test
     void toQnaCategoryResponseTest() {
-        assertThat(qnaCategoryAppInfraMapper.toQnaCategoryResponse(testQnaCategoryEntity)).isEqualTo(testQnaCategoryResponse);
+        assertThat(qnaCategoryAppInfraMapper.toQnaCategoryResponse(createTestQnaCategoryEntityWithUuid())).isEqualTo(testQnaCategoryResponse);
     }
 
     @DisplayName("요청을 엔터티로 전환")

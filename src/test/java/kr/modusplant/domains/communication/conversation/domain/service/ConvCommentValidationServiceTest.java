@@ -5,6 +5,7 @@ import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCommentEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvPostEntityTestUtils;
+import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCommentEntity;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCategoryRepository;
@@ -39,16 +40,14 @@ public class ConvCommentValidationServiceTest implements
     @Spy
     private final ConvCommentRepository commentRepository;
 
-    private final ConvCategoryRepository categoryRepository;
     private final EntityManager entityManager;
 
     @Autowired
     public ConvCommentValidationServiceTest(
             ConvCommentValidationService commentValidationService, ConvCommentRepository commentRepository,
-            ConvCategoryRepository categoryRepository, EntityManager entityManager) {
+            EntityManager entityManager) {
         this.commentValidationService = commentValidationService;
         this.commentRepository = commentRepository;
-        this.categoryRepository = categoryRepository;
         this.entityManager = entityManager;
     }
 
@@ -58,9 +57,9 @@ public class ConvCommentValidationServiceTest implements
     @BeforeEach
     void setUp() {
         memberEntity = createMemberBasicUserEntity();
-//        ConvCategoryEntity categoryEntity = categoryRepository.save(testConvCategoryEntity);
+        ConvCategoryEntity category = entityManager.merge(createTestConvCategoryEntity());
         postEntity = createConvPostEntityBuilder()
-                .group(testConvCategoryEntity)
+                .category(category)
                 .authMember(memberEntity)
                 .createMember(memberEntity)
                 .likeCount(1)

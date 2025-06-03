@@ -47,16 +47,16 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
 
     @BeforeEach
     void setUp() {
-        testQnaCategory = qnaCategoryRepository.save(testQnaCategoryEntity);
+        testQnaCategory = qnaCategoryRepository.save(createTestQnaCategoryEntity());
         testSiteMember = siteMemberRepository.save(createMemberBasicUserEntity());
     }
 
     @Test
-    @DisplayName("ULID로 팁 게시글 찾기")
+    @DisplayName("ULID로 Q&A 게시글 찾기")
     void findByUlidTest() {
         // given
         QnaPostEntity qnaPostEntity = createQnaPostEntityBuilder()
-                .group(testQnaCategory)
+                .category(testQnaCategory)
                 .authMember(testSiteMember)
                 .createMember(testSiteMember)
                 .build();
@@ -70,12 +70,12 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
     }
 
     @Test
-    @DisplayName("전체 팁 게시글 찾기(최신순)")
+    @DisplayName("전체 Q&A 게시글 찾기(최신순)")
     void findAllByOrderByCreatedAtDescTest() {
         // given
         List<QnaPostEntity> qnaPosts = IntStream.range(0, 10)
                 .mapToObj(i -> createQnaPostEntityBuilder()
-                        .group(testQnaCategory)
+                        .category(testQnaCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -100,12 +100,12 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
     }
 
     @Test
-    @DisplayName("삭제되지 않은 모든 팁 게시글 찾기(최신순)")
+    @DisplayName("삭제되지 않은 모든 Q&A 게시글 찾기(최신순)")
     void findByIsDeletedFalseOrderByCreatedAtDescTest() {
         // given
         List<QnaPostEntity> qnaPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createQnaPostEntityBuilder()
-                        .group(testQnaCategory)
+                        .category(testQnaCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -130,15 +130,14 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
     }
 
     @Test
-    @DisplayName("카테고리로 삭제되지 않은 모든 팁 게시글 찾기(최신순)")
-    void findByGroupAndIsDeletedFalseOrderByCreatedAtDescTest() {
+    @DisplayName("카테고리로 삭제되지 않은 모든 Q&A 게시글 찾기(최신순)")
+    void findByCategoryAndIsDeletedFalseOrderByCreatedAtDescTest() {
         // given
         QnaCategoryEntity testOtherGroup = qnaCategoryRepository.save(
-                QnaCategoryEntity.builder().order(2).category("기타").build()
-        );
+                QnaCategoryEntity.builder().order(2).category("기타").build());
         List<QnaPostEntity> qnaPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createQnaPostEntityBuilder()
-                        .group(i % 2 == 0 ? testQnaCategory : testOtherGroup)
+                        .category(i % 2 == 0 ? testQnaCategory : testOtherGroup)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -149,12 +148,12 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // when
-        Page<QnaPostEntity> result = qnaPostRepository.findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(testQnaCategory, pageable);
+        Page<QnaPostEntity> result = qnaPostRepository.findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(testQnaCategory, pageable);
 
         // then
         // i = 0, 2, 4 → testQnaCategory로 생성됨 (0번은 삭제됨)
         assertThat(result.getTotalElements()).isEqualTo(2);
-        assertThat(result.getContent().stream().allMatch(post -> post.getGroup().equals(testQnaCategory) && !post.getIsDeleted())).isTrue();
+        assertThat(result.getContent().stream().allMatch(post -> post.getCategory().equals(testQnaCategory) && !post.getIsDeleted())).isTrue();
 
         List<QnaPostEntity> content = result.getContent();
         for (int i = 0; i < content.size() - 1; i++) {
@@ -164,13 +163,13 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
     }
 
     @Test
-    @DisplayName("인가 회원으로 삭제되지 않은 모든 팁 게시글 찾기(최신순)")
+    @DisplayName("인가 회원으로 삭제되지 않은 모든 Q&A 게시글 찾기(최신순)")
     void findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDescTest() {
         // given
         SiteMemberEntity testSiteMember2 = siteMemberRepository.save(createMemberGoogleUserEntity());
         List<QnaPostEntity> qnaPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createQnaPostEntityBuilder()
-                        .group(testQnaCategory)
+                        .category(testQnaCategory)
                         .authMember(i % 2 == 0 ? testSiteMember : testSiteMember2)
                         .createMember(i % 2 == 0 ? testSiteMember : testSiteMember2)
                         .build()
@@ -202,7 +201,7 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
         // when
         QnaPostEntity qnaPostEntity = qnaPostRepository.save(
                 createQnaPostEntityBuilder()
-                        .group(testQnaCategory)
+                        .category(testQnaCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -218,7 +217,7 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
         // when
         QnaPostEntity qnaPostEntity = qnaPostRepository.save(
                 createQnaPostEntityBuilder()
-                        .group(testQnaCategory)
+                        .category(testQnaCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -229,12 +228,12 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
     }
 
     @Test
-    @DisplayName("ULID로 팁 게시글 삭제")
+    @DisplayName("ULID로 Q&A 게시글 삭제")
     void deleteByUlidTest() {
         // given
         QnaPostEntity qnaPostEntity = qnaPostRepository.save(
                 createQnaPostEntityBuilder()
-                        .group(testQnaCategory)
+                        .category(testQnaCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -249,12 +248,12 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
     }
 
     @Test
-    @DisplayName("ULID로 팁 게시글 확인")
+    @DisplayName("ULID로 Q&A 게시글 확인")
     void existsByUlidTest() {
         // when
         QnaPostEntity qnaPostEntity = qnaPostRepository.save(
                 createQnaPostEntityBuilder()
-                        .group(testQnaCategory)
+                        .category(testQnaCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -270,14 +269,14 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
         // given
         QnaPostEntity qnaPostEntity1 = qnaPostRepository.save(
                 createQnaPostEntityBuilder()
-                        .group(testQnaCategory)
+                        .category(testQnaCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
         );
         QnaPostEntity qnaPostEntity2 = qnaPostRepository.save(
                 createQnaPostEntityBuilder()
-                        .group(testQnaCategory)
+                        .category(testQnaCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .isDeleted(true)
@@ -292,7 +291,6 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
         assertThat(found).isPresent();
         assertThat(found.orElseThrow().getUlid()).isEqualTo(qnaPostEntity1.getUlid());
         assertThat(notFound).isEmpty();
-
     }
 
     @Test
@@ -301,7 +299,7 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
         // given
         qnaPostRepository.save(
                 createQnaPostEntityBuilder()
-                        .group(testQnaCategory)
+                        .category(testQnaCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build());
@@ -325,7 +323,7 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
         // given
         QnaPostEntity qnaPostEntity = qnaPostRepository.save(
                 createQnaPostEntityBuilder()
-                        .group(testQnaCategory)
+                        .category(testQnaCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .viewCount(10L)
@@ -348,7 +346,7 @@ class QnaPostRepositoryTest implements QnaPostEntityTestUtils, QnaCategoryEntity
         // given
         QnaPostEntity qnaPostEntity = qnaPostRepository.save(
                 createQnaPostEntityBuilder()
-                        .group(testQnaCategory)
+                        .category(testQnaCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .viewCount(10L)

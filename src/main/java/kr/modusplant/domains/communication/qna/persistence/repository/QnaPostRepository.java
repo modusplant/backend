@@ -21,7 +21,7 @@ public interface QnaPostRepository extends UlidPrimaryRepository<QnaPostEntity>,
 
     Page<QnaPostEntity> findByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 
-    Page<QnaPostEntity> findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(QnaCategoryEntity group, Pageable pageable);
+    Page<QnaPostEntity> findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(QnaCategoryEntity category, Pageable pageable);
 
     Page<QnaPostEntity> findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(SiteMemberEntity authMember, Pageable pageable);
 

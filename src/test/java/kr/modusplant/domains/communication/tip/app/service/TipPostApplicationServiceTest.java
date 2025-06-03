@@ -54,7 +54,9 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
     private TipPostViewCountRedisRepository tipPostViewCountRedisRepository;
 
     private UUID memberUuid;
-    private Integer groupOrder;
+    private UUID categoryUuid;
+    private TipPostInsertRequest testRequestAllTypes;
+    private TipPostInsertRequest testRequestBasicTypes;
 
     @BeforeEach
     void setUp() {
@@ -62,18 +64,21 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
         siteMemberRepository.save(member);
         memberUuid = member.getUuid();
 
-        TipCategoryEntity group = testTipCategoryEntity;
-        tipCategoryRepository.save(group);
-        groupOrder = group.getOrder();
+        TipCategoryEntity tipCategory = createTestTipCategoryEntity();
+        tipCategoryRepository.save(tipCategory);
+        categoryUuid = tipCategory.getUuid();
+
+        testRequestAllTypes = new TipPostInsertRequest(categoryUuid, requestAllTypes.title(), requestAllTypes.content(), requestAllTypes.orderInfo());
+        testRequestBasicTypes = new TipPostInsertRequest(categoryUuid, requestBasicTypes.title(), requestBasicTypes.content(), requestBasicTypes.orderInfo());
     }
 
     @Test
     @DisplayName("전체 팁 게시글 목록 조회하기")
     void getAllTest() throws IOException {
         // given
-        tipPostApplicationService.insert(requestAllTypes, memberUuid);
-        tipPostApplicationService.insert(requestAllTypes, memberUuid);
-        tipPostApplicationService.insert(requestAllTypes, memberUuid);
+        tipPostApplicationService.insert(testRequestAllTypes, memberUuid);
+        tipPostApplicationService.insert(testRequestAllTypes, memberUuid);
+        tipPostApplicationService.insert(testRequestAllTypes, memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
@@ -86,7 +91,7 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
         assertThat(result.getTotalPages()).isEqualTo(2);
         List<TipPostResponse> posts = result.getContent();
         assertThat(posts.get(0).getCreatedAt()).isAfterOrEqualTo(posts.get(1).getCreatedAt());
-        assertThat(posts.get(0).getGroupOrder()).isEqualTo(groupOrder);
+        assertThat(posts.get(0).getCategoryUuid()).isEqualTo(categoryUuid);
     }
 
 
@@ -94,12 +99,12 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
     @DisplayName("사이트 회원별 팁 게시글 목록 조회하기")
     void getByMemberUuidTest() throws IOException {
         // given
-        SiteMemberEntity member = createMemberKakaoUserEntity();
-        siteMemberRepository.save(member);
-        UUID memberUuid2 = member.getUuid();
-        tipPostApplicationService.insert(requestAllTypes, memberUuid);
-        tipPostApplicationService.insert(requestAllTypes, memberUuid2);
-        tipPostApplicationService.insert(requestAllTypes, memberUuid);
+        SiteMemberEntity member2 = createMemberKakaoUserEntity();
+        siteMemberRepository.save(member2);
+        UUID memberUuid2 = member2.getUuid();
+        tipPostApplicationService.insert(testRequestAllTypes, memberUuid);
+        tipPostApplicationService.insert(testRequestAllTypes, memberUuid2);
+        tipPostApplicationService.insert(testRequestAllTypes, memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
@@ -115,26 +120,22 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
     }
 
     @Test
-    @DisplayName("식물 그룹별 팁 게시글 목록 조회하기")
-    void getByGroupOrderTest() throws IOException {
+    @DisplayName("항목별 팁 게시글 목록 조회하기")
+    void getByCategoryUuidTest() throws IOException {
         // given
-        tipCategoryRepository.save(TipCategoryEntity.builder()
-                .order(2)
-                .category("기타")
-                .build());
-        tipPostApplicationService.insert(requestAllTypes, memberUuid);
-        tipPostApplicationService.insert(requestAllTypes, memberUuid);
-        tipPostApplicationService.insert(requestBasicTypes, memberUuid);
+        tipPostApplicationService.insert(testRequestAllTypes, memberUuid);
+        tipPostApplicationService.insert(testRequestAllTypes, memberUuid);
+        tipPostApplicationService.insert(testRequestBasicTypes, memberUuid);
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
-        Page<TipPostResponse> result = tipPostApplicationService.getByGroupOrder(groupOrder, pageable);
+        Page<TipPostResponse> result = tipPostApplicationService.getByCategoryUuid(categoryUuid, pageable);
 
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getNumber()).isEqualTo(0);
         assertThat(result.getSize()).isEqualTo(2);
-        assertThat(result.getTotalElements()).isEqualTo(2);
-        assertThat(result.getTotalPages()).isEqualTo(1);
+        assertThat(result.getTotalElements()).isEqualTo(3);
+        assertThat(result.getTotalPages()).isEqualTo(2);
         List<TipPostResponse> posts = result.getContent();
         assertThat(posts.get(0).getCreatedAt()).isAfterOrEqualTo(posts.get(1).getCreatedAt());
     }
@@ -144,10 +145,12 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
     void searchByKeywordTest() throws IOException {
         // given
         tipCategoryRepository.save(TipCategoryEntity.builder()
-                .order(2).category("기타").build());
-        TipPostInsertRequest tipPostInsertRequest = requestBasicTypes;
-        tipPostApplicationService.insert(requestAllTypes, memberUuid);
-        tipPostApplicationService.insert(tipPostInsertRequest, memberUuid);
+                .order(2)
+                .category("기타")
+                .build());
+        TipPostInsertRequest tipPostInsertRequest2 = testRequestBasicTypes;
+        tipPostApplicationService.insert(testRequestAllTypes, memberUuid);
+        tipPostApplicationService.insert(tipPostInsertRequest2, memberUuid);
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
@@ -159,7 +162,7 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
         assertThat(result1.getTotalElements()).isEqualTo(1);
         assertThat(result2.getTotalElements()).isEqualTo(2);
         TipPostResponse post = result1.getContent().getFirst();
-        assertThat(post.getTitle()).isEqualTo(tipPostInsertRequest.title());
+        assertThat(post.getTitle()).isEqualTo(tipPostInsertRequest2.title());
         assertThat(post.getContent().get(1).has("data")).isEqualTo(true);
     }
 
@@ -169,10 +172,10 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
     void getByUlidTest() throws IOException {
         // given
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        TipPostInsertRequest tipPostInsertRequest = requestAllTypes;
-        TipCategoryEntity tipCategoryEntity = tipCategoryRepository.findByOrder(tipPostInsertRequest.groupOrder()).orElseThrow();
+        TipPostInsertRequest tipPostInsertRequest = testRequestAllTypes;
+        TipCategoryEntity tipCategoryEntity = tipCategoryRepository.findByUuid(tipPostInsertRequest.categoryUuid()).orElseThrow();
         TipPostEntity tipPostEntity = TipPostEntity.builder()
-                .group(tipCategoryEntity)
+                .category(tipCategoryEntity)
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(tipPostInsertRequest.title())
@@ -197,10 +200,10 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
     void updateTest() throws IOException {
         // given
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        TipPostInsertRequest tipPostInsertRequest = requestAllTypes;
-        TipCategoryEntity tipCategoryEntity = tipCategoryRepository.findByOrder(tipPostInsertRequest.groupOrder()).orElseThrow();
+        TipPostInsertRequest tipPostInsertRequest = testRequestAllTypes;
+        TipCategoryEntity tipCategoryEntity = tipCategoryRepository.findByUuid(tipPostInsertRequest.categoryUuid()).orElseThrow();
         TipPostEntity tipPostEntity = TipPostEntity.builder()
-                .group(tipCategoryEntity)
+                .category(tipCategoryEntity)
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(tipPostInsertRequest.title())
@@ -211,12 +214,12 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
         // when
         TipPostUpdateRequest tipPostUpdateRequest = new TipPostUpdateRequest(
                 tipPostEntity.getUlid(),
-                1,
+                tipPostEntity.getCategory().getUuid(),
                 "식물 기르기 팁",
                 basicMediaFiles,
                 basicMediaFilesOrder
         );
-        tipPostApplicationService.update(tipPostUpdateRequest,memberUuid);
+        tipPostApplicationService.update(tipPostUpdateRequest, memberUuid);
 
         // then
         TipPostEntity result = tipPostRepository.findByUlid(tipPostEntity.getUlid()).orElseThrow();
@@ -228,10 +231,10 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
     void removeByUlidTest() throws IOException {
         // given
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        TipPostInsertRequest tipPostInsertRequest = requestAllTypes;
-        TipCategoryEntity tipCategoryEntity = tipCategoryRepository.findByOrder(tipPostInsertRequest.groupOrder()).orElseThrow();
+        TipPostInsertRequest tipPostInsertRequest = testRequestAllTypes;
+        TipCategoryEntity tipCategoryEntity = tipCategoryRepository.findByUuid(tipPostInsertRequest.categoryUuid()).orElseThrow();
         TipPostEntity tipPostEntity = TipPostEntity.builder()
-                .group(tipCategoryEntity)
+                .category(tipCategoryEntity)
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(tipPostInsertRequest.title())

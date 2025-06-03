@@ -2,9 +2,8 @@ package kr.modusplant.domains.communication.tip.persistence.entity;
 
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCommentEntityTestUtils;
-import kr.modusplant.domains.communication.tip.persistence.repository.TipCategoryRepository;
+import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.tip.common.util.entity.TipPostEntityTestUtils;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,12 +16,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TipCommentEntityTest implements TipCommentEntityTestUtils,
         TipCategoryEntityTestUtils, TipPostEntityTestUtils {
 
-    private final TipCategoryRepository categoryRepository;
     private final TestEntityManager entityManager;
 
     @Autowired
-    TipCommentEntityTest(TipCategoryRepository categoryRepository, TestEntityManager entityManager) {
-        this.categoryRepository = categoryRepository;
+    TipCommentEntityTest(TestEntityManager entityManager) {
         this.entityManager = entityManager;}
 
     @DisplayName("소통 팁 댓글 PrePersist")
@@ -30,9 +27,10 @@ public class TipCommentEntityTest implements TipCommentEntityTestUtils,
     void prePersist() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        TipCategoryEntity category = categoryRepository.save(testTipCategoryEntity);
+        TipCategoryEntity category = createTestTipCategoryEntity();
+        entityManager.persist(category);
         TipPostEntity postEntity = createTipPostEntityBuilder()
-                .group(category)
+                .category(category)
                 .authMember(member)
                 .createMember(member)
                 .likeCount(1)
@@ -48,6 +46,7 @@ public class TipCommentEntityTest implements TipCommentEntityTestUtils,
                 .build();
 
         // when
+//        entityManager.persist()
         entityManager.persist(postEntity);
         entityManager.persist(commentEntity);
         entityManager.flush();

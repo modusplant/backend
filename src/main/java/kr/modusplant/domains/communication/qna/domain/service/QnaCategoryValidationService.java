@@ -1,16 +1,17 @@
 package kr.modusplant.domains.communication.qna.domain.service;
 
 import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaCategoryEntity;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaCategoryRepository;
+import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
-import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 import static kr.modusplant.global.vo.CamelCaseWord.CATEGORY;
 import static kr.modusplant.global.vo.CamelCaseWord.ORDER;
@@ -38,9 +39,9 @@ public class QnaCategoryValidationService {
         }
     }
 
-    public void validateNotFoundOrder(Integer order) {
-        if (order == null || qnaCategoryRepository.findByOrder(order).isEmpty()) {
-            throw new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), ORDER, order, QnaCategoryEntity.class));
+    public void validateNotFoundUuid(UUID uuid) {
+        if (uuid == null || qnaCategoryRepository.findByUuid(uuid).isEmpty()) {
+            throw new EntityNotFoundWithUuidException(uuid, QnaCategoryEntity.class);
         }
     }
 }

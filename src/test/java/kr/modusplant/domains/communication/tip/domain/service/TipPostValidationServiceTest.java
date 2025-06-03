@@ -5,10 +5,13 @@ import kr.modusplant.domains.communication.common.error.PostAccessDeniedExceptio
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostInsertRequest;
 import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipPostRequestTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.domain.TipPostTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
+import kr.modusplant.domains.communication.tip.persistence.repository.TipCategoryRepository;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
+import kr.modusplant.global.error.EntityExistsWithUuidException;
 import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;
@@ -27,42 +30,58 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class TipPostValidationServiceTest implements TipPostRequestTestUtils {
+class TipPostValidationServiceTest implements TipPostRequestTestUtils, TipCategoryEntityTestUtils {
     @Mock
     private TipPostRepository tipPostRepository;
+
+    @Mock
+    private TipCategoryRepository tipCategoryRepository;
+
     @InjectMocks
     private TipPostValidationService tipPostValidationService;
 
     @Test
     @DisplayName("팁 게시글 추가/수정 시 TipPostRequest는 유효한 입력")
     void validateTipPostInsertRequestTestSuccess() {
+        // given & when
+        when(tipCategoryRepository.findByUuid(requestBasicTypes.categoryUuid())).thenReturn(Optional.of(createTestTipCategoryEntity()));
+
+        // then
         assertDoesNotThrow(() -> tipPostValidationService.validateTipPostInsertRequest(requestBasicTypes));
     }
 
     @Test
-    @DisplayName("팁 게시글 추가/수정 시 TipPostRequest의 groupOrder가 유효하지 않으면 예외 발생")
-    void validateTipPostInsertRequestInvalidGroupOrderTest() {
+    @DisplayName("팁 게시글 추가/수정 시 TipPostRequest의 categoryUuid가 유효하지 않으면 예외 발생")
+    void validateTipPostInsertRequestInvalidCategoryUuidTest() {
+        // given & when
         TipPostInsertRequest tipPostInsertRequest = new TipPostInsertRequest(
-                -1,
+                UUID.randomUUID(),
                 "유용한 팁 모음",
                 allMediaFiles,
                 allMediaFilesOrder
         );
 
-        assertThrows(IllegalArgumentException.class,
+        when(tipCategoryRepository.findByUuid(tipPostInsertRequest.categoryUuid())).thenReturn(Optional.empty());
+
+        // then
+        assertThrows(EntityExistsWithUuidException.class,
                 () -> tipPostValidationService.validateTipPostInsertRequest(tipPostInsertRequest));
     }
 
     @Test
     @DisplayName("팁 게시글 추가/수정 시 TipPostRequest의 title이 유효하지 않으면 예외 발생")
     void validateTipPostInsertRequestInvalidTitleTest() {
+        // given & when
         TipPostInsertRequest tipPostInsertRequest = new TipPostInsertRequest(
-                2,
+                UUID.randomUUID(),
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 allMediaFiles,
                 allMediaFilesOrder
         );
 
+        when(tipCategoryRepository.findByUuid(tipPostInsertRequest.categoryUuid())).thenReturn(Optional.of(createTestTipCategoryEntity()));
+
+        // then
         assertThrows(IllegalArgumentException.class,
                 () -> tipPostValidationService.validateTipPostInsertRequest(tipPostInsertRequest));
 
@@ -71,13 +90,17 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
     @Test
     @DisplayName("팁 게시글 추가/수정 시 TipPostRequest의 Content와 OrderInfo가 유효하지 않으면 예외 발생")
     void validateTipPostInsertRequestInvalidContentAndOrderInfoTest() {
+        // given & when
         TipPostInsertRequest tipPostInsertRequest = new TipPostInsertRequest(
-                1,
+                UUID.randomUUID(),
                 "유용한 팁 모음",
                 textImageFiles,
                 imageTextFilesOrder
         );
 
+        when(tipCategoryRepository.findByUuid(tipPostInsertRequest.categoryUuid())).thenReturn(Optional.of(createTestTipCategoryEntity()));
+
+        // then
         assertThrows(IllegalArgumentException.class,
                 () -> tipPostValidationService.validateTipPostInsertRequest(tipPostInsertRequest));
     }
@@ -91,7 +114,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         TipPostEntity tipPostEntity = TipPostEntity.builder()
                 .authMember(memberEntity)
-                .group(mock(TipCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
+                .category(mock(TipCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
                 .createMember(memberEntity)
                 .likeCount(0)
                 .viewCount(0L)
@@ -126,7 +149,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         TipPostEntity tipPostEntity = TipPostEntity.builder()
                 .authMember(memberEntity)
-                .group(mock(TipCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
+                .category(mock(TipCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
                 .createMember(memberEntity)
                 .likeCount(0)
                 .viewCount(0L)
@@ -146,7 +169,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
     @Test
     @DisplayName("ULID 존재할 경우 통과")
     void validateNotFoundUlidExists() {
-        String ulid = TipPostTestUtils.generator.generate(null, null,null,EventType.INSERT);
+        String ulid = TipPostTestUtils.generator.generate(null, null, null, EventType.INSERT);
         when(tipPostRepository.existsByUlid(ulid)).thenReturn(true);
         assertDoesNotThrow(() -> tipPostValidationService.validateNotFoundUlid(ulid));
     }
@@ -154,10 +177,22 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils {
     @Test
     @DisplayName("ULID 존재하지 않을 경우 예외 발생")
     void validateNotFoundUlidNotExists() {
-        String ulid = TipPostTestUtils.generator.generate(null, null,null,EventType.INSERT);
-        when(tipPostRepository.existsByUlid(ulid)).thenReturn(false);
+        // null ULID
+        // given & when
+        final String nullUlid = null;
+
+        // then
         assertThrows(EntityNotFoundWithUlidException.class, () ->
-                tipPostValidationService.validateNotFoundUlid(ulid));
+                tipPostValidationService.validateNotFoundUlid(nullUlid));
+
+        // Not Found ULID
+        // given & when
+        String notFoundUlid = TipPostTestUtils.generator.generate(null, null, null, EventType.INSERT);
+        when(tipPostRepository.existsByUlid(notFoundUlid)).thenReturn(false);
+
+        // then
+        assertThrows(EntityNotFoundWithUlidException.class, () ->
+                tipPostValidationService.validateNotFoundUlid(notFoundUlid));
     }
 
 }

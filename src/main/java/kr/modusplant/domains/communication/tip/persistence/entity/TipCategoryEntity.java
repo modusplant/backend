@@ -6,10 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_CREATED_AT;
 import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_TIP_CATE;
@@ -21,11 +23,15 @@ import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_TIP_CATE;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TipCategoryEntity {
     @Id
-    @Column(name = "\"order\"", nullable = false, updatable = false)
-    private Integer order;
+    @UuidGenerator
+    @Column(nullable = false, updatable = false)
+    private UUID uuid;
 
     @Column(nullable = false, updatable = false, unique = true)
     private String category;
+
+    @Column(name = "\"order\"", nullable = false, updatable = false, unique = true)
+    private Integer order;
 
     @Column(name = SNAKE_CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
@@ -47,9 +53,10 @@ public class TipCategoryEntity {
         return new HashCodeBuilder(17, 37).append(getOrder()).toHashCode();
     }
 
-    private TipCategoryEntity(Integer order, String category) {
-        this.order = order;
+    private TipCategoryEntity(UUID uuid, String category, Integer order) {
+        this.uuid = uuid;
         this.category = category;
+        this.order = order;
     }
 
     public static TipCategoryEntityBuilder builder() {
@@ -57,11 +64,12 @@ public class TipCategoryEntity {
     }
 
     public static final class TipCategoryEntityBuilder {
-        private Integer order;
+        private UUID uuid;
         private String category;
+        private Integer order;
 
-        public TipCategoryEntityBuilder order(final Integer order) {
-            this.order = order;
+        public TipCategoryEntityBuilder uuid(final UUID uuid) {
+            this.uuid = uuid;
             return this;
         }
 
@@ -70,14 +78,20 @@ public class TipCategoryEntity {
             return this;
         }
 
+        public TipCategoryEntityBuilder order(final Integer order) {
+            this.order = order;
+            return this;
+        }
+
         public TipCategoryEntityBuilder tipCategoryEntity(final TipCategoryEntity tipCategory) {
-            this.order = tipCategory.getOrder();
+            this.uuid = tipCategory.getUuid();
             this.category = tipCategory.getCategory();
+            this.order = tipCategory.getOrder();
             return this;
         }
 
         public TipCategoryEntity build() {
-            return new TipCategoryEntity(this.order, this.category);
+            return new TipCategoryEntity(this.uuid, this.category, this.order);
         }
     }
 }

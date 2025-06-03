@@ -1,11 +1,13 @@
 package kr.modusplant.domains.communication.tip.mapper;
 
+import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
 import kr.modusplant.domains.communication.tip.app.http.request.TipCommentInsertRequest;
 import kr.modusplant.domains.communication.tip.app.http.response.TipCommentResponse;
 import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipCommentInsertRequestTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.app.http.response.TipCommentResponseTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCommentEntityTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipCommentEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
@@ -14,7 +16,6 @@ import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRep
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.domains.tip.common.util.entity.TipPostEntityTestUtils;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,9 +48,9 @@ public class TipCommentAppInfraMapperTest implements
     @BeforeEach
     void setUp() {
         SiteMemberEntity member = createMemberBasicUserEntity();
-        TipCategoryEntity category = categoryRepository.save(testTipCategoryEntity);
+        TipCategoryEntity category = categoryRepository.save(createTestTipCategoryEntity());
         TipPostEntity postEntity = createTipPostEntityBuilder()
-                .group(category)
+                .category(category)
                 .authMember(member)
                 .createMember(member)
                 .likeCount(1)

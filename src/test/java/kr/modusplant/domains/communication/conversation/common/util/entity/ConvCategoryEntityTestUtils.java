@@ -4,8 +4,18 @@ import kr.modusplant.domains.communication.conversation.common.util.domain.ConvC
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
 
 public interface ConvCategoryEntityTestUtils extends ConvCategoryTestUtils {
-    ConvCategoryEntity testConvCategoryEntity = ConvCategoryEntity.builder()
-            .order(testConvCategory.getOrder())
-            .category(testConvCategory.getCategory())
-            .build();
+    default ConvCategoryEntity createTestConvCategoryEntity() {
+        return ConvCategoryEntity.builder()
+                .category(testConvCategory.getCategory())
+                .order(testConvCategory.getOrder())
+                .build();
+    }
+
+    default ConvCategoryEntity createTestConvCategoryEntityWithUuid() {
+        return ConvCategoryEntity.builder()
+                .uuid(testConvCategoryWithUuid.getUuid())
+                .category(testConvCategory.getCategory())
+                .order(testConvCategory.getOrder())
+                .build();
+    }
 }

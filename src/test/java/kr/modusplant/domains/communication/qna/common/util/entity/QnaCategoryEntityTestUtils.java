@@ -4,8 +4,18 @@ import kr.modusplant.domains.communication.qna.common.util.domain.QnaCategoryTes
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaCategoryEntity;
 
 public interface QnaCategoryEntityTestUtils extends QnaCategoryTestUtils {
-    QnaCategoryEntity testQnaCategoryEntity = QnaCategoryEntity.builder()
-            .order(testQnaCategory.getOrder())
-            .category(testQnaCategory.getCategory())
-            .build();
+    default QnaCategoryEntity createTestQnaCategoryEntity() {
+        return QnaCategoryEntity.builder()
+                .category(testQnaCategory.getCategory())
+                .order(testQnaCategory.getOrder())
+                .build();
+    }
+
+    default QnaCategoryEntity createTestQnaCategoryEntityWithUuid() {
+        return QnaCategoryEntity.builder()
+                .uuid(testQnaCategoryWithUuid.getUuid())
+                .category(testQnaCategory.getCategory())
+                .order(testQnaCategory.getOrder())
+                .build();
+    }
 }

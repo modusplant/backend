@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Primary
@@ -28,7 +29,12 @@ public class TipCategoryApplicationService {
     public List<TipCategoryResponse> getAll() {
         return tipCategoryRepository.findAll().stream().map(tipCategoryAppInfraMapper::toTipCategoryResponse).toList();
     }
-    
+
+    public Optional<TipCategoryResponse> getByUuid(UUID uuid) {
+        Optional<TipCategoryEntity> tipCategoryOrEmpty = tipCategoryRepository.findByUuid(uuid);
+        return tipCategoryOrEmpty.isEmpty() ? Optional.empty() : Optional.of(tipCategoryAppInfraMapper.toTipCategoryResponse(tipCategoryOrEmpty.orElseThrow()));
+    }
+
     public Optional<TipCategoryResponse> getByOrder(Integer order) {
         Optional<TipCategoryEntity> tipCategoryOrEmpty = tipCategoryRepository.findByOrder(order);
         return tipCategoryOrEmpty.isEmpty() ? Optional.empty() : Optional.of(tipCategoryAppInfraMapper.toTipCategoryResponse(tipCategoryOrEmpty.orElseThrow()));
@@ -42,12 +48,13 @@ public class TipCategoryApplicationService {
     @Transactional
     public TipCategoryResponse insert(TipCategoryInsertRequest tipCategoryInsertRequest) {
         validationService.validateExistedCategory(tipCategoryInsertRequest.category());
+        validationService.validateExistedOrder(tipCategoryInsertRequest.order());
         return tipCategoryAppInfraMapper.toTipCategoryResponse(tipCategoryRepository.save(tipCategoryAppInfraMapper.toTipCategoryEntity(tipCategoryInsertRequest)));
     }
 
     @Transactional
-    public void removeByOrder(Integer order) {
-        validationService.validateNotFoundOrder(order);
-        tipCategoryRepository.deleteByOrder(order);
+    public void removeByUuid(UUID uuid) {
+        validationService.validateNotFoundUuid(uuid);
+        tipCategoryRepository.deleteByUuid(uuid);
     }
 }

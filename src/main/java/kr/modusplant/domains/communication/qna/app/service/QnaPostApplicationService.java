@@ -61,7 +61,7 @@ public class QnaPostApplicationService {
 
     public Page<QnaPostResponse> getByMemberUuid(UUID memberUuid, Pageable pageable) {
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
-        return qnaPostRepository.findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(siteMember,pageable).map(entity -> {
+        return qnaPostRepository.findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(siteMember, pageable).map(entity -> {
             try {
                 entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
@@ -71,9 +71,9 @@ public class QnaPostApplicationService {
         });
     }
 
-    public Page<QnaPostResponse> getByGroupOrder(Integer groupOrder, Pageable pageable) {
-        QnaCategoryEntity qnaCategory = qnaCategoryRepository.findByOrder(groupOrder).orElseThrow();
-        return qnaPostRepository.findByGroupAndIsDeletedFalseOrderByCreatedAtDesc(qnaCategory,pageable).map(entity -> {
+    public Page<QnaPostResponse> getByCategoryUuid(UUID categoryUuid, Pageable pageable) {
+        QnaCategoryEntity qnaCategory = qnaCategoryRepository.findByUuid(categoryUuid).orElseThrow();
+        return qnaPostRepository.findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(qnaCategory, pageable).map(entity -> {
             try {
                 entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
@@ -84,7 +84,7 @@ public class QnaPostApplicationService {
     }
 
     public Page<QnaPostResponse> searchByKeyword(String keyword, Pageable pageable) {
-        return qnaPostRepository.searchByTitleOrContent(keyword,pageable).map(entity -> {
+        return qnaPostRepository.searchByTitleOrContent(keyword, pageable).map(entity -> {
             try {
                 entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
@@ -111,11 +111,11 @@ public class QnaPostApplicationService {
     @Transactional
     public void insert(QnaPostInsertRequest qnaPostInsertRequest, UUID memberUuid) throws IOException {
         qnaPostValidationService.validateQnaPostInsertRequest(qnaPostInsertRequest);
-        qnaCategoryValidationService.validateNotFoundOrder(qnaPostInsertRequest.groupOrder());
+        qnaCategoryValidationService.validateNotFoundUuid(qnaPostInsertRequest.categoryUuid());
         siteMemberValidationService.validateNotFoundUuid(memberUuid);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
         QnaPostEntity qnaPostEntity = QnaPostEntity.builder()
-                .group(qnaCategoryRepository.findByOrder(qnaPostInsertRequest.groupOrder()).orElseThrow())
+                .category(qnaCategoryRepository.findByUuid(qnaPostInsertRequest.categoryUuid()).orElseThrow())
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(qnaPostInsertRequest.title())
@@ -128,10 +128,10 @@ public class QnaPostApplicationService {
     public void update(QnaPostUpdateRequest qnaPostUpdateRequest, UUID memberUuid) throws IOException {
         qnaPostValidationService.validateQnaPostUpdateRequest(qnaPostUpdateRequest);
         qnaPostValidationService.validateAccessibleQnaPost(qnaPostUpdateRequest.ulid(), memberUuid);
-        qnaCategoryValidationService.validateNotFoundOrder(qnaPostUpdateRequest.groupOrder());
+        qnaCategoryValidationService.validateNotFoundUuid(qnaPostUpdateRequest.categoryUuid());
         QnaPostEntity qnaPostEntity = qnaPostRepository.findByUlid(qnaPostUpdateRequest.ulid()).orElseThrow();
         mediaContentService.deleteFiles(qnaPostEntity.getContent());
-        qnaPostEntity.updateGroup(qnaCategoryRepository.findByOrder(qnaPostUpdateRequest.groupOrder()).orElseThrow());
+        qnaPostEntity.updateCategory(qnaCategoryRepository.findByUuid(qnaPostUpdateRequest.categoryUuid()).orElseThrow());
         qnaPostEntity.updateTitle(qnaPostUpdateRequest.title());
         qnaPostEntity.updateContent(mediaContentService.saveFilesAndGenerateContentJson(qnaPostUpdateRequest.content()));
         qnaPostRepository.save(qnaPostEntity);
@@ -153,7 +153,7 @@ public class QnaPostApplicationService {
         }
         Long dbViewCount = qnaPostRepository.findByUlid(ulid)
                 .map(qnaPostEntity -> Optional.ofNullable(qnaPostEntity.getViewCount()).orElseThrow())
-                .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid,String.class));
+                .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid, String.class));
         qnaPostViewCountRedisRepository.write(ulid, dbViewCount);
         return dbViewCount;
     }
@@ -161,7 +161,7 @@ public class QnaPostApplicationService {
     @Transactional
     public Long increaseViewCount(String ulid, UUID memberUuid) {
         // 조회수 어뷰징 정책 - 사용자는 게시글 1개당 ttl에 1번 조회수 증가
-        if (!qnaPostViewLockRedisRepository.lock(ulid,memberUuid,ttlMinutes)) {
+        if (!qnaPostViewLockRedisRepository.lock(ulid, memberUuid, ttlMinutes)) {
             return qnaPostViewCountRedisRepository.read(ulid);
         }
         // 조회수 증가

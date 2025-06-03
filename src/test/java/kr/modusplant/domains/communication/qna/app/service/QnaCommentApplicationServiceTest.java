@@ -61,10 +61,10 @@ public class QnaCommentApplicationServiceTest implements
     @BeforeEach
     void setUp() {
         memberEntity = createMemberBasicUserEntityWithUuid();
-        QnaCategoryEntity category = categoryRepository.save(testQnaCategoryEntity);
+        QnaCategoryEntity category = categoryRepository.save(createTestQnaCategoryEntityWithUuid());
         postEntity = createQnaPostEntityBuilder()
                 .ulid(qnaPostWithUlid.getUlid())
-                .group(category)
+                .category(category)
                 .authMember(memberEntity)
                 .createMember(memberEntity)
                 .likeCount(1)

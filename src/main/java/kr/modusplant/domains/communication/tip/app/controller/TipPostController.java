@@ -22,7 +22,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Tag(name = "Tip Post API")
+import static kr.modusplant.global.vo.SnakeCaseWord.*;
+
+@Tag(name = "Tipersation Post API")
 @RestController
 @RequestMapping("/api/v1/tip/posts")
 @RequiredArgsConstructor
@@ -38,26 +40,26 @@ public class TipPostController {
 
     @Operation(summary = "전체 팁 게시글 목록 조회 API", description = "전체 팁 게시글의 목록과 페이지 정보를 조회합니다.")
     @GetMapping("")
-    public ResponseEntity<DataResponse<PostPageResponse>> getAllTipPosts(Pageable pageable) {
+    public ResponseEntity<DataResponse<PostPageResponse<?>>> getAllTipPosts(Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.getAll(pageable))));
     }
 
     @Operation(summary = "사이트 회원별 팁 게시글 목록 조회 API", description = "사이트 회원별 팁 게시글의 목록과 페이지 정보를 조회합니다.")
     @GetMapping("/members/{memb_uuid}")
-    public ResponseEntity<DataResponse<PostPageResponse>> getTipPostsByMember(@PathVariable("memb_uuid") UUID memberUuid, Pageable pageable) {
-        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.getByMemberUuid(memberUuid,pageable))));
+    public ResponseEntity<DataResponse<PostPageResponse<?>>> getTipPostsByMember(@PathVariable(SNAKE_MEMB_UUID) UUID memberUuid, Pageable pageable) {
+        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.getByMemberUuid(memberUuid, pageable))));
     }
 
-    @Operation(summary = "식물 그룹별 팁 게시글 목록 조회 API", description = "식물 그룹별 팁 게시글의 목록과 페이지 정보를 조회합니다.")
-    @GetMapping("/plant-groups/{group_id}")
-    public ResponseEntity<DataResponse<PostPageResponse>> getTipPostsByTipCategory(@PathVariable("group_id") Integer groupOrder, Pageable pageable) {
-        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.getByGroupOrder(groupOrder,pageable))));
+    @Operation(summary = "항목별 팁 게시글 목록 조회 API", description = "항목별 팁 게시글의 목록과 페이지 정보를 조회합니다.")
+    @GetMapping("/category/{cate_uuid}")
+    public ResponseEntity<DataResponse<PostPageResponse<?>>> getTipPostsByTipCategory(@PathVariable(SNAKE_CATE_UUID) UUID categoryUuid, Pageable pageable) {
+        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.getByCategoryUuid(categoryUuid, pageable))));
     }
 
     @Operation(summary = "제목+본문 검색어로 팁 게시글 목록 조회 API", description = "제목+본문 검색어로 팁 게시글의 목록과 페이지 정보를 조회합니다.")
     @GetMapping("/search")
-    public ResponseEntity<DataResponse<PostPageResponse>> searchTipPosts(@RequestParam String keyword, Pageable pageable) {
-        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.searchByKeyword(keyword,pageable))));
+    public ResponseEntity<DataResponse<PostPageResponse<?>>> searchTipPosts(@RequestParam String keyword, Pageable pageable) {
+        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.searchByKeyword(keyword, pageable))));
     }
 
     @Operation(summary = "특정 팁 게시글 조회 API", description = "게시글 id로 특정 팁 게시글을 조회합니다.")
@@ -71,27 +73,27 @@ public class TipPostController {
     }
 
     @Operation(summary = "팁 게시글 추가 API", description = "팁 게시글을 작성합니다.")
-    @PostMapping(value = "",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> insertTipPost(
-            @RequestPart("group_order") Integer groupOrder,
+            @RequestPart(SNAKE_CATE_UUID) UUID categoryUuid,
             @RequestPart String title,
             @RequestPart List<MultipartFile> content,
-            @RequestPart("order_info") List<FileOrder> orderInfo
+            @RequestPart(SNAKE_ORDER_INFO) List<FileOrder> orderInfo
     ) throws IOException {
-        tipPostApplicationService.insert(new TipPostInsertRequest(groupOrder,title,content,orderInfo),memberUuid);
+        tipPostApplicationService.insert(new TipPostInsertRequest(categoryUuid, title, content, orderInfo), memberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
     @Operation(summary = "특정 팁 게시글 수정 API", description = "특정 팁 게시글을 수정합니다.")
     @PutMapping(value = "/{ulid}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> updateTipPost(
-            @RequestPart("group_order") Integer groupOrder,
+            @RequestPart(SNAKE_CATE_UUID) UUID categoryUuid,
             @RequestPart String title,
             @RequestPart List<MultipartFile> content,
-            @RequestPart("order_info") List<FileOrder> orderInfo,
+            @RequestPart(SNAKE_ORDER_INFO) List<FileOrder> orderInfo,
             @PathVariable String ulid
     ) throws IOException {
-        tipPostApplicationService.update(new TipPostUpdateRequest(ulid,groupOrder,title,content,orderInfo), memberUuid);
+        tipPostApplicationService.update(new TipPostUpdateRequest(ulid, categoryUuid, title, content, orderInfo), memberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

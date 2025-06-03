@@ -2,9 +2,11 @@ package kr.modusplant.domains.communication.qna.domain.service;
 
 import jakarta.persistence.EntityManager;
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaCommentEntityTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaPostEntityTestUtils;
+import kr.modusplant.domains.communication.qna.persistence.entity.QnaCategoryEntity;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaCommentEntity;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaCategoryRepository;
@@ -39,16 +41,14 @@ public class QnaCommentValidationServiceTest implements
     @Spy
     private final QnaCommentRepository commentRepository;
 
-    private final QnaCategoryRepository categoryRepository;
     private final EntityManager entityManager;
 
     @Autowired
     public QnaCommentValidationServiceTest(
             QnaCommentValidationService commentValidationService, QnaCommentRepository commentRepository,
-            QnaCategoryRepository categoryRepository, EntityManager entityManager) {
+            EntityManager entityManager) {
         this.commentValidationService = commentValidationService;
         this.commentRepository = commentRepository;
-        this.categoryRepository = categoryRepository;
         this.entityManager = entityManager;
     }
 
@@ -58,9 +58,9 @@ public class QnaCommentValidationServiceTest implements
     @BeforeEach
     void setUp() {
         memberEntity = createMemberBasicUserEntity();
-//        QnaCategoryEntity categoryEntity = categoryRepository.save(testQnaCategoryEntity);
+        QnaCategoryEntity category = entityManager.merge(createTestQnaCategoryEntity());
         postEntity = createQnaPostEntityBuilder()
-                .group(testQnaCategoryEntity)
+                .category(category)
                 .authMember(memberEntity)
                 .createMember(memberEntity)
                 .likeCount(1)

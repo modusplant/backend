@@ -25,7 +25,7 @@ class TipPostAppInfraMapperTest implements TipPostEntityTestUtils, TipCategoryEn
     private final TipPostRepository tipPostRepository;
 
     @Autowired
-    TipPostAppInfraMapperTest(SiteMemberRepository siteMemberRepository,TipCategoryRepository tipCategoryRepository,TipPostRepository tipPostRepository){
+    TipPostAppInfraMapperTest(SiteMemberRepository siteMemberRepository, TipCategoryRepository tipCategoryRepository, TipPostRepository tipPostRepository){
         this.siteMemberRepository = siteMemberRepository;
         this.tipCategoryRepository = tipCategoryRepository;
         this.tipPostRepository = tipPostRepository;
@@ -35,11 +35,11 @@ class TipPostAppInfraMapperTest implements TipPostEntityTestUtils, TipCategoryEn
     @DisplayName("엔티티를 응답으로 전환")
     void toTipPostResponseTest() {
         // given
-        TipCategoryEntity tipCategoryEntity = tipCategoryRepository.save(testTipCategoryEntity);
+        TipCategoryEntity tipCategoryEntity = tipCategoryRepository.save(createTestTipCategoryEntity());
         SiteMemberEntity siteMemberEntity = siteMemberRepository.save(createMemberBasicUserEntity());
         TipPostEntity tipPostEntity = tipPostRepository.save(
                 createTipPostEntityBuilder()
-                        .group(tipCategoryEntity)
+                        .category(tipCategoryEntity)
                         .authMember(siteMemberEntity)
                         .createMember(siteMemberEntity)
                         .build()
@@ -49,8 +49,8 @@ class TipPostAppInfraMapperTest implements TipPostEntityTestUtils, TipCategoryEn
         TipPostResponse tipPostResponse = tipPostAppInfraMapper.toTipPostResponse(tipPostEntity);
 
         // then
-        assertThat(tipPostResponse.getGroupOrder()).isEqualTo(tipPostEntity.getGroup().getOrder());
-        assertThat(tipPostResponse.getCategory()).isEqualTo(tipPostEntity.getGroup().getCategory());
+        assertThat(tipPostResponse.getCategoryUuid()).isEqualTo(tipPostEntity.getCategory().getUuid());
+        assertThat(tipPostResponse.getCategory()).isEqualTo(tipPostEntity.getCategory().getCategory());
         assertThat(tipPostResponse.getNickname()).isEqualTo(tipPostEntity.getAuthMember().getNickname());
     }
 

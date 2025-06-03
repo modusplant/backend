@@ -47,9 +47,9 @@ public class QnaCommentAppInfraMapperTest implements
     @BeforeEach
     void setUp() {
         SiteMemberEntity member = createMemberBasicUserEntity();
-        QnaCategoryEntity category = categoryRepository.save(testQnaCategoryEntity);
+        QnaCategoryEntity category = categoryRepository.save(createTestQnaCategoryEntity());
         QnaPostEntity postEntity = createQnaPostEntityBuilder()
-                .group(category)
+                .category(category)
                 .authMember(member)
                 .createMember(member)
                 .likeCount(1)

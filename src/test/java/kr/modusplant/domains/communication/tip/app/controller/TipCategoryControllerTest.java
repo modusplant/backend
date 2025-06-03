@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static kr.modusplant.global.vo.CamelCaseWord.DATA;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,6 +62,29 @@ class TipCategoryControllerTest implements TipCategoryRequestTestUtils, TipCateg
         ).isEqualTo(testTipCategoryResponseList);
     }
 
+    @DisplayName("UUID로 팁 항목 얻기")
+    @Test
+    void getTipCategoryByUuidTest() throws Exception {
+        // given
+        ObjectMapper objectMapper = new ObjectMapper();
+        UUID uuid = testTipCategoryWithUuid.getUuid();
+
+        when(tipCategoryApplicationService.getByUuid(uuid)).thenReturn(Optional.of(testTipCategoryResponse));
+
+        // when
+        Map<String, Object> responseMap = objectMapper.readValue(
+                mockMvc.perform(get("/api/crud/tip/categories/{uuid}", uuid))
+                        .andExpect(status().isOk())
+                        .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
+                });
+
+        // then
+        assertThat(objectMapper.convertValue(responseMap.get(DATA),
+                new TypeReference<TipCategoryResponse>() {
+                })
+        ).isEqualTo(testTipCategoryResponse);
+    }
+
     @DisplayName("순서로 팁 항목 얻기")
     @Test
     void getTipCategoryByOrderTest() throws Exception {
@@ -72,7 +96,7 @@ class TipCategoryControllerTest implements TipCategoryRequestTestUtils, TipCateg
 
         // when
         Map<String, Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/tip/categories/{order}", order))
+                mockMvc.perform(get("/api/crud/tip/categories/order/{order}", order))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -120,7 +144,7 @@ class TipCategoryControllerTest implements TipCategoryRequestTestUtils, TipCateg
 
         // order - when
         Map<String, Object> uuidResponseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/tip/categories/{order}", order))
+                mockMvc.perform(get("/api/crud/tip/categories/order/{order}", order))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -172,12 +196,12 @@ class TipCategoryControllerTest implements TipCategoryRequestTestUtils, TipCateg
     @Test
     void removeTipCategoryByOrderTest() throws Exception {
         // given
-        Integer order = testTipCategory.getOrder();
+        UUID order = testTipCategoryWithUuid.getUuid();
 
-        doNothing().when(tipCategoryApplicationService).removeByOrder(order);
+        doNothing().when(tipCategoryApplicationService).removeByUuid(order);
 
         // when & then
-        mockMvc.perform(delete("/api/crud/tip/categories/{order}", order))
+        mockMvc.perform(delete("/api/crud/tip/categories/{uuid}", order))
                 .andExpect(status().isOk());
     }
 }
