@@ -1,7 +1,7 @@
-package kr.modusplant.domains.tip.common.util.app.http.response;
+package kr.modusplant.domains.communication.tip.common.util.app.http.response;
 
 import kr.modusplant.domains.communication.tip.app.http.response.TipCommentResponse;
-import kr.modusplant.domains.tip.common.util.entity.TipCommentEntityTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.entity.TipCommentEntityTestUtils;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipCommentEntity;
 
 import java.util.UUID;

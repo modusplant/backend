@@ -1,10 +1,9 @@
-package kr.modusplant.domains.tip.persistence.entity;
+package kr.modusplant.domains.communication.tip.persistence.entity;
 
-import kr.modusplant.domains.communication.tip.persistence.entity.TipCommentEntity;
-import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
+import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.entity.TipCommentEntityTestUtils;
+import kr.modusplant.domains.communication.tip.persistence.repository.TipCategoryRepository;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.tip.common.util.entity.TipCommentEntityTestUtils;
 import kr.modusplant.domains.tip.common.util.entity.TipPostEntityTestUtils;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
@@ -15,12 +14,15 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
-public class TipCommentEntityTest implements TipCommentEntityTestUtils, TipPostEntityTestUtils {
+public class TipCommentEntityTest implements TipCommentEntityTestUtils,
+        TipCategoryEntityTestUtils, TipPostEntityTestUtils {
 
+    private final TipCategoryRepository categoryRepository;
     private final TestEntityManager entityManager;
 
     @Autowired
-    TipCommentEntityTest(TestEntityManager entityManager) {
+    TipCommentEntityTest(TipCategoryRepository categoryRepository, TestEntityManager entityManager) {
+        this.categoryRepository = categoryRepository;
         this.entityManager = entityManager;}
 
     @DisplayName("소통 팁 댓글 PrePersist")
@@ -28,13 +30,13 @@ public class TipCommentEntityTest implements TipCommentEntityTestUtils, TipPostE
     void prePersist() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        PlantGroupEntity plantGroup = createPlantGroupEntity();
+        TipCategoryEntity category = categoryRepository.save(testTipCategoryEntity);
         TipPostEntity postEntity = createTipPostEntityBuilder()
-                .group(plantGroup)
+                .group(category)
                 .authMember(member)
                 .createMember(member)
-                .recommendationNumber(1)
-                .viewCount(1)
+                .likeCount(1)
+                .viewCount(1L)
                 .isDeleted(true)
                 .build();
 

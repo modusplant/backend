@@ -1,6 +1,6 @@
-package kr.modusplant.domains.tip.common.util.entity.compositekey;
+package kr.modusplant.domains.communication.tip.common.util.entity.compositekey;
 
-import kr.modusplant.domains.tip.common.util.entity.TipCommentEntityTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.entity.TipCommentEntityTestUtils;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipCommentEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.compositekey.TipCommentCompositeKey;
 

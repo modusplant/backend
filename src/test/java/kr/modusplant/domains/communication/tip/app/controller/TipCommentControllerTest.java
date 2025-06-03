@@ -1,18 +1,18 @@
-package kr.modusplant.domains.tip.app.controller;
+package kr.modusplant.domains.communication.tip.app.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.common.context.DomainsControllerOnlyContext;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
-import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.communication.tip.app.http.request.TipCommentInsertRequest;
 import kr.modusplant.domains.communication.tip.app.http.response.TipCommentResponse;
 import kr.modusplant.domains.communication.tip.app.service.TipCommentApplicationService;
-import kr.modusplant.domains.tip.common.util.app.http.request.TipCommentInsertRequestTestUtils;
-import kr.modusplant.domains.tip.common.util.app.http.response.TipCommentResponseTestUtils;
-import kr.modusplant.domains.tip.common.util.domain.TipCommentTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipCommentInsertRequestTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.app.http.response.TipCommentResponseTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.domain.TipCommentTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
+import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.tip.common.util.domain.TipPostTestUtils;
 import kr.modusplant.domains.tip.common.util.entity.TipPostEntityTestUtils;
-import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DomainsControllerOnlyContext
 public class TipCommentControllerTest implements
         TipCommentResponseTestUtils, TipCommentInsertRequestTestUtils, TipCommentTestUtils,
-        TipPostEntityTestUtils, TipPostTestUtils {
+        TipCategoryEntityTestUtils, TipPostEntityTestUtils, TipPostTestUtils {
 
     private final MockMvc mockMvc;
 
@@ -54,14 +54,13 @@ public class TipCommentControllerTest implements
     @BeforeEach
     void setUp() {
         memberEntity = createMemberBasicUserEntityWithUuid();
-        PlantGroupEntity plantGroup = createPlantGroupEntity();
         postEntity = createTipPostEntityBuilder()
-                .ulid((String) generator.generate(null, null))
-                .group(plantGroup)
+                .ulid(tipPostWithUlid.getUlid())
+                .group(testTipCategoryEntity)
                 .authMember(memberEntity)
                 .createMember(memberEntity)
-                .recommendationNumber(1)
-                .viewCount(1)
+                .likeCount(1)
+                .viewCount(1L)
                 .isDeleted(true)
                 .build();
     }

@@ -1,19 +1,20 @@
-package kr.modusplant.domains.tip.mapper;
+package kr.modusplant.domains.communication.tip.mapper;
 
-import kr.modusplant.domains.communication.tip.mapper.TipCommentAppInfraMapper;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
+import kr.modusplant.domains.communication.tip.app.http.request.TipCommentInsertRequest;
+import kr.modusplant.domains.communication.tip.app.http.response.TipCommentResponse;
+import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipCommentInsertRequestTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.app.http.response.TipCommentResponseTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.entity.TipCommentEntityTestUtils;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipCommentEntity;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
+import kr.modusplant.domains.communication.tip.persistence.repository.TipCategoryRepository;
+import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.domains.communication.tip.app.http.request.TipCommentInsertRequest;
-import kr.modusplant.domains.communication.tip.app.http.response.TipCommentResponse;
-import kr.modusplant.domains.tip.common.util.app.http.request.TipCommentInsertRequestTestUtils;
-import kr.modusplant.domains.tip.common.util.app.http.response.TipCommentResponseTestUtils;
-import kr.modusplant.domains.tip.common.util.entity.TipCommentEntityTestUtils;
 import kr.modusplant.domains.tip.common.util.entity.TipPostEntityTestUtils;
-import kr.modusplant.domains.communication.tip.persistence.entity.TipCommentEntity;
-import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
-import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,14 +26,17 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @RepositoryOnlyContext
 public class TipCommentAppInfraMapperTest implements
         TipCommentInsertRequestTestUtils, TipCommentResponseTestUtils, TipCommentEntityTestUtils,
-        TipPostEntityTestUtils, SiteMemberEntityTestUtils {
+        TipCategoryEntityTestUtils, TipPostEntityTestUtils, SiteMemberEntityTestUtils {
 
     private final TipCommentAppInfraMapper commentAppInfraMapper = new TipCommentAppInfraMapperImpl();
+    private final TipCategoryRepository categoryRepository;
     private final TipPostRepository postRepository;
     private final SiteMemberRepository memberRepository;
 
     @Autowired
-    public TipCommentAppInfraMapperTest(TipPostRepository postRepository, SiteMemberRepository memberRepository) {
+    public TipCommentAppInfraMapperTest(TipCategoryRepository categoryRepository,
+                                        TipPostRepository postRepository,SiteMemberRepository memberRepository) {
+        this.categoryRepository = categoryRepository;
         this.postRepository = postRepository;
         this.memberRepository = memberRepository;
     }
@@ -43,13 +47,13 @@ public class TipCommentAppInfraMapperTest implements
     @BeforeEach
     void setUp() {
         SiteMemberEntity member = createMemberBasicUserEntity();
-        PlantGroupEntity plantGroup = createPlantGroupEntity();
+        TipCategoryEntity category = categoryRepository.save(testTipCategoryEntity);
         TipPostEntity postEntity = createTipPostEntityBuilder()
-                .group(plantGroup)
+                .group(category)
                 .authMember(member)
                 .createMember(member)
-                .recommendationNumber(1)
-                .viewCount(1)
+                .likeCount(1)
+                .viewCount(1L)
                 .isDeleted(true)
                 .build();
 

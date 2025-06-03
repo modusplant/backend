@@ -1,4 +1,4 @@
-package kr.modusplant.domains.tip.common.util.domain;
+package kr.modusplant.domains.communication.tip.common.util.domain;
 
 import kr.modusplant.domains.communication.tip.domain.model.TipComment;
 

@@ -1,21 +1,22 @@
-package kr.modusplant.domains.tip.app.service;
+package kr.modusplant.domains.communication.tip.app.service;
 
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
-import kr.modusplant.domains.communication.tip.app.service.TipCommentApplicationService;
-import kr.modusplant.domains.group.persistence.entity.PlantGroupEntity;
+import kr.modusplant.domains.communication.tip.app.http.request.TipCommentInsertRequest;
+import kr.modusplant.domains.communication.tip.app.http.response.TipCommentResponse;
+import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipCommentInsertRequestTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.app.http.response.TipCommentResponseTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
+import kr.modusplant.domains.communication.tip.common.util.entity.TipCommentEntityTestUtils;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipCommentEntity;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
+import kr.modusplant.domains.communication.tip.persistence.repository.TipCategoryRepository;
+import kr.modusplant.domains.communication.tip.persistence.repository.TipCommentRepository;
+import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.domains.communication.tip.app.http.request.TipCommentInsertRequest;
-import kr.modusplant.domains.communication.tip.app.http.response.TipCommentResponse;
-import kr.modusplant.domains.tip.common.util.app.http.request.TipCommentInsertRequestTestUtils;
-import kr.modusplant.domains.tip.common.util.app.http.response.TipCommentResponseTestUtils;
-import kr.modusplant.domains.tip.common.util.entity.TipCommentEntityTestUtils;
 import kr.modusplant.domains.tip.common.util.entity.TipPostEntityTestUtils;
-import kr.modusplant.domains.communication.tip.persistence.entity.TipCommentEntity;
-import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
-import kr.modusplant.domains.communication.tip.persistence.repository.TipCommentRepository;
-import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,10 +34,11 @@ import static org.mockito.Mockito.verify;
 @Transactional
 public class TipCommentApplicationServiceTest implements
         TipCommentEntityTestUtils, TipCommentInsertRequestTestUtils, TipCommentResponseTestUtils,
-        TipPostEntityTestUtils, SiteMemberEntityTestUtils {
+        TipCategoryEntityTestUtils, TipPostEntityTestUtils, SiteMemberEntityTestUtils {
 
     private final TipCommentApplicationService commentApplicationService;
     private final TipCommentRepository commentRepository;
+    private final TipCategoryRepository categoryRepository;
     private final TipPostRepository postRepository;
     private final SiteMemberRepository memberRepository;
 
@@ -44,9 +46,10 @@ public class TipCommentApplicationServiceTest implements
     public TipCommentApplicationServiceTest(
             TipCommentApplicationService commentApplicationService,
             TipCommentRepository commentRepository, TipPostRepository postRepository,
-            SiteMemberRepository memberRepository) {
+            TipCategoryRepository categoryRepository, SiteMemberRepository memberRepository) {
         this.commentApplicationService = commentApplicationService;
         this.commentRepository = commentRepository;
+        this.categoryRepository = categoryRepository;
         this.postRepository = postRepository;
         this.memberRepository = memberRepository;
     }
@@ -58,14 +61,14 @@ public class TipCommentApplicationServiceTest implements
     @BeforeEach
     void setUp() {
         memberEntity = createMemberBasicUserEntityWithUuid();
-        PlantGroupEntity plantGroup = createPlantGroupEntity();
+        TipCategoryEntity category = categoryRepository.save(testTipCategoryEntity);
         postEntity = createTipPostEntityBuilder()
-                .ulid((String) generator.generate(null, null))
-                .group(plantGroup)
+                .ulid(tipPostWithUlid.getUlid())
+                .group(category)
                 .authMember(memberEntity)
                 .createMember(memberEntity)
-                .recommendationNumber(1)
-                .viewCount(1)
+                .likeCount(1)
+                .viewCount(1L)
                 .isDeleted(true)
                 .build();
     }
