@@ -51,7 +51,7 @@ public class ConvLikeApplicationServiceTest implements SiteMemberEntityTestUtils
         ConvPostEntity convPost = createConvPostEntityBuilder()
                 .authMember(member)
                 .createMember(member)
-                .group(testConvCategoryEntity)
+                .category(createTestConvCategoryEntity())
                 .build();
         convPostRepository.save(convPost);
         convPostId = convPost.getUlid();
