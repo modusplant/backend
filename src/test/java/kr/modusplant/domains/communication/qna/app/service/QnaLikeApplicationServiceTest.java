@@ -51,7 +51,7 @@ public class QnaLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
         QnaPostEntity qnaPost = createQnaPostEntityBuilder()
                 .authMember(member)
                 .createMember(member)
-                .group(testQnaCategoryEntity)
+                .category(createTestQnaCategoryEntity())
                 .build();
         qnaPostRepository.save(qnaPost);
         qnaPostId = qnaPost.getUlid();
