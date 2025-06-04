@@ -9,8 +9,8 @@ import java.util.Collection;
 
 @Component
 public class SiteMemberAuthToken extends AbstractAuthenticationToken {
-    private String credential;
     private Object principal;
+    private String credential;
 
     protected SiteMemberAuthToken() {
         super(null);
@@ -18,10 +18,10 @@ public class SiteMemberAuthToken extends AbstractAuthenticationToken {
     }
 
     // 인증 전
-    public SiteMemberAuthToken(String credential, String principal) {
+    public SiteMemberAuthToken(String principal, String credential) {
         super(null);
-        this.credential = credential;
         this.principal = principal;
+        this.credential = credential;
         setAuthenticated(false);
     }
 
