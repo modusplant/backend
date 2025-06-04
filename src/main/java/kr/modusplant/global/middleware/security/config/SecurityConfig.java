@@ -2,9 +2,12 @@ package kr.modusplant.global.middleware.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.global.advice.GlobalExceptionHandler;
-import kr.modusplant.global.middleware.security.JsonEmailAuthFilter;
+import kr.modusplant.global.middleware.security.NormalLoginFilter;
 import kr.modusplant.global.middleware.security.SiteMemberAuthProvider;
 import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
+import kr.modusplant.global.middleware.security.handler.NormalLoginFailureHandler;
+import kr.modusplant.global.middleware.security.handler.NormalLoginSuccessHandler;
+import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -34,6 +37,7 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authConfiguration;
     private final GlobalExceptionHandler globalExceptionHandler;
     private final SiteMemberUserDetailsService memberUserDetailsService;
+    private final TokenApplicationService tokenApplicationService;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -59,12 +63,26 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JsonEmailAuthFilter jsonEmailAuthFilter(HttpSecurity http) {
+    public NormalLoginSuccessHandler normalLoginSuccessHandler() {
+        return new NormalLoginSuccessHandler(tokenApplicationService);
+    }
+
+    @Bean
+    public NormalLoginFailureHandler normalLoginFailureHandler() {
+        return new NormalLoginFailureHandler();
+    }
+
+    @Bean
+    public NormalLoginFilter normalLoginFilter(HttpSecurity http) {
         try {
-            JsonEmailAuthFilter jsonEmailAuthFilter = new JsonEmailAuthFilter(
+            NormalLoginFilter normalLoginFilter = new NormalLoginFilter(
                     new ObjectMapper(), authenticationManager());
-            jsonEmailAuthFilter.setAuthenticationManager(authenticationManager());
-            return jsonEmailAuthFilter;
+
+            normalLoginFilter.setAuthenticationManager(authenticationManager());
+            normalLoginFilter.setAuthenticationSuccessHandler(normalLoginSuccessHandler());
+            normalLoginFilter.setAuthenticationFailureHandler(normalLoginFailureHandler());
+
+            return normalLoginFilter;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -74,7 +92,7 @@ public class SecurityConfig {
     public SecurityFilterChain defaultChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/api/**")
-                .addFilterBefore(jsonEmailAuthFilter(http), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(normalLoginFilter(http), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/terms").permitAll()
                         .requestMatchers("/api/members/**").permitAll()
