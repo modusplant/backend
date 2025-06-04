@@ -1,8 +1,8 @@
 package kr.modusplant.domains.communication.conversation.domain.service;
 
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCommentRepository;
-import kr.modusplant.global.error.EntityExistsWithPostUlidAndMatePathException;
-import kr.modusplant.global.error.EntityNotFoundWithPostUlidAndMatePathException;
+import kr.modusplant.domains.communication.common.error.EntityExistsWithPostUlidAndMatePathException;
+import kr.modusplant.domains.communication.common.error.EntityNotFoundWithPostUlidAndMatePathException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

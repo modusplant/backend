@@ -1,4 +1,4 @@
-package kr.modusplant.global.error;
+package kr.modusplant.domains.communication.common.error;
 
 import jakarta.persistence.EntityExistsException;
 

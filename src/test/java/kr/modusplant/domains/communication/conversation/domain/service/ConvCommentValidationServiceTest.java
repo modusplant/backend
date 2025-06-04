@@ -8,12 +8,11 @@ import kr.modusplant.domains.communication.conversation.common.util.entity.ConvP
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCommentEntity;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
-import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCategoryRepository;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCommentRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.global.error.EntityExistsWithPostUlidAndMatePathException;
-import kr.modusplant.global.error.EntityNotFoundWithPostUlidAndMatePathException;
+import kr.modusplant.domains.communication.common.error.EntityExistsWithPostUlidAndMatePathException;
+import kr.modusplant.domains.communication.common.error.EntityNotFoundWithPostUlidAndMatePathException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
