@@ -15,12 +15,12 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.io.IOException;
 
-public class JsonEmailAuthFilter extends AbstractAuthenticationProcessingFilter {
+public class NormalLoginFilter extends AbstractAuthenticationProcessingFilter {
 
     private final ObjectMapper objectMapper;
     private final AuthenticationManager authManager;
 
-    public JsonEmailAuthFilter(
+    public NormalLoginFilter(
             ObjectMapper objectMapper,
             AuthenticationManager authManager) {
         super(new AntPathRequestMatcher("/api/auth/login", "POST"));
@@ -31,7 +31,6 @@ public class JsonEmailAuthFilter extends AbstractAuthenticationProcessingFilter 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException {
         NormalLoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), NormalLoginRequest.class);
-        System.out.println("The arrived request in JsonEmailAuthFilter" + loginRequest);
 
         if (!loginRequest.checkFieldValidation()) {
             throw new IllegalArgumentException("one of email password deviceId missing");
@@ -46,8 +45,6 @@ public class JsonEmailAuthFilter extends AbstractAuthenticationProcessingFilter 
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authenticatedToken);
         SecurityContextHolder.setContext(context);
-
-        request.setAttribute("authentication", authenticatedToken);
 
         return authenticatedToken;
     }
