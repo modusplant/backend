@@ -1,8 +1,8 @@
-package kr.modusplant.modules.auth.normal.mapper;
+package kr.modusplant.modules.auth.normal.signup.mapper;
 
 import kr.modusplant.domains.member.app.http.request.SiteMemberInsertRequest;
 import kr.modusplant.domains.member.domain.model.SiteMember;
-import kr.modusplant.modules.auth.normal.app.http.request.NormalSignUpRequest;
+import kr.modusplant.modules.auth.normal.signup.app.http.request.NormalSignUpRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

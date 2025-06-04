@@ -1,12 +1,12 @@
-package kr.modusplant.modules.auth.normal.app.controller;
+package kr.modusplant.modules.auth.normal.signup.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import kr.modusplant.domains.term.app.http.response.TermResponse;
 import kr.modusplant.global.app.servlet.response.DataResponse;
-import kr.modusplant.modules.auth.normal.app.http.request.NormalSignUpRequest;
-import kr.modusplant.modules.auth.normal.app.service.NormalSignUpApplicationService;
+import kr.modusplant.modules.auth.normal.signup.app.http.request.NormalSignUpRequest;
+import kr.modusplant.modules.auth.normal.signup.app.service.NormalSignUpApplicationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package kr.modusplant.modules.auth.normal.app.service;
+package kr.modusplant.modules.auth.normal.signup.app.service;
 
 import kr.modusplant.domains.member.app.http.response.SiteMemberResponse;
 import kr.modusplant.domains.member.app.service.SiteMemberApplicationService;
@@ -6,10 +6,10 @@ import kr.modusplant.domains.member.app.service.SiteMemberAuthApplicationService
 import kr.modusplant.domains.member.app.service.SiteMemberTermApplicationService;
 import kr.modusplant.domains.term.app.http.response.TermResponse;
 import kr.modusplant.domains.term.app.service.TermApplicationService;
-import kr.modusplant.modules.auth.normal.app.http.request.NormalSignUpRequest;
-import kr.modusplant.modules.auth.normal.mapper.NormalSignUpMemberAppDomainMapper;
-import kr.modusplant.modules.auth.normal.mapper.NormalSignupAuthAppDomainMapper;
-import kr.modusplant.modules.auth.normal.mapper.NormalSignupTermAppDomainMapper;
+import kr.modusplant.modules.auth.normal.signup.app.http.request.NormalSignUpRequest;
+import kr.modusplant.modules.auth.normal.signup.mapper.NormalSignUpMemberAppDomainMapper;
+import kr.modusplant.modules.auth.normal.signup.mapper.NormalSignupAuthAppDomainMapper;
+import kr.modusplant.modules.auth.normal.signup.mapper.NormalSignupTermAppDomainMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

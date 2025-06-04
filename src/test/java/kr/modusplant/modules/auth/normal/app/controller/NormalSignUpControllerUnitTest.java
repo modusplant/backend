@@ -11,7 +11,7 @@ import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.domains.term.app.service.TermApplicationService;
 import kr.modusplant.domains.term.common.util.app.http.response.TermResponseTestUtils;
-import kr.modusplant.modules.auth.normal.app.http.request.NormalSignUpRequest;
+import kr.modusplant.modules.auth.normal.signup.app.http.request.NormalSignUpRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
