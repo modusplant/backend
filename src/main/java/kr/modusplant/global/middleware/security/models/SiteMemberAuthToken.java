@@ -9,8 +9,8 @@ import java.util.Collection;
 
 @Component
 public class SiteMemberAuthToken extends AbstractAuthenticationToken {
-    private String email;
-    private String password;
+    private String credential;
+    private Object principal;
 
     protected SiteMemberAuthToken() {
         super(null);
@@ -18,28 +18,28 @@ public class SiteMemberAuthToken extends AbstractAuthenticationToken {
     }
 
     // 인증 전
-    public SiteMemberAuthToken(String email, String password) {
+    public SiteMemberAuthToken(String credential, String principal) {
         super(null);
-        this.email = email;
-        this.password = password;
+        this.credential = credential;
+        this.principal = principal;
         setAuthenticated(false);
     }
 
     // 인증 후
     public SiteMemberAuthToken(UserDetails principal, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
-        this.email = principal.getUsername();
-        this.password = principal.getPassword();
+        this.credential = null;
+        this.principal = principal;
         setAuthenticated(true);
     }
 
     @Override
     public Object getCredentials() {
-        return email;
+        return credential;
     }
 
     @Override
     public Object getPrincipal() {
-        return password;
+        return principal;
     }
 }
