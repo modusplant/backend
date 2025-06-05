@@ -1,11 +1,11 @@
-package kr.modusplant.modules.auth.email.service;
+package kr.modusplant.modules.auth.email.app.service;
 
 import kr.modusplant.domains.member.app.http.response.SiteMemberAuthResponse;
 import kr.modusplant.domains.member.app.service.SiteMemberAuthApplicationService;
 import kr.modusplant.global.middleware.redis.RedisHelper;
 import kr.modusplant.global.middleware.redis.RedisKeys;
-import kr.modusplant.modules.auth.email.model.request.EmailRequest;
-import kr.modusplant.modules.auth.email.model.request.VerifyEmailRequest;
+import kr.modusplant.modules.auth.email.app.http.request.EmailRequest;
+import kr.modusplant.modules.auth.email.app.http.request.VerifyEmailRequest;
 import kr.modusplant.modules.jwt.app.service.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
