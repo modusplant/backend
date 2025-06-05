@@ -4,5 +4,5 @@ public class EntityNotFoundWithPostUlidAndMatePathException extends RuntimeExcep
     public EntityNotFoundWithPostUlidAndMatePathException(String message) {
         super(message);
     }
-    public EntityNotFoundWithPostUlidAndMatePathException() { super("Entity not found with postUlid and matePath"); }
+    public EntityNotFoundWithPostUlidAndMatePathException() { super("Entity not found with postUlid and path"); }
 }

@@ -33,7 +33,7 @@ public class TipCommentEntity {
     private TipPostEntity postEntity;
 
     @Id
-    @Column(name = "mate_path", nullable = false, updatable = false)
+    @Column(name = "path", nullable = false, updatable = false)
     private String path;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)

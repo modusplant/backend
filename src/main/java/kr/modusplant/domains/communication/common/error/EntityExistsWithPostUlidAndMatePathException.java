@@ -7,5 +7,5 @@ public class EntityExistsWithPostUlidAndMatePathException extends EntityExistsEx
         super(message);
     }
 
-    public EntityExistsWithPostUlidAndMatePathException() {super("Entity exists with postUlid and matePath"); }
+    public EntityExistsWithPostUlidAndMatePathException() {super("Entity exists with postUlid and path"); }
 }
