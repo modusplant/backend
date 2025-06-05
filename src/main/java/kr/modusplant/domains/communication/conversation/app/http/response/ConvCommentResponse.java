@@ -5,7 +5,8 @@ import java.util.UUID;
 public record ConvCommentResponse(
         String postUlid,
         String path,
-        UUID authMemberUuid,
-        UUID createMemberUuid,
+        UUID memberUuid,
+        String nickname,
         String content
-        ) {}
+) {
+}

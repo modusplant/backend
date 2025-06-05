@@ -3,7 +3,6 @@ package kr.modusplant.domains.communication.conversation.persistence.entity;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCommentEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvPostEntityTestUtils;
-import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCategoryRepository;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;

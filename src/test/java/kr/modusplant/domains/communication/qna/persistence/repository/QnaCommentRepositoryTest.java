@@ -1,6 +1,5 @@
 package kr.modusplant.domains.communication.qna.persistence.repository;
 
-import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaCommentEntityTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaPostEntityTestUtils;
@@ -72,7 +71,7 @@ public class QnaCommentRepositoryTest implements
         // when
         QnaCommentEntity savedCommentEntity = commentRepository.save(commentEntity);
         QnaCommentEntity result = commentRepository.findByPostUlidAndPath(
-                savedCommentEntity.getPostUlid(), savedCommentEntity.getPath()).get();
+                savedCommentEntity.getPostUlid(), savedCommentEntity.getPath()).orElseThrow();
 
         // then
         assertThat(savedCommentEntity).isEqualTo(result);

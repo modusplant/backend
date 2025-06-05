@@ -2,6 +2,8 @@ package kr.modusplant.domains.communication.tip.domain.service;
 
 import jakarta.persistence.EntityManager;
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.communication.common.error.EntityExistsWithPostUlidAndMatePathException;
+import kr.modusplant.domains.communication.common.error.EntityNotFoundWithPostUlidAndMatePathException;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCommentEntityTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
@@ -11,8 +13,6 @@ import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipCommentRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.communication.common.error.EntityExistsWithPostUlidAndMatePathException;
-import kr.modusplant.domains.communication.common.error.EntityNotFoundWithPostUlidAndMatePathException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

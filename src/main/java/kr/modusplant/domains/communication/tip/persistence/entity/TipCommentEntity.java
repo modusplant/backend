@@ -1,8 +1,8 @@
 package kr.modusplant.domains.communication.tip.persistence.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.compositekey.TipCommentCompositeKey;
+import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.global.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;

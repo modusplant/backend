@@ -1,5 +1,6 @@
 package kr.modusplant.domains.communication.conversation.mapper;
 
+import kr.modusplant.domains.communication.common.mapper.supers.PostAppInfraMapper;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvCommentInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.response.ConvCommentResponse;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCommentEntity;
@@ -15,11 +16,11 @@ import org.mapstruct.Named;
 import java.util.UUID;
 
 @Mapper
-public interface ConvCommentAppInfraMapper {
+public interface ConvCommentAppInfraMapper extends PostAppInfraMapper {
 
-    @Mapping(source = "postEntity", target = "postUlid", qualifiedByName = "getPostUlid")
-    @Mapping(source = "authMember", target = "authMemberUuid", qualifiedByName = "getMemberUuid")
-    @Mapping(source = "createMember", target = "createMemberUuid", qualifiedByName = "getMemberUuid")
+    @Mapping(source = "postEntity", target = "postUlid", qualifiedByName = "toPostUlid")
+    @Mapping(source = "authMember", target = "memberUuid", qualifiedByName = "toMemberUuid")
+    @Mapping(source = "authMember", target = "nickname", qualifiedByName = "toNickname")
     ConvCommentResponse toConvCommentResponse(ConvCommentEntity convCommentEntity);
 
     @Mapping(target = "ConvCommentEntity", ignore = true)
@@ -30,14 +31,9 @@ public interface ConvCommentAppInfraMapper {
     ConvCommentEntity toConvCommentEntity(ConvCommentInsertRequest insertRequest,
                                           @Context ConvPostRepository convPostRepository, @Context SiteMemberRepository memberRepository);
 
-    @Named("getPostUlid")
-    default String getPostUlid(ConvPostEntity postEntity) {
+    @Named("toPostUlid")
+    default String toPostUlid(ConvPostEntity postEntity) {
         return postEntity.getUlid();
-    }
-
-    @Named("getMemberUuid")
-    default UUID getMemberUuid(SiteMemberEntity member) {
-        return member.getUuid();
     }
 
     @Named("toMemberEntity")

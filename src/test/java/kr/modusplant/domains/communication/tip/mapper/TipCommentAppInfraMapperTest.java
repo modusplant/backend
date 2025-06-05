@@ -1,6 +1,5 @@
 package kr.modusplant.domains.communication.tip.mapper;
 
-import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
 import kr.modusplant.domains.communication.tip.app.http.request.TipCommentInsertRequest;
 import kr.modusplant.domains.communication.tip.app.http.response.TipCommentResponse;
 import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipCommentInsertRequestTestUtils;
@@ -75,7 +74,7 @@ public class TipCommentAppInfraMapperTest implements
 
         // when
         TipCommentResponse commentResponse = createTipCommentResponse(
-                savedPostEntity.getUlid(), savedMemberEntity.getUuid(), savedMemberEntity.getUuid());
+                savedPostEntity.getUlid(), savedMemberEntity.getUuid(), savedMemberEntity.getNickname());
 
         // then
         assertThat(commentAppInfraMapper.toTipCommentResponse(commentEntity))

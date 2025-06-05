@@ -1,8 +1,8 @@
 package kr.modusplant.domains.communication.tip.domain.service;
 
-import kr.modusplant.domains.communication.tip.persistence.repository.TipCommentRepository;
 import kr.modusplant.domains.communication.common.error.EntityExistsWithPostUlidAndMatePathException;
 import kr.modusplant.domains.communication.common.error.EntityNotFoundWithPostUlidAndMatePathException;
+import kr.modusplant.domains.communication.tip.persistence.repository.TipCommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

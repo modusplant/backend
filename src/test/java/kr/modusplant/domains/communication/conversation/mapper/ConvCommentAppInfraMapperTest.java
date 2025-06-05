@@ -74,7 +74,7 @@ public class ConvCommentAppInfraMapperTest implements
 
         // when
         ConvCommentResponse commentResponse = createConvCommentResponse(
-                savedPostEntity.getUlid(), savedMemberEntity.getUuid(), savedMemberEntity.getUuid());
+                savedPostEntity.getUlid(), savedMemberEntity.getUuid(), savedMemberEntity.getNickname());
 
         // then
         assertThat(commentAppInfraMapper.toConvCommentResponse(commentEntity))

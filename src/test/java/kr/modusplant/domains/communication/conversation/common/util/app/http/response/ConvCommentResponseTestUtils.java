@@ -7,10 +7,10 @@ import kr.modusplant.domains.communication.conversation.persistence.entity.ConvC
 import java.util.UUID;
 
 public interface ConvCommentResponseTestUtils extends ConvCommentEntityTestUtils {
-    default ConvCommentResponse createConvCommentResponse(String ulid, UUID authMemberUuid, UUID createMemberUuid) {
+    default ConvCommentResponse createConvCommentResponse(String ulid, UUID memberUuid, String nickname) {
         ConvCommentEntity commentEntity = createConvCommentEntityBuilder().build();
 
         return new ConvCommentResponse(ulid, commentEntity.getPath(),
-                authMemberUuid, createMemberUuid, commentEntity.getContent());
+                memberUuid, nickname, commentEntity.getContent());
     }
 }

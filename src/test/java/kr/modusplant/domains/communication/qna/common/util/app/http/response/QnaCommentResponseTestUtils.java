@@ -7,10 +7,10 @@ import kr.modusplant.domains.communication.qna.persistence.entity.QnaCommentEnti
 import java.util.UUID;
 
 public interface QnaCommentResponseTestUtils extends QnaCommentEntityTestUtils {
-    default QnaCommentResponse createQnaCommentResponse(String ulid, UUID authMemberUuid, UUID createMemberUuid) {
+    default QnaCommentResponse createQnaCommentResponse(String ulid, UUID memberUuid, String nickname) {
         QnaCommentEntity commentEntity = createQnaCommentEntityBuilder().build();
 
         return new QnaCommentResponse(ulid, commentEntity.getPath(),
-                authMemberUuid, createMemberUuid, commentEntity.getContent());
+                memberUuid, nickname, commentEntity.getContent());
     }
 }

@@ -2,8 +2,8 @@ package kr.modusplant.domains.communication.tip.app.service;
 
 import kr.modusplant.domains.communication.common.app.http.response.LikeResponse;
 import kr.modusplant.domains.communication.tip.domain.service.TipLikeValidationService;
-import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipLikeEntity;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipLikeRepository;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
 import lombok.RequiredArgsConstructor;

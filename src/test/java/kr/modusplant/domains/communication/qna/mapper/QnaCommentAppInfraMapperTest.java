@@ -74,7 +74,7 @@ public class QnaCommentAppInfraMapperTest implements
 
         // when
         QnaCommentResponse commentResponse = createQnaCommentResponse(
-                savedPostEntity.getUlid(), savedMemberEntity.getUuid(), savedMemberEntity.getUuid());
+                savedPostEntity.getUlid(), savedMemberEntity.getUuid(), savedMemberEntity.getNickname());
 
         // then
         assertThat(commentAppInfraMapper.toQnaCommentResponse(commentEntity))

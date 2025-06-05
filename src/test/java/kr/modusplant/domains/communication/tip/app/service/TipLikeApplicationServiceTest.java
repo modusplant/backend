@@ -2,9 +2,9 @@ package kr.modusplant.domains.communication.tip.app.service;
 
 import kr.modusplant.domains.communication.common.app.http.response.LikeResponse;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
-import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipLikeEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipLikeId;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipLikeRepository;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;

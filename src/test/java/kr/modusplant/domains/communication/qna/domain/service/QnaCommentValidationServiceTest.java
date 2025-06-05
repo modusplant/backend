@@ -2,6 +2,8 @@ package kr.modusplant.domains.communication.qna.domain.service;
 
 import jakarta.persistence.EntityManager;
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.communication.common.error.EntityExistsWithPostUlidAndMatePathException;
+import kr.modusplant.domains.communication.common.error.EntityNotFoundWithPostUlidAndMatePathException;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaCommentEntityTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaPostEntityTestUtils;
@@ -11,8 +13,6 @@ import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaCommentRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.communication.common.error.EntityExistsWithPostUlidAndMatePathException;
-import kr.modusplant.domains.communication.common.error.EntityNotFoundWithPostUlidAndMatePathException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
