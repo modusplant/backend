@@ -19,7 +19,7 @@ import java.util.UUID;
 @Tag(name = "Term API", description = "약관 API")
 @RestController
 @Primary
-@RequestMapping("/api/crud/terms")
+@RequestMapping("/api/v1/terms")
 @RequiredArgsConstructor
 public class TermController {
     private final TermApplicationService termApplicationService;

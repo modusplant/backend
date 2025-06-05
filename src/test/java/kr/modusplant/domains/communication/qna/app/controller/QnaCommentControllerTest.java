@@ -76,7 +76,7 @@ public class QnaCommentControllerTest implements
         given(commentApplicationService.getByPostEntity(postEntity)).willReturn(List.of(commentResponse));
 
         // then
-        mockMvc.perform(get("/api/crud/qna/comment/post/{ulid}", postEntity.getUlid()))
+        mockMvc.perform(get("/api/v1/qna/comments/post/{ulid}", postEntity.getUlid()))
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
@@ -97,7 +97,7 @@ public class QnaCommentControllerTest implements
         given(commentApplicationService.getByAuthMember(memberEntity)).willReturn(List.of(commentResponse));
 
         // then
-        mockMvc.perform(get("/api/crud/qna/comment/member/auth/{uuid}", memberEntity.getUuid()))
+        mockMvc.perform(get("/api/v1/qna/comments/member/auth/{uuid}", memberEntity.getUuid()))
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
@@ -118,7 +118,7 @@ public class QnaCommentControllerTest implements
         given(commentApplicationService.getByCreateMember(memberEntity)).willReturn(List.of(commentResponse));
 
         // then
-        mockMvc.perform(get("/api/crud/qna/comment/member/create/{uuid}", memberEntity.getUuid()))
+        mockMvc.perform(get("/api/v1/qna/comments/member/create/{uuid}", memberEntity.getUuid()))
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
@@ -140,7 +140,7 @@ public class QnaCommentControllerTest implements
                 .willReturn(List.of(commentResponse));
 
         // then
-        mockMvc.perform(get("/api/crud/qna/comment/content/{content}", commentResponse.content()))
+        mockMvc.perform(get("/api/v1/qna/comments/content/{content}", commentResponse.content()))
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
@@ -163,7 +163,7 @@ public class QnaCommentControllerTest implements
                 .willReturn(Optional.of(commentResponse));
 
         // then
-        mockMvc.perform(get("/api/crud/qna/comment/post/{ulid}/path/{path}", postEntity.getUlid(), encodedPath))
+        mockMvc.perform(get("/api/v1/qna/comments/post/{ulid}/path/{path}", postEntity.getUlid(), encodedPath))
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
@@ -186,7 +186,7 @@ public class QnaCommentControllerTest implements
         given(commentApplicationService.insert(insertRequest)).willReturn(commentResponse);
 
         // then
-        mockMvc.perform(post("/api/crud/qna/comment", insertRequest)
+        mockMvc.perform(post("/api/v1/qna/comments", insertRequest)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(insertRequest)).characterEncoding("UTF-8"))
 
@@ -207,7 +207,7 @@ public class QnaCommentControllerTest implements
         doNothing().when(commentApplicationService).removeByPostUlidAndPath(postEntity.getUlid(), qnaCommentWithPostUlidAndPath.getPath());
 
         // then
-        mockMvc.perform(delete("/api/crud/qna/comment/{ulid}/{path}", postEntity.getUlid(), encodedPath))
+        mockMvc.perform(delete("/api/v1/qna/comments/post/{ulid}/path/{path}", postEntity.getUlid(), encodedPath))
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))

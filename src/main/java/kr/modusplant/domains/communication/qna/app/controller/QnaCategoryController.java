@@ -18,7 +18,7 @@ import java.util.UUID;
 @Tag(name = "QnaCategory API", description = "Q&A 항목 API")
 @RestController
 @Primary
-@RequestMapping("/api/crud/qna/categories")
+@RequestMapping("/api/v1/qna/categories")
 @RequiredArgsConstructor
 public class QnaCategoryController {
     private final QnaCategoryApplicationService qnaCategoryApplicationService;

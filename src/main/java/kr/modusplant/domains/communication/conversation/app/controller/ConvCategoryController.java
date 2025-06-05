@@ -18,7 +18,7 @@ import java.util.UUID;
 @Tag(name = "ConvCategory API", description = "대화 항목 API")
 @RestController
 @Primary
-@RequestMapping("/api/crud/conversation/categories")
+@RequestMapping("/api/v1/conversation/categories")
 @RequiredArgsConstructor
 public class ConvCategoryController {
     private final ConvCategoryApplicationService convCategoryApplicationService;

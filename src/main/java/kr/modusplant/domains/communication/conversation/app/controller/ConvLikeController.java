@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Tag(name = "Conv Like API")
 @RestController
-@RequestMapping("/api/v1/conv/posts")
+@RequestMapping("/api/v1/conversation/posts")
 @RequiredArgsConstructor
 public class ConvLikeController {
 

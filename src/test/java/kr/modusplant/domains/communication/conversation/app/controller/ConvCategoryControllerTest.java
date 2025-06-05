@@ -50,7 +50,7 @@ class ConvCategoryControllerTest implements ConvCategoryRequestTestUtils, ConvCa
 
         // when
         Map<String, Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/conversation/categories"))
+                mockMvc.perform(get("/api/v1/conversation/categories"))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -73,7 +73,7 @@ class ConvCategoryControllerTest implements ConvCategoryRequestTestUtils, ConvCa
 
         // when
         Map<String, Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/conversation/categories/{uuid}", uuid))
+                mockMvc.perform(get("/api/v1/conversation/categories/{uuid}", uuid))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -96,7 +96,7 @@ class ConvCategoryControllerTest implements ConvCategoryRequestTestUtils, ConvCa
 
         // when
         Map<String, Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/conversation/categories/order/{order}", order))
+                mockMvc.perform(get("/api/v1/conversation/categories/order/{order}", order))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -119,7 +119,7 @@ class ConvCategoryControllerTest implements ConvCategoryRequestTestUtils, ConvCa
 
         // when
         Map<String, Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/conversation/categories/category/{category}", category))
+                mockMvc.perform(get("/api/v1/conversation/categories/category/{category}", category))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -144,7 +144,7 @@ class ConvCategoryControllerTest implements ConvCategoryRequestTestUtils, ConvCa
 
         // order - when
         Map<String, Object> uuidResponseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/conversation/categories/order/{order}", order))
+                mockMvc.perform(get("/api/v1/conversation/categories/order/{order}", order))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -157,7 +157,7 @@ class ConvCategoryControllerTest implements ConvCategoryRequestTestUtils, ConvCa
 
         // category - when
         Map<String, Object> nameResponseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/conversation/categories/category/{category}", category))
+                mockMvc.perform(get("/api/v1/conversation/categories/category/{category}", category))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -178,7 +178,7 @@ class ConvCategoryControllerTest implements ConvCategoryRequestTestUtils, ConvCa
 
         // when
         Map<String, Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(post("/api/crud/conversation/categories")
+                mockMvc.perform(post("/api/v1/conversation/categories")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(testConvCategoryInsertRequest)))
                         .andExpect(status().isOk())
@@ -201,7 +201,7 @@ class ConvCategoryControllerTest implements ConvCategoryRequestTestUtils, ConvCa
         doNothing().when(convCategoryApplicationService).removeByUuid(order);
 
         // when & then
-        mockMvc.perform(delete("/api/crud/conversation/categories/{uuid}", order))
+        mockMvc.perform(delete("/api/v1/conversation/categories/{uuid}", order))
                 .andExpect(status().isOk());
     }
 }

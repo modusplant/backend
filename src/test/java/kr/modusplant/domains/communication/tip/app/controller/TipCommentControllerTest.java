@@ -76,7 +76,7 @@ public class TipCommentControllerTest implements
         given(commentApplicationService.getByPostEntity(postEntity)).willReturn(List.of(commentResponse));
 
         // then
-        mockMvc.perform(get("/api/crud/tip/comment/post/{ulid}", postEntity.getUlid()))
+        mockMvc.perform(get("/api/v1/tip/comments/post/{ulid}", postEntity.getUlid()))
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
@@ -97,7 +97,7 @@ public class TipCommentControllerTest implements
         given(commentApplicationService.getByAuthMember(memberEntity)).willReturn(List.of(commentResponse));
 
         // then
-        mockMvc.perform(get("/api/crud/tip/comment/member/auth/{uuid}", memberEntity.getUuid()))
+        mockMvc.perform(get("/api/v1/tip/comments/member/auth/{uuid}", memberEntity.getUuid()))
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
@@ -118,7 +118,7 @@ public class TipCommentControllerTest implements
         given(commentApplicationService.getByCreateMember(memberEntity)).willReturn(List.of(commentResponse));
 
         // then
-        mockMvc.perform(get("/api/crud/tip/comment/member/create/{uuid}", memberEntity.getUuid()))
+        mockMvc.perform(get("/api/v1/tip/comments/member/create/{uuid}", memberEntity.getUuid()))
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
@@ -140,7 +140,7 @@ public class TipCommentControllerTest implements
                 .willReturn(List.of(commentResponse));
 
         // then
-        mockMvc.perform(get("/api/crud/tip/comment/content/{content}", commentResponse.content()))
+        mockMvc.perform(get("/api/v1/tip/comments/content/{content}", commentResponse.content()))
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
@@ -163,7 +163,7 @@ public class TipCommentControllerTest implements
                 .willReturn(Optional.of(commentResponse));
 
         // then
-        mockMvc.perform(get("/api/crud/tip/comment/post/{ulid}/path/{path}", postEntity.getUlid(), encodedPath))
+        mockMvc.perform(get("/api/v1/tip/comments/post/{ulid}/path/{path}", postEntity.getUlid(), encodedPath))
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
@@ -186,7 +186,7 @@ public class TipCommentControllerTest implements
         given(commentApplicationService.insert(insertRequest)).willReturn(commentResponse);
 
         // then
-        mockMvc.perform(post("/api/crud/tip/comment", insertRequest)
+        mockMvc.perform(post("/api/v1/tip/comments", insertRequest)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(insertRequest)).characterEncoding("UTF-8"))
 
@@ -207,7 +207,7 @@ public class TipCommentControllerTest implements
         doNothing().when(commentApplicationService).removeByPostUlidAndPath(postEntity.getUlid(), tipCommentWithPostUlidAndPath.getPath());
 
         // then
-        mockMvc.perform(delete("/api/crud/tip/comment/{ulid}/{path}", postEntity.getUlid(), encodedPath))
+        mockMvc.perform(delete("/api/v1/tip/comments/post/{ulid}/path/{path}", postEntity.getUlid(), encodedPath))
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))

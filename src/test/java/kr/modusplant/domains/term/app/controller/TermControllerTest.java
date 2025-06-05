@@ -50,7 +50,7 @@ class TermControllerTest implements TermRequestTestUtils, TermResponseTestUtils 
 
         // when
         Map<String, Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/terms"))
+                mockMvc.perform(get("/api/v1/terms"))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -74,7 +74,7 @@ class TermControllerTest implements TermRequestTestUtils, TermResponseTestUtils 
 
         // when
         Map<String, Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/terms/version/{version}", version))
+                mockMvc.perform(get("/api/v1/terms/version/{version}", version))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -97,7 +97,7 @@ class TermControllerTest implements TermRequestTestUtils, TermResponseTestUtils 
 
         // when
         Map<String, Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/terms/{uuid}", uuid))
+                mockMvc.perform(get("/api/v1/terms/{uuid}", uuid))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -120,7 +120,7 @@ class TermControllerTest implements TermRequestTestUtils, TermResponseTestUtils 
 
         // when
         Map<String, Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/terms/name/{name}", name))
+                mockMvc.perform(get("/api/v1/terms/name/{name}", name))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -145,7 +145,7 @@ class TermControllerTest implements TermRequestTestUtils, TermResponseTestUtils 
 
         // uuid - when
         Map<String, Object> uuidResponseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/terms/{uuid}", uuid))
+                mockMvc.perform(get("/api/v1/terms/{uuid}", uuid))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -158,7 +158,7 @@ class TermControllerTest implements TermRequestTestUtils, TermResponseTestUtils 
 
         // name - when
         Map<String, Object> nameResponseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/terms/name/{name}", name))
+                mockMvc.perform(get("/api/v1/terms/name/{name}", name))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -179,7 +179,7 @@ class TermControllerTest implements TermRequestTestUtils, TermResponseTestUtils 
 
         // when
         Map<String, Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(post("/api/crud/terms")
+                mockMvc.perform(post("/api/v1/terms")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(termsOfUseInsertRequest)))
                         .andExpect(status().isOk())
@@ -202,7 +202,7 @@ class TermControllerTest implements TermRequestTestUtils, TermResponseTestUtils 
 
         // when
         Map<String, Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(put("/api/crud/terms")
+                mockMvc.perform(put("/api/v1/terms")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(termsOfUseUpdateRequest)))
                         .andExpect(status().isOk())
@@ -225,7 +225,7 @@ class TermControllerTest implements TermRequestTestUtils, TermResponseTestUtils 
         doNothing().when(termApplicationService).removeByUuid(uuid);
 
         // when & then
-        mockMvc.perform(delete("/api/crud/terms/{uuid}", uuid))
+        mockMvc.perform(delete("/api/v1/terms/{uuid}", uuid))
                 .andExpect(status().isOk());
     }
 }

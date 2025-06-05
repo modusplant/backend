@@ -18,7 +18,7 @@ import java.util.UUID;
 @Tag(name = "TipCategory API", description = "팁 항목 API")
 @RestController
 @Primary
-@RequestMapping("/api/crud/tip/categories")
+@RequestMapping("/api/v1/tip/categories")
 @RequiredArgsConstructor
 public class TipCategoryController {
     private final TipCategoryApplicationService tipCategoryApplicationService;

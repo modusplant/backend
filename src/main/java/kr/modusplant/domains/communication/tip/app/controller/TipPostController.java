@@ -39,13 +39,13 @@ public class TipPostController {
     private UUID memberUuid;
 
     @Operation(summary = "전체 팁 게시글 목록 조회 API", description = "전체 팁 게시글의 목록과 페이지 정보를 조회합니다.")
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getAllTipPosts(Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.getAll(pageable))));
     }
 
     @Operation(summary = "사이트 회원별 팁 게시글 목록 조회 API", description = "사이트 회원별 팁 게시글의 목록과 페이지 정보를 조회합니다.")
-    @GetMapping("/members/{memb_uuid}")
+    @GetMapping("/member/{memb_uuid}")
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getTipPostsByMember(@PathVariable(SNAKE_MEMB_UUID) UUID memberUuid, Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.getByMemberUuid(memberUuid, pageable))));
     }
