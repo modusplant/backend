@@ -24,13 +24,13 @@ public class QnaLikeRepositoryTest implements QnaLikeEntityTestUtils {
     @Nested
     @DisplayName("setUp 사용 테스트 그룹")
     class SetupTest {
-        private String qnaPostId;
+        private String postId;
         private UUID memberId;
 
         @BeforeEach
         void setUp() {
             // given
-            qnaPostId = qnaPostWithUlid.getUlid();
+            postId = qnaPostWithUlid.getUlid();
             memberId = createMemberBasicUserEntityWithUuid().getUuid();
         }
 
@@ -38,12 +38,12 @@ public class QnaLikeRepositoryTest implements QnaLikeEntityTestUtils {
         @DisplayName("Q&A 게시글 좋아요 후 조회")
         void likeQnaPost_success() {
             // when
-            qnaLikeRepository.save(QnaLikeEntity.of(qnaPostId, memberId));
+            qnaLikeRepository.save(QnaLikeEntity.of(postId, memberId));
 
             // then
-            Optional<QnaLikeEntity> qnaLikeEntity = qnaLikeRepository.findById(new QnaLikeId(qnaPostId, memberId));
+            Optional<QnaLikeEntity> qnaLikeEntity = qnaLikeRepository.findById(new QnaLikeId(postId, memberId));
             assertThat(qnaLikeEntity).isPresent();
-            assertThat(qnaLikeEntity.get().getQnaPostId()).isEqualTo(qnaPostId);
+            assertThat(qnaLikeEntity.get().getPostId()).isEqualTo(postId);
             assertThat(qnaLikeEntity.get().getMemberId()).isEqualTo(memberId);
             assertThat(qnaLikeEntity.get().getCreatedAt()).isNotNull();
         }
@@ -52,10 +52,10 @@ public class QnaLikeRepositoryTest implements QnaLikeEntityTestUtils {
         @DisplayName("특정 사용자 Q&A 게시글 좋아요 여부 확인")
         void isLikedByMember_returnsTrue() {
             // given
-            qnaLikeRepository.save(QnaLikeEntity.of(qnaPostId, memberId));
+            qnaLikeRepository.save(QnaLikeEntity.of(postId, memberId));
 
             // when
-            boolean isLiked = qnaLikeRepository.existsByQnaPostIdAndMemberId(qnaPostId, memberId);
+            boolean isLiked = qnaLikeRepository.existsByPostIdAndMemberId(postId, memberId);
 
             // then
             assertThat(isLiked).isTrue();
@@ -65,13 +65,13 @@ public class QnaLikeRepositoryTest implements QnaLikeEntityTestUtils {
         @DisplayName("Q&A 게시글 좋아요 취소")
         void unlikeQnaPost_success() {
             // given
-            qnaLikeRepository.save(QnaLikeEntity.of(qnaPostId, memberId));
+            qnaLikeRepository.save(QnaLikeEntity.of(postId, memberId));
 
             // when
-            qnaLikeRepository.deleteByQnaPostIdAndMemberId(qnaPostId, memberId);
+            qnaLikeRepository.deleteByPostIdAndMemberId(postId, memberId);
 
             // then
-            assertThat(qnaLikeRepository.existsByQnaPostIdAndMemberId(qnaPostId, memberId)).isFalse();
+            assertThat(qnaLikeRepository.existsByPostIdAndMemberId(postId, memberId)).isFalse();
         }
     }
 
@@ -80,23 +80,23 @@ public class QnaLikeRepositoryTest implements QnaLikeEntityTestUtils {
     void findQnaLikesByMemberId() {
         // given
         UUID memberId = createMemberBasicUserEntityWithUuid().getUuid();
-        List<String> qnaPostIds = List.of(
+        List<String> postIds = List.of(
                 "TEST_QNA_POST_ID_001",
                 "TEST_QNA_POST_ID_002",
                 "TEST_QNA_POST_ID_003"
         );
 
         qnaLikeRepository.saveAll(List.of(
-                QnaLikeEntity.of(qnaPostIds.get(0), memberId),
-                QnaLikeEntity.of(qnaPostIds.get(1), memberId),
-                QnaLikeEntity.of(qnaPostIds.get(2), memberId)
+                QnaLikeEntity.of(postIds.get(0), memberId),
+                QnaLikeEntity.of(postIds.get(1), memberId),
+                QnaLikeEntity.of(postIds.get(2), memberId)
         ));
         qnaLikeRepository.flush();
 
         // when
         List<QnaLikeEntity> qnaLikeList = qnaLikeRepository.findByMemberId(memberId);
 
-        assertThat(qnaLikeList).hasSize(qnaPostIds.size());
+        assertThat(qnaLikeList).hasSize(postIds.size());
     }
 
     @Test
@@ -104,29 +104,29 @@ public class QnaLikeRepositoryTest implements QnaLikeEntityTestUtils {
     void findQnaLikesByMemberIdAndPostIds() {
         // given
         UUID memberId = createMemberBasicUserEntityWithUuid().getUuid();
-        List<String> qnaPostIds = List.of(
+        List<String> postIds = List.of(
                 "TEST_QNA_POST_ID_001",
                 "TEST_QNA_POST_ID_002",
                 "TEST_QNA_POST_ID_003"
         );
 
         qnaLikeRepository.saveAll(List.of(
-                QnaLikeEntity.of(qnaPostIds.get(0), memberId),
-                QnaLikeEntity.of(qnaPostIds.get(1), memberId),
-                QnaLikeEntity.of(qnaPostIds.get(2), memberId)
+                QnaLikeEntity.of(postIds.get(0), memberId),
+                QnaLikeEntity.of(postIds.get(1), memberId),
+                QnaLikeEntity.of(postIds.get(2), memberId)
         ));
         qnaLikeRepository.flush();
 
         // when
-        List<QnaLikeEntity> qnaLikeList = qnaLikeRepository.findByMemberIdAndQnaPostIdIn(memberId, qnaPostIds);
+        List<QnaLikeEntity> qnaLikeList = qnaLikeRepository.findByMemberIdAndPostIdIn(memberId, postIds);
 
         // then
-        List<String> likedQnaPostIds = qnaLikeList.stream()
-                .map(QnaLikeEntity::getQnaPostId)
+        List<String> likedPostIds = qnaLikeList.stream()
+                .map(QnaLikeEntity::getPostId)
                 .toList();
 
-        assertThat(qnaLikeList).size().isEqualTo(qnaPostIds.size());
-        assertThat(likedQnaPostIds).hasSize(qnaPostIds.size());
-        assertThat(likedQnaPostIds).containsExactlyInAnyOrder(qnaPostIds.get(0), qnaPostIds.get(1), qnaPostIds.get(2));
+        assertThat(qnaLikeList).size().isEqualTo(postIds.size());
+        assertThat(likedPostIds).hasSize(postIds.size());
+        assertThat(likedPostIds).containsExactlyInAnyOrder(postIds.get(0), postIds.get(1), postIds.get(2));
     }
 }

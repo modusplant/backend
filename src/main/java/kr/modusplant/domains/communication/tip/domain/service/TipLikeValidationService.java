@@ -21,27 +21,27 @@ public class TipLikeValidationService {
     private final SiteMemberRepository memberRepository;
     private final TipLikeRepository tipLikeRepository;
 
-    public void validateExistedTipPostAndMember(String tipPostId, UUID memberId) {
-        if (tipPostId == null || memberId == null) {
-            throw new IllegalArgumentException("tipPostId and memberId must not be null");
-        };
+    public void validateExistedTipPostAndMember(String postId, UUID memberId) {
+        if (postId == null || memberId == null) {
+            throw new IllegalArgumentException("postId and memberId must not be null");
+        }
 
-        if (!tipPostRepository.existsById(tipPostId)) {
-            throw new EntityNotFoundWithUlidException(tipPostId, TipPostEntity.class);
+        if (!tipPostRepository.existsById(postId)) {
+            throw new EntityNotFoundWithUlidException(postId, TipPostEntity.class);
         }
         if (!memberRepository.existsById(memberId)) {
             throw new EntityExistsWithUuidException(memberId, SiteMemberEntity.class);
         }
     }
 
-    public void validateTipLikeExists(String tipPostId, UUID memberId) {
-        if (!tipLikeRepository.existsByTipPostIdAndMemberId(tipPostId, memberId)) {
+    public void validateTipLikeExists(String postId, UUID memberId) {
+        if (!tipLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
             throw new IllegalArgumentException("member not liked status");
         }
     }
 
-    public void validateTipLikeNotExists(String tipPostId, UUID memberId) {
-        if (tipLikeRepository.existsByTipPostIdAndMemberId(tipPostId, memberId)) {
+    public void validateTipLikeNotExists(String postId, UUID memberId) {
+        if (tipLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
             throw new IllegalArgumentException("member already liked");
         }
     }

@@ -14,8 +14,8 @@ public interface TipLikeRepository extends JpaRepository<TipLikeEntity, TipLikeI
     List<TipLikeEntity> findByMemberId(UUID memberId);
 
     // 사용자별 팁 게시글 좋아요 리스트 조회
-    List<TipLikeEntity> findByMemberIdAndTipPostIdIn(UUID memberId, List<String> tipPostIds);
+    List<TipLikeEntity> findByMemberIdAndPostIdIn(UUID memberId, List<String> postIds);
 
-    boolean existsByTipPostIdAndMemberId(String tipPostId, UUID memberId);
-    void deleteByTipPostIdAndMemberId(String tipPostId, UUID memberId);
+    boolean existsByPostIdAndMemberId(String postId, UUID memberId);
+    void deleteByPostIdAndMemberId(String postId, UUID memberId);
 }

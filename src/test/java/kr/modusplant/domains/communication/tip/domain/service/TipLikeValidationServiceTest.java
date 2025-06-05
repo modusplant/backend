@@ -52,7 +52,7 @@ class TipLikeValidationServiceTest {
     @Test
     @DisplayName("좋아요가 존재하지 않을 경우 예외 발생")
     void validateTipLikeExists_notLiked() {
-        when(tipLikeRepository.existsByTipPostIdAndMemberId(TIP_POST_ID, MEMBER_ID)).thenReturn(false);
+        when(tipLikeRepository.existsByPostIdAndMemberId(TIP_POST_ID, MEMBER_ID)).thenReturn(false);
 
         assertThatThrownBy(() -> validationService.validateTipLikeExists(TIP_POST_ID, MEMBER_ID))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -62,7 +62,7 @@ class TipLikeValidationServiceTest {
     @Test
     @DisplayName("좋아요가 이미 존재할 경우 예외 발생")
     void validateTipLikeNotExists_alreadyLiked() {
-        when(tipLikeRepository.existsByTipPostIdAndMemberId(TIP_POST_ID, MEMBER_ID)).thenReturn(true);
+        when(tipLikeRepository.existsByPostIdAndMemberId(TIP_POST_ID, MEMBER_ID)).thenReturn(true);
 
         assertThatThrownBy(() -> validationService.validateTipLikeNotExists(TIP_POST_ID, MEMBER_ID))
                 .isInstanceOf(IllegalArgumentException.class)

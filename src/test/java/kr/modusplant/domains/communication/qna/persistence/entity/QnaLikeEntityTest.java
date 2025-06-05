@@ -19,16 +19,16 @@ public class QnaLikeEntityTest implements QnaLikeEntityTestUtils {
     @Autowired
     private TestEntityManager entityManager;
 
-    private String qnaPostId;
+    private String postId;
     private UUID memberId;
 
     @BeforeEach
     void setUp() {
         // given
-        qnaPostId = qnaPostWithUlid.getUlid();
+        postId = qnaPostWithUlid.getUlid();
         memberId = createMemberBasicUserEntityWithUuid().getUuid();
 
-        QnaLikeEntity qnaLikeEntity = QnaLikeEntity.of(qnaPostId, memberId);
+        QnaLikeEntity qnaLikeEntity = QnaLikeEntity.of(postId, memberId);
         entityManager.persistAndFlush(qnaLikeEntity);
     }
 
@@ -36,11 +36,11 @@ public class QnaLikeEntityTest implements QnaLikeEntityTestUtils {
     @DisplayName("Q&A 게시글 좋아요")
     void likeQnaPost_success () {
         // when
-        QnaLikeEntity qnaLikeEntity = entityManager.find(QnaLikeEntity.class, new QnaLikeId(qnaPostId, memberId));
+        QnaLikeEntity qnaLikeEntity = entityManager.find(QnaLikeEntity.class, new QnaLikeId(postId, memberId));
 
         // then
         assertThat(qnaLikeEntity).isNotNull();
-        assertThat(qnaLikeEntity.getQnaPostId()).isEqualTo(qnaPostId);
+        assertThat(qnaLikeEntity.getPostId()).isEqualTo(postId);
         assertThat(qnaLikeEntity.getMemberId()).isEqualTo(memberId);
         assertThat(qnaLikeEntity.getCreatedAt()).isNotNull();
         assertThat(qnaLikeEntity.getCreatedAt()).isBeforeOrEqualTo(LocalDateTime.now());
@@ -50,13 +50,13 @@ public class QnaLikeEntityTest implements QnaLikeEntityTestUtils {
     @DisplayName("Q&A 게시글 좋아요 삭제")
     void unlikeQnaPost_success() {
         // when
-        QnaLikeEntity qnaLikeEntity = entityManager.find(QnaLikeEntity.class, new QnaLikeId(qnaPostId, memberId));
+        QnaLikeEntity qnaLikeEntity = entityManager.find(QnaLikeEntity.class, new QnaLikeId(postId, memberId));
         entityManager.remove(qnaLikeEntity);
         entityManager.flush();
         entityManager.clear();
 
         // then
-        QnaLikeEntity deletedEntity = entityManager.find(QnaLikeEntity.class, new QnaLikeId(qnaPostId, memberId));
+        QnaLikeEntity deletedEntity = entityManager.find(QnaLikeEntity.class, new QnaLikeId(postId, memberId));
         assertThat(deletedEntity).isNull();
     }
 }

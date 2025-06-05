@@ -40,7 +40,7 @@ public class TipLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
     private TipLikeApplicationService tipLikeApplicationService;
 
     private UUID memberId;
-    private String tipPostId;
+    private String postId;
 
     @BeforeEach
     void setUp() {
@@ -54,7 +54,7 @@ public class TipLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
                 .category(createTestTipCategoryEntity())
                 .build();
         tipPostRepository.save(tipPost);
-        tipPostId = tipPost.getUlid();
+        postId = tipPost.getUlid();
 
         siteMemberRepository.flush();
         tipPostRepository.flush();
@@ -64,13 +64,13 @@ public class TipLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
     @DisplayName("좋아요 성공")
     void likeTipPost_success() {
         // when
-        LikeResponse response = tipLikeApplicationService.likeTipPost(tipPostId, memberId);
+        LikeResponse response = tipLikeApplicationService.likeTipPost(postId, memberId);
 
         // then
         assertThat(response.liked()).isTrue();
         assertThat(response.likeCount()).isEqualTo(1);
 
-        TipLikeEntity saved = tipLikeRepository.findById(new TipLikeId(tipPostId, memberId)).orElse(null);
+        TipLikeEntity saved = tipLikeRepository.findById(new TipLikeId(postId, memberId)).orElse(null);
 
         assertThat(saved).isNotNull();
     }
@@ -79,26 +79,26 @@ public class TipLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
     @DisplayName("좋아요 취소 성공")
     void unlikeTipPost_success() {
         // given
-        tipLikeApplicationService.likeTipPost(tipPostId, memberId);
+        tipLikeApplicationService.likeTipPost(postId, memberId);
 
         // when
-        LikeResponse response = tipLikeApplicationService.unlikeTipPost(tipPostId, memberId);
+        LikeResponse response = tipLikeApplicationService.unlikeTipPost(postId, memberId);
 
         // then
         assertThat(response.liked()).isFalse();
         assertThat(response.likeCount()).isEqualTo(0);
-        assertThat(tipLikeRepository.existsByTipPostIdAndMemberId(tipPostId, memberId)).isFalse();
+        assertThat(tipLikeRepository.existsByPostIdAndMemberId(postId, memberId)).isFalse();
     }
 
     @Test
     @DisplayName("이미 좋아요 한 게시글을 또 좋아요 시도할 경우 예외 발생")
     void likeTipPost_duplicateLike_throwsException() {
         // given
-        tipLikeApplicationService.likeTipPost(tipPostId, memberId);
+        tipLikeApplicationService.likeTipPost(postId, memberId);
 
         // when & then
         assertThatThrownBy(() ->
-                tipLikeApplicationService.likeTipPost(tipPostId, memberId))
+                tipLikeApplicationService.likeTipPost(postId, memberId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("member already liked");
     }
@@ -108,7 +108,7 @@ public class TipLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
     void unlikeTipPost_withoutLike_throwsException() {
         // when & then
         assertThatThrownBy(() ->
-                tipLikeApplicationService.unlikeTipPost(tipPostId, memberId))
+                tipLikeApplicationService.unlikeTipPost(postId, memberId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("member not liked status");
     }

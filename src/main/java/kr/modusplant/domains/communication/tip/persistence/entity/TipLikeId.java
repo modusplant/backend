@@ -12,6 +12,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class TipLikeId implements Serializable {
-    private String tipPostId;
+    private String postId;
     private UUID memberId;
 }

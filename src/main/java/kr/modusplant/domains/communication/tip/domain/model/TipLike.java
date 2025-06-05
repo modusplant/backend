@@ -10,6 +10,6 @@ import java.util.UUID;
 @Builder(access = AccessLevel.PUBLIC)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TipLike {
-    private String tipPostId;
+    private String postId;
     private UUID memberId;
 }
