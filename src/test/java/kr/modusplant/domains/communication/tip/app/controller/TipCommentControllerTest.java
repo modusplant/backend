@@ -70,7 +70,7 @@ public class TipCommentControllerTest implements
     void getByPostTest() throws Exception {
         // given
         TipCommentResponse commentResponse =
-                createTipCommentResponse(postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getUuid());
+                createTipCommentResponse(postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname());
 
         // when
         given(commentApplicationService.getByPostEntity(postEntity)).willReturn(List.of(commentResponse));
@@ -83,7 +83,7 @@ public class TipCommentControllerTest implements
                 .andExpect(jsonPath("$.message").exists())
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data[*].postUlid").value(postEntity.getUlid()))
-                .andExpect(jsonPath("$.data[*].authMemberUuid").value(memberEntity.getUuid().toString()));
+                .andExpect(jsonPath("$.data[*].memberUuid").value(memberEntity.getUuid().toString()));
     }
 
     @DisplayName("인증된 사용자로 댓글 얻기")
@@ -91,7 +91,7 @@ public class TipCommentControllerTest implements
     void getByAuthMemberTest() throws Exception {
         // given
         TipCommentResponse commentResponse =
-                createTipCommentResponse(postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getUuid());
+                createTipCommentResponse(postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname());
 
         // when
         given(commentApplicationService.getByAuthMember(memberEntity)).willReturn(List.of(commentResponse));
@@ -104,7 +104,7 @@ public class TipCommentControllerTest implements
                 .andExpect(jsonPath("$.message").exists())
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data[*].postUlid").value(postEntity.getUlid()))
-                .andExpect(jsonPath("$.data[*].authMemberUuid").value(memberEntity.getUuid().toString()));
+                .andExpect(jsonPath("$.data[*].memberUuid").value(memberEntity.getUuid().toString()));
     }
 
     @DisplayName("생성한 사용자로 댓글 얻기")
@@ -112,7 +112,7 @@ public class TipCommentControllerTest implements
     void getByCreateMemberTest() throws Exception {
         // given
         TipCommentResponse commentResponse =
-                createTipCommentResponse(postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getUuid());
+                createTipCommentResponse(postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname());
 
         // when
         given(commentApplicationService.getByCreateMember(memberEntity)).willReturn(List.of(commentResponse));
@@ -125,7 +125,7 @@ public class TipCommentControllerTest implements
                 .andExpect(jsonPath("$.message").exists())
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data[*].postUlid").value(postEntity.getUlid()))
-                .andExpect(jsonPath("$.data[*].createMemberUuid").value(memberEntity.getUuid().toString()));
+                .andExpect(jsonPath("$.data[*].nickname").value(memberEntity.getNickname()));
     }
 
     @DisplayName("댓글 내용으로 댓글 얻기")
@@ -133,7 +133,7 @@ public class TipCommentControllerTest implements
     void getByContentTest() throws Exception {
         // given
         TipCommentResponse commentResponse =
-                createTipCommentResponse(postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getUuid());
+                createTipCommentResponse(postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname());
 
         // when
         given(commentApplicationService.getByContent(commentResponse.content()))
@@ -155,7 +155,7 @@ public class TipCommentControllerTest implements
     void getByPostAndPathTest() throws Exception {
         // given
         TipCommentResponse commentResponse =
-                createTipCommentResponse(postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getUuid());
+                createTipCommentResponse(postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname());
         String encodedPath = URLEncoder.encode(commentResponse.path(), StandardCharsets.UTF_8);
 
         // when
@@ -180,7 +180,7 @@ public class TipCommentControllerTest implements
         TipCommentInsertRequest insertRequest = createTipCommentInsertRequest(
                 postEntity.getUlid(), memberEntity.getUuid());
         TipCommentResponse commentResponse =
-                createTipCommentResponse(postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getUuid());
+                createTipCommentResponse(postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname());
 
         // when
         given(commentApplicationService.insert(insertRequest)).willReturn(commentResponse);

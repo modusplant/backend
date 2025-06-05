@@ -85,7 +85,7 @@ public class ConvCommentApplicationServiceTest implements
                 .build();
 
         ConvCommentResponse commentResponse = createConvCommentResponse(
-                postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getUuid()
+                postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname()
         );
 
         // when
@@ -109,7 +109,7 @@ public class ConvCommentApplicationServiceTest implements
                 .build();
 
         ConvCommentResponse commentResponse = createConvCommentResponse(
-                postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getUuid()
+                postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname()
         );
 
         // when
@@ -133,7 +133,7 @@ public class ConvCommentApplicationServiceTest implements
                 .build();
 
         ConvCommentResponse commentResponse = createConvCommentResponse(
-                postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getUuid()
+                postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname()
         );
 
         // when
@@ -157,7 +157,7 @@ public class ConvCommentApplicationServiceTest implements
                 .build();
 
         ConvCommentResponse commentResponse = createConvCommentResponse(
-                postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getUuid()
+                postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname()
         );
 
         // when
@@ -180,7 +180,7 @@ public class ConvCommentApplicationServiceTest implements
                 .build();
 
         ConvCommentResponse commentResponse = createConvCommentResponse(
-                postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getUuid()
+                postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname()
         );
 
         // when
@@ -211,7 +211,7 @@ public class ConvCommentApplicationServiceTest implements
         );
 
         ConvCommentResponse commentResponse = createConvCommentResponse(
-                postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getUuid()
+                postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname()
         );
 
         // when

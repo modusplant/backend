@@ -7,10 +7,10 @@ import kr.modusplant.domains.communication.tip.persistence.entity.TipCommentEnti
 import java.util.UUID;
 
 public interface TipCommentResponseTestUtils extends TipCommentEntityTestUtils {
-    default TipCommentResponse createTipCommentResponse(String ulid, UUID authMemberUuid, UUID createMemberUuid) {
+    default TipCommentResponse createTipCommentResponse(String ulid, UUID memberUuid, String nickname) {
         TipCommentEntity commentEntity = createTipCommentEntityBuilder().build();
 
         return new TipCommentResponse(ulid, commentEntity.getPath(),
-                authMemberUuid, createMemberUuid, commentEntity.getContent());
+                memberUuid, nickname, commentEntity.getContent());
     }
 }

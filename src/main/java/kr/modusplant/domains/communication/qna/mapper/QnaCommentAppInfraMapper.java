@@ -1,5 +1,6 @@
 package kr.modusplant.domains.communication.qna.mapper;
 
+import kr.modusplant.domains.communication.common.mapper.supers.PostAppInfraMapper;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaCommentInsertRequest;
 import kr.modusplant.domains.communication.qna.app.http.response.QnaCommentResponse;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaCommentEntity;
@@ -15,11 +16,11 @@ import org.mapstruct.Named;
 import java.util.UUID;
 
 @Mapper
-public interface QnaCommentAppInfraMapper {
+public interface QnaCommentAppInfraMapper extends PostAppInfraMapper {
 
-    @Mapping(source = "postEntity", target = "postUlid", qualifiedByName = "getPostUlid")
-    @Mapping(source = "authMember", target = "authMemberUuid", qualifiedByName = "getMemberUuid")
-    @Mapping(source = "createMember", target = "createMemberUuid", qualifiedByName = "getMemberUuid")
+    @Mapping(source = "postEntity", target = "postUlid", qualifiedByName = "toPostUlid")
+    @Mapping(source = "authMember", target = "memberUuid", qualifiedByName = "toMemberUuid")
+    @Mapping(source = "authMember", target = "nickname", qualifiedByName = "toNickname")
     QnaCommentResponse toQnaCommentResponse(QnaCommentEntity qnaCommentEntity);
 
     @Mapping(target = "QnaCommentEntity", ignore = true)
@@ -30,14 +31,9 @@ public interface QnaCommentAppInfraMapper {
     QnaCommentEntity toQnaCommentEntity(QnaCommentInsertRequest insertRequest,
                                         @Context QnaPostRepository qnaPostRepository, @Context SiteMemberRepository memberRepository);
 
-    @Named("getPostUlid")
-    default String getPostUlid(QnaPostEntity postEntity) {
+    @Named("toPostUlid")
+    default String toPostUlid(QnaPostEntity postEntity) {
         return postEntity.getUlid();
-    }
-
-    @Named("getMemberUuid")
-    default UUID getMemberUuid(SiteMemberEntity member) {
-        return member.getUuid();
     }
 
     @Named("toMemberEntity")
