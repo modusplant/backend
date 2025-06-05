@@ -74,6 +74,22 @@ public class AuthController {
         return ResponseEntity.ok().body(DataResponse.of(200, "OK: Succeeded"));
     }
 
+    @Operation(summary = "비밀번호 재설정 검증 API", description = "비밀번호 재설정 본인인증 코드를 검증합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK: Succeeded"),
+            @ApiResponse(responseCode = "400", description = "Bad Request: Invalid input data.")
+    })
+    @PostMapping("/auth/reset-password-request/verify")
+    public ResponseEntity<DataResponse<?>> verifyResetPasswordCode(
+            @RequestBody VerifyEmailRequest request
+    ) {
+        authService.verifyResetPasswordCode(request);
+        return ResponseEntity.ok(
+                DataResponse.ok(new HashMap<>() {{
+                    put("hasEmailAuth", true);
+                }}));
+    }
+
     public void setHttpOnlyCookie(String accessToken, HttpServletResponse httpResponse) {
         Cookie accessTokenCookie = new Cookie("Authorization", accessToken);
         accessTokenCookie.setHttpOnly(true); // HTTP-Only 설정: JavaScript에서 접근 불가
