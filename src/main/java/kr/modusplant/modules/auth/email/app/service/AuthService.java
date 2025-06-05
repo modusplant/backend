@@ -1,7 +1,6 @@
 package kr.modusplant.modules.auth.email.app.service;
 
-import kr.modusplant.domains.member.app.http.response.SiteMemberAuthResponse;
-import kr.modusplant.domains.member.app.service.SiteMemberAuthApplicationService;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
 import kr.modusplant.global.middleware.redis.RedisHelper;
 import kr.modusplant.global.middleware.redis.RedisKeys;
 import kr.modusplant.modules.auth.email.app.http.request.EmailRequest;
@@ -12,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.List;
 
 import static kr.modusplant.global.middleware.redis.RedisKeys.RESET_PASSWORD_PREFIX;
 import static kr.modusplant.global.vo.CamelCaseWord.RESET_PASSWORD_EMAIL;
@@ -26,7 +24,7 @@ public class AuthService {
     private final RedisHelper redisHelper;
 
     private final MailService mailService;
-    private final SiteMemberAuthApplicationService siteMemberAuthService;
+    private final SiteMemberAuthRepository siteMemberAuthRepository;
 
     public String sendVerifyEmail(EmailRequest request) {
         String email = request.getEmail();
@@ -46,10 +44,7 @@ public class AuthService {
     public void sendResetPasswordCode(EmailRequest request) {
         // 가입한 유저인지 확인
         String email = request.getEmail();
-        List<SiteMemberAuthResponse> list = siteMemberAuthService.getByEmail(email);
-        if (list.isEmpty()) {
-            throw new RuntimeException("Email not found");
-        }
+        validateEmailExists(email);
 
         // 이메일 인증코드 생성
         String verifyCode = tokenProvider.generateVerifyCode();
@@ -62,4 +57,20 @@ public class AuthService {
         mailService.callSendEmail(email, verifyCode, RESET_PASSWORD_EMAIL);
     }
 
+    public void verifyResetPasswordCode(VerifyEmailRequest request) {
+        String email = request.getEmail();
+        validateEmailExists(email);
+
+        String redisKey = RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, email);
+        String storedCode = redisHelper.getString(redisKey).orElseThrow(() -> new RuntimeException("verification code is invalid. Please try again"));
+        if (!storedCode.equals(request.getVerifyCode())) {
+            throw new RuntimeException("verification code is invalid. Please try again");
+        }
+    }
+
+    private void validateEmailExists(String email) {
+        if (!siteMemberAuthRepository.existsByEmail(email)) {
+            throw new RuntimeException("Email not found");
+        }
+    }
 }
