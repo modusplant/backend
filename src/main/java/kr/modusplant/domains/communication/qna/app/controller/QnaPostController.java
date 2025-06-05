@@ -39,13 +39,13 @@ public class QnaPostController {
     private UUID memberUuid;
 
     @Operation(summary = "전체 Q&A 게시글 목록 조회 API", description = "전체 Q&A 게시글의 목록과 페이지 정보를 조회합니다.")
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getAllQnaPosts(Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(qnaPostApplicationService.getAll(pageable))));
     }
 
     @Operation(summary = "사이트 회원별 Q&A 게시글 목록 조회 API", description = "사이트 회원별 Q&A 게시글의 목록과 페이지 정보를 조회합니다.")
-    @GetMapping("/members/{memb_uuid}")
+    @GetMapping("/member/{memb_uuid}")
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getQnaPostsByMember(@PathVariable(SNAKE_MEMB_UUID) UUID memberUuid, Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(qnaPostApplicationService.getByMemberUuid(memberUuid, pageable))));
     }

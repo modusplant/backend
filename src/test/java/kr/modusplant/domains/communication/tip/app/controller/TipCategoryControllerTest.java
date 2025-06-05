@@ -50,7 +50,7 @@ class TipCategoryControllerTest implements TipCategoryRequestTestUtils, TipCateg
 
         // when
         Map<String, Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/tip/categories"))
+                mockMvc.perform(get("/api/v1/tip/categories"))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -73,7 +73,7 @@ class TipCategoryControllerTest implements TipCategoryRequestTestUtils, TipCateg
 
         // when
         Map<String, Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/tip/categories/{uuid}", uuid))
+                mockMvc.perform(get("/api/v1/tip/categories/{uuid}", uuid))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -96,7 +96,7 @@ class TipCategoryControllerTest implements TipCategoryRequestTestUtils, TipCateg
 
         // when
         Map<String, Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/tip/categories/order/{order}", order))
+                mockMvc.perform(get("/api/v1/tip/categories/order/{order}", order))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -119,7 +119,7 @@ class TipCategoryControllerTest implements TipCategoryRequestTestUtils, TipCateg
 
         // when
         Map<String, Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/tip/categories/category/{category}", category))
+                mockMvc.perform(get("/api/v1/tip/categories/category/{category}", category))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -144,7 +144,7 @@ class TipCategoryControllerTest implements TipCategoryRequestTestUtils, TipCateg
 
         // order - when
         Map<String, Object> uuidResponseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/tip/categories/order/{order}", order))
+                mockMvc.perform(get("/api/v1/tip/categories/order/{order}", order))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -157,7 +157,7 @@ class TipCategoryControllerTest implements TipCategoryRequestTestUtils, TipCateg
 
         // category - when
         Map<String, Object> nameResponseMap = objectMapper.readValue(
-                mockMvc.perform(get("/api/crud/tip/categories/category/{category}", category))
+                mockMvc.perform(get("/api/v1/tip/categories/category/{category}", category))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
                 });
@@ -178,7 +178,7 @@ class TipCategoryControllerTest implements TipCategoryRequestTestUtils, TipCateg
 
         // when
         Map<String, Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(post("/api/crud/tip/categories")
+                mockMvc.perform(post("/api/v1/tip/categories")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(testTipCategoryInsertRequest)))
                         .andExpect(status().isOk())
@@ -201,7 +201,7 @@ class TipCategoryControllerTest implements TipCategoryRequestTestUtils, TipCateg
         doNothing().when(tipCategoryApplicationService).removeByUuid(order);
 
         // when & then
-        mockMvc.perform(delete("/api/crud/tip/categories/{uuid}", order))
+        mockMvc.perform(delete("/api/v1/tip/categories/{uuid}", order))
                 .andExpect(status().isOk());
     }
 }

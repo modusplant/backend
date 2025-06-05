@@ -19,7 +19,7 @@ import java.util.UUID;
 
 @RestController
 @Primary
-@RequestMapping("/api/crud/conv/comment")
+@RequestMapping("/api/v1/conversation/comments")
 @RequiredArgsConstructor
 public class ConvCommentController {
 
@@ -79,7 +79,7 @@ public class ConvCommentController {
         return ResponseEntity.ok().body(DataResponse.ok(commentApplicationService.insert(insertRequest)));
     }
 
-    @DeleteMapping("/{ulid}/{path}")
+    @DeleteMapping("/post/{ulid}/path/{path}")
     public ResponseEntity<DataResponse<?>> removeConvComment(@PathVariable("ulid") String postUlid, @PathVariable("path") String path) {
         String decodedPath = URLDecoder.decode(path, StandardCharsets.UTF_8);
 

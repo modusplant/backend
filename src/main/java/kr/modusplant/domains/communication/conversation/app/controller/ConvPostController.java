@@ -26,7 +26,7 @@ import static kr.modusplant.global.vo.SnakeCaseWord.*;
 
 @Tag(name = "Conversation Post API")
 @RestController
-@RequestMapping("/api/v1/conv/posts")
+@RequestMapping("/api/v1/conversation/posts")
 @RequiredArgsConstructor
 public class ConvPostController {
 
@@ -39,13 +39,13 @@ public class ConvPostController {
     private UUID memberUuid;
 
     @Operation(summary = "전체 대화 게시글 목록 조회 API", description = "전체 대화 게시글의 목록과 페이지 정보를 조회합니다.")
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getAllConvPosts(Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(convPostApplicationService.getAll(pageable))));
     }
 
     @Operation(summary = "사이트 회원별 대화 게시글 목록 조회 API", description = "사이트 회원별 대화 게시글의 목록과 페이지 정보를 조회합니다.")
-    @GetMapping("/members/{memb_uuid}")
+    @GetMapping("/member/{memb_uuid}")
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getConvPostsByMember(@PathVariable(SNAKE_MEMB_UUID) UUID memberUuid, Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(convPostApplicationService.getByMemberUuid(memberUuid, pageable))));
     }
