@@ -24,7 +24,7 @@ public class RedisHelper {
     }
 
     public Optional<String> getString(String key) {
-        return Optional.of(stringRedisTemplate.opsForValue().get(key));
+        return Optional.ofNullable(stringRedisTemplate.opsForValue().get(key));
     }
 
     /** ===== [Object 값 저장] ===== */
@@ -37,7 +37,7 @@ public class RedisHelper {
     }
 
     public <T> Optional<T> getObject(String key, Class<T> clazz) {
-        return Optional.of(clazz.cast(redisTemplate.opsForValue().get(key)));
+        return Optional.ofNullable(clazz.cast(redisTemplate.opsForValue().get(key)));
     }
 
     /** ===== [공통] ===== */
