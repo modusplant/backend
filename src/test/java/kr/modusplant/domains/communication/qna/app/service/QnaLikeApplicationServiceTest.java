@@ -40,7 +40,7 @@ public class QnaLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
     private QnaLikeApplicationService qnaLikeApplicationService;
 
     private UUID memberId;
-    private String qnaPostId;
+    private String postId;
 
     @BeforeEach
     void setUp() {
@@ -54,7 +54,7 @@ public class QnaLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
                 .category(createTestQnaCategoryEntity())
                 .build();
         qnaPostRepository.save(qnaPost);
-        qnaPostId = qnaPost.getUlid();
+        postId = qnaPost.getUlid();
 
         siteMemberRepository.flush();
         qnaPostRepository.flush();
@@ -64,13 +64,13 @@ public class QnaLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
     @DisplayName("좋아요 성공")
     void likeQnaPost_success() {
         // when
-        LikeResponse response = qnaLikeApplicationService.likeQnaPost(qnaPostId, memberId);
+        LikeResponse response = qnaLikeApplicationService.likeQnaPost(postId, memberId);
 
         // then
         assertThat(response.liked()).isTrue();
         assertThat(response.likeCount()).isEqualTo(1);
 
-        QnaLikeEntity saved = qnaLikeRepository.findById(new QnaLikeId(qnaPostId, memberId)).orElse(null);
+        QnaLikeEntity saved = qnaLikeRepository.findById(new QnaLikeId(postId, memberId)).orElse(null);
 
         assertThat(saved).isNotNull();
     }
@@ -79,26 +79,26 @@ public class QnaLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
     @DisplayName("좋아요 취소 성공")
     void unlikeQnaPost_success() {
         // given
-        qnaLikeApplicationService.likeQnaPost(qnaPostId, memberId);
+        qnaLikeApplicationService.likeQnaPost(postId, memberId);
 
         // when
-        LikeResponse response = qnaLikeApplicationService.unlikeQnaPost(qnaPostId, memberId);
+        LikeResponse response = qnaLikeApplicationService.unlikeQnaPost(postId, memberId);
 
         // then
         assertThat(response.liked()).isFalse();
         assertThat(response.likeCount()).isEqualTo(0);
-        assertThat(qnaLikeRepository.existsByQnaPostIdAndMemberId(qnaPostId, memberId)).isFalse();
+        assertThat(qnaLikeRepository.existsByPostIdAndMemberId(postId, memberId)).isFalse();
     }
 
     @Test
     @DisplayName("이미 좋아요 한 게시글을 또 좋아요 시도할 경우 예외 발생")
     void likeQnaPost_duplicateLike_throwsException() {
         // given
-        qnaLikeApplicationService.likeQnaPost(qnaPostId, memberId);
+        qnaLikeApplicationService.likeQnaPost(postId, memberId);
 
         // when & then
         assertThatThrownBy(() ->
-                qnaLikeApplicationService.likeQnaPost(qnaPostId, memberId))
+                qnaLikeApplicationService.likeQnaPost(postId, memberId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("member already liked");
     }
@@ -108,7 +108,7 @@ public class QnaLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
     void unlikeQnaPost_withoutLike_throwsException() {
         // when & then
         assertThatThrownBy(() ->
-                qnaLikeApplicationService.unlikeQnaPost(qnaPostId, memberId))
+                qnaLikeApplicationService.unlikeQnaPost(postId, memberId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("member not liked status");
     }

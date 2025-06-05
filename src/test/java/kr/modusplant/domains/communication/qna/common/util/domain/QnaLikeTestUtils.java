@@ -5,7 +5,7 @@ import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 
 public interface QnaLikeTestUtils extends QnaPostTestUtils, SiteMemberTestUtils {
     QnaLike qnaLike = QnaLike.builder()
-            .qnaPostId(qnaPostWithUlid.getUlid())
+            .postId(qnaPostWithUlid.getUlid())
             .memberId(memberBasicUserWithUuid.getUuid())
             .build();
 }

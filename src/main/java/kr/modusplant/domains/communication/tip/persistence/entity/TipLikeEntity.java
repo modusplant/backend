@@ -19,7 +19,7 @@ import static kr.modusplant.global.vo.SnakeCaseWord.*;
 public class TipLikeEntity {
     @Id
     @Column(name = SNAKE_POST_ULID, nullable = false)
-    private String tipPostId;
+    private String postId;
 
     @Id
     @Column(name = SNAKE_MEMB_UUID, nullable = false)
@@ -29,12 +29,12 @@ public class TipLikeEntity {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    private TipLikeEntity(String tipPostId, UUID memberId) {
-        this.tipPostId = tipPostId;
+    private TipLikeEntity(String postId, UUID memberId) {
+        this.postId = postId;
         this.memberId = memberId;
     }
 
-    public static TipLikeEntity of(String tipPostId, UUID memberId) {
-        return new TipLikeEntity(tipPostId, memberId);
+    public static TipLikeEntity of(String postId, UUID memberId) {
+        return new TipLikeEntity(postId, memberId);
     }
 }

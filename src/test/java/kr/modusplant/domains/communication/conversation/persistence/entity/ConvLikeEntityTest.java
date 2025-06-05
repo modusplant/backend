@@ -19,16 +19,16 @@ public class ConvLikeEntityTest implements ConvLikeEntityTestUtils {
     @Autowired
     private TestEntityManager entityManager;
 
-    private String convPostId;
+    private String postId;
     private UUID memberId;
 
     @BeforeEach
     void setUp() {
         // given
-        convPostId = convPostWithUlid.getUlid();
+        postId = convPostWithUlid.getUlid();
         memberId = createMemberBasicUserEntityWithUuid().getUuid();
 
-        ConvLikeEntity convLikeEntity = ConvLikeEntity.of(convPostId, memberId);
+        ConvLikeEntity convLikeEntity = ConvLikeEntity.of(postId, memberId);
         entityManager.persistAndFlush(convLikeEntity);
     }
 
@@ -36,11 +36,11 @@ public class ConvLikeEntityTest implements ConvLikeEntityTestUtils {
     @DisplayName("대화 게시글 좋아요")
     void likeConvPost_success () {
         // when
-        ConvLikeEntity convLikeEntity = entityManager.find(ConvLikeEntity.class, new ConvLikeId(convPostId, memberId));
+        ConvLikeEntity convLikeEntity = entityManager.find(ConvLikeEntity.class, new ConvLikeId(postId, memberId));
 
         // then
         assertThat(convLikeEntity).isNotNull();
-        assertThat(convLikeEntity.getConvPostId()).isEqualTo(convPostId);
+        assertThat(convLikeEntity.getPostId()).isEqualTo(postId);
         assertThat(convLikeEntity.getMemberId()).isEqualTo(memberId);
         assertThat(convLikeEntity.getCreatedAt()).isNotNull();
         assertThat(convLikeEntity.getCreatedAt()).isBeforeOrEqualTo(LocalDateTime.now());
@@ -50,13 +50,13 @@ public class ConvLikeEntityTest implements ConvLikeEntityTestUtils {
     @DisplayName("대화 게시글 좋아요 삭제")
     void unlikeConvPost_success() {
         // when
-        ConvLikeEntity convLikeEntity = entityManager.find(ConvLikeEntity.class, new ConvLikeId(convPostId, memberId));
+        ConvLikeEntity convLikeEntity = entityManager.find(ConvLikeEntity.class, new ConvLikeId(postId, memberId));
         entityManager.remove(convLikeEntity);
         entityManager.flush();
         entityManager.clear();
 
         // then
-        ConvLikeEntity deletedEntity = entityManager.find(ConvLikeEntity.class, new ConvLikeId(convPostId, memberId));
+        ConvLikeEntity deletedEntity = entityManager.find(ConvLikeEntity.class, new ConvLikeId(postId, memberId));
         assertThat(deletedEntity).isNull();
     }
 }

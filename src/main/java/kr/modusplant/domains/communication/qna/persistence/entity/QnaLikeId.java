@@ -12,6 +12,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class QnaLikeId implements Serializable {
-    private String qnaPostId;
+    private String postId;
     private UUID memberId;
 }

@@ -14,8 +14,8 @@ public interface QnaLikeRepository extends JpaRepository<QnaLikeEntity, QnaLikeI
     List<QnaLikeEntity> findByMemberId(UUID memberId);
 
     // 사용자별 Q&A 게시글 좋아요 리스트 조회
-    List<QnaLikeEntity> findByMemberIdAndQnaPostIdIn(UUID memberId, List<String> qnaPostIds);
+    List<QnaLikeEntity> findByMemberIdAndPostIdIn(UUID memberId, List<String> postIds);
 
-    boolean existsByQnaPostIdAndMemberId(String qnaPostId, UUID memberId);
-    void deleteByQnaPostIdAndMemberId(String qnaPostId, UUID memberId);
+    boolean existsByPostIdAndMemberId(String postId, UUID memberId);
+    void deleteByPostIdAndMemberId(String postId, UUID memberId);
 }

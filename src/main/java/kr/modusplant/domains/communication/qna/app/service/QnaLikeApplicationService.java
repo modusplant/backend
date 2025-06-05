@@ -20,26 +20,26 @@ public class QnaLikeApplicationService {
     private final QnaLikeValidationService qnaLikeValidationService;
 
     @Transactional
-    public LikeResponse likeQnaPost(String qnaPostId, UUID memberId) {
-        qnaLikeValidationService.validateExistedQnaPostAndMember(qnaPostId, memberId);
-        qnaLikeValidationService.validateQnaLikeNotExists(qnaPostId, memberId);
+    public LikeResponse likeQnaPost(String postId, UUID memberId) {
+        qnaLikeValidationService.validateExistedQnaPostAndMember(postId, memberId);
+        qnaLikeValidationService.validateQnaLikeNotExists(postId, memberId);
 
-        QnaPostEntity qnaPost = qnaPostRepository.findById(qnaPostId).orElseThrow(() -> new IllegalArgumentException("qna post not found"));
+        QnaPostEntity qnaPost = qnaPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("qna post not found"));
         qnaPost.increaseLikeCount();
 
-        qnaLikeRepository.save(QnaLikeEntity.of(qnaPostId, memberId));
+        qnaLikeRepository.save(QnaLikeEntity.of(postId, memberId));
         return LikeResponse.of(qnaPost.getLikeCount(), true);
     }
 
     @Transactional
-    public LikeResponse unlikeQnaPost(String qnaPostId, UUID memberId) {
-        qnaLikeValidationService.validateExistedQnaPostAndMember(qnaPostId, memberId);
-        qnaLikeValidationService.validateQnaLikeExists(qnaPostId, memberId);
+    public LikeResponse unlikeQnaPost(String postId, UUID memberId) {
+        qnaLikeValidationService.validateExistedQnaPostAndMember(postId, memberId);
+        qnaLikeValidationService.validateQnaLikeExists(postId, memberId);
 
-        QnaPostEntity qnaPost = qnaPostRepository.findById(qnaPostId).orElseThrow(() -> new IllegalArgumentException("qna post not found"));
+        QnaPostEntity qnaPost = qnaPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("qna post not found"));
         qnaPost.decreaseLikeCount();
 
-        qnaLikeRepository.deleteByQnaPostIdAndMemberId(qnaPostId, memberId);
+        qnaLikeRepository.deleteByPostIdAndMemberId(postId, memberId);
         return LikeResponse.of(qnaPost.getLikeCount(), false);
     }
 }

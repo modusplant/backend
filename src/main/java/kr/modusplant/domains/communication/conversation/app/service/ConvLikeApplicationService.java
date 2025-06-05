@@ -20,26 +20,26 @@ public class ConvLikeApplicationService {
     private final ConvLikeValidationService convLikeValidationService;
 
     @Transactional
-    public LikeResponse likeConvPost(String convPostId, UUID memberId) {
-        convLikeValidationService.validateExistedConvPostAndMember(convPostId, memberId);
-        convLikeValidationService.validateConvLikeNotExists(convPostId, memberId);
+    public LikeResponse likeConvPost(String postId, UUID memberId) {
+        convLikeValidationService.validateExistedConvPostAndMember(postId, memberId);
+        convLikeValidationService.validateConvLikeNotExists(postId, memberId);
 
-        ConvPostEntity convPost = convPostRepository.findById(convPostId).orElseThrow(() -> new IllegalArgumentException("conv post not found"));
+        ConvPostEntity convPost = convPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("conv post not found"));
         convPost.increaseLikeCount();
 
-        convLikeRepository.save(ConvLikeEntity.of(convPostId, memberId));
+        convLikeRepository.save(ConvLikeEntity.of(postId, memberId));
         return LikeResponse.of(convPost.getLikeCount(), true);
     }
 
     @Transactional
-    public LikeResponse unlikeConvPost(String convPostId, UUID memberId) {
-        convLikeValidationService.validateExistedConvPostAndMember(convPostId, memberId);
-        convLikeValidationService.validateConvLikeExists(convPostId, memberId);
+    public LikeResponse unlikeConvPost(String postId, UUID memberId) {
+        convLikeValidationService.validateExistedConvPostAndMember(postId, memberId);
+        convLikeValidationService.validateConvLikeExists(postId, memberId);
 
-        ConvPostEntity convPost = convPostRepository.findById(convPostId).orElseThrow(() -> new IllegalArgumentException("conv post not found"));
+        ConvPostEntity convPost = convPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("conv post not found"));
         convPost.decreaseLikeCount();
 
-        convLikeRepository.deleteByConvPostIdAndMemberId(convPostId, memberId);
+        convLikeRepository.deleteByPostIdAndMemberId(postId, memberId);
         return LikeResponse.of(convPost.getLikeCount(), false);
     }
 }

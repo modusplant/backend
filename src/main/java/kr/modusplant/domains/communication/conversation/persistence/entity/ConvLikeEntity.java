@@ -21,7 +21,7 @@ import static kr.modusplant.global.vo.SnakeCaseWord.*;
 public class ConvLikeEntity {
     @Id
     @Column(name = SNAKE_POST_ULID, nullable = false)
-    private String convPostId;
+    private String postId;
 
     @Id
     @Column(name = SNAKE_MEMB_UUID, nullable = false)
@@ -31,12 +31,12 @@ public class ConvLikeEntity {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    private ConvLikeEntity(String convPostId, UUID memberId) {
-        this.convPostId = convPostId;
+    private ConvLikeEntity(String postId, UUID memberId) {
+        this.postId = postId;
         this.memberId = memberId;
     }
 
-    public static ConvLikeEntity of(String convPostId, UUID memberId) {
-        return new ConvLikeEntity(convPostId, memberId);
+    public static ConvLikeEntity of(String postId, UUID memberId) {
+        return new ConvLikeEntity(postId, memberId);
     }
 }

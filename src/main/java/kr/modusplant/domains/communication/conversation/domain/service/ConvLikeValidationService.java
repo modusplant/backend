@@ -21,27 +21,27 @@ public class ConvLikeValidationService {
     private final SiteMemberRepository memberRepository;
     private final ConvLikeRepository convLikeRepository;
 
-    public void validateExistedConvPostAndMember(String convPostId, UUID memberId) {
-        if (convPostId == null || memberId == null) {
-            throw new IllegalArgumentException("convPostId and memberId must not be null");
-        };
+    public void validateExistedConvPostAndMember(String postId, UUID memberId) {
+        if (postId == null || memberId == null) {
+            throw new IllegalArgumentException("postId and memberId must not be null");
+        }
 
-        if (!convPostRepository.existsById(convPostId)) {
-            throw new EntityNotFoundWithUlidException(convPostId, ConvPostEntity.class);
+        if (!convPostRepository.existsById(postId)) {
+            throw new EntityNotFoundWithUlidException(postId, ConvPostEntity.class);
         }
         if (!memberRepository.existsById(memberId)) {
             throw new EntityExistsWithUuidException(memberId, SiteMemberEntity.class);
         }
     }
 
-    public void validateConvLikeExists(String convPostId, UUID memberId) {
-        if (!convLikeRepository.existsByConvPostIdAndMemberId(convPostId, memberId)) {
+    public void validateConvLikeExists(String postId, UUID memberId) {
+        if (!convLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
             throw new IllegalArgumentException("member not liked status");
         }
     }
 
-    public void validateConvLikeNotExists(String convPostId, UUID memberId) {
-        if (convLikeRepository.existsByConvPostIdAndMemberId(convPostId, memberId)) {
+    public void validateConvLikeNotExists(String postId, UUID memberId) {
+        if (convLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
             throw new IllegalArgumentException("member already liked");
         }
     }

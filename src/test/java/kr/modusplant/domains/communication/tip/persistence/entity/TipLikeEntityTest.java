@@ -19,16 +19,16 @@ public class TipLikeEntityTest implements TipLikeEntityTestUtils {
     @Autowired
     private TestEntityManager entityManager;
 
-    private String tipPostId;
+    private String postId;
     private UUID memberId;
 
     @BeforeEach
     void setUp() {
         // given
-        tipPostId = tipPostWithUlid.getUlid();
+        postId = tipPostWithUlid.getUlid();
         memberId = createMemberBasicUserEntityWithUuid().getUuid();
 
-        TipLikeEntity tipLikeEntity = TipLikeEntity.of(tipPostId, memberId);
+        TipLikeEntity tipLikeEntity = TipLikeEntity.of(postId, memberId);
         entityManager.persistAndFlush(tipLikeEntity);
     }
 
@@ -36,11 +36,11 @@ public class TipLikeEntityTest implements TipLikeEntityTestUtils {
     @DisplayName("팁 게시글 좋아요")
     void likeTipPost_success () {
         // when
-        TipLikeEntity tipLikeEntity = entityManager.find(TipLikeEntity.class, new TipLikeId(tipPostId, memberId));
+        TipLikeEntity tipLikeEntity = entityManager.find(TipLikeEntity.class, new TipLikeId(postId, memberId));
 
         // then
         assertThat(tipLikeEntity).isNotNull();
-        assertThat(tipLikeEntity.getTipPostId()).isEqualTo(tipPostId);
+        assertThat(tipLikeEntity.getPostId()).isEqualTo(postId);
         assertThat(tipLikeEntity.getMemberId()).isEqualTo(memberId);
         assertThat(tipLikeEntity.getCreatedAt()).isNotNull();
         assertThat(tipLikeEntity.getCreatedAt()).isBeforeOrEqualTo(LocalDateTime.now());
@@ -50,13 +50,13 @@ public class TipLikeEntityTest implements TipLikeEntityTestUtils {
     @DisplayName("팁 게시글 좋아요 삭제")
     void unlikeTipPost_success() {
         // when
-        TipLikeEntity tipLikeEntity = entityManager.find(TipLikeEntity.class, new TipLikeId(tipPostId, memberId));
+        TipLikeEntity tipLikeEntity = entityManager.find(TipLikeEntity.class, new TipLikeId(postId, memberId));
         entityManager.remove(tipLikeEntity);
         entityManager.flush();
         entityManager.clear();
 
         // then
-        TipLikeEntity deletedEntity = entityManager.find(TipLikeEntity.class, new TipLikeId(tipPostId, memberId));
+        TipLikeEntity deletedEntity = entityManager.find(TipLikeEntity.class, new TipLikeId(postId, memberId));
         assertThat(deletedEntity).isNull();
     }
 }

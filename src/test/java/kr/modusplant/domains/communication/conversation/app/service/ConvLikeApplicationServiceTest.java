@@ -40,7 +40,7 @@ public class ConvLikeApplicationServiceTest implements SiteMemberEntityTestUtils
     private ConvLikeApplicationService convLikeApplicationService;
 
     private UUID memberId;
-    private String convPostId;
+    private String postId;
 
     @BeforeEach
     void setUp() {
@@ -54,7 +54,7 @@ public class ConvLikeApplicationServiceTest implements SiteMemberEntityTestUtils
                 .category(createTestConvCategoryEntity())
                 .build();
         convPostRepository.save(convPost);
-        convPostId = convPost.getUlid();
+        postId = convPost.getUlid();
 
         siteMemberRepository.flush();
         convPostRepository.flush();
@@ -64,13 +64,13 @@ public class ConvLikeApplicationServiceTest implements SiteMemberEntityTestUtils
     @DisplayName("좋아요 성공")
     void likeConvPost_success() {
         // when
-        LikeResponse response = convLikeApplicationService.likeConvPost(convPostId, memberId);
+        LikeResponse response = convLikeApplicationService.likeConvPost(postId, memberId);
 
         // then
         assertThat(response.liked()).isTrue();
         assertThat(response.likeCount()).isEqualTo(1);
 
-        ConvLikeEntity saved = convLikeRepository.findById(new ConvLikeId(convPostId, memberId)).orElse(null);
+        ConvLikeEntity saved = convLikeRepository.findById(new ConvLikeId(postId, memberId)).orElse(null);
 
         assertThat(saved).isNotNull();
     }
@@ -79,26 +79,26 @@ public class ConvLikeApplicationServiceTest implements SiteMemberEntityTestUtils
     @DisplayName("좋아요 취소 성공")
     void unlikeConvPost_success() {
         // given
-        convLikeApplicationService.likeConvPost(convPostId, memberId);
+        convLikeApplicationService.likeConvPost(postId, memberId);
 
         // when
-        LikeResponse response = convLikeApplicationService.unlikeConvPost(convPostId, memberId);
+        LikeResponse response = convLikeApplicationService.unlikeConvPost(postId, memberId);
 
         // then
         assertThat(response.liked()).isFalse();
         assertThat(response.likeCount()).isEqualTo(0);
-        assertThat(convLikeRepository.existsByConvPostIdAndMemberId(convPostId, memberId)).isFalse();
+        assertThat(convLikeRepository.existsByPostIdAndMemberId(postId, memberId)).isFalse();
     }
 
     @Test
     @DisplayName("이미 좋아요 한 게시글을 또 좋아요 시도할 경우 예외 발생")
     void likeConvPost_duplicateLike_throwsException() {
         // given
-        convLikeApplicationService.likeConvPost(convPostId, memberId);
+        convLikeApplicationService.likeConvPost(postId, memberId);
 
         // when & then
         assertThatThrownBy(() ->
-                convLikeApplicationService.likeConvPost(convPostId, memberId))
+                convLikeApplicationService.likeConvPost(postId, memberId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("member already liked");
     }
@@ -108,7 +108,7 @@ public class ConvLikeApplicationServiceTest implements SiteMemberEntityTestUtils
     void unlikeConvPost_withoutLike_throwsException() {
         // when & then
         assertThatThrownBy(() ->
-                convLikeApplicationService.unlikeConvPost(convPostId, memberId))
+                convLikeApplicationService.unlikeConvPost(postId, memberId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("member not liked status");
     }

@@ -20,26 +20,26 @@ public class TipLikeApplicationService {
     private final TipLikeValidationService tipLikeValidationService;
 
     @Transactional
-    public LikeResponse likeTipPost(String tipPostId, UUID memberId) {
-        tipLikeValidationService.validateExistedTipPostAndMember(tipPostId, memberId);
-        tipLikeValidationService.validateTipLikeNotExists(tipPostId, memberId);
+    public LikeResponse likeTipPost(String postId, UUID memberId) {
+        tipLikeValidationService.validateExistedTipPostAndMember(postId, memberId);
+        tipLikeValidationService.validateTipLikeNotExists(postId, memberId);
 
-        TipPostEntity tipPost = tipPostRepository.findById(tipPostId).orElseThrow(() -> new IllegalArgumentException("tip post not found"));
+        TipPostEntity tipPost = tipPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("tip post not found"));
         tipPost.increaseLikeCount();
 
-        tipLikeRepository.save(TipLikeEntity.of(tipPostId, memberId));
+        tipLikeRepository.save(TipLikeEntity.of(postId, memberId));
         return LikeResponse.of(tipPost.getLikeCount(), true);
     }
 
     @Transactional
-    public LikeResponse unlikeTipPost(String tipPostId, UUID memberId) {
-        tipLikeValidationService.validateExistedTipPostAndMember(tipPostId, memberId);
-        tipLikeValidationService.validateTipLikeExists(tipPostId, memberId);
+    public LikeResponse unlikeTipPost(String postId, UUID memberId) {
+        tipLikeValidationService.validateExistedTipPostAndMember(postId, memberId);
+        tipLikeValidationService.validateTipLikeExists(postId, memberId);
 
-        TipPostEntity tipPost = tipPostRepository.findById(tipPostId).orElseThrow(() -> new IllegalArgumentException("tip post not found"));
+        TipPostEntity tipPost = tipPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("tip post not found"));
         tipPost.decreaseLikeCount();
 
-        tipLikeRepository.deleteByTipPostIdAndMemberId(tipPostId, memberId);
+        tipLikeRepository.deleteByPostIdAndMemberId(postId, memberId);
         return LikeResponse.of(tipPost.getLikeCount(), false);
     }
 }

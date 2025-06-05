@@ -21,7 +21,7 @@ import static kr.modusplant.global.vo.SnakeCaseWord.*;
 public class QnaLikeEntity {
     @Id
     @Column(name = SNAKE_POST_ULID, nullable = false)
-    private String qnaPostId;
+    private String postId;
 
     @Id
     @Column(name = SNAKE_MEMB_UUID, nullable = false)
@@ -31,12 +31,12 @@ public class QnaLikeEntity {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    private QnaLikeEntity(String qnaPostId, UUID memberId) {
-        this.qnaPostId = qnaPostId;
+    private QnaLikeEntity(String postId, UUID memberId) {
+        this.postId = postId;
         this.memberId = memberId;
     }
 
-    public static QnaLikeEntity of(String qnaPostId, UUID memberId) {
-        return new QnaLikeEntity(qnaPostId, memberId);
+    public static QnaLikeEntity of(String postId, UUID memberId) {
+        return new QnaLikeEntity(postId, memberId);
     }
 }

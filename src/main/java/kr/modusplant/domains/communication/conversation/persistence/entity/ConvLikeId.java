@@ -12,6 +12,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class ConvLikeId implements Serializable {
-    private String convPostId;
+    private String postId;
     private UUID memberId;
 }

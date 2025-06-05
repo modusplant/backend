@@ -52,7 +52,7 @@ class ConvLikeValidationServiceTest {
     @Test
     @DisplayName("좋아요가 존재하지 않을 경우 예외 발생")
     void validateConvLikeExists_notLiked() {
-        when(convLikeRepository.existsByConvPostIdAndMemberId(CONV_POST_ID, MEMBER_ID)).thenReturn(false);
+        when(convLikeRepository.existsByPostIdAndMemberId(CONV_POST_ID, MEMBER_ID)).thenReturn(false);
 
         assertThatThrownBy(() -> validationService.validateConvLikeExists(CONV_POST_ID, MEMBER_ID))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -62,7 +62,7 @@ class ConvLikeValidationServiceTest {
     @Test
     @DisplayName("좋아요가 이미 존재할 경우 예외 발생")
     void validateConvLikeNotExists_alreadyLiked() {
-        when(convLikeRepository.existsByConvPostIdAndMemberId(CONV_POST_ID, MEMBER_ID)).thenReturn(true);
+        when(convLikeRepository.existsByPostIdAndMemberId(CONV_POST_ID, MEMBER_ID)).thenReturn(true);
 
         assertThatThrownBy(() -> validationService.validateConvLikeNotExists(CONV_POST_ID, MEMBER_ID))
                 .isInstanceOf(IllegalArgumentException.class)

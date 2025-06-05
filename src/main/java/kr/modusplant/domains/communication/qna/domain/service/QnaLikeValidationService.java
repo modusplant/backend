@@ -21,27 +21,27 @@ public class QnaLikeValidationService {
     private final SiteMemberRepository memberRepository;
     private final QnaLikeRepository qnaLikeRepository;
 
-    public void validateExistedQnaPostAndMember(String qnaPostId, UUID memberId) {
-        if (qnaPostId == null || memberId == null) {
-            throw new IllegalArgumentException("qnaPostId and memberId must not be null");
-        };
+    public void validateExistedQnaPostAndMember(String postId, UUID memberId) {
+        if (postId == null || memberId == null) {
+            throw new IllegalArgumentException("postId and memberId must not be null");
+        }
 
-        if (!qnaPostRepository.existsById(qnaPostId)) {
-            throw new EntityNotFoundWithUlidException(qnaPostId, QnaPostEntity.class);
+        if (!qnaPostRepository.existsById(postId)) {
+            throw new EntityNotFoundWithUlidException(postId, QnaPostEntity.class);
         }
         if (!memberRepository.existsById(memberId)) {
             throw new EntityExistsWithUuidException(memberId, SiteMemberEntity.class);
         }
     }
 
-    public void validateQnaLikeExists(String qnaPostId, UUID memberId) {
-        if (!qnaLikeRepository.existsByQnaPostIdAndMemberId(qnaPostId, memberId)) {
+    public void validateQnaLikeExists(String postId, UUID memberId) {
+        if (!qnaLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
             throw new IllegalArgumentException("member not liked status");
         }
     }
 
-    public void validateQnaLikeNotExists(String qnaPostId, UUID memberId) {
-        if (qnaLikeRepository.existsByQnaPostIdAndMemberId(qnaPostId, memberId)) {
+    public void validateQnaLikeNotExists(String postId, UUID memberId) {
+        if (qnaLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
             throw new IllegalArgumentException("member already liked");
         }
     }

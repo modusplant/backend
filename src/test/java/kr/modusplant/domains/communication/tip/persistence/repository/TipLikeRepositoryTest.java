@@ -24,13 +24,13 @@ public class TipLikeRepositoryTest implements TipLikeEntityTestUtils {
     @Nested
     @DisplayName("setUp 사용 테스트 그룹")
     class SetupTest {
-        private String tipPostId;
+        private String postId;
         private UUID memberId;
 
         @BeforeEach
         void setUp() {
             // given
-            tipPostId = tipPostWithUlid.getUlid();
+            postId = tipPostWithUlid.getUlid();
             memberId = createMemberBasicUserEntityWithUuid().getUuid();
         }
 
@@ -38,12 +38,12 @@ public class TipLikeRepositoryTest implements TipLikeEntityTestUtils {
         @DisplayName("팁 게시글 좋아요 후 조회")
         void likeTipPost_success() {
             // when
-            tipLikeRepository.save(TipLikeEntity.of(tipPostId, memberId));
+            tipLikeRepository.save(TipLikeEntity.of(postId, memberId));
 
             // then
-            Optional<TipLikeEntity> tipLikeEntity = tipLikeRepository.findById(new TipLikeId(tipPostId, memberId));
+            Optional<TipLikeEntity> tipLikeEntity = tipLikeRepository.findById(new TipLikeId(postId, memberId));
             assertThat(tipLikeEntity).isPresent();
-            assertThat(tipLikeEntity.get().getTipPostId()).isEqualTo(tipPostId);
+            assertThat(tipLikeEntity.get().getPostId()).isEqualTo(postId);
             assertThat(tipLikeEntity.get().getMemberId()).isEqualTo(memberId);
             assertThat(tipLikeEntity.get().getCreatedAt()).isNotNull();
         }
@@ -52,10 +52,10 @@ public class TipLikeRepositoryTest implements TipLikeEntityTestUtils {
         @DisplayName("특정 사용자 팁 게시글 좋아요 여부 확인")
         void isLikedByMember_returnsTrue() {
             // given
-            tipLikeRepository.save(TipLikeEntity.of(tipPostId, memberId));
+            tipLikeRepository.save(TipLikeEntity.of(postId, memberId));
 
             // when
-            boolean isLiked = tipLikeRepository.existsByTipPostIdAndMemberId(tipPostId, memberId);
+            boolean isLiked = tipLikeRepository.existsByPostIdAndMemberId(postId, memberId);
 
             // then
             assertThat(isLiked).isTrue();
@@ -65,13 +65,13 @@ public class TipLikeRepositoryTest implements TipLikeEntityTestUtils {
         @DisplayName("팁 게시글 좋아요 취소")
         void unlikeTipPost_success() {
             // given
-            tipLikeRepository.save(TipLikeEntity.of(tipPostId, memberId));
+            tipLikeRepository.save(TipLikeEntity.of(postId, memberId));
 
             // when
-            tipLikeRepository.deleteByTipPostIdAndMemberId(tipPostId, memberId);
+            tipLikeRepository.deleteByPostIdAndMemberId(postId, memberId);
 
             // then
-            assertThat(tipLikeRepository.existsByTipPostIdAndMemberId(tipPostId, memberId)).isFalse();
+            assertThat(tipLikeRepository.existsByPostIdAndMemberId(postId, memberId)).isFalse();
         }
     }
 
@@ -80,23 +80,23 @@ public class TipLikeRepositoryTest implements TipLikeEntityTestUtils {
     void findTipLikesByMemberId() {
         // given
         UUID memberId = createMemberBasicUserEntityWithUuid().getUuid();
-        List<String> tipPostIds = List.of(
+        List<String> postIds = List.of(
                 "TEST_TIP_POST_ID_001",
                 "TEST_TIP_POST_ID_002",
                 "TEST_TIP_POST_ID_003"
         );
 
         tipLikeRepository.saveAll(List.of(
-                TipLikeEntity.of(tipPostIds.get(0), memberId),
-                TipLikeEntity.of(tipPostIds.get(1), memberId),
-                TipLikeEntity.of(tipPostIds.get(2), memberId)
+                TipLikeEntity.of(postIds.get(0), memberId),
+                TipLikeEntity.of(postIds.get(1), memberId),
+                TipLikeEntity.of(postIds.get(2), memberId)
         ));
         tipLikeRepository.flush();
 
         // when
         List<TipLikeEntity> tipLikeList = tipLikeRepository.findByMemberId(memberId);
 
-        assertThat(tipLikeList).hasSize(tipPostIds.size());
+        assertThat(tipLikeList).hasSize(postIds.size());
     }
 
     @Test
@@ -104,29 +104,29 @@ public class TipLikeRepositoryTest implements TipLikeEntityTestUtils {
     void findTipLikesByMemberIdAndPostIds() {
         // given
         UUID memberId = createMemberBasicUserEntityWithUuid().getUuid();
-        List<String> tipPostIds = List.of(
+        List<String> postIds = List.of(
                 "TEST_TIP_POST_ID_001",
                 "TEST_TIP_POST_ID_002",
                 "TEST_TIP_POST_ID_003"
         );
 
         tipLikeRepository.saveAll(List.of(
-                TipLikeEntity.of(tipPostIds.get(0), memberId),
-                TipLikeEntity.of(tipPostIds.get(1), memberId),
-                TipLikeEntity.of(tipPostIds.get(2), memberId)
+                TipLikeEntity.of(postIds.get(0), memberId),
+                TipLikeEntity.of(postIds.get(1), memberId),
+                TipLikeEntity.of(postIds.get(2), memberId)
         ));
         tipLikeRepository.flush();
 
         // when
-        List<TipLikeEntity> tipLikeList = tipLikeRepository.findByMemberIdAndTipPostIdIn(memberId, tipPostIds);
+        List<TipLikeEntity> tipLikeList = tipLikeRepository.findByMemberIdAndPostIdIn(memberId, postIds);
 
         // then
-        List<String> likedTipPostIds = tipLikeList.stream()
-                .map(TipLikeEntity::getTipPostId)
+        List<String> likedPostIds = tipLikeList.stream()
+                .map(TipLikeEntity::getPostId)
                 .toList();
 
-        assertThat(tipLikeList).size().isEqualTo(tipPostIds.size());
-        assertThat(likedTipPostIds).hasSize(tipPostIds.size());
-        assertThat(likedTipPostIds).containsExactlyInAnyOrder(tipPostIds.get(0), tipPostIds.get(1), tipPostIds.get(2));
+        assertThat(tipLikeList).size().isEqualTo(postIds.size());
+        assertThat(likedPostIds).hasSize(postIds.size());
+        assertThat(likedPostIds).containsExactlyInAnyOrder(postIds.get(0), postIds.get(1), postIds.get(2));
     }
 }

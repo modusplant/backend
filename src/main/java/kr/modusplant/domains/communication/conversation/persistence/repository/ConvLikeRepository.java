@@ -14,8 +14,8 @@ public interface ConvLikeRepository extends JpaRepository<ConvLikeEntity, ConvLi
     List<ConvLikeEntity> findByMemberId(UUID memberId);
 
     // 사용자별 대화 게시글 좋아요 리스트 조회
-    List<ConvLikeEntity> findByMemberIdAndConvPostIdIn(UUID memberId, List<String> convPostIds);
+    List<ConvLikeEntity> findByMemberIdAndPostIdIn(UUID memberId, List<String> postIds);
 
-    boolean existsByConvPostIdAndMemberId(String convPostId, UUID memberId);
-    void deleteByConvPostIdAndMemberId(String convPostId, UUID memberId);
+    boolean existsByPostIdAndMemberId(String postId, UUID memberId);
+    void deleteByPostIdAndMemberId(String postId, UUID memberId);
 }
