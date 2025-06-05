@@ -18,6 +18,7 @@ public interface ConvPostAppInfraMapper extends PostAppInfraMapper {
     @Mapping(source = CATEGORY, target = CATEGORY, qualifiedByName = "toCategory")
     @Mapping(source = CATEGORY, target = CATEGORY_UUID, qualifiedByName = "toCategoryUuid")
     @Mapping(source = CATEGORY, target = CATEGORY_ORDER, qualifiedByName = "toCategoryOrder")
+    @Mapping(source = AUTH_MEMBER, target = MEMBER_UUID, qualifiedByName = "toMemberUuid")
     @Mapping(source = AUTH_MEMBER, target = NICKNAME, qualifiedByName = "toNickname")
     ConvPostResponse toConvPostResponse(ConvPostEntity convPostEntity);
 
