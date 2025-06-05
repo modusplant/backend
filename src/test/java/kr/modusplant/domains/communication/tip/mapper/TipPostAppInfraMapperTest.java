@@ -49,9 +49,9 @@ class TipPostAppInfraMapperTest implements TipPostEntityTestUtils, TipCategoryEn
         TipPostResponse tipPostResponse = tipPostAppInfraMapper.toTipPostResponse(tipPostEntity);
 
         // then
-        assertThat(tipPostResponse.getCategoryUuid()).isEqualTo(tipPostEntity.getCategory().getUuid());
-        assertThat(tipPostResponse.getCategory()).isEqualTo(tipPostEntity.getCategory().getCategory());
-        assertThat(tipPostResponse.getNickname()).isEqualTo(tipPostEntity.getAuthMember().getNickname());
+        assertThat(tipPostResponse.categoryUuid()).isEqualTo(tipPostEntity.getCategory().getUuid());
+        assertThat(tipPostResponse.category()).isEqualTo(tipPostEntity.getCategory().getCategory());
+        assertThat(tipPostResponse.nickname()).isEqualTo(tipPostEntity.getAuthMember().getNickname());
     }
 
 }

@@ -49,9 +49,9 @@ class ConvPostAppInfraMapperTest implements ConvPostEntityTestUtils, ConvCategor
         ConvPostResponse convPostResponse = convPostAppInfraMapper.toConvPostResponse(convPostEntity);
 
         // then
-        assertThat(convPostResponse.getCategoryUuid()).isEqualTo(convPostEntity.getCategory().getUuid());
-        assertThat(convPostResponse.getCategory()).isEqualTo(convPostEntity.getCategory().getCategory());
-        assertThat(convPostResponse.getNickname()).isEqualTo(convPostEntity.getAuthMember().getNickname());
+        assertThat(convPostResponse.categoryUuid()).isEqualTo(convPostEntity.getCategory().getUuid());
+        assertThat(convPostResponse.category()).isEqualTo(convPostEntity.getCategory().getCategory());
+        assertThat(convPostResponse.nickname()).isEqualTo(convPostEntity.getAuthMember().getNickname());
     }
 
 }

@@ -49,9 +49,8 @@ class QnaPostAppInfraMapperTest implements QnaPostEntityTestUtils, QnaCategoryEn
         QnaPostResponse qnaPostResponse = qnaPostAppInfraMapper.toQnaPostResponse(qnaPostEntity);
 
         // then
-        assertThat(qnaPostResponse.getCategoryUuid()).isEqualTo(qnaPostEntity.getCategory().getUuid());
-        assertThat(qnaPostResponse.getCategory()).isEqualTo(qnaPostEntity.getCategory().getCategory());
-        assertThat(qnaPostResponse.getNickname()).isEqualTo(qnaPostEntity.getAuthMember().getNickname());
+        assertThat(qnaPostResponse.categoryUuid()).isEqualTo(qnaPostEntity.getCategory().getUuid());
+        assertThat(qnaPostResponse.category()).isEqualTo(qnaPostEntity.getCategory().getCategory());
+        assertThat(qnaPostResponse.nickname()).isEqualTo(qnaPostEntity.getAuthMember().getNickname());
     }
-
 }

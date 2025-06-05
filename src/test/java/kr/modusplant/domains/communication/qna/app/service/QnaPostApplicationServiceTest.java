@@ -90,8 +90,8 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, QnaCat
         assertThat(result.getTotalElements()).isEqualTo(3);
         assertThat(result.getTotalPages()).isEqualTo(2);
         List<QnaPostResponse> posts = result.getContent();
-        assertThat(posts.get(0).getCreatedAt()).isAfterOrEqualTo(posts.get(1).getCreatedAt());
-        assertThat(posts.get(0).getCategoryUuid()).isEqualTo(categoryUuid);
+        assertThat(posts.get(0).createdAt()).isAfterOrEqualTo(posts.get(1).createdAt());
+        assertThat(posts.get(0).categoryUuid()).isEqualTo(categoryUuid);
     }
 
 
@@ -116,7 +116,7 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, QnaCat
         assertThat(result.getTotalElements()).isEqualTo(2);
         assertThat(result.getTotalPages()).isEqualTo(1);
         List<QnaPostResponse> posts = result.getContent();
-        assertThat(posts.get(0).getCreatedAt()).isAfterOrEqualTo(posts.get(1).getCreatedAt());
+        assertThat(posts.get(0).createdAt()).isAfterOrEqualTo(posts.get(1).createdAt());
     }
 
     @Test
@@ -137,7 +137,7 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, QnaCat
         assertThat(result.getTotalElements()).isEqualTo(3);
         assertThat(result.getTotalPages()).isEqualTo(2);
         List<QnaPostResponse> posts = result.getContent();
-        assertThat(posts.get(0).getCreatedAt()).isAfterOrEqualTo(posts.get(1).getCreatedAt());
+        assertThat(posts.get(0).createdAt()).isAfterOrEqualTo(posts.get(1).createdAt());
     }
 
     @Test
@@ -162,8 +162,8 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, QnaCat
         assertThat(result1.getTotalElements()).isEqualTo(1);
         assertThat(result2.getTotalElements()).isEqualTo(2);
         QnaPostResponse post = result1.getContent().getFirst();
-        assertThat(post.getTitle()).isEqualTo(qnaPostInsertRequest2.title());
-        assertThat(post.getContent().get(1).has("data")).isEqualTo(true);
+        assertThat(post.title()).isEqualTo(qnaPostInsertRequest2.title());
+        assertThat(post.content().get(1).has("data")).isEqualTo(true);
     }
 
 
@@ -189,10 +189,10 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, QnaCat
 
         assertThat(result).isPresent();
         QnaPostResponse response = result.get();
-        assertThat(response.getNickname()).isEqualTo(siteMember.getNickname());
-        assertThat(response.getCategory()).isEqualTo(qnaCategoryEntity.getCategory());
-        assertThat(response.getTitle()).isEqualTo(qnaPostInsertRequest.title());
-        assertThat(response.getViewCount()).isEqualTo(5L);
+        assertThat(response.nickname()).isEqualTo(siteMember.getNickname());
+        assertThat(response.category()).isEqualTo(qnaCategoryEntity.getCategory());
+        assertThat(response.title()).isEqualTo(qnaPostInsertRequest.title());
+        assertThat(response.viewCount()).isEqualTo(5L);
     }
 
     @Test
