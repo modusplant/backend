@@ -9,7 +9,6 @@ import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import kr.modusplant.modules.jwt.common.util.domain.RefreshTokenTestUtils;
 import kr.modusplant.modules.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
-import kr.modusplant.modules.jwt.error.InvalidTokenException;
 import kr.modusplant.modules.jwt.mapper.RefreshTokenAppInfraMapper;
 import kr.modusplant.modules.jwt.mapper.RefreshTokenAppInfraMapperImpl;
 import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
