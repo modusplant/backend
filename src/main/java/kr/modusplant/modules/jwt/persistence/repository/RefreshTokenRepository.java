@@ -12,11 +12,9 @@ import java.util.UUID;
 
 @Repository
 public interface RefreshTokenRepository extends UuidPrimaryKeyRepository<RefreshTokenEntity>,JpaRepository<RefreshTokenEntity, UUID> {
-    Optional<RefreshTokenEntity> findByMemberAndDeviceId(SiteMemberEntity member, UUID deviceId);
+    Optional<RefreshTokenEntity> findByMemberAndRefreshToken(SiteMemberEntity member, String refreshToken);
 
     Optional<RefreshTokenEntity> findByRefreshToken(String refreshToken);
-
-    Optional<RefreshTokenEntity> findByDeviceId(UUID deviceId);
 
     Boolean existsByRefreshToken(String refreshToken);
 

@@ -14,8 +14,6 @@ public class RefreshToken {
 
     private final UUID memberUuid;
 
-    private final UUID deviceId;
-
     private final String refreshToken;
 
     private final Date issuedAt;
@@ -25,7 +23,6 @@ public class RefreshToken {
     public static class TokenBuilder {
         private UUID uuid;
         private UUID memberUuid;
-        private UUID deviceId;
         private String refreshToken;
         private Date issuedAt;
         private Date expiredAt;
@@ -33,7 +30,6 @@ public class RefreshToken {
         public TokenBuilder token(RefreshToken refreshToken) {
             this.uuid = refreshToken.getUuid();
             this.memberUuid = refreshToken.getMemberUuid();
-            this.deviceId = refreshToken.getDeviceId();
             this.refreshToken = refreshToken.getRefreshToken();
             this.issuedAt = refreshToken.getIssuedAt();
             this.expiredAt = refreshToken.getExpiredAt();
@@ -41,7 +37,7 @@ public class RefreshToken {
         }
 
         public RefreshToken build() {
-            return new RefreshToken(this.uuid, this.memberUuid, this.deviceId, this.refreshToken, this.issuedAt, this.expiredAt);
+            return new RefreshToken(this.uuid, this.memberUuid, this.refreshToken, this.issuedAt, this.expiredAt);
         }
     }
 }
