@@ -17,5 +17,8 @@ public interface RefreshTokenRepository extends UuidPrimaryKeyRepository<Refresh
     Optional<RefreshTokenEntity> findByRefreshToken(String refreshToken);
 
     Optional<RefreshTokenEntity> findByDeviceId(UUID deviceId);
+
+    Boolean existsByRefreshToken(String refreshToken);
+
     void deleteByExpiredAtBefore(LocalDateTime expiredAt);
 }

@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Duration;
+
 import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_REFRESH_TOKEN;
 
 @Tag(name = "Social Login API", description = "소셜 로그인 API")
@@ -75,7 +77,13 @@ public class SocialAuthController {
     }
 
     private String setRefreshTokenCookie(String refreshToken) {
-        ResponseCookie refreshCookie = ResponseCookie.from(SNAKE_REFRESH_TOKEN, refreshToken).build();
+        ResponseCookie refreshCookie = ResponseCookie.from(SNAKE_REFRESH_TOKEN, refreshToken)
+                .httpOnly(true)
+                .secure(false)       // TODO: HTTPS 적용 후 true로 변경
+                .path("/")
+                .sameSite("Lax")
+                .maxAge(Duration.ofDays(7))
+                .build();
         return refreshCookie.toString();
     }
 }
