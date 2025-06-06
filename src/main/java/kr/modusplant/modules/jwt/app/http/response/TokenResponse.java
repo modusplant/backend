@@ -1,12 +1,7 @@
 package kr.modusplant.modules.jwt.app.http.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_ACCESS_TOKEN;
 
-@Getter
-@Setter
-@AllArgsConstructor
-public class TokenResponse {
-    private String accessToken;
+public record TokenResponse (@JsonProperty(SNAKE_ACCESS_TOKEN) String accessToken){
 }

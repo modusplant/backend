@@ -48,9 +48,9 @@ public class SocialAuthController {
 
         TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(), member.nickname(), member.role());
 
-        TokenResponse token = new TokenResponse(tokenPair.getAccessToken());
+        TokenResponse token = new TokenResponse(tokenPair.accessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(token);
-        String refreshCookie = setRefreshTokenCookie(tokenPair.getRefreshToken());
+        String refreshCookie = setRefreshTokenCookie(tokenPair.refreshToken());
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie).body(response);
     }
@@ -68,9 +68,9 @@ public class SocialAuthController {
 
         TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(), member.nickname(), member.role());
 
-        TokenResponse token = new TokenResponse(tokenPair.getAccessToken());
+        TokenResponse token = new TokenResponse(tokenPair.accessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(token);
-        String refreshCookie = setRefreshTokenCookie(tokenPair.getRefreshToken());
+        String refreshCookie = setRefreshTokenCookie(tokenPair.refreshToken());
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie).body(response);
     }
