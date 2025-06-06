@@ -9,6 +9,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -111,6 +113,53 @@ class RefreshTokenRepositoryTest implements RefreshTokenEntityTestUtils {
 
         // then
         assertThat(refreshTokenRepository.existsByUuid(refreshToken.getUuid())).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("refresh token값으로 refresh token 정보가 DB에 존재하는지 확인")
+    void existsByRefreshTokenTest() {
+        // given
+        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
+
+        // when
+        RefreshTokenEntity refreshToken = refreshTokenRepository.save(
+                createRefreshTokenBasicEntityBuilder()
+                        .member(member)
+                        .build()
+        );
+
+        // then
+        assertThat(refreshTokenRepository.existsByRefreshToken(refreshToken.getRefreshToken())).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("만료시간이 지난 refresh token 삭제")
+    void deleteByExpiredAtBeforeTest() {
+        // given
+        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
+        LocalDateTime now = LocalDateTime.now();
+        refreshTokenRepository.save(
+                createRefreshTokenBasicEntityBuilder()
+                        .member(member)
+                        .issuedAt(now.minusDays(7))
+                        .expiredAt(now.minusHours(1))
+                        .build()
+        );
+        refreshTokenRepository.save(
+                createRefreshTokenBasicEntityBuilder()
+                        .member(member)
+                        .issuedAt(now.minusDays(7))
+                        .expiredAt(now.plusHours(1))
+                        .build()
+        );
+
+        // when
+        refreshTokenRepository.deleteByExpiredAtBefore(now);
+
+        // then
+        List<RefreshTokenEntity> remainingTokens = refreshTokenRepository.findAll();
+        assertThat(remainingTokens.size()).isEqualTo(1);
+        assertThat(remainingTokens.get(0).getExpiredAt()).isAfter(now);
     }
 
 }

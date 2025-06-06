@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
@@ -37,6 +38,7 @@ import static org.mockito.BDDMockito.*;
 @ExtendWith(MockitoExtension.class)
 class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemberRoleResponseTestUtils {
     @InjectMocks
+    @Spy
     private TokenApplicationService tokenApplicationService;
     @Mock
     private TokenProvider tokenProvider;
@@ -89,8 +91,6 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
 
         // then
         assertNotNull(tokenPair);
-        assertEquals(accessToken, tokenPair.getAccessToken());
-        assertEquals(refreshToken, tokenPair.getRefreshToken());
         assertEquals(accessToken, tokenPair.accessToken());
         assertEquals(refreshToken, tokenPair.refreshToken());
 
@@ -108,6 +108,7 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
         SiteMemberRoleResponse siteMemberRoleResponse = mock(SiteMemberRoleResponse.class);
         given(siteMemberResponse.nickname()).willReturn(nickname);
         given(siteMemberRoleResponse.role()).willReturn(role);
+        String newRefreshToken = "new-refresh-token";
         String newAccessToken = "new-access-token";
         RefreshToken oldToken = RefreshToken.builder()
                 .uuid(UUID.randomUUID())
@@ -118,10 +119,12 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
         given(tokenProvider.validateToken(refreshToken)).willReturn(true);
         willDoNothing().given(tokenValidationService).validateNotFoundRefreshToken(refreshToken);
         given(tokenProvider.getMemberUuidFromToken(refreshToken)).willReturn(memberUuid);
-        given(siteMemberService.getByUuid(memberUuid)).willReturn(Optional.of(siteMemberResponse));
-        given(siteMemberRoleService.getByUuid(memberUuid)).willReturn(Optional.of(memberRoleUserResponse));
         given(memberApplicationService.getByUuid(memberUuid)).willReturn(Optional.of(siteMemberResponse));
         given(memberRoleApplicationService.getByUuid(memberUuid)).willReturn(Optional.of(siteMemberRoleResponse));
+        given(tokenProvider.generateRefreshToken(memberUuid)).willReturn(newRefreshToken);
+        given(refreshTokenApplicationService.getByRefreshToken(refreshToken)).willReturn(Optional.of(oldToken));
+        given(tokenProvider.getIssuedAtFromToken(newRefreshToken)).willReturn(issuedAt);
+        given(tokenProvider.getExpirationFromToken(newRefreshToken)).willReturn(expiredAt);
         given(refreshTokenApplicationService.insert(any())).willAnswer(invocation -> invocation.getArgument(0));
         given(tokenProvider.generateAccessToken(memberUuid, claims)).willReturn(newAccessToken);
 
@@ -129,15 +132,18 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
         TokenPair result = tokenApplicationService.reissueToken(refreshToken);
 
         // then
-        assertNotEquals(accessToken, result.getAccessToken());
-        assertEquals(refreshToken, result.getRefreshToken());
         assertThat(result.accessToken()).isEqualTo(newAccessToken);
+        assertThat(result.refreshToken()).isEqualTo(newRefreshToken);
 
         then(tokenProvider).should().validateToken(refreshToken);
         then(tokenValidationService).should().validateNotFoundRefreshToken(refreshToken);
         then(tokenProvider).should().getMemberUuidFromToken(refreshToken);
         then(memberApplicationService).should().getByUuid(memberUuid);
         then(memberRoleApplicationService).should().getByUuid(memberUuid);
+        then(tokenProvider).should().generateRefreshToken(memberUuid);
+        then(refreshTokenApplicationService).should().getByRefreshToken(refreshToken);
+        then(tokenProvider).should().getIssuedAtFromToken(newRefreshToken);
+        then(tokenProvider).should().getExpirationFromToken(newRefreshToken);
         then(refreshTokenApplicationService).should().insert(any(RefreshToken.class));
         then(tokenProvider).should().generateAccessToken(eq(memberUuid), eq(claims));
     }
@@ -218,7 +224,6 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
     void removeTokenNotFoundEarlyExit() {
         // given
         given(tokenProvider.validateToken(refreshToken)).willReturn(true);
-        given(refreshTokenApplicationService.checkNotExistedRefreshToken(refreshToken)).willReturn(true);
         willDoNothing().given(tokenValidationService).validateNotFoundRefreshToken(refreshToken);
         given(tokenProvider.getMemberUuidFromToken(refreshToken)).willReturn(memberUuid);
         given(refreshTokenApplicationService.getByMemberUuidAndRefreshToken(memberUuid, refreshToken)).willReturn(Optional.empty());
@@ -228,13 +233,43 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
         verify(refreshTokenApplicationService, never()).removeByUuid(any());
     }
 
+    @Test
+    @DisplayName("토큰 검증 테스트 : access token 만료 전")
+    void verifyAndReissueTokenWhenAccessTokenIsNotExpiredTest() {
+        // given
+        given(tokenProvider.validateToken(accessToken)).willReturn(true);
 
         // when
-        tokenApplicationService.removeToken(refreshToken);
+        TokenPair result = tokenApplicationService.verifyAndReissueToken(accessToken,refreshToken);
 
         // then
-        assertDoesNotThrow(() -> tokenApplicationService.removeToken(refreshToken));
-        verify(refreshTokenApplicationService, never()).removeByUuid(any());
+        assertThat(result.accessToken()).isEqualTo(accessToken);
+        assertThat(result.refreshToken()).isEqualTo(refreshToken);
+
+        then(tokenProvider).should().validateToken(accessToken);
+        then(tokenProvider).should(never()).validateToken(refreshToken);
+    }
+
+    @Test
+    @DisplayName("토큰 검증 테스트 : access token 만료")
+    void verifyAndReissueTokenWhenAccessTokenIsExpiredTest() {
+        // given
+        String newAccessToken = "new-access-token";
+        String newRefreshToken = "new-refresh-token";
+        given(tokenProvider.validateToken(accessToken)).willReturn(false);
+        given(tokenProvider.validateToken(refreshToken)).willReturn(true);
+        doReturn(new TokenPair(newAccessToken,newRefreshToken)).when(tokenApplicationService).reissueToken(refreshToken);
+
+        // when
+        TokenPair result = tokenApplicationService.verifyAndReissueToken(accessToken,refreshToken);
+
+        // then
+        assertThat(result.accessToken()).isEqualTo(newAccessToken);
+        assertThat(result.refreshToken()).isEqualTo(newRefreshToken);
+
+        then(tokenProvider).should().validateToken(accessToken);
+        then(tokenProvider).should().validateToken(refreshToken);
+        then(tokenApplicationService).should().reissueToken(refreshToken);
     }
 
 }
