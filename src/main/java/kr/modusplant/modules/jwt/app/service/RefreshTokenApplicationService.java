@@ -56,8 +56,4 @@ public class RefreshTokenApplicationService {
     public void removeByUuid(UUID uuid) {
         tokenRepository.deleteByUuid(uuid);
     }
-
-    public boolean checkNotExistedRefreshToken(String refreshToken) {
-        return tokenRepository.findByRefreshToken(refreshToken).isEmpty();
-    }
 }

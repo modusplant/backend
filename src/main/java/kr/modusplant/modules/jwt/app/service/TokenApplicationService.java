@@ -64,19 +64,27 @@ public class TokenApplicationService {
         // refresh token 검증
         if(!tokenProvider.validateToken(refreshToken))
             throw new InvalidTokenException("The Refresh Token has expired. Please log in again.");
-        if (refreshTokenApplicationService.checkNotExistedRefreshToken(refreshToken))
-            throw new InvalidTokenException("Failed to find Refresh Token");
+        tokenValidationService.validateNotFoundRefreshToken(refreshToken);
 
-        // access token 재발급
+        // token에서 사용자 정보 가져오기
         UUID memberUuid = tokenProvider.getMemberUuidFromToken(refreshToken);
         SiteMemberResponse siteMember = memberApplicationService.getByUuid(memberUuid)
                 .orElseThrow(() -> new TokenNotFoundException("Failed to find Site member"));
         SiteMemberRoleResponse siteMemberRole = memberRoleApplicationService.getByUuid(memberUuid)
                 .orElseThrow(() -> new TokenNotFoundException("Failed to find Site member role"));
 
-        Map<String,String> claims = new HashMap<>();
-        claims.put("nickname",siteMember.nickname());
-        claims.put("role",siteMemberRole.role().getValue());
+        // refresh token 재발급 (RTR기법)
+        String reissuedRefreshToken = tokenProvider.generateRefreshToken(memberUuid);
+        refreshTokenApplicationService.insert(
+                RefreshToken.builder()
+                        .uuid(refreshTokenApplicationService.getByRefreshToken(refreshToken).orElseThrow().getUuid())
+                        .memberUuid(memberUuid)
+                        .refreshToken(reissuedRefreshToken)
+                        .issuedAt(tokenProvider.getIssuedAtFromToken(reissuedRefreshToken))
+                        .expiredAt(tokenProvider.getExpirationFromToken(reissuedRefreshToken))
+                        .build());
+
+        // access token 재발급
         String accessToken = tokenProvider.generateAccessToken(memberUuid,claims);
 
         return TokenPair.builder()
@@ -89,9 +97,7 @@ public class TokenApplicationService {
     public void removeToken(String refreshToken) {
         // 토큰 검증
         tokenProvider.validateToken(refreshToken);
-        if (refreshTokenApplicationService.checkNotExistedRefreshToken(refreshToken))
-            return ;
-
+        tokenValidationService.validateNotFoundRefreshToken(refreshToken);
         UUID memberUuid = tokenProvider.getMemberUuidFromToken(refreshToken);
         UUID deviceId = refreshTokenApplicationService.getByRefreshToken(refreshToken)
                 .map(RefreshToken::getDeviceId)

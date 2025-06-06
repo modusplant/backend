@@ -39,4 +39,10 @@ public class TokenValidationService {
             throw new EntityNotFoundWithUuidException(uuid, RefreshTokenEntity.class);
         }
     }
+
+    public void validateNotFoundRefreshToken(String refreshToken) {
+        if (refreshToken == null || !tokenRepository.existsByRefreshToken(refreshToken)) {
+            throw new EntityNotFoundException("Failed to find Refresh Token");
+        }
+    }
 }
