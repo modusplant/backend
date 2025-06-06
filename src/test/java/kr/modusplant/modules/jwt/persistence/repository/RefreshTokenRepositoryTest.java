@@ -45,7 +45,7 @@ class RefreshTokenRepositoryTest implements RefreshTokenEntityTestUtils {
 
     @Test
     @DisplayName("member와 device id로 refresh token 정보 찾기")
-    void findByMemberAndDeviceIdTest() {
+    void findByMemberAndRefreshTokenTest() {
         // given
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
@@ -57,7 +57,7 @@ class RefreshTokenRepositoryTest implements RefreshTokenEntityTestUtils {
         );
 
         // then
-        assertThat(refreshTokenRepository.findByMemberAndDeviceId(member, refreshToken.getDeviceId()).orElseThrow()).isEqualTo(refreshToken);
+        assertThat(refreshTokenRepository.findByMemberAndRefreshToken(member, refreshToken.getRefreshToken()).orElseThrow()).isEqualTo(refreshToken);
     }
 
     @Test
@@ -75,23 +75,6 @@ class RefreshTokenRepositoryTest implements RefreshTokenEntityTestUtils {
 
         // then
         assertThat(refreshTokenRepository.findByRefreshToken(refreshToken.getRefreshToken()).orElseThrow()).isEqualTo(refreshToken);
-    }
-
-    @Test
-    @DisplayName("deviceId로 refresh token 정보 찾기")
-    void findByDeviceIdTest() {
-        // given
-        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
-
-        // when
-        RefreshTokenEntity refreshToken = refreshTokenRepository.save(
-                createRefreshTokenBasicEntityBuilder()
-                        .member(member)
-                        .build()
-        );
-
-        // then
-        assertThat(refreshTokenRepository.findByDeviceId(refreshToken.getDeviceId()).orElseThrow()).isEqualTo(refreshToken);
     }
 
     @Test
