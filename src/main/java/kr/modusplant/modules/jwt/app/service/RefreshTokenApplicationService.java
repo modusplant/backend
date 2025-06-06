@@ -28,22 +28,17 @@ public class RefreshTokenApplicationService {
         return tokenOrEmpty.isEmpty() ? Optional.empty() : Optional.of(refreshTokenAppInfraMapper.toRefreshToken(tokenOrEmpty.orElseThrow()));
     }
 
-    public Optional<RefreshToken> getByMemberUuidAndDeviceId(UUID uuid, UUID deviceId) {
-        Optional<RefreshTokenEntity> tokenOrEmpty = tokenRepository.findByMemberAndDeviceId(
+    public Optional<RefreshToken> getByMemberUuidAndRefreshToken(UUID uuid, String refreshToken) {
+        Optional<RefreshTokenEntity> tokenOrEmpty = tokenRepository.findByMemberAndRefreshToken(
                 memberRepository.findByUuid(uuid)
                         .orElseThrow(() -> new EntityNotFoundWithUuidException(uuid, RefreshTokenEntity.class)),
-                deviceId
+                refreshToken
         );
         return tokenOrEmpty.isEmpty() ? Optional.empty() : Optional.of(refreshTokenAppInfraMapper.toRefreshToken(tokenOrEmpty.orElseThrow()));
     }
 
     public Optional<RefreshToken> getByRefreshToken(String refreshToken) {
         Optional<RefreshTokenEntity> tokenOrEmpty = tokenRepository.findByRefreshToken(refreshToken);
-        return tokenOrEmpty.isEmpty() ? Optional.empty() : Optional.of(refreshTokenAppInfraMapper.toRefreshToken(tokenOrEmpty.orElseThrow()));
-    }
-
-    public Optional<RefreshToken> getByDeviceId(UUID deviceId) {
-        Optional<RefreshTokenEntity> tokenOrEmpty = tokenRepository.findByDeviceId(deviceId);
         return tokenOrEmpty.isEmpty() ? Optional.empty() : Optional.of(refreshTokenAppInfraMapper.toRefreshToken(tokenOrEmpty.orElseThrow()));
     }
 

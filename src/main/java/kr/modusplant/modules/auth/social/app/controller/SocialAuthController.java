@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.global.app.servlet.response.DataResponse;
-import kr.modusplant.global.util.GenerationUtils;
 import kr.modusplant.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.modules.auth.social.app.http.request.SocialLoginRequest;
 import kr.modusplant.modules.auth.social.app.service.SocialAuthApplicationService;
@@ -47,7 +46,7 @@ public class SocialAuthController {
     public ResponseEntity<DataResponse<?>> kakaoSocialLogin(@Valid @RequestBody SocialLoginRequest request) {
         JwtUserPayload member = socialAuthApplicationService.handleSocialLogin(AuthProvider.KAKAO, request.getCode());
 
-        TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(), member.nickname(), member.role(), GenerationUtils.generateDeviceId());
+        TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(), member.nickname(), member.role());
 
         TokenResponse token = new TokenResponse(tokenPair.getAccessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(token);
@@ -67,7 +66,7 @@ public class SocialAuthController {
     public ResponseEntity<DataResponse<?>> googleSocialLogin(@Valid @RequestBody SocialLoginRequest request) {
         JwtUserPayload member = socialAuthApplicationService.handleSocialLogin(AuthProvider.GOOGLE, request.getCode());
 
-        TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(), member.nickname(), member.role(), GenerationUtils.generateDeviceId());
+        TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(), member.nickname(), member.role());
 
         TokenResponse token = new TokenResponse(tokenPair.getAccessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(token);

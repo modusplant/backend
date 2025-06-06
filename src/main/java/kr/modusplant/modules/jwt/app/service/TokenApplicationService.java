@@ -29,10 +29,9 @@ public class TokenApplicationService {
     private final TokenValidationService tokenValidationService;
 
     // 토큰 생성
-    public TokenPair issueToken(UUID memberUuid, String nickname, Role role, UUID deviceId) {
-        // memberUuid, deviceId 검증
+    public TokenPair issueToken(UUID memberUuid, String nickname, Role role) {
+        // memberUuid 검증
         tokenValidationService.validateNotFoundMemberUuid(MEMBER_UUID, memberUuid);
-        tokenValidationService.validateExistedDeviceId(deviceId);
 
         // accessToken , refresh token 생성
         Map<String,String> claims = new HashMap<>();
@@ -43,20 +42,16 @@ public class TokenApplicationService {
         String refreshToken = tokenProvider.generateRefreshToken(memberUuid);
 
         // refresh token DB에 저장
-        RefreshToken token = RefreshToken.builder()
-                .memberUuid(memberUuid)
-                .deviceId(deviceId)
-                .refreshToken(refreshToken)
-                .issuedAt(tokenProvider.getIssuedAtFromToken(refreshToken))
-                .expiredAt(tokenProvider.getExpirationFromToken(refreshToken))
-                .build();
+        refreshTokenApplicationService.insert(
+                RefreshToken.builder()
+                        .memberUuid(memberUuid)
+                        .refreshToken(refreshToken)
+                        .issuedAt(tokenProvider.getIssuedAtFromToken(refreshToken))
+                        .expiredAt(tokenProvider.getExpirationFromToken(refreshToken))
+                        .build());
 
-        refreshTokenApplicationService.insert(token);
 
-        return TokenPair.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+        return new TokenPair(accessToken,refreshToken);
     }
 
     // 토큰 갱신
@@ -99,14 +94,9 @@ public class TokenApplicationService {
         tokenProvider.validateToken(refreshToken);
         tokenValidationService.validateNotFoundRefreshToken(refreshToken);
         UUID memberUuid = tokenProvider.getMemberUuidFromToken(refreshToken);
-        UUID deviceId = refreshTokenApplicationService.getByRefreshToken(refreshToken)
-                .map(RefreshToken::getDeviceId)
-                .orElseThrow(() -> new TokenNotFoundException("Failed to find Device ID"));
-
-        RefreshToken token = refreshTokenApplicationService.getByMemberUuidAndDeviceId(memberUuid,deviceId)
+        RefreshToken token = refreshTokenApplicationService.getByMemberUuidAndRefreshToken(memberUuid,refreshToken)
                 .orElseThrow(() -> new TokenNotFoundException("Failed to find Refresh Token"));
-
-        tokenValidationService.validateNotFoundTokenUuid(token.getUuid());
+        // 토큰 삭제
         refreshTokenApplicationService.removeByUuid(token.getUuid());
     }
 
