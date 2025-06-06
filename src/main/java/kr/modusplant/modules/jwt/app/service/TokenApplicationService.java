@@ -34,10 +34,7 @@ public class TokenApplicationService {
         tokenValidationService.validateNotFoundMemberUuid(MEMBER_UUID, memberUuid);
 
         // accessToken , refresh token 생성
-        Map<String,String> claims = new HashMap<>();
-        claims.put("nickname",nickname);
-        claims.put("role",role.getValue());
-
+        Map<String,String> claims = createClaims(nickname,role);
         String accessToken = tokenProvider.generateAccessToken(memberUuid, claims);
         String refreshToken = tokenProvider.generateRefreshToken(memberUuid);
 
@@ -80,12 +77,10 @@ public class TokenApplicationService {
                         .build());
 
         // access token 재발급
+        Map<String,String> claims = createClaims(siteMember.nickname(),siteMemberRole.role());
         String accessToken = tokenProvider.generateAccessToken(memberUuid,claims);
 
-        return TokenPair.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+        return new TokenPair(accessToken,reissuedRefreshToken);
     }
 
     // 토큰 삭제
@@ -103,10 +98,17 @@ public class TokenApplicationService {
     // 토큰 검증
     public TokenPair verifyAndReissueToken(String accessToken, String refreshToken) {
         if (tokenProvider.validateToken(accessToken)) {
-            return TokenPair.builder().accessToken(accessToken).refreshToken(refreshToken).build();
+            return new TokenPair(accessToken,refreshToken);
         }
         tokenProvider.validateToken(refreshToken);
 
         return reissueToken(refreshToken);
+    }
+
+    private Map<String,String> createClaims(String nickname, Role role) {
+        Map<String,String> claims = new HashMap<>();
+        claims.put("nickname",nickname);
+        claims.put("role",role.getValue());
+        return claims;
     }
 }

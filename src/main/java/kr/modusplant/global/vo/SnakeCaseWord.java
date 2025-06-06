@@ -14,7 +14,6 @@ public final class SnakeCaseWord {
     public static final String SNAKE_CATE_UUID = "cate_uuid";
     public static final String SNAKE_CONV_CATE = "conv_cate";
     public static final String SNAKE_CREATED_AT = "created_at";
-    public static final String SNAKE_DEVICE_ID = "device_id";
     public static final String SNAKE_EXPIRED_AT = "expired_at";
     public static final String SNAKE_FAILED_ATTEMPT = "failed_attempt";
     public static final String SNAKE_FK_TOKEN_MEMB_UUID = "fk_token_memb_uuid";
@@ -30,6 +29,7 @@ public final class SnakeCaseWord {
     public static final String SNAKE_ORDER_INFO = "order_info";
     public static final String SNAKE_PROVIDER_ID = "provider_id";
     public static final String SNAKE_QNA_CATE = "qna_cate";
+    public static final String SNAKE_ACCESS_TOKEN = "access_token";
     public static final String SNAKE_REFRESH_TOKEN = "refresh_token";
     public static final String SNAKE_SITE_MEMBER = "site_member";
     public static final String SNAKE_SITE_MEMBER_AUTH = "site_member_auth";
@@ -38,7 +38,6 @@ public final class SnakeCaseWord {
     public static final String SNAKE_TIP_CATE = "tip_cate";
     public static final String SNAKE_VER_NUM = "ver_num";
     public static final String SNAKE_MEMB_UUID = "memb_uuid";
-    public static final String SNAKE_PLANT_GROUP = "plant_group";
     public static final String SNAKE_TIP_POST = "tip_post";
     public static final String SNAKE_QNA_POST = "qna_post";
     public static final String SNAKE_CONV_POST = "conv_post";
