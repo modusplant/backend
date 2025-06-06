@@ -6,6 +6,7 @@ import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,4 +17,5 @@ public interface RefreshTokenRepository extends UuidPrimaryKeyRepository<Refresh
     Optional<RefreshTokenEntity> findByRefreshToken(String refreshToken);
 
     Optional<RefreshTokenEntity> findByDeviceId(UUID deviceId);
+    void deleteByExpiredAtBefore(LocalDateTime expiredAt);
 }
