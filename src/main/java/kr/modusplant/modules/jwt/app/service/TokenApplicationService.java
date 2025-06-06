@@ -103,4 +103,14 @@ public class TokenApplicationService {
         tokenValidationService.validateNotFoundTokenUuid(token.getUuid());
         refreshTokenApplicationService.removeByUuid(token.getUuid());
     }
+
+    // 토큰 검증
+    public TokenPair verifyAndReissueToken(String accessToken, String refreshToken) {
+        if (tokenProvider.validateToken(accessToken)) {
+            return TokenPair.builder().accessToken(accessToken).refreshToken(refreshToken).build();
+        }
+        tokenProvider.validateToken(refreshToken);
+
+        return reissueToken(refreshToken);
+    }
 }
