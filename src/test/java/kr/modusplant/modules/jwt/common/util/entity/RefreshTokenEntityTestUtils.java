@@ -13,7 +13,6 @@ import static kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity.bu
 public interface RefreshTokenEntityTestUtils extends SiteMemberEntityTestUtils {
     default RefreshTokenEntityBuilder createRefreshTokenBasicEntityBuilder() {
         return builder()
-                .deviceId(RefreshTokenTestUtils.refreshTokenBasicUser.getDeviceId())
                 .refreshToken(RefreshTokenTestUtils.refreshTokenBasicUser.getRefreshToken())
                 .issuedAt(convertToLocalDateTime(RefreshTokenTestUtils.refreshTokenBasicUser.getIssuedAt()))
                 .expiredAt(convertToLocalDateTime(RefreshTokenTestUtils.refreshTokenBasicUser.getExpiredAt()));
