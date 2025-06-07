@@ -8,7 +8,7 @@ import kr.modusplant.domains.communication.tip.app.http.request.TipPostInsertReq
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostUpdateRequest;
 import kr.modusplant.domains.communication.tip.app.http.response.TipPostResponse;
 import kr.modusplant.domains.communication.tip.app.service.TipPostApplicationService;
-import kr.modusplant.global.app.servlet.response.DataResponse;
+import kr.modusplant.global.app.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
