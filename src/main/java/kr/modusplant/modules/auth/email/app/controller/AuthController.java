@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import kr.modusplant.global.app.servlet.response.DataResponse;
+import kr.modusplant.global.app.http.response.DataResponse;
 import kr.modusplant.modules.auth.email.app.http.request.EmailRequest;
 import kr.modusplant.modules.auth.email.app.http.request.VerifyEmailRequest;
 import kr.modusplant.modules.auth.email.app.service.MailService;

@@ -5,7 +5,7 @@ import kr.modusplant.domains.communication.qna.app.http.response.QnaCommentRespo
 import kr.modusplant.domains.communication.qna.app.service.QnaCommentApplicationService;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.global.app.servlet.response.DataResponse;
+import kr.modusplant.global.app.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;

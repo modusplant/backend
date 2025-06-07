@@ -5,7 +5,7 @@ import kr.modusplant.domains.communication.tip.app.http.response.TipCommentRespo
 import kr.modusplant.domains.communication.tip.app.service.TipCommentApplicationService;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.global.app.servlet.response.DataResponse;
+import kr.modusplant.global.app.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;

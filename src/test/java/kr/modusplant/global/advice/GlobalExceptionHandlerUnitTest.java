@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import jakarta.servlet.http.HttpServletRequest;
-import kr.modusplant.global.app.servlet.response.DataResponse;
+import kr.modusplant.global.app.http.response.DataResponse;
 import kr.modusplant.modules.auth.social.error.OAuthException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

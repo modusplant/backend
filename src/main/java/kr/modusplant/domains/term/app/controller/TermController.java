@@ -6,7 +6,7 @@ import kr.modusplant.domains.term.app.http.request.TermInsertRequest;
 import kr.modusplant.domains.term.app.http.request.TermUpdateRequest;
 import kr.modusplant.domains.term.app.http.response.TermResponse;
 import kr.modusplant.domains.term.app.service.TermApplicationService;
-import kr.modusplant.global.app.servlet.response.DataResponse;
+import kr.modusplant.global.app.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;

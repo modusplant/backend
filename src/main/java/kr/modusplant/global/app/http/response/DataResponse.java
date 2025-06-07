@@ -1,4 +1,4 @@
-package kr.modusplant.global.app.servlet.response;
+package kr.modusplant.global.app.http.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;

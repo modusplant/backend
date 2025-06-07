@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvCategoryInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.response.ConvCategoryResponse;
 import kr.modusplant.domains.communication.conversation.app.service.ConvCategoryApplicationService;
-import kr.modusplant.global.app.servlet.response.DataResponse;
+import kr.modusplant.global.app.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;

@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaCategoryInsertRequest;
 import kr.modusplant.domains.communication.qna.app.http.response.QnaCategoryResponse;
 import kr.modusplant.domains.communication.qna.app.service.QnaCategoryApplicationService;
-import kr.modusplant.global.app.servlet.response.DataResponse;
+import kr.modusplant.global.app.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;

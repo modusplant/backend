@@ -8,7 +8,7 @@ import kr.modusplant.domains.communication.conversation.app.http.request.ConvPos
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostUpdateRequest;
 import kr.modusplant.domains.communication.conversation.app.http.response.ConvPostResponse;
 import kr.modusplant.domains.communication.conversation.app.service.ConvPostApplicationService;
-import kr.modusplant.global.app.servlet.response.DataResponse;
+import kr.modusplant.global.app.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;

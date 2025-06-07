@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.modusplant.domains.member.enums.AuthProvider;
-import kr.modusplant.global.app.servlet.response.DataResponse;
+import kr.modusplant.global.app.http.response.DataResponse;
 import kr.modusplant.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.modules.auth.social.app.http.request.SocialLoginRequest;
 import kr.modusplant.modules.auth.social.app.service.SocialAuthApplicationService;
