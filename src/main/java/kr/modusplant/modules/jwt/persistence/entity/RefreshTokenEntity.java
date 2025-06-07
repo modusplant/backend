@@ -25,16 +25,16 @@ public class RefreshTokenEntity {
     private UUID uuid;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(nullable = false, name = SNAKE_MEMB_UUID, foreignKey = @ForeignKey(name = SNAKE_FK_TOKEN_MEMB_UUID, value = ConstraintMode.CONSTRAINT))
+    @JoinColumn(name = SNAKE_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(name = SNAKE_FK_TOKEN_MEMB_UUID, value = ConstraintMode.CONSTRAINT))
     private SiteMemberEntity member;
 
     @Column(name = SNAKE_REFRESH_TOKEN, nullable = false)
     private String refreshToken;
 
-    @Column(name = SNAKE_ISSUED_AT)
+    @Column(name = SNAKE_ISSUED_AT, nullable = false)
     private LocalDateTime issuedAt;
 
-    @Column(name = SNAKE_EXPIRED_AT)
+    @Column(name = SNAKE_EXPIRED_AT, nullable = false)
     private LocalDateTime expiredAt;
 
     @Override
