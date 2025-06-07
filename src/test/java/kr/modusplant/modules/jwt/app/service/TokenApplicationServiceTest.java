@@ -13,6 +13,7 @@ import kr.modusplant.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.modules.jwt.domain.service.TokenValidationService;
 import kr.modusplant.modules.jwt.error.InvalidTokenException;
 import kr.modusplant.modules.jwt.error.TokenNotFoundException;
+import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static kr.modusplant.domains.member.vo.MemberUuid.MEMBER_UUID;
+import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
+import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -162,7 +165,7 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
     void reissueTokenFailWhenRefreshTokenNotFoundInDB() {
         // given
         given(tokenProvider.validateToken(refreshToken)).willReturn(true);
-        doThrow(new EntityNotFoundException("Failed to find Refresh Token"))
+        doThrow(new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), "refreshToken", refreshToken, RefreshTokenEntity.class)))
                 .when(tokenValidationService).validateNotFoundRefreshToken(refreshToken);
 
         // then

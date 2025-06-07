@@ -23,7 +23,7 @@ public class TipLikeValidationService {
 
     public void validateExistedTipPostAndMember(String postId, UUID memberId) {
         if (postId == null || memberId == null) {
-            throw new IllegalArgumentException("postId and memberId must not be null");
+            throw new IllegalArgumentException("PostId and memberId must not be null.");
         }
 
         if (!tipPostRepository.existsById(postId)) {
@@ -34,15 +34,15 @@ public class TipLikeValidationService {
         }
     }
 
-    public void validateTipLikeExists(String postId, UUID memberId) {
+    public void validateNotFoundTipLike(String postId, UUID memberId) {
         if (!tipLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
-            throw new IllegalArgumentException("member not liked status");
+            throw new IllegalArgumentException("Member not liked.");
         }
     }
 
-    public void validateTipLikeNotExists(String postId, UUID memberId) {
+    public void validateExistedTipLike(String postId, UUID memberId) {
         if (tipLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
-            throw new IllegalArgumentException("member already liked");
+            throw new IllegalArgumentException("Member already liked.");
         }
     }
 }

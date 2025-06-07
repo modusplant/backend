@@ -1,7 +1,8 @@
 package kr.modusplant.domains.communication.qna.domain.service;
 
-import kr.modusplant.domains.communication.common.error.EntityExistsWithPostUlidAndMatePathException;
-import kr.modusplant.domains.communication.common.error.EntityNotFoundWithPostUlidAndMatePathException;
+import kr.modusplant.domains.communication.common.error.EntityExistsWithPostUlidAndPathException;
+import kr.modusplant.domains.communication.common.error.EntityNotFoundWithPostUlidAndPathException;
+import kr.modusplant.domains.communication.qna.persistence.entity.QnaCommentEntity;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaCommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public class QnaCommentValidationService {
         Optional.ofNullable(path).orElseThrow(() -> new IllegalArgumentException("path is null"));
 
         if (commentRepository.findByPostUlidAndPath(postUlid, path).isPresent()) {
-            throw new EntityExistsWithPostUlidAndMatePathException("qna comment entity already exists");
+            throw new EntityExistsWithPostUlidAndPathException(postUlid, path, QnaCommentEntity.class);
         }
     }
 
@@ -29,7 +30,7 @@ public class QnaCommentValidationService {
         Optional.ofNullable(path).orElseThrow(() -> new IllegalArgumentException("path is null"));
 
         if(commentRepository.findByPostUlidAndPath(postUlid, path).isEmpty()) {
-            throw new EntityNotFoundWithPostUlidAndMatePathException("qna comment entity not found");
+            throw new EntityNotFoundWithPostUlidAndPathException(postUlid, path, QnaCommentEntity.class);
         }
     }
 }

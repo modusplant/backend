@@ -28,7 +28,7 @@ public abstract class AbstractPostValidationService {
 
     protected void validateTitle(String title) {
         if (title == null || title.isBlank() || title.length() > 150) {
-            throw new IllegalArgumentException("title must not be null or blank and must be at most 150 characters long.");
+            throw new IllegalArgumentException("Title must not be null or blank and must be at most 150 characters long.");
         }
     }
 

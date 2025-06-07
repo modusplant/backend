@@ -1,7 +1,8 @@
 package kr.modusplant.domains.communication.conversation.domain.service;
 
-import kr.modusplant.domains.communication.common.error.EntityExistsWithPostUlidAndMatePathException;
-import kr.modusplant.domains.communication.common.error.EntityNotFoundWithPostUlidAndMatePathException;
+import kr.modusplant.domains.communication.common.error.EntityExistsWithPostUlidAndPathException;
+import kr.modusplant.domains.communication.common.error.EntityNotFoundWithPostUlidAndPathException;
+import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCommentEntity;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,12 +16,12 @@ import java.util.Optional;
 public class ConvCommentValidationService {
     private final ConvCommentRepository commentRepository;
 
-    public void validateFoundConvCommentEntity(String postUlid, String path) {
+    public void validateExistedConvCommentEntity(String postUlid, String path) {
         Optional.ofNullable(postUlid).orElseThrow(() -> new IllegalArgumentException("postUlid is null"));
         Optional.ofNullable(path).orElseThrow(() -> new IllegalArgumentException("path is null"));
 
         if (commentRepository.findByPostUlidAndPath(postUlid, path).isPresent()) {
-            throw new EntityExistsWithPostUlidAndMatePathException("conv comment entity already exists");
+            throw new EntityExistsWithPostUlidAndPathException(postUlid, path, ConvCommentEntity.class);
         }
     }
 
@@ -29,7 +30,7 @@ public class ConvCommentValidationService {
         Optional.ofNullable(path).orElseThrow(() -> new IllegalArgumentException("path is null"));
 
         if(commentRepository.findByPostUlidAndPath(postUlid, path).isEmpty()) {
-            throw new EntityNotFoundWithPostUlidAndMatePathException("conv comment entity not found");
+            throw new EntityNotFoundWithPostUlidAndPathException(postUlid, path, ConvCommentEntity.class);
         }
     }
 }

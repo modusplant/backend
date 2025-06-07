@@ -22,7 +22,7 @@ public class ConvLikeApplicationService {
     @Transactional
     public LikeResponse likeConvPost(String postId, UUID memberId) {
         convLikeValidationService.validateExistedConvPostAndMember(postId, memberId);
-        convLikeValidationService.validateConvLikeNotExists(postId, memberId);
+        convLikeValidationService.validateExistedConvLike(postId, memberId);
 
         ConvPostEntity convPost = convPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("conv post not found"));
         convPost.increaseLikeCount();
@@ -34,7 +34,7 @@ public class ConvLikeApplicationService {
     @Transactional
     public LikeResponse unlikeConvPost(String postId, UUID memberId) {
         convLikeValidationService.validateExistedConvPostAndMember(postId, memberId);
-        convLikeValidationService.validateConvLikeExists(postId, memberId);
+        convLikeValidationService.validateNotFoundConvLike(postId, memberId);
 
         ConvPostEntity convPost = convPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("conv post not found"));
         convPost.decreaseLikeCount();

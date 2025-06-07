@@ -23,7 +23,7 @@ public class ConvLikeValidationService {
 
     public void validateExistedConvPostAndMember(String postId, UUID memberId) {
         if (postId == null || memberId == null) {
-            throw new IllegalArgumentException("postId and memberId must not be null");
+            throw new IllegalArgumentException("PostId and memberId must not be null.");
         }
 
         if (!convPostRepository.existsById(postId)) {
@@ -34,15 +34,15 @@ public class ConvLikeValidationService {
         }
     }
 
-    public void validateConvLikeExists(String postId, UUID memberId) {
+    public void validateNotFoundConvLike(String postId, UUID memberId) {
         if (!convLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
-            throw new IllegalArgumentException("member not liked status");
+            throw new IllegalArgumentException("Member not liked.");
         }
     }
 
-    public void validateConvLikeNotExists(String postId, UUID memberId) {
+    public void validateExistedConvLike(String postId, UUID memberId) {
         if (convLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
-            throw new IllegalArgumentException("member already liked");
+            throw new IllegalArgumentException("Member already liked.");
         }
     }
 }

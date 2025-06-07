@@ -36,7 +36,7 @@ public class TokenValidationService {
 
     public void validateNotFoundRefreshToken(String refreshToken) {
         if (refreshToken == null || !tokenRepository.existsByRefreshToken(refreshToken)) {
-            throw new EntityNotFoundException("Failed to find Refresh Token");
+            throw new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), "refreshToken", refreshToken, RefreshTokenEntity.class));
         }
     }
 }
