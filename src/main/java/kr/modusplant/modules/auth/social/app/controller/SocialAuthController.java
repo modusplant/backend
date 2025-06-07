@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.global.app.servlet.response.DataResponse;
-import kr.modusplant.global.util.GenerationUtils;
 import kr.modusplant.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.modules.auth.social.app.http.request.SocialLoginRequest;
 import kr.modusplant.modules.auth.social.app.service.SocialAuthApplicationService;
@@ -22,6 +21,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Duration;
 
 import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_REFRESH_TOKEN;
 
@@ -45,11 +46,11 @@ public class SocialAuthController {
     public ResponseEntity<DataResponse<?>> kakaoSocialLogin(@Valid @RequestBody SocialLoginRequest request) {
         JwtUserPayload member = socialAuthApplicationService.handleSocialLogin(AuthProvider.KAKAO, request.getCode());
 
-        TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(), member.nickname(), member.role(), GenerationUtils.generateDeviceId());
+        TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(), member.nickname(), member.role());
 
-        TokenResponse token = new TokenResponse(tokenPair.getAccessToken());
+        TokenResponse token = new TokenResponse(tokenPair.accessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(token);
-        String refreshCookie = setRefreshTokenCookie(tokenPair.getRefreshToken());
+        String refreshCookie = setRefreshTokenCookie(tokenPair.refreshToken());
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie).body(response);
     }
@@ -65,17 +66,23 @@ public class SocialAuthController {
     public ResponseEntity<DataResponse<?>> googleSocialLogin(@Valid @RequestBody SocialLoginRequest request) {
         JwtUserPayload member = socialAuthApplicationService.handleSocialLogin(AuthProvider.GOOGLE, request.getCode());
 
-        TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(), member.nickname(), member.role(), GenerationUtils.generateDeviceId());
+        TokenPair tokenPair = tokenApplicationService.issueToken(member.memberUuid(), member.nickname(), member.role());
 
-        TokenResponse token = new TokenResponse(tokenPair.getAccessToken());
+        TokenResponse token = new TokenResponse(tokenPair.accessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(token);
-        String refreshCookie = setRefreshTokenCookie(tokenPair.getRefreshToken());
+        String refreshCookie = setRefreshTokenCookie(tokenPair.refreshToken());
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie).body(response);
     }
 
     private String setRefreshTokenCookie(String refreshToken) {
-        ResponseCookie refreshCookie = ResponseCookie.from(SNAKE_REFRESH_TOKEN, refreshToken).build();
+        ResponseCookie refreshCookie = ResponseCookie.from(SNAKE_REFRESH_TOKEN, refreshToken)
+                .httpOnly(true)
+                .secure(false)       // TODO: HTTPS 적용 후 true로 변경
+                .path("/")
+                .sameSite("Lax")
+                .maxAge(Duration.ofDays(7))
+                .build();
         return refreshCookie.toString();
     }
 }

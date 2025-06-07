@@ -28,9 +28,6 @@ public class RefreshTokenEntity {
     @JoinColumn(nullable = false, name = SNAKE_MEMB_UUID, foreignKey = @ForeignKey(name = SNAKE_FK_TOKEN_MEMB_UUID, value = ConstraintMode.CONSTRAINT))
     private SiteMemberEntity member;
 
-    @Column(name = SNAKE_DEVICE_ID, nullable = false, unique = true)
-    private UUID deviceId;
-
     @Column(name = SNAKE_REFRESH_TOKEN, nullable = false)
     private String refreshToken;
 
@@ -52,10 +49,9 @@ public class RefreshTokenEntity {
         return new HashCodeBuilder(17, 37).append(getMember()).toHashCode();
     }
 
-    private RefreshTokenEntity(UUID uuid, SiteMemberEntity member, UUID deviceId, String refreshToken, LocalDateTime issuedAt, LocalDateTime expiredAt) {
+    private RefreshTokenEntity(UUID uuid, SiteMemberEntity member, String refreshToken, LocalDateTime issuedAt, LocalDateTime expiredAt) {
         this.uuid = uuid;
         this.member = member;
-        this.deviceId = deviceId;
         this.refreshToken = refreshToken;
         this.issuedAt = issuedAt;
         this.expiredAt = expiredAt;
@@ -68,7 +64,6 @@ public class RefreshTokenEntity {
     public static final class RefreshTokenEntityBuilder {
         private UUID uuid;
         private SiteMemberEntity member;
-        private UUID deviceId;
         private String refreshToken;
         private LocalDateTime issuedAt;
         private LocalDateTime expiredAt;
@@ -80,11 +75,6 @@ public class RefreshTokenEntity {
 
         public RefreshTokenEntityBuilder member(final SiteMemberEntity member) {
             this.member = member;
-            return this;
-        }
-
-        public RefreshTokenEntityBuilder deviceId(final UUID deviceId) {
-            this.deviceId = deviceId;
             return this;
         }
 
@@ -106,7 +96,6 @@ public class RefreshTokenEntity {
         public RefreshTokenEntityBuilder tokenEntity(final RefreshTokenEntity token) {
             this.uuid = token.getUuid();
             this.member = token.getMember();
-            this.deviceId = token.getDeviceId();
             this.refreshToken = token.getRefreshToken();
             this.issuedAt = token.getIssuedAt();
             this.expiredAt = token.getExpiredAt();
@@ -114,7 +103,7 @@ public class RefreshTokenEntity {
         }
 
         public RefreshTokenEntity build() {
-            return new RefreshTokenEntity(this.uuid, this.member, this.deviceId, this.refreshToken, this.issuedAt, this.expiredAt);
+            return new RefreshTokenEntity(this.uuid, this.member, this.refreshToken, this.issuedAt, this.expiredAt);
         }
     }
 }

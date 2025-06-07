@@ -19,7 +19,6 @@ public interface RefreshTokenAppInfraMapper {
     default RefreshTokenEntity toRefreshTokenEntity(RefreshToken refreshToken, @Context SiteMemberRepository memberRepository) {
         return RefreshTokenEntity.builder()
                 .member(memberRepository.findByUuid(refreshToken.getMemberUuid()).orElseThrow())
-                .deviceId(refreshToken.getDeviceId())
                 .refreshToken(refreshToken.getRefreshToken())
                 .issuedAt(convertToLocalDateTime(refreshToken.getIssuedAt()))
                 .expiredAt(convertToLocalDateTime(refreshToken.getExpiredAt()))
