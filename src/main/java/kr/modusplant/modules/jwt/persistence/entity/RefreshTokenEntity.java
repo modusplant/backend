@@ -25,7 +25,7 @@ public class RefreshTokenEntity {
     private UUID uuid;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = SNAKE_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(name = SNAKE_FK_TOKEN_MEMB_UUID, value = ConstraintMode.CONSTRAINT))
+    @JoinColumn(nullable = false, name = SNAKE_MEMB_UUID, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity member;
 
     @Column(name = SNAKE_REFRESH_TOKEN, nullable = false)
