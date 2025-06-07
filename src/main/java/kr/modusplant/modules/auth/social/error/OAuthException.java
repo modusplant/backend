@@ -1,5 +1,6 @@
 package kr.modusplant.modules.auth.social.error;
 
+import kr.modusplant.global.enums.ResponseMessage;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -11,9 +12,9 @@ public class OAuthException extends RuntimeException {
     private final String message;
 
     private static final Map<HttpStatus,String> STATUS_MESSAGES = Map.of(
-            HttpStatus.BAD_REQUEST, "Bad Request: Failed due to client error",
             HttpStatus.UNAUTHORIZED, "Unauthorized: Invalid or missing authentication credentials",
-            HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error: An unexpected error occurred on the server"
+            HttpStatus.BAD_REQUEST, ResponseMessage.RESPONSE_MESSAGE_400.getValue(),
+            HttpStatus.INTERNAL_SERVER_ERROR, ResponseMessage.RESPONSE_MESSAGE_500.getValue()
     );
 
     public OAuthException(HttpStatus status) {

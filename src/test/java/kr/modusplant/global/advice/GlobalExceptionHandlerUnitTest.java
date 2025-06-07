@@ -94,7 +94,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("Invalid client data", errorResponse.getMessage());
+        assertEquals("invalid client data", errorResponse.getMessage());
     }
 
     @DisplayName("MethodArgumentNotValidException 처리")
@@ -110,7 +110,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("Invalid method argument", errorResponse.getMessage());
+        assertEquals("invalid method argument", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -127,7 +127,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.CONFLICT.value(), errorResponse.getStatus());
-        assertEquals("Not available resource", errorResponse.getMessage());
+        assertEquals("not available resource", errorResponse.getMessage());
     }
 
     @DisplayName("요청 간 InvalidFormatException 처리")
@@ -145,7 +145,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("Value cannot be deserialized to expected type", errorResponse.getMessage());
+        assertEquals("Value cannot be deserialized to expected type.", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -164,7 +164,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("Body has property that target class do not know", errorResponse.getMessage());
+        assertEquals("Body has property that target class do not know.", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -183,7 +183,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("Mapping to body and Java object failed", errorResponse.getMessage());
+        assertEquals("Mapping to body and Java object failed.", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -202,7 +202,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("Parsing body and Java object failed", errorResponse.getMessage());
+        assertEquals("Parsing body and Java object failed.", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -220,7 +220,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("Malformed request body", errorResponse.getMessage());
+        assertEquals("malformed request body", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -239,7 +239,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
-        assertEquals("Value cannot be deserialized to expected type", errorResponse.getMessage());
+        assertEquals("Value cannot be deserialized to expected type.", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -258,7 +258,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
-        assertEquals("Body has property that target class do not know", errorResponse.getMessage());
+        assertEquals("Body has property that target class do not know.", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -277,7 +277,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
-        assertEquals("Mapping to body and Java object failed", errorResponse.getMessage());
+        assertEquals("Mapping to body and Java object failed.", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -296,7 +296,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
-        assertEquals("Parsing body and Java object failed", errorResponse.getMessage());
+        assertEquals("Parsing body and Java object failed.", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -313,7 +313,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
-        assertEquals("Malformed request body", errorResponse.getMessage());
+        assertEquals("malformed request body", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 }

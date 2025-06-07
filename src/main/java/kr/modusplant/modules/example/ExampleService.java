@@ -38,7 +38,7 @@ public class ExampleService {
             String value3 = "Test String Value 3(1min), Expire Time : " + LocalDateTime.now().plusMinutes(1).toString();
             redisHelper.setString(redisKey3, value3, Duration.ofMinutes(1));
         } catch (Exception e) {
-            throw new RuntimeException("Redis 저장 Test 에러"); // 예외 발생
+            throw new RuntimeException("Redis storage test error occurred."); // 예외 발생
         }
 
         return "RedisHelper Test Successful";

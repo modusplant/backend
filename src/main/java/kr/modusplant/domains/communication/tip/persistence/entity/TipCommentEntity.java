@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 
 import static kr.modusplant.domains.member.vo.MemberUuid.SNAKE_AUTH_MEMB_UUID;
 import static kr.modusplant.domains.member.vo.MemberUuid.SNAKE_CREA_MEMB_UUID;
-import static kr.modusplant.global.vo.SnakeCaseWord.*;
+import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_IS_DELETED;
 import static kr.modusplant.global.vo.TableName.TIP_COMM;
 
 @Entity

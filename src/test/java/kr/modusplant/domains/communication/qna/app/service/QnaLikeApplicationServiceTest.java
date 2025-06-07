@@ -100,7 +100,7 @@ public class QnaLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
         assertThatThrownBy(() ->
                 qnaLikeApplicationService.likeQnaPost(postId, memberId))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("member already liked");
+                .hasMessageContaining("Member already liked.");
     }
 
     @Test
@@ -110,6 +110,6 @@ public class QnaLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
         assertThatThrownBy(() ->
                 qnaLikeApplicationService.unlikeQnaPost(postId, memberId))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("member not liked status");
+                .hasMessageContaining("Member not liked.");
     }
 }

@@ -22,7 +22,7 @@ public class TipLikeApplicationService {
     @Transactional
     public LikeResponse likeTipPost(String postId, UUID memberId) {
         tipLikeValidationService.validateExistedTipPostAndMember(postId, memberId);
-        tipLikeValidationService.validateTipLikeNotExists(postId, memberId);
+        tipLikeValidationService.validateExistedTipLike(postId, memberId);
 
         TipPostEntity tipPost = tipPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("tip post not found"));
         tipPost.increaseLikeCount();
@@ -34,7 +34,7 @@ public class TipLikeApplicationService {
     @Transactional
     public LikeResponse unlikeTipPost(String postId, UUID memberId) {
         tipLikeValidationService.validateExistedTipPostAndMember(postId, memberId);
-        tipLikeValidationService.validateTipLikeExists(postId, memberId);
+        tipLikeValidationService.validateNotFoundTipLike(postId, memberId);
 
         TipPostEntity tipPost = tipPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("tip post not found"));
         tipPost.decreaseLikeCount();

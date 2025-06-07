@@ -1,7 +1,8 @@
 package kr.modusplant.domains.communication.tip.domain.service;
 
-import kr.modusplant.domains.communication.common.error.EntityExistsWithPostUlidAndMatePathException;
-import kr.modusplant.domains.communication.common.error.EntityNotFoundWithPostUlidAndMatePathException;
+import kr.modusplant.domains.communication.common.error.EntityExistsWithPostUlidAndPathException;
+import kr.modusplant.domains.communication.common.error.EntityNotFoundWithPostUlidAndPathException;
+import kr.modusplant.domains.communication.tip.persistence.entity.TipCommentEntity;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipCommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public class TipCommentValidationService {
         Optional.ofNullable(path).orElseThrow(() -> new IllegalArgumentException("path is null"));
 
         if (commentRepository.findByPostUlidAndPath(postUlid, path).isPresent()) {
-            throw new EntityExistsWithPostUlidAndMatePathException("tip comment entity already exists");
+            throw new EntityExistsWithPostUlidAndPathException(postUlid, path, TipCommentEntity.class);
         }
     }
 
@@ -29,7 +30,7 @@ public class TipCommentValidationService {
         Optional.ofNullable(path).orElseThrow(() -> new IllegalArgumentException("path is null"));
 
         if(commentRepository.findByPostUlidAndPath(postUlid, path).isEmpty()) {
-            throw new EntityNotFoundWithPostUlidAndMatePathException("tip comment entity not found");
+            throw new EntityNotFoundWithPostUlidAndPathException(postUlid, path, TipCommentEntity.class);
         }
     }
 }

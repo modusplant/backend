@@ -23,7 +23,7 @@ public class QnaLikeValidationService {
 
     public void validateExistedQnaPostAndMember(String postId, UUID memberId) {
         if (postId == null || memberId == null) {
-            throw new IllegalArgumentException("postId and memberId must not be null");
+            throw new IllegalArgumentException("PostId and memberId must not be null.");
         }
 
         if (!qnaPostRepository.existsById(postId)) {
@@ -34,15 +34,15 @@ public class QnaLikeValidationService {
         }
     }
 
-    public void validateQnaLikeExists(String postId, UUID memberId) {
+    public void validateNotFoundQnaLike(String postId, UUID memberId) {
         if (!qnaLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
-            throw new IllegalArgumentException("member not liked status");
+            throw new IllegalArgumentException("Member not liked.");
         }
     }
 
-    public void validateQnaLikeNotExists(String postId, UUID memberId) {
+    public void validateExistedQnaLike(String postId, UUID memberId) {
         if (qnaLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
-            throw new IllegalArgumentException("member already liked");
+            throw new IllegalArgumentException("Member already liked.");
         }
     }
 }

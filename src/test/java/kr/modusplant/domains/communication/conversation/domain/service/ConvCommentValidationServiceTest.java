@@ -2,8 +2,8 @@ package kr.modusplant.domains.communication.conversation.domain.service;
 
 import jakarta.persistence.EntityManager;
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
-import kr.modusplant.domains.communication.common.error.EntityExistsWithPostUlidAndMatePathException;
-import kr.modusplant.domains.communication.common.error.EntityNotFoundWithPostUlidAndMatePathException;
+import kr.modusplant.domains.communication.common.error.EntityExistsWithPostUlidAndPathException;
+import kr.modusplant.domains.communication.common.error.EntityNotFoundWithPostUlidAndPathException;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCommentEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvPostEntityTestUtils;
@@ -23,6 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
+import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
+import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -73,7 +76,7 @@ public class ConvCommentValidationServiceTest implements
 
     @DisplayName("postUlid와 구체화된 경로에 해당하는 댓글 데이터가 존재하는지 확인")
     @Test
-    void validateFoundConvCommentEntityTest() {
+    void validateExistedConvCommentEntityTest() {
         // given
         ConvCommentEntity commentEntity = createConvCommentEntityBuilder()
                 .postEntity(postEntity)
@@ -91,13 +94,13 @@ public class ConvCommentValidationServiceTest implements
         )).willReturn(Optional.of(commentEntity));
 
         // then
-        EntityExistsWithPostUlidAndMatePathException ex = assertThrows(
-                EntityExistsWithPostUlidAndMatePathException.class,
-                () -> commentValidationService.validateFoundConvCommentEntity(
+        EntityExistsWithPostUlidAndPathException ex = assertThrows(
+                EntityExistsWithPostUlidAndPathException.class,
+                () -> commentValidationService.validateExistedConvCommentEntity(
                         commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );
-        assertEquals("conv comment entity already exists", ex.getMessage());
+        assertEquals(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), "postUlid", commentEntity.getPostUlid(), "path", commentEntity.getPath(), ConvCommentEntity.class), ex.getMessage());
     }
 
     @DisplayName("postUlid와 댓글 경로에 해당하는 댓글 데이터가 존재하지 않는지 확인")
@@ -120,13 +123,12 @@ public class ConvCommentValidationServiceTest implements
         )).willReturn(Optional.empty());
 
         // then
-        EntityNotFoundWithPostUlidAndMatePathException ex = assertThrows(
-                EntityNotFoundWithPostUlidAndMatePathException.class,
+        EntityNotFoundWithPostUlidAndPathException ex = assertThrows(
+                EntityNotFoundWithPostUlidAndPathException.class,
                 () -> commentValidationService.validateNotFoundConvCommentEntity(
                         commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );
-        assertEquals("conv comment entity not found", ex.getMessage());
+        assertEquals(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), "postUlid", commentEntity.getPostUlid(), "path", commentEntity.getPath(), ConvCommentEntity.class), ex.getMessage());
     }
-
 }

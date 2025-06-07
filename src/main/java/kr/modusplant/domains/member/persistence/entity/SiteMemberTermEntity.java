@@ -12,7 +12,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.SnakeCaseWord.*;
+import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_LAST_MODIFIED_AT;
+import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_VER_NUM;
 import static kr.modusplant.global.vo.TableName.SITE_MEMBER_TERM;
 
 @Entity

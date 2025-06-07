@@ -10,6 +10,7 @@ import kr.modusplant.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.modules.jwt.domain.service.TokenValidationService;
 import kr.modusplant.modules.jwt.error.InvalidTokenException;
 import kr.modusplant.modules.jwt.error.TokenNotFoundException;
+import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import static kr.modusplant.domains.member.vo.MemberUuid.MEMBER_UUID;
+import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
+import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 
 @Service
 @RequiredArgsConstructor
@@ -90,7 +93,7 @@ public class TokenApplicationService {
         tokenValidationService.validateNotFoundRefreshToken(refreshToken);
         UUID memberUuid = tokenProvider.getMemberUuidFromToken(refreshToken);
         RefreshToken token = refreshTokenApplicationService.getByMemberUuidAndRefreshToken(memberUuid,refreshToken)
-                .orElseThrow(() -> new TokenNotFoundException("Failed to find Refresh Token"));
+                .orElseThrow(() -> new TokenNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), "refreshToken", refreshToken, RefreshTokenEntity.class)));
         // 토큰 삭제
         refreshTokenApplicationService.removeByUuid(token.getUuid());
     }

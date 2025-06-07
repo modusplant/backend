@@ -22,7 +22,7 @@ public class QnaLikeApplicationService {
     @Transactional
     public LikeResponse likeQnaPost(String postId, UUID memberId) {
         qnaLikeValidationService.validateExistedQnaPostAndMember(postId, memberId);
-        qnaLikeValidationService.validateQnaLikeNotExists(postId, memberId);
+        qnaLikeValidationService.validateExistedQnaLike(postId, memberId);
 
         QnaPostEntity qnaPost = qnaPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("qna post not found"));
         qnaPost.increaseLikeCount();
@@ -34,7 +34,7 @@ public class QnaLikeApplicationService {
     @Transactional
     public LikeResponse unlikeQnaPost(String postId, UUID memberId) {
         qnaLikeValidationService.validateExistedQnaPostAndMember(postId, memberId);
-        qnaLikeValidationService.validateQnaLikeExists(postId, memberId);
+        qnaLikeValidationService.validateNotFoundQnaLike(postId, memberId);
 
         QnaPostEntity qnaPost = qnaPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("qna post not found"));
         qnaPost.decreaseLikeCount();

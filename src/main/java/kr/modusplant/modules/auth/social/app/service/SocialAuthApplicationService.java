@@ -51,7 +51,7 @@ public class SocialAuthApplicationService {
         return switch (provider) {
             case KAKAO -> kakaoAuthClient;
             case GOOGLE -> googleAuthClient;
-            default -> throw new IllegalArgumentException("지원하지 않는 소셜 로그인 방식입니다: " + provider);
+            default -> throw new IllegalArgumentException("Unsupported social login method: " + provider);
         };
     }
 

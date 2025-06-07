@@ -2,8 +2,8 @@ package kr.modusplant.domains.communication.qna.domain.service;
 
 import jakarta.persistence.EntityManager;
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
-import kr.modusplant.domains.communication.common.error.EntityExistsWithPostUlidAndMatePathException;
-import kr.modusplant.domains.communication.common.error.EntityNotFoundWithPostUlidAndMatePathException;
+import kr.modusplant.domains.communication.common.error.EntityExistsWithPostUlidAndPathException;
+import kr.modusplant.domains.communication.common.error.EntityNotFoundWithPostUlidAndPathException;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaCommentEntityTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaPostEntityTestUtils;
@@ -23,6 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
+import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
+import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -91,13 +94,13 @@ public class QnaCommentValidationServiceTest implements
         )).willReturn(Optional.of(commentEntity));
 
         // then
-        EntityExistsWithPostUlidAndMatePathException ex = assertThrows(
-                EntityExistsWithPostUlidAndMatePathException.class,
+        EntityExistsWithPostUlidAndPathException ex = assertThrows(
+                EntityExistsWithPostUlidAndPathException.class,
                 () -> commentValidationService.validateFoundQnaCommentEntity(
                         commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );
-        assertEquals("qna comment entity already exists", ex.getMessage());
+        assertEquals(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), "postUlid", commentEntity.getPostUlid(), "path", commentEntity.getPath(), QnaCommentEntity.class), ex.getMessage());
     }
 
     @DisplayName("postUlid와 댓글 경로에 해당하는 댓글 데이터가 존재하지 않는지 확인")
@@ -120,13 +123,12 @@ public class QnaCommentValidationServiceTest implements
         )).willReturn(Optional.empty());
 
         // then
-        EntityNotFoundWithPostUlidAndMatePathException ex = assertThrows(
-                EntityNotFoundWithPostUlidAndMatePathException.class,
+        EntityNotFoundWithPostUlidAndPathException ex = assertThrows(
+                EntityNotFoundWithPostUlidAndPathException.class,
                 () -> commentValidationService.validateNotFoundQnaCommentEntity(
                         commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );
-        assertEquals("qna comment entity not found", ex.getMessage());
+        assertEquals(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), "postUlid", commentEntity.getPostUlid(), "path", commentEntity.getPath(), QnaCommentEntity.class), ex.getMessage());
     }
-
 }

@@ -44,7 +44,7 @@ public class MediaContentService {
 
     public JsonNode saveFilesAndGenerateContentJson(List<MultipartFile> parts) throws IOException {
         ArrayNode contentArray = objectMapper.createArrayNode();
-        int order=1;
+        int order = 1;
         for (MultipartFile part:parts) {
             contentArray.add(convertSinglePartToJson(part,order++));
         }
@@ -65,11 +65,11 @@ public class MediaContentService {
             node.put("type", "text");
             node.put(DATA, text);
         } else if (CONTENT_TYPE_DIR_MAP.containsKey(type)) {
-            String path = saveFileToLocal(part,CONTENT_TYPE_DIR_MAP.get(type),filename);
+            String path = saveFileToLocal(part, CONTENT_TYPE_DIR_MAP.get(type), filename);
             node.put("type", type);
             node.put(SRC, path);
         } else {
-            throw new IllegalArgumentException("Unsupported file type: "+contentType);
+            throw new IllegalArgumentException("Unsupported file type: " + contentType);
         }
         return node;
     }
@@ -142,7 +142,7 @@ public class MediaContentService {
         if (Files.exists(path)) {
             Files.delete(path);
         } else {
-            throw new FileNotFoundException("파일을 찾을 수 없습니다: " + src);
+            throw new FileNotFoundException("Cannot find the file with the path: " + src);
         }
     }
 }

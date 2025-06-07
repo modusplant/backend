@@ -73,7 +73,7 @@ public class ConvCommentApplicationService {
     public ConvCommentResponse insert(ConvCommentInsertRequest commentInsertRequest) {
         String postUlid = commentInsertRequest.postUlid();
         String path = commentInsertRequest.path();
-        convCommentValidationService.validateFoundConvCommentEntity(postUlid, path);
+        convCommentValidationService.validateExistedConvCommentEntity(postUlid, path);
 
         ConvCommentEntity commentEntity =
                 convCommentAppInfraMapper.toConvCommentEntity(commentInsertRequest, convPostRepository, memberRepository);
