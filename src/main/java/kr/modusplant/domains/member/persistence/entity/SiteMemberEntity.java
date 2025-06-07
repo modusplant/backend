@@ -17,10 +17,11 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static kr.modusplant.global.vo.SnakeCaseWord.*;
+import static kr.modusplant.global.vo.TableName.SITE_MEMBER;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = SNAKE_SITE_MEMBER)
+@Table(name = SITE_MEMBER)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SiteMemberEntity {
@@ -32,18 +33,18 @@ public class SiteMemberEntity {
     @Column(nullable = false, length = 40)
     private String nickname;
 
-    @Column(name = SNAKE_BIRTH_DATE)
+    @Column(name = "birth_date")
     private LocalDate birthDate;
 
-    @Column(name = SNAKE_IS_ACTIVE, nullable = false)
+    @Column(name = "is_active", nullable = false)
     @DefaultValue
     private Boolean isActive;
 
-    @Column(name = SNAKE_IS_DISABLED_BY_LINKING, nullable = false)
+    @Column(name = "is_disabled_by_linking", nullable = false)
     @DefaultValue
     private Boolean isDisabledByLinking;
 
-    @Column(name = SNAKE_IS_BANNED, nullable = false)
+    @Column(name = "is_banned", nullable = false)
     @DefaultValue
     private Boolean isBanned;
 
@@ -51,7 +52,7 @@ public class SiteMemberEntity {
     @DefaultValue
     private Boolean isDeleted;
 
-    @Column(name = SNAKE_LOGGED_IN_AT)
+    @Column(name = "logged_in_at")
     private LocalDateTime loggedInAt;
 
     @Column(name = SNAKE_CREATED_AT, nullable = false, updatable = false)

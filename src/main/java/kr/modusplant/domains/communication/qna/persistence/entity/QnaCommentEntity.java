@@ -14,11 +14,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+import static kr.modusplant.domains.member.vo.MemberUuid.SNAKE_AUTH_MEMB_UUID;
+import static kr.modusplant.domains.member.vo.MemberUuid.SNAKE_CREA_MEMB_UUID;
 import static kr.modusplant.global.vo.SnakeCaseWord.*;
+import static kr.modusplant.global.vo.TableName.QNA_COMM;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "qna_comm")
+@Table(name = QNA_COMM)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @IdClass(QnaCommentCompositeKey.class)

@@ -12,7 +12,8 @@ import org.hibernate.annotations.UuidGenerator;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.SnakeCaseWord.*;
+import static kr.modusplant.domains.member.vo.MemberUuid.SNAKE_MEMB_UUID;
+import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_REFRESH_TOKEN;
 
 @Entity
 @Table(name = SNAKE_REFRESH_TOKEN)
@@ -31,10 +32,10 @@ public class RefreshTokenEntity {
     @Column(name = SNAKE_REFRESH_TOKEN, nullable = false)
     private String refreshToken;
 
-    @Column(name = SNAKE_ISSUED_AT, nullable = false)
+    @Column(name = "issued_at", nullable = false)
     private LocalDateTime issuedAt;
 
-    @Column(name = SNAKE_EXPIRED_AT, nullable = false)
+    @Column(name = "expired_at", nullable = false)
     private LocalDateTime expiredAt;
 
     @Override

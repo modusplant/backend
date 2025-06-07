@@ -3,7 +3,6 @@ package kr.modusplant.modules.jwt.common.util.domain;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
 
 import java.util.Date;
-import java.util.UUID;
 
 public interface RefreshTokenTestUtils {
     RefreshToken refreshTokenBasicUser = RefreshToken.builder()

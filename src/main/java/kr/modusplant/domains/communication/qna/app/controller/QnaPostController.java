@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kr.modusplant.domains.member.vo.MemberUuid.SNAKE_MEMB_UUID;
 import static kr.modusplant.global.vo.SnakeCaseWord.*;
 
 @Tag(name = "Qnaersation Post API")

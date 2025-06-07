@@ -12,9 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+import static kr.modusplant.domains.member.vo.MemberUuid.ORIGINAL_MEMBER_UUID;
 import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
-import static kr.modusplant.global.vo.CamelCaseWord.ORIGINAL_MEMBER_UUID;
 
 @Service
 @Primary

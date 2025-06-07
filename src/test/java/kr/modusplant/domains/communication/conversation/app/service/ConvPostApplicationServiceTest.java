@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kr.modusplant.global.vo.CamelCaseWord.DATA;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -163,7 +164,7 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
         assertThat(result2.getTotalElements()).isEqualTo(2);
         ConvPostResponse post = result1.getContent().getFirst();
         assertThat(post.title()).isEqualTo(convPostInsertRequest2.title());
-        assertThat(post.content().get(1).has("data")).isEqualTo(true);
+        assertThat(post.content().get(1).has(DATA)).isEqualTo(true);
     }
 
 

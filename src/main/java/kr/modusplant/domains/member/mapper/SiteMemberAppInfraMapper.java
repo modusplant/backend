@@ -6,7 +6,7 @@ import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import static kr.modusplant.global.vo.CamelCaseWord.*;
+import static kr.modusplant.global.vo.FieldName.*;
 
 @Mapper
 public interface SiteMemberAppInfraMapper {

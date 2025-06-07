@@ -10,17 +10,19 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static kr.modusplant.domains.member.vo.MemberUuid.SNAKE_MEMB_UUID;
 import static kr.modusplant.global.vo.SnakeCaseWord.*;
+import static kr.modusplant.global.vo.TableName.QNA_LIKE;
 
 @Entity
-@Table(name = SNAKE_QNA_LIKE)
+@Table(name = QNA_LIKE)
 @IdClass(QnaLikeId.class)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class QnaLikeEntity {
     @Id
-    @Column(name = SNAKE_POST_ULID, nullable = false)
+    @Column(name = "post_ulid", nullable = false)
     private String postId;
 
     @Id

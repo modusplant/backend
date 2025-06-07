@@ -11,7 +11,10 @@ import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.CamelCaseWord.*;
+import static kr.modusplant.domains.member.vo.MemberUuid.MEMBER_UUID;
+import static kr.modusplant.global.vo.CamelCaseWord.MEMBER;
+import static kr.modusplant.global.vo.FieldName.EXPIRED_AT;
+import static kr.modusplant.global.vo.FieldName.ISSUED_AT;
 
 @Mapper
 public interface RefreshTokenAppInfraMapper {

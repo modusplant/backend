@@ -17,6 +17,10 @@ import java.nio.file.Path;
 import java.util.Base64;
 import java.util.List;
 
+import static kr.modusplant.global.vo.CamelCaseWord.DATA;
+import static kr.modusplant.global.vo.CamelCaseWord.ORDER;
+import static kr.modusplant.global.vo.FileSystem.FILENAME;
+import static kr.modusplant.global.vo.FileSystem.SRC;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,41 +40,41 @@ class MediaContentServiceTest implements TipPostRequestTestUtils {
         assertThat(result.size()).isEqualTo(5);
 
         JsonNode textNode = result.get(0);
-        assertThat(textNode.get("order").asInt()).isEqualTo(1);
+        assertThat(textNode.get(ORDER).asInt()).isEqualTo(1);
         assertThat(textNode.get("type").asText()).isEqualTo("text");
-        assertThat(textNode.get("filename").asText()).isEqualTo(allMediaFiles.getFirst().getOriginalFilename());
-        assertThat(textNode.get("data").asText()).isEqualTo(new String(allMediaFiles.getFirst().getBytes(), StandardCharsets.UTF_8));
+        assertThat(textNode.get(FILENAME).asText()).isEqualTo(allMediaFiles.getFirst().getOriginalFilename());
+        assertThat(textNode.get(DATA).asText()).isEqualTo(new String(allMediaFiles.getFirst().getBytes(), StandardCharsets.UTF_8));
 
         JsonNode imageNode = result.get(1);
-        File savedImage = new File(imageNode.get("src").asText());
-        assertThat(imageNode.get("order").asInt()).isEqualTo(2);
+        File savedImage = new File(imageNode.get(SRC).asText());
+        assertThat(imageNode.get(ORDER).asInt()).isEqualTo(2);
         assertThat(imageNode.get("type").asText()).isEqualTo("image");
-        assertThat(imageNode.get("filename").asText()).isEqualTo(allMediaFiles.get(1).getOriginalFilename());
-        assertThat(imageNode.get("src").asText()).contains("uploads/images/image_");
+        assertThat(imageNode.get(FILENAME).asText()).isEqualTo(allMediaFiles.get(1).getOriginalFilename());
+        assertThat(imageNode.get(SRC).asText()).contains("uploads/images/image_");
         assertTrue(savedImage.exists());
 
         JsonNode videoNode = result.get(2);
-        File savedVideo = new File(imageNode.get("src").asText());
-        assertThat(videoNode.get("order").asInt()).isEqualTo(3);
+        File savedVideo = new File(imageNode.get(SRC).asText());
+        assertThat(videoNode.get(ORDER).asInt()).isEqualTo(3);
         assertThat(videoNode.get("type").asText()).isEqualTo("video");
-        assertThat(videoNode.get("filename").asText()).isEqualTo(allMediaFiles.get(2).getOriginalFilename());
-        assertThat(videoNode.get("src").asText()).contains("uploads/video/video_");
+        assertThat(videoNode.get(FILENAME).asText()).isEqualTo(allMediaFiles.get(2).getOriginalFilename());
+        assertThat(videoNode.get(SRC).asText()).contains("uploads/video/video_");
         assertTrue(savedVideo.exists());
 
         JsonNode audioNode = result.get(3);
-        File savedAudio = new File(imageNode.get("src").asText());
-        assertThat(audioNode.get("order").asInt()).isEqualTo(4);
+        File savedAudio = new File(imageNode.get(SRC).asText());
+        assertThat(audioNode.get(ORDER).asInt()).isEqualTo(4);
         assertThat(audioNode.get("type").asText()).isEqualTo("audio");
-        assertThat(audioNode.get("filename").asText()).isEqualTo(allMediaFiles.get(3).getOriginalFilename());
-        assertThat(audioNode.get("src").asText()).contains("uploads/audio/audio_");
+        assertThat(audioNode.get(FILENAME).asText()).isEqualTo(allMediaFiles.get(3).getOriginalFilename());
+        assertThat(audioNode.get(SRC).asText()).contains("uploads/audio/audio_");
         assertTrue(savedAudio.exists());
 
         JsonNode fileNode = result.get(4);
-        File savedFile = new File(imageNode.get("src").asText());
-        assertThat(fileNode.get("order").asInt()).isEqualTo(5);
+        File savedFile = new File(imageNode.get(SRC).asText());
+        assertThat(fileNode.get(ORDER).asInt()).isEqualTo(5);
         assertThat(fileNode.get("type").asText()).isEqualTo("file");
-        assertThat(fileNode.get("filename").asText()).isEqualTo(allMediaFiles.get(4).getOriginalFilename());
-        assertThat(fileNode.get("src").asText()).contains("uploads/files/file_");
+        assertThat(fileNode.get(FILENAME).asText()).isEqualTo(allMediaFiles.get(4).getOriginalFilename());
+        assertThat(fileNode.get(SRC).asText()).contains("uploads/files/file_");
         assertTrue(savedFile.exists());
 
         mediaContentService.deleteFiles(result);
@@ -103,9 +107,9 @@ class MediaContentServiceTest implements TipPostRequestTestUtils {
         assertTrue(result.isArray());
         assertThat(result.size()).isEqualTo(1);
         JsonNode firstNode = result.get(0);
-        assertFalse(firstNode.has("src"));
-        assertTrue(firstNode.has("data"));
-        assertThat(firstNode.get("data").asText()).isEqualTo(Base64.getEncoder().encodeToString(jpegData));
+        assertFalse(firstNode.has(SRC));
+        assertTrue(firstNode.has(DATA));
+        assertThat(firstNode.get(DATA).asText()).isEqualTo(Base64.getEncoder().encodeToString(jpegData));
 
         mediaContentService.deleteFiles(content);
     }
@@ -121,8 +125,8 @@ class MediaContentServiceTest implements TipPostRequestTestUtils {
 
         // then
         for (JsonNode node : contentJson) {
-            if (node.has("src")) {
-                String src = node.get("src").asText();
+            if (node.has(SRC)) {
+                String src = node.get(SRC).asText();
                 Path path = Path.of(src);
                 assertThat(Files.exists(path)).isEqualTo(false);
             }

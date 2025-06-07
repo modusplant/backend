@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.CamelCaseWord.MEMBER_UUID;
+import static kr.modusplant.domains.member.vo.MemberUuid.MEMBER_UUID;
 
 @Service
 @RequiredArgsConstructor
