@@ -14,11 +14,11 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_CREATED_AT;
-import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_QNA_CATE;
+import static kr.modusplant.global.vo.TableName.QNA_CATE;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = SNAKE_QNA_CATE)
+@Table(name = QNA_CATE)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class QnaCategoryEntity {

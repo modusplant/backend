@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static kr.modusplant.global.vo.FileSystem.SRC;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RepositoryOnlyContext
@@ -314,7 +315,7 @@ class TipPostRepositoryTest implements TipPostEntityTestUtils, TipCategoryEntity
         assertThat(result1.getTotalElements()).isEqualTo(1);
         assertThat(result2.getTotalElements()).isEqualTo(1);
         assertThat(result3.getTotalElements()).isEqualTo(0);
-        assertThat(result1.getContent().getFirst().getContent().get(1).has("src")).isEqualTo(true);
+        assertThat(result1.getContent().getFirst().getContent().get(1).has(SRC)).isEqualTo(true);
     }
 
     @Test

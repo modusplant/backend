@@ -23,8 +23,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 
-import static kr.modusplant.global.vo.CamelCaseWord.EMAIL;
 import static kr.modusplant.global.vo.CamelCaseWord.VERIFY_CODE;
+import static kr.modusplant.global.vo.FieldName.EMAIL;
 
 @RestController
 @RequiredArgsConstructor

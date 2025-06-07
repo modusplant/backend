@@ -13,11 +13,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.util.UUID;
 
 import static kr.modusplant.global.enums.Role.ROLE_USER;
-import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_SITE_MEMBER_ROLE;
+import static kr.modusplant.global.vo.TableName.SITE_MEMBER_ROLE;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = SNAKE_SITE_MEMBER_ROLE)
+@Table(name = SITE_MEMBER_ROLE)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SiteMemberRoleEntity {

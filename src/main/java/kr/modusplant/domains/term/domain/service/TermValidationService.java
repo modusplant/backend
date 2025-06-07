@@ -14,7 +14,7 @@ import java.util.UUID;
 
 import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
-import static kr.modusplant.global.vo.CamelCaseWord.NAME;
+import static kr.modusplant.global.vo.FieldName.NAME;
 
 @Service
 @Primary

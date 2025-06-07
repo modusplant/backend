@@ -13,12 +13,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_CONV_CATE;
 import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_CREATED_AT;
+import static kr.modusplant.global.vo.TableName.CONV_CATE;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = SNAKE_CONV_CATE)
+@Table(name = CONV_CATE)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ConvCategoryEntity {

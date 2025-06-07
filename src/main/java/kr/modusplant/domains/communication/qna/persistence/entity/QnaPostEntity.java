@@ -18,11 +18,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+import static kr.modusplant.domains.member.vo.MemberUuid.SNAKE_AUTH_MEMB_UUID;
+import static kr.modusplant.domains.member.vo.MemberUuid.SNAKE_CREA_MEMB_UUID;
 import static kr.modusplant.global.vo.SnakeCaseWord.*;
+import static kr.modusplant.global.vo.TableName.QNA_POST;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = SNAKE_QNA_POST)
+@Table(name = QNA_POST)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class QnaPostEntity {
@@ -43,11 +46,11 @@ public class QnaPostEntity {
     @JoinColumn(name = SNAKE_CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity createMember;
 
-    @Column(name = SNAKE_LIKE_COUNT, nullable = false)
+    @Column(name = "like_count", nullable = false)
     @DefaultValue
     private Integer likeCount;
 
-    @Column(name = SNAKE_VIEW_COUNT, nullable = false)
+    @Column(name = "view_count", nullable = false)
     @DefaultValue
     private Long viewCount;
 

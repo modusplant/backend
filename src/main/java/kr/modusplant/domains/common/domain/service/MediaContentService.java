@@ -19,6 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static kr.modusplant.global.vo.CamelCaseWord.DATA;
+import static kr.modusplant.global.vo.CamelCaseWord.ORDER;
+import static kr.modusplant.global.vo.FileSystem.FILENAME;
+import static kr.modusplant.global.vo.FileSystem.SRC;
+
 @Service
 @RequiredArgsConstructor
 public class MediaContentService {
@@ -51,18 +56,18 @@ public class MediaContentService {
         String filename = part.getOriginalFilename();
 
         ObjectNode node = objectMapper.createObjectNode();
-        node.put("filename",filename);
-        node.put("order",order);
+        node.put(FILENAME, filename);
+        node.put(ORDER, order);
 
         String type = extractType(contentType);
         if (type.equals("text")) {
             String text = new String(part.getBytes(), StandardCharsets.UTF_8);
-            node.put("type","text");
-            node.put("data",text);
+            node.put("type", "text");
+            node.put(DATA, text);
         } else if (CONTENT_TYPE_DIR_MAP.containsKey(type)) {
             String path = saveFileToLocal(part,CONTENT_TYPE_DIR_MAP.get(type),filename);
-            node.put("type",type);
-            node.put("src",path);
+            node.put("type", type);
+            node.put(SRC, path);
         } else {
             throw new IllegalArgumentException("Unsupported file type: "+contentType);
         }
@@ -102,12 +107,12 @@ public class MediaContentService {
         ArrayNode newArray = objectMapper.createArrayNode();
         for(JsonNode node:content) {
             ObjectNode objectNode = node.deepCopy();
-            if(node.isObject() && node.has("src")) {
-                String src = objectNode.get("src").asText();
+            if(node.isObject() && node.has(SRC)) {
+                String src = objectNode.get(SRC).asText();
                 byte[] fileBytes = readMediaFileAsBytes(src);
                 String base64Encoded = Base64.getEncoder().encodeToString(fileBytes);
-                objectNode.put("data",base64Encoded);
-                objectNode.remove("src");
+                objectNode.put(DATA, base64Encoded);
+                objectNode.remove(SRC);
             }
             newArray.add(objectNode);
         }
@@ -123,8 +128,8 @@ public class MediaContentService {
     public void deleteFiles(JsonNode content) throws IOException {
         for (JsonNode node : content) {
             if (node.isObject()) {
-                if (node.has("src")) {
-                    String src = node.get("src").asText();
+                if (node.has(SRC)) {
+                    String src = node.get(SRC).asText();
                     deleteMediaFile(src);
                 }
             }
