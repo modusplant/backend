@@ -87,7 +87,7 @@ public class MediaContentService {
         String uploadDirectory = BASE_DIRECTORY + directory;
         File fileDirectory = new File(uploadDirectory);
         if (!fileDirectory.exists()) {
-            fileDirectory.mkdirs();
+            boolean ignoredResult = fileDirectory.mkdirs();
         }
 
         String ext = "";
