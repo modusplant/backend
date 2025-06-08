@@ -35,10 +35,10 @@ public class NormalLoginSuccessHandler implements AuthenticationSuccessHandler {
         );
 
         request.setAttribute("authentication", authentication);
-        request.setAttribute("accessToken", loginTokenPair);
-        request.setAttribute("refreshToken", loginTokenPair);
+        request.setAttribute("accessToken", loginTokenPair.getAccessToken());
+        request.setAttribute("refreshToken", loginTokenPair.getRefreshToken());
 
-        request.getRequestDispatcher("/api/auth/login/initial").forward(request, response);
+        request.getRequestDispatcher("/api/auth/login-success").forward(request, response);
     }
 
     private Role getMemberRole(SiteMemberUserDetails memberUserDetails) {
