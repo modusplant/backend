@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @Getter
 public class VerifyEmailRequest {
-    @Schema(description = "검증 코드", example = "123456")
+    @Schema(description = "검증 코드", example = "1a2b3c")
     String verifyCode;
 }

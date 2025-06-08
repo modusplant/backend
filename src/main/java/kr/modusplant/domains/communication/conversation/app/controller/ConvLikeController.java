@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-@Tag(name = "Conv Like API")
+@Tag(name = "대화 좋아요 API", description = "대화 게시글 좋아요를 다루는 API입니다.")
 @RestController
 @RequestMapping("/api/v1/conversation/posts")
 @RequiredArgsConstructor
@@ -24,13 +24,13 @@ public class ConvLikeController {
     @Value("${fake-auth-uuid}")
     private UUID memberUuid;
 
-    @Operation(summary = "대화 게시글 좋아요 API", description = "대화 게시글 좋아요 기능")
+    @Operation(summary = "대화 게시글 좋아요 API", description = "대화 게시글에 좋아요를 표시합니다.")
     @PostMapping("/{ulid}/like")
     public ResponseEntity<DataResponse<LikeResponse>> likeConvPost(@PathVariable String ulid) {
         return ResponseEntity.ok().body(DataResponse.ok(convLikeApplicationService.likeConvPost(ulid, memberUuid)));
     }
 
-    @Operation(summary = "대화 게시글 좋아요 취소 API", description = "대화 게시글 좋아요 취소 기능")
+    @Operation(summary = "대화 게시글 좋아요 취소 API", description = "대화 게시글에 표시한 좋아요를 취소합니다.")
     @DeleteMapping("/{ulid}/like")
     public ResponseEntity<DataResponse<LikeResponse>> unlikeConvPost(@PathVariable String ulid) {
         return ResponseEntity.ok().body(DataResponse.ok(convLikeApplicationService.unlikeConvPost(ulid, memberUuid)));

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-@Tag(name = "Tip Like API")
+@Tag(name = "팁 좋아요 API", description = "팁 게시글 좋아요를 다루는 API입니다.")
 @RestController
 @RequestMapping("/api/v1/tip/posts")
 @RequiredArgsConstructor
@@ -24,13 +24,19 @@ public class TipLikeController {
     @Value("${fake-auth-uuid}")
     private UUID memberUuid;
 
-    @Operation(summary = "팁 게시글 좋아요 API", description = "팁 게시글 좋아요 기능")
+    @Operation(
+            summary = "팁 게시글 좋아요 API",
+            description = "팁 게시글 좋아요 기능"
+    )
     @PostMapping("/{ulid}/like")
     public ResponseEntity<DataResponse<LikeResponse>> likeTipPost(@PathVariable String ulid) {
         return ResponseEntity.ok().body(DataResponse.ok(tipLikeApplicationService.likeTipPost(ulid, memberUuid)));
     }
 
-    @Operation(summary = "팁 게시글 좋아요 취소 API", description = "팁 게시글 좋아요 취소 기능")
+    @Operation(
+            summary = "팁 게시글 좋아요 취소 API",
+            description = "팁 게시글 좋아요 취소 기능"
+    )
     @DeleteMapping("/{ulid}/like")
     public ResponseEntity<DataResponse<LikeResponse>> unlikeTipPost(@PathVariable String ulid) {
         return ResponseEntity.ok().body(DataResponse.ok(tipLikeApplicationService.unlikeTipPost(ulid, memberUuid)));

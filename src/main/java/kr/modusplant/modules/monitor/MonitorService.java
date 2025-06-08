@@ -41,6 +41,6 @@ public class MonitorService {
             throw new RuntimeException("Redis storage test error occurred."); // 예외 발생
         }
 
-        return "RedisHelper Test Successful";
+        return "redisHelper test successful";
     }
 }

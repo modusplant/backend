@@ -26,7 +26,7 @@ import java.time.Duration;
 
 import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_REFRESH_TOKEN;
 
-@Tag(name = "Social Login API", description = "소셜 로그인 API")
+@Tag(name = "소셜 로그인 API", description = "소셜 로그인을 다루는 API입니다.")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -35,10 +35,10 @@ public class SocialAuthController {
     private final SocialAuthApplicationService socialAuthApplicationService;
     private final TokenApplicationService tokenApplicationService;
 
-    @Operation(summary = "카카오 소셜 로그인 API", description = "카카오 인가코드를 받아 로그인합니다.")
+    @Operation(summary = "카카오 소셜 로그인 API", description = "카카오 인가 코드를 받아 로그인합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK : Kakao login succeeded"),
-            @ApiResponse(responseCode = "400", description = "Bad Request: Invalid client input data"),
+            @ApiResponse(responseCode = "400", description = "Bad Request: Failed due to client error"),
             @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid or missing authentication credentials"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error: An unexpected error occurred on the Authorization server")
     })
@@ -55,10 +55,10 @@ public class SocialAuthController {
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie).body(response);
     }
 
-    @Operation(summary = "구글 소셜 로그인 API", description = "구글 인가코드를 받아 로그인합니다.<br> 구글 인가 코드를 URL에서 추출할 경우 '%2F'는 '/'로 대체해야 합니다.")
+    @Operation(summary = "구글 소셜 로그인 API", description = "구글 인가 코드를 받아 로그인합니다.<br>구글 인가 코드를 URL에서 추출할 경우 '%2F'는 '/'로 대체해야 합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK : Google login succeed"),
-            @ApiResponse(responseCode = "400", description = "Bad Request: Invalid client input data"),
+            @ApiResponse(responseCode = "400", description = "Bad Request: Failed due to client error"),
             @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid or missing authentication credentials"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error: An unexpected error occurred on the Authorization server")
     })
