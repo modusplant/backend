@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Tag(name = "Term API", description = "약관 API")
+@Tag(name = "약관 API", description = "약관을 다루는 API입니다.")
 @RestController
 @Primary
 @RequestMapping("/api/v1/terms")

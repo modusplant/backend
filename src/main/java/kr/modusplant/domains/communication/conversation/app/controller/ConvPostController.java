@@ -26,7 +26,7 @@ import static kr.modusplant.domains.member.vo.MemberUuid.SNAKE_MEMB_UUID;
 import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_CATE_UUID;
 import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_ORDER_INFO;
 
-@Tag(name = "Conversation Post API")
+@Tag(name = "대화 게시글 API", description = "대화 게시글을 다루는 API입니다.")
 @RestController
 @RequestMapping("/api/v1/conversation/posts")
 @RequiredArgsConstructor
@@ -40,31 +40,46 @@ public class ConvPostController {
     @Value("${fake-auth-uuid}")
     private UUID memberUuid;
 
-    @Operation(summary = "전체 대화 게시글 목록 조회 API", description = "전체 대화 게시글의 목록과 페이지 정보를 조회합니다.")
+    @Operation(
+            summary = "전체 대화 게시글 목록 조회 API",
+            description = "전체 대화 게시글과 페이지 정보를 조회합니다."
+    )
     @GetMapping
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getAllConvPosts(Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(convPostApplicationService.getAll(pageable))));
     }
 
-    @Operation(summary = "사이트 회원별 대화 게시글 목록 조회 API", description = "사이트 회원별 대화 게시글의 목록과 페이지 정보를 조회합니다.")
+    @Operation(
+            summary = "사이트 회원별 대화 게시글 목록 조회 API",
+            description = "사이트 회원별 대화 게시글의 목록과 페이지 정보를 조회합니다."
+    )
     @GetMapping("/member/{memb_uuid}")
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getConvPostsByMember(@PathVariable(SNAKE_MEMB_UUID) UUID memberUuid, Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(convPostApplicationService.getByMemberUuid(memberUuid, pageable))));
     }
 
-    @Operation(summary = "항목별 대화 게시글 목록 조회 API", description = "항목별 대화 게시글의 목록과 페이지 정보를 조회합니다.")
+    @Operation(
+            summary = "항목별 대화 게시글 목록 조회 API",
+            description = "항목별 대화 게시글의 목록과 페이지 정보를 조회합니다."
+    )
     @GetMapping("/category/{cate_uuid}")
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getConvPostsByConvCategory(@PathVariable(SNAKE_CATE_UUID) UUID categoryUuid, Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(convPostApplicationService.getByCategoryUuid(categoryUuid, pageable))));
     }
 
-    @Operation(summary = "제목+본문 검색어로 대화 게시글 목록 조회 API", description = "제목+본문 검색어로 대화 게시글의 목록과 페이지 정보를 조회합니다.")
+    @Operation(
+            summary = "제목+본문 검색어로 대화 게시글 목록 조회 API",
+            description = "제목+본문 검색어로 대화 게시글의 목록과 페이지 정보를 조회합니다."
+    )
     @GetMapping("/search")
     public ResponseEntity<DataResponse<PostPageResponse<?>>> searchConvPosts(@RequestParam String keyword, Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(convPostApplicationService.searchByKeyword(keyword, pageable))));
     }
 
-    @Operation(summary = "특정 대화 게시글 조회 API", description = "게시글 id로 특정 대화 게시글을 조회합니다.")
+    @Operation(
+            summary = "특정 대화 게시글 조회 API",
+            description = "게시글 id로 특정 대화 게시글을 조회합니다."
+    )
     @GetMapping("/{ulid}")
     public ResponseEntity<DataResponse<?>> getConvPostByUlid(@PathVariable String ulid) {
         Optional<ConvPostResponse> optionalConvPostResponse = convPostApplicationService.getByUlid(ulid);
@@ -74,7 +89,10 @@ public class ConvPostController {
         return ResponseEntity.ok().body(DataResponse.ok(optionalConvPostResponse.orElseThrow()));
     }
 
-    @Operation(summary = "대화 게시글 추가 API", description = "대화 게시글을 작성합니다.")
+    @Operation(
+            summary = "대화 게시글 추가 API",
+            description = "대화 게시글을 작성합니다."
+    )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> insertConvPost(
             @RequestPart(SNAKE_CATE_UUID) UUID categoryUuid,
@@ -86,7 +104,10 @@ public class ConvPostController {
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
-    @Operation(summary = "특정 대화 게시글 수정 API", description = "특정 대화 게시글을 수정합니다.")
+    @Operation(
+            summary = "특정 대화 게시글 수정 API",
+            description = "특정 대화 게시글을 수정합니다."
+    )
     @PutMapping(value = "/{ulid}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> updateConvPost(
             @RequestPart(SNAKE_CATE_UUID) UUID categoryUuid,
@@ -99,20 +120,29 @@ public class ConvPostController {
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
-    @Operation(summary = "특정 대화 게시글 삭제 API", description = "특정 대화 게시글을 삭제합니다.")
+    @Operation(
+            summary = "특정 대화 게시글 삭제 API",
+            description = "특정 대화 게시글을 삭제합니다."
+    )
     @DeleteMapping("/{ulid}")
     public ResponseEntity<DataResponse<Void>> removeConvPostByUlid(@PathVariable String ulid) throws IOException {
         convPostApplicationService.removeByUlid(ulid,memberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
-    @Operation(summary = "특정 대화 게시글 조회수 조회 API", description = "특정 대화 게시글의 조회수를 조회합니다.")
+    @Operation(
+            summary = "특정 대화 게시글 조회수 조회 API",
+            description = "특정 대화 게시글의 조회수를 조회합니다."
+    )
     @GetMapping("/{ulid}/views")
     public ResponseEntity<DataResponse<Long>> countViewCount(@PathVariable String ulid) {
         return ResponseEntity.ok().body(DataResponse.ok(convPostApplicationService.readViewCount(ulid)));
     }
 
-    @Operation(summary = "특정 대화 게시글 조회수 증가 API", description = "특정 대화 게시글의 조회수를 증가시킵니다.")
+    @Operation(
+            summary = "특정 대화 게시글 조회수 증가 API",
+            description = "특정 대화 게시글의 조회수를 증가시킵니다."
+    )
     @PatchMapping("/{ulid}/views")
     public ResponseEntity<DataResponse<Long>> increaseViewCount(@PathVariable String ulid) {
         return ResponseEntity.ok().body(DataResponse.ok(convPostApplicationService.increaseViewCount(ulid, memberUuid)));

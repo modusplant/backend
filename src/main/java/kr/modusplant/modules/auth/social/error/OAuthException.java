@@ -12,8 +12,8 @@ public class OAuthException extends RuntimeException {
     private final String message;
 
     private static final Map<HttpStatus,String> STATUS_MESSAGES = Map.of(
-            HttpStatus.UNAUTHORIZED, "Unauthorized: Invalid or missing authentication credentials",
             HttpStatus.BAD_REQUEST, ResponseMessage.RESPONSE_MESSAGE_400.getValue(),
+            HttpStatus.UNAUTHORIZED, ResponseMessage.RESPONSE_MESSAGE_401.getValue(),
             HttpStatus.INTERNAL_SERVER_ERROR, ResponseMessage.RESPONSE_MESSAGE_500.getValue()
     );
 

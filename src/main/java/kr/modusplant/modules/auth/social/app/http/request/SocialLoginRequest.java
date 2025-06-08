@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 public class SocialLoginRequest {
-    @Schema(description = "소셜 로그인 인가 코드", example = "BPAlKjanydCLdDnYdib6MQpDRwPG7hgqgWwECDwlr_jVWR6WpNeIbGlpBKIKKiVOAAABjE6Zt5qBPKUF0hG4dQ")
+    @Schema(description = "인가 코드", example = "BPAlKjanydCLdDnYdib6MQpDRwPG7hgqgWwECDwlr_jVWR6WpNeIbGlpBKIKKiVOAAABjE6Zt5qBPKUF0hG4dQ")
     @NotNull(message = "code는 필수 값입니다")
     private String code;
 }

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-@Tag(name = "Q&A Like API")
+@Tag(name = "Q&A 좋아요 API", description = "Q&A 게시글 좋아요를 다루는 API입니다.")
 @RestController
 @RequestMapping("/api/v1/qna/posts")
 @RequiredArgsConstructor
@@ -24,13 +24,19 @@ public class QnaLikeController {
     @Value("${fake-auth-uuid}")
     private UUID memberUuid;
 
-    @Operation(summary = "Q&A 게시글 좋아요 API", description = "Q&A 게시글 좋아요 기능")
+    @Operation(
+            summary = "Q&A 게시글 좋아요 API",
+            description = "Q&A 게시글 좋아요 기능"
+    )
     @PostMapping("/{ulid}/like")
     public ResponseEntity<DataResponse<LikeResponse>> likeQnaPost(@PathVariable String ulid) {
         return ResponseEntity.ok().body(DataResponse.ok(qnaLikeApplicationService.likeQnaPost(ulid, memberUuid)));
     }
 
-    @Operation(summary = "Q&A 게시글 좋아요 취소 API", description = "Q&A 게시글 좋아요 취소 기능")
+    @Operation(
+            summary = "Q&A 게시글 좋아요 취소 API",
+            description = "Q&A 게시글 좋아요 취소 기능"
+    )
     @DeleteMapping("/{ulid}/like")
     public ResponseEntity<DataResponse<LikeResponse>> unlikeQnaPost(@PathVariable String ulid) {
         return ResponseEntity.ok().body(DataResponse.ok(qnaLikeApplicationService.unlikeQnaPost(ulid, memberUuid)));

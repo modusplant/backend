@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -26,6 +27,7 @@ import java.util.Random;
 import static kr.modusplant.global.vo.CamelCaseWord.VERIFY_CODE;
 import static kr.modusplant.global.vo.FieldName.EMAIL;
 
+@Tag(name = "이메일 인증 API", description = "이메일 인증 메일 발송과 검증을 다루는 API입니다.")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -36,13 +38,10 @@ public class EmailAuthController {
     @Value("${mail-api.jwt-secret-key}")
     private String JWT_SECRET_KEY;
 
-    @Operation(
-            summary = "본인인증 메일 전송 API",
-            description = "회원가입 시 본인인증 메일 전송을 합니다."
-    )
+    @Operation(summary = "본인 인증 메일 전송 API", description = "본인 인증을 위해 메일을 전송합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK: Succeeded"),
-            @ApiResponse(responseCode = "400", description = "Bad Request: Invalid input data.")
+            @ApiResponse(responseCode = "400", description = "Bad Request: Failed email handling due to client error")
     })
     @PostMapping("/members/verify-email/send")
     public ResponseEntity<DataResponse<?>> verify(
@@ -60,13 +59,13 @@ public class EmailAuthController {
 
         // JWT AccessToken 설정
         setHttpOnlyCookie(accessToken, httpResponse);
-        return ResponseEntity.ok(DataResponse.of(200, "OK: Succeeded"));
+        return ResponseEntity.ok(DataResponse.ok());
     }
 
-    @Operation(summary = "본인인증 메일 검증 API", description = "회원가입 시 본인인증 코드를 검증합니다.")
+    @Operation(summary = "본인 인증 메일 검증 API", description = "본인 인증을 위해 코드를 검증합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK: Succeeded"),
-            @ApiResponse(responseCode = "400", description = "Bad Request: Invalid input data.")
+            @ApiResponse(responseCode = "400", description = "Bad Request: Failed verification due to client error")
     })
     @PostMapping("/members/verify-email")
     public ResponseEntity<DataResponse<?>> verifyEmail(
