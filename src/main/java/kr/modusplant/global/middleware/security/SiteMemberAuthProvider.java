@@ -1,9 +1,14 @@
 package kr.modusplant.global.middleware.security;
 
+import kr.modusplant.global.middleware.security.error.BannedException;
+import kr.modusplant.global.middleware.security.error.DeletedException;
+import kr.modusplant.global.middleware.security.error.DisabledByLinkingException;
+import kr.modusplant.global.middleware.security.error.InavtiveException;
 import kr.modusplant.global.middleware.security.models.SiteMemberAuthToken;
 import kr.modusplant.global.middleware.security.models.SiteMemberUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,24 +23,36 @@ public class SiteMemberAuthProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String email = authentication.getPrincipal().toString();
         String password = authentication.getCredentials().toString();
-        // TODO: 테스트가 완료된 후에 출력 코드를 지우고 인증 로직도 복구할 것.
-        System.out.println("The email from authProvider: " + email);
 
         SiteMemberUserDetails userDetails = memberUserDetailsService.loadUserByUsername(email);
 
-//        if(passwordEncoder.matches(password, userDetails.getPassword())) {
+        if(validateSiteMemberUserDetails(userDetails, password)) {
             System.out.println("The credentials are valid.");
-//            return new SiteMemberAuthToken(userDetails, userDetails.getAuthorities());
-//        } else {
-//            System.out.println("The credential was invalid.");
-//            return new SiteMemberAuthToken(email, password);
-//        }
-        System.out.println("The process of AuthenticationProvider has passed");
-        return new SiteMemberAuthToken(userDetails, userDetails.getAuthorities());
+            return new SiteMemberAuthToken(userDetails, userDetails.getAuthorities());
+        } else {
+            System.out.println("The credentials are invalid.");
+            return new SiteMemberAuthToken(email, password);
+        }
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
         return SiteMemberAuthToken.class.isAssignableFrom(authentication);
+    }
+
+    private boolean validateSiteMemberUserDetails(SiteMemberUserDetails userDetails, String password) {
+        if(!passwordEncoder.matches(password, userDetails.getPassword())) {
+            throw new BadCredentialsException("The password is not correct");
+        } else if (!userDetails.isActive()) {
+            throw new InavtiveException("The account is inactive");
+        } else if (userDetails.isDisabledByLinking()) {
+            throw new DisabledByLinkingException("The account is disabled by account linking");
+        } else if (userDetails.isBanned()) {
+            throw new BannedException("The account is banned");
+        } else if (userDetails.isDeleted()) {
+            throw new DeletedException("The account is deleted");
+        } else {
+            return true;
+        }
     }
 }
