@@ -10,7 +10,12 @@ import java.io.IOException;
 
 public class NormalLoginFailureHandler implements AuthenticationFailureHandler {
     @Override
-    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+    public void onAuthenticationFailure(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        AuthenticationException exception) throws IOException, ServletException {
 
+        request.setAttribute("exception", exception);
+
+        request.getRequestDispatcher("/api/auth/login-fail").forward(request, response);
     }
 }
