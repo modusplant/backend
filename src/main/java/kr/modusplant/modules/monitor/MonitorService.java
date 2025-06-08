@@ -1,4 +1,4 @@
-package kr.modusplant.modules.example;
+package kr.modusplant.modules.monitor;
 
 import kr.modusplant.global.middleware.redis.RedisHelper;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class ExampleService {
+public class MonitorService {
 
     private final RedisHelper redisHelper;
 
@@ -21,7 +21,7 @@ public class ExampleService {
         }
     }
 
-    public String testRedisHelper() {
+    public String monitorRedisHelper() {
         try {
             // 영구적
             String redisKey = "test-redis-key";
