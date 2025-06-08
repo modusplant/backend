@@ -34,6 +34,40 @@ public class SiteMemberUserDetails implements UserDetails {
         return email;
     }
 
+    @Override
+    public String getPassword() { return password; }
+
+    @Override
+    public List<GrantedAuthority> getAuthorities() { return authorities; }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    public boolean isActive() { return isActive; }
+
+    public boolean isDisabledByLinking() { return isDisabledByLinking; }
+
+    public boolean isBanned() { return isBanned; }
+
+    public boolean isDeleted() { return isDeleted; }
+
     public static class SiteMemberUserDetailsBuilder {
         private String email;
         private String password;
