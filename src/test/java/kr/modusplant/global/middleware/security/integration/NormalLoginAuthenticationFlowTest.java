@@ -69,7 +69,7 @@ public class NormalLoginAuthenticationFlowTest implements
 
     @Test
     public void normalLoginFilter_givenValidSiteMember_willCallSuccessHandler() throws Exception {
-
+        // given
         SiteMemberUserDetails validSiteMemberUserDetails = testSiteMemberUserDetailsBuilder
                 .isActive(true)
                 .isDisabledByLinking(false)
@@ -83,9 +83,12 @@ public class NormalLoginAuthenticationFlowTest implements
         doNothing().when(tokenValidationService).validateExistedDeviceId(any());
         given(refreshTokenApplicationService.insert(any())).willReturn(any());
 
+        // when
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testLoginRequest)).characterEncoding("UTF-8"))
+
+                // then
                 .andExpect(status().isOk())
                 .andExpect(forwardedUrl("/api/auth/login-success"))
                 .andExpect(request().attribute("accessToken", notNullValue()))
@@ -94,7 +97,7 @@ public class NormalLoginAuthenticationFlowTest implements
     
     @Test
     public void normalLoginFilter_givenInvalidSiteMember_thenCallFailureHandler() throws Exception {
-
+        // given
         SiteMemberUserDetails invalidSiteMemberUserDetails = testSiteMemberUserDetailsBuilder
                 .isActive(false)
                 .isDisabledByLinking(false)
@@ -105,9 +108,12 @@ public class NormalLoginAuthenticationFlowTest implements
         when(memberUserDetailsService.loadUserByUsername(testLoginRequest.email()))
                 .thenReturn(invalidSiteMemberUserDetails);
 
+        // when
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testLoginRequest)).characterEncoding("UTF-8"))
+
+                // then
                 .andExpect(forwardedUrl("/api/auth/login-fail"))
                 .andExpect(request().attribute("exception", instanceOf(AuthenticationException.class)));
     }
