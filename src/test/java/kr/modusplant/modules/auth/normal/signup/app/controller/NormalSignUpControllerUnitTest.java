@@ -1,4 +1,4 @@
-package kr.modusplant.modules.auth.normal.app.controller;
+package kr.modusplant.modules.auth.normal.signup.app.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.member.app.service.SiteMemberApplicationService;
