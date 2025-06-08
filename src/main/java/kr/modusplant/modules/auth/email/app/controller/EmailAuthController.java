@@ -29,7 +29,7 @@ import static kr.modusplant.global.vo.FieldName.EMAIL;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class AuthController {
+public class EmailAuthController {
     private final MailService mailService;
 
     // 비밀키 설정
