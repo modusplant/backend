@@ -1,4 +1,4 @@
-package kr.modusplant.modules.auth.normal.login.app.controller;
+package kr.modusplant.global.middleware.security.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(SecurityConfig.class)
-public class NormalLoginControllerIntegrationTest implements
+public class NormalLoginAuthenticationFlowTest implements
         SiteMemberUserDetailsTestUtils, NormalLoginRequestTestUtils {
 
     @Autowired
