@@ -1,6 +1,6 @@
 package kr.modusplant.modules.jwt.app.service;
 
-ㅍimport io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
