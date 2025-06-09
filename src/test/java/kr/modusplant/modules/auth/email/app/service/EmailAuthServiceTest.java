@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
@@ -36,13 +37,13 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
     @Autowired
     private SiteMemberAuthRepository siteMemberAuthRepository;
 
-    @MockBean
+    @MockitoBean
     private RedisHelper redisHelper;
 
-    @MockBean
+    @MockitoBean
     private MailService mailService;
 
-    @MockBean
+    @MockitoBean
     private TokenProvider tokenProvider;
 
     private final String email = "test@example.com";
@@ -92,7 +93,7 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
         emailAuthService.verifyEmail(request, token);
 
         // then
-        verify(tokenProvider).validateVerifyAccessToken(token, code);
+        verify(tokenProvider).validateVerifyAccessToken(token, request);
     }
 
     @Test
