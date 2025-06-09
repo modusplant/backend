@@ -1,10 +1,14 @@
 package kr.modusplant.modules.jwt.app.service;
 
-import io.jsonwebtoken.*;
+ㅍimport io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import kr.modusplant.modules.jwt.app.error.InvalidTokenException;
-import kr.modusplant.modules.jwt.app.error.TokenKeyCreationException;
+import kr.modusplant.modules.auth.email.app.http.request.VerifyEmailRequest;
+import kr.modusplant.modules.jwt.error.InvalidTokenException;
+import kr.modusplant.modules.jwt.error.TokenKeyCreationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,8 +20,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.CamelCaseWord.EMAIL;
 import static kr.modusplant.global.vo.CamelCaseWord.VERIFY_CODE;
+import static kr.modusplant.global.vo.FieldName.EMAIL;
 
 @Service
 @RequiredArgsConstructor
@@ -158,7 +162,10 @@ public class TokenProvider {
     }
 
     // TODO : Spring Security 적용 후 필터에서 쿠키 검증 로직 추가된 후 테스트 필요
-    public void validateVerifyAccessToken(String jwtToken, String verifyCode) {
+    public void validateVerifyAccessToken(String jwtToken, VerifyEmailRequest verifyEmailRequest) {
+        String verifyCode = verifyEmailRequest.getVerifyCode();
+        String email = verifyEmailRequest.getEmail();
+
         if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
             jwtToken = jwtToken.substring(7);
         }
@@ -174,9 +181,12 @@ public class TokenProvider {
             // JWT 토큰 검증
             String payloadVerifyCode = claims.get(VERIFY_CODE, String.class);
 
-            // 발급된 인증코드와 메일 인증코드 일치 검증
+            // 인증코드, 메일 일치 검증
             if (!verifyCode.equals(payloadVerifyCode)) {
                 throw new RuntimeException("Invalid verification code");
+            }
+            if (!email.equals(claims.get(EMAIL, String.class))) {
+                throw new RuntimeException("Invalid email address");
             }
         } catch (ExpiredJwtException e) {
             throw new RuntimeException("Expired JWT token");

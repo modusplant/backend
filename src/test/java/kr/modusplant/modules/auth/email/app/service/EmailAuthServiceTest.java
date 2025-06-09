@@ -28,10 +28,10 @@ import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 @SpringBootTest(classes = {TestAopConfig.class})
 @Transactional
-class AuthServiceTest implements SiteMemberAuthEntityTestUtils {
+class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
 
     @Autowired
-    private AuthService authService;
+    private EmailAuthService emailAuthService;
 
     @Autowired
     private SiteMemberAuthRepository siteMemberAuthRepository;
@@ -70,7 +70,7 @@ class AuthServiceTest implements SiteMemberAuthEntityTestUtils {
         when(tokenProvider.generateVerifyAccessToken(email, code)).thenReturn("jwt-token");
 
         // when
-        String result = authService.sendVerifyEmail(request);
+        String result = emailAuthService.sendVerifyEmail(request);
 
         // then
         assertThat(result).isEqualTo("jwt-token");
@@ -89,7 +89,7 @@ class AuthServiceTest implements SiteMemberAuthEntityTestUtils {
         setField(request, "verifyCode", code);
 
         // when
-        authService.verifyEmail(request, token);
+        emailAuthService.verifyEmail(request, token);
 
         // then
         verify(tokenProvider).validateVerifyAccessToken(token, code);
@@ -106,7 +106,7 @@ class AuthServiceTest implements SiteMemberAuthEntityTestUtils {
         when(tokenProvider.generateVerifyCode()).thenReturn(code);
 
         // when
-        authService.sendResetPasswordCode(request);
+        emailAuthService.sendResetPasswordCode(request);
 
         // then
         verify(redisHelper).setString(
@@ -123,7 +123,7 @@ class AuthServiceTest implements SiteMemberAuthEntityTestUtils {
         setField(request, "email", "notExistsEmail@gmail.com");
 
         // when/then
-        assertThatThrownBy(() -> authService.sendResetPasswordCode(request))
+        assertThatThrownBy(() -> emailAuthService.sendResetPasswordCode(request))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Email not found");
     }
@@ -141,7 +141,7 @@ class AuthServiceTest implements SiteMemberAuthEntityTestUtils {
                 .thenReturn(Optional.of(code));
 
         // when
-        authService.verifyResetPasswordCode(request);
+        emailAuthService.verifyResetPasswordCode(request);
 
         // then
         verify(redisHelper).getString(RESET_PASSWORD_PREFIX.concat(email));
@@ -159,7 +159,7 @@ class AuthServiceTest implements SiteMemberAuthEntityTestUtils {
         when(redisHelper.getString(anyString())).thenReturn(Optional.empty());
 
         // expect
-        assertThatThrownBy(() -> authService.verifyResetPasswordCode(request))
+        assertThatThrownBy(() -> emailAuthService.verifyResetPasswordCode(request))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("verification code is invalid");
     }
@@ -176,7 +176,7 @@ class AuthServiceTest implements SiteMemberAuthEntityTestUtils {
         when(redisHelper.getString(anyString())).thenReturn(Optional.of(code));
 
         // expect
-        assertThatThrownBy(() -> authService.verifyResetPasswordCode(request))
+        assertThatThrownBy(() -> emailAuthService.verifyResetPasswordCode(request))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("verification code is invalid");
     }

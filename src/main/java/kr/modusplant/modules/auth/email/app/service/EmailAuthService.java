@@ -19,7 +19,7 @@ import static kr.modusplant.global.vo.CamelCaseWord.SIGNUP_VERIFY_EMAIL;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class AuthService {
+public class EmailAuthService {
     private final TokenProvider tokenProvider;
     private final RedisHelper redisHelper;
 
@@ -38,7 +38,7 @@ public class AuthService {
     }
 
     public void verifyEmail(VerifyEmailRequest verifyEmailRequest, String accessToken) {
-        tokenProvider.validateVerifyAccessToken(accessToken, verifyEmailRequest.getVerifyCode());
+        tokenProvider.validateVerifyAccessToken(accessToken, verifyEmailRequest);
     }
 
     public void sendResetPasswordCode(EmailRequest request) {
