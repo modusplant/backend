@@ -39,7 +39,7 @@ public class EmailAuthController {
 
         // JWT AccessToken 설정
         setHttpOnlyCookie(accessToken, httpResponse);
-        return ResponseEntity.ok(DataResponse.of(200, "OK: Succeeded"));
+        return ResponseEntity.ok(DataResponse.ok());
     }
 
     @Operation(summary = "본인 인증 메일 검증 API", description = "본인 인증을 위해 코드를 검증합니다.")
@@ -70,7 +70,7 @@ public class EmailAuthController {
             @RequestBody @Valid EmailRequest request
     ) {
         emailAuthService.sendResetPasswordCode(request);
-        return ResponseEntity.ok().body(DataResponse.of(200, "OK: Succeeded"));
+        return ResponseEntity.ok(DataResponse.ok());
     }
 
     @Operation(summary = "비밀번호 재설정 검증 API", description = "비밀번호 재설정 본인인증 코드를 검증합니다.")
