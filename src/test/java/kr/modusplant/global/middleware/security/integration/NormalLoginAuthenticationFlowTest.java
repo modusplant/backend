@@ -92,7 +92,9 @@ public class NormalLoginAuthenticationFlowTest implements
                 .andExpect(status().isOk())
                 .andExpect(forwardedUrl("/api/auth/login-success"))
                 .andExpect(request().attribute("accessToken", notNullValue()))
-                .andExpect(request().attribute("refreshToken", notNullValue()));
+                .andExpect(request().attribute("refreshToken", notNullValue()))
+                .andExpect(request().attribute("accessTokenExpirationTime", notNullValue()))
+                .andExpect(request().attribute("refreshTokenExpirationTime", notNullValue()));
     }
     
     @Test
