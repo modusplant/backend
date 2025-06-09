@@ -8,6 +8,7 @@ import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
 import kr.modusplant.global.middleware.security.handler.NormalLoginFailureHandler;
 import kr.modusplant.global.middleware.security.handler.NormalLoginSuccessHandler;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
+import kr.modusplant.modules.jwt.app.service.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -38,6 +39,7 @@ public class SecurityConfig {
     private final GlobalExceptionHandler globalExceptionHandler;
     private final SiteMemberUserDetailsService memberUserDetailsService;
     private final TokenApplicationService tokenApplicationService;
+    private final TokenProvider tokenProvider;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -64,7 +66,7 @@ public class SecurityConfig {
 
     @Bean
     public NormalLoginSuccessHandler normalLoginSuccessHandler() {
-        return new NormalLoginSuccessHandler(tokenApplicationService);
+        return new NormalLoginSuccessHandler(tokenApplicationService, tokenProvider);
     }
 
     @Bean

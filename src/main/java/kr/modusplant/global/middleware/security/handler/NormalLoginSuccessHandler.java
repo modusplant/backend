@@ -7,6 +7,7 @@ import kr.modusplant.global.enums.Role;
 import kr.modusplant.global.middleware.security.models.SiteMemberUserDetails;
 import kr.modusplant.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
+import kr.modusplant.modules.jwt.app.service.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,6 +21,7 @@ import java.util.UUID;
 public class NormalLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final TokenApplicationService tokenApplicationService;
+    private final TokenProvider tokenProvider;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -34,9 +36,12 @@ public class NormalLoginSuccessHandler implements AuthenticationSuccessHandler {
                 currentUser.getActiveUuid(), currentUser.getNickname(), getMemberRole(currentUser), deviceIdToSend
         );
 
+        // TODO: authentication을 컨트롤러에서 사용하지 않는다면 null로 초기화할 것. 컨텍스트도 비우고.
         request.setAttribute("authentication", authentication);
         request.setAttribute("accessToken", loginTokenPair.getAccessToken());
         request.setAttribute("refreshToken", loginTokenPair.getRefreshToken());
+        request.setAttribute("accessTokenExpirationTime", tokenProvider.getExpirationFromToken(loginTokenPair.getAccessToken()));
+        request.setAttribute("refreshTokenExpirationTime", tokenProvider.getExpirationFromToken(loginTokenPair.getRefreshToken()));
 
         request.getRequestDispatcher("/api/auth/login-success").forward(request, response);
     }
