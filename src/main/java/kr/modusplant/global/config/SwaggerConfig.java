@@ -38,11 +38,11 @@ public class SwaggerConfig {
                         )
                 )
                 .addServersItem(new Server() // 프로덕션 서버 정보 설정
-                        .url("https://ep-divine-mouse-a4z30c6m.us-east-1.pg.koyeb.app:5432") // 프로덕션 서버 링크
+                        .url("https://ep-divine-mouse-a4z30c6m.us-east-1.pg.koyeb.app") // 프로덕션 서버 링크
                         .description("Production Server")  // 프로덕션 서버 설명
                 )
                 .addServersItem(new Server() // 테스트 서버 정보 설정
-                        .url("https://localhost:8080")  // 테스트 서버 링크(http://localhost:8080/swagger-ui/index.html)
+                        .url("http://localhost:8080")  // 테스트 서버 링크(http://localhost:8080/swagger-ui/index.html)
                         .description("Test Server")  // 테스트 서버 설명
                 );
     }
