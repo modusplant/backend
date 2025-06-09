@@ -20,8 +20,8 @@ public class SiteMemberAuthToken extends AbstractAuthenticationToken {
     // 인증 전
     public SiteMemberAuthToken(String principal, String credential) {
         super(null);
-        this.principal = principal;
         this.credential = credential;
+        this.principal = principal;
         setAuthenticated(false);
     }
 

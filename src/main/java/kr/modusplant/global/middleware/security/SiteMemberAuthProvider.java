@@ -27,10 +27,8 @@ public class SiteMemberAuthProvider implements AuthenticationProvider {
         SiteMemberUserDetails userDetails = memberUserDetailsService.loadUserByUsername(email);
 
         if(validateSiteMemberUserDetails(userDetails, password)) {
-            System.out.println("The credentials are valid.");
             return new SiteMemberAuthToken(userDetails, userDetails.getAuthorities());
         } else {
-            System.out.println("The credentials are invalid.");
             return new SiteMemberAuthToken(email, password);
         }
     }
