@@ -28,20 +28,23 @@ public class NormalLoginSuccessHandler implements AuthenticationSuccessHandler {
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
 
-        SiteMemberUserDetails currentUser =
-                (SiteMemberUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        SiteMemberUserDetails currentUser = (SiteMemberUserDetails) authentication.getPrincipal();
         UUID deviceIdToSend = UUID.randomUUID();
 
         TokenPair loginTokenPair = tokenApplicationService.issueToken(
                 currentUser.getActiveUuid(), currentUser.getNickname(), getMemberRole(currentUser), deviceIdToSend
         );
+        long epochSecondsOfAccessTokenExpirationTime =
+                (tokenProvider.getExpirationFromToken(loginTokenPair.getAccessToken())).getTime() / 1000;
+        long epochSecondsOfRefreshTokenExpirationTime =
+                (tokenProvider.getExpirationFromToken(loginTokenPair.getRefreshToken())).getTime() / 1000;
 
         // TODO: authentication을 컨트롤러에서 사용하지 않는다면 null로 초기화할 것. 컨텍스트도 비우고.
         request.setAttribute("authentication", authentication);
         request.setAttribute("accessToken", loginTokenPair.getAccessToken());
         request.setAttribute("refreshToken", loginTokenPair.getRefreshToken());
-        request.setAttribute("accessTokenExpirationTime", tokenProvider.getExpirationFromToken(loginTokenPair.getAccessToken()));
-        request.setAttribute("refreshTokenExpirationTime", tokenProvider.getExpirationFromToken(loginTokenPair.getRefreshToken()));
+        request.setAttribute("accessTokenExpirationTime", epochSecondsOfAccessTokenExpirationTime);
+        request.setAttribute("refreshTokenExpirationTime", epochSecondsOfRefreshTokenExpirationTime);
 
         request.getRequestDispatcher("/api/auth/login-success").forward(request, response);
     }
