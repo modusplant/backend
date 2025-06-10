@@ -14,7 +14,7 @@ public class NormalLoginFailureHandler implements AuthenticationFailureHandler {
                                         HttpServletResponse response,
                                         AuthenticationException exception) throws IOException, ServletException {
 
-        request.setAttribute("exception", exception);
+        request.setAttribute("errorMessage", exception.getMessage());
 
         request.getRequestDispatcher("/api/auth/login-fail").forward(request, response);
     }
