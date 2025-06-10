@@ -28,19 +28,19 @@ public class QnaCategoryValidationService {
         if (order == null) {
             return;
         }
-        if (qnaCategoryRepository.findByOrder(order).isPresent()) {
+        if (qnaCategoryRepository.existsByOrder(order)) {
             throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), ORDER, order, QnaCategoryEntity.class));
         }
     }
 
     public void validateExistedCategory(String category) {
-        if (qnaCategoryRepository.findByCategory(category).isPresent()) {
+        if (qnaCategoryRepository.existsByCategory(category)) {
             throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), CATEGORY, category, QnaCategoryEntity.class));
         }
     }
 
     public void validateNotFoundUuid(UUID uuid) {
-        if (uuid == null || qnaCategoryRepository.findByUuid(uuid).isEmpty()) {
+        if (uuid == null || !qnaCategoryRepository.existsByUuid(uuid)) {
             throw new EntityNotFoundWithUuidException(uuid, QnaCategoryEntity.class);
         }
     }

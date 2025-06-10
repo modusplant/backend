@@ -15,13 +15,13 @@ public abstract class AbstractPostValidationService {
         if (categoryUuid == null) {
             return;
         }
-        if (categoryRepository.findByUuid(categoryUuid).isPresent()) {
+        if (categoryRepository.existsByUuid(categoryUuid)) {
             throw new EntityExistsWithUuidException(categoryUuid, categoryRepository.getClass());
         }
     }
 
     protected void validateNotFoundCategoryUuid(UUID categoryUuid, UuidPrimaryKeyRepository<?> categoryRepository) {
-        if (categoryUuid == null || categoryRepository.findByUuid(categoryUuid).isEmpty()) {
+        if (categoryUuid == null || !categoryRepository.existsByUuid(categoryUuid)) {
             throw new EntityExistsWithUuidException(categoryUuid, categoryRepository.getClass());
         }
     }

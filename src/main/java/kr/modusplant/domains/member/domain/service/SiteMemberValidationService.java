@@ -22,13 +22,13 @@ public class SiteMemberValidationService {
         if (uuid == null) {
             return;
         }
-        if (memberRepository.findByUuid(uuid).isPresent()) {
+        if (memberRepository.existsByUuid(uuid)) {
             throw new EntityExistsWithUuidException(uuid, SiteMemberEntity.class);
         }
     }
 
     public void validateNotFoundUuid(UUID uuid) {
-        if (uuid == null || memberRepository.findByUuid(uuid).isEmpty()) {
+        if (uuid == null || !memberRepository.existsByUuid(uuid)) {
             throw new EntityNotFoundWithUuidException(uuid, SiteMemberEntity.class);
         }
     }

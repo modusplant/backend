@@ -42,8 +42,8 @@ class TipCategoryApplicationServiceTest implements TipCategoryRequestTestUtils, 
 
         given(tipCategoryRepository.save(tipCategoryEntity)).willReturn(returnedTipCategoryEntity);
         given(tipCategoryRepository.findAll()).willReturn(List.of(returnedTipCategoryEntity));
-        given(tipCategoryRepository.findByCategory(tipCategoryEntity.getCategory())).willReturn(Optional.empty());
-        given(tipCategoryRepository.findByOrder(tipCategoryEntity.getOrder())).willReturn(Optional.empty());
+        given(tipCategoryRepository.existsByCategory(tipCategoryEntity.getCategory())).willReturn(false);
+        given(tipCategoryRepository.existsByOrder(tipCategoryEntity.getOrder())).willReturn(false);
 
         // when
         tipCategoryApplicationService.insert(testTipCategoryInsertRequest);
@@ -61,8 +61,8 @@ class TipCategoryApplicationServiceTest implements TipCategoryRequestTestUtils, 
 
         given(tipCategoryRepository.save(tipCategoryEntity)).willReturn(returnedTipCategoryEntity);
         given(tipCategoryRepository.findByUuid(returnedTipCategoryEntity.getUuid())).willReturn(Optional.of(returnedTipCategoryEntity));
-        given(tipCategoryRepository.findByCategory(tipCategoryEntity.getCategory())).willReturn(Optional.empty());
-        given(tipCategoryRepository.findByOrder(tipCategoryEntity.getOrder())).willReturn(Optional.empty());
+        given(tipCategoryRepository.existsByCategory(tipCategoryEntity.getCategory())).willReturn(false);
+        given(tipCategoryRepository.existsByOrder(tipCategoryEntity.getOrder())).willReturn(false);
 
         // when
         tipCategoryApplicationService.insert(testTipCategoryInsertRequest);
@@ -79,8 +79,9 @@ class TipCategoryApplicationServiceTest implements TipCategoryRequestTestUtils, 
         TipCategoryEntity returnedTipCategoryEntity = createTestTipCategoryEntityWithUuid();
 
         given(tipCategoryRepository.save(tipCategoryEntity)).willReturn(returnedTipCategoryEntity);
-        given(tipCategoryRepository.findByCategory(testTipCategoryResponse.category())).willReturn(Optional.empty()).willReturn(Optional.of(returnedTipCategoryEntity));
-        given(tipCategoryRepository.findByOrder(tipCategoryEntity.getOrder())).willReturn(Optional.empty());
+        given(tipCategoryRepository.existsByCategory(testTipCategoryResponse.category())).willReturn(false);
+        given(tipCategoryRepository.findByCategory(testTipCategoryResponse.category())).willReturn(Optional.of(returnedTipCategoryEntity));
+        given(tipCategoryRepository.existsByOrder(tipCategoryEntity.getOrder())).willReturn(false);
 
         // when
         tipCategoryApplicationService.insert(testTipCategoryInsertRequest);
@@ -97,8 +98,9 @@ class TipCategoryApplicationServiceTest implements TipCategoryRequestTestUtils, 
         TipCategoryEntity returnedTipCategoryEntity = createTestTipCategoryEntityWithUuid();
 
         given(tipCategoryRepository.save(tipCategoryEntity)).willReturn(returnedTipCategoryEntity);
-        given(tipCategoryRepository.findByCategory(tipCategoryEntity.getCategory())).willReturn(Optional.empty());
-        given(tipCategoryRepository.findByOrder(testTipCategoryResponse.order())).willReturn(Optional.empty()).willReturn(Optional.of(returnedTipCategoryEntity));
+        given(tipCategoryRepository.existsByCategory(tipCategoryEntity.getCategory())).willReturn(false);
+        given(tipCategoryRepository.existsByOrder(testTipCategoryResponse.order())).willReturn(false);
+        given(tipCategoryRepository.findByOrder(testTipCategoryResponse.order())).willReturn(Optional.of(returnedTipCategoryEntity));
 
         // when
         tipCategoryApplicationService.insert(testTipCategoryInsertRequest);
@@ -146,9 +148,10 @@ class TipCategoryApplicationServiceTest implements TipCategoryRequestTestUtils, 
         TipCategoryEntity tipCategoryEntity = tipCategoryAppInfraMapper.toTipCategoryEntity(testTipCategoryInsertRequest);
 
         given(tipCategoryRepository.save(tipCategoryEntity)).willReturn(tipCategoryEntity);
-        given(tipCategoryRepository.findByUuid(uuid)).willReturn(Optional.of(tipCategoryEntity)).willReturn(Optional.empty());
-        given(tipCategoryRepository.findByCategory(tipCategoryEntity.getCategory())).willReturn(Optional.empty());
-        given(tipCategoryRepository.findByOrder(tipCategoryEntity.getOrder())).willReturn(Optional.empty());
+        given(tipCategoryRepository.findByUuid(uuid)).willReturn(Optional.empty());
+        given(tipCategoryRepository.existsByUuid(uuid)).willReturn(true);
+        given(tipCategoryRepository.existsByCategory(tipCategoryEntity.getCategory())).willReturn(false);
+        given(tipCategoryRepository.existsByOrder(tipCategoryEntity.getOrder())).willReturn(false);
         willDoNothing().given(tipCategoryRepository).deleteByUuid(uuid);
 
         // when

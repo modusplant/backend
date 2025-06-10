@@ -15,4 +15,8 @@ public interface ConvCategoryRepository extends UuidPrimaryKeyRepository<ConvCat
     Optional<ConvCategoryEntity> findByOrder(Integer order);
 
     Optional<ConvCategoryEntity> findByCategory(String category);
+
+    boolean existsByOrder(Integer order);
+
+    boolean existsByCategory(String category);
 }

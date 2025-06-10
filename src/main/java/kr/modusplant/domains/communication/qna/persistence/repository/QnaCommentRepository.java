@@ -24,4 +24,6 @@ public interface QnaCommentRepository extends JpaRepository<QnaCommentEntity, Qn
     List<QnaCommentEntity> findByContent(String content);
 
     void deleteByPostUlidAndPath(String postUlid, String path);
+
+    boolean existsByPostUlidAndPath(String postUlid, String path);
 }

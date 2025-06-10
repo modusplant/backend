@@ -24,4 +24,6 @@ public interface ConvCommentRepository extends JpaRepository<ConvCommentEntity, 
     List<ConvCommentEntity> findByContent(String content);
 
     void deleteByPostUlidAndPath(String postUlid, String path);
+
+    boolean existsByPostUlidAndPath(String postUlid, String path);
 }

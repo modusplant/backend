@@ -42,8 +42,8 @@ class ConvCategoryApplicationServiceTest implements ConvCategoryRequestTestUtils
 
         given(convCategoryRepository.save(convCategoryEntity)).willReturn(returnedConvCategoryEntity);
         given(convCategoryRepository.findAll()).willReturn(List.of(returnedConvCategoryEntity));
-        given(convCategoryRepository.findByCategory(convCategoryEntity.getCategory())).willReturn(Optional.empty());
-        given(convCategoryRepository.findByOrder(convCategoryEntity.getOrder())).willReturn(Optional.empty());
+        given(convCategoryRepository.existsByCategory(convCategoryEntity.getCategory())).willReturn(false);
+        given(convCategoryRepository.existsByOrder(convCategoryEntity.getOrder())).willReturn(false);
 
         // when
         convCategoryApplicationService.insert(testConvCategoryInsertRequest);
@@ -61,8 +61,8 @@ class ConvCategoryApplicationServiceTest implements ConvCategoryRequestTestUtils
 
         given(convCategoryRepository.save(convCategoryEntity)).willReturn(returnedConvCategoryEntity);
         given(convCategoryRepository.findByUuid(returnedConvCategoryEntity.getUuid())).willReturn(Optional.of(returnedConvCategoryEntity));
-        given(convCategoryRepository.findByCategory(convCategoryEntity.getCategory())).willReturn(Optional.empty());
-        given(convCategoryRepository.findByOrder(convCategoryEntity.getOrder())).willReturn(Optional.empty());
+        given(convCategoryRepository.existsByCategory(convCategoryEntity.getCategory())).willReturn(false);
+        given(convCategoryRepository.existsByOrder(convCategoryEntity.getOrder())).willReturn(false);
 
         // when
         convCategoryApplicationService.insert(testConvCategoryInsertRequest);
@@ -79,8 +79,9 @@ class ConvCategoryApplicationServiceTest implements ConvCategoryRequestTestUtils
         ConvCategoryEntity returnedConvCategoryEntity = createTestConvCategoryEntityWithUuid();
 
         given(convCategoryRepository.save(convCategoryEntity)).willReturn(returnedConvCategoryEntity);
-        given(convCategoryRepository.findByCategory(testConvCategoryResponse.category())).willReturn(Optional.empty()).willReturn(Optional.of(returnedConvCategoryEntity));
-        given(convCategoryRepository.findByOrder(convCategoryEntity.getOrder())).willReturn(Optional.empty());
+        given(convCategoryRepository.existsByCategory(testConvCategoryResponse.category())).willReturn(false);
+        given(convCategoryRepository.findByCategory(testConvCategoryResponse.category())).willReturn(Optional.of(returnedConvCategoryEntity));
+        given(convCategoryRepository.existsByOrder(convCategoryEntity.getOrder())).willReturn(false);
 
         // when
         convCategoryApplicationService.insert(testConvCategoryInsertRequest);
@@ -97,8 +98,9 @@ class ConvCategoryApplicationServiceTest implements ConvCategoryRequestTestUtils
         ConvCategoryEntity returnedConvCategoryEntity = createTestConvCategoryEntityWithUuid();
 
         given(convCategoryRepository.save(convCategoryEntity)).willReturn(returnedConvCategoryEntity);
-        given(convCategoryRepository.findByCategory(convCategoryEntity.getCategory())).willReturn(Optional.empty());
-        given(convCategoryRepository.findByOrder(testConvCategoryResponse.order())).willReturn(Optional.empty()).willReturn(Optional.of(returnedConvCategoryEntity));
+        given(convCategoryRepository.existsByCategory(convCategoryEntity.getCategory())).willReturn(false);
+        given(convCategoryRepository.existsByOrder(testConvCategoryResponse.order())).willReturn(false);
+        given(convCategoryRepository.findByOrder(testConvCategoryResponse.order())).willReturn(Optional.of(returnedConvCategoryEntity));
 
         // when
         convCategoryApplicationService.insert(testConvCategoryInsertRequest);
@@ -146,9 +148,10 @@ class ConvCategoryApplicationServiceTest implements ConvCategoryRequestTestUtils
         ConvCategoryEntity convCategoryEntity = convCategoryAppInfraMapper.toConvCategoryEntity(testConvCategoryInsertRequest);
 
         given(convCategoryRepository.save(convCategoryEntity)).willReturn(convCategoryEntity);
-        given(convCategoryRepository.findByUuid(uuid)).willReturn(Optional.of(convCategoryEntity)).willReturn(Optional.empty());
-        given(convCategoryRepository.findByCategory(convCategoryEntity.getCategory())).willReturn(Optional.empty());
-        given(convCategoryRepository.findByOrder(convCategoryEntity.getOrder())).willReturn(Optional.empty());
+        given(convCategoryRepository.findByUuid(uuid)).willReturn(Optional.empty());
+        given(convCategoryRepository.existsByUuid(uuid)).willReturn(true);
+        given(convCategoryRepository.existsByCategory(convCategoryEntity.getCategory())).willReturn(false);
+        given(convCategoryRepository.existsByOrder(convCategoryEntity.getOrder())).willReturn(false);
         willDoNothing().given(convCategoryRepository).deleteByUuid(uuid);
 
         // when

@@ -11,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
@@ -42,7 +41,7 @@ class QnaCategoryValidationServiceTest implements QnaCategoryResponseTestUtils, 
         Integer order = createTestQnaCategoryEntity().getOrder();
 
         // when
-        given(qnaCategoryRepository.findByOrder(order)).willReturn(Optional.of(createTestQnaCategoryEntity()));
+        given(qnaCategoryRepository.existsByOrder(order)).willReturn(true);
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
@@ -59,8 +58,8 @@ class QnaCategoryValidationServiceTest implements QnaCategoryResponseTestUtils, 
         String category = createTestQnaCategoryEntity().getCategory();
 
         // when
-        given(qnaCategoryRepository.findByOrder(order)).willReturn(Optional.empty());
-        given(qnaCategoryRepository.findByCategory(category)).willReturn(Optional.of(createTestQnaCategoryEntity()));
+        given(qnaCategoryRepository.existsByOrder(order)).willReturn(false);
+        given(qnaCategoryRepository.existsByCategory(category)).willReturn(true);
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
@@ -76,7 +75,7 @@ class QnaCategoryValidationServiceTest implements QnaCategoryResponseTestUtils, 
         UUID uuid = createTestQnaCategoryEntity().getUuid();
 
         // when
-        given(qnaCategoryRepository.findByUuid(uuid)).willReturn(Optional.empty());
+        given(qnaCategoryRepository.existsByUuid(uuid)).willReturn(false);
 
         // then
         EntityNotFoundException existsException = assertThrows(EntityNotFoundException.class,

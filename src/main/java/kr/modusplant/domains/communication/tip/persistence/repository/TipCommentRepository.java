@@ -24,4 +24,6 @@ public interface TipCommentRepository extends JpaRepository<TipCommentEntity, Ti
     List<TipCommentEntity> findByContent(String content);
 
     void deleteByPostUlidAndPath(String postUlid, String path);
+
+    boolean existsByPostUlidAndPath(String postUlid, String path);
 }

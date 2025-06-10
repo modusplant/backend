@@ -15,4 +15,8 @@ public interface QnaCategoryRepository extends UuidPrimaryKeyRepository<QnaCateg
     Optional<QnaCategoryEntity> findByOrder(Integer order);
 
     Optional<QnaCategoryEntity> findByCategory(String category);
+
+    boolean existsByOrder(Integer order);
+
+    boolean existsByCategory(String category);
 }

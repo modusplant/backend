@@ -20,7 +20,7 @@ public class TipCommentValidationService {
         Optional.ofNullable(postUlid).orElseThrow(() -> new IllegalArgumentException("postUlid is null"));
         Optional.ofNullable(path).orElseThrow(() -> new IllegalArgumentException("path is null"));
 
-        if (commentRepository.findByPostUlidAndPath(postUlid, path).isPresent()) {
+        if (commentRepository.existsByPostUlidAndPath(postUlid, path)) {
             throw new EntityExistsWithPostUlidAndPathException(postUlid, path, TipCommentEntity.class);
         }
     }
@@ -29,7 +29,7 @@ public class TipCommentValidationService {
         Optional.ofNullable(postUlid).orElseThrow(() -> new IllegalArgumentException("postUlid is null"));
         Optional.ofNullable(path).orElseThrow(() -> new IllegalArgumentException("path is null"));
 
-        if(commentRepository.findByPostUlidAndPath(postUlid, path).isEmpty()) {
+        if (!commentRepository.existsByPostUlidAndPath(postUlid, path)) {
             throw new EntityNotFoundWithPostUlidAndPathException(postUlid, path, TipCommentEntity.class);
         }
     }

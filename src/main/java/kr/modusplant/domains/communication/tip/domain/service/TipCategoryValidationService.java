@@ -28,19 +28,19 @@ public class TipCategoryValidationService {
         if (order == null) {
             return;
         }
-        if (tipCategoryRepository.findByOrder(order).isPresent()) {
+        if (tipCategoryRepository.existsByOrder(order)) {
             throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), ORDER, order, TipCategoryEntity.class));
         }
     }
 
     public void validateExistedCategory(String category) {
-        if (tipCategoryRepository.findByCategory(category).isPresent()) {
+        if (tipCategoryRepository.existsByCategory(category)) {
             throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), CATEGORY, category, TipCategoryEntity.class));
         }
     }
 
     public void validateNotFoundUuid(UUID uuid) {
-        if (uuid == null || tipCategoryRepository.findByUuid(uuid).isEmpty()) {
+        if (uuid == null || !tipCategoryRepository.existsByUuid(uuid)) {
             throw new EntityNotFoundWithUuidException(uuid, TipCategoryEntity.class);
         }
     }
