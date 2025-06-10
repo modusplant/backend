@@ -6,7 +6,8 @@ import kr.modusplant.modules.auth.normal.signup.app.http.request.NormalSignUpReq
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import static kr.modusplant.global.vo.CamelCaseWord.*;
+import static kr.modusplant.global.vo.CamelCaseWord.MEMBER;
+import static kr.modusplant.global.vo.FieldName.*;
 
 @Mapper
 public interface NormalSignUpMemberAppDomainMapper {

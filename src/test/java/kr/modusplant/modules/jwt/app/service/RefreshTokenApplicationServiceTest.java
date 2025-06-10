@@ -71,7 +71,7 @@ class RefreshTokenApplicationServiceTest implements RefreshTokenTestUtils, Refre
 
     @Test
     @DisplayName("MemberUuid와 DeviceId로 Refresh Token 조회 테스트")
-    void getByMemberUuidAndDeviceIdTest() {
+    void getByMemberUuidAndRefreshTokenTest() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         RefreshTokenEntity tokenEntity = createRefreshTokenBasicEntityBuilder()
@@ -81,7 +81,7 @@ class RefreshTokenApplicationServiceTest implements RefreshTokenTestUtils, Refre
         RefreshToken token = tokenMapper.toRefreshToken(tokenEntity);
 
         given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
-        given(tokenRepository.findByMemberAndDeviceId(memberEntity, tokenEntity.getDeviceId())).willReturn(Optional.of(tokenEntity));
+        given(tokenRepository.findByMemberAndRefreshToken(memberEntity, tokenEntity.getRefreshToken())).willReturn(Optional.of(tokenEntity));
         given(tokenRepository.save(tokenEntity)).willReturn(tokenEntity);
 
         // when
@@ -89,7 +89,7 @@ class RefreshTokenApplicationServiceTest implements RefreshTokenTestUtils, Refre
         token = tokenApplicationService.insert(token);
 
         // then
-        assertThat(tokenApplicationService.getByMemberUuidAndDeviceId(token.getMemberUuid(), token.getDeviceId()).orElseThrow()).isEqualTo(token);
+        assertThat(tokenApplicationService.getByMemberUuidAndRefreshToken(token.getMemberUuid(), token.getRefreshToken()).orElseThrow()).isEqualTo(token);
     }
 
     @Test
@@ -116,29 +116,6 @@ class RefreshTokenApplicationServiceTest implements RefreshTokenTestUtils, Refre
     }
 
     @Test
-    @DisplayName("DeviceId로 Refresh Token 조회 테스트")
-    void getByDeviceIdTest() {
-        // given
-        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        RefreshTokenEntity tokenEntity = createRefreshTokenBasicEntityBuilder()
-                .uuid(UUID.randomUUID())
-                .member(memberEntity)
-                .build();
-        RefreshToken token = tokenMapper.toRefreshToken(tokenEntity);
-
-        given(tokenRepository.findByDeviceId(tokenEntity.getDeviceId())).willReturn(Optional.of(tokenEntity));
-        given(tokenRepository.save(tokenEntity)).willReturn(tokenEntity);
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
-
-        // when
-        memberService.insert(memberBasicUserInsertRequest);
-        token = tokenApplicationService.insert(token);
-
-        // then
-        assertThat(tokenApplicationService.getByDeviceId(token.getDeviceId()).orElseThrow()).isEqualTo(token);
-    }
-
-    @Test
     @DisplayName("빈 refresh token 얻기")
     void getOptionalEmptyTest() {
         // given
@@ -155,24 +132,18 @@ class RefreshTokenApplicationServiceTest implements RefreshTokenTestUtils, Refre
         // then
         assertThat(tokenApplicationService.getByUuid(token.getUuid())).isEmpty();
 
-        // getByMemberUuidAndDeviceId
+        // getByMemberUuidAndRefreshToken
         // given
         given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
-        given(tokenRepository.findByMemberAndDeviceId(memberEntity, tokenEntity.getDeviceId())).willReturn(Optional.empty());
+        given(tokenRepository.findByMemberAndRefreshToken(memberEntity, tokenEntity.getRefreshToken())).willReturn(Optional.empty());
         //then
-        assertThat(tokenApplicationService.getByMemberUuidAndDeviceId(memberEntity.getUuid(), token.getDeviceId())).isEmpty();
+        assertThat(tokenApplicationService.getByMemberUuidAndRefreshToken(memberEntity.getUuid(), token.getRefreshToken())).isEmpty();
 
         // getByRefreshToken
         // given
         given(tokenRepository.findByRefreshToken(tokenEntity.getRefreshToken())).willReturn(Optional.empty());
         // then
         assertThat(tokenApplicationService.getByRefreshToken(token.getRefreshToken())).isEmpty();
-
-        // getByDeviceId
-        // given
-        given(tokenRepository.findByDeviceId(tokenEntity.getDeviceId())).willReturn(Optional.empty());
-        // then
-        assertThat(tokenApplicationService.getByDeviceId(token.getDeviceId())).isEmpty();
     }
 
     @Test

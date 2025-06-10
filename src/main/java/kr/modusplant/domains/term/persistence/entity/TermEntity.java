@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static kr.modusplant.global.util.VersionUtils.createVersion;
-import static kr.modusplant.global.vo.CamelCaseWord.TERM;
-import static kr.modusplant.global.vo.CamelCaseWord.VER;
+import static kr.modusplant.global.vo.FieldName.VER;
 import static kr.modusplant.global.vo.SnakeCaseWord.*;
+import static kr.modusplant.global.vo.TableName.TERM;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)

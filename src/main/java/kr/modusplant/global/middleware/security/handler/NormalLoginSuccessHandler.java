@@ -14,7 +14,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import java.io.IOException;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 public class NormalLoginSuccessHandler implements AuthenticationSuccessHandler {
@@ -28,18 +27,16 @@ public class NormalLoginSuccessHandler implements AuthenticationSuccessHandler {
                                         Authentication authentication) throws IOException, ServletException {
 
         SiteMemberUserDetails currentUser = (SiteMemberUserDetails) authentication.getPrincipal();
-        UUID deviceIdToSend = UUID.randomUUID();
 
         TokenPair loginTokenPair = tokenApplicationService.issueToken(
-                currentUser.getActiveUuid(), currentUser.getNickname(), getMemberRole(currentUser), deviceIdToSend
-        );
+                currentUser.getActiveUuid(), currentUser.getNickname(), getMemberRole(currentUser));
         long epochSecondsOfAccessTokenExpirationTime =
-                (tokenProvider.getExpirationFromToken(loginTokenPair.getAccessToken())).getTime() / 1000;
+                (tokenProvider.getExpirationFromToken(loginTokenPair.accessToken())).getTime() / 1000;
         long epochSecondsOfRefreshTokenExpirationTime =
-                (tokenProvider.getExpirationFromToken(loginTokenPair.getRefreshToken())).getTime() / 1000;
+                (tokenProvider.getExpirationFromToken(loginTokenPair.refreshToken())).getTime() / 1000;
 
-        request.setAttribute("accessToken", loginTokenPair.getAccessToken());
-        request.setAttribute("refreshToken", loginTokenPair.getRefreshToken());
+        request.setAttribute("accessToken", loginTokenPair.accessToken());
+        request.setAttribute("refreshToken", loginTokenPair.refreshToken());
         request.setAttribute("accessTokenExpirationTime", epochSecondsOfAccessTokenExpirationTime);
         request.setAttribute("refreshTokenExpirationTime", epochSecondsOfRefreshTokenExpirationTime);
 

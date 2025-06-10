@@ -12,11 +12,13 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.SnakeCaseWord.*;
+import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_LAST_MODIFIED_AT;
+import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_VER_NUM;
+import static kr.modusplant.global.vo.TableName.SITE_MEMBER_TERM;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = SNAKE_SITE_MEMBER_TERM)
+@Table(name = SITE_MEMBER_TERM)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SiteMemberTermEntity {
@@ -28,13 +30,13 @@ public class SiteMemberTermEntity {
     @JoinColumn(name = "uuid", nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity member;
 
-    @Column(name = SNAKE_AGREED_TOU_VER, nullable = false, length = 10)
+    @Column(name = "agreed_tou_ver", nullable = false, length = 10)
     private String agreedTermsOfUseVersion;
 
-    @Column(name = SNAKE_AGREED_PRIV_POLI_VER, nullable = false, length = 10)
+    @Column(name = "agreed_priv_poli_ver", nullable = false, length = 10)
     private String agreedPrivacyPolicyVersion;
 
-    @Column(name = SNAKE_AGREED_AD_INFO_RECE_VER, length = 10)
+    @Column(name = "agreed_ad_info_rece_ver", length = 10)
     private String agreedAdInfoReceivingVersion;
 
     @Column(name = SNAKE_LAST_MODIFIED_AT, nullable = false)

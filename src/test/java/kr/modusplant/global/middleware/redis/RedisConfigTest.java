@@ -1,18 +1,21 @@
 package kr.modusplant.global.middleware.redis;
 
+import kr.modusplant.global.context.RepositoryOnlyContext;
 import kr.modusplant.global.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.*;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+@RepositoryOnlyContext
 public class RedisConfigTest {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;

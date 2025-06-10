@@ -13,12 +13,11 @@ import org.mapstruct.Named;
 import java.util.UUID;
 
 import static kr.modusplant.global.vo.CamelCaseWord.MEMBER;
-import static kr.modusplant.global.vo.CamelCaseWord.MEMBER_TERM_ENTITY;
 
 @Mapper
 public interface SiteMemberTermAppInfraMapper {
 
-    @Mapping(target = MEMBER_TERM_ENTITY, ignore = true)
+    @Mapping(target = "memberTermEntity", ignore = true)
     @Mapping(source = "uuid", target = MEMBER, qualifiedByName = "toMember")
     SiteMemberTermEntity toMemberTermEntity(SiteMemberTermInsertRequest memberTermInsertRequest, @Context SiteMemberRepository memberRepository);
 

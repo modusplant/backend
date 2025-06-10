@@ -6,7 +6,7 @@ import kr.modusplant.domains.term.app.http.request.TermInsertRequest;
 import kr.modusplant.domains.term.app.http.request.TermUpdateRequest;
 import kr.modusplant.domains.term.app.http.response.TermResponse;
 import kr.modusplant.domains.term.app.service.TermApplicationService;
-import kr.modusplant.global.app.servlet.response.DataResponse;
+import kr.modusplant.global.app.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Tag(name = "Term API", description = "약관 API")
+@Tag(name = "약관 API", description = "약관을 다루는 API입니다.")
 @RestController
 @Primary
-@RequestMapping("/api/crud/terms")
+@RequestMapping("/api/v1/terms")
 @RequiredArgsConstructor
 public class TermController {
     private final TermApplicationService termApplicationService;

@@ -1,9 +1,9 @@
 package kr.modusplant.domains.term.common.util.entity;
 
-import kr.modusplant.domains.term.common.util.app.http.response.TermResponseTestUtils;
+import kr.modusplant.domains.term.common.util.domain.TermTestUtils;
 import kr.modusplant.domains.term.persistence.entity.TermEntity;
 
-public interface TermEntityTestUtils extends TermResponseTestUtils {
+public interface TermEntityTestUtils extends TermTestUtils {
     default TermEntity createTermsOfUseEntity() {
         return TermEntity.builder()
                 .name(termsOfUse.getName())

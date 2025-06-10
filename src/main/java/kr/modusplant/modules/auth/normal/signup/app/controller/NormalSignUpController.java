@@ -3,21 +3,18 @@ package kr.modusplant.modules.auth.normal.signup.app.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import kr.modusplant.domains.term.app.http.response.TermResponse;
-import kr.modusplant.global.app.servlet.response.DataResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.modusplant.global.app.http.response.DataResponse;
 import kr.modusplant.modules.auth.normal.signup.app.http.request.NormalSignUpRequest;
 import kr.modusplant.modules.auth.normal.signup.app.service.NormalSignUpApplicationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Map;
-
+@Tag(name = "일반 회원가입 API", description = "일반 회원가입을 다루는 API입니다.")
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -26,38 +23,18 @@ public class NormalSignUpController {
     private final NormalSignUpApplicationService normalSignUpApplicationService;
 
     @Operation(
-            summary = "이용약관 정보 전달 API",
-            description = "회원가입 시 이용약관 정보를 클라이언트에 전달합니다."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK: Succeeded"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error: Fail to fetch data")
-    })
-    @GetMapping("/api/terms")
-    public ResponseEntity<DataResponse<?>> sendTerms(){
-
-        List<TermResponse> terms = normalSignUpApplicationService.getAllTerms();
-        List<Map<String, Object>> termMapList = normalSignUpApplicationService.createTermMapList(terms);
-
-        DataResponse<List<Map<String, Object>>> successDataResponse =
-                DataResponse.of(200, "terms info successfully fetched", termMapList);
-
-        return ResponseEntity.ok(successDataResponse);
-    }
-
-    @Operation(
             summary = "일반 회원가입 API",
-            description = "클라이언트가 전달한 정보로 일반 회원가입 합니다."
+            description = "클라이언트가 전달한 정보로 일반 회원가입합니다."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK: Succeeded"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error: fail to sign up")
+            @ApiResponse(responseCode = "500", description = "Internal Server Error: Failed sign-up due to server error")
     })
     @PostMapping("/api/members/register")
     public ResponseEntity<DataResponse<Void>> saveMember(@RequestBody NormalSignUpRequest memberData) {
 
         normalSignUpApplicationService.insertMember(memberData);
-        DataResponse<Void> successDataResponse = DataResponse.of(200, "sign up successfully");
+        DataResponse<Void> successDataResponse = DataResponse.of(200, "signed up successfully");
 
         return ResponseEntity.ok(successDataResponse);
 

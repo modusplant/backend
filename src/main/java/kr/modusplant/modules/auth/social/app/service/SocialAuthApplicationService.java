@@ -2,6 +2,7 @@ package kr.modusplant.modules.auth.social.app.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.domains.member.domain.model.SiteMemberAuth;
+import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.domains.member.mapper.SiteMemberAuthDomainInfraMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberAuthDomainInfraMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
@@ -13,7 +14,6 @@ import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleReposit
 import kr.modusplant.global.enums.Role;
 import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import kr.modusplant.modules.auth.social.app.dto.JwtUserPayload;
-import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.modules.auth.social.app.dto.supers.SocialUserInfo;
 import kr.modusplant.modules.auth.social.app.service.supers.SocialAuthClient;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +51,7 @@ public class SocialAuthApplicationService {
         return switch (provider) {
             case KAKAO -> kakaoAuthClient;
             case GOOGLE -> googleAuthClient;
-            default -> throw new IllegalArgumentException("지원하지 않는 소셜 로그인 방식입니다: " + provider);
+            default -> throw new IllegalArgumentException("Unsupported social login method: " + provider);
         };
     }
 

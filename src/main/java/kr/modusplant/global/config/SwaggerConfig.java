@@ -18,31 +18,33 @@ import org.springframework.context.annotation.Configuration;
         bearerFormat = "JWT"
 )
 public class SwaggerConfig {
-    //http://localhost:8080/swagger-ui/index.html
-    private static final String API_TITLE = "modus-plant-Backend API";
-    private static final String API_VERSION = "0.0.1";
-    private static final String API_DESCRIPTION = "modus-plant-Backend API 명세서";
 
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .addServersItem(new Server().url("/"))
                 .info(new Info() // API 문서 정보 설정
-                        .title(API_TITLE) // API 제목
-                        .version(API_VERSION) // API 버전
-                        .description(API_DESCRIPTION) // API 설명
-                        .termsOfService("https://www.example.com/terms") // 서비스 약관 링크
-                        .license( // 라이센스 정보
-                                new License().name("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0")
-                        )
+                        .title("ModusPlant Backend API") // API 제목
+                        .version("0.0.1") // API 버전
+                        .description("ModusPlant Backend API 명세서") // API 설명
+                        .termsOfService("https://modusplant.vercel.app/terms") // API 약관 링크
                         .contact( // 연락처 정보
                                 new Contact()
-                                        .name("Support Team") // 지원 팀 이름
-                                        .url("https://www.example.com/support") // 지원 페이지 링크
-                                        .email("test@gmail.com") // 이메일 주소
+                                        .name("ModusPlant Support") // 지원 팀 이름
+                                        .url("https://modusplant.vercel.app/support") // 지원 페이지 링크
+                                        .email("modusplant@gmail.com") // 이메일 주소
                         )
+                        .license( // 라이센스 정보
+                                new License().name("MIT License").url("https://github.com/modusplant/backend/blob/develop/LICENSE")
+                        )
+                )
+                .addServersItem(new Server() // 프로덕션 서버 정보 설정
+                        .url("https://ep-divine-mouse-a4z30c6m.us-east-1.pg.koyeb.app") // 프로덕션 서버 링크
+                        .description("Production Server")  // 프로덕션 서버 설명
+                )
+                .addServersItem(new Server() // 테스트 서버 정보 설정
+                        .url("http://localhost:8080")  // 테스트 서버 링크(http://localhost:8080/swagger-ui/index.html)
+                        .description("Test Server")  // 테스트 서버 설명
                 );
     }
-
-
 }

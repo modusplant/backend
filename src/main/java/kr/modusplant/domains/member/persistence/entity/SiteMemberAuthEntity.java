@@ -14,11 +14,13 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.SnakeCaseWord.*;
+import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_LAST_MODIFIED_AT;
+import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_VER_NUM;
+import static kr.modusplant.global.vo.TableName.SITE_MEMBER_AUTH;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = SNAKE_SITE_MEMBER_AUTH)
+@Table(name = SITE_MEMBER_AUTH)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SiteMemberAuthEntity {
@@ -31,7 +33,7 @@ public class SiteMemberAuthEntity {
     private SiteMemberEntity originalMember;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(nullable = false, name = SNAKE_ACT_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(nullable = false, name = "act_memb_uuid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity activeMember;
 
     @Column(nullable = false, length = 80)
@@ -44,17 +46,17 @@ public class SiteMemberAuthEntity {
     @Enumerated(value = EnumType.STRING)
     private AuthProvider provider;
 
-    @Column(unique = true, updatable = false, name = SNAKE_PROVIDER_ID)
+    @Column(unique = true, updatable = false, name = "provider_id")
     private String providerId;
 
-    @Column(name = SNAKE_FAILED_ATTEMPT, nullable = false)
+    @Column(name = "failed_attempt", nullable = false)
     @DefaultValue
     private Integer failedAttempt;
 
-    @Column(name = SNAKE_LOCKOUT_REFRESH_AT)
+    @Column(name = "lockout_refresh_at")
     private LocalDateTime lockoutRefreshAt;
 
-    @Column(name = SNAKE_LOCKOUT_UNTIL)
+    @Column(name = "lockout_until")
     private LocalDateTime lockoutUntil;
 
     @Column(name = SNAKE_LAST_MODIFIED_AT, nullable = false)
