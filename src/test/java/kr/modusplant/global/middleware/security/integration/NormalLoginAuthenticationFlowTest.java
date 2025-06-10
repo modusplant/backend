@@ -5,7 +5,7 @@ import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
 import kr.modusplant.global.middleware.security.common.util.SiteMemberUserDetailsTestUtils;
 import kr.modusplant.global.middleware.security.config.SecurityConfig;
 import kr.modusplant.global.middleware.security.models.SiteMemberUserDetails;
-import kr.modusplant.modules.auth.normal.login.app.http.NormalLoginRequestTestUtils;
+import kr.modusplant.modules.auth.normal.login.common.util.app.http.request.NormalLoginRequestTestUtils;
 import kr.modusplant.modules.jwt.app.service.RefreshTokenApplicationService;
 import kr.modusplant.modules.jwt.domain.service.TokenValidationService;
 import org.junit.jupiter.api.BeforeEach;
