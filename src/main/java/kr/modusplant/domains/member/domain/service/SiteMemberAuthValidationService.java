@@ -31,13 +31,13 @@ public class SiteMemberAuthValidationService {
         if (uuid == null) {
             return;
         }
-        if (memberAuthRepository.findByOriginalMember(memberRepository.findByUuid(uuid).orElseThrow()).isPresent()) {
+        if (memberAuthRepository.existsByOriginalMember(memberRepository.findByUuid(uuid).orElseThrow())) {
             throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), ORIGINAL_MEMBER_UUID, uuid, SiteMemberAuthEntity.class));
         }
     }
 
     public void validateNotFoundOriginalMemberUuid(UUID uuid) {
-        if (uuid == null || memberAuthRepository.findByUuid(uuid).isEmpty()) {
+        if (uuid == null || !memberAuthRepository.existsByOriginalMember(memberRepository.findByUuid(uuid).orElseThrow())) {
             throw new EntityNotFoundWithUuidException(uuid, SiteMemberAuthEntity.class);
         }
     }

@@ -19,13 +19,13 @@ public class SiteMemberTermValidationService {
     private final SiteMemberTermRepository memberTermRepository;
 
     public void validateExistedUuid(UUID uuid) {
-        if (memberTermRepository.findByUuid(uuid).isPresent()) {
+        if (memberTermRepository.existsByUuid(uuid)) {
             throw new EntityExistsWithUuidException(uuid, SiteMemberTermEntity.class);
         }
     }
 
     public void validateNotFoundUuid(UUID uuid) {
-        if (uuid == null || memberTermRepository.findByUuid(uuid).isEmpty()) {
+        if (uuid == null || !memberTermRepository.existsByUuid(uuid)) {
             throw new EntityNotFoundWithUuidException(uuid, SiteMemberTermEntity.class);
         }
     }

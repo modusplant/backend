@@ -28,19 +28,19 @@ public class TermValidationService {
         if (uuid == null) {
             return;
         }
-        if (termRepository.findByUuid(uuid).isPresent()) {
+        if (termRepository.existsByUuid(uuid)) {
             throw new EntityExistsWithUuidException(uuid, TermEntity.class);
         }
     }
 
     public void validateExistedName(String name) {
-        if (termRepository.findByName(name).isPresent()) {
+        if (termRepository.existsByName(name)) {
             throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), NAME, name, TermEntity.class));
         }
     }
 
     public void validateNotFoundUuid(UUID uuid) {
-        if (uuid == null || termRepository.findByUuid(uuid).isEmpty()) {
+        if (uuid == null || !termRepository.existsByUuid(uuid)) {
             throw new EntityNotFoundWithUuidException(uuid, TermEntity.class);
         }
     }

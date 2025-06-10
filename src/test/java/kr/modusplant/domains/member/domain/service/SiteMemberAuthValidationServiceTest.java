@@ -50,11 +50,10 @@ class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, Si
         SiteMemberEntity activeMemberEntity = createMemberBasicUserEntityWithUuid();
         SiteMemberEntity originalMemberEntity = SiteMemberEntity.builder().memberEntity(activeMemberEntity).uuid(UUID.randomUUID()).build();
         UUID originalMemberEntityUuid = originalMemberEntity.getUuid();
-        SiteMemberAuthEntity memberAuthEntity = this.createMemberAuthBasicUserEntityBuilder().originalMember(originalMemberEntity).activeMember(activeMemberEntity).build();
 
         // when
         given(memberRepository.findByUuid(originalMemberEntityUuid)).willReturn(Optional.of(originalMemberEntity));
-        given(memberAuthRepository.findByOriginalMember(originalMemberEntity)).willReturn(Optional.of(memberAuthEntity));
+        given(memberAuthRepository.existsByOriginalMember(originalMemberEntity)).willReturn(true);
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
@@ -75,7 +74,7 @@ class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, Si
 
         // when
         given(memberRepository.findByUuid(originalMemberEntityUuid)).willReturn(Optional.of(originalMemberEntity));
-        given(memberAuthRepository.findByUuid(memberAuthEntityUuid)).willReturn(Optional.empty());
+        given(memberAuthRepository.existsByOriginalMember(originalMemberEntity)).willReturn(false);
 
         // then
         EntityNotFoundException notFoundException = assertThrows(EntityNotFoundWithUuidException.class,

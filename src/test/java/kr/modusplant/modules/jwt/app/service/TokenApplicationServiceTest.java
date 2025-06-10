@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.domains.member.vo.MemberUuid.MEMBER_UUID;
 import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -82,7 +81,7 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
     @DisplayName("토큰 생성 테스트")
     void issueTokenSuccess() {
         // given
-        willDoNothing().given(tokenValidationService).validateNotFoundMemberUuid(MEMBER_UUID, memberUuid);
+        willDoNothing().given(tokenValidationService).validateNotFoundMemberUuid(memberUuid);
         given(tokenProvider.generateAccessToken(memberUuid, claims)).willReturn(accessToken);
         given(tokenProvider.generateRefreshToken(memberUuid)).willReturn(refreshToken);
         given(tokenProvider.getIssuedAtFromToken(refreshToken)).willReturn(issuedAt);
@@ -97,7 +96,7 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
         assertEquals(accessToken, tokenPair.accessToken());
         assertEquals(refreshToken, tokenPair.refreshToken());
 
-        verify(tokenValidationService).validateNotFoundMemberUuid(MEMBER_UUID, memberUuid);
+        verify(tokenValidationService).validateNotFoundMemberUuid(memberUuid);
         verify(tokenProvider).generateAccessToken(eq(memberUuid), anyMap());
         verify(tokenProvider).generateRefreshToken(memberUuid);
         verify(refreshTokenApplicationService).insert(any(RefreshToken.class));

@@ -93,8 +93,7 @@ public class SiteMemberAuthApplicationService implements UuidCrudApplicationServ
     @Transactional
     @Override
     public SiteMemberAuthResponse update(SiteMemberAuthUpdateRequest memberAuthUpdateRequest) {
-        memberValidationService.validateNotFoundUuid(memberAuthUpdateRequest.originalMemberUuid());
-        memberValidationService.validateNotFoundUuid(memberAuthUpdateRequest.activeMemberUuid());
+        memberAuthValidationService.validateExistedOriginalMemberUuid(memberAuthUpdateRequest.originalMemberUuid());
         SiteMemberAuthEntity memberAuthEntity = memberAuthRepository.findByOriginalMember(memberRepository.findByUuid(memberAuthUpdateRequest.originalMemberUuid()).orElseThrow()).orElseThrow();
         memberAuthEntity.updateEmail(memberAuthUpdateRequest.email());
         memberAuthEntity.updatePw(memberAuthUpdateRequest.pw());

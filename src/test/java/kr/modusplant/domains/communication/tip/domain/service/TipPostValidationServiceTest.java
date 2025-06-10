@@ -44,7 +44,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils, TipCatego
     @DisplayName("팁 게시글 추가/수정 시 TipPostRequest는 유효한 입력")
     void validateTipPostInsertRequestTestSuccess() {
         // given & when
-        when(tipCategoryRepository.findByUuid(requestBasicTypes.categoryUuid())).thenReturn(Optional.of(createTestTipCategoryEntity()));
+        when(tipCategoryRepository.existsByUuid(requestBasicTypes.categoryUuid())).thenReturn(true);
 
         // then
         assertDoesNotThrow(() -> tipPostValidationService.validateTipPostInsertRequest(requestBasicTypes));
@@ -61,7 +61,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils, TipCatego
                 allMediaFilesOrder
         );
 
-        when(tipCategoryRepository.findByUuid(tipPostInsertRequest.categoryUuid())).thenReturn(Optional.empty());
+        when(tipCategoryRepository.existsByUuid(tipPostInsertRequest.categoryUuid())).thenReturn(false);
 
         // then
         assertThrows(EntityExistsWithUuidException.class,
@@ -74,12 +74,12 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils, TipCatego
         // given & when
         TipPostInsertRequest tipPostInsertRequest = new TipPostInsertRequest(
                 UUID.randomUUID(),
-                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "a".repeat(151),
                 allMediaFiles,
                 allMediaFilesOrder
         );
 
-        when(tipCategoryRepository.findByUuid(tipPostInsertRequest.categoryUuid())).thenReturn(Optional.of(createTestTipCategoryEntity()));
+        when(tipCategoryRepository.existsByUuid(tipPostInsertRequest.categoryUuid())).thenReturn(true);
 
         // then
         assertThrows(IllegalArgumentException.class,
@@ -98,7 +98,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils, TipCatego
                 imageTextFilesOrder
         );
 
-        when(tipCategoryRepository.findByUuid(tipPostInsertRequest.categoryUuid())).thenReturn(Optional.of(createTestTipCategoryEntity()));
+        when(tipCategoryRepository.existsByUuid(tipPostInsertRequest.categoryUuid())).thenReturn(true);
 
         // then
         assertThrows(IllegalArgumentException.class,
@@ -127,7 +127,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils, TipCatego
         when(tipPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.of(tipPostEntity));
         when(tipPostEntity.getAuthMember().getUuid()).thenReturn(memberUuid);
 
-        assertDoesNotThrow(() -> tipPostValidationService.validateAccessibleTipPost(ulid,memberUuid));
+        assertDoesNotThrow(() -> tipPostValidationService.validateAccessibleTipPost(ulid, memberUuid));
     }
 
     @Test

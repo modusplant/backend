@@ -15,4 +15,8 @@ public interface TipCategoryRepository extends UuidPrimaryKeyRepository<TipCateg
     Optional<TipCategoryEntity> findByOrder(Integer order);
 
     Optional<TipCategoryEntity> findByCategory(String category);
+
+    boolean existsByOrder(Integer order);
+
+    boolean existsByCategory(String category);
 }

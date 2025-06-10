@@ -215,16 +215,13 @@ public class TipCommentApplicationServiceTest implements
         );
 
         // when
-        given(commentRepository.findByPostUlidAndPath(
-                postEntity.getUlid(), commentEntity.getPath()
-        )).willReturn(Optional.empty());
+        given(commentRepository.existsByPostUlidAndPath(postEntity.getUlid(), commentEntity.getPath())).willReturn(false);
         given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(postRepository.findByUlid(postEntity.getUlid())).willReturn(Optional.of(postEntity));
         given(commentRepository.save(commentEntity)).willReturn(commentEntity);
 
         // then
-        assertThat(commentApplicationService.insert(insertRequest))
-                .isEqualTo(commentResponse);
+        assertThat(commentApplicationService.insert(insertRequest)).isEqualTo(commentResponse);
     }
 
     @DisplayName("게시글 ulid와 댓글 경로로 댓글 삭제하기")
@@ -239,8 +236,8 @@ public class TipCommentApplicationServiceTest implements
                 .build();
 
         // when
-        given(commentRepository.findByPostUlidAndPath(commentEntity.getPostEntity().getUlid(), commentEntity.getPath()))
-                .willReturn(Optional.of(commentEntity));
+        given(commentRepository.existsByPostUlidAndPath(commentEntity.getPostEntity().getUlid(), commentEntity.getPath()))
+                .willReturn(true);
         commentApplicationService
                 .removeByPostUlidAndPath(commentEntity.getPostEntity().getUlid(), commentEntity.getPath());
 

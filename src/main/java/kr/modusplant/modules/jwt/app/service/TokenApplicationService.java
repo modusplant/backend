@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static kr.modusplant.domains.member.vo.MemberUuid.MEMBER_UUID;
 import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 
@@ -34,7 +33,7 @@ public class TokenApplicationService {
     // 토큰 생성
     public TokenPair issueToken(UUID memberUuid, String nickname, Role role) {
         // memberUuid 검증
-        tokenValidationService.validateNotFoundMemberUuid(MEMBER_UUID, memberUuid);
+        tokenValidationService.validateNotFoundMemberUuid(memberUuid);
 
         // accessToken , refresh token 생성
         Map<String,String> claims = createClaims(nickname,role);

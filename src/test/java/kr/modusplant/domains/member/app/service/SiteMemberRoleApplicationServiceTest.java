@@ -50,9 +50,11 @@ class SiteMemberRoleApplicationServiceTest implements SiteMemberRoleRequestTestU
         SiteMemberEntity memberEntity = memberRoleEntity.getMember();
         UUID uuid = memberEntity.getUuid();
 
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
-        given(memberRoleRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberRoleEntity));
+        given(memberRoleRepository.existsByUuid(uuid)).willReturn(false);
+        given(memberRoleRepository.findByUuid(uuid)).willReturn(Optional.of(memberRoleEntity));
         given(memberRoleRepository.save(memberRoleEntity)).willReturn(memberRoleEntity);
 
         // when
@@ -71,9 +73,11 @@ class SiteMemberRoleApplicationServiceTest implements SiteMemberRoleRequestTestU
         SiteMemberEntity memberEntity = memberRoleEntity.getMember();
         UUID uuid = memberEntity.getUuid();
 
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
-        given(memberRoleRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberRoleEntity));
+        given(memberRoleRepository.existsByUuid(uuid)).willReturn(false);
+        given(memberRoleRepository.findByUuid(uuid)).willReturn(Optional.of(memberRoleEntity));
         given(memberRoleRepository.save(memberRoleEntity)).willReturn(memberRoleEntity);
 
         // when
@@ -92,9 +96,10 @@ class SiteMemberRoleApplicationServiceTest implements SiteMemberRoleRequestTestU
         SiteMemberEntity memberEntity = memberRoleEntity.getMember();
         UUID uuid = memberEntity.getUuid();
 
-        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
-        given(memberRoleRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberRoleEntity));
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
+        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberRoleRepository.existsByUuid(uuid)).willReturn(false);
         given(memberRoleRepository.save(memberRoleEntity)).willReturn(memberRoleEntity);
         given(memberRoleRepository.findByRole(memberRoleEntity.getRole())).willReturn(List.of(memberRoleEntity));
 
@@ -139,10 +144,12 @@ class SiteMemberRoleApplicationServiceTest implements SiteMemberRoleRequestTestU
         SiteMemberRoleEntity updatedMemberRoleEntity = SiteMemberRoleEntity.builder().memberRoleEntity(memberRoleEntity).role(updatedRole).build();
         UUID uuid = memberEntity.getUuid();
 
-        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
-        given(memberRoleRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberRoleEntity));
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
+        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberRoleRepository.existsByUuid(uuid)).willReturn(false).willReturn(true);
         given(memberRoleRepository.save(memberRoleEntity)).willReturn(memberRoleEntity).willReturn(updatedMemberRoleEntity);
+        given(memberRoleRepository.findByUuid(uuid)).willReturn(Optional.of(updatedMemberRoleEntity));
         given(memberRoleRepository.findByRole(updatedRole)).willReturn(List.of(updatedMemberRoleEntity));
 
         // when
@@ -162,10 +169,12 @@ class SiteMemberRoleApplicationServiceTest implements SiteMemberRoleRequestTestU
         SiteMemberEntity memberEntity = memberRoleEntity.getMember();
         UUID uuid = memberEntity.getUuid();
 
-        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
-        given(memberRoleRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberRoleEntity)).willReturn(Optional.empty());
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
+        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberRoleRepository.existsByUuid(uuid)).willReturn(false).willReturn(true);
         given(memberRoleRepository.save(memberRoleEntity)).willReturn(memberRoleEntity);
+        given(memberRoleRepository.findByUuid(uuid)).willReturn(Optional.empty());
         willDoNothing().given(memberRoleRepository).deleteByUuid(uuid);
 
         // when

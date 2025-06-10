@@ -42,8 +42,8 @@ class QnaCategoryApplicationServiceTest implements QnaCategoryRequestTestUtils, 
 
         given(qnaCategoryRepository.save(qnaCategoryEntity)).willReturn(returnedQnaCategoryEntity);
         given(qnaCategoryRepository.findAll()).willReturn(List.of(returnedQnaCategoryEntity));
-        given(qnaCategoryRepository.findByCategory(qnaCategoryEntity.getCategory())).willReturn(Optional.empty());
-        given(qnaCategoryRepository.findByOrder(qnaCategoryEntity.getOrder())).willReturn(Optional.empty());
+        given(qnaCategoryRepository.existsByCategory(qnaCategoryEntity.getCategory())).willReturn(false);
+        given(qnaCategoryRepository.existsByOrder(qnaCategoryEntity.getOrder())).willReturn(false);
 
         // when
         qnaCategoryApplicationService.insert(testQnaCategoryInsertRequest);
@@ -61,8 +61,8 @@ class QnaCategoryApplicationServiceTest implements QnaCategoryRequestTestUtils, 
 
         given(qnaCategoryRepository.save(qnaCategoryEntity)).willReturn(returnedQnaCategoryEntity);
         given(qnaCategoryRepository.findByUuid(returnedQnaCategoryEntity.getUuid())).willReturn(Optional.of(returnedQnaCategoryEntity));
-        given(qnaCategoryRepository.findByCategory(qnaCategoryEntity.getCategory())).willReturn(Optional.empty());
-        given(qnaCategoryRepository.findByOrder(qnaCategoryEntity.getOrder())).willReturn(Optional.empty());
+        given(qnaCategoryRepository.existsByCategory(qnaCategoryEntity.getCategory())).willReturn(false);
+        given(qnaCategoryRepository.existsByOrder(qnaCategoryEntity.getOrder())).willReturn(false);
 
         // when
         qnaCategoryApplicationService.insert(testQnaCategoryInsertRequest);
@@ -79,8 +79,9 @@ class QnaCategoryApplicationServiceTest implements QnaCategoryRequestTestUtils, 
         QnaCategoryEntity returnedQnaCategoryEntity = createTestQnaCategoryEntityWithUuid();
 
         given(qnaCategoryRepository.save(qnaCategoryEntity)).willReturn(returnedQnaCategoryEntity);
-        given(qnaCategoryRepository.findByCategory(testQnaCategoryResponse.category())).willReturn(Optional.empty()).willReturn(Optional.of(returnedQnaCategoryEntity));
-        given(qnaCategoryRepository.findByOrder(qnaCategoryEntity.getOrder())).willReturn(Optional.empty());
+        given(qnaCategoryRepository.existsByCategory(testQnaCategoryResponse.category())).willReturn(false);
+        given(qnaCategoryRepository.findByCategory(testQnaCategoryResponse.category())).willReturn(Optional.of(returnedQnaCategoryEntity));
+        given(qnaCategoryRepository.existsByOrder(qnaCategoryEntity.getOrder())).willReturn(false);
 
         // when
         qnaCategoryApplicationService.insert(testQnaCategoryInsertRequest);
@@ -97,8 +98,9 @@ class QnaCategoryApplicationServiceTest implements QnaCategoryRequestTestUtils, 
         QnaCategoryEntity returnedQnaCategoryEntity = createTestQnaCategoryEntityWithUuid();
 
         given(qnaCategoryRepository.save(qnaCategoryEntity)).willReturn(returnedQnaCategoryEntity);
-        given(qnaCategoryRepository.findByCategory(qnaCategoryEntity.getCategory())).willReturn(Optional.empty());
-        given(qnaCategoryRepository.findByOrder(testQnaCategoryResponse.order())).willReturn(Optional.empty()).willReturn(Optional.of(returnedQnaCategoryEntity));
+        given(qnaCategoryRepository.existsByCategory(qnaCategoryEntity.getCategory())).willReturn(false);
+        given(qnaCategoryRepository.existsByOrder(testQnaCategoryResponse.order())).willReturn(false);
+        given(qnaCategoryRepository.findByOrder(testQnaCategoryResponse.order())).willReturn(Optional.of(returnedQnaCategoryEntity));
 
         // when
         qnaCategoryApplicationService.insert(testQnaCategoryInsertRequest);
@@ -146,9 +148,10 @@ class QnaCategoryApplicationServiceTest implements QnaCategoryRequestTestUtils, 
         QnaCategoryEntity qnaCategoryEntity = qnaCategoryAppInfraMapper.toQnaCategoryEntity(testQnaCategoryInsertRequest);
 
         given(qnaCategoryRepository.save(qnaCategoryEntity)).willReturn(qnaCategoryEntity);
-        given(qnaCategoryRepository.findByUuid(uuid)).willReturn(Optional.of(qnaCategoryEntity)).willReturn(Optional.empty());
-        given(qnaCategoryRepository.findByCategory(qnaCategoryEntity.getCategory())).willReturn(Optional.empty());
-        given(qnaCategoryRepository.findByOrder(qnaCategoryEntity.getOrder())).willReturn(Optional.empty());
+        given(qnaCategoryRepository.findByUuid(uuid)).willReturn(Optional.empty());
+        given(qnaCategoryRepository.existsByUuid(uuid)).willReturn(true);
+        given(qnaCategoryRepository.existsByCategory(qnaCategoryEntity.getCategory())).willReturn(false);
+        given(qnaCategoryRepository.existsByOrder(qnaCategoryEntity.getOrder())).willReturn(false);
         willDoNothing().given(qnaCategoryRepository).deleteByUuid(uuid);
 
         // when

@@ -21,8 +21,6 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
 import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
@@ -89,9 +87,7 @@ public class ConvCommentValidationServiceTest implements
         entityManager.flush();
 
         // when
-        given(commentRepository.findByPostUlidAndPath(
-                commentEntity.getPostUlid(), commentEntity.getPath()
-        )).willReturn(Optional.of(commentEntity));
+        given(commentRepository.existsByPostUlidAndPath(commentEntity.getPostUlid(), commentEntity.getPath())).willReturn(true);
 
         // then
         EntityExistsWithPostUlidAndPathException ex = assertThrows(
@@ -118,9 +114,7 @@ public class ConvCommentValidationServiceTest implements
         entityManager.flush();
 
         // when
-        given(commentRepository.findByPostUlidAndPath(
-                commentEntity.getPostUlid(), commentEntity.getPath()
-        )).willReturn(Optional.empty());
+        given(commentRepository.existsByPostUlidAndPath(commentEntity.getPostUlid(), commentEntity.getPath())).willReturn(false);
 
         // then
         EntityNotFoundWithPostUlidAndPathException ex = assertThrows(

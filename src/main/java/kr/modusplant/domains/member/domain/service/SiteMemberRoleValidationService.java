@@ -19,13 +19,13 @@ public class SiteMemberRoleValidationService {
     private final SiteMemberRoleRepository memberRoleRepository;
 
     public void validateExistedUuid(UUID uuid) {
-        if (memberRoleRepository.findByUuid(uuid).isPresent()) {
+        if (memberRoleRepository.existsByUuid(uuid)) {
             throw new EntityExistsWithUuidException(uuid, SiteMemberRoleEntity.class);
         }
     }
 
     public void validateNotFoundUuid(UUID uuid) {
-        if (uuid == null || memberRoleRepository.findByUuid(uuid).isEmpty()) {
+        if (uuid == null || !memberRoleRepository.existsByUuid(uuid)) {
             throw new EntityNotFoundWithUuidException(uuid, SiteMemberRoleEntity.class);
         }
     }

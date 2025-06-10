@@ -46,11 +46,10 @@ class SiteMemberRoleValidationServiceTest implements SiteMemberRoleTestUtils, Si
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         UUID memberEntityUuid = memberEntity.getUuid();
-        SiteMemberRoleEntity memberRoleEntity = SiteMemberRoleEntity.builder().member(memberEntity).build();
 
         // when
         given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.of(memberEntity));
-        given(memberRoleRepository.findByUuid(memberEntityUuid)).willReturn(Optional.of(memberRoleEntity));
+        given(memberRoleRepository.existsByUuid(memberEntityUuid)).willReturn(true);
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsWithUuidException.class,
@@ -68,7 +67,7 @@ class SiteMemberRoleValidationServiceTest implements SiteMemberRoleTestUtils, Si
 
         // when
         given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.of(memberEntity));
-        given(memberRoleRepository.findByUuid(memberEntityUuid)).willReturn(Optional.empty());
+        given(memberRoleRepository.existsByUuid(memberEntityUuid)).willReturn(false);
 
         // then
         EntityNotFoundWithUuidException notFoundException = assertThrows(EntityNotFoundWithUuidException.class,
