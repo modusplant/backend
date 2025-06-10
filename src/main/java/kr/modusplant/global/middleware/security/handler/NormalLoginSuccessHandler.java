@@ -11,7 +11,6 @@ import kr.modusplant.modules.jwt.app.service.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import java.io.IOException;
@@ -40,7 +39,6 @@ public class NormalLoginSuccessHandler implements AuthenticationSuccessHandler {
                 (tokenProvider.getExpirationFromToken(loginTokenPair.getRefreshToken())).getTime() / 1000;
 
         // TODO: authentication을 컨트롤러에서 사용하지 않는다면 null로 초기화할 것. 컨텍스트도 비우고.
-        request.setAttribute("authentication", authentication);
         request.setAttribute("accessToken", loginTokenPair.getAccessToken());
         request.setAttribute("refreshToken", loginTokenPair.getRefreshToken());
         request.setAttribute("accessTokenExpirationTime", epochSecondsOfAccessTokenExpirationTime);

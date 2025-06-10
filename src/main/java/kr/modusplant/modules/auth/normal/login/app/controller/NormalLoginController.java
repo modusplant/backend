@@ -1,7 +1,6 @@
 package kr.modusplant.modules.auth.normal.login.app.controller;
 
 import kr.modusplant.global.app.servlet.response.DataResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,7 +15,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@Slf4j
 public class NormalLoginController {
 
     @Value("${jwt.refresh_duration}")
