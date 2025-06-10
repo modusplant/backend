@@ -70,6 +70,14 @@ public class NormalLoginControllerUnitTest {
                 .andExpect(jsonPath("$.data.refreshTokenExpirationTime").value(testRefreshTokenExpirationTime));
     }
 
+    @Test
+    public void sendLoginFailure() throws Exception {
+        String testErrorMessage = "The account is inactive";
 
-
+        mockMvc.perform(post("/api/auth/login-fail")
+                        .requestAttr("errorMessage", testErrorMessage))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.message").value(testErrorMessage));
+    }
 }
