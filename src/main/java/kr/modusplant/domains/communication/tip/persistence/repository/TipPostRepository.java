@@ -1,31 +1,17 @@
 package kr.modusplant.domains.communication.tip.persistence.repository;
 
-import kr.modusplant.domains.common.persistence.repository.supers.CreatedAtAndUpdatedAtRepository;
-import kr.modusplant.domains.common.persistence.repository.supers.UlidPrimaryRepository;
+import kr.modusplant.domains.communication.common.persistence.supers.CommunicationPostRepository;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
-import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 @Repository
-public interface TipPostRepository extends UlidPrimaryRepository<TipPostEntity>, CreatedAtAndUpdatedAtRepository<TipPostEntity>, JpaRepository<TipPostEntity,String> {
-    Page<TipPostEntity> findAllByOrderByCreatedAtDesc(Pageable pageable);
-
-    Page<TipPostEntity> findByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
-
-    Page<TipPostEntity> findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(TipCategoryEntity category, Pageable pageable);
-
-    Page<TipPostEntity> findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(SiteMemberEntity authMember, Pageable pageable);
-
-    Optional<TipPostEntity> findByUlidAndIsDeletedFalse(String ulid);
+public interface TipPostRepository extends CommunicationPostRepository<TipPostEntity, TipCategoryEntity> {
 
     @Query(
             value = "SELECT * FROM tip_post p " +

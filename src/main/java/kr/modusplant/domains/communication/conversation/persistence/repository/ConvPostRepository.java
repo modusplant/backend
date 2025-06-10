@@ -1,31 +1,17 @@
 package kr.modusplant.domains.communication.conversation.persistence.repository;
 
-import kr.modusplant.domains.common.persistence.repository.supers.CreatedAtAndUpdatedAtRepository;
-import kr.modusplant.domains.common.persistence.repository.supers.UlidPrimaryRepository;
+import kr.modusplant.domains.communication.common.persistence.supers.CommunicationPostRepository;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
-import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 @Repository
-public interface ConvPostRepository extends UlidPrimaryRepository<ConvPostEntity>, CreatedAtAndUpdatedAtRepository<ConvPostEntity>, JpaRepository<ConvPostEntity,String> {
-    Page<ConvPostEntity> findAllByOrderByCreatedAtDesc(Pageable pageable);
-
-    Page<ConvPostEntity> findByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
-
-    Page<ConvPostEntity> findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(ConvCategoryEntity category, Pageable pageable);
-
-    Page<ConvPostEntity> findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(SiteMemberEntity authMember, Pageable pageable);
-
-    Optional<ConvPostEntity> findByUlidAndIsDeletedFalse(String ulid);
+public interface ConvPostRepository extends CommunicationPostRepository<ConvPostEntity, ConvCategoryEntity> {
 
     @Query(
             value = "SELECT * FROM conv_post p " +
