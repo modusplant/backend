@@ -23,6 +23,7 @@ public class RedisHelper {
         stringRedisTemplate.opsForValue().set(key, value, ttl);
     }
 
+    @SuppressWarnings("OptionalOfNullableMisuse")
     public Optional<String> getString(String key) {
         return Optional.ofNullable(stringRedisTemplate.opsForValue().get(key));
     }
@@ -36,6 +37,7 @@ public class RedisHelper {
         redisTemplate.opsForValue().set(key, value, ttl);
     }
 
+    @SuppressWarnings("OptionalOfNullableMisuse")
     public <T> Optional<T> getObject(String key, Class<T> clazz) {
         return Optional.ofNullable(clazz.cast(redisTemplate.opsForValue().get(key)));
     }

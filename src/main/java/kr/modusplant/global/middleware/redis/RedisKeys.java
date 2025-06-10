@@ -13,8 +13,8 @@ public final class RedisKeys {
      * Prefix 상수와 동적으로 변하는 key 값을
      * RedisKey 로 생성하는 메소드
      *
-     * @param prefix
-     * @Param dynamicValue - 예시) 특정 유저의 email
+     * @param prefix - 예시) RESET_PASSWORD_PREFIX 값
+     * @param dynamicValue - 예시) 특정 유저의 email
      * @return redisKey
      */
     public static String generateRedisKey(String prefix, String dynamicValue) {
