@@ -117,7 +117,7 @@ public class NormalLoginAuthenticationFlowTest implements
 
                 // then
                 .andExpect(forwardedUrl("/api/auth/login-fail"))
-                .andExpect(request().attribute("exception", instanceOf(AuthenticationException.class)));
+                .andExpect(request().attribute("errorMessage", instanceOf(String.class)));
     }
 
     @Test
