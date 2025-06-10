@@ -17,7 +17,7 @@ public class MonitorService {
         if (shouldThrowError) {
             return "Business logic executed successfully!"; // 정상 흐름
         } else {
-            throw new RuntimeException("Something went wrong during the business logic execution!"); // 예외 발생
+            throw new RuntimeException("Exception occurred during the business logic execution!"); // 예외 발생
         }
     }
 
@@ -38,9 +38,9 @@ public class MonitorService {
             String value3 = "Test String Value 3(1min), Expire Time : " + LocalDateTime.now().plusMinutes(1);
             redisHelper.setString(redisKey3, value3, Duration.ofMinutes(1));
         } catch (Exception e) {
-            throw new RuntimeException("Redis storage test error occurred."); // 예외 발생
+            throw new RuntimeException("Exception occurred during testing the Redis storage!"); // 예외 발생
         }
 
-        return "redisHelper test successful";
+        return "RedisHelper test executed successfully!"; // 정상 흐름
     }
 }
