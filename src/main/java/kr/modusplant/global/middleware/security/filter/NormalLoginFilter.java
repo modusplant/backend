@@ -1,4 +1,4 @@
-package kr.modusplant.global.middleware.security;
+package kr.modusplant.global.middleware.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;

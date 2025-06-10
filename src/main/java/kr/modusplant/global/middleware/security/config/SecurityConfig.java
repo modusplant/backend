@@ -2,7 +2,7 @@ package kr.modusplant.global.middleware.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.global.advice.GlobalExceptionHandler;
-import kr.modusplant.global.middleware.security.NormalLoginFilter;
+import kr.modusplant.global.middleware.security.filter.NormalLoginFilter;
 import kr.modusplant.global.middleware.security.SiteMemberAuthProvider;
 import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
 import kr.modusplant.global.middleware.security.handler.NormalLoginFailureHandler;
