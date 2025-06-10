@@ -11,5 +11,5 @@ public class VerifyEmailRequest {
     private String email;
 
     @Schema(description = "검증 코드", example = "12cA56")
-    String verifyCode;
+    private String verifyCode;
 }
