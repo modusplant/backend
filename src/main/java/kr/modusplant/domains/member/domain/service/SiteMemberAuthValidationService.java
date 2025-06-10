@@ -1,6 +1,7 @@
 package kr.modusplant.domains.member.domain.service;
 
 import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
@@ -14,7 +15,9 @@ import java.util.UUID;
 
 import static kr.modusplant.domains.member.vo.MemberUuid.ORIGINAL_MEMBER_UUID;
 import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
+import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
+import static kr.modusplant.global.vo.FieldName.EMAIL;
 
 @Service
 @Primary
@@ -36,6 +39,12 @@ public class SiteMemberAuthValidationService {
     public void validateNotFoundOriginalMemberUuid(UUID uuid) {
         if (uuid == null || memberAuthRepository.findByUuid(uuid).isEmpty()) {
             throw new EntityNotFoundWithUuidException(uuid, SiteMemberAuthEntity.class);
+        }
+    }
+
+    public void validateNotFoundEmail(String email) {
+        if (!memberAuthRepository.existsByEmail(email)) {
+            throw new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), EMAIL, email, SiteMemberAuthEntity.class));
         }
     }
 }

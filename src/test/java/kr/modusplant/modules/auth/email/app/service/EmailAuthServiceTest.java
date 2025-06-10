@@ -7,6 +7,7 @@ import kr.modusplant.global.config.TestAopConfig;
 import kr.modusplant.global.middleware.redis.RedisHelper;
 import kr.modusplant.modules.auth.email.app.http.request.EmailRequest;
 import kr.modusplant.modules.auth.email.app.http.request.VerifyEmailRequest;
+import kr.modusplant.modules.auth.email.enums.EmailType;
 import kr.modusplant.modules.jwt.app.service.TokenProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,9 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.util.Optional;
 
+import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
 import static kr.modusplant.global.middleware.redis.RedisKeys.RESET_PASSWORD_PREFIX;
-import static kr.modusplant.global.vo.CamelCaseWord.RESET_PASSWORD_EMAIL;
-import static kr.modusplant.global.vo.CamelCaseWord.SIGNUP_VERIFY_EMAIL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
@@ -76,7 +76,7 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
         assertThat(result).isEqualTo("jwt-token");
         verify(tokenProvider).generateVerifyCode();
         verify(tokenProvider).generateVerifyAccessToken(email, code);
-        verify(mailService).callSendEmail(eq(email), eq(code), eq(SIGNUP_VERIFY_EMAIL));
+        verify(mailService).callSendEmail(eq(email), eq(code), eq(EmailType.SIGNUP_VERIFY_EMAIL));
     }
 
     @Test
@@ -112,7 +112,7 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
         verify(redisHelper).setString(
                 contains(RESET_PASSWORD_PREFIX), eq(code), eq(Duration.ofMinutes(5))
         );
-        verify(mailService).callSendEmail(eq(email), eq(code), eq(RESET_PASSWORD_EMAIL));
+        verify(mailService).callSendEmail(eq(email), eq(code), eq(EmailType.RESET_PASSWORD_EMAIL));
     }
 
     @Test
@@ -125,7 +125,7 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
         // when/then
         assertThatThrownBy(() -> emailAuthService.sendResetPasswordCode(request))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Email not found");
+                .hasMessageContaining(NOT_FOUND_ENTITY.getValue());
     }
 
     @Test
@@ -161,7 +161,7 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
         // expect
         assertThatThrownBy(() -> emailAuthService.verifyResetPasswordCode(request))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("verification code is invalid");
+                .hasMessageContaining("Verification code is invalid");
     }
 
     @Test
@@ -178,6 +178,6 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
         // expect
         assertThatThrownBy(() -> emailAuthService.verifyResetPasswordCode(request))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("verification code is invalid");
+                .hasMessageContaining("Verification code is invalid");
     }
 }
