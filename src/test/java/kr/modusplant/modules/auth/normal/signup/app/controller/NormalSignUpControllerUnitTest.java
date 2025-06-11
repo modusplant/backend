@@ -1,4 +1,4 @@
-package kr.modusplant.modules.auth.normal.app.controller;
+package kr.modusplant.modules.auth.normal.signup.app.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.member.common.util.app.http.response.SiteMemberAuthResponseTestUtils;
@@ -31,7 +31,7 @@ public class NormalSignUpControllerUnitTest implements SiteMemberResponseTestUti
     public void saveMember_givenValidInput_thenReturn200() throws Exception {
         // given
         NormalSignUpRequest validData = new NormalSignUpRequest(
-                "akdnjs0308@gmail.com", "userPw2!",
+                "test123@example.com", "userPw2!",
                 "테스트닉네임", "v1.0.0", "v1.0.0", "v1.0.0");
         String testRequestBody = objectMapper.writeValueAsString(validData);
 
