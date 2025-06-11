@@ -9,6 +9,7 @@ import kr.modusplant.domains.communication.qna.persistence.entity.QnaCommentEnti
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaCommentRepository;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostRepository;
+import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Primary
@@ -26,6 +28,7 @@ import java.util.Optional;
 public class QnaCommentApplicationService {
 
     private final QnaCommentValidationService qnaCommentValidationService;
+    private final SiteMemberValidationService memberValidationService;
     private final QnaCommentAppInfraMapper qnaCommentAppInfraMapper = new QnaCommentAppInfraMapperImpl();
     private final QnaCommentRepository qnaCommentRepository;
     private final QnaPostRepository qnaPostRepository;
@@ -70,16 +73,22 @@ public class QnaCommentApplicationService {
     }
 
     @Transactional
-    public QnaCommentResponse insert(QnaCommentInsertRequest commentInsertRequest) {
+    public QnaCommentResponse insert(QnaCommentInsertRequest commentInsertRequest, UUID memberUuid) {
         String postUlid = commentInsertRequest.postUlid();
         String path = commentInsertRequest.path();
-        qnaCommentValidationService.validateFoundQnaCommentEntity(postUlid, path);
+        qnaCommentValidationService.validateExistedQnaCommentEntity(postUlid, path);
+        memberValidationService.validateNotFoundUuid(memberUuid);
 
-        QnaCommentEntity commentEntity =
-                qnaCommentAppInfraMapper.toQnaCommentEntity(commentInsertRequest, qnaPostRepository, memberRepository);
+        SiteMemberEntity memberEntity = memberRepository.findByUuid(memberUuid).orElseThrow();
+        QnaCommentEntity commentEntity = QnaCommentEntity.builder()
+                .postEntity(qnaPostRepository.findByUlid(postUlid).orElseThrow())
+                .path(path)
+                .authMember(memberEntity)
+                .createMember(memberEntity)
+                .content(commentInsertRequest.content())
+                .build();
 
-        return qnaCommentAppInfraMapper.toQnaCommentResponse(
-                qnaCommentRepository.save(commentEntity));
+        return qnaCommentAppInfraMapper.toQnaCommentResponse(qnaCommentRepository.save(commentEntity));
     }
 
     @Transactional

@@ -177,13 +177,12 @@ public class QnaCommentControllerTest implements
     void insertQnaCommentTest() throws Exception {
         // given
         ObjectMapper objectMapper = new ObjectMapper();
-        QnaCommentInsertRequest insertRequest = createQnaCommentInsertRequest(
-                postEntity.getUlid(), memberEntity.getUuid());
+        QnaCommentInsertRequest insertRequest = createQnaCommentInsertRequest(postEntity.getUlid());
         QnaCommentResponse commentResponse =
                 createQnaCommentResponse(postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname());
 
         // when
-        given(commentApplicationService.insert(insertRequest)).willReturn(commentResponse);
+        given(commentApplicationService.insert(insertRequest, memberEntity.getUuid())).willReturn(commentResponse);
 
         // then
         mockMvc.perform(post("/api/v1/qna/comments", insertRequest)

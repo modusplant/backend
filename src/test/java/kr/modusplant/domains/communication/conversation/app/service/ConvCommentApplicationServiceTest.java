@@ -206,9 +206,7 @@ public class ConvCommentApplicationServiceTest implements
                 .isDeleted(true)
                 .build();
 
-        ConvCommentInsertRequest insertRequest = createConvCommentInsertRequest(
-                postEntity.getUlid(), memberEntity.getUuid()
-        );
+        ConvCommentInsertRequest insertRequest = createConvCommentInsertRequest(postEntity.getUlid());
 
         ConvCommentResponse commentResponse = createConvCommentResponse(
                 postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname()
@@ -216,12 +214,13 @@ public class ConvCommentApplicationServiceTest implements
 
         // when
         given(commentRepository.existsByPostUlidAndPath(postEntity.getUlid(), commentEntity.getPath())).willReturn(false);
+        given(memberRepository.existsByUuid(memberEntity.getUuid())).willReturn(true);
         given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(postRepository.findByUlid(postEntity.getUlid())).willReturn(Optional.of(postEntity));
         given(commentRepository.save(commentEntity)).willReturn(commentEntity);
 
         // then
-        assertThat(commentApplicationService.insert(insertRequest))
+        assertThat(commentApplicationService.insert(insertRequest, memberEntity.getUuid()))
                 .isEqualTo(commentResponse);
     }
 

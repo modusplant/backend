@@ -206,9 +206,7 @@ public class TipCommentApplicationServiceTest implements
                 .isDeleted(true)
                 .build();
 
-        TipCommentInsertRequest insertRequest = createTipCommentInsertRequest(
-                postEntity.getUlid(), memberEntity.getUuid()
-        );
+        TipCommentInsertRequest insertRequest = createTipCommentInsertRequest(postEntity.getUlid());
 
         TipCommentResponse commentResponse = createTipCommentResponse(
                 postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname()
@@ -216,12 +214,13 @@ public class TipCommentApplicationServiceTest implements
 
         // when
         given(commentRepository.existsByPostUlidAndPath(postEntity.getUlid(), commentEntity.getPath())).willReturn(false);
+        given(memberRepository.existsByUuid(memberEntity.getUuid())).willReturn(true);
         given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(postRepository.findByUlid(postEntity.getUlid())).willReturn(Optional.of(postEntity));
         given(commentRepository.save(commentEntity)).willReturn(commentEntity);
 
         // then
-        assertThat(commentApplicationService.insert(insertRequest)).isEqualTo(commentResponse);
+        assertThat(commentApplicationService.insert(insertRequest, memberEntity.getUuid())).isEqualTo(commentResponse);
     }
 
     @DisplayName("게시글 ulid와 댓글 경로로 댓글 삭제하기")

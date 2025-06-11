@@ -1,6 +1,5 @@
 package kr.modusplant.domains.communication.qna.mapper;
 
-import kr.modusplant.domains.communication.qna.app.http.request.QnaCommentInsertRequest;
 import kr.modusplant.domains.communication.qna.app.http.response.QnaCommentResponse;
 import kr.modusplant.domains.communication.qna.common.util.app.http.request.QnaCommentInsertRequestTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.app.http.response.QnaCommentResponseTestUtils;
@@ -80,25 +79,4 @@ public class QnaCommentAppInfraMapperTest implements
         assertThat(commentAppInfraMapper.toQnaCommentResponse(commentEntity))
                 .isEqualTo(commentResponse);
     }
-
-    @DisplayName("삽입 요청을 엔티티로 전환함")
-    @Test
-    void toQnaCommentEntityTest() {
-        // given
-        QnaCommentEntity commentEntity = createQnaCommentEntityBuilder()
-                .postEntity(savedPostEntity)
-                .authMember(savedMemberEntity)
-                .createMember(savedMemberEntity)
-                .isDeleted(true)
-                .build();
-
-        // when
-        QnaCommentInsertRequest commentInsertRequest = createQnaCommentInsertRequest(
-                savedPostEntity.getUlid(), savedMemberEntity.getUuid());
-
-        // then
-        assertThat(commentAppInfraMapper.toQnaCommentEntity(commentInsertRequest, postRepository, memberRepository))
-                .isEqualTo(commentEntity);
-    }
-
 }

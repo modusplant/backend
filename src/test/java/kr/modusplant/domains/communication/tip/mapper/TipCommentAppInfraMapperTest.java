@@ -1,6 +1,5 @@
 package kr.modusplant.domains.communication.tip.mapper;
 
-import kr.modusplant.domains.communication.tip.app.http.request.TipCommentInsertRequest;
 import kr.modusplant.domains.communication.tip.app.http.response.TipCommentResponse;
 import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipCommentInsertRequestTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.app.http.response.TipCommentResponseTestUtils;
@@ -80,25 +79,4 @@ public class TipCommentAppInfraMapperTest implements
         assertThat(commentAppInfraMapper.toTipCommentResponse(commentEntity))
                 .isEqualTo(commentResponse);
     }
-
-    @DisplayName("삽입 요청을 엔티티로 전환함")
-    @Test
-    void toTipCommentEntityTest() {
-        // given
-        TipCommentEntity commentEntity = createTipCommentEntityBuilder()
-                .postEntity(savedPostEntity)
-                .authMember(savedMemberEntity)
-                .createMember(savedMemberEntity)
-                .isDeleted(true)
-                .build();
-
-        // when
-        TipCommentInsertRequest commentInsertRequest = createTipCommentInsertRequest(
-                savedPostEntity.getUlid(), savedMemberEntity.getUuid());
-
-        // then
-        assertThat(commentAppInfraMapper.toTipCommentEntity(commentInsertRequest, postRepository, memberRepository))
-                .isEqualTo(commentEntity);
-    }
-
 }

@@ -1,7 +1,6 @@
 package kr.modusplant.domains.communication.conversation.mapper;
 
 import kr.modusplant.domains.communication.common.mapper.supers.PostAppInfraMapper;
-import kr.modusplant.domains.communication.conversation.app.http.request.ConvCommentInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.response.ConvCommentResponse;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCommentEntity;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
@@ -22,14 +21,6 @@ public interface ConvCommentAppInfraMapper extends PostAppInfraMapper {
     @Mapping(source = "authMember", target = "memberUuid", qualifiedByName = "toMemberUuid")
     @Mapping(source = "authMember", target = "nickname", qualifiedByName = "toNickname")
     ConvCommentResponse toConvCommentResponse(ConvCommentEntity convCommentEntity);
-
-    @Mapping(target = "ConvCommentEntity", ignore = true)
-    @Mapping(source = "createMemberUuid", target = "authMember", qualifiedByName = "toMemberEntity")
-    @Mapping(source = "createMemberUuid", target = "createMember", qualifiedByName = "toMemberEntity")
-    @Mapping(target = "isDeleted", ignore = true)
-    @Mapping(source = "postUlid", target = "postEntity", qualifiedByName = "toConvPostEntity")
-    ConvCommentEntity toConvCommentEntity(ConvCommentInsertRequest insertRequest,
-                                          @Context ConvPostRepository convPostRepository, @Context SiteMemberRepository memberRepository);
 
     @Named("toPostUlid")
     default String toPostUlid(ConvPostEntity postEntity) {

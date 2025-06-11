@@ -16,7 +16,7 @@ import java.util.Optional;
 public class QnaCommentValidationService {
     private final QnaCommentRepository commentRepository;
 
-    public void validateFoundQnaCommentEntity(String postUlid, String path) {
+    public void validateExistedQnaCommentEntity(String postUlid, String path) {
         Optional.ofNullable(postUlid).orElseThrow(() -> new IllegalArgumentException("postUlid is null"));
         Optional.ofNullable(path).orElseThrow(() -> new IllegalArgumentException("path is null"));
 

@@ -206,9 +206,7 @@ public class QnaCommentApplicationServiceTest implements
                 .isDeleted(true)
                 .build();
 
-        QnaCommentInsertRequest insertRequest = createQnaCommentInsertRequest(
-                postEntity.getUlid(), memberEntity.getUuid()
-        );
+        QnaCommentInsertRequest insertRequest = createQnaCommentInsertRequest(postEntity.getUlid());
 
         QnaCommentResponse commentResponse = createQnaCommentResponse(
                 postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname()
@@ -216,12 +214,13 @@ public class QnaCommentApplicationServiceTest implements
 
         // when
         given(commentRepository.existsByPostUlidAndPath(postEntity.getUlid(), commentEntity.getPath())).willReturn(false);
+        given(memberRepository.existsByUuid(memberEntity.getUuid())).willReturn(true);
         given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(postRepository.findByUlid(postEntity.getUlid())).willReturn(Optional.of(postEntity));
         given(commentRepository.save(commentEntity)).willReturn(commentEntity);
 
         // then
-        assertThat(commentApplicationService.insert(insertRequest))
+        assertThat(commentApplicationService.insert(insertRequest, memberEntity.getUuid()))
                 .isEqualTo(commentResponse);
     }
 

@@ -1,7 +1,6 @@
 package kr.modusplant.domains.communication.qna.mapper;
 
 import kr.modusplant.domains.communication.common.mapper.supers.PostAppInfraMapper;
-import kr.modusplant.domains.communication.qna.app.http.request.QnaCommentInsertRequest;
 import kr.modusplant.domains.communication.qna.app.http.response.QnaCommentResponse;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaCommentEntity;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
@@ -22,14 +21,6 @@ public interface QnaCommentAppInfraMapper extends PostAppInfraMapper {
     @Mapping(source = "authMember", target = "memberUuid", qualifiedByName = "toMemberUuid")
     @Mapping(source = "authMember", target = "nickname", qualifiedByName = "toNickname")
     QnaCommentResponse toQnaCommentResponse(QnaCommentEntity qnaCommentEntity);
-
-    @Mapping(target = "QnaCommentEntity", ignore = true)
-    @Mapping(source = "createMemberUuid", target = "authMember", qualifiedByName = "toMemberEntity")
-    @Mapping(source = "createMemberUuid", target = "createMember", qualifiedByName = "toMemberEntity")
-    @Mapping(target = "isDeleted", ignore = true)
-    @Mapping(source = "postUlid", target = "postEntity", qualifiedByName = "toQnaPostEntity")
-    QnaCommentEntity toQnaCommentEntity(QnaCommentInsertRequest insertRequest,
-                                        @Context QnaPostRepository qnaPostRepository, @Context SiteMemberRepository memberRepository);
 
     @Named("toPostUlid")
     default String toPostUlid(QnaPostEntity postEntity) {
