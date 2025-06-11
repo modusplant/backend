@@ -10,8 +10,10 @@ import kr.modusplant.global.middleware.security.handler.JwtClearingLogoutHandler
 import kr.modusplant.global.middleware.security.handler.NormalLoginFailureHandler;
 import kr.modusplant.global.middleware.security.handler.NormalLoginSuccessHandler;
 import kr.modusplant.global.middleware.security.handler.RequestForwardLogoutSuccessHandler;
+import kr.modusplant.modules.jwt.app.service.RefreshTokenApplicationService;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
 import kr.modusplant.modules.jwt.app.service.TokenProvider;
+import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -44,6 +46,10 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authConfiguration;
     private final GlobalExceptionHandler globalExceptionHandler;
     private final SiteMemberUserDetailsService memberUserDetailsService;
+
+    private final ObjectMapper objectMapper;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenApplicationService refreshTokenApplicationService;
     private final TokenApplicationService tokenApplicationService;
     private final TokenProvider tokenProvider;
     private final SiteMemberRepository memberRepository;
@@ -77,7 +83,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtClearingLogoutHandler JwtClearingLogoutHandler() { return new JwtClearingLogoutHandler(); }
+    public JwtClearingLogoutHandler JwtClearingLogoutHandler() {
+        return new JwtClearingLogoutHandler(refreshTokenRepository, refreshTokenApplicationService); }
 
     @Bean
     public NormalLoginFailureHandler normalLoginFailureHandler() {
@@ -85,7 +92,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public RequestForwardLogoutSuccessHandler normalLogoutSuccessHandler() { return new RequestForwardLogoutSuccessHandler(); }
+    public RequestForwardLogoutSuccessHandler normalLogoutSuccessHandler() {
+        return new RequestForwardLogoutSuccessHandler(objectMapper); }
 
     @Bean
     public NormalLoginFilter normalLoginFilter(HttpSecurity http) {
@@ -120,7 +128,6 @@ public class SecurityConfig {
                 .authenticationProvider(siteMemberAuthProvider())
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
-                        .invalidateHttpSession(true)
                         .clearAuthentication(true)
                         .addLogoutHandler(JwtClearingLogoutHandler())
                         .logoutSuccessHandler(normalLogoutSuccessHandler()))
