@@ -1,12 +1,15 @@
 package kr.modusplant.global.middleware.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.advice.GlobalExceptionHandler;
-import kr.modusplant.global.middleware.security.filter.NormalLoginFilter;
 import kr.modusplant.global.middleware.security.SiteMemberAuthProvider;
 import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
+import kr.modusplant.global.middleware.security.filter.NormalLoginFilter;
+import kr.modusplant.global.middleware.security.handler.JwtClearingLogoutHandler;
 import kr.modusplant.global.middleware.security.handler.NormalLoginFailureHandler;
 import kr.modusplant.global.middleware.security.handler.NormalLoginSuccessHandler;
+import kr.modusplant.global.middleware.security.handler.RequestForwardLogoutSuccessHandler;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
 import kr.modusplant.modules.jwt.app.service.TokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +46,7 @@ public class SecurityConfig {
     private final SiteMemberUserDetailsService memberUserDetailsService;
     private final TokenApplicationService tokenApplicationService;
     private final TokenProvider tokenProvider;
+    private final SiteMemberRepository memberRepository;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -69,13 +73,19 @@ public class SecurityConfig {
 
     @Bean
     public NormalLoginSuccessHandler normalLoginSuccessHandler() {
-        return new NormalLoginSuccessHandler(tokenApplicationService, tokenProvider);
+        return new NormalLoginSuccessHandler(memberRepository, tokenApplicationService, tokenProvider);
     }
+
+    @Bean
+    public JwtClearingLogoutHandler JwtClearingLogoutHandler() { return new JwtClearingLogoutHandler(); }
 
     @Bean
     public NormalLoginFailureHandler normalLoginFailureHandler() {
         return new NormalLoginFailureHandler();
     }
+
+    @Bean
+    public RequestForwardLogoutSuccessHandler normalLogoutSuccessHandler() { return new RequestForwardLogoutSuccessHandler(); }
 
     @Bean
     public NormalLoginFilter normalLoginFilter(HttpSecurity http) {
@@ -108,6 +118,12 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(siteMemberAuthProvider())
+                .logout(logout -> logout
+                        .logoutUrl("/api/auth/logout")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .addLogoutHandler(JwtClearingLogoutHandler())
+                        .logoutSuccessHandler(normalLogoutSuccessHandler()))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
