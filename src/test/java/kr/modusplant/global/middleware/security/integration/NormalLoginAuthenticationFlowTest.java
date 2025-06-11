@@ -73,7 +73,7 @@ public class NormalLoginAuthenticationFlowTest implements
     }
 
     @Test
-    public void normalLoginFilter_givenValidSiteMember_willCallSuccessHandler() throws Exception {
+    public void givenValidSiteMemberUserDetails_willCallSuccessHandler() throws Exception {
         // given
         SiteMemberUserDetails validSiteMemberUserDetails = testSiteMemberUserDetailsBuilder
                 .isActive(true)
@@ -105,7 +105,7 @@ public class NormalLoginAuthenticationFlowTest implements
     }
     
     @Test
-    public void normalLoginFilter_givenInvalidSiteMember_thenCallFailureHandler() throws Exception {
+    public void givenInvalidSiteMemberUserDetails_thenCallFailureHandler() throws Exception {
         // given
         SiteMemberUserDetails invalidSiteMemberUserDetails = testSiteMemberUserDetailsBuilder
                 .isActive(false)
