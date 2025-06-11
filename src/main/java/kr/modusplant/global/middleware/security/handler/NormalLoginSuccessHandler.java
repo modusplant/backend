@@ -1,8 +1,11 @@
 package kr.modusplant.global.middleware.security.handler;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.enums.Role;
 import kr.modusplant.global.middleware.security.models.SiteMemberUserDetails;
 import kr.modusplant.modules.jwt.app.dto.TokenPair;
@@ -14,10 +17,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 public class NormalLoginSuccessHandler implements AuthenticationSuccessHandler {
 
+    private final SiteMemberRepository memberRepository;
     private final TokenApplicationService tokenApplicationService;
     private final TokenProvider tokenProvider;
 
@@ -26,10 +32,12 @@ public class NormalLoginSuccessHandler implements AuthenticationSuccessHandler {
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
 
-        SiteMemberUserDetails currentUser = (SiteMemberUserDetails) authentication.getPrincipal();
+        SiteMemberUserDetails currentMember = (SiteMemberUserDetails) authentication.getPrincipal();
+
+        updateMemberLoggedInAt(currentMember.getActiveUuid());
 
         TokenPair loginTokenPair = tokenApplicationService.issueToken(
-                currentUser.getActiveUuid(), currentUser.getNickname(), getMemberRole(currentUser));
+                currentMember.getActiveUuid(), currentMember.getNickname(), getMemberRole(currentMember));
         long epochSecondsOfAccessTokenExpirationTime =
                 (tokenProvider.getExpirationFromToken(loginTokenPair.accessToken())).getTime() / 1000;
         long epochSecondsOfRefreshTokenExpirationTime =
@@ -49,5 +57,12 @@ public class NormalLoginSuccessHandler implements AuthenticationSuccessHandler {
                 .findFirst().orElseThrow(() -> new IllegalArgumentException("The authenticated user does not have role"));
 
         return Role.valueOf(memberRole.getAuthority());
+    }
+
+    private void updateMemberLoggedInAt(UUID currentMemberUuid) {
+        SiteMemberEntity memberEntity = memberRepository.findByUuid(currentMemberUuid)
+                .orElseThrow(() -> new EntityNotFoundException("cannot find the member of the uuid"));
+        memberEntity.updateLoggedInAt(LocalDateTime.now());
+        memberRepository.save(memberEntity);
     }
 }
