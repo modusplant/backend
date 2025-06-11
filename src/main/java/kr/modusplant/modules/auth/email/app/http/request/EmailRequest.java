@@ -7,6 +7,6 @@ import lombok.Getter;
 @Getter
 public class EmailRequest {
     @Schema(description = "이메일 주소", example = "example@gmail.com")
-    @Email(message = "Invalid email format")
+    @Email(message = "invalid email format")
     private String email;
 }
