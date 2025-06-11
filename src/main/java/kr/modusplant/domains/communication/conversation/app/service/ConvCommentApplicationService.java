@@ -9,6 +9,7 @@ import kr.modusplant.domains.communication.conversation.persistence.entity.ConvC
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCommentRepository;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostRepository;
+import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Primary
@@ -26,6 +28,7 @@ import java.util.Optional;
 public class ConvCommentApplicationService {
 
     private final ConvCommentValidationService convCommentValidationService;
+    private final SiteMemberValidationService memberValidationService;
     private final ConvCommentAppInfraMapper convCommentAppInfraMapper = new ConvCommentAppInfraMapperImpl();
     private final ConvCommentRepository convCommentRepository;
     private final ConvPostRepository convPostRepository;
@@ -70,16 +73,22 @@ public class ConvCommentApplicationService {
     }
 
     @Transactional
-    public ConvCommentResponse insert(ConvCommentInsertRequest commentInsertRequest) {
+    public ConvCommentResponse insert(ConvCommentInsertRequest commentInsertRequest, UUID memberUuid) {
         String postUlid = commentInsertRequest.postUlid();
         String path = commentInsertRequest.path();
         convCommentValidationService.validateExistedConvCommentEntity(postUlid, path);
+        memberValidationService.validateNotFoundUuid(memberUuid);
 
-        ConvCommentEntity commentEntity =
-                convCommentAppInfraMapper.toConvCommentEntity(commentInsertRequest, convPostRepository, memberRepository);
+        SiteMemberEntity memberEntity = memberRepository.findByUuid(memberUuid).orElseThrow();
+        ConvCommentEntity commentEntity = ConvCommentEntity.builder()
+                .postEntity(convPostRepository.findByUlid(postUlid).orElseThrow())
+                .path(path)
+                .authMember(memberEntity)
+                .createMember(memberEntity)
+                .content(commentInsertRequest.content())
+                .build();
 
-        return convCommentAppInfraMapper.toConvCommentResponse(
-                convCommentRepository.save(commentEntity));
+        return convCommentAppInfraMapper.toConvCommentResponse(convCommentRepository.save(commentEntity));
     }
 
     @Transactional

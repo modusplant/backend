@@ -74,7 +74,7 @@ public class TipCommentValidationServiceTest implements
 
     @DisplayName("postUlid와 구체화된 경로에 해당하는 댓글 데이터가 존재하는지 확인")
     @Test
-    void validateFoundTipCommentEntityTest() {
+    void validateExistedTipCommentEntityTest() {
         // given
         TipCommentEntity commentEntity = createTipCommentEntityBuilder()
                 .postEntity(postEntity)
@@ -92,7 +92,7 @@ public class TipCommentValidationServiceTest implements
         // then
         EntityExistsWithPostUlidAndPathException ex = assertThrows(
                 EntityExistsWithPostUlidAndPathException.class,
-                () -> commentValidationService.validateFoundTipCommentEntity(
+                () -> commentValidationService.validateExistedTipCommentEntity(
                         commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );

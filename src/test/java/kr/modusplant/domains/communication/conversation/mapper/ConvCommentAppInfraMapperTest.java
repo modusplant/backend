@@ -1,6 +1,5 @@
 package kr.modusplant.domains.communication.conversation.mapper;
 
-import kr.modusplant.domains.communication.conversation.app.http.request.ConvCommentInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.response.ConvCommentResponse;
 import kr.modusplant.domains.communication.conversation.common.util.app.http.request.ConvCommentInsertRequestTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.app.http.response.ConvCommentResponseTestUtils;
@@ -80,25 +79,4 @@ public class ConvCommentAppInfraMapperTest implements
         assertThat(commentAppInfraMapper.toConvCommentResponse(commentEntity))
                 .isEqualTo(commentResponse);
     }
-
-    @DisplayName("삽입 요청을 엔티티로 전환함")
-    @Test
-    void toConvCommentEntityTest() {
-        // given
-        ConvCommentEntity commentEntity = createConvCommentEntityBuilder()
-                .postEntity(savedPostEntity)
-                .authMember(savedMemberEntity)
-                .createMember(savedMemberEntity)
-                .isDeleted(true)
-                .build();
-
-        // when
-        ConvCommentInsertRequest commentInsertRequest = createConvCommentInsertRequest(
-                savedPostEntity.getUlid(), savedMemberEntity.getUuid());
-
-        // then
-        assertThat(commentAppInfraMapper.toConvCommentEntity(commentInsertRequest, postRepository, memberRepository))
-                .isEqualTo(commentEntity);
-    }
-
 }

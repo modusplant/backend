@@ -74,7 +74,7 @@ public class QnaCommentValidationServiceTest implements
 
     @DisplayName("postUlid와 구체화된 경로에 해당하는 댓글 데이터가 존재하는지 확인")
     @Test
-    void validateFoundQnaCommentEntityTest() {
+    void validateExistedQnaCommentEntityTest() {
         // given
         QnaCommentEntity commentEntity = createQnaCommentEntityBuilder()
                 .postEntity(postEntity)
@@ -92,7 +92,7 @@ public class QnaCommentValidationServiceTest implements
         // then
         EntityExistsWithPostUlidAndPathException ex = assertThrows(
                 EntityExistsWithPostUlidAndPathException.class,
-                () -> commentValidationService.validateFoundQnaCommentEntity(
+                () -> commentValidationService.validateExistedQnaCommentEntity(
                         commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );

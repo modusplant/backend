@@ -177,13 +177,12 @@ public class ConvCommentControllerTest implements
     void insertConvCommentTest() throws Exception {
         // given
         ObjectMapper objectMapper = new ObjectMapper();
-        ConvCommentInsertRequest insertRequest = createConvCommentInsertRequest(
-                postEntity.getUlid(), memberEntity.getUuid());
+        ConvCommentInsertRequest insertRequest = createConvCommentInsertRequest(postEntity.getUlid());
         ConvCommentResponse commentResponse =
                 createConvCommentResponse(postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname());
 
         // when
-        given(commentApplicationService.insert(insertRequest)).willReturn(commentResponse);
+        given(commentApplicationService.insert(insertRequest, memberEntity.getUuid())).willReturn(commentResponse);
 
         // then
         mockMvc.perform(post("/api/v1/conversation/comments", insertRequest)
