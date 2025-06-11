@@ -1,6 +1,8 @@
 package kr.modusplant.global.middleware.security.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
+import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
 import kr.modusplant.global.middleware.security.common.util.SiteMemberUserDetailsTestUtils;
 import kr.modusplant.global.middleware.security.config.SecurityConfig;
@@ -20,6 +22,8 @@ import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Optional;
+
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Import(SecurityConfig.class)
 public class NormalLoginAuthenticationFlowTest implements
-        SiteMemberUserDetailsTestUtils, NormalLoginRequestTestUtils {
+        SiteMemberUserDetailsTestUtils, NormalLoginRequestTestUtils, SiteMemberEntityTestUtils {
 
     @Autowired
     private MockMvc mockMvc;
@@ -57,9 +61,11 @@ public class NormalLoginAuthenticationFlowTest implements
     @MockitoBean
     private RefreshTokenApplicationService refreshTokenApplicationService;
 
+    @MockitoBean
+    private SiteMemberRepository memberRepository;
+
     @BeforeEach
     void setUp() {
-
         when(bCryptPasswordEncoder.encode("userPw2!"))
                 .thenReturn(testSiteMemberUserDetailsBuilder.build().getPassword());
         when(bCryptPasswordEncoder.matches(anyString(), anyString()))
@@ -76,10 +82,13 @@ public class NormalLoginAuthenticationFlowTest implements
                 .isDeleted(false)
                 .build();
 
-        when(memberUserDetailsService.loadUserByUsername(testLoginRequest.email()))
-                .thenReturn(validSiteMemberUserDetails);
+        given(memberUserDetailsService.loadUserByUsername(testLoginRequest.email()))
+                .willReturn(validSiteMemberUserDetails);
         doNothing().when(tokenValidationService).validateNotFoundMemberUuid(any(), any());
         given(refreshTokenApplicationService.insert(any())).willReturn(any());
+        given(memberRepository.findByUuid(validSiteMemberUserDetails.getActiveUuid()))
+                .willReturn(Optional.ofNullable(createMemberBasicUserEntityWithUuid()));
+        given(memberRepository.save(any())).willReturn(any());
 
         // when
         mockMvc.perform(post("/api/auth/login")
