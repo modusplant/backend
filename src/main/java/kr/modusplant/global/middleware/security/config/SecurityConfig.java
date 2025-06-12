@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -118,11 +119,13 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .addFilterBefore(normalLoginFilter(http), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/terms").permitAll()
-                        .requestMatchers("/api/members/**").permitAll()
+                        .requestMatchers("/terms").permitAll()
+                        .requestMatchers("/members/**").hasRole("ROLE_ADMIN")
                         .requestMatchers("/*/social-login").permitAll()
-                        .requestMatchers("/api/auth/login", "/api/auth/logout").permitAll()
-                        .requestMatchers("/auth/token/refresh").authenticated()
+                        .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/conversation/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/qna/comments").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tip/comments").permitAll()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(siteMemberAuthProvider())
