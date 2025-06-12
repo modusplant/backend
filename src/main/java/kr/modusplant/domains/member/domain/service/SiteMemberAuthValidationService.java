@@ -2,6 +2,7 @@ package kr.modusplant.domains.member.domain.service;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
@@ -39,6 +40,15 @@ public class SiteMemberAuthValidationService {
     public void validateNotFoundOriginalMemberUuid(UUID uuid) {
         if (uuid == null || !memberAuthRepository.existsByOriginalMember(memberRepository.findByUuid(uuid).orElseThrow())) {
             throw new EntityNotFoundWithUuidException(uuid, SiteMemberAuthEntity.class);
+        }
+    }
+
+    public void validateExistedEmailAndAuthProvider(String email, AuthProvider authProvider) {
+        if (email == null || authProvider == null) {
+            return;
+        }
+        if (memberAuthRepository.findByEmailAndProvider(email, authProvider).isPresent()) {
+            throw new EntityExistsException("member with email and auth provider already exists");
         }
     }
 
