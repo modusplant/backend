@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -59,6 +60,9 @@ public class SecurityConfig {
                         .requestMatchers("/*/social-login").permitAll()
                         .requestMatchers("/api/auth/login", "/api/auth/logout").permitAll()
                         .requestMatchers("/auth/token/refresh").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/conversation/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/qna/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tip/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
