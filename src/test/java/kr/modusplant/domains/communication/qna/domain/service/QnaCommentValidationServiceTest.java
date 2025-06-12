@@ -21,8 +21,6 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
 import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
@@ -76,7 +74,7 @@ public class QnaCommentValidationServiceTest implements
 
     @DisplayName("postUlid와 구체화된 경로에 해당하는 댓글 데이터가 존재하는지 확인")
     @Test
-    void validateFoundQnaCommentEntityTest() {
+    void validateExistedQnaCommentEntityTest() {
         // given
         QnaCommentEntity commentEntity = createQnaCommentEntityBuilder()
                 .postEntity(postEntity)
@@ -89,14 +87,12 @@ public class QnaCommentValidationServiceTest implements
         entityManager.flush();
 
         // when
-        given(commentRepository.findByPostUlidAndPath(
-                commentEntity.getPostUlid(), commentEntity.getPath()
-        )).willReturn(Optional.of(commentEntity));
+        given(commentRepository.existsByPostUlidAndPath(commentEntity.getPostUlid(), commentEntity.getPath())).willReturn(true);
 
         // then
         EntityExistsWithPostUlidAndPathException ex = assertThrows(
                 EntityExistsWithPostUlidAndPathException.class,
-                () -> commentValidationService.validateFoundQnaCommentEntity(
+                () -> commentValidationService.validateExistedQnaCommentEntity(
                         commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );
@@ -118,9 +114,7 @@ public class QnaCommentValidationServiceTest implements
         entityManager.flush();
 
         // when
-        given(commentRepository.findByPostUlidAndPath(
-                commentEntity.getPostUlid(), commentEntity.getPath()
-        )).willReturn(Optional.empty());
+        given(commentRepository.existsByPostUlidAndPath(commentEntity.getPostUlid(), commentEntity.getPath())).willReturn(false);
 
         // then
         EntityNotFoundWithPostUlidAndPathException ex = assertThrows(

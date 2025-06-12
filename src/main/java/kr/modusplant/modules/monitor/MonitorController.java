@@ -39,7 +39,7 @@ public class MonitorController {
     )
     @GetMapping("/monitor-error-controller")
     public String monitorErrorController() {
-        throw new RuntimeException("컨트롤러에서 예외 발생"); // 예외 발생
+        throw new RuntimeException("Exception occurred on the controller!"); // 예외 발생
     }
 
     @Operation(

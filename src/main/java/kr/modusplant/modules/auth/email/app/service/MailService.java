@@ -6,13 +6,14 @@ import com.mailjet.client.MailjetRequest;
 import com.mailjet.client.MailjetResponse;
 import com.mailjet.client.errors.MailjetException;
 import com.mailjet.client.resource.Emailv31;
+import kr.modusplant.modules.auth.email.enums.EmailType;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import static kr.modusplant.global.vo.CamelCaseWord.*;
+import static kr.modusplant.global.vo.CamelCaseWord.VERIFY_CODE;
 
 @Slf4j
 @Service
@@ -23,18 +24,18 @@ public class MailService {
     @Value("${mail-api.secret-key}")
     private String API_SECRET_KEY;
 
-    public MailjetResponse callSendEmail(String email, String verifyCode, String type) {
+    public MailjetResponse callSendEmail(String email, String verifyCode, EmailType type) {
         int templateId = 0;
         String subject = null;
 
         switch (type) {
             case SIGNUP_VERIFY_EMAIL:   // 회원가입 인증메일 발송
                 templateId = 6747014;
-                subject = "[modus-plant] 회원가입 본인인증 메일입니다.";
+                subject = "[ModusPlant] 회원가입 본인인증 메일입니다.";
                 break;
             case RESET_PASSWORD_EMAIL:
                 templateId = 7011045; // 비밀번호 재설정 인증메일 발송
-                subject = "[modus-plant] 비밀번호 재설정 메일입니다.";
+                subject = "[ModusPlant] 비밀번호 재설정 메일입니다.";
                 break;
             default:break;
         }
@@ -58,7 +59,7 @@ public class MailService {
                                                 .put(
                                                         Emailv31.Message.FROM, new JSONObject()
                                                                 .put("Email", "modusplant.master@gmail.com")
-                                                                .put("Name", "modus-plant")
+                                                                .put("Name", "ModusPlant")
                                                 )
                                                 .put(
                                                         Emailv31.Message.TO, new JSONArray()

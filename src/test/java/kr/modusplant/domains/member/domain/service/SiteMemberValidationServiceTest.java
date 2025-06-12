@@ -12,7 +12,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
@@ -41,7 +40,7 @@ class SiteMemberValidationServiceTest implements SiteMemberTestUtils, SiteMember
         UUID memberEntityUuid = memberEntity.getUuid();
 
         // when
-        given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.of(memberEntity));
+        given(memberRepository.existsByUuid(memberEntityUuid)).willReturn(true);
 
         // then
         EntityExistsWithUuidException existsException = assertThrows(EntityExistsWithUuidException.class,
@@ -58,7 +57,7 @@ class SiteMemberValidationServiceTest implements SiteMemberTestUtils, SiteMember
         UUID memberEntityUuid = memberEntity.getUuid();
 
         // when
-        given(memberRepository.findByUuid(memberEntityUuid)).willReturn(Optional.empty());
+        given(memberRepository.existsByUuid(memberEntityUuid)).willReturn(false);
 
         // then
         EntityNotFoundException notFoundException = assertThrows(EntityNotFoundWithUuidException.class,

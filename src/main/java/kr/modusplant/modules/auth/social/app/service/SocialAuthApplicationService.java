@@ -63,6 +63,8 @@ public class SocialAuthApplicationService {
         // 신규 멤버 저장 및 멤버 반환
         return existedMemberAuth.map(siteMemberAuth -> {
             SiteMemberEntity memberEntity = getMemberEntityByUuid(siteMemberAuth.getActiveMemberUuid());
+            memberEntity.updateLoggedInAt(LocalDateTime.now());
+            memberRepository.save(memberEntity);
             Role role = getMemberRoleEntityByMember(memberEntity).getRole();
             return new JwtUserPayload(memberEntity.getUuid(), memberEntity.getNickname(), role);
         }).orElseGet(() -> {

@@ -17,4 +17,6 @@ public interface TermRepository extends CreatedAtAndLastModifiedAtRepository<Ter
     List<TermEntity> findByVersion(String version);
 
     Optional<TermEntity> findByName(String name);
+
+    boolean existsByName(String name);
 }

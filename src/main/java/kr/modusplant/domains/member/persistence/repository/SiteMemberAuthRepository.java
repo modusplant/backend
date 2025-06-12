@@ -2,7 +2,6 @@ package kr.modusplant.domains.member.persistence.repository;
 
 import kr.modusplant.domains.common.persistence.repository.supers.LastModifiedAtRepository;
 import kr.modusplant.domains.common.persistence.repository.supers.UuidPrimaryKeyRepository;
-import kr.modusplant.domains.member.app.http.response.SiteMemberAuthResponse;
 import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
@@ -34,4 +33,6 @@ public interface SiteMemberAuthRepository extends LastModifiedAtRepository<SiteM
     Optional<SiteMemberAuthEntity> findByProviderAndProviderId(AuthProvider provider, String providerId);
 
     boolean existsByEmail(String email);
+
+    boolean existsByOriginalMember(SiteMemberEntity originalMember);
 }

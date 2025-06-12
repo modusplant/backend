@@ -28,19 +28,19 @@ public class ConvCategoryValidationService {
         if (order == null) {
             return;
         }
-        if (convCategoryRepository.findByOrder(order).isPresent()) {
+        if (convCategoryRepository.existsByOrder(order)) {
             throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), ORDER, order, ConvCategoryEntity.class));
         }
     }
 
     public void validateExistedCategory(String category) {
-        if (convCategoryRepository.findByCategory(category).isPresent()) {
+        if (convCategoryRepository.existsByCategory(category)) {
             throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), CATEGORY, category, ConvCategoryEntity.class));
         }
     }
 
     public void validateNotFoundUuid(UUID uuid) {
-        if (uuid == null || convCategoryRepository.findByUuid(uuid).isEmpty()) {
+        if (uuid == null || !convCategoryRepository.existsByUuid(uuid)) {
             throw new EntityNotFoundWithUuidException(uuid, ConvCategoryEntity.class);
         }
     }

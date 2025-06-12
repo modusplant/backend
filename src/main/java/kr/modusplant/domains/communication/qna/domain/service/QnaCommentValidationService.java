@@ -16,11 +16,11 @@ import java.util.Optional;
 public class QnaCommentValidationService {
     private final QnaCommentRepository commentRepository;
 
-    public void validateFoundQnaCommentEntity(String postUlid, String path) {
+    public void validateExistedQnaCommentEntity(String postUlid, String path) {
         Optional.ofNullable(postUlid).orElseThrow(() -> new IllegalArgumentException("postUlid is null"));
         Optional.ofNullable(path).orElseThrow(() -> new IllegalArgumentException("path is null"));
 
-        if (commentRepository.findByPostUlidAndPath(postUlid, path).isPresent()) {
+        if (commentRepository.existsByPostUlidAndPath(postUlid, path)) {
             throw new EntityExistsWithPostUlidAndPathException(postUlid, path, QnaCommentEntity.class);
         }
     }
@@ -29,7 +29,7 @@ public class QnaCommentValidationService {
         Optional.ofNullable(postUlid).orElseThrow(() -> new IllegalArgumentException("postUlid is null"));
         Optional.ofNullable(path).orElseThrow(() -> new IllegalArgumentException("path is null"));
 
-        if(commentRepository.findByPostUlidAndPath(postUlid, path).isEmpty()) {
+        if(!commentRepository.existsByPostUlidAndPath(postUlid, path)) {
             throw new EntityNotFoundWithPostUlidAndPathException(postUlid, path, QnaCommentEntity.class);
         }
     }

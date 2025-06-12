@@ -44,7 +44,7 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils, ConvCat
     @DisplayName("대화 게시글 추가/수정 시 ConvPostRequest는 유효한 입력")
     void validateConvPostInsertRequestTestSuccess() {
         // given & when
-        when(convCategoryRepository.findByUuid(requestBasicTypes.categoryUuid())).thenReturn(Optional.of(createTestConvCategoryEntity()));
+        when(convCategoryRepository.existsByUuid(requestBasicTypes.categoryUuid())).thenReturn(true);
 
         // then
         assertDoesNotThrow(() -> convPostValidationService.validateConvPostInsertRequest(requestBasicTypes));
@@ -61,7 +61,7 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils, ConvCat
                 allMediaFilesOrder
         );
 
-        when(convCategoryRepository.findByUuid(convPostInsertRequest.categoryUuid())).thenReturn(Optional.empty());
+        when(convCategoryRepository.existsByUuid(convPostInsertRequest.categoryUuid())).thenReturn(false);
 
         // then
         assertThrows(EntityExistsWithUuidException.class,
@@ -74,12 +74,12 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils, ConvCat
         // given & when
         ConvPostInsertRequest convPostInsertRequest = new ConvPostInsertRequest(
                 UUID.randomUUID(),
-                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "a".repeat(151),
                 allMediaFiles,
                 allMediaFilesOrder
         );
 
-        when(convCategoryRepository.findByUuid(convPostInsertRequest.categoryUuid())).thenReturn(Optional.of(createTestConvCategoryEntity()));
+        when(convCategoryRepository.existsByUuid(convPostInsertRequest.categoryUuid())).thenReturn(true);
 
         // then
         assertThrows(IllegalArgumentException.class,
@@ -98,7 +98,7 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils, ConvCat
                 imageTextFilesOrder
         );
 
-        when(convCategoryRepository.findByUuid(convPostInsertRequest.categoryUuid())).thenReturn(Optional.of(createTestConvCategoryEntity()));
+        when(convCategoryRepository.existsByUuid(convPostInsertRequest.categoryUuid())).thenReturn(true);
 
         // then
         assertThrows(IllegalArgumentException.class,

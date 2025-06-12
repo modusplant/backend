@@ -44,7 +44,7 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils, QnaCatego
     @DisplayName("Q&A 게시글 추가/수정 시 QnaPostRequest는 유효한 입력")
     void validateQnaPostInsertRequestTestSuccess() {
         // given & when
-        when(qnaCategoryRepository.findByUuid(requestBasicTypes.categoryUuid())).thenReturn(Optional.of(createTestQnaCategoryEntity()));
+        when(qnaCategoryRepository.existsByUuid(requestBasicTypes.categoryUuid())).thenReturn(true);
 
         // then
         assertDoesNotThrow(() -> qnaPostValidationService.validateQnaPostInsertRequest(requestBasicTypes));
@@ -61,7 +61,7 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils, QnaCatego
                 allMediaFilesOrder
         );
 
-        when(qnaCategoryRepository.findByUuid(qnaPostInsertRequest.categoryUuid())).thenReturn(Optional.empty());
+        when(qnaCategoryRepository.existsByUuid(qnaPostInsertRequest.categoryUuid())).thenReturn(false);
 
         // then
         assertThrows(EntityExistsWithUuidException.class,
@@ -74,12 +74,12 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils, QnaCatego
         // given & when
         QnaPostInsertRequest qnaPostInsertRequest = new QnaPostInsertRequest(
                 UUID.randomUUID(),
-                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "a".repeat(151),
                 allMediaFiles,
                 allMediaFilesOrder
         );
 
-        when(qnaCategoryRepository.findByUuid(qnaPostInsertRequest.categoryUuid())).thenReturn(Optional.of(createTestQnaCategoryEntity()));
+        when(qnaCategoryRepository.existsByUuid(qnaPostInsertRequest.categoryUuid())).thenReturn(true);
 
         // then
         assertThrows(IllegalArgumentException.class,
@@ -98,7 +98,7 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils, QnaCatego
                 imageTextFilesOrder
         );
 
-        when(qnaCategoryRepository.findByUuid(qnaPostInsertRequest.categoryUuid())).thenReturn(Optional.of(createTestQnaCategoryEntity()));
+        when(qnaCategoryRepository.existsByUuid(qnaPostInsertRequest.categoryUuid())).thenReturn(true);
 
         // then
         assertThrows(IllegalArgumentException.class,

@@ -4,13 +4,10 @@ import kr.modusplant.domains.communication.tip.app.http.request.TipCommentInsert
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCommentEntityTestUtils;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipCommentEntity;
 
-import java.util.UUID;
-
 public interface TipCommentInsertRequestTestUtils extends TipCommentEntityTestUtils {
-    default TipCommentInsertRequest createTipCommentInsertRequest(String postUlid, UUID createMemberUuid) {
+    default TipCommentInsertRequest createTipCommentInsertRequest(String postUlid) {
         TipCommentEntity commentEntity = createTipCommentEntityBuilder().build();
 
-        return new TipCommentInsertRequest(postUlid, commentEntity.getPath(),
-                createMemberUuid, commentEntity.getContent());
+        return new TipCommentInsertRequest(postUlid, commentEntity.getPath(), commentEntity.getContent());
     }
 }

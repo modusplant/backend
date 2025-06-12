@@ -52,10 +52,11 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
         UUID uuid = memberEntity.getUuid();
 
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(uuid)).willReturn(Optional.of(memberAuthEntity));
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty());
+        given(memberAuthRepository.existsByOriginalMember(memberEntity)).willReturn(false);
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
+        given(memberAuthRepository.findByUuid(uuid)).willReturn(Optional.of(memberAuthEntity));
 
         // when
         memberService.insert(memberBasicUserInsertRequest);
@@ -74,9 +75,9 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
         UUID uuid = memberEntity.getUuid();
 
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(uuid)).willReturn(Optional.of(memberAuthEntity));
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty());
+        given(memberAuthRepository.existsByOriginalMember(memberEntity)).willReturn(false);
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
         given(memberAuthRepository.findByActiveMember(memberEntity)).willReturn(List.of(memberAuthEntity));
 
@@ -97,10 +98,11 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
         UUID uuid = memberEntity.getUuid();
 
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(uuid)).willReturn(Optional.of(memberAuthEntity));
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty()).willReturn(Optional.of(memberAuthEntity));
+        given(memberAuthRepository.existsByOriginalMember(memberEntity)).willReturn(false);
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
+        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.of(memberAuthEntity));
 
         // when
         memberService.insert(memberBasicUserInsertRequest);
@@ -119,9 +121,9 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
         UUID uuid = memberEntity.getUuid();
 
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(uuid)).willReturn(Optional.of(memberAuthEntity));
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty());
+        given(memberAuthRepository.existsByOriginalMember(memberEntity)).willReturn(false);
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
         given(memberAuthRepository.findByEmail(memberAuthEntity.getEmail())).willReturn(List.of(memberAuthEntity));
 
@@ -142,9 +144,9 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
         UUID uuid = memberEntity.getUuid();
 
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(uuid)).willReturn(Optional.of(memberAuthEntity));
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty());
+        given(memberAuthRepository.existsByOriginalMember(memberEntity)).willReturn(false);
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
         given(memberAuthRepository.findByProvider(memberAuthEntity.getProvider())).willReturn(List.of(memberAuthEntity));
 
@@ -165,9 +167,9 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
         UUID uuid = memberEntity.getUuid();
 
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(uuid)).willReturn(Optional.of(memberAuthEntity));
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty());
+        given(memberAuthRepository.existsByOriginalMember(memberEntity)).willReturn(false);
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
         given(memberAuthRepository.findByProviderId(memberAuthEntity.getProviderId())).willReturn(List.of(memberAuthEntity));
 
@@ -185,10 +187,12 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         SiteMemberAuthEntity memberAuthEntity = this.createMemberAuthBasicUserEntityBuilder().originalMember(memberEntity).activeMember(memberEntity).build();
+        UUID uuid = memberEntity.getUuid();
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(memberAuthEntity.getUuid())).willReturn(Optional.of(memberAuthEntity));
+        given(memberAuthRepository.existsByOriginalMember(memberEntity)).willReturn(false);
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
         given(memberAuthRepository.findByEmailAndProvider(memberAuthEntity.getEmail(), memberAuthEntity.getProvider())).willReturn(Optional.of(memberAuthEntity));
 
@@ -209,9 +213,9 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
         UUID uuid = memberEntity.getUuid();
 
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(uuid)).willReturn(Optional.of(memberAuthEntity));
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty());
+        given(memberAuthRepository.existsByOriginalMember(memberEntity)).willReturn(false);
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
         given(memberAuthRepository.findByProviderAndProviderId(memberAuthEntity.getProvider(), memberAuthEntity.getProviderId())).willReturn(Optional.of(memberAuthEntity));
 
@@ -232,9 +236,9 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
         UUID uuid = memberEntity.getUuid();
 
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(uuid)).willReturn(Optional.of(memberAuthEntity));
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty());
+        given(memberAuthRepository.existsByOriginalMember(memberEntity)).willReturn(false);
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
         given(memberAuthRepository.findByFailedAttempt(memberAuthEntity.getFailedAttempt())).willReturn(List.of(memberAuthEntity));
 
@@ -298,16 +302,17 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
         UUID uuid = memberEntity.getUuid();
 
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(uuid)).willReturn(Optional.of(memberAuthEntity)).willReturn(Optional.empty());
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty()).willReturn(Optional.of(updatedMemberAuthEntity));
+        given(memberAuthRepository.existsByOriginalMember(memberEntity)).willReturn(false);
+        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.of(updatedMemberAuthEntity));
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity).willReturn(updatedMemberAuthEntity);
         given(memberAuthRepository.findByEmail(updatedEmail)).willReturn(List.of(updatedMemberAuthEntity));
 
         // when
         memberService.insert(memberBasicUserInsertRequest);
         memberAuthService.insert(memberAuthBasicUserInsertRequest);
-        SiteMemberAuthResponse updatedMemberAuthResponse = memberAuthService.update(new SiteMemberAuthUpdateRequest(memberAuthEntity.getActiveMember().getUuid(), memberAuthEntity.getOriginalMember().getUuid(), updatedEmail, memberAuthEntity.getPw()));
+        SiteMemberAuthResponse updatedMemberAuthResponse = memberAuthService.update(new SiteMemberAuthUpdateRequest(memberAuthEntity.getOriginalMember().getUuid(), updatedEmail, memberAuthEntity.getPw()));
 
         // then
         assertThat(memberAuthService.getByEmail(updatedEmail).getFirst()).isEqualTo(updatedMemberAuthResponse);
@@ -322,10 +327,11 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
         UUID uuid = memberEntity.getUuid();
 
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
         given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.findByUuid(uuid)).willReturn(Optional.of(memberAuthEntity)).willReturn(Optional.empty());
-        given(memberAuthRepository.findByOriginalMember(memberEntity)).willReturn(Optional.empty());
+        given(memberAuthRepository.existsByOriginalMember(memberEntity)).willReturn(false).willReturn(true);
         given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
+        given(memberAuthRepository.findByUuid(uuid)).willReturn(Optional.empty());
         willDoNothing().given(memberAuthRepository).deleteByUuid(memberAuthEntity.getUuid());
 
         // when

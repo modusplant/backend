@@ -44,7 +44,7 @@ class TermValidationServiceTest implements TermResponseTestUtils, TermEntityTest
         UUID termEntityUuid = termEntity.getUuid();
 
         // when
-        given(termRepository.findByUuid(termEntityUuid)).willReturn(Optional.of(termEntity));
+        given(termRepository.existsByUuid(termEntityUuid)).willReturn(true);
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsWithUuidException.class,
@@ -62,7 +62,7 @@ class TermValidationServiceTest implements TermResponseTestUtils, TermEntityTest
 
         // when
         given(termRepository.findByUuid(termEntityUuid)).willReturn(Optional.empty());
-        given(termRepository.findByName(termEntity.getName())).willReturn(Optional.of(termEntity));
+        given(termRepository.existsByName(termEntity.getName())).willReturn(true);
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
@@ -78,7 +78,7 @@ class TermValidationServiceTest implements TermResponseTestUtils, TermEntityTest
         TermEntity termEntity = createTermsOfUseEntityWithUuid();
         UUID termEntityUuid = termEntity.getUuid();
 
-        given(termRepository.findByUuid(termEntityUuid)).willReturn(Optional.empty());
+        given(termRepository.existsByUuid(termEntityUuid)).willReturn(false);
 
         // then
         EntityNotFoundException existsException = assertThrows(EntityNotFoundWithUuidException.class,
