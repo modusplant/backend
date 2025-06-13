@@ -29,13 +29,13 @@ public class TipCategoryValidationService {
             return;
         }
         if (tipCategoryRepository.existsByOrder(order)) {
-            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), ORDER, order, TipCategoryEntity.class));
+            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY, ORDER, order, TipCategoryEntity.class));
         }
     }
 
     public void validateExistedCategory(String category) {
         if (tipCategoryRepository.existsByCategory(category)) {
-            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), CATEGORY, category, TipCategoryEntity.class));
+            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY, CATEGORY, category, TipCategoryEntity.class));
         }
     }
 

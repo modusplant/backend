@@ -34,7 +34,7 @@ public class SiteMemberAuthValidationService {
             return;
         }
         if (memberAuthRepository.existsByOriginalMember(memberRepository.findByUuid(uuid).orElseThrow())) {
-            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), ORIGINAL_MEMBER_UUID, uuid, SiteMemberAuthEntity.class));
+            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY, ORIGINAL_MEMBER_UUID, uuid, SiteMemberAuthEntity.class));
         }
     }
 
@@ -55,7 +55,7 @@ public class SiteMemberAuthValidationService {
 
     public void validateNotFoundEmail(String email) {
         if (!memberAuthRepository.existsByEmail(email)) {
-            throw new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), EMAIL, email, SiteMemberAuthEntity.class));
+            throw new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY, EMAIL, email, SiteMemberAuthEntity.class));
         }
     }
 }

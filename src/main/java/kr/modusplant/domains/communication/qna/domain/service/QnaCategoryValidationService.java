@@ -29,13 +29,13 @@ public class QnaCategoryValidationService {
             return;
         }
         if (qnaCategoryRepository.existsByOrder(order)) {
-            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), ORDER, order, QnaCategoryEntity.class));
+            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY, ORDER, order, QnaCategoryEntity.class));
         }
     }
 
     public void validateExistedCategory(String category) {
         if (qnaCategoryRepository.existsByCategory(category)) {
-            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), CATEGORY, category, QnaCategoryEntity.class));
+            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY, CATEGORY, category, QnaCategoryEntity.class));
         }
     }
 
