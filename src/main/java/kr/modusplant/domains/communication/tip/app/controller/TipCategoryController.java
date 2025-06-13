@@ -2,6 +2,8 @@ package kr.modusplant.domains.communication.tip.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.modusplant.domains.communication.common.domain.validation.CommunicationCategory;
+import kr.modusplant.domains.communication.common.domain.validation.CommunicationOrder;
 import kr.modusplant.domains.communication.tip.app.http.request.TipCategoryInsertRequest;
 import kr.modusplant.domains.communication.tip.app.http.response.TipCategoryResponse;
 import kr.modusplant.domains.communication.tip.app.service.TipCategoryApplicationService;
@@ -51,7 +53,7 @@ public class TipCategoryController {
             description = "순서에 맞는 팁 항목을 조회합니다."
     )
     @GetMapping("/order/{order}")
-    public ResponseEntity<DataResponse<?>> getTipCategoryByOrder(@PathVariable Integer order) {
+    public ResponseEntity<DataResponse<?>> getTipCategoryByOrder(@PathVariable @CommunicationOrder Integer order) {
         Optional<TipCategoryResponse> optionalTipCategoryResponse = tipCategoryApplicationService.getByOrder(order);
         if (optionalTipCategoryResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -64,7 +66,7 @@ public class TipCategoryController {
             description = "항목에 맞는 팁 항목을 조회합니다."
     )
     @GetMapping("/category/{category}")
-    public ResponseEntity<DataResponse<?>> getTipCategoryByName(@PathVariable String category) {
+    public ResponseEntity<DataResponse<?>> getTipCategoryByName(@PathVariable @CommunicationCategory String category) {
         Optional<TipCategoryResponse> optionalTipCategoryResponse = tipCategoryApplicationService.getByCategory(category);
         if (optionalTipCategoryResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());

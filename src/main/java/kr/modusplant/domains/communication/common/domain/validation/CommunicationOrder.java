@@ -10,8 +10,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Range(min = 0, max = 100, message = "Order must be range from 0 to 100.")
 @NotNull(message = "Order must not be null.")
+@Range(min = 0, max = 100, message = "Order must be range from 0 to 100.")
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)

@@ -10,8 +10,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Length(max = 40, message = "Category must be at maximum 40 strings.")
 @NotEmpty(message = "Category must not be empty.")
+@Length(max = 40, message = "Category must be at maximum 40 strings.")
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
