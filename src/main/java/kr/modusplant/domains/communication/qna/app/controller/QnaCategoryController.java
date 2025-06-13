@@ -9,6 +9,7 @@ import kr.modusplant.global.app.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -76,7 +77,7 @@ public class QnaCategoryController {
             description = "순서, 항목 정보로 Q&A 항목을 삽입합니다."
     )
     @PostMapping
-    public ResponseEntity<DataResponse<QnaCategoryResponse>> insertQnaCategory(@RequestBody QnaCategoryInsertRequest qnaCategoryInsertRequest) {
+    public ResponseEntity<DataResponse<QnaCategoryResponse>> insertQnaCategory(@RequestBody @Validated QnaCategoryInsertRequest qnaCategoryInsertRequest) {
         return ResponseEntity.ok().body(DataResponse.ok(qnaCategoryApplicationService.insert(qnaCategoryInsertRequest)));
     }
 
