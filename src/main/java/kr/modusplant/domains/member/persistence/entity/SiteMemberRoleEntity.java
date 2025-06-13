@@ -12,7 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.UUID;
 
-import static kr.modusplant.global.enums.Role.ROLE_USER;
+import static kr.modusplant.global.enums.Role.USER;
 import static kr.modusplant.global.vo.TableName.SITE_MEMBER_ROLE;
 
 @Entity
@@ -53,14 +53,14 @@ public class SiteMemberRoleEntity {
     @PrePersist
     public void prePersist() {
         if (this.role == null) {
-            this.role = ROLE_USER;
+            this.role = USER;
         }
     }
 
     @PreUpdate
     public void preUpdate() {
         if (this.role == null) {
-            this.role = ROLE_USER;
+            this.role = USER;
         }
     }
 

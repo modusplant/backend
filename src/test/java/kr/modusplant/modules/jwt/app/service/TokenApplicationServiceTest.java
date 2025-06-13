@@ -66,12 +66,12 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
     void setUp() {
         memberUuid = UUID.randomUUID();
         nickname = "testUser";
-        role = Role.ROLE_USER;
+        role = Role.USER;
         accessToken = "access-token";
         refreshToken = "refresh-token";
         claims = Map.of(
                 "nickname", nickname,
-                "role", role.getValue()
+                "role", role.name()
         );
         issuedAt = Date.from(Instant.now());
         expiredAt = Date.from(Instant.now().plusSeconds(3600));

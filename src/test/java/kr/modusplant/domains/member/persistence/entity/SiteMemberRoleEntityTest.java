@@ -25,14 +25,14 @@ class SiteMemberRoleEntityTest implements SiteMemberRoleEntityTestUtils {
     void prePersist() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        SiteMemberRoleEntity memberRole = SiteMemberRoleEntity.builder().member(member).role(Role.ROLE_ADMIN).build();
+        SiteMemberRoleEntity memberRole = SiteMemberRoleEntity.builder().member(member).role(Role.ADMIN).build();
 
         // when
         entityManager.persist(memberRole);
         entityManager.flush();
 
         // then
-        assertThat(memberRole.getRole()).isEqualTo(Role.ROLE_ADMIN);
+        assertThat(memberRole.getRole()).isEqualTo(Role.ADMIN);
     }
 
     @DisplayName("회원 역할 PreUpdate")
@@ -50,6 +50,6 @@ class SiteMemberRoleEntityTest implements SiteMemberRoleEntityTestUtils {
         entityManager.persist(memberRoleEntity);
 
         // then
-        assertThat(memberRoleEntity.getRole()).isEqualTo(Role.ROLE_USER);
+        assertThat(memberRoleEntity.getRole()).isEqualTo(Role.USER);
     }
 }
