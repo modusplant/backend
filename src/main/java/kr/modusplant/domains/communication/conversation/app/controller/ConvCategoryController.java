@@ -9,6 +9,7 @@ import kr.modusplant.global.app.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -76,7 +77,7 @@ public class ConvCategoryController {
             description = "순서, 항목 정보로 대화 항목을 삽입합니다."
     )
     @PostMapping
-    public ResponseEntity<DataResponse<ConvCategoryResponse>> insertConvCategory(@RequestBody ConvCategoryInsertRequest convCategoryInsertRequest) {
+    public ResponseEntity<DataResponse<ConvCategoryResponse>> insertConvCategory(@RequestBody @Validated ConvCategoryInsertRequest convCategoryInsertRequest) {
         return ResponseEntity.ok().body(DataResponse.ok(convCategoryApplicationService.insert(convCategoryInsertRequest)));
     }
 

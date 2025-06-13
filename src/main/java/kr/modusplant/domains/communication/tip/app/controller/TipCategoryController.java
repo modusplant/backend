@@ -9,6 +9,7 @@ import kr.modusplant.global.app.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -75,7 +76,7 @@ public class TipCategoryController {
             summary = "팁 항목 삽입 API",
             description = "순서, 항목 정보로 팁 항목을 삽입합니다.")
     @PostMapping
-    public ResponseEntity<DataResponse<TipCategoryResponse>> insertTipCategory(@RequestBody TipCategoryInsertRequest tipCategoryInsertRequest) {
+    public ResponseEntity<DataResponse<TipCategoryResponse>> insertTipCategory(@RequestBody @Validated TipCategoryInsertRequest tipCategoryInsertRequest) {
         return ResponseEntity.ok().body(DataResponse.ok(tipCategoryApplicationService.insert(tipCategoryInsertRequest)));
     }
 

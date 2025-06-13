@@ -30,7 +30,6 @@ class TipCategoryControllerTest implements TipCategoryRequestTestUtils, TipCateg
 
     private final MockMvc mockMvc;
 
-    @Autowired
     private final TipCategoryApplicationService tipCategoryApplicationService;
 
     @Autowired
