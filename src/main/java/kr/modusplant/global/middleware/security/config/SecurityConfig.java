@@ -49,8 +49,6 @@ public class SecurityConfig {
     private final SiteMemberUserDetailsService memberUserDetailsService;
 
     private final ObjectMapper objectMapper;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final RefreshTokenApplicationService refreshTokenApplicationService;
     private final TokenApplicationService tokenApplicationService;
     private final TokenProvider tokenProvider;
     private final SiteMemberRepository memberRepository;
@@ -85,7 +83,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtClearingLogoutHandler JwtClearingLogoutHandler() {
-        return new JwtClearingLogoutHandler(refreshTokenRepository, refreshTokenApplicationService); }
+        return new JwtClearingLogoutHandler(tokenApplicationService); }
 
     @Bean
     public NormalLoginFailureHandler normalLoginFailureHandler() {
