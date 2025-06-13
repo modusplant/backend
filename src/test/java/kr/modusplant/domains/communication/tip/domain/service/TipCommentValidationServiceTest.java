@@ -96,7 +96,7 @@ public class TipCommentValidationServiceTest implements
                         commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );
-        assertEquals(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), "postUlid", commentEntity.getPostUlid(), "path", commentEntity.getPath(), TipCommentEntity.class), ex.getMessage());
+        assertEquals(getFormattedExceptionMessage(EXISTED_ENTITY, "postUlid", commentEntity.getPostUlid(), "path", commentEntity.getPath(), TipCommentEntity.class), ex.getMessage());
     }
 
     @DisplayName("postUlid와 댓글 경로에 해당하는 댓글 데이터가 존재하지 않는지 확인")
@@ -123,6 +123,6 @@ public class TipCommentValidationServiceTest implements
                         commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );
-        assertEquals(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), "postUlid", commentEntity.getPostUlid(), "path", commentEntity.getPath(), TipCommentEntity.class), ex.getMessage());
+        assertEquals(getFormattedExceptionMessage(NOT_FOUND_ENTITY, "postUlid", commentEntity.getPostUlid(), "path", commentEntity.getPath(), TipCommentEntity.class), ex.getMessage());
     }
 }

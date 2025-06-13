@@ -25,7 +25,7 @@ public class TokenValidationService {
 
     public void validateNotFoundMemberUuid(UUID memberUuid) {
         if (memberUuid == null || !memberRepository.existsByUuid(memberUuid)) {
-            throw new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), MEMBER_UUID, memberUuid, SiteMemberEntity.class));
+            throw new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY, MEMBER_UUID, memberUuid, SiteMemberEntity.class));
         }
     }
 
@@ -37,7 +37,7 @@ public class TokenValidationService {
 
     public void validateNotFoundRefreshToken(String refreshToken) {
         if (refreshToken == null || !tokenRepository.existsByRefreshToken(refreshToken)) {
-            throw new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), "refreshToken", refreshToken, RefreshTokenEntity.class));
+            throw new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY, "refreshToken", refreshToken, RefreshTokenEntity.class));
         }
     }
 }

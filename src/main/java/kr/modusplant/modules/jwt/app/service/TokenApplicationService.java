@@ -92,7 +92,7 @@ public class TokenApplicationService {
         tokenValidationService.validateNotFoundRefreshToken(refreshToken);
         UUID memberUuid = tokenProvider.getMemberUuidFromToken(refreshToken);
         RefreshToken token = refreshTokenApplicationService.getByMemberUuidAndRefreshToken(memberUuid,refreshToken)
-                .orElseThrow(() -> new TokenNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), "refreshToken", refreshToken, RefreshTokenEntity.class)));
+                .orElseThrow(() -> new TokenNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY, "refreshToken", refreshToken, RefreshTokenEntity.class)));
         // 토큰 삭제
         refreshTokenApplicationService.removeByUuid(token.getUuid());
     }

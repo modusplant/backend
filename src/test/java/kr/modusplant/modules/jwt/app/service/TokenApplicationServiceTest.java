@@ -164,7 +164,7 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
     void reissueTokenFailWhenRefreshTokenNotFoundInDB() {
         // given
         given(tokenProvider.validateToken(refreshToken)).willReturn(true);
-        doThrow(new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), "refreshToken", refreshToken, RefreshTokenEntity.class)))
+        doThrow(new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY, "refreshToken", refreshToken, RefreshTokenEntity.class)))
                 .when(tokenValidationService).validateNotFoundRefreshToken(refreshToken);
 
         // then

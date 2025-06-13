@@ -29,13 +29,13 @@ public class ConvCategoryValidationService {
             return;
         }
         if (convCategoryRepository.existsByOrder(order)) {
-            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), ORDER, order, ConvCategoryEntity.class));
+            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY, ORDER, order, ConvCategoryEntity.class));
         }
     }
 
     public void validateExistedCategory(String category) {
         if (convCategoryRepository.existsByCategory(category)) {
-            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), CATEGORY, category, ConvCategoryEntity.class));
+            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY, CATEGORY, category, ConvCategoryEntity.class));
         }
     }
 

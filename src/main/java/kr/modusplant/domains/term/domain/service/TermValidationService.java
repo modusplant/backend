@@ -35,7 +35,7 @@ public class TermValidationService {
 
     public void validateExistedName(String name) {
         if (termRepository.existsByName(name)) {
-            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), NAME, name, TermEntity.class));
+            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY, NAME, name, TermEntity.class));
         }
     }
 
