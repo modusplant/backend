@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.global.middleware.security.models.SiteMemberAuthToken;
 import kr.modusplant.modules.auth.normal.login.app.http.NormalLoginRequest;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -23,7 +24,7 @@ public class NormalLoginFilter extends AbstractAuthenticationProcessingFilter {
     public NormalLoginFilter(
             ObjectMapper objectMapper,
             AuthenticationManager authManager) {
-        super(new AntPathRequestMatcher("/api/auth/login", "POST"));
+        super(new AntPathRequestMatcher("/api/auth/login", HttpMethod.POST.name()));
         this.objectMapper = objectMapper;
         this.authManager = authManager;
     }
@@ -33,7 +34,7 @@ public class NormalLoginFilter extends AbstractAuthenticationProcessingFilter {
         NormalLoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), NormalLoginRequest.class);
 
         if (!loginRequest.checkFieldValidation()) {
-            throw new IllegalArgumentException("one of email password deviceId missing");
+            throw new IllegalArgumentException("missing email or password");
         }
 
         SiteMemberAuthToken requestToken = new SiteMemberAuthToken(
