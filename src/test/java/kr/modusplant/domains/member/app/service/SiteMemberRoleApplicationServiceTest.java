@@ -138,7 +138,7 @@ class SiteMemberRoleApplicationServiceTest implements SiteMemberRoleRequestTestU
     @Test
     void updateTest() {
         // given
-        Role updatedRole = Role.ROLE_ADMIN;
+        Role updatedRole = Role.ADMIN;
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         SiteMemberRoleEntity memberRoleEntity = createMemberRoleUserEntityWithUuid();
         SiteMemberRoleEntity updatedMemberRoleEntity = SiteMemberRoleEntity.builder().memberRoleEntity(memberRoleEntity).role(updatedRole).build();

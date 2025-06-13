@@ -109,8 +109,8 @@ public class TokenApplicationService {
 
     private Map<String,String> createClaims(String nickname, Role role) {
         Map<String,String> claims = new HashMap<>();
-        claims.put("nickname",nickname);
-        claims.put("role",role.getValue());
+        claims.put("nickname", nickname);
+        claims.put("role", role.name());
         return claims;
     }
 }

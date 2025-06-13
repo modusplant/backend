@@ -114,7 +114,7 @@ public class SocialAuthApplicationService {
     private SiteMemberRoleEntity createSiteMemberRole(SiteMemberEntity memberEntity) {
         SiteMemberRoleEntity memberRoleEntity = SiteMemberRoleEntity.builder()
                 .member(memberEntity)
-                .role(Role.ROLE_USER).build();
+                .role(Role.USER).build();
 
         return memberRoleRepository.save(memberRoleEntity);
     }
