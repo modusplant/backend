@@ -1,6 +1,7 @@
 package kr.modusplant.domains.communication.conversation.app.service;
 
-import kr.modusplant.domains.common.domain.service.MediaContentService;
+import kr.modusplant.domains.common.app.service.MultipartDataProcessor;
+import kr.modusplant.domains.common.enums.PostType;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostUpdateRequest;
 import kr.modusplant.domains.communication.conversation.app.http.response.ConvPostResponse;
@@ -49,7 +50,7 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
     private ConvPostRepository convPostRepository;
 
     @Autowired
-    private MediaContentService mediaContentService;
+    private MultipartDataProcessor multipartDataProcessor;
 
     @Autowired
     private ConvPostViewCountRedisRepository convPostViewCountRedisRepository;
@@ -180,7 +181,7 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(convPostInsertRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(convPostInsertRequest.content()))
+                .content(multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.CONV_POST,convPostInsertRequest.content()))
                 .build();
         convPostRepository.save(convPostEntity);
         convPostViewCountRedisRepository.write(convPostEntity.getUlid(),5L);
@@ -208,7 +209,7 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(convPostInsertRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(convPostInsertRequest.content()))
+                .content(multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.CONV_POST,convPostInsertRequest.content()))
                 .build();
         convPostRepository.save(convPostEntity);
 
@@ -239,7 +240,7 @@ class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvC
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(convPostInsertRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(convPostInsertRequest.content()))
+                .content(multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.CONV_POST,convPostInsertRequest.content()))
                 .build();
         convPostRepository.save(convPostEntity);
 
