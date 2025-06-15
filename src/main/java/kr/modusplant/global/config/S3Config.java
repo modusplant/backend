@@ -13,16 +13,16 @@ import java.net.URI;
 
 @Configuration
 public class S3Config {
-    @Value("${cloud.aws.s3.endpoint}")
+    @Value("${cloud.wasabi.s3.endpoint}")
     private String endpoint;
 
-    @Value("${cloud.aws.s3.region}")
+    @Value("${cloud.wasabi.s3.region}")
     private String region;
 
-    @Value("${cloud.aws.s3.access-key}")
+    @Value("${cloud.wasabi.s3.access-key}")
     private String accessKey;
 
-    @Value("${cloud.aws.s3.secret-key}")
+    @Value("${cloud.wasabi.s3.secret-key}")
     private String secretKey;
 
     @Bean

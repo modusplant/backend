@@ -17,7 +17,7 @@ import java.io.IOException;
 public class S3FileService {
     private final S3Client s3Client;
 
-    @Value("${cloud.aws.s3.bucket}")
+    @Value("${cloud.wasabi.s3.bucket}")
     private String bucket;
 
     public void uploadFile(MultipartFile file, String fileKey) throws IOException {

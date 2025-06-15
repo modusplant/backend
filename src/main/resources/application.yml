@@ -29,7 +29,7 @@ spring:
 
 # Wasabi
 cloud:
-  aws:
+  wasabi:
     s3:
       endpoint: ${S3_ENDPOINT}
       region: ${S3_REGION}
