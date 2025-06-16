@@ -3,7 +3,7 @@ package kr.modusplant.global.middleware.security;
 import kr.modusplant.global.middleware.security.error.BannedException;
 import kr.modusplant.global.middleware.security.error.DeletedException;
 import kr.modusplant.global.middleware.security.error.DisabledByLinkingException;
-import kr.modusplant.global.middleware.security.error.InavtiveException;
+import kr.modusplant.global.middleware.security.error.InactiveException;
 import kr.modusplant.global.middleware.security.models.SiteMemberAuthToken;
 import kr.modusplant.global.middleware.security.models.SiteMemberUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -40,17 +40,16 @@ public class SiteMemberAuthProvider implements AuthenticationProvider {
 
     private boolean validateSiteMemberUserDetails(SiteMemberUserDetails userDetails, String password) {
         if(!passwordEncoder.matches(password, userDetails.getPassword())) {
-            throw new BadCredentialsException("The password is not correct");
-        } else if (!userDetails.isActive()) {
-            throw new InavtiveException("The account is inactive");
-        } else if (userDetails.isDisabledByLinking()) {
-            throw new DisabledByLinkingException("The account is disabled by account linking");
-        } else if (userDetails.isBanned()) {
-            throw new BannedException("The account is banned");
-        } else if (userDetails.isDeleted()) {
-            throw new DeletedException("The account is deleted");
-        } else {
-            return true;
-        }
+            throw new BadCredentialsException("The password is not correct"); }
+        if (!userDetails.isActive()) {
+            throw new InactiveException("The account is inactive"); }
+        if (userDetails.isDisabledByLinking()) {
+            throw new DisabledByLinkingException("The account is disabled by account linking"); }
+        if (userDetails.isBanned()) {
+            throw new BannedException("The account is banned"); }
+        if (userDetails.isDeleted()) {
+            throw new DeletedException("The account is deleted"); }
+
+        return true;
     }
 }
