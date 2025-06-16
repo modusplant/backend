@@ -40,12 +40,4 @@ public class NormalLoginController {
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
                 .body(DataResponse.ok(accessTokenData));
     }
-
-    @PostMapping("/login-fail")
-    public ResponseEntity<DataResponse<Void>> sendLoginFailure(
-            @RequestAttribute("errorMessage") String errorMessage
-    ) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(DataResponse.of(HttpStatus.UNAUTHORIZED.value(), errorMessage));
-    }
 }

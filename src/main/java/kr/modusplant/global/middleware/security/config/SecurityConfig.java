@@ -7,9 +7,9 @@ import kr.modusplant.global.middleware.security.SiteMemberAuthProvider;
 import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
 import kr.modusplant.global.middleware.security.filter.NormalLoginFilter;
 import kr.modusplant.global.middleware.security.handler.JwtClearingLogoutHandler;
-import kr.modusplant.global.middleware.security.handler.NormalLoginFailureHandler;
-import kr.modusplant.global.middleware.security.handler.NormalLoginSuccessHandler;
-import kr.modusplant.global.middleware.security.handler.RequestForwardLogoutSuccessHandler;
+import kr.modusplant.global.middleware.security.handler.WriteResponseLoginFailureHandler;
+import kr.modusplant.global.middleware.security.handler.ForwardRequestLoginSuccessHandler;
+import kr.modusplant.global.middleware.security.handler.ForwardRequestLogoutSuccessHandler;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -72,8 +72,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public NormalLoginSuccessHandler normalLoginSuccessHandler() {
-        return new NormalLoginSuccessHandler(memberRepository, tokenApplicationService);
+    public ForwardRequestLoginSuccessHandler normalLoginSuccessHandler() {
+        return new ForwardRequestLoginSuccessHandler(memberRepository, tokenApplicationService);
     }
 
     @Bean
@@ -81,13 +81,13 @@ public class SecurityConfig {
         return new JwtClearingLogoutHandler(tokenApplicationService); }
 
     @Bean
-    public NormalLoginFailureHandler normalLoginFailureHandler() {
-        return new NormalLoginFailureHandler();
+    public WriteResponseLoginFailureHandler normalLoginFailureHandler() {
+        return new WriteResponseLoginFailureHandler(objectMapper);
     }
 
     @Bean
-    public RequestForwardLogoutSuccessHandler normalLogoutSuccessHandler() {
-        return new RequestForwardLogoutSuccessHandler(objectMapper); }
+    public ForwardRequestLogoutSuccessHandler normalLogoutSuccessHandler() {
+        return new ForwardRequestLogoutSuccessHandler(objectMapper); }
 
     @Bean
     public NormalLoginFilter normalLoginFilter(HttpSecurity http) {
