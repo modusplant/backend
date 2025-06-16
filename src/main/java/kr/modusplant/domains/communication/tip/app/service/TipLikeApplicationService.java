@@ -1,6 +1,7 @@
 package kr.modusplant.domains.communication.tip.app.service;
 
 import kr.modusplant.domains.communication.common.app.http.response.LikeResponse;
+import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.tip.domain.service.TipLikeValidationService;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipLikeEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
@@ -24,7 +25,7 @@ public class TipLikeApplicationService {
         tipLikeValidationService.validateExistedTipPostAndMember(postId, memberId);
         tipLikeValidationService.validateExistedTipLike(postId, memberId);
 
-        TipPostEntity tipPost = tipPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("tip post not found"));
+        TipPostEntity tipPost = tipPostRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         tipPost.increaseLikeCount();
 
         tipLikeRepository.save(TipLikeEntity.of(postId, memberId));
@@ -36,7 +37,7 @@ public class TipLikeApplicationService {
         tipLikeValidationService.validateExistedTipPostAndMember(postId, memberId);
         tipLikeValidationService.validateNotFoundTipLike(postId, memberId);
 
-        TipPostEntity tipPost = tipPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("tip post not found"));
+        TipPostEntity tipPost = tipPostRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         tipPost.decreaseLikeCount();
 
         tipLikeRepository.deleteByPostIdAndMemberId(postId, memberId);

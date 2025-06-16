@@ -1,23 +1,17 @@
 package kr.modusplant.domains.member.domain.service;
 
-import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTermTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberTermEntityTestUtils;
-import kr.modusplant.domains.member.persistence.entity.SiteMemberTermEntity;
+import kr.modusplant.domains.member.error.SiteMemberTermExistsException;
+import kr.modusplant.domains.member.error.SiteMemberTermNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberTermRepository;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
-import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
-import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
-import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -43,10 +37,9 @@ class SiteMemberTermValidationServiceTest implements SiteMemberTermTestUtils, Si
         given(memberTermRepository.existsByUuid(uuid)).willReturn(true);
 
         // then
-        EntityExistsException existsException = assertThrows(EntityExistsWithUuidException.class,
+        SiteMemberTermExistsException existsException = assertThrows(SiteMemberTermExistsException.class,
                 () -> memberTermValidationService.validateExistedUuid(uuid));
-        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                EXISTED_ENTITY.getValue(), "uuid", uuid, SiteMemberTermEntity.class));
+        assertThat(existsException.getMessage()).isEqualTo(new SiteMemberTermExistsException().getMessage());
     }
 
     @DisplayName("존재하지 않는 회원 약관 UUID 검증")
@@ -59,9 +52,8 @@ class SiteMemberTermValidationServiceTest implements SiteMemberTermTestUtils, Si
         given(memberTermRepository.existsByUuid(uuid)).willReturn(false);
 
         // then
-        EntityNotFoundException notFoundException = assertThrows(EntityNotFoundWithUuidException.class,
+        SiteMemberTermNotFoundException notFoundException = assertThrows(SiteMemberTermNotFoundException.class,
                 () -> memberTermValidationService.validateNotFoundUuid(uuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY.getValue(), "uuid", uuid, SiteMemberTermEntity.class));
+        assertThat(notFoundException.getMessage()).isEqualTo(new SiteMemberTermNotFoundException().getMessage());
     }
 }

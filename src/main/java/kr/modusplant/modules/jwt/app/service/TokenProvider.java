@@ -56,7 +56,7 @@ public class TokenProvider {
             privateKey = keyPair.getPrivate();
             publicKey = keyPair.getPublic();
         } catch (NoSuchAlgorithmException e) {
-            throw new TokenKeyCreationException("Failed to create RefreshToken KeyPair: ", e);
+            throw new TokenKeyCreationException();
         }
     }
 
@@ -102,11 +102,9 @@ public class TokenProvider {
                     .parseSignedClaims(token);
             return true;
         } catch(ExpiredJwtException e) {
-            log.warn("만료된 JWT 토큰입니다.");
             return false;
         } catch (JwtException e) {
-            log.error("유효하지 않은 JWT 토큰입니다 : {}", e.getMessage());
-            throw new InvalidTokenException("Invalid JWT RefreshToken");
+            throw new InvalidTokenException();
         }
     }
 
@@ -118,12 +116,8 @@ public class TokenProvider {
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-        } catch(ExpiredJwtException e) {
-            log.warn("만료된 JWT 토큰입니다");
-            throw new InvalidTokenException("Expired JWT RefreshToken");
         } catch (JwtException e) {
-            log.error("유효하지 않은 JWT 토큰입니다 : {}", e.getMessage());
-            throw new InvalidTokenException("Invalid JWT RefreshToken");
+            throw new InvalidTokenException();
         }
     }
 

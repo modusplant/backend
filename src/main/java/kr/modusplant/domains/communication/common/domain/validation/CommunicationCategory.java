@@ -10,13 +10,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@NotEmpty(message = "Category must not be empty.")
-@Length(max = 40, message = "Category must be at maximum 40 strings.")
+@NotEmpty(message = "항목이 비어 있습니다.")
+@Length(max = 40, message = "항목은 최대 40글자까지 작성할 수 있습니다.")
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CommunicationCategory {
-    String message() default "category error occurred";
+    String message() default "항목에서 오류가 발생했습니다.";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

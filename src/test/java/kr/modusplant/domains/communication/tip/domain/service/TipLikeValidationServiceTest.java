@@ -1,10 +1,12 @@
 package kr.modusplant.domains.communication.tip.domain.service;
 
+import kr.modusplant.domains.communication.common.error.LikeExistsException;
+import kr.modusplant.domains.communication.common.error.LikeNotFoundException;
+import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipLikeRepository;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUlidException;
+import kr.modusplant.global.error.EntityExistsDomainException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +38,7 @@ class TipLikeValidationServiceTest {
         when(tipPostRepository.existsById(TIP_POST_ID)).thenReturn(false);
 
         assertThatThrownBy(() -> validationService.validateExistedTipPostAndMember(TIP_POST_ID, MEMBER_ID))
-                .isInstanceOf(EntityNotFoundWithUlidException.class);
+                .isInstanceOf(PostNotFoundException.class);
     }
 
     @Test
@@ -46,7 +48,7 @@ class TipLikeValidationServiceTest {
         when(memberRepository.existsById(MEMBER_ID)).thenReturn(false);
 
         assertThatThrownBy(() -> validationService.validateExistedTipPostAndMember(TIP_POST_ID, MEMBER_ID))
-                .isInstanceOf(EntityExistsWithUuidException.class);
+                .isInstanceOf(EntityExistsDomainException.class);
     }
 
     @Test
@@ -55,8 +57,7 @@ class TipLikeValidationServiceTest {
         when(tipLikeRepository.existsByPostIdAndMemberId(TIP_POST_ID, MEMBER_ID)).thenReturn(false);
 
         assertThatThrownBy(() -> validationService.validateNotFoundTipLike(TIP_POST_ID, MEMBER_ID))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Member not liked.");
+                .isInstanceOf(LikeNotFoundException.class);
     }
 
     @Test
@@ -65,7 +66,6 @@ class TipLikeValidationServiceTest {
         when(tipLikeRepository.existsByPostIdAndMemberId(TIP_POST_ID, MEMBER_ID)).thenReturn(true);
 
         assertThatThrownBy(() -> validationService.validateExistedTipLike(TIP_POST_ID, MEMBER_ID))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Member already liked.");
+                .isInstanceOf(LikeExistsException.class);
     }
 }

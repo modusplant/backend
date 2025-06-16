@@ -1,9 +1,8 @@
 package kr.modusplant.domains.member.domain.service;
 
-import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
+import kr.modusplant.domains.member.error.SiteMemberExistsException;
+import kr.modusplant.domains.member.error.SiteMemberNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -23,13 +22,13 @@ public class SiteMemberValidationService {
             return;
         }
         if (memberRepository.existsByUuid(uuid)) {
-            throw new EntityExistsWithUuidException(uuid, SiteMemberEntity.class);
+            throw new SiteMemberExistsException();
         }
     }
 
     public void validateNotFoundUuid(UUID uuid) {
         if (uuid == null || !memberRepository.existsByUuid(uuid)) {
-            throw new EntityNotFoundWithUuidException(uuid, SiteMemberEntity.class);
+            throw new SiteMemberNotFoundException();
         }
     }
 }

@@ -1,5 +1,6 @@
 package kr.modusplant.domains.communication.tip.app.service;
 
+import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
@@ -7,7 +8,6 @@ import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRep
 import kr.modusplant.domains.communication.tip.persistence.repository.TipPostViewCountRedisRepository;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipPostViewLockRedisRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
-import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import kr.modusplant.global.persistence.generator.UlidIdGenerator;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.BeforeEach;
@@ -92,7 +92,7 @@ class TipPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, Ti
         given(tipPostRepository.findByUlid(ulid)).willReturn(Optional.empty());
 
         // when & then
-        assertThrows(EntityNotFoundWithUlidException.class,
+        assertThrows(PostNotFoundException.class,
                 () -> tipPostApplicationService.readViewCount(ulid));
     }
 

@@ -92,7 +92,7 @@ class MediaContentServiceTest implements TipPostRequestTestUtils {
         // when & then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> mediaContentService.saveFilesAndGenerateContentJson(fontFiles));
-        assertThat(exception.getMessage()).isEqualTo("Unsupported file type: font/ttf");
+        assertThat(exception.getMessage()).isEqualTo("지원되지 않는 파일 타입입니다.");
     }
 
     @Test

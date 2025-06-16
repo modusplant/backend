@@ -1,6 +1,8 @@
 package kr.modusplant.domains.communication.conversation.app.service;
 
 import kr.modusplant.domains.communication.common.app.http.response.LikeResponse;
+import kr.modusplant.domains.communication.common.error.LikeExistsException;
+import kr.modusplant.domains.communication.common.error.LikeNotFoundException;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvPostEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvLikeEntity;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvLikeId;
@@ -99,8 +101,7 @@ public class ConvLikeApplicationServiceTest implements SiteMemberEntityTestUtils
         // when & then
         assertThatThrownBy(() ->
                 convLikeApplicationService.likeConvPost(postId, memberId))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Member already liked.");
+                .isInstanceOf(LikeExistsException.class);
     }
 
     @Test
@@ -109,7 +110,6 @@ public class ConvLikeApplicationServiceTest implements SiteMemberEntityTestUtils
         // when & then
         assertThatThrownBy(() ->
                 convLikeApplicationService.unlikeConvPost(postId, memberId))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Member not liked.");
+                .isInstanceOf(LikeNotFoundException.class);
     }
 }

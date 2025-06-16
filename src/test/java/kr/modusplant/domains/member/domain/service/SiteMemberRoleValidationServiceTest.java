@@ -1,17 +1,15 @@
 package kr.modusplant.domains.member.domain.service;
 
-import jakarta.persistence.EntityExistsException;
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberRoleTestUtils;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberRoleEntityTestUtils;
+import kr.modusplant.domains.member.error.SiteMemberRoleExistsException;
+import kr.modusplant.domains.member.error.SiteMemberRoleNotFoundException;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.domains.member.persistence.entity.SiteMemberRoleEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleRepository;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
-import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
-import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -52,10 +47,9 @@ class SiteMemberRoleValidationServiceTest implements SiteMemberRoleTestUtils, Si
         given(memberRoleRepository.existsByUuid(memberEntityUuid)).willReturn(true);
 
         // then
-        EntityExistsException existsException = assertThrows(EntityExistsWithUuidException.class,
+        SiteMemberRoleExistsException existsException = assertThrows(SiteMemberRoleExistsException.class,
                 () -> memberRoleValidationService.validateExistedUuid(memberEntityUuid));
-        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                EXISTED_ENTITY.getValue(), "uuid", memberEntityUuid, SiteMemberRoleEntity.class));
+        assertThat(existsException.getMessage()).isEqualTo(new SiteMemberRoleExistsException().getMessage());
     }
 
     @DisplayName("존재하지 않는 회원 역할 UUID 검증")
@@ -70,9 +64,8 @@ class SiteMemberRoleValidationServiceTest implements SiteMemberRoleTestUtils, Si
         given(memberRoleRepository.existsByUuid(memberEntityUuid)).willReturn(false);
 
         // then
-        EntityNotFoundWithUuidException notFoundException = assertThrows(EntityNotFoundWithUuidException.class,
+        SiteMemberRoleNotFoundException notFoundException = assertThrows(SiteMemberRoleNotFoundException.class,
                 () -> memberRoleValidationService.validateNotFoundUuid(memberEntityUuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY.getValue(), "uuid", memberEntityUuid, SiteMemberRoleEntity.class));
+        assertThat(notFoundException.getMessage()).isEqualTo(new SiteMemberRoleNotFoundException().getMessage());
     }
 }

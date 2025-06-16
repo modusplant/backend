@@ -1,9 +1,9 @@
 package kr.modusplant.domains.communication.common.error;
 
-import org.springframework.security.access.AccessDeniedException;
+import kr.modusplant.global.error.AccessDeniedDomainException;
 
-public class PostAccessDeniedException extends AccessDeniedException {
+public class PostAccessDeniedException extends AccessDeniedDomainException {
     public PostAccessDeniedException() {
-        super("Post access denied.");
+        super("POST_ACCESS_DENIED", "게시글 접근이 거부되었습니다.");
     }
 }

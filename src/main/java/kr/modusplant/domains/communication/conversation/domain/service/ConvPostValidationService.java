@@ -2,12 +2,12 @@ package kr.modusplant.domains.communication.conversation.domain.service;
 
 import kr.modusplant.domains.communication.common.domain.service.supers.AbstractPostValidationService;
 import kr.modusplant.domains.communication.common.error.PostAccessDeniedException;
+import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostUpdateRequest;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCategoryRepository;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostRepository;
-import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,16 +41,16 @@ public class ConvPostValidationService extends AbstractPostValidationService {
 
     public void validateNotFoundUlid(String ulid) {
         if (ulid == null || !convPostRepository.existsByUlid(ulid)) {
-            throw new EntityNotFoundWithUlidException(ulid, ConvPostEntity.class);
+            throw new PostNotFoundException();
         }
     }
 
     private ConvPostEntity findIfExistsByUlid(String ulid) {
         if (ulid == null) {
-            throw new EntityNotFoundWithUlidException(ulid, ConvPostEntity.class);
+            throw new PostNotFoundException();
         }
         return convPostRepository.findByUlidAndIsDeletedFalse(ulid)
-                .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid,ConvPostEntity.class));
+                .orElseThrow(PostNotFoundException::new);
     }
 
     // TODO : Spring Security 적용 후 PreAuthorize 고려

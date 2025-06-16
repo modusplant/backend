@@ -1,14 +1,13 @@
 package kr.modusplant.modules.jwt.domain.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import kr.modusplant.modules.jwt.common.util.domain.RefreshTokenTestUtils;
 import kr.modusplant.modules.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
+import kr.modusplant.modules.jwt.error.TokenNotFoundException;
 import kr.modusplant.modules.jwt.mapper.RefreshTokenAppInfraMapper;
 import kr.modusplant.modules.jwt.mapper.RefreshTokenAppInfraMapperImpl;
 import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
@@ -40,36 +39,6 @@ class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenE
     private final RefreshTokenAppInfraMapper tokenMapper = new RefreshTokenAppInfraMapperImpl();
 
     @Nested
-    class validateNotFoundMemberUuidTest {
-        @Test
-        @DisplayName("memberUuid가 없으면 예외 발생")
-        void throwIfMemberUuidNotFound() {
-            UUID memberUuid = UUID.randomUUID();
-            given(memberRepository.existsByUuid(memberUuid)).willReturn(false);
-
-            assertThatThrownBy(() -> tokenValidationService.validateNotFoundMemberUuid(memberUuid))
-                    .isInstanceOf(EntityNotFoundException.class);
-        }
-
-        @Test
-        @DisplayName("memberUuid가 null이면 예외 발생")
-        void throwIfMemberUuidIsNull() {
-            assertThatThrownBy(() -> tokenValidationService.validateNotFoundMemberUuid(null))
-                    .isInstanceOf(EntityNotFoundException.class);
-        }
-
-        @Test
-        @DisplayName("memberUuid가 존재하면 예외 없음")
-        void passIfMemberExists() {
-            SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-            given(memberRepository.existsByUuid(memberEntity.getUuid())).willReturn(true);
-
-            assertThatCode(() -> tokenValidationService.validateNotFoundMemberUuid(memberEntity.getUuid()))
-                    .doesNotThrowAnyException();
-        }
-    }
-
-    @Nested
     class validateNotFoundTokenUuidTest {
         @Test
         @DisplayName("tokenUuid가 없으면 예외 발생")
@@ -78,14 +47,14 @@ class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenE
             given(tokenRepository.existsByUuid(uuid)).willReturn(false);
 
             assertThatThrownBy(() -> tokenValidationService.validateNotFoundTokenUuid(uuid))
-                    .isInstanceOf(EntityNotFoundWithUuidException.class);
+                    .isInstanceOf(TokenNotFoundException.class);
         }
 
         @Test
         @DisplayName("tokenUuid가 null이면 예외 발생")
         void throwIfTokenUuidIsNull() {
             assertThatThrownBy(() -> tokenValidationService.validateNotFoundTokenUuid(null))
-                    .isInstanceOf(EntityNotFoundWithUuidException.class);
+                    .isInstanceOf(TokenNotFoundException.class);
         }
 
         @Test
@@ -114,14 +83,14 @@ class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenE
             given(tokenRepository.existsByRefreshToken(refreshToken)).willReturn(false);
 
             assertThatThrownBy(() -> tokenValidationService.validateNotFoundRefreshToken(refreshToken))
-                    .isInstanceOf(EntityNotFoundException.class);
+                    .isInstanceOf(TokenNotFoundException.class);
         }
 
         @Test
         @DisplayName("refresh token이 null이면 예외 발생")
         void throwIfRefreshTokenIsNull() {
             assertThatThrownBy(() -> tokenValidationService.validateNotFoundRefreshToken(null))
-                    .isInstanceOf(EntityNotFoundException.class);
+                    .isInstanceOf(TokenNotFoundException.class);
         }
 
         @Test

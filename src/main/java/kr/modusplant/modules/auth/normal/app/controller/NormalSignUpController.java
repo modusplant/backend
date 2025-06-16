@@ -34,8 +34,7 @@ public class NormalSignUpController {
     public ResponseEntity<DataResponse<Void>> saveMember(@RequestBody NormalSignUpRequest memberData) {
 
         normalSignUpApplicationService.insertMember(memberData);
-        DataResponse<Void> successDataResponse = DataResponse.of(200, "signed up successfully");
-
+        DataResponse<Void> successDataResponse = DataResponse.ok();
         return ResponseEntity.ok(successDataResponse);
 
     }
