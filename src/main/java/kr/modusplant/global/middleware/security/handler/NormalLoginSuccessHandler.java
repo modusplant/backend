@@ -10,7 +10,6 @@ import kr.modusplant.global.enums.Role;
 import kr.modusplant.global.middleware.security.models.SiteMemberUserDetails;
 import kr.modusplant.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
-import kr.modusplant.modules.jwt.app.service.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

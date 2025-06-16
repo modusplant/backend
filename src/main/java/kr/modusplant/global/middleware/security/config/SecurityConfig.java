@@ -3,7 +3,6 @@ package kr.modusplant.global.middleware.security.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.advice.GlobalExceptionHandler;
-import kr.modusplant.global.enums.Role;
 import kr.modusplant.global.middleware.security.SiteMemberAuthProvider;
 import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
 import kr.modusplant.global.middleware.security.filter.NormalLoginFilter;
@@ -11,10 +10,7 @@ import kr.modusplant.global.middleware.security.handler.JwtClearingLogoutHandler
 import kr.modusplant.global.middleware.security.handler.NormalLoginFailureHandler;
 import kr.modusplant.global.middleware.security.handler.NormalLoginSuccessHandler;
 import kr.modusplant.global.middleware.security.handler.RequestForwardLogoutSuccessHandler;
-import kr.modusplant.modules.jwt.app.service.RefreshTokenApplicationService;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
-import kr.modusplant.modules.jwt.app.service.TokenProvider;
-import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -48,10 +44,8 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authConfiguration;
     private final GlobalExceptionHandler globalExceptionHandler;
     private final SiteMemberUserDetailsService memberUserDetailsService;
-
     private final ObjectMapper objectMapper;
     private final TokenApplicationService tokenApplicationService;
-    private final TokenProvider tokenProvider;
     private final SiteMemberRepository memberRepository;
 
     @Bean
@@ -79,7 +73,7 @@ public class SecurityConfig {
 
     @Bean
     public NormalLoginSuccessHandler normalLoginSuccessHandler() {
-        return new NormalLoginSuccessHandler(memberRepository, tokenApplicationService, tokenProvider);
+        return new NormalLoginSuccessHandler(memberRepository, tokenApplicationService);
     }
 
     @Bean

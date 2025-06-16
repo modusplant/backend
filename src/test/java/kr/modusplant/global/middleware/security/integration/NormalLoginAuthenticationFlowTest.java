@@ -127,8 +127,7 @@ public class NormalLoginAuthenticationFlowTest implements
 
     @Test
     public void verifyFilterChain() {
-        filterChainProxy.getFilterChains().forEach(filter -> {
-            System.out.println("Filter being chained: " + filter);
-        });
+        filterChainProxy.getFilterChains()
+                .forEach(filter -> System.out.println("Filter being chained: " + filter));
     }
 }
