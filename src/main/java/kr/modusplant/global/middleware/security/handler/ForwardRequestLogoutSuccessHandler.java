@@ -11,7 +11,7 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import java.io.IOException;
 
 @RequiredArgsConstructor
-public class RequestForwardLogoutSuccessHandler implements LogoutSuccessHandler {
+public class ForwardRequestLogoutSuccessHandler implements LogoutSuccessHandler {
 
     private final ObjectMapper objectMapper;
 

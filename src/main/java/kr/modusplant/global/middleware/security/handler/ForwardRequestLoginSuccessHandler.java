@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-public class NormalLoginSuccessHandler implements AuthenticationSuccessHandler {
+public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final SiteMemberRepository memberRepository;
     private final TokenApplicationService tokenApplicationService;
