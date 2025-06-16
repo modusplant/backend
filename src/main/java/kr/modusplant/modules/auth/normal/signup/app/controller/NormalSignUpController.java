@@ -8,7 +8,6 @@ import kr.modusplant.global.app.http.response.DataResponse;
 import kr.modusplant.modules.auth.normal.signup.app.http.request.NormalSignUpRequest;
 import kr.modusplant.modules.auth.normal.signup.app.service.NormalSignUpApplicationService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "일반 회원가입 API", description = "일반 회원가입을 다루는 API입니다.")
 @RestController
-@Slf4j
 @RequiredArgsConstructor
 public class NormalSignUpController {
 
