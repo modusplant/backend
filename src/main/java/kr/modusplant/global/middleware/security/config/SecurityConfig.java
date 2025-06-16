@@ -126,7 +126,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/kakao/social-login").permitAll()
                         .requestMatchers("/api/auth/google/social-login").permitAll()
                         .requestMatchers("/api/members/register").permitAll()
-                        .requestMatchers("/api/example").hasRole(Role.ROLE_ADMIN.name())
+                        .requestMatchers("/api/example").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(siteMemberAuthProvider())
