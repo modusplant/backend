@@ -25,7 +25,6 @@ public class NormalLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final SiteMemberRepository memberRepository;
     private final TokenApplicationService tokenApplicationService;
-    private final TokenProvider tokenProvider;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -38,15 +37,9 @@ public class NormalLoginSuccessHandler implements AuthenticationSuccessHandler {
 
         TokenPair loginTokenPair = tokenApplicationService.issueToken(
                 currentMember.getActiveUuid(), currentMember.getNickname(), getMemberRole(currentMember));
-        long epochSecondsOfAccessTokenExpirationTime =
-                (tokenProvider.getExpirationFromToken(loginTokenPair.accessToken())).getTime() / 1000;
-        long epochSecondsOfRefreshTokenExpirationTime =
-                (tokenProvider.getExpirationFromToken(loginTokenPair.refreshToken())).getTime() / 1000;
 
         request.setAttribute("accessToken", loginTokenPair.accessToken());
         request.setAttribute("refreshToken", loginTokenPair.refreshToken());
-        request.setAttribute("accessTokenExpirationTime", epochSecondsOfAccessTokenExpirationTime);
-        request.setAttribute("refreshTokenExpirationTime", epochSecondsOfRefreshTokenExpirationTime);
 
         request.getRequestDispatcher("/api/auth/login-success").forward(request, response);
     }

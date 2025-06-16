@@ -23,9 +23,7 @@ public class NormalLoginController {
     @PostMapping("/login-success")
     public ResponseEntity<DataResponse<Map<String, Object>>> sendLoginSuccess(
             @RequestAttribute("accessToken") String accessToken,
-            @RequestAttribute("refreshToken") String refreshToken,
-            @RequestAttribute("accessTokenExpirationTime") long accessTokenExpirationTime,
-            @RequestAttribute("refreshTokenExpirationTime") long refreshTokenExpirationTime
+            @RequestAttribute("refreshToken") String refreshToken
     ) {
 
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
@@ -36,10 +34,7 @@ public class NormalLoginController {
                 .sameSite("Lax")
                 .build();
 
-        Map<String, Object> accessTokenData = Map.of(
-                "accessToken", accessToken,
-                "accessTokenExpirationTime", accessTokenExpirationTime,
-                "refreshTokenExpirationTime", refreshTokenExpirationTime);
+        Map<String, Object> accessTokenData = Map.of("accessToken", accessToken);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
