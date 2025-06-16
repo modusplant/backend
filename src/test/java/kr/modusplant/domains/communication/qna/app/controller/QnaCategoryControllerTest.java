@@ -30,7 +30,6 @@ class QnaCategoryControllerTest implements QnaCategoryRequestTestUtils, QnaCateg
 
     private final MockMvc mockMvc;
 
-    @Autowired
     private final QnaCategoryApplicationService qnaCategoryApplicationService;
 
     @Autowired

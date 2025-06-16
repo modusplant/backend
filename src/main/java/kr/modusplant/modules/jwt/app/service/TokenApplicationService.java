@@ -7,9 +7,9 @@ import kr.modusplant.domains.member.app.service.SiteMemberRoleApplicationService
 import kr.modusplant.global.enums.Role;
 import kr.modusplant.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.modules.jwt.app.error.InvalidTokenException;
-import kr.modusplant.modules.jwt.app.error.TokenNotFoundException;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.modules.jwt.domain.service.TokenValidationService;
+import kr.modusplant.modules.jwt.error.TokenNotFoundException;
 import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static kr.modusplant.domains.member.vo.MemberUuid.MEMBER_UUID;
 import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 
@@ -34,7 +33,7 @@ public class TokenApplicationService {
     // 토큰 생성
     public TokenPair issueToken(UUID memberUuid, String nickname, Role role) {
         // memberUuid 검증
-        tokenValidationService.validateNotFoundMemberUuid(MEMBER_UUID, memberUuid);
+        tokenValidationService.validateNotFoundMemberUuid(memberUuid);
 
         // accessToken , refresh token 생성
         Map<String,String> claims = createClaims(nickname,role);
@@ -93,7 +92,7 @@ public class TokenApplicationService {
         tokenValidationService.validateNotFoundRefreshToken(refreshToken);
         UUID memberUuid = tokenProvider.getMemberUuidFromToken(refreshToken);
         RefreshToken token = refreshTokenApplicationService.getByMemberUuidAndRefreshToken(memberUuid,refreshToken)
-                .orElseThrow(() -> new TokenNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), "refreshToken", refreshToken, RefreshTokenEntity.class)));
+                .orElseThrow(() -> new TokenNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY, "refreshToken", refreshToken, RefreshTokenEntity.class)));
         // 토큰 삭제
         refreshTokenApplicationService.removeByUuid(token.getUuid());
     }
@@ -110,8 +109,8 @@ public class TokenApplicationService {
 
     private Map<String,String> createClaims(String nickname, Role role) {
         Map<String,String> claims = new HashMap<>();
-        claims.put("nickname",nickname);
-        claims.put("role",role.getValue());
+        claims.put("nickname", nickname);
+        claims.put("role", role.name());
         return claims;
     }
 }

@@ -206,24 +206,21 @@ public class ConvCommentApplicationServiceTest implements
                 .isDeleted(true)
                 .build();
 
-        ConvCommentInsertRequest insertRequest = createConvCommentInsertRequest(
-                postEntity.getUlid(), memberEntity.getUuid()
-        );
+        ConvCommentInsertRequest insertRequest = createConvCommentInsertRequest(postEntity.getUlid());
 
         ConvCommentResponse commentResponse = createConvCommentResponse(
                 postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname()
         );
 
         // when
-        given(commentRepository.findByPostUlidAndPath(
-                postEntity.getUlid(), commentEntity.getPath()
-        )).willReturn(Optional.empty());
+        given(commentRepository.existsByPostUlidAndPath(postEntity.getUlid(), commentEntity.getPath())).willReturn(false);
+        given(memberRepository.existsByUuid(memberEntity.getUuid())).willReturn(true);
         given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(postRepository.findByUlid(postEntity.getUlid())).willReturn(Optional.of(postEntity));
         given(commentRepository.save(commentEntity)).willReturn(commentEntity);
 
         // then
-        assertThat(commentApplicationService.insert(insertRequest))
+        assertThat(commentApplicationService.insert(insertRequest, memberEntity.getUuid()))
                 .isEqualTo(commentResponse);
     }
 
@@ -239,10 +236,8 @@ public class ConvCommentApplicationServiceTest implements
                 .build();
 
         // when
-        given(commentRepository.findByPostUlidAndPath(commentEntity.getPostEntity().getUlid(), commentEntity.getPath()))
-                .willReturn(Optional.of(commentEntity));
-        commentApplicationService
-                .removeByPostUlidAndPath(commentEntity.getPostEntity().getUlid(), commentEntity.getPath());
+        given(commentRepository.existsByPostUlidAndPath(commentEntity.getPostEntity().getUlid(), commentEntity.getPath())).willReturn(true);
+        commentApplicationService.removeByPostUlidAndPath(commentEntity.getPostEntity().getUlid(), commentEntity.getPath());
 
         // then
         verify(commentRepository).deleteByPostUlidAndPath(commentEntity.getPostEntity().getUlid(), commentEntity.getPath());

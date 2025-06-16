@@ -2,6 +2,8 @@ package kr.modusplant.domains.communication.conversation.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.modusplant.domains.communication.common.domain.validation.CommunicationCategory;
+import kr.modusplant.domains.communication.common.domain.validation.CommunicationOrder;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvCategoryInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.response.ConvCategoryResponse;
 import kr.modusplant.domains.communication.conversation.app.service.ConvCategoryApplicationService;
@@ -9,6 +11,7 @@ import kr.modusplant.global.app.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -50,7 +53,7 @@ public class ConvCategoryController {
             description = "순서에 맞는 대화 항목을 조회합니다."
     )
     @GetMapping("/order/{order}")
-    public ResponseEntity<DataResponse<?>> getConvCategoryByOrder(@PathVariable Integer order) {
+    public ResponseEntity<DataResponse<?>> getConvCategoryByOrder(@PathVariable @CommunicationOrder Integer order) {
         Optional<ConvCategoryResponse> optionalConvCategoryResponse = convCategoryApplicationService.getByOrder(order);
         if (optionalConvCategoryResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -63,7 +66,7 @@ public class ConvCategoryController {
             description = "항목에 맞는 대화 항목을 조회합니다."
     )
     @GetMapping("/category/{category}")
-    public ResponseEntity<DataResponse<?>> getConvCategoryByName(@PathVariable String category) {
+    public ResponseEntity<DataResponse<?>> getConvCategoryByName(@PathVariable @CommunicationCategory String category) {
         Optional<ConvCategoryResponse> optionalConvCategoryResponse = convCategoryApplicationService.getByCategory(category);
         if (optionalConvCategoryResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -76,7 +79,7 @@ public class ConvCategoryController {
             description = "순서, 항목 정보로 대화 항목을 삽입합니다."
     )
     @PostMapping
-    public ResponseEntity<DataResponse<ConvCategoryResponse>> insertConvCategory(@RequestBody ConvCategoryInsertRequest convCategoryInsertRequest) {
+    public ResponseEntity<DataResponse<ConvCategoryResponse>> insertConvCategory(@RequestBody @Validated ConvCategoryInsertRequest convCategoryInsertRequest) {
         return ResponseEntity.ok().body(DataResponse.ok(convCategoryApplicationService.insert(convCategoryInsertRequest)));
     }
 

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+import static kr.modusplant.domains.member.vo.MemberUuid.MEMBER_UUID;
 import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 
@@ -22,21 +23,21 @@ public class TokenValidationService {
     private final RefreshTokenRepository tokenRepository;
     private final SiteMemberRepository memberRepository;
 
-    public void validateNotFoundMemberUuid(String name, UUID memberUuid) {
-        if (memberUuid == null || memberRepository.findByUuid(memberUuid).isEmpty()) {
-            throw new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), name, memberUuid, SiteMemberEntity.class));
+    public void validateNotFoundMemberUuid(UUID memberUuid) {
+        if (memberUuid == null || !memberRepository.existsByUuid(memberUuid)) {
+            throw new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY, MEMBER_UUID, memberUuid, SiteMemberEntity.class));
         }
     }
 
     public void validateNotFoundTokenUuid(UUID uuid) {
-        if (uuid == null || tokenRepository.findByUuid(uuid).isEmpty()) {
+        if (uuid == null || !tokenRepository.existsByUuid(uuid)) {
             throw new EntityNotFoundWithUuidException(uuid, RefreshTokenEntity.class);
         }
     }
 
     public void validateNotFoundRefreshToken(String refreshToken) {
         if (refreshToken == null || !tokenRepository.existsByRefreshToken(refreshToken)) {
-            throw new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), "refreshToken", refreshToken, RefreshTokenEntity.class));
+            throw new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY, "refreshToken", refreshToken, RefreshTokenEntity.class));
         }
     }
 }

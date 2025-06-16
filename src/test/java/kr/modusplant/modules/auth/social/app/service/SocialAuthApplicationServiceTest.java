@@ -55,7 +55,7 @@ class SocialAuthApplicationServiceTest implements SiteMemberEntityTestUtils, Sit
 
         SiteMemberRoleEntity memberRoleEntity = SiteMemberRoleEntity.builder()
                 .member(savedMemberEntity)
-                .role(Role.ROLE_USER).build();
+                .role(Role.USER).build();
         SiteMemberRoleEntity savedMemberRoleEntity = memberRoleRepository.save(memberRoleEntity);
 
         // when

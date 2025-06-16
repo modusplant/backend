@@ -22,7 +22,6 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-                .addServersItem(new Server().url("/"))
                 .info(new Info() // API 문서 정보 설정
                         .title("ModusPlant Backend API") // API 제목
                         .version("0.0.1") // API 버전
@@ -39,7 +38,7 @@ public class SwaggerConfig {
                         )
                 )
                 .addServersItem(new Server() // 프로덕션 서버 정보 설정
-                        .url("https://ep-divine-mouse-a4z30c6m.us-east-1.pg.koyeb.app") // 프로덕션 서버 링크
+                        .url("https://specified-jaquith-modusplant-0c942371.koyeb.app") // 프로덕션 서버 링크
                         .description("Production Server")  // 프로덕션 서버 설명
                 )
                 .addServersItem(new Server() // 테스트 서버 정보 설정

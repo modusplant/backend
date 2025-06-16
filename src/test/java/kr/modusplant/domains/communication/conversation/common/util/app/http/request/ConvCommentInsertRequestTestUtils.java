@@ -4,13 +4,10 @@ import kr.modusplant.domains.communication.conversation.app.http.request.ConvCom
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCommentEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCommentEntity;
 
-import java.util.UUID;
-
 public interface ConvCommentInsertRequestTestUtils extends ConvCommentEntityTestUtils {
-    default ConvCommentInsertRequest createConvCommentInsertRequest(String postUlid, UUID createMemberUuid) {
+    default ConvCommentInsertRequest createConvCommentInsertRequest(String postUlid) {
         ConvCommentEntity commentEntity = createConvCommentEntityBuilder().build();
 
-        return new ConvCommentInsertRequest(postUlid, commentEntity.getPath(),
-                createMemberUuid, commentEntity.getContent());
+        return new ConvCommentInsertRequest(postUlid, commentEntity.getPath(), commentEntity.getContent());
     }
 }

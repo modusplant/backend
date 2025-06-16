@@ -2,6 +2,8 @@ package kr.modusplant.domains.communication.qna.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.modusplant.domains.communication.common.domain.validation.CommunicationCategory;
+import kr.modusplant.domains.communication.common.domain.validation.CommunicationOrder;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaCategoryInsertRequest;
 import kr.modusplant.domains.communication.qna.app.http.response.QnaCategoryResponse;
 import kr.modusplant.domains.communication.qna.app.service.QnaCategoryApplicationService;
@@ -9,6 +11,7 @@ import kr.modusplant.global.app.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -50,7 +53,7 @@ public class QnaCategoryController {
             description = "순서에 맞는 Q&A 항목을 조회합니다."
     )
     @GetMapping("/order/{order}")
-    public ResponseEntity<DataResponse<?>> getQnaCategoryByOrder(@PathVariable Integer order) {
+    public ResponseEntity<DataResponse<?>> getQnaCategoryByOrder(@PathVariable @CommunicationOrder Integer order) {
         Optional<QnaCategoryResponse> optionalQnaCategoryResponse = qnaCategoryApplicationService.getByOrder(order);
         if (optionalQnaCategoryResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -63,7 +66,7 @@ public class QnaCategoryController {
             description = "항목에 맞는 Q&A 항목을 조회합니다."
     )
     @GetMapping("/category/{category}")
-    public ResponseEntity<DataResponse<?>> getQnaCategoryByName(@PathVariable String category) {
+    public ResponseEntity<DataResponse<?>> getQnaCategoryByName(@PathVariable @CommunicationCategory String category) {
         Optional<QnaCategoryResponse> optionalQnaCategoryResponse = qnaCategoryApplicationService.getByCategory(category);
         if (optionalQnaCategoryResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -76,7 +79,7 @@ public class QnaCategoryController {
             description = "순서, 항목 정보로 Q&A 항목을 삽입합니다."
     )
     @PostMapping
-    public ResponseEntity<DataResponse<QnaCategoryResponse>> insertQnaCategory(@RequestBody QnaCategoryInsertRequest qnaCategoryInsertRequest) {
+    public ResponseEntity<DataResponse<QnaCategoryResponse>> insertQnaCategory(@RequestBody @Validated QnaCategoryInsertRequest qnaCategoryInsertRequest) {
         return ResponseEntity.ok().body(DataResponse.ok(qnaCategoryApplicationService.insert(qnaCategoryInsertRequest)));
     }
 

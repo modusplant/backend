@@ -4,6 +4,8 @@ import kr.modusplant.domains.member.app.http.response.SiteMemberResponse;
 import kr.modusplant.domains.member.app.service.SiteMemberApplicationService;
 import kr.modusplant.domains.member.app.service.SiteMemberAuthApplicationService;
 import kr.modusplant.domains.member.app.service.SiteMemberTermApplicationService;
+import kr.modusplant.domains.member.domain.service.SiteMemberAuthValidationService;
+import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.modules.auth.normal.signup.app.http.request.NormalSignUpRequest;
 import kr.modusplant.modules.auth.normal.signup.mapper.NormalSignUpMemberAppDomainMapper;
 import kr.modusplant.modules.auth.normal.signup.mapper.NormalSignupAuthAppDomainMapper;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class NormalSignUpApplicationService {
 
+    private final SiteMemberAuthValidationService siteMemberAuthValidationService;
     private final SiteMemberApplicationService siteMemberApplicationService;
     private final SiteMemberAuthApplicationService siteMemberAuthApplicationService;
     private final SiteMemberTermApplicationService siteMemberTermApplicationService;
@@ -25,6 +28,8 @@ public class NormalSignUpApplicationService {
 
     @Transactional
     public void insertMember(NormalSignUpRequest request) {
+        siteMemberAuthValidationService.validateExistedEmailAndAuthProvider(request.email(), AuthProvider.BASIC);
+
         SiteMemberResponse savedMember = siteMemberApplicationService.insert(normalSignUpMemberAppDomainMapper.toSiteMemberInsertRequest(request));
         siteMemberAuthApplicationService.insert(normalSignupAuthAppDomainMapper.toSiteMemberAuthInsertRequest(request, savedMember));
         siteMemberTermApplicationService.insert(normalSignupTermAppDomainMapper.toSiteMemberTermInsertRequest(request, savedMember));

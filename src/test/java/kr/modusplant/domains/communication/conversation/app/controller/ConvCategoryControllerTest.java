@@ -30,7 +30,6 @@ class ConvCategoryControllerTest implements ConvCategoryRequestTestUtils, ConvCa
 
     private final MockMvc mockMvc;
 
-    @Autowired
     private final ConvCategoryApplicationService convCategoryApplicationService;
 
     @Autowired

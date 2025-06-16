@@ -9,6 +9,7 @@ import kr.modusplant.domains.communication.tip.persistence.entity.TipCommentEnti
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipCommentRepository;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
+import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Primary
@@ -26,6 +28,7 @@ import java.util.Optional;
 public class TipCommentApplicationService {
 
     private final TipCommentValidationService tipCommentValidationService;
+    private final SiteMemberValidationService memberValidationService;
     private final TipCommentAppInfraMapper tipCommentAppInfraMapper = new TipCommentAppInfraMapperImpl();
     private final TipCommentRepository tipCommentRepository;
     private final TipPostRepository tipPostRepository;
@@ -70,16 +73,22 @@ public class TipCommentApplicationService {
     }
 
     @Transactional
-    public TipCommentResponse insert(TipCommentInsertRequest commentInsertRequest) {
+    public TipCommentResponse insert(TipCommentInsertRequest commentInsertRequest, UUID memberUuid) {
         String postUlid = commentInsertRequest.postUlid();
         String path = commentInsertRequest.path();
-        tipCommentValidationService.validateFoundTipCommentEntity(postUlid, path);
+        tipCommentValidationService.validateExistedTipCommentEntity(postUlid, path);
+        memberValidationService.validateNotFoundUuid(memberUuid);
 
-        TipCommentEntity commentEntity =
-                tipCommentAppInfraMapper.toTipCommentEntity(commentInsertRequest, tipPostRepository, memberRepository);
+        SiteMemberEntity memberEntity = memberRepository.findByUuid(memberUuid).orElseThrow();
+        TipCommentEntity commentEntity = TipCommentEntity.builder()
+                .postEntity(tipPostRepository.findByUlid(postUlid).orElseThrow())
+                .path(path)
+                .authMember(memberEntity)
+                .createMember(memberEntity)
+                .content(commentInsertRequest.content())
+                .build();
 
-        return tipCommentAppInfraMapper.toTipCommentResponse(
-                tipCommentRepository.save(commentEntity));
+        return tipCommentAppInfraMapper.toTipCommentResponse(tipCommentRepository.save(commentEntity));
     }
 
     @Transactional

@@ -108,12 +108,12 @@ public class RedisConfigTest {
 
     @Test
     void testEnumWithRedisTemplate() {
-        redisTemplate.opsForValue().set("testEnumKey", Role.ROLE_USER);
+        redisTemplate.opsForValue().set("testEnumKey", Role.USER);
 
         Role role = (Role) redisTemplate.opsForValue().get("testEnumKey");
 
         assertNotNull(role);
-        assertEquals(Role.ROLE_USER,role);
+        assertEquals(Role.USER,role);
     }
 
 

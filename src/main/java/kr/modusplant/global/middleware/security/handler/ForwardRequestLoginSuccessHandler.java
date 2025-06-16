@@ -29,7 +29,6 @@ public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessH
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
-
         SiteMemberUserDetails currentMember = (SiteMemberUserDetails) authentication.getPrincipal();
 
         updateMemberLoggedInAt(currentMember.getActiveUuid());
@@ -48,7 +47,11 @@ public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessH
                 .filter(auth -> auth.getAuthority().startsWith("ROLE_"))
                 .findFirst().orElseThrow(() -> new IllegalArgumentException("The authenticated user does not have role"));
 
-        return Role.valueOf(memberRole.getAuthority());
+        String rawRole = memberRole.getAuthority();
+
+        return Role.valueOf(rawRole
+                .substring(rawRole.indexOf("_") + 1)
+        );
     }
 
     private void updateMemberLoggedInAt(UUID currentMemberUuid) {

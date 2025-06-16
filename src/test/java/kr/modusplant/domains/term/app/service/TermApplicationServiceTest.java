@@ -57,9 +57,11 @@ class TermApplicationServiceTest implements TermRequestTestUtils, TermResponseTe
         // given
         TermEntity termEntity = termAppInfraMapper.toTermEntity(termsOfUseInsertRequest);
         TermEntity returnedTermEntity = createTermsOfUseEntityWithUuid();
+        String name = termsOfUseResponse.name();
 
         given(termRepository.save(termEntity)).willReturn(returnedTermEntity);
-        given(termRepository.findByName(termsOfUseResponse.name())).willReturn(Optional.empty()).willReturn(Optional.of(returnedTermEntity));
+        given(termRepository.existsByName(name)).willReturn(false);
+        given(termRepository.findByName(name)).willReturn(Optional.of(returnedTermEntity));
 
         // when
         TermResponse termResponse = termApplicationService.insert(termsOfUseInsertRequest);
@@ -76,7 +78,7 @@ class TermApplicationServiceTest implements TermRequestTestUtils, TermResponseTe
         TermEntity returnedTermEntity = createTermsOfUseEntityWithUuid();
 
         given(termRepository.save(termEntity)).willReturn(returnedTermEntity);
-        given(termRepository.findByName(termEntity.getName())).willReturn(Optional.empty());
+        given(termRepository.existsByName(termEntity.getName())).willReturn(false);
         given(termRepository.findByVersion(termsOfUseResponse.version())).willReturn(List.of(returnedTermEntity));
 
         // when
@@ -117,17 +119,19 @@ class TermApplicationServiceTest implements TermRequestTestUtils, TermResponseTe
         String updatedContent = "갱신된 컨텐츠";
         TermEntity termEntity = termAppInfraMapper.toTermEntity(termsOfUseInsertRequest);
         TermEntity updatedTermEntity = TermEntity.builder().uuid(uuid).termEntity(termEntity).content(updatedContent).build();
+        String name = updatedTermEntity.getName();
 
         given(termRepository.save(termEntity)).willReturn(termEntity).willReturn(updatedTermEntity);
-        given(termRepository.findByUuid(uuid)).willReturn(Optional.of(termEntity));
-        given(termRepository.findByName(updatedTermEntity.getName())).willReturn(Optional.empty()).willReturn(Optional.of(updatedTermEntity));
+        given(termRepository.existsByUuid(uuid)).willReturn(true);
+        given(termRepository.existsByName(name)).willReturn(false).willReturn(true);
+        given(termRepository.findByName(name)).willReturn(Optional.of(updatedTermEntity));
 
         // when
         termApplicationService.insert(termsOfUseInsertRequest);
         termApplicationService.update(termsOfUseUpdateRequest);
 
         // then
-        assertThat(termApplicationService.getByName(updatedTermEntity.getName()).orElseThrow().content()).isEqualTo(updatedContent);
+        assertThat(termApplicationService.getByName(name).orElseThrow().content()).isEqualTo(updatedContent);
     }
 
     @DisplayName("uuid로 약관 제거")
@@ -138,8 +142,9 @@ class TermApplicationServiceTest implements TermRequestTestUtils, TermResponseTe
         TermEntity termEntity = termAppInfraMapper.toTermEntity(termsOfUseInsertRequest);
 
         given(termRepository.save(termEntity)).willReturn(termEntity);
-        given(termRepository.findByUuid(uuid)).willReturn(Optional.of(termEntity)).willReturn(Optional.empty());
+        given(termRepository.existsByUuid(uuid)).willReturn(true).willReturn(false);
         given(termRepository.findByName(termEntity.getName())).willReturn(Optional.empty());
+        given(termRepository.findByUuid(uuid)).willReturn(Optional.empty());
         willDoNothing().given(termRepository).deleteByUuid(uuid);
 
         // when

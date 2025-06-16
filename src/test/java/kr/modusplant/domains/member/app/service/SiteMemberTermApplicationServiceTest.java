@@ -50,9 +50,11 @@ class SiteMemberTermApplicationServiceTest implements SiteMemberTermRequestTestU
         SiteMemberEntity memberEntity = memberTermEntity.getMember();
         UUID uuid = memberEntity.getUuid();
 
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
-        given(memberTermRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberTermEntity));
+        given(memberTermRepository.existsByUuid(uuid)).willReturn(false);
+        given(memberTermRepository.findByUuid(uuid)).willReturn(Optional.of(memberTermEntity));
         given(memberTermRepository.save(memberTermEntity)).willReturn(memberTermEntity);
 
         // when
@@ -70,9 +72,11 @@ class SiteMemberTermApplicationServiceTest implements SiteMemberTermRequestTestU
         SiteMemberEntity memberEntity = memberTermEntity.getMember();
         UUID uuid = memberEntity.getUuid();
 
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
-        given(memberTermRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberTermEntity));
+        given(memberTermRepository.existsByUuid(uuid)).willReturn(false);
+        given(memberTermRepository.findByUuid(uuid)).willReturn(Optional.of(memberTermEntity));
         given(memberTermRepository.save(memberTermEntity)).willReturn(memberTermEntity);
 
         // when
@@ -89,10 +93,12 @@ class SiteMemberTermApplicationServiceTest implements SiteMemberTermRequestTestU
         // given
         SiteMemberTermEntity memberTermEntity = createMemberTermUserEntityWithUuid();
         SiteMemberEntity memberEntity = memberTermEntity.getMember();
+        UUID uuid = memberEntity.getUuid();
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
-        given(memberTermRepository.findByUuid(memberTermEntity.getUuid())).willReturn(Optional.of(memberTermEntity));
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
+        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberTermRepository.existsByUuid(uuid)).willReturn(false);
         given(memberTermRepository.save(memberTermEntity)).willReturn(memberTermEntity);
         given(memberTermRepository.findByAgreedTermsOfUseVersion(memberTermEntity.getAgreedTermsOfUseVersion())).willReturn(List.of(memberTermEntity));
 
@@ -110,10 +116,12 @@ class SiteMemberTermApplicationServiceTest implements SiteMemberTermRequestTestU
         // given
         SiteMemberTermEntity memberTermEntity = createMemberTermUserEntityWithUuid();
         SiteMemberEntity memberEntity = memberTermEntity.getMember();
+        UUID uuid = memberEntity.getUuid();
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
-        given(memberTermRepository.findByUuid(memberTermEntity.getUuid())).willReturn(Optional.of(memberTermEntity));
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
+        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberTermRepository.existsByUuid(uuid)).willReturn(false);
         given(memberTermRepository.save(memberTermEntity)).willReturn(memberTermEntity);
         given(memberTermRepository.findByAgreedPrivacyPolicyVersion(memberTermEntity.getAgreedPrivacyPolicyVersion())).willReturn(List.of(memberTermEntity));
 
@@ -131,10 +139,12 @@ class SiteMemberTermApplicationServiceTest implements SiteMemberTermRequestTestU
         // given
         SiteMemberTermEntity memberTermEntity = createMemberTermUserEntityWithUuid();
         SiteMemberEntity memberEntity = memberTermEntity.getMember();
+        UUID uuid = memberEntity.getUuid();
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
-        given(memberTermRepository.findByUuid(memberTermEntity.getUuid())).willReturn(Optional.of(memberTermEntity));
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
+        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberTermRepository.existsByUuid(uuid)).willReturn(false);
         given(memberTermRepository.save(memberTermEntity)).willReturn(memberTermEntity);
         given(memberTermRepository.findByAgreedAdInfoReceivingVersion(memberTermEntity.getAgreedAdInfoReceivingVersion())).willReturn(List.of(memberTermEntity));
 
@@ -179,10 +189,12 @@ class SiteMemberTermApplicationServiceTest implements SiteMemberTermRequestTestU
         SiteMemberTermEntity memberTermEntity = createMemberTermUserEntityWithUuid();
         SiteMemberTermEntity updatedMemberTermEntity = SiteMemberTermEntity.builder().memberTermEntity(memberTermEntity).agreedTermsOfUseVersion(updatedAgreedTermsOfUseVersion).build();
 
-        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
-        given(memberTermRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberTermEntity));
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
+        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberTermRepository.existsByUuid(uuid)).willReturn(false).willReturn(true);
         given(memberTermRepository.save(memberTermEntity)).willReturn(memberTermEntity).willReturn(updatedMemberTermEntity);
+        given(memberTermRepository.findByUuid(uuid)).willReturn(Optional.of(updatedMemberTermEntity));
         given(memberTermRepository.findByAgreedTermsOfUseVersion(updatedAgreedTermsOfUseVersion)).willReturn(List.of(updatedMemberTermEntity));
 
         // when
@@ -202,10 +214,12 @@ class SiteMemberTermApplicationServiceTest implements SiteMemberTermRequestTestU
         SiteMemberEntity memberEntity = memberTermEntity.getMember();
         UUID uuid = memberEntity.getUuid();
 
-        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
-        given(memberTermRepository.findByUuid(uuid)).willReturn(Optional.empty()).willReturn(Optional.of(memberTermEntity)).willReturn(Optional.empty());
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
+        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
+        given(memberTermRepository.existsByUuid(uuid)).willReturn(false).willReturn(true);
         given(memberTermRepository.save(memberTermEntity)).willReturn(memberTermEntity);
+        given(memberTermRepository.findByUuid(uuid)).willReturn(Optional.empty());
         willDoNothing().given(memberTermRepository).deleteByUuid(uuid);
 
         // when

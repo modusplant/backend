@@ -21,8 +21,6 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
 import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
@@ -89,9 +87,7 @@ public class ConvCommentValidationServiceTest implements
         entityManager.flush();
 
         // when
-        given(commentRepository.findByPostUlidAndPath(
-                commentEntity.getPostUlid(), commentEntity.getPath()
-        )).willReturn(Optional.of(commentEntity));
+        given(commentRepository.existsByPostUlidAndPath(commentEntity.getPostUlid(), commentEntity.getPath())).willReturn(true);
 
         // then
         EntityExistsWithPostUlidAndPathException ex = assertThrows(
@@ -100,7 +96,7 @@ public class ConvCommentValidationServiceTest implements
                         commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );
-        assertEquals(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), "postUlid", commentEntity.getPostUlid(), "path", commentEntity.getPath(), ConvCommentEntity.class), ex.getMessage());
+        assertEquals(getFormattedExceptionMessage(EXISTED_ENTITY, "postUlid", commentEntity.getPostUlid(), "path", commentEntity.getPath(), ConvCommentEntity.class), ex.getMessage());
     }
 
     @DisplayName("postUlid와 댓글 경로에 해당하는 댓글 데이터가 존재하지 않는지 확인")
@@ -118,9 +114,7 @@ public class ConvCommentValidationServiceTest implements
         entityManager.flush();
 
         // when
-        given(commentRepository.findByPostUlidAndPath(
-                commentEntity.getPostUlid(), commentEntity.getPath()
-        )).willReturn(Optional.empty());
+        given(commentRepository.existsByPostUlidAndPath(commentEntity.getPostUlid(), commentEntity.getPath())).willReturn(false);
 
         // then
         EntityNotFoundWithPostUlidAndPathException ex = assertThrows(
@@ -129,6 +123,6 @@ public class ConvCommentValidationServiceTest implements
                         commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );
-        assertEquals(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), "postUlid", commentEntity.getPostUlid(), "path", commentEntity.getPath(), ConvCommentEntity.class), ex.getMessage());
+        assertEquals(getFormattedExceptionMessage(NOT_FOUND_ENTITY, "postUlid", commentEntity.getPostUlid(), "path", commentEntity.getPath(), ConvCommentEntity.class), ex.getMessage());
     }
 }

@@ -177,13 +177,12 @@ public class TipCommentControllerTest implements
     void insertTipCommentTest() throws Exception {
         // given
         ObjectMapper objectMapper = new ObjectMapper();
-        TipCommentInsertRequest insertRequest = createTipCommentInsertRequest(
-                postEntity.getUlid(), memberEntity.getUuid());
+        TipCommentInsertRequest insertRequest = createTipCommentInsertRequest(postEntity.getUlid());
         TipCommentResponse commentResponse =
                 createTipCommentResponse(postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname());
 
         // when
-        given(commentApplicationService.insert(insertRequest)).willReturn(commentResponse);
+        given(commentApplicationService.insert(insertRequest, memberEntity.getUuid())).willReturn(commentResponse);
 
         // then
         mockMvc.perform(post("/api/v1/tip/comments", insertRequest)

@@ -9,10 +9,10 @@ import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMess
 
 public class EntityNotFoundWithUuidException extends EntityNotFoundException {
     public EntityNotFoundWithUuidException(UUID uuid, Class<?> clazz) {
-        super(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), "uuid", uuid, clazz));
+        super(getFormattedExceptionMessage(NOT_FOUND_ENTITY, "uuid", uuid, clazz));
     }
 
     public EntityNotFoundWithUuidException(String name, UUID value, Class<?> clazz) {
-        super(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), name, value, clazz));
+        super(getFormattedExceptionMessage(NOT_FOUND_ENTITY, name, value, clazz));
     }
 }

@@ -56,7 +56,7 @@ public class TokenProvider {
             privateKey = keyPair.getPrivate();
             publicKey = keyPair.getPublic();
         } catch (NoSuchAlgorithmException e) {
-            throw new TokenKeyCreationException("Failed to create RefreshToken KeyPair", e);
+            throw new TokenKeyCreationException("Failed to create RefreshToken KeyPair: ", e);
         }
     }
 
@@ -183,13 +183,13 @@ public class TokenProvider {
 
             // 인증코드, 메일 일치 검증
             if (!verifyCode.equals(payloadVerifyCode)) {
-                throw new RuntimeException("Invalid verification code");
+                throw new RuntimeException("invalid verification code");
             }
             if (!email.equals(claims.get(EMAIL, String.class))) {
-                throw new RuntimeException("Invalid email address");
+                throw new RuntimeException("invalid email address");
             }
         } catch (ExpiredJwtException e) {
-            throw new RuntimeException("Expired JWT token");
+            throw new RuntimeException("expired JWT token");
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }

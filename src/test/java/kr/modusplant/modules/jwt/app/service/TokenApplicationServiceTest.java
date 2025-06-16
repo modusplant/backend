@@ -10,9 +10,9 @@ import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils
 import kr.modusplant.global.enums.Role;
 import kr.modusplant.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.modules.jwt.app.error.InvalidTokenException;
-import kr.modusplant.modules.jwt.app.error.TokenNotFoundException;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.modules.jwt.domain.service.TokenValidationService;
+import kr.modusplant.modules.jwt.error.TokenNotFoundException;
 import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.domains.member.vo.MemberUuid.MEMBER_UUID;
 import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
 import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -67,12 +66,12 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
     void setUp() {
         memberUuid = UUID.randomUUID();
         nickname = "testUser";
-        role = Role.ROLE_USER;
+        role = Role.USER;
         accessToken = "access-token";
         refreshToken = "refresh-token";
         claims = Map.of(
                 "nickname", nickname,
-                "role", role.getValue()
+                "role", role.name()
         );
         issuedAt = Date.from(Instant.now());
         expiredAt = Date.from(Instant.now().plusSeconds(3600));
@@ -82,7 +81,7 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
     @DisplayName("토큰 생성 테스트")
     void issueTokenSuccess() {
         // given
-        willDoNothing().given(tokenValidationService).validateNotFoundMemberUuid(MEMBER_UUID, memberUuid);
+        willDoNothing().given(tokenValidationService).validateNotFoundMemberUuid(memberUuid);
         given(tokenProvider.generateAccessToken(memberUuid, claims)).willReturn(accessToken);
         given(tokenProvider.generateRefreshToken(memberUuid)).willReturn(refreshToken);
         given(tokenProvider.getIssuedAtFromToken(refreshToken)).willReturn(issuedAt);
@@ -97,7 +96,7 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
         assertEquals(accessToken, tokenPair.accessToken());
         assertEquals(refreshToken, tokenPair.refreshToken());
 
-        verify(tokenValidationService).validateNotFoundMemberUuid(MEMBER_UUID, memberUuid);
+        verify(tokenValidationService).validateNotFoundMemberUuid(memberUuid);
         verify(tokenProvider).generateAccessToken(eq(memberUuid), anyMap());
         verify(tokenProvider).generateRefreshToken(memberUuid);
         verify(refreshTokenApplicationService).insert(any(RefreshToken.class));
@@ -165,7 +164,7 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
     void reissueTokenFailWhenRefreshTokenNotFoundInDB() {
         // given
         given(tokenProvider.validateToken(refreshToken)).willReturn(true);
-        doThrow(new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY.getValue(), "refreshToken", refreshToken, RefreshTokenEntity.class)))
+        doThrow(new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY, "refreshToken", refreshToken, RefreshTokenEntity.class)))
                 .when(tokenValidationService).validateNotFoundRefreshToken(refreshToken);
 
         // then

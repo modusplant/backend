@@ -38,8 +38,8 @@ class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, Si
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
+        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
 
         // when
         SiteMemberResponse memberResponse = memberApplicationService.insert(memberBasicUserInsertRequest);
@@ -54,7 +54,6 @@ class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, Si
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty());
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
         given(memberRepository.findByNickname(memberEntity.getNickname())).willReturn(List.of(memberEntity));
 
@@ -71,7 +70,6 @@ class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, Si
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty());
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
         given(memberRepository.findByBirthDate(memberEntity.getBirthDate())).willReturn(List.of(memberEntity));
 
@@ -88,7 +86,6 @@ class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, Si
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty());
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
         given(memberRepository.findByIsActive(memberEntity.getIsActive())).willReturn(List.of(memberEntity));
 
@@ -105,7 +102,6 @@ class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, Si
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty());
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
         given(memberRepository.findByIsDisabledByLinking(memberEntity.getIsDisabledByLinking())).willReturn(List.of(memberEntity));
 
@@ -122,7 +118,6 @@ class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, Si
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty());
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
         given(memberRepository.findByIsBanned(memberEntity.getIsBanned())).willReturn(List.of(memberEntity));
 
@@ -139,7 +134,6 @@ class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, Si
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty());
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
         given(memberRepository.findByIsDeleted(memberEntity.getIsDeleted())).willReturn(List.of(memberEntity));
 
@@ -156,7 +150,6 @@ class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, Si
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.empty());
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
         given(memberRepository.findByLoggedInAt(memberEntity.getLoggedInAt())).willReturn(List.of(memberEntity));
 
@@ -186,16 +179,20 @@ class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, Si
     void updateTest() {
         // given
         String updatedNickname = "갱신된 닉네임";
-        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        SiteMemberEntity updatedMemberEntity = SiteMemberEntity.builder().memberEntity(memberEntity).nickname(updatedNickname).build();
+        SiteMemberEntity memberEntity = createMemberBasicUserEntity();
+        SiteMemberEntity beforeUpdatedMemberEntity = createMemberBasicUserEntityWithUuid();
+        UUID uuid = beforeUpdatedMemberEntity.getUuid();
+        SiteMemberEntity updatedMemberEntity = SiteMemberEntity.builder().memberEntity(beforeUpdatedMemberEntity).nickname(updatedNickname).build();
 
-        given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
-        given(memberRepository.save(memberEntity)).willReturn(memberEntity).willReturn(updatedMemberEntity);
+        given(memberRepository.save(memberEntity)).willReturn(beforeUpdatedMemberEntity);
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
+        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(beforeUpdatedMemberEntity));
+        given(memberRepository.save(updatedMemberEntity)).willReturn(updatedMemberEntity);
         given(memberRepository.findByNickname(updatedNickname)).willReturn(List.of(updatedMemberEntity));
 
         // when
         memberApplicationService.insert(memberBasicUserInsertRequest);
-        SiteMemberResponse updatedMemberResponse = memberApplicationService.update(new SiteMemberUpdateRequest(memberEntity.getUuid(), updatedNickname, memberEntity.getBirthDate()));
+        SiteMemberResponse updatedMemberResponse = memberApplicationService.update(new SiteMemberUpdateRequest(uuid, updatedNickname, memberEntity.getBirthDate()));
 
         // then
         assertThat(memberApplicationService.getByNickname(updatedNickname).getFirst()).isEqualTo(updatedMemberResponse);
@@ -208,8 +205,9 @@ class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, Si
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         UUID uuid = memberEntity.getUuid();
 
-        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity)).willReturn(Optional.empty());
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
+        given(memberRepository.existsByUuid(uuid)).willReturn(true);
+        given(memberRepository.findByUuid(uuid)).willReturn(Optional.empty());
         willDoNothing().given(memberRepository).deleteByUuid(uuid);
 
         // when

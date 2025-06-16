@@ -11,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
@@ -42,7 +41,7 @@ class ConvCategoryValidationServiceTest implements ConvCategoryResponseTestUtils
         Integer order = createTestConvCategoryEntity().getOrder();
 
         // when
-        given(convCategoryRepository.findByOrder(order)).willReturn(Optional.of(createTestConvCategoryEntity()));
+        given(convCategoryRepository.existsByOrder(order)).willReturn(true);
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
@@ -59,8 +58,8 @@ class ConvCategoryValidationServiceTest implements ConvCategoryResponseTestUtils
         String category = createTestConvCategoryEntity().getCategory();
 
         // when
-        given(convCategoryRepository.findByOrder(order)).willReturn(Optional.empty());
-        given(convCategoryRepository.findByCategory(category)).willReturn(Optional.of(createTestConvCategoryEntity()));
+        given(convCategoryRepository.existsByOrder(order)).willReturn(false);
+        given(convCategoryRepository.existsByCategory(category)).willReturn(true);
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
@@ -76,7 +75,7 @@ class ConvCategoryValidationServiceTest implements ConvCategoryResponseTestUtils
         UUID uuid = createTestConvCategoryEntity().getUuid();
 
         // when
-        given(convCategoryRepository.findByUuid(uuid)).willReturn(Optional.empty());
+        given(convCategoryRepository.existsByUuid(uuid)).willReturn(false);
 
         // then
         EntityNotFoundException existsException = assertThrows(EntityNotFoundException.class,

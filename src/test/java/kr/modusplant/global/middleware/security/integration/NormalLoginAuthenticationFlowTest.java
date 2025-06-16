@@ -1,6 +1,7 @@
 package kr.modusplant.global.middleware.security.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.models.PathItem;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
@@ -84,7 +85,7 @@ public class NormalLoginAuthenticationFlowTest implements
 
         given(memberUserDetailsService.loadUserByUsername(testLoginRequest.email()))
                 .willReturn(validSiteMemberUserDetails);
-        doNothing().when(tokenValidationService).validateNotFoundMemberUuid(any(), any());
+        doNothing().when(tokenValidationService).validateNotFoundMemberUuid(any());
         given(refreshTokenApplicationService.insert(any())).willReturn(any());
         given(memberRepository.findByUuid(validSiteMemberUserDetails.getActiveUuid()))
                 .willReturn(Optional.ofNullable(createMemberBasicUserEntityWithUuid()));
@@ -121,8 +122,8 @@ public class NormalLoginAuthenticationFlowTest implements
                         .content(objectMapper.writeValueAsString(testLoginRequest)).characterEncoding("UTF-8"))
 
                 // then
-                .andExpect(forwardedUrl("/api/auth/login-fail"))
-                .andExpect(request().attribute("errorMessage", instanceOf(String.class)));
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401));
     }
 
     @Test

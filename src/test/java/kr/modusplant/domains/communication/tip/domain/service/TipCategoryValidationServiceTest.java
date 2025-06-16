@@ -11,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
@@ -42,7 +41,7 @@ class TipCategoryValidationServiceTest implements TipCategoryResponseTestUtils, 
         Integer order = createTestTipCategoryEntity().getOrder();
 
         // when
-        given(tipCategoryRepository.findByOrder(order)).willReturn(Optional.of(createTestTipCategoryEntity()));
+        given(tipCategoryRepository.existsByOrder(order)).willReturn(true);
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
@@ -59,8 +58,8 @@ class TipCategoryValidationServiceTest implements TipCategoryResponseTestUtils, 
         String category = createTestTipCategoryEntity().getCategory();
 
         // when
-        given(tipCategoryRepository.findByOrder(order)).willReturn(Optional.empty());
-        given(tipCategoryRepository.findByCategory(category)).willReturn(Optional.of(createTestTipCategoryEntity()));
+        given(tipCategoryRepository.existsByOrder(order)).willReturn(false);
+        given(tipCategoryRepository.existsByCategory(category)).willReturn(true);
 
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
@@ -76,7 +75,7 @@ class TipCategoryValidationServiceTest implements TipCategoryResponseTestUtils, 
         UUID uuid = createTestTipCategoryEntity().getUuid();
 
         // when
-        given(tipCategoryRepository.findByUuid(uuid)).willReturn(Optional.empty());
+        given(tipCategoryRepository.existsByUuid(uuid)).willReturn(false);
 
         // then
         EntityNotFoundException existsException = assertThrows(EntityNotFoundException.class,

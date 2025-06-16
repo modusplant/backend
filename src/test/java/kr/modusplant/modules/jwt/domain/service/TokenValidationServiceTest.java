@@ -22,7 +22,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
@@ -46,15 +45,16 @@ class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenE
         @DisplayName("memberUuid가 없으면 예외 발생")
         void throwIfMemberUuidNotFound() {
             UUID memberUuid = UUID.randomUUID();
-            given(memberRepository.findByUuid(memberUuid)).willReturn(Optional.empty());
-            assertThatThrownBy(() -> tokenValidationService.validateNotFoundMemberUuid("memberUuid", memberUuid))
+            given(memberRepository.existsByUuid(memberUuid)).willReturn(false);
+
+            assertThatThrownBy(() -> tokenValidationService.validateNotFoundMemberUuid(memberUuid))
                     .isInstanceOf(EntityNotFoundException.class);
         }
 
         @Test
         @DisplayName("memberUuid가 null이면 예외 발생")
         void throwIfMemberUuidIsNull() {
-            assertThatThrownBy(() -> tokenValidationService.validateNotFoundMemberUuid("memberUuid", null))
+            assertThatThrownBy(() -> tokenValidationService.validateNotFoundMemberUuid(null))
                     .isInstanceOf(EntityNotFoundException.class);
         }
 
@@ -62,9 +62,9 @@ class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenE
         @DisplayName("memberUuid가 존재하면 예외 없음")
         void passIfMemberExists() {
             SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-            given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
+            given(memberRepository.existsByUuid(memberEntity.getUuid())).willReturn(true);
 
-            assertThatCode(() -> tokenValidationService.validateNotFoundMemberUuid("memberUuid", memberEntity.getUuid()))
+            assertThatCode(() -> tokenValidationService.validateNotFoundMemberUuid(memberEntity.getUuid()))
                     .doesNotThrowAnyException();
         }
     }
@@ -75,7 +75,7 @@ class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenE
         @DisplayName("tokenUuid가 없으면 예외 발생")
         void throwIfTokenNotFound() {
             UUID uuid = UUID.randomUUID();
-            given(tokenRepository.findByUuid(uuid)).willReturn(Optional.empty());
+            given(tokenRepository.existsByUuid(uuid)).willReturn(false);
 
             assertThatThrownBy(() -> tokenValidationService.validateNotFoundTokenUuid(uuid))
                     .isInstanceOf(EntityNotFoundWithUuidException.class);
@@ -97,7 +97,7 @@ class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenE
                     .member(memberEntity)
                     .build();
             RefreshToken token = tokenMapper.toRefreshToken(tokenEntity);
-            given(tokenRepository.findByUuid(tokenEntity.getUuid())).willReturn(Optional.of(tokenEntity));
+            given(tokenRepository.existsByUuid(tokenEntity.getUuid())).willReturn(true);
 
             assertThatCode(() -> tokenValidationService.validateNotFoundTokenUuid(token.getUuid()))
                     .doesNotThrowAnyException();

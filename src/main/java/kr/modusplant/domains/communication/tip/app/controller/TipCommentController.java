@@ -9,6 +9,7 @@ import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.global.app.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,12 @@ import java.util.UUID;
 public class TipCommentController {
 
     private final TipCommentApplicationService commentApplicationService;
+
+    // 임시로 Spring Security 적용 전 인증 우회를 위해 사용
+    // gitignore 처리된 yml 파일에 임의로 값을 추가하여 사용
+    // TODO : Spring Security 적용 후 정상 인증 로직으로 대체할 것
+    @Value("${fake-auth-uuid}")
+    private UUID memberUuid;
 
     @Operation(
             summary = "전체 팁 댓글 조회 API",
@@ -107,7 +114,7 @@ public class TipCommentController {
     )
     @PostMapping
     public ResponseEntity<DataResponse<TipCommentResponse>> insertTipComment(@RequestBody TipCommentInsertRequest insertRequest) {
-        return ResponseEntity.ok().body(DataResponse.ok(commentApplicationService.insert(insertRequest)));
+        return ResponseEntity.ok().body(DataResponse.ok(commentApplicationService.insert(insertRequest, memberUuid)));
     }
 
     @Operation(
