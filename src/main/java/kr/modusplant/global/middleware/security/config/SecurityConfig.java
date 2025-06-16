@@ -3,6 +3,7 @@ package kr.modusplant.global.middleware.security.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.advice.GlobalExceptionHandler;
+import kr.modusplant.global.enums.Role;
 import kr.modusplant.global.middleware.security.SiteMemberAuthProvider;
 import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
 import kr.modusplant.global.middleware.security.filter.NormalLoginFilter;
@@ -117,13 +118,15 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .addFilterBefore(normalLoginFilter(http), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/terms").permitAll()
-                        .requestMatchers("/members/**").hasRole("ROLE_ADMIN")
-                        .requestMatchers("/*/social-login").permitAll()
-                        .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/conversation/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/qna/comments").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/tip/comments").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/qna/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tip/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/terms/**").permitAll()
+                        .requestMatchers("/api/members/verify-email/send/**").permitAll()
+                        .requestMatchers("/api/auth/kakao/social-login").permitAll()
+                        .requestMatchers("/api/auth/google/social-login").permitAll()
+                        .requestMatchers("/api/members/register").permitAll()
+                        .requestMatchers("/api/example").hasRole(Role.ROLE_ADMIN.name())
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(siteMemberAuthProvider())
