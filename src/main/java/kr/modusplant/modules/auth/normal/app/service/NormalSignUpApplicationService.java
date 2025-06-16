@@ -6,7 +6,6 @@ import kr.modusplant.domains.member.app.service.SiteMemberAuthApplicationService
 import kr.modusplant.domains.member.app.service.SiteMemberTermApplicationService;
 import kr.modusplant.domains.member.domain.service.SiteMemberAuthValidationService;
 import kr.modusplant.domains.member.enums.AuthProvider;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
 import kr.modusplant.modules.auth.normal.app.http.request.NormalSignUpRequest;
 import kr.modusplant.modules.auth.normal.mapper.NormalSignUpMemberAppDomainMapper;
 import kr.modusplant.modules.auth.normal.mapper.NormalSignupAuthAppDomainMapper;

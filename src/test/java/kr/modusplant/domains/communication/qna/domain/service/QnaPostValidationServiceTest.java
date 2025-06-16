@@ -1,7 +1,9 @@
 package kr.modusplant.domains.communication.qna.domain.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import kr.modusplant.domains.communication.common.error.CategoryNotFoundException;
 import kr.modusplant.domains.communication.common.error.PostAccessDeniedException;
+import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostInsertRequest;
 import kr.modusplant.domains.communication.qna.common.util.app.http.request.QnaPostRequestTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.domain.QnaPostTestUtils;
@@ -11,8 +13,6 @@ import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaCategoryRepository;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostRepository;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -64,7 +64,7 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils, QnaCatego
         when(qnaCategoryRepository.existsByUuid(qnaPostInsertRequest.categoryUuid())).thenReturn(false);
 
         // then
-        assertThrows(EntityExistsWithUuidException.class,
+        assertThrows(CategoryNotFoundException.class,
                 () -> qnaPostValidationService.validateQnaPostInsertRequest(qnaPostInsertRequest));
     }
 
@@ -136,7 +136,7 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils, QnaCatego
         UUID memberUuid = UUID.randomUUID();
         String ulid = QnaPostTestUtils.generator.generate(null, null,null,EventType.INSERT);
         when(qnaPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundWithUlidException.class,
+        assertThrows(PostNotFoundException.class,
                 () -> qnaPostValidationService.validateAccessibleQnaPost(ulid,memberUuid));
     }
 
@@ -182,7 +182,7 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils, QnaCatego
         final String nullUlid = null;
 
         // then
-        assertThrows(EntityNotFoundWithUlidException.class, () ->
+        assertThrows(PostNotFoundException.class, () ->
                 qnaPostValidationService.validateNotFoundUlid(nullUlid));
 
         // Not Found ULID
@@ -191,7 +191,7 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils, QnaCatego
         when(qnaPostRepository.existsByUlid(notFoundUlid)).thenReturn(false);
 
         // then
-        assertThrows(EntityNotFoundWithUlidException.class, () ->
+        assertThrows(PostNotFoundException.class, () ->
                 qnaPostValidationService.validateNotFoundUlid(notFoundUlid));
     }
 

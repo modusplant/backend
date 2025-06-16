@@ -1,20 +1,14 @@
 package kr.modusplant.domains.communication.conversation.domain.service;
 
-import jakarta.persistence.EntityExistsException;
-import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
+import kr.modusplant.domains.communication.common.error.CategoryExistsException;
+import kr.modusplant.domains.communication.common.error.CategoryNotFoundException;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCategoryRepository;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
-
-import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
-import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
-import static kr.modusplant.global.vo.CamelCaseWord.CATEGORY;
-import static kr.modusplant.global.vo.CamelCaseWord.ORDER;
 
 @Service
 @Primary
@@ -29,19 +23,19 @@ public class ConvCategoryValidationService {
             return;
         }
         if (convCategoryRepository.existsByOrder(order)) {
-            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY, ORDER, order, ConvCategoryEntity.class));
+            throw new CategoryExistsException();
         }
     }
 
     public void validateExistedCategory(String category) {
         if (convCategoryRepository.existsByCategory(category)) {
-            throw new EntityExistsException(getFormattedExceptionMessage(EXISTED_ENTITY, CATEGORY, category, ConvCategoryEntity.class));
+            throw new CategoryExistsException();
         }
     }
 
     public void validateNotFoundUuid(UUID uuid) {
         if (uuid == null || !convCategoryRepository.existsByUuid(uuid)) {
-            throw new EntityNotFoundWithUuidException(uuid, ConvCategoryEntity.class);
+            throw new CategoryNotFoundException();
         }
     }
 }

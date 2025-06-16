@@ -1,5 +1,6 @@
 package kr.modusplant.domains.communication.conversation.app.service;
 
+import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvPostEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
@@ -7,7 +8,6 @@ import kr.modusplant.domains.communication.conversation.persistence.repository.C
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostViewCountRedisRepository;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostViewLockRedisRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
-import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import kr.modusplant.global.persistence.generator.UlidIdGenerator;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.BeforeEach;
@@ -92,7 +92,7 @@ class ConvPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, C
         given(convPostRepository.findByUlid(ulid)).willReturn(Optional.empty());
 
         // when & then
-        assertThrows(EntityNotFoundWithUlidException.class,
+        assertThrows(PostNotFoundException.class,
                 () -> convPostApplicationService.readViewCount(ulid));
     }
 

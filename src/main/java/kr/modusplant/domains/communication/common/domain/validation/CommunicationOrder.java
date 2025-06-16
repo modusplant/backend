@@ -10,13 +10,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@NotNull(message = "Order must not be null.")
-@Range(min = 0, max = 100, message = "Order must be range from 0 to 100.")
+@NotNull(message = "순서가 비어 있습니다.")
+@Range(min = 0, max = 100, message = "순서는 0부터 100 사이의 값이어야 합니다.")
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CommunicationOrder {
-    String message() default "order error occurred";
+    String message() default "순서에서 오류가 발생했습니다.";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

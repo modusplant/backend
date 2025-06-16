@@ -1,5 +1,6 @@
 package kr.modusplant.domains.communication.qna.app.service;
 
+import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaPostEntityTestUtils;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
@@ -7,7 +8,6 @@ import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostRep
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostViewCountRedisRepository;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostViewLockRedisRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
-import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import kr.modusplant.global.persistence.generator.UlidIdGenerator;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.BeforeEach;
@@ -92,7 +92,7 @@ class QnaPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, Qn
         given(qnaPostRepository.findByUlid(ulid)).willReturn(Optional.empty());
 
         // when & then
-        assertThrows(EntityNotFoundWithUlidException.class,
+        assertThrows(PostNotFoundException.class,
                 () -> qnaPostApplicationService.readViewCount(ulid));
     }
 

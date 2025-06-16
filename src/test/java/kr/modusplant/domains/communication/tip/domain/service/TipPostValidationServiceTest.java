@@ -1,7 +1,9 @@
 package kr.modusplant.domains.communication.tip.domain.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import kr.modusplant.domains.communication.common.error.CategoryNotFoundException;
 import kr.modusplant.domains.communication.common.error.PostAccessDeniedException;
+import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostInsertRequest;
 import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipPostRequestTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.domain.TipPostTestUtils;
@@ -11,8 +13,6 @@ import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipCategoryRepository;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipPostRepository;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -64,7 +64,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils, TipCatego
         when(tipCategoryRepository.existsByUuid(tipPostInsertRequest.categoryUuid())).thenReturn(false);
 
         // then
-        assertThrows(EntityExistsWithUuidException.class,
+        assertThrows(CategoryNotFoundException.class,
                 () -> tipPostValidationService.validateTipPostInsertRequest(tipPostInsertRequest));
     }
 
@@ -136,7 +136,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils, TipCatego
         UUID memberUuid = UUID.randomUUID();
         String ulid = TipPostTestUtils.generator.generate(null, null,null,EventType.INSERT);
         when(tipPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundWithUlidException.class,
+        assertThrows(PostNotFoundException.class,
                 () -> tipPostValidationService.validateAccessibleTipPost(ulid,memberUuid));
     }
 
@@ -182,7 +182,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils, TipCatego
         final String nullUlid = null;
 
         // then
-        assertThrows(EntityNotFoundWithUlidException.class, () ->
+        assertThrows(PostNotFoundException.class, () ->
                 tipPostValidationService.validateNotFoundUlid(nullUlid));
 
         // Not Found ULID
@@ -191,7 +191,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils, TipCatego
         when(tipPostRepository.existsByUlid(notFoundUlid)).thenReturn(false);
 
         // then
-        assertThrows(EntityNotFoundWithUlidException.class, () ->
+        assertThrows(PostNotFoundException.class, () ->
                 tipPostValidationService.validateNotFoundUlid(notFoundUlid));
     }
 

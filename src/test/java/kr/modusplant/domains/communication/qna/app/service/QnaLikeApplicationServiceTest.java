@@ -1,6 +1,8 @@
 package kr.modusplant.domains.communication.qna.app.service;
 
 import kr.modusplant.domains.communication.common.app.http.response.LikeResponse;
+import kr.modusplant.domains.communication.common.error.LikeExistsException;
+import kr.modusplant.domains.communication.common.error.LikeNotFoundException;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaPostEntityTestUtils;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaLikeEntity;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaLikeId;
@@ -99,8 +101,7 @@ public class QnaLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
         // when & then
         assertThatThrownBy(() ->
                 qnaLikeApplicationService.likeQnaPost(postId, memberId))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Member already liked.");
+                .isInstanceOf(LikeExistsException.class);
     }
 
     @Test
@@ -109,7 +110,6 @@ public class QnaLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
         // when & then
         assertThatThrownBy(() ->
                 qnaLikeApplicationService.unlikeQnaPost(postId, memberId))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Member not liked.");
+                .isInstanceOf(LikeNotFoundException.class);
     }
 }
