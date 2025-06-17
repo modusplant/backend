@@ -1,7 +1,6 @@
 package kr.modusplant.global.middleware.security.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.v3.oas.models.PathItem;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
@@ -25,7 +24,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;

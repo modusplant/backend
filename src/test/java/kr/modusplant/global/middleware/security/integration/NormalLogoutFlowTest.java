@@ -1,11 +1,7 @@
 package kr.modusplant.global.middleware.security.integration;
 
-import io.jsonwebtoken.Jwts;
 import kr.modusplant.global.middleware.security.config.SecurityConfig;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
-import kr.modusplant.modules.jwt.app.service.TokenProvider;
-import kr.modusplant.modules.jwt.domain.service.TokenValidationService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,10 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.security.*;
-import java.util.Date;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
