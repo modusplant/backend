@@ -4,6 +4,9 @@ import jakarta.transaction.Transactional;
 import kr.modusplant.domains.member.domain.model.SiteMember;
 import kr.modusplant.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.domains.member.domain.model.SiteMemberRole;
+import kr.modusplant.domains.member.domain.service.SiteMemberAuthValidationService;
+import kr.modusplant.domains.member.domain.service.SiteMemberRoleValidationService;
+import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
@@ -25,8 +28,11 @@ import java.util.List;
 @Transactional
 public class SiteMemberUserDetailsService implements UserDetailsService {
 
+    private final SiteMemberValidationService memberValidationService;
     private final SiteMemberRepository memberRepository;
+    private final SiteMemberAuthValidationService memberAuthValidationService;
     private final SiteMemberAuthRepository memberAuthRepository;
+    private final SiteMemberRoleValidationService memberRoleValidationService;
     private final SiteMemberRoleRepository memberRoleRepository;
     private final SiteMemberEntityToDomainMapper memberEntityToDomainMapper;
     private final SiteMemberAuthEntityToDomainMapper memberAuthEntityToDomainMapper;
@@ -35,17 +41,17 @@ public class SiteMemberUserDetailsService implements UserDetailsService {
     @Override
     public SiteMemberUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
+        memberAuthValidationService.validateNotFoundEmailAndAuthProvider(email, AuthProvider.BASIC);
         SiteMemberAuth memberAuth = memberAuthEntityToDomainMapper.toSiteMemberAuth(
-                memberAuthRepository.findByEmailAndProvider(email, AuthProvider.BASIC)
-                        .orElseThrow(() -> new IllegalStateException("no user auth")));
+                memberAuthRepository.findByEmailAndProvider(email, AuthProvider.BASIC).get());
 
+        memberValidationService.validateNotFoundUuid(memberAuth.getActiveMemberUuid());
         SiteMember member = memberEntityToDomainMapper.toSiteMember(
-                memberRepository.findByUuid(memberAuth.getActiveMemberUuid())
-                        .orElseThrow(() -> new IllegalStateException("no user")));
+                memberRepository.findByUuid(memberAuth.getActiveMemberUuid()).get());
 
+        memberRoleValidationService.validateNotFoundUuid(memberAuth.getActiveMemberUuid());
         SiteMemberRole memberRole = memberRoleEntityToDomainMapper.toSiteMemberRole(
-                memberRoleRepository.findByUuid(memberAuth.getActiveMemberUuid())
-                        .orElseThrow(() -> new IllegalStateException("no user role")));
+                memberRoleRepository.findByUuid(memberAuth.getActiveMemberUuid()).get());
 
         return SiteMemberUserDetails.builder()
                 .email(memberAuth.getEmail())
