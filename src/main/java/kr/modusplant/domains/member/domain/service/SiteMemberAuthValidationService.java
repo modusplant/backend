@@ -53,6 +53,15 @@ public class SiteMemberAuthValidationService {
         }
     }
 
+    public void validateNotFoundEmailAndAuthProvider(String email, AuthProvider authProvider) {
+        if (email == null || authProvider == null) {
+            return;
+        }
+        if (!memberAuthRepository.existsByEmailAndProvider(email, authProvider)) {
+            throw new EntityNotFoundException(getFormattedExceptionMessage(EXISTED_ENTITY.getValue(), "email", email, "authProvider", authProvider, SiteMemberEntity.class));
+        }
+    }
+
     public void validateNotFoundEmail(String email) {
         if (!memberAuthRepository.existsByEmail(email)) {
             throw new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY, EMAIL, email, SiteMemberAuthEntity.class));
