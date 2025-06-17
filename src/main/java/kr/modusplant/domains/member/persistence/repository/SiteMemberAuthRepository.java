@@ -32,6 +32,8 @@ public interface SiteMemberAuthRepository extends LastModifiedAtRepository<SiteM
 
     Optional<SiteMemberAuthEntity> findByProviderAndProviderId(AuthProvider provider, String providerId);
 
+    boolean existsByEmailAndProvider(String email, AuthProvider authProvider);
+
     boolean existsByEmail(String email);
 
     boolean existsByOriginalMember(SiteMemberEntity originalMember);
