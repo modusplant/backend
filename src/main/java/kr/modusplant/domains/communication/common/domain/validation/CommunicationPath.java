@@ -4,7 +4,6 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import org.hibernate.validator.constraints.Length;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @NotBlank(message = "경로가 비어 있습니다.")
-@Pattern(regexp = "^(\\d+\\.)+$", message = "경로 서식이 올바르지 않습니다.")
+@Pattern(regexp = "^\\d+(?:\\.\\d+)*$", message = "경로 서식이 올바르지 않습니다.")
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)

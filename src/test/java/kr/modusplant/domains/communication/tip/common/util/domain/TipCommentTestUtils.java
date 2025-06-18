@@ -13,7 +13,7 @@ public interface TipCommentTestUtils {
 
     TipComment tipCommentWithPostUlidAndPath = TipComment.builder()
             .postUlid(tipPostWithUlid.getUlid())
-            .path("1.6.2.")
+            .path("1.6.2")
             .authMemberUuid(memberBasicUserWithUuid.getUuid())
             .createMemberUuid(memberBasicUserWithUuid.getUuid())
             .content("테스트 댓글 내용")
