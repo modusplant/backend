@@ -16,12 +16,12 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.io.IOException;
 
-public class NormalLoginFilter extends AbstractAuthenticationProcessingFilter {
+public class EmailPasswordAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     private final ObjectMapper objectMapper;
     private final AuthenticationManager authManager;
 
-    public NormalLoginFilter(
+    public EmailPasswordAuthenticationFilter(
             ObjectMapper objectMapper,
             AuthenticationManager authManager) {
         super(new AntPathRequestMatcher("/api/auth/login", HttpMethod.POST.name()));

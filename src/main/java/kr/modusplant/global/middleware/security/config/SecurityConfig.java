@@ -5,7 +5,7 @@ import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.advice.GlobalExceptionHandler;
 import kr.modusplant.global.middleware.security.SiteMemberAuthProvider;
 import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
-import kr.modusplant.global.middleware.security.filter.NormalLoginFilter;
+import kr.modusplant.global.middleware.security.filter.EmailPasswordAuthenticationFilter;
 import kr.modusplant.global.middleware.security.handler.JwtClearingLogoutHandler;
 import kr.modusplant.global.middleware.security.handler.WriteResponseLoginFailureHandler;
 import kr.modusplant.global.middleware.security.handler.ForwardRequestLoginSuccessHandler;
@@ -90,16 +90,16 @@ public class SecurityConfig {
         return new ForwardRequestLogoutSuccessHandler(objectMapper); }
 
     @Bean
-    public NormalLoginFilter normalLoginFilter(HttpSecurity http) {
+    public EmailPasswordAuthenticationFilter emailPasswordAuthenticationFilter(HttpSecurity http) {
         try {
-            NormalLoginFilter normalLoginFilter = new NormalLoginFilter(
+            EmailPasswordAuthenticationFilter emailPasswordAuthenticationFilter = new EmailPasswordAuthenticationFilter(
                     new ObjectMapper(), authenticationManager());
 
-            normalLoginFilter.setAuthenticationManager(authenticationManager());
-            normalLoginFilter.setAuthenticationSuccessHandler(normalLoginSuccessHandler());
-            normalLoginFilter.setAuthenticationFailureHandler(normalLoginFailureHandler());
+            emailPasswordAuthenticationFilter.setAuthenticationManager(authenticationManager());
+            emailPasswordAuthenticationFilter.setAuthenticationSuccessHandler(normalLoginSuccessHandler());
+            emailPasswordAuthenticationFilter.setAuthenticationFailureHandler(normalLoginFailureHandler());
 
-            return normalLoginFilter;
+            return emailPasswordAuthenticationFilter;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -110,7 +110,7 @@ public class SecurityConfig {
         http
                 .securityMatcher("/api/**")
                 .cors(Customizer.withDefaults())
-                .addFilterBefore(normalLoginFilter(http), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(emailPasswordAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/v1/conversation/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/qna/**").permitAll()
