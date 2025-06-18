@@ -3,6 +3,7 @@ package kr.modusplant.modules.auth.social.app.service;
 import kr.modusplant.modules.auth.social.app.dto.KakaoUserInfo;
 import kr.modusplant.modules.auth.social.app.service.supers.SocialAuthClient;
 import kr.modusplant.modules.auth.social.error.OAuthException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,15 +17,17 @@ import org.springframework.web.client.RestClient;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class KakaoAuthClient implements SocialAuthClient {
-    private RestClient restClient;
+    private final RestClient.Builder restClientBuilder;
+
     @Value("${kakao.api-key}")
     private String KAKAO_API_KEY;
     @Value("${kakao.redirect-uri}")
     private String KAKAO_REDIRECT_URI;
 
     public String getAccessToken(String code) {
-        restClient = RestClient.builder()
+        RestClient restClient = restClientBuilder
                 .baseUrl("https://kauth.kakao.com")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .build();
@@ -49,7 +52,7 @@ public class KakaoAuthClient implements SocialAuthClient {
     }
 
     public KakaoUserInfo getUserInfo(String accessToken) {
-        restClient = RestClient.builder()
+        RestClient restClient = restClientBuilder
                 .baseUrl("https://kapi.kakao.com")
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer "+accessToken)
                 .build();
