@@ -17,16 +17,8 @@ public abstract class AbstractPostValidationService {
         }
     }
 
-    protected void validateTitle(String title) {
-        if (title == null || title.isBlank() || title.length() > 150) {
-            throw new IllegalArgumentException("제목이 비어있거나 150자를 초과하였습니다.");
-        }
-    }
-
     protected void validateContentAndOrderInfo(List<MultipartFile> content, List<FileOrder> orderInfo) {
-        boolean contentEmpty = content == null || content.isEmpty();
-        boolean orderInfoEmpty = orderInfo==null || orderInfo.isEmpty();
-        if (contentEmpty || orderInfoEmpty || isContentNotValid(content,orderInfo)) {
+        if (isContentNotValid(content,orderInfo)) {
             throw new IllegalArgumentException("컨텐츠 또는 순서 정보가 비어 있거나 그들의 파일명의 크기 혹은 순서가 일치하지 않습니다.");
         }
     }

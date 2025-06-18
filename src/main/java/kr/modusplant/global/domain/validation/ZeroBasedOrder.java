@@ -1,4 +1,4 @@
-package kr.modusplant.domains.communication.common.domain.validation;
+package kr.modusplant.global.domain.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CommunicationOrder {
+public @interface ZeroBasedOrder {
     String message() default "순서에서 오류가 발생했습니다.";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};

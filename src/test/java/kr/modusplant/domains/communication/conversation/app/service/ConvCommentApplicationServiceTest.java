@@ -1,6 +1,6 @@
 package kr.modusplant.domains.communication.conversation.app.service;
 
-import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvCommentInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.response.ConvCommentResponse;
 import kr.modusplant.domains.communication.conversation.common.util.app.http.request.ConvCommentInsertRequestTestUtils;
@@ -30,7 +30,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-@DomainsServiceOnlyContext
+@DomainsServiceWithoutValidationServiceContext
 @Transactional
 public class ConvCommentApplicationServiceTest implements
         ConvCommentEntityTestUtils, ConvCommentInsertRequestTestUtils, ConvCommentResponseTestUtils,

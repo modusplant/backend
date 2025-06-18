@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static kr.modusplant.domains.member.vo.MemberUuid.SNAKE_MEMB_UUID;
-import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_REFRESH_TOKEN;
+import static kr.modusplant.global.vo.DatabaseFieldName.REFRESH_TOKEN;
 
 @Entity
-@Table(name = SNAKE_REFRESH_TOKEN)
+@Table(name = REFRESH_TOKEN)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RefreshTokenEntity {
@@ -29,7 +29,7 @@ public class RefreshTokenEntity {
     @JoinColumn(nullable = false, name = SNAKE_MEMB_UUID, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity member;
 
-    @Column(name = SNAKE_REFRESH_TOKEN, nullable = false)
+    @Column(name = REFRESH_TOKEN, nullable = false)
     private String refreshToken;
 
     @Column(name = "issued_at", nullable = false)

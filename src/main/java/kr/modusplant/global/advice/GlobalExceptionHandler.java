@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import kr.modusplant.global.app.http.response.DataResponse;
 import kr.modusplant.global.error.DomainException;
 import kr.modusplant.modules.auth.social.error.OAuthException;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.util.Set;
 
 import static kr.modusplant.global.enums.ResponseCode.BAD_REQUEST;
 import static kr.modusplant.global.enums.ResponseCode.INTERNAL_SERVER_ERROR;
@@ -55,8 +59,8 @@ public class GlobalExceptionHandler {
 
     // 메소드의 타입과 요청 값의 타입이 불일치하는 경우
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<DataResponse<Void>> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ignoredEx) {
-        DataResponse<Void> errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "TYPE_MISMATCH", "서식이 올바르지 않아 값을 처리할 수 없습니다.");
+    public ResponseEntity<DataResponse<Void>> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        DataResponse<Void> errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "TYPE_MISMATCH", ex.getName() + "의 서식이 올바르지 않아 값을 처리할 수 없습니다.");
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
@@ -64,14 +68,22 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<DataResponse<Void>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         FieldError fieldError = ex.getBindingResult().getFieldErrors().getFirst();
-        DataResponse<Void> errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "CONSTRAINT_VIOLATION", fieldError.getDefaultMessage());
+        DataResponse<Void> errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "VALIDATION_FAILED", fieldError.getDefaultMessage());
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    // 검증이 실패한 경우
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<DataResponse<Void>> handleConstraintViolationException(ConstraintViolationException ex) {
+        Set<ConstraintViolation<?>> constraintViolations = ex.getConstraintViolations();
+        DataResponse<Void> errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "VALIDATION_FAILED", constraintViolations.iterator().next().getMessage());
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
     // 메서드의 인자가 유효하지 않은 값일 경우
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<DataResponse<Void>> handleIllegalArgumentException(IllegalArgumentException ex) {
-        DataResponse<Void> errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "CONSTRAINT_VIOLATION", ex.getMessage());
+        DataResponse<Void> errorResponse = DataResponse.of(HttpStatus.BAD_REQUEST.value(), "VALIDATION_FAILED", ex.getMessage());
         return ResponseEntity.badRequest().body(errorResponse);
     }
 

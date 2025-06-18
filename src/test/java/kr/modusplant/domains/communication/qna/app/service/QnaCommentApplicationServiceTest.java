@@ -1,6 +1,6 @@
 package kr.modusplant.domains.communication.qna.app.service;
 
-import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaCommentInsertRequest;
 import kr.modusplant.domains.communication.qna.app.http.response.QnaCommentResponse;
 import kr.modusplant.domains.communication.qna.common.util.app.http.request.QnaCommentInsertRequestTestUtils;
@@ -30,7 +30,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-@DomainsServiceOnlyContext
+@DomainsServiceWithoutValidationServiceContext
 @Transactional
 public class QnaCommentApplicationServiceTest implements
         QnaCommentEntityTestUtils, QnaCommentInsertRequestTestUtils, QnaCommentResponseTestUtils,

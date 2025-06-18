@@ -60,6 +60,7 @@ public class QnaPostApplicationService {
     }
 
     public Page<QnaPostResponse> getByMemberUuid(UUID memberUuid, Pageable pageable) {
+        siteMemberValidationService.validateNotFoundUuid(memberUuid);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
         return qnaPostRepository.findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(siteMember, pageable).map(entity -> {
             try {
@@ -72,6 +73,7 @@ public class QnaPostApplicationService {
     }
 
     public Page<QnaPostResponse> getByCategoryUuid(UUID categoryUuid, Pageable pageable) {
+        qnaCategoryValidationService.validateNotFoundUuid(categoryUuid);
         QnaCategoryEntity qnaCategory = qnaCategoryRepository.findByUuid(categoryUuid).orElseThrow();
         return qnaPostRepository.findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(qnaCategory, pageable).map(entity -> {
             try {
@@ -95,6 +97,7 @@ public class QnaPostApplicationService {
     }
 
     public Optional<QnaPostResponse> getByUlid(String ulid) {
+        qnaPostValidationService.validateNotFoundUlid(ulid);
         return qnaPostRepository.findByUlid(ulid)
                 .map(qnaPost -> {
                     try {

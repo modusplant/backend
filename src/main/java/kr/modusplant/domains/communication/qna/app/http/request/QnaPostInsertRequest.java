@@ -1,7 +1,9 @@
 package kr.modusplant.domains.communication.qna.app.http.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.communication.common.app.http.request.FileOrder;
+import kr.modusplant.domains.communication.common.domain.validation.CommunicationTitle;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -12,11 +14,14 @@ public record QnaPostInsertRequest(
         UUID categoryUuid,
 
         @Schema(description = "게시글의 제목", example = "이거 과습인가요?")
+        @CommunicationTitle
         String title,
 
         @Schema(description = "게시글 컨텐츠")
+        @NotNull(message = "게시글이 비어 있습니다.")
         List<MultipartFile> content,
 
         @Schema(description = "게시글에 속한 파트들의 순서에 대한 정보")
+        @NotNull(message = "순서 정보가 비어 있습니다.")
         List<FileOrder> orderInfo) {
 }

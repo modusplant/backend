@@ -3,6 +3,7 @@ package kr.modusplant.domains.communication.conversation.app.service;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvCommentInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.response.ConvCommentResponse;
 import kr.modusplant.domains.communication.conversation.domain.service.ConvCommentValidationService;
+import kr.modusplant.domains.communication.conversation.domain.service.ConvPostValidationService;
 import kr.modusplant.domains.communication.conversation.mapper.ConvCommentAppInfraMapper;
 import kr.modusplant.domains.communication.conversation.mapper.ConvCommentAppInfraMapperImpl;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCommentEntity;
@@ -28,6 +29,7 @@ import java.util.UUID;
 public class ConvCommentApplicationService {
 
     private final ConvCommentValidationService convCommentValidationService;
+    private final ConvPostValidationService convPostValidationService;
     private final SiteMemberValidationService memberValidationService;
     private final ConvCommentAppInfraMapper convCommentAppInfraMapper = new ConvCommentAppInfraMapperImpl();
     private final ConvCommentRepository convCommentRepository;
@@ -40,13 +42,16 @@ public class ConvCommentApplicationService {
     }
 
     public List<ConvCommentResponse> getByPostEntity(ConvPostEntity requestPostEntity) {
-        ConvPostEntity postEntity = convPostRepository.findByUlid(requestPostEntity.getUlid()).orElseThrow();
+        String ulid = requestPostEntity.getUlid();
+        convPostValidationService.validateNotFoundUlid(ulid);
+        ConvPostEntity postEntity = convPostRepository.findByUlid(ulid).orElseThrow();
 
         return convCommentRepository.findByPostEntity(postEntity)
                 .stream().map(convCommentAppInfraMapper::toConvCommentResponse).toList();
     }
 
     public List<ConvCommentResponse> getByAuthMember(SiteMemberEntity authMember) {
+        memberValidationService.validateNotFoundUuid(authMember.getUuid());
         SiteMemberEntity memberEntity = memberRepository.findByUuid(authMember.getUuid()).orElseThrow();
 
         return convCommentRepository.findByAuthMember(memberEntity)
@@ -54,6 +59,7 @@ public class ConvCommentApplicationService {
     }
 
     public List<ConvCommentResponse> getByCreateMember(SiteMemberEntity createMember) {
+        memberValidationService.validateNotFoundUuid(createMember.getUuid());
         SiteMemberEntity memberEntity = memberRepository.findByUuid(createMember.getUuid()).orElseThrow();
 
         return convCommentRepository.findByCreateMember(memberEntity)
@@ -66,6 +72,7 @@ public class ConvCommentApplicationService {
     }
 
     public Optional<ConvCommentResponse> getByPostUlidAndPath(String postUlid, String path) {
+        convPostValidationService.validateNotFoundUlid(postUlid);
         return Optional.of(
                 convCommentAppInfraMapper.toConvCommentResponse(
                         convCommentRepository.findByPostUlidAndPath(postUlid, path).orElseThrow()

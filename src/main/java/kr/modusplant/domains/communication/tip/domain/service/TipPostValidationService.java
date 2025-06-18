@@ -24,13 +24,11 @@ public class TipPostValidationService extends AbstractPostValidationService {
 
     public void validateTipPostInsertRequest(TipPostInsertRequest request) {
         validateNotFoundCategoryUuid(request.categoryUuid(), tipCategoryRepository);
-        validateTitle(request.title());
         validateContentAndOrderInfo(request.content(),request.orderInfo());
     }
 
     public void validateTipPostUpdateRequest(TipPostUpdateRequest request) {
         validateNotFoundCategoryUuid(request.categoryUuid(), tipCategoryRepository);
-        validateTitle(request.title());
         validateContentAndOrderInfo(request.content(),request.orderInfo());
     }
 

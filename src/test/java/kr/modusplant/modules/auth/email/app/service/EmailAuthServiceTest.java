@@ -160,7 +160,7 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
         // expect
         assertThatThrownBy(() -> emailAuthService.verifyResetPasswordCode(request))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Verification code is invalid");
+                .hasMessageContaining("코드를 잘못 입력하였습니다.");
     }
 
     @Test
@@ -177,6 +177,6 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
         // expect
         assertThatThrownBy(() -> emailAuthService.verifyResetPasswordCode(request))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Verification code is invalid");
+                .hasMessageContaining("코드를 잘못 입력하였습니다.");
     }
 }

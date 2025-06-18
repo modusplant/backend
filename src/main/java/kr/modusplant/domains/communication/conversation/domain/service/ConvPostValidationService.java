@@ -24,13 +24,11 @@ public class ConvPostValidationService extends AbstractPostValidationService {
 
     public void validateConvPostInsertRequest(ConvPostInsertRequest request) {
         validateNotFoundCategoryUuid(request.categoryUuid(), convCategoryRepository);
-        validateTitle(request.title());
         validateContentAndOrderInfo(request.content(),request.orderInfo());
     }
 
     public void validateConvPostUpdateRequest(ConvPostUpdateRequest request) {
         validateNotFoundCategoryUuid(request.categoryUuid(), convCategoryRepository);
-        validateTitle(request.title());
         validateContentAndOrderInfo(request.content(),request.orderInfo());
     }
 

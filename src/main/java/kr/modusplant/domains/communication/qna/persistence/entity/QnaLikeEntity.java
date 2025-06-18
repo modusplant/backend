@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static kr.modusplant.domains.member.vo.MemberUuid.SNAKE_MEMB_UUID;
-import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_CREATED_AT;
+import static kr.modusplant.global.vo.DatabaseFieldName.CREATED_AT;
 import static kr.modusplant.global.vo.TableName.QNA_LIKE;
 
 @Entity
@@ -29,7 +29,7 @@ public class QnaLikeEntity {
     @Column(name = SNAKE_MEMB_UUID, nullable = false)
     private UUID memberId;
 
-    @Column(name = SNAKE_CREATED_AT, nullable = false, updatable = false)
+    @Column(name = CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 

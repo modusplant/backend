@@ -2,12 +2,14 @@ package kr.modusplant.domains.communication.qna.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.communication.common.domain.validation.CommunicationCategory;
-import kr.modusplant.domains.communication.common.domain.validation.CommunicationOrder;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaCategoryInsertRequest;
 import kr.modusplant.domains.communication.qna.app.http.response.QnaCategoryResponse;
 import kr.modusplant.domains.communication.qna.app.service.QnaCategoryApplicationService;
 import kr.modusplant.global.app.http.response.DataResponse;
+import kr.modusplant.global.domain.validation.ZeroBasedOrder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ import java.util.UUID;
 @Primary
 @RequestMapping("/api/v1/qna/categories")
 @RequiredArgsConstructor
+@Validated
 public class QnaCategoryController {
     private final QnaCategoryApplicationService qnaCategoryApplicationService;
 
@@ -40,7 +43,9 @@ public class QnaCategoryController {
             description = "UUID에 맞는 Q&A 항목을 조회합니다."
     )
     @GetMapping("/{uuid}")
-    public ResponseEntity<DataResponse<?>> getQnaCategoryByUuid(@PathVariable UUID uuid) {
+    public ResponseEntity<DataResponse<?>> getQnaCategoryByUuid(@PathVariable
+                                                                @NotNull(message = "식별자가 비어 있습니다.")
+                                                                UUID uuid) {
         Optional<QnaCategoryResponse> optionalQnaCategoryResponse = qnaCategoryApplicationService.getByUuid(uuid);
         if (optionalQnaCategoryResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -53,7 +58,7 @@ public class QnaCategoryController {
             description = "순서에 맞는 Q&A 항목을 조회합니다."
     )
     @GetMapping("/order/{order}")
-    public ResponseEntity<DataResponse<?>> getQnaCategoryByOrder(@PathVariable @CommunicationOrder Integer order) {
+    public ResponseEntity<DataResponse<?>> getQnaCategoryByOrder(@PathVariable @ZeroBasedOrder Integer order) {
         Optional<QnaCategoryResponse> optionalQnaCategoryResponse = qnaCategoryApplicationService.getByOrder(order);
         if (optionalQnaCategoryResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -79,7 +84,7 @@ public class QnaCategoryController {
             description = "순서, 항목 정보로 Q&A 항목을 삽입합니다."
     )
     @PostMapping
-    public ResponseEntity<DataResponse<QnaCategoryResponse>> insertQnaCategory(@RequestBody @Validated QnaCategoryInsertRequest qnaCategoryInsertRequest) {
+    public ResponseEntity<DataResponse<QnaCategoryResponse>> insertQnaCategory(@RequestBody @Valid QnaCategoryInsertRequest qnaCategoryInsertRequest) {
         return ResponseEntity.ok().body(DataResponse.ok(qnaCategoryApplicationService.insert(qnaCategoryInsertRequest)));
     }
 
@@ -88,7 +93,9 @@ public class QnaCategoryController {
             description = "UUID로 Q&A 항목을 제거합니다."
     )
     @DeleteMapping("/{uuid}")
-    public ResponseEntity<DataResponse<?>> removeQnaCategoryByUuid(@PathVariable UUID uuid) {
+    public ResponseEntity<DataResponse<?>> removeQnaCategoryByUuid(@PathVariable
+                                                                   @NotNull(message = "식별자가 비어 있습니다.")
+                                                                   UUID uuid) {
         qnaCategoryApplicationService.removeByUuid(uuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }

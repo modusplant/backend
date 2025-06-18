@@ -1,6 +1,6 @@
 package kr.modusplant.domains.communication.tip.app.service;
 
-import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.domains.communication.tip.app.http.request.TipCommentInsertRequest;
 import kr.modusplant.domains.communication.tip.app.http.response.TipCommentResponse;
 import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipCommentInsertRequestTestUtils;
@@ -30,7 +30,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-@DomainsServiceOnlyContext
+@DomainsServiceWithoutValidationServiceContext
 @Transactional
 public class TipCommentApplicationServiceTest implements
         TipCommentEntityTestUtils, TipCommentInsertRequestTestUtils, TipCommentResponseTestUtils,

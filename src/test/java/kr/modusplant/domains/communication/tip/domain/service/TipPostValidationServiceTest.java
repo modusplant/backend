@@ -69,25 +69,6 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils, TipCatego
     }
 
     @Test
-    @DisplayName("팁 게시글 추가/수정 시 TipPostRequest의 title이 유효하지 않으면 예외 발생")
-    void validateTipPostInsertRequestInvalidTitleTest() {
-        // given & when
-        TipPostInsertRequest tipPostInsertRequest = new TipPostInsertRequest(
-                UUID.randomUUID(),
-                "a".repeat(151),
-                allMediaFiles,
-                allMediaFilesOrder
-        );
-
-        when(tipCategoryRepository.existsByUuid(tipPostInsertRequest.categoryUuid())).thenReturn(true);
-
-        // then
-        assertThrows(IllegalArgumentException.class,
-                () -> tipPostValidationService.validateTipPostInsertRequest(tipPostInsertRequest));
-
-    }
-
-    @Test
     @DisplayName("팁 게시글 추가/수정 시 TipPostRequest의 Content와 OrderInfo가 유효하지 않으면 예외 발생")
     void validateTipPostInsertRequestInvalidContentAndOrderInfoTest() {
         // given & when

@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import static kr.modusplant.global.vo.CamelCaseWord.MEMBER;
-import static kr.modusplant.global.vo.FieldName.*;
+import static kr.modusplant.global.vo.EntityFieldName.*;
 
 @Mapper
 public interface NormalSignUpMemberAppDomainMapper {

@@ -13,7 +13,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_CREATED_AT;
+import static kr.modusplant.global.vo.DatabaseFieldName.CREATED_AT;
 import static kr.modusplant.global.vo.TableName.CONV_CATE;
 
 @Entity
@@ -33,7 +33,7 @@ public class ConvCategoryEntity {
     @Column(name = "\"order\"", nullable = false, updatable = false, unique = true)
     private Integer order;
 
-    @Column(name = SNAKE_CREATED_AT, nullable = false, updatable = false)
+    @Column(name = CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 
