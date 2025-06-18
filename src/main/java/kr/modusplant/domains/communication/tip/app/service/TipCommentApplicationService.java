@@ -66,11 +66,6 @@ public class TipCommentApplicationService {
                 .stream().map(tipCommentAppInfraMapper::toTipCommentResponse).toList();
     }
 
-    public List<TipCommentResponse> getByContent(String content) {
-        return tipCommentRepository.findByContent(content)
-                .stream().map(tipCommentAppInfraMapper::toTipCommentResponse).toList();
-    }
-
     public Optional<TipCommentResponse> getByPostUlidAndPath(String postUlid, String path) {
         tipPostValidationService.validateNotFoundUlid(postUlid);
         return Optional.of(

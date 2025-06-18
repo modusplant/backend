@@ -145,29 +145,6 @@ public class ConvCommentApplicationServiceTest implements
                 .isEqualTo(List.of(commentResponse));
     }
 
-    @DisplayName("댓글 내용으로 댓글 가져오기")
-    @Test
-    void getByContentTest() {
-        // given
-        commentEntity = createConvCommentEntityBuilder()
-                .postEntity(postEntity)
-                .authMember(memberEntity)
-                .createMember(memberEntity)
-                .isDeleted(true)
-                .build();
-
-        ConvCommentResponse commentResponse = createConvCommentResponse(
-                postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname()
-        );
-
-        // when
-        given(commentRepository.findByContent(commentEntity.getContent())).willReturn(List.of(commentEntity));
-
-        // then
-        assertThat(commentApplicationService.getByContent(commentEntity.getContent()))
-                .isEqualTo(List.of(commentResponse));
-    }
-
     @DisplayName("게시글의 ulid와 댓글 경로로 댓글 가져오기")
     @Test
     void getByPostUlidAndPathTest() {

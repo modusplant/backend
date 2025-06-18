@@ -66,11 +66,6 @@ public class QnaCommentApplicationService {
                 .stream().map(qnaCommentAppInfraMapper::toQnaCommentResponse).toList();
     }
 
-    public List<QnaCommentResponse> getByContent(String content) {
-        return qnaCommentRepository.findByContent(content)
-                .stream().map(qnaCommentAppInfraMapper::toQnaCommentResponse).toList();
-    }
-
     public Optional<QnaCommentResponse> getByPostUlidAndPath(String postUlid, String path) {
         qnaPostValidationService.validateNotFoundUlid(postUlid);
         return Optional.of(

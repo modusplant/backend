@@ -66,11 +66,6 @@ public class ConvCommentApplicationService {
                 .stream().map(convCommentAppInfraMapper::toConvCommentResponse).toList();
     }
 
-    public List<ConvCommentResponse> getByContent(String content) {
-        return convCommentRepository.findByContent(content)
-                .stream().map(convCommentAppInfraMapper::toConvCommentResponse).toList();
-    }
-
     public Optional<ConvCommentResponse> getByPostUlidAndPath(String postUlid, String path) {
         convPostValidationService.validateNotFoundUlid(postUlid);
         return Optional.of(
