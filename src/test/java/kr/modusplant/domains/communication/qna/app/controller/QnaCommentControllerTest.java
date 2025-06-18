@@ -126,28 +126,6 @@ public class QnaCommentControllerTest implements
                 .andExpect(jsonPath("$.data[*].nickname").value(memberEntity.getNickname()));
     }
 
-    @DisplayName("댓글 내용으로 댓글 얻기")
-    @Test
-    void getByContentTest() throws Exception {
-        // given
-        QnaCommentResponse commentResponse =
-                createQnaCommentResponse(postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname());
-
-        // when
-        given(commentApplicationService.getByContent(commentResponse.content()))
-                .willReturn(List.of(commentResponse));
-
-        // then
-        mockMvc.perform(get("/api/v1/qna/comments/content/{content}", commentResponse.content()))
-
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data[*].postUlid").value(postEntity.getUlid()))
-                .andExpect(jsonPath("$.data[*].content").value(commentResponse.content()));
-    }
-
     @DisplayName("게시글 ulid와 댓글 경로로 댓글 얻기")
     @Test
     void getByPostAndPathTest() throws Exception {

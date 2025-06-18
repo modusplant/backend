@@ -95,19 +95,6 @@ public class ConvCommentController {
     }
 
     @Operation(
-            summary = "컨텐츠로 대화 댓글 조회 API",
-            description = "컨텐츠에 맞는 대화 댓글을 조회합니다."
-    )
-    @GetMapping("/content/{content}")
-    public ResponseEntity<DataResponse<List<ConvCommentResponse>>> getByContent(
-            @PathVariable(required = false, value = "content")
-            @NotBlank(message = "컨텐츠가 비어 있습니다.")
-            String content) {
-        return ResponseEntity.ok().body(
-                DataResponse.ok(commentApplicationService.getByContent(content)));
-    }
-
-    @Operation(
             summary = "게시글 식별자와 경로로 대화 댓글 조회 API",
             description = "게시글 식별자와 경로에 맞는 대화 댓글을 조회합니다."
     )
