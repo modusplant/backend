@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class FieldName {
+public final class EntityFieldName {
     public static final String ACTIVE_MEMBER = "activeMember";
     public static final String AUTH_MEMBER = "authMember";
     public static final String BIRTH_DATE = "birthDate";

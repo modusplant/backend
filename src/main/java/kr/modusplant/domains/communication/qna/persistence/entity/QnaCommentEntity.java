@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 
 import static kr.modusplant.domains.member.vo.MemberUuid.SNAKE_AUTH_MEMB_UUID;
 import static kr.modusplant.domains.member.vo.MemberUuid.SNAKE_CREA_MEMB_UUID;
-import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_IS_DELETED;
+import static kr.modusplant.global.vo.DatabaseFieldName.IS_DELETED;
 import static kr.modusplant.global.vo.TableName.QNA_COMM;
 
 @Entity
@@ -50,7 +50,7 @@ public class QnaCommentEntity {
     @Column(name = "content", nullable = false, length = 900)
     private String content;
 
-    @Column(name = SNAKE_IS_DELETED, nullable = false)
+    @Column(name = IS_DELETED, nullable = false)
     @DefaultValue
     private Boolean isDeleted;
 

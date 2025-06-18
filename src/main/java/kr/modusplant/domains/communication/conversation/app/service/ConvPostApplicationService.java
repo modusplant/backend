@@ -60,6 +60,7 @@ public class ConvPostApplicationService {
     }
 
     public Page<ConvPostResponse> getByMemberUuid(UUID memberUuid, Pageable pageable) {
+        siteMemberValidationService.validateNotFoundUuid(memberUuid);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
         return convPostRepository.findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(siteMember, pageable).map(entity -> {
             try {
@@ -72,6 +73,7 @@ public class ConvPostApplicationService {
     }
 
     public Page<ConvPostResponse> getByCategoryUuid(UUID categoryUuid, Pageable pageable) {
+        convCategoryValidationService.validateNotFoundUuid(categoryUuid);
         ConvCategoryEntity convCategory = convCategoryRepository.findByUuid(categoryUuid).orElseThrow();
         return convPostRepository.findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(convCategory, pageable).map(entity -> {
             try {
@@ -95,6 +97,7 @@ public class ConvPostApplicationService {
     }
 
     public Optional<ConvPostResponse> getByUlid(String ulid) {
+        convPostValidationService.validateNotFoundUlid(ulid);
         return convPostRepository.findByUlid(ulid)
                 .map(convPost -> {
                     try {

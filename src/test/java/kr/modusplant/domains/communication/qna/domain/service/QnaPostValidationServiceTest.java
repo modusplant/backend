@@ -69,25 +69,6 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils, QnaCatego
     }
 
     @Test
-    @DisplayName("Q&A 게시글 추가/수정 시 QnaPostRequest의 title이 유효하지 않으면 예외 발생")
-    void validateQnaPostInsertRequestInvalidTitleTest() {
-        // given & when
-        QnaPostInsertRequest qnaPostInsertRequest = new QnaPostInsertRequest(
-                UUID.randomUUID(),
-                "a".repeat(151),
-                allMediaFiles,
-                allMediaFilesOrder
-        );
-
-        when(qnaCategoryRepository.existsByUuid(qnaPostInsertRequest.categoryUuid())).thenReturn(true);
-
-        // then
-        assertThrows(IllegalArgumentException.class,
-                () -> qnaPostValidationService.validateQnaPostInsertRequest(qnaPostInsertRequest));
-
-    }
-
-    @Test
     @DisplayName("Q&A 게시글 추가/수정 시 QnaPostRequest의 Content와 OrderInfo가 유효하지 않으면 예외 발생")
     void validateQnaPostInsertRequestInvalidContentAndOrderInfoTest() {
         // given & when

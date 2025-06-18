@@ -24,13 +24,11 @@ public class QnaPostValidationService extends AbstractPostValidationService {
 
     public void validateQnaPostInsertRequest(QnaPostInsertRequest request) {
         validateNotFoundCategoryUuid(request.categoryUuid(), qnaCategoryRepository);
-        validateTitle(request.title());
         validateContentAndOrderInfo(request.content(),request.orderInfo());
     }
 
     public void validateQnaPostUpdateRequest(QnaPostUpdateRequest request) {
         validateNotFoundCategoryUuid(request.categoryUuid(), qnaCategoryRepository);
-        validateTitle(request.title());
         validateContentAndOrderInfo(request.content(),request.orderInfo());
     }
 

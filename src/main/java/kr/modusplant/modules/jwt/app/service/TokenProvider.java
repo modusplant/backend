@@ -21,7 +21,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import static kr.modusplant.global.vo.CamelCaseWord.VERIFY_CODE;
-import static kr.modusplant.global.vo.FieldName.EMAIL;
+import static kr.modusplant.global.vo.EntityFieldName.EMAIL;
 
 @Service
 @RequiredArgsConstructor

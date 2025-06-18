@@ -1,6 +1,6 @@
 package kr.modusplant.domains.communication.tip.app.service;
 
-import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipCategoryRequestTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.app.http.response.TipCategoryResponseTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
-@DomainsServiceOnlyContext
+@DomainsServiceWithoutValidationServiceContext
 class TipCategoryApplicationServiceTest implements TipCategoryRequestTestUtils, TipCategoryResponseTestUtils, TipCategoryEntityTestUtils {
 
     private final TipCategoryApplicationService tipCategoryApplicationService;

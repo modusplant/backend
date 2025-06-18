@@ -2,12 +2,14 @@ package kr.modusplant.domains.communication.conversation.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.communication.common.domain.validation.CommunicationCategory;
-import kr.modusplant.domains.communication.common.domain.validation.CommunicationOrder;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvCategoryInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.response.ConvCategoryResponse;
 import kr.modusplant.domains.communication.conversation.app.service.ConvCategoryApplicationService;
 import kr.modusplant.global.app.http.response.DataResponse;
+import kr.modusplant.global.domain.validation.ZeroBasedOrder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ import java.util.UUID;
 @Primary
 @RequestMapping("/api/v1/conversation/categories")
 @RequiredArgsConstructor
+@Validated
 public class ConvCategoryController {
     private final ConvCategoryApplicationService convCategoryApplicationService;
 
@@ -40,7 +43,9 @@ public class ConvCategoryController {
             description = "식별자에 맞는 대화 항목을 조회합니다."
     )
     @GetMapping("/{uuid}")
-    public ResponseEntity<DataResponse<?>> getConvCategoryByUuid(@PathVariable UUID uuid) {
+    public ResponseEntity<DataResponse<?>> getConvCategoryByUuid(@PathVariable
+                                                                 @NotNull(message = "식별자가 비어 있습니다.")
+                                                                 UUID uuid) {
         Optional<ConvCategoryResponse> optionalConvCategoryResponse = convCategoryApplicationService.getByUuid(uuid);
         if (optionalConvCategoryResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -53,7 +58,7 @@ public class ConvCategoryController {
             description = "순서에 맞는 대화 항목을 조회합니다."
     )
     @GetMapping("/order/{order}")
-    public ResponseEntity<DataResponse<?>> getConvCategoryByOrder(@PathVariable @CommunicationOrder Integer order) {
+    public ResponseEntity<DataResponse<?>> getConvCategoryByOrder(@PathVariable @ZeroBasedOrder Integer order) {
         Optional<ConvCategoryResponse> optionalConvCategoryResponse = convCategoryApplicationService.getByOrder(order);
         if (optionalConvCategoryResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -79,7 +84,7 @@ public class ConvCategoryController {
             description = "순서, 항목 정보로 대화 항목을 삽입합니다."
     )
     @PostMapping
-    public ResponseEntity<DataResponse<ConvCategoryResponse>> insertConvCategory(@RequestBody @Validated ConvCategoryInsertRequest convCategoryInsertRequest) {
+    public ResponseEntity<DataResponse<ConvCategoryResponse>> insertConvCategory(@RequestBody @Valid ConvCategoryInsertRequest convCategoryInsertRequest) {
         return ResponseEntity.ok().body(DataResponse.ok(convCategoryApplicationService.insert(convCategoryInsertRequest)));
     }
 
@@ -88,7 +93,9 @@ public class ConvCategoryController {
             description = "식별자로 대화 항목을 제거합니다."
     )
     @DeleteMapping("/{uuid}")
-    public ResponseEntity<DataResponse<?>> removeConvCategoryByUuid(@PathVariable UUID uuid) {
+    public ResponseEntity<DataResponse<?>> removeConvCategoryByUuid(@PathVariable
+                                                                    @NotNull(message = "식별자가 비어 있습니다.")
+                                                                    UUID uuid) {
         convCategoryApplicationService.removeByUuid(uuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }

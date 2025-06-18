@@ -69,25 +69,6 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils, ConvCat
     }
 
     @Test
-    @DisplayName("대화 게시글 추가/수정 시 ConvPostRequest의 title이 유효하지 않으면 예외 발생")
-    void validateConvPostInsertRequestInvalidTitleTest() {
-        // given & when
-        ConvPostInsertRequest convPostInsertRequest = new ConvPostInsertRequest(
-                UUID.randomUUID(),
-                "a".repeat(151),
-                allMediaFiles,
-                allMediaFilesOrder
-        );
-
-        when(convCategoryRepository.existsByUuid(convPostInsertRequest.categoryUuid())).thenReturn(true);
-
-        // then
-        assertThrows(IllegalArgumentException.class,
-                () -> convPostValidationService.validateConvPostInsertRequest(convPostInsertRequest));
-
-    }
-
-    @Test
     @DisplayName("대화 게시글 추가/수정 시 ConvPostRequest의 Content와 OrderInfo가 유효하지 않으면 예외 발생")
     void validateConvPostInsertRequestInvalidContentAndOrderInfoTest() {
         // given & when

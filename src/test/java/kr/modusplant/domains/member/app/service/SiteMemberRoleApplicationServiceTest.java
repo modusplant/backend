@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.app.service;
 
-import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.domains.member.app.http.request.SiteMemberRoleUpdateRequest;
 import kr.modusplant.domains.member.app.http.response.SiteMemberRoleResponse;
 import kr.modusplant.domains.member.common.util.app.http.request.SiteMemberRequestTestUtils;
@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
-@DomainsServiceOnlyContext
+@DomainsServiceWithoutValidationServiceContext
 class SiteMemberRoleApplicationServiceTest implements SiteMemberRoleRequestTestUtils, SiteMemberRoleResponseTestUtils, SiteMemberRoleEntityTestUtils, SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityTestUtils {
 
     private final SiteMemberRoleApplicationService memberRoleService;

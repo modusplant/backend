@@ -60,6 +60,7 @@ public class TipPostApplicationService {
     }
 
     public Page<TipPostResponse> getByMemberUuid(UUID memberUuid, Pageable pageable) {
+        siteMemberValidationService.validateNotFoundUuid(memberUuid);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
         return tipPostRepository.findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(siteMember, pageable).map(entity -> {
             try {
@@ -72,6 +73,7 @@ public class TipPostApplicationService {
     }
 
     public Page<TipPostResponse> getByCategoryUuid(UUID categoryUuid, Pageable pageable) {
+        tipCategoryValidationService.validateNotFoundUuid(categoryUuid);
         TipCategoryEntity tipCategory = tipCategoryRepository.findByUuid(categoryUuid).orElseThrow();
         return tipPostRepository.findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(tipCategory, pageable).map(entity -> {
             try {
@@ -95,6 +97,7 @@ public class TipPostApplicationService {
     }
 
     public Optional<TipPostResponse> getByUlid(String ulid) {
+        tipPostValidationService.validateNotFoundUlid(ulid);
         return tipPostRepository.findByUlid(ulid)
                 .map(tipPost -> {
                     try {

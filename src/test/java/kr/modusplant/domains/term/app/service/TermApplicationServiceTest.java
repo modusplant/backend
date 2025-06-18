@@ -1,6 +1,6 @@
 package kr.modusplant.domains.term.app.service;
 
-import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.domains.term.app.http.response.TermResponse;
 import kr.modusplant.domains.term.common.util.app.http.request.TermRequestTestUtils;
 import kr.modusplant.domains.term.common.util.app.http.response.TermResponseTestUtils;
@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
-@DomainsServiceOnlyContext
+@DomainsServiceWithoutValidationServiceContext
 class TermApplicationServiceTest implements TermRequestTestUtils, TermResponseTestUtils, TermEntityTestUtils {
 
     private final TermApplicationService termApplicationService;
