@@ -6,7 +6,7 @@ public interface ConvCommentEntityTestUtils extends ConvPostEntityTestUtils {
 
     default ConvCommentEntity.ConvCommentEntityBuilder createConvCommentEntityBuilder() {
         return ConvCommentEntity.builder()
-                .path("1.6.2.")
+                .path("1.6.2")
                 .content("테스트 댓글 내용");
     }
 }
