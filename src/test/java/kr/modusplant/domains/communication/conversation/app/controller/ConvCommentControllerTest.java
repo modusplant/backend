@@ -21,8 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
@@ -156,14 +154,13 @@ public class ConvCommentControllerTest implements
         // given
         ConvCommentResponse commentResponse =
                 createConvCommentResponse(postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname());
-        String encodedPath = URLEncoder.encode(commentResponse.path(), StandardCharsets.UTF_8);
 
         // when
         given(commentApplicationService.getByPostUlidAndPath(postEntity.getUlid(), commentResponse.path()))
                 .willReturn(Optional.of(commentResponse));
 
         // then
-        mockMvc.perform(get("/api/v1/conversation/comments/post/{ulid}/path/{path}", postEntity.getUlid(), encodedPath))
+        mockMvc.perform(get("/api/v1/conversation/comments/post/{ulid}/path/{path}", postEntity.getUlid(), commentResponse.path()))
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
@@ -199,14 +196,11 @@ public class ConvCommentControllerTest implements
     @DisplayName("게시글 ulid와 댓글 경로로 댓글 삭제하기")
     @Test
     void removeConvCommentTest() throws Exception {
-        // given
-        String encodedPath = URLEncoder.encode(convCommentWithPostUlidAndPath.getPath(), StandardCharsets.UTF_8);
-
-        // when
+        // given & when
         doNothing().when(commentApplicationService).removeByPostUlidAndPath(postEntity.getUlid(), convCommentWithPostUlidAndPath.getPath());
 
         // then
-        mockMvc.perform(delete("/api/v1/conversation/comments/post/{ulid}/path/{path}", postEntity.getUlid(), encodedPath))
+        mockMvc.perform(delete("/api/v1/conversation/comments/post/{ulid}/path/{path}", postEntity.getUlid(), convCommentWithPostUlidAndPath.getPath()))
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
