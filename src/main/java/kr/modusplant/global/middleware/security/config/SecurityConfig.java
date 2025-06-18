@@ -6,11 +6,13 @@ import kr.modusplant.global.advice.GlobalExceptionHandler;
 import kr.modusplant.global.middleware.security.SiteMemberAuthProvider;
 import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
 import kr.modusplant.global.middleware.security.filter.EmailPasswordAuthenticationFilter;
-import kr.modusplant.global.middleware.security.handler.JwtClearingLogoutHandler;
-import kr.modusplant.global.middleware.security.handler.WriteResponseLoginFailureHandler;
+import kr.modusplant.global.middleware.security.filter.JwtAuthenticationFilter;
 import kr.modusplant.global.middleware.security.handler.ForwardRequestLoginSuccessHandler;
 import kr.modusplant.global.middleware.security.handler.ForwardRequestLogoutSuccessHandler;
+import kr.modusplant.global.middleware.security.handler.JwtClearingLogoutHandler;
+import kr.modusplant.global.middleware.security.handler.WriteResponseLoginFailureHandler;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
+import kr.modusplant.modules.jwt.app.service.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -45,6 +47,7 @@ public class SecurityConfig {
     private final GlobalExceptionHandler globalExceptionHandler;
     private final SiteMemberUserDetailsService memberUserDetailsService;
     private final ObjectMapper objectMapper;
+    private final TokenProvider tokenProvider;
     private final TokenApplicationService tokenApplicationService;
     private final SiteMemberRepository memberRepository;
 
@@ -90,10 +93,19 @@ public class SecurityConfig {
         return new ForwardRequestLogoutSuccessHandler(objectMapper); }
 
     @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(HttpSecurity http) {
+        try {
+            return new JwtAuthenticationFilter(tokenProvider);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Bean
     public EmailPasswordAuthenticationFilter emailPasswordAuthenticationFilter(HttpSecurity http) {
         try {
             EmailPasswordAuthenticationFilter emailPasswordAuthenticationFilter = new EmailPasswordAuthenticationFilter(
-                    new ObjectMapper(), authenticationManager());
+                    objectMapper, authenticationManager());
 
             emailPasswordAuthenticationFilter.setAuthenticationManager(authenticationManager());
             emailPasswordAuthenticationFilter.setAuthenticationSuccessHandler(normalLoginSuccessHandler());
@@ -110,6 +122,7 @@ public class SecurityConfig {
         http
                 .securityMatcher("/api/**")
                 .cors(Customizer.withDefaults())
+                .addFilterBefore(jwtAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(emailPasswordAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/v1/conversation/**").permitAll()
