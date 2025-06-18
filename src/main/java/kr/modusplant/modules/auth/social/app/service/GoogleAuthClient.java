@@ -3,6 +3,7 @@ package kr.modusplant.modules.auth.social.app.service;
 import kr.modusplant.modules.auth.social.app.dto.GoogleUserInfo;
 import kr.modusplant.modules.auth.social.app.service.supers.SocialAuthClient;
 import kr.modusplant.modules.auth.social.error.OAuthException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,8 +17,10 @@ import org.springframework.web.client.RestClient;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class GoogleAuthClient implements SocialAuthClient {
-    private RestClient restClient;
+    private final RestClient.Builder restClientBuilder;
+
     @Value("${google.api-key}")
     private String GOOGLE_API_KEY;
     @Value("${google.secret}")
@@ -26,7 +29,7 @@ public class GoogleAuthClient implements SocialAuthClient {
     private String GOOGLE_REDIRECT_URI;
 
     public String getAccessToken(String code) {
-        restClient = RestClient.builder()
+        RestClient restClient = restClientBuilder
                 .baseUrl("https://oauth2.googleapis.com")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .build();
@@ -52,7 +55,7 @@ public class GoogleAuthClient implements SocialAuthClient {
     }
 
     public GoogleUserInfo getUserInfo(String accessToken) {
-        restClient = RestClient.builder()
+        RestClient restClient = restClientBuilder
                 .baseUrl("https://www.googleapis.com")
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer "+accessToken)
                 .build();
