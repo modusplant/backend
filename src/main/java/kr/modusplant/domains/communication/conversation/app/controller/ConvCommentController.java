@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import kr.modusplant.domains.communication.common.domain.validation.CommunicationPath;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvCommentInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.response.ConvCommentResponse;
 import kr.modusplant.domains.communication.conversation.app.service.ConvCommentApplicationService;
@@ -18,8 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -119,11 +118,10 @@ public class ConvCommentController {
             String postUlid,
 
             @PathVariable(required = false, value = "path")
-            @NotBlank(message = "경로가 비어 있습니다.")
+            @CommunicationPath
             String path) {
-        String decodedPath = URLDecoder.decode(path, StandardCharsets.UTF_8);
         Optional<ConvCommentResponse> optionalResponse = commentApplicationService
-                .getByPostUlidAndPath(postUlid, decodedPath);
+                .getByPostUlidAndPath(postUlid, path);
 
         return optionalResponse.isPresent() ?
                 ResponseEntity.ok().body(DataResponse.ok(optionalResponse)) :
@@ -150,10 +148,9 @@ public class ConvCommentController {
             String postUlid,
 
             @PathVariable(required = false, value = "path")
-            @NotBlank(message = "경로가 비어 있습니다.")
+            @CommunicationPath
             String path) {
-        String decodedPath = URLDecoder.decode(path, StandardCharsets.UTF_8);
-        commentApplicationService.removeByPostUlidAndPath(postUlid, decodedPath);
+        commentApplicationService.removeByPostUlidAndPath(postUlid, path);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 }
