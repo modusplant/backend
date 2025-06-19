@@ -1,6 +1,8 @@
 package kr.modusplant.domains.communication.tip.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -43,9 +45,14 @@ public class TipCategoryController {
             description = "UUID에 맞는 팁 항목을 조회합니다."
     )
     @GetMapping("/{uuid}")
-    public ResponseEntity<DataResponse<?>> getTipCategoryByUuid(@PathVariable
-                                                                @NotNull(message = "식별자가 비어 있습니다.")
-                                                                UUID uuid) {
+    public ResponseEntity<DataResponse<?>> getTipCategoryByUuid(
+            @Parameter(schema = @Schema(
+                    description = "항목의 식별자",
+                    example = "57d7daad-a62e-4c00-9555-dbfaaefcef46")
+            )
+            @PathVariable(required = false)
+            @NotNull(message = "식별자가 비어 있습니다.")
+            UUID uuid) {
         Optional<TipCategoryResponse> optionalTipCategoryResponse = tipCategoryApplicationService.getByUuid(uuid);
         if (optionalTipCategoryResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -58,7 +65,16 @@ public class TipCategoryController {
             description = "순서에 맞는 팁 항목을 조회합니다."
     )
     @GetMapping("/order/{order}")
-    public ResponseEntity<DataResponse<?>> getTipCategoryByOrder(@PathVariable @ZeroBasedOrder Integer order) {
+    public ResponseEntity<DataResponse<?>> getTipCategoryByOrder(
+            @Parameter(schema = @Schema(
+                    description = "항목이 렌더링되는 순서",
+                    minimum = "0",
+                    maximum = "100",
+                    example = "3")
+            )
+            @PathVariable(required = false)
+            @ZeroBasedOrder
+            Integer order) {
         Optional<TipCategoryResponse> optionalTipCategoryResponse = tipCategoryApplicationService.getByOrder(order);
         if (optionalTipCategoryResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -71,7 +87,15 @@ public class TipCategoryController {
             description = "항목에 맞는 팁 항목을 조회합니다."
     )
     @GetMapping("/category/{category}")
-    public ResponseEntity<DataResponse<?>> getTipCategoryByName(@PathVariable @CommunicationCategory String category) {
+    public ResponseEntity<DataResponse<?>> getTipCategoryByName(
+            @Parameter(schema = @Schema(
+                    description = "항목",
+                    maxLength = 40,
+                    example = "잎상태 + 성장 + 병충해")
+            )
+            @PathVariable(required = false)
+            @CommunicationCategory
+            String category) {
         Optional<TipCategoryResponse> optionalTipCategoryResponse = tipCategoryApplicationService.getByCategory(category);
         if (optionalTipCategoryResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -92,9 +116,14 @@ public class TipCategoryController {
             description = "UUID로 팁 항목을 제거합니다."
     )
     @DeleteMapping("/{uuid}")
-    public ResponseEntity<DataResponse<?>> removeTipCategoryByUuid(@PathVariable
-                                                                   @NotNull(message = "식별자가 비어 있습니다.")
-                                                                   UUID uuid) {
+    public ResponseEntity<DataResponse<?>> removeTipCategoryByUuid(
+            @Parameter(schema = @Schema(
+                    description = "항목의 식별자",
+                    example = "57d7daad-a62e-4c00-9555-dbfaaefcef46")
+            )
+            @PathVariable(required = false)
+            @NotNull(message = "식별자가 비어 있습니다.")
+            UUID uuid) {
         tipCategoryApplicationService.removeByUuid(uuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }

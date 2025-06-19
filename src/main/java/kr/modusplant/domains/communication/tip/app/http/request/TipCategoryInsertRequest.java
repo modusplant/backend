@@ -5,11 +5,20 @@ import kr.modusplant.domains.communication.common.domain.validation.Communicatio
 import kr.modusplant.global.domain.validation.ZeroBasedOrder;
 
 public record TipCategoryInsertRequest(
-        @Schema(description = "팁 항목", example = "삽목 + 포기 나누기")
+        @Schema(
+                description = "팁 항목",
+                maxLength = 40,
+                example = "삽목 + 포기 나누기"
+        )
         @CommunicationCategory
         String category,
 
-        @Schema(description = "팁 항목의 렌더링 순서(0부터 시작)", example = "3")
+        @Schema(
+                description = "팁 항목의 렌더링 순서(0부터 시작)",
+                minimum = "0",
+                maximum = "100",
+                example = "3"
+        )
         @ZeroBasedOrder
         Integer order) {
 }

@@ -29,21 +29,20 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static kr.modusplant.global.vo.CamelCaseWord.DATA;
-import static kr.modusplant.global.vo.DatabaseFieldName.CATE_UUID;
-import static kr.modusplant.global.vo.DatabaseFieldName.ORDER_INFO;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DomainsControllerOnlyContext
 class ConvPostControllerTest implements ConvPostRequestTestUtils, ConvPostResponseTestUtils {
 
     private final MockMvc mockMvc;
 
-    private ConvPostApplicationService convPostApplicationService;
+    private final ConvPostApplicationService convPostApplicationService;
 
     @Autowired
     ConvPostControllerTest(MockMvc mockMvc, ConvPostApplicationService convPostApplicationService) {
@@ -203,7 +202,7 @@ class ConvPostControllerTest implements ConvPostRequestTestUtils, ConvPostRespon
         String title = "Test Post Title";
         MockMultipartFile mockTextFile = (MockMultipartFile) textFile0;
         MockMultipartFile mockImageFile = (MockMultipartFile) imageFile;
-        MockMultipartFile mockOrderInfoPart = new MockMultipartFile(ORDER_INFO, "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(textImageFilesOrder));
+        MockMultipartFile mockOrderInfoPart = new MockMultipartFile("orderInfo", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(textImageFilesOrder));
         
         doNothing().when(convPostApplicationService).insert(any(ConvPostInsertRequest.class), any(UUID.class));
 
@@ -212,7 +211,7 @@ class ConvPostControllerTest implements ConvPostRequestTestUtils, ConvPostRespon
                         .file(mockTextFile)
                         .file(mockImageFile)
                         .file(mockOrderInfoPart)
-                        .param(CATE_UUID, TEST_CATEGORY_UUID.toString())
+                        .param("categoryUuid", TEST_CATEGORY_UUID.toString())
                         .param("title", title)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isOk());
@@ -233,7 +232,7 @@ class ConvPostControllerTest implements ConvPostRequestTestUtils, ConvPostRespon
         String title = "Test Post Title";
         MockMultipartFile mockTextFile = (MockMultipartFile) textFile0;
         MockMultipartFile mockImageFile = (MockMultipartFile) imageFile;
-        MockMultipartFile mockOrderInfoPart = new MockMultipartFile(ORDER_INFO, "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(textImageFilesOrder));
+        MockMultipartFile mockOrderInfoPart = new MockMultipartFile("orderInfo", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(textImageFilesOrder));
 
         doNothing().when(convPostApplicationService).update(any(ConvPostUpdateRequest.class), any(UUID.class));
 
@@ -242,7 +241,7 @@ class ConvPostControllerTest implements ConvPostRequestTestUtils, ConvPostRespon
                         .file(mockTextFile)
                         .file(mockImageFile)
                         .file(mockOrderInfoPart)
-                        .param(CATE_UUID, TEST_CATEGORY_UUID.toString())
+                        .param("categoryUuid", TEST_CATEGORY_UUID.toString())
                         .param("title", title)
                         .with(request -> {
                             request.setMethod("PUT");

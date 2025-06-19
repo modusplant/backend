@@ -10,10 +10,18 @@ import java.util.List;
 import java.util.UUID;
 
 public record QnaPostInsertRequest(
-        @Schema(description = "게시글이 포함된 항목의 식별자", example = "148d6e33-102d-4df4-a4d0-5ff233665548")
+        @Schema(
+                description = "게시글이 포함된 항목의 식별자",
+                example = "148d6e33-102d-4df4-a4d0-5ff233665548"
+        )
+        @NotNull(message = "항목 식별자가 비어 있습니다.")
         UUID categoryUuid,
 
-        @Schema(description = "게시글의 제목", example = "이거 과습인가요?")
+        @Schema(
+                description = "게시글의 제목",
+                maximum = "150",
+                example = "이거 과습인가요?"
+        )
         @CommunicationTitle
         String title,
 
