@@ -130,10 +130,10 @@ public class TipPostController {
     )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> insertTipPost(
-            @RequestPart(CATE_UUID)
+            @RequestParam(CATE_UUID)
             UUID categoryUuid,
 
-            @RequestPart
+            @RequestParam
             @CommunicationTitle
             String title,
 
@@ -155,11 +155,11 @@ public class TipPostController {
     )
     @PutMapping(value = "/{ulid}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> updateTipPost(
-            @RequestPart(CATE_UUID)
+            @RequestParam(CATE_UUID)
             @NotNull(message = "항목 식별자가 비어 있습니다.")
             UUID categoryUuid,
 
-            @RequestPart
+            @RequestParam
             @CommunicationTitle
             String title,
 
