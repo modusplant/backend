@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @NotNull(message = "순서가 비어 있습니다.")
-@Range(min = 1, max = 100, message = "순서는 0부터 100 사이의 값이어야 합니다.")
+@Range(min = 1, max = 100, message = "순서는 1부터 100 사이의 값이어야 합니다.")
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)

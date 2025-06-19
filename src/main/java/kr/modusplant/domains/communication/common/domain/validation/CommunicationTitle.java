@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @NotBlank(message = "제목이 비어 있습니다.")
-@Length(max = 40, message = "제목은 최대 150글자까지 작성할 수 있습니다.")
+@Length(max = 150, message = "제목은 최대 150글자까지 작성할 수 있습니다.")
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
