@@ -51,7 +51,9 @@ public class TipPostController {
             description = "전체 팁 게시글의 목록과 페이지 정보를 조회합니다."
     )
     @GetMapping
-    public ResponseEntity<DataResponse<PostPageResponse<?>>> getAllTipPosts(Pageable pageable) {
+    public ResponseEntity<DataResponse<PostPageResponse<?>>> getAllTipPosts(
+            @NotNull(message = "페이지네이션 정보가 비어 있습니다.")
+            Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.getAll(pageable))));
     }
 
@@ -63,7 +65,10 @@ public class TipPostController {
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getTipPostsByMember(
             @PathVariable(required = false, value = SNAKE_MEMB_UUID)
             @NotNull(message = "회원 식별자가 비어 있습니다.")
-            UUID memberUuid, Pageable pageable) {
+            UUID memberUuid,
+
+            @NotNull(message = "페이지네이션 정보가 비어 있습니다.")
+            Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.getByMemberUuid(memberUuid, pageable))));
     }
 
@@ -75,7 +80,10 @@ public class TipPostController {
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getTipPostsByTipCategory(
             @PathVariable(required = false, value = CATE_UUID)
             @NotNull(message = "항목 식별자가 비어 있습니다.")
-            UUID categoryUuid, Pageable pageable) {
+            UUID categoryUuid,
+
+            @NotNull(message = "페이지네이션 정보가 비어 있습니다.")
+            Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.getByCategoryUuid(categoryUuid, pageable))));
     }
 
@@ -87,7 +95,10 @@ public class TipPostController {
     public ResponseEntity<DataResponse<PostPageResponse<?>>> searchTipPosts(
             @RequestParam
             @NotBlank(message = "키워드가 비어 있습니다.")
-            String keyword, Pageable pageable) {
+            String keyword,
+
+            @NotNull(message = "페이지네이션 정보가 비어 있습니다.")
+            Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.searchByKeyword(keyword, pageable))));
     }
 

@@ -6,6 +6,7 @@ import kr.modusplant.domains.communication.conversation.app.http.request.ConvPos
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostUpdateRequest;
 import kr.modusplant.domains.communication.conversation.app.http.response.ConvPostResponse;
 import kr.modusplant.domains.communication.conversation.domain.service.ConvCategoryValidationService;
+import kr.modusplant.domains.communication.conversation.domain.service.ConvPageableValidationService;
 import kr.modusplant.domains.communication.conversation.domain.service.ConvPostValidationService;
 import kr.modusplant.domains.communication.conversation.mapper.ConvPostAppInfraMapper;
 import kr.modusplant.domains.communication.conversation.mapper.ConvPostAppInfraMapperImpl;
@@ -35,6 +36,7 @@ import java.util.UUID;
 public class ConvPostApplicationService {
 
     private final ConvPostValidationService convPostValidationService;
+    private final ConvPageableValidationService convPageableValidationService;
     private final ConvCategoryValidationService convCategoryValidationService;
     private final SiteMemberValidationService siteMemberValidationService;
     private final MediaContentService mediaContentService;
@@ -49,6 +51,8 @@ public class ConvPostApplicationService {
     private long ttlMinutes;
 
     public Page<ConvPostResponse> getAll(Pageable pageable) {
+        convPageableValidationService.validatePageExistence(pageable);
+        convPageableValidationService.validateNotUnsorted(pageable);
         return convPostRepository.findByIsDeletedFalseOrderByCreatedAtDesc(pageable).map(entity -> {
             try {
                 entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
@@ -61,6 +65,8 @@ public class ConvPostApplicationService {
 
     public Page<ConvPostResponse> getByMemberUuid(UUID memberUuid, Pageable pageable) {
         siteMemberValidationService.validateNotFoundUuid(memberUuid);
+        convPageableValidationService.validatePageExistence(pageable);
+        convPageableValidationService.validateNotUnsorted(pageable);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
         return convPostRepository.findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(siteMember, pageable).map(entity -> {
             try {
@@ -74,6 +80,8 @@ public class ConvPostApplicationService {
 
     public Page<ConvPostResponse> getByCategoryUuid(UUID categoryUuid, Pageable pageable) {
         convCategoryValidationService.validateNotFoundUuid(categoryUuid);
+        convPageableValidationService.validatePageExistence(pageable);
+        convPageableValidationService.validateNotUnsorted(pageable);
         ConvCategoryEntity convCategory = convCategoryRepository.findByUuid(categoryUuid).orElseThrow();
         return convPostRepository.findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(convCategory, pageable).map(entity -> {
             try {
@@ -86,6 +94,8 @@ public class ConvPostApplicationService {
     }
 
     public Page<ConvPostResponse> searchByKeyword(String keyword, Pageable pageable) {
+        convPageableValidationService.validatePageExistence(pageable);
+        convPageableValidationService.validateNotUnsorted(pageable);
         return convPostRepository.searchByTitleOrContent(keyword, pageable).map(entity -> {
             try {
                 entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));

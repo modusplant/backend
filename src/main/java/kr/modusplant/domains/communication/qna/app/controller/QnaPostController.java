@@ -51,7 +51,9 @@ public class QnaPostController {
             description = "전체 Q&A 게시글의 목록과 페이지 정보를 조회합니다."
     )
     @GetMapping
-    public ResponseEntity<DataResponse<PostPageResponse<?>>> getAllQnaPosts(Pageable pageable) {
+    public ResponseEntity<DataResponse<PostPageResponse<?>>> getAllQnaPosts(
+            @NotNull(message = "페이지네이션 정보가 비어 있습니다.")
+            Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(qnaPostApplicationService.getAll(pageable))));
     }
 
@@ -63,7 +65,10 @@ public class QnaPostController {
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getQnaPostsByMember(
             @PathVariable(required = false, value = SNAKE_MEMB_UUID)
             @NotNull(message = "회원 식별자가 비어 있습니다.")
-            UUID memberUuid, Pageable pageable) {
+            UUID memberUuid,
+
+            @NotNull(message = "페이지네이션 정보가 비어 있습니다.")
+            Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(qnaPostApplicationService.getByMemberUuid(memberUuid, pageable))));
     }
 
@@ -75,7 +80,10 @@ public class QnaPostController {
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getQnaPostsByQnaCategory(
             @PathVariable(required = false, value = CATE_UUID)
             @NotNull(message = "항목 식별자가 비어 있습니다.")
-            UUID categoryUuid, Pageable pageable) {
+            UUID categoryUuid,
+
+            @NotNull(message = "페이지네이션 정보가 비어 있습니다.")
+            Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(qnaPostApplicationService.getByCategoryUuid(categoryUuid, pageable))));
     }
 
@@ -87,7 +95,10 @@ public class QnaPostController {
     public ResponseEntity<DataResponse<PostPageResponse<?>>> searchQnaPosts(
             @RequestParam
             @NotBlank(message = "키워드가 비어 있습니다.")
-            String keyword, Pageable pageable) {
+            String keyword,
+
+            @NotNull(message = "페이지네이션 정보가 비어 있습니다.")
+            Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(qnaPostApplicationService.searchByKeyword(keyword, pageable))));
     }
 

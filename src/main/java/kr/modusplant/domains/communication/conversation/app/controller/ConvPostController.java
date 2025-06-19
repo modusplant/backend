@@ -51,7 +51,9 @@ public class ConvPostController {
             description = "전체 대화 게시글과 페이지 정보를 조회합니다."
     )
     @GetMapping
-    public ResponseEntity<DataResponse<PostPageResponse<?>>> getAllConvPosts(Pageable pageable) {
+    public ResponseEntity<DataResponse<PostPageResponse<?>>> getAllConvPosts(
+            @NotNull(message = "페이지네이션 정보가 비어 있습니다.")
+            Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(convPostApplicationService.getAll(pageable))));
     }
 
@@ -63,7 +65,10 @@ public class ConvPostController {
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getConvPostsByMember(
             @PathVariable(required = false, value = SNAKE_MEMB_UUID)
             @NotNull(message = "회원 식별자가 비어 있습니다.")
-            UUID memberUuid, Pageable pageable) {
+            UUID memberUuid,
+
+            @NotNull(message = "페이지네이션 정보가 비어 있습니다.")
+            Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(convPostApplicationService.getByMemberUuid(memberUuid, pageable))));
     }
 
@@ -75,7 +80,10 @@ public class ConvPostController {
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getConvPostsByConvCategory(
             @PathVariable(required = false, value = CATE_UUID)
             @NotNull(message = "항목 식별자가 비어 있습니다.")
-            UUID categoryUuid, Pageable pageable) {
+            UUID categoryUuid,
+
+            @NotNull(message = "페이지네이션 정보가 비어 있습니다.")
+            Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(convPostApplicationService.getByCategoryUuid(categoryUuid, pageable))));
     }
 
@@ -87,7 +95,10 @@ public class ConvPostController {
     public ResponseEntity<DataResponse<PostPageResponse<?>>> searchConvPosts(
             @RequestParam
             @NotBlank(message = "키워드가 비어 있습니다.")
-            String keyword, Pageable pageable) {
+            String keyword,
+
+            @NotNull(message = "페이지네이션 정보가 비어 있습니다.")
+            Pageable pageable) {
         return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(convPostApplicationService.searchByKeyword(keyword, pageable))));
     }
 
