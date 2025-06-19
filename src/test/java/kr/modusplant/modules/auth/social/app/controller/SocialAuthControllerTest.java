@@ -67,7 +67,7 @@ class SocialAuthControllerTest {
                         .content(requestBody))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.data.access_token").value(TEST_ACCESS_TOKEN))
+                .andExpect(jsonPath("$.data.accessToken").value(TEST_ACCESS_TOKEN))
                 .andExpect(header().exists("Set-Cookie"))
                 .andExpect(cookie().exists("refresh_token"));
     }
@@ -90,7 +90,7 @@ class SocialAuthControllerTest {
                         .content(requestBody))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.data.access_token").value(TEST_ACCESS_TOKEN))
+                .andExpect(jsonPath("$.data.accessToken").value(TEST_ACCESS_TOKEN))
                 .andExpect(header().exists("Set-Cookie"))
                 .andExpect(cookie().exists("refresh_token"));
     }

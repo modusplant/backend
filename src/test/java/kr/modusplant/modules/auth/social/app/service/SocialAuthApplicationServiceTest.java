@@ -117,7 +117,7 @@ class SocialAuthApplicationServiceTest implements SiteMemberEntityTestUtils, Sit
         // when & then
         assertThatThrownBy(() -> socialAuthApplicationService.handleSocialLogin(AuthProvider.BASIC, code))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Unsupported social login method");
+                .hasMessage("이 방법은 지원되지 않습니다.");
     }
 
     @Test
