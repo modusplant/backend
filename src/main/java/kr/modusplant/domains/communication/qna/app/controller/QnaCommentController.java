@@ -1,6 +1,8 @@
 package kr.modusplant.domains.communication.qna.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -55,6 +57,10 @@ public class QnaCommentController {
     )
     @GetMapping("/post/{ulid}")
     public ResponseEntity<DataResponse<List<QnaCommentResponse>>> getByPost(
+            @Parameter(schema = @Schema(
+                    description = "해당 댓글이 달린 게시글의 식별자",
+                    example = "01JY3PPG5YJ41H7BPD0DSQW2RD")
+            )
             @PathVariable(required = false, value = "ulid")
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String ulid) {
@@ -70,6 +76,10 @@ public class QnaCommentController {
     )
     @GetMapping("/member/auth/{uuid}")
     public ResponseEntity<DataResponse<List<QnaCommentResponse>>> getByAuthMember(
+            @Parameter(schema = @Schema(
+                    description = "회원의 식별자",
+                    example = "038ae842-3c93-484f-b526-7c4645a195a7")
+            )
             @PathVariable(required = false, value = "uuid")
             @NotNull(message = "회원 식별자가 비어 있습니다.")
             UUID authMemberUuid) {
@@ -85,6 +95,10 @@ public class QnaCommentController {
     )
     @GetMapping("/member/create/{uuid}")
     public ResponseEntity<DataResponse<List<QnaCommentResponse>>> getByCreateMember(
+            @Parameter(schema = @Schema(
+                    description = "회원의 식별자",
+                    example = "038ae842-3c93-484f-b526-7c4645a195a7")
+            )
             @PathVariable(required = false, value = "uuid")
             @NotNull(message = "회원 식별자가 비어 있습니다.")
             UUID createMemberUuid) {
@@ -100,10 +114,19 @@ public class QnaCommentController {
     )
     @GetMapping("/post/{ulid}/path/{path}")
     public ResponseEntity<DataResponse<?>> getByPostAndPath(
+            @Parameter(schema = @Schema(
+                    description = "해당 댓글이 달린 게시글의 식별자",
+                    example = "01JY3PPG5YJ41H7BPD0DSQW2RD")
+            )
             @PathVariable(required = false, value = "ulid")
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid,
 
+            @Parameter(schema = @Schema(
+                    description = "댓글의 구체화된 경로",
+                    pattern = "^\\d+(?:\\.\\d+)*$",
+                    example = "4.8.12")
+            )
             @PathVariable(required = false, value = "path")
             @CommunicationPath
             String path) {
@@ -130,10 +153,19 @@ public class QnaCommentController {
     )
     @DeleteMapping("/post/{ulid}/path/{path}")
     public ResponseEntity<DataResponse<?>> removeQnaComment(
+            @Parameter(schema = @Schema(
+                    description = "해당 댓글이 달린 게시글의 식별자",
+                    example = "01JY3PPG5YJ41H7BPD0DSQW2RD")
+            )
             @PathVariable(required = false, value = "ulid")
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid,
 
+            @Parameter(schema = @Schema(
+                    description = "댓글의 구체화된 경로",
+                    pattern = "^\\d+(?:\\.\\d+)*$",
+                    example = "4.8.12")
+            )
             @PathVariable(required = false, value = "path")
             @CommunicationPath
             String path) {

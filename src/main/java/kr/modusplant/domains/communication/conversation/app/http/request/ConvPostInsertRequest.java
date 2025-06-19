@@ -10,10 +10,18 @@ import java.util.List;
 import java.util.UUID;
 
 public record ConvPostInsertRequest(
-        @Schema(description = "게시글이 포함된 항목의 식별자", example = "5f989e30-b0b8-4e59-a733-f7b5c8d901f8")
+        @Schema(
+                description = "게시글이 포함된 항목의 식별자",
+                example = "5f989e30-b0b8-4e59-a733-f7b5c8d901f8"
+        )
+        @NotNull(message = "항목 식별자가 비어 있습니다.")
         UUID categoryUuid,
 
-        @Schema(description = "게시글의 제목", example = "우리 집 식물 구경하세요~")
+        @Schema(
+                description = "게시글의 제목",
+                maximum = "150",
+                example = "우리 집 식물 구경하세요~"
+        )
         @CommunicationTitle
         String title,
 

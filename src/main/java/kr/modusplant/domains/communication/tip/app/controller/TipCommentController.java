@@ -1,6 +1,8 @@
 package kr.modusplant.domains.communication.tip.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -55,6 +57,10 @@ public class TipCommentController {
     )
     @GetMapping("/post/{ulid}")
     public ResponseEntity<DataResponse<List<TipCommentResponse>>> getByPost(
+            @Parameter(schema = @Schema(
+                    description = "해당 댓글이 달린 게시글의 식별자",
+                    example = "01JY3PPXRH2QVWT0B8CPKA4TS1")
+            )
             @PathVariable(required = false, value = "ulid")
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String ulid) {
@@ -70,6 +76,10 @@ public class TipCommentController {
     )
     @GetMapping("/member/auth/{uuid}")
     public ResponseEntity<DataResponse<List<TipCommentResponse>>> getByAuthMember(
+            @Parameter(schema = @Schema(
+                    description = "회원의 식별자",
+                    example = "2ae593ee-c9af-412a-a62d-351bf07282dd")
+            )
             @PathVariable(required = false, value = "uuid")
             @NotNull(message = "회원 식별자가 비어 있습니다.")
             UUID authMemberUuid) {
@@ -85,6 +95,10 @@ public class TipCommentController {
     )
     @GetMapping("/member/create/{uuid}")
     public ResponseEntity<DataResponse<List<TipCommentResponse>>> getByCreateMember(
+            @Parameter(schema = @Schema(
+                    description = "회원의 식별자",
+                    example = "2ae593ee-c9af-412a-a62d-351bf07282dd")
+            )
             @PathVariable(required = false, value = "uuid")
             @NotNull(message = "회원 식별자가 비어 있습니다.")
             UUID createMemberUuid) {
@@ -100,10 +114,19 @@ public class TipCommentController {
     )
     @GetMapping("/post/{ulid}/path/{path}")
     public ResponseEntity<DataResponse<?>> getByPostAndPath(
+            @Parameter(schema = @Schema(
+                    description = "해당 댓글이 달린 게시글의 식별자",
+                    example = "01JY3PPXRH2QVWT0B8CPKA4TS1")
+            )
             @PathVariable(required = false, value = "ulid")
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid,
 
+            @Parameter(schema = @Schema(
+                    description = "댓글의 구체화된 경로",
+                    pattern = "^\\d+(?:\\.\\d+)*$",
+                    example = "5.2.9")
+            )
             @PathVariable(required = false, value = "path")
             @CommunicationPath
             String path) {
@@ -130,10 +153,19 @@ public class TipCommentController {
     )
     @DeleteMapping("/post/{ulid}/path/{path}")
     public ResponseEntity<DataResponse<?>> removeTipComment(
+            @Parameter(schema = @Schema(
+                    description = "해당 댓글이 달린 게시글의 식별자",
+                    example = "01JY3PPXRH2QVWT0B8CPKA4TS1")
+            )
             @PathVariable(required = false, value = "ulid")
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid,
 
+            @Parameter(schema = @Schema(
+                    description = "댓글의 구체화된 경로",
+                    pattern = "^\\d+(?:\\.\\d+)*$",
+                    example = "5.2.9")
+            )
             @PathVariable(required = false, value = "path")
             @CommunicationPath
             String path) {

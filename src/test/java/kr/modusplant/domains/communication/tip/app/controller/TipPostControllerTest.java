@@ -29,16 +29,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static kr.modusplant.global.vo.CamelCaseWord.DATA;
-import static kr.modusplant.global.vo.DatabaseFieldName.CATE_UUID;
-import static kr.modusplant.global.vo.DatabaseFieldName.ORDER_INFO;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -47,7 +41,7 @@ class TipPostControllerTest implements TipPostRequestTestUtils, TipPostResponseT
 
     private final MockMvc mockMvc;
 
-    private TipPostApplicationService tipPostApplicationService;
+    private final TipPostApplicationService tipPostApplicationService;
 
     @Autowired
     TipPostControllerTest(MockMvc mockMvc, TipPostApplicationService tipPostApplicationService) {
@@ -207,7 +201,7 @@ class TipPostControllerTest implements TipPostRequestTestUtils, TipPostResponseT
         String title = "Test Post Title";
         MockMultipartFile mockTextFile = (MockMultipartFile) textFile0;
         MockMultipartFile mockImageFile = (MockMultipartFile) imageFile;
-        MockMultipartFile mockOrderInfoPart = new MockMultipartFile(ORDER_INFO, "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(textImageFilesOrder));
+        MockMultipartFile mockOrderInfoPart = new MockMultipartFile("orderInfo", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(textImageFilesOrder));
 
         doNothing().when(tipPostApplicationService).insert(any(TipPostInsertRequest.class), any(UUID.class));
 
@@ -216,7 +210,7 @@ class TipPostControllerTest implements TipPostRequestTestUtils, TipPostResponseT
                         .file(mockTextFile)
                         .file(mockImageFile)
                         .file(mockOrderInfoPart)
-                        .param(CATE_UUID, TEST_CATEGORY_UUID.toString())
+                        .param("categoryUuid", TEST_CATEGORY_UUID.toString())
                         .param("title", title)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isOk());
@@ -237,7 +231,7 @@ class TipPostControllerTest implements TipPostRequestTestUtils, TipPostResponseT
         String title = "Test Post Title";
         MockMultipartFile mockTextFile = (MockMultipartFile) textFile0;
         MockMultipartFile mockImageFile = (MockMultipartFile) imageFile;
-        MockMultipartFile mockOrderInfoPart = new MockMultipartFile(ORDER_INFO, "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(textImageFilesOrder));
+        MockMultipartFile mockOrderInfoPart = new MockMultipartFile("orderInfo", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(textImageFilesOrder));
 
         doNothing().when(tipPostApplicationService).update(any(TipPostUpdateRequest.class), any(UUID.class));
 
@@ -246,7 +240,7 @@ class TipPostControllerTest implements TipPostRequestTestUtils, TipPostResponseT
                         .file(mockTextFile)
                         .file(mockImageFile)
                         .file(mockOrderInfoPart)
-                        .param(CATE_UUID, TEST_CATEGORY_UUID.toString())
+                        .param("categoryUuid", TEST_CATEGORY_UUID.toString())
                         .param("title", title)
                         .with(request -> {
                             request.setMethod("PUT");

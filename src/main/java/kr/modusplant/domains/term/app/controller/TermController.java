@@ -37,7 +37,7 @@ public class TermController {
 
     @Operation(summary = "버전으로 약관 조회 API", description = "버전에 맞는 약관을 조회합니다.")
     @GetMapping("/version/{version}")
-    public ResponseEntity<DataResponse<List<TermResponse>>> getTermsByVersion(@PathVariable
+    public ResponseEntity<DataResponse<List<TermResponse>>> getTermsByVersion(@PathVariable(required = false)
                                                                               @SemanticVersioning
                                                                               String version) {
         return ResponseEntity.ok().body(DataResponse.ok(termApplicationService.getByVersion(version)));
@@ -45,7 +45,7 @@ public class TermController {
 
     @Operation(summary = "식별자로 약관 조회 API", description = "식별자에 맞는 약관을 조회합니다.")
     @GetMapping("/{uuid}")
-    public ResponseEntity<DataResponse<?>> getTermByUuid(@PathVariable UUID uuid) {
+    public ResponseEntity<DataResponse<?>> getTermByUuid(@PathVariable(required = false) UUID uuid) {
         Optional<TermResponse> optionalTermResponse = termApplicationService.getByUuid(uuid);
         if (optionalTermResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -55,7 +55,7 @@ public class TermController {
 
     @Operation(summary = "이름으로 약관 조회 API", description = "이름에 맞는 약관을 조회합니다.")
     @GetMapping("/name/{name}")
-    public ResponseEntity<DataResponse<?>> getTermByName(@PathVariable
+    public ResponseEntity<DataResponse<?>> getTermByName(@PathVariable(required = false)
                                                          @NotBlank(message = "이름이 비어 있습니다.")
                                                          String name) {
         Optional<TermResponse> optionalTermResponse = termApplicationService.getByName(name);
@@ -79,7 +79,7 @@ public class TermController {
 
     @Operation(summary = "약관 제거 API", description = "식별자로 약관을 제거합니다.")
     @DeleteMapping("/{uuid}")
-    public ResponseEntity<DataResponse<?>> removeTermByUuid(@PathVariable UUID uuid) {
+    public ResponseEntity<DataResponse<?>> removeTermByUuid(@PathVariable(required = false) UUID uuid) {
         termApplicationService.removeByUuid(uuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }

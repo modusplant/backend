@@ -1,6 +1,8 @@
 package kr.modusplant.domains.communication.qna.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -29,9 +31,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static kr.modusplant.domains.communication.common.vo.CommPageableValue.PAGE_SIZE;
-import static kr.modusplant.domains.member.vo.MemberUuid.SNAKE_MEMB_UUID;
-import static kr.modusplant.global.vo.DatabaseFieldName.CATE_UUID;
-import static kr.modusplant.global.vo.DatabaseFieldName.ORDER_INFO;
 
 @Tag(name = "Q&A 게시글 API", description = "Q&A 게시글을 다루는 API입니다.")
 @RestController
@@ -54,6 +53,11 @@ public class QnaPostController {
     )
     @GetMapping
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getAllQnaPosts(
+            @Parameter(schema = @Schema(
+                    description = "페이지 숫자",
+                    minimum = "1",
+                    example = "4")
+            )
             @RequestParam
             @CommunicationPageNumber
             Integer page) {
@@ -64,12 +68,21 @@ public class QnaPostController {
             summary = "사이트 회원별 Q&A 게시글 목록 조회 API",
             description = "사이트 회원별 Q&A 게시글의 목록과 페이지 정보를 조회합니다."
     )
-    @GetMapping("/member/{memb_uuid}")
+    @GetMapping("/member/{memberUuid}")
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getQnaPostsByMember(
-            @PathVariable(required = false, value = SNAKE_MEMB_UUID)
+            @Parameter(schema = @Schema(
+                    description = "회원의 식별자",
+                    example = "038ae842-3c93-484f-b526-7c4645a195a7")
+            )
+            @PathVariable(required = false)
             @NotNull(message = "회원 식별자가 비어 있습니다.")
             UUID memberUuid,
 
+            @Parameter(schema = @Schema(
+                    description = "페이지 숫자",
+                    minimum = "1",
+                    example = "4")
+            )
             @RequestParam
             @CommunicationPageNumber
             Integer page) {
@@ -80,12 +93,21 @@ public class QnaPostController {
             summary = "항목별 Q&A 게시글 목록 조회 API",
             description = "항목별 Q&A 게시글의 목록과 페이지 정보를 조회합니다."
     )
-    @GetMapping("/category/{cate_uuid}")
+    @GetMapping("/category/{categoryUuid}")
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getQnaPostsByQnaCategory(
-            @PathVariable(required = false, value = CATE_UUID)
+            @Parameter(schema = @Schema(
+                    description = "Q&A 항목 식별자",
+                    example = "4803f4e8-c982-4631-ba82-234d4fa6e824")
+            )
+            @PathVariable(required = false)
             @NotNull(message = "항목 식별자가 비어 있습니다.")
             UUID categoryUuid,
 
+            @Parameter(schema = @Schema(
+                    description = "페이지 숫자",
+                    minimum = "1",
+                    example = "4")
+            )
             @RequestParam
             @CommunicationPageNumber
             Integer page) {
@@ -98,10 +120,19 @@ public class QnaPostController {
     )
     @GetMapping("/search")
     public ResponseEntity<DataResponse<PostPageResponse<?>>> searchQnaPosts(
+            @Parameter(schema = @Schema(
+                    description = "검색 키워드",
+                    example = "벌레")
+            )
             @RequestParam
             @NotBlank(message = "키워드가 비어 있습니다.")
             String keyword,
 
+            @Parameter(schema = @Schema(
+                    description = "페이지 숫자",
+                    minimum = "1",
+                    example = "4")
+            )
             @RequestParam
             @CommunicationPageNumber
             Integer page) {
@@ -114,7 +145,11 @@ public class QnaPostController {
     )
     @GetMapping("/{ulid}")
     public ResponseEntity<DataResponse<?>> getQnaPostByUlid(
-            @PathVariable
+            @Parameter(schema = @Schema(
+                    description = "게시글의 식별자",
+                    example = "01JY3PPG5YJ41H7BPD0DSQW2RD")
+            )
+            @PathVariable(required = false)
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String ulid) {
         Optional<QnaPostResponse> optionalQnaPostResponse = qnaPostApplicationService.getByUlid(ulid);
@@ -130,18 +165,34 @@ public class QnaPostController {
     )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> insertQnaPost(
-            @RequestParam(CATE_UUID)
+            @Parameter(schema = @Schema(
+                    description = "게시글이 포함된 항목의 식별자",
+                    example = "148d6e33-102d-4df4-a4d0-5ff233665548")
+            )
+            @RequestParam
+            @NotNull(message = "항목 식별자가 비어 있습니다.")
             UUID categoryUuid,
 
+            @Parameter(schema = @Schema(
+                    description = "게시글의 제목",
+                    maximum = "150",
+                    example = "이거 과습인가요?")
+            )
             @RequestParam
             @CommunicationTitle
             String title,
 
+            @Parameter(schema = @Schema(
+                    description = "게시글 컨텐츠")
+            )
             @RequestPart
-            @NotNull(message = "컨텐츠가 비어 있습니다.")
+            @NotNull(message = "게시글이 비어 있습니다.")
             List<MultipartFile> content,
 
-            @RequestPart(ORDER_INFO)
+            @Parameter(schema = @Schema(
+                    description = "게시글에 속한 파트들의 순서에 대한 정보")
+            )
+            @RequestPart
             @NotNull(message = "순서 정보가 비어 있습니다.")
             List<@Valid FileOrder> orderInfo
     ) throws IOException {
@@ -155,23 +206,42 @@ public class QnaPostController {
     )
     @PutMapping(value = "/{ulid}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> updateQnaPost(
-            @RequestParam(CATE_UUID)
+            @Parameter(schema = @Schema(
+                    description = "갱신을 위한 게시글 항목 식별자",
+                    example = "bde79fd5-083d-425c-b71b-69a157fc5739")
+            )
+            @RequestParam
             @NotNull(message = "항목 식별자가 비어 있습니다.")
             UUID categoryUuid,
 
+            @Parameter(schema = @Schema(
+                    description = "갱신을 위한 게시글 제목",
+                    example = "이거 과습인지 아시는 분!")
+            )
             @RequestParam
             @CommunicationTitle
             String title,
 
+            @Parameter(schema = @Schema(
+                    description = "갱신을 위한 게시글 컨텐츠")
+            )
             @RequestPart
             @NotNull(message = "컨텐츠가 비어 있습니다.")
             List<MultipartFile> content,
 
-            @RequestPart(ORDER_INFO)
+            @Parameter(schema = @Schema(
+                    description = "게시글에 속한 파트들의 순서에 대한 정보")
+            )
+            @RequestPart
             @NotNull(message = "순서 정보가 비어 있습니다.")
             List<@Valid FileOrder> orderInfo,
 
-            @PathVariable
+            @Parameter(schema = @Schema(
+                    description = "게시글 식별을 위한 게시글 식별자",
+                    example = "01JXEDF9SNSMAVBY8Z3P5YXK5J")
+            )
+            @PathVariable(required = false)
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String ulid
     ) throws IOException {
         qnaPostApplicationService.update(new QnaPostUpdateRequest(ulid, categoryUuid, title, content, orderInfo), memberUuid);
@@ -184,10 +254,14 @@ public class QnaPostController {
     )
     @DeleteMapping("/{ulid}")
     public ResponseEntity<DataResponse<Void>> removeQnaPostByUlid(
-            @PathVariable
+            @Parameter(schema = @Schema(
+                    description = "게시글의 식별자",
+                    example = "01JY3PPG5YJ41H7BPD0DSQW2RD")
+            )
+            @PathVariable(required = false)
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String ulid) throws IOException {
-        qnaPostApplicationService.removeByUlid(ulid,memberUuid);
+        qnaPostApplicationService.removeByUlid(ulid, memberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
@@ -197,7 +271,11 @@ public class QnaPostController {
     )
     @GetMapping("/{ulid}/views")
     public ResponseEntity<DataResponse<Long>> countViewCount(
-            @PathVariable
+            @Parameter(schema = @Schema(
+                    description = "게시글의 식별자",
+                    example = "01JY3PPG5YJ41H7BPD0DSQW2RD")
+            )
+            @PathVariable(required = false)
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String ulid) {
         return ResponseEntity.ok().body(DataResponse.ok(qnaPostApplicationService.readViewCount(ulid)));
@@ -209,7 +287,11 @@ public class QnaPostController {
     )
     @PatchMapping("/{ulid}/views")
     public ResponseEntity<DataResponse<Long>> increaseViewCount(
-            @PathVariable
+            @Parameter(schema = @Schema(
+                    description = "게시글의 식별자",
+                    example = "01JY3PPG5YJ41H7BPD0DSQW2RD")
+            )
+            @PathVariable(required = false)
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String ulid) {
         return ResponseEntity.ok().body(DataResponse.ok(qnaPostApplicationService.increaseViewCount(ulid, memberUuid)));
