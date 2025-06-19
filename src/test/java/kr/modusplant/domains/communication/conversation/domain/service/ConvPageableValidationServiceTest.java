@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 
+import static kr.modusplant.domains.communication.common.vo.CommPageableValue.PAGE_SIZE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -31,10 +32,10 @@ class ConvPageableValidationServiceTest {
 
         // when
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                pageableValidationService.validatePageExistence(PageRequest.of(1, 20)));
+                pageableValidationService.validatePageExistence(PageRequest.of(2, PAGE_SIZE)));
 
         // then
-        assertThat(exception.getMessage()).isEqualTo("현재 이용할 수 있는 페이지 범위(0 ~ 0)를 벗어났습니다.");
+        assertThat(exception.getMessage()).isEqualTo("현재 이용할 수 있는 페이지 범위(1 ~ 1)를 벗어났습니다.");
     }
 
     @DisplayName("totalElement가 0을 초과할 때 존재하지 않는 페이지 검증")
@@ -45,9 +46,9 @@ class ConvPageableValidationServiceTest {
 
         // when
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                pageableValidationService.validatePageExistence(PageRequest.of(1, 20)));
+                pageableValidationService.validatePageExistence(PageRequest.of(2, PAGE_SIZE)));
 
         // then
-        assertThat(exception.getMessage()).isEqualTo("현재 이용할 수 있는 페이지 범위(0 ~ 0)를 벗어났습니다.");
+        assertThat(exception.getMessage()).isEqualTo("현재 이용할 수 있는 페이지 범위(1 ~ 1)를 벗어났습니다.");
     }
 }
