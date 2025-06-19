@@ -11,7 +11,6 @@ public class GoogleUserInfo implements SocialUserInfo {
     private String id;
     private String email;
 
-    @JsonProperty("verified_email")
     private Boolean verifiedEmail;
 
     @JsonProperty(NAME)
