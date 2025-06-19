@@ -1,6 +1,5 @@
 package kr.modusplant.modules.auth.social.app.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import kr.modusplant.modules.auth.social.app.dto.supers.SocialUserInfo;
 import lombok.Getter;
 
@@ -8,7 +7,6 @@ import lombok.Getter;
 public class KakaoUserInfo implements SocialUserInfo {
     private Long id;
 
-    @JsonProperty("kakao_account")
     private KakaoAccount kakaoAccount;
 
     @Getter
@@ -16,7 +14,6 @@ public class KakaoUserInfo implements SocialUserInfo {
         private Profile profile;
         private String email;
 
-        @JsonProperty("is_email_verified")
         private Boolean isEmailVerified;
     }
 
