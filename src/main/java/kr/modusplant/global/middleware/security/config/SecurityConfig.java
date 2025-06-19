@@ -133,7 +133,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/kakao/social-login").permitAll()
                         .requestMatchers("/api/auth/google/social-login").permitAll()
                         .requestMatchers("/api/members/register").permitAll()
-                        .requestMatchers("/api/example").hasRole("ADMIN")
+                        .requestMatchers("/api/monitor").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(siteMemberAuthProvider())
