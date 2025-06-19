@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.communication.common.app.http.request.FileOrder;
 import kr.modusplant.domains.communication.common.app.http.response.PostPageResponse;
+import kr.modusplant.domains.communication.common.domain.validation.CommunicationPageNumber;
 import kr.modusplant.domains.communication.common.domain.validation.CommunicationTitle;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostInsertRequest;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostUpdateRequest;
@@ -15,7 +16,7 @@ import kr.modusplant.domains.communication.qna.app.service.QnaPostApplicationSer
 import kr.modusplant.global.app.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kr.modusplant.domains.communication.common.vo.CommPageableValue.PAGE_SIZE;
 import static kr.modusplant.domains.member.vo.MemberUuid.SNAKE_MEMB_UUID;
 import static kr.modusplant.global.vo.DatabaseFieldName.CATE_UUID;
 import static kr.modusplant.global.vo.DatabaseFieldName.ORDER_INFO;
@@ -52,9 +54,10 @@ public class QnaPostController {
     )
     @GetMapping
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getAllQnaPosts(
-            @NotNull(message = "페이지네이션 정보가 비어 있습니다.")
-            Pageable pageable) {
-        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(qnaPostApplicationService.getAll(pageable))));
+            @RequestParam
+            @CommunicationPageNumber
+            Integer page) {
+        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(qnaPostApplicationService.getAll(PageRequest.of(page, PAGE_SIZE)))));
     }
 
     @Operation(
@@ -67,9 +70,10 @@ public class QnaPostController {
             @NotNull(message = "회원 식별자가 비어 있습니다.")
             UUID memberUuid,
 
-            @NotNull(message = "페이지네이션 정보가 비어 있습니다.")
-            Pageable pageable) {
-        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(qnaPostApplicationService.getByMemberUuid(memberUuid, pageable))));
+            @RequestParam
+            @CommunicationPageNumber
+            Integer page) {
+        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(qnaPostApplicationService.getByMemberUuid(memberUuid, PageRequest.of(page, PAGE_SIZE)))));
     }
 
     @Operation(
@@ -82,9 +86,10 @@ public class QnaPostController {
             @NotNull(message = "항목 식별자가 비어 있습니다.")
             UUID categoryUuid,
 
-            @NotNull(message = "페이지네이션 정보가 비어 있습니다.")
-            Pageable pageable) {
-        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(qnaPostApplicationService.getByCategoryUuid(categoryUuid, pageable))));
+            @RequestParam
+            @CommunicationPageNumber
+            Integer page) {
+        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(qnaPostApplicationService.getByCategoryUuid(categoryUuid, PageRequest.of(page, PAGE_SIZE)))));
     }
 
     @Operation(
@@ -97,9 +102,10 @@ public class QnaPostController {
             @NotBlank(message = "키워드가 비어 있습니다.")
             String keyword,
 
-            @NotNull(message = "페이지네이션 정보가 비어 있습니다.")
-            Pageable pageable) {
-        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(qnaPostApplicationService.searchByKeyword(keyword, pageable))));
+            @RequestParam
+            @CommunicationPageNumber
+            Integer page) {
+        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(qnaPostApplicationService.searchByKeyword(keyword, PageRequest.of(page, PAGE_SIZE)))));
     }
 
     @Operation(
