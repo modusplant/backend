@@ -30,6 +30,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.validation.Validator;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -49,6 +50,7 @@ public class SecurityConfig {
     private final SiteMemberValidationService memberValidationService;
     private final SiteMemberRepository memberRepository;
     private final ObjectMapper objectMapper;
+    private final Validator validator;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -92,7 +94,7 @@ public class SecurityConfig {
     public NormalLoginFilter normalLoginFilter(HttpSecurity http) {
         try {
             NormalLoginFilter normalLoginFilter = new NormalLoginFilter(
-                    new ObjectMapper(), authenticationManager());
+                    new ObjectMapper(), validator, authenticationManager());
 
             normalLoginFilter.setAuthenticationManager(authenticationManager());
             normalLoginFilter.setAuthenticationSuccessHandler(normalLoginSuccessHandler());

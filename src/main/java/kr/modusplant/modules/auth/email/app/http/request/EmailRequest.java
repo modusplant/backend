@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 public class EmailRequest {
-    @Schema(description = "이메일 주소", example = "example@gmail.com")
+    @Schema(description = "이메일", example = "example@gmail.com")
     @NotBlank(message = "이메일이 비어 있습니다.")
     @Email(message = "이메일 서식이 올바르지 않습니다.")
     private String email;

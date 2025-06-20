@@ -13,28 +13,35 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.Validator;
 
 import java.io.IOException;
 
 public class NormalLoginFilter extends AbstractAuthenticationProcessingFilter {
 
     private final ObjectMapper objectMapper;
+    private final Validator validator;
     private final AuthenticationManager authManager;
 
     public NormalLoginFilter(
             ObjectMapper objectMapper,
+            Validator validator,
             AuthenticationManager authManager) {
         super(new AntPathRequestMatcher("/api/auth/login", HttpMethod.POST.name()));
         this.objectMapper = objectMapper;
+        this.validator = validator;
         this.authManager = authManager;
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException {
         NormalLoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), NormalLoginRequest.class);
+        BeanPropertyBindingResult result = new BeanPropertyBindingResult(loginRequest, "loginRequest");
+        validator.validate(loginRequest, result);
 
-        if (loginRequest.isEmailOrPasswordNull()) {
-            throw new IllegalArgumentException("이메일 또는 비밀번호가 비어 있습니다.");
+        if (result.hasErrors()) {
+            throw new IllegalArgumentException(result.getFieldError().getDefaultMessage());
         }
 
         SiteMemberAuthToken requestToken = new SiteMemberAuthToken(
