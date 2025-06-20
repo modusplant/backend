@@ -1,10 +1,12 @@
 package kr.modusplant.domains.communication.conversation.app.service;
 
 import kr.modusplant.domains.common.domain.service.MediaContentService;
+import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostUpdateRequest;
 import kr.modusplant.domains.communication.conversation.app.http.response.ConvPostResponse;
 import kr.modusplant.domains.communication.conversation.domain.service.ConvCategoryValidationService;
+import kr.modusplant.domains.communication.conversation.domain.service.ConvPageableValidationService;
 import kr.modusplant.domains.communication.conversation.domain.service.ConvPostValidationService;
 import kr.modusplant.domains.communication.conversation.mapper.ConvPostAppInfraMapper;
 import kr.modusplant.domains.communication.conversation.mapper.ConvPostAppInfraMapperImpl;
@@ -17,7 +19,6 @@ import kr.modusplant.domains.communication.conversation.persistence.repository.C
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -35,6 +36,7 @@ import java.util.UUID;
 public class ConvPostApplicationService {
 
     private final ConvPostValidationService convPostValidationService;
+    private final ConvPageableValidationService convPageableValidationService;
     private final ConvCategoryValidationService convCategoryValidationService;
     private final SiteMemberValidationService siteMemberValidationService;
     private final MediaContentService mediaContentService;
@@ -49,6 +51,8 @@ public class ConvPostApplicationService {
     private long ttlMinutes;
 
     public Page<ConvPostResponse> getAll(Pageable pageable) {
+        convPageableValidationService.validatePageExistence(pageable);
+        convPageableValidationService.validateNotUnsorted(pageable);
         return convPostRepository.findByIsDeletedFalseOrderByCreatedAtDesc(pageable).map(entity -> {
             try {
                 entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
@@ -60,6 +64,9 @@ public class ConvPostApplicationService {
     }
 
     public Page<ConvPostResponse> getByMemberUuid(UUID memberUuid, Pageable pageable) {
+        siteMemberValidationService.validateNotFoundUuid(memberUuid);
+        convPageableValidationService.validatePageExistence(pageable);
+        convPageableValidationService.validateNotUnsorted(pageable);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
         return convPostRepository.findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(siteMember, pageable).map(entity -> {
             try {
@@ -72,6 +79,9 @@ public class ConvPostApplicationService {
     }
 
     public Page<ConvPostResponse> getByCategoryUuid(UUID categoryUuid, Pageable pageable) {
+        convCategoryValidationService.validateNotFoundUuid(categoryUuid);
+        convPageableValidationService.validatePageExistence(pageable);
+        convPageableValidationService.validateNotUnsorted(pageable);
         ConvCategoryEntity convCategory = convCategoryRepository.findByUuid(categoryUuid).orElseThrow();
         return convPostRepository.findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(convCategory, pageable).map(entity -> {
             try {
@@ -84,6 +94,8 @@ public class ConvPostApplicationService {
     }
 
     public Page<ConvPostResponse> searchByKeyword(String keyword, Pageable pageable) {
+        convPageableValidationService.validatePageExistence(pageable);
+        convPageableValidationService.validateNotUnsorted(pageable);
         return convPostRepository.searchByTitleOrContent(keyword, pageable).map(entity -> {
             try {
                 entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
@@ -95,6 +107,7 @@ public class ConvPostApplicationService {
     }
 
     public Optional<ConvPostResponse> getByUlid(String ulid) {
+        convPostValidationService.validateNotFoundUlid(ulid);
         return convPostRepository.findByUlid(ulid)
                 .map(convPost -> {
                     try {
@@ -153,7 +166,7 @@ public class ConvPostApplicationService {
         }
         Long dbViewCount = convPostRepository.findByUlid(ulid)
                 .map(convPostEntity -> Optional.ofNullable(convPostEntity.getViewCount()).orElseThrow())
-                .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid, String.class));
+                .orElseThrow(PostNotFoundException::new);
         convPostViewCountRedisRepository.write(ulid, dbViewCount);
         return dbViewCount;
     }

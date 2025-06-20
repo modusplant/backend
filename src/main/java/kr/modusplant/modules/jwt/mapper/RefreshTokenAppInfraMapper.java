@@ -13,8 +13,8 @@ import java.util.UUID;
 
 import static kr.modusplant.domains.member.vo.MemberUuid.MEMBER_UUID;
 import static kr.modusplant.global.vo.CamelCaseWord.MEMBER;
-import static kr.modusplant.global.vo.FieldName.EXPIRED_AT;
-import static kr.modusplant.global.vo.FieldName.ISSUED_AT;
+import static kr.modusplant.global.vo.EntityFieldName.EXPIRED_AT;
+import static kr.modusplant.global.vo.EntityFieldName.ISSUED_AT;
 
 @Mapper
 public interface RefreshTokenAppInfraMapper {

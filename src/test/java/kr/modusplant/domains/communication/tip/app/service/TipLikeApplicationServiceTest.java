@@ -1,6 +1,8 @@
 package kr.modusplant.domains.communication.tip.app.service;
 
 import kr.modusplant.domains.communication.common.app.http.response.LikeResponse;
+import kr.modusplant.domains.communication.common.error.LikeExistsException;
+import kr.modusplant.domains.communication.common.error.LikeNotFoundException;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipLikeEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipLikeId;
@@ -99,8 +101,7 @@ public class TipLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
         // when & then
         assertThatThrownBy(() ->
                 tipLikeApplicationService.likeTipPost(postId, memberId))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Member already liked.");
+                .isInstanceOf(LikeExistsException.class);
     }
 
     @Test
@@ -109,7 +110,6 @@ public class TipLikeApplicationServiceTest implements SiteMemberEntityTestUtils,
         // when & then
         assertThatThrownBy(() ->
                 tipLikeApplicationService.unlikeTipPost(postId, memberId))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Member not liked.");
+                .isInstanceOf(LikeNotFoundException.class);
     }
 }

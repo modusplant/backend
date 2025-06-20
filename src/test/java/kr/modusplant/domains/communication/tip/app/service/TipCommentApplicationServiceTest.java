@@ -1,6 +1,6 @@
 package kr.modusplant.domains.communication.tip.app.service;
 
-import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.domains.communication.tip.app.http.request.TipCommentInsertRequest;
 import kr.modusplant.domains.communication.tip.app.http.response.TipCommentResponse;
 import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipCommentInsertRequestTestUtils;
@@ -30,7 +30,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-@DomainsServiceOnlyContext
+@DomainsServiceWithoutValidationServiceContext
 @Transactional
 public class TipCommentApplicationServiceTest implements
         TipCommentEntityTestUtils, TipCommentInsertRequestTestUtils, TipCommentResponseTestUtils,
@@ -142,29 +142,6 @@ public class TipCommentApplicationServiceTest implements
 
         // then
         assertThat(commentApplicationService.getByCreateMember(memberEntity))
-                .isEqualTo(List.of(commentResponse));
-    }
-
-    @DisplayName("댓글 내용으로 댓글 가져오기")
-    @Test
-    void getByContentTest() {
-        // given
-        commentEntity = createTipCommentEntityBuilder()
-                .postEntity(postEntity)
-                .authMember(memberEntity)
-                .createMember(memberEntity)
-                .isDeleted(true)
-                .build();
-
-        TipCommentResponse commentResponse = createTipCommentResponse(
-                postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname()
-        );
-
-        // when
-        given(commentRepository.findByContent(commentEntity.getContent())).willReturn(List.of(commentEntity));
-
-        // then
-        assertThat(commentApplicationService.getByContent(commentEntity.getContent()))
                 .isEqualTo(List.of(commentResponse));
     }
 

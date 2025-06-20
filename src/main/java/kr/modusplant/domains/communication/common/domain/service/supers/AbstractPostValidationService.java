@@ -2,7 +2,7 @@ package kr.modusplant.domains.communication.common.domain.service.supers;
 
 import kr.modusplant.domains.common.persistence.repository.supers.UuidPrimaryKeyRepository;
 import kr.modusplant.domains.communication.common.app.http.request.FileOrder;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
+import kr.modusplant.domains.communication.common.error.CategoryNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -11,32 +11,15 @@ import java.util.List;
 import java.util.UUID;
 
 public abstract class AbstractPostValidationService {
-    protected void validateExistedCategoryUuid(UUID categoryUuid, UuidPrimaryKeyRepository<?> categoryRepository) {
-        if (categoryUuid == null) {
-            return;
-        }
-        if (categoryRepository.existsByUuid(categoryUuid)) {
-            throw new EntityExistsWithUuidException(categoryUuid, categoryRepository.getClass());
-        }
-    }
-
     protected void validateNotFoundCategoryUuid(UUID categoryUuid, UuidPrimaryKeyRepository<?> categoryRepository) {
         if (categoryUuid == null || !categoryRepository.existsByUuid(categoryUuid)) {
-            throw new EntityExistsWithUuidException(categoryUuid, categoryRepository.getClass());
-        }
-    }
-
-    protected void validateTitle(String title) {
-        if (title == null || title.isBlank() || title.length() > 150) {
-            throw new IllegalArgumentException("Title must not be null or blank and must be at most 150 characters long.");
+            throw new CategoryNotFoundException();
         }
     }
 
     protected void validateContentAndOrderInfo(List<MultipartFile> content, List<FileOrder> orderInfo) {
-        boolean contentEmpty = content == null || content.isEmpty();
-        boolean orderInfoEmpty = orderInfo==null || orderInfo.isEmpty();
-        if (contentEmpty || orderInfoEmpty || isContentNotValid(content,orderInfo)) {
-            throw new IllegalArgumentException("Content and orderInfo must not be empty, and their filenames must match in size and order.");
+        if (isContentNotValid(content,orderInfo)) {
+            throw new IllegalArgumentException("컨텐츠 또는 순서 정보가 비어 있거나 그들의 파일명의 크기 혹은 순서가 일치하지 않습니다.");
         }
     }
 

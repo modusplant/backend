@@ -14,8 +14,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_LAST_MODIFIED_AT;
-import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_VER_NUM;
+import static kr.modusplant.global.vo.DatabaseFieldName.LAST_MODIFIED_AT;
+import static kr.modusplant.global.vo.DatabaseFieldName.VER_NUM;
 import static kr.modusplant.global.vo.TableName.SITE_MEMBER_AUTH;
 
 @Entity
@@ -59,12 +59,12 @@ public class SiteMemberAuthEntity {
     @Column(name = "lockout_until")
     private LocalDateTime lockoutUntil;
 
-    @Column(name = SNAKE_LAST_MODIFIED_AT, nullable = false)
+    @Column(name = LAST_MODIFIED_AT, nullable = false)
     @LastModifiedDate
     private LocalDateTime lastModifiedAt;
 
     @Version
-    @Column(name = SNAKE_VER_NUM, nullable = false)
+    @Column(name = VER_NUM, nullable = false)
     private Long versionNumber;
 
     public void updateActiveMember(SiteMemberEntity activeMember) {

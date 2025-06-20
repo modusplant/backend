@@ -4,22 +4,19 @@ import kr.modusplant.domains.member.app.http.response.SiteMemberResponse;
 import kr.modusplant.domains.member.app.http.response.SiteMemberRoleResponse;
 import kr.modusplant.domains.member.app.service.SiteMemberApplicationService;
 import kr.modusplant.domains.member.app.service.SiteMemberRoleApplicationService;
+import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.global.enums.Role;
 import kr.modusplant.modules.jwt.app.dto.TokenPair;
-import kr.modusplant.modules.jwt.app.error.InvalidTokenException;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.modules.jwt.domain.service.TokenValidationService;
+import kr.modusplant.modules.jwt.error.InvalidTokenException;
 import kr.modusplant.modules.jwt.error.TokenNotFoundException;
-import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
-import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 
 @Service
 @RequiredArgsConstructor
@@ -29,11 +26,12 @@ public class TokenApplicationService {
     private final SiteMemberRoleApplicationService memberRoleApplicationService;
     private final RefreshTokenApplicationService refreshTokenApplicationService;
     private final TokenValidationService tokenValidationService;
+    private final SiteMemberValidationService memberValidationService;
 
     // 토큰 생성
     public TokenPair issueToken(UUID memberUuid, String nickname, Role role) {
         // memberUuid 검증
-        tokenValidationService.validateNotFoundMemberUuid(memberUuid);
+        memberValidationService.validateNotFoundUuid(memberUuid);
 
         // accessToken , refresh token 생성
         Map<String,String> claims = createClaims(nickname,role);
@@ -57,15 +55,15 @@ public class TokenApplicationService {
     public TokenPair reissueToken(String refreshToken) {
         // refresh token 검증
         if(!tokenProvider.validateToken(refreshToken))
-            throw new InvalidTokenException("The Refresh Token has expired. Please log in again.");
+            throw new InvalidTokenException();
         tokenValidationService.validateNotFoundRefreshToken(refreshToken);
 
         // token에서 사용자 정보 가져오기
         UUID memberUuid = tokenProvider.getMemberUuidFromToken(refreshToken);
         SiteMemberResponse siteMember = memberApplicationService.getByUuid(memberUuid)
-                .orElseThrow(() -> new TokenNotFoundException("Failed to find Site member"));
+                .orElseThrow(TokenNotFoundException::new);
         SiteMemberRoleResponse siteMemberRole = memberRoleApplicationService.getByUuid(memberUuid)
-                .orElseThrow(() -> new TokenNotFoundException("Failed to find Site member role"));
+                .orElseThrow(TokenNotFoundException::new);
 
         // refresh token 재발급 (RTR기법)
         String reissuedRefreshToken = tokenProvider.generateRefreshToken(memberUuid);
@@ -92,7 +90,7 @@ public class TokenApplicationService {
         tokenValidationService.validateNotFoundRefreshToken(refreshToken);
         UUID memberUuid = tokenProvider.getMemberUuidFromToken(refreshToken);
         RefreshToken token = refreshTokenApplicationService.getByMemberUuidAndRefreshToken(memberUuid,refreshToken)
-                .orElseThrow(() -> new TokenNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY, "refreshToken", refreshToken, RefreshTokenEntity.class)));
+                .orElseThrow(TokenNotFoundException::new);
         // 토큰 삭제
         refreshTokenApplicationService.removeByUuid(token.getUuid());
     }

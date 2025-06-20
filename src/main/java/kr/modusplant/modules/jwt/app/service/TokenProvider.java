@@ -7,7 +7,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import kr.modusplant.modules.auth.email.app.http.request.VerifyEmailRequest;
-import kr.modusplant.modules.jwt.app.error.InvalidTokenException;
+import kr.modusplant.modules.jwt.error.InvalidTokenException;
 import kr.modusplant.modules.jwt.error.TokenKeyCreationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import static kr.modusplant.global.vo.CamelCaseWord.VERIFY_CODE;
-import static kr.modusplant.global.vo.FieldName.EMAIL;
+import static kr.modusplant.global.vo.EntityFieldName.EMAIL;
 
 @Service
 @RequiredArgsConstructor
@@ -56,7 +56,7 @@ public class TokenProvider {
             privateKey = keyPair.getPrivate();
             publicKey = keyPair.getPublic();
         } catch (NoSuchAlgorithmException e) {
-            throw new TokenKeyCreationException("Failed to create RefreshToken KeyPair: ", e);
+            throw new TokenKeyCreationException();
         }
     }
 
@@ -102,11 +102,9 @@ public class TokenProvider {
                     .parseSignedClaims(token);
             return true;
         } catch(ExpiredJwtException e) {
-            log.warn("만료된 JWT 토큰입니다.");
             return false;
         } catch (JwtException e) {
-            log.error("유효하지 않은 JWT 토큰입니다 : {}", e.getMessage());
-            throw new InvalidTokenException("Invalid JWT RefreshToken");
+            throw new InvalidTokenException();
         }
     }
 
@@ -118,12 +116,8 @@ public class TokenProvider {
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-        } catch(ExpiredJwtException e) {
-            log.warn("만료된 JWT 토큰입니다");
-            throw new InvalidTokenException("Expired JWT RefreshToken");
         } catch (JwtException e) {
-            log.error("유효하지 않은 JWT 토큰입니다 : {}", e.getMessage());
-            throw new InvalidTokenException("Invalid JWT RefreshToken");
+            throw new InvalidTokenException();
         }
     }
 

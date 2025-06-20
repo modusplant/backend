@@ -1,6 +1,6 @@
 package kr.modusplant.domains.communication.qna.app.service;
 
-import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.domains.communication.qna.common.util.app.http.request.QnaCategoryRequestTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.app.http.response.QnaCategoryResponseTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaCategoryEntityTestUtils;
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
-@DomainsServiceOnlyContext
+@DomainsServiceWithoutValidationServiceContext
 class QnaCategoryApplicationServiceTest implements QnaCategoryRequestTestUtils, QnaCategoryResponseTestUtils, QnaCategoryEntityTestUtils {
 
     private final QnaCategoryApplicationService qnaCategoryApplicationService;

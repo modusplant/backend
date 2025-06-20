@@ -69,7 +69,7 @@ public class MediaContentService {
             node.put("type", type);
             node.put(SRC, path);
         } else {
-            throw new IllegalArgumentException("Unsupported file type: " + contentType);
+            throw new IllegalArgumentException("지원되지 않는 파일 타입입니다.");
         }
         return node;
     }

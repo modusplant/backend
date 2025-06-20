@@ -1,11 +1,10 @@
 package kr.modusplant.domains.communication.tip.domain.service;
 
-import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.communication.common.error.CategoryExistsException;
+import kr.modusplant.domains.communication.common.error.CategoryNotFoundException;
 import kr.modusplant.domains.communication.tip.common.util.app.http.response.TipCategoryResponseTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
-import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipCategoryRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,11 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
-import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
-import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
-import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
-import static kr.modusplant.global.vo.CamelCaseWord.CATEGORY;
-import static kr.modusplant.global.vo.CamelCaseWord.ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -44,10 +38,9 @@ class TipCategoryValidationServiceTest implements TipCategoryResponseTestUtils, 
         given(tipCategoryRepository.existsByOrder(order)).willReturn(true);
 
         // then
-        EntityExistsException existsException = assertThrows(EntityExistsException.class,
+        CategoryExistsException existsException = assertThrows(CategoryExistsException.class,
                 () -> tipCategoryValidationService.validateExistedOrder(order));
-        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                EXISTED_ENTITY.getValue(), ORDER, order, TipCategoryEntity.class));
+        assertThat(existsException.getMessage()).isEqualTo(new CategoryExistsException().getMessage());
     }
 
     @DisplayName("존재하는 항목 검증")
@@ -62,10 +55,9 @@ class TipCategoryValidationServiceTest implements TipCategoryResponseTestUtils, 
         given(tipCategoryRepository.existsByCategory(category)).willReturn(true);
 
         // then
-        EntityExistsException existsException = assertThrows(EntityExistsException.class,
+        CategoryExistsException existsException = assertThrows(CategoryExistsException.class,
                 () -> tipCategoryValidationService.validateExistedCategory(category));
-        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                EXISTED_ENTITY.getValue(), CATEGORY, category, TipCategoryEntity.class));
+        assertThat(existsException.getMessage()).isEqualTo(new CategoryExistsException().getMessage());
     }
 
     @DisplayName("존재하지 않는 순서 검증")
@@ -78,9 +70,8 @@ class TipCategoryValidationServiceTest implements TipCategoryResponseTestUtils, 
         given(tipCategoryRepository.existsByUuid(uuid)).willReturn(false);
 
         // then
-        EntityNotFoundException existsException = assertThrows(EntityNotFoundException.class,
+        CategoryNotFoundException notFoundException = assertThrows(CategoryNotFoundException.class,
                 () -> tipCategoryValidationService.validateNotFoundUuid(uuid));
-        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY.getValue(), "uuid", uuid, TipCategoryEntity.class));
+        assertThat(notFoundException.getMessage()).isEqualTo(new CategoryNotFoundException().getMessage());
     }
 }

@@ -1,6 +1,6 @@
 package kr.modusplant.domains.communication.conversation.app.service;
 
-import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvCommentInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.response.ConvCommentResponse;
 import kr.modusplant.domains.communication.conversation.common.util.app.http.request.ConvCommentInsertRequestTestUtils;
@@ -30,7 +30,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-@DomainsServiceOnlyContext
+@DomainsServiceWithoutValidationServiceContext
 @Transactional
 public class ConvCommentApplicationServiceTest implements
         ConvCommentEntityTestUtils, ConvCommentInsertRequestTestUtils, ConvCommentResponseTestUtils,
@@ -142,29 +142,6 @@ public class ConvCommentApplicationServiceTest implements
 
         // then
         assertThat(commentApplicationService.getByCreateMember(memberEntity))
-                .isEqualTo(List.of(commentResponse));
-    }
-
-    @DisplayName("댓글 내용으로 댓글 가져오기")
-    @Test
-    void getByContentTest() {
-        // given
-        commentEntity = createConvCommentEntityBuilder()
-                .postEntity(postEntity)
-                .authMember(memberEntity)
-                .createMember(memberEntity)
-                .isDeleted(true)
-                .build();
-
-        ConvCommentResponse commentResponse = createConvCommentResponse(
-                postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname()
-        );
-
-        // when
-        given(commentRepository.findByContent(commentEntity.getContent())).willReturn(List.of(commentEntity));
-
-        // then
-        assertThat(commentApplicationService.getByContent(commentEntity.getContent()))
                 .isEqualTo(List.of(commentResponse));
     }
 

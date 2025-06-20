@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.app.service;
 
-import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.domains.member.app.http.request.SiteMemberAuthUpdateRequest;
 import kr.modusplant.domains.member.app.http.response.SiteMemberAuthResponse;
 import kr.modusplant.domains.member.common.util.app.http.request.SiteMemberAuthRequestTestUtils;
@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
-@DomainsServiceOnlyContext
+@DomainsServiceWithoutValidationServiceContext
 class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestUtils, SiteMemberAuthResponseTestUtils, SiteMemberAuthEntityTestUtils, SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityTestUtils {
 
     private final SiteMemberAuthApplicationService memberAuthService;

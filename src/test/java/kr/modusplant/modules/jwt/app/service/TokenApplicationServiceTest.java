@@ -1,19 +1,18 @@
 package kr.modusplant.modules.jwt.app.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.domains.member.app.http.response.SiteMemberResponse;
 import kr.modusplant.domains.member.app.http.response.SiteMemberRoleResponse;
 import kr.modusplant.domains.member.app.service.SiteMemberApplicationService;
 import kr.modusplant.domains.member.app.service.SiteMemberRoleApplicationService;
 import kr.modusplant.domains.member.common.util.app.http.response.SiteMemberRoleResponseTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
+import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.global.enums.Role;
 import kr.modusplant.modules.jwt.app.dto.TokenPair;
-import kr.modusplant.modules.jwt.app.error.InvalidTokenException;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.modules.jwt.domain.service.TokenValidationService;
+import kr.modusplant.modules.jwt.error.InvalidTokenException;
 import kr.modusplant.modules.jwt.error.TokenNotFoundException;
-import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,8 +28,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
-import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -52,6 +49,8 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
     private RefreshTokenApplicationService refreshTokenApplicationService;
     @Mock
     private TokenValidationService tokenValidationService;
+    @Mock
+    private SiteMemberValidationService memberValidationService;
 
     private UUID memberUuid;
     private String nickname;
@@ -81,7 +80,7 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
     @DisplayName("토큰 생성 테스트")
     void issueTokenSuccess() {
         // given
-        willDoNothing().given(tokenValidationService).validateNotFoundMemberUuid(memberUuid);
+        willDoNothing().given(memberValidationService).validateNotFoundUuid(memberUuid);
         given(tokenProvider.generateAccessToken(memberUuid, claims)).willReturn(accessToken);
         given(tokenProvider.generateRefreshToken(memberUuid)).willReturn(refreshToken);
         given(tokenProvider.getIssuedAtFromToken(refreshToken)).willReturn(issuedAt);
@@ -96,7 +95,7 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
         assertEquals(accessToken, tokenPair.accessToken());
         assertEquals(refreshToken, tokenPair.refreshToken());
 
-        verify(tokenValidationService).validateNotFoundMemberUuid(memberUuid);
+        verify(memberValidationService).validateNotFoundUuid(memberUuid);
         verify(tokenProvider).generateAccessToken(eq(memberUuid), anyMap());
         verify(tokenProvider).generateRefreshToken(memberUuid);
         verify(refreshTokenApplicationService).insert(any(RefreshToken.class));
@@ -164,11 +163,11 @@ class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemb
     void reissueTokenFailWhenRefreshTokenNotFoundInDB() {
         // given
         given(tokenProvider.validateToken(refreshToken)).willReturn(true);
-        doThrow(new EntityNotFoundException(getFormattedExceptionMessage(NOT_FOUND_ENTITY, "refreshToken", refreshToken, RefreshTokenEntity.class)))
+        doThrow(new TokenNotFoundException())
                 .when(tokenValidationService).validateNotFoundRefreshToken(refreshToken);
 
         // then
-        assertThrows(EntityNotFoundException.class, () -> tokenApplicationService.reissueToken(refreshToken));
+        assertThrows(TokenNotFoundException.class, () -> tokenApplicationService.reissueToken(refreshToken));
     }
 
     @Test

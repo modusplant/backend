@@ -1,6 +1,6 @@
 package kr.modusplant.domains.communication.conversation.app.service;
 
-import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.domains.communication.conversation.common.util.app.http.request.ConvCategoryRequestTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.app.http.response.ConvCategoryResponseTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCategoryEntityTestUtils;
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
-@DomainsServiceOnlyContext
+@DomainsServiceWithoutValidationServiceContext
 class ConvCategoryApplicationServiceTest implements ConvCategoryRequestTestUtils, ConvCategoryResponseTestUtils, ConvCategoryEntityTestUtils {
 
     private final ConvCategoryApplicationService convCategoryApplicationService;

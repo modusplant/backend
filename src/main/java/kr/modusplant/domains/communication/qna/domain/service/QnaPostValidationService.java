@@ -2,12 +2,12 @@ package kr.modusplant.domains.communication.qna.domain.service;
 
 import kr.modusplant.domains.communication.common.domain.service.supers.AbstractPostValidationService;
 import kr.modusplant.domains.communication.common.error.PostAccessDeniedException;
+import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostInsertRequest;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostUpdateRequest;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaCategoryRepository;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostRepository;
-import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,13 +24,11 @@ public class QnaPostValidationService extends AbstractPostValidationService {
 
     public void validateQnaPostInsertRequest(QnaPostInsertRequest request) {
         validateNotFoundCategoryUuid(request.categoryUuid(), qnaCategoryRepository);
-        validateTitle(request.title());
         validateContentAndOrderInfo(request.content(),request.orderInfo());
     }
 
     public void validateQnaPostUpdateRequest(QnaPostUpdateRequest request) {
         validateNotFoundCategoryUuid(request.categoryUuid(), qnaCategoryRepository);
-        validateTitle(request.title());
         validateContentAndOrderInfo(request.content(),request.orderInfo());
     }
 
@@ -41,16 +39,16 @@ public class QnaPostValidationService extends AbstractPostValidationService {
 
     public void validateNotFoundUlid(String ulid) {
         if (ulid == null || !qnaPostRepository.existsByUlid(ulid)) {
-            throw new EntityNotFoundWithUlidException(ulid, QnaPostEntity.class);
+            throw new PostNotFoundException();
         }
     }
 
     private QnaPostEntity findIfExistsByUlid(String ulid) {
         if (ulid == null) {
-            throw new EntityNotFoundWithUlidException(ulid, QnaPostEntity.class);
+            throw new PostNotFoundException();
         }
         return qnaPostRepository.findByUlidAndIsDeletedFalse(ulid)
-                .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid,QnaPostEntity.class));
+                .orElseThrow(PostNotFoundException::new);
     }
 
     // TODO : Spring Security 적용 후 PreAuthorize 고려

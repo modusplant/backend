@@ -53,7 +53,7 @@ class TokenProviderTest {
 
             assertThatThrownBy(tokenProvider::init)
                     .isInstanceOf(TokenKeyCreationException.class)
-                    .hasMessageContaining("Failed to create RefreshToken KeyPair");
+                    .hasMessageContaining("토큰 생성에 실패했습니다.");
         }
     }
 

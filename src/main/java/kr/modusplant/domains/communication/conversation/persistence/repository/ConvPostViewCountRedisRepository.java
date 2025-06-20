@@ -50,6 +50,6 @@ public class ConvPostViewCountRedisRepository {
         if (parts.length == 4) {
             return parts[2];
         }
-        throw new IllegalArgumentException("Invalid Redis key format: " + key);
+        throw new IllegalArgumentException("유효하지 않은 키 서식입니다.");
     }
 }

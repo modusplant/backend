@@ -12,8 +12,8 @@ import java.util.UUID;
 
 import static kr.modusplant.domains.member.vo.MemberUuid.MEMBER_UUID;
 import static kr.modusplant.global.vo.CamelCaseWord.CATEGORY;
-import static kr.modusplant.global.vo.FieldName.AUTH_MEMBER;
-import static kr.modusplant.global.vo.FieldName.NICKNAME;
+import static kr.modusplant.global.vo.EntityFieldName.AUTH_MEMBER;
+import static kr.modusplant.global.vo.EntityFieldName.NICKNAME;
 
 @Mapper
 public interface ConvPostAppInfraMapper extends PostAppInfraMapper {

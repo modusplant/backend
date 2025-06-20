@@ -1,9 +1,16 @@
 package kr.modusplant.domains.communication.tip.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.communication.common.app.http.request.FileOrder;
 import kr.modusplant.domains.communication.common.app.http.response.PostPageResponse;
+import kr.modusplant.domains.communication.common.domain.validation.CommunicationPageNumber;
+import kr.modusplant.domains.communication.common.domain.validation.CommunicationTitle;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostInsertRequest;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostUpdateRequest;
 import kr.modusplant.domains.communication.tip.app.http.response.TipPostResponse;
@@ -11,9 +18,10 @@ import kr.modusplant.domains.communication.tip.app.service.TipPostApplicationSer
 import kr.modusplant.global.app.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,14 +30,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.domains.member.vo.MemberUuid.SNAKE_MEMB_UUID;
-import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_CATE_UUID;
-import static kr.modusplant.global.vo.SnakeCaseWord.SNAKE_ORDER_INFO;
+import static kr.modusplant.domains.communication.common.vo.CommPageableValue.PAGE_SIZE;
 
 @Tag(name = "팁 게시글 API", description = "팁 게시글을 다루는 API입니다.")
 @RestController
 @RequestMapping("/api/v1/tip/posts")
 @RequiredArgsConstructor
+@Validated
 public class TipPostController {
 
     private final TipPostApplicationService tipPostApplicationService;
@@ -45,26 +52,66 @@ public class TipPostController {
             description = "전체 팁 게시글의 목록과 페이지 정보를 조회합니다."
     )
     @GetMapping
-    public ResponseEntity<DataResponse<PostPageResponse<?>>> getAllTipPosts(Pageable pageable) {
-        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.getAll(pageable))));
+    public ResponseEntity<DataResponse<PostPageResponse<?>>> getAllTipPosts(
+            @Parameter(schema = @Schema(
+                    description = "페이지 숫자",
+                    minimum = "1",
+                    example = "1")
+            )
+            @RequestParam
+            @CommunicationPageNumber
+            Integer page) {
+        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.getAll(PageRequest.of(page, PAGE_SIZE)))));
     }
 
     @Operation(
             summary = "사이트 회원별 팁 게시글 목록 조회 API",
             description = "사이트 회원별 팁 게시글의 목록과 페이지 정보를 조회합니다."
     )
-    @GetMapping("/member/{memb_uuid}")
-    public ResponseEntity<DataResponse<PostPageResponse<?>>> getTipPostsByMember(@PathVariable(SNAKE_MEMB_UUID) UUID memberUuid, Pageable pageable) {
-        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.getByMemberUuid(memberUuid, pageable))));
+    @GetMapping("/member/{memberUuid}")
+    public ResponseEntity<DataResponse<PostPageResponse<?>>> getTipPostsByMember(
+            @Parameter(schema = @Schema(
+                    description = "회원의 식별자",
+                    example = "2ae593ee-c9af-412a-a62d-351bf07282dd")
+            )
+            @PathVariable(required = false)
+            @NotNull(message = "회원 식별자가 비어 있습니다.")
+            UUID memberUuid,
+
+            @Parameter(schema = @Schema(
+                    description = "페이지 숫자",
+                    minimum = "1",
+                    example = "1")
+            )
+            @RequestParam
+            @CommunicationPageNumber
+            Integer page) {
+        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.getByMemberUuid(memberUuid, PageRequest.of(page, PAGE_SIZE)))));
     }
 
     @Operation(
             summary = "항목별 팁 게시글 목록 조회 API",
             description = "항목별 팁 게시글의 목록과 페이지 정보를 조회합니다."
     )
-    @GetMapping("/category/{cate_uuid}")
-    public ResponseEntity<DataResponse<PostPageResponse<?>>> getTipPostsByTipCategory(@PathVariable(SNAKE_CATE_UUID) UUID categoryUuid, Pageable pageable) {
-        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.getByCategoryUuid(categoryUuid, pageable))));
+    @GetMapping("/category/{categoryUuid}")
+    public ResponseEntity<DataResponse<PostPageResponse<?>>> getTipPostsByTipCategory(
+            @Parameter(schema = @Schema(
+                    description = "팁 항목 식별자",
+                    example = "6b6f3315-3a22-4484-a494-104c76fdc8a5")
+            )
+            @PathVariable(required = false)
+            @NotNull(message = "항목 식별자가 비어 있습니다.")
+            UUID categoryUuid,
+
+            @Parameter(schema = @Schema(
+                    description = "페이지 숫자",
+                    minimum = "1",
+                    example = "1")
+            )
+            @RequestParam
+            @CommunicationPageNumber
+            Integer page) {
+        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.getByCategoryUuid(categoryUuid, PageRequest.of(page, PAGE_SIZE)))));
     }
 
     @Operation(
@@ -72,16 +119,39 @@ public class TipPostController {
             description = "제목+본문 검색어로 팁 게시글의 목록과 페이지 정보를 조회합니다."
     )
     @GetMapping("/search")
-    public ResponseEntity<DataResponse<PostPageResponse<?>>> searchTipPosts(@RequestParam String keyword, Pageable pageable) {
-        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.searchByKeyword(keyword, pageable))));
+    public ResponseEntity<DataResponse<PostPageResponse<?>>> searchTipPosts(
+            @Parameter(schema = @Schema(
+                    description = "검색 키워드",
+                    example = "물주기")
+            )
+            @RequestParam
+            @NotBlank(message = "키워드가 비어 있습니다.")
+            String keyword,
+
+            @Parameter(schema = @Schema(
+                    description = "페이지 숫자",
+                    minimum = "1",
+                    example = "1")
+            )
+            @RequestParam
+            @CommunicationPageNumber
+            Integer page) {
+        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(tipPostApplicationService.searchByKeyword(keyword, PageRequest.of(page, PAGE_SIZE)))));
     }
 
     @Operation(
             summary = "특정 팁 게시글 조회 API",
-            description = "게시글 id로 특정 팁 게시글을 조회합니다."
+            description = "게시글 식별자로 특정 팁 게시글을 조회합니다."
     )
     @GetMapping("/{ulid}")
-    public ResponseEntity<DataResponse<?>> getTipPostByUlid(@PathVariable String ulid) {
+    public ResponseEntity<DataResponse<?>> getTipPostByUlid(
+            @Parameter(schema = @Schema(
+                    description = "게시글의 식별자",
+                    example = "01JY3PPXRH2QVWT0B8CPKA4TS1")
+            )
+            @PathVariable(required = false)
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String ulid) {
         Optional<TipPostResponse> optionalTipPostResponse = tipPostApplicationService.getByUlid(ulid);
         if (optionalTipPostResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -95,10 +165,36 @@ public class TipPostController {
     )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> insertTipPost(
-            @RequestPart(SNAKE_CATE_UUID) UUID categoryUuid,
-            @RequestPart String title,
-            @RequestPart List<MultipartFile> content,
-            @RequestPart(SNAKE_ORDER_INFO) List<FileOrder> orderInfo
+            @Parameter(schema = @Schema(
+                    description = "게시글이 포함된 항목의 식별자",
+                    example = "9c200e7d-77c7-41c1-abd0-87e3b9e49c40")
+            )
+            @RequestParam
+            @NotNull(message = "항목 식별자가 비어 있습니다.")
+            UUID categoryUuid,
+
+            @Parameter(schema = @Schema(
+                    description = "게시글의 제목",
+                    maximum = "150",
+                    example = "흙이 마른 것을 쉽게 확인할 수 있는 방법")
+            )
+            @RequestParam
+            @CommunicationTitle
+            String title,
+
+            @Parameter(schema = @Schema(
+                    description = "게시글 컨텐츠")
+            )
+            @RequestPart
+            @NotNull(message = "게시글이 비어 있습니다.")
+            List<MultipartFile> content,
+
+            @Parameter(schema = @Schema(
+                    description = "게시글에 속한 파트들의 순서에 대한 정보")
+            )
+            @RequestPart
+            @NotNull(message = "순서 정보가 비어 있습니다.")
+            List<@Valid FileOrder> orderInfo
     ) throws IOException {
         tipPostApplicationService.insert(new TipPostInsertRequest(categoryUuid, title, content, orderInfo), memberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
@@ -110,11 +206,43 @@ public class TipPostController {
     )
     @PutMapping(value = "/{ulid}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> updateTipPost(
-            @RequestPart(SNAKE_CATE_UUID) UUID categoryUuid,
-            @RequestPart String title,
-            @RequestPart List<MultipartFile> content,
-            @RequestPart(SNAKE_ORDER_INFO) List<FileOrder> orderInfo,
-            @PathVariable String ulid
+            @Parameter(schema = @Schema(
+                    description = "갱신을 위한 게시글 항목 식별자",
+                    example = "601f7b88-f0cc-4142-ab8f-d09ce06e5317")
+            )
+            @RequestParam
+            @NotNull(message = "항목 식별자가 비어 있습니다.")
+            UUID categoryUuid,
+
+            @Parameter(schema = @Schema(
+                    description = "갱신을 위한 게시글 제목",
+                    example = "이것만 있으면 흙이 마른 것을 바로 알 수 있습니다")
+            )
+            @RequestParam
+            @CommunicationTitle
+            String title,
+
+            @Parameter(schema = @Schema(
+                    description = "갱신을 위한 게시글 컨텐츠")
+            )
+            @RequestPart
+            @NotNull(message = "컨텐츠가 비어 있습니다.")
+            List<MultipartFile> content,
+
+            @Parameter(schema = @Schema(
+                    description = "게시글에 속한 파트들의 순서에 대한 정보")
+            )
+            @RequestPart
+            @NotNull(message = "순서 정보가 비어 있습니다.")
+            List<@Valid FileOrder> orderInfo,
+
+            @Parameter(schema = @Schema(
+                    description = "게시글 식별을 위한 게시글 식별자",
+                    example = "01JXEDEX5GJNBB9SAB7FB2ZG9W")
+            )
+            @PathVariable(required = false)
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String ulid
     ) throws IOException {
         tipPostApplicationService.update(new TipPostUpdateRequest(ulid, categoryUuid, title, content, orderInfo), memberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
@@ -125,8 +253,15 @@ public class TipPostController {
             description = "특정 팁 게시글을 삭제합니다."
     )
     @DeleteMapping("/{ulid}")
-    public ResponseEntity<DataResponse<Void>> removeTipPostByUlid(@PathVariable String ulid) throws IOException {
-        tipPostApplicationService.removeByUlid(ulid,memberUuid);
+    public ResponseEntity<DataResponse<Void>> removeTipPostByUlid(
+            @Parameter(schema = @Schema(
+                    description = "게시글의 식별자",
+                    example = "01JY3PPXRH2QVWT0B8CPKA4TS1")
+            )
+            @PathVariable(required = false)
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String ulid) throws IOException {
+        tipPostApplicationService.removeByUlid(ulid, memberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
@@ -135,7 +270,14 @@ public class TipPostController {
             description = "특정 팁 게시글의 조회수를 조회합니다."
     )
     @GetMapping("/{ulid}/views")
-    public ResponseEntity<DataResponse<Long>> countViewCount(@PathVariable String ulid) {
+    public ResponseEntity<DataResponse<Long>> countViewCount(
+            @Parameter(schema = @Schema(
+                    description = "게시글의 식별자",
+                    example = "01JY3PPXRH2QVWT0B8CPKA4TS1")
+            )
+            @PathVariable(required = false)
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String ulid) {
         return ResponseEntity.ok().body(DataResponse.ok(tipPostApplicationService.readViewCount(ulid)));
     }
 
@@ -144,7 +286,14 @@ public class TipPostController {
             description = "특정 팁 게시글의 조회수를 증가시킵니다."
     )
     @PatchMapping("/{ulid}/views")
-    public ResponseEntity<DataResponse<Long>> increaseViewCount(@PathVariable String ulid) {
+    public ResponseEntity<DataResponse<Long>> increaseViewCount(
+            @Parameter(schema = @Schema(
+                    description = "게시글의 식별자",
+                    example = "01JY3PPXRH2QVWT0B8CPKA4TS1")
+            )
+            @PathVariable(required = false)
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String ulid) {
         return ResponseEntity.ok().body(DataResponse.ok(tipPostApplicationService.increaseViewCount(ulid, memberUuid)));
     }
 }
