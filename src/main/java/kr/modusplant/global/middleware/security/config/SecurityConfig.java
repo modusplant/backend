@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.advice.GlobalExceptionHandler;
 import kr.modusplant.global.middleware.security.SiteMemberAuthProvider;
+import kr.modusplant.global.middleware.security.SiteMemberAuthenticationEntryPoint;
 import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
 import kr.modusplant.global.middleware.security.filter.EmailPasswordAuthenticationFilter;
 import kr.modusplant.global.middleware.security.filter.JwtAuthenticationFilter;
@@ -75,7 +76,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public ForwardRequestLoginSuccessHandler normalLoginSuccessHandler() {
+    public ForwardRequestLoginSuccessHandler forwardRequestLoginSuccessHandler() {
         return new ForwardRequestLoginSuccessHandler(memberRepository, tokenApplicationService);
     }
 
@@ -84,7 +85,7 @@ public class SecurityConfig {
         return new JwtClearingLogoutHandler(tokenApplicationService); }
 
     @Bean
-    public WriteResponseLoginFailureHandler normalLoginFailureHandler() {
+    public WriteResponseLoginFailureHandler writeResponseLoginFailureHandler() {
         return new WriteResponseLoginFailureHandler(objectMapper);
     }
 
@@ -104,14 +105,14 @@ public class SecurityConfig {
     @Bean
     public EmailPasswordAuthenticationFilter emailPasswordAuthenticationFilter(HttpSecurity http) {
         try {
-            EmailPasswordAuthenticationFilter emailPasswordAuthenticationFilter = new EmailPasswordAuthenticationFilter(
+            EmailPasswordAuthenticationFilter filter = new EmailPasswordAuthenticationFilter(
                     objectMapper, authenticationManager());
 
-            emailPasswordAuthenticationFilter.setAuthenticationManager(authenticationManager());
-            emailPasswordAuthenticationFilter.setAuthenticationSuccessHandler(normalLoginSuccessHandler());
-            emailPasswordAuthenticationFilter.setAuthenticationFailureHandler(normalLoginFailureHandler());
+            filter.setAuthenticationManager(authenticationManager());
+            filter.setAuthenticationSuccessHandler(forwardRequestLoginSuccessHandler());
+            filter.setAuthenticationFailureHandler(writeResponseLoginFailureHandler());
 
-            return emailPasswordAuthenticationFilter;
+            return filter;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -122,8 +123,8 @@ public class SecurityConfig {
         http
                 .securityMatcher("/api/**")
                 .cors(Customizer.withDefaults())
-                .addFilterBefore(jwtAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(emailPasswordAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter(http), EmailPasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/v1/conversation/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/qna/**").permitAll()
@@ -142,15 +143,15 @@ public class SecurityConfig {
                         .clearAuthentication(true)
                         .addLogoutHandler(JwtClearingLogoutHandler())
                         .logoutSuccessHandler(normalLogoutSuccessHandler()))
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(eh ->
                         eh.authenticationEntryPoint((request, response, authException) ->
                                         globalExceptionHandler.handleGenericException(request, authException))
                                 .accessDeniedHandler((request, response, accessDeniedException) ->
                                         globalExceptionHandler.handleGenericException(request, accessDeniedException))
                 )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers
                         .httpStrictTransportSecurity(hsts -> hsts
                                 .includeSubDomains(true)
