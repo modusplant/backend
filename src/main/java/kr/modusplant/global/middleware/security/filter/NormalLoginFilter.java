@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.global.middleware.security.models.SiteMemberAuthToken;
-import kr.modusplant.modules.auth.normal.login.app.http.NormalLoginRequest;
+import kr.modusplant.modules.auth.normal.login.app.http.request.NormalLoginRequest;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -33,8 +33,8 @@ public class NormalLoginFilter extends AbstractAuthenticationProcessingFilter {
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException {
         NormalLoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), NormalLoginRequest.class);
 
-        if (!loginRequest.checkFieldValidation()) {
-            throw new IllegalArgumentException("missing email or password");
+        if (loginRequest.isEmailOrPasswordNull()) {
+            throw new IllegalArgumentException("이메일 또는 비밀번호가 비어 있습니다.");
         }
 
         SiteMemberAuthToken requestToken = new SiteMemberAuthToken(

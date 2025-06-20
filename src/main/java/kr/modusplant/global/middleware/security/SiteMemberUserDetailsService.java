@@ -8,12 +8,12 @@ import kr.modusplant.domains.member.domain.service.SiteMemberAuthValidationServi
 import kr.modusplant.domains.member.domain.service.SiteMemberRoleValidationService;
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.enums.AuthProvider;
+import kr.modusplant.domains.member.mapper.SiteMemberAuthDomainInfraMapper;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleRepository;
-import kr.modusplant.global.middleware.security.mapper.SiteMemberAuthEntityToDomainMapper;
-import kr.modusplant.global.middleware.security.mapper.SiteMemberEntityToDomainMapper;
-import kr.modusplant.global.middleware.security.mapper.SiteMemberRoleEntityToDomainMapper;
+import kr.modusplant.domains.member.mapper.SiteMemberDomainInfraMapper;
+import kr.modusplant.domains.member.mapper.SiteMemberRoleDomainInfraMapper;
 import kr.modusplant.global.middleware.security.models.SiteMemberUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -29,29 +29,31 @@ import java.util.List;
 public class SiteMemberUserDetailsService implements UserDetailsService {
 
     private final SiteMemberValidationService memberValidationService;
-    private final SiteMemberRepository memberRepository;
     private final SiteMemberAuthValidationService memberAuthValidationService;
-    private final SiteMemberAuthRepository memberAuthRepository;
     private final SiteMemberRoleValidationService memberRoleValidationService;
+
+    private final SiteMemberDomainInfraMapper memberDomainInfraMapper;
+    private final SiteMemberAuthDomainInfraMapper memberAuthDomainInfraMapper;
+    private final SiteMemberRoleDomainInfraMapper memberRoleDomainInfraMapper;
+
+    private final SiteMemberRepository memberRepository;
+    private final SiteMemberAuthRepository memberAuthRepository;
     private final SiteMemberRoleRepository memberRoleRepository;
-    private final SiteMemberEntityToDomainMapper memberEntityToDomainMapper;
-    private final SiteMemberAuthEntityToDomainMapper memberAuthEntityToDomainMapper;
-    private final SiteMemberRoleEntityToDomainMapper memberRoleEntityToDomainMapper;
 
     @Override
     public SiteMemberUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         memberAuthValidationService.validateNotFoundEmailAndAuthProvider(email, AuthProvider.BASIC);
-        SiteMemberAuth memberAuth = memberAuthEntityToDomainMapper.toSiteMemberAuth(
-                memberAuthRepository.findByEmailAndProvider(email, AuthProvider.BASIC).get());
+        SiteMemberAuth memberAuth = memberAuthDomainInfraMapper.toSiteMemberAuth(
+                memberAuthRepository.findByEmailAndProvider(email, AuthProvider.BASIC).orElseThrow());
 
         memberValidationService.validateNotFoundUuid(memberAuth.getActiveMemberUuid());
-        SiteMember member = memberEntityToDomainMapper.toSiteMember(
-                memberRepository.findByUuid(memberAuth.getActiveMemberUuid()).get());
+        SiteMember member = memberDomainInfraMapper.toSiteMember(
+                memberRepository.findByUuid(memberAuth.getActiveMemberUuid()).orElseThrow());
 
         memberRoleValidationService.validateNotFoundUuid(memberAuth.getActiveMemberUuid());
-        SiteMemberRole memberRole = memberRoleEntityToDomainMapper.toSiteMemberRole(
-                memberRoleRepository.findByUuid(memberAuth.getActiveMemberUuid()).get());
+        SiteMemberRole memberRole = memberRoleDomainInfraMapper.toSiteMemberRole(
+                memberRoleRepository.findByUuid(memberAuth.getActiveMemberUuid()).orElseThrow());
 
         return SiteMemberUserDetails.builder()
                 .email(memberAuth.getEmail())

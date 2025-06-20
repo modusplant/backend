@@ -1,15 +1,16 @@
 package kr.modusplant.global.middleware.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.advice.GlobalExceptionHandler;
 import kr.modusplant.global.middleware.security.SiteMemberAuthProvider;
 import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
 import kr.modusplant.global.middleware.security.filter.NormalLoginFilter;
-import kr.modusplant.global.middleware.security.handler.JwtClearingLogoutHandler;
-import kr.modusplant.global.middleware.security.handler.WriteResponseLoginFailureHandler;
 import kr.modusplant.global.middleware.security.handler.ForwardRequestLoginSuccessHandler;
 import kr.modusplant.global.middleware.security.handler.ForwardRequestLogoutSuccessHandler;
+import kr.modusplant.global.middleware.security.handler.JwtClearingLogoutHandler;
+import kr.modusplant.global.middleware.security.handler.WriteResponseLoginFailureHandler;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,7 +26,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -44,17 +45,15 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authConfiguration;
     private final GlobalExceptionHandler globalExceptionHandler;
     private final SiteMemberUserDetailsService memberUserDetailsService;
-    private final ObjectMapper objectMapper;
     private final TokenApplicationService tokenApplicationService;
+    private final SiteMemberValidationService memberValidationService;
     private final SiteMemberRepository memberRepository;
+    private final ObjectMapper objectMapper;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.debug(debugEnabled);
     }
-
-    @Bean
-    public SecurityContextHolder securityContextHolder() { return new SecurityContextHolder(); }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -67,23 +66,23 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SiteMemberAuthProvider siteMemberAuthProvider() {
+    public AuthenticationProvider siteMemberAuthProvider() {
         return new SiteMemberAuthProvider(memberUserDetailsService, passwordEncoder());
     }
 
     @Bean
     public ForwardRequestLoginSuccessHandler normalLoginSuccessHandler() {
-        return new ForwardRequestLoginSuccessHandler(memberRepository, tokenApplicationService);
+        return new ForwardRequestLoginSuccessHandler(memberRepository, memberValidationService, tokenApplicationService);
     }
-
-    @Bean
-    public JwtClearingLogoutHandler JwtClearingLogoutHandler() {
-        return new JwtClearingLogoutHandler(tokenApplicationService); }
 
     @Bean
     public WriteResponseLoginFailureHandler normalLoginFailureHandler() {
         return new WriteResponseLoginFailureHandler(objectMapper);
     }
+
+    @Bean
+    public JwtClearingLogoutHandler JwtClearingLogoutHandler() {
+        return new JwtClearingLogoutHandler(tokenApplicationService); }
 
     @Bean
     public ForwardRequestLogoutSuccessHandler normalLogoutSuccessHandler() {

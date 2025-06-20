@@ -40,15 +40,15 @@ public class SiteMemberAuthProvider implements AuthenticationProvider {
 
     private boolean validateSiteMemberUserDetails(SiteMemberUserDetails userDetails, String password) {
         if(!passwordEncoder.matches(password, userDetails.getPassword())) {
-            throw new BadCredentialsException("The password is not correct"); }
-        if (!userDetails.isActive()) {
-            throw new InactiveException("The account is inactive"); }
+            throw new BadCredentialsException("비밀번호가 틀렸습니다."); }
         if (userDetails.isDisabledByLinking()) {
-            throw new DisabledByLinkingException("The account is disabled by account linking"); }
+            throw new DisabledByLinkingException("계정 연동으로 인해 이 계정을 사용할 수 없습니다."); }
         if (userDetails.isBanned()) {
-            throw new BannedException("The account is banned"); }
+            throw new BannedException("계정이 밴 되어 사용할 수 없습니다."); }
         if (userDetails.isDeleted()) {
-            throw new DeletedException("The account is deleted"); }
+            throw new DeletedException("계정이 삭제되어 더 이상 사용할 수 없습니다."); }
+        if (!userDetails.isActive()) {
+            throw new InactiveException("계정이 사용할 수 없습니다."); }
 
         return true;
     }

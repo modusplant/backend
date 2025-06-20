@@ -1,4 +1,4 @@
-package kr.modusplant.global.middleware.security.mapper;
+package kr.modusplant.domains.member.mapper;
 
 import kr.modusplant.domains.member.domain.model.SiteMember;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper
-public interface SiteMemberEntityToDomainMapper {
+public interface SiteMemberDomainInfraMapper {
 
     @Mapping(target = "birthDate", ignore = true)
     @Mapping(target = "loggedInAt", ignore = true)

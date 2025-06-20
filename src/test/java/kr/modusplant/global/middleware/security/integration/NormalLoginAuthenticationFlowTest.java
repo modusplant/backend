@@ -2,6 +2,7 @@ package kr.modusplant.global.middleware.security.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
+import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
 import kr.modusplant.global.middleware.security.common.util.SiteMemberUserDetailsTestUtils;
@@ -52,6 +53,9 @@ public class NormalLoginAuthenticationFlowTest implements
     private SiteMemberUserDetailsService memberUserDetailsService;
 
     @MockitoBean
+    private SiteMemberValidationService memberValidationService;
+
+    @MockitoBean
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @MockitoBean
@@ -83,11 +87,12 @@ public class NormalLoginAuthenticationFlowTest implements
 
         given(memberUserDetailsService.loadUserByUsername(testLoginRequest.email()))
                 .willReturn(validSiteMemberUserDetails);
-        doNothing().when(tokenValidationService).validateNotFoundMemberUuid(any());
-        given(refreshTokenApplicationService.insert(any())).willReturn(any());
+        doNothing().when(tokenValidationService).validateNotFoundMemberUuid(null);
+        given(refreshTokenApplicationService.insert(any())).willReturn(null);
+        doNothing().when(memberValidationService).validateNotFoundUuid(validSiteMemberUserDetails.getActiveUuid());
         given(memberRepository.findByUuid(validSiteMemberUserDetails.getActiveUuid()))
                 .willReturn(Optional.ofNullable(createMemberBasicUserEntityWithUuid()));
-        given(memberRepository.save(any())).willReturn(any());
+        given(memberRepository.save(any())).willReturn(null);
 
         // when
         mockMvc.perform(post("/api/auth/login")

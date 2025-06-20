@@ -1,9 +1,9 @@
 package kr.modusplant.global.middleware.security.handler;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.enums.Role;
@@ -23,6 +23,7 @@ import java.util.UUID;
 public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final SiteMemberRepository memberRepository;
+    private final SiteMemberValidationService memberValidationService;
     private final TokenApplicationService tokenApplicationService;
 
     @Override
@@ -45,7 +46,7 @@ public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessH
     private Role getMemberRole(SiteMemberUserDetails memberUserDetails) {
         GrantedAuthority memberRole = memberUserDetails.getAuthorities().stream()
                 .filter(auth -> auth.getAuthority().startsWith("ROLE_"))
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("The authenticated user does not have role"));
+                .findFirst().orElseThrow(() -> new IllegalArgumentException("인증된 유저에게 할당된 역할이 없습니다."));
 
         String rawRole = memberRole.getAuthority();
 
@@ -55,8 +56,8 @@ public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessH
     }
 
     private void updateMemberLoggedInAt(UUID currentMemberUuid) {
-        SiteMemberEntity memberEntity = memberRepository.findByUuid(currentMemberUuid)
-                .orElseThrow(() -> new EntityNotFoundException("cannot find the member of the uuid"));
+        memberValidationService.validateNotFoundUuid(currentMemberUuid);
+        SiteMemberEntity memberEntity = memberRepository.findByUuid(currentMemberUuid).orElseThrow();
         memberEntity.updateLoggedInAt(LocalDateTime.now());
         memberRepository.save(memberEntity);
     }

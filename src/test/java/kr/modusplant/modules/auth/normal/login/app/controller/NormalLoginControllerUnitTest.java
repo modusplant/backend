@@ -25,7 +25,7 @@ public class NormalLoginControllerUnitTest {
     private MockMvc mockMvc;
 
     @Mock
-    HttpServletRequest testRequest;
+    private HttpServletRequest testRequest;
 
     @InjectMocks
     private NormalLoginController normalLoginController = new NormalLoginController();
@@ -65,19 +65,6 @@ public class NormalLoginControllerUnitTest {
                 .andExpect(matchCookie(
                         "refreshToken", testRefreshToken, "/",
                         (int) refreshDuration, true, true
-                ))
-                .andExpect(jsonPath("$.data.accessTokenExpirationTime").value(testAccessTokenExpirationTime))
-                .andExpect(jsonPath("$.data.refreshTokenExpirationTime").value(testRefreshTokenExpirationTime));
-    }
-
-    @Test
-    public void sendLoginFailure() throws Exception {
-        String testErrorMessage = "The account is inactive";
-
-        mockMvc.perform(post("/api/auth/login-fail")
-                        .requestAttr("errorMessage", testErrorMessage))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.status").value(401))
-                .andExpect(jsonPath("$.message").value(testErrorMessage));
+                ));
     }
 }

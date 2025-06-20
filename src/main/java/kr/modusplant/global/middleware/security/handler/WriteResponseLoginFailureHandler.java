@@ -1,7 +1,6 @@
 package kr.modusplant.global.middleware.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.global.app.http.response.DataResponse;
@@ -20,7 +19,7 @@ public class WriteResponseLoginFailureHandler implements AuthenticationFailureHa
     @Override
     public void onAuthenticationFailure(HttpServletRequest request,
                                         HttpServletResponse response,
-                                        AuthenticationException exception) throws IOException, ServletException {
+                                        AuthenticationException exception) throws IOException {
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.getWriter().write(
