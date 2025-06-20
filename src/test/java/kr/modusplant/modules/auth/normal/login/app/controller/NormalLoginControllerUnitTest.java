@@ -1,9 +1,6 @@
 package kr.modusplant.modules.auth.normal.login.app.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -23,12 +20,6 @@ public class NormalLoginControllerUnitTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Mock
-    HttpServletRequest testRequest;
-
-    @InjectMocks
-    private NormalLoginController normalLoginController = new NormalLoginController();
 
     public static ResultMatcher matchCookie(String name, String value,
                                             String path, int maxAge,
@@ -54,9 +45,7 @@ public class NormalLoginControllerUnitTest {
         // when
         mockMvc.perform(post("/api/auth/login-success")
                         .requestAttr("accessToken", testAccessToken)
-                        .requestAttr("refreshToken", testRefreshToken)
-                        .requestAttr("accessTokenExpirationTime", testAccessTokenExpirationTime)
-                        .requestAttr("refreshTokenExpirationTime", testRefreshTokenExpirationTime))
+                        .requestAttr("refreshToken", testRefreshToken))
 
                 // then
                 .andExpect(status().isOk())
@@ -65,8 +54,6 @@ public class NormalLoginControllerUnitTest {
                 .andExpect(matchCookie(
                         "refreshToken", testRefreshToken, "/",
                         (int) refreshDuration, true, true
-                ))
-                .andExpect(jsonPath("$.data.accessTokenExpirationTime").value(testAccessTokenExpirationTime))
-                .andExpect(jsonPath("$.data.refreshTokenExpirationTime").value(testRefreshTokenExpirationTime));
+                ));
     }
 }
