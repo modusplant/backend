@@ -1,6 +1,7 @@
 package kr.modusplant.domains.communication.qna.app.service;
 
-import kr.modusplant.domains.common.domain.service.MediaContentService;
+import kr.modusplant.domains.common.app.service.MultipartDataProcessor;
+import kr.modusplant.domains.common.enums.PostType;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostInsertRequest;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostUpdateRequest;
 import kr.modusplant.domains.communication.qna.app.http.response.QnaPostResponse;
@@ -48,7 +49,7 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, QnaCat
     private QnaPostRepository qnaPostRepository;
 
     @Autowired
-    private MediaContentService mediaContentService;
+    private MultipartDataProcessor multipartDataProcessor;
 
     @Autowired
     private QnaPostViewCountRedisRepository qnaPostViewCountRedisRepository;
@@ -179,7 +180,7 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, QnaCat
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(qnaPostInsertRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(qnaPostInsertRequest.content()))
+                .content(multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.QNA_POST,qnaPostInsertRequest.content()))
                 .build();
         qnaPostRepository.save(qnaPostEntity);
         qnaPostViewCountRedisRepository.write(qnaPostEntity.getUlid(),5L);
@@ -207,7 +208,7 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, QnaCat
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(qnaPostInsertRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(qnaPostInsertRequest.content()))
+                .content(multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.QNA_POST,qnaPostInsertRequest.content()))
                 .build();
         qnaPostRepository.save(qnaPostEntity);
 
@@ -238,7 +239,7 @@ class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, QnaCat
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(qnaPostInsertRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(qnaPostInsertRequest.content()))
+                .content(multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.QNA_POST,qnaPostInsertRequest.content()))
                 .build();
         qnaPostRepository.save(qnaPostEntity);
 

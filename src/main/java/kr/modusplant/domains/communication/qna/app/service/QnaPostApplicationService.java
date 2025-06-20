@@ -1,12 +1,11 @@
 package kr.modusplant.domains.communication.qna.app.service;
 
-import kr.modusplant.domains.common.domain.service.MediaContentService;
-import kr.modusplant.domains.communication.common.error.PostNotFoundException;
+import kr.modusplant.domains.common.app.service.MultipartDataProcessor;
+import kr.modusplant.domains.common.enums.PostType;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostInsertRequest;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostUpdateRequest;
 import kr.modusplant.domains.communication.qna.app.http.response.QnaPostResponse;
 import kr.modusplant.domains.communication.qna.domain.service.QnaCategoryValidationService;
-import kr.modusplant.domains.communication.qna.domain.service.QnaPageableValidationService;
 import kr.modusplant.domains.communication.qna.domain.service.QnaPostValidationService;
 import kr.modusplant.domains.communication.qna.mapper.QnaPostAppInfraMapper;
 import kr.modusplant.domains.communication.qna.mapper.QnaPostAppInfraMapperImpl;
@@ -19,6 +18,7 @@ import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostVie
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -36,10 +36,9 @@ import java.util.UUID;
 public class QnaPostApplicationService {
 
     private final QnaPostValidationService qnaPostValidationService;
-    private final QnaPageableValidationService qnaPageableValidationService;
     private final QnaCategoryValidationService qnaCategoryValidationService;
     private final SiteMemberValidationService siteMemberValidationService;
-    private final MediaContentService mediaContentService;
+    private final MultipartDataProcessor multipartDataProcessor;
     private final QnaPostRepository qnaPostRepository;
     private final SiteMemberRepository siteMemberRepository;
     private final QnaCategoryRepository qnaCategoryRepository;
@@ -51,11 +50,9 @@ public class QnaPostApplicationService {
     private long ttlMinutes;
 
     public Page<QnaPostResponse> getAll(Pageable pageable) {
-        qnaPageableValidationService.validatePageExistence(pageable);
-        qnaPageableValidationService.validateNotUnsorted(pageable);
         return qnaPostRepository.findByIsDeletedFalseOrderByCreatedAtDesc(pageable).map(entity -> {
             try {
-                entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
+                entity.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -64,13 +61,10 @@ public class QnaPostApplicationService {
     }
 
     public Page<QnaPostResponse> getByMemberUuid(UUID memberUuid, Pageable pageable) {
-        siteMemberValidationService.validateNotFoundUuid(memberUuid);
-        qnaPageableValidationService.validatePageExistence(pageable);
-        qnaPageableValidationService.validateNotUnsorted(pageable);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
         return qnaPostRepository.findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(siteMember, pageable).map(entity -> {
             try {
-                entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
+                entity.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -79,13 +73,10 @@ public class QnaPostApplicationService {
     }
 
     public Page<QnaPostResponse> getByCategoryUuid(UUID categoryUuid, Pageable pageable) {
-        qnaCategoryValidationService.validateNotFoundUuid(categoryUuid);
-        qnaPageableValidationService.validatePageExistence(pageable);
-        qnaPageableValidationService.validateNotUnsorted(pageable);
         QnaCategoryEntity qnaCategory = qnaCategoryRepository.findByUuid(categoryUuid).orElseThrow();
         return qnaPostRepository.findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(qnaCategory, pageable).map(entity -> {
             try {
-                entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
+                entity.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -94,11 +85,9 @@ public class QnaPostApplicationService {
     }
 
     public Page<QnaPostResponse> searchByKeyword(String keyword, Pageable pageable) {
-        qnaPageableValidationService.validatePageExistence(pageable);
-        qnaPageableValidationService.validateNotUnsorted(pageable);
         return qnaPostRepository.searchByTitleOrContent(keyword, pageable).map(entity -> {
             try {
-                entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
+                entity.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -107,11 +96,10 @@ public class QnaPostApplicationService {
     }
 
     public Optional<QnaPostResponse> getByUlid(String ulid) {
-        qnaPostValidationService.validateNotFoundUlid(ulid);
         return qnaPostRepository.findByUlid(ulid)
                 .map(qnaPost -> {
                     try {
-                        qnaPost.updateContent(mediaContentService.convertFileSrcToBinaryData(qnaPost.getContent()));
+                        qnaPost.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(qnaPost.getContent()));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -132,7 +120,7 @@ public class QnaPostApplicationService {
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(qnaPostInsertRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(qnaPostInsertRequest.content()))
+                .content(multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.QNA_POST,qnaPostInsertRequest.content()))
                 .build();
         qnaPostRepository.save(qnaPostEntity);
     }
@@ -143,10 +131,10 @@ public class QnaPostApplicationService {
         qnaPostValidationService.validateAccessibleQnaPost(qnaPostUpdateRequest.ulid(), memberUuid);
         qnaCategoryValidationService.validateNotFoundUuid(qnaPostUpdateRequest.categoryUuid());
         QnaPostEntity qnaPostEntity = qnaPostRepository.findByUlid(qnaPostUpdateRequest.ulid()).orElseThrow();
-        mediaContentService.deleteFiles(qnaPostEntity.getContent());
+        multipartDataProcessor.deleteFiles(qnaPostEntity.getContent());
         qnaPostEntity.updateCategory(qnaCategoryRepository.findByUuid(qnaPostUpdateRequest.categoryUuid()).orElseThrow());
         qnaPostEntity.updateTitle(qnaPostUpdateRequest.title());
-        qnaPostEntity.updateContent(mediaContentService.saveFilesAndGenerateContentJson(qnaPostUpdateRequest.content()));
+        qnaPostEntity.updateContent(multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.QNA_POST,qnaPostUpdateRequest.content()));
         qnaPostRepository.save(qnaPostEntity);
     }
 
@@ -154,7 +142,7 @@ public class QnaPostApplicationService {
     public void removeByUlid(String ulid, UUID memberUuid) throws IOException {
         qnaPostValidationService.validateAccessibleQnaPost(ulid,memberUuid);
         QnaPostEntity qnaPostEntity = qnaPostRepository.findByUlid(ulid).orElseThrow();
-        mediaContentService.deleteFiles(qnaPostEntity.getContent());
+        multipartDataProcessor.deleteFiles(qnaPostEntity.getContent());
         qnaPostEntity.updateIsDeleted(true);
         qnaPostRepository.save(qnaPostEntity);
     }
@@ -166,7 +154,7 @@ public class QnaPostApplicationService {
         }
         Long dbViewCount = qnaPostRepository.findByUlid(ulid)
                 .map(qnaPostEntity -> Optional.ofNullable(qnaPostEntity.getViewCount()).orElseThrow())
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid, String.class));
         qnaPostViewCountRedisRepository.write(ulid, dbViewCount);
         return dbViewCount;
     }

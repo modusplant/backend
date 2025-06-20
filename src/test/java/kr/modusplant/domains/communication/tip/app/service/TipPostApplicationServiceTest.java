@@ -1,6 +1,7 @@
 package kr.modusplant.domains.communication.tip.app.service;
 
-import kr.modusplant.domains.common.domain.service.MediaContentService;
+import kr.modusplant.domains.common.app.service.MultipartDataProcessor;
+import kr.modusplant.domains.common.enums.PostType;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostInsertRequest;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostUpdateRequest;
 import kr.modusplant.domains.communication.tip.app.http.response.TipPostResponse;
@@ -48,7 +49,7 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
     private TipPostRepository tipPostRepository;
 
     @Autowired
-    private MediaContentService mediaContentService;
+    private MultipartDataProcessor multipartDataProcessor;
 
     @Autowired
     private TipPostViewCountRedisRepository tipPostViewCountRedisRepository;
@@ -179,7 +180,7 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(tipPostInsertRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(tipPostInsertRequest.content()))
+                .content(multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.TIP_POST,tipPostInsertRequest.content()))
                 .build();
         tipPostRepository.save(tipPostEntity);
         tipPostViewCountRedisRepository.write(tipPostEntity.getUlid(),5L);
@@ -207,7 +208,7 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(tipPostInsertRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(tipPostInsertRequest.content()))
+                .content(multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.TIP_POST,tipPostInsertRequest.content()))
                 .build();
         tipPostRepository.save(tipPostEntity);
 
@@ -238,7 +239,7 @@ class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCat
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(tipPostInsertRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(tipPostInsertRequest.content()))
+                .content(multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.TIP_POST,tipPostInsertRequest.content()))
                 .build();
         tipPostRepository.save(tipPostEntity);
 

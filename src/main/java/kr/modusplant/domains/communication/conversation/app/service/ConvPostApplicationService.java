@@ -1,12 +1,11 @@
 package kr.modusplant.domains.communication.conversation.app.service;
 
-import kr.modusplant.domains.common.domain.service.MediaContentService;
-import kr.modusplant.domains.communication.common.error.PostNotFoundException;
+import kr.modusplant.domains.common.app.service.MultipartDataProcessor;
+import kr.modusplant.domains.common.enums.PostType;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostUpdateRequest;
 import kr.modusplant.domains.communication.conversation.app.http.response.ConvPostResponse;
 import kr.modusplant.domains.communication.conversation.domain.service.ConvCategoryValidationService;
-import kr.modusplant.domains.communication.conversation.domain.service.ConvPageableValidationService;
 import kr.modusplant.domains.communication.conversation.domain.service.ConvPostValidationService;
 import kr.modusplant.domains.communication.conversation.mapper.ConvPostAppInfraMapper;
 import kr.modusplant.domains.communication.conversation.mapper.ConvPostAppInfraMapperImpl;
@@ -19,6 +18,7 @@ import kr.modusplant.domains.communication.conversation.persistence.repository.C
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -36,10 +36,9 @@ import java.util.UUID;
 public class ConvPostApplicationService {
 
     private final ConvPostValidationService convPostValidationService;
-    private final ConvPageableValidationService convPageableValidationService;
     private final ConvCategoryValidationService convCategoryValidationService;
     private final SiteMemberValidationService siteMemberValidationService;
-    private final MediaContentService mediaContentService;
+    private final MultipartDataProcessor multipartDataProcessor;
     private final ConvPostRepository convPostRepository;
     private final SiteMemberRepository siteMemberRepository;
     private final ConvCategoryRepository convCategoryRepository;
@@ -51,11 +50,9 @@ public class ConvPostApplicationService {
     private long ttlMinutes;
 
     public Page<ConvPostResponse> getAll(Pageable pageable) {
-        convPageableValidationService.validatePageExistence(pageable);
-        convPageableValidationService.validateNotUnsorted(pageable);
         return convPostRepository.findByIsDeletedFalseOrderByCreatedAtDesc(pageable).map(entity -> {
             try {
-                entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
+                entity.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -64,13 +61,10 @@ public class ConvPostApplicationService {
     }
 
     public Page<ConvPostResponse> getByMemberUuid(UUID memberUuid, Pageable pageable) {
-        siteMemberValidationService.validateNotFoundUuid(memberUuid);
-        convPageableValidationService.validatePageExistence(pageable);
-        convPageableValidationService.validateNotUnsorted(pageable);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
         return convPostRepository.findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(siteMember, pageable).map(entity -> {
             try {
-                entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
+                entity.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -79,13 +73,10 @@ public class ConvPostApplicationService {
     }
 
     public Page<ConvPostResponse> getByCategoryUuid(UUID categoryUuid, Pageable pageable) {
-        convCategoryValidationService.validateNotFoundUuid(categoryUuid);
-        convPageableValidationService.validatePageExistence(pageable);
-        convPageableValidationService.validateNotUnsorted(pageable);
         ConvCategoryEntity convCategory = convCategoryRepository.findByUuid(categoryUuid).orElseThrow();
         return convPostRepository.findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(convCategory, pageable).map(entity -> {
             try {
-                entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
+                entity.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -94,11 +85,9 @@ public class ConvPostApplicationService {
     }
 
     public Page<ConvPostResponse> searchByKeyword(String keyword, Pageable pageable) {
-        convPageableValidationService.validatePageExistence(pageable);
-        convPageableValidationService.validateNotUnsorted(pageable);
         return convPostRepository.searchByTitleOrContent(keyword, pageable).map(entity -> {
             try {
-                entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
+                entity.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -107,11 +96,10 @@ public class ConvPostApplicationService {
     }
 
     public Optional<ConvPostResponse> getByUlid(String ulid) {
-        convPostValidationService.validateNotFoundUlid(ulid);
         return convPostRepository.findByUlid(ulid)
                 .map(convPost -> {
                     try {
-                        convPost.updateContent(mediaContentService.convertFileSrcToBinaryData(convPost.getContent()));
+                        convPost.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(convPost.getContent()));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -132,7 +120,7 @@ public class ConvPostApplicationService {
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(convPostInsertRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(convPostInsertRequest.content()))
+                .content(multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.CONV_POST,convPostInsertRequest.content()))
                 .build();
         convPostRepository.save(convPostEntity);
     }
@@ -143,10 +131,10 @@ public class ConvPostApplicationService {
         convPostValidationService.validateAccessibleConvPost(convPostUpdateRequest.ulid(), memberUuid);
         convCategoryValidationService.validateNotFoundUuid(convPostUpdateRequest.categoryUuid());
         ConvPostEntity convPostEntity = convPostRepository.findByUlid(convPostUpdateRequest.ulid()).orElseThrow();
-        mediaContentService.deleteFiles(convPostEntity.getContent());
+        multipartDataProcessor.deleteFiles(convPostEntity.getContent());
         convPostEntity.updateCategory(convCategoryRepository.findByUuid(convPostUpdateRequest.categoryUuid()).orElseThrow());
         convPostEntity.updateTitle(convPostUpdateRequest.title());
-        convPostEntity.updateContent(mediaContentService.saveFilesAndGenerateContentJson(convPostUpdateRequest.content()));
+        convPostEntity.updateContent(multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.CONV_POST,convPostUpdateRequest.content()));
         convPostRepository.save(convPostEntity);
     }
 
@@ -154,7 +142,7 @@ public class ConvPostApplicationService {
     public void removeByUlid(String ulid, UUID memberUuid) throws IOException {
         convPostValidationService.validateAccessibleConvPost(ulid,memberUuid);
         ConvPostEntity convPostEntity = convPostRepository.findByUlid(ulid).orElseThrow();
-        mediaContentService.deleteFiles(convPostEntity.getContent());
+        multipartDataProcessor.deleteFiles(convPostEntity.getContent());
         convPostEntity.updateIsDeleted(true);
         convPostRepository.save(convPostEntity);
     }
@@ -166,7 +154,7 @@ public class ConvPostApplicationService {
         }
         Long dbViewCount = convPostRepository.findByUlid(ulid)
                 .map(convPostEntity -> Optional.ofNullable(convPostEntity.getViewCount()).orElseThrow())
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid, String.class));
         convPostViewCountRedisRepository.write(ulid, dbViewCount);
         return dbViewCount;
     }
