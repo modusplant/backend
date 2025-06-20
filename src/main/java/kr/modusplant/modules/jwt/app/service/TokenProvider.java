@@ -177,13 +177,13 @@ public class TokenProvider {
 
             // 인증코드, 메일 일치 검증
             if (!verifyCode.equals(payloadVerifyCode)) {
-                throw new RuntimeException("invalid verification code");
+                throw new IllegalArgumentException("코드를 잘못 입력하였습니다.");
             }
             if (!email.equals(claims.get(EMAIL, String.class))) {
-                throw new RuntimeException("invalid email address");
+                throw new IllegalArgumentException("이메일이 중간에 변경되었습니다.");
             }
         } catch (ExpiredJwtException e) {
-            throw new RuntimeException("expired JWT token");
+            throw new IllegalStateException("토큰이 만료되었습니다.");
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
