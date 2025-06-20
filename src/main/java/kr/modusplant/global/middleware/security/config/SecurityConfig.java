@@ -61,6 +61,10 @@ public class SecurityConfig {
     public SecurityContextHolder securityContextHolder() { return new SecurityContextHolder(); }
 
     @Bean
+    public SiteMemberAuthenticationEntryPoint siteMemberAuthenticationEntryPoint() {
+        return new SiteMemberAuthenticationEntryPoint(objectMapper); }
+
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -144,8 +148,7 @@ public class SecurityConfig {
                         .addLogoutHandler(JwtClearingLogoutHandler())
                         .logoutSuccessHandler(normalLogoutSuccessHandler()))
                 .exceptionHandling(eh ->
-                        eh.authenticationEntryPoint((request, response, authException) ->
-                                        globalExceptionHandler.handleGenericException(request, authException))
+                        eh.authenticationEntryPoint(siteMemberAuthenticationEntryPoint())
                                 .accessDeniedHandler((request, response, accessDeniedException) ->
                                         globalExceptionHandler.handleGenericException(request, accessDeniedException))
                 )
