@@ -8,10 +8,7 @@ import kr.modusplant.global.middleware.security.SiteMemberAuthenticationEntryPoi
 import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
 import kr.modusplant.global.middleware.security.filter.EmailPasswordAuthenticationFilter;
 import kr.modusplant.global.middleware.security.filter.JwtAuthenticationFilter;
-import kr.modusplant.global.middleware.security.handler.ForwardRequestLoginSuccessHandler;
-import kr.modusplant.global.middleware.security.handler.ForwardRequestLogoutSuccessHandler;
-import kr.modusplant.global.middleware.security.handler.JwtClearingLogoutHandler;
-import kr.modusplant.global.middleware.security.handler.WriteResponseLoginFailureHandler;
+import kr.modusplant.global.middleware.security.handler.*;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
 import kr.modusplant.modules.jwt.app.service.TokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +48,7 @@ public class SecurityConfig {
     private final TokenProvider tokenProvider;
     private final TokenApplicationService tokenApplicationService;
     private final SiteMemberRepository memberRepository;
+    private final JwtResponseHandler jwtResponseHandler;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -100,7 +98,7 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(HttpSecurity http) {
         try {
-            return new JwtAuthenticationFilter(tokenProvider);
+            return new JwtAuthenticationFilter(tokenProvider, jwtResponseHandler);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
