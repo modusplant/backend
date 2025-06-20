@@ -9,8 +9,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -41,12 +39,6 @@ public class EmailPasswordAuthenticationFilter extends AbstractAuthenticationPro
                 loginRequest.email(), loginRequest.password()
         );
 
-        Authentication authenticatedToken = authManager.authenticate(requestToken);
-
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(authenticatedToken);
-        SecurityContextHolder.setContext(context);
-
-        return authenticatedToken;
+        return authManager.authenticate(requestToken);
     }
 }
