@@ -1,4 +1,4 @@
-package kr.modusplant.modules.jwt.app.error;
+package kr.modusplant.modules.jwt.error;
 
 import org.springframework.http.HttpStatus;
 

@@ -87,7 +87,7 @@ public class NormalLoginAuthenticationFlowTest implements
 
         given(memberUserDetailsService.loadUserByUsername(testLoginRequest.email()))
                 .willReturn(validSiteMemberUserDetails);
-        doNothing().when(tokenValidationService).validateNotFoundMemberUuid(null);
+        doNothing().when(memberValidationService).validateNotFoundUuid(null);
         given(refreshTokenApplicationService.insert(any())).willReturn(null);
         doNothing().when(memberValidationService).validateNotFoundUuid(validSiteMemberUserDetails.getActiveUuid());
         given(memberRepository.findByUuid(validSiteMemberUserDetails.getActiveUuid()))
