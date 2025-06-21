@@ -48,7 +48,7 @@ public class SecurityConfig {
     private final TokenApplicationService tokenApplicationService;
     private final SiteMemberRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final JwtResponseHandler jwtResponseHandler;
+    private final JwtSecurityHandler jwtSecurityHandler;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -98,7 +98,7 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(HttpSecurity http) {
         try {
-            return new JwtAuthenticationFilter(tokenProvider, jwtResponseHandler, refreshTokenRepository);
+            return new JwtAuthenticationFilter(tokenProvider, jwtSecurityHandler, refreshTokenRepository);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
