@@ -2,7 +2,6 @@ package kr.modusplant.global.middleware.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.global.advice.GlobalExceptionHandler;
 import kr.modusplant.global.middleware.security.SiteMemberAuthProvider;
 import kr.modusplant.global.middleware.security.SiteMemberAuthenticationEntryPoint;
 import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
@@ -11,6 +10,7 @@ import kr.modusplant.global.middleware.security.filter.JwtAuthenticationFilter;
 import kr.modusplant.global.middleware.security.handler.*;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
 import kr.modusplant.modules.jwt.app.service.TokenProvider;
+import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -42,12 +42,12 @@ public class SecurityConfig {
     private Boolean debugEnabled;
 
     private final AuthenticationConfiguration authConfiguration;
-    private final GlobalExceptionHandler globalExceptionHandler;
     private final SiteMemberUserDetailsService memberUserDetailsService;
     private final ObjectMapper objectMapper;
     private final TokenProvider tokenProvider;
     private final TokenApplicationService tokenApplicationService;
     private final SiteMemberRepository memberRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final JwtResponseHandler jwtResponseHandler;
 
     @Bean
@@ -98,7 +98,7 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(HttpSecurity http) {
         try {
-            return new JwtAuthenticationFilter(tokenProvider, jwtResponseHandler);
+            return new JwtAuthenticationFilter(tokenProvider, jwtResponseHandler, refreshTokenRepository);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -118,6 +118,11 @@ public class SecurityConfig {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Bean
+    public SiteMemberAccessDeniedHandler siteMemberAccessDeniedHandler() {
+        return new SiteMemberAccessDeniedHandler(objectMapper);
     }
 
     @Bean
@@ -147,8 +152,7 @@ public class SecurityConfig {
                         .logoutSuccessHandler(normalLogoutSuccessHandler()))
                 .exceptionHandling(eh ->
                         eh.authenticationEntryPoint(siteMemberAuthenticationEntryPoint())
-                                .accessDeniedHandler((request, response, accessDeniedException) ->
-                                        globalExceptionHandler.handleGenericException(request, accessDeniedException))
+                                .accessDeniedHandler(siteMemberAccessDeniedHandler())
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
