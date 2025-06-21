@@ -83,7 +83,7 @@ class S3FileServiceTest {
     }
 
     @Test
-    void testDeleteFile() {
+    void testDeleteFiles() {
         // given
         String fileKey = "test-file-key";
 

@@ -2,6 +2,7 @@ package kr.modusplant.domains.communication.conversation.app.service;
 
 import kr.modusplant.domains.common.app.service.MultipartDataProcessor;
 import kr.modusplant.domains.common.enums.PostType;
+import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostUpdateRequest;
 import kr.modusplant.domains.communication.conversation.app.http.response.ConvPostResponse;
@@ -18,7 +19,6 @@ import kr.modusplant.domains.communication.conversation.persistence.repository.C
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -154,7 +154,7 @@ public class ConvPostApplicationService {
         }
         Long dbViewCount = convPostRepository.findByUlid(ulid)
                 .map(convPostEntity -> Optional.ofNullable(convPostEntity.getViewCount()).orElseThrow())
-                .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid, String.class));
+                .orElseThrow(PostNotFoundException::new);
         convPostViewCountRedisRepository.write(ulid, dbViewCount);
         return dbViewCount;
     }

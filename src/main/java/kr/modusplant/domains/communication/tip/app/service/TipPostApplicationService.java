@@ -2,6 +2,7 @@ package kr.modusplant.domains.communication.tip.app.service;
 
 import kr.modusplant.domains.common.app.service.MultipartDataProcessor;
 import kr.modusplant.domains.common.enums.PostType;
+import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostInsertRequest;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostUpdateRequest;
 import kr.modusplant.domains.communication.tip.app.http.response.TipPostResponse;
@@ -18,7 +19,6 @@ import kr.modusplant.domains.communication.tip.persistence.repository.TipPostVie
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -154,7 +154,7 @@ public class TipPostApplicationService {
         }
         Long dbViewCount = tipPostRepository.findByUlid(ulid)
                 .map(tipPostEntity -> Optional.ofNullable(tipPostEntity.getViewCount()).orElseThrow())
-                .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid, String.class));
+                .orElseThrow(PostNotFoundException::new);
         tipPostViewCountRedisRepository.write(ulid, dbViewCount);
         return dbViewCount;
     }

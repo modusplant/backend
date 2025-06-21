@@ -9,5 +9,6 @@ public final class CamelCaseWord {
     public static final String DATA = "data";
     public static final String MEMBER = "member";
     public static final String ORDER = "order";
+    public static final String TYPE = "type";
     public static final String VERIFY_CODE = "verifyCode";
 }

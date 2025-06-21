@@ -19,8 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 
-import static kr.modusplant.global.vo.CamelCaseWord.DATA;
-import static kr.modusplant.global.vo.CamelCaseWord.ORDER;
+import static kr.modusplant.global.vo.CamelCaseWord.*;
 import static kr.modusplant.global.vo.FileSystem.FILENAME;
 import static kr.modusplant.global.vo.FileSystem.SRC;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -52,36 +51,35 @@ class MultipartDataProcessorTest implements TipPostRequestTestUtils {
         JsonNode result = multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.TIP_POST,allMediaFiles);
 
         // then
-        assertThat(result.isArray());
         assertThat(result.size()).isEqualTo(allMediaFiles.size());
 
         JsonNode textNode = result.get(0);
         assertThat(textNode.get(ORDER).asInt()).isEqualTo(1);
-        assertThat(textNode.get("type").asText()).isEqualTo(FileType.TEXT.getValue());
+        assertThat(textNode.get(TYPE).asText()).isEqualTo(FileType.TEXT.getValue());
         assertThat(textNode.get(FILENAME).asText()).isEqualTo(textFile0.getOriginalFilename());
         assertThat(textNode.get(DATA).asText()).isEqualTo(new String(textFile0.getBytes(), StandardCharsets.UTF_8));
 
         JsonNode imageNode = result.get(1);
         assertThat(imageNode.get(ORDER).asInt()).isEqualTo(2);
-        assertThat(imageNode.get("type").asText()).isEqualTo(FileType.IMAGE.getValue());
+        assertThat(imageNode.get(TYPE).asText()).isEqualTo(FileType.IMAGE.getValue());
         assertThat(imageNode.get(FILENAME).asText()).isEqualTo(imageFile.getOriginalFilename());
         assertThat(imageNode.get(SRC).asText()).matches(regex+FileType.IMAGE.getValue()+"/.*");
 
         JsonNode videoNode = result.get(2);
         assertThat(videoNode.get(ORDER).asInt()).isEqualTo(3);
-        assertThat(videoNode.get("type").asText()).isEqualTo(FileType.VIDEO.getValue());
+        assertThat(videoNode.get(TYPE).asText()).isEqualTo(FileType.VIDEO.getValue());
         assertThat(videoNode.get(FILENAME).asText()).isEqualTo(videoFile.getOriginalFilename());
         assertThat(videoNode.get(SRC).asText()).matches(regex+FileType.VIDEO.getValue()+"/.*");
 
         JsonNode audioNode = result.get(3);
         assertThat(audioNode.get(ORDER).asInt()).isEqualTo(4);
-        assertThat(audioNode.get("type").asText()).isEqualTo(FileType.AUDIO.getValue());
+        assertThat(audioNode.get(TYPE).asText()).isEqualTo(FileType.AUDIO.getValue());
         assertThat(audioNode.get(FILENAME).asText()).isEqualTo(audioFile.getOriginalFilename());
         assertThat(audioNode.get(SRC).asText()).matches(regex+FileType.AUDIO.getValue()+"/.*");
 
         JsonNode fileNode = result.get(4);
         assertThat(fileNode.get(ORDER).asInt()).isEqualTo(5);
-        assertThat(fileNode.get("type").asText()).isEqualTo(FileType.FILE.getValue());
+        assertThat(fileNode.get(TYPE).asText()).isEqualTo(FileType.FILE.getValue());
         assertThat(fileNode.get(FILENAME).asText()).isEqualTo(applicationFile.getOriginalFilename());
         assertThat(fileNode.get(SRC).asText()).matches(regex+FileType.FILE.getValue()+"/.*");
     }
@@ -96,7 +94,7 @@ class MultipartDataProcessorTest implements TipPostRequestTestUtils {
         // when
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.QNA_POST,fontFiles));
-        assertThat(exception.getMessage()).isEqualTo("Unsupported file type: font/ttf");
+        assertThat(exception.getMessage()).isEqualTo("지원되지 않는 파일 타입입니다.");
     }
 
     @Test
@@ -116,7 +114,7 @@ class MultipartDataProcessorTest implements TipPostRequestTestUtils {
 
         JsonNode imageNode = result.get(0);
         assertFalse(imageNode.has(SRC));
-        assertThat(imageNode.get("type").asText()).isEqualTo(FileType.IMAGE.getValue());
+        assertThat(imageNode.get(TYPE).asText()).isEqualTo(FileType.IMAGE.getValue());
         assertTrue(imageNode.has(DATA));
         assertThat(imageNode.get(DATA).asText()).isEqualTo(Base64.getEncoder().encodeToString(jpegData));
     }

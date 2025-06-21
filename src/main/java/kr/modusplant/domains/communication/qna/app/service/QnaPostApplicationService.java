@@ -2,6 +2,7 @@ package kr.modusplant.domains.communication.qna.app.service;
 
 import kr.modusplant.domains.common.app.service.MultipartDataProcessor;
 import kr.modusplant.domains.common.enums.PostType;
+import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostInsertRequest;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostUpdateRequest;
 import kr.modusplant.domains.communication.qna.app.http.response.QnaPostResponse;
@@ -18,7 +19,6 @@ import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostVie
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -154,7 +154,7 @@ public class QnaPostApplicationService {
         }
         Long dbViewCount = qnaPostRepository.findByUlid(ulid)
                 .map(qnaPostEntity -> Optional.ofNullable(qnaPostEntity.getViewCount()).orElseThrow())
-                .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid, String.class));
+                .orElseThrow(PostNotFoundException::new);
         qnaPostViewCountRedisRepository.write(ulid, dbViewCount);
         return dbViewCount;
     }
