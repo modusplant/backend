@@ -42,4 +42,7 @@ public class SiteMemberAuthToken extends AbstractAuthenticationToken {
     public Object getPrincipal() {
         return principal;
     }
+
+    @Override
+    public Collection<GrantedAuthority> getAuthorities() { return super.getAuthorities(); }
 }
