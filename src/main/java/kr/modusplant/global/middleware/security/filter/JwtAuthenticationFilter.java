@@ -6,10 +6,11 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.modusplant.global.middleware.security.handler.JwtResponseHandler;
+import kr.modusplant.global.middleware.security.handler.JwtSecurityHandler;
 import kr.modusplant.global.middleware.security.models.SiteMemberAuthToken;
 import kr.modusplant.global.middleware.security.models.SiteMemberUserDetails;
 import kr.modusplant.modules.jwt.app.service.TokenProvider;
+import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,7 +26,8 @@ import java.util.UUID;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenProvider tokenProvider;
-    private final JwtResponseHandler jwtResponseHandler;
+    private final JwtSecurityHandler jwtSecurityHandler;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -40,15 +42,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 saveSecurityContext(memberUserDetails);
 
             } else {
-                // TODO: JWT 검증 필터에서 토큰 갱신을 하는 디자인이 적절한지 확인할 것.
-                Map<String, String> headersOfNewTokens = jwtResponseHandler.provideHeaders(request);
-                String newAccessToken = headersOfNewTokens.get("Authorization");
+                String refreshToken = request.getHeader("Cookie");
+                if(refreshTokenRepository.findByRefreshToken(refreshToken).isPresent()) {
 
-                response.setHeader("Authorization", newAccessToken);
-                response.setHeader("Set-Cookie", headersOfNewTokens.get("Set-Cookie"));
+                    Map<String, String> headersOfNewTokens = jwtSecurityHandler.provideHeaderTokenPair(request);
+                    String newAccessToken = headersOfNewTokens.get("accessToken");
+                    String newRefreshToken = headersOfNewTokens.get("refreshToken");
 
-                SiteMemberUserDetails memberUserDetails = constructUserDetails(newAccessToken);
-                saveSecurityContext(memberUserDetails);
+                    if(jwtSecurityHandler.insertRefreshToken(newRefreshToken) != null) {
+                        response.setHeader("X-Access-Token", newAccessToken);
+                        response.setHeader("Set-Cookie", newRefreshToken);
+
+                        SiteMemberUserDetails memberUserDetails = constructUserDetails(newAccessToken);
+                        saveSecurityContext(memberUserDetails);
+                    }
+
+                } else {
+                    SecurityContextHolder.clearContext();
+                }
             }
         }
 
