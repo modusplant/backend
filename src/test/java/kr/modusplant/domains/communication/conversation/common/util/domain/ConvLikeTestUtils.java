@@ -5,7 +5,7 @@ import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 
 public interface ConvLikeTestUtils extends ConvPostTestUtils, SiteMemberTestUtils {
     ConvLike convLike = ConvLike.builder()
-            .postId(convPostWithUlid.getUlid())
+            .postId(testConvPostWithUlid.getUlid())
             .memberId(memberBasicUserWithUuid.getUuid())
             .build();
 }

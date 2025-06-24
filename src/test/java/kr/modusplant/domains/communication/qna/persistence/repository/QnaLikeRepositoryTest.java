@@ -30,7 +30,7 @@ public class QnaLikeRepositoryTest implements QnaLikeEntityTestUtils {
         @BeforeEach
         void setUp() {
             // given
-            postId = qnaPostWithUlid.getUlid();
+            postId = testQnaPostWithUlid.getUlid();
             memberId = createMemberBasicUserEntityWithUuid().getUuid();
         }
 

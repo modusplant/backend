@@ -25,7 +25,7 @@ public class ConvLikeEntityTest implements ConvLikeEntityTestUtils {
     @BeforeEach
     void setUp() {
         // given
-        postId = convPostWithUlid.getUlid();
+        postId = testConvPostWithUlid.getUlid();
         memberId = createMemberBasicUserEntityWithUuid().getUuid();
 
         ConvLikeEntity convLikeEntity = ConvLikeEntity.of(postId, memberId);

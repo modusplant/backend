@@ -8,7 +8,7 @@ import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils
 public interface TipPostEntityTestUtils extends SiteMemberEntityTestUtils, TipCategoryEntityTestUtils, TipPostTestUtils {
     default TipPostEntityBuilder createTipPostEntityBuilder() {
         return TipPostEntity.builder()
-                .title(tipPost.getTitle())
-                .content(tipPost.getContent());
+                .title(testTipPost.getTitle())
+                .content(testTipPost.getContent());
     }
 }

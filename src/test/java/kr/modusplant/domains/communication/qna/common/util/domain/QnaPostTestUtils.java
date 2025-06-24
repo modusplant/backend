@@ -14,12 +14,12 @@ public interface QnaPostTestUtils extends QnaCategoryTestUtils, SiteMemberTestUt
     ObjectMapper objectMapper = new ObjectMapper();
     UlidIdGenerator generator = new UlidIdGenerator();
 
-    QnaPost qnaPost = QnaPost.builder()
+    QnaPost testQnaPost = QnaPost.builder()
             .title("물 주는 타이밍, 이제 헷갈리지 마세요! 식물별 물 주기 가이드")
             .content(createSampleContent())
             .build();
 
-    QnaPost qnaPostWithUlid = QnaPost.builder()
+    QnaPost testQnaPostWithUlid = QnaPost.builder()
             .ulid(generator.generate(null, null,null, EventType.INSERT))
             .categoryUuid(testQnaCategoryWithUuid.getUuid())
             .authMemberUuid(memberBasicUserWithUuid.getUuid())

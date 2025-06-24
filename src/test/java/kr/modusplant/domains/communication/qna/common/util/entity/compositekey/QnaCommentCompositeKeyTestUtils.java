@@ -7,7 +7,6 @@ import kr.modusplant.domains.communication.qna.persistence.entity.compositekey.Q
 public interface QnaCommentCompositeKeyTestUtils extends QnaCommentEntityTestUtils {
     default QnaCommentCompositeKey createQnaCommentCompositeKey(String postUlid) {
         QnaCommentEntity commentEntity = createQnaCommentEntityBuilder().build();
-
         return new QnaCommentCompositeKey(postUlid,commentEntity.getContent());
     }
 }

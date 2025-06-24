@@ -25,7 +25,7 @@ public class TipLikeEntityTest implements TipLikeEntityTestUtils {
     @BeforeEach
     void setUp() {
         // given
-        postId = tipPostWithUlid.getUlid();
+        postId = testTipPostWithUlid.getUlid();
         memberId = createMemberBasicUserEntityWithUuid().getUuid();
 
         TipLikeEntity tipLikeEntity = TipLikeEntity.of(postId, memberId);

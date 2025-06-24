@@ -5,7 +5,7 @@ import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 
 public interface TipLikeTestUtils extends TipPostTestUtils, SiteMemberTestUtils {
     TipLike tipLike = TipLike.builder()
-            .postId(tipPostWithUlid.getUlid())
+            .postId(testTipPostWithUlid.getUlid())
             .memberId(memberBasicUserWithUuid.getUuid())
             .build();
 }
