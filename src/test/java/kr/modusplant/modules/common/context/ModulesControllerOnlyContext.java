@@ -37,7 +37,8 @@ import static kr.modusplant.modules.common.vo.Reference.NOTATION_MODULES;
 )
 @ComponentScan(
         basePackages = NOTATION_MODULES,
-        includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Controller.class)
+        includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Controller.class),
+        useDefaultFilters = false
 )
 @ExtendWith(MockitoExtension.class)
 @Execution(ExecutionMode.CONCURRENT)
