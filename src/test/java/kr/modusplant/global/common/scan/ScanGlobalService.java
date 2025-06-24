@@ -1,4 +1,4 @@
-package kr.modusplant.domains.common.scan;
+package kr.modusplant.global.common.scan;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
