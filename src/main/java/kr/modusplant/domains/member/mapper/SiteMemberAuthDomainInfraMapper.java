@@ -11,8 +11,8 @@ import java.util.UUID;
 
 import static kr.modusplant.domains.member.vo.MemberUuid.ACTIVE_MEMBER_UUID;
 import static kr.modusplant.domains.member.vo.MemberUuid.ORIGINAL_MEMBER_UUID;
-import static kr.modusplant.global.vo.EntityFieldName.ACTIVE_MEMBER;
-import static kr.modusplant.global.vo.EntityFieldName.ORIGINAL_MEMBER;
+import static kr.modusplant.global.vo.FieldName.ACTIVE_MEMBER;
+import static kr.modusplant.global.vo.FieldName.ORIGINAL_MEMBER;
 
 @Mapper
 public interface SiteMemberAuthDomainInfraMapper {

@@ -31,7 +31,7 @@ public class SwaggerConfig {
                                 new Contact()
                                         .name("ModusPlant Support") // 지원 팀 이름
                                         .url("https://modusplant.vercel.app/support") // 지원 페이지 링크
-                                        .email("modusplant@gmail.com") // 이메일 주소
+                                        .email("modusplant@gmail.com") // 이메일
                         )
                         .license( // 라이센스 정보
                                 new License().name("MIT License").url("https://github.com/modusplant/backend/blob/develop/LICENSE")

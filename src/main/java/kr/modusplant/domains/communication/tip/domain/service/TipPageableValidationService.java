@@ -15,8 +15,8 @@ public class TipPageableValidationService extends AbstractCommPageableValidation
     public void validatePageExistence(Pageable pageable) {
         long totalElements = postRepository.count();
         if (totalElements == 0L) {
-            if (pageable.getPageNumber() > 0) {
-                throw new IllegalArgumentException("현재 이용할 수 있는 페이지 범위(0 ~ 0)를 벗어났습니다.");
+            if (pageable.getPageNumber() > 1) {
+                throw new IllegalArgumentException("현재 이용할 수 있는 페이지 범위(1 ~ 1)를 벗어났습니다.");
             }
             return;
         }
@@ -25,7 +25,7 @@ public class TipPageableValidationService extends AbstractCommPageableValidation
 
         if (pageable.getPageNumber() >= totalPages) {
             throw new IllegalArgumentException(
-                    "현재 이용할 수 있는 페이지 범위(0 ~ " + (totalPages - 1) + ")를 벗어났습니다.");
+                    "현재 이용할 수 있는 페이지 범위(1 ~ " + (totalPages) + ")를 벗어났습니다.");
         }
     }
 }

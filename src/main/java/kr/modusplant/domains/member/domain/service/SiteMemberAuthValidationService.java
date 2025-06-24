@@ -38,6 +38,15 @@ public class SiteMemberAuthValidationService {
         }
     }
 
+    public void validateNotFoundEmailAndAuthProvider(String email, AuthProvider authProvider) {
+        if (email == null || authProvider == null) {
+            throw new SiteMemberAuthNotFoundException();
+        }
+        if (memberAuthRepository.findByEmailAndProvider(email, authProvider).isEmpty()) {
+            throw new SiteMemberAuthNotFoundException();
+        }
+    }
+
     public void validateNotFoundOriginalMemberUuid(UUID uuid) {
         if (uuid == null || !memberAuthRepository.existsByOriginalMember(memberRepository.findByUuid(uuid).orElseThrow())) {
             throw new SiteMemberAuthNotFoundException();

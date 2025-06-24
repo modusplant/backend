@@ -29,24 +29,19 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static kr.modusplant.global.vo.CamelCaseWord.DATA;
-import static kr.modusplant.global.vo.DatabaseFieldName.CATE_UUID;
-import static kr.modusplant.global.vo.DatabaseFieldName.ORDER_INFO;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DomainsControllerOnlyContext
 class QnaPostControllerTest implements QnaPostRequestTestUtils, QnaPostResponseTestUtils {
+
     private final MockMvc mockMvc;
 
-    private QnaPostApplicationService qnaPostApplicationService;
+    private final QnaPostApplicationService qnaPostApplicationService;
 
     @Autowired
     QnaPostControllerTest(MockMvc mockMvc, QnaPostApplicationService qnaPostApplicationService) {
@@ -206,7 +201,7 @@ class QnaPostControllerTest implements QnaPostRequestTestUtils, QnaPostResponseT
         String title = "Test Post Title";
         MockMultipartFile mockTextFile = (MockMultipartFile) textFile0;
         MockMultipartFile mockImageFile = (MockMultipartFile) imageFile;
-        MockMultipartFile mockOrderInfoPart = new MockMultipartFile(ORDER_INFO, "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(textImageFilesOrder));
+        MockMultipartFile mockOrderInfoPart = new MockMultipartFile("orderInfo", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(textImageFilesOrder));
 
         doNothing().when(qnaPostApplicationService).insert(any(QnaPostInsertRequest.class), any(UUID.class));
 
@@ -215,7 +210,7 @@ class QnaPostControllerTest implements QnaPostRequestTestUtils, QnaPostResponseT
                         .file(mockTextFile)
                         .file(mockImageFile)
                         .file(mockOrderInfoPart)
-                        .param(CATE_UUID, TEST_CATEGORY_UUID.toString())
+                        .param("categoryUuid", TEST_CATEGORY_UUID.toString())
                         .param("title", title)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isOk());
@@ -236,7 +231,7 @@ class QnaPostControllerTest implements QnaPostRequestTestUtils, QnaPostResponseT
         String title = "Test Post Title";
         MockMultipartFile mockTextFile = (MockMultipartFile) textFile0;
         MockMultipartFile mockImageFile = (MockMultipartFile) imageFile;
-        MockMultipartFile mockOrderInfoPart = new MockMultipartFile(ORDER_INFO, "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(textImageFilesOrder));
+        MockMultipartFile mockOrderInfoPart = new MockMultipartFile("orderInfo", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(textImageFilesOrder));
 
         doNothing().when(qnaPostApplicationService).update(any(QnaPostUpdateRequest.class), any(UUID.class));
 
@@ -245,7 +240,7 @@ class QnaPostControllerTest implements QnaPostRequestTestUtils, QnaPostResponseT
                         .file(mockTextFile)
                         .file(mockImageFile)
                         .file(mockOrderInfoPart)
-                        .param(CATE_UUID, TEST_CATEGORY_UUID.toString())
+                        .param("categoryUuid", TEST_CATEGORY_UUID.toString())
                         .param("title", title)
                         .with(request -> {
                             request.setMethod("PUT");

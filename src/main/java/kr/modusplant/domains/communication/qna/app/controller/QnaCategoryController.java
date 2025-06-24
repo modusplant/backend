@@ -1,6 +1,8 @@
 package kr.modusplant.domains.communication.qna.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -43,9 +45,14 @@ public class QnaCategoryController {
             description = "UUID에 맞는 Q&A 항목을 조회합니다."
     )
     @GetMapping("/{uuid}")
-    public ResponseEntity<DataResponse<?>> getQnaCategoryByUuid(@PathVariable
-                                                                @NotNull(message = "식별자가 비어 있습니다.")
-                                                                UUID uuid) {
+    public ResponseEntity<DataResponse<?>> getQnaCategoryByUuid(
+            @Parameter(schema = @Schema(
+                    description = "항목의 식별자",
+                    example = "72197aeb-b1e7-4bd4-9116-bbcb9cd3f60d")
+            )
+            @PathVariable(required = false)
+            @NotNull(message = "식별자가 비어 있습니다.")
+            UUID uuid) {
         Optional<QnaCategoryResponse> optionalQnaCategoryResponse = qnaCategoryApplicationService.getByUuid(uuid);
         if (optionalQnaCategoryResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -58,7 +65,16 @@ public class QnaCategoryController {
             description = "순서에 맞는 Q&A 항목을 조회합니다."
     )
     @GetMapping("/order/{order}")
-    public ResponseEntity<DataResponse<?>> getQnaCategoryByOrder(@PathVariable @ZeroBasedOrder Integer order) {
+    public ResponseEntity<DataResponse<?>> getQnaCategoryByOrder(
+            @Parameter(schema = @Schema(
+                    description = "항목이 렌더링되는 순서",
+                    minimum = "0",
+                    maximum = "100",
+                    example = "3")
+            )
+            @PathVariable(required = false)
+            @ZeroBasedOrder
+            Integer order) {
         Optional<QnaCategoryResponse> optionalQnaCategoryResponse = qnaCategoryApplicationService.getByOrder(order);
         if (optionalQnaCategoryResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -71,7 +87,15 @@ public class QnaCategoryController {
             description = "항목에 맞는 Q&A 항목을 조회합니다."
     )
     @GetMapping("/category/{category}")
-    public ResponseEntity<DataResponse<?>> getQnaCategoryByName(@PathVariable @CommunicationCategory String category) {
+    public ResponseEntity<DataResponse<?>> getQnaCategoryByName(
+            @Parameter(schema = @Schema(
+                    description = "항목",
+                    maxLength = 40,
+                    example = "삽목 + 포기 나누기")
+            )
+            @PathVariable(required = false)
+            @CommunicationCategory
+            String category) {
         Optional<QnaCategoryResponse> optionalQnaCategoryResponse = qnaCategoryApplicationService.getByCategory(category);
         if (optionalQnaCategoryResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -93,9 +117,14 @@ public class QnaCategoryController {
             description = "UUID로 Q&A 항목을 제거합니다."
     )
     @DeleteMapping("/{uuid}")
-    public ResponseEntity<DataResponse<?>> removeQnaCategoryByUuid(@PathVariable
-                                                                   @NotNull(message = "식별자가 비어 있습니다.")
-                                                                   UUID uuid) {
+    public ResponseEntity<DataResponse<?>> removeQnaCategoryByUuid(
+            @Parameter(schema = @Schema(
+                    description = "항목의 식별자",
+                    example = "72197aeb-b1e7-4bd4-9116-bbcb9cd3f60d")
+            )
+            @PathVariable(required = false)
+            @NotNull(message = "식별자가 비어 있습니다.")
+            UUID uuid) {
         qnaCategoryApplicationService.removeByUuid(uuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
