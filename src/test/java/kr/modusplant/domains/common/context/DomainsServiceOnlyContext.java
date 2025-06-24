@@ -2,7 +2,7 @@ package kr.modusplant.domains.common.context;
 
 import kr.modusplant.domains.common.postprocessor.MockDomainsRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.domains.common.scan.ScanDomainsService;
-import kr.modusplant.domains.common.scan.ScanGlobalService;
+import kr.modusplant.global.common.scan.ScanGlobalService;
 import kr.modusplant.global.config.TestJpaConfig;
 import kr.modusplant.global.config.TestRedisConfig;
 import kr.modusplant.global.config.TestS3Config;
