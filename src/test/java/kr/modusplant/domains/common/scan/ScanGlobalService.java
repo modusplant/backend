@@ -11,7 +11,7 @@ import static kr.modusplant.global.vo.Reference.NOTATION_GLOBAL;
 @ComponentScan(
         basePackages = NOTATION_GLOBAL,
         includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Service.class),
-        excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Configuration.class)
+        useDefaultFilters = false
 )
 public abstract class ScanGlobalService {
 }
