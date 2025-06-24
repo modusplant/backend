@@ -21,7 +21,7 @@ public class TipLikeValidationService {
     private final SiteMemberRepository memberRepository;
     private final TipLikeRepository tipLikeRepository;
 
-    public void validateExistedTipPostAndMember(String postId, UUID memberId) {
+    public void validateNotFoundTipPostOrMember(String postId, UUID memberId) {
         if (postId == null || memberId == null) {
             throw new IllegalArgumentException("게시글 또는 회원 입력 창이 비어 있습니다.");
         }
