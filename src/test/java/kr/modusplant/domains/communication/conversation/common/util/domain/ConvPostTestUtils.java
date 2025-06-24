@@ -15,6 +15,8 @@ public interface ConvPostTestUtils extends ConvCategoryTestUtils, SiteMemberTest
     UlidIdGenerator generator = new UlidIdGenerator();
 
     ConvPost testConvPost = ConvPost.builder()
+            .likeCount(0)
+            .viewCount(0L)
             .title("물 주는 타이밍, 이제 헷갈리지 마세요! 식물별 물 주기 가이드")
             .content(createSampleContent())
             .build();
@@ -24,6 +26,8 @@ public interface ConvPostTestUtils extends ConvCategoryTestUtils, SiteMemberTest
             .categoryUuid(testConvCategoryWithUuid.getUuid())
             .authMemberUuid(memberBasicUserWithUuid.getUuid())
             .createMemberUuid(memberBasicUserWithUuid.getUuid())
+            .likeCount(testConvPost.getLikeCount())
+            .viewCount(testConvPost.getViewCount())
             .title("물 주는 타이밍, 이제 헷갈리지 마세요! 식물별 물 주기 가이드")
             .content(createSampleContent())
             .build();
