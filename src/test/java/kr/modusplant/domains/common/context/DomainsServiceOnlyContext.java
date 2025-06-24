@@ -1,6 +1,5 @@
 package kr.modusplant.domains.common.context;
 
-import kr.modusplant.domains.common.postprocessor.MockDomainsClientBeanFactoryPostProcessor;
 import kr.modusplant.domains.common.postprocessor.MockDomainsRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.domains.common.scan.ScanDomainsService;
 import kr.modusplant.domains.common.scan.ScanGlobalService;
@@ -27,8 +26,7 @@ import java.lang.annotation.*;
 @Import({TestJpaConfig.class,
         TestRedisConfig.class,
         TestS3Config.class,
-        MockDomainsRepositoryBeanFactoryPostProcessor.class,
-        MockDomainsClientBeanFactoryPostProcessor.class})
+        MockDomainsRepositoryBeanFactoryPostProcessor.class})
 @SpringBootTest(classes = {ScanGlobalService.class, ScanDomainsService.class})
 @ExtendWith(MockitoExtension.class)
 @Execution(ExecutionMode.CONCURRENT)
