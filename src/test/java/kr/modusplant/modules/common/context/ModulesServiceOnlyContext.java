@@ -1,6 +1,5 @@
 package kr.modusplant.modules.common.context;
 
-import kr.modusplant.domains.common.postprocessor.MockDomainsRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.domains.common.scan.ScanDomainsService;
 import kr.modusplant.global.common.scan.ScanGlobalService;
 import kr.modusplant.global.config.TestJpaConfig;
@@ -28,7 +27,6 @@ import java.lang.annotation.*;
 @Import({TestJpaConfig.class,
         TestRedisConfig.class,
         TestS3Config.class,
-        MockDomainsRepositoryBeanFactoryPostProcessor.class,
         MockModulesRepositoryBeanFactoryPostProcessor.class}
 )
 @SpringBootTest(classes = {ScanGlobalService.class, ScanDomainsService.class, ScanModulesService.class})
