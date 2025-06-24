@@ -14,12 +14,12 @@ public interface ConvPostTestUtils extends ConvCategoryTestUtils, SiteMemberTest
     ObjectMapper objectMapper = new ObjectMapper();
     UlidIdGenerator generator = new UlidIdGenerator();
 
-    ConvPost convPost = ConvPost.builder()
+    ConvPost testConvPost = ConvPost.builder()
             .title("물 주는 타이밍, 이제 헷갈리지 마세요! 식물별 물 주기 가이드")
             .content(createSampleContent())
             .build();
 
-    ConvPost convPostWithUlid = ConvPost.builder()
+    ConvPost testConvPostWithUlid = ConvPost.builder()
             .ulid(generator.generate(null, null,null, EventType.INSERT))
             .categoryUuid(testConvCategoryWithUuid.getUuid())
             .authMemberUuid(memberBasicUserWithUuid.getUuid())

@@ -25,7 +25,7 @@ public class QnaLikeEntityTest implements QnaLikeEntityTestUtils {
     @BeforeEach
     void setUp() {
         // given
-        postId = qnaPostWithUlid.getUlid();
+        postId = testQnaPostWithUlid.getUlid();
         memberId = createMemberBasicUserEntityWithUuid().getUuid();
 
         QnaLikeEntity qnaLikeEntity = QnaLikeEntity.of(postId, memberId);

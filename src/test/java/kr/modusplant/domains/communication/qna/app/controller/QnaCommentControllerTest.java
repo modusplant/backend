@@ -53,7 +53,7 @@ public class QnaCommentControllerTest implements
     void setUp() {
         memberEntity = createMemberBasicUserEntityWithUuid();
         postEntity = createQnaPostEntityBuilder()
-                .ulid(qnaPostWithUlid.getUlid())
+                .ulid(testQnaPostWithUlid.getUlid())
                 .category(createTestQnaCategoryEntityWithUuid())
                 .authMember(memberEntity)
                 .createMember(memberEntity)
@@ -175,10 +175,10 @@ public class QnaCommentControllerTest implements
     @Test
     void removeQnaCommentTest() throws Exception {
         // given & when
-        doNothing().when(commentApplicationService).removeByPostUlidAndPath(postEntity.getUlid(), qnaCommentWithPostUlidAndPath.getPath());
+        doNothing().when(commentApplicationService).removeByPostUlidAndPath(postEntity.getUlid(), testQnaCommentWithPostUlidAndPath.getPath());
 
         // then
-        mockMvc.perform(delete("/api/v1/qna/comments/post/{ulid}/path/{path}", postEntity.getUlid(), qnaCommentWithPostUlidAndPath.getPath()))
+        mockMvc.perform(delete("/api/v1/qna/comments/post/{ulid}/path/{path}", postEntity.getUlid(), testQnaCommentWithPostUlidAndPath.getPath()))
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))

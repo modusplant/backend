@@ -2,7 +2,7 @@ package kr.modusplant.domains.communication.conversation.common.util.domain;
 
 import kr.modusplant.domains.communication.conversation.domain.model.ConvComment;
 
-import static kr.modusplant.domains.communication.conversation.common.util.domain.ConvPostTestUtils.convPostWithUlid;
+import static kr.modusplant.domains.communication.conversation.common.util.domain.ConvPostTestUtils.testConvPostWithUlid;
 import static kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils.memberBasicUserWithUuid;
 
 public interface ConvCommentTestUtils {
@@ -12,7 +12,7 @@ public interface ConvCommentTestUtils {
             .build();
 
     ConvComment convCommentWithPostUlidAndPath = ConvComment.builder()
-            .postUlid(convPostWithUlid.getUlid())
+            .postUlid(testConvPostWithUlid.getUlid())
             .path("1.6.2")
             .authMemberUuid(memberBasicUserWithUuid.getUuid())
             .createMemberUuid(memberBasicUserWithUuid.getUuid())

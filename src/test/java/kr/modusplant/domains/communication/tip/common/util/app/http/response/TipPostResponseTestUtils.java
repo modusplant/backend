@@ -9,16 +9,16 @@ public interface TipPostResponseTestUtils extends TipPostTestUtils {
     LocalDateTime testDate = LocalDateTime.of(2025, 6, 1, 0, 0);
 
     TipPostResponse testTipPostResponse = new TipPostResponse(
-            tipPostWithUlid.getUlid(),
+            testTipPostWithUlid.getUlid(),
             testTipCategoryWithUuid.getCategory(),
-            tipPostWithUlid.getCategoryUuid(),
+            testTipPostWithUlid.getCategoryUuid(),
             testTipCategoryWithUuid.getOrder(),
-            tipPostWithUlid.getAuthMemberUuid(),
+            testTipPostWithUlid.getAuthMemberUuid(),
             memberBasicUserWithUuid.getNickname(),
             5,
             76L,
-            tipPostWithUlid.getTitle(),
-            tipPostWithUlid.getContent(),
+            testTipPostWithUlid.getTitle(),
+            testTipPostWithUlid.getContent(),
             testDate,
             testDate.plusMinutes(24)
     );

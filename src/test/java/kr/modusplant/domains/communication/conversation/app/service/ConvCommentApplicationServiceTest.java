@@ -63,7 +63,7 @@ public class ConvCommentApplicationServiceTest implements
         memberEntity = createMemberBasicUserEntityWithUuid();
         ConvCategoryEntity category = categoryRepository.save(createTestConvCategoryEntityWithUuid());
         postEntity = createConvPostEntityBuilder()
-                .ulid(convPostWithUlid.getUlid())
+                .ulid(testConvPostWithUlid.getUlid())
                 .category(category)
                 .authMember(memberEntity)
                 .createMember(memberEntity)

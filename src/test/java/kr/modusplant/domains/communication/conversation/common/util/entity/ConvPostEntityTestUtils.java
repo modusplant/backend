@@ -8,7 +8,7 @@ import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils
 public interface ConvPostEntityTestUtils extends SiteMemberEntityTestUtils, ConvCategoryEntityTestUtils, ConvPostTestUtils {
     default ConvPostEntityBuilder createConvPostEntityBuilder() {
         return ConvPostEntity.builder()
-                .title(convPost.getTitle())
-                .content(convPost.getContent());
+                .title(testConvPost.getTitle())
+                .content(testConvPost.getContent());
     }
 }

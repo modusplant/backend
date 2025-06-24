@@ -9,16 +9,16 @@ public interface QnaPostResponseTestUtils extends QnaPostTestUtils {
     LocalDateTime testDate = LocalDateTime.of(2025, 6, 1, 0, 0);
 
     QnaPostResponse testQnaPostResponse = new QnaPostResponse(
-            qnaPostWithUlid.getUlid(),
+            testQnaPostWithUlid.getUlid(),
             testQnaCategoryWithUuid.getCategory(),
-            qnaPostWithUlid.getCategoryUuid(),
+            testQnaPostWithUlid.getCategoryUuid(),
             testQnaCategoryWithUuid.getOrder(),
-            qnaPostWithUlid.getAuthMemberUuid(),
+            testQnaPostWithUlid.getAuthMemberUuid(),
             memberBasicUserWithUuid.getNickname(),
             5,
             76L,
-            qnaPostWithUlid.getTitle(),
-            qnaPostWithUlid.getContent(),
+            testQnaPostWithUlid.getTitle(),
+            testQnaPostWithUlid.getContent(),
             testDate,
             testDate.plusMinutes(24)
     );

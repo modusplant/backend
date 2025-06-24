@@ -63,7 +63,7 @@ public class QnaCommentApplicationServiceTest implements
         memberEntity = createMemberBasicUserEntityWithUuid();
         QnaCategoryEntity category = categoryRepository.save(createTestQnaCategoryEntityWithUuid());
         postEntity = createQnaPostEntityBuilder()
-                .ulid(qnaPostWithUlid.getUlid())
+                .ulid(testQnaPostWithUlid.getUlid())
                 .category(category)
                 .authMember(memberEntity)
                 .createMember(memberEntity)

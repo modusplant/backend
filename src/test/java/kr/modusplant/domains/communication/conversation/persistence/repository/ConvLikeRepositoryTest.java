@@ -30,7 +30,7 @@ public class ConvLikeRepositoryTest implements ConvLikeEntityTestUtils {
         @BeforeEach
         void setUp() {
             // given
-            postId = convPostWithUlid.getUlid();
+            postId = testConvPostWithUlid.getUlid();
             memberId = createMemberBasicUserEntityWithUuid().getUuid();
         }
 

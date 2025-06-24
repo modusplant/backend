@@ -30,7 +30,7 @@ public class TipLikeRepositoryTest implements TipLikeEntityTestUtils {
         @BeforeEach
         void setUp() {
             // given
-            postId = tipPostWithUlid.getUlid();
+            postId = testTipPostWithUlid.getUlid();
             memberId = createMemberBasicUserEntityWithUuid().getUuid();
         }
 
