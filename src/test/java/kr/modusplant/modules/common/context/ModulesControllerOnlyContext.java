@@ -1,10 +1,12 @@
-package kr.modusplant.domains.common.context;
+package kr.modusplant.modules.common.context;
 
 import kr.modusplant.domains.common.postprocessor.MockDomainsRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.domains.common.postprocessor.MockDomainsServiceBeanFactoryPostProcessor;
 import kr.modusplant.global.config.TestJpaConfig;
 import kr.modusplant.global.config.TestRedisConfig;
 import kr.modusplant.global.config.TestS3Config;
+import kr.modusplant.modules.common.postprocessor.MockModulesRepositoryBeanFactoryPostProcessor;
+import kr.modusplant.modules.common.postprocessor.MockModulesServiceBeanFactoryPostProcessor;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -18,7 +20,7 @@ import org.springframework.stereotype.Controller;
 
 import java.lang.annotation.*;
 
-import static kr.modusplant.domains.common.vo.Reference.NOTATION_DOMAINS;
+import static kr.modusplant.modules.common.vo.Reference.NOTATION_MODULES;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
@@ -29,13 +31,15 @@ import static kr.modusplant.domains.common.vo.Reference.NOTATION_DOMAINS;
         TestRedisConfig.class,
         TestS3Config.class,
         MockDomainsRepositoryBeanFactoryPostProcessor.class,
-        MockDomainsServiceBeanFactoryPostProcessor.class}
+        MockModulesRepositoryBeanFactoryPostProcessor.class,
+        MockDomainsServiceBeanFactoryPostProcessor.class,
+        MockModulesServiceBeanFactoryPostProcessor.class}
 )
 @ComponentScan(
-        basePackages = NOTATION_DOMAINS,
+        basePackages = NOTATION_MODULES,
         includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Controller.class)
 )
 @ExtendWith(MockitoExtension.class)
 @Execution(ExecutionMode.CONCURRENT)
-public @interface DomainsControllerOnlyContext {
+public @interface ModulesControllerOnlyContext {
 }
