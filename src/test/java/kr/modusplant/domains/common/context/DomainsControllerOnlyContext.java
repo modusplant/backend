@@ -1,6 +1,5 @@
 package kr.modusplant.domains.common.context;
 
-import kr.modusplant.domains.common.postprocessor.MockDomainsClientBeanFactoryPostProcessor;
 import kr.modusplant.domains.common.postprocessor.MockDomainsRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.domains.common.postprocessor.MockDomainsServiceBeanFactoryPostProcessor;
 import kr.modusplant.global.config.TestJpaConfig;
@@ -30,7 +29,6 @@ import static kr.modusplant.domains.common.vo.Reference.NOTATION_DOMAINS;
         TestRedisConfig.class,
         TestS3Config.class,
         MockDomainsRepositoryBeanFactoryPostProcessor.class,
-        MockDomainsClientBeanFactoryPostProcessor.class,
         MockDomainsServiceBeanFactoryPostProcessor.class})
 @ComponentScan(
         basePackages = NOTATION_DOMAINS,
