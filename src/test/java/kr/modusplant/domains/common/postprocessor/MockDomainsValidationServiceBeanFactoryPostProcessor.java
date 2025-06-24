@@ -12,9 +12,11 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ClassUtils;
 
+import java.util.List;
 import java.util.Objects;
 
 import static kr.modusplant.domains.common.vo.Reference.NOTATION_DOMAINS;
+import static kr.modusplant.global.vo.Reference.NOTATION_GLOBAL;
 
 @NonNullApi
 public class MockDomainsValidationServiceBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
@@ -32,15 +34,17 @@ public class MockDomainsValidationServiceBeanFactoryPostProcessor implements Bea
         scanner.addIncludeFilter(new AnnotationTypeFilter(Service.class));
         ClassLoader classLoader = this.getClass().getClassLoader();
 
-        for (BeanDefinition serviceDef : scanner.findCandidateComponents(NOTATION_DOMAINS)) {
-            Class<?> clazz;
-            try {
-                clazz = ClassUtils.forName(Objects.requireNonNull(serviceDef.getBeanClassName()), classLoader);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException("Fail to load the validation service class: " + serviceDef.getBeanClassName());
+        for (String reference: List.of(NOTATION_DOMAINS, NOTATION_GLOBAL)) {
+            for (BeanDefinition serviceDef : scanner.findCandidateComponents(reference)) {
+                Class<?> clazz;
+                try {
+                    clazz = ClassUtils.forName(Objects.requireNonNull(serviceDef.getBeanClassName()), classLoader);
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException("Fail to load the validation service class: " + serviceDef.getBeanClassName());
+                }
+                String simpleName = clazz.getSimpleName();
+                beanFactory.registerSingleton(String.valueOf(simpleName.charAt(0)).toLowerCase() + simpleName.substring(1), Mockito.mock(clazz));
             }
-            String simpleName = clazz.getSimpleName();
-            beanFactory.registerSingleton(String.valueOf(simpleName.charAt(0)).toLowerCase() + simpleName.substring(1), Mockito.mock(clazz));
         }
     }
 }

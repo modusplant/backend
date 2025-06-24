@@ -82,7 +82,7 @@ public class MultipartDataProcessor {
         ArrayNode newArray = objectMapper.createArrayNode();
         for (JsonNode node : content) {
             ObjectNode objectNode = node.deepCopy();
-            if (node.isObject() && node.has(SRC)) {
+            if (node.has(SRC)) {
                 String src = objectNode.get(SRC).asText();
                 byte[] fileBytes = s3FileService.downloadFile(src);
                 String base64Encoded = Base64.getEncoder().encodeToString(fileBytes);
@@ -96,7 +96,7 @@ public class MultipartDataProcessor {
 
     public void deleteFiles(JsonNode content) {
         for (JsonNode node : content) {
-            if (node.isObject() && node.has(SRC)) {
+            if (node.has(SRC)) {
                 String src = node.get(SRC).asText();
                 s3FileService.deleteFiles(src);
             }
