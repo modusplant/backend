@@ -32,7 +32,7 @@ public class MockDomainsServiceBeanFactoryPostProcessor implements BeanFactoryPo
         scanner.addIncludeFilter(new AnnotationTypeFilter(Service.class));
         ClassLoader classLoader = this.getClass().getClassLoader();
 
-        for (String reference: List.of(NOTATION_DOMAINS, NOTATION_GLOBAL)) {
+        for (String reference: List.of(NOTATION_GLOBAL, NOTATION_DOMAINS)) {
             for (BeanDefinition serviceDef : scanner.findCandidateComponents(reference)) {
                 Class<?> clazz;
                 try {

@@ -28,7 +28,8 @@ import java.lang.annotation.*;
         TestRedisConfig.class,
         TestS3Config.class,
         MockDomainsRepositoryBeanFactoryPostProcessor.class,
-        MockDomainsValidationServiceBeanFactoryPostProcessor.class})
+        MockDomainsValidationServiceBeanFactoryPostProcessor.class}
+)
 @SpringBootTest(classes = {ScanGlobalService.class, ScanDomainsService.class})
 @ExtendWith(MockitoExtension.class)
 @Execution(ExecutionMode.CONCURRENT)

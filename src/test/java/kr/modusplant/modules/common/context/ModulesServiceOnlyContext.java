@@ -1,4 +1,4 @@
-package kr.modusplant.domains.common.context;
+package kr.modusplant.modules.common.context;
 
 import kr.modusplant.domains.common.postprocessor.MockDomainsRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.domains.common.scan.ScanDomainsService;
@@ -6,6 +6,8 @@ import kr.modusplant.global.common.scan.ScanGlobalService;
 import kr.modusplant.global.config.TestJpaConfig;
 import kr.modusplant.global.config.TestRedisConfig;
 import kr.modusplant.global.config.TestS3Config;
+import kr.modusplant.modules.common.postprocessor.MockModulesRepositoryBeanFactoryPostProcessor;
+import kr.modusplant.modules.common.scan.ScanModulesService;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -26,10 +28,11 @@ import java.lang.annotation.*;
 @Import({TestJpaConfig.class,
         TestRedisConfig.class,
         TestS3Config.class,
-        MockDomainsRepositoryBeanFactoryPostProcessor.class}
+        MockDomainsRepositoryBeanFactoryPostProcessor.class,
+        MockModulesRepositoryBeanFactoryPostProcessor.class}
 )
-@SpringBootTest(classes = {ScanGlobalService.class, ScanDomainsService.class})
+@SpringBootTest(classes = {ScanGlobalService.class, ScanDomainsService.class, ScanModulesService.class})
 @ExtendWith(MockitoExtension.class)
 @Execution(ExecutionMode.CONCURRENT)
-public @interface DomainsServiceOnlyContext {
+public @interface ModulesServiceOnlyContext {
 }
