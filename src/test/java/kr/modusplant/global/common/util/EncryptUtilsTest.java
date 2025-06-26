@@ -5,28 +5,28 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
-class HashUtilsTest {
+class EncryptUtilsTest {
 
     @Test
     @DisplayName("null 입력 시 NullPointerException 발생")
-    void sha256NullInputThrowsNullPointerException() {
+    void encryptWithSha256NullInputThrowsNullPointerException() {
         // given
         String input = null;
 
         // when & then
-        assertThatThrownBy(() -> HashUtils.sha256(input))
+        assertThatThrownBy(() -> EncryptUtils.encryptWithSha256(input))
                 .isInstanceOf(NullPointerException.class);
     }
 
     @Test
     @DisplayName("빈 문자열 입력 시 올바른 해시값 반환")
-    void sha256EmptyStringReturnsCorrectHash() {
+    void encryptWithSha256EmptyStringReturnsCorrectHash() {
         // given
         String input = "";
         String expectedHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
 
         // when
-        String result = HashUtils.sha256(input);
+        String result = EncryptUtils.encryptWithSha256(input);
 
         // then
         assertThat(result).isEqualTo(expectedHash);
@@ -35,13 +35,13 @@ class HashUtilsTest {
 
     @Test
     @DisplayName("같은 입력에 대해서는 항상 같은 해시값 반환")
-    void sha256SameInputReturnsSameHash() {
+    void encryptWithSha256SameInputReturnsSameHash() {
         // given
         String input = "test input";
 
         // when
-        String hash1 = HashUtils.sha256(input);
-        String hash2 = HashUtils.sha256(input);
+        String hash1 = EncryptUtils.encryptWithSha256(input);
+        String hash2 = EncryptUtils.encryptWithSha256(input);
 
         // then
         assertThat(hash1).isEqualTo(hash2);
@@ -49,14 +49,14 @@ class HashUtilsTest {
 
     @Test
     @DisplayName("다른 입력에 대해서는 다른 해시값 반환")
-    void sha256DifferentInputsReturnDifferentHashes() {
+    void encryptWithSha256DifferentInputsReturnDifferentHashes() {
         // given
         String input1 = "test1";
         String input2 = "test2";
 
         // when
-        String hash1 = HashUtils.sha256(input1);
-        String hash2 = HashUtils.sha256(input2);
+        String hash1 = EncryptUtils.encryptWithSha256(input1);
+        String hash2 = EncryptUtils.encryptWithSha256(input2);
 
         // then
         assertThat(hash1).isNotEqualTo(hash2);
@@ -64,13 +64,13 @@ class HashUtilsTest {
 
     @Test
     @DisplayName("sha256 정상 생성")
-    void sha256StringReturnsCorrectHash() {
+    void encryptWithSha256StringReturnsCorrectHash() {
         // given
         String input = "test input";
         String expectedHash = "9dfe6f15d1ab73af898739394fd22fd72a03db01834582f24bb2e1c66c7aaeae";
 
         // when
-        String result = HashUtils.sha256(input);
+        String result = EncryptUtils.encryptWithSha256(input);
 
         // then
         assertThat(result).isEqualTo(expectedHash);

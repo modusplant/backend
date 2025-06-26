@@ -4,7 +4,7 @@ import kr.modusplant.global.middleware.redis.RedisHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import java.time.Duration;
-import static kr.modusplant.global.common.util.HashUtils.sha256;
+import static kr.modusplant.global.common.util.EncryptUtils.encryptWithSha256;
 
 @Repository
 @RequiredArgsConstructor
@@ -25,7 +25,7 @@ public class TokenRedisRepository {
     }
 
     private String generateKey(String token) {
-        return KEY_FORMAT.formatted(sha256(token));
+        return KEY_FORMAT.formatted(encryptWithSha256(token));
     }
 
 }

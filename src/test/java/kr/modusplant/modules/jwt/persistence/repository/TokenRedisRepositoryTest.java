@@ -2,7 +2,7 @@ package kr.modusplant.modules.jwt.persistence.repository;
 
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import kr.modusplant.global.middleware.redis.RedisHelper;
-import kr.modusplant.global.common.util.HashUtils;
+import kr.modusplant.global.common.util.EncryptUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,8 +36,8 @@ class TokenRedisRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        closeable = Mockito.mockStatic(HashUtils.class);
-        when(HashUtils.sha256(TOKEN)).thenReturn(HASHED_TOKEN);
+        closeable = Mockito.mockStatic(EncryptUtils.class);
+        when(EncryptUtils.encryptWithSha256(TOKEN)).thenReturn(HASHED_TOKEN);
     }
 
     @AfterEach
