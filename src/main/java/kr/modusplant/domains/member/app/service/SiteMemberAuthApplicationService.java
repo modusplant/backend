@@ -56,10 +56,6 @@ public class SiteMemberAuthApplicationService implements UuidCrudApplicationServ
         return memberAuthRepository.findByProviderId(providerId).stream().map(memberAuthAppInfraMapper::toMemberAuthResponse).toList();
     }
 
-    public List<SiteMemberAuthResponse> getByFailedAttempt(Integer failedAttempt) {
-        return memberAuthRepository.findByFailedAttempt(failedAttempt).stream().map(memberAuthAppInfraMapper::toMemberAuthResponse).toList();
-    }
-
     public Optional<SiteMemberAuthResponse> getByUuid(UUID uuid) {
         Optional<SiteMemberAuthEntity> memberAuthOrEmpty = memberAuthRepository.findByUuid(uuid);
         return memberAuthOrEmpty.isEmpty() ? Optional.empty() : Optional.of(memberAuthAppInfraMapper.toMemberAuthResponse(memberAuthOrEmpty.orElseThrow()));

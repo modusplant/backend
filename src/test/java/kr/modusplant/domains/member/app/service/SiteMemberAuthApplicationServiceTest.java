@@ -227,29 +227,6 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
         assertThat(memberAuthService.getByProviderAndProviderId(memberAuthEntity.getProvider(), memberAuthEntity.getProviderId()).orElseThrow()).isEqualTo(memberAuthResponse);
     }
 
-    @DisplayName("failedAttempt로 회원 인증 얻기")
-    @Test
-    void getByFailedAttemptTest() {
-        // given
-        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        SiteMemberAuthEntity memberAuthEntity = this.createMemberAuthBasicUserEntityBuilder().originalMember(memberEntity).activeMember(memberEntity).build();
-        UUID uuid = memberEntity.getUuid();
-
-        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
-        given(memberRepository.existsByUuid(uuid)).willReturn(true);
-        given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.existsByOriginalMember(memberEntity)).willReturn(false);
-        given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
-        given(memberAuthRepository.findByFailedAttempt(memberAuthEntity.getFailedAttempt())).willReturn(List.of(memberAuthEntity));
-
-        // when
-        memberService.insert(memberBasicUserInsertRequest);
-        SiteMemberAuthResponse memberAuthResponse = memberAuthService.insert(memberAuthBasicUserInsertRequest);
-
-        // then
-        assertThat(memberAuthService.getByFailedAttempt(memberAuthEntity.getFailedAttempt()).getFirst()).isEqualTo(memberAuthResponse);
-    }
-
     @DisplayName("빈 회원 인증 얻기")
     @Test
     void getOptionalEmptyTest() {
