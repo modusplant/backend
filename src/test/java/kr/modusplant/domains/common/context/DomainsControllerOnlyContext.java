@@ -1,4 +1,4 @@
-package kr.modusplant.domains.common.context;
+ package kr.modusplant.domains.common.context;
 
 import kr.modusplant.domains.common.postprocessor.MockDomainsRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.domains.common.postprocessor.MockDomainsServiceBeanFactoryPostProcessor;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Controller;
 import java.lang.annotation.*;
 
 import static kr.modusplant.domains.common.vo.Reference.NOTATION_DOMAINS;
-import static kr.modusplant.global.vo.Reference.NOTATION_GLOBAL;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
@@ -34,11 +33,6 @@ import static kr.modusplant.global.vo.Reference.NOTATION_GLOBAL;
 )
 @ComponentScan(
         basePackages = NOTATION_DOMAINS,
-        includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Controller.class),
-        useDefaultFilters = false
-)
-@ComponentScan(
-        basePackages = NOTATION_GLOBAL,
         includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Controller.class),
         useDefaultFilters = false
 )
