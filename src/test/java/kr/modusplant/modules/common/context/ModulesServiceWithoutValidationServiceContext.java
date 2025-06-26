@@ -7,6 +7,7 @@ import kr.modusplant.global.config.TestRedisConfig;
 import kr.modusplant.global.config.TestS3Config;
 import kr.modusplant.global.initializer.MockRedisComponentInitializer;
 import kr.modusplant.modules.common.postprocessor.MockModulesRepositoryBeanFactoryPostProcessor;
+import kr.modusplant.modules.common.postprocessor.MockModulesValidationServiceBeanFactoryPostProcessor;
 import kr.modusplant.modules.common.scan.ScanModulesService;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.Execution;
@@ -32,11 +33,12 @@ import java.lang.annotation.*;
                 TestRedisConfig.class,
                 TestS3Config.class,
                 MockModulesRepositoryBeanFactoryPostProcessor.class,
+                MockModulesValidationServiceBeanFactoryPostProcessor.class,
                 RestClientAutoConfiguration.class},
         initializers = MockRedisComponentInitializer.class
 )
 @SpringBootTest(classes = {ScanGlobalService.class, ScanDomainsService.class, ScanModulesService.class})
 @ExtendWith(MockitoExtension.class)
 @Execution(ExecutionMode.CONCURRENT)
-public @interface ModulesServiceOnlyContext {
+public @interface ModulesServiceWithoutValidationServiceContext {
 }
