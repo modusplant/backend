@@ -1,11 +1,9 @@
 package kr.modusplant.global.middleware.security.integration;
 
+import kr.modusplant.global.context.SecurityOnlyContext;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -14,15 +12,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@SecurityOnlyContext
 public class NormalLogoutFlowTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    private final MockMvc mockMvc;
+    private final TokenApplicationService tokenApplicationService;
 
-    @MockitoBean
-    private TokenApplicationService tokenApplicationService;
+    @Autowired
+    public NormalLogoutFlowTest(MockMvc mockMvc, TokenApplicationService tokenApplicationService) {
+        this.mockMvc = mockMvc;
+        this.tokenApplicationService = tokenApplicationService;
+    }
 
     @Test
     public void givenRefreshToken_willCallSuccessHandler() throws Exception {
