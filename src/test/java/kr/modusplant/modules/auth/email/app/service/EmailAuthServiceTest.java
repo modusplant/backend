@@ -1,21 +1,21 @@
 package kr.modusplant.modules.auth.email.app.service;
 
 import kr.modusplant.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
+import kr.modusplant.domains.member.domain.service.SiteMemberAuthValidationService;
 import kr.modusplant.domains.member.error.SiteMemberAuthNotFoundException;
+import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
-import kr.modusplant.global.config.TestAopConfig;
 import kr.modusplant.global.middleware.redis.RedisHelper;
 import kr.modusplant.modules.auth.email.app.http.request.EmailRequest;
 import kr.modusplant.modules.auth.email.app.http.request.VerifyEmailRequest;
 import kr.modusplant.modules.auth.email.enums.EmailType;
+import kr.modusplant.modules.common.context.ModulesServiceWithoutValidationServiceContext;
 import kr.modusplant.modules.jwt.app.service.TokenProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -23,40 +23,34 @@ import java.util.Optional;
 import static kr.modusplant.global.middleware.redis.RedisKeys.RESET_PASSWORD_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
-@SpringBootTest(classes = {TestAopConfig.class})
-@Transactional
+@ModulesServiceWithoutValidationServiceContext
 class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
 
-    @Autowired
-    private EmailAuthService emailAuthService;
-
-    @Autowired
-    private SiteMemberAuthRepository siteMemberAuthRepository;
+    private final EmailAuthService emailAuthService;
+    private final SiteMemberAuthRepository siteMemberAuthRepository;
+    private final SiteMemberAuthValidationService siteMemberAuthValidationService;
+    private final RedisHelper redisHelper;
 
     @MockitoBean
-    private RedisHelper redisHelper;
+    private final TokenProvider tokenProvider;
 
     @MockitoBean
     private MailService mailService;
 
-    @MockitoBean
-    private TokenProvider tokenProvider;
-
     private final String email = "test@example.com";
     private final String code = "123456";
 
-    private void createTestUser() {
-        SiteMemberEntity member = createMemberBasicUserEntity();
-        siteMemberAuthRepository.save(
-                createMemberAuthBasicUserEntityBuilder()
-                        .activeMember(member)
-                        .originalMember(member)
-                        .email(email)
-                        .build()
-        );
+    @Autowired
+    EmailAuthServiceTest(EmailAuthService emailAuthService, SiteMemberAuthRepository siteMemberAuthRepository, SiteMemberAuthValidationService siteMemberAuthValidationService, TokenProvider tokenProvider, RedisHelper redisHelper) {
+        this.emailAuthService = emailAuthService;
+        this.siteMemberAuthRepository = siteMemberAuthRepository;
+        this.siteMemberAuthValidationService = siteMemberAuthValidationService;
+        this.tokenProvider = tokenProvider;
+        this.redisHelper = redisHelper;
     }
 
     @Test
@@ -99,7 +93,15 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
     @DisplayName("비밀번호 재설정 메일전송 성공 테스트")
     void sendResetPasswordCode_success() {
         // given
-        createTestUser();
+        SiteMemberEntity member = createMemberBasicUserEntity();
+        SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntityBuilder()
+                .activeMember(member)
+                .originalMember(member)
+                .email(email)
+                .build();
+        given(siteMemberAuthRepository.save(memberAuth)).willReturn(memberAuth);
+        siteMemberAuthRepository.save(memberAuth);
+
         EmailRequest request = new EmailRequest();
         setField(request, "email", email);
 
@@ -120,7 +122,9 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
     void sendResetPasswordCode_fail_whenEmailNotExists() {
         // given
         EmailRequest request = new EmailRequest();
-        setField(request, "email", "notExistsEmail@gmail.com");
+        String email = "notExistsEmail@gmail.com";
+        setField(request, "email", email);
+        doThrow(new SiteMemberAuthNotFoundException()).when(siteMemberAuthValidationService).validateNotFoundEmail(email);
 
         // when/then
         assertThatThrownBy(() -> emailAuthService.sendResetPasswordCode(request))
@@ -131,7 +135,15 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
     @DisplayName("비밀번호 재설정 검증 성공 테스트")
     void verifyResetPasswordCode_success() {
         // given
-        createTestUser();
+        SiteMemberEntity member = createMemberBasicUserEntity();
+        SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntityBuilder()
+                .activeMember(member)
+                .originalMember(member)
+                .email(email)
+                .build();
+        given(siteMemberAuthRepository.save(memberAuth)).willReturn(memberAuth);
+        siteMemberAuthRepository.save(memberAuth);
+
         VerifyEmailRequest request = new VerifyEmailRequest();
         setField(request, "email", email);
         setField(request, "verifyCode", code);
@@ -150,7 +162,15 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
     @DisplayName("비밀번호 재설정 검증 실패 테스트(레디스 인증코드 조회 실패)")
     void verifyResetPasswordCode_fail_whenCodeNotInRedis() {
         // given
-        createTestUser();
+        SiteMemberEntity member = createMemberBasicUserEntity();
+        SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntityBuilder()
+                .activeMember(member)
+                .originalMember(member)
+                .email(email)
+                .build();
+        given(siteMemberAuthRepository.save(memberAuth)).willReturn(memberAuth);
+        siteMemberAuthRepository.save(memberAuth);
+
         VerifyEmailRequest request = new VerifyEmailRequest();
         setField(request, "email", email);
         setField(request, "verifyCode", code);
@@ -167,7 +187,15 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
     @DisplayName("비밀번호 재설정 검증 실패 테스트(레디스 인증코드와 불일치)")
     void verifyResetPasswordCode_fail_whenCodeDoesNotMatch() {
         // given
-        createTestUser();
+        SiteMemberEntity member = createMemberBasicUserEntity();
+        SiteMemberAuthEntity memberAuth = createMemberAuthBasicUserEntityBuilder()
+                .activeMember(member)
+                .originalMember(member)
+                .email(email)
+                .build();
+        given(siteMemberAuthRepository.save(memberAuth)).willReturn(memberAuth);
+        siteMemberAuthRepository.save(memberAuth);
+
         VerifyEmailRequest request = new VerifyEmailRequest();
         setField(request, "email", email);
         setField(request, "verifyCode", "wrong-code");
