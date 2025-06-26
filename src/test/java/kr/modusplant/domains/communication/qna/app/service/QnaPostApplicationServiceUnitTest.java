@@ -30,7 +30,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class QnaPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, QnaCategoryEntityTestUtils, QnaPostEntityTestUtils {
+class QnaPostApplicationServiceUnitTest implements SiteMemberEntityTestUtils, QnaCategoryEntityTestUtils, QnaPostEntityTestUtils {
     @Mock
     private QnaPostViewCountRedisRepository qnaPostViewCountRedisRepository;
     @Mock
