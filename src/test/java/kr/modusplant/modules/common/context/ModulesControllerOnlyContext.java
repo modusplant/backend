@@ -14,7 +14,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Controller;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -27,12 +26,14 @@ import static kr.modusplant.modules.common.vo.Reference.NOTATION_MODULES;
 @Documented
 @WebMvcTest(useDefaultFilters = false)
 @AutoConfigureMockMvc(addFilters = false)
-@ContextConfiguration(initializers = MockRedisComponentInitializer.class)
-@Import({TestJpaConfig.class,
-        TestRedisConfig.class,
-        TestS3Config.class,
-        MockModulesRepositoryBeanFactoryPostProcessor.class,
-        MockModulesServiceBeanFactoryPostProcessor.class}
+@ContextConfiguration(
+        classes = {
+                TestJpaConfig.class,
+                TestRedisConfig.class,
+                TestS3Config.class,
+                MockModulesRepositoryBeanFactoryPostProcessor.class,
+                MockModulesServiceBeanFactoryPostProcessor.class},
+        initializers = MockRedisComponentInitializer.class
 )
 @ComponentScan(
         basePackages = NOTATION_MODULES,

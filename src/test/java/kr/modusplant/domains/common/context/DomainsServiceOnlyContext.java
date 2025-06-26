@@ -14,7 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Repository;
 import org.springframework.test.context.ContextConfiguration;
@@ -25,11 +24,13 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @EnableJpaRepositories(excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
-@ContextConfiguration(initializers = MockRedisComponentInitializer.class)
-@Import({TestJpaConfig.class,
-        TestRedisConfig.class,
-        TestS3Config.class,
-        MockDomainsRepositoryBeanFactoryPostProcessor.class}
+@ContextConfiguration(
+        classes = {
+                TestJpaConfig.class,
+                TestRedisConfig.class,
+                TestS3Config.class,
+                MockDomainsRepositoryBeanFactoryPostProcessor.class},
+        initializers = MockRedisComponentInitializer.class
 )
 @SpringBootTest(classes = {ScanGlobalService.class, ScanDomainsService.class})
 @ExtendWith(MockitoExtension.class)
