@@ -35,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-class TipPostApplicationServiceTest implements SiteMemberEntityTestUtils, TipCategoryEntityTestUtils, TipPostRequestTestUtils, TipPostEntityTestUtils {
+class TipPostApplicationServiceIntegrationTest implements SiteMemberEntityTestUtils, TipCategoryEntityTestUtils, TipPostRequestTestUtils, TipPostEntityTestUtils {
     @Autowired
     private TipPostApplicationService tipPostApplicationService;
 

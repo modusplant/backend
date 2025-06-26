@@ -35,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-class QnaPostApplicationServiceTest implements SiteMemberEntityTestUtils, QnaCategoryEntityTestUtils, QnaPostRequestTestUtils, QnaPostEntityTestUtils {
+class QnaPostApplicationServiceIntegrationTest implements SiteMemberEntityTestUtils, QnaCategoryEntityTestUtils, QnaPostRequestTestUtils, QnaPostEntityTestUtils {
     @Autowired
     private QnaPostApplicationService qnaPostApplicationService;
 
