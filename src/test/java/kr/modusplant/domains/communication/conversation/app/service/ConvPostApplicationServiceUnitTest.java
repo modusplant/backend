@@ -30,7 +30,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ConvPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, ConvCategoryEntityTestUtils, ConvPostEntityTestUtils {
+class ConvPostApplicationServiceUnitTest implements SiteMemberEntityTestUtils, ConvCategoryEntityTestUtils, ConvPostEntityTestUtils {
     @Mock
     private ConvPostViewCountRedisRepository convPostViewCountRedisRepository;
     @Mock
