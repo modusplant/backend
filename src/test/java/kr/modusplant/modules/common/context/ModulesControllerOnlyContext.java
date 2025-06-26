@@ -3,6 +3,7 @@ package kr.modusplant.modules.common.context;
 import kr.modusplant.global.config.TestJpaConfig;
 import kr.modusplant.global.config.TestRedisConfig;
 import kr.modusplant.global.config.TestS3Config;
+import kr.modusplant.global.initializer.MockRedisComponentInitializer;
 import kr.modusplant.modules.common.postprocessor.MockModulesRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.modules.common.postprocessor.MockModulesServiceBeanFactoryPostProcessor;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Controller;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.lang.annotation.*;
 
@@ -25,6 +27,7 @@ import static kr.modusplant.modules.common.vo.Reference.NOTATION_MODULES;
 @Documented
 @WebMvcTest(useDefaultFilters = false)
 @AutoConfigureMockMvc(addFilters = false)
+@ContextConfiguration(initializers = MockRedisComponentInitializer.class)
 @Import({TestJpaConfig.class,
         TestRedisConfig.class,
         TestS3Config.class,

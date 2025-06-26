@@ -7,6 +7,8 @@ import kr.modusplant.global.config.TestS3Config;
 import kr.modusplant.global.middleware.redis.RedisHelper;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ContextConfiguration;
@@ -28,5 +30,10 @@ import static kr.modusplant.global.vo.Reference.NOTATION_ALL;
         TestRedisConfig.class,
         TestS3Config.class,
         RedisHelper.class})
+@ComponentScan(
+        basePackageClasses = RedisHelper.class,
+        includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = RedisHelper.class),
+        useDefaultFilters = false
+)
 public @interface RepositoryOnlyContext {
 }
