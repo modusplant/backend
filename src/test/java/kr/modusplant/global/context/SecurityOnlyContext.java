@@ -28,14 +28,18 @@ import static kr.modusplant.global.vo.Reference.NOTATION_GLOBAL;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @WebMvcTest(useDefaultFilters = false)
-@ContextConfiguration(initializers = MockSecurityConfigInitializer.class)
+@ContextConfiguration(
+        classes = {
+                TestJpaConfig.class,
+                TestRedisConfig.class,
+                TestS3Config.class,
+                TestSecurityConfig.class,
+                MockModulesRepositoryBeanFactoryPostProcessor.class,
+                MockModulesServiceBeanFactoryPostProcessor.class},
+        initializers = MockSecurityConfigInitializer.class
+)
 @AutoConfigureMockMvc
-@Import({TestJpaConfig.class,
-        TestRedisConfig.class,
-        TestS3Config.class,
-        TestSecurityConfig.class,
-        MockModulesRepositoryBeanFactoryPostProcessor.class,
-        MockModulesServiceBeanFactoryPostProcessor.class}
+@Import({}
 )
 @ComponentScan(
         basePackages = NOTATION_GLOBAL,

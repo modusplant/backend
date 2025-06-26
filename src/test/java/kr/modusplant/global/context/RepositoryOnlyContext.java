@@ -1,6 +1,5 @@
 package kr.modusplant.global.context;
 
-import kr.modusplant.ModusplantApplication;
 import kr.modusplant.global.config.TestJpaConfig;
 import kr.modusplant.global.config.TestRedisConfig;
 import kr.modusplant.global.config.TestS3Config;
@@ -11,7 +10,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.annotation.*;
@@ -23,7 +21,6 @@ import static kr.modusplant.global.vo.Reference.NOTATION_ALL;
 @Documented
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ContextConfiguration(classes = ModusplantApplication.class)
 @EnableJpaRepositories(basePackages = NOTATION_ALL)
 @Transactional
 @Import({TestJpaConfig.class,
