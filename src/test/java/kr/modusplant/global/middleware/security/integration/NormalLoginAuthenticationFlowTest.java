@@ -4,19 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.global.context.SecurityOnlyContext;
 import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
 import kr.modusplant.global.middleware.security.common.util.SiteMemberUserDetailsTestUtils;
 import kr.modusplant.global.middleware.security.models.SiteMemberUserDetails;
 import kr.modusplant.modules.auth.normal.login.common.util.app.http.request.NormalLoginRequestTestUtils;
+import kr.modusplant.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.modules.jwt.app.service.RefreshTokenApplicationService;
-import kr.modusplant.modules.jwt.domain.service.TokenValidationService;
-import org.junit.jupiter.api.BeforeEach;
+import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,49 +31,42 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@SecurityOnlyContext
 public class NormalLoginAuthenticationFlowTest implements
         SiteMemberUserDetailsTestUtils, NormalLoginRequestTestUtils, SiteMemberEntityTestUtils {
 
+    private final MockMvc mockMvc;
+    private final ObjectMapper objectMapper;
+    private final FilterChainProxy filterChainProxy;
+    private final SiteMemberUserDetailsService memberUserDetailsService;
+    private final SiteMemberValidationService memberValidationService;
+    private final TokenApplicationService tokenApplicationService;
+    private final RefreshTokenApplicationService refreshTokenApplicationService;
+    private final SiteMemberRepository memberRepository;
+
+    @MockitoBean
+    private PasswordEncoder bCryptPasswordEncoder;
+
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private FilterChainProxy filterChainProxy;
-
-    @MockitoBean
-    private SiteMemberUserDetailsService memberUserDetailsService;
-
-    @MockitoBean
-    private SiteMemberValidationService memberValidationService;
-
-    @MockitoBean
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @MockitoBean
-    private TokenValidationService tokenValidationService;
-
-    @MockitoBean
-    private RefreshTokenApplicationService refreshTokenApplicationService;
-
-    @MockitoBean
-    private SiteMemberRepository memberRepository;
-
-    @BeforeEach
-    void setUp() {
-        when(bCryptPasswordEncoder.encode("userPw2!"))
-                .thenReturn(testSiteMemberUserDetailsBuilder.build().getPassword());
-        when(bCryptPasswordEncoder.matches(anyString(), anyString()))
-                .thenReturn(true);
+    public NormalLoginAuthenticationFlowTest(MockMvc mockMvc, ObjectMapper objectMapper, FilterChainProxy filterChainProxy, SiteMemberUserDetailsService memberUserDetailsService, SiteMemberValidationService memberValidationService, TokenApplicationService tokenApplicationService, RefreshTokenApplicationService refreshTokenApplicationService, SiteMemberRepository memberRepository) {
+        this.mockMvc = mockMvc;
+        this.objectMapper = objectMapper;
+        this.filterChainProxy = filterChainProxy;
+        this.memberUserDetailsService = memberUserDetailsService;
+        this.memberValidationService = memberValidationService;
+        this.tokenApplicationService = tokenApplicationService;
+        this.refreshTokenApplicationService = refreshTokenApplicationService;
+        this.memberRepository = memberRepository;
     }
 
     @Test
     public void givenValidSiteMemberUserDetails_willCallSuccessHandler() throws Exception {
         // given
+        when(bCryptPasswordEncoder.encode("userPw2!"))
+                .thenReturn(testSiteMemberUserDetailsBuilder.build().getPassword());
+        when(bCryptPasswordEncoder.matches(anyString(), anyString()))
+                .thenReturn(true);
+
         SiteMemberUserDetails validSiteMemberUserDetails = testSiteMemberUserDetailsBuilder
                 .isActive(true)
                 .isDisabledByLinking(false)
@@ -90,6 +82,8 @@ public class NormalLoginAuthenticationFlowTest implements
         given(memberRepository.findByUuid(validSiteMemberUserDetails.getActiveUuid()))
                 .willReturn(Optional.ofNullable(createMemberBasicUserEntityWithUuid()));
         given(memberRepository.save(any())).willReturn(null);
+        given(tokenApplicationService.issueToken(any(), any(), any()))
+                .willReturn(new TokenPair("TEST_ACCESS_TOKEN", "TEST_REFRESH_TOKEN"));
 
         // when
         mockMvc.perform(post("/api/auth/login")
@@ -106,6 +100,11 @@ public class NormalLoginAuthenticationFlowTest implements
     @Test
     public void givenInvalidSiteMemberUserDetails_thenCallFailureHandler() throws Exception {
         // given
+        when(bCryptPasswordEncoder.encode("userPw2!"))
+                .thenReturn(testSiteMemberUserDetailsBuilder.build().getPassword());
+        when(bCryptPasswordEncoder.matches(anyString(), anyString()))
+                .thenReturn(true);
+
         SiteMemberUserDetails invalidSiteMemberUserDetails = testSiteMemberUserDetailsBuilder
                 .isActive(false)
                 .isDisabledByLinking(false)
