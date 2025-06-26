@@ -26,7 +26,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -51,15 +50,11 @@ public class TestSecurityConfig {
     private final SiteMemberRepository memberRepository;
     private final ObjectMapper objectMapper;
     private final Validator validator;
+    private final PasswordEncoder passwordEncoder;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.debug(debugEnabled);
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -69,7 +64,7 @@ public class TestSecurityConfig {
 
     @Bean
     public AuthenticationProvider siteMemberAuthProvider() {
-        return new SiteMemberAuthProvider(memberUserDetailsService, passwordEncoder());
+        return new SiteMemberAuthProvider(memberUserDetailsService, passwordEncoder);
     }
 
     @Bean

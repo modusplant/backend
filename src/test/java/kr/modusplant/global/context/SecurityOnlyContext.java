@@ -4,6 +4,7 @@ import kr.modusplant.global.config.TestJpaConfig;
 import kr.modusplant.global.config.TestRedisConfig;
 import kr.modusplant.global.config.TestS3Config;
 import kr.modusplant.global.config.TestSecurityConfig;
+import kr.modusplant.global.initializer.MockSecurityConfigInitializer;
 import kr.modusplant.modules.common.postprocessor.MockModulesRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.modules.common.postprocessor.MockModulesServiceBeanFactoryPostProcessor;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Controller;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.lang.annotation.*;
@@ -26,6 +28,7 @@ import static kr.modusplant.global.vo.Reference.NOTATION_GLOBAL;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @WebMvcTest(useDefaultFilters = false)
+@ContextConfiguration(initializers = MockSecurityConfigInitializer.class)
 @AutoConfigureMockMvc
 @Import({TestJpaConfig.class,
         TestRedisConfig.class,

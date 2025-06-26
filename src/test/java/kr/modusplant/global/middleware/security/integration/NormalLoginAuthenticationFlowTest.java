@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.FilterChainProxy;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
@@ -43,12 +42,10 @@ public class NormalLoginAuthenticationFlowTest implements
     private final TokenApplicationService tokenApplicationService;
     private final RefreshTokenApplicationService refreshTokenApplicationService;
     private final SiteMemberRepository memberRepository;
-
-    @MockitoBean
-    private PasswordEncoder bCryptPasswordEncoder;
+    private final PasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public NormalLoginAuthenticationFlowTest(MockMvc mockMvc, ObjectMapper objectMapper, FilterChainProxy filterChainProxy, SiteMemberUserDetailsService memberUserDetailsService, SiteMemberValidationService memberValidationService, TokenApplicationService tokenApplicationService, RefreshTokenApplicationService refreshTokenApplicationService, SiteMemberRepository memberRepository) {
+    public NormalLoginAuthenticationFlowTest(MockMvc mockMvc, ObjectMapper objectMapper, FilterChainProxy filterChainProxy, SiteMemberUserDetailsService memberUserDetailsService, SiteMemberValidationService memberValidationService, TokenApplicationService tokenApplicationService, RefreshTokenApplicationService refreshTokenApplicationService, SiteMemberRepository memberRepository, PasswordEncoder bCryptPasswordEncoder) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
         this.filterChainProxy = filterChainProxy;
@@ -57,6 +54,7 @@ public class NormalLoginAuthenticationFlowTest implements
         this.tokenApplicationService = tokenApplicationService;
         this.refreshTokenApplicationService = refreshTokenApplicationService;
         this.memberRepository = memberRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @Test
