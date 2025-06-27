@@ -26,7 +26,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class SiteMemberUserDetailsService implements UserDetailsService {
+public class DefaultUserDetailsService implements UserDetailsService {
 
     private final SiteMemberValidationService memberValidationService;
     private final SiteMemberRepository memberRepository;

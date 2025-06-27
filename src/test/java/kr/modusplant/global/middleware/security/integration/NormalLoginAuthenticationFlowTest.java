@@ -3,7 +3,7 @@ package kr.modusplant.global.middleware.security.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
+import kr.modusplant.global.middleware.security.DefaultUserDetailsService;
 import kr.modusplant.global.middleware.security.common.util.SiteMemberUserDetailsTestUtils;
 import kr.modusplant.global.middleware.security.config.SecurityConfig;
 import kr.modusplant.global.middleware.security.models.DefaultUserDetails;
@@ -49,7 +49,7 @@ public class NormalLoginAuthenticationFlowTest implements
     private FilterChainProxy filterChainProxy;
 
     @MockitoBean
-    private SiteMemberUserDetailsService memberUserDetailsService;
+    private DefaultUserDetailsService defaultUserDetailsService;
 
     @MockitoBean
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -81,7 +81,7 @@ public class NormalLoginAuthenticationFlowTest implements
                 .isDeleted(false)
                 .build();
 
-        given(memberUserDetailsService.loadUserByUsername(testLoginRequest.email()))
+        given(defaultUserDetailsService.loadUserByUsername(testLoginRequest.email()))
                 .willReturn(validDefaultUserDetails);
         doNothing().when(tokenValidationService).validateNotFoundMemberUuid(any());
         given(refreshTokenApplicationService.insert(any())).willReturn(any());
@@ -111,7 +111,7 @@ public class NormalLoginAuthenticationFlowTest implements
                 .isDeleted(false)
                 .build();
 
-        when(memberUserDetailsService.loadUserByUsername(testLoginRequest.email()))
+        when(defaultUserDetailsService.loadUserByUsername(testLoginRequest.email()))
                 .thenReturn(invalidDefaultUserDetails);
 
         // when

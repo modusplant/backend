@@ -14,9 +14,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @RequiredArgsConstructor
-public class SiteMemberAuthProvider implements AuthenticationProvider {
+public class DefaultAuthProvider implements AuthenticationProvider {
 
-    private final SiteMemberUserDetailsService memberUserDetailsService;
+    private final DefaultUserDetailsService defaultUserDetailsService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -24,7 +24,7 @@ public class SiteMemberAuthProvider implements AuthenticationProvider {
         String email = authentication.getPrincipal().toString();
         String password = authentication.getCredentials().toString();
 
-        DefaultUserDetails userDetails = memberUserDetailsService.loadUserByUsername(email);
+        DefaultUserDetails userDetails = defaultUserDetailsService.loadUserByUsername(email);
 
         if(validateDefaultUserDetails(userDetails, password)) {
             return new DefaultAuthToken(userDetails, userDetails.getAuthorities());

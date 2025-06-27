@@ -2,9 +2,9 @@ package kr.modusplant.global.middleware.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.global.middleware.security.SiteMemberAuthProvider;
+import kr.modusplant.global.middleware.security.DefaultAuthProvider;
 import kr.modusplant.global.middleware.security.DefaultAuthenticationEntryPoint;
-import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
+import kr.modusplant.global.middleware.security.DefaultUserDetailsService;
 import kr.modusplant.global.middleware.security.filter.EmailPasswordAuthenticationFilter;
 import kr.modusplant.global.middleware.security.filter.JwtAuthenticationFilter;
 import kr.modusplant.global.middleware.security.handler.*;
@@ -42,7 +42,7 @@ public class SecurityConfig {
     private Boolean debugEnabled;
 
     private final AuthenticationConfiguration authConfiguration;
-    private final SiteMemberUserDetailsService memberUserDetailsService;
+    private final DefaultUserDetailsService defaultUserDetailsService;
     private final ObjectMapper objectMapper;
     private final TokenProvider tokenProvider;
     private final TokenApplicationService tokenApplicationService;
@@ -73,8 +73,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SiteMemberAuthProvider siteMemberAuthProvider() {
-        return new SiteMemberAuthProvider(memberUserDetailsService, passwordEncoder());
+    public DefaultAuthProvider siteMemberAuthProvider() {
+        return new DefaultAuthProvider(defaultUserDetailsService, passwordEncoder());
     }
 
     @Bean
