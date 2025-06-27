@@ -24,8 +24,6 @@ public interface SiteMemberAuthRepository extends LastModifiedAtRepository<SiteM
 
     List<SiteMemberAuthEntity> findByProviderId(String providerId);
 
-    List<SiteMemberAuthEntity> findByFailedAttempt(Integer failedAttempt);
-
     Optional<SiteMemberAuthEntity> findByOriginalMember(SiteMemberEntity originalMember);
 
     Optional<SiteMemberAuthEntity> findByEmailAndProvider(String email, AuthProvider provider);

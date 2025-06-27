@@ -128,19 +128,6 @@ class SiteMemberAuthRepositoryTest implements SiteMemberAuthEntityTestUtils {
         assertThat(memberAuthRepository.findByProviderAndProviderId(memberAuth.getProvider(), memberAuth.getProviderId()).orElseThrow()).isEqualTo(memberAuth);
     }
 
-    @DisplayName("failedAttempt로 회원 인증 찾기")
-    @Test
-    void findByFailedAttemptTest() {
-        // given
-        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
-
-        // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
-
-        // then
-        assertThat(memberAuthRepository.findByFailedAttempt(memberAuth.getFailedAttempt()).getFirst()).isEqualTo(memberAuth);
-    }
-
     @DisplayName("lastModifiedAt으로 회원 인증 찾기")
     @Test
     void findByLastModifiedAtTest() {
