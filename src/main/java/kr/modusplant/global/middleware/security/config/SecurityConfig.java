@@ -3,7 +3,7 @@ package kr.modusplant.global.middleware.security.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.middleware.security.SiteMemberAuthProvider;
-import kr.modusplant.global.middleware.security.SiteMemberAuthenticationEntryPoint;
+import kr.modusplant.global.middleware.security.DefaultAuthenticationEntryPoint;
 import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
 import kr.modusplant.global.middleware.security.filter.EmailPasswordAuthenticationFilter;
 import kr.modusplant.global.middleware.security.filter.JwtAuthenticationFilter;
@@ -59,8 +59,8 @@ public class SecurityConfig {
     public SecurityContextHolder securityContextHolder() { return new SecurityContextHolder(); }
 
     @Bean
-    public SiteMemberAuthenticationEntryPoint siteMemberAuthenticationEntryPoint() {
-        return new SiteMemberAuthenticationEntryPoint(objectMapper); }
+    public DefaultAuthenticationEntryPoint defaultAuthenticationEntryPoint() {
+        return new DefaultAuthenticationEntryPoint(objectMapper); }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -121,8 +121,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SiteMemberAccessDeniedHandler siteMemberAccessDeniedHandler() {
-        return new SiteMemberAccessDeniedHandler(objectMapper);
+    public DefaultAccessDeniedHandler defaultAccessDeniedHandler() {
+        return new DefaultAccessDeniedHandler(objectMapper);
     }
 
     @Bean
@@ -151,8 +151,8 @@ public class SecurityConfig {
                         .addLogoutHandler(JwtClearingLogoutHandler())
                         .logoutSuccessHandler(normalLogoutSuccessHandler()))
                 .exceptionHandling(eh ->
-                        eh.authenticationEntryPoint(siteMemberAuthenticationEntryPoint())
-                                .accessDeniedHandler(siteMemberAccessDeniedHandler())
+                        eh.authenticationEntryPoint(defaultAuthenticationEntryPoint())
+                                .accessDeniedHandler(defaultAccessDeniedHandler())
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

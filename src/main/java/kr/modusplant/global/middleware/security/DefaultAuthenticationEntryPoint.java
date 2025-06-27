@@ -12,7 +12,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import java.io.IOException;
 
 @RequiredArgsConstructor
-public class SiteMemberAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class DefaultAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;
 
