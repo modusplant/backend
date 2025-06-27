@@ -10,7 +10,6 @@ import kr.modusplant.global.middleware.security.filter.JwtAuthenticationFilter;
 import kr.modusplant.global.middleware.security.handler.*;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
 import kr.modusplant.modules.jwt.app.service.TokenProvider;
-import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -47,8 +46,6 @@ public class SecurityConfig {
     private final TokenProvider tokenProvider;
     private final TokenApplicationService tokenApplicationService;
     private final SiteMemberRepository memberRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final JwtSecurityHandler jwtSecurityHandler;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -98,7 +95,7 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(HttpSecurity http) {
         try {
-            return new JwtAuthenticationFilter(tokenProvider, jwtSecurityHandler, refreshTokenRepository);
+            return new JwtAuthenticationFilter(tokenProvider, defaultAuthenticationEntryPoint());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

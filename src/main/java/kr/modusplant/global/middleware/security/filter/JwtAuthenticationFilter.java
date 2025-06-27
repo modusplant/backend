@@ -6,28 +6,26 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.modusplant.global.middleware.security.handler.JwtSecurityHandler;
+import kr.modusplant.global.middleware.security.DefaultAuthenticationEntryPoint;
 import kr.modusplant.global.middleware.security.models.DefaultAuthToken;
 import kr.modusplant.global.middleware.security.models.DefaultUserDetails;
 import kr.modusplant.modules.jwt.app.service.TokenProvider;
-import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenProvider tokenProvider;
-    private final JwtSecurityHandler jwtSecurityHandler;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final DefaultAuthenticationEntryPoint entryPoint;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -39,27 +37,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if(accessToken != null) {
             if(tokenProvider.validateToken(accessToken.substring(7))) {
                 DefaultUserDetails defaultUserDetails = constructUserDetails(accessToken);
-                saveSecurityContext(defaultUserDetails);
+                DefaultAuthToken authenticatedToken =
+                        new DefaultAuthToken(defaultUserDetails, defaultUserDetails.getAuthorities());
+
+                SecurityContextHolder.getContext().setAuthentication(authenticatedToken);
 
             } else {
-                String refreshToken = request.getHeader("Cookie");
-                if(refreshTokenRepository.findByRefreshToken(refreshToken).isPresent()) {
-
-                    Map<String, String> headersOfNewTokens = jwtSecurityHandler.provideHeaderTokenPair(request);
-                    String newAccessToken = headersOfNewTokens.get("accessToken");
-                    String newRefreshToken = headersOfNewTokens.get("refreshToken");
-
-                    if(jwtSecurityHandler.insertRefreshToken(newRefreshToken) != null) {
-                        response.setHeader("X-Access-Token", newAccessToken);
-                        response.setHeader("Set-Cookie", newRefreshToken);
-
-                        DefaultUserDetails defaultUserDetails = constructUserDetails(newAccessToken);
-                        saveSecurityContext(defaultUserDetails);
-                    }
-
-                } else {
-                    SecurityContextHolder.clearContext();
-                }
+               SecurityContextHolder.clearContext();
+               entryPoint.commence(request, response, new BadCredentialsException("접근 토큰이 만료되었습니다."));
             }
         }
 
@@ -79,10 +64,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .build();
     }
 
-    private void saveSecurityContext(DefaultUserDetails userDetails) {
-        DefaultAuthToken authenticatedToken =
-                new DefaultAuthToken(userDetails, userDetails.getAuthorities());
-
-        SecurityContextHolder.getContext().setAuthentication(authenticatedToken);
-    }
 }
