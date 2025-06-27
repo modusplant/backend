@@ -1,9 +1,8 @@
 package kr.modusplant.domains.member.domain.service;
 
-import kr.modusplant.domains.member.persistence.entity.SiteMemberRoleEntity;
+import kr.modusplant.domains.member.error.SiteMemberRoleExistsException;
+import kr.modusplant.domains.member.error.SiteMemberRoleNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleRepository;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -20,13 +19,13 @@ public class SiteMemberRoleValidationService {
 
     public void validateExistedUuid(UUID uuid) {
         if (memberRoleRepository.existsByUuid(uuid)) {
-            throw new EntityExistsWithUuidException(uuid, SiteMemberRoleEntity.class);
+            throw new SiteMemberRoleExistsException();
         }
     }
 
     public void validateNotFoundUuid(UUID uuid) {
         if (uuid == null || !memberRoleRepository.existsByUuid(uuid)) {
-            throw new EntityNotFoundWithUuidException(uuid, SiteMemberRoleEntity.class);
+            throw new SiteMemberRoleNotFoundException();
         }
     }
 }

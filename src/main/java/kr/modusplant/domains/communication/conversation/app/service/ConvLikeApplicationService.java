@@ -1,6 +1,7 @@
 package kr.modusplant.domains.communication.conversation.app.service;
 
 import kr.modusplant.domains.communication.common.app.http.response.LikeResponse;
+import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.conversation.domain.service.ConvLikeValidationService;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvLikeEntity;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
@@ -21,10 +22,10 @@ public class ConvLikeApplicationService {
 
     @Transactional
     public LikeResponse likeConvPost(String postId, UUID memberId) {
-        convLikeValidationService.validateExistedConvPostAndMember(postId, memberId);
+        convLikeValidationService.validateNotFoundConvPostOrMember(postId, memberId);
         convLikeValidationService.validateExistedConvLike(postId, memberId);
 
-        ConvPostEntity convPost = convPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("conv post not found"));
+        ConvPostEntity convPost = convPostRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         convPost.increaseLikeCount();
 
         convLikeRepository.save(ConvLikeEntity.of(postId, memberId));
@@ -33,10 +34,10 @@ public class ConvLikeApplicationService {
 
     @Transactional
     public LikeResponse unlikeConvPost(String postId, UUID memberId) {
-        convLikeValidationService.validateExistedConvPostAndMember(postId, memberId);
+        convLikeValidationService.validateNotFoundConvPostOrMember(postId, memberId);
         convLikeValidationService.validateNotFoundConvLike(postId, memberId);
 
-        ConvPostEntity convPost = convPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("conv post not found"));
+        ConvPostEntity convPost = convPostRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         convPost.decreaseLikeCount();
 
         convLikeRepository.deleteByPostIdAndMemberId(postId, memberId);

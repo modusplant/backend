@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static kr.modusplant.global.util.VersionUtils.createVersion;
-import static kr.modusplant.global.vo.FieldName.VER;
-import static kr.modusplant.global.vo.SnakeCaseWord.*;
+import static kr.modusplant.global.vo.DatabaseFieldName.*;
+import static kr.modusplant.global.vo.EntityFieldName.VER;
 import static kr.modusplant.global.vo.TableName.TERM;
 
 @Entity
@@ -41,16 +41,16 @@ public class TermEntity {
     @DefaultValue
     private String version;
 
-    @Column(name = SNAKE_CREATED_AT, nullable = false, updatable = false)
+    @Column(name = CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 
-    @Column(name = SNAKE_LAST_MODIFIED_AT, nullable = false)
+    @Column(name = LAST_MODIFIED_AT, nullable = false)
     @LastModifiedDate
     private LocalDateTime lastModifiedAt;
 
     @Version
-    @Column(name = SNAKE_VER_NUM, nullable = false)
+    @Column(name = VER_NUM, nullable = false)
     private Long versionNumber;
 
     public void updateContent(String content) {

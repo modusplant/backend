@@ -1,7 +1,9 @@
 package kr.modusplant.domains.communication.conversation.domain.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import kr.modusplant.domains.communication.common.error.CategoryNotFoundException;
 import kr.modusplant.domains.communication.common.error.PostAccessDeniedException;
+import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostInsertRequest;
 import kr.modusplant.domains.communication.conversation.common.util.app.http.request.ConvPostRequestTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.domain.ConvPostTestUtils;
@@ -11,8 +13,6 @@ import kr.modusplant.domains.communication.conversation.persistence.entity.ConvP
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCategoryRepository;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostRepository;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -64,27 +64,8 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils, ConvCat
         when(convCategoryRepository.existsByUuid(convPostInsertRequest.categoryUuid())).thenReturn(false);
 
         // then
-        assertThrows(EntityExistsWithUuidException.class,
+        assertThrows(CategoryNotFoundException.class,
                 () -> convPostValidationService.validateConvPostInsertRequest(convPostInsertRequest));
-    }
-
-    @Test
-    @DisplayName("대화 게시글 추가/수정 시 ConvPostRequest의 title이 유효하지 않으면 예외 발생")
-    void validateConvPostInsertRequestInvalidTitleTest() {
-        // given & when
-        ConvPostInsertRequest convPostInsertRequest = new ConvPostInsertRequest(
-                UUID.randomUUID(),
-                "a".repeat(151),
-                allMediaFiles,
-                allMediaFilesOrder
-        );
-
-        when(convCategoryRepository.existsByUuid(convPostInsertRequest.categoryUuid())).thenReturn(true);
-
-        // then
-        assertThrows(IllegalArgumentException.class,
-                () -> convPostValidationService.validateConvPostInsertRequest(convPostInsertRequest));
-
     }
 
     @Test
@@ -136,8 +117,8 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils, ConvCat
         UUID memberUuid = UUID.randomUUID();
         String ulid = ConvPostTestUtils.generator.generate(null, null,null,EventType.INSERT);
         when(convPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundWithUlidException.class,
-                () -> convPostValidationService.validateAccessibleConvPost(ulid,memberUuid));
+        assertThrows(PostNotFoundException.class,
+                () -> convPostValidationService.validateAccessibleConvPost(ulid, memberUuid));
     }
 
     @Test
@@ -182,7 +163,7 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils, ConvCat
         final String nullUlid = null;
 
         // then
-        assertThrows(EntityNotFoundWithUlidException.class, () ->
+        assertThrows(PostNotFoundException.class, () ->
                 convPostValidationService.validateNotFoundUlid(nullUlid));
 
         // Not Found ULID
@@ -191,7 +172,7 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils, ConvCat
         when(convPostRepository.existsByUlid(notFoundUlid)).thenReturn(false);
 
         // then
-        assertThrows(EntityNotFoundWithUlidException.class, () ->
+        assertThrows(PostNotFoundException.class, () ->
                 convPostValidationService.validateNotFoundUlid(notFoundUlid));
     }
 

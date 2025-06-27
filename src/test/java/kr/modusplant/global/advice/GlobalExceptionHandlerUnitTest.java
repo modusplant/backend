@@ -6,18 +6,22 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import jakarta.servlet.http.HttpServletRequest;
 import kr.modusplant.global.app.http.response.DataResponse;
+import kr.modusplant.global.error.DomainException;
 import kr.modusplant.modules.auth.social.error.OAuthException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -65,6 +69,25 @@ public class GlobalExceptionHandlerUnitTest {
         assertNull(errorResponse.getData());
     }
 
+    @DisplayName("DomainException 처리")
+    @Test
+    public void handleDomainExceptionTest() {
+        // given
+        DomainException ex = new DomainException("TEST", "테스트 예외");
+        HttpServletRequest servletRequest = mock(HttpServletRequest.class);
+
+        // when
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleDomainException(servletRequest, ex);
+        DataResponse<Void> errorResponse = response.getBody();
+
+        // then
+        assertNotNull(errorResponse);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
+        assertEquals("TEST", errorResponse.getCode());
+        assertEquals("테스트 예외", errorResponse.getMessage());
+        assertNull(errorResponse.getData());
+    }
+
     @DisplayName("OAuthException 처리")
     @Test
     public void handleOAuthExceptionTest() {
@@ -85,7 +108,7 @@ public class GlobalExceptionHandlerUnitTest {
     @Test
     public void handleIllegalArgumentExceptionTest() {
         // given
-        IllegalArgumentException ex = mock(IllegalArgumentException.class);
+        IllegalArgumentException ex = new IllegalArgumentException("테스트 예외");
 
         // when
         ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleIllegalArgumentException(ex);
@@ -94,14 +117,16 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("invalid client data", errorResponse.getMessage());
+        assertEquals("테스트 예외", errorResponse.getMessage());
     }
 
     @DisplayName("MethodArgumentNotValidException 처리")
     @Test
     public void handleMethodArgumentNotValidExceptionTest() {
         // given
-        MethodArgumentNotValidException ex = mock(MethodArgumentNotValidException.class);
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(new Object(), "테스트 객체");
+        bindingResult.addError(new FieldError("testObject", "testField", "테스트 메시지"));
+        MethodArgumentNotValidException ex = new MethodArgumentNotValidException(mock(MethodParameter.class), bindingResult);
 
         // when
         ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleMethodArgumentNotValidException(ex);
@@ -110,7 +135,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("invalid method argument", errorResponse.getMessage());
+        assertEquals("테스트 메시지", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -118,7 +143,7 @@ public class GlobalExceptionHandlerUnitTest {
     @Test
     public void handleIllegalStateExceptionTest() {
         // given
-        IllegalStateException ex = mock(IllegalStateException.class);
+        IllegalStateException ex = new IllegalStateException("테스트 예외");
 
         // when
         ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleIllegalStateException(ex);
@@ -126,8 +151,8 @@ public class GlobalExceptionHandlerUnitTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(HttpStatus.CONFLICT.value(), errorResponse.getStatus());
-        assertEquals("not available resource", errorResponse.getMessage());
+        assertEquals(HttpStatus.SERVICE_UNAVAILABLE.value(), errorResponse.getStatus());
+        assertEquals("테스트 예외", errorResponse.getMessage());
     }
 
     @DisplayName("요청 간 InvalidFormatException 처리")
@@ -145,7 +170,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("Value cannot be deserialized to expected type.", errorResponse.getMessage());
+        assertEquals("유효하지 않은 JSON입니다.", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -164,7 +189,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("Body has property that target class do not know.", errorResponse.getMessage());
+        assertEquals("서버가 알지 못하는 데이터가 포함되어 있습니다.", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -183,7 +208,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("Mapping to body and Java object failed.", errorResponse.getMessage());
+        assertEquals("JSON의 Java 객체로의 매핑이 실패하였습니다.", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -202,7 +227,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("Parsing body and Java object failed.", errorResponse.getMessage());
+        assertEquals("Java 객체의 JSON으로의 파싱이 실패하였습니다.", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -220,7 +245,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("malformed request body", errorResponse.getMessage());
+        assertEquals("요청 바디의 서식이 올바르지 않습니다.", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -239,7 +264,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
-        assertEquals("Value cannot be deserialized to expected type.", errorResponse.getMessage());
+        assertEquals("유효하지 않은 JSON입니다.", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -258,7 +283,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
-        assertEquals("Body has property that target class do not know.", errorResponse.getMessage());
+        assertEquals("서버가 알지 못하는 데이터가 포함되어 있습니다.", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -277,7 +302,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
-        assertEquals("Mapping to body and Java object failed.", errorResponse.getMessage());
+        assertEquals("JSON의 Java 객체로의 매핑이 실패하였습니다.", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -296,7 +321,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
-        assertEquals("Parsing body and Java object failed.", errorResponse.getMessage());
+        assertEquals("Java 객체의 JSON으로의 파싱이 실패하였습니다.", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -313,7 +338,7 @@ public class GlobalExceptionHandlerUnitTest {
         // then
         assertNotNull(errorResponse);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
-        assertEquals("malformed request body", errorResponse.getMessage());
+        assertEquals("요청 바디의 서식이 올바르지 않습니다.", errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 }

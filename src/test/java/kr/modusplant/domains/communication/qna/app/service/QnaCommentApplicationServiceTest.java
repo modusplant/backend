@@ -1,6 +1,6 @@
 package kr.modusplant.domains.communication.qna.app.service;
 
-import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaCommentInsertRequest;
 import kr.modusplant.domains.communication.qna.app.http.response.QnaCommentResponse;
 import kr.modusplant.domains.communication.qna.common.util.app.http.request.QnaCommentInsertRequestTestUtils;
@@ -30,7 +30,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-@DomainsServiceOnlyContext
+@DomainsServiceWithoutValidationServiceContext
 @Transactional
 public class QnaCommentApplicationServiceTest implements
         QnaCommentEntityTestUtils, QnaCommentInsertRequestTestUtils, QnaCommentResponseTestUtils,
@@ -142,29 +142,6 @@ public class QnaCommentApplicationServiceTest implements
 
         // then
         assertThat(commentApplicationService.getByCreateMember(memberEntity))
-                .isEqualTo(List.of(commentResponse));
-    }
-
-    @DisplayName("댓글 내용으로 댓글 가져오기")
-    @Test
-    void getByContentTest() {
-        // given
-        commentEntity = createQnaCommentEntityBuilder()
-                .postEntity(postEntity)
-                .authMember(memberEntity)
-                .createMember(memberEntity)
-                .isDeleted(true)
-                .build();
-
-        QnaCommentResponse commentResponse = createQnaCommentResponse(
-                postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname()
-        );
-
-        // when
-        given(commentRepository.findByContent(commentEntity.getContent())).willReturn(List.of(commentEntity));
-
-        // then
-        assertThat(commentApplicationService.getByContent(commentEntity.getContent()))
                 .isEqualTo(List.of(commentResponse));
     }
 

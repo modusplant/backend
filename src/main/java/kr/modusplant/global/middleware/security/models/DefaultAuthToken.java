@@ -20,27 +20,27 @@ public class DefaultAuthToken extends AbstractAuthenticationToken {
     // 인증 전
     public DefaultAuthToken(String principal, String credential) {
         super(null);
-        this.credential = credential;
         this.principal = principal;
+        this.credential = credential;
         setAuthenticated(false);
     }
 
     // 인증 후
     public DefaultAuthToken(UserDetails principal, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
-        this.credential = null;
         this.principal = principal;
+        this.credential = null;
         setAuthenticated(true);
-    }
-
-    @Override
-    public Object getCredentials() {
-        return credential;
     }
 
     @Override
     public Object getPrincipal() {
         return principal;
+    }
+
+    @Override
+    public Object getCredentials() {
+        return credential;
     }
 
     @Override

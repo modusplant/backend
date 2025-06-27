@@ -61,9 +61,9 @@ public class EmailAuthService {
         memberAuthValidationService.validateNotFoundEmail(email);
 
         String redisKey = RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, email);
-        String storedCode = redisHelper.getString(redisKey).orElseThrow(() -> new RuntimeException("Verification code is invalid. Please try again."));
+        String storedCode = redisHelper.getString(redisKey).orElseThrow(() -> new RuntimeException("코드를 잘못 입력하였습니다."));
         if (!storedCode.equals(request.getVerifyCode())) {
-            throw new RuntimeException("Verification code is invalid. Please try again.");
+            throw new RuntimeException("코드를 잘못 입력하였습니다.");
         }
     }
 }

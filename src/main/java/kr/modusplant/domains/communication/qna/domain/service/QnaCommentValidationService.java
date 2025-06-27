@@ -1,8 +1,7 @@
 package kr.modusplant.domains.communication.qna.domain.service;
 
-import kr.modusplant.domains.communication.common.error.EntityExistsWithPostUlidAndPathException;
-import kr.modusplant.domains.communication.common.error.EntityNotFoundWithPostUlidAndPathException;
-import kr.modusplant.domains.communication.qna.persistence.entity.QnaCommentEntity;
+import kr.modusplant.domains.communication.common.error.CommentExistsException;
+import kr.modusplant.domains.communication.common.error.CommentNotFoundException;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaCommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,20 +16,20 @@ public class QnaCommentValidationService {
     private final QnaCommentRepository commentRepository;
 
     public void validateExistedQnaCommentEntity(String postUlid, String path) {
-        Optional.ofNullable(postUlid).orElseThrow(() -> new IllegalArgumentException("postUlid is null"));
-        Optional.ofNullable(path).orElseThrow(() -> new IllegalArgumentException("path is null"));
+        Optional.ofNullable(postUlid).orElseThrow(() -> new IllegalArgumentException("게시글 값이 비어 있습니다."));
+        Optional.ofNullable(path).orElseThrow(() -> new IllegalArgumentException("경로 값이 비어 있습니다."));
 
         if (commentRepository.existsByPostUlidAndPath(postUlid, path)) {
-            throw new EntityExistsWithPostUlidAndPathException(postUlid, path, QnaCommentEntity.class);
+            throw new CommentExistsException();
         }
     }
 
     public void validateNotFoundQnaCommentEntity(String postUlid, String path) {
-        Optional.ofNullable(postUlid).orElseThrow(() -> new IllegalArgumentException("postUlid is null"));
-        Optional.ofNullable(path).orElseThrow(() -> new IllegalArgumentException("path is null"));
+        Optional.ofNullable(postUlid).orElseThrow(() -> new IllegalArgumentException("게시글 값이 비어 있습니다."));
+        Optional.ofNullable(path).orElseThrow(() -> new IllegalArgumentException("경로 값이 비어 있습니다."));
 
         if(!commentRepository.existsByPostUlidAndPath(postUlid, path)) {
-            throw new EntityNotFoundWithPostUlidAndPathException(postUlid, path, QnaCommentEntity.class);
+            throw new CommentNotFoundException();
         }
     }
 }

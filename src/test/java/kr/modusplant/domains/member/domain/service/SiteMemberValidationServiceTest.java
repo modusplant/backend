@@ -1,22 +1,18 @@
 package kr.modusplant.domains.member.domain.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
+import kr.modusplant.domains.member.error.SiteMemberExistsException;
+import kr.modusplant.domains.member.error.SiteMemberNotFoundException;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
-import static kr.modusplant.global.enums.ExceptionMessage.EXISTED_ENTITY;
-import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
-import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -43,10 +39,9 @@ class SiteMemberValidationServiceTest implements SiteMemberTestUtils, SiteMember
         given(memberRepository.existsByUuid(memberEntityUuid)).willReturn(true);
 
         // then
-        EntityExistsWithUuidException existsException = assertThrows(EntityExistsWithUuidException.class,
+        SiteMemberExistsException existsException = assertThrows(SiteMemberExistsException.class,
                 () -> memberValidationService.validateExistedUuid(memberEntity.getUuid()));
-        assertThat(existsException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                EXISTED_ENTITY.getValue(), "uuid", memberEntityUuid, SiteMemberEntity.class));
+        assertThat(existsException.getMessage()).isEqualTo(new SiteMemberExistsException().getMessage());
     }
 
     @DisplayName("존재하지 않는 회원 UUID 검증")
@@ -60,9 +55,8 @@ class SiteMemberValidationServiceTest implements SiteMemberTestUtils, SiteMember
         given(memberRepository.existsByUuid(memberEntityUuid)).willReturn(false);
 
         // then
-        EntityNotFoundException notFoundException = assertThrows(EntityNotFoundWithUuidException.class,
+        SiteMemberNotFoundException notFoundException = assertThrows(SiteMemberNotFoundException.class,
                 () -> memberValidationService.validateNotFoundUuid(memberEntityUuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(getFormattedExceptionMessage(
-                NOT_FOUND_ENTITY.getValue(), "uuid", memberEntityUuid, SiteMemberEntity.class));
+        assertThat(notFoundException.getMessage()).isEqualTo(new SiteMemberNotFoundException().getMessage());
     }
 }

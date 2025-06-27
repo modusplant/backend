@@ -3,6 +3,7 @@ package kr.modusplant.domains.communication.qna.app.service;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaCommentInsertRequest;
 import kr.modusplant.domains.communication.qna.app.http.response.QnaCommentResponse;
 import kr.modusplant.domains.communication.qna.domain.service.QnaCommentValidationService;
+import kr.modusplant.domains.communication.qna.domain.service.QnaPostValidationService;
 import kr.modusplant.domains.communication.qna.mapper.QnaCommentAppInfraMapper;
 import kr.modusplant.domains.communication.qna.mapper.QnaCommentAppInfraMapperImpl;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaCommentEntity;
@@ -28,6 +29,7 @@ import java.util.UUID;
 public class QnaCommentApplicationService {
 
     private final QnaCommentValidationService qnaCommentValidationService;
+    private final QnaPostValidationService qnaPostValidationService;
     private final SiteMemberValidationService memberValidationService;
     private final QnaCommentAppInfraMapper qnaCommentAppInfraMapper = new QnaCommentAppInfraMapperImpl();
     private final QnaCommentRepository qnaCommentRepository;
@@ -40,6 +42,8 @@ public class QnaCommentApplicationService {
     }
 
     public List<QnaCommentResponse> getByPostEntity(QnaPostEntity requestPostEntity) {
+        String ulid = requestPostEntity.getUlid();
+        qnaPostValidationService.validateNotFoundUlid(ulid);
         QnaPostEntity postEntity = qnaPostRepository.findByUlid(requestPostEntity.getUlid()).orElseThrow();
 
         return qnaCommentRepository.findByPostEntity(postEntity)
@@ -47,6 +51,7 @@ public class QnaCommentApplicationService {
     }
 
     public List<QnaCommentResponse> getByAuthMember(SiteMemberEntity authMember) {
+        memberValidationService.validateNotFoundUuid(authMember.getUuid());
         SiteMemberEntity memberEntity = memberRepository.findByUuid(authMember.getUuid()).orElseThrow();
 
         return qnaCommentRepository.findByAuthMember(memberEntity)
@@ -54,18 +59,15 @@ public class QnaCommentApplicationService {
     }
 
     public List<QnaCommentResponse> getByCreateMember(SiteMemberEntity createMember) {
+        memberValidationService.validateNotFoundUuid(createMember.getUuid());
         SiteMemberEntity memberEntity = memberRepository.findByUuid(createMember.getUuid()).orElseThrow();
 
         return qnaCommentRepository.findByCreateMember(memberEntity)
                 .stream().map(qnaCommentAppInfraMapper::toQnaCommentResponse).toList();
     }
 
-    public List<QnaCommentResponse> getByContent(String content) {
-        return qnaCommentRepository.findByContent(content)
-                .stream().map(qnaCommentAppInfraMapper::toQnaCommentResponse).toList();
-    }
-
     public Optional<QnaCommentResponse> getByPostUlidAndPath(String postUlid, String path) {
+        qnaPostValidationService.validateNotFoundUlid(postUlid);
         return Optional.of(
                 qnaCommentAppInfraMapper.toQnaCommentResponse(
                         qnaCommentRepository.findByPostUlidAndPath(postUlid, path).orElseThrow()

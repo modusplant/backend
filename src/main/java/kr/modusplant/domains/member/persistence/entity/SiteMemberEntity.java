@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.SnakeCaseWord.*;
+import static kr.modusplant.global.vo.DatabaseFieldName.*;
 import static kr.modusplant.global.vo.TableName.SITE_MEMBER;
 
 @Entity
@@ -48,23 +48,23 @@ public class SiteMemberEntity {
     @DefaultValue
     private Boolean isBanned;
 
-    @Column(name = SNAKE_IS_DELETED, nullable = false)
+    @Column(name = IS_DELETED, nullable = false)
     @DefaultValue
     private Boolean isDeleted;
 
     @Column(name = "logged_in_at")
     private LocalDateTime loggedInAt;
 
-    @Column(name = SNAKE_CREATED_AT, nullable = false, updatable = false)
+    @Column(name = CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 
-    @Column(name = SNAKE_LAST_MODIFIED_AT, nullable = false)
+    @Column(name = LAST_MODIFIED_AT, nullable = false)
     @LastModifiedDate
     private LocalDateTime lastModifiedAt;
 
     @Version
-    @Column(name = SNAKE_VER_NUM, nullable = false)
+    @Column(name = VER_NUM, nullable = false)
     private Long versionNumber;
 
     public void updateNickname(String nickname) {

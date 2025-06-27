@@ -3,6 +3,7 @@ package kr.modusplant.domains.communication.tip.app.service;
 import kr.modusplant.domains.communication.tip.app.http.request.TipCommentInsertRequest;
 import kr.modusplant.domains.communication.tip.app.http.response.TipCommentResponse;
 import kr.modusplant.domains.communication.tip.domain.service.TipCommentValidationService;
+import kr.modusplant.domains.communication.tip.domain.service.TipPostValidationService;
 import kr.modusplant.domains.communication.tip.mapper.TipCommentAppInfraMapper;
 import kr.modusplant.domains.communication.tip.mapper.TipCommentAppInfraMapperImpl;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipCommentEntity;
@@ -28,6 +29,7 @@ import java.util.UUID;
 public class TipCommentApplicationService {
 
     private final TipCommentValidationService tipCommentValidationService;
+    private final TipPostValidationService tipPostValidationService;
     private final SiteMemberValidationService memberValidationService;
     private final TipCommentAppInfraMapper tipCommentAppInfraMapper = new TipCommentAppInfraMapperImpl();
     private final TipCommentRepository tipCommentRepository;
@@ -40,6 +42,8 @@ public class TipCommentApplicationService {
     }
 
     public List<TipCommentResponse> getByPostEntity(TipPostEntity requestPostEntity) {
+        String ulid = requestPostEntity.getUlid();
+        tipPostValidationService.validateNotFoundUlid(ulid);
         TipPostEntity postEntity = tipPostRepository.findByUlid(requestPostEntity.getUlid()).orElseThrow();
 
         return tipCommentRepository.findByPostEntity(postEntity)
@@ -47,6 +51,7 @@ public class TipCommentApplicationService {
     }
 
     public List<TipCommentResponse> getByAuthMember(SiteMemberEntity authMember) {
+        memberValidationService.validateNotFoundUuid(authMember.getUuid());
         SiteMemberEntity memberEntity = memberRepository.findByUuid(authMember.getUuid()).orElseThrow();
 
         return tipCommentRepository.findByAuthMember(memberEntity)
@@ -54,18 +59,15 @@ public class TipCommentApplicationService {
     }
 
     public List<TipCommentResponse> getByCreateMember(SiteMemberEntity createMember) {
+        memberValidationService.validateNotFoundUuid(createMember.getUuid());
         SiteMemberEntity memberEntity = memberRepository.findByUuid(createMember.getUuid()).orElseThrow();
 
         return tipCommentRepository.findByCreateMember(memberEntity)
                 .stream().map(tipCommentAppInfraMapper::toTipCommentResponse).toList();
     }
 
-    public List<TipCommentResponse> getByContent(String content) {
-        return tipCommentRepository.findByContent(content)
-                .stream().map(tipCommentAppInfraMapper::toTipCommentResponse).toList();
-    }
-
     public Optional<TipCommentResponse> getByPostUlidAndPath(String postUlid, String path) {
+        tipPostValidationService.validateNotFoundUlid(postUlid);
         return Optional.of(
                 tipCommentAppInfraMapper.toTipCommentResponse(
                         tipCommentRepository.findByPostUlidAndPath(postUlid, path).orElseThrow()

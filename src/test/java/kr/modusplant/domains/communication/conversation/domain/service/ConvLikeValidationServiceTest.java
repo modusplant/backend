@@ -1,10 +1,12 @@
 package kr.modusplant.domains.communication.conversation.domain.service;
 
+import kr.modusplant.domains.communication.common.error.LikeExistsException;
+import kr.modusplant.domains.communication.common.error.LikeNotFoundException;
+import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvLikeRepository;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.global.error.EntityExistsWithUuidException;
-import kr.modusplant.global.error.EntityNotFoundWithUlidException;
+import kr.modusplant.global.error.EntityExistsDomainException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,21 +34,21 @@ class ConvLikeValidationServiceTest {
 
     @Test
     @DisplayName("존재하지 않는 게시글일 경우 예외 발생")
-    void validateExistedConvPostAndMember_postNotExist() {
+    void validateNotFoundConvPostAndMember_postNotExist() {
         when(convPostRepository.existsById(CONV_POST_ID)).thenReturn(false);
 
-        assertThatThrownBy(() -> validationService.validateExistedConvPostAndMember(CONV_POST_ID, MEMBER_ID))
-                .isInstanceOf(EntityNotFoundWithUlidException.class);
+        assertThatThrownBy(() -> validationService.validateNotFoundConvPostOrMember(CONV_POST_ID, MEMBER_ID))
+                .isInstanceOf(PostNotFoundException.class);
     }
 
     @Test
     @DisplayName("존재하지 않는 회원일 경우 예외 발생")
-    void validateExistedConvPostAndMember_memberNotExist() {
+    void validateNotFoundConvPostOrMember_memberNotExist() {
         when(convPostRepository.existsById(CONV_POST_ID)).thenReturn(true);
         when(memberRepository.existsById(MEMBER_ID)).thenReturn(false);
 
-        assertThatThrownBy(() -> validationService.validateExistedConvPostAndMember(CONV_POST_ID, MEMBER_ID))
-                .isInstanceOf(EntityExistsWithUuidException.class);
+        assertThatThrownBy(() -> validationService.validateNotFoundConvPostOrMember(CONV_POST_ID, MEMBER_ID))
+                .isInstanceOf(EntityExistsDomainException.class);
     }
 
     @Test
@@ -55,8 +57,7 @@ class ConvLikeValidationServiceTest {
         when(convLikeRepository.existsByPostIdAndMemberId(CONV_POST_ID, MEMBER_ID)).thenReturn(false);
 
         assertThatThrownBy(() -> validationService.validateNotFoundConvLike(CONV_POST_ID, MEMBER_ID))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Member not liked.");
+                .isInstanceOf(LikeNotFoundException.class);
     }
 
     @Test
@@ -65,7 +66,6 @@ class ConvLikeValidationServiceTest {
         when(convLikeRepository.existsByPostIdAndMemberId(CONV_POST_ID, MEMBER_ID)).thenReturn(true);
 
         assertThatThrownBy(() -> validationService.validateExistedConvLike(CONV_POST_ID, MEMBER_ID))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Member already liked.");
+                .isInstanceOf(LikeExistsException.class);
     }
 }

@@ -4,10 +4,10 @@ import lombok.Getter;
 
 @Getter
 public enum ResponseMessage {
-    RESPONSE_MESSAGE_200("OK: Succeeded"),
-    RESPONSE_MESSAGE_400("Bad Request: Failed due to client error"),
-    RESPONSE_MESSAGE_401("Unauthorized: Invalid or missing authentication credentials"),
-    RESPONSE_MESSAGE_500("Internal Server Error: Failed due to server error");
+    RESPONSE_MESSAGE_200("성공했습니다."),
+    RESPONSE_MESSAGE_400("잘못된 요청입니다."),
+    RESPONSE_MESSAGE_401("인증되지 않은 유저입니다."),
+    RESPONSE_MESSAGE_500("서버에 문제가 발생했습니다.");
 
     private final String value;
 

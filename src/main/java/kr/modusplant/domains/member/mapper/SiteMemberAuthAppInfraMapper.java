@@ -21,8 +21,6 @@ public interface SiteMemberAuthAppInfraMapper {
     @Mapping(source = ORIGINAL_MEMBER_UUID, target = ACTIVE_MEMBER, qualifiedByName = "toActiveMember")
     @Mapping(source = ORIGINAL_MEMBER_UUID , target = ORIGINAL_MEMBER, qualifiedByName = "toOriginalMember")
     @Mapping(target = "memberAuthEntity", ignore = true)
-    @Mapping(target = FAILED_ATTEMPT, ignore = true)
-    @Mapping(target = LOCKOUT_REFRESH_AT, ignore = true)
     @Mapping(target = LOCKOUT_UNTIL, ignore = true)
     SiteMemberAuthEntity toMemberAuthEntity(SiteMemberAuthInsertRequest memberAuthInsertRequest, @Context SiteMemberRepository memberRepository);
 

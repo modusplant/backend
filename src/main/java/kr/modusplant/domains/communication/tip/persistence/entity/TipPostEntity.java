@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 
 import static kr.modusplant.domains.member.vo.MemberUuid.SNAKE_AUTH_MEMB_UUID;
 import static kr.modusplant.domains.member.vo.MemberUuid.SNAKE_CREA_MEMB_UUID;
-import static kr.modusplant.global.vo.SnakeCaseWord.*;
+import static kr.modusplant.global.vo.DatabaseFieldName.*;
 import static kr.modusplant.global.vo.TableName.TIP_POST;
 
 @Entity
@@ -35,7 +35,7 @@ public class TipPostEntity {
     private String ulid;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = SNAKE_CATE_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = CATE_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private TipCategoryEntity category;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
@@ -61,15 +61,15 @@ public class TipPostEntity {
     @Column(nullable = false, columnDefinition = "jsonb")
     private JsonNode content;
 
-    @Column(name = SNAKE_IS_DELETED, nullable = false)
+    @Column(name = IS_DELETED, nullable = false)
     @DefaultValue
     private Boolean isDeleted;
 
-    @Column(name = SNAKE_CREATED_AT, nullable = false, updatable = false)
+    @Column(name = CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 
-    @Column(name = SNAKE_UPDATED_AT, nullable = false)
+    @Column(name = UPDATED_AT, nullable = false)
     @LastModifiedDate
     private LocalDateTime updatedAt;
 

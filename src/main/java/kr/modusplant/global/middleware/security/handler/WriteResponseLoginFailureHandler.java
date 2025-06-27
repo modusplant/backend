@@ -24,7 +24,7 @@ public class WriteResponseLoginFailureHandler implements AuthenticationFailureHa
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.getWriter().write(
                 objectMapper.writeValueAsString(DataResponse
-                        .of(HttpStatus.UNAUTHORIZED.value(), exception.getMessage())
+                        .of(HttpStatus.UNAUTHORIZED.value(), "LOGOUT_FAILED", exception.getMessage())
                 )
         );
     }

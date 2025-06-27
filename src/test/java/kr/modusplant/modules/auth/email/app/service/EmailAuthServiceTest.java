@@ -1,6 +1,7 @@
 package kr.modusplant.modules.auth.email.app.service;
 
 import kr.modusplant.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
+import kr.modusplant.domains.member.error.SiteMemberAuthNotFoundException;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
 import kr.modusplant.global.config.TestAopConfig;
@@ -19,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.util.Optional;
 
-import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
 import static kr.modusplant.global.middleware.redis.RedisKeys.RESET_PASSWORD_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -124,8 +124,7 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
 
         // when/then
         assertThatThrownBy(() -> emailAuthService.sendResetPasswordCode(request))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining(NOT_FOUND_ENTITY.getValue());
+                .isInstanceOf(SiteMemberAuthNotFoundException.class);
     }
 
     @Test
@@ -161,7 +160,7 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
         // expect
         assertThatThrownBy(() -> emailAuthService.verifyResetPasswordCode(request))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Verification code is invalid");
+                .hasMessageContaining("코드를 잘못 입력하였습니다.");
     }
 
     @Test
@@ -178,6 +177,6 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
         // expect
         assertThatThrownBy(() -> emailAuthService.verifyResetPasswordCode(request))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Verification code is invalid");
+                .hasMessageContaining("코드를 잘못 입력하였습니다.");
     }
 }

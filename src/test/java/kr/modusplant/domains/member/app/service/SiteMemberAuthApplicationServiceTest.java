@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.app.service;
 
-import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.domains.member.app.http.request.SiteMemberAuthUpdateRequest;
 import kr.modusplant.domains.member.app.http.response.SiteMemberAuthResponse;
 import kr.modusplant.domains.member.common.util.app.http.request.SiteMemberAuthRequestTestUtils;
@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
-@DomainsServiceOnlyContext
+@DomainsServiceWithoutValidationServiceContext
 class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestUtils, SiteMemberAuthResponseTestUtils, SiteMemberAuthEntityTestUtils, SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityTestUtils {
 
     private final SiteMemberAuthApplicationService memberAuthService;
@@ -225,29 +225,6 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
 
         // then
         assertThat(memberAuthService.getByProviderAndProviderId(memberAuthEntity.getProvider(), memberAuthEntity.getProviderId()).orElseThrow()).isEqualTo(memberAuthResponse);
-    }
-
-    @DisplayName("failedAttempt로 회원 인증 얻기")
-    @Test
-    void getByFailedAttemptTest() {
-        // given
-        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        SiteMemberAuthEntity memberAuthEntity = this.createMemberAuthBasicUserEntityBuilder().originalMember(memberEntity).activeMember(memberEntity).build();
-        UUID uuid = memberEntity.getUuid();
-
-        given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(memberEntity));
-        given(memberRepository.existsByUuid(uuid)).willReturn(true);
-        given(memberRepository.save(memberEntity)).willReturn(memberEntity);
-        given(memberAuthRepository.existsByOriginalMember(memberEntity)).willReturn(false);
-        given(memberAuthRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
-        given(memberAuthRepository.findByFailedAttempt(memberAuthEntity.getFailedAttempt())).willReturn(List.of(memberAuthEntity));
-
-        // when
-        memberService.insert(memberBasicUserInsertRequest);
-        SiteMemberAuthResponse memberAuthResponse = memberAuthService.insert(memberAuthBasicUserInsertRequest);
-
-        // then
-        assertThat(memberAuthService.getByFailedAttempt(memberAuthEntity.getFailedAttempt()).getFirst()).isEqualTo(memberAuthResponse);
     }
 
     @DisplayName("빈 회원 인증 얻기")

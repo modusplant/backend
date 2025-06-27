@@ -1,6 +1,7 @@
 package kr.modusplant.domains.communication.qna.app.service;
 
 import kr.modusplant.domains.communication.common.app.http.response.LikeResponse;
+import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.qna.domain.service.QnaLikeValidationService;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaLikeEntity;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
@@ -21,10 +22,10 @@ public class QnaLikeApplicationService {
 
     @Transactional
     public LikeResponse likeQnaPost(String postId, UUID memberId) {
-        qnaLikeValidationService.validateExistedQnaPostAndMember(postId, memberId);
+        qnaLikeValidationService.validateNotFoundQnaPostOrMember(postId, memberId);
         qnaLikeValidationService.validateExistedQnaLike(postId, memberId);
 
-        QnaPostEntity qnaPost = qnaPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("qna post not found"));
+        QnaPostEntity qnaPost = qnaPostRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         qnaPost.increaseLikeCount();
 
         qnaLikeRepository.save(QnaLikeEntity.of(postId, memberId));
@@ -33,10 +34,10 @@ public class QnaLikeApplicationService {
 
     @Transactional
     public LikeResponse unlikeQnaPost(String postId, UUID memberId) {
-        qnaLikeValidationService.validateExistedQnaPostAndMember(postId, memberId);
+        qnaLikeValidationService.validateNotFoundQnaPostOrMember(postId, memberId);
         qnaLikeValidationService.validateNotFoundQnaLike(postId, memberId);
 
-        QnaPostEntity qnaPost = qnaPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("qna post not found"));
+        QnaPostEntity qnaPost = qnaPostRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         qnaPost.decreaseLikeCount();
 
         qnaLikeRepository.deleteByPostIdAndMemberId(postId, memberId);

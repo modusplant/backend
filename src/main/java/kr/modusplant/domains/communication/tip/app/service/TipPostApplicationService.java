@@ -1,6 +1,8 @@
 package kr.modusplant.domains.communication.tip.app.service;
 
-import kr.modusplant.domains.common.domain.service.MediaContentService;
+import kr.modusplant.domains.common.app.service.MultipartDataProcessor;
+import kr.modusplant.domains.common.enums.PostType;
+import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostInsertRequest;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostUpdateRequest;
 import kr.modusplant.domains.communication.tip.app.http.response.TipPostResponse;
@@ -17,7 +19,6 @@ import kr.modusplant.domains.communication.tip.persistence.repository.TipPostVie
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.global.error.EntityNotFoundWithUlidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -37,7 +38,7 @@ public class TipPostApplicationService {
     private final TipPostValidationService tipPostValidationService;
     private final TipCategoryValidationService tipCategoryValidationService;
     private final SiteMemberValidationService siteMemberValidationService;
-    private final MediaContentService mediaContentService;
+    private final MultipartDataProcessor multipartDataProcessor;
     private final TipPostRepository tipPostRepository;
     private final SiteMemberRepository siteMemberRepository;
     private final TipCategoryRepository tipCategoryRepository;
@@ -51,7 +52,7 @@ public class TipPostApplicationService {
     public Page<TipPostResponse> getAll(Pageable pageable) {
         return tipPostRepository.findByIsDeletedFalseOrderByCreatedAtDesc(pageable).map(entity -> {
             try {
-                entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
+                entity.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -63,7 +64,7 @@ public class TipPostApplicationService {
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
         return tipPostRepository.findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(siteMember, pageable).map(entity -> {
             try {
-                entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
+                entity.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -75,7 +76,7 @@ public class TipPostApplicationService {
         TipCategoryEntity tipCategory = tipCategoryRepository.findByUuid(categoryUuid).orElseThrow();
         return tipPostRepository.findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(tipCategory, pageable).map(entity -> {
             try {
-                entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
+                entity.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -86,7 +87,7 @@ public class TipPostApplicationService {
     public Page<TipPostResponse> searchByKeyword(String keyword, Pageable pageable) {
         return tipPostRepository.searchByTitleOrContent(keyword, pageable).map(entity -> {
             try {
-                entity.updateContent(mediaContentService.convertFileSrcToBinaryData(entity.getContent()));
+                entity.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -98,7 +99,7 @@ public class TipPostApplicationService {
         return tipPostRepository.findByUlid(ulid)
                 .map(tipPost -> {
                     try {
-                        tipPost.updateContent(mediaContentService.convertFileSrcToBinaryData(tipPost.getContent()));
+                        tipPost.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(tipPost.getContent()));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -119,7 +120,7 @@ public class TipPostApplicationService {
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(tipPostInsertRequest.title())
-                .content(mediaContentService.saveFilesAndGenerateContentJson(tipPostInsertRequest.content()))
+                .content(multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.TIP_POST,tipPostInsertRequest.content()))
                 .build();
         tipPostRepository.save(tipPostEntity);
     }
@@ -130,10 +131,10 @@ public class TipPostApplicationService {
         tipPostValidationService.validateAccessibleTipPost(tipPostUpdateRequest.ulid(), memberUuid);
         tipCategoryValidationService.validateNotFoundUuid(tipPostUpdateRequest.categoryUuid());
         TipPostEntity tipPostEntity = tipPostRepository.findByUlid(tipPostUpdateRequest.ulid()).orElseThrow();
-        mediaContentService.deleteFiles(tipPostEntity.getContent());
+        multipartDataProcessor.deleteFiles(tipPostEntity.getContent());
         tipPostEntity.updateCategory(tipCategoryRepository.findByUuid(tipPostUpdateRequest.categoryUuid()).orElseThrow());
         tipPostEntity.updateTitle(tipPostUpdateRequest.title());
-        tipPostEntity.updateContent(mediaContentService.saveFilesAndGenerateContentJson(tipPostUpdateRequest.content()));
+        tipPostEntity.updateContent(multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.TIP_POST,tipPostUpdateRequest.content()));
         tipPostRepository.save(tipPostEntity);
     }
 
@@ -141,7 +142,7 @@ public class TipPostApplicationService {
     public void removeByUlid(String ulid, UUID memberUuid) throws IOException {
         tipPostValidationService.validateAccessibleTipPost(ulid,memberUuid);
         TipPostEntity tipPostEntity = tipPostRepository.findByUlid(ulid).orElseThrow();
-        mediaContentService.deleteFiles(tipPostEntity.getContent());
+        multipartDataProcessor.deleteFiles(tipPostEntity.getContent());
         tipPostEntity.updateIsDeleted(true);
         tipPostRepository.save(tipPostEntity);
     }
@@ -153,7 +154,7 @@ public class TipPostApplicationService {
         }
         Long dbViewCount = tipPostRepository.findByUlid(ulid)
                 .map(tipPostEntity -> Optional.ofNullable(tipPostEntity.getViewCount()).orElseThrow())
-                .orElseThrow(() -> new EntityNotFoundWithUlidException(ulid, String.class));
+                .orElseThrow(PostNotFoundException::new);
         tipPostViewCountRedisRepository.write(ulid, dbViewCount);
         return dbViewCount;
     }

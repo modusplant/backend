@@ -1,8 +1,9 @@
 package kr.modusplant.modules.auth.social.app.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import kr.modusplant.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.domains.member.enums.AuthProvider;
+import kr.modusplant.domains.member.error.SiteMemberNotFoundException;
+import kr.modusplant.domains.member.error.SiteMemberRoleNotFoundException;
 import kr.modusplant.domains.member.mapper.SiteMemberAuthDomainInfraMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberAuthDomainInfraMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
@@ -12,7 +13,6 @@ import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthReposit
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleRepository;
 import kr.modusplant.global.enums.Role;
-import kr.modusplant.global.error.EntityNotFoundWithUuidException;
 import kr.modusplant.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.modules.auth.social.app.dto.supers.SocialUserInfo;
 import kr.modusplant.modules.auth.social.app.service.supers.SocialAuthClient;
@@ -23,10 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
-
-import static kr.modusplant.global.enums.ExceptionMessage.NOT_FOUND_ENTITY;
-import static kr.modusplant.global.util.ExceptionUtils.getFormattedExceptionMessage;
-import static kr.modusplant.global.vo.CamelCaseWord.MEMBER;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +47,7 @@ public class SocialAuthApplicationService {
         return switch (provider) {
             case KAKAO -> kakaoAuthClient;
             case GOOGLE -> googleAuthClient;
-            default -> throw new IllegalArgumentException("Unsupported social login method: " + provider);
+            default -> throw new IllegalArgumentException("이 방법은 지원되지 않습니다.");
         };
     }
 
@@ -82,13 +78,12 @@ public class SocialAuthApplicationService {
 
     private SiteMemberEntity getMemberEntityByUuid(UUID uuid) {
         return memberRepository.findByUuid(uuid)
-                .orElseThrow(() -> new EntityNotFoundWithUuidException(uuid, SiteMemberEntity.class));
+                .orElseThrow(SiteMemberNotFoundException::new);
     }
 
     private SiteMemberRoleEntity getMemberRoleEntityByMember(SiteMemberEntity memberEntity) {
         return memberRoleRepository.findByMember(memberEntity)
-                .orElseThrow(() -> new EntityNotFoundException(getFormattedExceptionMessage(
-                        NOT_FOUND_ENTITY.getValue(), MEMBER, memberEntity.toString(), SiteMemberRoleEntity.class)));
+                .orElseThrow(SiteMemberRoleNotFoundException::new);
     }
 
     private SiteMemberEntity createSiteMember(String nickname) {
@@ -99,7 +94,7 @@ public class SocialAuthApplicationService {
         return memberRepository.save(memberEntity);
     }
 
-    private SiteMemberAuthEntity createSiteMemberAuth(SiteMemberEntity memberEntity, AuthProvider provider, String id, String email) {
+    private void createSiteMemberAuth(SiteMemberEntity memberEntity, AuthProvider provider, String id, String email) {
         SiteMemberAuthEntity memberAuthEntity = SiteMemberAuthEntity.builder()
                 .activeMember(memberEntity)
                 .originalMember(memberEntity)
@@ -108,7 +103,7 @@ public class SocialAuthApplicationService {
                 .providerId(id)
                 .build();
 
-        return memberAuthRepository.save(memberAuthEntity);
+        memberAuthRepository.save(memberAuthEntity);
     }
 
     private SiteMemberRoleEntity createSiteMemberRole(SiteMemberEntity memberEntity) {

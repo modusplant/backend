@@ -1,7 +1,13 @@
 package kr.modusplant.global.middleware.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.global.advice.GlobalExceptionHandler;
+import kr.modusplant.global.middleware.security.handler.ForwardRequestLoginSuccessHandler;
+import kr.modusplant.global.middleware.security.handler.ForwardRequestLogoutSuccessHandler;
+import kr.modusplant.global.middleware.security.handler.JwtClearingLogoutHandler;
+import kr.modusplant.global.middleware.security.handler.WriteResponseLoginFailureHandler;
 import kr.modusplant.global.middleware.security.DefaultAuthProvider;
 import kr.modusplant.global.middleware.security.DefaultAuthenticationEntryPoint;
 import kr.modusplant.global.middleware.security.DefaultUserDetailsService;
@@ -23,11 +29,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.validation.Validator;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -45,7 +51,9 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper;
     private final TokenProvider tokenProvider;
     private final TokenApplicationService tokenApplicationService;
+    private final SiteMemberValidationService memberValidationService;
     private final SiteMemberRepository memberRepository;
+    private final Validator validator;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -76,17 +84,17 @@ public class SecurityConfig {
 
     @Bean
     public ForwardRequestLoginSuccessHandler forwardRequestLoginSuccessHandler() {
-        return new ForwardRequestLoginSuccessHandler(memberRepository, tokenApplicationService);
+        return new ForwardRequestLoginSuccessHandler(memberRepository, memberValidationService, tokenApplicationService);
     }
-
-    @Bean
-    public JwtClearingLogoutHandler JwtClearingLogoutHandler() {
-        return new JwtClearingLogoutHandler(tokenApplicationService); }
 
     @Bean
     public WriteResponseLoginFailureHandler writeResponseLoginFailureHandler() {
         return new WriteResponseLoginFailureHandler(objectMapper);
     }
+
+    @Bean
+    public JwtClearingLogoutHandler JwtClearingLogoutHandler() {
+        return new JwtClearingLogoutHandler(tokenApplicationService); }
 
     @Bean
     public ForwardRequestLogoutSuccessHandler normalLogoutSuccessHandler() {
@@ -105,7 +113,7 @@ public class SecurityConfig {
     public EmailPasswordAuthenticationFilter emailPasswordAuthenticationFilter(HttpSecurity http) {
         try {
             EmailPasswordAuthenticationFilter filter = new EmailPasswordAuthenticationFilter(
-                    objectMapper, authenticationManager());
+                    objectMapper, validator, authenticationManager());
 
             filter.setAuthenticationManager(authenticationManager());
             filter.setAuthenticationSuccessHandler(forwardRequestLoginSuccessHandler());

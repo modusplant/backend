@@ -1,7 +1,13 @@
 package kr.modusplant.domains.communication.tip.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import kr.modusplant.domains.communication.common.domain.validation.CommunicationPath;
 import kr.modusplant.domains.communication.tip.app.http.request.TipCommentInsertRequest;
 import kr.modusplant.domains.communication.tip.app.http.response.TipCommentResponse;
 import kr.modusplant.domains.communication.tip.app.service.TipCommentApplicationService;
@@ -12,10 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,6 +30,7 @@ import java.util.UUID;
 @Primary
 @RequestMapping("/api/v1/tip/comments")
 @RequiredArgsConstructor
+@Validated
 public class TipCommentController {
 
     private final TipCommentApplicationService commentApplicationService;
@@ -50,7 +56,14 @@ public class TipCommentController {
             description = "게시글 식별자에 맞는 팁 댓글을 조회합니다."
     )
     @GetMapping("/post/{ulid}")
-    public ResponseEntity<DataResponse<List<TipCommentResponse>>> getByPost(@PathVariable("ulid") String ulid) {
+    public ResponseEntity<DataResponse<List<TipCommentResponse>>> getByPost(
+            @Parameter(schema = @Schema(
+                    description = "해당 댓글이 달린 게시글의 식별자",
+                    example = "01JY3PPXRH2QVWT0B8CPKA4TS1")
+            )
+            @PathVariable(required = false, value = "ulid")
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String ulid) {
         TipPostEntity postEntity = TipPostEntity.builder().ulid(ulid).build();
 
         return ResponseEntity.ok().body(
@@ -62,7 +75,14 @@ public class TipCommentController {
             description = "인가 회원 식별자에 맞는 팁 댓글을 조회합니다."
     )
     @GetMapping("/member/auth/{uuid}")
-    public ResponseEntity<DataResponse<List<TipCommentResponse>>> getByAuthMember(@PathVariable("uuid") UUID authMemberUuid) {
+    public ResponseEntity<DataResponse<List<TipCommentResponse>>> getByAuthMember(
+            @Parameter(schema = @Schema(
+                    description = "회원의 식별자",
+                    example = "2ae593ee-c9af-412a-a62d-351bf07282dd")
+            )
+            @PathVariable(required = false, value = "uuid")
+            @NotNull(message = "회원 식별자가 비어 있습니다.")
+            UUID authMemberUuid) {
         SiteMemberEntity authMemberEntity = SiteMemberEntity.builder().uuid(authMemberUuid).build();
 
         return ResponseEntity.ok().body(
@@ -74,7 +94,14 @@ public class TipCommentController {
             description = "작성 회원 식별자에 맞는 팁 댓글을 조회합니다."
     )
     @GetMapping("/member/create/{uuid}")
-    public ResponseEntity<DataResponse<List<TipCommentResponse>>> getByCreateMember(@PathVariable("uuid") UUID createMemberUuid) {
+    public ResponseEntity<DataResponse<List<TipCommentResponse>>> getByCreateMember(
+            @Parameter(schema = @Schema(
+                    description = "회원의 식별자",
+                    example = "2ae593ee-c9af-412a-a62d-351bf07282dd")
+            )
+            @PathVariable(required = false, value = "uuid")
+            @NotNull(message = "회원 식별자가 비어 있습니다.")
+            UUID createMemberUuid) {
         SiteMemberEntity createMemberEntity = SiteMemberEntity.builder().uuid(createMemberUuid).build();
 
         return ResponseEntity.ok().body(
@@ -82,26 +109,29 @@ public class TipCommentController {
     }
 
     @Operation(
-            summary = "컨텐츠로 팁 댓글 조회 API",
-            description = "컨텐츠에 맞는 팁 댓글을 조회합니다."
-    )
-    @GetMapping("/content/{content}")
-    public ResponseEntity<DataResponse<List<TipCommentResponse>>> getByContent(@PathVariable("content") String content) {
-        return ResponseEntity.ok().body(
-                DataResponse.ok(commentApplicationService.getByContent(content)));
-    }
-
-    @Operation(
             summary = "게시글 식별자와 경로로 팁 댓글 조회 API",
             description = "게시글 식별자와 경로에 맞는 팁 댓글을 조회합니다."
     )
     @GetMapping("/post/{ulid}/path/{path}")
-    public ResponseEntity<DataResponse<?>> getByPostAndPath
-            (@PathVariable("ulid") String postUlid, @PathVariable("path") String path) {
-        String decodedPath = URLDecoder.decode(path, StandardCharsets.UTF_8);
+    public ResponseEntity<DataResponse<?>> getByPostAndPath(
+            @Parameter(schema = @Schema(
+                    description = "해당 댓글이 달린 게시글의 식별자",
+                    example = "01JY3PPXRH2QVWT0B8CPKA4TS1")
+            )
+            @PathVariable(required = false, value = "ulid")
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String postUlid,
 
+            @Parameter(schema = @Schema(
+                    description = "댓글의 구체화된 경로",
+                    pattern = "^\\d+(?:\\.\\d+)*$",
+                    example = "5.2.9")
+            )
+            @PathVariable(required = false, value = "path")
+            @CommunicationPath
+            String path) {
         Optional<TipCommentResponse> optionalResponse = commentApplicationService
-                .getByPostUlidAndPath(postUlid, decodedPath);
+                .getByPostUlidAndPath(postUlid, path);
 
         return optionalResponse.isPresent() ?
                 ResponseEntity.ok().body(DataResponse.ok(optionalResponse)) :
@@ -113,7 +143,7 @@ public class TipCommentController {
             description = "게시글 식별자와 경로, 회원 식별자, 컨텐츠 정보로 팁 항목을 삽입합니다."
     )
     @PostMapping
-    public ResponseEntity<DataResponse<TipCommentResponse>> insertTipComment(@RequestBody TipCommentInsertRequest insertRequest) {
+    public ResponseEntity<DataResponse<TipCommentResponse>> insertTipComment(@RequestBody @Valid TipCommentInsertRequest insertRequest) {
         return ResponseEntity.ok().body(DataResponse.ok(commentApplicationService.insert(insertRequest, memberUuid)));
     }
 
@@ -122,10 +152,24 @@ public class TipCommentController {
             description = "식별자로 팁 댓글을 제거합니다."
     )
     @DeleteMapping("/post/{ulid}/path/{path}")
-    public ResponseEntity<DataResponse<?>> removeTipComment(@PathVariable("ulid") String postUlid, @PathVariable("path") String path) {
-        String decodedPath = URLDecoder.decode(path, StandardCharsets.UTF_8);
+    public ResponseEntity<DataResponse<?>> removeTipComment(
+            @Parameter(schema = @Schema(
+                    description = "해당 댓글이 달린 게시글의 식별자",
+                    example = "01JY3PPXRH2QVWT0B8CPKA4TS1")
+            )
+            @PathVariable(required = false, value = "ulid")
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String postUlid,
 
-        commentApplicationService.removeByPostUlidAndPath(postUlid, decodedPath);
+            @Parameter(schema = @Schema(
+                    description = "댓글의 구체화된 경로",
+                    pattern = "^\\d+(?:\\.\\d+)*$",
+                    example = "5.2.9")
+            )
+            @PathVariable(required = false, value = "path")
+            @CommunicationPath
+            String path) {
+        commentApplicationService.removeByPostUlidAndPath(postUlid, path);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 }

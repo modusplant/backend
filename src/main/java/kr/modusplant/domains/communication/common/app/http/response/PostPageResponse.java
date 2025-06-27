@@ -1,6 +1,5 @@
 package kr.modusplant.domains.communication.common.app.http.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.data.domain.Page;
 
@@ -17,19 +16,15 @@ public record PostPageResponse<T> (
         int size,
 
         @Schema(description = "포스트의 총 개수", example = "62")
-        @JsonProperty("total_elements")
         long totalElements,
 
         @Schema(description = "페이지의 총 개수", example = "7")
-        @JsonProperty("total_pages")
         int totalPages,
 
         @Schema(description = "다음 페이지가 존재하는지", example = "true")
-        @JsonProperty("has_next")
         boolean hasNext,
 
         @Schema(description = "이전 페이지가 존재하는지", example = "true")
-        @JsonProperty("has_previous")
         boolean hasPrevious
 ){
     public static <T> PostPageResponse<T> from(Page<T> page) {
