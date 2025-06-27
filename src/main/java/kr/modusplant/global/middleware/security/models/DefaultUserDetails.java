@@ -17,7 +17,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Getter
 @Builder
-public class SiteMemberUserDetails implements UserDetails {
+public class DefaultUserDetails implements UserDetails {
     private final String email;
     private final String password;
     private final UUID activeUuid;
@@ -68,7 +68,7 @@ public class SiteMemberUserDetails implements UserDetails {
 
     public boolean isDeleted() { return isDeleted; }
 
-    public static class SiteMemberUserDetailsBuilder {
+    public static class DefaultUserDetailsBuilder {
         private String email;
         private String password;
         private UUID activeUuid;
@@ -80,7 +80,7 @@ public class SiteMemberUserDetails implements UserDetails {
         private boolean isDeleted;
         private List<GrantedAuthority> authorities;
 
-        public SiteMemberUserDetails.SiteMemberUserDetailsBuilder member(
+        public DefaultUserDetailsBuilder member(
                 SiteMember member, SiteMemberAuth memberAuth, SiteMemberRole memberRole) {
             this.email = memberAuth.getEmail();
             this.password = memberAuth.getPw();
@@ -95,8 +95,8 @@ public class SiteMemberUserDetails implements UserDetails {
             return this;
         }
 
-        public SiteMemberUserDetails build() {
-            return new SiteMemberUserDetails(this.email, this.password, this.activeUuid, this.nickname, this.provider, this.isActive, this.isDisabledByLinking, this.isBanned, this.isDeleted, this.authorities);
+        public DefaultUserDetails build() {
+            return new DefaultUserDetails(this.email, this.password, this.activeUuid, this.nickname, this.provider, this.isActive, this.isDisabledByLinking, this.isBanned, this.isDeleted, this.authorities);
         }
     }
 }

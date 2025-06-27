@@ -14,7 +14,7 @@ import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleReposit
 import kr.modusplant.global.middleware.security.mapper.SiteMemberAuthEntityToDomainMapper;
 import kr.modusplant.global.middleware.security.mapper.SiteMemberEntityToDomainMapper;
 import kr.modusplant.global.middleware.security.mapper.SiteMemberRoleEntityToDomainMapper;
-import kr.modusplant.global.middleware.security.models.SiteMemberUserDetails;
+import kr.modusplant.global.middleware.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -39,7 +39,7 @@ public class SiteMemberUserDetailsService implements UserDetailsService {
     private final SiteMemberRoleEntityToDomainMapper memberRoleEntityToDomainMapper;
 
     @Override
-    public SiteMemberUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public DefaultUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         memberAuthValidationService.validateNotFoundEmailAndAuthProvider(email, AuthProvider.BASIC);
         SiteMemberAuth memberAuth = memberAuthEntityToDomainMapper.toSiteMemberAuth(
@@ -53,7 +53,7 @@ public class SiteMemberUserDetailsService implements UserDetailsService {
         SiteMemberRole memberRole = memberRoleEntityToDomainMapper.toSiteMemberRole(
                 memberRoleRepository.findByUuid(memberAuth.getActiveMemberUuid()).get());
 
-        return SiteMemberUserDetails.builder()
+        return DefaultUserDetails.builder()
                 .email(memberAuth.getEmail())
                 .password(memberAuth.getPw())
                 .activeUuid(memberAuth.getActiveMemberUuid())

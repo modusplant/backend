@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.enums.Role;
-import kr.modusplant.global.middleware.security.models.SiteMemberUserDetails;
+import kr.modusplant.global.middleware.security.models.DefaultUserDetails;
 import kr.modusplant.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessH
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
-        SiteMemberUserDetails currentMember = (SiteMemberUserDetails) authentication.getPrincipal();
+        DefaultUserDetails currentMember = (DefaultUserDetails) authentication.getPrincipal();
 
         updateMemberLoggedInAt(currentMember.getActiveUuid());
 
@@ -42,8 +42,8 @@ public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessH
         request.getRequestDispatcher("/api/auth/login-success").forward(request, response);
     }
 
-    private Role getMemberRole(SiteMemberUserDetails memberUserDetails) {
-        GrantedAuthority memberRole = memberUserDetails.getAuthorities().stream()
+    private Role getMemberRole(DefaultUserDetails currentUserDetails) {
+        GrantedAuthority memberRole = currentUserDetails.getAuthorities().stream()
                 .filter(auth -> auth.getAuthority().startsWith("ROLE_"))
                 .findFirst().orElseThrow(() -> new IllegalArgumentException("The authenticated user does not have role"));
 
@@ -54,8 +54,8 @@ public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessH
         );
     }
 
-    private void updateMemberLoggedInAt(UUID currentMemberUuid) {
-        SiteMemberEntity memberEntity = memberRepository.findByUuid(currentMemberUuid)
+    private void updateMemberLoggedInAt(UUID memberActiveUuid) {
+        SiteMemberEntity memberEntity = memberRepository.findByUuid(memberActiveUuid)
                 .orElseThrow(() -> new EntityNotFoundException("cannot find the member of the uuid"));
         memberEntity.updateLoggedInAt(LocalDateTime.now());
         memberRepository.save(memberEntity);

@@ -7,8 +7,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.global.middleware.security.handler.JwtSecurityHandler;
-import kr.modusplant.global.middleware.security.models.SiteMemberAuthToken;
-import kr.modusplant.global.middleware.security.models.SiteMemberUserDetails;
+import kr.modusplant.global.middleware.security.models.DefaultAuthToken;
+import kr.modusplant.global.middleware.security.models.DefaultUserDetails;
 import kr.modusplant.modules.jwt.app.service.TokenProvider;
 import kr.modusplant.modules.jwt.persistence.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,8 +38,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if(accessToken != null) {
             if(tokenProvider.validateToken(accessToken.substring(7))) {
-                SiteMemberUserDetails memberUserDetails = constructUserDetails(accessToken);
-                saveSecurityContext(memberUserDetails);
+                DefaultUserDetails defaultUserDetails = constructUserDetails(accessToken);
+                saveSecurityContext(defaultUserDetails);
 
             } else {
                 String refreshToken = request.getHeader("Cookie");
@@ -53,8 +53,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         response.setHeader("X-Access-Token", newAccessToken);
                         response.setHeader("Set-Cookie", newRefreshToken);
 
-                        SiteMemberUserDetails memberUserDetails = constructUserDetails(newAccessToken);
-                        saveSecurityContext(memberUserDetails);
+                        DefaultUserDetails defaultUserDetails = constructUserDetails(newAccessToken);
+                        saveSecurityContext(defaultUserDetails);
                     }
 
                 } else {
@@ -66,10 +66,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private SiteMemberUserDetails constructUserDetails(String accessToken) {
+    private DefaultUserDetails constructUserDetails(String accessToken) {
         Claims tokenClaims = tokenProvider.getClaimsFromToken(accessToken);
 
-        return SiteMemberUserDetails.builder()
+        return DefaultUserDetails.builder()
                 .activeUuid(UUID.fromString(tokenClaims.getSubject()))
                 .nickname(String.valueOf(tokenClaims.get("nickname")))
                 .isActive(true)
@@ -79,9 +79,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .build();
     }
 
-    private void saveSecurityContext(SiteMemberUserDetails memberUserDetails) {
-        SiteMemberAuthToken authenticatedToken =
-                new SiteMemberAuthToken(memberUserDetails, memberUserDetails.getAuthorities());
+    private void saveSecurityContext(DefaultUserDetails userDetails) {
+        DefaultAuthToken authenticatedToken =
+                new DefaultAuthToken(userDetails, userDetails.getAuthorities());
 
         SecurityContextHolder.getContext().setAuthentication(authenticatedToken);
     }

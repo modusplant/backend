@@ -3,7 +3,7 @@ package kr.modusplant.global.middleware.security.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.modusplant.global.middleware.security.models.SiteMemberAuthToken;
+import kr.modusplant.global.middleware.security.models.DefaultAuthToken;
 import kr.modusplant.modules.auth.normal.login.app.http.NormalLoginRequest;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,7 +35,7 @@ public class EmailPasswordAuthenticationFilter extends AbstractAuthenticationPro
             throw new IllegalArgumentException("missing email or password");
         }
 
-        SiteMemberAuthToken requestToken = new SiteMemberAuthToken(
+        DefaultAuthToken requestToken = new DefaultAuthToken(
                 loginRequest.email(), loginRequest.password()
         );
 
