@@ -4,10 +4,7 @@ spring:
     properties:
       hibernate:
         default_schema: ${DB_DEV_SCHEMA}
-  # 파일 로컬 저장
-  web:
-    resources:
-      static-locations: classpath:/static/, file:uploads/
+
 security:
   debug:
     enabled: true
