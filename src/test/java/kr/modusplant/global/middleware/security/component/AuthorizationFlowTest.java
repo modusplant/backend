@@ -23,7 +23,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -72,5 +74,29 @@ public class AuthorizationFlowTest implements
 
                 // then
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void givenInvalidRole_willReturnErrorResponse() throws Exception {
+        // given
+        String rawAccessToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+        Claims accessTokenClaims = Jwts.claims()
+                .subject(memberBasicUserWithUuid.getUuid().toString())
+                .add("nickname", memberBasicUserWithUuid.getNickname())
+                .add("roles", memberRoleUser.getRole())
+                .build();
+
+        given(tokenProvider.validateToken(rawAccessToken.substring(7))).willReturn(true);
+        given(tokenProvider.getClaimsFromToken(rawAccessToken.substring(7))).willReturn(accessTokenClaims);
+
+        // when
+        mockMvc.perform(get("/api/monitor/monitor-success")
+                        .header("Authorization", rawAccessToken))
+
+                // then
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.status").value(403))
+                .andExpect(jsonPath("$.code").value("FORBIDDEN"))
+                .andExpect(jsonPath("$.message").isNotEmpty());
     }
 }
