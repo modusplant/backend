@@ -32,10 +32,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NotNull HttpServletResponse response,
                                     @NotNull FilterChain filterChain) throws JwtException, ServletException, IOException {
 
-        String accessToken = request.getHeader("Authorization");
+        String rawAccessToken = request.getHeader("Authorization");
 
-        if(accessToken != null) {
-            if(tokenProvider.validateToken(accessToken.substring(7))) {
+        if(rawAccessToken != null) {
+            String accessToken = rawAccessToken.substring(7);
+
+            if(tokenProvider.validateToken(accessToken)) {
                 DefaultUserDetails defaultUserDetails = constructUserDetails(accessToken);
                 DefaultAuthToken authenticatedToken =
                         new DefaultAuthToken(defaultUserDetails, defaultUserDetails.getAuthorities());
