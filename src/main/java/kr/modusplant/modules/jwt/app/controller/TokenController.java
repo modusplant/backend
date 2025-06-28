@@ -10,6 +10,7 @@ import kr.modusplant.modules.jwt.app.http.response.TokenResponse;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +46,10 @@ public class TokenController {
         DataResponse<TokenResponse> response = DataResponse.ok(tokenResponse);
         String refreshCookie = setRefreshTokenCookie(tokenPair.refreshToken());
 
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie).body(response);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshCookie)
+                .cacheControl(CacheControl.noStore())
+                .body(response);
     }
 
     private String setRefreshTokenCookie(String refreshToken) {
