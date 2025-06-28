@@ -14,10 +14,7 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name="Token API", description = "JWT API")
 @RestController
@@ -36,7 +33,7 @@ public class TokenController {
     })
     @PostMapping("/auth/token/refresh")
     public ResponseEntity<DataResponse<?>> refreshToken(@CookieValue("Cookie") String refreshToken,
-                                                        @CookieValue("Authorization") String rawAccessToken) {
+                                                        @RequestHeader("Authorization") String rawAccessToken) {
 
         String accessToken = rawAccessToken.substring(7);
 
