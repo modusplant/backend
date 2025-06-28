@@ -8,6 +8,8 @@ import kr.modusplant.domains.communication.tip.mapper.TipCategoryAppInfraMapperI
 import kr.modusplant.domains.communication.tip.persistence.entity.TipCategoryEntity;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipCategoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,7 @@ public class TipCategoryApplicationService {
     private final TipCategoryRepository tipCategoryRepository;
     private final TipCategoryAppInfraMapper tipCategoryAppInfraMapper = new TipCategoryAppInfraMapperImpl();
 
+    @Cacheable(value = "tip_categories")
     public List<TipCategoryResponse> getAll() {
         return tipCategoryRepository.findAll().stream().map(tipCategoryAppInfraMapper::toTipCategoryResponse).toList();
     }
@@ -46,6 +49,7 @@ public class TipCategoryApplicationService {
     }
 
     @Transactional
+    @CacheEvict(value = "tip_categories", allEntries = true)
     public TipCategoryResponse insert(TipCategoryInsertRequest tipCategoryInsertRequest) {
         validationService.validateExistedCategory(tipCategoryInsertRequest.category());
         validationService.validateExistedOrder(tipCategoryInsertRequest.order());
@@ -53,6 +57,7 @@ public class TipCategoryApplicationService {
     }
 
     @Transactional
+    @CacheEvict(value = "tip_categories", allEntries = true)
     public void removeByUuid(UUID uuid) {
         validationService.validateNotFoundUuid(uuid);
         tipCategoryRepository.deleteByUuid(uuid);
