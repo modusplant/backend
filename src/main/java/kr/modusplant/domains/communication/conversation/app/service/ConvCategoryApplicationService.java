@@ -8,6 +8,8 @@ import kr.modusplant.domains.communication.conversation.mapper.ConvCategoryAppIn
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvCategoryEntity;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCategoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,7 @@ public class ConvCategoryApplicationService {
     private final ConvCategoryRepository convCategoryRepository;
     private final ConvCategoryAppInfraMapper convCategoryAppInfraMapper = new ConvCategoryAppInfraMapperImpl();
 
+    @Cacheable(value = "conv_categories")
     public List<ConvCategoryResponse> getAll() {
         return convCategoryRepository.findAll().stream().map(convCategoryAppInfraMapper::toConvCategoryResponse).toList();
     }
@@ -46,6 +49,7 @@ public class ConvCategoryApplicationService {
     }
 
     @Transactional
+    @CacheEvict(value = "conv_categories", allEntries = true)
     public ConvCategoryResponse insert(ConvCategoryInsertRequest convCategoryInsertRequest) {
         validationService.validateExistedCategory(convCategoryInsertRequest.category());
         validationService.validateExistedOrder(convCategoryInsertRequest.order());
@@ -53,6 +57,7 @@ public class ConvCategoryApplicationService {
     }
 
     @Transactional
+    @CacheEvict(value = "conv_categories", allEntries = true)
     public void removeByUuid(UUID uuid) {
         validationService.validateNotFoundUuid(uuid);
         convCategoryRepository.deleteByUuid(uuid);

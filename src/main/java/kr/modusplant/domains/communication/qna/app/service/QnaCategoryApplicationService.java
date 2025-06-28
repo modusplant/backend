@@ -8,6 +8,8 @@ import kr.modusplant.domains.communication.qna.mapper.QnaCategoryAppInfraMapperI
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaCategoryEntity;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaCategoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,7 @@ public class QnaCategoryApplicationService {
     private final QnaCategoryRepository qnaCategoryRepository;
     private final QnaCategoryAppInfraMapper qnaCategoryAppInfraMapper = new QnaCategoryAppInfraMapperImpl();
 
+    @Cacheable(value = "qna_categories")
     public List<QnaCategoryResponse> getAll() {
         return qnaCategoryRepository.findAll().stream().map(qnaCategoryAppInfraMapper::toQnaCategoryResponse).toList();
     }
@@ -46,6 +49,7 @@ public class QnaCategoryApplicationService {
     }
 
     @Transactional
+    @CacheEvict(value = "qna_categories", allEntries = true)
     public QnaCategoryResponse insert(QnaCategoryInsertRequest qnaCategoryInsertRequest) {
         validationService.validateExistedCategory(qnaCategoryInsertRequest.category());
         validationService.validateExistedOrder(qnaCategoryInsertRequest.order());
@@ -53,6 +57,7 @@ public class QnaCategoryApplicationService {
     }
 
     @Transactional
+    @CacheEvict(value = "qna_categories", allEntries = true)
     public void removeByUuid(UUID uuid) {
         validationService.validateNotFoundUuid(uuid);
         qnaCategoryRepository.deleteByUuid(uuid);
