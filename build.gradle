@@ -50,6 +50,7 @@ dependencies {
     implementation 'com.mailjet:mailjet-client:5.2.5'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'com.github.f4b6a3:ulid-creator:5.2.3'
 	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.9.10'
