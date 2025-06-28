@@ -1,4 +1,4 @@
-package kr.modusplant.global.middleware.security.integration;
+package kr.modusplant.global.middleware.security.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
@@ -10,7 +10,6 @@ import kr.modusplant.global.middleware.security.config.SecurityConfig;
 import kr.modusplant.global.middleware.security.models.DefaultUserDetails;
 import kr.modusplant.modules.auth.normal.login.common.util.app.http.request.NormalLoginRequestTestUtils;
 import kr.modusplant.modules.jwt.app.service.RefreshTokenApplicationService;
-import kr.modusplant.modules.jwt.domain.service.TokenValidationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,9 +56,6 @@ public class NormalLoginAuthenticationFlowTest implements
 
     @MockitoBean
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @MockitoBean
-    private TokenValidationService tokenValidationService;
 
     @MockitoBean
     private RefreshTokenApplicationService refreshTokenApplicationService;
