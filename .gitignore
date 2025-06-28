@@ -41,3 +41,6 @@ application-env.yml
 ### Generated Objects ###
 **/generated/**
 /uploads/
+
+### Local Redis Setting ###
+redis.*
