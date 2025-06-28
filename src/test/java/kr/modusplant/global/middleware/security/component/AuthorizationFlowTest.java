@@ -13,6 +13,7 @@ import kr.modusplant.domains.member.common.util.domain.SiteMemberRoleTestUtils;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.global.middleware.security.config.SecurityConfig;
 import kr.modusplant.modules.jwt.app.service.TokenProvider;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -47,15 +48,22 @@ public class AuthorizationFlowTest implements
     @MockitoBean
     private ConvCommentApplicationService convCommentApplicationService;
 
-    @Test
-    public void givenValidJwtAccessToken_willAllowRequest() throws Exception {
-        // given
-        String rawAccessToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
-        Claims accessTokenClaims = Jwts.claims()
+    private String rawAccessToken;
+    private Claims accessTokenClaims;
+
+    @BeforeEach
+    void setUp() {
+        rawAccessToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+        accessTokenClaims = Jwts.claims()
                 .subject(memberBasicUserWithUuid.getUuid().toString())
                 .add("nickname", memberBasicUserWithUuid.getNickname())
                 .add("roles", memberRoleUser.getRole())
                 .build();
+    }
+
+    @Test
+    public void givenMatchingRole_willReturnSuccessResponse() throws Exception {
+        // given
         ConvCommentInsertRequest commentInsertRequest =
                 createConvCommentInsertRequest(convPostWithUlid.getUlid());
         ConvCommentResponse commentResponse = createConvCommentResponse(
@@ -77,15 +85,8 @@ public class AuthorizationFlowTest implements
     }
 
     @Test
-    public void givenInvalidRole_willReturnErrorResponse() throws Exception {
+    public void givenMismatchingRole_willReturnErrorResponse() throws Exception {
         // given
-        String rawAccessToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
-        Claims accessTokenClaims = Jwts.claims()
-                .subject(memberBasicUserWithUuid.getUuid().toString())
-                .add("nickname", memberBasicUserWithUuid.getNickname())
-                .add("roles", memberRoleUser.getRole())
-                .build();
-
         given(tokenProvider.validateToken(rawAccessToken.substring(7))).willReturn(true);
         given(tokenProvider.getClaimsFromToken(rawAccessToken.substring(7))).willReturn(accessTokenClaims);
 
