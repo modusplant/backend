@@ -34,9 +34,12 @@ public class TokenController {
             @ApiResponse(responseCode = "200", description = "Succeeded : JWT 발급 완료")
     })
     @PostMapping("/auth/token/refresh")
-    public ResponseEntity<DataResponse<?>> refreshToken(@CookieValue("Cookie") String refreshToken) {
+    public ResponseEntity<DataResponse<?>> refreshToken(@CookieValue("Cookie") String refreshToken,
+                                                        @CookieValue("Authorization") String rawAccessToken) {
 
-        TokenPair tokenPair = tokenService.reissueToken(refreshToken);
+        String accessToken = rawAccessToken.substring(7);
+
+        TokenPair tokenPair = tokenService.verifyAndReissueToken(accessToken, refreshToken);
 
         TokenResponse tokenResponse = new TokenResponse(tokenPair.accessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(tokenResponse);

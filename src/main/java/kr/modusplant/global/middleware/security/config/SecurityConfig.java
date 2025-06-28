@@ -61,9 +61,6 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityContextHolder securityContextHolder() { return new SecurityContextHolder(); }
-
-    @Bean
     public DefaultAuthenticationEntryPoint defaultAuthenticationEntryPoint() {
         return new DefaultAuthenticationEntryPoint(objectMapper); }
 

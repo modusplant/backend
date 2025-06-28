@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.global.app.http.response.DataResponse;
+import kr.modusplant.global.enums.ResponseCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -24,7 +25,7 @@ public class DefaultAccessDeniedHandler implements AccessDeniedHandler {
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.getWriter().write(
                 objectMapper.writeValueAsString(DataResponse
-                        .of(HttpStatus.FORBIDDEN.value(), accessDeniedException.getMessage())
+                        .of(HttpStatus.FORBIDDEN.value(), ResponseCode.FORBIDDEN.getValue(), accessDeniedException.getMessage())
                 )
         );
     }

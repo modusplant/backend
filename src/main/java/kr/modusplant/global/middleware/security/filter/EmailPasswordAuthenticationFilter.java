@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.global.middleware.security.models.DefaultAuthToken;
+import kr.modusplant.modules.auth.normal.login.app.http.request.NormalLoginRequest;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
