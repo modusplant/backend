@@ -13,6 +13,7 @@ import kr.modusplant.domains.member.common.util.domain.SiteMemberRoleTestUtils;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.global.middleware.security.config.SecurityConfig;
 import kr.modusplant.modules.jwt.app.service.TokenProvider;
+import kr.modusplant.modules.jwt.persistence.repository.TokenRedisRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,9 @@ public class AuthorizationFlowTest implements
     @MockitoBean
     private ConvCommentApplicationService convCommentApplicationService;
 
+    @MockitoBean
+    private TokenRedisRepository tokenRedisRepository;
+
     private String rawAccessToken;
     private Claims accessTokenClaims;
 
@@ -70,6 +74,7 @@ public class AuthorizationFlowTest implements
                 convPostWithUlid.getUlid(), memberBasicUserWithUuid.getUuid(), memberBasicUserWithUuid.getNickname()
         );
 
+        given(tokenRedisRepository.isBlacklisted(rawAccessToken.substring(7))).willReturn(false);
         given(tokenProvider.validateToken(rawAccessToken.substring(7))).willReturn(true);
         given(tokenProvider.getClaimsFromToken(rawAccessToken.substring(7))).willReturn(accessTokenClaims);
         given(convCommentApplicationService.insert(commentInsertRequest, memberBasicUserWithUuid.getUuid())).willReturn(commentResponse);
@@ -87,6 +92,7 @@ public class AuthorizationFlowTest implements
     @Test
     public void givenMismatchingRole_willReturnErrorResponse() throws Exception {
         // given
+        given(tokenRedisRepository.isBlacklisted(rawAccessToken.substring(7))).willReturn(false);
         given(tokenProvider.validateToken(rawAccessToken.substring(7))).willReturn(true);
         given(tokenProvider.getClaimsFromToken(rawAccessToken.substring(7))).willReturn(accessTokenClaims);
 
