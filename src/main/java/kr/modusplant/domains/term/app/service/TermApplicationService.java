@@ -9,6 +9,8 @@ import kr.modusplant.domains.term.mapper.TermAppInfraMapperImpl;
 import kr.modusplant.domains.term.persistence.entity.TermEntity;
 import kr.modusplant.domains.term.persistence.repository.TermRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,10 +29,12 @@ public class TermApplicationService {
     private final TermRepository termRepository;
     private final TermAppInfraMapper termAppInfraMapper = new TermAppInfraMapperImpl();
 
+    @Cacheable(value = "terms")
     public List<TermResponse> getAll() {
         return termRepository.findAll().stream().map(termAppInfraMapper::toTermResponse).toList();
     }
 
+    @Cacheable(value = "terms", key = "'version:' + #version", unless = "#result == null or #result.isEmpty()")
     public List<TermResponse> getByVersion(String version) {
         return termRepository.findByVersion(version).stream().map(termAppInfraMapper::toTermResponse).toList();
     }
@@ -46,12 +50,14 @@ public class TermApplicationService {
     }
 
     @Transactional
+    @CacheEvict(value = "terms", allEntries = true)
     public TermResponse insert(TermInsertRequest termInsertRequest) {
         validationService.validateExistedName(termInsertRequest.name());
         return termAppInfraMapper.toTermResponse(termRepository.save(termAppInfraMapper.toTermEntity(termInsertRequest)));
     }
 
     @Transactional
+    @CacheEvict(value = "terms", allEntries = true)
     public TermResponse update(TermUpdateRequest termUpdateRequest) {
         UUID uuid = termUpdateRequest.uuid();
         validationService.validateNotFoundUuid(uuid);
@@ -62,6 +68,7 @@ public class TermApplicationService {
     }
 
     @Transactional
+    @CacheEvict(value = "terms", allEntries = true)
     public void removeByUuid(UUID uuid) {
         validationService.validateNotFoundUuid(uuid);
         termRepository.deleteByUuid(uuid);

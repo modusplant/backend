@@ -26,6 +26,8 @@ spring:
       password: ${REDIS_PASSWORD}
       ssl:  # Upstash 환경을 위한 ssl 설정
         enabled: true
+  cache:
+    type: redis
 
 # Wasabi
 cloud:
