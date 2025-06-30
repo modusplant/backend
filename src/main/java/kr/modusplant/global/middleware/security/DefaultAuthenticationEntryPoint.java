@@ -25,7 +25,7 @@ public class DefaultAuthenticationEntryPoint implements AuthenticationEntryPoint
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.getWriter().write(
                 objectMapper.writeValueAsString(DataResponse
-                        .of(HttpStatus.UNAUTHORIZED.value(), ResponseCode.UNAUTHORIZED.getValue(), authException.getMessage())
+                        .of(HttpStatus.UNAUTHORIZED.value(), ResponseCode.UNAUTHORIZED.getValue(), "인증에 실패하였습니다.")
                 )
         );
     }

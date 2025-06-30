@@ -25,7 +25,7 @@ public class DefaultAccessDeniedHandler implements AccessDeniedHandler {
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.getWriter().write(
                 objectMapper.writeValueAsString(DataResponse
-                        .of(HttpStatus.FORBIDDEN.value(), ResponseCode.FORBIDDEN.getValue(), accessDeniedException.getMessage())
+                        .of(HttpStatus.FORBIDDEN.value(), ResponseCode.FORBIDDEN.getValue(), "접근이 거부되었습니다.")
                 )
         );
     }
