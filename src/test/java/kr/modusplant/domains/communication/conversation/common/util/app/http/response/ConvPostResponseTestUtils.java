@@ -9,16 +9,16 @@ public interface ConvPostResponseTestUtils extends ConvPostTestUtils {
     LocalDateTime testDate = LocalDateTime.of(2025, 6, 1, 0, 0);
 
     ConvPostResponse testConvPostResponse = new ConvPostResponse(
-            convPostWithUlid.getUlid(),
+            testConvPostWithUlid.getUlid(),
             testConvCategoryWithUuid.getCategory(),
-            convPostWithUlid.getCategoryUuid(),
+            testConvPostWithUlid.getCategoryUuid(),
             testConvCategoryWithUuid.getOrder(),
-            convPostWithUlid.getAuthMemberUuid(),
+            testConvPostWithUlid.getAuthMemberUuid(),
             memberBasicUserWithUuid.getNickname(),
             5,
             76L,
-            convPostWithUlid.getTitle(),
-            convPostWithUlid.getContent(),
+            testConvPostWithUlid.getTitle(),
+            testConvPostWithUlid.getContent(),
             testDate,
             testDate.plusMinutes(24)
     );

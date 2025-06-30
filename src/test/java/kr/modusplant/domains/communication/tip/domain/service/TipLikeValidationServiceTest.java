@@ -34,20 +34,20 @@ class TipLikeValidationServiceTest {
 
     @Test
     @DisplayName("존재하지 않는 게시글일 경우 예외 발생")
-    void validateExistedTipPostAndMember_postNotExist() {
+    void validateNotFoundTipPostAndMember_postNotExist() {
         when(tipPostRepository.existsById(TIP_POST_ID)).thenReturn(false);
 
-        assertThatThrownBy(() -> validationService.validateExistedTipPostAndMember(TIP_POST_ID, MEMBER_ID))
+        assertThatThrownBy(() -> validationService.validateNotFoundTipPostOrMember(TIP_POST_ID, MEMBER_ID))
                 .isInstanceOf(PostNotFoundException.class);
     }
 
     @Test
     @DisplayName("존재하지 않는 회원일 경우 예외 발생")
-    void validateExistedTipPostAndMember_memberNotExist() {
+    void validateNotFoundTipPostOrMember_memberNotExist() {
         when(tipPostRepository.existsById(TIP_POST_ID)).thenReturn(true);
         when(memberRepository.existsById(MEMBER_ID)).thenReturn(false);
 
-        assertThatThrownBy(() -> validationService.validateExistedTipPostAndMember(TIP_POST_ID, MEMBER_ID))
+        assertThatThrownBy(() -> validationService.validateNotFoundTipPostOrMember(TIP_POST_ID, MEMBER_ID))
                 .isInstanceOf(EntityExistsDomainException.class);
     }
 

@@ -2,7 +2,7 @@ package kr.modusplant.domains.communication.tip.common.util.domain;
 
 import kr.modusplant.domains.communication.tip.domain.model.TipComment;
 
-import static kr.modusplant.domains.communication.tip.common.util.domain.TipPostTestUtils.tipPostWithUlid;
+import static kr.modusplant.domains.communication.tip.common.util.domain.TipPostTestUtils.testTipPostWithUlid;
 import static kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils.memberBasicUserWithUuid;
 
 public interface TipCommentTestUtils {
@@ -12,7 +12,7 @@ public interface TipCommentTestUtils {
             .build();
 
     TipComment tipCommentWithPostUlidAndPath = TipComment.builder()
-            .postUlid(tipPostWithUlid.getUlid())
+            .postUlid(testTipPostWithUlid.getUlid())
             .path("1.6.2")
             .authMemberUuid(memberBasicUserWithUuid.getUuid())
             .createMemberUuid(memberBasicUserWithUuid.getUuid())

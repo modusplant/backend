@@ -14,16 +14,20 @@ public interface TipPostTestUtils extends TipCategoryTestUtils, SiteMemberTestUt
     ObjectMapper objectMapper = new ObjectMapper();
     UlidIdGenerator generator = new UlidIdGenerator();
 
-    TipPost tipPost = TipPost.builder()
+    TipPost testTipPost = TipPost.builder()
+            .likeCount(0)
+            .viewCount(0L)
             .title("물 주는 타이밍, 이제 헷갈리지 마세요! 식물별 물 주기 가이드")
             .content(createSampleContent())
             .build();
 
-    TipPost tipPostWithUlid = TipPost.builder()
+    TipPost testTipPostWithUlid = TipPost.builder()
             .ulid(generator.generate(null, null,null, EventType.INSERT))
             .categoryUuid(testTipCategoryWithUuid.getUuid())
             .authMemberUuid(memberBasicUserWithUuid.getUuid())
             .createMemberUuid(memberBasicUserWithUuid.getUuid())
+            .likeCount(testTipPost.getLikeCount())
+            .viewCount(testTipPost.getViewCount())
             .title("물 주는 타이밍, 이제 헷갈리지 마세요! 식물별 물 주기 가이드")
             .content(createSampleContent())
             .build();

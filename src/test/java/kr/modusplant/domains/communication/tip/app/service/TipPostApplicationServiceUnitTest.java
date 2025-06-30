@@ -30,7 +30,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class TipPostApplicationServiceMockTest implements SiteMemberEntityTestUtils, TipCategoryEntityTestUtils, TipPostEntityTestUtils {
+class TipPostApplicationServiceUnitTest implements SiteMemberEntityTestUtils, TipCategoryEntityTestUtils, TipPostEntityTestUtils {
     @Mock
     private TipPostViewCountRedisRepository tipPostViewCountRedisRepository;
     @Mock

@@ -63,7 +63,7 @@ public class TipCommentApplicationServiceTest implements
         memberEntity = createMemberBasicUserEntityWithUuid();
         TipCategoryEntity category = categoryRepository.save(createTestTipCategoryEntityWithUuid());
         postEntity = createTipPostEntityBuilder()
-                .ulid(tipPostWithUlid.getUlid())
+                .ulid(testTipPostWithUlid.getUlid())
                 .category(category)
                 .authMember(memberEntity)
                 .createMember(memberEntity)

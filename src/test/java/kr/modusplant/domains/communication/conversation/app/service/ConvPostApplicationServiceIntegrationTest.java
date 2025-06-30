@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-class ConvPostApplicationServiceTest implements SiteMemberEntityTestUtils, ConvCategoryEntityTestUtils, ConvPostRequestTestUtils, ConvPostEntityTestUtils {
+class ConvPostApplicationServiceIntegrationTest implements SiteMemberEntityTestUtils, ConvCategoryEntityTestUtils, ConvPostRequestTestUtils, ConvPostEntityTestUtils {
     @Autowired
     private ConvPostApplicationService convPostApplicationService;
 

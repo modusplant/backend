@@ -8,7 +8,9 @@ import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils
 public interface QnaPostEntityTestUtils extends SiteMemberEntityTestUtils, QnaCategoryEntityTestUtils, QnaPostTestUtils {
     default QnaPostEntityBuilder createQnaPostEntityBuilder() {
         return QnaPostEntity.builder()
-                .title(qnaPost.getTitle())
-                .content(qnaPost.getContent());
+                .likeCount(testQnaPost.getLikeCount())
+                .viewCount(testQnaPost.getViewCount())
+                .title(testQnaPost.getTitle())
+                .content(testQnaPost.getContent());
     }
 }

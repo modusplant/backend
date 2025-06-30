@@ -61,7 +61,7 @@ public class TipCommentControllerTest implements
     void setUp() {
         memberEntity = createMemberBasicUserEntityWithUuid();
         postEntity = createTipPostEntityBuilder()
-                .ulid(tipPostWithUlid.getUlid())
+                .ulid(testTipPostWithUlid.getUlid())
                 .category(createTestTipCategoryEntityWithUuid())
                 .authMember(memberEntity)
                 .createMember(memberEntity)
