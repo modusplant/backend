@@ -1,5 +1,6 @@
 package kr.modusplant.domains.communication.qna.app.controller;
 
+import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,8 +15,8 @@ import kr.modusplant.domains.communication.qna.app.service.QnaCommentApplication
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.global.app.http.response.DataResponse;
+import kr.modusplant.modules.jwt.app.service.TokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -34,12 +35,7 @@ import java.util.UUID;
 public class QnaCommentController {
 
     private final QnaCommentApplicationService commentApplicationService;
-
-    // 임시로 Spring Security 적용 전 인증 우회를 위해 사용
-    // gitignore 처리된 yml 파일에 임의로 값을 추가하여 사용
-    // TODO : Spring Security 적용 후 정상 인증 로직으로 대체할 것
-    @Value("${fake-auth-uuid}")
-    private UUID memberUuid;
+    private final TokenProvider tokenProvider;
 
     @Operation(
             summary = "전체 Q&A 댓글 조회 API",
@@ -143,8 +139,19 @@ public class QnaCommentController {
             description = "게시글 식별자와 경로, 회원 식별자, 컨텐츠 정보로 Q&A 항목을 삽입합니다."
     )
     @PostMapping
-    public ResponseEntity<DataResponse<QnaCommentResponse>> insertQnaComment(@RequestBody @Valid QnaCommentInsertRequest insertRequest) {
-        return ResponseEntity.ok().body(DataResponse.ok(commentApplicationService.insert(insertRequest, memberUuid)));
+    public ResponseEntity<DataResponse<QnaCommentResponse>> insertQnaComment(
+            @Parameter(schema = @Schema(
+                    description = "회원의 접근 토큰")
+            )
+            @RequestHeader("Authorization")
+            @NotBlank(message = "접근 토큰이 비어 있습니다.")
+            String rawAccessToken,
+            @RequestBody @Valid
+            QnaCommentInsertRequest insertRequest) {
+        Claims accessTokenClaims = tokenProvider.getClaimsFromToken(rawAccessToken.substring(7));
+        return ResponseEntity.ok().body(DataResponse.ok(commentApplicationService
+                .insert(insertRequest, UUID.fromString(accessTokenClaims.getSubject()))
+        ));
     }
 
     @Operation(

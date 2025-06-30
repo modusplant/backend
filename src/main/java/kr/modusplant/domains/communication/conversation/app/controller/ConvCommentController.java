@@ -146,11 +146,12 @@ public class ConvCommentController {
             @RequestHeader("Authorization")
             @NotBlank(message = "접근 토큰이 비어 있습니다.")
             String rawAccessToken,
-
             @RequestBody @Valid
             ConvCommentInsertRequest insertRequest) {
         Claims accessTokenClaims = tokenProvider.getClaimsFromToken(rawAccessToken.substring(7));
-        return ResponseEntity.ok().body(DataResponse.ok(commentApplicationService.insert(insertRequest, UUID.fromString(accessTokenClaims.getSubject()))));
+        return ResponseEntity.ok().body(DataResponse.ok(commentApplicationService
+                .insert(insertRequest, UUID.fromString(accessTokenClaims.getSubject()))
+        ));
     }
 
     @Operation(
