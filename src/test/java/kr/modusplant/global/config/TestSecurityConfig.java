@@ -3,14 +3,11 @@ package kr.modusplant.global.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.global.advice.GlobalExceptionHandler;
-import kr.modusplant.global.middleware.security.SiteMemberAuthProvider;
-import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
-import kr.modusplant.global.middleware.security.filter.NormalLoginFilter;
-import kr.modusplant.global.middleware.security.handler.ForwardRequestLoginSuccessHandler;
-import kr.modusplant.global.middleware.security.handler.ForwardRequestLogoutSuccessHandler;
-import kr.modusplant.global.middleware.security.handler.JwtClearingLogoutHandler;
-import kr.modusplant.global.middleware.security.handler.WriteResponseLoginFailureHandler;
+import kr.modusplant.global.middleware.security.DefaultAuthProvider;
+import kr.modusplant.global.middleware.security.DefaultAuthenticationEntryPoint;
+import kr.modusplant.global.middleware.security.DefaultUserDetailsService;
+import kr.modusplant.global.middleware.security.filter.EmailPasswordAuthenticationFilter;
+import kr.modusplant.global.middleware.security.handler.*;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,8 +40,7 @@ public class TestSecurityConfig {
     private Boolean debugEnabled;
 
     private final AuthenticationConfiguration authConfiguration;
-    private final GlobalExceptionHandler globalExceptionHandler;
-    private final SiteMemberUserDetailsService memberUserDetailsService;
+    private final DefaultUserDetailsService defaultUserDetailsService;
     private final TokenApplicationService tokenApplicationService;
     private final SiteMemberValidationService memberValidationService;
     private final SiteMemberRepository memberRepository;
@@ -58,13 +54,17 @@ public class TestSecurityConfig {
     }
 
     @Bean
+    public DefaultAuthenticationEntryPoint defaultAuthenticationEntryPoint() {
+        return new DefaultAuthenticationEntryPoint(objectMapper); }
+
+    @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         return authConfiguration.getAuthenticationManager();
     }
 
     @Bean
-    public AuthenticationProvider siteMemberAuthProvider() {
-        return new SiteMemberAuthProvider(memberUserDetailsService, passwordEncoder);
+    public AuthenticationProvider defaultAuthProvider() {
+        return new DefaultAuthProvider(defaultUserDetailsService, passwordEncoder);
     }
 
     @Bean
@@ -86,16 +86,21 @@ public class TestSecurityConfig {
         return new ForwardRequestLogoutSuccessHandler(objectMapper); }
 
     @Bean
-    public NormalLoginFilter normalLoginFilter(HttpSecurity http) {
+    public DefaultAccessDeniedHandler defaultAccessDeniedHandler() {
+        return new DefaultAccessDeniedHandler(objectMapper);
+    }
+
+    @Bean
+    public EmailPasswordAuthenticationFilter emailPasswordAuthenticationFilter(HttpSecurity http) {
         try {
-            NormalLoginFilter normalLoginFilter = new NormalLoginFilter(
+            EmailPasswordAuthenticationFilter emailPasswordAuthenticationFilter = new EmailPasswordAuthenticationFilter(
                     new ObjectMapper(), validator, authenticationManager());
 
-            normalLoginFilter.setAuthenticationManager(authenticationManager());
-            normalLoginFilter.setAuthenticationSuccessHandler(normalLoginSuccessHandler());
-            normalLoginFilter.setAuthenticationFailureHandler(normalLoginFailureHandler());
+            emailPasswordAuthenticationFilter.setAuthenticationManager(authenticationManager());
+            emailPasswordAuthenticationFilter.setAuthenticationSuccessHandler(normalLoginSuccessHandler());
+            emailPasswordAuthenticationFilter.setAuthenticationFailureHandler(normalLoginFailureHandler());
 
-            return normalLoginFilter;
+            return emailPasswordAuthenticationFilter;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -106,7 +111,7 @@ public class TestSecurityConfig {
         http
                 .securityMatcher("/api/**")
                 .cors(Customizer.withDefaults())
-                .addFilterBefore(normalLoginFilter(http), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(emailPasswordAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/v1/conversation/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/qna/**").permitAll()
@@ -116,10 +121,10 @@ public class TestSecurityConfig {
                         .requestMatchers("/api/auth/kakao/social-login").permitAll()
                         .requestMatchers("/api/auth/google/social-login").permitAll()
                         .requestMatchers("/api/members/register").permitAll()
-                        .requestMatchers("/api/example").hasRole("ADMIN")
+                        .requestMatchers("/api/example/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .authenticationProvider(siteMemberAuthProvider())
+                .authenticationProvider(defaultAuthProvider())
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
                         .clearAuthentication(true)
@@ -129,10 +134,8 @@ public class TestSecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(eh ->
-                        eh.authenticationEntryPoint((request, response, authException) ->
-                                        globalExceptionHandler.handleGenericException(request, authException))
-                                .accessDeniedHandler((request, response, accessDeniedException) ->
-                                        globalExceptionHandler.handleGenericException(request, accessDeniedException))
+                        eh.authenticationEntryPoint(defaultAuthenticationEntryPoint())
+                                .accessDeniedHandler(defaultAccessDeniedHandler())
                 )
                 .headers(headers -> headers
                         .httpStrictTransportSecurity(hsts -> hsts

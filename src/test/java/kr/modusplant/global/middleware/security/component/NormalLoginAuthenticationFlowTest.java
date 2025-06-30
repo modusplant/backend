@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.global.context.SecurityOnlyContext;
 import kr.modusplant.global.middleware.security.DefaultUserDetailsService;
 import kr.modusplant.global.middleware.security.common.util.SiteMemberUserDetailsTestUtils;
 import kr.modusplant.global.middleware.security.models.DefaultUserDetails;
@@ -11,7 +12,6 @@ import kr.modusplant.modules.auth.normal.login.common.util.app.http.request.Norm
 import kr.modusplant.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.modules.jwt.app.service.RefreshTokenApplicationService;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
-import kr.modusplant.global.context.SecurityOnlyContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

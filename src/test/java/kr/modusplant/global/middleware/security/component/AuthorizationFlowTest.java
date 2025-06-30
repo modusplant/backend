@@ -69,9 +69,9 @@ public class AuthorizationFlowTest implements
     public void givenMatchingRole_willReturnSuccessResponse() throws Exception {
         // given
         ConvCommentInsertRequest commentInsertRequest =
-                createConvCommentInsertRequest(convPostWithUlid.getUlid());
+                createConvCommentInsertRequest(testConvPostWithUlid.getUlid());
         ConvCommentResponse commentResponse = createConvCommentResponse(
-                convPostWithUlid.getUlid(), memberBasicUserWithUuid.getUuid(), memberBasicUserWithUuid.getNickname()
+                testConvPostWithUlid.getUlid(), memberBasicUserWithUuid.getUuid(), memberBasicUserWithUuid.getNickname()
         );
 
         given(tokenRedisRepository.isBlacklisted(rawAccessToken.substring(7))).willReturn(false);
