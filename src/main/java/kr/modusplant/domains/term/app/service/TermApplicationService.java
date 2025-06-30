@@ -34,7 +34,7 @@ public class TermApplicationService {
         return termRepository.findAll().stream().map(termAppInfraMapper::toTermResponse).toList();
     }
 
-    @Cacheable(value = "terms", key = "'version::' + #version", unless = "#result == null or #result.isEmpty()")
+    @Cacheable(value = "terms", key = "'version:' + #version", unless = "#result == null or #result.isEmpty()")
     public List<TermResponse> getByVersion(String version) {
         return termRepository.findByVersion(version).stream().map(termAppInfraMapper::toTermResponse).toList();
     }
