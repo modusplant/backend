@@ -10,9 +10,11 @@ import kr.modusplant.global.middleware.security.DefaultAuthenticationEntryPoint;
 import kr.modusplant.global.middleware.security.models.DefaultAuthToken;
 import kr.modusplant.global.middleware.security.models.DefaultUserDetails;
 import kr.modusplant.modules.jwt.app.service.TokenProvider;
+import kr.modusplant.modules.jwt.persistence.repository.TokenRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -26,6 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenProvider tokenProvider;
     private final DefaultAuthenticationEntryPoint entryPoint;
+    private final TokenRedisRepository tokenRedisRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -36,21 +39,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if(rawAccessToken != null) {
             String accessToken = rawAccessToken.substring(7);
-
-            if(tokenProvider.validateToken(accessToken)) {
-                DefaultUserDetails defaultUserDetails = constructUserDetails(accessToken);
-                DefaultAuthToken authenticatedToken =
-                        new DefaultAuthToken(defaultUserDetails, defaultUserDetails.getAuthorities());
-
-                SecurityContextHolder.getContext().setAuthentication(authenticatedToken);
-
-            } else {
-               SecurityContextHolder.clearContext();
-               entryPoint.commence(request, response, new BadCredentialsException("접근 토큰이 만료되었습니다."));
-            }
+            evaluateAccessToken(request, response, accessToken);
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private void evaluateAccessToken(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        String accessToken) throws IOException {
+        if(tokenRedisRepository.isBlacklisted(accessToken)) {
+            SecurityContextHolder.clearContext();
+            entryPoint.commence(request, response, new BadCredentialsException("블랙리스트에 있는 접근 토큰입니다."));
+
+        } else if (!tokenProvider.validateToken(accessToken)) {
+            SecurityContextHolder.clearContext();
+            entryPoint.commence(request, response, new CredentialsExpiredException("만료된 접근 토큰입니다."));
+
+        } else {
+            DefaultUserDetails defaultUserDetails = constructUserDetails(accessToken);
+            DefaultAuthToken authenticatedToken =
+                    new DefaultAuthToken(defaultUserDetails, defaultUserDetails.getAuthorities());
+
+            SecurityContextHolder.getContext().setAuthentication(authenticatedToken);
+        }
     }
 
     private DefaultUserDetails constructUserDetails(String accessToken) {

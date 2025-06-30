@@ -11,6 +11,7 @@ import kr.modusplant.global.middleware.security.filter.JwtAuthenticationFilter;
 import kr.modusplant.global.middleware.security.handler.*;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
 import kr.modusplant.modules.jwt.app.service.TokenProvider;
+import kr.modusplant.modules.jwt.persistence.repository.TokenRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -49,6 +50,7 @@ public class SecurityConfig {
     private final SiteMemberValidationService memberValidationService;
     private final SiteMemberRepository memberRepository;
     private final Validator validator;
+    private final TokenRedisRepository tokenRedisRepository;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -95,7 +97,7 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(HttpSecurity http) {
         try {
-            return new JwtAuthenticationFilter(tokenProvider, defaultAuthenticationEntryPoint());
+            return new JwtAuthenticationFilter(tokenProvider, defaultAuthenticationEntryPoint(), tokenRedisRepository);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
