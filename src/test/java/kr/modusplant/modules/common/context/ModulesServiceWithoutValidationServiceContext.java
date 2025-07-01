@@ -5,7 +5,7 @@ import kr.modusplant.global.common.scan.ScanGlobalService;
 import kr.modusplant.global.config.TestJpaConfig;
 import kr.modusplant.global.config.TestRedisConfig;
 import kr.modusplant.global.config.TestS3Config;
-import kr.modusplant.global.initializer.MockRedisComponentInitializer;
+import kr.modusplant.global.initializer.MockRedisHelperInitializer;
 import kr.modusplant.modules.common.postprocessor.MockModulesRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.modules.common.postprocessor.MockModulesValidationServiceBeanFactoryPostProcessor;
 import kr.modusplant.modules.common.scan.ScanModulesService;
@@ -35,7 +35,7 @@ import java.lang.annotation.*;
                 MockModulesRepositoryBeanFactoryPostProcessor.class,
                 MockModulesValidationServiceBeanFactoryPostProcessor.class,
                 RestClientAutoConfiguration.class},
-        initializers = MockRedisComponentInitializer.class
+        initializers = MockRedisHelperInitializer.class
 )
 @SpringBootTest(classes = {ScanGlobalService.class, ScanDomainsService.class, ScanModulesService.class})
 @ExtendWith(MockitoExtension.class)
