@@ -15,7 +15,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Controller;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -39,8 +38,6 @@ import static kr.modusplant.global.vo.Reference.NOTATION_GLOBAL;
         initializers = MockSecurityConfigInitializer.class
 )
 @AutoConfigureMockMvc
-@Import({}
-)
 @ComponentScan(
         basePackages = NOTATION_GLOBAL,
         includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = {
