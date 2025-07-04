@@ -1,9 +1,11 @@
 package kr.modusplant.domains.term.error;
 
-import kr.modusplant.global.error.EntityNotFoundDomainException;
+import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.global.error.EntityNotFoundException;
+import kr.modusplant.global.vo.EntityName;
 
-public class TermNotFoundException extends EntityNotFoundDomainException {
+public class TermNotFoundException extends EntityNotFoundException {
     public TermNotFoundException() {
-        super("TERM_NOT_FOUND", "약관을 찾을 수 없습니다.");
+        super(ErrorCode.TERM_NOT_FOUND, EntityName.TERM);
     }
 }

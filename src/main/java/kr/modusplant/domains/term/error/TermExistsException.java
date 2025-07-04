@@ -1,9 +1,12 @@
 package kr.modusplant.domains.term.error;
 
-import kr.modusplant.global.error.EntityExistsDomainException;
+import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.global.error.EntityExistsException;
+import kr.modusplant.global.vo.EntityName;
 
-public class TermExistsException extends EntityExistsDomainException {
+public class TermExistsException extends EntityExistsException {
+
     public TermExistsException() {
-        super("TERM_EXISTS", "약관이 이미 있습니다.");
+        super(ErrorCode.TERM_EXISTS, EntityName.TERM);
     }
 }
