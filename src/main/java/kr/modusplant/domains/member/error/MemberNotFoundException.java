@@ -10,19 +10,19 @@ public class MemberNotFoundException extends EntityNotFoundException {
         super(errorCode, entityName);
     }
 
-    public static MemberNotFoundException ofSiteMember() {
+    public static MemberNotFoundException ofMember() {
         return new MemberNotFoundException(ErrorCode.SITEMEMBER_NOT_FOUND, EntityName.SITE_MEMBER);
     }
 
-    public static MemberNotFoundException ofSiteMemberAuth() {
+    public static MemberNotFoundException ofMemberAuth() {
         return new MemberNotFoundException(ErrorCode.SITEMEMBER_AUTH_NOT_FOUND, EntityName.SITE_MEMBER_AUTH);
     }
 
-    public static MemberNotFoundException ofSiteMemberRole() {
+    public static MemberNotFoundException ofMemberRole() {
         return new MemberNotFoundException(ErrorCode.SITEMEMBER_ROLE_NOT_FOUND, EntityName.SITE_MEMBER_ROLE);
     }
 
-    public static MemberNotFoundException ofSiteMemberTerm() {
+    public static MemberNotFoundException ofMemberTerm() {
         return new MemberNotFoundException(ErrorCode.SITEMEMBER_TERM_NOT_FOUND, EntityName.SITE_MEMBER_TERM);
     }
 }

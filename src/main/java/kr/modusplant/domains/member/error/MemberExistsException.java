@@ -10,19 +10,19 @@ public class MemberExistsException extends EntityExistsException {
         super(errorCode, entityName);
     }
 
-    public static MemberExistsException ofSiteMember() {
+    public static MemberExistsException ofMember() {
         return new MemberExistsException(ErrorCode.SITEMEMBER_EXISTS, EntityName.SITE_MEMBER);
     }
 
-    public static MemberExistsException ofSiteMemberAuth() {
+    public static MemberExistsException ofMemberAuth() {
         return new MemberExistsException(ErrorCode.SITEMEMBER_AUTH_EXISTS, EntityName.SITE_MEMBER_AUTH);
     }
 
-    public static MemberExistsException ofSiteMemberRole() {
+    public static MemberExistsException ofMemberRole() {
         return new MemberExistsException(ErrorCode.SITEMEMBER_ROLE_EXISTS, EntityName.SITE_MEMBER_ROLE);
     }
 
-    public static MemberExistsException ofSiteMemberTerm() {
+    public static MemberExistsException ofMemberTerm() {
         return new MemberExistsException(ErrorCode.SITEMEMBER_TERM_EXISTS, EntityName.SITE_MEMBER_TERM);
     }
 }

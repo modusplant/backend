@@ -5,6 +5,7 @@ import kr.modusplant.domains.member.common.util.domain.SiteMemberAuthTestUtils;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
+import kr.modusplant.domains.member.error.MemberExistsException;
 import kr.modusplant.domains.member.error.SiteMemberAuthExistsException;
 import kr.modusplant.domains.member.error.SiteMemberAuthNotFoundException;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
@@ -50,9 +51,9 @@ class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, Si
         given(memberAuthRepository.existsByOriginalMember(originalMemberEntity)).willReturn(true);
 
         // then
-        SiteMemberAuthExistsException existsException = assertThrows(SiteMemberAuthExistsException.class,
+        MemberExistsException existsException = assertThrows(MemberExistsException.class,
                 () -> memberAuthValidationService.validateExistedOriginalMemberUuid(originalMemberEntityUuid));
-        assertThat(existsException.getMessage()).isEqualTo(new SiteMemberAuthExistsException().getMessage());
+        assertThat(existsException.getMessage()).isEqualTo(MemberExistsException.ofMemberAuth().getMessage());
     }
 
     @DisplayName("존재하지 않는 최초 회원 UUID 검증")
