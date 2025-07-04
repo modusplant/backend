@@ -1,8 +1,7 @@
 package kr.modusplant.domains.communication.qna.domain.service;
 
-import kr.modusplant.domains.communication.common.error.LikeExistsException;
-import kr.modusplant.domains.communication.common.error.LikeNotFoundException;
-import kr.modusplant.domains.communication.common.error.PostNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationExistsException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaLikeRepository;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostRepository;
 import kr.modusplant.domains.member.error.SiteMemberNotFoundException;
@@ -27,7 +26,7 @@ public class QnaLikeValidationService {
         }
 
         if (!qnaPostRepository.existsById(postId)) {
-            throw new PostNotFoundException();
+            throw CommunicationNotFoundException.ofPost();
         }
         if (!memberRepository.existsById(memberId)) {
             throw new SiteMemberNotFoundException();
@@ -36,13 +35,13 @@ public class QnaLikeValidationService {
 
     public void validateNotFoundQnaLike(String postId, UUID memberId) {
         if (!qnaLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
-            throw new LikeNotFoundException();
+            throw CommunicationNotFoundException.ofLike();
         }
     }
 
     public void validateExistedQnaLike(String postId, UUID memberId) {
         if (qnaLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
-            throw new LikeExistsException();
+            throw CommunicationExistsException.ofLike();
         }
     }
 }

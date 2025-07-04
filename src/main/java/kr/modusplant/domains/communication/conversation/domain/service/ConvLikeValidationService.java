@@ -1,8 +1,7 @@
 package kr.modusplant.domains.communication.conversation.domain.service;
 
-import kr.modusplant.domains.communication.common.error.LikeExistsException;
-import kr.modusplant.domains.communication.common.error.LikeNotFoundException;
-import kr.modusplant.domains.communication.common.error.PostNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationExistsException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvLikeRepository;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostRepository;
 import kr.modusplant.domains.member.error.SiteMemberNotFoundException;
@@ -26,7 +25,7 @@ public class ConvLikeValidationService {
             throw new IllegalArgumentException("게시글 또는 회원 값이 비어 있습니다.");
         }
         if (!convPostRepository.existsById(postId)) {
-            throw new PostNotFoundException();
+            throw CommunicationNotFoundException.ofPost();
         }
         if (!memberRepository.existsById(memberId)) {
             throw new SiteMemberNotFoundException();
@@ -35,13 +34,13 @@ public class ConvLikeValidationService {
 
     public void validateNotFoundConvLike(String postId, UUID memberId) {
         if (!convLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
-            throw new LikeNotFoundException();
+            throw CommunicationNotFoundException.ofLike();
         }
     }
 
     public void validateExistedConvLike(String postId, UUID memberId) {
         if (convLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
-            throw new LikeExistsException();
+            throw CommunicationExistsException.ofLike();
         }
     }
 }

@@ -1,8 +1,8 @@
 package kr.modusplant.domains.communication.qna.domain.service;
 
 import kr.modusplant.domains.communication.common.domain.service.supers.AbstractPostValidationService;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.common.error.PostAccessDeniedException;
-import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostInsertRequest;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostUpdateRequest;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
@@ -39,16 +39,16 @@ public class QnaPostValidationService extends AbstractPostValidationService {
 
     public void validateNotFoundUlid(String ulid) {
         if (ulid == null || !qnaPostRepository.existsByUlid(ulid)) {
-            throw new PostNotFoundException();
+            throw CommunicationNotFoundException.ofPost();
         }
     }
 
     private QnaPostEntity findIfExistsByUlid(String ulid) {
         if (ulid == null) {
-            throw new PostNotFoundException();
+            throw CommunicationNotFoundException.ofPost();
         }
         return qnaPostRepository.findByUlidAndIsDeletedFalse(ulid)
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(CommunicationNotFoundException::ofPost);
     }
 
     // TODO : Spring Security 적용 후 PreAuthorize 고려

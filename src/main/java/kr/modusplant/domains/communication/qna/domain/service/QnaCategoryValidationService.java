@@ -1,7 +1,7 @@
 package kr.modusplant.domains.communication.qna.domain.service;
 
-import kr.modusplant.domains.communication.common.error.CategoryExistsException;
-import kr.modusplant.domains.communication.common.error.CategoryNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationExistsException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -23,19 +23,19 @@ public class QnaCategoryValidationService {
             return;
         }
         if (qnaCategoryRepository.existsByOrder(order)) {
-            throw new CategoryExistsException();
+            throw CommunicationExistsException.ofCategory();
         }
     }
 
     public void validateExistedCategory(String category) {
         if (qnaCategoryRepository.existsByCategory(category)) {
-            throw new CategoryExistsException();
+            throw CommunicationExistsException.ofCategory();
         }
     }
 
     public void validateNotFoundUuid(UUID uuid) {
         if (uuid == null || !qnaCategoryRepository.existsByUuid(uuid)) {
-            throw new CategoryNotFoundException();
+            throw CommunicationNotFoundException.ofCategory();
         }
     }
 }

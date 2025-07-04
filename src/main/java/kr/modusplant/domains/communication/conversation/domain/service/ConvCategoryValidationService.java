@@ -1,7 +1,7 @@
 package kr.modusplant.domains.communication.conversation.domain.service;
 
-import kr.modusplant.domains.communication.common.error.CategoryExistsException;
-import kr.modusplant.domains.communication.common.error.CategoryNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationExistsException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -23,19 +23,19 @@ public class ConvCategoryValidationService {
             return;
         }
         if (convCategoryRepository.existsByOrder(order)) {
-            throw new CategoryExistsException();
+            throw CommunicationExistsException.ofCategory();
         }
     }
 
     public void validateExistedCategory(String category) {
         if (convCategoryRepository.existsByCategory(category)) {
-            throw new CategoryExistsException();
+            throw CommunicationExistsException.ofCategory();
         }
     }
 
     public void validateNotFoundUuid(UUID uuid) {
         if (uuid == null || !convCategoryRepository.existsByUuid(uuid)) {
-            throw new CategoryNotFoundException();
+            throw CommunicationNotFoundException.ofCategory();
         }
     }
 }

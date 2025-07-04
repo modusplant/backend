@@ -1,8 +1,8 @@
 package kr.modusplant.domains.communication.tip.domain.service;
 
 import kr.modusplant.domains.communication.common.domain.service.supers.AbstractPostValidationService;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.common.error.PostAccessDeniedException;
-import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostInsertRequest;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostUpdateRequest;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
@@ -39,16 +39,16 @@ public class TipPostValidationService extends AbstractPostValidationService {
 
     public void validateNotFoundUlid(String ulid) {
         if (ulid == null || !tipPostRepository.existsByUlid(ulid)) {
-            throw new PostNotFoundException();
+            throw CommunicationNotFoundException.ofPost();
         }
     }
 
     private TipPostEntity findIfExistsByUlid(String ulid) {
         if (ulid == null) {
-            throw new PostNotFoundException();
+            throw CommunicationNotFoundException.ofPost();
         }
         return tipPostRepository.findByUlidAndIsDeletedFalse(ulid)
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(CommunicationNotFoundException::ofPost);
     }
 
     // TODO : Spring Security 적용 후 PreAuthorize 고려

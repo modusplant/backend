@@ -1,8 +1,8 @@
 package kr.modusplant.domains.communication.conversation.domain.service;
 
 import kr.modusplant.domains.communication.common.domain.service.supers.AbstractPostValidationService;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.common.error.PostAccessDeniedException;
-import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostUpdateRequest;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
@@ -39,16 +39,16 @@ public class ConvPostValidationService extends AbstractPostValidationService {
 
     public void validateNotFoundUlid(String ulid) {
         if (ulid == null || !convPostRepository.existsByUlid(ulid)) {
-            throw new PostNotFoundException();
+            throw CommunicationNotFoundException.ofPost();
         }
     }
 
     private ConvPostEntity findIfExistsByUlid(String ulid) {
         if (ulid == null) {
-            throw new PostNotFoundException();
+            throw CommunicationNotFoundException.ofPost();
         }
         return convPostRepository.findByUlidAndIsDeletedFalse(ulid)
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(CommunicationNotFoundException::ofPost);
     }
 
     // TODO : Spring Security 적용 후 PreAuthorize 고려
