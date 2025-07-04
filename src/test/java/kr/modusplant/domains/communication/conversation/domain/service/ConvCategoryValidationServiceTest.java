@@ -60,8 +60,7 @@ class ConvCategoryValidationServiceTest implements ConvCategoryResponseTestUtils
         // then
         CommunicationExistsException existsException = assertThrows(CommunicationExistsException.class,
                 () -> convCategoryValidationService.validateExistedCategory(category));
-        assertThat(existsException.getMessage()).isEqualTo(new
-                CommunicationExistsException(ErrorCode.CATEGORY_EXISTS, EntityName.CATEGORY).getMessage());
+        assertThat(existsException.getMessage()).isEqualTo(CommunicationExistsException.ofCategory().getMessage());
     }
 
     @DisplayName("존재하지 않는 순서 검증")
@@ -76,7 +75,6 @@ class ConvCategoryValidationServiceTest implements ConvCategoryResponseTestUtils
         // then
         CommunicationNotFoundException notFoundException = assertThrows(CommunicationNotFoundException.class,
                 () -> convCategoryValidationService.validateNotFoundUuid(uuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(new
-                CommunicationNotFoundException(ErrorCode.CATEGORY_NOT_FOUND, EntityName.CATEGORY).getMessage());
+        assertThat(notFoundException.getMessage()).isEqualTo(CommunicationNotFoundException.ofCategory().getMessage());
     }
 }

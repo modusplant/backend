@@ -42,8 +42,7 @@ class QnaCategoryValidationServiceTest implements QnaCategoryResponseTestUtils, 
         // then
         CommunicationExistsException existsException = assertThrows(CommunicationExistsException.class,
                 () -> qnaCategoryValidationService.validateExistedOrder(order));
-        assertThat(existsException.getMessage()).isEqualTo(
-                new CommunicationExistsException(ErrorCode.CATEGORY_EXISTS, EntityName.CATEGORY).getMessage());
+        assertThat(existsException.getMessage()).isEqualTo(CommunicationExistsException.ofCategory().getMessage());
     }
 
     @DisplayName("존재하는 항목 검증")
@@ -60,8 +59,7 @@ class QnaCategoryValidationServiceTest implements QnaCategoryResponseTestUtils, 
         // then
         CommunicationExistsException existsException = assertThrows(CommunicationExistsException.class,
                 () -> qnaCategoryValidationService.validateExistedCategory(category));
-        assertThat(existsException.getMessage()).isEqualTo(
-                new CommunicationExistsException(ErrorCode.CATEGORY_EXISTS, EntityName.CATEGORY).getMessage());
+        assertThat(existsException.getMessage()).isEqualTo(CommunicationExistsException.ofCategory().getMessage());
     }
 
     @DisplayName("존재하지 않는 순서 검증")
@@ -76,7 +74,6 @@ class QnaCategoryValidationServiceTest implements QnaCategoryResponseTestUtils, 
         // then
         CommunicationNotFoundException notFoundException = assertThrows(CommunicationNotFoundException.class,
                 () -> qnaCategoryValidationService.validateNotFoundUuid(uuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(
-                new CommunicationNotFoundException(ErrorCode.CATEGORY_NOT_FOUND, EntityName.CATEGORY).getMessage());
+        assertThat(notFoundException.getMessage()).isEqualTo(CommunicationNotFoundException.ofCategory().getMessage());
     }
 }
