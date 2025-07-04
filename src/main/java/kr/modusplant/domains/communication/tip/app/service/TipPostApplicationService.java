@@ -2,7 +2,7 @@ package kr.modusplant.domains.communication.tip.app.service;
 
 import kr.modusplant.domains.common.app.service.MultipartDataProcessor;
 import kr.modusplant.domains.common.enums.PostType;
-import kr.modusplant.domains.communication.common.error.PostNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostInsertRequest;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostUpdateRequest;
 import kr.modusplant.domains.communication.tip.app.http.response.TipPostResponse;
@@ -154,7 +154,7 @@ public class TipPostApplicationService {
         }
         Long dbViewCount = tipPostRepository.findByUlid(ulid)
                 .map(tipPostEntity -> Optional.ofNullable(tipPostEntity.getViewCount()).orElseThrow())
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(CommunicationNotFoundException::ofPost);
         tipPostViewCountRedisRepository.write(ulid, dbViewCount);
         return dbViewCount;
     }

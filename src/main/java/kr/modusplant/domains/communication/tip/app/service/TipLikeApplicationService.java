@@ -1,7 +1,7 @@
 package kr.modusplant.domains.communication.tip.app.service;
 
 import kr.modusplant.domains.communication.common.app.http.response.LikeResponse;
-import kr.modusplant.domains.communication.common.error.PostNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.tip.domain.service.TipLikeValidationService;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipLikeEntity;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
@@ -25,7 +25,7 @@ public class TipLikeApplicationService {
         tipLikeValidationService.validateNotFoundTipPostOrMember(postId, memberId);
         tipLikeValidationService.validateExistedTipLike(postId, memberId);
 
-        TipPostEntity tipPost = tipPostRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        TipPostEntity tipPost = tipPostRepository.findById(postId).orElseThrow(CommunicationNotFoundException::ofPost);
         tipPost.increaseLikeCount();
 
         tipLikeRepository.save(TipLikeEntity.of(postId, memberId));
@@ -37,7 +37,7 @@ public class TipLikeApplicationService {
         tipLikeValidationService.validateNotFoundTipPostOrMember(postId, memberId);
         tipLikeValidationService.validateNotFoundTipLike(postId, memberId);
 
-        TipPostEntity tipPost = tipPostRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        TipPostEntity tipPost = tipPostRepository.findById(postId).orElseThrow(CommunicationNotFoundException::ofPost);
         tipPost.decreaseLikeCount();
 
         tipLikeRepository.deleteByPostIdAndMemberId(postId, memberId);

@@ -2,7 +2,7 @@ package kr.modusplant.domains.communication.conversation.app.service;
 
 import kr.modusplant.domains.common.app.service.MultipartDataProcessor;
 import kr.modusplant.domains.common.enums.PostType;
-import kr.modusplant.domains.communication.common.error.PostNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostInsertRequest;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostUpdateRequest;
 import kr.modusplant.domains.communication.conversation.app.http.response.ConvPostResponse;
@@ -154,7 +154,7 @@ public class ConvPostApplicationService {
         }
         Long dbViewCount = convPostRepository.findByUlid(ulid)
                 .map(convPostEntity -> Optional.ofNullable(convPostEntity.getViewCount()).orElseThrow())
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(CommunicationNotFoundException::ofPost);
         convPostViewCountRedisRepository.write(ulid, dbViewCount);
         return dbViewCount;
     }

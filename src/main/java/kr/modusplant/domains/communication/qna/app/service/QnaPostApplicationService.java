@@ -2,7 +2,7 @@ package kr.modusplant.domains.communication.qna.app.service;
 
 import kr.modusplant.domains.common.app.service.MultipartDataProcessor;
 import kr.modusplant.domains.common.enums.PostType;
-import kr.modusplant.domains.communication.common.error.PostNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostInsertRequest;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostUpdateRequest;
 import kr.modusplant.domains.communication.qna.app.http.response.QnaPostResponse;
@@ -154,7 +154,7 @@ public class QnaPostApplicationService {
         }
         Long dbViewCount = qnaPostRepository.findByUlid(ulid)
                 .map(qnaPostEntity -> Optional.ofNullable(qnaPostEntity.getViewCount()).orElseThrow())
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(CommunicationNotFoundException::ofPost);
         qnaPostViewCountRedisRepository.write(ulid, dbViewCount);
         return dbViewCount;
     }
