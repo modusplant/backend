@@ -1,6 +1,6 @@
 package kr.modusplant.domains.communication.qna.app.service;
 
-import kr.modusplant.domains.communication.common.error.PostNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaPostEntityTestUtils;
 import kr.modusplant.domains.communication.qna.persistence.entity.QnaPostEntity;
@@ -92,7 +92,7 @@ class QnaPostApplicationServiceUnitTest implements SiteMemberEntityTestUtils, Qn
         given(qnaPostRepository.findByUlid(ulid)).willReturn(Optional.empty());
 
         // when & then
-        assertThrows(PostNotFoundException.class,
+        assertThrows(CommunicationNotFoundException.class,
                 () -> qnaPostApplicationService.readViewCount(ulid));
     }
 

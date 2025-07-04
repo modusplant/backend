@@ -2,8 +2,8 @@ package kr.modusplant.domains.communication.tip.app.service;
 
 import kr.modusplant.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.domains.communication.common.app.http.response.LikeResponse;
-import kr.modusplant.domains.communication.common.error.LikeExistsException;
-import kr.modusplant.domains.communication.common.error.LikeNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationExistsException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipLikeEntityTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
 import kr.modusplant.domains.communication.tip.domain.service.TipLikeValidationService;
@@ -144,8 +144,8 @@ class TipLikeApplicationServiceTest implements SiteMemberEntityTestUtils, TipPos
 
         // then
         doNothing().when(tipLikeValidationService).validateNotFoundTipPostOrMember(postId, memberId);
-        doThrow(new LikeExistsException()).when(tipLikeValidationService).validateExistedTipLike(postId, memberId);
-        assertThatThrownBy(() -> tipLikeApplicationService.likeTipPost(postId, memberId)).isInstanceOf(LikeExistsException.class);
+        doThrow(CommunicationExistsException.ofLike()).when(tipLikeValidationService).validateExistedTipLike(postId, memberId);
+        assertThatThrownBy(() -> tipLikeApplicationService.likeTipPost(postId, memberId)).isInstanceOf(CommunicationExistsException.class);
     }
 
     @Test
@@ -178,8 +178,8 @@ class TipLikeApplicationServiceTest implements SiteMemberEntityTestUtils, TipPos
 
         // then
         doNothing().when(tipLikeValidationService).validateNotFoundTipPostOrMember(postId, memberId);
-        doThrow(new LikeNotFoundException()).when(tipLikeValidationService).validateNotFoundTipLike(postId, memberId);
+        doThrow(CommunicationNotFoundException.ofLike()).when(tipLikeValidationService).validateNotFoundTipLike(postId, memberId);
         assertThatThrownBy(() -> tipLikeApplicationService.unlikeTipPost(postId, memberId))
-                .isInstanceOf(LikeNotFoundException.class);
+                .isInstanceOf(CommunicationNotFoundException.class);
     }
 }

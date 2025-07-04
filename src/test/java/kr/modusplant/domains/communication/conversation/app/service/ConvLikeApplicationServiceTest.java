@@ -2,8 +2,8 @@ package kr.modusplant.domains.communication.conversation.app.service;
 
 import kr.modusplant.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.domains.communication.common.app.http.response.LikeResponse;
-import kr.modusplant.domains.communication.common.error.LikeExistsException;
-import kr.modusplant.domains.communication.common.error.LikeNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationExistsException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvLikeEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvPostEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.domain.service.ConvLikeValidationService;
@@ -144,8 +144,8 @@ class ConvLikeApplicationServiceTest implements SiteMemberEntityTestUtils, ConvP
 
         // then
         doNothing().when(convLikeValidationService).validateNotFoundConvPostOrMember(postId, memberId);
-        doThrow(new LikeExistsException()).when(convLikeValidationService).validateExistedConvLike(postId, memberId);
-        assertThatThrownBy(() -> convLikeApplicationService.likeConvPost(postId, memberId)).isInstanceOf(LikeExistsException.class);
+        doThrow(CommunicationExistsException.ofLike()).when(convLikeValidationService).validateExistedConvLike(postId, memberId);
+        assertThatThrownBy(() -> convLikeApplicationService.likeConvPost(postId, memberId)).isInstanceOf(CommunicationExistsException.class);
     }
 
     @Test
@@ -178,8 +178,8 @@ class ConvLikeApplicationServiceTest implements SiteMemberEntityTestUtils, ConvP
 
         // then
         doNothing().when(convLikeValidationService).validateNotFoundConvPostOrMember(postId, memberId);
-        doThrow(new LikeNotFoundException()).when(convLikeValidationService).validateNotFoundConvLike(postId, memberId);
+        doThrow(CommunicationNotFoundException.ofLike()).when(convLikeValidationService).validateNotFoundConvLike(postId, memberId);
         assertThatThrownBy(() -> convLikeApplicationService.unlikeConvPost(postId, memberId))
-                .isInstanceOf(LikeNotFoundException.class);
+                .isInstanceOf(CommunicationNotFoundException.class);
     }
 }

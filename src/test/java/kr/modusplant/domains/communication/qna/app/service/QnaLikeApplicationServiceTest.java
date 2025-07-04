@@ -2,8 +2,8 @@ package kr.modusplant.domains.communication.qna.app.service;
 
 import kr.modusplant.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.domains.communication.common.app.http.response.LikeResponse;
-import kr.modusplant.domains.communication.common.error.LikeExistsException;
-import kr.modusplant.domains.communication.common.error.LikeNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationExistsException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaLikeEntityTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaPostEntityTestUtils;
 import kr.modusplant.domains.communication.qna.domain.service.QnaLikeValidationService;
@@ -144,8 +144,8 @@ class QnaLikeApplicationServiceTest implements SiteMemberEntityTestUtils, QnaPos
 
         // then
         doNothing().when(qnaLikeValidationService).validateNotFoundQnaPostOrMember(postId, memberId);
-        doThrow(new LikeExistsException()).when(qnaLikeValidationService).validateExistedQnaLike(postId, memberId);
-        assertThatThrownBy(() -> qnaLikeApplicationService.likeQnaPost(postId, memberId)).isInstanceOf(LikeExistsException.class);
+        doThrow(CommunicationExistsException.ofLike()).when(qnaLikeValidationService).validateExistedQnaLike(postId, memberId);
+        assertThatThrownBy(() -> qnaLikeApplicationService.likeQnaPost(postId, memberId)).isInstanceOf(CommunicationExistsException.class);
     }
 
     @Test
@@ -178,8 +178,8 @@ class QnaLikeApplicationServiceTest implements SiteMemberEntityTestUtils, QnaPos
 
         // then
         doNothing().when(qnaLikeValidationService).validateNotFoundQnaPostOrMember(postId, memberId);
-        doThrow(new LikeNotFoundException()).when(qnaLikeValidationService).validateNotFoundQnaLike(postId, memberId);
+        doThrow(CommunicationNotFoundException.ofLike()).when(qnaLikeValidationService).validateNotFoundQnaLike(postId, memberId);
         assertThatThrownBy(() -> qnaLikeApplicationService.unlikeQnaPost(postId, memberId))
-                .isInstanceOf(LikeNotFoundException.class);
+                .isInstanceOf(CommunicationNotFoundException.class);
     }
 }

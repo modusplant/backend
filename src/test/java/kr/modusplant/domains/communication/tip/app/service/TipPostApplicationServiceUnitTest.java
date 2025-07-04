@@ -1,6 +1,6 @@
 package kr.modusplant.domains.communication.tip.app.service;
 
-import kr.modusplant.domains.communication.common.error.PostNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
@@ -92,7 +92,7 @@ class TipPostApplicationServiceUnitTest implements SiteMemberEntityTestUtils, Ti
         given(tipPostRepository.findByUlid(ulid)).willReturn(Optional.empty());
 
         // when & then
-        assertThrows(PostNotFoundException.class,
+        assertThrows(CommunicationNotFoundException.class,
                 () -> tipPostApplicationService.readViewCount(ulid));
     }
 

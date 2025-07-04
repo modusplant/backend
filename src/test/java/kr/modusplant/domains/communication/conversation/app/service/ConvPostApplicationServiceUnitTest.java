@@ -1,6 +1,6 @@
 package kr.modusplant.domains.communication.conversation.app.service;
 
-import kr.modusplant.domains.communication.common.error.PostNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.entity.ConvPostEntityTestUtils;
 import kr.modusplant.domains.communication.conversation.persistence.entity.ConvPostEntity;
@@ -92,7 +92,7 @@ class ConvPostApplicationServiceUnitTest implements SiteMemberEntityTestUtils, C
         given(convPostRepository.findByUlid(ulid)).willReturn(Optional.empty());
 
         // when & then
-        assertThrows(PostNotFoundException.class,
+        assertThrows(CommunicationNotFoundException.class,
                 () -> convPostApplicationService.readViewCount(ulid));
     }
 
