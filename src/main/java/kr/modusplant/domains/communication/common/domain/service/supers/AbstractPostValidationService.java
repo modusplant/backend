@@ -2,7 +2,7 @@ package kr.modusplant.domains.communication.common.domain.service.supers;
 
 import kr.modusplant.domains.common.persistence.repository.supers.UuidPrimaryKeyRepository;
 import kr.modusplant.domains.communication.common.app.http.request.FileOrder;
-import kr.modusplant.domains.communication.common.error.CategoryNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import java.util.UUID;
 public abstract class AbstractPostValidationService {
     protected void validateNotFoundCategoryUuid(UUID categoryUuid, UuidPrimaryKeyRepository<?> categoryRepository) {
         if (categoryUuid == null || !categoryRepository.existsByUuid(categoryUuid)) {
-            throw new CategoryNotFoundException();
+            throw CommunicationNotFoundException.ofCategory();
         }
     }
 
