@@ -1,8 +1,8 @@
 package kr.modusplant.domains.communication.tip.domain.service;
 
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
-import kr.modusplant.domains.communication.common.error.CategoryExistsException;
-import kr.modusplant.domains.communication.common.error.CategoryNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationExistsException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.tip.common.util.app.http.response.TipCategoryResponseTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.tip.persistence.repository.TipCategoryRepository;
@@ -38,9 +38,9 @@ class TipCategoryValidationServiceTest implements TipCategoryResponseTestUtils, 
         given(tipCategoryRepository.existsByOrder(order)).willReturn(true);
 
         // then
-        CategoryExistsException existsException = assertThrows(CategoryExistsException.class,
+        CommunicationExistsException existsException = assertThrows(CommunicationExistsException.class,
                 () -> tipCategoryValidationService.validateExistedOrder(order));
-        assertThat(existsException.getMessage()).isEqualTo(new CategoryExistsException().getMessage());
+        assertThat(existsException.getMessage()).isEqualTo(CommunicationExistsException.ofCategory().getMessage());
     }
 
     @DisplayName("존재하는 항목 검증")
@@ -55,9 +55,9 @@ class TipCategoryValidationServiceTest implements TipCategoryResponseTestUtils, 
         given(tipCategoryRepository.existsByCategory(category)).willReturn(true);
 
         // then
-        CategoryExistsException existsException = assertThrows(CategoryExistsException.class,
+        CommunicationExistsException existsException = assertThrows(CommunicationExistsException.class,
                 () -> tipCategoryValidationService.validateExistedCategory(category));
-        assertThat(existsException.getMessage()).isEqualTo(new CategoryExistsException().getMessage());
+        assertThat(existsException.getMessage()).isEqualTo(CommunicationExistsException.ofCategory().getMessage());
     }
 
     @DisplayName("존재하지 않는 순서 검증")
@@ -70,8 +70,8 @@ class TipCategoryValidationServiceTest implements TipCategoryResponseTestUtils, 
         given(tipCategoryRepository.existsByUuid(uuid)).willReturn(false);
 
         // then
-        CategoryNotFoundException notFoundException = assertThrows(CategoryNotFoundException.class,
+        CommunicationNotFoundException notFoundException = assertThrows(CommunicationNotFoundException.class,
                 () -> tipCategoryValidationService.validateNotFoundUuid(uuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(new CategoryNotFoundException().getMessage());
+        assertThat(notFoundException.getMessage()).isEqualTo(CommunicationNotFoundException.ofCategory().getMessage());
     }
 }

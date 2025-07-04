@@ -1,9 +1,8 @@
 package kr.modusplant.domains.communication.conversation.domain.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import kr.modusplant.domains.communication.common.error.CategoryNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.common.error.PostAccessDeniedException;
-import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.conversation.app.http.request.ConvPostInsertRequest;
 import kr.modusplant.domains.communication.conversation.common.util.app.http.request.ConvPostRequestTestUtils;
 import kr.modusplant.domains.communication.conversation.common.util.domain.ConvPostTestUtils;
@@ -64,7 +63,7 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils, ConvCat
         when(convCategoryRepository.existsByUuid(convPostInsertRequest.categoryUuid())).thenReturn(false);
 
         // then
-        assertThrows(CategoryNotFoundException.class,
+        assertThrows(CommunicationNotFoundException.class,
                 () -> convPostValidationService.validateConvPostInsertRequest(convPostInsertRequest));
     }
 
@@ -117,7 +116,7 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils, ConvCat
         UUID memberUuid = UUID.randomUUID();
         String ulid = ConvPostTestUtils.generator.generate(null, null,null,EventType.INSERT);
         when(convPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.empty());
-        assertThrows(PostNotFoundException.class,
+        assertThrows(CommunicationNotFoundException.class,
                 () -> convPostValidationService.validateAccessibleConvPost(ulid, memberUuid));
     }
 
@@ -163,7 +162,7 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils, ConvCat
         final String nullUlid = null;
 
         // then
-        assertThrows(PostNotFoundException.class, () ->
+        assertThrows(CommunicationNotFoundException.class, () ->
                 convPostValidationService.validateNotFoundUlid(nullUlid));
 
         // Not Found ULID
@@ -172,7 +171,7 @@ class ConvPostValidationServiceTest implements ConvPostRequestTestUtils, ConvCat
         when(convPostRepository.existsByUlid(notFoundUlid)).thenReturn(false);
 
         // then
-        assertThrows(PostNotFoundException.class, () ->
+        assertThrows(CommunicationNotFoundException.class, () ->
                 convPostValidationService.validateNotFoundUlid(notFoundUlid));
     }
 

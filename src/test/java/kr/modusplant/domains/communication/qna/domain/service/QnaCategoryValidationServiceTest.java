@@ -1,11 +1,13 @@
 package kr.modusplant.domains.communication.qna.domain.service;
 
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
-import kr.modusplant.domains.communication.common.error.CategoryExistsException;
-import kr.modusplant.domains.communication.common.error.CategoryNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationExistsException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.qna.common.util.app.http.response.QnaCategoryResponseTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaCategoryRepository;
+import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.global.vo.EntityName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +40,10 @@ class QnaCategoryValidationServiceTest implements QnaCategoryResponseTestUtils, 
         given(qnaCategoryRepository.existsByOrder(order)).willReturn(true);
 
         // then
-        CategoryExistsException existsException = assertThrows(CategoryExistsException.class,
+        CommunicationExistsException existsException = assertThrows(CommunicationExistsException.class,
                 () -> qnaCategoryValidationService.validateExistedOrder(order));
-        assertThat(existsException.getMessage()).isEqualTo(new CategoryExistsException().getMessage());
+        assertThat(existsException.getMessage()).isEqualTo(
+                new CommunicationExistsException(ErrorCode.CATEGORY_EXISTS, EntityName.CATEGORY).getMessage());
     }
 
     @DisplayName("존재하는 항목 검증")
@@ -55,9 +58,10 @@ class QnaCategoryValidationServiceTest implements QnaCategoryResponseTestUtils, 
         given(qnaCategoryRepository.existsByCategory(category)).willReturn(true);
 
         // then
-        CategoryExistsException existsException = assertThrows(CategoryExistsException.class,
+        CommunicationExistsException existsException = assertThrows(CommunicationExistsException.class,
                 () -> qnaCategoryValidationService.validateExistedCategory(category));
-        assertThat(existsException.getMessage()).isEqualTo(new CategoryExistsException().getMessage());
+        assertThat(existsException.getMessage()).isEqualTo(
+                new CommunicationExistsException(ErrorCode.CATEGORY_EXISTS, EntityName.CATEGORY).getMessage());
     }
 
     @DisplayName("존재하지 않는 순서 검증")
@@ -70,8 +74,9 @@ class QnaCategoryValidationServiceTest implements QnaCategoryResponseTestUtils, 
         given(qnaCategoryRepository.existsByUuid(uuid)).willReturn(false);
 
         // then
-        CategoryNotFoundException notFoundException = assertThrows(CategoryNotFoundException.class,
+        CommunicationNotFoundException notFoundException = assertThrows(CommunicationNotFoundException.class,
                 () -> qnaCategoryValidationService.validateNotFoundUuid(uuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(new CategoryNotFoundException().getMessage());
+        assertThat(notFoundException.getMessage()).isEqualTo(
+                new CommunicationNotFoundException(ErrorCode.CATEGORY_NOT_FOUND, EntityName.CATEGORY).getMessage());
     }
 }

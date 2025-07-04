@@ -2,8 +2,8 @@ package kr.modusplant.domains.communication.qna.domain.service;
 
 import jakarta.persistence.EntityManager;
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
-import kr.modusplant.domains.communication.common.error.CommentExistsException;
-import kr.modusplant.domains.communication.common.error.CommentNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationExistsException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaCommentEntityTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaPostEntityTestUtils;
@@ -87,13 +87,13 @@ public class QnaCommentValidationServiceTest implements
         given(commentRepository.existsByPostUlidAndPath(commentEntity.getPostUlid(), commentEntity.getPath())).willReturn(true);
 
         // then
-        CommentExistsException ex = assertThrows(
-                CommentExistsException.class,
+        CommunicationExistsException ex = assertThrows(
+                CommunicationExistsException.class,
                 () -> commentValidationService.validateExistedQnaCommentEntity(
                         commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );
-        assertEquals(new CommentExistsException().getMessage(), ex.getMessage());
+        assertEquals(CommunicationExistsException.ofComment().getMessage(), ex.getMessage());
     }
 
     @DisplayName("postUlid와 댓글 경로에 해당하는 댓글 데이터가 존재하지 않는지 확인")
@@ -114,12 +114,12 @@ public class QnaCommentValidationServiceTest implements
         given(commentRepository.existsByPostUlidAndPath(commentEntity.getPostUlid(), commentEntity.getPath())).willReturn(false);
 
         // then
-        CommentNotFoundException ex = assertThrows(
-                CommentNotFoundException.class,
+        CommunicationNotFoundException ex = assertThrows(
+                CommunicationNotFoundException.class,
                 () -> commentValidationService.validateNotFoundQnaCommentEntity(
                         commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );
-        assertEquals(new CommentNotFoundException().getMessage(), ex.getMessage());
+        assertEquals(CommunicationNotFoundException.ofComment().getMessage(), ex.getMessage());
     }
 }

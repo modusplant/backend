@@ -2,8 +2,8 @@ package kr.modusplant.domains.communication.tip.domain.service;
 
 import jakarta.persistence.EntityManager;
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
-import kr.modusplant.domains.communication.common.error.CommentExistsException;
-import kr.modusplant.domains.communication.common.error.CommentNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationExistsException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCommentEntityTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
@@ -87,13 +87,13 @@ public class TipCommentValidationServiceTest implements
         given(commentRepository.existsByPostUlidAndPath(commentEntity.getPostUlid(), commentEntity.getPath())).willReturn(true);
 
         // then
-        CommentExistsException ex = assertThrows(
-                CommentExistsException.class,
+        CommunicationExistsException ex = assertThrows(
+                CommunicationExistsException.class,
                 () -> commentValidationService.validateExistedTipCommentEntity(
                         commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );
-        assertEquals(new CommentExistsException().getMessage(), ex.getMessage());
+        assertEquals(CommunicationExistsException.ofComment().getMessage(), ex.getMessage());
     }
 
     @DisplayName("postUlid와 댓글 경로에 해당하는 댓글 데이터가 존재하지 않는지 확인")
@@ -114,12 +114,12 @@ public class TipCommentValidationServiceTest implements
         given(commentRepository.existsByPostUlidAndPath(commentEntity.getPostUlid(), commentEntity.getPath())).willReturn(false);
 
         // then
-        CommentNotFoundException ex = assertThrows(
-                CommentNotFoundException.class,
+        CommunicationNotFoundException ex = assertThrows(
+                CommunicationNotFoundException.class,
                 () -> commentValidationService.validateNotFoundTipCommentEntity(
                         commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );
-        assertEquals(new CommentNotFoundException().getMessage(), ex.getMessage());
+        assertEquals(CommunicationNotFoundException.ofComment().getMessage(), ex.getMessage());
     }
 }

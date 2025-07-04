@@ -1,8 +1,7 @@
 package kr.modusplant.domains.communication.qna.domain.service;
 
-import kr.modusplant.domains.communication.common.error.LikeExistsException;
-import kr.modusplant.domains.communication.common.error.LikeNotFoundException;
-import kr.modusplant.domains.communication.common.error.PostNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationExistsException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaLikeRepository;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
@@ -38,7 +37,7 @@ class QnaLikeValidationServiceTest {
         when(qnaPostRepository.existsById(QNA_POST_ID)).thenReturn(false);
 
         assertThatThrownBy(() -> validationService.validateNotFoundQnaPostOrMember(QNA_POST_ID, MEMBER_ID))
-                .isInstanceOf(PostNotFoundException.class);
+                .isInstanceOf(CommunicationNotFoundException.class);
     }
 
     @Test
@@ -57,7 +56,7 @@ class QnaLikeValidationServiceTest {
         when(qnaLikeRepository.existsByPostIdAndMemberId(QNA_POST_ID, MEMBER_ID)).thenReturn(false);
 
         assertThatThrownBy(() -> validationService.validateNotFoundQnaLike(QNA_POST_ID, MEMBER_ID))
-                .isInstanceOf(LikeNotFoundException.class);
+                .isInstanceOf(CommunicationNotFoundException.class);
     }
 
     @Test
@@ -66,6 +65,6 @@ class QnaLikeValidationServiceTest {
         when(qnaLikeRepository.existsByPostIdAndMemberId(QNA_POST_ID, MEMBER_ID)).thenReturn(true);
 
         assertThatThrownBy(() -> validationService.validateExistedQnaLike(QNA_POST_ID, MEMBER_ID))
-                .isInstanceOf(LikeExistsException.class);
+                .isInstanceOf(CommunicationExistsException.class);
     }
 }

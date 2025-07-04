@@ -1,9 +1,8 @@
 package kr.modusplant.domains.communication.qna.domain.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import kr.modusplant.domains.communication.common.error.CategoryNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.common.error.PostAccessDeniedException;
-import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.qna.app.http.request.QnaPostInsertRequest;
 import kr.modusplant.domains.communication.qna.common.util.app.http.request.QnaPostRequestTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.domain.QnaPostTestUtils;
@@ -64,7 +63,7 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils, QnaCatego
         when(qnaCategoryRepository.existsByUuid(qnaPostInsertRequest.categoryUuid())).thenReturn(false);
 
         // then
-        assertThrows(CategoryNotFoundException.class,
+        assertThrows(CommunicationNotFoundException.class,
                 () -> qnaPostValidationService.validateQnaPostInsertRequest(qnaPostInsertRequest));
     }
 
@@ -117,7 +116,7 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils, QnaCatego
         UUID memberUuid = UUID.randomUUID();
         String ulid = QnaPostTestUtils.generator.generate(null, null,null,EventType.INSERT);
         when(qnaPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.empty());
-        assertThrows(PostNotFoundException.class,
+        assertThrows(CommunicationNotFoundException.class,
                 () -> qnaPostValidationService.validateAccessibleQnaPost(ulid,memberUuid));
     }
 
@@ -163,7 +162,7 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils, QnaCatego
         final String nullUlid = null;
 
         // then
-        assertThrows(PostNotFoundException.class, () ->
+        assertThrows(CommunicationNotFoundException.class, () ->
                 qnaPostValidationService.validateNotFoundUlid(nullUlid));
 
         // Not Found ULID
@@ -172,7 +171,7 @@ class QnaPostValidationServiceTest implements QnaPostRequestTestUtils, QnaCatego
         when(qnaPostRepository.existsByUlid(notFoundUlid)).thenReturn(false);
 
         // then
-        assertThrows(PostNotFoundException.class, () ->
+        assertThrows(CommunicationNotFoundException.class, () ->
                 qnaPostValidationService.validateNotFoundUlid(notFoundUlid));
     }
 

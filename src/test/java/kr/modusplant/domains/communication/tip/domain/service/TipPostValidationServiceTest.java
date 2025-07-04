@@ -1,9 +1,8 @@
 package kr.modusplant.domains.communication.tip.domain.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import kr.modusplant.domains.communication.common.error.CategoryNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.common.error.PostAccessDeniedException;
-import kr.modusplant.domains.communication.common.error.PostNotFoundException;
 import kr.modusplant.domains.communication.tip.app.http.request.TipPostInsertRequest;
 import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipPostRequestTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.domain.TipPostTestUtils;
@@ -64,7 +63,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils, TipCatego
         when(tipCategoryRepository.existsByUuid(tipPostInsertRequest.categoryUuid())).thenReturn(false);
 
         // then
-        assertThrows(CategoryNotFoundException.class,
+        assertThrows(CommunicationNotFoundException.class,
                 () -> tipPostValidationService.validateTipPostInsertRequest(tipPostInsertRequest));
     }
 
@@ -117,7 +116,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils, TipCatego
         UUID memberUuid = UUID.randomUUID();
         String ulid = TipPostTestUtils.generator.generate(null, null,null,EventType.INSERT);
         when(tipPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.empty());
-        assertThrows(PostNotFoundException.class,
+        assertThrows(CommunicationNotFoundException.class,
                 () -> tipPostValidationService.validateAccessibleTipPost(ulid,memberUuid));
     }
 
@@ -163,7 +162,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils, TipCatego
         final String nullUlid = null;
 
         // then
-        assertThrows(PostNotFoundException.class, () ->
+        assertThrows(CommunicationNotFoundException.class, () ->
                 tipPostValidationService.validateNotFoundUlid(nullUlid));
 
         // Not Found ULID
@@ -172,7 +171,7 @@ class TipPostValidationServiceTest implements TipPostRequestTestUtils, TipCatego
         when(tipPostRepository.existsByUlid(notFoundUlid)).thenReturn(false);
 
         // then
-        assertThrows(PostNotFoundException.class, () ->
+        assertThrows(CommunicationNotFoundException.class, () ->
                 tipPostValidationService.validateNotFoundUlid(notFoundUlid));
     }
 

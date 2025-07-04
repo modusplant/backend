@@ -1,8 +1,7 @@
 package kr.modusplant.domains.communication.conversation.domain.service;
 
-import kr.modusplant.domains.communication.common.error.LikeExistsException;
-import kr.modusplant.domains.communication.common.error.LikeNotFoundException;
-import kr.modusplant.domains.communication.common.error.PostNotFoundException;
+import kr.modusplant.domains.communication.common.error.CommunicationExistsException;
+import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvLikeRepository;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
@@ -38,7 +37,7 @@ class ConvLikeValidationServiceTest {
         when(convPostRepository.existsById(CONV_POST_ID)).thenReturn(false);
 
         assertThatThrownBy(() -> validationService.validateNotFoundConvPostOrMember(CONV_POST_ID, MEMBER_ID))
-                .isInstanceOf(PostNotFoundException.class);
+                .isInstanceOf(CommunicationNotFoundException.class);
     }
 
     @Test
@@ -57,7 +56,7 @@ class ConvLikeValidationServiceTest {
         when(convLikeRepository.existsByPostIdAndMemberId(CONV_POST_ID, MEMBER_ID)).thenReturn(false);
 
         assertThatThrownBy(() -> validationService.validateNotFoundConvLike(CONV_POST_ID, MEMBER_ID))
-                .isInstanceOf(LikeNotFoundException.class);
+                .isInstanceOf(CommunicationNotFoundException.class);
     }
 
     @Test
@@ -66,6 +65,6 @@ class ConvLikeValidationServiceTest {
         when(convLikeRepository.existsByPostIdAndMemberId(CONV_POST_ID, MEMBER_ID)).thenReturn(true);
 
         assertThatThrownBy(() -> validationService.validateExistedConvLike(CONV_POST_ID, MEMBER_ID))
-                .isInstanceOf(LikeExistsException.class);
+                .isInstanceOf(CommunicationExistsException.class);
     }
 }
