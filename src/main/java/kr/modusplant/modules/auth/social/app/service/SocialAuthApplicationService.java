@@ -2,6 +2,7 @@ package kr.modusplant.modules.auth.social.app.service;
 
 import kr.modusplant.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.domains.member.enums.AuthProvider;
+import kr.modusplant.domains.member.error.MemberNotFoundException;
 import kr.modusplant.domains.member.error.SiteMemberNotFoundException;
 import kr.modusplant.domains.member.error.SiteMemberRoleNotFoundException;
 import kr.modusplant.domains.member.mapper.SiteMemberAuthDomainInfraMapper;
@@ -78,12 +79,12 @@ public class SocialAuthApplicationService {
 
     private SiteMemberEntity getMemberEntityByUuid(UUID uuid) {
         return memberRepository.findByUuid(uuid)
-                .orElseThrow(SiteMemberNotFoundException::new);
+                .orElseThrow(MemberNotFoundException::ofMember);
     }
 
     private SiteMemberRoleEntity getMemberRoleEntityByMember(SiteMemberEntity memberEntity) {
         return memberRoleRepository.findByMember(memberEntity)
-                .orElseThrow(SiteMemberRoleNotFoundException::new);
+                .orElseThrow(MemberNotFoundException::ofMemberRole);
     }
 
     private SiteMemberEntity createSiteMember(String nickname) {
