@@ -6,6 +6,7 @@ import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.error.MemberExistsException;
+import kr.modusplant.domains.member.error.MemberNotFoundException;
 import kr.modusplant.domains.member.error.SiteMemberAuthExistsException;
 import kr.modusplant.domains.member.error.SiteMemberAuthNotFoundException;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
@@ -71,9 +72,9 @@ class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, Si
         given(memberAuthRepository.existsByOriginalMember(originalMemberEntity)).willReturn(false);
 
         // then
-        SiteMemberAuthNotFoundException notFoundException = assertThrows(SiteMemberAuthNotFoundException.class,
+        MemberNotFoundException notFoundException = assertThrows(MemberNotFoundException.class,
                 () -> memberAuthValidationService.validateNotFoundOriginalMemberUuid(memberAuthEntityUuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(new SiteMemberAuthNotFoundException().getMessage());
+        assertThat(notFoundException.getMessage()).isEqualTo(MemberNotFoundException.ofMemberAuth().getMessage());
     }
 
     @DisplayName("존재하지 않는 이메일 검증")
@@ -91,8 +92,8 @@ class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, Si
         given(memberAuthRepository.findByEmail(email)).willReturn(emptyList());
 
         // then
-        SiteMemberAuthNotFoundException notFoundException = assertThrows(SiteMemberAuthNotFoundException.class,
+        MemberNotFoundException notFoundException = assertThrows(MemberNotFoundException.class,
                 () -> memberAuthValidationService.validateNotFoundEmail(email));
-        assertThat(notFoundException.getMessage()).isEqualTo(new SiteMemberAuthNotFoundException().getMessage());
+        assertThat(notFoundException.getMessage()).isEqualTo(MemberNotFoundException.ofMemberAuth().getMessage());
     }
 }

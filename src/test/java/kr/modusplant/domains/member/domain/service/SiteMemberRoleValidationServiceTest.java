@@ -5,6 +5,8 @@ import kr.modusplant.domains.member.common.util.domain.SiteMemberRoleTestUtils;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberRoleEntityTestUtils;
+import kr.modusplant.domains.member.error.MemberExistsException;
+import kr.modusplant.domains.member.error.MemberNotFoundException;
 import kr.modusplant.domains.member.error.SiteMemberRoleExistsException;
 import kr.modusplant.domains.member.error.SiteMemberRoleNotFoundException;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
@@ -47,9 +49,9 @@ class SiteMemberRoleValidationServiceTest implements SiteMemberRoleTestUtils, Si
         given(memberRoleRepository.existsByUuid(memberEntityUuid)).willReturn(true);
 
         // then
-        SiteMemberRoleExistsException existsException = assertThrows(SiteMemberRoleExistsException.class,
+        MemberExistsException existsException = assertThrows(MemberExistsException.class,
                 () -> memberRoleValidationService.validateExistedUuid(memberEntityUuid));
-        assertThat(existsException.getMessage()).isEqualTo(new SiteMemberRoleExistsException().getMessage());
+        assertThat(existsException.getMessage()).isEqualTo(MemberExistsException.ofMemberRole().getMessage());
     }
 
     @DisplayName("존재하지 않는 회원 역할 UUID 검증")
@@ -64,8 +66,8 @@ class SiteMemberRoleValidationServiceTest implements SiteMemberRoleTestUtils, Si
         given(memberRoleRepository.existsByUuid(memberEntityUuid)).willReturn(false);
 
         // then
-        SiteMemberRoleNotFoundException notFoundException = assertThrows(SiteMemberRoleNotFoundException.class,
+        MemberNotFoundException notFoundException = assertThrows(MemberNotFoundException.class,
                 () -> memberRoleValidationService.validateNotFoundUuid(memberEntityUuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(new SiteMemberRoleNotFoundException().getMessage());
+        assertThat(notFoundException.getMessage()).isEqualTo(MemberNotFoundException.ofMemberRole().getMessage());
     }
 }

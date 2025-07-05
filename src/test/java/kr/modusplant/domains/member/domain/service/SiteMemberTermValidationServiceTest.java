@@ -3,6 +3,8 @@ package kr.modusplant.domains.member.domain.service;
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTermTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberTermEntityTestUtils;
+import kr.modusplant.domains.member.error.MemberExistsException;
+import kr.modusplant.domains.member.error.MemberNotFoundException;
 import kr.modusplant.domains.member.error.SiteMemberTermExistsException;
 import kr.modusplant.domains.member.error.SiteMemberTermNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberTermRepository;
@@ -37,9 +39,9 @@ class SiteMemberTermValidationServiceTest implements SiteMemberTermTestUtils, Si
         given(memberTermRepository.existsByUuid(uuid)).willReturn(true);
 
         // then
-        SiteMemberTermExistsException existsException = assertThrows(SiteMemberTermExistsException.class,
+        MemberExistsException existsException = assertThrows(MemberExistsException.class,
                 () -> memberTermValidationService.validateExistedUuid(uuid));
-        assertThat(existsException.getMessage()).isEqualTo(new SiteMemberTermExistsException().getMessage());
+        assertThat(existsException.getMessage()).isEqualTo(MemberExistsException.ofMemberTerm().getMessage());
     }
 
     @DisplayName("존재하지 않는 회원 약관 UUID 검증")
@@ -52,8 +54,8 @@ class SiteMemberTermValidationServiceTest implements SiteMemberTermTestUtils, Si
         given(memberTermRepository.existsByUuid(uuid)).willReturn(false);
 
         // then
-        SiteMemberTermNotFoundException notFoundException = assertThrows(SiteMemberTermNotFoundException.class,
+        MemberNotFoundException notFoundException = assertThrows(MemberNotFoundException.class,
                 () -> memberTermValidationService.validateNotFoundUuid(uuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(new SiteMemberTermNotFoundException().getMessage());
+        assertThat(notFoundException.getMessage()).isEqualTo(MemberNotFoundException.ofMemberTerm().getMessage());
     }
 }
