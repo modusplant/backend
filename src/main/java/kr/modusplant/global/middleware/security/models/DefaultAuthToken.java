@@ -8,17 +8,17 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 
 @Component
-public class SiteMemberAuthToken extends AbstractAuthenticationToken {
+public class DefaultAuthToken extends AbstractAuthenticationToken {
     private Object principal;
     private String credential;
 
-    protected SiteMemberAuthToken() {
+    protected DefaultAuthToken() {
         super(null);
         setAuthenticated(false);
     }
 
     // 인증 전
-    public SiteMemberAuthToken(String principal, String credential) {
+    public DefaultAuthToken(String principal, String credential) {
         super(null);
         this.principal = principal;
         this.credential = credential;
@@ -26,7 +26,7 @@ public class SiteMemberAuthToken extends AbstractAuthenticationToken {
     }
 
     // 인증 후
-    public SiteMemberAuthToken(UserDetails principal, Collection<? extends GrantedAuthority> authorities) {
+    public DefaultAuthToken(UserDetails principal, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
         this.principal = principal;
         this.credential = null;
@@ -42,4 +42,7 @@ public class SiteMemberAuthToken extends AbstractAuthenticationToken {
     public Object getCredentials() {
         return credential;
     }
+
+    @Override
+    public Collection<GrantedAuthority> getAuthorities() { return super.getAuthorities(); }
 }

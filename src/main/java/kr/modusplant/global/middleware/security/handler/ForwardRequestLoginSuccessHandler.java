@@ -7,7 +7,7 @@ import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.enums.Role;
-import kr.modusplant.global.middleware.security.models.SiteMemberUserDetails;
+import kr.modusplant.global.middleware.security.models.DefaultUserDetails;
 import kr.modusplant.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessH
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
-        SiteMemberUserDetails currentMember = (SiteMemberUserDetails) authentication.getPrincipal();
+        DefaultUserDetails currentMember = (DefaultUserDetails) authentication.getPrincipal();
 
         updateMemberLoggedInAt(currentMember.getActiveUuid());
 
@@ -43,8 +43,8 @@ public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessH
         request.getRequestDispatcher("/api/auth/login-success").forward(request, response);
     }
 
-    private Role getMemberRole(SiteMemberUserDetails memberUserDetails) {
-        GrantedAuthority memberRole = memberUserDetails.getAuthorities().stream()
+    private Role getMemberRole(DefaultUserDetails currentUserDetails) {
+        GrantedAuthority memberRole = currentUserDetails.getAuthorities().stream()
                 .filter(auth -> auth.getAuthority().startsWith("ROLE_"))
                 .findFirst().orElseThrow(() -> new IllegalArgumentException("인증된 유저에게 할당된 역할이 없습니다."));
 

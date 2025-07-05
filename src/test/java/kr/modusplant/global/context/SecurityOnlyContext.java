@@ -4,7 +4,7 @@ import kr.modusplant.global.config.TestJpaConfig;
 import kr.modusplant.global.config.TestRedisConfig;
 import kr.modusplant.global.config.TestS3Config;
 import kr.modusplant.global.config.TestSecurityConfig;
-import kr.modusplant.global.initializer.MockSecurityConfigInitializer;
+import kr.modusplant.global.initializer.MockPasswordEncoderInitializer;
 import kr.modusplant.modules.common.postprocessor.MockModulesRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.modules.common.postprocessor.MockModulesServiceBeanFactoryPostProcessor;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +15,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Controller;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -36,11 +35,9 @@ import static kr.modusplant.global.vo.Reference.NOTATION_GLOBAL;
                 TestSecurityConfig.class,
                 MockModulesRepositoryBeanFactoryPostProcessor.class,
                 MockModulesServiceBeanFactoryPostProcessor.class},
-        initializers = MockSecurityConfigInitializer.class
+        initializers = MockPasswordEncoderInitializer.class
 )
 @AutoConfigureMockMvc
-@Import({}
-)
 @ComponentScan(
         basePackages = NOTATION_GLOBAL,
         includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = {

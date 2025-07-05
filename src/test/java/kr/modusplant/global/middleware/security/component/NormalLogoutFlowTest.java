@@ -1,4 +1,4 @@
-package kr.modusplant.global.middleware.security.integration;
+package kr.modusplant.global.middleware.security.component;
 
 import kr.modusplant.global.context.SecurityOnlyContext;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;

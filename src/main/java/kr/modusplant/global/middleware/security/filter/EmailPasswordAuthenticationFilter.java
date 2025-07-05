@@ -3,14 +3,12 @@ package kr.modusplant.global.middleware.security.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.modusplant.global.middleware.security.models.SiteMemberAuthToken;
+import kr.modusplant.global.middleware.security.models.DefaultAuthToken;
 import kr.modusplant.modules.auth.normal.login.app.http.request.NormalLoginRequest;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -18,13 +16,13 @@ import org.springframework.validation.Validator;
 
 import java.io.IOException;
 
-public class NormalLoginFilter extends AbstractAuthenticationProcessingFilter {
+public class EmailPasswordAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     private final ObjectMapper objectMapper;
     private final Validator validator;
     private final AuthenticationManager authManager;
 
-    public NormalLoginFilter(
+    public EmailPasswordAuthenticationFilter(
             ObjectMapper objectMapper,
             Validator validator,
             AuthenticationManager authManager) {
@@ -44,16 +42,10 @@ public class NormalLoginFilter extends AbstractAuthenticationProcessingFilter {
             throw new IllegalArgumentException(result.getFieldError().getDefaultMessage());
         }
 
-        SiteMemberAuthToken requestToken = new SiteMemberAuthToken(
+        DefaultAuthToken requestToken = new DefaultAuthToken(
                 loginRequest.email(), loginRequest.password()
         );
 
-        Authentication authenticatedToken = authManager.authenticate(requestToken);
-
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(authenticatedToken);
-        SecurityContextHolder.setContext(context);
-
-        return authenticatedToken;
+        return authManager.authenticate(requestToken);
     }
 }

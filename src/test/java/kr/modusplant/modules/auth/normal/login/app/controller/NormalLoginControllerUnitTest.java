@@ -1,9 +1,6 @@
 package kr.modusplant.modules.auth.normal.login.app.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -24,11 +21,6 @@ public class NormalLoginControllerUnitTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Mock
-    private HttpServletRequest testRequest;
-
-    @InjectMocks
-    private NormalLoginController normalLoginController = new NormalLoginController();
 
     public static ResultMatcher matchCookie(String name, String value,
                                             String path, int maxAge,
@@ -48,15 +40,11 @@ public class NormalLoginControllerUnitTest {
         // given
         String testAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwianRpIjoiYWJjMTIzeHl6NDU2IiwiZXhwIjoxNjM4NzY4MDIyLCJpYXQiOjE2MzYxNzYwMjJ9.7Qm6ZxQz3XW6J8KvY1lTn4RfG2HsPpLq1DwYb5Nv0eE";
         String testRefreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
-        long testAccessTokenExpirationTime = 1000L;
-        long testRefreshTokenExpirationTime = 1300L;
 
         // when
         mockMvc.perform(post("/api/auth/login-success")
                         .requestAttr("accessToken", testAccessToken)
-                        .requestAttr("refreshToken", testRefreshToken)
-                        .requestAttr("accessTokenExpirationTime", testAccessTokenExpirationTime)
-                        .requestAttr("refreshTokenExpirationTime", testRefreshTokenExpirationTime))
+                        .requestAttr("refreshToken", testRefreshToken))
 
                 // then
                 .andExpect(status().isOk())

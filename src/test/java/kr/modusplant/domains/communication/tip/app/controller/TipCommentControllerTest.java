@@ -1,6 +1,8 @@
 package kr.modusplant.domains.communication.tip.app.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import kr.modusplant.domains.common.context.DomainsControllerOnlyContext;
 import kr.modusplant.domains.communication.tip.app.http.request.TipCommentInsertRequest;
 import kr.modusplant.domains.communication.tip.app.http.response.TipCommentResponse;
@@ -12,13 +14,16 @@ import kr.modusplant.domains.communication.tip.common.util.domain.TipPostTestUti
 import kr.modusplant.domains.communication.tip.common.util.entity.TipCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.tip.common.util.entity.TipPostEntityTestUtils;
 import kr.modusplant.domains.communication.tip.persistence.entity.TipPostEntity;
+import kr.modusplant.domains.member.common.util.domain.SiteMemberRoleTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
+import kr.modusplant.modules.jwt.app.service.TokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -33,12 +38,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DomainsControllerOnlyContext
 public class TipCommentControllerTest implements
         TipCommentResponseTestUtils, TipCommentInsertRequestTestUtils, TipCommentTestUtils,
-        TipCategoryEntityTestUtils, TipPostEntityTestUtils, TipPostTestUtils {
+        TipCategoryEntityTestUtils, TipPostEntityTestUtils, TipPostTestUtils, SiteMemberRoleTestUtils {
 
     private final MockMvc mockMvc;
 
     @Spy
     private final TipCommentApplicationService commentApplicationService;
+
+    @MockitoBean
+    private TokenProvider tokenProvider;
 
     @Autowired
     public TipCommentControllerTest(MockMvc mockMvc, TipCommentApplicationService commentApplicationService) {
@@ -152,15 +160,23 @@ public class TipCommentControllerTest implements
     void insertTipCommentTest() throws Exception {
         // given
         ObjectMapper objectMapper = new ObjectMapper();
+        String rawAccessToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+        Claims accessTokenClaims = Jwts.claims()
+                .subject(memberBasicUserWithUuid.getUuid().toString())
+                .add("nickname", memberBasicUserWithUuid.getNickname())
+                .add("roles", memberRoleUser.getRole())
+                .build();
         TipCommentInsertRequest insertRequest = createTipCommentInsertRequest(postEntity.getUlid());
         TipCommentResponse commentResponse =
                 createTipCommentResponse(postEntity.getUlid(), memberEntity.getUuid(), memberEntity.getNickname());
 
         // when
+        given(tokenProvider.getClaimsFromToken(rawAccessToken.substring(7))).willReturn(accessTokenClaims);
         given(commentApplicationService.insert(insertRequest, memberEntity.getUuid())).willReturn(commentResponse);
 
         // then
         mockMvc.perform(post("/api/v1/tip/comments", insertRequest)
+                        .header("Authorization", rawAccessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(insertRequest)).characterEncoding("UTF-8"))
 

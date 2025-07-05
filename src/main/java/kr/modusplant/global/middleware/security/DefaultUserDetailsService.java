@@ -14,7 +14,7 @@ import kr.modusplant.domains.member.mapper.SiteMemberRoleDomainInfraMapper;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleRepository;
-import kr.modusplant.global.middleware.security.models.SiteMemberUserDetails;
+import kr.modusplant.global.middleware.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,7 +26,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class SiteMemberUserDetailsService implements UserDetailsService {
+public class DefaultUserDetailsService implements UserDetailsService {
 
     private final SiteMemberValidationService memberValidationService;
     private final SiteMemberAuthValidationService memberAuthValidationService;
@@ -41,7 +41,7 @@ public class SiteMemberUserDetailsService implements UserDetailsService {
     private final SiteMemberRoleRepository memberRoleRepository;
 
     @Override
-    public SiteMemberUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public DefaultUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         memberAuthValidationService.validateNotFoundEmailAndAuthProvider(email, AuthProvider.BASIC);
         SiteMemberAuth memberAuth = memberAuthDomainInfraMapper.toSiteMemberAuth(
@@ -55,7 +55,7 @@ public class SiteMemberUserDetailsService implements UserDetailsService {
         SiteMemberRole memberRole = memberRoleDomainInfraMapper.toSiteMemberRole(
                 memberRoleRepository.findByUuid(memberAuth.getActiveMemberUuid()).orElseThrow());
 
-        return SiteMemberUserDetails.builder()
+        return DefaultUserDetails.builder()
                 .email(memberAuth.getEmail())
                 .password(memberAuth.getPw())
                 .activeUuid(memberAuth.getActiveMemberUuid())

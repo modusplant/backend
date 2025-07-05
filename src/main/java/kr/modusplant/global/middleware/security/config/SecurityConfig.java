@@ -3,22 +3,21 @@ package kr.modusplant.global.middleware.security.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.global.advice.GlobalExceptionHandler;
-import kr.modusplant.global.middleware.security.SiteMemberAuthProvider;
-import kr.modusplant.global.middleware.security.SiteMemberUserDetailsService;
-import kr.modusplant.global.middleware.security.filter.NormalLoginFilter;
-import kr.modusplant.global.middleware.security.handler.ForwardRequestLoginSuccessHandler;
-import kr.modusplant.global.middleware.security.handler.ForwardRequestLogoutSuccessHandler;
-import kr.modusplant.global.middleware.security.handler.JwtClearingLogoutHandler;
-import kr.modusplant.global.middleware.security.handler.WriteResponseLoginFailureHandler;
+import kr.modusplant.global.middleware.security.DefaultAuthProvider;
+import kr.modusplant.global.middleware.security.DefaultAuthenticationEntryPoint;
+import kr.modusplant.global.middleware.security.DefaultUserDetailsService;
+import kr.modusplant.global.middleware.security.filter.EmailPasswordAuthenticationFilter;
+import kr.modusplant.global.middleware.security.filter.JwtAuthenticationFilter;
+import kr.modusplant.global.middleware.security.handler.*;
 import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
+import kr.modusplant.modules.jwt.app.service.TokenProvider;
+import kr.modusplant.modules.jwt.persistence.repository.TokenRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -44,18 +43,23 @@ public class SecurityConfig {
     private Boolean debugEnabled;
 
     private final AuthenticationConfiguration authConfiguration;
-    private final GlobalExceptionHandler globalExceptionHandler;
-    private final SiteMemberUserDetailsService memberUserDetailsService;
+    private final DefaultUserDetailsService defaultUserDetailsService;
+    private final ObjectMapper objectMapper;
+    private final TokenProvider tokenProvider;
     private final TokenApplicationService tokenApplicationService;
     private final SiteMemberValidationService memberValidationService;
     private final SiteMemberRepository memberRepository;
-    private final ObjectMapper objectMapper;
     private final Validator validator;
+    private final TokenRedisRepository tokenRedisRepository;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.debug(debugEnabled);
     }
+
+    @Bean
+    public DefaultAuthenticationEntryPoint defaultAuthenticationEntryPoint() {
+        return new DefaultAuthenticationEntryPoint(objectMapper); }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -68,17 +72,17 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationProvider siteMemberAuthProvider() {
-        return new SiteMemberAuthProvider(memberUserDetailsService, passwordEncoder());
+    public DefaultAuthProvider siteMemberAuthProvider() {
+        return new DefaultAuthProvider(defaultUserDetailsService, passwordEncoder());
     }
 
     @Bean
-    public ForwardRequestLoginSuccessHandler normalLoginSuccessHandler() {
+    public ForwardRequestLoginSuccessHandler forwardRequestLoginSuccessHandler() {
         return new ForwardRequestLoginSuccessHandler(memberRepository, memberValidationService, tokenApplicationService);
     }
 
     @Bean
-    public WriteResponseLoginFailureHandler normalLoginFailureHandler() {
+    public WriteResponseLoginFailureHandler writeResponseLoginFailureHandler() {
         return new WriteResponseLoginFailureHandler(objectMapper);
     }
 
@@ -91,19 +95,33 @@ public class SecurityConfig {
         return new ForwardRequestLogoutSuccessHandler(objectMapper); }
 
     @Bean
-    public NormalLoginFilter normalLoginFilter(HttpSecurity http) {
+    public JwtAuthenticationFilter jwtAuthenticationFilter(HttpSecurity http) {
         try {
-            NormalLoginFilter normalLoginFilter = new NormalLoginFilter(
-                    new ObjectMapper(), validator, authenticationManager());
-
-            normalLoginFilter.setAuthenticationManager(authenticationManager());
-            normalLoginFilter.setAuthenticationSuccessHandler(normalLoginSuccessHandler());
-            normalLoginFilter.setAuthenticationFailureHandler(normalLoginFailureHandler());
-
-            return normalLoginFilter;
+            return new JwtAuthenticationFilter(tokenProvider, defaultAuthenticationEntryPoint(), tokenRedisRepository);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Bean
+    public EmailPasswordAuthenticationFilter emailPasswordAuthenticationFilter(HttpSecurity http) {
+        try {
+            EmailPasswordAuthenticationFilter filter = new EmailPasswordAuthenticationFilter(
+                    objectMapper, validator, authenticationManager());
+
+            filter.setAuthenticationManager(authenticationManager());
+            filter.setAuthenticationSuccessHandler(forwardRequestLoginSuccessHandler());
+            filter.setAuthenticationFailureHandler(writeResponseLoginFailureHandler());
+
+            return filter;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Bean
+    public DefaultAccessDeniedHandler defaultAccessDeniedHandler() {
+        return new DefaultAccessDeniedHandler(objectMapper);
     }
 
     @Bean
@@ -111,7 +129,8 @@ public class SecurityConfig {
         http
                 .securityMatcher("/api/**")
                 .cors(Customizer.withDefaults())
-                .addFilterBefore(normalLoginFilter(http), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(emailPasswordAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter(http), EmailPasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/v1/conversation/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/qna/**").permitAll()
@@ -121,7 +140,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/kakao/social-login").permitAll()
                         .requestMatchers("/api/auth/google/social-login").permitAll()
                         .requestMatchers("/api/members/register").permitAll()
-                        .requestMatchers("/api/example").hasRole("ADMIN")
+                        .requestMatchers("/api/monitor/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(siteMemberAuthProvider())
@@ -130,15 +149,13 @@ public class SecurityConfig {
                         .clearAuthentication(true)
                         .addLogoutHandler(JwtClearingLogoutHandler())
                         .logoutSuccessHandler(normalLogoutSuccessHandler()))
+                .exceptionHandling(eh ->
+                        eh.authenticationEntryPoint(defaultAuthenticationEntryPoint())
+                                .accessDeniedHandler(defaultAccessDeniedHandler())
+                )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(eh ->
-                        eh.authenticationEntryPoint((request, response, authException) ->
-                                        globalExceptionHandler.handleGenericException(request, authException))
-                                .accessDeniedHandler((request, response, accessDeniedException) ->
-                                        globalExceptionHandler.handleGenericException(request, accessDeniedException))
-                )
                 .headers(headers -> headers
                         .httpStrictTransportSecurity(hsts -> hsts
                                 .includeSubDomains(true)

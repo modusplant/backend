@@ -4,8 +4,8 @@ import kr.modusplant.global.middleware.security.error.BannedException;
 import kr.modusplant.global.middleware.security.error.DeletedException;
 import kr.modusplant.global.middleware.security.error.DisabledByLinkingException;
 import kr.modusplant.global.middleware.security.error.InactiveException;
-import kr.modusplant.global.middleware.security.models.SiteMemberAuthToken;
-import kr.modusplant.global.middleware.security.models.SiteMemberUserDetails;
+import kr.modusplant.global.middleware.security.models.DefaultAuthToken;
+import kr.modusplant.global.middleware.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,9 +14,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @RequiredArgsConstructor
-public class SiteMemberAuthProvider implements AuthenticationProvider {
+public class DefaultAuthProvider implements AuthenticationProvider {
 
-    private final SiteMemberUserDetailsService memberUserDetailsService;
+    private final DefaultUserDetailsService defaultUserDetailsService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -24,21 +24,21 @@ public class SiteMemberAuthProvider implements AuthenticationProvider {
         String email = authentication.getPrincipal().toString();
         String password = authentication.getCredentials().toString();
 
-        SiteMemberUserDetails userDetails = memberUserDetailsService.loadUserByUsername(email);
+        DefaultUserDetails userDetails = defaultUserDetailsService.loadUserByUsername(email);
 
-        if(validateSiteMemberUserDetails(userDetails, password)) {
-            return new SiteMemberAuthToken(userDetails, userDetails.getAuthorities());
+        if(validateDefaultUserDetails(userDetails, password)) {
+            return new DefaultAuthToken(userDetails, userDetails.getAuthorities());
         } else {
-            return new SiteMemberAuthToken(email, password);
+            return new DefaultAuthToken(email, password);
         }
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return SiteMemberAuthToken.class.isAssignableFrom(authentication);
+        return DefaultAuthToken.class.isAssignableFrom(authentication);
     }
 
-    private boolean validateSiteMemberUserDetails(SiteMemberUserDetails userDetails, String password) {
+    private boolean validateDefaultUserDetails(DefaultUserDetails userDetails, String password) {
         if(!passwordEncoder.matches(password, userDetails.getPassword())) {
             throw new BadCredentialsException("비밀번호가 틀렸습니다."); }
         if (userDetails.isDisabledByLinking()) {
