@@ -1,5 +1,7 @@
 package kr.modusplant.domains.member.domain.service;
 
+import kr.modusplant.domains.member.error.MemberExistsException;
+import kr.modusplant.domains.member.error.MemberNotFoundException;
 import kr.modusplant.domains.member.error.SiteMemberTermExistsException;
 import kr.modusplant.domains.member.error.SiteMemberTermNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberTermRepository;
@@ -19,13 +21,13 @@ public class SiteMemberTermValidationService {
 
     public void validateExistedUuid(UUID uuid) {
         if (memberTermRepository.existsByUuid(uuid)) {
-            throw new SiteMemberTermExistsException();
+            throw MemberExistsException.ofMemberTerm();
         }
     }
 
     public void validateNotFoundUuid(UUID uuid) {
         if (uuid == null || !memberTermRepository.existsByUuid(uuid)) {
-            throw new SiteMemberTermNotFoundException();
+            throw MemberNotFoundException.ofMemberTerm();
         }
     }
 }

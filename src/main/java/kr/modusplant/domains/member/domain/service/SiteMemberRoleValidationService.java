@@ -1,5 +1,7 @@
 package kr.modusplant.domains.member.domain.service;
 
+import kr.modusplant.domains.member.error.MemberExistsException;
+import kr.modusplant.domains.member.error.MemberNotFoundException;
 import kr.modusplant.domains.member.error.SiteMemberRoleExistsException;
 import kr.modusplant.domains.member.error.SiteMemberRoleNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleRepository;
@@ -19,13 +21,13 @@ public class SiteMemberRoleValidationService {
 
     public void validateExistedUuid(UUID uuid) {
         if (memberRoleRepository.existsByUuid(uuid)) {
-            throw new SiteMemberRoleExistsException();
+            throw MemberExistsException.ofMemberRole();
         }
     }
 
     public void validateNotFoundUuid(UUID uuid) {
         if (uuid == null || !memberRoleRepository.existsByUuid(uuid)) {
-            throw new SiteMemberRoleNotFoundException();
+            throw MemberNotFoundException.ofMemberRole();
         }
     }
 }

@@ -1,6 +1,8 @@
 package kr.modusplant.domains.member.domain.service;
 
 import kr.modusplant.domains.member.enums.AuthProvider;
+import kr.modusplant.domains.member.error.MemberExistsException;
+import kr.modusplant.domains.member.error.MemberNotFoundException;
 import kr.modusplant.domains.member.error.SiteMemberAuthExistsException;
 import kr.modusplant.domains.member.error.SiteMemberAuthNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
@@ -25,7 +27,7 @@ public class SiteMemberAuthValidationService {
             return;
         }
         if (memberAuthRepository.existsByOriginalMember(memberRepository.findByUuid(uuid).orElseThrow())) {
-            throw new SiteMemberAuthExistsException();
+            throw MemberExistsException.ofMemberAuth();
         }
     }
 
@@ -34,28 +36,28 @@ public class SiteMemberAuthValidationService {
             return;
         }
         if (memberAuthRepository.findByEmailAndProvider(email, authProvider).isPresent()) {
-            throw new SiteMemberAuthExistsException();
+            throw MemberExistsException.ofMemberAuth();
         }
     }
 
     public void validateNotFoundEmailAndAuthProvider(String email, AuthProvider authProvider) {
         if (email == null || authProvider == null) {
-            throw new SiteMemberAuthNotFoundException();
+            throw MemberNotFoundException.ofMemberAuth();
         }
         if (memberAuthRepository.findByEmailAndProvider(email, authProvider).isEmpty()) {
-            throw new SiteMemberAuthNotFoundException();
+            throw MemberNotFoundException.ofMemberAuth();
         }
     }
 
     public void validateNotFoundOriginalMemberUuid(UUID uuid) {
         if (uuid == null || !memberAuthRepository.existsByOriginalMember(memberRepository.findByUuid(uuid).orElseThrow())) {
-            throw new SiteMemberAuthNotFoundException();
+            throw MemberNotFoundException.ofMemberAuth();
         }
     }
 
     public void validateNotFoundEmail(String email) {
         if (!memberAuthRepository.existsByEmail(email)) {
-            throw new SiteMemberAuthNotFoundException();
+            throw MemberNotFoundException.ofMemberAuth();
         }
     }
 }
