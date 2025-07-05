@@ -2,6 +2,7 @@ package kr.modusplant.modules.auth.email.app.service;
 
 import kr.modusplant.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.domains.member.domain.service.SiteMemberAuthValidationService;
+import kr.modusplant.domains.member.error.MemberNotFoundException;
 import kr.modusplant.domains.member.error.SiteMemberAuthNotFoundException;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
@@ -124,11 +125,11 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
         EmailRequest request = new EmailRequest();
         String email = "notExistsEmail@gmail.com";
         setField(request, "email", email);
-        doThrow(new SiteMemberAuthNotFoundException()).when(siteMemberAuthValidationService).validateNotFoundEmail(email);
+        doThrow(MemberNotFoundException.ofMemberAuth()).when(siteMemberAuthValidationService).validateNotFoundEmail(email);
 
         // when/then
         assertThatThrownBy(() -> emailAuthService.sendResetPasswordCode(request))
-                .isInstanceOf(SiteMemberAuthNotFoundException.class);
+                .isInstanceOf(MemberNotFoundException.class);
     }
 
     @Test
