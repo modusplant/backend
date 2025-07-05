@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import kr.modusplant.domains.common.enums.FileType;
 import kr.modusplant.domains.common.enums.PostType;
+import kr.modusplant.domains.common.error.UnsupportedFileException;
 import kr.modusplant.global.app.service.S3FileService;
 import kr.modusplant.global.persistence.generator.UlidIdGenerator;
 import lombok.RequiredArgsConstructor;
@@ -59,7 +60,7 @@ public class MultipartDataProcessor {
             node.put(TYPE, fileType.getValue());
             node.put(SRC, fileKey);
         } else {
-            throw new IllegalArgumentException("지원되지 않는 파일 타입입니다.");
+            throw new UnsupportedFileException();
         }
         return node;
     }
