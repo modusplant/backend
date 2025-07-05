@@ -38,7 +38,8 @@ public enum ErrorCode {
     EMPTY_POSTULID_INPUT(HttpStatus.BAD_REQUEST, "empty_postulid_input", "게시글 ulid의 값이 비어 있습니다"),
     EMPTY_PATH_INPUT(HttpStatus.BAD_REQUEST, "empty_path_input", "경로의 값이 비어 있습니다"),
 
-    UNSUPPORTED_FILE(HttpStatus.NOT_ACCEPTABLE, "unsupported_file", "지원되지 않는 파일 타입입니다");
+    UNSUPPORTED_FILE(HttpStatus.NOT_ACCEPTABLE, "unsupported_file", "지원되지 않는 파일 타입입니다"),
+    SPECIFIED_SORTING_METHOD(HttpStatus.BAD_REQUEST, "specified_sorting_method", "페이지 정렬 방식은 지정되지 않아야 합니다");
 
     // auth errors
 
