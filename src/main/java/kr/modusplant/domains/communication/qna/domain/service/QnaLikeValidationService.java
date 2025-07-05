@@ -4,6 +4,7 @@ import kr.modusplant.domains.communication.common.error.CommunicationExistsExcep
 import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaLikeRepository;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaPostRepository;
+import kr.modusplant.domains.member.error.MemberNotFoundException;
 import kr.modusplant.domains.member.error.SiteMemberNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class QnaLikeValidationService {
             throw CommunicationNotFoundException.ofPost();
         }
         if (!memberRepository.existsById(memberId)) {
-            throw new SiteMemberNotFoundException();
+            throw MemberNotFoundException.ofMember();
         }
     }
 

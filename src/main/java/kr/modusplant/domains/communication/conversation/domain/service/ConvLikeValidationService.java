@@ -4,6 +4,7 @@ import kr.modusplant.domains.communication.common.error.CommunicationExistsExcep
 import kr.modusplant.domains.communication.common.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvLikeRepository;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostRepository;
+import kr.modusplant.domains.member.error.MemberNotFoundException;
 import kr.modusplant.domains.member.error.SiteMemberNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class ConvLikeValidationService {
             throw CommunicationNotFoundException.ofPost();
         }
         if (!memberRepository.existsById(memberId)) {
-            throw new SiteMemberNotFoundException();
+            throw MemberNotFoundException.ofMember();
         }
     }
 
