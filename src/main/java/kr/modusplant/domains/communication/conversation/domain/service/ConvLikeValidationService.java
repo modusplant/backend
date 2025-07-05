@@ -5,7 +5,6 @@ import kr.modusplant.domains.communication.common.error.CommunicationNotFoundExc
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvLikeRepository;
 import kr.modusplant.domains.communication.conversation.persistence.repository.ConvPostRepository;
 import kr.modusplant.domains.member.error.MemberNotFoundException;
-import kr.modusplant.domains.member.error.SiteMemberNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

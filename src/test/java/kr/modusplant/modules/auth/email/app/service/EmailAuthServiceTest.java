@@ -3,7 +3,6 @@ package kr.modusplant.modules.auth.email.app.service;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.domains.member.domain.service.SiteMemberAuthValidationService;
 import kr.modusplant.domains.member.error.MemberNotFoundException;
-import kr.modusplant.domains.member.error.SiteMemberAuthNotFoundException;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;

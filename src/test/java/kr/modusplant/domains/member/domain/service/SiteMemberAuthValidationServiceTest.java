@@ -7,8 +7,6 @@ import kr.modusplant.domains.member.common.util.entity.SiteMemberAuthEntityTestU
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.error.MemberExistsException;
 import kr.modusplant.domains.member.error.MemberNotFoundException;
-import kr.modusplant.domains.member.error.SiteMemberAuthExistsException;
-import kr.modusplant.domains.member.error.SiteMemberAuthNotFoundException;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;

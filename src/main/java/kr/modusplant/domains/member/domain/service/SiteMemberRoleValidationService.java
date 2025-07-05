@@ -2,8 +2,6 @@ package kr.modusplant.domains.member.domain.service;
 
 import kr.modusplant.domains.member.error.MemberExistsException;
 import kr.modusplant.domains.member.error.MemberNotFoundException;
-import kr.modusplant.domains.member.error.SiteMemberRoleExistsException;
-import kr.modusplant.domains.member.error.SiteMemberRoleNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;

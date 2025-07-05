@@ -5,8 +5,6 @@ import kr.modusplant.domains.member.common.util.domain.SiteMemberTermTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberTermEntityTestUtils;
 import kr.modusplant.domains.member.error.MemberExistsException;
 import kr.modusplant.domains.member.error.MemberNotFoundException;
-import kr.modusplant.domains.member.error.SiteMemberTermExistsException;
-import kr.modusplant.domains.member.error.SiteMemberTermNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberTermRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

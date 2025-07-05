@@ -6,8 +6,6 @@ import kr.modusplant.domains.communication.common.error.CommunicationNotFoundExc
 import kr.modusplant.domains.communication.qna.common.util.app.http.response.QnaCategoryResponseTestUtils;
 import kr.modusplant.domains.communication.qna.common.util.entity.QnaCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.qna.persistence.repository.QnaCategoryRepository;
-import kr.modusplant.global.enums.ErrorCode;
-import kr.modusplant.global.vo.EntityName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

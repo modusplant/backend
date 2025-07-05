@@ -1,7 +1,6 @@
 package kr.modusplant.modules.jwt.app.service;
 
 import kr.modusplant.domains.member.error.MemberNotFoundException;
-import kr.modusplant.domains.member.error.SiteMemberNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.modules.jwt.mapper.RefreshTokenAppInfraMapper;

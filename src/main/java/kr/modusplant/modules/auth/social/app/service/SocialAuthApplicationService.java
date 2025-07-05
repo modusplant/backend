@@ -3,8 +3,6 @@ package kr.modusplant.modules.auth.social.app.service;
 import kr.modusplant.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.domains.member.error.MemberNotFoundException;
-import kr.modusplant.domains.member.error.SiteMemberNotFoundException;
-import kr.modusplant.domains.member.error.SiteMemberRoleNotFoundException;
 import kr.modusplant.domains.member.mapper.SiteMemberAuthDomainInfraMapper;
 import kr.modusplant.domains.member.mapper.SiteMemberAuthDomainInfraMapperImpl;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;

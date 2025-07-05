@@ -7,8 +7,6 @@ import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils
 import kr.modusplant.domains.member.common.util.entity.SiteMemberRoleEntityTestUtils;
 import kr.modusplant.domains.member.error.MemberExistsException;
 import kr.modusplant.domains.member.error.MemberNotFoundException;
-import kr.modusplant.domains.member.error.SiteMemberRoleExistsException;
-import kr.modusplant.domains.member.error.SiteMemberRoleNotFoundException;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleRepository;
