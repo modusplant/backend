@@ -6,9 +6,10 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import kr.modusplant.domains.common.error.InvalidInputException;
+import kr.modusplant.global.error.InvalidInputException;
 import kr.modusplant.modules.auth.email.app.http.request.VerifyEmailRequest;
 import kr.modusplant.modules.jwt.error.InvalidTokenException;
+import kr.modusplant.modules.jwt.error.TokenExpiredException;
 import kr.modusplant.modules.jwt.error.TokenKeyCreationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -184,7 +185,7 @@ public class TokenProvider {
                 throw InvalidInputException.email();
             }
         } catch (ExpiredJwtException e) {
-            throw new IllegalStateException("토큰이 만료되었습니다.");
+            throw new TokenExpiredException();
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
