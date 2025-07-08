@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import kr.modusplant.domains.common.enums.FileType;
-import kr.modusplant.domains.common.enums.PostType;
 import kr.modusplant.global.app.service.S3FileService;
 import kr.modusplant.global.persistence.generator.UlidIdGenerator;
 import lombok.RequiredArgsConstructor;
@@ -30,17 +29,17 @@ public class MultipartDataProcessor {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final UlidIdGenerator generator = new UlidIdGenerator();
 
-    public JsonNode saveFilesAndGenerateContentJson(PostType postType, List<MultipartFile> parts) throws IOException {
+    public JsonNode saveFilesAndGenerateContentJson(List<MultipartFile> parts) throws IOException {
         String fileUlid = generator.generate(null, null, null, EventType.INSERT);
         ArrayNode contentArray = objectMapper.createArrayNode();
         int order = 1;
         for (MultipartFile part:parts) {
-            contentArray.add(convertSinglePartToJson(postType, fileUlid, part, order++));
+            contentArray.add(convertSinglePartToJson(fileUlid, part, order++));
         }
         return contentArray;
     }
 
-    private ObjectNode convertSinglePartToJson(PostType postType, String fileUlid, MultipartFile part, int order) throws IOException {
+    private ObjectNode convertSinglePartToJson(String fileUlid, MultipartFile part, int order) throws IOException {
         String contentType = part.getContentType();
         String filename = part.getOriginalFilename();
 
@@ -54,7 +53,7 @@ public class MultipartDataProcessor {
             node.put(TYPE, fileType.getValue());
             node.put(DATA, text);
         } else if (fileType.getUploadable()) {
-            String fileKey = generateFileKey(postType, fileUlid, fileType, filename, order);
+            String fileKey = generateFileKey(fileUlid, fileType, filename, order);
             s3FileService.uploadFile(part, fileKey);
             node.put(TYPE, fileType.getValue());
             node.put(SRC, fileKey);
@@ -64,9 +63,9 @@ public class MultipartDataProcessor {
         return node;
     }
 
-    private String generateFileKey(PostType postType, String fileUlid, FileType fileType, String originalFilename, int order) {
-        // {tip/qna/conv}-post/{RAMDOM UlID}/{fileType}/{fileName}
-        String directory = postType.getValue() + "/" + fileUlid + "/" + fileType.getValue() + "/";
+    private String generateFileKey(String fileUlid, FileType fileType, String originalFilename, int order) {
+        // post/{RAMDOM UlID}/{fileType}/{fileName}
+        String directory = "post/" + fileUlid + "/" + fileType.getValue() + "/";
 
         String ext = "";
         int i = originalFilename.lastIndexOf('.');

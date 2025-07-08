@@ -3,12 +3,12 @@ package kr.modusplant.global.middleware.security.component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import kr.modusplant.domains.communication.conversation.app.http.request.ConvCommentInsertRequest;
-import kr.modusplant.domains.communication.conversation.app.http.response.ConvCommentResponse;
-import kr.modusplant.domains.communication.conversation.app.service.ConvCommentApplicationService;
-import kr.modusplant.domains.communication.conversation.common.util.app.http.request.ConvCommentInsertRequestTestUtils;
-import kr.modusplant.domains.communication.conversation.common.util.app.http.response.ConvCommentResponseTestUtils;
-import kr.modusplant.domains.communication.conversation.common.util.domain.ConvPostTestUtils;
+import kr.modusplant.domains.communication.app.http.request.CommCommentInsertRequest;
+import kr.modusplant.domains.communication.app.http.response.CommCommentResponse;
+import kr.modusplant.domains.communication.app.service.CommCommentApplicationService;
+import kr.modusplant.domains.communication.common.util.app.http.request.CommCommentInsertRequestTestUtils;
+import kr.modusplant.domains.communication.common.util.app.http.response.CommCommentResponseTestUtils;
+import kr.modusplant.domains.communication.common.util.domain.CommPostTestUtils;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberRoleTestUtils;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.global.middleware.security.config.SecurityConfig;
@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(SecurityConfig.class)
 public class AuthorizationFlowTest implements
         SiteMemberTestUtils, SiteMemberRoleTestUtils,
-        ConvCommentInsertRequestTestUtils, ConvPostTestUtils, ConvCommentResponseTestUtils {
+        CommCommentInsertRequestTestUtils, CommPostTestUtils, CommCommentResponseTestUtils {
 
     @Autowired
     private MockMvc mockMvc;
@@ -47,7 +47,7 @@ public class AuthorizationFlowTest implements
     private TokenProvider tokenProvider;
 
     @MockitoBean
-    private ConvCommentApplicationService convCommentApplicationService;
+    private CommCommentApplicationService commCommentApplicationService;
 
     @MockitoBean
     private TokenRedisRepository tokenRedisRepository;
@@ -68,19 +68,19 @@ public class AuthorizationFlowTest implements
     @Test
     public void givenMatchingRole_willReturnSuccessResponse() throws Exception {
         // given
-        ConvCommentInsertRequest commentInsertRequest =
-                createConvCommentInsertRequest(testConvPostWithUlid.getUlid());
-        ConvCommentResponse commentResponse = createConvCommentResponse(
-                testConvPostWithUlid.getUlid(), memberBasicUserWithUuid.getUuid(), memberBasicUserWithUuid.getNickname()
+        CommCommentInsertRequest commentInsertRequest =
+                createCommCommentInsertRequest(TEST_COMM_POST_WITH_ULID.getUlid());
+        CommCommentResponse commentResponse = createCommCommentResponse(
+                TEST_COMM_POST_WITH_ULID.getUlid(), memberBasicUserWithUuid.getUuid(), memberBasicUserWithUuid.getNickname()
         );
 
         given(tokenRedisRepository.isBlacklisted(rawAccessToken.substring(7))).willReturn(false);
         given(tokenProvider.validateToken(rawAccessToken.substring(7))).willReturn(true);
         given(tokenProvider.getClaimsFromToken(rawAccessToken.substring(7))).willReturn(accessTokenClaims);
-        given(convCommentApplicationService.insert(commentInsertRequest, memberBasicUserWithUuid.getUuid())).willReturn(commentResponse);
+        given(commCommentApplicationService.insert(commentInsertRequest, memberBasicUserWithUuid.getUuid())).willReturn(commentResponse);
 
         // when
-        mockMvc.perform(post("/api/v1/conversation/comments")
+        mockMvc.perform(post("/api/v1/communication/comments")
                         .header("Authorization", rawAccessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(commentInsertRequest)).characterEncoding("UTF-8"))

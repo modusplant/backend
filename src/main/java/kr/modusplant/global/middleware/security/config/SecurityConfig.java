@@ -132,9 +132,7 @@ public class SecurityConfig {
                 .addFilterBefore(emailPasswordAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(http), EmailPasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/api/v1/conversation/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/qna/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/tip/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/communication/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/terms/**").permitAll()
                         .requestMatchers("/api/members/verify-email/send/**").permitAll()
                         .requestMatchers("/api/auth/kakao/social-login").permitAll()
