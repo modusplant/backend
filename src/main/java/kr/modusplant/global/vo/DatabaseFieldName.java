@@ -5,7 +5,8 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DatabaseFieldName {
-    public static final String CATE_UUID = "cate_uuid";
+    public static final String PRI_CATE_UUID = "pri_cate_uuid";
+    public static final String SECO_CATE_UUID = "seco_cate_uuid";
     public static final String CREATED_AT = "created_at";
     public static final String IS_DELETED = "is_deleted";
     public static final String LAST_MODIFIED_AT = "last_modified_at";

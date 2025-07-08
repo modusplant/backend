@@ -1,0 +1,101 @@
+package kr.modusplant.domains.communication.domain.service;
+
+import kr.modusplant.domains.common.persistence.repository.supers.UuidPrimaryKeyRepository;
+import kr.modusplant.domains.communication.app.http.request.CommPostInsertRequest;
+import kr.modusplant.domains.communication.app.http.request.CommPostUpdateRequest;
+import kr.modusplant.domains.communication.app.http.request.FileOrder;
+import kr.modusplant.domains.communication.error.CategoryNotFoundException;
+import kr.modusplant.domains.communication.error.PostAccessDeniedException;
+import kr.modusplant.domains.communication.error.PostNotFoundException;
+import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
+import kr.modusplant.domains.communication.persistence.repository.CommPostRepository;
+import kr.modusplant.domains.communication.persistence.repository.CommSecondaryCategoryRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+public class CommPostValidationService {
+
+    private final CommPostRepository commPostRepository;
+    private final CommSecondaryCategoryRepository commCategoryRepository;
+
+    public void validateCommPostInsertRequest(CommPostInsertRequest request) {
+        validateNotFoundCategoryUuid(request.primaryCategoryUuid(), commCategoryRepository);
+        validateContentAndOrderInfo(request.content(),request.orderInfo());
+    }
+
+    public void validateCommPostUpdateRequest(CommPostUpdateRequest request) {
+        validateNotFoundCategoryUuid(request.primaryCategoryUuid(), commCategoryRepository);
+        validateContentAndOrderInfo(request.content(),request.orderInfo());
+    }
+
+    public void validateAccessibleCommPost(String ulid, UUID memberUuid) {
+        CommPostEntity commPost = findIfExistsByUlid(ulid);
+        validateMemberHasPostAccess(commPost,memberUuid);
+    }
+
+    public void validateNotFoundUlid(String ulid) {
+        if (ulid == null || !commPostRepository.existsByUlid(ulid)) {
+            throw new PostNotFoundException();
+        }
+    }
+
+    private CommPostEntity findIfExistsByUlid(String ulid) {
+        if (ulid == null) {
+            throw new PostNotFoundException();
+        }
+        return commPostRepository.findByUlidAndIsDeletedFalse(ulid)
+                .orElseThrow(PostNotFoundException::new);
+    }
+
+    // TODO : Spring Security 적용 후 PreAuthorize 고려
+    private void validateMemberHasPostAccess(CommPostEntity commPost, UUID memberUuid) {
+        if(!commPost.getAuthMember().getUuid().equals(memberUuid)) {
+            throw new PostAccessDeniedException();
+        }
+    }
+
+    private void validateNotFoundCategoryUuid(UUID categoryUuid, UuidPrimaryKeyRepository<?> categoryRepository) {
+        if (categoryUuid == null || !categoryRepository.existsByUuid(categoryUuid)) {
+            throw new CategoryNotFoundException();
+        }
+    }
+
+    private void validateContentAndOrderInfo(List<MultipartFile> content, List<FileOrder> orderInfo) {
+        if (isContentNotValid(content,orderInfo)) {
+            throw new IllegalArgumentException("컨텐츠 또는 순서 정보가 비어 있거나 그들의 파일명의 크기 혹은 순서가 일치하지 않습니다.");
+        }
+    }
+
+    private boolean isContentNotValid(List<MultipartFile> content, List<FileOrder> orderInfo) {
+        if(content.size() != orderInfo.size()) {
+            return true;
+        }
+
+        List<String> contentFilenames = new ArrayList<>(content.size());
+        for(MultipartFile part:content) {
+            String fileName = part.getOriginalFilename();
+            String contentType = part.getContentType();
+            if (fileName.isEmpty() || fileName.isBlank() || contentType.isEmpty() || contentType.isBlank()) {
+                return true;
+            }
+            contentFilenames.add(fileName);
+        }
+
+        List<String> orderFilenames = orderInfo.stream()
+                .sorted(Comparator.comparingInt(FileOrder::order))
+                .map(FileOrder::filename)
+                .toList();
+
+        return !contentFilenames.equals(orderFilenames);
+    }
+}

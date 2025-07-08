@@ -3,7 +3,9 @@ package kr.modusplant.modules.jwt.persistence.repository;
 import kr.modusplant.global.middleware.redis.RedisHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
 import java.time.Duration;
+
 import static kr.modusplant.global.common.util.EncryptUtils.encryptWithSha256;
 
 @Repository

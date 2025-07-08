@@ -2,8 +2,7 @@ package kr.modusplant.domains.common.app.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.common.enums.FileType;
-import kr.modusplant.domains.common.enums.PostType;
-import kr.modusplant.domains.communication.tip.common.util.app.http.request.TipPostRequestTestUtils;
+import kr.modusplant.domains.communication.common.util.app.http.request.CommPostRequestTestUtils;
 import kr.modusplant.global.app.service.S3FileService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,7 +29,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class MultipartDataProcessorTest implements TipPostRequestTestUtils {
+class MultipartDataProcessorTest implements CommPostRequestTestUtils {
     @Mock
     private S3FileService s3FileService;
 
@@ -41,14 +40,14 @@ class MultipartDataProcessorTest implements TipPostRequestTestUtils {
     @DisplayName("멀티파트 데이터를 저장하고 Json 반환값 받기")
     void saveFilesAndGenerateContentJsonTestSuccess() throws IOException {
         // given
-        String regex = PostType.TIP_POST.getValue()+ "/[a-zA-Z0-9]{26}/";
+        String regex = "post/[a-zA-Z0-9]{26}/";
         doNothing().when(s3FileService).uploadFile(eq(imageFile), anyString());
         doNothing().when(s3FileService).uploadFile(eq(videoFile), anyString());
         doNothing().when(s3FileService).uploadFile(eq(audioFile), anyString());
         doNothing().when(s3FileService).uploadFile(eq(applicationFile), anyString());
 
         // when
-        JsonNode result = multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.TIP_POST,allMediaFiles);
+        JsonNode result = multipartDataProcessor.saveFilesAndGenerateContentJson(allMediaFiles);
 
         // then
         assertThat(result.size()).isEqualTo(allMediaFiles.size());
@@ -93,7 +92,7 @@ class MultipartDataProcessorTest implements TipPostRequestTestUtils {
 
         // when
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.QNA_POST,fontFiles));
+                () -> multipartDataProcessor.saveFilesAndGenerateContentJson(fontFiles));
         assertThat(exception.getMessage()).isEqualTo("지원되지 않는 파일 타입입니다.");
     }
 
@@ -102,7 +101,7 @@ class MultipartDataProcessorTest implements TipPostRequestTestUtils {
     void convertFileSrcToBinaryDataTest() throws IOException {
         // given
         List<MultipartFile> imageFiles = List.of(imageFile);
-        JsonNode content = multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.CONV_POST,imageFiles);
+        JsonNode content = multipartDataProcessor.saveFilesAndGenerateContentJson(imageFiles);
         given(s3FileService.downloadFile(content.get(0).get(SRC).asText())).willReturn(jpegData);
 
         // when
@@ -121,9 +120,9 @@ class MultipartDataProcessorTest implements TipPostRequestTestUtils {
 
     @Test
     @DisplayName("저장된 파일 경로로 파일 삭제")
-    void deletefilesTest() throws IOException {
+    void deleteFilesTest() throws IOException {
         // given
-        JsonNode content = multipartDataProcessor.saveFilesAndGenerateContentJson(PostType.CONV_POST,textImageFiles);
+        JsonNode content = multipartDataProcessor.saveFilesAndGenerateContentJson(textImageFiles);
         doNothing().when(s3FileService).deleteFiles(content.get(1).get(SRC).asText());
 
         // when
