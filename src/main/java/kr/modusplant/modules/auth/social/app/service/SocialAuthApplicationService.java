@@ -15,6 +15,7 @@ import kr.modusplant.global.enums.Role;
 import kr.modusplant.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.modules.auth.social.app.dto.supers.SocialUserInfo;
 import kr.modusplant.modules.auth.social.app.service.supers.SocialAuthClient;
+import kr.modusplant.modules.auth.social.error.UnsupportedSocialProviderException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +47,7 @@ public class SocialAuthApplicationService {
         return switch (provider) {
             case KAKAO -> kakaoAuthClient;
             case GOOGLE -> googleAuthClient;
-            default -> throw new IllegalArgumentException("이 방법은 지원되지 않습니다.");
+            default -> throw new UnsupportedSocialProviderException();
         };
     }
 
