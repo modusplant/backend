@@ -38,14 +38,18 @@ public enum ErrorCode {
     EMPTY_POSTULID_INPUT(HttpStatus.BAD_REQUEST, "empty_postulid_input", "게시글 ulid의 값이 비어 있습니다"),
     EMPTY_PATH_INPUT(HttpStatus.BAD_REQUEST, "empty_path_input", "경로의 값이 비어 있습니다"),
 
-    UNSUPPORTED_FILE(HttpStatus.NOT_ACCEPTABLE, "unsupported_file", "지원되지 않는 파일 타입입니다"),
+    UNSUPPORTED_FILE(HttpStatus.FORBIDDEN, "unsupported_file", "지원되지 않는 파일 타입입니다"),
+    UNSUPPORTED_SOCIAL_PROVIDER(HttpStatus.FORBIDDEN, "unsupported_social_provider", "지원되지 않는 소셜 로그인 방식입니다"),
+    // TODO: 인가 과정에서 내부적으로 완료되지 못한 예외 코드들은 "서버가 잘못했다"는 하나의 코드로 통일할 것.
+    UNSUPPORTED_ALGORITHM(HttpStatus.FORBIDDEN, "unsupported_algorithm", "지원되지 않는 알고리즘입니다"),
+
     SPECIFIED_SORTING_METHOD(HttpStatus.BAD_REQUEST, "specified_sorting_method", "페이지 정렬 방식은 지정되지 않아야 합니다"),
 
     // auth errors
     INVALID_EMAIL_VERIFY_CODE(HttpStatus.FORBIDDEN, "invalid_email_verify_code", "이메일의 검증 코드가 올바르지 않습니다"),
     INVALID_EMAIL(HttpStatus.FORBIDDEN, "invalid_email", "이메일이 올바르지 않습니다"),
 
-    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "token_expired", "토큰이 만료되었습니다");
+    CREDENTIAL_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "credential_not_authorized", "인증에 필요한 데이터가 없거나 유효하지 않습니다");
 
     private final HttpStatus httpStatus;
     private final String code;

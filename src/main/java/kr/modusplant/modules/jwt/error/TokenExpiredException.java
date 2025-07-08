@@ -4,6 +4,6 @@ import kr.modusplant.global.enums.ErrorCode;
 
 public class TokenExpiredException extends AuthTokenException {
     public TokenExpiredException() {
-        super(ErrorCode.TOKEN_EXPIRED);
+        super(ErrorCode.CREDENTIAL_NOT_AUTHORIZED);
     }
 }
