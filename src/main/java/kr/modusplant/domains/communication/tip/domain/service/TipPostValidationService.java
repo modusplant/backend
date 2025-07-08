@@ -38,15 +38,12 @@ public class TipPostValidationService extends AbstractPostValidationService {
     }
 
     public void validateNotFoundUlid(String ulid) {
-        if (ulid == null || !tipPostRepository.existsByUlid(ulid)) {
+        if (!tipPostRepository.existsByUlid(ulid)) {
             throw CommunicationNotFoundException.ofPost();
         }
     }
 
     private TipPostEntity findIfExistsByUlid(String ulid) {
-        if (ulid == null) {
-            throw CommunicationNotFoundException.ofPost();
-        }
         return tipPostRepository.findByUlidAndIsDeletedFalse(ulid)
                 .orElseThrow(CommunicationNotFoundException::ofPost);
     }

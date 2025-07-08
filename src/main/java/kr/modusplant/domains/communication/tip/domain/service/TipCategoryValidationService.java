@@ -19,9 +19,6 @@ public class TipCategoryValidationService {
     private final TipCategoryRepository tipCategoryRepository;
 
     public void validateExistedOrder(Integer order) {
-        if (order == null) {
-            return;
-        }
         if (tipCategoryRepository.existsByOrder(order)) {
             throw CommunicationExistsException.ofCategory();
         }
@@ -34,7 +31,7 @@ public class TipCategoryValidationService {
     }
 
     public void validateNotFoundUuid(UUID uuid) {
-        if (uuid == null || !tipCategoryRepository.existsByUuid(uuid)) {
+        if (!tipCategoryRepository.existsByUuid(uuid)) {
             throw CommunicationNotFoundException.ofCategory();
         }
     }

@@ -21,10 +21,6 @@ public class TipLikeValidationService {
     private final TipLikeRepository tipLikeRepository;
 
     public void validateNotFoundTipPostOrMember(String postId, UUID memberId) {
-        if (postId == null || memberId == null) {
-            throw new IllegalArgumentException("게시글 또는 회원 입력 창이 비어 있습니다.");
-        }
-
         if (!tipPostRepository.existsById(postId)) {
             throw CommunicationNotFoundException.ofPost();
         }
