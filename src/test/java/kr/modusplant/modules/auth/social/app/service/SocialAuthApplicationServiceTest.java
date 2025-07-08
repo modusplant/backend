@@ -12,11 +12,13 @@ import kr.modusplant.domains.member.persistence.entity.SiteMemberRoleEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleRepository;
+import kr.modusplant.global.enums.ErrorCode;
 import kr.modusplant.global.enums.Role;
 import kr.modusplant.modules.auth.social.app.dto.GoogleUserInfo;
 import kr.modusplant.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.modules.auth.social.app.dto.KakaoUserInfo;
 import kr.modusplant.modules.auth.social.app.dto.supers.SocialUserInfo;
+import kr.modusplant.modules.auth.social.error.UnsupportedSocialProviderException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -116,8 +118,8 @@ class SocialAuthApplicationServiceTest implements SiteMemberEntityTestUtils, Sit
     void handleSocialLoginUnsupportedProviderTest() {
         // when & then
         assertThatThrownBy(() -> socialAuthApplicationService.handleSocialLogin(AuthProvider.BASIC, code))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("이 방법은 지원되지 않습니다.");
+                .isInstanceOf(UnsupportedSocialProviderException.class)
+                .hasMessage(ErrorCode.UNSUPPORTED_SOCIAL_PROVIDER.getMessage());
     }
 
     @Test
