@@ -44,7 +44,7 @@ class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSec
     @DisplayName("컨텐츠 게시글 추가/수정 시 CommPostRequest는 유효한 입력")
     void validateCommPostInsertRequestTestSuccess() {
         // given & when
-        when(commCategoryRepository.existsByUuid(requestBasicTypes.categoryUuid())).thenReturn(true);
+        when(commCategoryRepository.existsByUuid(requestBasicTypes.primaryCategoryUuid())).thenReturn(true);
 
         // then
         assertDoesNotThrow(() -> commPostValidationService.validateCommPostInsertRequest(requestBasicTypes));
@@ -56,12 +56,13 @@ class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSec
         // given & when
         CommPostInsertRequest commPostInsertRequest = new CommPostInsertRequest(
                 UUID.randomUUID(),
+                UUID.randomUUID(),
                 "유용한 컨텐츠 모음",
                 allMediaFiles,
                 allMediaFilesOrder
         );
 
-        when(commCategoryRepository.existsByUuid(commPostInsertRequest.categoryUuid())).thenReturn(false);
+        when(commCategoryRepository.existsByUuid(commPostInsertRequest.primaryCategoryUuid())).thenReturn(false);
 
         // then
         assertThrows(CategoryNotFoundException.class,
@@ -74,12 +75,13 @@ class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSec
         // given & when
         CommPostInsertRequest commPostInsertRequest = new CommPostInsertRequest(
                 UUID.randomUUID(),
+                UUID.randomUUID(),
                 "유용한 컨텐츠 모음",
                 textImageFiles,
                 imageTextFilesOrder
         );
 
-        when(commCategoryRepository.existsByUuid(commPostInsertRequest.categoryUuid())).thenReturn(true);
+        when(commCategoryRepository.existsByUuid(commPostInsertRequest.primaryCategoryUuid())).thenReturn(true);
 
         // then
         assertThrows(IllegalArgumentException.class,
@@ -95,7 +97,7 @@ class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSec
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         CommPostEntity commPostEntity = CommPostEntity.builder()
                 .authMember(memberEntity)
-                .category(mock(CommSecondaryCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
+                .secondaryCategory(mock(CommSecondaryCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
                 .createMember(memberEntity)
                 .likeCount(0)
                 .viewCount(0L)
@@ -130,7 +132,7 @@ class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSec
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         CommPostEntity commPostEntity = CommPostEntity.builder()
                 .authMember(memberEntity)
-                .category(mock(CommSecondaryCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
+                .secondaryCategory(mock(CommSecondaryCategoryEntity.class)) // 다른 필드도 필요시 같이 mock 처리
                 .createMember(memberEntity)
                 .likeCount(0)
                 .viewCount(0L)

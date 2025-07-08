@@ -3,8 +3,10 @@ package kr.modusplant.domains.communication.persistence.repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import kr.modusplant.domains.communication.common.util.entity.CommPostEntityTestUtils;
+import kr.modusplant.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
+import kr.modusplant.domains.communication.persistence.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
@@ -27,27 +29,31 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RepositoryOnlyContext
-class CommPostRepositoryTest implements CommPostEntityTestUtils, CommSecondaryCategoryEntityTestUtils, SiteMemberEntityTestUtils {
+class CommPostRepositoryTest implements CommPostEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils, SiteMemberEntityTestUtils {
     private final CommPostRepository commPostRepository;
-    private final CommSecondaryCategoryRepository commCategoryRepository;
+    private final CommPrimaryCategoryRepository commPrimaryCategoryRepository;
+    private final CommSecondaryCategoryRepository commSecondaryCategoryRepository;
     private final SiteMemberRepository siteMemberRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Autowired
-    CommPostRepositoryTest(CommPostRepository commPostRepository, CommSecondaryCategoryRepository commCategoryRepository, SiteMemberRepository siteMemberRepository) {
+    CommPostRepositoryTest(CommPostRepository commPostRepository, CommPrimaryCategoryRepository commPrimaryCategoryRepository, CommSecondaryCategoryRepository commSecondaryCategoryRepository, SiteMemberRepository siteMemberRepository) {
         this.commPostRepository = commPostRepository;
-        this.commCategoryRepository = commCategoryRepository;
+        this.commPrimaryCategoryRepository = commPrimaryCategoryRepository;
+        this.commSecondaryCategoryRepository = commSecondaryCategoryRepository;
         this.siteMemberRepository = siteMemberRepository;
     }
 
-    private CommSecondaryCategoryEntity testCommCategory;
+    private CommPrimaryCategoryEntity testCommPrimaryCategory;
+    private CommSecondaryCategoryEntity testCommSecondaryCategory;
     private SiteMemberEntity testSiteMember;
 
     @BeforeEach
     void setUp() {
-        testCommCategory = commCategoryRepository.save(createTestCommSecondaryCategoryEntity());
+        testCommPrimaryCategory = commPrimaryCategoryRepository.save(createTestCommPrimaryCategoryEntity());
+        testCommSecondaryCategory = commSecondaryCategoryRepository.save(createTestCommSecondaryCategoryEntity());
         testSiteMember = siteMemberRepository.save(createMemberBasicUserEntity());
     }
 
@@ -56,7 +62,8 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommSecondaryCa
     void findByUlidTest() {
         // given
         CommPostEntity commPostEntity = createCommPostEntityBuilder()
-                .category(testCommCategory)
+                .primaryCategory(testCommPrimaryCategory)
+                .secondaryCategory(testCommSecondaryCategory)
                 .authMember(testSiteMember)
                 .createMember(testSiteMember)
                 .build();
@@ -75,7 +82,8 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommSecondaryCa
         // given
         List<CommPostEntity> commPosts = IntStream.range(0, 10)
                 .mapToObj(i -> createCommPostEntityBuilder()
-                        .category(testCommCategory)
+                        .primaryCategory(testCommPrimaryCategory)
+                        .secondaryCategory(testCommSecondaryCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -105,7 +113,8 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommSecondaryCa
         // given
         List<CommPostEntity> commPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createCommPostEntityBuilder()
-                        .category(testCommCategory)
+                        .primaryCategory(testCommPrimaryCategory)
+                        .secondaryCategory(testCommSecondaryCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -130,14 +139,15 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommSecondaryCa
     }
 
     @Test
-    @DisplayName("카테고리로 삭제되지 않은 모든 컨텐츠 게시글 찾기(최신순)")
-    void findByCategoryAndIsDeletedFalseOrderByCreatedAtDescTest() {
+    @DisplayName("1차 항목으로 삭제되지 않은 모든 컨텐츠 게시글 찾기(최신순)")
+    void findByPrimaryCategoryAndIsDeletedFalseOrderByCreatedAtDescTest() {
         // given
-        CommSecondaryCategoryEntity testOtherGroup = commCategoryRepository.save(
-                CommSecondaryCategoryEntity.builder().order(3).category("기타").build());
+        CommPrimaryCategoryEntity testOtherGroup = commPrimaryCategoryRepository.save(
+                CommPrimaryCategoryEntity.builder().order(3).category("기타").build());
         List<CommPostEntity> commPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createCommPostEntityBuilder()
-                        .category(i % 2 == 0 ? testCommCategory : testOtherGroup)
+                        .primaryCategory(i % 2 == 0 ? testCommPrimaryCategory : testOtherGroup)
+                        .secondaryCategory(testCommSecondaryCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -148,12 +158,46 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommSecondaryCa
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // when
-        Page<CommPostEntity> result = commPostRepository.findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(testCommCategory, pageable);
+        Page<CommPostEntity> result = commPostRepository.findByPrimaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(testCommPrimaryCategory, pageable);
 
         // then
         // i = 0, 2, 4 → testCommCategory로 생성됨 (0번은 삭제됨)
         assertThat(result.getTotalElements()).isEqualTo(2);
-        assertThat(result.getContent().stream().allMatch(post -> post.getCategory().equals(testCommCategory) && !post.getIsDeleted())).isTrue();
+        assertThat(result.getContent().stream().allMatch(post -> post.getPrimaryCategory().equals(testCommPrimaryCategory) && !post.getIsDeleted())).isTrue();
+
+        List<CommPostEntity> content = result.getContent();
+        for (int i = 0; i < content.size() - 1; i++) {
+            assertThat(content.get(i).getCreatedAt())
+                    .isAfterOrEqualTo(content.get(i + 1).getCreatedAt());
+        }
+    }
+
+    @Test
+    @DisplayName("2차 항목으로 삭제되지 않은 모든 컨텐츠 게시글 찾기(최신순)")
+    void findBySecondaryCategoryAndIsDeletedFalseOrderByCreatedAtDescTest() {
+        // given
+        CommSecondaryCategoryEntity testOtherGroup = commSecondaryCategoryRepository.save(
+                CommSecondaryCategoryEntity.builder().order(3).category("기타").build());
+        List<CommPostEntity> commPosts = IntStream.range(0, 5)
+                .mapToObj(i -> createCommPostEntityBuilder()
+                        .primaryCategory(testCommPrimaryCategory)
+                        .secondaryCategory(i % 2 == 0 ? testCommSecondaryCategory : testOtherGroup)
+                        .authMember(testSiteMember)
+                        .createMember(testSiteMember)
+                        .build()
+                ).collect(Collectors.toList());
+        commPosts.getFirst().updateIsDeleted(true);
+        commPostRepository.saveAll(commPosts);
+
+        Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        // when
+        Page<CommPostEntity> result = commPostRepository.findBySecondaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(testCommSecondaryCategory, pageable);
+
+        // then
+        // i = 0, 2, 4 → testCommCategory로 생성됨 (0번은 삭제됨)
+        assertThat(result.getTotalElements()).isEqualTo(2);
+        assertThat(result.getContent().stream().allMatch(post -> post.getSecondaryCategory().equals(testCommSecondaryCategory) && !post.getIsDeleted())).isTrue();
 
         List<CommPostEntity> content = result.getContent();
         for (int i = 0; i < content.size() - 1; i++) {
@@ -169,7 +213,8 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommSecondaryCa
         SiteMemberEntity testSiteMember2 = siteMemberRepository.save(createMemberGoogleUserEntity());
         List<CommPostEntity> commPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createCommPostEntityBuilder()
-                        .category(testCommCategory)
+                        .primaryCategory(testCommPrimaryCategory)
+                        .secondaryCategory(testCommSecondaryCategory)
                         .authMember(i % 2 == 0 ? testSiteMember : testSiteMember2)
                         .createMember(i % 2 == 0 ? testSiteMember : testSiteMember2)
                         .build()
@@ -201,7 +246,8 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommSecondaryCa
         // when
         CommPostEntity commPostEntity = commPostRepository.save(
                 createCommPostEntityBuilder()
-                        .category(testCommCategory)
+                        .primaryCategory(testCommPrimaryCategory)
+                        .secondaryCategory(testCommSecondaryCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -217,7 +263,8 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommSecondaryCa
         // when
         CommPostEntity commPostEntity = commPostRepository.save(
                 createCommPostEntityBuilder()
-                        .category(testCommCategory)
+                        .primaryCategory(testCommPrimaryCategory)
+                        .secondaryCategory(testCommSecondaryCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -233,7 +280,8 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommSecondaryCa
         // given
         CommPostEntity commPostEntity = commPostRepository.save(
                 createCommPostEntityBuilder()
-                        .category(testCommCategory)
+                        .primaryCategory(testCommPrimaryCategory)
+                        .secondaryCategory(testCommSecondaryCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -253,7 +301,8 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommSecondaryCa
         // when
         CommPostEntity commPostEntity = commPostRepository.save(
                 createCommPostEntityBuilder()
-                        .category(testCommCategory)
+                        .primaryCategory(testCommPrimaryCategory)
+                        .secondaryCategory(testCommSecondaryCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
@@ -269,14 +318,16 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommSecondaryCa
         // given
         CommPostEntity commPostEntity1 = commPostRepository.save(
                 createCommPostEntityBuilder()
-                        .category(testCommCategory)
+                        .primaryCategory(testCommPrimaryCategory)
+                        .secondaryCategory(testCommSecondaryCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build()
         );
         CommPostEntity commPostEntity2 = commPostRepository.save(
                 createCommPostEntityBuilder()
-                        .category(testCommCategory)
+                        .primaryCategory(testCommPrimaryCategory)
+                        .secondaryCategory(testCommSecondaryCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .isDeleted(true)
@@ -299,7 +350,8 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommSecondaryCa
         // given
         commPostRepository.save(
                 createCommPostEntityBuilder()
-                        .category(testCommCategory)
+                        .primaryCategory(testCommPrimaryCategory)
+                        .secondaryCategory(testCommSecondaryCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .build());
@@ -323,7 +375,8 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommSecondaryCa
         // given
         CommPostEntity commPostEntity = commPostRepository.save(
                 createCommPostEntityBuilder()
-                        .category(testCommCategory)
+                        .primaryCategory(testCommPrimaryCategory)
+                        .secondaryCategory(testCommSecondaryCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .viewCount(10L)
@@ -346,7 +399,8 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommSecondaryCa
         // given
         CommPostEntity commPostEntity = commPostRepository.save(
                 createCommPostEntityBuilder()
-                        .category(testCommCategory)
+                        .primaryCategory(testCommPrimaryCategory)
+                        .secondaryCategory(testCommSecondaryCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
                         .viewCount(10L)

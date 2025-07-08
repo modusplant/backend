@@ -62,7 +62,7 @@ public class CommCommentControllerTest implements
         memberEntity = createMemberBasicUserEntityWithUuid();
         postEntity = createCommPostEntityBuilder()
                 .ulid(TEST_COMM_POST_WITH_ULID.getUlid())
-                .category(createTestCommSecondaryCategoryEntityWithUuid())
+                .secondaryCategory(createTestCommSecondaryCategoryEntityWithUuid())
                 .authMember(memberEntity)
                 .createMember(memberEntity)
                 .likeCount(1)

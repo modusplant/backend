@@ -12,7 +12,9 @@ import java.util.UUID;
 public class CommPost {
     private final String ulid;
 
-    private final UUID categoryUuid;
+    private final UUID primaryCategoryUuid;
+
+    private final UUID secondaryCategoryUuid;
 
     private final UUID authMemberUuid;
 
@@ -30,7 +32,8 @@ public class CommPost {
 
     public static class CommPostBuilder {
         private String ulid;
-        private UUID categoryUuid;
+        private UUID primaryCategoryUuid;
+        private UUID secondaryCategoryUuid;
         private UUID authMemberUuid;
         private UUID createMemberUuid;
         private Integer likeCount;
@@ -41,7 +44,8 @@ public class CommPost {
 
         public CommPostBuilder commPost(CommPost commPost) {
             this.ulid = commPost.ulid;
-            this.categoryUuid = commPost.categoryUuid;
+            this.primaryCategoryUuid = commPost.primaryCategoryUuid;
+            this.secondaryCategoryUuid = commPost.secondaryCategoryUuid;
             this.authMemberUuid = commPost.authMemberUuid;
             this.createMemberUuid = commPost.createMemberUuid;
             this.likeCount = commPost.likeCount;
@@ -53,8 +57,7 @@ public class CommPost {
         }
 
         public CommPost build() {
-            return new CommPost(this.ulid, this.categoryUuid, this.authMemberUuid, this.createMemberUuid, this.likeCount, this.viewCount, this.title, this.content, this.isDeleted);
+            return new CommPost(this.ulid, this.primaryCategoryUuid, this.secondaryCategoryUuid, this.authMemberUuid, this.createMemberUuid, this.likeCount, this.viewCount, this.title, this.content, this.isDeleted);
         }
     }
-
 }

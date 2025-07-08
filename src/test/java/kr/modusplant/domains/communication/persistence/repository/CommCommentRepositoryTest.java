@@ -2,9 +2,11 @@ package kr.modusplant.domains.communication.persistence.repository;
 
 import kr.modusplant.domains.communication.common.util.entity.CommCommentEntityTestUtils;
 import kr.modusplant.domains.communication.common.util.entity.CommPostEntityTestUtils;
+import kr.modusplant.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.persistence.entity.CommCommentEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
+import kr.modusplant.domains.communication.persistence.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
@@ -21,18 +23,20 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RepositoryOnlyContext
 public class CommCommentRepositoryTest implements
-        CommCommentEntityTestUtils, CommSecondaryCategoryEntityTestUtils, CommPostEntityTestUtils, SiteMemberEntityTestUtils {
+        CommCommentEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils, CommPostEntityTestUtils, SiteMemberEntityTestUtils {
 
     private final CommCommentRepository commentRepository;
-    private final CommSecondaryCategoryRepository categoryRepository;
+    private final CommPrimaryCategoryRepository primaryCategoryRepository;
+    private final CommSecondaryCategoryRepository secondaryCategoryRepository;
     private final CommPostRepository postRepository;
     private final SiteMemberRepository memberRepository;
 
     @Autowired
-    public CommCommentRepositoryTest(CommCommentRepository commentRepository, CommSecondaryCategoryRepository categoryRepository,
+    public CommCommentRepositoryTest(CommCommentRepository commentRepository, CommPrimaryCategoryRepository primaryCategoryRepository, CommSecondaryCategoryRepository secondaryCategoryRepository,
                                      CommPostRepository postRepository, SiteMemberRepository memberRepository) {
         this.commentRepository = commentRepository;
-        this.categoryRepository = categoryRepository;
+        this.primaryCategoryRepository = primaryCategoryRepository;
+        this.secondaryCategoryRepository = secondaryCategoryRepository;
         this.postRepository = postRepository;
         this.memberRepository = memberRepository;
     }
@@ -43,9 +47,11 @@ public class CommCommentRepositoryTest implements
     @BeforeEach
     void setUp() {
         SiteMemberEntity member = createMemberBasicUserEntity();
-        CommSecondaryCategoryEntity category = categoryRepository.save(createTestCommSecondaryCategoryEntity());
+        CommPrimaryCategoryEntity primaryCategory = primaryCategoryRepository.save(createTestCommPrimaryCategoryEntity());
+        CommSecondaryCategoryEntity secondaryCategory = secondaryCategoryRepository.save(createTestCommSecondaryCategoryEntity());
         CommPostEntity postEntity = createCommPostEntityBuilder()
-                .category(category)
+                .primaryCategory(primaryCategory)
+                .secondaryCategory(secondaryCategory)
                 .authMember(member)
                 .createMember(member)
                 .likeCount(1)

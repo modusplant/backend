@@ -2,10 +2,13 @@ package kr.modusplant.domains.communication.mapper;
 
 import kr.modusplant.domains.communication.app.http.response.CommPostResponse;
 import kr.modusplant.domains.communication.common.util.entity.CommPostEntityTestUtils;
+import kr.modusplant.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
+import kr.modusplant.domains.communication.persistence.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.domains.communication.persistence.repository.CommPostRepository;
+import kr.modusplant.domains.communication.persistence.repository.CommPrimaryCategoryRepository;
 import kr.modusplant.domains.communication.persistence.repository.CommSecondaryCategoryRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
@@ -18,16 +21,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RepositoryOnlyContext
-class CommPostAppInfraMapperTest implements CommPostEntityTestUtils, CommSecondaryCategoryEntityTestUtils, SiteMemberEntityTestUtils {
+class CommPostAppInfraMapperTest implements CommPostEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils, SiteMemberEntityTestUtils {
     private final CommPostAppInfraMapper commPostAppInfraMapper = new CommPostAppInfraMapperImpl();
     private final SiteMemberRepository siteMemberRepository;
-    private final CommSecondaryCategoryRepository commCategoryRepository;
+    private final CommPrimaryCategoryRepository commPrimaryCategoryRepository;
+    private final CommSecondaryCategoryRepository commSecondaryCategoryRepository;
     private final CommPostRepository commPostRepository;
 
     @Autowired
-    CommPostAppInfraMapperTest(SiteMemberRepository siteMemberRepository, CommSecondaryCategoryRepository commCategoryRepository, CommPostRepository commPostRepository){
+    CommPostAppInfraMapperTest(SiteMemberRepository siteMemberRepository, CommPrimaryCategoryRepository commPrimaryCategoryRepository, CommSecondaryCategoryRepository commSecondaryCategoryRepository, CommPostRepository commPostRepository){
         this.siteMemberRepository = siteMemberRepository;
-        this.commCategoryRepository = commCategoryRepository;
+        this.commPrimaryCategoryRepository = commPrimaryCategoryRepository;
+        this.commSecondaryCategoryRepository = commSecondaryCategoryRepository;
         this.commPostRepository = commPostRepository;
     }
 
@@ -35,11 +40,13 @@ class CommPostAppInfraMapperTest implements CommPostEntityTestUtils, CommSeconda
     @DisplayName("엔티티를 응답으로 전환")
     void toCommPostResponseTest() {
         // given
-        CommSecondaryCategoryEntity commSecondaryCategoryEntity = commCategoryRepository.save(createTestCommSecondaryCategoryEntity());
+        CommPrimaryCategoryEntity commPrimaryCategoryEntity = commPrimaryCategoryRepository.save(createTestCommPrimaryCategoryEntity());
+        CommSecondaryCategoryEntity commSecondaryCategoryEntity = commSecondaryCategoryRepository.save(createTestCommSecondaryCategoryEntity());
         SiteMemberEntity siteMemberEntity = siteMemberRepository.save(createMemberBasicUserEntity());
         CommPostEntity commPostEntity = commPostRepository.save(
                 createCommPostEntityBuilder()
-                        .category(commSecondaryCategoryEntity)
+                        .primaryCategory(commPrimaryCategoryEntity)
+                        .secondaryCategory(commSecondaryCategoryEntity)
                         .authMember(siteMemberEntity)
                         .createMember(siteMemberEntity)
                         .build()
@@ -49,8 +56,12 @@ class CommPostAppInfraMapperTest implements CommPostEntityTestUtils, CommSeconda
         CommPostResponse commPostResponse = commPostAppInfraMapper.toCommPostResponse(commPostEntity);
 
         // then
-        assertThat(commPostResponse.categoryUuid()).isEqualTo(commPostEntity.getCategory().getUuid());
-        assertThat(commPostResponse.category()).isEqualTo(commPostEntity.getCategory().getCategory());
+        assertThat(commPostResponse.primaryCategory()).isEqualTo(commPostEntity.getPrimaryCategory().getCategory());
+        assertThat(commPostResponse.primaryCategoryUuid()).isEqualTo(commPostEntity.getPrimaryCategory().getUuid());
+        assertThat(commPostResponse.primaryCategoryOrder()).isEqualTo(commPostEntity.getPrimaryCategory().getOrder());
+        assertThat(commPostResponse.secondaryCategory()).isEqualTo(commPostEntity.getSecondaryCategory().getCategory());
+        assertThat(commPostResponse.secondaryCategoryUuid()).isEqualTo(commPostEntity.getSecondaryCategory().getUuid());
+        assertThat(commPostResponse.secondaryCategoryOrder()).isEqualTo(commPostEntity.getSecondaryCategory().getOrder());
         assertThat(commPostResponse.nickname()).isEqualTo(commPostEntity.getAuthMember().getNickname());
     }
 }

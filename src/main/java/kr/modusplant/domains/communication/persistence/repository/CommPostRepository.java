@@ -3,6 +3,7 @@ package kr.modusplant.domains.communication.persistence.repository;
 import kr.modusplant.domains.common.persistence.repository.supers.CreatedAtAndUpdatedAtRepository;
 import kr.modusplant.domains.common.persistence.repository.supers.UlidPrimaryRepository;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
+import kr.modusplant.domains.communication.persistence.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import org.springframework.data.domain.Page;
@@ -22,7 +23,9 @@ public interface CommPostRepository extends UlidPrimaryRepository<CommPostEntity
 
     Page<CommPostEntity> findByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 
-    Page<CommPostEntity> findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(CommSecondaryCategoryEntity category, Pageable pageable);
+    Page<CommPostEntity> findByPrimaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(CommPrimaryCategoryEntity primaryCategory, Pageable pageable);
+
+    Page<CommPostEntity> findBySecondaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(CommSecondaryCategoryEntity secondaryCategory, Pageable pageable);
 
     Page<CommPostEntity> findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(SiteMemberEntity authMember, Pageable pageable);
 

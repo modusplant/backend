@@ -10,9 +10,12 @@ public interface CommPostResponseTestUtils extends CommPostTestUtils {
 
     CommPostResponse TEST_COMM_POST_RESPONSE = new CommPostResponse(
             TEST_COMM_POST_WITH_ULID.getUlid(),
-            TEST_COMM_SECOND_CATEGORY_WITH_UUID.getCategory(),
-            TEST_COMM_POST_WITH_ULID.getCategoryUuid(),
-            TEST_COMM_SECOND_CATEGORY_WITH_UUID.getOrder(),
+            TEST_COMM_PRIMARY_CATEGORY_WITH_UUID.getCategory(),
+            TEST_COMM_PRIMARY_CATEGORY_WITH_UUID.getUuid(),
+            TEST_COMM_PRIMARY_CATEGORY_WITH_UUID.getOrder(),
+            TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getCategory(),
+            TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getUuid(),
+            TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getOrder(),
             TEST_COMM_POST_WITH_ULID.getAuthMemberUuid(),
             memberBasicUserWithUuid.getNickname(),
             5,

@@ -67,7 +67,7 @@ class CommSecondaryCategoryControllerTest implements CommCategoryRequestTestUtil
     void getCommCategoryByUuidTest() throws Exception {
         // given
         ObjectMapper objectMapper = new ObjectMapper();
-        UUID uuid = CommSecondaryCategoryTestUtils.TEST_COMM_SECOND_CATEGORY_WITH_UUID.getUuid();
+        UUID uuid = CommSecondaryCategoryTestUtils.TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getUuid();
 
         when(commCategoryApplicationService.getByUuid(uuid)).thenReturn(Optional.of(TEST_COMM_SECONDARY_CATEGORY_RESPONSE));
 
@@ -196,7 +196,7 @@ class CommSecondaryCategoryControllerTest implements CommCategoryRequestTestUtil
     @Test
     void removeCommCategoryByOrderTest() throws Exception {
         // given
-        UUID order = CommSecondaryCategoryTestUtils.TEST_COMM_SECOND_CATEGORY_WITH_UUID.getUuid();
+        UUID order = CommSecondaryCategoryTestUtils.TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getUuid();
 
         doNothing().when(commCategoryApplicationService).removeByUuid(order);
 

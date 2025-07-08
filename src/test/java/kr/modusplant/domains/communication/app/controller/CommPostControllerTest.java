@@ -53,7 +53,8 @@ class CommPostControllerTest implements CommPostRequestTestUtils, CommPostRespon
 
     private final String BASE_URL = "/api/v1/communication/posts";
     private final UUID TEST_POST_MEMBER_UUID = UUID.randomUUID();
-    private final UUID TEST_CATEGORY_UUID = UUID.randomUUID();
+    private final UUID TEST_PRIMARY_CATEGORY_UUID = UUID.randomUUID();
+    private final UUID TEST_SECONDARY_CATEGORY_UUID = UUID.randomUUID();
     private final String TEST_POST_ULID = "test-ulid";
 
     @BeforeEach
@@ -112,16 +113,40 @@ class CommPostControllerTest implements CommPostRequestTestUtils, CommPostRespon
     }
 
     @Test
-    @DisplayName("컨텐츠 항목별 게시글 목록 조회하기")
-    void getCommPostsByCommCategoryTest() throws Exception {
+    @DisplayName("1차 항목별 게시글 목록 조회하기")
+    void getCommPostsPrimaryCategoryTest() throws Exception {
         // given
         Page<CommPostResponse> commPostResponse = new PageImpl<>(List.of(TEST_COMM_POST_RESPONSE));
         CommPostPageResponse<CommPostResponse> commCommPostPageResponse = CommPostPageResponse.from(commPostResponse);
-        when(commPostApplicationService.getByCategoryUuid(any(UUID.class), any(Pageable.class))).thenReturn(commPostResponse);
+        when(commPostApplicationService.getByPrimaryCategoryUuid(any(UUID.class), any(Pageable.class))).thenReturn(commPostResponse);
 
         // when
         Map<String,Object> responseMap = objectMapper.readValue(
-                mockMvc.perform(get(BASE_URL + "/category/" + TEST_CATEGORY_UUID)
+                mockMvc.perform(get(BASE_URL + "/category/primary/" + TEST_PRIMARY_CATEGORY_UUID)
+                                .param("page", "1")
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isOk())
+                        .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
+                });
+
+        // then
+        assertThat(objectMapper.convertValue(responseMap.get(DATA),
+                new TypeReference<CommPostPageResponse<CommPostResponse>>() {
+                })
+        ).isEqualTo(commCommPostPageResponse);
+    }
+
+    @Test
+    @DisplayName("2차 항목별 게시글 목록 조회하기")
+    void getCommPostsSecondaryCategoryTest() throws Exception {
+        // given
+        Page<CommPostResponse> commPostResponse = new PageImpl<>(List.of(TEST_COMM_POST_RESPONSE));
+        CommPostPageResponse<CommPostResponse> commCommPostPageResponse = CommPostPageResponse.from(commPostResponse);
+        when(commPostApplicationService.getBySecondaryCategoryUuid(any(UUID.class), any(Pageable.class))).thenReturn(commPostResponse);
+
+        // when
+        Map<String,Object> responseMap = objectMapper.readValue(
+                mockMvc.perform(get(BASE_URL + "/category/secondary/" + TEST_SECONDARY_CATEGORY_UUID)
                                 .param("page", "1")
                                 .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isOk())
@@ -210,14 +235,16 @@ class CommPostControllerTest implements CommPostRequestTestUtils, CommPostRespon
                         .file(mockTextFile)
                         .file(mockImageFile)
                         .file(mockOrderInfoPart)
-                        .param("categoryUuid", TEST_CATEGORY_UUID.toString())
+                        .param("primaryCategoryUuid", TEST_PRIMARY_CATEGORY_UUID.toString())
+                        .param("secondaryCategoryUuid", TEST_SECONDARY_CATEGORY_UUID.toString())
                         .param("title", title)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isOk());
 
         verify(commPostApplicationService, times(1))
                 .insert(argThat(req ->
-                        req.categoryUuid().equals(TEST_CATEGORY_UUID) &&
+                        req.primaryCategoryUuid().equals(TEST_PRIMARY_CATEGORY_UUID) &&
+                                req.secondaryCategoryUuid().equals(TEST_SECONDARY_CATEGORY_UUID) &&
                                 req.title().equals(title) &&
                                 req.content().size() == 2 &&
                                 req.orderInfo().size() == 2
@@ -240,7 +267,8 @@ class CommPostControllerTest implements CommPostRequestTestUtils, CommPostRespon
                         .file(mockTextFile)
                         .file(mockImageFile)
                         .file(mockOrderInfoPart)
-                        .param("categoryUuid", TEST_CATEGORY_UUID.toString())
+                        .param("primaryCategoryUuid", TEST_PRIMARY_CATEGORY_UUID.toString())
+                        .param("secondaryCategoryUuid", TEST_SECONDARY_CATEGORY_UUID.toString())
                         .param("title", title)
                         .with(request -> {
                             request.setMethod("PUT");
@@ -252,7 +280,8 @@ class CommPostControllerTest implements CommPostRequestTestUtils, CommPostRespon
         verify(commPostApplicationService, times(1))
                 .update(argThat(req ->
                         req.ulid().equals(TEST_POST_ULID) &&
-                                req.categoryUuid().equals(TEST_CATEGORY_UUID) &&
+                                req.primaryCategoryUuid().equals(TEST_PRIMARY_CATEGORY_UUID) &&
+                                req.secondaryCategoryUuid().equals(TEST_SECONDARY_CATEGORY_UUID) &&
                                 req.title().equals(title) &&
                                 req.content().size() == 2 &&
                                 req.orderInfo().size() == 2

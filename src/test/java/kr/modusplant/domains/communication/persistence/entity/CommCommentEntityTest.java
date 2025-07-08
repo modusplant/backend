@@ -2,6 +2,7 @@ package kr.modusplant.domains.communication.persistence.entity;
 
 import kr.modusplant.domains.communication.common.util.entity.CommCommentEntityTestUtils;
 import kr.modusplant.domains.communication.common.util.entity.CommPostEntityTestUtils;
+import kr.modusplant.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.global.context.RepositoryOnlyContext;
@@ -14,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
 public class CommCommentEntityTest implements CommCommentEntityTestUtils,
-        CommSecondaryCategoryEntityTestUtils, CommPostEntityTestUtils {
+        CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils, CommPostEntityTestUtils {
 
     private final TestEntityManager entityManager;
 
@@ -27,10 +28,13 @@ public class CommCommentEntityTest implements CommCommentEntityTestUtils,
     void prePersist() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        CommSecondaryCategoryEntity category = createTestCommSecondaryCategoryEntity();
-        entityManager.persist(category);
+        CommPrimaryCategoryEntity primaryCategory = createTestCommPrimaryCategoryEntity();
+        CommSecondaryCategoryEntity secondaryCategory = createTestCommSecondaryCategoryEntity();
+        entityManager.persist(primaryCategory);
+        entityManager.persist(secondaryCategory);
         CommPostEntity postEntity = createCommPostEntityBuilder()
-                .category(category)
+                .primaryCategory(primaryCategory)
+                .secondaryCategory(secondaryCategory)
                 .authMember(member)
                 .createMember(member)
                 .likeCount(1)

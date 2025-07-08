@@ -10,7 +10,7 @@ public interface CommSecondaryCategoryTestUtils {
             .order(2)
             .build();
 
-    CommSecondaryCategory TEST_COMM_SECOND_CATEGORY_WITH_UUID = CommSecondaryCategory.builder()
+    CommSecondaryCategory TEST_COMM_SECONDARY_CATEGORY_WITH_UUID = CommSecondaryCategory.builder()
             .uuid(UUID.randomUUID())
             .category(TEST_COMM_SECONDARY_CATEGORY.getCategory())
             .order(TEST_COMM_SECONDARY_CATEGORY.getOrder())

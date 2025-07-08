@@ -4,11 +4,13 @@ import jakarta.persistence.EntityManager;
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.domains.communication.common.util.entity.CommCommentEntityTestUtils;
 import kr.modusplant.domains.communication.common.util.entity.CommPostEntityTestUtils;
+import kr.modusplant.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.error.CommentExistsException;
 import kr.modusplant.domains.communication.error.CommentNotFoundException;
 import kr.modusplant.domains.communication.persistence.entity.CommCommentEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
+import kr.modusplant.domains.communication.persistence.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.domains.communication.persistence.repository.CommCommentRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
@@ -28,7 +30,7 @@ import static org.mockito.BDDMockito.given;
 @DomainsServiceOnlyContext
 @Transactional
 public class CommCommentValidationServiceTest implements
-        CommCommentEntityTestUtils, CommSecondaryCategoryEntityTestUtils,
+        CommCommentEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils,
         CommPostEntityTestUtils, SiteMemberEntityTestUtils {
 
     @InjectMocks
@@ -54,9 +56,11 @@ public class CommCommentValidationServiceTest implements
     @BeforeEach
     void setUp() {
         memberEntity = createMemberBasicUserEntity();
-        CommSecondaryCategoryEntity category = entityManager.merge(createTestCommSecondaryCategoryEntity());
+        CommPrimaryCategoryEntity primaryCategory = entityManager.merge(createTestCommPrimaryCategoryEntity());
+        CommSecondaryCategoryEntity secondaryCategory = entityManager.merge(createTestCommSecondaryCategoryEntity());
         postEntity = createCommPostEntityBuilder()
-                .category(category)
+                .primaryCategory(primaryCategory)
+                .secondaryCategory(secondaryCategory)
                 .authMember(memberEntity)
                 .createMember(memberEntity)
                 .likeCount(1)

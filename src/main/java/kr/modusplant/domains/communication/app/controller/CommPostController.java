@@ -90,18 +90,18 @@ public class CommPostController {
     }
 
     @Operation(
-            summary = "항목별 컨텐츠 게시글 목록 조회 API",
-            description = "항목별 컨텐츠 게시글의 목록과 페이지 정보를 조회합니다."
+            summary = "1차 항목별 컨텐츠 게시글 목록 조회 API",
+            description = "1차 항목별 컨텐츠 게시글의 목록과 페이지 정보를 조회합니다."
     )
-    @GetMapping("/category/{categoryUuid}")
-    public ResponseEntity<DataResponse<CommPostPageResponse<?>>> getCommPostsByCommCategory(
+    @GetMapping("/category/primary/{primaryCategoryUuid}")
+    public ResponseEntity<DataResponse<CommPostPageResponse<?>>> getCommPostsByPrimaryCategory(
             @Parameter(schema = @Schema(
-                    description = "컨텐츠 항목 식별자",
-                    example = "4803f4e8-c982-4631-ba82-234d4fa6e824")
+                    description = "1차 항목 식별자",
+                    example = "2d9f462d-b50f-4394-928e-5c864f60b09a")
             )
             @PathVariable(required = false)
-            @NotNull(message = "항목 식별자가 비어 있습니다.")
-            UUID categoryUuid,
+            @NotNull(message = "1차 항목 식별자가 비어 있습니다.")
+            UUID primaryCategoryUuid,
 
             @Parameter(schema = @Schema(
                     description = "페이지 숫자",
@@ -111,7 +111,32 @@ public class CommPostController {
             @RequestParam
             @CommunicationPageNumber
             Integer page) {
-        return ResponseEntity.ok().body(DataResponse.ok(CommPostPageResponse.from(commPostApplicationService.getByCategoryUuid(categoryUuid, PageRequest.of(page, PAGE_SIZE)))));
+        return ResponseEntity.ok().body(DataResponse.ok(CommPostPageResponse.from(commPostApplicationService.getByPrimaryCategoryUuid(primaryCategoryUuid, PageRequest.of(page, PAGE_SIZE)))));
+    }
+
+    @Operation(
+            summary = "2차 항목별 컨텐츠 게시글 목록 조회 API",
+            description = "2차 항목별 컨텐츠 게시글의 목록과 페이지 정보를 조회합니다."
+    )
+    @GetMapping("/category/secondary/{secondaryCategoryUuid}")
+    public ResponseEntity<DataResponse<CommPostPageResponse<?>>> getCommPostsBySecondaryCategory(
+            @Parameter(schema = @Schema(
+                    description = "2차 항목 식별자",
+                    example = "4803f4e8-c982-4631-ba82-234d4fa6e824")
+            )
+            @PathVariable(required = false)
+            @NotNull(message = "2차 항목 식별자가 비어 있습니다.")
+            UUID secondaryCategoryUuid,
+
+            @Parameter(schema = @Schema(
+                    description = "페이지 숫자",
+                    minimum = "1",
+                    example = "4")
+            )
+            @RequestParam
+            @CommunicationPageNumber
+            Integer page) {
+        return ResponseEntity.ok().body(DataResponse.ok(CommPostPageResponse.from(commPostApplicationService.getBySecondaryCategoryUuid(secondaryCategoryUuid, PageRequest.of(page, PAGE_SIZE)))));
     }
 
     @Operation(
@@ -166,12 +191,20 @@ public class CommPostController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> insertCommPost(
             @Parameter(schema = @Schema(
-                    description = "게시글이 포함된 항목의 식별자",
+                    description = "게시글이 포함된 1차 항목의 식별자",
                     example = "148d6e33-102d-4df4-a4d0-5ff233665548")
             )
             @RequestParam
-            @NotNull(message = "항목 식별자가 비어 있습니다.")
-            UUID categoryUuid,
+            @NotNull(message = "1차 항목 식별자가 비어 있습니다.")
+            UUID primaryCategoryUuid,
+
+            @Parameter(schema = @Schema(
+                    description = "게시글이 포함된 2차 항목의 식별자",
+                    example = "148d6e33-102d-4df4-a4d0-5ff233665548")
+            )
+            @RequestParam
+            @NotNull(message = "2차 항목 식별자가 비어 있습니다.")
+            UUID secondaryCategoryUuid,
 
             @Parameter(schema = @Schema(
                     description = "게시글의 제목",
@@ -196,7 +229,7 @@ public class CommPostController {
             @NotNull(message = "순서 정보가 비어 있습니다.")
             List<@Valid FileOrder> orderInfo
     ) throws IOException {
-        commPostApplicationService.insert(new CommPostInsertRequest(categoryUuid, title, content, orderInfo), memberUuid);
+        commPostApplicationService.insert(new CommPostInsertRequest(primaryCategoryUuid, secondaryCategoryUuid, title, content, orderInfo), memberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
@@ -207,12 +240,20 @@ public class CommPostController {
     @PutMapping(value = "/{ulid}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> updateCommPost(
             @Parameter(schema = @Schema(
-                    description = "갱신을 위한 게시글 항목 식별자",
+                    description = "갱신을 위한 1차 항목 식별자",
+                    example = "e493d48f-0ae6-4572-b624-f8f468515c71")
+            )
+            @RequestParam
+            @NotNull(message = "1차 항목 식별자가 비어 있습니다.")
+            UUID primaryCategoryUuid,
+
+            @Parameter(schema = @Schema(
+                    description = "갱신을 위한 2차 항목 식별자",
                     example = "bde79fd5-083d-425c-b71b-69a157fc5739")
             )
             @RequestParam
-            @NotNull(message = "항목 식별자가 비어 있습니다.")
-            UUID categoryUuid,
+            @NotNull(message = "2차 항목 식별자가 비어 있습니다.")
+            UUID secondaryCategoryUuid,
 
             @Parameter(schema = @Schema(
                     description = "갱신을 위한 게시글 제목",
@@ -244,7 +285,7 @@ public class CommPostController {
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String ulid
     ) throws IOException {
-        commPostApplicationService.update(new CommPostUpdateRequest(ulid, categoryUuid, title, content, orderInfo), memberUuid);
+        commPostApplicationService.update(new CommPostUpdateRequest(ulid, primaryCategoryUuid, secondaryCategoryUuid, title, content, orderInfo), memberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

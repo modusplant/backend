@@ -29,12 +29,12 @@ public class CommPostValidationService {
     private final CommSecondaryCategoryRepository commCategoryRepository;
 
     public void validateCommPostInsertRequest(CommPostInsertRequest request) {
-        validateNotFoundCategoryUuid(request.categoryUuid(), commCategoryRepository);
+        validateNotFoundCategoryUuid(request.primaryCategoryUuid(), commCategoryRepository);
         validateContentAndOrderInfo(request.content(),request.orderInfo());
     }
 
     public void validateCommPostUpdateRequest(CommPostUpdateRequest request) {
-        validateNotFoundCategoryUuid(request.categoryUuid(), commCategoryRepository);
+        validateNotFoundCategoryUuid(request.primaryCategoryUuid(), commCategoryRepository);
         validateContentAndOrderInfo(request.content(),request.orderInfo());
     }
 

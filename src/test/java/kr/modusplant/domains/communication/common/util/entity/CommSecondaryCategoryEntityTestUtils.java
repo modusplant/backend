@@ -13,7 +13,7 @@ public interface CommSecondaryCategoryEntityTestUtils extends CommSecondaryCateg
 
     default CommSecondaryCategoryEntity createTestCommSecondaryCategoryEntityWithUuid() {
         return CommSecondaryCategoryEntity.builder()
-                .uuid(TEST_COMM_SECOND_CATEGORY_WITH_UUID.getUuid())
+                .uuid(TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getUuid())
                 .category(TEST_COMM_SECONDARY_CATEGORY.getCategory())
                 .order(TEST_COMM_SECONDARY_CATEGORY.getOrder())
                 .build();
