@@ -8,7 +8,7 @@ public class EmptyInputException extends BusinessException {
 
     private final String inputName;
 
-    public EmptyInputException(ErrorCode errorCode, String inputName) {
+    private EmptyInputException(ErrorCode errorCode, String inputName) {
         super(errorCode);
         this.inputName = inputName;
     }
