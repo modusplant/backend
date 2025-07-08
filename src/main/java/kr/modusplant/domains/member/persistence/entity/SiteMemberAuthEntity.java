@@ -2,7 +2,6 @@ package kr.modusplant.domains.member.persistence.entity;
 
 import jakarta.persistence.*;
 import kr.modusplant.domains.member.enums.AuthProvider;
-import kr.modusplant.global.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
