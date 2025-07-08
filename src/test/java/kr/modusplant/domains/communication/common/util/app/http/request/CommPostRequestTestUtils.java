@@ -89,14 +89,16 @@ public interface CommPostRequestTestUtils extends CommCategoryRequestTestUtils {
 
     /* CommPostInsertRequest Utils */
     CommPostInsertRequest requestAllTypes = new CommPostInsertRequest(
-            TEST_COMM_SECOND_CATEGORY_WITH_UUID.getUuid(),
+            TEST_COMM_PRIMARY_CATEGORY_WITH_UUID.getUuid(),
+            TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getUuid(),
             "유용한 컨텐츠 모음",
             allMediaFiles,
             allMediaFilesOrder
     );
 
     CommPostInsertRequest requestBasicTypes = new CommPostInsertRequest(
-            TEST_COMM_SECOND_CATEGORY_WITH_UUID.getUuid(),
+            TEST_COMM_PRIMARY_CATEGORY_WITH_UUID.getUuid(),
+            TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getUuid(),
             "유용한 식물 기르기 컨텐츠",
             basicMediaFiles,
             basicMediaFilesOrder

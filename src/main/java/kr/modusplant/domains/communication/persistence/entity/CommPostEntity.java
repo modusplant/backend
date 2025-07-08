@@ -35,8 +35,12 @@ public class CommPostEntity {
     private String ulid;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = CATE_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private CommSecondaryCategoryEntity category;
+    @JoinColumn(name = PRI_CATE_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private CommPrimaryCategoryEntity primaryCategory;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
+    @JoinColumn(name = SECO_CATE_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private CommSecondaryCategoryEntity secondaryCategory;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = SNAKE_AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
@@ -77,8 +81,12 @@ public class CommPostEntity {
     @Column(nullable = false)
     private Long ver;
 
-    public void updateCategory(CommSecondaryCategoryEntity category) {
-        this.category = category;
+    public void updatePrimaryCategory(CommPrimaryCategoryEntity primaryCategory) {
+        this.primaryCategory = primaryCategory;
+    }
+
+    public void updateSecondaryCategory(CommSecondaryCategoryEntity secondaryCategory) {
+        this.secondaryCategory = secondaryCategory;
     }
 
     public void increaseLikeCount() {
@@ -140,9 +148,10 @@ public class CommPostEntity {
         }
     }
 
-    private CommPostEntity(String ulid, CommSecondaryCategoryEntity category, SiteMemberEntity authMember, SiteMemberEntity createMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isDeleted) {
+    private CommPostEntity(String ulid, CommPrimaryCategoryEntity primaryCategory, CommSecondaryCategoryEntity secondaryCategory, SiteMemberEntity authMember, SiteMemberEntity createMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isDeleted) {
         this.ulid = ulid;
-        this.category = category;
+        this.primaryCategory = primaryCategory;
+        this.secondaryCategory = secondaryCategory;
         this.authMember = authMember;
         this.createMember = createMember;
         this.likeCount = likeCount;
@@ -158,7 +167,8 @@ public class CommPostEntity {
 
     public static final class CommPostEntityBuilder {
         private String ulid;
-        private CommSecondaryCategoryEntity category;
+        private CommPrimaryCategoryEntity primaryCategory;
+        private CommSecondaryCategoryEntity secondaryCategory;
         private SiteMemberEntity authMember;
         private SiteMemberEntity createMember;
         private Integer likeCount;
@@ -172,8 +182,13 @@ public class CommPostEntity {
             return this;
         }
 
-        public CommPostEntityBuilder category(final CommSecondaryCategoryEntity category) {
-            this.category = category;
+        public CommPostEntityBuilder primaryCategory(final CommPrimaryCategoryEntity primaryCategory) {
+            this.primaryCategory = primaryCategory;
+            return this;
+        }
+
+        public CommPostEntityBuilder secondaryCategory(final CommSecondaryCategoryEntity secondaryCategory) {
+            this.secondaryCategory = secondaryCategory;
             return this;
         }
 
@@ -214,7 +229,8 @@ public class CommPostEntity {
 
         public CommPostEntityBuilder commPostEntity(final CommPostEntity commPostEntity) {
             this.ulid = commPostEntity.ulid;
-            this.category = commPostEntity.category;
+            this.primaryCategory = commPostEntity.primaryCategory;
+            this.secondaryCategory = commPostEntity.secondaryCategory;
             this.authMember = commPostEntity.authMember;
             this.createMember = commPostEntity.createMember;
             this.likeCount = commPostEntity.likeCount;
@@ -226,7 +242,7 @@ public class CommPostEntity {
         }
 
         public CommPostEntity build() {
-            return new CommPostEntity(this.ulid,this.category,this.authMember,this.createMember,this.likeCount,this.viewCount,this.title,this.content,this.isDeleted);
+            return new CommPostEntity(this.ulid, this.primaryCategory, this.secondaryCategory, this.authMember, this.createMember, this.likeCount, this.viewCount, this.title, this.content, this.isDeleted);
         }
 
     }

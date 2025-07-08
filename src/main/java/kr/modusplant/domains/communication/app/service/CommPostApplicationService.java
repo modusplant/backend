@@ -10,11 +10,9 @@ import kr.modusplant.domains.communication.error.PostNotFoundException;
 import kr.modusplant.domains.communication.mapper.CommPostAppInfraMapper;
 import kr.modusplant.domains.communication.mapper.CommPostAppInfraMapperImpl;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
+import kr.modusplant.domains.communication.persistence.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.domains.communication.persistence.repository.CommPostRepository;
-import kr.modusplant.domains.communication.persistence.repository.CommPostViewCountRedisRepository;
-import kr.modusplant.domains.communication.persistence.repository.CommPostViewLockRedisRepository;
-import kr.modusplant.domains.communication.persistence.repository.CommSecondaryCategoryRepository;
+import kr.modusplant.domains.communication.persistence.repository.*;
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
@@ -40,7 +38,8 @@ public class CommPostApplicationService {
     private final MultipartDataProcessor multipartDataProcessor;
     private final CommPostRepository commPostRepository;
     private final SiteMemberRepository siteMemberRepository;
-    private final CommSecondaryCategoryRepository commCategoryRepository;
+    private final CommPrimaryCategoryRepository commPrimaryCategoryRepository;
+    private final CommSecondaryCategoryRepository commSecondaryCategoryRepository;
     private final CommPostViewCountRedisRepository commPostViewCountRedisRepository;
     private final CommPostViewLockRedisRepository commPostViewLockRedisRepository;
     private final CommPostAppInfraMapper commPostAppInfraMapper = new CommPostAppInfraMapperImpl();
@@ -71,9 +70,21 @@ public class CommPostApplicationService {
         });
     }
 
-    public Page<CommPostResponse> getByCategoryUuid(UUID categoryUuid, Pageable pageable) {
-        CommSecondaryCategoryEntity commCategory = commCategoryRepository.findByUuid(categoryUuid).orElseThrow();
-        return commPostRepository.findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(commCategory, pageable).map(entity -> {
+    public Page<CommPostResponse> getByPrimaryCategoryUuid(UUID categoryUuid, Pageable pageable) {
+        CommPrimaryCategoryEntity commCategory = commPrimaryCategoryRepository.findByUuid(categoryUuid).orElseThrow();
+        return commPostRepository.findByPrimaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(commCategory, pageable).map(entity -> {
+            try {
+                entity.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(entity.getContent()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return commPostAppInfraMapper.toCommPostResponse(entity);
+        });
+    }
+
+    public Page<CommPostResponse> getBySecondaryCategoryUuid(UUID categoryUuid, Pageable pageable) {
+        CommSecondaryCategoryEntity commCategory = commSecondaryCategoryRepository.findByUuid(categoryUuid).orElseThrow();
+        return commPostRepository.findBySecondaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(commCategory, pageable).map(entity -> {
             try {
                 entity.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(entity.getContent()));
             } catch (IOException e) {
@@ -111,11 +122,13 @@ public class CommPostApplicationService {
     @Transactional
     public void insert(CommPostInsertRequest commPostInsertRequest, UUID memberUuid) throws IOException {
         commPostValidationService.validateCommPostInsertRequest(commPostInsertRequest);
-        commCategoryValidationService.validateNotFoundUuid(commPostInsertRequest.categoryUuid());
+        commCategoryValidationService.validateNotFoundUuid(commPostInsertRequest.primaryCategoryUuid());
+        commCategoryValidationService.validateNotFoundUuid(commPostInsertRequest.secondaryCategoryUuid());
         siteMemberValidationService.validateNotFoundUuid(memberUuid);
         SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
         CommPostEntity commPostEntity = CommPostEntity.builder()
-                .category(commCategoryRepository.findByUuid(commPostInsertRequest.categoryUuid()).orElseThrow())
+                .primaryCategory(commPrimaryCategoryRepository.findByUuid(commPostInsertRequest.primaryCategoryUuid()).orElseThrow())
+                .secondaryCategory(commSecondaryCategoryRepository.findByUuid(commPostInsertRequest.secondaryCategoryUuid()).orElseThrow())
                 .authMember(siteMember)
                 .createMember(siteMember)
                 .title(commPostInsertRequest.title())
@@ -128,10 +141,12 @@ public class CommPostApplicationService {
     public void update(CommPostUpdateRequest commPostUpdateRequest, UUID memberUuid) throws IOException {
         commPostValidationService.validateCommPostUpdateRequest(commPostUpdateRequest);
         commPostValidationService.validateAccessibleCommPost(commPostUpdateRequest.ulid(), memberUuid);
-        commCategoryValidationService.validateNotFoundUuid(commPostUpdateRequest.categoryUuid());
+        commCategoryValidationService.validateNotFoundUuid(commPostUpdateRequest.primaryCategoryUuid());
+        commCategoryValidationService.validateNotFoundUuid(commPostUpdateRequest.secondaryCategoryUuid());
         CommPostEntity commPostEntity = commPostRepository.findByUlid(commPostUpdateRequest.ulid()).orElseThrow();
         multipartDataProcessor.deleteFiles(commPostEntity.getContent());
-        commPostEntity.updateCategory(commCategoryRepository.findByUuid(commPostUpdateRequest.categoryUuid()).orElseThrow());
+        commPostEntity.updatePrimaryCategory(commPrimaryCategoryRepository.findByUuid(commPostUpdateRequest.primaryCategoryUuid()).orElseThrow());
+        commPostEntity.updateSecondaryCategory(commSecondaryCategoryRepository.findByUuid(commPostUpdateRequest.secondaryCategoryUuid()).orElseThrow());
         commPostEntity.updateTitle(commPostUpdateRequest.title());
         commPostEntity.updateContent(multipartDataProcessor.saveFilesAndGenerateContentJson(commPostUpdateRequest.content()));
         commPostRepository.save(commPostEntity);

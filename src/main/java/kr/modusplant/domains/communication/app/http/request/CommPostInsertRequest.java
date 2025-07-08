@@ -10,11 +10,18 @@ import java.util.UUID;
 
 public record CommPostInsertRequest(
         @Schema(
-                description = "게시글이 포함된 항목의 식별자",
+                description = "게시글이 포함된 1차 항목의 식별자",
                 example = "148d6e33-102d-4df4-a4d0-5ff233665548"
         )
-        @NotNull(message = "항목 식별자가 비어 있습니다.")
-        UUID categoryUuid,
+        @NotNull(message = "1차 항목 식별자가 비어 있습니다.")
+        UUID primaryCategoryUuid,
+
+        @Schema(
+                description = "게시글이 포함된 2차 항목의 식별자",
+                example = "533d1106-c4b9-4c87-8536-a182f3cac4a0"
+        )
+        @NotNull(message = "2차 항목 식별자가 비어 있습니다.")
+        UUID secondaryCategoryUuid,
 
         @Schema(
                 description = "게시글의 제목",

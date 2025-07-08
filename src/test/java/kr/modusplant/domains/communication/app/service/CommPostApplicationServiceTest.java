@@ -8,16 +8,15 @@ import kr.modusplant.domains.communication.app.http.request.CommPostUpdateReques
 import kr.modusplant.domains.communication.app.http.response.CommPostResponse;
 import kr.modusplant.domains.communication.common.util.app.http.request.CommPostRequestTestUtils;
 import kr.modusplant.domains.communication.common.util.entity.CommPostEntityTestUtils;
+import kr.modusplant.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.domain.service.CommCategoryValidationService;
 import kr.modusplant.domains.communication.domain.service.CommPostValidationService;
 import kr.modusplant.domains.communication.error.PostNotFoundException;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
+import kr.modusplant.domains.communication.persistence.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.domains.communication.persistence.repository.CommPostRepository;
-import kr.modusplant.domains.communication.persistence.repository.CommPostViewCountRedisRepository;
-import kr.modusplant.domains.communication.persistence.repository.CommPostViewLockRedisRepository;
-import kr.modusplant.domains.communication.persistence.repository.CommSecondaryCategoryRepository;
+import kr.modusplant.domains.communication.persistence.repository.*;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
@@ -48,7 +47,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommSecondaryCategoryEntityTestUtils, CommPostEntityTestUtils, CommPostRequestTestUtils {
+class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils, CommPostEntityTestUtils, CommPostRequestTestUtils {
     @Mock
     private CommPostValidationService commPostValidationService;
     @Mock
@@ -58,7 +57,9 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommS
     @Mock
     private SiteMemberRepository siteMemberRepository;
     @Mock
-    private CommSecondaryCategoryRepository commCategoryRepository;
+    private CommPrimaryCategoryRepository commPrimaryCategoryRepository;
+    @Mock
+    private CommSecondaryCategoryRepository commSecondaryCategoryRepository;
     @Mock
     private CommPostRepository commPostRepository;
     @Mock
@@ -74,15 +75,18 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommS
 
     private UUID memberUuid;
     private SiteMemberEntity siteMemberEntity;
+    private CommPrimaryCategoryEntity commPrimaryCategoryEntity;
     private CommSecondaryCategoryEntity commSecondaryCategoryEntity;
     private CommPostEntity.CommPostEntityBuilder commPostEntityBuilder;
 
     @BeforeEach
     void setUp() {
         siteMemberEntity = createMemberBasicUserEntityWithUuid();
+        commPrimaryCategoryEntity = createTestCommPrimaryCategoryEntityWithUuid();
         commSecondaryCategoryEntity = createTestCommSecondaryCategoryEntityWithUuid();
         commPostEntityBuilder = createCommPostEntityBuilder()
-                .category(commSecondaryCategoryEntity)
+                .primaryCategory(commPrimaryCategoryEntity)
+                .secondaryCategory(commSecondaryCategoryEntity)
                 .authMember(siteMemberEntity)
                 .createMember(siteMemberEntity);
         memberUuid = siteMemberEntity.getUuid();
@@ -147,20 +151,20 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommS
     }
 
     @Test
-    @DisplayName("항목별 컨텐츠 게시글 목록 조회하기")
-    void getByCategoryUuidTest() throws IOException {
+    @DisplayName("1차 항목별 컨텐츠 게시글 목록 조회하기")
+    void getByPrimaryCategoryUuidTest() throws IOException {
         // given
         Pageable pageable = PageRequest.of(0, 2);
-        CommPostEntity post1 = commPostEntityBuilder.ulid(generator.generate(null,null,null, EventType.INSERT)).build();
-        CommPostEntity post2 = commPostEntityBuilder.ulid(generator.generate(null,null,null, EventType.INSERT)).build();
+        CommPostEntity post1 = commPostEntityBuilder.ulid(generator.generate(null, null, null, EventType.INSERT)).build();
+        CommPostEntity post2 = commPostEntityBuilder.ulid(generator.generate(null, null, null, EventType.INSERT)).build();
         Page<CommPostEntity> page = new PageImpl<>(List.of(post1, post2),pageable,3);
 
-        given(commCategoryRepository.findByUuid(commSecondaryCategoryEntity.getUuid())).willReturn(Optional.of(commSecondaryCategoryEntity));
-        given(commPostRepository.findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(commSecondaryCategoryEntity, pageable)).willReturn(page);
+        given(commPrimaryCategoryRepository.findByUuid(commPrimaryCategoryEntity.getUuid())).willReturn(Optional.of(commPrimaryCategoryEntity));
+        given(commPostRepository.findByPrimaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(commPrimaryCategoryEntity, pageable)).willReturn(page);
         given(multipartDataProcessor.convertFileSrcToBinaryData(any(JsonNode.class))).willReturn(mock(ArrayNode.class));
 
         // when
-        Page<CommPostResponse> result = commPostApplicationService.getByCategoryUuid(commSecondaryCategoryEntity.getUuid(), pageable);
+        Page<CommPostResponse> result = commPostApplicationService.getByPrimaryCategoryUuid(commPrimaryCategoryEntity.getUuid(), pageable);
 
         // then
         assertThat(result).isNotNull();
@@ -169,8 +173,36 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommS
         assertThat(result.getTotalElements()).isEqualTo(3);
         assertThat(result.getTotalPages()).isEqualTo(2);
         assertThat(result.getContent()).allMatch(r -> r instanceof CommPostResponse);
-        then(commCategoryRepository).should().findByUuid(commSecondaryCategoryEntity.getUuid());
-        then(commPostRepository).should().findByCategoryAndIsDeletedFalseOrderByCreatedAtDesc(commSecondaryCategoryEntity, pageable);
+        then(commPrimaryCategoryRepository).should().findByUuid(commPrimaryCategoryEntity.getUuid());
+        then(commPostRepository).should().findByPrimaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(commPrimaryCategoryEntity, pageable);
+        then(multipartDataProcessor).should(times(2)).convertFileSrcToBinaryData(any(JsonNode.class));
+    }
+
+    @Test
+    @DisplayName("2차 항목별 컨텐츠 게시글 목록 조회하기")
+    void getBySecondaryCategoryUuidTest() throws IOException {
+        // given
+        Pageable pageable = PageRequest.of(0, 2);
+        CommPostEntity post1 = commPostEntityBuilder.ulid(generator.generate(null,null,null, EventType.INSERT)).build();
+        CommPostEntity post2 = commPostEntityBuilder.ulid(generator.generate(null,null,null, EventType.INSERT)).build();
+        Page<CommPostEntity> page = new PageImpl<>(List.of(post1, post2),pageable,3);
+
+        given(commSecondaryCategoryRepository.findByUuid(commSecondaryCategoryEntity.getUuid())).willReturn(Optional.of(commSecondaryCategoryEntity));
+        given(commPostRepository.findBySecondaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(commSecondaryCategoryEntity, pageable)).willReturn(page);
+        given(multipartDataProcessor.convertFileSrcToBinaryData(any(JsonNode.class))).willReturn(mock(ArrayNode.class));
+
+        // when
+        Page<CommPostResponse> result = commPostApplicationService.getBySecondaryCategoryUuid(commSecondaryCategoryEntity.getUuid(), pageable);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getNumber()).isEqualTo(0);
+        assertThat(result.getTotalElements()).isEqualTo(3);
+        assertThat(result.getTotalPages()).isEqualTo(2);
+        assertThat(result.getContent()).allMatch(r -> r instanceof CommPostResponse);
+        then(commSecondaryCategoryRepository).should().findByUuid(commSecondaryCategoryEntity.getUuid());
+        then(commPostRepository).should().findBySecondaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(commSecondaryCategoryEntity, pageable);
         then(multipartDataProcessor).should(times(2)).convertFileSrcToBinaryData(any(JsonNode.class));
     }
 
@@ -228,10 +260,12 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommS
         // given
         CommPostInsertRequest insertRequest = requestAllTypes;
         willDoNothing().given(commPostValidationService).validateCommPostInsertRequest(insertRequest);
-        willDoNothing().given(commCategoryValidationService).validateNotFoundUuid(insertRequest.categoryUuid());
+        willDoNothing().given(commCategoryValidationService).validateNotFoundUuid(insertRequest.primaryCategoryUuid());
+        willDoNothing().given(commCategoryValidationService).validateNotFoundUuid(insertRequest.secondaryCategoryUuid());
         willDoNothing().given(siteMemberValidationService).validateNotFoundUuid(memberUuid);
         given(siteMemberRepository.findByUuid(memberUuid)).willReturn(Optional.of(siteMemberEntity));
-        given(commCategoryRepository.findByUuid(insertRequest.categoryUuid())).willReturn(Optional.of(commSecondaryCategoryEntity));
+        given(commPrimaryCategoryRepository.findByUuid(insertRequest.primaryCategoryUuid())).willReturn(Optional.of(commPrimaryCategoryEntity));
+        given(commSecondaryCategoryRepository.findByUuid(insertRequest.secondaryCategoryUuid())).willReturn(Optional.of(commSecondaryCategoryEntity));
         given(multipartDataProcessor.saveFilesAndGenerateContentJson(insertRequest.content())).willReturn(mock(JsonNode.class));
 
         // when
@@ -239,10 +273,12 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommS
 
         // then
         then(commPostValidationService).should().validateCommPostInsertRequest(insertRequest);
-        then(commCategoryValidationService).should().validateNotFoundUuid(insertRequest.categoryUuid());
+        then(commCategoryValidationService).should().validateNotFoundUuid(insertRequest.primaryCategoryUuid());
+        then(commCategoryValidationService).should().validateNotFoundUuid(insertRequest.secondaryCategoryUuid());
         then(siteMemberValidationService).should().validateNotFoundUuid(memberUuid);
         then(siteMemberRepository).should().findByUuid(memberUuid);
-        then(commCategoryRepository).should().findByUuid(insertRequest.categoryUuid());
+        then(commPrimaryCategoryRepository).should().findByUuid(insertRequest.primaryCategoryUuid());
+        then(commSecondaryCategoryRepository).should().findByUuid(insertRequest.secondaryCategoryUuid());
         then(multipartDataProcessor).should().saveFilesAndGenerateContentJson(insertRequest.content());
         then(commPostRepository).should().save(any(CommPostEntity.class));
     }
@@ -253,7 +289,8 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommS
         // given
         CommPostUpdateRequest updateRequest = new CommPostUpdateRequest(
                 generator.generate(null,null,null, EventType.INSERT),
-                requestAllTypes.categoryUuid(),
+                requestAllTypes.primaryCategoryUuid(),
+                requestAllTypes.secondaryCategoryUuid(),
                 requestAllTypes.title(),
                 requestAllTypes.content(),
                 requestAllTypes.orderInfo());
@@ -261,22 +298,26 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommS
 
         willDoNothing().given(commPostValidationService).validateCommPostUpdateRequest(updateRequest);
         willDoNothing().given(commPostValidationService).validateAccessibleCommPost(updateRequest.ulid(),memberUuid);
-        willDoNothing().given(commCategoryValidationService).validateNotFoundUuid(updateRequest.categoryUuid());
+        willDoNothing().given(commCategoryValidationService).validateNotFoundUuid(updateRequest.primaryCategoryUuid());
+        willDoNothing().given(commCategoryValidationService).validateNotFoundUuid(updateRequest.secondaryCategoryUuid());
         given(commPostRepository.findByUlid(updateRequest.ulid())).willReturn(Optional.of(post));
         willDoNothing().given(multipartDataProcessor).deleteFiles(any(JsonNode.class));
-        given(commCategoryRepository.findByUuid(updateRequest.categoryUuid())).willReturn(Optional.of(commSecondaryCategoryEntity));
+        given(commPrimaryCategoryRepository.findByUuid(updateRequest.primaryCategoryUuid())).willReturn(Optional.of(commPrimaryCategoryEntity));
+        given(commSecondaryCategoryRepository.findByUuid(updateRequest.secondaryCategoryUuid())).willReturn(Optional.of(commSecondaryCategoryEntity));
         given(multipartDataProcessor.saveFilesAndGenerateContentJson(updateRequest.content())).willReturn(mock(JsonNode.class));
 
         // when
-        commPostApplicationService.update(updateRequest,memberUuid);
+        commPostApplicationService.update(updateRequest, memberUuid);
 
         // then
         then(commPostValidationService).should().validateCommPostUpdateRequest(updateRequest);
-        then(commPostValidationService).should().validateAccessibleCommPost(updateRequest.ulid(),memberUuid);
-        then(commCategoryValidationService).should().validateNotFoundUuid(updateRequest.categoryUuid());
+        then(commPostValidationService).should().validateAccessibleCommPost(updateRequest.ulid(), memberUuid);
+        then(commCategoryValidationService).should().validateNotFoundUuid(updateRequest.primaryCategoryUuid());
+        then(commCategoryValidationService).should().validateNotFoundUuid(updateRequest.secondaryCategoryUuid());
         then(commPostRepository).should().findByUlid(updateRequest.ulid());
         then(multipartDataProcessor).should().deleteFiles(any(JsonNode.class));
-        then(commCategoryRepository).should().findByUuid(updateRequest.categoryUuid());
+        then(commPrimaryCategoryRepository).should().findByUuid(updateRequest.primaryCategoryUuid());
+        then(commSecondaryCategoryRepository).should().findByUuid(updateRequest.secondaryCategoryUuid());
         then(multipartDataProcessor).should().saveFilesAndGenerateContentJson(updateRequest.content());
         then(commPostRepository).should().save(any(CommPostEntity.class));
     }
@@ -323,7 +364,7 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommS
         String ulid = generator.generate(null,null,null, EventType.INSERT);
         given(commPostViewCountRedisRepository.read(ulid)).willReturn(null);
         CommPostEntity commPostEntity = createCommPostEntityBuilder()
-                .category(createTestCommSecondaryCategoryEntity())
+                .secondaryCategory(createTestCommSecondaryCategoryEntity())
                 .authMember(createMemberBasicAdminEntityWithUuid())
                 .createMember(createMemberBasicAdminEntityWithUuid())
                 .viewCount(55L)

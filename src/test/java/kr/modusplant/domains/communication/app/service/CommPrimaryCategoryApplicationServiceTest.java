@@ -144,7 +144,7 @@ class CommPrimaryCategoryApplicationServiceTest implements CommCategoryRequestTe
     @Test
     void removeByUuidTest() {
         // given
-        UUID uuid = TEST_COMM_SECOND_CATEGORY_WITH_UUID.getUuid();
+        UUID uuid = TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getUuid();
         CommPrimaryCategoryEntity commPrimaryCategoryEntity = commCategoryAppInfraMapper.toCommCategoryEntity(TEST_COMM_PRIMARY_CATEGORY_INSERT_REQUEST);
 
         given(commCategoryRepository.save(commPrimaryCategoryEntity)).willReturn(commPrimaryCategoryEntity);

@@ -25,9 +25,11 @@ class CommPostEntityTest implements CommPostEntityTestUtils {
     void prePersist() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
+        CommPrimaryCategoryEntity commPrimaryCategoryEntity = entityManager.merge(createTestCommPrimaryCategoryEntity());
         CommSecondaryCategoryEntity commSecondaryCategoryEntity = entityManager.merge(createTestCommSecondaryCategoryEntity());
         CommPostEntity commPost = createCommPostEntityBuilder()
-                .category(commSecondaryCategoryEntity)
+                .primaryCategory(commPrimaryCategoryEntity)
+                .secondaryCategory(commSecondaryCategoryEntity)
                 .authMember(member)
                 .createMember(member)
                 .likeCount(1)
@@ -51,7 +53,8 @@ class CommPostEntityTest implements CommPostEntityTestUtils {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
         CommPostEntity commPost = createCommPostEntityBuilder()
-                .category(createTestCommSecondaryCategoryEntity())
+                .primaryCategory(createTestCommPrimaryCategoryEntity())
+                .secondaryCategory(createTestCommSecondaryCategoryEntity())
                 .authMember(member)
                 .createMember(member)
                 .build();

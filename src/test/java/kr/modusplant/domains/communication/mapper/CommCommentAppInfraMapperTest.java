@@ -48,7 +48,7 @@ public class CommCommentAppInfraMapperTest implements
         SiteMemberEntity member = createMemberBasicUserEntity();
         CommSecondaryCategoryEntity category = categoryRepository.save(createTestCommSecondaryCategoryEntity());
         CommPostEntity postEntity = createCommPostEntityBuilder()
-                .category(category)
+                .secondaryCategory(category)
                 .authMember(member)
                 .createMember(member)
                 .likeCount(1)

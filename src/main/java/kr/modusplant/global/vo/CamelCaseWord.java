@@ -5,7 +5,8 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CamelCaseWord {
-    public static final String CATEGORY = "category";
+    public static final String PRIMARY_CATEGORY = "primaryCategory";
+    public static final String SECONDARY_CATEGORY = "secondaryCategory";
     public static final String DATA = "data";
     public static final String MEMBER = "member";
     public static final String ORDER = "order";

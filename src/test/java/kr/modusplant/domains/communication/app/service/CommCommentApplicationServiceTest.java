@@ -62,7 +62,7 @@ public class CommCommentApplicationServiceTest implements
         CommSecondaryCategoryEntity category = categoryRepository.save(createTestCommSecondaryCategoryEntityWithUuid());
         postEntity = createCommPostEntityBuilder()
                 .ulid(TEST_COMM_POST_WITH_ULID.getUlid())
-                .category(category)
+                .secondaryCategory(category)
                 .authMember(memberEntity)
                 .createMember(memberEntity)
                 .likeCount(1)

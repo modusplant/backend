@@ -10,7 +10,7 @@ import org.hibernate.generator.EventType;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 
-public interface CommPostTestUtils extends CommSecondaryCategoryTestUtils, SiteMemberTestUtils {
+public interface CommPostTestUtils extends CommPrimaryCategoryTestUtils, CommSecondaryCategoryTestUtils, SiteMemberTestUtils {
     ObjectMapper objectMapper = new ObjectMapper();
     UlidIdGenerator generator = new UlidIdGenerator();
 
@@ -23,7 +23,8 @@ public interface CommPostTestUtils extends CommSecondaryCategoryTestUtils, SiteM
 
     CommPost TEST_COMM_POST_WITH_ULID = CommPost.builder()
             .ulid(generator.generate(null, null,null, EventType.INSERT))
-            .categoryUuid(TEST_COMM_SECOND_CATEGORY_WITH_UUID.getUuid())
+            .primaryCategoryUuid(TEST_COMM_PRIMARY_CATEGORY_WITH_UUID.getUuid())
+            .secondaryCategoryUuid(TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getUuid())
             .authMemberUuid(memberBasicUserWithUuid.getUuid())
             .createMemberUuid(memberBasicUserWithUuid.getUuid())
             .likeCount(TEST_COMM_POST.getLikeCount())

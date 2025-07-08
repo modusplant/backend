@@ -56,7 +56,7 @@ class CommLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         CommPostEntity commPost = createCommPostEntityBuilder()
                 .authMember(member)
                 .createMember(member)
-                .category(createTestCommSecondaryCategoryEntity())
+                .secondaryCategory(createTestCommSecondaryCategoryEntity())
                 .build();
         when(commPostRepository.save(commPost)).thenReturn(commPost);
         commPostRepository.save(commPost);
@@ -92,7 +92,7 @@ class CommLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         CommPostEntity commPost = createCommPostEntityBuilder()
                 .authMember(member)
                 .createMember(member)
-                .category(createTestCommSecondaryCategoryEntity())
+                .secondaryCategory(createTestCommSecondaryCategoryEntity())
                 .build();
         when(commPostRepository.save(commPost)).thenReturn(commPost);
         commPostRepository.save(commPost);
@@ -128,7 +128,7 @@ class CommLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         CommPostEntity commPost = createCommPostEntityBuilder()
                 .authMember(member)
                 .createMember(member)
-                .category(createTestCommSecondaryCategoryEntity())
+                .secondaryCategory(createTestCommSecondaryCategoryEntity())
                 .build();
         when(commPostRepository.save(commPost)).thenReturn(commPost);
         commPostRepository.save(commPost);
@@ -160,7 +160,7 @@ class CommLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         CommPostEntity commPost = createCommPostEntityBuilder()
                 .authMember(member)
                 .createMember(member)
-                .category(createTestCommSecondaryCategoryEntity())
+                .secondaryCategory(createTestCommSecondaryCategoryEntity())
                 .build();
         when(commPostRepository.save(commPost)).thenReturn(commPost);
         commPostRepository.save(commPost);
