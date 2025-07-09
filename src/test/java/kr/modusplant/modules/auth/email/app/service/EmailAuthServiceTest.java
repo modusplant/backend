@@ -6,7 +6,10 @@ import kr.modusplant.domains.member.error.MemberNotFoundException;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
+import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.global.error.EntityNotFoundException;
 import kr.modusplant.global.middleware.redis.RedisHelper;
+import kr.modusplant.global.vo.EntityName;
 import kr.modusplant.modules.auth.email.app.http.request.EmailRequest;
 import kr.modusplant.modules.auth.email.app.http.request.VerifyEmailRequest;
 import kr.modusplant.modules.auth.email.enums.EmailType;
@@ -124,11 +127,11 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
         EmailRequest request = new EmailRequest();
         String email = "notExistsEmail@gmail.com";
         setField(request, "email", email);
-        doThrow(MemberNotFoundException.ofMemberAuth()).when(siteMemberAuthValidationService).validateNotFoundEmail(email);
+        doThrow(new EntityNotFoundException(ErrorCode.SITEMEMBER_AUTH_NOT_FOUND, EntityName.SITE_MEMBER_AUTH)).when(siteMemberAuthValidationService).validateNotFoundEmail(email);
 
         // when/then
         assertThatThrownBy(() -> emailAuthService.sendResetPasswordCode(request))
-                .isInstanceOf(MemberNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test

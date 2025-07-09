@@ -6,6 +6,10 @@ import kr.modusplant.domains.member.common.util.entity.SiteMemberTermEntityTestU
 import kr.modusplant.domains.member.error.MemberExistsException;
 import kr.modusplant.domains.member.error.MemberNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberTermRepository;
+import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.global.error.EntityExistsException;
+import kr.modusplant.global.error.EntityNotFoundException;
+import kr.modusplant.global.vo.EntityName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +41,9 @@ class SiteMemberTermValidationServiceTest implements SiteMemberTermTestUtils, Si
         given(memberTermRepository.existsByUuid(uuid)).willReturn(true);
 
         // then
-        MemberExistsException existsException = assertThrows(MemberExistsException.class,
+        EntityExistsException existsException = assertThrows(EntityExistsException.class,
                 () -> memberTermValidationService.validateExistedUuid(uuid));
-        assertThat(existsException.getMessage()).isEqualTo(MemberExistsException.ofMemberTerm().getMessage());
+        assertThat(existsException.getMessage()).isEqualTo(new EntityExistsException(ErrorCode.SITEMEMBER_TERM_EXISTS, EntityName.SITE_MEMBER_TERM).getMessage());
     }
 
     @DisplayName("존재하지 않는 회원 약관 UUID 검증")
@@ -52,8 +56,8 @@ class SiteMemberTermValidationServiceTest implements SiteMemberTermTestUtils, Si
         given(memberTermRepository.existsByUuid(uuid)).willReturn(false);
 
         // then
-        MemberNotFoundException notFoundException = assertThrows(MemberNotFoundException.class,
+        EntityNotFoundException notFoundException = assertThrows(EntityNotFoundException.class,
                 () -> memberTermValidationService.validateNotFoundUuid(uuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(MemberNotFoundException.ofMemberTerm().getMessage());
+        assertThat(notFoundException.getMessage()).isEqualTo(new EntityNotFoundException(ErrorCode.SITEMEMBER_TERM_NOT_FOUND, EntityName.SITE_MEMBER_TERM).getMessage());
     }
 }

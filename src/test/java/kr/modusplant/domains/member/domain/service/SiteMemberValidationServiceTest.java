@@ -7,6 +7,10 @@ import kr.modusplant.domains.member.error.MemberExistsException;
 import kr.modusplant.domains.member.error.MemberNotFoundException;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.global.error.EntityExistsException;
+import kr.modusplant.global.error.EntityNotFoundException;
+import kr.modusplant.global.vo.EntityName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,9 +43,9 @@ class SiteMemberValidationServiceTest implements SiteMemberTestUtils, SiteMember
         given(memberRepository.existsByUuid(memberEntityUuid)).willReturn(true);
 
         // then
-        MemberExistsException existsException = assertThrows(MemberExistsException.class,
+        EntityExistsException existsException = assertThrows(EntityExistsException.class,
                 () -> memberValidationService.validateExistedUuid(memberEntity.getUuid()));
-        assertThat(existsException.getMessage()).isEqualTo(MemberExistsException.ofMember().getMessage());
+        assertThat(existsException.getMessage()).isEqualTo(new EntityExistsException(ErrorCode.SITEMEMBER_EXISTS, EntityName.SITE_MEMBER).getMessage());
     }
 
     @DisplayName("존재하지 않는 회원 UUID 검증")
@@ -55,8 +59,8 @@ class SiteMemberValidationServiceTest implements SiteMemberTestUtils, SiteMember
         given(memberRepository.existsByUuid(memberEntityUuid)).willReturn(false);
 
         // then
-        MemberNotFoundException notFoundException = assertThrows(MemberNotFoundException.class,
+        EntityNotFoundException notFoundException = assertThrows(EntityNotFoundException.class,
                 () -> memberValidationService.validateNotFoundUuid(memberEntityUuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(MemberNotFoundException.ofMember().getMessage());
+        assertThat(notFoundException.getMessage()).isEqualTo(new EntityNotFoundException(ErrorCode.SITEMEMBER_NOT_FOUND, EntityName.SITE_MEMBER).getMessage());
     }
 }

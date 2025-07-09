@@ -11,6 +11,10 @@ import kr.modusplant.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.global.error.EntityExistsException;
+import kr.modusplant.global.error.EntityNotFoundException;
+import kr.modusplant.global.vo.EntityName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,9 +54,9 @@ class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, Si
         given(memberAuthRepository.existsByOriginalMember(originalMemberEntity)).willReturn(true);
 
         // then
-        MemberExistsException existsException = assertThrows(MemberExistsException.class,
+        EntityExistsException existsException = assertThrows(EntityExistsException.class,
                 () -> memberAuthValidationService.validateExistedOriginalMemberUuid(originalMemberEntityUuid));
-        assertThat(existsException.getMessage()).isEqualTo(MemberExistsException.ofMemberAuth().getMessage());
+        assertThat(existsException.getMessage()).isEqualTo(new EntityExistsException(ErrorCode.SITEMEMBER_AUTH_EXISTS, EntityName.SITE_MEMBER_AUTH).getMessage());
     }
 
     @DisplayName("존재하지 않는 최초 회원 UUID 검증")
@@ -70,9 +74,9 @@ class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, Si
         given(memberAuthRepository.existsByOriginalMember(originalMemberEntity)).willReturn(false);
 
         // then
-        MemberNotFoundException notFoundException = assertThrows(MemberNotFoundException.class,
+        EntityNotFoundException notFoundException = assertThrows(EntityNotFoundException.class,
                 () -> memberAuthValidationService.validateNotFoundOriginalMemberUuid(memberAuthEntityUuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(MemberNotFoundException.ofMemberAuth().getMessage());
+        assertThat(notFoundException.getMessage()).isEqualTo(new EntityNotFoundException(ErrorCode.SITEMEMBER_AUTH_NOT_FOUND, EntityName.SITE_MEMBER_AUTH).getMessage());
     }
 
     @DisplayName("존재하지 않는 이메일 검증")
@@ -90,8 +94,8 @@ class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, Si
         given(memberAuthRepository.findByEmail(email)).willReturn(emptyList());
 
         // then
-        MemberNotFoundException notFoundException = assertThrows(MemberNotFoundException.class,
+        EntityNotFoundException notFoundException = assertThrows(EntityNotFoundException.class,
                 () -> memberAuthValidationService.validateNotFoundEmail(email));
-        assertThat(notFoundException.getMessage()).isEqualTo(MemberNotFoundException.ofMemberAuth().getMessage());
+        assertThat(notFoundException.getMessage()).isEqualTo(new EntityNotFoundException(ErrorCode.SITEMEMBER_AUTH_NOT_FOUND, EntityName.SITE_MEMBER_AUTH).getMessage());
     }
 }
