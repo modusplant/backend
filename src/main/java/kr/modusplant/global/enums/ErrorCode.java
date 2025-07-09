@@ -40,8 +40,6 @@ public enum ErrorCode {
 
     UNSUPPORTED_FILE(HttpStatus.FORBIDDEN, "unsupported_file", "지원되지 않는 파일 타입입니다"),
     UNSUPPORTED_SOCIAL_PROVIDER(HttpStatus.FORBIDDEN, "unsupported_social_provider", "지원되지 않는 소셜 로그인 방식입니다"),
-    // TODO: 인가 과정에서 내부적으로 완료되지 못한 예외 코드들은 "서버가 잘못했다"는 하나의 코드로 통일할 것.
-    UNSUPPORTED_ALGORITHM(HttpStatus.FORBIDDEN, "unsupported_algorithm", "지원되지 않는 알고리즘입니다"),
 
     SPECIFIED_SORTING_METHOD(HttpStatus.BAD_REQUEST, "specified_sorting_method", "페이지 정렬 방식은 지정되지 않아야 합니다"),
     INVALID_PAGE_RANGE(HttpStatus.BAD_REQUEST, "invalid_page_range", "이용할 수 있는 페이지 범위가 아닙니다"),
@@ -54,8 +52,10 @@ public enum ErrorCode {
     CONTENT_AND_FILE_ORDER_MISMATCH(HttpStatus.BAD_REQUEST, "content_and_file_order_mismatch", "컨텐츠와 순서 정보의 파일명 순서가 일치하지 않습니다"),
     FILE_NAME_EMPTY(HttpStatus.BAD_REQUEST, "file_name_empty", "컨텐츠의 파일명이 비었습니다"),
     CONTENT_TYPE_EMPTY(HttpStatus.BAD_REQUEST, "content_type_empty", "컨텐츠의 컨텐츠 타입이 비었습니다"),
+
     // auth errors
-    CREDENTIAL_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "credential_not_authorized", "인증에 필요한 데이터가 없거나 유효하지 않습니다");
+    CREDENTIAL_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "credential_not_authorized", "인증에 필요한 데이터가 없거나 유효하지 않습니다"),
+    INTERNAL_AUTHENTICATION_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "internal_authentication_fail", "서버의 문제로 인증을 처리하지 못했습니다");
 
     private final HttpStatus httpStatus;
     private final String code;
