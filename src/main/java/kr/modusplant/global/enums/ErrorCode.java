@@ -50,6 +50,10 @@ public enum ErrorCode {
     INVALID_EMAIL_VERIFY_CODE(HttpStatus.FORBIDDEN, "invalid_email_verify_code", "이메일의 검증 코드가 올바르지 않습니다"),
     INVALID_EMAIL(HttpStatus.FORBIDDEN, "invalid_email", "이메일이 올바르지 않습니다"),
 
+    CONTENT_AND_FILE_NUMBER_MISMATCH(HttpStatus.BAD_REQUEST, "content_and_file_number_mismatch", "컨텐츠와 순서 정보의 파일명 개수가 일치하지 않습니다"),
+    CONTENT_AND_FILE_ORDER_MISMATCH(HttpStatus.BAD_REQUEST, "content_and_file_order_mismatch", "컨텐츠와 순서 정보의 파일명 순서가 일치하지 않습니다"),
+    FILE_NAME_EMPTY(HttpStatus.BAD_REQUEST, "file_name_empty", "컨텐츠의 파일명이 비었습니다"),
+    CONTENT_TYPE_EMPTY(HttpStatus.BAD_REQUEST, "content_type_empty", "컨텐츠의 컨텐츠 타입이 비었습니다"),
     // auth errors
     CREDENTIAL_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "credential_not_authorized", "인증에 필요한 데이터가 없거나 유효하지 않습니다");
 

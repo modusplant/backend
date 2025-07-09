@@ -1,5 +1,7 @@
 package kr.modusplant.domains.communication.domain.service;
 
+import kr.modusplant.domains.common.error.EmptyValueException;
+import kr.modusplant.domains.common.error.InvalidMultipartDataException;
 import kr.modusplant.domains.common.persistence.repository.supers.UuidPrimaryKeyRepository;
 import kr.modusplant.domains.communication.app.http.request.CommPostInsertRequest;
 import kr.modusplant.domains.communication.app.http.request.CommPostUpdateRequest;
@@ -9,6 +11,7 @@ import kr.modusplant.domains.communication.error.PostAccessDeniedException;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
 import kr.modusplant.domains.communication.persistence.repository.CommPostRepository;
 import kr.modusplant.domains.communication.persistence.repository.CommSecondaryCategoryRepository;
+import kr.modusplant.global.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,18 +74,18 @@ public class CommPostValidationService {
 
     private void validateContentAndOrderInfo(List<MultipartFile> content, List<FileOrder> orderInfo) {
         if(content.size() != orderInfo.size()) {
-            throw new IllegalArgumentException("컨텐츠와 순서 정보의 파일명 개수가 일치하지 않습니다.");
+            throw new InvalidMultipartDataException(ErrorCode.CONTENT_AND_FILE_NUMBER_MISMATCH);
         }
 
         List<String> contentFilenames = new ArrayList<>(content.size());
         for(MultipartFile part:content) {
             String fileName = part.getOriginalFilename();
             if (fileName == null || fileName.isBlank()) {
-                throw new IllegalArgumentException("컨텐츠의 파일명이 비어있습니다.");
+                throw new EmptyValueException(ErrorCode.FILE_NAME_EMPTY, "fileName");
             }
             String contentType = part.getContentType();
             if (contentType == null || contentType.isBlank()) {
-                throw new IllegalArgumentException("컨텐츠의 컨텐츠 타입이 비어있습니다.");
+                throw new EmptyValueException(ErrorCode.CONTENT_TYPE_EMPTY, "contentType");
             }
             contentFilenames.add(fileName);
         }
@@ -93,7 +96,7 @@ public class CommPostValidationService {
                 .toList();
 
         if (!contentFilenames.equals(orderFilenames)) {
-            throw new IllegalArgumentException("컨텐츠와 순서 정보의 파일명 순서가 일치하지 않습니다.");
+            throw new InvalidMultipartDataException(ErrorCode.CONTENT_AND_FILE_ORDER_MISMATCH);
         }
     }
 }
