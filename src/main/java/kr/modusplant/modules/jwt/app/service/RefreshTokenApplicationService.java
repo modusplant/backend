@@ -1,6 +1,5 @@
 package kr.modusplant.modules.jwt.app.service;
 
-import kr.modusplant.domains.member.error.MemberNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.enums.ErrorCode;
 import kr.modusplant.global.error.EntityNotFoundException;

@@ -1,8 +1,6 @@
 package kr.modusplant.domains.member.domain.service;
 
 import kr.modusplant.domains.member.enums.AuthProvider;
-import kr.modusplant.domains.member.error.MemberExistsException;
-import kr.modusplant.domains.member.error.MemberNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.enums.ErrorCode;

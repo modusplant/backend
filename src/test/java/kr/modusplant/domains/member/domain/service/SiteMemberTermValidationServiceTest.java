@@ -3,8 +3,6 @@ package kr.modusplant.domains.member.domain.service;
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.domains.member.common.util.domain.SiteMemberTermTestUtils;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberTermEntityTestUtils;
-import kr.modusplant.domains.member.error.MemberExistsException;
-import kr.modusplant.domains.member.error.MemberNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberTermRepository;
 import kr.modusplant.global.enums.ErrorCode;
 import kr.modusplant.global.error.EntityExistsException;
