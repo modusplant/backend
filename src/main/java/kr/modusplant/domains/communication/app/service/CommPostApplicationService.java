@@ -6,7 +6,6 @@ import kr.modusplant.domains.communication.app.http.request.CommPostUpdateReques
 import kr.modusplant.domains.communication.app.http.response.CommPostResponse;
 import kr.modusplant.domains.communication.domain.service.CommCategoryValidationService;
 import kr.modusplant.domains.communication.domain.service.CommPostValidationService;
-import kr.modusplant.domains.communication.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.mapper.CommPostAppInfraMapper;
 import kr.modusplant.domains.communication.mapper.CommPostAppInfraMapperImpl;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
@@ -16,6 +15,9 @@ import kr.modusplant.domains.communication.persistence.repository.*;
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.global.error.EntityNotFoundException;
+import kr.modusplant.global.vo.EntityName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -168,7 +170,7 @@ public class CommPostApplicationService {
         }
         Long dbViewCount = commPostRepository.findByUlid(ulid)
                 .map(commPostEntity -> Optional.ofNullable(commPostEntity.getViewCount()).orElseThrow())
-                .orElseThrow(CommunicationNotFoundException::ofPost);
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.POST_NOT_FOUND, EntityName.POST));
         commPostViewCountRedisRepository.write(ulid, dbViewCount);
         return dbViewCount;
     }

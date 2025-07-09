@@ -1,11 +1,12 @@
 package kr.modusplant.domains.communication.domain.service;
 
-import kr.modusplant.domains.communication.error.CommunicationExistsException;
-import kr.modusplant.domains.communication.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.persistence.repository.CommLikeRepository;
 import kr.modusplant.domains.communication.persistence.repository.CommPostRepository;
-import kr.modusplant.domains.member.error.MemberNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.global.error.EntityExistsException;
+import kr.modusplant.global.error.EntityNotFoundException;
+import kr.modusplant.global.vo.EntityName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,22 +23,22 @@ public class CommLikeValidationService {
 
     public void validateNotFoundCommPostOrMember(String postId, UUID memberId) {
         if (!commPostRepository.existsById(postId)) {
-            throw CommunicationNotFoundException.ofPost();
+            throw new EntityNotFoundException(ErrorCode.POST_NOT_FOUND, EntityName.POST);
         }
         if (!memberRepository.existsById(memberId)) {
-            throw MemberNotFoundException.ofMember();
+            throw new EntityNotFoundException(ErrorCode.SITEMEMBER_NOT_FOUND, EntityName.SITE_MEMBER);
         }
     }
 
     public void validateNotFoundCommLike(String postId, UUID memberId) {
         if (!commLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
-            throw CommunicationNotFoundException.ofLike();
+            throw new EntityNotFoundException(ErrorCode.LIKE_NOT_FOUND, EntityName.LIKE);
         }
     }
 
     public void validateExistedCommLike(String postId, UUID memberId) {
         if (commLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
-            throw CommunicationExistsException.ofLike();
+            throw new EntityExistsException(ErrorCode.LIKE_EXISTS, EntityName.LIKE);
         }
     }
 }

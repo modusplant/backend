@@ -7,11 +7,12 @@ import kr.modusplant.domains.communication.app.http.request.CommPostInsertReques
 import kr.modusplant.domains.communication.app.http.request.CommPostUpdateRequest;
 import kr.modusplant.domains.communication.app.http.request.FileOrder;
 import kr.modusplant.domains.communication.error.AccessDeniedException;
-import kr.modusplant.domains.communication.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
 import kr.modusplant.domains.communication.persistence.repository.CommPostRepository;
 import kr.modusplant.domains.communication.persistence.repository.CommSecondaryCategoryRepository;
 import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.global.error.EntityNotFoundException;
+import kr.modusplant.global.vo.EntityName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,16 +48,16 @@ public class CommPostValidationService {
 
     public void validateNotFoundUlid(String ulid) {
         if (ulid == null || !commPostRepository.existsByUlid(ulid)) {
-            throw CommunicationNotFoundException.ofPost();
+            throw new EntityNotFoundException(ErrorCode.POST_NOT_FOUND, EntityName.POST);
         }
     }
 
     private CommPostEntity findIfExistsByUlid(String ulid) {
         if (ulid == null) {
-            throw CommunicationNotFoundException.ofPost();
+            throw new EntityNotFoundException(ErrorCode.POST_NOT_FOUND, EntityName.POST);
         }
         return commPostRepository.findByUlidAndIsDeletedFalse(ulid)
-                .orElseThrow(CommunicationNotFoundException::ofPost);
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.POST_NOT_FOUND, EntityName.POST));
     }
 
     // TODO : Spring Security 적용 후 PreAuthorize 고려
@@ -68,7 +69,7 @@ public class CommPostValidationService {
 
     private void validateNotFoundCategoryUuid(UUID categoryUuid, UuidPrimaryKeyRepository<?> categoryRepository) {
         if (categoryUuid == null || !categoryRepository.existsByUuid(categoryUuid)) {
-            throw CommunicationNotFoundException.ofCategory();
+            throw new EntityNotFoundException(ErrorCode.CATEGORY_NOT_FOUND, EntityName.CATEGORY);
         }
     }
 
