@@ -71,22 +71,19 @@ public class CommPostValidationService {
     }
 
     private void validateContentAndOrderInfo(List<MultipartFile> content, List<FileOrder> orderInfo) {
-        if (isContentNotValid(content,orderInfo)) {
-            throw new IllegalArgumentException("컨텐츠 또는 순서 정보가 비어 있거나 그들의 파일명의 크기 혹은 순서가 일치하지 않습니다.");
-        }
-    }
-
-    private boolean isContentNotValid(List<MultipartFile> content, List<FileOrder> orderInfo) {
         if(content.size() != orderInfo.size()) {
-            return true;
+            throw new IllegalArgumentException("컨텐츠와 순서 정보의 파일명 개수가 일치하지 않습니다.");
         }
 
         List<String> contentFilenames = new ArrayList<>(content.size());
         for(MultipartFile part:content) {
             String fileName = part.getOriginalFilename();
+            if (fileName == null || fileName.isBlank()) {
+                throw new IllegalArgumentException("컨텐츠의 파일명이 비어있습니다.");
+            }
             String contentType = part.getContentType();
-            if (fileName.isEmpty() || fileName.isBlank() || contentType.isEmpty() || contentType.isBlank()) {
-                return true;
+            if (contentType == null || contentType.isBlank()) {
+                throw new IllegalArgumentException("컨텐츠의 컨텐츠 타입이 비어있습니다.");
             }
             contentFilenames.add(fileName);
         }
@@ -96,6 +93,8 @@ public class CommPostValidationService {
                 .map(FileOrder::filename)
                 .toList();
 
-        return !contentFilenames.equals(orderFilenames);
+        if (!contentFilenames.equals(orderFilenames)) {
+            throw new IllegalArgumentException("컨텐츠와 순서 정보의 파일명 순서가 일치하지 않습니다.");
+        }
     }
 }
