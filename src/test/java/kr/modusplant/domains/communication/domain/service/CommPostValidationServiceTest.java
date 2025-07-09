@@ -1,14 +1,13 @@
 package kr.modusplant.domains.communication.domain.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import kr.modusplant.domains.common.error.EmptyValueException;
 import kr.modusplant.domains.common.error.InvalidMultipartDataException;
 import kr.modusplant.domains.communication.app.http.request.CommPostInsertRequest;
 import kr.modusplant.domains.communication.common.util.app.http.request.CommPostRequestTestUtils;
 import kr.modusplant.domains.communication.common.util.domain.CommPostTestUtils;
 import kr.modusplant.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
+import kr.modusplant.domains.communication.error.AccessDeniedException;
 import kr.modusplant.domains.communication.error.CommunicationNotFoundException;
-import kr.modusplant.domains.communication.error.PostAccessDeniedException;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.domains.communication.persistence.repository.CommPostRepository;
@@ -146,7 +145,7 @@ class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSec
         when(commPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.of(commPostEntity));
         when(commPostEntity.getAuthMember().getUuid()).thenReturn(UUID.randomUUID());
 
-        assertThrows(PostAccessDeniedException.class,
+        assertThrows(AccessDeniedException.class,
                 () -> commPostValidationService.validateAccessibleCommPost(ulid,memberUuid));
     }
 
