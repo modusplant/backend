@@ -1,6 +1,8 @@
 package kr.modusplant.domains.communication.domain.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import kr.modusplant.domains.common.error.EmptyValueException;
+import kr.modusplant.domains.common.error.InvalidMultipartDataException;
 import kr.modusplant.domains.communication.app.http.request.CommPostInsertRequest;
 import kr.modusplant.domains.communication.common.util.app.http.request.CommPostRequestTestUtils;
 import kr.modusplant.domains.communication.common.util.domain.CommPostTestUtils;
@@ -83,7 +85,7 @@ class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSec
         when(commCategoryRepository.existsByUuid(commPostInsertRequest.primaryCategoryUuid())).thenReturn(true);
 
         // then
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(InvalidMultipartDataException.class,
                 () -> commPostValidationService.validateCommPostInsertRequest(commPostInsertRequest));
     }
 
