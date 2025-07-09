@@ -37,13 +37,10 @@ public enum ErrorCode {
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "post_not_found", "게시글을 찾을 수 없습니다"),
 
     // empty or invalid value
-    POST_IDENTIFIER_EMPTY(HttpStatus.BAD_REQUEST, "empty_identifier", "게시글의 식별자 값이 비어 있습니다"),
-    PATH_EMPTY(HttpStatus.BAD_REQUEST, "empty_path", "경로의 값이 비어 있습니다"),
     FILE_NAME_EMPTY(HttpStatus.BAD_REQUEST, "file_name_empty", "컨텐츠의 파일명이 비었습니다"),
     CONTENT_TYPE_EMPTY(HttpStatus.BAD_REQUEST, "content_type_empty", "컨텐츠의 컨텐츠 타입이 비었습니다"),
     
     INVALID_PAGE_RANGE(HttpStatus.BAD_REQUEST, "invalid_page_range", "이용할 수 있는 페이지 범위가 아닙니다"),
-
     INVALID_FORMAT(HttpStatus.INTERNAL_SERVER_ERROR, "invalid_format", "데이터의 형식이 올바르지 않습니다"),
     INVALID_EMAIL_VERIFY_CODE(HttpStatus.FORBIDDEN, "invalid_email_verify_code", "이메일의 검증 코드가 올바르지 않습니다"),
     INVALID_EMAIL(HttpStatus.FORBIDDEN, "invalid_email", "이메일이 올바르지 않습니다"),
