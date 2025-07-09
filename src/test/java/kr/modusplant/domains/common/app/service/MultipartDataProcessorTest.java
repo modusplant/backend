@@ -2,8 +2,10 @@ package kr.modusplant.domains.common.app.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.common.enums.FileType;
+import kr.modusplant.domains.common.error.UnsupportedFileException;
 import kr.modusplant.domains.communication.common.util.app.http.request.CommPostRequestTestUtils;
 import kr.modusplant.global.app.service.S3FileService;
+import kr.modusplant.global.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -91,9 +93,9 @@ class MultipartDataProcessorTest implements CommPostRequestTestUtils {
         List<MultipartFile> fontFiles = List.of(fontFile);
 
         // when
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        UnsupportedFileException exception = assertThrows(UnsupportedFileException.class,
                 () -> multipartDataProcessor.saveFilesAndGenerateContentJson(fontFiles));
-        assertThat(exception.getMessage()).isEqualTo("지원되지 않는 파일 타입입니다.");
+        assertThat(exception.getMessage()).isEqualTo(ErrorCode.UNSUPPORTED_FILE.getMessage());
     }
 
     @Test
