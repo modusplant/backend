@@ -6,8 +6,8 @@ import kr.modusplant.domains.communication.common.util.entity.CommCommentEntityT
 import kr.modusplant.domains.communication.common.util.entity.CommPostEntityTestUtils;
 import kr.modusplant.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
-import kr.modusplant.domains.communication.error.CommentExistsException;
-import kr.modusplant.domains.communication.error.CommentNotFoundException;
+import kr.modusplant.domains.communication.error.CommunicationExistsException;
+import kr.modusplant.domains.communication.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.persistence.entity.CommCommentEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommPrimaryCategoryEntity;
@@ -91,13 +91,13 @@ public class CommCommentValidationServiceTest implements
         given(commentRepository.existsByPostUlidAndPath(commentEntity.getPostUlid(), commentEntity.getPath())).willReturn(true);
 
         // then
-        CommentExistsException ex = assertThrows(
-                CommentExistsException.class,
+        CommunicationExistsException ex = assertThrows(
+                CommunicationExistsException.class,
                 () -> commentValidationService.validateExistedCommCommentEntity(
                         commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );
-        assertEquals(new CommentExistsException().getMessage(), ex.getMessage());
+        assertEquals(CommunicationExistsException.ofComment().getMessage(), ex.getMessage());
     }
 
     @DisplayName("postUlid와 댓글 경로에 해당하는 댓글 데이터가 존재하지 않는지 확인")
@@ -118,12 +118,12 @@ public class CommCommentValidationServiceTest implements
         given(commentRepository.existsByPostUlidAndPath(commentEntity.getPostUlid(), commentEntity.getPath())).willReturn(false);
 
         // then
-        CommentNotFoundException ex = assertThrows(
-                CommentNotFoundException.class,
+        CommunicationNotFoundException ex = assertThrows(
+                CommunicationNotFoundException.class,
                 () -> commentValidationService.validateNotFoundCommCommentEntity(
                         commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );
-        assertEquals(new CommentNotFoundException().getMessage(), ex.getMessage());
+        assertEquals(CommunicationNotFoundException.ofComment().getMessage(), ex.getMessage());
     }
 }

@@ -5,8 +5,8 @@ import kr.modusplant.domains.communication.app.http.response.CommLikeResponse;
 import kr.modusplant.domains.communication.common.util.entity.CommLikeEntityTestUtils;
 import kr.modusplant.domains.communication.common.util.entity.CommPostEntityTestUtils;
 import kr.modusplant.domains.communication.domain.service.CommLikeValidationService;
-import kr.modusplant.domains.communication.error.LikeExistsException;
-import kr.modusplant.domains.communication.error.LikeNotFoundException;
+import kr.modusplant.domains.communication.error.CommunicationExistsException;
+import kr.modusplant.domains.communication.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.persistence.entity.CommLikeEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommLikeId;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
@@ -144,8 +144,8 @@ class CommLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
 
         // then
         doNothing().when(commLikeValidationService).validateNotFoundCommPostOrMember(postId, memberId);
-        doThrow(new LikeExistsException()).when(commLikeValidationService).validateExistedCommLike(postId, memberId);
-        assertThatThrownBy(() -> commLikeApplicationService.likeCommPost(postId, memberId)).isInstanceOf(LikeExistsException.class);
+        doThrow(CommunicationExistsException.ofLike()).when(commLikeValidationService).validateExistedCommLike(postId, memberId);
+        assertThatThrownBy(() -> commLikeApplicationService.likeCommPost(postId, memberId)).isInstanceOf(CommunicationExistsException.class);
     }
 
     @Test
@@ -178,8 +178,8 @@ class CommLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
 
         // then
         doNothing().when(commLikeValidationService).validateNotFoundCommPostOrMember(postId, memberId);
-        doThrow(new LikeNotFoundException()).when(commLikeValidationService).validateNotFoundCommLike(postId, memberId);
+        doThrow(CommunicationNotFoundException.ofLike()).when(commLikeValidationService).validateNotFoundCommLike(postId, memberId);
         assertThatThrownBy(() -> commLikeApplicationService.unlikeCommPost(postId, memberId))
-                .isInstanceOf(LikeNotFoundException.class);
+                .isInstanceOf(CommunicationNotFoundException.class);
     }
 }

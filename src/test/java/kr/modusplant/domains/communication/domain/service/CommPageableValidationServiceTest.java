@@ -1,7 +1,9 @@
 package kr.modusplant.domains.communication.domain.service;
 
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.domains.common.error.InvalidPaginationRangeException;
 import kr.modusplant.domains.communication.persistence.repository.CommPostRepository;
+import kr.modusplant.global.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +33,11 @@ class CommPageableValidationServiceTest {
         given(postRepository.count()).willReturn(0L);
 
         // when
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+        InvalidPaginationRangeException exception = assertThrows(InvalidPaginationRangeException.class, () ->
                 pageableValidationService.validatePageExistence(PageRequest.of(2, PAGE_SIZE)));
 
         // then
-        assertThat(exception.getMessage()).isEqualTo("현재 이용할 수 있는 페이지 범위(1 ~ 1)를 벗어났습니다.");
+        assertThat(exception.getMessage()).isEqualTo(ErrorCode.INVALID_PAGE_RANGE.getMessage());
     }
 
     @DisplayName("totalElement가 0을 초과할 때 존재하지 않는 페이지 검증")
@@ -45,10 +47,10 @@ class CommPageableValidationServiceTest {
         given(postRepository.count()).willReturn(1L);
 
         // when
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+        InvalidPaginationRangeException exception = assertThrows(InvalidPaginationRangeException.class, () ->
                 pageableValidationService.validatePageExistence(PageRequest.of(2, PAGE_SIZE)));
 
         // then
-        assertThat(exception.getMessage()).isEqualTo("현재 이용할 수 있는 페이지 범위(1 ~ 1)를 벗어났습니다.");
+        assertThat(exception.getMessage()).isEqualTo(ErrorCode.INVALID_PAGE_RANGE.getMessage());
     }
 }

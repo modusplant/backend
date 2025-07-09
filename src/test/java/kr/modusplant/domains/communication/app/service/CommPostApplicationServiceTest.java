@@ -12,7 +12,7 @@ import kr.modusplant.domains.communication.common.util.entity.CommPrimaryCategor
 import kr.modusplant.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.domain.service.CommCategoryValidationService;
 import kr.modusplant.domains.communication.domain.service.CommPostValidationService;
-import kr.modusplant.domains.communication.error.PostNotFoundException;
+import kr.modusplant.domains.communication.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommSecondaryCategoryEntity;
@@ -388,7 +388,7 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         given(commPostRepository.findByUlid(ulid)).willReturn(Optional.empty());
 
         // when & then
-        assertThrows(PostNotFoundException.class,
+        assertThrows(CommunicationNotFoundException.class,
                 () -> commPostApplicationService.readViewCount(ulid));
     }
 

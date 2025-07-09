@@ -5,9 +5,8 @@ import kr.modusplant.domains.communication.app.http.request.CommPostInsertReques
 import kr.modusplant.domains.communication.common.util.app.http.request.CommPostRequestTestUtils;
 import kr.modusplant.domains.communication.common.util.domain.CommPostTestUtils;
 import kr.modusplant.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
-import kr.modusplant.domains.communication.error.CategoryNotFoundException;
+import kr.modusplant.domains.communication.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.error.PostAccessDeniedException;
-import kr.modusplant.domains.communication.error.PostNotFoundException;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.domains.communication.persistence.repository.CommPostRepository;
@@ -65,7 +64,7 @@ class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSec
         when(commCategoryRepository.existsByUuid(commPostInsertRequest.primaryCategoryUuid())).thenReturn(false);
 
         // then
-        assertThrows(CategoryNotFoundException.class,
+        assertThrows(CommunicationNotFoundException.class,
                 () -> commPostValidationService.validateCommPostInsertRequest(commPostInsertRequest));
     }
 
@@ -119,7 +118,7 @@ class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSec
         UUID memberUuid = UUID.randomUUID();
         String ulid = CommPostTestUtils.generator.generate(null, null,null,EventType.INSERT);
         when(commPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.empty());
-        assertThrows(PostNotFoundException.class,
+        assertThrows(CommunicationNotFoundException.class,
                 () -> commPostValidationService.validateAccessibleCommPost(ulid,memberUuid));
     }
 
@@ -165,7 +164,7 @@ class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSec
         final String nullUlid = null;
 
         // then
-        assertThrows(PostNotFoundException.class, () ->
+        assertThrows(CommunicationNotFoundException.class, () ->
                 commPostValidationService.validateNotFoundUlid(nullUlid));
 
         // Not Found ULID
@@ -174,7 +173,7 @@ class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSec
         when(commPostRepository.existsByUlid(notFoundUlid)).thenReturn(false);
 
         // then
-        assertThrows(PostNotFoundException.class, () ->
+        assertThrows(CommunicationNotFoundException.class, () ->
                 commPostValidationService.validateNotFoundUlid(notFoundUlid));
     }
 

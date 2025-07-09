@@ -1,12 +1,11 @@
 package kr.modusplant.domains.communication.domain.service;
 
-import kr.modusplant.domains.communication.error.LikeExistsException;
-import kr.modusplant.domains.communication.error.LikeNotFoundException;
-import kr.modusplant.domains.communication.error.PostNotFoundException;
+import kr.modusplant.domains.communication.error.CommunicationExistsException;
+import kr.modusplant.domains.communication.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.persistence.repository.CommLikeRepository;
 import kr.modusplant.domains.communication.persistence.repository.CommPostRepository;
+import kr.modusplant.domains.member.error.MemberNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.global.error.EntityExistsDomainException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +37,7 @@ class CommLikeValidationServiceTest {
         when(commPostRepository.existsById(QNA_POST_ID)).thenReturn(false);
 
         assertThatThrownBy(() -> validationService.validateNotFoundCommPostOrMember(QNA_POST_ID, MEMBER_ID))
-                .isInstanceOf(PostNotFoundException.class);
+                .isInstanceOf(CommunicationNotFoundException.class);
     }
 
     @Test
@@ -48,7 +47,7 @@ class CommLikeValidationServiceTest {
         when(memberRepository.existsById(MEMBER_ID)).thenReturn(false);
 
         assertThatThrownBy(() -> validationService.validateNotFoundCommPostOrMember(QNA_POST_ID, MEMBER_ID))
-                .isInstanceOf(EntityExistsDomainException.class);
+                .isInstanceOf(MemberNotFoundException.class);
     }
 
     @Test
@@ -57,7 +56,7 @@ class CommLikeValidationServiceTest {
         when(commLikeRepository.existsByPostIdAndMemberId(QNA_POST_ID, MEMBER_ID)).thenReturn(false);
 
         assertThatThrownBy(() -> validationService.validateNotFoundCommLike(QNA_POST_ID, MEMBER_ID))
-                .isInstanceOf(LikeNotFoundException.class);
+                .isInstanceOf(CommunicationNotFoundException.class);
     }
 
     @Test
@@ -66,6 +65,6 @@ class CommLikeValidationServiceTest {
         when(commLikeRepository.existsByPostIdAndMemberId(QNA_POST_ID, MEMBER_ID)).thenReturn(true);
 
         assertThatThrownBy(() -> validationService.validateExistedCommLike(QNA_POST_ID, MEMBER_ID))
-                .isInstanceOf(LikeExistsException.class);
+                .isInstanceOf(CommunicationExistsException.class);
     }
 }
