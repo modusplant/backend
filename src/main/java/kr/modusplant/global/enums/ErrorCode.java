@@ -38,7 +38,6 @@ public enum ErrorCode {
     EMPTY_POSTULID_INPUT(HttpStatus.BAD_REQUEST, "empty_postulid_input", "게시글 ulid의 값이 비어 있습니다"),
     EMPTY_PATH_INPUT(HttpStatus.BAD_REQUEST, "empty_path_input", "경로의 값이 비어 있습니다"),
 
-
     UNSUPPORTED_FILE(HttpStatus.FORBIDDEN, "unsupported_file", "지원되지 않는 파일 타입입니다"),
     UNSUPPORTED_SOCIAL_PROVIDER(HttpStatus.FORBIDDEN, "unsupported_social_provider", "지원되지 않는 소셜 로그인 방식입니다"),
     // TODO: 인가 과정에서 내부적으로 완료되지 못한 예외 코드들은 "서버가 잘못했다"는 하나의 코드로 통일할 것.
