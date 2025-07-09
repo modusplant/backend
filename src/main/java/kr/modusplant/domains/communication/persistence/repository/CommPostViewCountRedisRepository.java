@@ -1,5 +1,6 @@
 package kr.modusplant.domains.communication.persistence.repository;
 
+import kr.modusplant.domains.common.error.InvalidFormatException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -50,6 +51,6 @@ public class CommPostViewCountRedisRepository {
         if (parts.length == 4) {
             return parts[2];
         }
-        throw new IllegalArgumentException("유효하지 않은 키 서식입니다.");
+        throw new InvalidFormatException("redisKey");
     }
 }
