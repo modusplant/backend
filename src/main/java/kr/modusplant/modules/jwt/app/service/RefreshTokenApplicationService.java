@@ -2,6 +2,9 @@ package kr.modusplant.modules.jwt.app.service;
 
 import kr.modusplant.domains.member.error.MemberNotFoundException;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.global.error.EntityNotFoundException;
+import kr.modusplant.global.vo.EntityName;
 import kr.modusplant.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.modules.jwt.mapper.RefreshTokenAppInfraMapper;
 import kr.modusplant.modules.jwt.persistence.entity.RefreshTokenEntity;
@@ -30,7 +33,7 @@ public class RefreshTokenApplicationService {
 
     public Optional<RefreshToken> getByMemberUuidAndRefreshToken(UUID uuid, String refreshToken) {
         Optional<RefreshTokenEntity> tokenOrEmpty = tokenRepository.findByMemberAndRefreshToken(
-                memberRepository.findByUuid(uuid).orElseThrow(MemberNotFoundException::ofMember), refreshToken);
+                memberRepository.findByUuid(uuid).orElseThrow(() -> new EntityNotFoundException(ErrorCode.SITEMEMBER_NOT_FOUND, EntityName.SITE_MEMBER)), refreshToken);
         return tokenOrEmpty.isEmpty() ? Optional.empty() : Optional.of(refreshTokenAppInfraMapper.toRefreshToken(tokenOrEmpty.orElseThrow()));
     }
 

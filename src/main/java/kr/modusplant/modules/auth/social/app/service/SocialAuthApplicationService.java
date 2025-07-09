@@ -11,7 +11,10 @@ import kr.modusplant.domains.member.persistence.entity.SiteMemberRoleEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberAuthRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRoleRepository;
+import kr.modusplant.global.enums.ErrorCode;
 import kr.modusplant.global.enums.Role;
+import kr.modusplant.global.error.EntityNotFoundException;
+import kr.modusplant.global.vo.EntityName;
 import kr.modusplant.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.modules.auth.social.app.dto.supers.SocialUserInfo;
 import kr.modusplant.modules.auth.social.app.service.supers.SocialAuthClient;
@@ -78,12 +81,12 @@ public class SocialAuthApplicationService {
 
     private SiteMemberEntity getMemberEntityByUuid(UUID uuid) {
         return memberRepository.findByUuid(uuid)
-                .orElseThrow(MemberNotFoundException::ofMember);
+                .orElseThrow((() -> new EntityNotFoundException(ErrorCode.SITEMEMBER_NOT_FOUND, EntityName.SITE_MEMBER)));
     }
 
     private SiteMemberRoleEntity getMemberRoleEntityByMember(SiteMemberEntity memberEntity) {
         return memberRoleRepository.findByMember(memberEntity)
-                .orElseThrow(MemberNotFoundException::ofMemberRole);
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.SITEMEMBER_ROLE_NOT_FOUND, EntityName.SITE_MEMBER_ROLE));
     }
 
     private SiteMemberEntity createSiteMember(String nickname) {
