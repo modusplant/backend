@@ -1,7 +1,7 @@
 package kr.modusplant.domains.communication.domain.service;
 
-import kr.modusplant.domains.communication.error.CategoryExistsException;
-import kr.modusplant.domains.communication.error.CategoryNotFoundException;
+import kr.modusplant.domains.communication.error.CommunicationExistsException;
+import kr.modusplant.domains.communication.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.persistence.repository.CommSecondaryCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -23,19 +23,19 @@ public class CommCategoryValidationService {
             return;
         }
         if (commCategoryRepository.existsByOrder(order)) {
-            throw new CategoryExistsException();
+            throw CommunicationExistsException.ofCategory();
         }
     }
 
     public void validateExistedCategory(String category) {
         if (commCategoryRepository.existsByCategory(category)) {
-            throw new CategoryExistsException();
+            throw CommunicationExistsException.ofCategory();
         }
     }
 
     public void validateNotFoundUuid(UUID uuid) {
         if (uuid == null || !commCategoryRepository.existsByUuid(uuid)) {
-            throw new CategoryNotFoundException();
+            throw CommunicationNotFoundException.ofCategory();
         }
     }
 }

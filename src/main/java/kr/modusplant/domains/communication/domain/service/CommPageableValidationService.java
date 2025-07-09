@@ -1,5 +1,6 @@
 package kr.modusplant.domains.communication.domain.service;
 
+import kr.modusplant.domains.common.error.InvalidPaginationRangeException;
 import kr.modusplant.domains.communication.persistence.repository.CommPostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +16,7 @@ public class CommPageableValidationService {
         long totalElements = postRepository.count();
         if (totalElements == 0L) {
             if (pageable.getPageNumber() > 1) {
-                throw new IllegalArgumentException("현재 이용할 수 있는 페이지 범위(1 ~ 1)를 벗어났습니다.");
+                throw new InvalidPaginationRangeException();
             }
             return;
         }
@@ -23,8 +24,7 @@ public class CommPageableValidationService {
         int totalPages = (int) Math.ceil((double) totalElements / pageable.getPageSize());
 
         if (pageable.getPageNumber() >= totalPages) {
-            throw new IllegalArgumentException(
-                    "현재 이용할 수 있는 페이지 범위(1 ~ " + (totalPages) + ")를 벗어났습니다.");
+            throw new InvalidPaginationRangeException();
         }
     }
 }

@@ -2,7 +2,7 @@ package kr.modusplant.domains.communication.app.service;
 
 import kr.modusplant.domains.communication.app.http.response.CommLikeResponse;
 import kr.modusplant.domains.communication.domain.service.CommLikeValidationService;
-import kr.modusplant.domains.communication.error.PostNotFoundException;
+import kr.modusplant.domains.communication.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.persistence.entity.CommLikeEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
 import kr.modusplant.domains.communication.persistence.repository.CommLikeRepository;
@@ -25,7 +25,7 @@ public class CommLikeApplicationService {
         commLikeValidationService.validateNotFoundCommPostOrMember(postId, memberId);
         commLikeValidationService.validateExistedCommLike(postId, memberId);
 
-        CommPostEntity commPost = commPostRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        CommPostEntity commPost = commPostRepository.findById(postId).orElseThrow(CommunicationNotFoundException::ofPost);
         commPost.increaseLikeCount();
 
         commLikeRepository.save(CommLikeEntity.of(postId, memberId));
@@ -37,7 +37,7 @@ public class CommLikeApplicationService {
         commLikeValidationService.validateNotFoundCommPostOrMember(postId, memberId);
         commLikeValidationService.validateNotFoundCommLike(postId, memberId);
 
-        CommPostEntity commPost = commPostRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        CommPostEntity commPost = commPostRepository.findById(postId).orElseThrow(CommunicationNotFoundException::ofPost);
         commPost.decreaseLikeCount();
 
         commLikeRepository.deleteByPostIdAndMemberId(postId, memberId);

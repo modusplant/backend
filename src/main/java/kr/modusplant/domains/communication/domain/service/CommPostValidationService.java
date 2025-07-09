@@ -4,9 +4,8 @@ import kr.modusplant.domains.common.persistence.repository.supers.UuidPrimaryKey
 import kr.modusplant.domains.communication.app.http.request.CommPostInsertRequest;
 import kr.modusplant.domains.communication.app.http.request.CommPostUpdateRequest;
 import kr.modusplant.domains.communication.app.http.request.FileOrder;
-import kr.modusplant.domains.communication.error.CategoryNotFoundException;
+import kr.modusplant.domains.communication.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.error.PostAccessDeniedException;
-import kr.modusplant.domains.communication.error.PostNotFoundException;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
 import kr.modusplant.domains.communication.persistence.repository.CommPostRepository;
 import kr.modusplant.domains.communication.persistence.repository.CommSecondaryCategoryRepository;
@@ -45,16 +44,16 @@ public class CommPostValidationService {
 
     public void validateNotFoundUlid(String ulid) {
         if (ulid == null || !commPostRepository.existsByUlid(ulid)) {
-            throw new PostNotFoundException();
+            throw CommunicationNotFoundException.ofPost();
         }
     }
 
     private CommPostEntity findIfExistsByUlid(String ulid) {
         if (ulid == null) {
-            throw new PostNotFoundException();
+            throw CommunicationNotFoundException.ofPost();
         }
         return commPostRepository.findByUlidAndIsDeletedFalse(ulid)
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(CommunicationNotFoundException::ofPost);
     }
 
     // TODO : Spring Security 적용 후 PreAuthorize 고려
@@ -66,7 +65,7 @@ public class CommPostValidationService {
 
     private void validateNotFoundCategoryUuid(UUID categoryUuid, UuidPrimaryKeyRepository<?> categoryRepository) {
         if (categoryUuid == null || !categoryRepository.existsByUuid(categoryUuid)) {
-            throw new CategoryNotFoundException();
+            throw CommunicationNotFoundException.ofCategory();
         }
     }
 

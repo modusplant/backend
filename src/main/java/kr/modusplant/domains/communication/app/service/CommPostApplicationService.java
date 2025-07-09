@@ -6,7 +6,7 @@ import kr.modusplant.domains.communication.app.http.request.CommPostUpdateReques
 import kr.modusplant.domains.communication.app.http.response.CommPostResponse;
 import kr.modusplant.domains.communication.domain.service.CommCategoryValidationService;
 import kr.modusplant.domains.communication.domain.service.CommPostValidationService;
-import kr.modusplant.domains.communication.error.PostNotFoundException;
+import kr.modusplant.domains.communication.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.mapper.CommPostAppInfraMapper;
 import kr.modusplant.domains.communication.mapper.CommPostAppInfraMapperImpl;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
@@ -168,7 +168,7 @@ public class CommPostApplicationService {
         }
         Long dbViewCount = commPostRepository.findByUlid(ulid)
                 .map(commPostEntity -> Optional.ofNullable(commPostEntity.getViewCount()).orElseThrow())
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(CommunicationNotFoundException::ofPost);
         commPostViewCountRedisRepository.write(ulid, dbViewCount);
         return dbViewCount;
     }
