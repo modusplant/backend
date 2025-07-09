@@ -14,9 +14,9 @@ public class EmptyInputException extends BusinessException {
     }
 
     public static EmptyInputException postUlid() {
-        return new EmptyInputException(ErrorCode.EMPTY_POSTULID_INPUT, "postUlid"); }
+        return new EmptyInputException(ErrorCode.EMPTY_POST_IDENTIFIER, "postUlid"); }
 
     public static EmptyInputException path() {
-        return new EmptyInputException(ErrorCode.EMPTY_PATH_INPUT, "path");
+        return new EmptyInputException(ErrorCode.EMPTY_PATH, "path");
     }
 }
