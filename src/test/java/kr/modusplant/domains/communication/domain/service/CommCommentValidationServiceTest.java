@@ -6,8 +6,6 @@ import kr.modusplant.domains.communication.common.util.entity.CommCommentEntityT
 import kr.modusplant.domains.communication.common.util.entity.CommPostEntityTestUtils;
 import kr.modusplant.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
-import kr.modusplant.domains.communication.error.CommunicationExistsException;
-import kr.modusplant.domains.communication.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.persistence.entity.CommCommentEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommPrimaryCategoryEntity;
@@ -15,6 +13,10 @@ import kr.modusplant.domains.communication.persistence.entity.CommSecondaryCateg
 import kr.modusplant.domains.communication.persistence.repository.CommCommentRepository;
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
+import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.global.error.EntityExistsException;
+import kr.modusplant.global.error.EntityNotFoundException;
+import kr.modusplant.global.vo.EntityName;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -91,13 +93,13 @@ public class CommCommentValidationServiceTest implements
         given(commentRepository.existsByPostUlidAndPath(commentEntity.getPostUlid(), commentEntity.getPath())).willReturn(true);
 
         // then
-        CommunicationExistsException ex = assertThrows(
-                CommunicationExistsException.class,
+        EntityExistsException ex = assertThrows(
+                EntityExistsException.class,
                 () -> commentValidationService.validateExistedCommCommentEntity(
                         commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );
-        assertEquals(CommunicationExistsException.ofComment().getMessage(), ex.getMessage());
+        assertEquals(new EntityExistsException(ErrorCode.COMMENT_EXISTS, EntityName.COMMENT).getMessage(), ex.getMessage());
     }
 
     @DisplayName("postUlid와 댓글 경로에 해당하는 댓글 데이터가 존재하지 않는지 확인")
@@ -118,12 +120,12 @@ public class CommCommentValidationServiceTest implements
         given(commentRepository.existsByPostUlidAndPath(commentEntity.getPostUlid(), commentEntity.getPath())).willReturn(false);
 
         // then
-        CommunicationNotFoundException ex = assertThrows(
-                CommunicationNotFoundException.class,
+        EntityNotFoundException ex = assertThrows(
+                EntityNotFoundException.class,
                 () -> commentValidationService.validateNotFoundCommCommentEntity(
                         commentEntity.getPostUlid(), commentEntity.getPath()
                 )
         );
-        assertEquals(CommunicationNotFoundException.ofComment().getMessage(), ex.getMessage());
+        assertEquals(new EntityNotFoundException(ErrorCode.COMMENT_NOT_FOUND, EntityName.COMMENT).getMessage(), ex.getMessage());
     }
 }

@@ -5,8 +5,6 @@ import kr.modusplant.domains.communication.app.http.response.CommLikeResponse;
 import kr.modusplant.domains.communication.common.util.entity.CommLikeEntityTestUtils;
 import kr.modusplant.domains.communication.common.util.entity.CommPostEntityTestUtils;
 import kr.modusplant.domains.communication.domain.service.CommLikeValidationService;
-import kr.modusplant.domains.communication.error.CommunicationExistsException;
-import kr.modusplant.domains.communication.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.persistence.entity.CommLikeEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommLikeId;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
@@ -15,6 +13,10 @@ import kr.modusplant.domains.communication.persistence.repository.CommPostReposi
 import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.global.error.EntityExistsException;
+import kr.modusplant.global.error.EntityNotFoundException;
+import kr.modusplant.global.vo.EntityName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -144,8 +146,8 @@ class CommLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
 
         // then
         doNothing().when(commLikeValidationService).validateNotFoundCommPostOrMember(postId, memberId);
-        doThrow(CommunicationExistsException.ofLike()).when(commLikeValidationService).validateExistedCommLike(postId, memberId);
-        assertThatThrownBy(() -> commLikeApplicationService.likeCommPost(postId, memberId)).isInstanceOf(CommunicationExistsException.class);
+        doThrow(new EntityExistsException(ErrorCode.LIKE_EXISTS, EntityName.LIKE)).when(commLikeValidationService).validateExistedCommLike(postId, memberId);
+        assertThatThrownBy(() -> commLikeApplicationService.likeCommPost(postId, memberId)).isInstanceOf(EntityExistsException.class);
     }
 
     @Test
@@ -178,8 +180,8 @@ class CommLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
 
         // then
         doNothing().when(commLikeValidationService).validateNotFoundCommPostOrMember(postId, memberId);
-        doThrow(CommunicationNotFoundException.ofLike()).when(commLikeValidationService).validateNotFoundCommLike(postId, memberId);
+        doThrow(new EntityNotFoundException(ErrorCode.LIKE_NOT_FOUND, EntityName.LIKE)).when(commLikeValidationService).validateNotFoundCommLike(postId, memberId);
         assertThatThrownBy(() -> commLikeApplicationService.unlikeCommPost(postId, memberId))
-                .isInstanceOf(CommunicationNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 }

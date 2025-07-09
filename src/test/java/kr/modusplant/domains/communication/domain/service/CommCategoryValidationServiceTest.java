@@ -3,9 +3,11 @@ package kr.modusplant.domains.communication.domain.service;
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.domains.communication.common.util.app.http.response.CommCategoryResponseTestUtils;
 import kr.modusplant.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
-import kr.modusplant.domains.communication.error.CommunicationExistsException;
-import kr.modusplant.domains.communication.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.persistence.repository.CommSecondaryCategoryRepository;
+import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.global.error.EntityExistsException;
+import kr.modusplant.global.error.EntityNotFoundException;
+import kr.modusplant.global.vo.EntityName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +40,9 @@ class CommCategoryValidationServiceTest implements CommCategoryResponseTestUtils
         given(commCategoryRepository.existsByOrder(order)).willReturn(true);
 
         // then
-        CommunicationExistsException existsException = assertThrows(CommunicationExistsException.class,
+        EntityExistsException existsException = assertThrows(EntityExistsException.class,
                 () -> commCategoryValidationService.validateExistedOrder(order));
-        assertThat(existsException.getMessage()).isEqualTo(CommunicationExistsException.ofCategory().getMessage());
+        assertThat(existsException.getMessage()).isEqualTo(new EntityExistsException(ErrorCode.CATEGORY_EXISTS, EntityName.CATEGORY).getMessage());
     }
 
     @DisplayName("존재하는 항목 검증")
@@ -55,9 +57,9 @@ class CommCategoryValidationServiceTest implements CommCategoryResponseTestUtils
         given(commCategoryRepository.existsByCategory(category)).willReturn(true);
 
         // then
-        CommunicationExistsException existsException = assertThrows(CommunicationExistsException.class,
+        EntityExistsException existsException = assertThrows(EntityExistsException.class,
                 () -> commCategoryValidationService.validateExistedCategory(category));
-        assertThat(existsException.getMessage()).isEqualTo(CommunicationExistsException.ofCategory().getMessage());
+        assertThat(existsException.getMessage()).isEqualTo(new EntityExistsException(ErrorCode.CATEGORY_EXISTS, EntityName.CATEGORY).getMessage());
     }
 
     @DisplayName("존재하지 않는 순서 검증")
@@ -70,8 +72,9 @@ class CommCategoryValidationServiceTest implements CommCategoryResponseTestUtils
         given(commCategoryRepository.existsByUuid(uuid)).willReturn(false);
 
         // then
-        CommunicationNotFoundException notFoundException = assertThrows(CommunicationNotFoundException.class,
+        EntityNotFoundException notFoundException = assertThrows(EntityNotFoundException.class,
                 () -> commCategoryValidationService.validateNotFoundUuid(uuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(CommunicationNotFoundException.ofCategory().getMessage());
+        assertThat(notFoundException.getMessage())
+                .isEqualTo(new EntityNotFoundException(ErrorCode.CATEGORY_NOT_FOUND, EntityName.CATEGORY).getMessage());
     }
 }

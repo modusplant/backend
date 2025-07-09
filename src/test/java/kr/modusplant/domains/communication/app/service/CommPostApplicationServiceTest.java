@@ -12,7 +12,6 @@ import kr.modusplant.domains.communication.common.util.entity.CommPrimaryCategor
 import kr.modusplant.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.domains.communication.domain.service.CommCategoryValidationService;
 import kr.modusplant.domains.communication.domain.service.CommPostValidationService;
-import kr.modusplant.domains.communication.error.CommunicationNotFoundException;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.domains.communication.persistence.entity.CommSecondaryCategoryEntity;
@@ -21,6 +20,7 @@ import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils
 import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.global.error.EntityNotFoundException;
 import kr.modusplant.global.persistence.generator.UlidIdGenerator;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.BeforeEach;
@@ -388,7 +388,7 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         given(commPostRepository.findByUlid(ulid)).willReturn(Optional.empty());
 
         // when & then
-        assertThrows(CommunicationNotFoundException.class,
+        assertThrows(EntityNotFoundException.class,
                 () -> commPostApplicationService.readViewCount(ulid));
     }
 
