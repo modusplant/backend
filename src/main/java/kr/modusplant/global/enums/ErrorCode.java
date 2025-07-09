@@ -55,7 +55,9 @@ public enum ErrorCode {
 
     // auth errors
     CREDENTIAL_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "credential_not_authorized", "인증에 필요한 데이터가 없거나 유효하지 않습니다"),
-    INTERNAL_AUTHENTICATION_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "internal_authentication_fail", "서버의 문제로 인증을 처리하지 못했습니다");
+    INTERNAL_AUTHENTICATION_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "internal_authentication_fail", "서버의 문제로 인증을 처리하지 못했습니다"),
+    POST_ACCESS_DENIED(HttpStatus.FORBIDDEN, "post_access_denied", "게시글에 대한 접근이 거부되었습니다");
+
 
     private final HttpStatus httpStatus;
     private final String code;

@@ -6,8 +6,8 @@ import kr.modusplant.domains.common.persistence.repository.supers.UuidPrimaryKey
 import kr.modusplant.domains.communication.app.http.request.CommPostInsertRequest;
 import kr.modusplant.domains.communication.app.http.request.CommPostUpdateRequest;
 import kr.modusplant.domains.communication.app.http.request.FileOrder;
+import kr.modusplant.domains.communication.error.AccessDeniedException;
 import kr.modusplant.domains.communication.error.CommunicationNotFoundException;
-import kr.modusplant.domains.communication.error.PostAccessDeniedException;
 import kr.modusplant.domains.communication.persistence.entity.CommPostEntity;
 import kr.modusplant.domains.communication.persistence.repository.CommPostRepository;
 import kr.modusplant.domains.communication.persistence.repository.CommSecondaryCategoryRepository;
@@ -62,7 +62,7 @@ public class CommPostValidationService {
     // TODO : Spring Security 적용 후 PreAuthorize 고려
     private void validateMemberHasPostAccess(CommPostEntity commPost, UUID memberUuid) {
         if(!commPost.getAuthMember().getUuid().equals(memberUuid)) {
-            throw new PostAccessDeniedException();
+            throw new AccessDeniedException(ErrorCode.POST_ACCESS_DENIED, "post");
         }
     }
 
