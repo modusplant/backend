@@ -2,7 +2,7 @@ package kr.modusplant.modules.auth.social.app.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.modules.auth.social.app.dto.GoogleUserInfo;
-import kr.modusplant.modules.auth.social.error.OAuthException;
+import kr.modusplant.modules.auth.social.error.OAuthRequestFailException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -81,7 +81,7 @@ class GoogleAuthClientTest {
 
     @Test
     @DisplayName("구글 access token 발급 실패 시 예외 발생 테스트")
-    void getAccessTokenWhenErrorResponseThrowsOAuthExceptionTest() {
+    void getAccessTokenWhenErrorResponseThrowsOAuthRequestFailExceptionTest() {
         // Given
         String authCode = "fake-auth-code";
         
@@ -89,7 +89,7 @@ class GoogleAuthClientTest {
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST));
 
         // When & Then
-        assertThrows(OAuthException.class, () -> googleAuthClient.getAccessToken(authCode));
+        assertThrows(OAuthRequestFailException.class, () -> googleAuthClient.getAccessToken(authCode));
     }
 
     @Test
@@ -119,7 +119,7 @@ class GoogleAuthClientTest {
 
     @Test
     @DisplayName("구글 사용자 정보 가져오기 실패 시 예외 발생 테스트")
-    void getUserInfoWhenErrorResponseThrowsOAuthExceptionTest() {
+    void getUserInfoWhenErrorResponseThrowsOAuthRequestFailExceptionTest() {
         // Given
         String accessToken = "invalid-token";
         
@@ -127,6 +127,6 @@ class GoogleAuthClientTest {
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST));
 
         // When & Then
-        assertThrows(OAuthException.class, () -> googleAuthClient.getUserInfo(accessToken));
+        assertThrows(OAuthRequestFailException.class, () -> googleAuthClient.getUserInfo(accessToken));
     }
 }

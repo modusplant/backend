@@ -1,7 +1,7 @@
 package kr.modusplant.modules.auth.social.app.service;
 
 import kr.modusplant.modules.auth.social.app.dto.KakaoUserInfo;
-import kr.modusplant.modules.auth.social.error.OAuthException;
+import kr.modusplant.modules.auth.social.error.OAuthRequestFailException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -75,7 +75,7 @@ class KakaoAuthClientTest {
 
     @Test
     @DisplayName("카카오 access token 발급 실패 시 예외 발생 테스트")
-    void getAccessTokenWhenErrorResponseThrowsOAuthExceptionTest() {
+    void getAccessTokenWhenErrorResponseThrowsOAuthRequestFailExceptionTest() {
         // given
         String authCode = "fake-auth-code";
 
@@ -83,7 +83,7 @@ class KakaoAuthClientTest {
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST));
 
         // when & then
-        assertThrows(OAuthException.class, () -> kakaoAuthClient.getAccessToken(authCode));
+        assertThrows(OAuthRequestFailException.class, () -> kakaoAuthClient.getAccessToken(authCode));
     }
 
     @Test
@@ -122,7 +122,7 @@ class KakaoAuthClientTest {
 
     @Test
     @DisplayName("카카오 사용자 정보 가져오기 실패 시 예외 발생 테스트")
-    void getUserInfoWhenErrorResponseThrowsOAuthExceptionTest() {
+    void getUserInfoWhenErrorResponseThrowsOAuthRequestFailExceptionTest() {
         // given
         String accessToken = "invalid-token";
 
@@ -130,6 +130,6 @@ class KakaoAuthClientTest {
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST));
 
         // when & then
-        assertThrows(OAuthException.class, () -> kakaoAuthClient.getUserInfo(accessToken));
+        assertThrows(OAuthRequestFailException.class, () -> kakaoAuthClient.getUserInfo(accessToken));
     }
 }
