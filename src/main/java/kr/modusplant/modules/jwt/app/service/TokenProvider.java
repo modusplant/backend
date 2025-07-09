@@ -6,7 +6,8 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import kr.modusplant.global.error.InvalidInputException;
+import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.global.error.InvalidDataException;
 import kr.modusplant.modules.auth.email.app.http.request.VerifyEmailRequest;
 import kr.modusplant.modules.jwt.error.InvalidTokenException;
 import kr.modusplant.modules.jwt.error.TokenExpiredException;
@@ -179,10 +180,10 @@ public class TokenProvider {
 
             // 인증코드, 메일 일치 검증
             if (!verifyCode.equals(payloadVerifyCode)) {
-                throw InvalidInputException.verifyCode();
+                throw new InvalidDataException(ErrorCode.INVALID_EMAIL_VERIFY_CODE, "verifyCode");
             }
             if (!email.equals(claims.get(EMAIL, String.class))) {
-                throw InvalidInputException.email();
+                throw new InvalidDataException(ErrorCode.INVALID_EMAIL, "email");
             }
         } catch (ExpiredJwtException e) {
             throw new TokenExpiredException();
