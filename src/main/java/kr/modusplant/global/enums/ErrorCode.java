@@ -37,8 +37,8 @@ public enum ErrorCode {
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "post_not_found", "게시글을 찾을 수 없습니다"),
 
     // empty or invalid value
-    EMPTY_POST_IDENTIFIER(HttpStatus.BAD_REQUEST, "empty_identifier", "게시글의 식별자 값이 비어 있습니다"),
-    EMPTY_PATH(HttpStatus.BAD_REQUEST, "empty_path", "경로의 값이 비어 있습니다"),
+    POST_IDENTIFIER_EMPTY(HttpStatus.BAD_REQUEST, "empty_identifier", "게시글의 식별자 값이 비어 있습니다"),
+    PATH_EMPTY(HttpStatus.BAD_REQUEST, "empty_path", "경로의 값이 비어 있습니다"),
     FILE_NAME_EMPTY(HttpStatus.BAD_REQUEST, "file_name_empty", "컨텐츠의 파일명이 비었습니다"),
     CONTENT_TYPE_EMPTY(HttpStatus.BAD_REQUEST, "content_type_empty", "컨텐츠의 컨텐츠 타입이 비었습니다"),
     
