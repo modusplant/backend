@@ -1,8 +1,9 @@
 package kr.modusplant.modules.auth.social.app.service;
 
+import kr.modusplant.global.enums.ErrorCode;
 import kr.modusplant.modules.auth.social.app.dto.KakaoUserInfo;
 import kr.modusplant.modules.auth.social.app.service.supers.SocialAuthClient;
-import kr.modusplant.modules.auth.social.error.OAuthException;
+import kr.modusplant.modules.auth.social.error.OAuthRequestFailException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -45,7 +46,7 @@ public class KakaoAuthClient implements SocialAuthClient {
                 .body(formData)
                 .retrieve()
                 .onStatus(this::isErrorStatus, (request, response) -> {
-                    throw new OAuthException((HttpStatus) response.getStatusCode());
+                    throw new OAuthRequestFailException(ErrorCode.KAKAO_LOGIN_FAIL, "kakao");
                 })
                 .body(Map.class)
                 .get("access_token").toString();
@@ -61,7 +62,7 @@ public class KakaoAuthClient implements SocialAuthClient {
                 .uri("/v2/user/me")
                 .retrieve()
                 .onStatus(this::isErrorStatus, (request, response) -> {
-                    throw new OAuthException((HttpStatus) response.getStatusCode());
+                    throw new OAuthRequestFailException(ErrorCode.KAKAO_LOGIN_FAIL, "kakao");
                 })
                 .body(KakaoUserInfo.class);
     }
