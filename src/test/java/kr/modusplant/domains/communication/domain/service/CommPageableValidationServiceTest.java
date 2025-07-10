@@ -1,9 +1,9 @@
 package kr.modusplant.domains.communication.domain.service;
 
 import kr.modusplant.domains.common.context.DomainsServiceOnlyContext;
-import kr.modusplant.domains.common.error.InvalidPaginationRangeException;
 import kr.modusplant.domains.communication.persistence.repository.CommPostRepository;
 import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.global.error.InvalidDataException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ class CommPageableValidationServiceTest {
         given(postRepository.count()).willReturn(0L);
 
         // when
-        InvalidPaginationRangeException exception = assertThrows(InvalidPaginationRangeException.class, () ->
+        InvalidDataException exception = assertThrows(InvalidDataException.class, () ->
                 pageableValidationService.validatePageExistence(PageRequest.of(2, PAGE_SIZE)));
 
         // then
@@ -47,7 +47,7 @@ class CommPageableValidationServiceTest {
         given(postRepository.count()).willReturn(1L);
 
         // when
-        InvalidPaginationRangeException exception = assertThrows(InvalidPaginationRangeException.class, () ->
+        InvalidDataException exception = assertThrows(InvalidDataException.class, () ->
                 pageableValidationService.validatePageExistence(PageRequest.of(2, PAGE_SIZE)));
 
         // then
