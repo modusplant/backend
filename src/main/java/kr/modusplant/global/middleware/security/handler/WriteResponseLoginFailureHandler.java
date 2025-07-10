@@ -26,18 +26,14 @@ public class WriteResponseLoginFailureHandler implements AuthenticationFailureHa
             response.setStatus(ex.getErrorCode().getHttpStatus().value());
             response.getWriter().write(
                     objectMapper.writeValueAsString(DataResponse
-                            .of(ex.getErrorCode().getHttpStatus().value(),
-                                    ex.getErrorCode().getCode(),
-                                    ex.getErrorCode().getMessage())
+                            .of(ex.getErrorCode())
                     )
             );
         } else {
             response.setStatus(SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus().value());
             response.getWriter().write(
                     objectMapper.writeValueAsString(DataResponse
-                            .of(SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus().value(),
-                                    SecurityErrorCode.AUTHENTICATION_FAILED.getCode(),
-                                    SecurityErrorCode.AUTHENTICATION_FAILED.getMessage())
+                            .of(SecurityErrorCode.AUTHENTICATION_FAILED)
                     )
             );
         }

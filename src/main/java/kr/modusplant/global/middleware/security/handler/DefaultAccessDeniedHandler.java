@@ -24,9 +24,7 @@ public class DefaultAccessDeniedHandler implements AccessDeniedHandler {
         response.setStatus(SecurityErrorCode.ACCESS_DENIED.getHttpStatus().value());
         response.getWriter().write(
                 objectMapper.writeValueAsString(DataResponse
-                        .of(SecurityErrorCode.ACCESS_DENIED.getHttpStatus().value(),
-                                SecurityErrorCode.ACCESS_DENIED.getCode(),
-                                SecurityErrorCode.ACCESS_DENIED.getMessage())
+                        .of(SecurityErrorCode.ACCESS_DENIED)
                 )
         );
     }

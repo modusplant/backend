@@ -1,12 +1,13 @@
 package kr.modusplant.global.middleware.security.enums;
 
+import kr.modusplant.global.enums.supers.ResponseCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum SecurityErrorCode {
+public enum SecurityErrorCode implements ResponseCode {
 
     BAD_PASSWORD(HttpStatus.UNAUTHORIZED, "bad_password", "비밀번호가 틀렸습니다"),
     BANNED(HttpStatus.UNAUTHORIZED, "banned", "밴 처리 된 계정입니다"),
@@ -20,4 +21,8 @@ public enum SecurityErrorCode {
     private final String code;
     private final String message;
 
+    @Override
+    public boolean isSuccess() {
+        return false;
+    }
 }
