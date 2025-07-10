@@ -1,13 +1,11 @@
 package kr.modusplant.global.app.http.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import kr.modusplant.global.enums.ResponseCode;
+import kr.modusplant.global.enums.SuccessCode;
+import kr.modusplant.global.enums.supers.ResponseCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
-
-import static kr.modusplant.global.enums.ResponseMessage.RESPONSE_MESSAGE_200;
 
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -18,36 +16,44 @@ public class DataResponse<T> {
     private String message;
     private T data;
 
-    public static <T> DataResponse<T> of(int status, String code, String message, T data) {
+    public static <T> DataResponse<T> of(ResponseCode responseCode, T data) {
         DataResponse<T> response = new DataResponse<>();
-        response.status = status;
-        response.code = code;
-        response.message = message;
+        response.status = responseCode.getHttpStatus().value();
+        response.code = responseCode.getCode();
+        response.message = responseCode.getMessage();
         response.data = data;
         return response;
     }
 
-    public static DataResponse<Void> of(int status, String code, String message) {
+    public static DataResponse<Void> of(ResponseCode responseCode) {
         DataResponse<Void> response = new DataResponse<>();
-        response.status = status;
-        response.code = code;
-        response.message = message;
+        response.status = responseCode.getHttpStatus().value();
+        response.code = responseCode.getCode();
+        response.message = responseCode.getMessage();
+        return response;
+    }
+
+    public static DataResponse<Void> ofErrorFieldName(ResponseCode responseCode, String errorFieldName) {
+        DataResponse<Void> response = new DataResponse<>();
+        response.status = responseCode.getHttpStatus().value();
+        response.code = responseCode.getCode();
+        response.message = responseCode.getMessage() + ". 원인: " + errorFieldName;
         return response;
     }
 
     public static DataResponse<Void> ok() {
         DataResponse<Void> response = new DataResponse<>();
-        response.status = HttpStatus.OK.value();
-        response.code = ResponseCode.OK.name();
-        response.message = RESPONSE_MESSAGE_200.getValue();
+        response.status = SuccessCode.GENERIC_SUCCESS.getHttpStatus().value();
+        response.code = SuccessCode.GENERIC_SUCCESS.getCode();
+        response.message = SuccessCode.GENERIC_SUCCESS.getMessage();
         return response;
     }
 
     public static <T> DataResponse<T> ok(T data) {
         DataResponse<T> response = new DataResponse<>();
-        response.status = HttpStatus.OK.value();
-        response.code = ResponseCode.OK.name();
-        response.message = RESPONSE_MESSAGE_200.getValue();
+        response.status = SuccessCode.GENERIC_SUCCESS.getHttpStatus().value();
+        response.code = SuccessCode.GENERIC_SUCCESS.getCode();
+        response.message = SuccessCode.GENERIC_SUCCESS.getMessage();
         response.data = data;
         return response;
     }
