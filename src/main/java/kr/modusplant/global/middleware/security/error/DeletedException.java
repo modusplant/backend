@@ -5,17 +5,13 @@ import lombok.Getter;
 import org.springframework.security.core.AuthenticationException;
 
 @Getter
-public class DeletedException extends AuthenticationException {
-
-    private final SecurityErrorCode errorCode;
+public class DeletedException extends BusinessAuthenticationException {
 
     public DeletedException() {
-        super(SecurityErrorCode.BANNED.getMessage());
-        this.errorCode = SecurityErrorCode.BANNED;
+        super(SecurityErrorCode.DELETED);
     }
 
     public DeletedException(String message) {
-        super(message);
-        this.errorCode = SecurityErrorCode.BANNED;
+        super(SecurityErrorCode.DELETED, message);
     }
 }
