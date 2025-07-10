@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.global.app.http.response.DataResponse;
+import kr.modusplant.global.middleware.security.enums.SecurityErrorCode;
+import kr.modusplant.global.middleware.security.error.BusinessAuthenticationException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
@@ -21,11 +22,24 @@ public class WriteResponseLoginFailureHandler implements AuthenticationFailureHa
                                         HttpServletResponse response,
                                         AuthenticationException exception) throws IOException {
 
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.getWriter().write(
-                objectMapper.writeValueAsString(DataResponse
-                        .of(HttpStatus.UNAUTHORIZED.value(), "LOGOUT_FAILED", exception.getMessage())
-                )
-        );
+        if(exception instanceof BusinessAuthenticationException ex) {
+            response.setStatus(ex.getErrorCode().getHttpStatus().value());
+            response.getWriter().write(
+                    objectMapper.writeValueAsString(DataResponse
+                            .of(ex.getErrorCode().getHttpStatus().value(),
+                                    ex.getErrorCode().getCode(),
+                                    ex.getErrorCode().getMessage())
+                    )
+            );
+        } else {
+            response.setStatus(SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus().value());
+            response.getWriter().write(
+                    objectMapper.writeValueAsString(DataResponse
+                            .of(SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus().value(),
+                                    SecurityErrorCode.AUTHENTICATION_FAILED.getCode(),
+                                    SecurityErrorCode.AUTHENTICATION_FAILED.getMessage())
+                    )
+            );
+        }
     }
 }
