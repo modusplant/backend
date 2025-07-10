@@ -1,14 +1,11 @@
 package kr.modusplant.global.middleware.security;
 
-import kr.modusplant.global.middleware.security.error.BannedException;
-import kr.modusplant.global.middleware.security.error.DeletedException;
-import kr.modusplant.global.middleware.security.error.DisabledByLinkingException;
-import kr.modusplant.global.middleware.security.error.InactiveException;
+import kr.modusplant.global.middleware.security.enums.SecurityErrorCode;
+import kr.modusplant.global.middleware.security.error.*;
 import kr.modusplant.global.middleware.security.models.DefaultAuthToken;
 import kr.modusplant.global.middleware.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,7 +37,7 @@ public class DefaultAuthProvider implements AuthenticationProvider {
 
     private boolean validateDefaultUserDetails(DefaultUserDetails userDetails, String password) {
         if(!passwordEncoder.matches(password, userDetails.getPassword())) {
-            throw new BadCredentialsException("비밀번호가 틀렸습니다."); }
+            throw new BadCredentialException(SecurityErrorCode.BAD_PASSWORD); }
         if (userDetails.isDisabledByLinking()) {
             throw new DisabledByLinkingException(); }
         if (userDetails.isBanned()) {
