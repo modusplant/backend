@@ -1,7 +1,8 @@
 package kr.modusplant.domains.communication.domain.service;
 
-import kr.modusplant.domains.common.error.InvalidPaginationRangeException;
 import kr.modusplant.domains.communication.persistence.repository.CommPostRepository;
+import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.global.error.InvalidDataException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,7 @@ public class CommPageableValidationService {
         long totalElements = postRepository.count();
         if (totalElements == 0L) {
             if (pageable.getPageNumber() > 1) {
-                throw new InvalidPaginationRangeException();
+                throw new InvalidDataException(ErrorCode.INVALID_PAGE_RANGE, "pageNumber");
             }
             return;
         }
@@ -24,7 +25,7 @@ public class CommPageableValidationService {
         int totalPages = (int) Math.ceil((double) totalElements / pageable.getPageSize());
 
         if (pageable.getPageNumber() >= totalPages) {
-            throw new InvalidPaginationRangeException();
+            throw new InvalidDataException(ErrorCode.INVALID_PAGE_RANGE, "pageNumber");
         }
     }
 }
