@@ -1,10 +1,21 @@
 package kr.modusplant.global.middleware.security.error;
 
+import kr.modusplant.global.middleware.security.enums.SecurityErrorCode;
+import lombok.Getter;
 import org.springframework.security.core.AuthenticationException;
 
+@Getter
 public class InactiveException extends AuthenticationException {
 
-    public InactiveException(String msg, Throwable cause) { super(msg, cause); }
+    private final SecurityErrorCode errorCode;
 
-    public InactiveException(String msg) { super(msg); }
+    public InactiveException() {
+        super(SecurityErrorCode.BANNED.getMessage());
+        this.errorCode = SecurityErrorCode.BANNED;
+    }
+
+    public InactiveException(String message) {
+        super(message);
+        this.errorCode = SecurityErrorCode.BANNED;
+    }
 }
