@@ -1,17 +1,18 @@
 package kr.modusplant.global.enums;
 
+import kr.modusplant.global.enums.supers.ResponseCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum ErrorCode {
+public enum ErrorCode implements ResponseCode {
 
     // -- common errors --
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "internal_server_error", "서버에 문제가 발생했습니다"),
-    INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "invalid_input_value", "입력값이 올바르지 않습니다"),
-    NO_INPUT_VALUE(HttpStatus.BAD_REQUEST, "no_input_value", "입력값이 존재하지 않습니다"),
+    GENERIC_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "internal_server_error", "서버에 문제가 발생했습니다"),
+    INPUT_TYPE_MISMATCH(HttpStatus.BAD_REQUEST, "input_type_mismatch", "요청 데이터의 서식이 올바르지 않습니다"),
+    INVALID_INPUT(HttpStatus.BAD_REQUEST, "invalid_input", "요청 데이터가 무효합니다"),
 
     // -- business errors --
     // exists and not found
@@ -67,4 +68,8 @@ public enum ErrorCode {
     private final String code;
     private final String message;
 
+    @Override
+    public boolean isSuccess() {
+        return false;
+    }
 }
