@@ -7,6 +7,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -41,6 +44,14 @@ public class DataResponse<T> {
         return response;
     }
 
+    public static DataResponse<Void> ofErrorFieldNames(ResponseCode responseCode, Collection<?> errorFieldNames) {
+        DataResponse<Void> response = new DataResponse<>();
+        response.status = responseCode.getHttpStatus().value();
+        response.code = responseCode.getCode();
+        response.message = responseCode.getMessage() + ". 원인: " + generateErrorDetail(errorFieldNames);
+        return response;
+    }
+
     public static DataResponse<Void> ok() {
         DataResponse<Void> response = new DataResponse<>();
         response.status = SuccessCode.GENERIC_SUCCESS.getHttpStatus().value();
@@ -56,6 +67,13 @@ public class DataResponse<T> {
         response.message = SuccessCode.GENERIC_SUCCESS.getMessage();
         response.data = data;
         return response;
+    }
+
+    private static String generateErrorDetail(Collection<?> errorFieldNames) {
+        String arrangedNames = errorFieldNames.stream()
+                .map(fieldName -> fieldName + ", ")
+                .collect(Collectors.joining());
+        return arrangedNames.substring(0, arrangedNames.length() - 2);
     }
 
 }
