@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.global.app.http.response.DataResponse;
-import kr.modusplant.global.enums.ResponseCode;
+import kr.modusplant.global.middleware.security.enums.SecurityErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
@@ -25,7 +25,7 @@ public class DefaultAuthenticationEntryPoint implements AuthenticationEntryPoint
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.getWriter().write(
                 objectMapper.writeValueAsString(DataResponse
-                        .of(HttpStatus.UNAUTHORIZED.value(), ResponseCode.UNAUTHORIZED.getValue(), "인증에 실패하였습니다.")
+                        .of(SecurityErrorCode.AUTHENTICATION_FAILED)
                 )
         );
     }
