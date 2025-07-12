@@ -13,7 +13,6 @@ public enum ErrorCode implements ResponseCode {
     GENERIC_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "internal_server_error", "서버에 문제가 발생했습니다"),
     INPUT_TYPE_MISMATCH(HttpStatus.BAD_REQUEST, "input_type_mismatch", "입력값의 서식이 올바르지 않습니다"),
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "invalid_input", "입력값이 유효하지 않습니다"),
-    INVALID_FORMAT(HttpStatus.INTERNAL_SERVER_ERROR, "invalid_format", "데이터의 형식이 올바르지 않습니다"),
     INVALID_STATE(HttpStatus.CONFLICT, "invalid_state", "리소스의 상태가 유효하지 않습니다"),
     CONSTRAINT_VIOLATION(HttpStatus.BAD_REQUEST, "constraint_violation", "데이터에 설정된 조건을 위배했습니다"),
     MALFORMED_INPUT(HttpStatus.BAD_REQUEST, "malformed_input", "입력값의 형식이 올바르지 않습니다"),

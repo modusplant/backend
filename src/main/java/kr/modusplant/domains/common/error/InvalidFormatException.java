@@ -10,7 +10,7 @@ public class InvalidFormatException extends BusinessException {
     private final String invalidData;
 
     public InvalidFormatException(String invalidData) {
-        super(ErrorCode.INVALID_FORMAT);
+        super(ErrorCode.GENERIC_ERROR);
         this.invalidData = invalidData;
     }
 }
