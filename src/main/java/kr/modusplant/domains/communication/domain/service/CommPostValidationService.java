@@ -1,7 +1,8 @@
 package kr.modusplant.domains.communication.domain.service;
 
+import kr.modusplant.domains.common.error.DataPairNumberMismatchException;
+import kr.modusplant.domains.common.error.DataPairOrderMismatchException;
 import kr.modusplant.domains.common.error.EmptyValueException;
-import kr.modusplant.domains.common.error.InvalidMultipartDataException;
 import kr.modusplant.domains.common.persistence.repository.supers.UuidPrimaryKeyRepository;
 import kr.modusplant.domains.communication.app.http.request.CommPostInsertRequest;
 import kr.modusplant.domains.communication.app.http.request.CommPostUpdateRequest;
@@ -75,7 +76,7 @@ public class CommPostValidationService {
 
     private void validateContentAndOrderInfo(List<MultipartFile> content, List<FileOrder> orderInfo) {
         if(content.size() != orderInfo.size()) {
-            throw new InvalidMultipartDataException(ErrorCode.CONTENT_AND_FILE_NUMBER_MISMATCH);
+            throw new DataPairNumberMismatchException(ErrorCode.DATA_NUMBERS_MISMATCH, List.of("content", "orderInfo"));
         }
 
         List<String> contentFilenames = new ArrayList<>(content.size());
@@ -97,7 +98,7 @@ public class CommPostValidationService {
                 .toList();
 
         if (!contentFilenames.equals(orderFilenames)) {
-            throw new InvalidMultipartDataException(ErrorCode.CONTENT_AND_FILE_ORDER_MISMATCH);
+            throw new DataPairOrderMismatchException(ErrorCode.DATA_ORDERS_MISMATCH, List.of("content", "orderInfo"));
         }
     }
 }

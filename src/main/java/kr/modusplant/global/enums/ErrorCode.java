@@ -55,8 +55,8 @@ public enum ErrorCode implements ResponseCode {
 
     SPECIFIED_SORTING_METHOD(HttpStatus.BAD_REQUEST, "specified_sorting_method", "페이지 정렬 방식은 지정되지 않아야 합니다"),
     
-    CONTENT_AND_FILE_NUMBER_MISMATCH(HttpStatus.BAD_REQUEST, "content_and_file_number_mismatch", "컨텐츠와 순서 정보의 파일명 개수가 일치하지 않습니다"),
-    CONTENT_AND_FILE_ORDER_MISMATCH(HttpStatus.BAD_REQUEST, "content_and_file_order_mismatch", "컨텐츠와 순서 정보의 파일명 순서가 일치하지 않습니다"),
+    DATA_NUMBERS_MISMATCH(HttpStatus.BAD_REQUEST, "data_numbers_mismatch", "상호적인 데이터들의 개수가 일치하지 않습니다"),
+    DATA_ORDERS_MISMATCH(HttpStatus.BAD_REQUEST, "data_orders_mismatch", "상호적인 데이터들의 순서가 일치하지 않습니다"),
 
     // -- auth errors --
     CREDENTIAL_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "credential_not_authorized", "인증에 필요한 데이터가 없거나 유효하지 않습니다"),
