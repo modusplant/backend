@@ -2,12 +2,14 @@ package kr.modusplant.global.advice;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import kr.modusplant.global.app.http.response.DataResponse;
-import kr.modusplant.global.error.DomainException;
-import kr.modusplant.modules.auth.social.error.OAuthException;
+import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.global.error.BusinessException;
+import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,16 +17,19 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpInputMessage;
-import org.springframework.http.HttpOutputMessage;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,8 +42,8 @@ public class GlobalExceptionHandlerUnitTest {
     @Test
     public void handleGenericExceptionTest() {
         // given
-        HttpServletRequest servletRequest = mock(HttpServletRequest.class);
         Exception ex = mock(Exception.class);
+        HttpServletRequest servletRequest = mock(HttpServletRequest.class);
 
         // when
         ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleGenericException(servletRequest, ex);
@@ -46,7 +51,8 @@ public class GlobalExceptionHandlerUnitTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
+        assertEquals(ErrorCode.GENERIC_ERROR.getHttpStatus().value(), errorResponse.getStatus());
+        assertEquals(ErrorCode.GENERIC_ERROR.getCode(), errorResponse.getCode());
         assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
@@ -64,60 +70,58 @@ public class GlobalExceptionHandlerUnitTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
+        assertEquals(ErrorCode.GENERIC_ERROR.getHttpStatus().value(), errorResponse.getStatus());
+        assertEquals(ErrorCode.GENERIC_ERROR.getCode(), errorResponse.getCode());
         assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
-    @DisplayName("DomainException 처리")
+    @DisplayName("BusinessException 처리")
     @Test
-    public void handleDomainExceptionTest() {
+    public void handleBusinessExceptionTest() {
         // given
-        DomainException ex = new DomainException("TEST", "테스트 예외");
-        HttpServletRequest servletRequest = mock(HttpServletRequest.class);
+        BusinessException ex = new BusinessException(ErrorCode.GENERIC_ERROR);
 
         // when
-        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleDomainException(servletRequest, ex);
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleBusinessException(ex);
         DataResponse<Void> errorResponse = response.getBody();
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("TEST", errorResponse.getCode());
-        assertEquals("테스트 예외", errorResponse.getMessage());
+        assertEquals(ErrorCode.GENERIC_ERROR.getHttpStatus().value(), errorResponse.getStatus());
+        assertEquals(ErrorCode.GENERIC_ERROR.getCode(), errorResponse.getCode());
+        assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
-    }
-
-    @DisplayName("OAuthException 처리")
-    @Test
-    public void handleOAuthExceptionTest() {
-        // given
-        OAuthException ex = new OAuthException(HttpStatus.BAD_REQUEST);
-
-        // when
-        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleOAuthException(ex);
-        DataResponse<Void> errorResponse = response.getBody();
-
-        // then
-        assertNotNull(errorResponse);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals(ex.getMessage(), errorResponse.getMessage());
     }
 
     @DisplayName("IllegalArgumentException 처리")
     @Test
     public void handleIllegalArgumentExceptionTest() {
-        // given
-        IllegalArgumentException ex = new IllegalArgumentException("테스트 예외");
-
-        // when
-        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleIllegalArgumentException(ex);
+        // given & when
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleIllegalArgumentException();
         DataResponse<Void> errorResponse = response.getBody();
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("테스트 예외", errorResponse.getMessage());
+        assertEquals(ErrorCode.INVALID_INPUT.getHttpStatus().value(), errorResponse.getStatus());
+        assertEquals(ErrorCode.INVALID_INPUT.getCode(), errorResponse.getCode());
+        assertNotNull(errorResponse.getMessage());
+        assertNull(errorResponse.getData());
+    }
+
+    @DisplayName("IllegalStateException 처리")
+    @Test
+    public void handleIllegalStateExceptionTest() {
+        // given & when
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleIllegalStateException();
+        DataResponse<Void> errorResponse = response.getBody();
+
+        // then
+        assertNotNull(errorResponse);
+        assertEquals(ErrorCode.INVALID_STATE.getHttpStatus().value(), errorResponse.getStatus());
+        assertEquals(ErrorCode.INVALID_STATE.getCode(), errorResponse.getCode());
+        assertNotNull(errorResponse.getMessage());
+        assertNull(errorResponse.getData());
     }
 
     @DisplayName("MethodArgumentNotValidException 처리")
@@ -134,47 +138,66 @@ public class GlobalExceptionHandlerUnitTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("테스트 메시지", errorResponse.getMessage());
+        assertEquals(ErrorCode.INVALID_INPUT.getHttpStatus().value(), errorResponse.getStatus());
+        assertEquals(ErrorCode.INVALID_INPUT.getCode(), errorResponse.getCode());
+        assertTrue(errorResponse.getMessage().contains("testField"));
         assertNull(errorResponse.getData());
     }
 
-    @DisplayName("IllegalStateException 처리")
+    @DisplayName("MethodArgumentTypeMismatchException 처리")
     @Test
-    public void handleIllegalStateExceptionTest() {
+    public void handleMethodArgumentTypeMismatchExceptionTest() {
         // given
-        IllegalStateException ex = new IllegalStateException("테스트 예외");
+        MethodArgumentTypeMismatchException ex = mock(MethodArgumentTypeMismatchException.class);
+        given(ex.getName()).willReturn("testRequestParam");
 
         // when
-        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleIllegalStateException(ex);
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleMethodArgumentTypeMismatchException(ex);
         DataResponse<Void> errorResponse = response.getBody();
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(HttpStatus.SERVICE_UNAVAILABLE.value(), errorResponse.getStatus());
-        assertEquals("테스트 예외", errorResponse.getMessage());
+        assertEquals(ErrorCode.INPUT_TYPE_MISMATCH.getHttpStatus().value(), errorResponse.getStatus());
+        assertEquals(ErrorCode.INPUT_TYPE_MISMATCH.getCode(), errorResponse.getCode());
+        assertTrue(errorResponse.getMessage().contains("testRequestParam"));
+        assertNull(errorResponse.getData());
     }
 
-    @DisplayName("요청 간 InvalidFormatException 처리")
+    @DisplayName("ConstraintViolationException 처리")
     @Test
-    public void handleInvalidFormatExceptionOnRequestTest() {
+    public void handleConstraintViolationExceptionTest() {
         // given
-        InvalidFormatException ifx = new InvalidFormatException(null, "Invalid format", "value", Integer.class);
-        HttpInputMessage inputMessage = mock(HttpInputMessage.class);
-        HttpMessageNotReadableException ex = new HttpMessageNotReadableException("error", ifx, inputMessage);
+        ConstraintViolationException ex = mock(ConstraintViolationException.class);
+
+        ConstraintViolation<?> violation1 = mock(ConstraintViolation.class);
+        ConstraintViolation<?> violation2 = mock(ConstraintViolation.class);
+        ConstraintViolation<?> violation3 = mock(ConstraintViolation.class);
+
+        Set<ConstraintViolation<?>> testViolations =
+                new HashSet<>(Arrays.asList(violation1, violation2, violation3));
+
+        given(ex.getConstraintViolations()).willReturn(testViolations);
+        given(violation1.getPropertyPath()).willReturn(PathImpl.createPathFromString("testFieldName1"));
+        given(violation2.getPropertyPath()).willReturn(PathImpl.createPathFromString("testFieldName2"));
+        given(violation3.getPropertyPath()).willReturn(PathImpl.createPathFromString("testFieldName3"));
+
 
         // when
-        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleHttpMessageNotReadableException(ex);
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleConstraintViolationException(ex);
         DataResponse<Void> errorResponse = response.getBody();
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("유효하지 않은 JSON입니다.", errorResponse.getMessage());
+        System.out.println(errorResponse.getMessage());
+        assertEquals(ErrorCode.CONSTRAINT_VIOLATION.getHttpStatus().value(), errorResponse.getStatus());
+        assertEquals(ErrorCode.CONSTRAINT_VIOLATION.getCode(), errorResponse.getCode());
+        assertTrue(errorResponse.getMessage().contains("testFieldName1"));
+        assertTrue(errorResponse.getMessage().contains("testFieldName2"));
+        assertTrue(errorResponse.getMessage().contains("testFieldName3"));
         assertNull(errorResponse.getData());
     }
 
-    @DisplayName("요청 간 UnrecognizedPropertyException 처리")
+    @DisplayName("요청으로 인한 UnrecognizedPropertyException 처리")
     @Test
     void handleUnrecognizedPropertyExceptionOnRequestTest() {
         // given
@@ -188,12 +211,13 @@ public class GlobalExceptionHandlerUnitTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("서버가 알지 못하는 데이터가 포함되어 있습니다.", errorResponse.getMessage());
+        assertEquals(ErrorCode.UNEXPECTED_INPUT.getHttpStatus().value(), errorResponse.getStatus());
+        assertEquals(ErrorCode.UNEXPECTED_INPUT.getCode(), errorResponse.getCode());
+        assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
-    @DisplayName("요청 간 JsonMappingException 처리")
+    @DisplayName("요청으로 인한 JsonMappingException 처리")
     @Test
     void handleJsonMappingExceptionOnRequestTest() {
         // given
@@ -207,12 +231,13 @@ public class GlobalExceptionHandlerUnitTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("JSON의 Java 객체로의 매핑이 실패하였습니다.", errorResponse.getMessage());
+        assertEquals(ErrorCode.INVALID_INPUT.getHttpStatus().value(), errorResponse.getStatus());
+        assertEquals(ErrorCode.INVALID_INPUT.getCode(), errorResponse.getCode());
+        assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
-    @DisplayName("요청 간 JsonParseException 처리")
+    @DisplayName("요청으로 인한 JsonParseException 처리")
     @Test
     void handleJsonParseExceptionOnRequestTest() {
         // given
@@ -226,8 +251,9 @@ public class GlobalExceptionHandlerUnitTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("Java 객체의 JSON으로의 파싱이 실패하였습니다.", errorResponse.getMessage());
+        assertEquals(ErrorCode.INVALID_INPUT.getHttpStatus().value(), errorResponse.getStatus());
+        assertEquals(ErrorCode.INVALID_INPUT.getCode(), errorResponse.getCode());
+        assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
@@ -244,101 +270,24 @@ public class GlobalExceptionHandlerUnitTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
-        assertEquals("요청 바디의 서식이 올바르지 않습니다.", errorResponse.getMessage());
-        assertNull(errorResponse.getData());
-    }
-
-    @DisplayName("응답 간 InvalidFormatException 처리")
-    @Test
-    public void handleInvalidFormatExceptionOnResponseTest() {
-        // given
-        InvalidFormatException ifx = new InvalidFormatException(null, "Invalid format", "value", Integer.class);
-        HttpOutputMessage outputMessage = mock(HttpOutputMessage.class);
-        HttpMessageNotWritableException ex = new HttpMessageNotWritableException(outputMessage.toString(), ifx);
-
-        // when
-        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleHttpMessageNotWritableException(ex);
-        DataResponse<Void> errorResponse = response.getBody();
-
-        // then
-        assertNotNull(errorResponse);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
-        assertEquals("유효하지 않은 JSON입니다.", errorResponse.getMessage());
-        assertNull(errorResponse.getData());
-    }
-
-    @DisplayName("응답 간 UnrecognizedPropertyException 처리")
-    @Test
-    void handleUnrecognizedPropertyExceptionOnResponseTest() {
-        // given
-        UnrecognizedPropertyException upx = new UnrecognizedPropertyException(null, null, null, null, null, null);
-        HttpOutputMessage outputMessage = mock(HttpOutputMessage.class);
-        HttpMessageNotWritableException ex = new HttpMessageNotWritableException(outputMessage.toString(), upx);
-
-        // when
-        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleHttpMessageNotWritableException(ex);
-        DataResponse<Void> errorResponse = response.getBody();
-
-        // then
-        assertNotNull(errorResponse);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
-        assertEquals("서버가 알지 못하는 데이터가 포함되어 있습니다.", errorResponse.getMessage());
-        assertNull(errorResponse.getData());
-    }
-
-    @DisplayName("응답 간 JsonMappingException 처리")
-    @Test
-    void handleJsonMappingExceptionOnResponseTest() {
-        // given
-        JsonMappingException jmx = mock(JsonMappingException.class);
-        HttpOutputMessage outputMessage = mock(HttpOutputMessage.class);
-        HttpMessageNotWritableException ex = new HttpMessageNotWritableException(outputMessage.toString(), jmx);
-
-        // when
-        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleHttpMessageNotWritableException(ex);
-        DataResponse<Void> errorResponse = response.getBody();
-
-        // then
-        assertNotNull(errorResponse);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
-        assertEquals("JSON의 Java 객체로의 매핑이 실패하였습니다.", errorResponse.getMessage());
-        assertNull(errorResponse.getData());
-    }
-
-    @DisplayName("응답 간 JsonParseException 처리")
-    @Test
-    void handleJsonParseExceptionOnResponseTest() {
-        // given
-        JsonParseException jpx = mock(JsonParseException.class);
-        HttpOutputMessage outputMessage = mock(HttpOutputMessage.class);
-        HttpMessageNotWritableException ex = new HttpMessageNotWritableException(outputMessage.toString(), jpx);
-
-        // when
-        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleHttpMessageNotWritableException(ex);
-        DataResponse<Void> errorResponse = response.getBody();
-
-        // then
-        assertNotNull(errorResponse);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
-        assertEquals("Java 객체의 JSON으로의 파싱이 실패하였습니다.", errorResponse.getMessage());
+        assertEquals(ErrorCode.MALFORMED_INPUT.getHttpStatus().value(), errorResponse.getStatus());
+        assertEquals(ErrorCode.MALFORMED_INPUT.getCode(), errorResponse.getCode());
+        assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 
     @DisplayName("HttpMessageNotWritableException 처리")
     @Test
     public void handleHttpMessageNotWritableExceptionTest() {
-        // given
-        HttpMessageNotWritableException ex = new HttpMessageNotWritableException("", mock(HttpMessageNotWritableException.class));
-
-        // when
-        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleHttpMessageNotWritableException(ex);
+        // given & when
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleHttpMessageNotWritableException();
         DataResponse<Void> errorResponse = response.getBody();
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
-        assertEquals("요청 바디의 서식이 올바르지 않습니다.", errorResponse.getMessage());
+        assertEquals(ErrorCode.GENERIC_ERROR.getHttpStatus().value(), errorResponse.getStatus());
+        assertEquals(ErrorCode.GENERIC_ERROR.getCode(), errorResponse.getCode());
+        assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
 }
