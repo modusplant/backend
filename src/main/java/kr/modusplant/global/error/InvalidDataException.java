@@ -3,13 +3,23 @@ package kr.modusplant.global.error;
 import kr.modusplant.global.enums.ErrorCode;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public class InvalidDataException extends BusinessException {
 
-    private final String invalidDataName;
+    private final String dataName;
+    private final List<String> dataNames;
 
-    public InvalidDataException(ErrorCode errorCode, String invalidDataName) {
+    public InvalidDataException(ErrorCode errorCode, String dataName) {
         super(errorCode);
-        this.invalidDataName = invalidDataName;
+        this.dataName = dataName;
+        this.dataNames = null;
+    }
+
+    public InvalidDataException(ErrorCode errorCode, List<String> dataNames) {
+        super(errorCode);
+        this.dataName = null;
+        this.dataNames = dataNames;
     }
 }
