@@ -24,27 +24,6 @@ import java.util.Set;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Exception
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<DataResponse<Void>> handleGenericException(HttpServletRequest ignoredRequest, Exception ignoredEx) {
-        return ResponseEntity.status(ErrorCode.GENERIC_ERROR.getHttpStatus())
-                .body(DataResponse.of(ErrorCode.GENERIC_ERROR));
-    }
-
-    // RuntimeException
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<DataResponse<Void>> handleRuntimeException(HttpServletRequest ignoredRequest, RuntimeException ignoredEx) {
-        return ResponseEntity.status(ErrorCode.GENERIC_ERROR.getHttpStatus())
-                .body(DataResponse.of(ErrorCode.GENERIC_ERROR));
-    }
-
-    // BusinessException
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<DataResponse<Void>> handleBusinessException(BusinessException ex) {
-        return ResponseEntity.status(ex.getErrorCode().getHttpStatus())
-                .body(DataResponse.of(ex.getErrorCode()));
-    }
-
     // 메서드의 인자가 유효하지 않은 값일 경우
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<DataResponse<Void>> handleIllegalArgumentException() {
@@ -126,6 +105,27 @@ public class GlobalExceptionHandler {
     // 응답 처리 간 예외가 발생한 경우
     @ExceptionHandler(HttpMessageNotWritableException.class)
     public ResponseEntity<DataResponse<Void>> handleHttpMessageNotWritableException() {
+        return ResponseEntity.status(ErrorCode.GENERIC_ERROR.getHttpStatus())
+                .body(DataResponse.of(ErrorCode.GENERIC_ERROR));
+    }
+
+    // BusinessException
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<DataResponse<Void>> handleBusinessException(BusinessException ex) {
+        return ResponseEntity.status(ex.getErrorCode().getHttpStatus())
+                .body(DataResponse.of(ex.getErrorCode()));
+    }
+
+    // RuntimeException
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<DataResponse<Void>> handleRuntimeException(HttpServletRequest ignoredRequest, RuntimeException ignoredEx) {
+        return ResponseEntity.status(ErrorCode.GENERIC_ERROR.getHttpStatus())
+                .body(DataResponse.of(ErrorCode.GENERIC_ERROR));
+    }
+
+    // Exception
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<DataResponse<Void>> handleGenericException(HttpServletRequest ignoredRequest, Exception ignoredEx) {
         return ResponseEntity.status(ErrorCode.GENERIC_ERROR.getHttpStatus())
                 .body(DataResponse.of(ErrorCode.GENERIC_ERROR));
     }

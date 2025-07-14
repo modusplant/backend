@@ -38,62 +38,6 @@ public class GlobalExceptionHandlerUnitTest {
     @Spy
     private GlobalExceptionHandler globalExceptionHandler;
 
-    @DisplayName("Exception 처리")
-    @Test
-    public void handleGenericExceptionTest() {
-        // given
-        Exception ex = mock(Exception.class);
-        HttpServletRequest servletRequest = mock(HttpServletRequest.class);
-
-        // when
-        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleGenericException(servletRequest, ex);
-        DataResponse<Void> errorResponse = response.getBody();
-
-        // then
-        assertNotNull(errorResponse);
-        assertEquals(ErrorCode.GENERIC_ERROR.getHttpStatus().value(), errorResponse.getStatus());
-        assertEquals(ErrorCode.GENERIC_ERROR.getCode(), errorResponse.getCode());
-        assertNotNull(errorResponse.getMessage());
-        assertNull(errorResponse.getData());
-    }
-
-    @DisplayName("RuntimeException 처리")
-    @Test
-    public void handleRuntimeExceptionTest() {
-        // given
-        RuntimeException ex = mock(RuntimeException.class);
-        HttpServletRequest servletRequest = mock(HttpServletRequest.class);
-
-        // when
-        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleRuntimeException(servletRequest, ex);
-        DataResponse<Void> errorResponse = response.getBody();
-
-        // then
-        assertNotNull(errorResponse);
-        assertEquals(ErrorCode.GENERIC_ERROR.getHttpStatus().value(), errorResponse.getStatus());
-        assertEquals(ErrorCode.GENERIC_ERROR.getCode(), errorResponse.getCode());
-        assertNotNull(errorResponse.getMessage());
-        assertNull(errorResponse.getData());
-    }
-
-    @DisplayName("BusinessException 처리")
-    @Test
-    public void handleBusinessExceptionTest() {
-        // given
-        BusinessException ex = new BusinessException(ErrorCode.GENERIC_ERROR);
-
-        // when
-        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleBusinessException(ex);
-        DataResponse<Void> errorResponse = response.getBody();
-
-        // then
-        assertNotNull(errorResponse);
-        assertEquals(ErrorCode.GENERIC_ERROR.getHttpStatus().value(), errorResponse.getStatus());
-        assertEquals(ErrorCode.GENERIC_ERROR.getCode(), errorResponse.getCode());
-        assertNotNull(errorResponse.getMessage());
-        assertNull(errorResponse.getData());
-    }
-
     @DisplayName("IllegalArgumentException 처리")
     @Test
     public void handleIllegalArgumentExceptionTest() {
@@ -290,4 +234,61 @@ public class GlobalExceptionHandlerUnitTest {
         assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
+
+    @DisplayName("BusinessException 처리")
+    @Test
+    public void handleBusinessExceptionTest() {
+        // given
+        BusinessException ex = new BusinessException(ErrorCode.GENERIC_ERROR);
+
+        // when
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleBusinessException(ex);
+        DataResponse<Void> errorResponse = response.getBody();
+
+        // then
+        assertNotNull(errorResponse);
+        assertEquals(ErrorCode.GENERIC_ERROR.getHttpStatus().value(), errorResponse.getStatus());
+        assertEquals(ErrorCode.GENERIC_ERROR.getCode(), errorResponse.getCode());
+        assertNotNull(errorResponse.getMessage());
+        assertNull(errorResponse.getData());
+    }
+
+    @DisplayName("RuntimeException 처리")
+    @Test
+    public void handleRuntimeExceptionTest() {
+        // given
+        RuntimeException ex = mock(RuntimeException.class);
+        HttpServletRequest servletRequest = mock(HttpServletRequest.class);
+
+        // when
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleRuntimeException(servletRequest, ex);
+        DataResponse<Void> errorResponse = response.getBody();
+
+        // then
+        assertNotNull(errorResponse);
+        assertEquals(ErrorCode.GENERIC_ERROR.getHttpStatus().value(), errorResponse.getStatus());
+        assertEquals(ErrorCode.GENERIC_ERROR.getCode(), errorResponse.getCode());
+        assertNotNull(errorResponse.getMessage());
+        assertNull(errorResponse.getData());
+    }
+
+    @DisplayName("Exception 처리")
+    @Test
+    public void handleGenericExceptionTest() {
+        // given
+        Exception ex = mock(Exception.class);
+        HttpServletRequest servletRequest = mock(HttpServletRequest.class);
+
+        // when
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleGenericException(servletRequest, ex);
+        DataResponse<Void> errorResponse = response.getBody();
+
+        // then
+        assertNotNull(errorResponse);
+        assertEquals(ErrorCode.GENERIC_ERROR.getHttpStatus().value(), errorResponse.getStatus());
+        assertEquals(ErrorCode.GENERIC_ERROR.getCode(), errorResponse.getCode());
+        assertNotNull(errorResponse.getMessage());
+        assertNull(errorResponse.getData());
+    }
+
 }
