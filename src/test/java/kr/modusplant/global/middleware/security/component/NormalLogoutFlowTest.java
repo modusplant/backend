@@ -1,7 +1,7 @@
 package kr.modusplant.global.middleware.security.component;
 
 import kr.modusplant.global.context.SecurityOnlyContext;
-import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
+import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;

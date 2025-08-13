@@ -1,17 +1,17 @@
 package kr.modusplant.global.middleware.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.middleware.security.DefaultAuthProvider;
 import kr.modusplant.global.middleware.security.DefaultAuthenticationEntryPoint;
 import kr.modusplant.global.middleware.security.DefaultUserDetailsService;
 import kr.modusplant.global.middleware.security.filter.EmailPasswordAuthenticationFilter;
 import kr.modusplant.global.middleware.security.filter.JwtAuthenticationFilter;
 import kr.modusplant.global.middleware.security.handler.*;
-import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
-import kr.modusplant.modules.jwt.app.service.TokenProvider;
-import kr.modusplant.modules.jwt.persistence.repository.TokenRedisRepository;
+import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
+import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
+import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
+import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

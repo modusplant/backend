@@ -1,9 +1,9 @@
 package kr.modusplant.global.middleware.security.common.util;
 
-import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
-import kr.modusplant.domains.member.enums.AuthProvider;
 import kr.modusplant.global.middleware.security.models.DefaultUserDetails;
 import kr.modusplant.global.middleware.security.models.DefaultUserDetails.DefaultUserDetailsBuilder;
+import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTestUtils;
+import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 

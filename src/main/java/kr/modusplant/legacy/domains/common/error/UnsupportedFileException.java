@@ -1,0 +1,8 @@
+package kr.modusplant.legacy.domains.common.error;
+
+import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.global.error.BusinessException;
+
+public class UnsupportedFileException extends BusinessException {
+  public UnsupportedFileException() { super(ErrorCode.UNSUPPORTED_FILE); }
+}

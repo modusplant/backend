@@ -1,9 +1,9 @@
 package kr.modusplant.global.middleware.security.models;
 
-import kr.modusplant.domains.member.domain.model.SiteMember;
-import kr.modusplant.domains.member.domain.model.SiteMemberAuth;
-import kr.modusplant.domains.member.domain.model.SiteMemberRole;
-import kr.modusplant.domains.member.enums.AuthProvider;
+import kr.modusplant.legacy.domains.member.domain.model.SiteMember;
+import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
+import kr.modusplant.legacy.domains.member.domain.model.SiteMemberRole;
+import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

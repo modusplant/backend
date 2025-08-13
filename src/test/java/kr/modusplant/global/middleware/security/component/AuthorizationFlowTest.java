@@ -3,17 +3,18 @@ package kr.modusplant.global.middleware.security.component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import kr.modusplant.domains.communication.app.http.request.CommCommentInsertRequest;
-import kr.modusplant.domains.communication.app.http.response.CommCommentResponse;
-import kr.modusplant.domains.communication.app.service.CommCommentApplicationService;
-import kr.modusplant.domains.communication.common.util.app.http.request.CommCommentInsertRequestTestUtils;
-import kr.modusplant.domains.communication.common.util.app.http.response.CommCommentResponseTestUtils;
-import kr.modusplant.domains.communication.common.util.domain.CommPostTestUtils;
-import kr.modusplant.domains.member.common.util.domain.SiteMemberRoleTestUtils;
-import kr.modusplant.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.global.middleware.security.config.SecurityConfig;
-import kr.modusplant.modules.jwt.app.service.TokenProvider;
-import kr.modusplant.modules.jwt.persistence.repository.TokenRedisRepository;
+import kr.modusplant.global.middleware.security.enums.SecurityErrorCode;
+import kr.modusplant.legacy.domains.communication.app.http.request.CommCommentInsertRequest;
+import kr.modusplant.legacy.domains.communication.app.http.response.CommCommentResponse;
+import kr.modusplant.legacy.domains.communication.app.service.CommCommentApplicationService;
+import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommCommentInsertRequestTestUtils;
+import kr.modusplant.legacy.domains.communication.common.util.app.http.response.CommCommentResponseTestUtils;
+import kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberRoleTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTestUtils;
+import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
+import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,8 +103,7 @@ public class AuthorizationFlowTest implements
 
                 // then
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.status").value(403))
-                .andExpect(jsonPath("$.code").value("FORBIDDEN"))
-                .andExpect(jsonPath("$.message").isNotEmpty());
-    }
+                .andExpect(jsonPath("$.status").value(SecurityErrorCode.ACCESS_DENIED.getHttpStatus().value()))
+                .andExpect(jsonPath("$.code").value(SecurityErrorCode.ACCESS_DENIED.getCode()))
+                .andExpect(jsonPath("$.message").isNotEmpty());    }
 }
