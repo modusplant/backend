@@ -1,4 +1,4 @@
-package kr.modusplant.global.app.service;
+package kr.modusplant.framework.outbound.cloud.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

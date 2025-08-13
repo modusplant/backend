@@ -9,7 +9,7 @@ import static kr.modusplant.legacy.domains.common.vo.Reference.NOTATION_DOMAINS;
 
 @Configuration
 @ComponentScan(
-        basePackages = NOTATION_DOMAINS,
+        basePackages = {NOTATION_DOMAINS, "kr.modusplant.framework.outbound"},
         excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Controller.class)
 )
 public abstract class ScanDomainsService {

@@ -1,4 +1,4 @@
-package kr.modusplant.global.app.service;
+package kr.modusplant.framework.outbound.cloud.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

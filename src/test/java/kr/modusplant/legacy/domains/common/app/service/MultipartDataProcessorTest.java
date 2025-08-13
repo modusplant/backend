@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.common.app.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import kr.modusplant.global.app.service.S3FileService;
+import kr.modusplant.framework.outbound.cloud.service.S3FileService;
 import kr.modusplant.legacy.domains.common.enums.FileType;
 import kr.modusplant.legacy.domains.common.error.UnsupportedFileException;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommPostRequestTestUtils;

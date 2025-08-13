@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import kr.modusplant.global.app.service.S3FileService;
+import kr.modusplant.framework.outbound.cloud.service.S3FileService;
 import kr.modusplant.global.persistence.generator.UlidIdGenerator;
 import kr.modusplant.legacy.domains.common.enums.FileType;
 import kr.modusplant.legacy.domains.common.error.UnsupportedFileException;
