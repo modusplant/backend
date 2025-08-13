@@ -1,9 +1,9 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
-import kr.modusplant.infrastructure.exception.InvalidDataException;
-import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostRepository;
+import kr.modusplant.shared.exception.InvalidDataException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

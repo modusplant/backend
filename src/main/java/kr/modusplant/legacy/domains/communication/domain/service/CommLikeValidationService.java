@@ -1,12 +1,12 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
 import kr.modusplant.global.vo.EntityName;
-import kr.modusplant.infrastructure.exception.EntityExistsException;
-import kr.modusplant.infrastructure.exception.EntityNotFoundException;
-import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommLikeRepository;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostRepository;
 import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.shared.exception.EntityExistsException;
+import kr.modusplant.shared.exception.EntityNotFoundException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

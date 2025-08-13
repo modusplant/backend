@@ -1,9 +1,6 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
 import kr.modusplant.global.vo.EntityName;
-import kr.modusplant.infrastructure.exception.EntityExistsException;
-import kr.modusplant.infrastructure.exception.EntityNotFoundException;
-import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommLikeResponse;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommLikeEntityTestUtils;
@@ -17,6 +14,9 @@ import kr.modusplant.legacy.domains.communication.persistence.repository.CommPos
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.shared.exception.EntityExistsException;
+import kr.modusplant.shared.exception.EntityNotFoundException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

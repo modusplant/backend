@@ -1,13 +1,13 @@
 package kr.modusplant.legacy.modules.jwt.app.service;
 
 import kr.modusplant.global.vo.EntityName;
-import kr.modusplant.infrastructure.exception.EntityNotFoundException;
-import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.legacy.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.legacy.modules.jwt.mapper.RefreshTokenAppInfraMapper;
 import kr.modusplant.legacy.modules.jwt.persistence.entity.RefreshTokenEntity;
 import kr.modusplant.legacy.modules.jwt.persistence.repository.RefreshTokenRepository;
+import kr.modusplant.shared.exception.EntityNotFoundException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;

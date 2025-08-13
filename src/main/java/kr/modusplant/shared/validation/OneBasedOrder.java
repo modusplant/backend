@@ -1,4 +1,4 @@
-package kr.modusplant.infrastructure.validation;
+package kr.modusplant.shared.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

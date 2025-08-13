@@ -1,6 +1,6 @@
-package kr.modusplant.infrastructure.exception;
+package kr.modusplant.shared.exception;
 
-import kr.modusplant.infrastructure.exception.enums.ErrorCode;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.Getter;
 
 @Getter

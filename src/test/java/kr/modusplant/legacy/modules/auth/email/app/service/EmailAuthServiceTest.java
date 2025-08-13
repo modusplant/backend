@@ -2,8 +2,6 @@ package kr.modusplant.legacy.modules.auth.email.app.service;
 
 import kr.modusplant.global.middleware.redis.RedisHelper;
 import kr.modusplant.global.vo.EntityName;
-import kr.modusplant.infrastructure.exception.EntityNotFoundException;
-import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberAuthValidationService;
 import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberAuthEntity;
@@ -14,6 +12,8 @@ import kr.modusplant.legacy.modules.auth.email.app.http.request.VerifyEmailReque
 import kr.modusplant.legacy.modules.auth.email.enums.EmailType;
 import kr.modusplant.legacy.modules.common.context.ModulesServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
+import kr.modusplant.shared.exception.EntityNotFoundException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

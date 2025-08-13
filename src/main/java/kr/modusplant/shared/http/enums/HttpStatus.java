@@ -1,4 +1,4 @@
-package kr.modusplant.infrastructure.http.enums;
+package kr.modusplant.shared.http.enums;
 
 import lombok.Getter;
 

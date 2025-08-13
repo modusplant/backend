@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.communication.error;
 
-import kr.modusplant.infrastructure.exception.BusinessException;
-import kr.modusplant.infrastructure.exception.enums.ErrorCode;
+import kr.modusplant.shared.exception.BusinessException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.Getter;
 
 @Getter

@@ -2,7 +2,7 @@ package kr.modusplant.legacy.domains.communication.app.http.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import kr.modusplant.infrastructure.validation.OneBasedOrder;
+import kr.modusplant.shared.validation.OneBasedOrder;
 
 public record FileOrder(
         @Schema(
