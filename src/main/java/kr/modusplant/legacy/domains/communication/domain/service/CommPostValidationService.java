@@ -1,8 +1,8 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
-import kr.modusplant.domain.exception.enums.ErrorCode;
 import kr.modusplant.global.error.EntityNotFoundException;
 import kr.modusplant.global.vo.EntityName;
+import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 import kr.modusplant.legacy.domains.common.error.DataPairNumberMismatchException;
 import kr.modusplant.legacy.domains.common.error.DataPairOrderMismatchException;
 import kr.modusplant.legacy.domains.common.error.EmptyValueException;

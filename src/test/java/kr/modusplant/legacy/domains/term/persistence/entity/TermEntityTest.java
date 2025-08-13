@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
-import static kr.modusplant.domain.util.VersionUtils.createVersion;
+import static kr.modusplant.infrastructure.util.VersionUtils.createVersion;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext

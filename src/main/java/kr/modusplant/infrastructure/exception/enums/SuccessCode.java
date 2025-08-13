@@ -1,7 +1,7 @@
-package kr.modusplant.domain.exception.enums;
+package kr.modusplant.infrastructure.exception.enums;
 
-import kr.modusplant.domain.enums.HttpStatus;
-import kr.modusplant.domain.exception.enums.supers.ResponseCode;
+import kr.modusplant.infrastructure.exception.enums.supers.ResponseCode;
+import kr.modusplant.infrastructure.http.enums.HttpStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

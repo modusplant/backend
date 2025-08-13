@@ -1,9 +1,9 @@
-package kr.modusplant.domain.util;
+package kr.modusplant.infrastructure.util;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.domain.util.VersionUtils.createVersion;
+import static kr.modusplant.infrastructure.util.VersionUtils.createVersion;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

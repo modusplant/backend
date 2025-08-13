@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import kr.modusplant.global.app.http.response.DataResponse;
-import kr.modusplant.domain.validation.SemanticVersioning;
+import kr.modusplant.infrastructure.validation.SemanticVersioning;
 import kr.modusplant.legacy.domains.term.app.http.request.TermInsertRequest;
 import kr.modusplant.legacy.domains.term.app.http.request.TermUpdateRequest;
 import kr.modusplant.legacy.domains.term.app.http.response.TermResponse;

@@ -1,9 +1,9 @@
 package kr.modusplant.legacy.modules.auth.social.app.service;
 
-import kr.modusplant.domain.exception.enums.ErrorCode;
 import kr.modusplant.global.enums.Role;
 import kr.modusplant.global.error.EntityNotFoundException;
 import kr.modusplant.global.vo.EntityName;
+import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthDomainInfraMapper;

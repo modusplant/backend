@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
-import kr.modusplant.domain.exception.enums.ErrorCode;
 import kr.modusplant.global.error.InvalidDataException;
+import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostRepository;
 import org.junit.jupiter.api.DisplayName;
