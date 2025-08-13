@@ -1,11 +1,11 @@
 package kr.modusplant.legacy.modules.common.context;
 
-import kr.modusplant.legacy.domains.common.scan.ScanDomainsService;
 import kr.modusplant.global.common.scan.ScanGlobalService;
 import kr.modusplant.global.config.TestJpaConfig;
 import kr.modusplant.global.config.TestRedisConfig;
 import kr.modusplant.global.config.TestS3Config;
 import kr.modusplant.global.initializer.MockRedisHelperInitializer;
+import kr.modusplant.legacy.domains.common.scan.ScanDomainsService;
 import kr.modusplant.legacy.modules.common.postprocessor.MockModulesRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.legacy.modules.common.scan.ScanModulesService;
 import org.junit.jupiter.api.extension.ExtendWith;

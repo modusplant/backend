@@ -1,7 +1,6 @@
 package kr.modusplant.legacy.modules.monitor;
 
 import kr.modusplant.global.middleware.redis.RedisHelper;
-import kr.modusplant.legacy.modules.monitor.MonitorService;
 import kr.modusplant.legacy.modules.common.context.ModulesServiceWithoutValidationServiceContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
