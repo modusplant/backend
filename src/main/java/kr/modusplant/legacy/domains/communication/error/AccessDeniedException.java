@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.error;
 
-import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.domain.exception.enums.ErrorCode;
 import kr.modusplant.global.error.BusinessException;
 import lombok.Getter;
 

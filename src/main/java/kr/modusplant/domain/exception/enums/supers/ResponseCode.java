@@ -1,6 +1,6 @@
-package kr.modusplant.global.enums.supers;
+package kr.modusplant.domain.exception.enums.supers;
 
-import org.springframework.http.HttpStatus;
+import kr.modusplant.domain.enums.HttpStatus;
 
 public interface ResponseCode {
     HttpStatus getHttpStatus();

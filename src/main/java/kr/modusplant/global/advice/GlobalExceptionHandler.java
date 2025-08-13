@@ -6,9 +6,10 @@ import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import kr.modusplant.domain.exception.enums.ErrorCode;
 import kr.modusplant.global.app.http.response.DataResponse;
-import kr.modusplant.global.enums.ErrorCode;
 import kr.modusplant.global.error.BusinessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
@@ -27,14 +28,14 @@ public class GlobalExceptionHandler {
     // 메서드의 인자가 유효하지 않은 값일 경우
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<DataResponse<Void>> handleIllegalArgumentException() {
-        return ResponseEntity.status(ErrorCode.INVALID_INPUT.getHttpStatus())
+        return ResponseEntity.status(HttpStatus.valueOf(ErrorCode.INVALID_INPUT.getHttpStatus().getValue()))
                 .body(DataResponse.of(ErrorCode.INVALID_INPUT));
     }
 
     // 호출된 메서드가 정상적으로 작동할 수 없는 경우
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<DataResponse<Void>> handleIllegalStateException() {
-        return ResponseEntity.status(ErrorCode.INVALID_STATE.getHttpStatus())
+        return ResponseEntity.status(HttpStatus.valueOf(ErrorCode.INVALID_STATE.getHttpStatus().getValue()))
                 .body(DataResponse.of(ErrorCode.INVALID_STATE));
     }
 
@@ -44,10 +45,10 @@ public class GlobalExceptionHandler {
         FieldError fieldError = ex.getBindingResult().getFieldErrors().getFirst();
 
         if(fieldError != null) {
-            return ResponseEntity.status(ErrorCode.INVALID_INPUT.getHttpStatus())
+            return ResponseEntity.status(HttpStatus.valueOf(ErrorCode.INVALID_INPUT.getHttpStatus().getValue()))
                     .body(DataResponse.ofErrorFieldName(ErrorCode.INVALID_INPUT, fieldError.getField()));
         } else {
-            return ResponseEntity.status(ErrorCode.INVALID_INPUT.getHttpStatus())
+            return ResponseEntity.status(HttpStatus.valueOf(ErrorCode.INVALID_INPUT.getHttpStatus().getValue()))
                     .body(DataResponse.of(ErrorCode.INVALID_INPUT));
         }
     }
@@ -58,10 +59,10 @@ public class GlobalExceptionHandler {
             MethodArgumentTypeMismatchException ex) {
 
         if(!ex.getName().isBlank()) {
-            return ResponseEntity.status(ErrorCode.INPUT_TYPE_MISMATCH.getHttpStatus())
+            return ResponseEntity.status(HttpStatus.valueOf(ErrorCode.INPUT_TYPE_MISMATCH.getHttpStatus().getValue()))
                     .body(DataResponse.ofErrorFieldName(ErrorCode.INPUT_TYPE_MISMATCH, ex.getName()));
         } else {
-            return ResponseEntity.status(ErrorCode.INPUT_TYPE_MISMATCH.getHttpStatus())
+            return ResponseEntity.status(HttpStatus.valueOf(ErrorCode.INPUT_TYPE_MISMATCH.getHttpStatus().getValue()))
                     .body(DataResponse.of(ErrorCode.INPUT_TYPE_MISMATCH));
         }
     }
@@ -76,10 +77,10 @@ public class GlobalExceptionHandler {
                     .map(violation -> violation.getPropertyPath().toString())
                     .toList();
 
-            return ResponseEntity.status(ErrorCode.CONSTRAINT_VIOLATION.getHttpStatus())
+            return ResponseEntity.status(HttpStatus.valueOf(ErrorCode.CONSTRAINT_VIOLATION.getHttpStatus().getValue()))
                     .body(DataResponse.ofErrorFieldNames(ErrorCode.CONSTRAINT_VIOLATION, invalidPropertyNames));
         } else {
-            return ResponseEntity.status(ErrorCode.CONSTRAINT_VIOLATION.getHttpStatus())
+            return ResponseEntity.status(HttpStatus.valueOf(ErrorCode.CONSTRAINT_VIOLATION.getHttpStatus().getValue()))
                     .body(DataResponse.of(ErrorCode.CONSTRAINT_VIOLATION));
         }
     }
@@ -105,28 +106,28 @@ public class GlobalExceptionHandler {
     // 응답 처리 간 예외가 발생한 경우
     @ExceptionHandler(HttpMessageNotWritableException.class)
     public ResponseEntity<DataResponse<Void>> handleHttpMessageNotWritableException() {
-        return ResponseEntity.status(ErrorCode.GENERIC_ERROR.getHttpStatus())
+        return ResponseEntity.status(HttpStatus.valueOf(ErrorCode.GENERIC_ERROR.getHttpStatus().getValue()))
                 .body(DataResponse.of(ErrorCode.GENERIC_ERROR));
     }
 
     // BusinessException
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<DataResponse<Void>> handleBusinessException(BusinessException ex) {
-        return ResponseEntity.status(ex.getErrorCode().getHttpStatus())
+        return ResponseEntity.status(HttpStatus.valueOf(ex.getErrorCode().getHttpStatus().getValue()))
                 .body(DataResponse.of(ex.getErrorCode()));
     }
 
     // RuntimeException
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<DataResponse<Void>> handleRuntimeException(HttpServletRequest ignoredRequest, RuntimeException ignoredEx) {
-        return ResponseEntity.status(ErrorCode.GENERIC_ERROR.getHttpStatus())
+        return ResponseEntity.status(HttpStatus.valueOf(ErrorCode.GENERIC_ERROR.getHttpStatus().getValue()))
                 .body(DataResponse.of(ErrorCode.GENERIC_ERROR));
     }
 
     // Exception
     @ExceptionHandler(Exception.class)
     public ResponseEntity<DataResponse<Void>> handleGenericException(HttpServletRequest ignoredRequest, Exception ignoredEx) {
-        return ResponseEntity.status(ErrorCode.GENERIC_ERROR.getHttpStatus())
+        return ResponseEntity.status(HttpStatus.valueOf(ErrorCode.GENERIC_ERROR.getHttpStatus().getValue()))
                 .body(DataResponse.of(ErrorCode.GENERIC_ERROR));
     }
 }

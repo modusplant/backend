@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.term.error;
 
-import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.domain.exception.enums.ErrorCode;
 import kr.modusplant.global.error.EntityNotFoundException;
 import kr.modusplant.global.vo.EntityName;
 

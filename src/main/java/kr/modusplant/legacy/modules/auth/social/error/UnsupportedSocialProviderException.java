@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.modules.auth.social.error;
 
-import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.domain.exception.enums.ErrorCode;
 import kr.modusplant.global.error.BusinessException;
 
 public class UnsupportedSocialProviderException extends BusinessException {
