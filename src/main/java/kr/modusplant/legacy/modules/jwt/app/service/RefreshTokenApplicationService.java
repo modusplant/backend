@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.modules.jwt.app.service;
 
-import kr.modusplant.global.error.EntityNotFoundException;
 import kr.modusplant.global.vo.EntityName;
+import kr.modusplant.infrastructure.exception.EntityNotFoundException;
 import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.legacy.modules.jwt.domain.model.RefreshToken;

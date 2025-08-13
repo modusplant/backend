@@ -2,8 +2,8 @@ package kr.modusplant.legacy.domains.communication.app.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import kr.modusplant.global.error.EntityNotFoundException;
 import kr.modusplant.global.persistence.generator.UlidIdGenerator;
+import kr.modusplant.infrastructure.exception.EntityNotFoundException;
 import kr.modusplant.legacy.domains.common.app.service.MultipartDataProcessor;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostInsertRequest;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostUpdateRequest;

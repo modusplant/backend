@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
-import kr.modusplant.global.error.InvalidDataException;
+import kr.modusplant.infrastructure.exception.InvalidDataException;
 import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostRepository;
 import lombok.RequiredArgsConstructor;
