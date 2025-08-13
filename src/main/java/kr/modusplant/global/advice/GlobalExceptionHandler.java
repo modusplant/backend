@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import kr.modusplant.global.app.http.response.DataResponse;
-import kr.modusplant.global.error.BusinessException;
+import kr.modusplant.infrastructure.exception.BusinessException;
 import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

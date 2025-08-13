@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.common.error;
 
-import kr.modusplant.global.error.InvalidDataException;
+import kr.modusplant.infrastructure.exception.InvalidDataException;
 import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 
 import java.util.List;

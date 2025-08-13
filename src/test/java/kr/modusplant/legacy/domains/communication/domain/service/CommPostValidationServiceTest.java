@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import kr.modusplant.global.error.EntityNotFoundException;
+import kr.modusplant.infrastructure.exception.EntityNotFoundException;
 import kr.modusplant.legacy.domains.common.error.DataPairOrderMismatchException;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostInsertRequest;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommPostRequestTestUtils;

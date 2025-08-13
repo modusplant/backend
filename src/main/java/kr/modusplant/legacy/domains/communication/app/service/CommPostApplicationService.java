@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
-import kr.modusplant.global.error.EntityNotFoundException;
 import kr.modusplant.global.vo.EntityName;
+import kr.modusplant.infrastructure.exception.EntityNotFoundException;
 import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 import kr.modusplant.legacy.domains.common.app.service.MultipartDataProcessor;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostInsertRequest;
