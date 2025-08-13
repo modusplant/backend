@@ -1,4 +1,4 @@
-package kr.modusplant.global.enums;
+package kr.modusplant.global.middleware.security.enums;
 
 import lombok.Getter;
 

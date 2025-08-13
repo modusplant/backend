@@ -1,7 +1,7 @@
 package kr.modusplant.framework.outbound.persistence.redis;
 
 import kr.modusplant.global.context.RepositoryOnlyContext;
-import kr.modusplant.global.enums.Role;
+import kr.modusplant.global.middleware.security.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.member.common.util.domain;
 
-import kr.modusplant.global.enums.Role;
+import kr.modusplant.global.middleware.security.enums.Role;
 import kr.modusplant.legacy.domains.member.domain.model.SiteMemberRole;
 
 public interface SiteMemberRoleTestUtils extends SiteMemberTestUtils {

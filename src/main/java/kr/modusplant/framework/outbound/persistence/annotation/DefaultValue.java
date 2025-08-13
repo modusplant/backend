@@ -1,4 +1,4 @@
-package kr.modusplant.global.persistence.annotation;
+package kr.modusplant.framework.outbound.persistence.annotation;
 
 import java.lang.annotation.*;
 

@@ -3,7 +3,7 @@ package kr.modusplant.global.middleware.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.modusplant.global.app.http.response.DataResponse;
+import kr.modusplant.framework.outbound.jackson.http.response.DataResponse;
 import kr.modusplant.global.middleware.security.enums.SecurityErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

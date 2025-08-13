@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.member.app.service;
 
-import kr.modusplant.global.enums.Role;
+import kr.modusplant.global.middleware.security.enums.Role;
 import kr.modusplant.legacy.domains.common.app.service.supers.UuidCrudApplicationService;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberRoleInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberRoleUpdateRequest;
