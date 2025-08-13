@@ -103,7 +103,7 @@ public class AuthorizationFlowTest implements
 
                 // then
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.status").value(SecurityErrorCode.ACCESS_DENIED.getHttpStatus().value()))
+                .andExpect(jsonPath("$.status").value(SecurityErrorCode.ACCESS_DENIED.getHttpStatus().getValue()))
                 .andExpect(jsonPath("$.code").value(SecurityErrorCode.ACCESS_DENIED.getCode()))
                 .andExpect(jsonPath("$.message").isNotEmpty());    }
 }

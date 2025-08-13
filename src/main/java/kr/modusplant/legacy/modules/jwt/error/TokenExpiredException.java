@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.modules.jwt.error;
 
-import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.domain.exception.enums.ErrorCode;
 
 public class TokenExpiredException extends AuthTokenException {
     public TokenExpiredException() {

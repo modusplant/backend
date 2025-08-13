@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.modules.auth.social.app.service;
 
-import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.domain.exception.enums.ErrorCode;
 import kr.modusplant.legacy.modules.auth.social.app.dto.GoogleUserInfo;
 import kr.modusplant.legacy.modules.auth.social.app.service.supers.SocialAuthClient;
 import kr.modusplant.legacy.modules.auth.social.error.OAuthRequestFailException;

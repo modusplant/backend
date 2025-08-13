@@ -1,9 +1,9 @@
-package kr.modusplant.global.enums;
+package kr.modusplant.domain.exception.enums;
 
-import kr.modusplant.global.enums.supers.ResponseCode;
+import kr.modusplant.domain.enums.HttpStatus;
+import kr.modusplant.domain.exception.enums.supers.ResponseCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor

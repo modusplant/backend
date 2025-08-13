@@ -6,7 +6,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.domain.exception.enums.ErrorCode;
 import kr.modusplant.global.error.InvalidDataException;
 import kr.modusplant.legacy.modules.auth.email.app.http.request.VerifyEmailRequest;
 import kr.modusplant.legacy.modules.jwt.error.InvalidTokenException;

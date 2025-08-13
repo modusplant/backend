@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
 import jakarta.persistence.EntityManager;
-import kr.modusplant.global.enums.ErrorCode;
+import kr.modusplant.domain.exception.enums.ErrorCode;
 import kr.modusplant.global.error.EntityExistsException;
 import kr.modusplant.global.error.EntityNotFoundException;
 import kr.modusplant.global.vo.EntityName;
