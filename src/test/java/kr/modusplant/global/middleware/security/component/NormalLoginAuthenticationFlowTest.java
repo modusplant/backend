@@ -1,17 +1,17 @@
 package kr.modusplant.global.middleware.security.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.domains.member.common.util.entity.SiteMemberEntityTestUtils;
-import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.context.SecurityOnlyContext;
 import kr.modusplant.global.middleware.security.DefaultUserDetailsService;
 import kr.modusplant.global.middleware.security.common.util.SiteMemberUserDetailsTestUtils;
 import kr.modusplant.global.middleware.security.models.DefaultUserDetails;
-import kr.modusplant.modules.auth.normal.login.common.util.app.http.request.NormalLoginRequestTestUtils;
-import kr.modusplant.modules.jwt.app.dto.TokenPair;
-import kr.modusplant.modules.jwt.app.service.RefreshTokenApplicationService;
-import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
+import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
+import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.legacy.modules.auth.normal.login.common.util.app.http.request.NormalLoginRequestTestUtils;
+import kr.modusplant.legacy.modules.jwt.app.dto.TokenPair;
+import kr.modusplant.legacy.modules.jwt.app.service.RefreshTokenApplicationService;
+import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

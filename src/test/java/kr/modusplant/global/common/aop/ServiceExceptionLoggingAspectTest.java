@@ -28,7 +28,7 @@ public class ServiceExceptionLoggingAspectTest {
         logCaptor.setLogLevelToInfo();
         mockMvc.perform(get("/api/monitor/monitor-error")
                         .with(user("admin").roles("ADMIN")))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().is5xxServerError());
 
         // then
         boolean logFound = logCaptor.getErrorLogs().stream()

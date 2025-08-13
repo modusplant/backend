@@ -1,14 +1,14 @@
 package kr.modusplant.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.domains.member.domain.service.SiteMemberValidationService;
-import kr.modusplant.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.global.middleware.security.DefaultAuthProvider;
 import kr.modusplant.global.middleware.security.DefaultAuthenticationEntryPoint;
 import kr.modusplant.global.middleware.security.DefaultUserDetailsService;
 import kr.modusplant.global.middleware.security.filter.EmailPasswordAuthenticationFilter;
 import kr.modusplant.global.middleware.security.handler.*;
-import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
+import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
+import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;

@@ -2,7 +2,7 @@ package kr.modusplant.global.middleware.security.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.modusplant.modules.jwt.app.service.TokenApplicationService;
+import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
