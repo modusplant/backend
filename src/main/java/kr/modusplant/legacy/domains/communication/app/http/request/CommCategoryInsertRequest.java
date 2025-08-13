@@ -1,8 +1,8 @@
 package kr.modusplant.legacy.domains.communication.app.http.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import kr.modusplant.infrastructure.validation.ZeroBasedOrder;
 import kr.modusplant.legacy.domains.communication.domain.validation.CommunicationCategory;
+import kr.modusplant.shared.validation.ZeroBasedOrder;
 
 public record CommCategoryInsertRequest(
         @Schema(

@@ -18,7 +18,7 @@ import java.util.UUID;
 import static kr.modusplant.global.vo.DatabaseFieldName.*;
 import static kr.modusplant.global.vo.EntityFieldName.VER;
 import static kr.modusplant.global.vo.TableName.TERM;
-import static kr.modusplant.infrastructure.util.VersionUtils.createVersion;
+import static kr.modusplant.shared.util.VersionUtils.createVersion;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)

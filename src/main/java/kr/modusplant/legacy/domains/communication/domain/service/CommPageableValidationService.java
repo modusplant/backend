@@ -1,8 +1,8 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
-import kr.modusplant.infrastructure.exception.InvalidDataException;
-import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostRepository;
+import kr.modusplant.shared.exception.InvalidDataException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

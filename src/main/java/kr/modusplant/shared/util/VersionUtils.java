@@ -1,4 +1,4 @@
-package kr.modusplant.infrastructure.util;
+package kr.modusplant.shared.util;
 
 public abstract class VersionUtils {
     public static String createVersion(int major, int minor, int patch) {

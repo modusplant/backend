@@ -2,9 +2,6 @@ package kr.modusplant.legacy.domains.communication.domain.service;
 
 import jakarta.persistence.EntityManager;
 import kr.modusplant.global.vo.EntityName;
-import kr.modusplant.infrastructure.exception.EntityExistsException;
-import kr.modusplant.infrastructure.exception.EntityNotFoundException;
-import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommCommentEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;
@@ -17,6 +14,9 @@ import kr.modusplant.legacy.domains.communication.persistence.entity.CommSeconda
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommCommentRepository;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
+import kr.modusplant.shared.exception.EntityExistsException;
+import kr.modusplant.shared.exception.EntityNotFoundException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

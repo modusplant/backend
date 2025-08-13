@@ -1,9 +1,9 @@
 package kr.modusplant.legacy.modules.auth.social.app.service;
 
-import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 import kr.modusplant.legacy.modules.auth.social.app.dto.KakaoUserInfo;
 import kr.modusplant.legacy.modules.auth.social.app.service.supers.SocialAuthClient;
 import kr.modusplant.legacy.modules.auth.social.error.OAuthRequestFailException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;

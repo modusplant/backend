@@ -1,8 +1,8 @@
 package kr.modusplant.global.app.http.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import kr.modusplant.infrastructure.exception.enums.SuccessCode;
-import kr.modusplant.infrastructure.exception.enums.supers.ResponseCode;
+import kr.modusplant.shared.exception.enums.SuccessCode;
+import kr.modusplant.shared.exception.enums.supers.ResponseCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

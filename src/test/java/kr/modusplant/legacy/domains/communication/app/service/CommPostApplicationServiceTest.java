@@ -3,7 +3,6 @@ package kr.modusplant.legacy.domains.communication.app.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import kr.modusplant.global.persistence.generator.UlidIdGenerator;
-import kr.modusplant.infrastructure.exception.EntityNotFoundException;
 import kr.modusplant.legacy.domains.common.app.service.MultipartDataProcessor;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostInsertRequest;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostUpdateRequest;
@@ -22,6 +21,7 @@ import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTe
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.shared.exception.EntityNotFoundException;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,6 +1,6 @@
-package kr.modusplant.infrastructure.exception.enums.supers;
+package kr.modusplant.shared.exception.enums.supers;
 
-import kr.modusplant.infrastructure.http.enums.HttpStatus;
+import kr.modusplant.shared.http.enums.HttpStatus;
 
 public interface ResponseCode {
     HttpStatus getHttpStatus();

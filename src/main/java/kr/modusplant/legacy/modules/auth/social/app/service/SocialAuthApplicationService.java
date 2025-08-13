@@ -2,8 +2,6 @@ package kr.modusplant.legacy.modules.auth.social.app.service;
 
 import kr.modusplant.global.enums.Role;
 import kr.modusplant.global.vo.EntityName;
-import kr.modusplant.infrastructure.exception.EntityNotFoundException;
-import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthDomainInfraMapper;
@@ -18,6 +16,8 @@ import kr.modusplant.legacy.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.legacy.modules.auth.social.app.dto.supers.SocialUserInfo;
 import kr.modusplant.legacy.modules.auth.social.app.service.supers.SocialAuthClient;
 import kr.modusplant.legacy.modules.auth.social.error.UnsupportedSocialProviderException;
+import kr.modusplant.shared.exception.EntityNotFoundException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -2,10 +2,10 @@ package kr.modusplant.legacy.domains.common.app.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.global.app.service.S3FileService;
-import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 import kr.modusplant.legacy.domains.common.enums.FileType;
 import kr.modusplant.legacy.domains.common.error.UnsupportedFileException;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommPostRequestTestUtils;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
