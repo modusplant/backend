@@ -1,4 +1,4 @@
-package kr.modusplant.framework.outbound.aop;
+package kr.modusplant.infrastructure.aop;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package kr.modusplant.global.advice;
+package kr.modusplant.infrastructure.advice;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
