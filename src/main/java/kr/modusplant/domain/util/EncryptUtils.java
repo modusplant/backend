@@ -1,4 +1,4 @@
-package kr.modusplant.shared.util;
+package kr.modusplant.domain.util;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

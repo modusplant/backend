@@ -2,7 +2,7 @@ package kr.modusplant.legacy.domains.member.common.util.domain;
 
 import kr.modusplant.legacy.domains.member.domain.model.SiteMemberTerm;
 
-import static kr.modusplant.shared.util.VersionUtils.createVersion;
+import static kr.modusplant.domain.util.VersionUtils.createVersion;
 
 public interface SiteMemberTermTestUtils extends SiteMemberTestUtils {
     SiteMemberTerm memberTermAdmin = SiteMemberTerm.builder()
