@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.modules.auth.email.app.service;
 
-import kr.modusplant.global.middleware.redis.RedisHelper;
+import kr.modusplant.framework.outbound.persistence.redis.RedisHelper;
 import kr.modusplant.global.vo.EntityName;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberAuthValidationService;
@@ -22,7 +22,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import java.time.Duration;
 import java.util.Optional;
 
-import static kr.modusplant.global.middleware.redis.RedisKeys.RESET_PASSWORD_PREFIX;
+import static kr.modusplant.framework.outbound.persistence.redis.RedisKeys.RESET_PASSWORD_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;

@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.modules.jwt.persistence.repository;
 
+import kr.modusplant.framework.outbound.persistence.redis.RedisHelper;
 import kr.modusplant.global.context.RepositoryOnlyContext;
-import kr.modusplant.global.middleware.redis.RedisHelper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

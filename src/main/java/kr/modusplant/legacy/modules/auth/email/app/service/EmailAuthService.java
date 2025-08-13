@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.modules.auth.email.app.service;
 
-import kr.modusplant.global.middleware.redis.RedisHelper;
-import kr.modusplant.global.middleware.redis.RedisKeys;
+import kr.modusplant.framework.outbound.persistence.redis.RedisHelper;
+import kr.modusplant.framework.outbound.persistence.redis.RedisKeys;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberAuthValidationService;
 import kr.modusplant.legacy.modules.auth.email.app.http.request.EmailRequest;
 import kr.modusplant.legacy.modules.auth.email.app.http.request.VerifyEmailRequest;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
-import static kr.modusplant.global.middleware.redis.RedisKeys.RESET_PASSWORD_PREFIX;
+import static kr.modusplant.framework.outbound.persistence.redis.RedisKeys.RESET_PASSWORD_PREFIX;
 
 @Slf4j
 @RequiredArgsConstructor

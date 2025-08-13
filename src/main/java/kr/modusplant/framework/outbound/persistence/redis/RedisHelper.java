@@ -1,4 +1,4 @@
-package kr.modusplant.global.middleware.redis;
+package kr.modusplant.framework.outbound.persistence.redis;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
