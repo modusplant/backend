@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.member.persistence.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.global.persistence.annotation.DefaultValue;
+import kr.modusplant.framework.outbound.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

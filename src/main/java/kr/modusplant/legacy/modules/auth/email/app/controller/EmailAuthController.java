@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import kr.modusplant.global.app.http.response.DataResponse;
+import kr.modusplant.framework.outbound.jackson.http.response.DataResponse;
 import kr.modusplant.legacy.modules.auth.email.app.http.request.EmailRequest;
 import kr.modusplant.legacy.modules.auth.email.app.http.request.VerifyEmailRequest;
 import kr.modusplant.legacy.modules.auth.email.app.service.EmailAuthService;

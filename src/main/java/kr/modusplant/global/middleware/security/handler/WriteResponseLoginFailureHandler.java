@@ -3,7 +3,7 @@ package kr.modusplant.global.middleware.security.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.modusplant.global.app.http.response.DataResponse;
+import kr.modusplant.framework.outbound.jackson.http.response.DataResponse;
 import kr.modusplant.global.middleware.security.enums.SecurityErrorCode;
 import kr.modusplant.global.middleware.security.error.BusinessAuthenticationException;
 import lombok.RequiredArgsConstructor;

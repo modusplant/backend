@@ -1,4 +1,4 @@
-package kr.modusplant.global.persistence.generator;
+package kr.modusplant.framework.outbound.persistence.generator;
 
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;

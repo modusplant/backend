@@ -3,7 +3,7 @@ package kr.modusplant.global.middleware.security.handler;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.modusplant.global.enums.Role;
+import kr.modusplant.global.middleware.security.enums.Role;
 import kr.modusplant.global.middleware.security.models.DefaultUserDetails;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;

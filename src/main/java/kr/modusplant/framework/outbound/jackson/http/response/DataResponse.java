@@ -1,4 +1,4 @@
-package kr.modusplant.global.app.http.response;
+package kr.modusplant.framework.outbound.jackson.http.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import kr.modusplant.shared.exception.enums.SuccessCode;

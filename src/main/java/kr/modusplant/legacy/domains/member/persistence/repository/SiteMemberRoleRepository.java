@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.member.persistence.repository;
 
-import kr.modusplant.global.enums.Role;
+import kr.modusplant.global.middleware.security.enums.Role;
 import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberRoleEntity;
 import kr.modusplant.legacy.domains.member.persistence.repository.supers.SiteMemberUuidPrimaryKeyRepository;
 import org.springframework.context.annotation.Primary;

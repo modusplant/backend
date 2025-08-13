@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
-import kr.modusplant.global.app.http.response.DataResponse;
+import kr.modusplant.framework.outbound.jackson.http.response.DataResponse;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommLikeResponse;
 import kr.modusplant.legacy.domains.communication.app.service.CommLikeApplicationService;
 import lombok.RequiredArgsConstructor;

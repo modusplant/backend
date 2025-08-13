@@ -1,6 +1,5 @@
-package kr.modusplant.global.persistence.annotation;
+package kr.modusplant.framework.outbound.persistence.generator;
 
-import kr.modusplant.global.persistence.generator.UlidIdGenerator;
 import org.hibernate.annotations.IdGeneratorType;
 
 import java.lang.annotation.Retention;
