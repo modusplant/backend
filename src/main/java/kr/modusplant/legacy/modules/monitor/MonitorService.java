@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.modules.monitor;
 
-import kr.modusplant.global.middleware.redis.RedisHelper;
+import kr.modusplant.framework.outbound.persistence.redis.RedisHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

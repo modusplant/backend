@@ -1,4 +1,4 @@
-package kr.modusplant.global.config;
+package kr.modusplant.framework.outbound.config.aws;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;

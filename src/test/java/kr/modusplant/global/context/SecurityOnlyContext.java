@@ -1,8 +1,8 @@
 package kr.modusplant.global.context;
 
-import kr.modusplant.global.config.TestJpaConfig;
-import kr.modusplant.global.config.TestRedisConfig;
-import kr.modusplant.global.config.TestS3Config;
+import kr.modusplant.framework.outbound.config.aws.TestS3Config;
+import kr.modusplant.framework.outbound.config.jpa.TestJpaConfig;
+import kr.modusplant.framework.outbound.config.redis.TestRedisConfig;
 import kr.modusplant.global.config.TestSecurityConfig;
 import kr.modusplant.global.initializer.MockPasswordEncoderInitializer;
 import kr.modusplant.legacy.modules.common.postprocessor.MockModulesRepositoryBeanFactoryPostProcessor;

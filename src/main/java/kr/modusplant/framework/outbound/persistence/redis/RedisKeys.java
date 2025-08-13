@@ -1,4 +1,4 @@
-package kr.modusplant.global.middleware.redis;
+package kr.modusplant.framework.outbound.persistence.redis;
 
 /**
  * Redis 저장소 Key 를 관리하는 클래스

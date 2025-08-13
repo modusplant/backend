@@ -1,6 +1,5 @@
-package kr.modusplant.global.config;
+package kr.modusplant.infrastructure.aop;
 
-import kr.modusplant.infrastructure.aop.ServiceExceptionLoggingAspect;
 import org.aspectj.lang.JoinPoint;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;

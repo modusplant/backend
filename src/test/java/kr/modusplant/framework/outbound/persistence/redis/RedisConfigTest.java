@@ -1,4 +1,4 @@
-package kr.modusplant.global.middleware.redis;
+package kr.modusplant.framework.outbound.persistence.redis;
 
 import kr.modusplant.global.context.RepositoryOnlyContext;
 import kr.modusplant.global.enums.Role;

@@ -1,9 +1,9 @@
 package kr.modusplant.legacy.domains.common.context;
 
+import kr.modusplant.framework.outbound.config.aws.TestS3Config;
+import kr.modusplant.framework.outbound.config.jpa.TestJpaConfig;
+import kr.modusplant.framework.outbound.config.redis.TestRedisConfig;
 import kr.modusplant.global.common.scan.ScanGlobalService;
-import kr.modusplant.global.config.TestJpaConfig;
-import kr.modusplant.global.config.TestRedisConfig;
-import kr.modusplant.global.config.TestS3Config;
 import kr.modusplant.global.initializer.MockRedisHelperInitializer;
 import kr.modusplant.legacy.domains.common.postprocessor.MockDomainsRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.legacy.domains.common.postprocessor.MockDomainsValidationServiceBeanFactoryPostProcessor;
