@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import kr.modusplant.global.app.http.response.DataResponse;
-import kr.modusplant.global.domain.validation.ZeroBasedOrder;
+import kr.modusplant.domain.validation.ZeroBasedOrder;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommCategoryInsertRequest;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommCategoryResponse;
 import kr.modusplant.legacy.domains.communication.app.service.CommPrimaryCategoryApplicationService;

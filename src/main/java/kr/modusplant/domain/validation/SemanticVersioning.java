@@ -1,22 +1,22 @@
-package kr.modusplant.global.domain.validation;
+package kr.modusplant.domain.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import jakarta.validation.constraints.NotNull;
-import org.hibernate.validator.constraints.Range;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@NotNull(message = "순서가 비어 있습니다.")
-@Range(min = 1, max = 100, message = "순서는 1부터 100 사이의 값이어야 합니다.")
+@NotBlank(message = "버전이 비어 있습니다.")
+@Pattern(regexp = "^v\\d+.\\d+.\\d+$", message = "버전 서식이 올바르지 않습니다.")
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface OneBasedOrder {
-    String message() default "순서에서 오류가 발생했습니다.";
+public @interface SemanticVersioning {
+    String message() default "버전에서 오류가 발생했습니다.";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
