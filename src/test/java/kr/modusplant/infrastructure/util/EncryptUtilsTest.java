@@ -1,4 +1,4 @@
-package kr.modusplant.domain.util;
+package kr.modusplant.infrastructure.util;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package kr.modusplant.domain.validation;
+package kr.modusplant.infrastructure.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

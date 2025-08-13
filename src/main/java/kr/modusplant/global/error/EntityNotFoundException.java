@@ -1,6 +1,6 @@
 package kr.modusplant.global.error;
 
-import kr.modusplant.domain.exception.enums.ErrorCode;
+import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 import lombok.Getter;
 
 @Getter

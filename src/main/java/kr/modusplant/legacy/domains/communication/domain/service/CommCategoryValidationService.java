@@ -1,9 +1,9 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
-import kr.modusplant.domain.exception.enums.ErrorCode;
 import kr.modusplant.global.error.EntityExistsException;
 import kr.modusplant.global.error.EntityNotFoundException;
 import kr.modusplant.global.vo.EntityName;
+import kr.modusplant.infrastructure.exception.enums.ErrorCode;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommSecondaryCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;

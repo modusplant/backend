@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
 
-import static kr.modusplant.domain.util.EncryptUtils.encryptWithSha256;
+import static kr.modusplant.infrastructure.util.EncryptUtils.encryptWithSha256;
 
 @Repository
 @RequiredArgsConstructor

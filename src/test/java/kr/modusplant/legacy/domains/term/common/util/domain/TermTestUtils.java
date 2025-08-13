@@ -4,7 +4,7 @@ import kr.modusplant.legacy.domains.term.domain.model.Term;
 
 import java.util.UUID;
 
-import static kr.modusplant.domain.util.VersionUtils.createVersion;
+import static kr.modusplant.infrastructure.util.VersionUtils.createVersion;
 
 public interface TermTestUtils {
     Term termsOfUse = Term.builder().name("이용약관").content("이용약관 내용").version(createVersion(1, 0, 0)).build();
