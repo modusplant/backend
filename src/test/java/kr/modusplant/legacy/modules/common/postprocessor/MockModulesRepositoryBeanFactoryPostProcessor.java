@@ -15,8 +15,8 @@ import org.springframework.util.ClassUtils;
 import java.util.List;
 import java.util.Objects;
 
-import static kr.modusplant.legacy.domains.common.vo.Reference.NOTATION_DOMAINS;
 import static kr.modusplant.global.vo.Reference.NOTATION_GLOBAL;
+import static kr.modusplant.legacy.domains.common.vo.Reference.NOTATION_DOMAINS;
 import static kr.modusplant.legacy.modules.common.vo.Reference.NOTATION_MODULES;
 
 @NonNullApi

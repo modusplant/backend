@@ -1,4 +1,4 @@
-package kr.modusplant.global.common.aop;
+package kr.modusplant.framework.outbound.aop;
 
 import nl.altindag.log.LogCaptor;
 import org.junit.jupiter.api.DisplayName;
@@ -15,26 +15,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class ControllerExceptionLoggingAspectTest {
+public class ApiLoggingAspectTest {
     private final MockMvc mockMvc;
 
     @Autowired
-    ControllerExceptionLoggingAspectTest(MockMvc mockMvc) {
+    ApiLoggingAspectTest(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
     }
 
     @Test
-    @DisplayName("AOP 적용 컨트롤러 메소드 예외상황 로깅 성공")
-    void ControllerExceptionLoggingAspectTest() throws Exception{
-        LogCaptor logCaptor = LogCaptor.forClass(ControllerExceptionLoggingAspect.class);
+    @DisplayName("AOP 적용 컨트롤러 메소드 호출 성공")
+    void apiLoggingAspectTest() throws Exception{
+        LogCaptor logCaptor = LogCaptor.forClass(ApiLoggingAspect.class);
         logCaptor.setLogLevelToInfo();
-        mockMvc.perform(get("/api/monitor/monitor-error-controller")
+        mockMvc.perform(get("/api/monitor/monitor-success")
                         .with(user("admin").roles("ADMIN")))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().isOk());
 
         // then
-        boolean logFound = logCaptor.getErrorLogs().stream()
-                .anyMatch(log -> log.contains("method=GET") && log.contains("uri=/api/monitor/monitor-error-controller"));
+        boolean logFound = logCaptor.getInfoLogs().stream()
+                        .anyMatch(log -> log.contains("method=GET") && log.contains("uri=/api/monitor/monitor-success"));
         assertThat(logFound).isTrue();
     }
 }
