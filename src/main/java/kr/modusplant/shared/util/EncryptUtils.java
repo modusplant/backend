@@ -1,11 +1,10 @@
-package kr.modusplant.global.common.util;
+package kr.modusplant.shared.util;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class EncryptUtils {
-
+public abstract class EncryptUtils {
     public static String encryptWithSha256(String input) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -20,7 +19,7 @@ public class EncryptUtils {
             }
             return hexString.toString();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("SHA-256 해시 생성 실패",e);
+            throw new RuntimeException("SHA-256 해시 생성 실패", e);
         }
     }
 

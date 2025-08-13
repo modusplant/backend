@@ -1,4 +1,4 @@
-package kr.modusplant.global.common.util;
+package kr.modusplant.shared.util;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
