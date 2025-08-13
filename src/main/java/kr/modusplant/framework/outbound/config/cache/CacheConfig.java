@@ -1,4 +1,4 @@
-package kr.modusplant.global.config;
+package kr.modusplant.framework.outbound.config.cache;
 
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -24,7 +24,7 @@ public class CacheConfig {
                 .disableCachingNullValues()
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(
-                        new Jackson2JsonRedisSerializer<Object>(Object.class))
+                        new Jackson2JsonRedisSerializer<>(Object.class))
                 );
 
         return RedisCacheManager.builder(redisConnectionFactory)

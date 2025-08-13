@@ -1,4 +1,4 @@
-package kr.modusplant.global.config;
+package kr.modusplant.framework.outbound.config.jpa;
 
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.context.annotation.Bean;

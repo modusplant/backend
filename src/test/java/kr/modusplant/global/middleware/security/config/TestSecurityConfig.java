@@ -1,4 +1,4 @@
-package kr.modusplant.global.config;
+package kr.modusplant.global.middleware.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.global.middleware.security.DefaultAuthProvider;
