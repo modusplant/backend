@@ -16,8 +16,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.DatabaseFieldName.*;
-import static kr.modusplant.global.vo.TableName.SITE_MEMBER;
+import static kr.modusplant.shared.database.TableColumnName.*;
+import static kr.modusplant.shared.database.TableName.SITE_MEMBER;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)

@@ -12,8 +12,8 @@ import org.hibernate.annotations.UuidGenerator;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.DatabaseFieldName.REFRESH_TOKEN;
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.SNAKE_MEMB_UUID;
+import static kr.modusplant.shared.database.TableColumnName.REFRESH_TOKEN;
 
 @Entity
 @Table(name = REFRESH_TOKEN)

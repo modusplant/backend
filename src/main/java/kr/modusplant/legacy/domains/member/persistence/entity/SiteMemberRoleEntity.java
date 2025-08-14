@@ -12,8 +12,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.TableName.SITE_MEMBER_ROLE;
 import static kr.modusplant.infrastructure.security.enums.Role.USER;
+import static kr.modusplant.shared.database.TableName.SITE_MEMBER_ROLE;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)

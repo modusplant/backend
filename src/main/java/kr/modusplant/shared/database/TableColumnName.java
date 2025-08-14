@@ -1,10 +1,10 @@
-package kr.modusplant.global.vo;
+package kr.modusplant.shared.database;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class DatabaseFieldName {
+public final class TableColumnName {
     public static final String PRI_CATE_UUID = "pri_cate_uuid";
     public static final String SECO_CATE_UUID = "seco_cate_uuid";
     public static final String CREATED_AT = "created_at";

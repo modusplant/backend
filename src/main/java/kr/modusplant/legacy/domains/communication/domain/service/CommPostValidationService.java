@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
-import kr.modusplant.global.vo.EntityName;
+import kr.modusplant.framework.outbound.persistence.vo.EntityName;
 import kr.modusplant.legacy.domains.common.error.DataPairNumberMismatchException;
 import kr.modusplant.legacy.domains.common.error.DataPairOrderMismatchException;
 import kr.modusplant.legacy.domains.common.error.EmptyValueException;

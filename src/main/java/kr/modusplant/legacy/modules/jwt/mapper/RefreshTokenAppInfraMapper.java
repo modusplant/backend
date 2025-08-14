@@ -11,9 +11,8 @@ import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.CamelCaseWord.MEMBER;
-import static kr.modusplant.global.vo.EntityFieldName.EXPIRED_AT;
-import static kr.modusplant.global.vo.EntityFieldName.ISSUED_AT;
+import static kr.modusplant.framework.outbound.persistence.vo.EntityFieldName.EXPIRED_AT;
+import static kr.modusplant.framework.outbound.persistence.vo.EntityFieldName.ISSUED_AT;
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.MEMBER_UUID;
 
 @Mapper
@@ -28,7 +27,7 @@ public interface RefreshTokenAppInfraMapper {
                 .build();
     }
 
-    @Mapping(source = MEMBER, target = MEMBER_UUID, qualifiedByName = "toMemberUuid")
+    @Mapping(source = "member", target = MEMBER_UUID, qualifiedByName = "toMemberUuid")
     @Mapping(source = ISSUED_AT, target = ISSUED_AT, qualifiedByName = "toDate")
     @Mapping(source = EXPIRED_AT, target = EXPIRED_AT, qualifiedByName = "toDate")
     RefreshToken toRefreshToken(RefreshTokenEntity refreshTokenEntity);

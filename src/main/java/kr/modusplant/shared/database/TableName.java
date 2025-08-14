@@ -1,4 +1,4 @@
-package kr.modusplant.global.vo;
+package kr.modusplant.shared.database;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

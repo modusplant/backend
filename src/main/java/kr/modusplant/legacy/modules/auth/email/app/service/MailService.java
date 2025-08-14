@@ -13,8 +13,6 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import static kr.modusplant.global.vo.CamelCaseWord.VERIFY_CODE;
-
 @Slf4j
 @Service
 public class MailService {
@@ -72,7 +70,7 @@ public class MailService {
                                                 .put("TemplateLanguage", true)
                                                 .put(Emailv31.Message.SUBJECT, subject)
                                                 .put(Emailv31.Message.VARS, new JSONObject()
-                                                        .put(VERIFY_CODE, verifyCode)
+                                                        .put("verifyCode", verifyCode)
                                                 )
                                 )
                 );

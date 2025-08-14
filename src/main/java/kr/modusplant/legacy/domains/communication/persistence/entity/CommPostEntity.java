@@ -18,10 +18,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-import static kr.modusplant.global.vo.DatabaseFieldName.*;
-import static kr.modusplant.global.vo.TableName.COMM_POST;
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.SNAKE_AUTH_MEMB_UUID;
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.SNAKE_CREA_MEMB_UUID;
+import static kr.modusplant.shared.database.TableColumnName.*;
+import static kr.modusplant.shared.database.TableName.COMM_POST;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)

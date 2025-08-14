@@ -23,8 +23,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.CamelCaseWord.VERIFY_CODE;
-import static kr.modusplant.global.vo.EntityFieldName.EMAIL;
+import static kr.modusplant.framework.outbound.persistence.vo.EntityFieldName.EMAIL;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +47,8 @@ public class TokenProvider {
     // 메일 API 비밀키 설정
     @Value("${mail-api.jwt-secret-key}")
     private String MAIL_API_JWT_SECRET_KEY;
+
+    private final String VERIFY_CODE = "verifyCode";
 
     @PostConstruct
     public void init() {

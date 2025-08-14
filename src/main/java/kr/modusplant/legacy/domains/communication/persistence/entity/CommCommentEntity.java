@@ -14,10 +14,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-import static kr.modusplant.global.vo.DatabaseFieldName.IS_DELETED;
-import static kr.modusplant.global.vo.TableName.COMM_COMMENT;
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.SNAKE_AUTH_MEMB_UUID;
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.SNAKE_CREA_MEMB_UUID;
+import static kr.modusplant.shared.database.TableColumnName.IS_DELETED;
+import static kr.modusplant.shared.database.TableName.COMM_COMMENT;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)

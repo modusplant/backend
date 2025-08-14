@@ -10,9 +10,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.DatabaseFieldName.CREATED_AT;
-import static kr.modusplant.global.vo.TableName.COMM_LIKE;
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.SNAKE_MEMB_UUID;
+import static kr.modusplant.shared.database.TableColumnName.CREATED_AT;
+import static kr.modusplant.shared.database.TableName.COMM_LIKE;
 
 @Entity
 @Table(name = COMM_LIKE)
