@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.mapper;
 
-import kr.modusplant.global.context.RepositoryOnlyContext;
+import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommCommentResponse;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommCommentInsertRequestTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.response.CommCommentResponseTestUtils;

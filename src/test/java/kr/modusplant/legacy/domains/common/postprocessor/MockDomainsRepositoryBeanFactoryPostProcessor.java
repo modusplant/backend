@@ -15,7 +15,6 @@ import org.springframework.util.ClassUtils;
 import java.util.List;
 import java.util.Objects;
 
-import static kr.modusplant.global.vo.Reference.NOTATION_GLOBAL;
 import static kr.modusplant.legacy.domains.common.vo.Reference.NOTATION_DOMAINS;
 
 @NonNullApi
@@ -32,7 +31,7 @@ public class MockDomainsRepositoryBeanFactoryPostProcessor implements BeanFactor
         scanner.addIncludeFilter(new AnnotationTypeFilter(Repository.class));
         ClassLoader classLoader = this.getClass().getClassLoader();
 
-        for (String reference: List.of(NOTATION_GLOBAL, NOTATION_DOMAINS)) {
+        for (String reference: List.of(NOTATION_DOMAINS)) {
             for (BeanDefinition repositoryDef : scanner.findCandidateComponents(reference)) {
                 Class<?> clazz;
                 try {

@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.term.mapper;
 
-import kr.modusplant.global.context.RepositoryOnlyContext;
+import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.term.app.http.response.TermResponse;
 import kr.modusplant.legacy.domains.term.common.util.app.http.request.TermRequestTestUtils;
 import kr.modusplant.legacy.domains.term.common.util.app.http.response.TermResponseTestUtils;

@@ -1,4 +1,4 @@
-package kr.modusplant.global.initializer;
+package kr.modusplant.infrastructure.initializer;
 
 import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
 import org.springframework.boot.test.context.TestConfiguration;

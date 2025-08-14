@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.communication.persistence.repository;
 
 import kr.modusplant.framework.outbound.persistence.generator.UlidIdGenerator;
-import kr.modusplant.global.context.RepositoryOnlyContext;
+import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

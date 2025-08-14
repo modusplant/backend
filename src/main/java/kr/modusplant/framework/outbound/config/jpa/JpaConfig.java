@@ -14,7 +14,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 
-import static kr.modusplant.global.vo.Reference.NOTATION_ALL;
+import static kr.modusplant.shared.vo.Reference.NOTATION_ALL;
 
 @Configuration
 @EnableJpaAuditing
