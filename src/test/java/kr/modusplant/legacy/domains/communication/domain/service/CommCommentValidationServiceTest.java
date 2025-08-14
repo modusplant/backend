@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
 import jakarta.persistence.EntityManager;
-import kr.modusplant.global.vo.EntityName;
+import kr.modusplant.framework.outbound.persistence.vo.EntityName;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommCommentEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;

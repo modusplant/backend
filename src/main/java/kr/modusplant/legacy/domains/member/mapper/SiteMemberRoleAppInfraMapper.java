@@ -12,16 +12,14 @@ import org.mapstruct.Named;
 
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.CamelCaseWord.MEMBER;
-
 @Mapper
 public interface SiteMemberRoleAppInfraMapper {
 
     @Mapping(target = "memberRoleEntity", ignore = true)
-    @Mapping(source = "uuid", target = MEMBER, qualifiedByName = "toMember")
+    @Mapping(source = "uuid", target = "member", qualifiedByName = "toMember")
     SiteMemberRoleEntity toMemberRoleEntity(SiteMemberRoleInsertRequest memberRoleInsertRequest, @Context SiteMemberRepository memberRepository);
 
-    @Mapping(source = MEMBER, target = "uuid", qualifiedByName = "toUuid")
+    @Mapping(source = "member", target = "uuid", qualifiedByName = "toUuid")
     SiteMemberRoleResponse toMemberRoleResponse(SiteMemberRoleEntity memberRoleEntity);
 
     @Named("toMember")

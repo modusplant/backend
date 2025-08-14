@@ -21,8 +21,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.lang.annotation.*;
 
-import static kr.modusplant.global.vo.Reference.NOTATION_GLOBAL;
-
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

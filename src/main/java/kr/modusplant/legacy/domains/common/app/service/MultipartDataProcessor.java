@@ -18,9 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 
-import static kr.modusplant.global.vo.CamelCaseWord.*;
-import static kr.modusplant.global.vo.FileSystem.FILENAME;
-import static kr.modusplant.global.vo.FileSystem.SRC;
+import static kr.modusplant.legacy.domains.common.vo.FileSystem.*;
 
 @Service
 @RequiredArgsConstructor

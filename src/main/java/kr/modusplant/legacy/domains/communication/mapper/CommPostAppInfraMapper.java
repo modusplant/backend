@@ -11,10 +11,10 @@ import org.mapstruct.Named;
 
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.CamelCaseWord.PRIMARY_CATEGORY;
-import static kr.modusplant.global.vo.CamelCaseWord.SECONDARY_CATEGORY;
-import static kr.modusplant.global.vo.EntityFieldName.AUTH_MEMBER;
-import static kr.modusplant.global.vo.EntityFieldName.NICKNAME;
+import static kr.modusplant.framework.outbound.persistence.vo.EntityFieldName.AUTH_MEMBER;
+import static kr.modusplant.framework.outbound.persistence.vo.EntityFieldName.NICKNAME;
+import static kr.modusplant.legacy.domains.communication.vo.CommCategoryWord.PRIMARY_CATEGORY;
+import static kr.modusplant.legacy.domains.communication.vo.CommCategoryWord.SECONDARY_CATEGORY;
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.MEMBER_UUID;
 
 @Mapper

@@ -1,4 +1,4 @@
-package kr.modusplant.global.vo;
+package kr.modusplant.framework.outbound.persistence.vo;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

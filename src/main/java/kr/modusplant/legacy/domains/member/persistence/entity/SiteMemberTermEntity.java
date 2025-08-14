@@ -12,9 +12,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.DatabaseFieldName.LAST_MODIFIED_AT;
-import static kr.modusplant.global.vo.DatabaseFieldName.VER_NUM;
-import static kr.modusplant.global.vo.TableName.SITE_MEMBER_TERM;
+import static kr.modusplant.shared.database.TableColumnName.LAST_MODIFIED_AT;
+import static kr.modusplant.shared.database.TableColumnName.VER_NUM;
+import static kr.modusplant.shared.database.TableName.SITE_MEMBER_TERM;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)

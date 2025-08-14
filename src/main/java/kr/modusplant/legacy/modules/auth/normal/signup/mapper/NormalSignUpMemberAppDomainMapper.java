@@ -6,13 +6,12 @@ import kr.modusplant.legacy.modules.auth.normal.signup.app.http.request.NormalSi
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import static kr.modusplant.global.vo.CamelCaseWord.MEMBER;
-import static kr.modusplant.global.vo.FieldName.*;
+import static kr.modusplant.framework.outbound.persistence.vo.EntityFieldName.*;
 
 @Mapper
 public interface NormalSignUpMemberAppDomainMapper {
 
-    @Mapping(target = MEMBER, ignore = true)
+    @Mapping(target = "member", ignore = true)
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = BIRTH_DATE, ignore = true)
     @Mapping(target = IS_ACTIVE, ignore = true)

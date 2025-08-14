@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
-import kr.modusplant.global.vo.EntityName;
+import kr.modusplant.framework.outbound.persistence.vo.EntityName;
 import kr.modusplant.legacy.domains.common.app.service.MultipartDataProcessor;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostInsertRequest;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostUpdateRequest;

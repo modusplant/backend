@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.global.vo.CamelCaseWord.DATA;
+import static kr.modusplant.legacy.domains.common.vo.FileSystem.DATA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
