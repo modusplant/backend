@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.member.persistence.repository;
 
-import kr.modusplant.global.context.RepositoryOnlyContext;
+import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberTermEntityTestUtils;
 import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberTermEntity;
 import org.junit.jupiter.api.DisplayName;

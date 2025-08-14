@@ -1,4 +1,4 @@
-package kr.modusplant.global.initializer;
+package kr.modusplant.infrastructure.initializer;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContextInitializer;

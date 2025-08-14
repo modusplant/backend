@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.modules.auth.normal.login.persistence.repository;
 
-import kr.modusplant.global.context.RepositoryOnlyContext;
+import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

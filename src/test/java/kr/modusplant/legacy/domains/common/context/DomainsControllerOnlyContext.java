@@ -3,8 +3,8 @@
  import kr.modusplant.framework.outbound.config.aws.TestS3Config;
  import kr.modusplant.framework.outbound.config.jpa.TestJpaConfig;
  import kr.modusplant.framework.outbound.config.redis.TestRedisConfig;
- import kr.modusplant.global.initializer.MockRedisHelperInitializer;
- import kr.modusplant.global.initializer.MockTokenProviderInitializer;
+ import kr.modusplant.infrastructure.initializer.MockRedisHelperInitializer;
+ import kr.modusplant.infrastructure.initializer.MockTokenProviderInitializer;
  import kr.modusplant.legacy.domains.common.postprocessor.MockDomainsRepositoryBeanFactoryPostProcessor;
  import kr.modusplant.legacy.domains.common.postprocessor.MockDomainsServiceBeanFactoryPostProcessor;
  import org.junit.jupiter.api.extension.ExtendWith;
