@@ -3,8 +3,7 @@ package kr.modusplant.legacy.domains.common.context;
 import kr.modusplant.framework.outbound.config.aws.TestS3Config;
 import kr.modusplant.framework.outbound.config.jpa.TestJpaConfig;
 import kr.modusplant.framework.outbound.config.redis.TestRedisConfig;
-import kr.modusplant.global.common.scan.ScanGlobalService;
-import kr.modusplant.global.initializer.MockRedisHelperInitializer;
+import kr.modusplant.infrastructure.initializer.MockRedisHelperInitializer;
 import kr.modusplant.legacy.domains.common.postprocessor.MockDomainsRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.legacy.domains.common.scan.ScanDomainsService;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +31,7 @@ import java.lang.annotation.*;
                 MockDomainsRepositoryBeanFactoryPostProcessor.class},
         initializers = MockRedisHelperInitializer.class
 )
-@SpringBootTest(classes = {ScanGlobalService.class, ScanDomainsService.class})
+@SpringBootTest(classes = {ScanDomainsService.class})
 @ExtendWith(MockitoExtension.class)
 @Execution(ExecutionMode.CONCURRENT)
 public @interface DomainsServiceOnlyContext {

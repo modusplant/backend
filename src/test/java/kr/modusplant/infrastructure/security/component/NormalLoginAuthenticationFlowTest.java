@@ -1,7 +1,7 @@
 package kr.modusplant.infrastructure.security.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.global.context.SecurityOnlyContext;
+import kr.modusplant.infrastructure.context.SecurityOnlyContext;
 import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
 import kr.modusplant.infrastructure.security.common.util.SiteMemberUserDetailsTestUtils;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;

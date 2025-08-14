@@ -1,6 +1,6 @@
 package kr.modusplant.infrastructure.security.component;
 
-import kr.modusplant.global.context.SecurityOnlyContext;
+import kr.modusplant.infrastructure.context.SecurityOnlyContext;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

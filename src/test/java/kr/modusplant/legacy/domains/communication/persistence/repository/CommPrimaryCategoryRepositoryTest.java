@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.persistence.repository;
 
-import kr.modusplant.global.context.RepositoryOnlyContext;
+import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.persistence.entity.CommPrimaryCategoryEntity;
 import org.junit.jupiter.api.DisplayName;

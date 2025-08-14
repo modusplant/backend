@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.persistence.repository;
 
-import kr.modusplant.global.context.RepositoryOnlyContext;
+import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommLikeEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.persistence.entity.CommLikeEntity;
 import kr.modusplant.legacy.domains.communication.persistence.entity.CommLikeId;

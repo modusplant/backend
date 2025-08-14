@@ -1,4 +1,4 @@
-package kr.modusplant.global.context;
+package kr.modusplant.infrastructure.context;
 
 import kr.modusplant.framework.outbound.config.aws.TestS3Config;
 import kr.modusplant.framework.outbound.config.jpa.TestJpaConfig;
@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.annotation.*;
 
-import static kr.modusplant.global.vo.Reference.NOTATION_ALL;
+import static kr.modusplant.shared.vo.Reference.NOTATION_ALL;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

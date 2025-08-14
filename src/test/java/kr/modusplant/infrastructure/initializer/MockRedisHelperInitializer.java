@@ -1,4 +1,4 @@
-package kr.modusplant.global.initializer;
+package kr.modusplant.infrastructure.initializer;
 
 import kr.modusplant.framework.outbound.persistence.redis.RedisHelper;
 import org.springframework.boot.test.context.TestConfiguration;
