@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.modules.auth.social.app.service;
 
-import kr.modusplant.global.middleware.security.enums.Role;
 import kr.modusplant.global.vo.EntityName;
+import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthDomainInfraMapper;

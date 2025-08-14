@@ -4,7 +4,7 @@ import kr.modusplant.framework.outbound.config.aws.TestS3Config;
 import kr.modusplant.framework.outbound.config.jpa.TestJpaConfig;
 import kr.modusplant.framework.outbound.config.redis.TestRedisConfig;
 import kr.modusplant.global.initializer.MockPasswordEncoderInitializer;
-import kr.modusplant.global.middleware.security.config.TestSecurityConfig;
+import kr.modusplant.infrastructure.security.config.TestSecurityConfig;
 import kr.modusplant.legacy.modules.common.postprocessor.MockModulesRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.legacy.modules.common.postprocessor.MockModulesServiceBeanFactoryPostProcessor;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +39,8 @@ import static kr.modusplant.global.vo.Reference.NOTATION_GLOBAL;
 )
 @AutoConfigureMockMvc
 @ComponentScan(
-        basePackages = NOTATION_GLOBAL,
+        // HACK: 임시 방편, 추후 보안 속박된 맥락을 대상으로 하는 어노테이션 개발 필요
+        basePackages = "kr.modusplant.infrastructure.security",
         includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = {
                 Controller.class,
                 RestControllerAdvice.class}),
