@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.member.domain.model;
 
-import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.legacy.modules.security.enums.Role;
 import lombok.*;
 
 import java.util.UUID;
@@ -8,7 +8,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @EqualsAndHashCode
-@Builder(access = AccessLevel.PUBLIC)
+@Builder
 public class SiteMemberRole {
     private final UUID uuid;
 

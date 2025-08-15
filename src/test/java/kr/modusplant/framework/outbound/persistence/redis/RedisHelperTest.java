@@ -1,6 +1,10 @@
 package kr.modusplant.framework.outbound.persistence.redis;
 
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,7 +20,8 @@ class RedisHelperTest {
     private RedisHelper redisHelper;
 
     @Test
-    void testSetAndGetString() {
+    @DisplayName("Redis 헬퍼로 문자열 저장")
+    void storeString_withValidRedisHelper_returnString() {
         String stringKey = "test:string";
         String stringValue = "stringValue";
 
@@ -27,7 +32,8 @@ class RedisHelperTest {
     }
 
     @Test
-    void testSetAndGetObject() {
+    @DisplayName("Redis 헬퍼로 객체 저장")
+    void storeObject_withValidRedisHelper_returnObject() {
         String objectKey = "test:object";
         TestDto objectValue = new TestDto("John",30);
 
@@ -40,7 +46,8 @@ class RedisHelperTest {
     }
 
     @Test
-    void testDeleteAndExists() {
+    @DisplayName("Redis 헬퍼로 객체 삭제 후 존재하지 않는지 확인")
+    void deleteString_withValidRedisHelper_assertNotExists() {
         String deleteKey = "test:delete";
         String deleteValue = "deleteValue";
 
@@ -52,7 +59,8 @@ class RedisHelperTest {
     }
 
     @Test
-    void testExpiredAndGetTTL() throws InterruptedException {
+    @DisplayName("Redis 헬퍼로 문자열 만료")
+    void expireString_withValidRedisHelper_returnTTL() throws InterruptedException {
         String expireKey = "test:expire";
         String expireValue = "expireValue";
 
@@ -70,12 +78,13 @@ class RedisHelperTest {
     }
 
     @Test
-    void testTTLExists() throws InterruptedException {
+    @DisplayName("Redis 헬퍼로 문자열 저장 후 TTL 확인")
+    void storeString_withValidRedisHelper_assertTTLGreaterThan() throws InterruptedException {
         String key = "test:ttl:exists";
         String value = "someValue";
 
         redisHelper.setString(key, value, Duration.ofSeconds(5));
-        Thread.sleep(2000);
+        Thread.sleep(1000);
 
         Optional<Duration> ttl = redisHelper.getTTL(key);
         assertThat(ttl).isPresent();
@@ -83,7 +92,8 @@ class RedisHelperTest {
     }
 
     @Test
-    void testTTLInfinite() {
+    @DisplayName("Redis 헬퍼로 문자열 저장 후 TTL이 만료가 없음을 확인")
+    void storeString_withValidRedisHelper_assertTTLHasNoExpiration() {
         String key = "test:ttl:infinite";
         String value = "persistentValue";
 
@@ -95,7 +105,8 @@ class RedisHelperTest {
     }
 
     @Test
-    void testTTLKeyDoesNotExist() {
+    @DisplayName("Redis 헬퍼로 문자열 저장 후 TTL이 비어있음을 확인")
+    void storeString_withValidRedisHelper_assertTTLEmpty() {
         String key = "test:ttl:nonexistent";
 
         Optional<Duration> ttl = redisHelper.getTTL(key);
@@ -103,24 +114,11 @@ class RedisHelperTest {
         assertThat(ttl).isEmpty();
     }
 
-
-    static class TestDto implements Serializable {
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    private static class TestDto implements Serializable {
         private String name;
         private int age;
-
-        public TestDto() { }
-
-        public TestDto(String name, int age) {
-            this.name = name;
-            this.age = age;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getAge() {
-            return age;
-        }
     }
 }

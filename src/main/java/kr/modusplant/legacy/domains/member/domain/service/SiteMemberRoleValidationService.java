@@ -21,13 +21,13 @@ public class SiteMemberRoleValidationService {
 
     public void validateExistedUuid(UUID uuid) {
         if (memberRoleRepository.existsByUuid(uuid)) {
-            throw new EntityExistsException(ErrorCode.SITEMEMBER_ROLE_EXISTS, EntityName.SITE_MEMBER_ROLE);
+            throw new EntityExistsException(ErrorCode.MEMBER_ROLE_EXISTS, EntityName.SITE_MEMBER_ROLE);
         }
     }
 
     public void validateNotFoundUuid(UUID uuid) {
         if (uuid == null || !memberRoleRepository.existsByUuid(uuid)) {
-            throw new EntityNotFoundException(ErrorCode.SITEMEMBER_ROLE_NOT_FOUND, EntityName.SITE_MEMBER_ROLE);
+            throw new EntityNotFoundException(ErrorCode.MEMBER_ROLE_NOT_FOUND, EntityName.SITE_MEMBER_ROLE);
         }
     }
 }

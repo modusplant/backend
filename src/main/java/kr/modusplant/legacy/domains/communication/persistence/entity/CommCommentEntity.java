@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.SNAKE_AUTH_MEMB_UUID;
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.SNAKE_CREA_MEMB_UUID;
-import static kr.modusplant.shared.database.TableColumnName.IS_DELETED;
-import static kr.modusplant.shared.database.TableName.COMM_COMMENT;
+import static kr.modusplant.shared.persistence.vo.TableColumnName.IS_DELETED;
+import static kr.modusplant.shared.persistence.vo.TableName.COMM_COMMENT;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)

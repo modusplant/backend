@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 
 @TestConfiguration
 public class TestAopConfig {
+
     @Bean("serviceExceptionLoggingAspect")
     public ServiceExceptionLoggingAspect serviceExceptionLoggingAspect() {
         return new ServiceExceptionLoggingAspect() {

@@ -1,6 +1,5 @@
 package kr.modusplant.legacy.domains.member.app.service;
 
-import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberRoleUpdateRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberRoleResponse;
@@ -14,6 +13,7 @@ import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberRoleEntity;
 import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRoleRepository;
+import kr.modusplant.legacy.modules.security.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

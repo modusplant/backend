@@ -7,7 +7,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @EqualsAndHashCode
-@Builder(access = AccessLevel.PUBLIC)
+@Builder
 public class CommComment {
     private final String postUlid;
     private final String path;

@@ -27,7 +27,7 @@ public class SiteMemberAuthValidationService {
             return;
         }
         if (memberAuthRepository.existsByOriginalMember(memberRepository.findByUuid(uuid).orElseThrow())) {
-            throw new EntityExistsException(ErrorCode.SITEMEMBER_AUTH_EXISTS, EntityName.SITE_MEMBER_AUTH);
+            throw new EntityExistsException(ErrorCode.MEMBER_AUTH_EXISTS, EntityName.SITE_MEMBER_AUTH);
         }
     }
 
@@ -36,28 +36,28 @@ public class SiteMemberAuthValidationService {
             return;
         }
         if (memberAuthRepository.findByEmailAndProvider(email, authProvider).isPresent()) {
-            throw new EntityExistsException(ErrorCode.SITEMEMBER_AUTH_EXISTS, EntityName.SITE_MEMBER_AUTH);
+            throw new EntityExistsException(ErrorCode.MEMBER_AUTH_EXISTS, EntityName.SITE_MEMBER_AUTH);
         }
     }
 
     public void validateNotFoundEmailAndAuthProvider(String email, AuthProvider authProvider) {
         if (email == null || authProvider == null) {
-            throw new EntityNotFoundException(ErrorCode.SITEMEMBER_AUTH_NOT_FOUND, EntityName.SITE_MEMBER_AUTH);
+            throw new EntityNotFoundException(ErrorCode.MEMBER_AUTH_NOT_FOUND, EntityName.SITE_MEMBER_AUTH);
         }
         if (memberAuthRepository.findByEmailAndProvider(email, authProvider).isEmpty()) {
-            throw new EntityNotFoundException(ErrorCode.SITEMEMBER_AUTH_NOT_FOUND, EntityName.SITE_MEMBER_AUTH);
+            throw new EntityNotFoundException(ErrorCode.MEMBER_AUTH_NOT_FOUND, EntityName.SITE_MEMBER_AUTH);
         }
     }
 
     public void validateNotFoundOriginalMemberUuid(UUID uuid) {
         if (uuid == null || !memberAuthRepository.existsByOriginalMember(memberRepository.findByUuid(uuid).orElseThrow())) {
-            throw new EntityNotFoundException(ErrorCode.SITEMEMBER_AUTH_NOT_FOUND, EntityName.SITE_MEMBER_AUTH);
+            throw new EntityNotFoundException(ErrorCode.MEMBER_AUTH_NOT_FOUND, EntityName.SITE_MEMBER_AUTH);
         }
     }
 
     public void validateNotFoundEmail(String email) {
         if (!memberAuthRepository.existsByEmail(email)) {
-            throw new EntityNotFoundException(ErrorCode.SITEMEMBER_AUTH_NOT_FOUND, EntityName.SITE_MEMBER_AUTH);
+            throw new EntityNotFoundException(ErrorCode.MEMBER_AUTH_NOT_FOUND, EntityName.SITE_MEMBER_AUTH);
         }
     }
 }

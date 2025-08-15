@@ -24,13 +24,13 @@ public class SiteMemberValidationService {
             return;
         }
         if (memberRepository.existsByUuid(uuid)) {
-            throw new EntityExistsException(ErrorCode.SITEMEMBER_EXISTS, EntityName.SITE_MEMBER);
+            throw new EntityExistsException(ErrorCode.MEMBER_EXISTS, EntityName.SITE_MEMBER);
         }
     }
 
     public void validateNotFoundUuid(UUID uuid) {
         if (uuid == null || !memberRepository.existsByUuid(uuid)) {
-            throw new EntityNotFoundException(ErrorCode.SITEMEMBER_NOT_FOUND, EntityName.SITE_MEMBER);
+            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER);
         }
     }
 }

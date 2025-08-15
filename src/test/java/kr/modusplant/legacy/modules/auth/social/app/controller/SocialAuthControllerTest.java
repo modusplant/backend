@@ -1,11 +1,11 @@
 package kr.modusplant.legacy.modules.auth.social.app.controller;
 
-import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.legacy.modules.auth.social.app.service.SocialAuthApplicationService;
 import kr.modusplant.legacy.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
+import kr.modusplant.legacy.modules.security.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

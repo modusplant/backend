@@ -1,8 +1,8 @@
 package kr.modusplant.legacy.domains.member.persistence.entity;
 
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
-import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberRoleEntityTestUtils;
+import kr.modusplant.legacy.modules.security.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

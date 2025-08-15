@@ -1,11 +1,11 @@
 package kr.modusplant.legacy.domains.communication.persistence.repository;
 
-import kr.modusplant.legacy.domains.common.persistence.repository.supers.CreatedAtAndUpdatedAtRepository;
-import kr.modusplant.legacy.domains.common.persistence.repository.supers.UlidPrimaryRepository;
 import kr.modusplant.legacy.domains.communication.persistence.entity.CommPostEntity;
 import kr.modusplant.legacy.domains.communication.persistence.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.legacy.domains.communication.persistence.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
+import kr.modusplant.shared.persistence.repository.supers.CreatedAtAndUpdatedAtRepository;
+import kr.modusplant.shared.persistence.repository.supers.UlidPrimaryRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
