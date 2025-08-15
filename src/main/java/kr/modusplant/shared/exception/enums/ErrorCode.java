@@ -20,14 +20,14 @@ public enum ErrorCode implements ResponseCode {
 
     // -- business errors --
     // exists and not found
-    SITEMEMBER_EXISTS(HttpStatus.CONFLICT, "member_exists", "사용자의 계정이 이미 존재합니다"),
-    SITEMEMBER_AUTH_EXISTS(HttpStatus.CONFLICT, "member_auth_exists", "사용자의 권한 정보가 이미 존재합니다"),
-    SITEMEMBER_ROLE_EXISTS(HttpStatus.CONFLICT, "member_role_exists", "사용자의 역할 정보가 이미 존재합니다"),
-    SITEMEMBER_TERM_EXISTS(HttpStatus.CONFLICT, "member_term_exists", "사용자가 동의한 약관 정보가 이미 존재합니다"),
-    SITEMEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "member_not_found", "사용자의 계정이 존재하지 않습니다"),
-    SITEMEMBER_AUTH_NOT_FOUND(HttpStatus.NOT_FOUND, "member_auth_not_found", "사용자의 권한 정보가 존재하지 않습니다"),
-    SITEMEMBER_ROLE_NOT_FOUND(HttpStatus.NOT_FOUND, "member_role_not_found", "사용자의 역할 정보가 존재하지 않습니다"),
-    SITEMEMBER_TERM_NOT_FOUND(HttpStatus.NOT_FOUND, "member_term_not_found", "사용자가 동의한 약관 정보가 존재하지 않습니다"),
+    MEMBER_EXISTS(HttpStatus.CONFLICT, "member_exists", "사용자의 계정이 이미 존재합니다"),
+    MEMBER_AUTH_EXISTS(HttpStatus.CONFLICT, "member_auth_exists", "사용자의 권한 정보가 이미 존재합니다"),
+    MEMBER_ROLE_EXISTS(HttpStatus.CONFLICT, "member_role_exists", "사용자의 역할 정보가 이미 존재합니다"),
+    MEMBER_TERM_EXISTS(HttpStatus.CONFLICT, "member_term_exists", "사용자가 동의한 약관 정보가 이미 존재합니다"),
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "member_not_found", "사용자의 계정이 존재하지 않습니다"),
+    MEMBER_AUTH_NOT_FOUND(HttpStatus.NOT_FOUND, "member_auth_not_found", "사용자의 권한 정보가 존재하지 않습니다"),
+    MEMBER_ROLE_NOT_FOUND(HttpStatus.NOT_FOUND, "member_role_not_found", "사용자의 역할 정보가 존재하지 않습니다"),
+    MEMBER_TERM_NOT_FOUND(HttpStatus.NOT_FOUND, "member_term_not_found", "사용자가 동의한 약관 정보가 존재하지 않습니다"),
 
     TERM_EXISTS(HttpStatus.CONFLICT, "term_exists", "약관 정보가 이미 존재합니다"),
     TERM_NOT_FOUND(HttpStatus.NOT_FOUND, "term_not_found", "약관 정보가 존재하지 않습니다"),

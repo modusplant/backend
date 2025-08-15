@@ -7,7 +7,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @EqualsAndHashCode
-@Builder(access = AccessLevel.PUBLIC)
+@Builder
 public class CommPrimaryCategory {
     private final UUID uuid;
 

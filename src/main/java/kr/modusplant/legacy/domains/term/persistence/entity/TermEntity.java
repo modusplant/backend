@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static kr.modusplant.framework.outbound.persistence.vo.EntityFieldName.VER;
-import static kr.modusplant.shared.database.TableColumnName.*;
-import static kr.modusplant.shared.database.TableName.TERM;
+import static kr.modusplant.shared.persistence.vo.TableColumnName.*;
+import static kr.modusplant.shared.persistence.vo.TableName.TERM;
 import static kr.modusplant.shared.util.VersionUtils.createVersion;
 
 @Entity

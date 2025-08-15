@@ -21,7 +21,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-
 class S3FileServiceTest {
     private S3Client s3Client;
     private S3FileService s3FileService;
@@ -36,8 +35,8 @@ class S3FileServiceTest {
     }
 
     @Test
-    @DisplayName("파일 업로드 테스트")
-    void uploadFileTest() throws IOException {
+    @DisplayName("파일 업로드")
+    void uploadFile_withValidFile_returnActualRequest() throws IOException {
         // given
         MultipartFile multipartFile = mock(MultipartFile.class);
         String fileKey = "test-file-key";
@@ -62,8 +61,8 @@ class S3FileServiceTest {
     }
 
     @Test
-    @DisplayName("파일 다운로드 테스트")
-    void downloadFileTest() throws IOException {
+    @DisplayName("파일 다운로드")
+    void downloadFile_withValidFile_returnFileContent() throws IOException {
         // given
         String fileKey = "test-file-key";
         byte[] fileContent = "test-download-content".getBytes();
@@ -83,7 +82,8 @@ class S3FileServiceTest {
     }
 
     @Test
-    void testDeleteFiles() {
+    @DisplayName("파일 삭제")
+    void deleteFile_withValidFile_returnActualRequest() {
         // given
         String fileKey = "test-file-key";
 

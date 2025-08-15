@@ -32,7 +32,7 @@ public class RefreshTokenApplicationService {
 
     public Optional<RefreshToken> getByMemberUuidAndRefreshToken(UUID uuid, String refreshToken) {
         Optional<RefreshTokenEntity> tokenOrEmpty = tokenRepository.findByMemberAndRefreshToken(
-                memberRepository.findByUuid(uuid).orElseThrow(() -> new EntityNotFoundException(ErrorCode.SITEMEMBER_NOT_FOUND, EntityName.SITE_MEMBER)), refreshToken);
+                memberRepository.findByUuid(uuid).orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER)), refreshToken);
         return tokenOrEmpty.isEmpty() ? Optional.empty() : Optional.of(refreshTokenAppInfraMapper.toRefreshToken(tokenOrEmpty.orElseThrow()));
     }
 

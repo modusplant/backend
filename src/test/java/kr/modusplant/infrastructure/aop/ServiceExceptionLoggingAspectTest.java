@@ -22,8 +22,8 @@ public class ServiceExceptionLoggingAspectTest {
     ServiceExceptionLoggingAspectTest(MockMvc mockMvc) { this.mockMvc = mockMvc; }
 
     @Test
-    @DisplayName("AOP 적용 서비스 메소드 예외상황 로깅 성공")
-    void ServiceExceptionLoggingAspectTest() throws Exception{
+    @DisplayName("AOP 적용 서비스 메소드 예외 상황 로깅")
+    void getMonitorServiceError_withRestController_returnErrorStatusWithAopLogging() throws Exception{
         LogCaptor logCaptor = LogCaptor.forClass(ServiceExceptionLoggingAspect.class);
         logCaptor.setLogLevelToInfo();
         mockMvc.perform(get("/api/monitor/monitor-error")

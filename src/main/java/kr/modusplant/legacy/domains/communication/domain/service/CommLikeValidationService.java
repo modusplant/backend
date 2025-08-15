@@ -26,7 +26,7 @@ public class CommLikeValidationService {
             throw new EntityNotFoundException(ErrorCode.POST_NOT_FOUND, EntityName.POST);
         }
         if (!memberRepository.existsById(memberId)) {
-            throw new EntityNotFoundException(ErrorCode.SITEMEMBER_NOT_FOUND, EntityName.SITE_MEMBER);
+            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER);
         }
     }
 
