@@ -2,8 +2,8 @@ package kr.modusplant.domains.member.adapter.presenter;
 
 import kr.modusplant.domains.member.adapter.mapper.MemberMapperImpl;
 import kr.modusplant.domains.member.adapter.mapper.supers.MemberMapper;
-import kr.modusplant.domains.member.test.utils.MemberResponseUtils;
-import kr.modusplant.domains.member.test.utils.MemberUtils;
+import kr.modusplant.domains.member.test.utils.adapter.MemberResponseUtils;
+import kr.modusplant.domains.member.test.utils.domain.MemberUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

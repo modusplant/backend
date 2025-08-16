@@ -1,4 +1,4 @@
-package kr.modusplant.domains.member.test.utils;
+package kr.modusplant.domains.member.test.utils.domain;
 
 import kr.modusplant.domains.member.domain.entity.Member;
 

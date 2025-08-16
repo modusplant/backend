@@ -67,34 +67,6 @@ public class MemberEntity {
     @Column(name = VER_NUM, nullable = false)
     private Long versionNumber;
 
-    public void updateNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public void updateBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
-    }
-
-    public void updateIsActive(Boolean isActive) {
-        this.isActive = isActive;
-    }
-
-    public void updateIsDisabledByLinking(Boolean isDisabledByLinking) {
-        this.isDisabledByLinking = isDisabledByLinking;
-    }
-
-    public void updateIsBanned(Boolean isBanned) {
-        this.isBanned = isBanned;
-    }
-
-    public void updateIsDeleted(Boolean isDeleted) {
-        this.isDeleted = isDeleted;
-    }
-
-    public void updateLoggedInAt(LocalDateTime loggedInAt) {
-        this.loggedInAt = loggedInAt;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
