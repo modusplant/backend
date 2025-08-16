@@ -4,7 +4,7 @@ import kr.modusplant.domains.member.domain.entity.Member;
 import kr.modusplant.domains.member.framework.outbound.persistence.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.persistence.jpa.mapper.MemberJpaMapperImpl;
 import kr.modusplant.domains.member.framework.outbound.persistence.jpa.repository.supers.MemberJpaRepository;
-import kr.modusplant.domains.member.test.utils.framework.MemberEntityUtils;
+import kr.modusplant.domains.member.test.utils.framework.MemberEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -12,7 +12,7 @@ import org.mockito.Mockito;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
-class MemberRepositoryImplTest implements MemberEntityUtils {
+class MemberRepositoryImplTest implements MemberEntityTestUtils {
     private final MemberJpaMapperImpl memberJpaMapper = new MemberJpaMapperImpl();
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
     private final MemberRepositoryImpl memberRepositoryImpl = new MemberRepositoryImpl(memberJpaMapper, memberJpaRepository);

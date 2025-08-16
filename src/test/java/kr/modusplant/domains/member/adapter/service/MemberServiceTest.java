@@ -5,8 +5,8 @@ import kr.modusplant.domains.member.adapter.mapper.supers.MemberMapper;
 import kr.modusplant.domains.member.adapter.repository.MemberRepository;
 import kr.modusplant.domains.member.domain.entity.Member;
 import kr.modusplant.domains.member.framework.outbound.persistence.jpa.repository.MemberRepositoryImpl;
-import kr.modusplant.domains.member.test.utils.adapter.MemberRequestUtils;
-import kr.modusplant.domains.member.test.utils.domain.MemberUtils;
+import kr.modusplant.domains.member.test.utils.adapter.MemberRequestTestUtils;
+import kr.modusplant.domains.member.test.utils.domain.MemberTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-class MemberServiceTest implements MemberUtils, MemberRequestUtils {
+class MemberServiceTest implements MemberTestUtils, MemberRequestTestUtils {
     private final MemberMapper memberMapper = new MemberMapperImpl();
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryImpl.class);
     private final MemberService memberService = new MemberService(memberMapper, memberRepository);

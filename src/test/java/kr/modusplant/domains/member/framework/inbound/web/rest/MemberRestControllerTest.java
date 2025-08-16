@@ -4,9 +4,9 @@ import kr.modusplant.domains.member.adapter.presenter.MemberPresenter;
 import kr.modusplant.domains.member.adapter.response.MemberResponse;
 import kr.modusplant.domains.member.adapter.service.MemberService;
 import kr.modusplant.domains.member.domain.entity.Member;
-import kr.modusplant.domains.member.test.utils.adapter.MemberRequestUtils;
-import kr.modusplant.domains.member.test.utils.adapter.MemberResponseUtils;
-import kr.modusplant.domains.member.test.utils.domain.MemberUtils;
+import kr.modusplant.domains.member.test.utils.adapter.MemberRequestTestUtils;
+import kr.modusplant.domains.member.test.utils.adapter.MemberResponseTestUtils;
+import kr.modusplant.domains.member.test.utils.domain.MemberTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
-class MemberRestControllerTest implements MemberUtils, MemberRequestUtils, MemberResponseUtils {
+class MemberRestControllerTest implements MemberTestUtils, MemberRequestTestUtils, MemberResponseTestUtils {
     private final MemberService memberService = Mockito.mock(MemberService.class);
     private final MemberPresenter memberPresenter = Mockito.mock(MemberPresenter.class);
     private final MemberRestController memberRestController = new MemberRestController(memberService, memberPresenter);
