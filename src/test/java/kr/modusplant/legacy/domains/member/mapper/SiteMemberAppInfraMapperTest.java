@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
-class SiteMemberAppInfraMapperTestTest implements SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityTestUtils {
+class SiteMemberAppInfraMapperTest implements SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityTestUtils {
 
     private final SiteMemberAppInfraMapper memberMapper =  new SiteMemberAppInfraMapperImpl();
 

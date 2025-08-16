@@ -1,13 +1,13 @@
 package kr.modusplant.domains.member.framework.outbound.persistence.jpa.mapper;
 
 import kr.modusplant.domains.member.framework.outbound.persistence.jpa.mapper.supers.MemberJpaMapper;
-import kr.modusplant.domains.member.test.utils.framework.MemberEntityUtils;
+import kr.modusplant.domains.member.test.utils.framework.MemberEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class MemberJpaMapperImplTest implements MemberEntityUtils {
+class MemberJpaMapperImplTest implements MemberEntityTestUtils {
     private final MemberJpaMapper memberJpaMapper = new MemberJpaMapperImpl();
 
     @Test

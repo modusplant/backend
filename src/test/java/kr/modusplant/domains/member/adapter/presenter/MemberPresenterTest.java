@@ -2,14 +2,14 @@ package kr.modusplant.domains.member.adapter.presenter;
 
 import kr.modusplant.domains.member.adapter.mapper.MemberMapperImpl;
 import kr.modusplant.domains.member.adapter.mapper.supers.MemberMapper;
-import kr.modusplant.domains.member.test.utils.adapter.MemberResponseUtils;
-import kr.modusplant.domains.member.test.utils.domain.MemberUtils;
+import kr.modusplant.domains.member.test.utils.adapter.MemberResponseTestUtils;
+import kr.modusplant.domains.member.test.utils.domain.MemberTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class MemberPresenterTest implements MemberUtils, MemberResponseUtils {
+class MemberPresenterTest implements MemberTestUtils, MemberResponseTestUtils {
     private final MemberMapper memberMapper = new MemberMapperImpl();
     private final MemberPresenter memberPresenter = new MemberPresenter(memberMapper);
 

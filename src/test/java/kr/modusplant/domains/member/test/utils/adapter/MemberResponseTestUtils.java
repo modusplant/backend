@@ -7,6 +7,6 @@ import static kr.modusplant.domains.member.test.vo.MemberStringVO.TEST_MEMBER_AC
 import static kr.modusplant.domains.member.test.vo.MemberStringVO.TEST_NICKNAME;
 import static kr.modusplant.domains.member.test.vo.MemberUuidVO.TEST_MEMBER_UUID;
 
-public interface MemberResponseUtils {
+public interface MemberResponseTestUtils {
     MemberResponse testMemberResponse = new MemberResponse(TEST_MEMBER_UUID, TEST_MEMBER_ACTIVE_STATUS, TEST_NICKNAME, TEST_BIRTHDATE);
 }

@@ -1,11 +1,11 @@
 package kr.modusplant.domains.member.test.utils.framework;
 
 import kr.modusplant.domains.member.framework.outbound.persistence.jpa.entity.MemberEntity;
-import kr.modusplant.domains.member.test.utils.domain.MemberUtils;
+import kr.modusplant.domains.member.test.utils.domain.MemberTestUtils;
 
 import java.time.LocalDateTime;
 
-public interface MemberEntityUtils extends MemberUtils {
+public interface MemberEntityTestUtils extends MemberTestUtils {
     default MemberEntity createMemberEntity() {
         return MemberEntity.builder()
                 .uuid(testMemberId.getValue())
