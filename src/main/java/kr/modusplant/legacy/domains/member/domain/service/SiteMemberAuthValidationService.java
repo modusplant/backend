@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.member.domain.service;
 
-import kr.modusplant.framework.outbound.persistence.vo.EntityName;
+import kr.modusplant.framework.out.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberAuthRepository;
 import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;

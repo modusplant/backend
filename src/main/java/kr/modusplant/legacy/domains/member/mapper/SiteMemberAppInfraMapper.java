@@ -6,7 +6,7 @@ import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import static kr.modusplant.framework.outbound.persistence.vo.EntityFieldName.*;
+import static kr.modusplant.framework.out.persistence.constant.EntityFieldName.*;
 
 @Mapper
 public interface SiteMemberAppInfraMapper {

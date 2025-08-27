@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
-import kr.modusplant.framework.outbound.persistence.vo.EntityName;
+import kr.modusplant.framework.out.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommCommentRepository;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;

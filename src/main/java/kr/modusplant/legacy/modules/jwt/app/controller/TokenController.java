@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.modusplant.framework.outbound.jackson.http.response.DataResponse;
+import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import kr.modusplant.legacy.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.legacy.modules.jwt.app.http.response.TokenResponse;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;

@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.modules.auth.social.app.service;
 
-import kr.modusplant.framework.outbound.persistence.vo.EntityName;
+import kr.modusplant.framework.out.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthDomainInfraMapper;
