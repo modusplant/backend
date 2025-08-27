@@ -1,4 +1,4 @@
-package kr.modusplant.domains.member.domain.model;
+package kr.modusplant.domains.member.domain.entity;
 
 import kr.modusplant.domains.member.domain.exception.EmptyNicknameException;
 import kr.modusplant.domains.member.domain.vo.BirthDate;

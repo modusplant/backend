@@ -3,7 +3,7 @@ package kr.modusplant.domains.member.adapter.in.mapper;
 import kr.modusplant.domains.member.adapter.in.mapper.supers.MemberMapper;
 import kr.modusplant.domains.member.adapter.in.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.adapter.in.response.MemberResponse;
-import kr.modusplant.domains.member.domain.model.Member;
+import kr.modusplant.domains.member.domain.entity.Member;
 import kr.modusplant.domains.member.domain.vo.Nickname;
 import org.springframework.stereotype.Component;
 
