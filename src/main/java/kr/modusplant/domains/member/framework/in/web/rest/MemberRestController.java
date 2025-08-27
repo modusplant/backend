@@ -2,6 +2,7 @@ package kr.modusplant.domains.member.framework.in.web.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.modusplant.domains.member.adapter.in.request.MemberNicknameUpdateRequest;
 import kr.modusplant.domains.member.adapter.in.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.adapter.in.response.MemberResponse;
 import kr.modusplant.domains.member.application.service.MemberApplicationService;
@@ -25,5 +26,11 @@ public class MemberRestController {
     @PostMapping
     public ResponseEntity<MemberResponse> registerMember(MemberRegisterRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(memberService.register(request));
+    }
+
+    @Operation(summary = "회원 닉네임 갱신 API", description = "회원의 닉네임을 갱신합니다.")
+    @PostMapping("/nickname")
+    public ResponseEntity<MemberResponse> updateMemberNickname(MemberNicknameUpdateRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).body(memberService.updateNickname(request));
     }
 }

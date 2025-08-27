@@ -4,7 +4,7 @@ import kr.modusplant.domains.member.adapter.in.mapper.MemberMapperImpl;
 import kr.modusplant.domains.member.adapter.in.mapper.supers.MemberMapper;
 import kr.modusplant.domains.member.adapter.out.repository.MemberRepository;
 import kr.modusplant.domains.member.domain.entity.Member;
-import kr.modusplant.domains.member.framework.out.persistence.jpa.repository.MemberRepositoryImpl;
+import kr.modusplant.domains.member.framework.out.persistence.jpa.repository.MemberRepositoryJpaAdapter;
 import kr.modusplant.domains.member.test.utils.adapter.MemberRequestTestUtils;
 import kr.modusplant.domains.member.test.utils.domain.MemberTestUtils;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +17,7 @@ import static org.mockito.BDDMockito.given;
 
 class MemberApplicationServiceTest implements MemberTestUtils, MemberRequestTestUtils {
     private final MemberMapper memberMapper = new MemberMapperImpl();
-    private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryImpl.class);
+    private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryJpaAdapter.class);
     private final MemberApplicationService memberService = new MemberApplicationService(memberMapper, memberRepository);
 
     @Test
@@ -25,9 +25,9 @@ class MemberApplicationServiceTest implements MemberTestUtils, MemberRequestTest
     void callRegister_withValidRequest_returnsMember() {
         // given
         Member member = createMember();
-        given(memberRepository.save(any())).willReturn(member);
+        given(memberRepository.saveMember(any())).willReturn(member);
 
         // when & then
-        assertThat(memberService.register(testMemberRegisterRequest).nickname()).isEqualTo(member.getNickname().getValue());
+        assertThat(memberService.register(testMemberRegisterRequest).nickname()).isEqualTo(member.getMemberNickname().getValue());
     }
 }

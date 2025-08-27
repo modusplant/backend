@@ -12,10 +12,10 @@ import org.mockito.Mockito;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
-class MemberRepositoryImplTest implements MemberEntityTestUtils {
+class MemberRepositoryJpaAdapterTest implements MemberEntityTestUtils {
     private final MemberJpaMapperImpl memberJpaMapper = new MemberJpaMapperImpl();
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
-    private final MemberRepositoryImpl memberRepositoryImpl = new MemberRepositoryImpl(memberJpaMapper, memberJpaRepository);
+    private final MemberRepositoryJpaAdapter memberRepositoryJpaAdapter = new MemberRepositoryJpaAdapter(memberJpaMapper, memberJpaRepository);
 
     @Test
     @DisplayName("save로 Member 반환")
@@ -26,7 +26,7 @@ class MemberRepositoryImplTest implements MemberEntityTestUtils {
         given(memberJpaRepository.save(memberEntity)).willReturn(memberEntity);
 
         // when & then
-        assertThat(memberRepositoryImpl.save(member)).isEqualTo(member);
+        assertThat(memberRepositoryJpaAdapter.saveMember(member)).isEqualTo(member);
     }
 
 }

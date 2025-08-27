@@ -1,5 +1,6 @@
 package kr.modusplant.domains.member.domain.vo;
 
+import kr.modusplant.domains.member.domain.exception.EmptyMemberStatusException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,16 @@ public class MemberStatus {
 
     public static MemberStatus inactive() {
         return new MemberStatus(Status.INACTIVE);
+    }
+
+    public static MemberStatus fromBoolean(Boolean bool) {
+        if (bool == null) {
+            throw new EmptyMemberStatusException();
+        } else if (bool.equals(true)) {
+            return MemberStatus.active();
+        } else {
+            return MemberStatus.inactive();
+        }
     }
 
     public boolean isActive() {

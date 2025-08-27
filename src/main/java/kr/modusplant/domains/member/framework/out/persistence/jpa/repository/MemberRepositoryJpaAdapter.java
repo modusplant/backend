@@ -9,12 +9,17 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class MemberRepositoryImpl implements MemberRepository {
+public class MemberRepositoryJpaAdapter implements MemberRepository {
     private final MemberJpaMapperImpl memberJpaMapper;
     private final MemberJpaRepository memberJpaRepository;
 
     @Override
-    public Member save(Member member) {
+    public Member updateNickname(Member member) {
+        return memberJpaMapper.toMember(memberJpaRepository.save(memberJpaMapper.toMemberEntity(member)));
+    }
+
+    @Override
+    public Member saveMember(Member member) {
         return memberJpaMapper.toMember(memberJpaRepository.save(memberJpaMapper.toMemberEntity(member)));
     }
 }

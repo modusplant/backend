@@ -10,20 +10,20 @@ import java.time.LocalDate;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class BirthDate {
+public class MemberBirthDate {
     private final LocalDate value;
 
-    public static BirthDate of(LocalDate value) {
-        return new BirthDate(value);
+    public static MemberBirthDate of(LocalDate value) {
+        return new MemberBirthDate(value);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof BirthDate BirthDate)) return false;
+        if (!(o instanceof MemberBirthDate MemberBirthDate)) return false;
 
-        return new EqualsBuilder().append(getValue(), BirthDate.getValue()).isEquals();
+        return new EqualsBuilder().append(getValue(), MemberBirthDate.getValue()).isEquals();
     }
 
     @Override

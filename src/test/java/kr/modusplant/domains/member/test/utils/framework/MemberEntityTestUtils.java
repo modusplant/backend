@@ -9,8 +9,8 @@ public interface MemberEntityTestUtils extends MemberTestUtils {
     default MemberEntity createMemberEntity() {
         return MemberEntity.builder()
                 .uuid(testMemberId.getValue())
-                .nickname(testNickname.getValue())
-                .birthDate(testBirthDate.getValue())
+                .nickname(TEST_MEMBER_NICKNAME.getValue())
+                .birthDate(TEST_MEMBER_BIRTH_DATE.getValue())
                 .isActive(testMemberActiveStatus.isActive())
                 .isDisabledByLinking(false)
                 .isBanned(false)

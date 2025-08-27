@@ -1,18 +1,26 @@
 package kr.modusplant.domains.member.adapter.in.mapper;
 
 import kr.modusplant.domains.member.adapter.in.mapper.supers.MemberMapper;
+import kr.modusplant.domains.member.adapter.in.request.MemberNicknameUpdateRequest;
 import kr.modusplant.domains.member.adapter.in.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.adapter.in.response.MemberResponse;
 import kr.modusplant.domains.member.domain.entity.Member;
-import kr.modusplant.domains.member.domain.vo.Nickname;
+import kr.modusplant.domains.member.domain.vo.MemberId;
+import kr.modusplant.domains.member.domain.vo.MemberNickname;
+import kr.modusplant.domains.member.domain.vo.MemberStatus;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MemberMapperImpl implements MemberMapper {
 
     @Override
-    public Nickname toNickname(MemberRegisterRequest request) {
-        return Nickname.of(request.nickname());
+    public MemberNickname toNickname(MemberRegisterRequest request) {
+        return MemberNickname.of(request.nickname());
+    }
+
+    @Override
+    public Member toMember(MemberNicknameUpdateRequest request) {
+        return Member.create(MemberId.fromUuid(request.id()), MemberStatus.fromBoolean(request.isActive()), MemberNickname.of(request.nickname()));
     }
 
     @Override
@@ -20,7 +28,7 @@ public class MemberMapperImpl implements MemberMapper {
         return new MemberResponse(
                 member.getMemberId().getValue(),
                 member.getMemberStatus().getStatus().getValue(),
-                member.getNickname().getValue(),
-                member.getBirthDate().getValue());
+                member.getMemberNickname().getValue(),
+                member.getMemberBirthDate().getValue());
     }
 }

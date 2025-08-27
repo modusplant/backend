@@ -1,5 +1,7 @@
 package kr.modusplant.domains.member.domain.vo;
 
+import kr.modusplant.domains.member.domain.exception.EmptyMemberIdException;
+import kr.modusplant.domains.member.domain.exception.EmptyMemberNicknameException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -8,11 +10,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class Nickname {
+public class MemberNickname {
     private final String value;
 
-    public static Nickname of(String value) {
-        return new Nickname(value);
+    public static MemberNickname of(String value) {
+        if (value == null) {
+            throw new EmptyMemberNicknameException();
+        }
+        return new MemberNickname(value);
     }
 
     public boolean isEmpty() {
@@ -23,9 +28,9 @@ public class Nickname {
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof Nickname nickname)) return false;
+        if (!(o instanceof MemberNickname memberNickname)) return false;
 
-        return new EqualsBuilder().append(getValue(), nickname.getValue()).isEquals();
+        return new EqualsBuilder().append(getValue(), memberNickname.getValue()).isEquals();
     }
 
     @Override
