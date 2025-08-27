@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.modusplant.domains.member.adapter.in.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.adapter.in.response.MemberResponse;
-import kr.modusplant.domains.member.application.service.MemberService;
+import kr.modusplant.domains.member.application.service.MemberApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Validated
 public class MemberRestController {
-    private final MemberService memberService;
+    private final MemberApplicationService memberService;
 
     @Operation(summary = "회원 등록 API", description = "닉네임을 통해 회원을 등록합니다.")
     @PostMapping

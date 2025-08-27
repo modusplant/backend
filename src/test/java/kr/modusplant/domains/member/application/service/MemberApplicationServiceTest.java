@@ -15,10 +15,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-class MemberServiceTest implements MemberTestUtils, MemberRequestTestUtils {
+class MemberApplicationServiceTest implements MemberTestUtils, MemberRequestTestUtils {
     private final MemberMapper memberMapper = new MemberMapperImpl();
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryImpl.class);
-    private final MemberService memberService = new MemberService(memberMapper, memberRepository);
+    private final MemberApplicationService memberService = new MemberApplicationService(memberMapper, memberRepository);
 
     @Test
     @DisplayName("register로 요청 등록")
