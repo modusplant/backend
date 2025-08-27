@@ -3,7 +3,7 @@ package kr.modusplant.domains.member.application.service;
 import kr.modusplant.domains.member.adapter.in.mapper.MemberMapperImpl;
 import kr.modusplant.domains.member.adapter.in.mapper.supers.MemberMapper;
 import kr.modusplant.domains.member.adapter.out.repository.MemberRepository;
-import kr.modusplant.domains.member.domain.model.Member;
+import kr.modusplant.domains.member.domain.entity.Member;
 import kr.modusplant.domains.member.framework.out.persistence.jpa.repository.MemberRepositoryImpl;
 import kr.modusplant.domains.member.test.utils.adapter.MemberRequestTestUtils;
 import kr.modusplant.domains.member.test.utils.domain.MemberTestUtils;

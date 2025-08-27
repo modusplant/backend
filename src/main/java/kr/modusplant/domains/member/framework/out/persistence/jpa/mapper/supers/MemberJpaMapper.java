@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.framework.out.persistence.jpa.mapper.supers;
 
-import kr.modusplant.domains.member.domain.model.Member;
+import kr.modusplant.domains.member.domain.entity.Member;
 import kr.modusplant.domains.member.framework.out.persistence.jpa.entity.MemberEntity;
 
 public interface MemberJpaMapper {
