@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import kr.modusplant.legacy.modules.auth.social.app.dto.supers.SocialUserInfo;
 import lombok.Getter;
 
-import static kr.modusplant.framework.outbound.persistence.vo.EntityFieldName.NAME;
+import static kr.modusplant.framework.out.persistence.constant.EntityFieldName.NAME;
 
 @Getter
 public class GoogleUserInfo implements SocialUserInfo {

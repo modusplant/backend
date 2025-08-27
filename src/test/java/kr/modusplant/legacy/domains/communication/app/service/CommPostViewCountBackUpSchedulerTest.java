@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
-import kr.modusplant.framework.outbound.persistence.generator.UlidIdGenerator;
+import kr.modusplant.framework.out.persistence.generator.UlidIdGenerator;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostRepository;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostViewCountRedisRepository;
 import org.hibernate.generator.EventType;

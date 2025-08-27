@@ -12,7 +12,7 @@ import org.mapstruct.Named;
 
 import java.util.UUID;
 
-import static kr.modusplant.framework.outbound.persistence.vo.EntityFieldName.*;
+import static kr.modusplant.framework.out.persistence.constant.EntityFieldName.*;
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.ACTIVE_MEMBER_UUID;
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.ORIGINAL_MEMBER_UUID;
 

@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import kr.modusplant.framework.outbound.jackson.http.response.DataResponse;
+import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostInsertRequest;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostUpdateRequest;
 import kr.modusplant.legacy.domains.communication.app.http.request.FileOrder;
