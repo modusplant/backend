@@ -1,8 +1,8 @@
 package kr.modusplant.legacy.modules.security.context;
 
-import kr.modusplant.framework.outbound.config.aws.TestS3Config;
-import kr.modusplant.framework.outbound.config.jpa.TestJpaConfig;
-import kr.modusplant.framework.outbound.config.redis.TestRedisConfig;
+import kr.modusplant.framework.out.config.aws.TestS3Config;
+import kr.modusplant.framework.out.config.jpa.TestJpaConfig;
+import kr.modusplant.framework.out.config.redis.TestRedisConfig;
 import kr.modusplant.legacy.modules.common.postprocessor.MockModulesRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.legacy.modules.common.postprocessor.MockModulesServiceBeanFactoryPostProcessor;
 import kr.modusplant.legacy.modules.security.config.TestSecurityConfig;

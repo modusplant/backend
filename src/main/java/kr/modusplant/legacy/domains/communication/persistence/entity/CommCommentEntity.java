@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.communication.persistence.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.framework.outbound.persistence.annotation.DefaultValue;
+import kr.modusplant.framework.out.persistence.annotation.DefaultValue;
 import kr.modusplant.legacy.domains.communication.persistence.entity.compositekey.CommCommentCompositeKey;
 import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
 import lombok.AccessLevel;

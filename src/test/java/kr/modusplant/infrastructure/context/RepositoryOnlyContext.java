@@ -1,9 +1,9 @@
 package kr.modusplant.infrastructure.context;
 
-import kr.modusplant.framework.outbound.config.aws.TestS3Config;
-import kr.modusplant.framework.outbound.config.jpa.TestJpaConfig;
-import kr.modusplant.framework.outbound.config.redis.TestRedisConfig;
-import kr.modusplant.framework.outbound.persistence.redis.RedisHelper;
+import kr.modusplant.framework.out.config.aws.TestS3Config;
+import kr.modusplant.framework.out.config.jpa.TestJpaConfig;
+import kr.modusplant.framework.out.config.redis.TestRedisConfig;
+import kr.modusplant.framework.out.persistence.redis.RedisHelper;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.annotation.*;
 
-import static kr.modusplant.shared.vo.Reference.NOTATION_ALL;
+import static kr.modusplant.shared.constant.Reference.NOTATION_ALL;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

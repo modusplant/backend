@@ -3,7 +3,7 @@ package kr.modusplant.legacy.modules.auth.normal.signup.app.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import kr.modusplant.framework.outbound.jackson.http.response.DataResponse;
+import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import kr.modusplant.legacy.modules.auth.normal.signup.app.http.request.NormalSignUpRequest;
 import kr.modusplant.legacy.modules.auth.normal.signup.app.service.NormalSignUpApplicationService;
 import lombok.RequiredArgsConstructor;
