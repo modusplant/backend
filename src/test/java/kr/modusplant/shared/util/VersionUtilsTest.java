@@ -11,14 +11,14 @@ class VersionUtilsTest {
 
     @Test
     @DisplayName("올바른 형식의 버전 반환")
-    void successfulVersionCreation() {
+    void inputVersion_withValidInt_returnsVersion() {
         assertThat(createVersion(1, 0, 0)).isEqualTo("v1.0.0");
         assertThat(createVersion(1, 10, 0)).isEqualTo("v1.10.0");
     }
 
     @Test
     @DisplayName("버전 숫자가 0보다 작을 때 예외 발생")
-    void failedVersionCreationForVersionLowerThanZero() {
+    void inputVersion_withVersionLowerThanZero_throwsIllegalArgumentException() {
         assertThat(assertThrows(IllegalArgumentException.class, () -> createVersion(-1, 0, 0)).getMessage()).isEqualTo("유효하지 않은 시맨틱 확인됨");
         assertThat(assertThrows(IllegalArgumentException.class, () -> createVersion(0, -1, 0)).getMessage()).isEqualTo("유효하지 않은 시맨틱 확인됨");
         assertThat(assertThrows(IllegalArgumentException.class, () -> createVersion(0, 0, -1)).getMessage()).isEqualTo("유효하지 않은 시맨틱 확인됨");

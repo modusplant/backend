@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.modules.jwt.app.service;
 
-import kr.modusplant.framework.outbound.persistence.vo.EntityName;
+import kr.modusplant.framework.out.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.legacy.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.legacy.modules.jwt.mapper.RefreshTokenAppInfraMapper;
@@ -32,7 +32,7 @@ public class RefreshTokenApplicationService {
 
     public Optional<RefreshToken> getByMemberUuidAndRefreshToken(UUID uuid, String refreshToken) {
         Optional<RefreshTokenEntity> tokenOrEmpty = tokenRepository.findByMemberAndRefreshToken(
-                memberRepository.findByUuid(uuid).orElseThrow(() -> new EntityNotFoundException(ErrorCode.SITEMEMBER_NOT_FOUND, EntityName.SITE_MEMBER)), refreshToken);
+                memberRepository.findByUuid(uuid).orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER)), refreshToken);
         return tokenOrEmpty.isEmpty() ? Optional.empty() : Optional.of(refreshTokenAppInfraMapper.toRefreshToken(tokenOrEmpty.orElseThrow()));
     }
 

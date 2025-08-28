@@ -1,8 +1,8 @@
 package kr.modusplant.legacy.domains.communication.persistence.repository;
 
-import kr.modusplant.legacy.domains.common.persistence.repository.supers.CreatedAtRepository;
-import kr.modusplant.legacy.domains.common.persistence.repository.supers.UuidPrimaryKeyRepository;
 import kr.modusplant.legacy.domains.communication.persistence.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.shared.persistence.repository.supers.CreatedAtRepository;
+import kr.modusplant.shared.persistence.repository.supers.UuidPrimaryKeyRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

@@ -1,8 +1,8 @@
 package kr.modusplant.legacy.modules.jwt.persistence.repository;
 
-import kr.modusplant.legacy.domains.common.persistence.repository.supers.UuidPrimaryKeyRepository;
 import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.legacy.modules.jwt.persistence.entity.RefreshTokenEntity;
+import kr.modusplant.shared.persistence.repository.supers.UuidPrimaryKeyRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

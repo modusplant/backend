@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.member.domain.service;
 
-import kr.modusplant.framework.outbound.persistence.vo.EntityName;
+import kr.modusplant.framework.out.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberAuthTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTestUtils;
@@ -54,7 +54,7 @@ class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, Si
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
                 () -> memberAuthValidationService.validateExistedOriginalMemberUuid(originalMemberEntityUuid));
-        assertThat(existsException.getMessage()).isEqualTo(new EntityExistsException(ErrorCode.SITEMEMBER_AUTH_EXISTS, EntityName.SITE_MEMBER_AUTH).getMessage());
+        assertThat(existsException.getMessage()).isEqualTo(new EntityExistsException(ErrorCode.MEMBER_AUTH_EXISTS, EntityName.SITE_MEMBER_AUTH).getMessage());
     }
 
     @DisplayName("존재하지 않는 최초 회원 UUID 검증")
@@ -74,7 +74,7 @@ class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, Si
         // then
         EntityNotFoundException notFoundException = assertThrows(EntityNotFoundException.class,
                 () -> memberAuthValidationService.validateNotFoundOriginalMemberUuid(memberAuthEntityUuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(new EntityNotFoundException(ErrorCode.SITEMEMBER_AUTH_NOT_FOUND, EntityName.SITE_MEMBER_AUTH).getMessage());
+        assertThat(notFoundException.getMessage()).isEqualTo(new EntityNotFoundException(ErrorCode.MEMBER_AUTH_NOT_FOUND, EntityName.SITE_MEMBER_AUTH).getMessage());
     }
 
     @DisplayName("존재하지 않는 이메일 검증")
@@ -94,6 +94,6 @@ class SiteMemberAuthValidationServiceTest implements SiteMemberAuthTestUtils, Si
         // then
         EntityNotFoundException notFoundException = assertThrows(EntityNotFoundException.class,
                 () -> memberAuthValidationService.validateNotFoundEmail(email));
-        assertThat(notFoundException.getMessage()).isEqualTo(new EntityNotFoundException(ErrorCode.SITEMEMBER_AUTH_NOT_FOUND, EntityName.SITE_MEMBER_AUTH).getMessage());
+        assertThat(notFoundException.getMessage()).isEqualTo(new EntityNotFoundException(ErrorCode.MEMBER_AUTH_NOT_FOUND, EntityName.SITE_MEMBER_AUTH).getMessage());
     }
 }

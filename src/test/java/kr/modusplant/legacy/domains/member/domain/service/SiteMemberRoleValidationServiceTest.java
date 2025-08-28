@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.member.domain.service;
 
-import kr.modusplant.framework.outbound.persistence.vo.EntityName;
+import kr.modusplant.framework.out.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberRoleTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTestUtils;
@@ -51,7 +51,7 @@ class SiteMemberRoleValidationServiceTest implements SiteMemberRoleTestUtils, Si
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
                 () -> memberRoleValidationService.validateExistedUuid(memberEntityUuid));
-        assertThat(existsException.getMessage()).isEqualTo(new EntityExistsException(ErrorCode.SITEMEMBER_ROLE_EXISTS, EntityName.SITE_MEMBER_ROLE).getMessage());
+        assertThat(existsException.getMessage()).isEqualTo(new EntityExistsException(ErrorCode.MEMBER_ROLE_EXISTS, EntityName.SITE_MEMBER_ROLE).getMessage());
     }
 
     @DisplayName("존재하지 않는 회원 역할 UUID 검증")
@@ -68,6 +68,6 @@ class SiteMemberRoleValidationServiceTest implements SiteMemberRoleTestUtils, Si
         // then
         EntityNotFoundException notFoundException = assertThrows(EntityNotFoundException.class,
                 () -> memberRoleValidationService.validateNotFoundUuid(memberEntityUuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(new EntityNotFoundException(ErrorCode.SITEMEMBER_ROLE_NOT_FOUND, EntityName.SITE_MEMBER_ROLE).getMessage());
+        assertThat(notFoundException.getMessage()).isEqualTo(new EntityNotFoundException(ErrorCode.MEMBER_ROLE_NOT_FOUND, EntityName.SITE_MEMBER_ROLE).getMessage());
     }
 }

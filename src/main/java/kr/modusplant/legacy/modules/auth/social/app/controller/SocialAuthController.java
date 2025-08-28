@@ -3,7 +3,7 @@ package kr.modusplant.legacy.modules.auth.social.app.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import kr.modusplant.framework.outbound.jackson.http.response.DataResponse;
+import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.legacy.modules.auth.social.app.http.request.SocialLoginRequest;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
 
-import static kr.modusplant.shared.database.TableColumnName.REFRESH_TOKEN;
+import static kr.modusplant.shared.persistence.vo.TableColumnName.REFRESH_TOKEN;
 
 @Tag(name = "소셜 로그인 API", description = "소셜 로그인을 다루는 API입니다.")
 @RestController

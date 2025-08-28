@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.modules.auth.email.app.service;
 
-import kr.modusplant.framework.outbound.persistence.redis.RedisHelper;
-import kr.modusplant.framework.outbound.persistence.vo.EntityName;
+import kr.modusplant.framework.out.persistence.constant.EntityName;
+import kr.modusplant.framework.out.persistence.redis.RedisHelper;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberAuthValidationService;
 import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberAuthEntity;
@@ -22,7 +22,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import java.time.Duration;
 import java.util.Optional;
 
-import static kr.modusplant.framework.outbound.persistence.redis.RedisKeys.RESET_PASSWORD_PREFIX;
+import static kr.modusplant.framework.out.persistence.redis.RedisKeys.RESET_PASSWORD_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -126,7 +126,7 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
         EmailRequest request = new EmailRequest();
         String email = "notExistsEmail@gmail.com";
         setField(request, "email", email);
-        doThrow(new EntityNotFoundException(ErrorCode.SITEMEMBER_AUTH_NOT_FOUND, EntityName.SITE_MEMBER_AUTH)).when(siteMemberAuthValidationService).validateNotFoundEmail(email);
+        doThrow(new EntityNotFoundException(ErrorCode.MEMBER_AUTH_NOT_FOUND, EntityName.SITE_MEMBER_AUTH)).when(siteMemberAuthValidationService).validateNotFoundEmail(email);
 
         // when/then
         assertThatThrownBy(() -> emailAuthService.sendResetPasswordCode(request))

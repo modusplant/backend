@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.member.domain.service;
 
-import kr.modusplant.framework.outbound.persistence.vo.EntityName;
+import kr.modusplant.framework.out.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTermTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberTermEntityTestUtils;
@@ -41,7 +41,7 @@ class SiteMemberTermValidationServiceTest implements SiteMemberTermTestUtils, Si
         // then
         EntityExistsException existsException = assertThrows(EntityExistsException.class,
                 () -> memberTermValidationService.validateExistedUuid(uuid));
-        assertThat(existsException.getMessage()).isEqualTo(new EntityExistsException(ErrorCode.SITEMEMBER_TERM_EXISTS, EntityName.SITE_MEMBER_TERM).getMessage());
+        assertThat(existsException.getMessage()).isEqualTo(new EntityExistsException(ErrorCode.MEMBER_TERM_EXISTS, EntityName.SITE_MEMBER_TERM).getMessage());
     }
 
     @DisplayName("존재하지 않는 회원 약관 UUID 검증")
@@ -56,6 +56,6 @@ class SiteMemberTermValidationServiceTest implements SiteMemberTermTestUtils, Si
         // then
         EntityNotFoundException notFoundException = assertThrows(EntityNotFoundException.class,
                 () -> memberTermValidationService.validateNotFoundUuid(uuid));
-        assertThat(notFoundException.getMessage()).isEqualTo(new EntityNotFoundException(ErrorCode.SITEMEMBER_TERM_NOT_FOUND, EntityName.SITE_MEMBER_TERM).getMessage());
+        assertThat(notFoundException.getMessage()).isEqualTo(new EntityNotFoundException(ErrorCode.MEMBER_TERM_NOT_FOUND, EntityName.SITE_MEMBER_TERM).getMessage());
     }
 }

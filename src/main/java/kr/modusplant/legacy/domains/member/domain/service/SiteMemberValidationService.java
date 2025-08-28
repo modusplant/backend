@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.member.domain.service;
 
-import kr.modusplant.framework.outbound.persistence.vo.EntityName;
+import kr.modusplant.framework.out.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
@@ -24,13 +24,13 @@ public class SiteMemberValidationService {
             return;
         }
         if (memberRepository.existsByUuid(uuid)) {
-            throw new EntityExistsException(ErrorCode.SITEMEMBER_EXISTS, EntityName.SITE_MEMBER);
+            throw new EntityExistsException(ErrorCode.MEMBER_EXISTS, EntityName.SITE_MEMBER);
         }
     }
 
     public void validateNotFoundUuid(UUID uuid) {
         if (uuid == null || !memberRepository.existsByUuid(uuid)) {
-            throw new EntityNotFoundException(ErrorCode.SITEMEMBER_NOT_FOUND, EntityName.SITE_MEMBER);
+            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER);
         }
     }
 }

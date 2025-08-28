@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.member.persistence.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.framework.outbound.persistence.annotation.DefaultValue;
+import kr.modusplant.framework.out.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,8 +16,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.shared.database.TableColumnName.*;
-import static kr.modusplant.shared.database.TableName.SITE_MEMBER;
+import static kr.modusplant.shared.persistence.vo.TableColumnName.*;
+import static kr.modusplant.shared.persistence.vo.TableName.SITE_MEMBER;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)

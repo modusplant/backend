@@ -1,7 +1,6 @@
 package kr.modusplant.legacy.modules.auth.social.app.service;
 
-import kr.modusplant.framework.outbound.persistence.vo.EntityName;
-import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.framework.out.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthDomainInfraMapper;
@@ -16,6 +15,7 @@ import kr.modusplant.legacy.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.legacy.modules.auth.social.app.dto.supers.SocialUserInfo;
 import kr.modusplant.legacy.modules.auth.social.app.service.supers.SocialAuthClient;
 import kr.modusplant.legacy.modules.auth.social.error.UnsupportedSocialProviderException;
+import kr.modusplant.legacy.modules.security.enums.Role;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -80,12 +80,12 @@ public class SocialAuthApplicationService {
 
     private SiteMemberEntity getMemberEntityByUuid(UUID uuid) {
         return memberRepository.findByUuid(uuid)
-                .orElseThrow((() -> new EntityNotFoundException(ErrorCode.SITEMEMBER_NOT_FOUND, EntityName.SITE_MEMBER)));
+                .orElseThrow((() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER)));
     }
 
     private SiteMemberRoleEntity getMemberRoleEntityByMember(SiteMemberEntity memberEntity) {
         return memberRoleRepository.findByMember(memberEntity)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.SITEMEMBER_ROLE_NOT_FOUND, EntityName.SITE_MEMBER_ROLE));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_ROLE_NOT_FOUND, EntityName.SITE_MEMBER_ROLE));
     }
 
     private SiteMemberEntity createSiteMember(String nickname) {

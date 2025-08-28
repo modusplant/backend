@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
-import kr.modusplant.framework.outbound.persistence.vo.EntityName;
+import kr.modusplant.framework.out.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommLikeRepository;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostRepository;
 import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
@@ -26,7 +26,7 @@ public class CommLikeValidationService {
             throw new EntityNotFoundException(ErrorCode.POST_NOT_FOUND, EntityName.POST);
         }
         if (!memberRepository.existsById(memberId)) {
-            throw new EntityNotFoundException(ErrorCode.SITEMEMBER_NOT_FOUND, EntityName.SITE_MEMBER);
+            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER);
         }
     }
 

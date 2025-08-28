@@ -3,8 +3,8 @@ package kr.modusplant.legacy.domains.communication.persistence.entity;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
-import kr.modusplant.framework.outbound.persistence.annotation.DefaultValue;
-import kr.modusplant.framework.outbound.persistence.generator.UlidGenerator;
+import kr.modusplant.framework.out.persistence.annotation.DefaultValue;
+import kr.modusplant.framework.out.persistence.generator.UlidGenerator;
 import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -20,8 +20,8 @@ import java.time.LocalDateTime;
 
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.SNAKE_AUTH_MEMB_UUID;
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.SNAKE_CREA_MEMB_UUID;
-import static kr.modusplant.shared.database.TableColumnName.*;
-import static kr.modusplant.shared.database.TableName.COMM_POST;
+import static kr.modusplant.shared.persistence.vo.TableColumnName.*;
+import static kr.modusplant.shared.persistence.vo.TableName.COMM_POST;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)

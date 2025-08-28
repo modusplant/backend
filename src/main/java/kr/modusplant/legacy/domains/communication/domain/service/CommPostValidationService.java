@@ -1,10 +1,9 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
-import kr.modusplant.framework.outbound.persistence.vo.EntityName;
+import kr.modusplant.framework.out.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.error.DataPairNumberMismatchException;
 import kr.modusplant.legacy.domains.common.error.DataPairOrderMismatchException;
 import kr.modusplant.legacy.domains.common.error.EmptyValueException;
-import kr.modusplant.legacy.domains.common.persistence.repository.supers.UuidPrimaryKeyRepository;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostInsertRequest;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostUpdateRequest;
 import kr.modusplant.legacy.domains.communication.app.http.request.FileOrder;
@@ -14,6 +13,7 @@ import kr.modusplant.legacy.domains.communication.persistence.repository.CommPos
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommSecondaryCategoryRepository;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.persistence.repository.supers.UuidPrimaryKeyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

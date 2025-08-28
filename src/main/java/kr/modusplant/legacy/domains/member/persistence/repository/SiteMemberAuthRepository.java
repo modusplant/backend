@@ -1,10 +1,10 @@
 package kr.modusplant.legacy.domains.member.persistence.repository;
 
-import kr.modusplant.legacy.domains.common.persistence.repository.supers.LastModifiedAtRepository;
-import kr.modusplant.legacy.domains.common.persistence.repository.supers.UuidPrimaryKeyRepository;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberAuthEntity;
 import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
+import kr.modusplant.shared.persistence.repository.supers.LastModifiedAtRepository;
+import kr.modusplant.shared.persistence.repository.supers.UuidPrimaryKeyRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
