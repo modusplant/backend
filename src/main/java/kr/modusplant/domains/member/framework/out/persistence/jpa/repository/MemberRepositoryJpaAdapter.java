@@ -19,7 +19,7 @@ public class MemberRepositoryJpaAdapter implements MemberRepository {
     }
 
     @Override
-    public Member saveMember(Member member) {
+    public Member save(Member member) {
         return memberJpaMapper.toMember(memberJpaRepository.save(memberJpaMapper.toMemberEntity(member)));
     }
 }

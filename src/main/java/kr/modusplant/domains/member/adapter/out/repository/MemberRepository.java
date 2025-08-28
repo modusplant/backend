@@ -5,5 +5,5 @@ import kr.modusplant.domains.member.domain.entity.Member;
 public interface MemberRepository {
     Member updateNickname(Member member);
 
-    Member saveMember(Member member);
+    Member save(Member member);
 }

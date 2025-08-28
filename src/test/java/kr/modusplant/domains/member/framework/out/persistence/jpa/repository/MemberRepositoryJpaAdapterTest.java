@@ -18,15 +18,26 @@ class MemberRepositoryJpaAdapterTest implements MemberEntityTestUtils {
     private final MemberRepositoryJpaAdapter memberRepositoryJpaAdapter = new MemberRepositoryJpaAdapter(memberJpaMapper, memberJpaRepository);
 
     @Test
-    @DisplayName("save로 Member 반환")
-    void callSave_withValidMember_returnsMember() {
+    @DisplayName("updateNickname로 Member 반환")
+    void callUpdateNickname_withValidMember_returnsMember() {
         // given
         Member member = createMember();
         MemberEntity memberEntity = createMemberEntity();
         given(memberJpaRepository.save(memberEntity)).willReturn(memberEntity);
 
         // when & then
-        assertThat(memberRepositoryJpaAdapter.saveMember(member)).isEqualTo(member);
+        assertThat(memberRepositoryJpaAdapter.updateNickname(member)).isEqualTo(member);
     }
 
+    @Test
+    @DisplayName("save로 Member 반환")
+    void callSave_withValidMember_returns() {
+        // given
+        Member member = createMember();
+        MemberEntity memberEntity = createMemberEntity();
+        given(memberJpaRepository.save(memberEntity)).willReturn(memberEntity);
+
+        // when & then
+        assertThat(memberRepositoryJpaAdapter.save(member)).isEqualTo(member);
+    }
 }

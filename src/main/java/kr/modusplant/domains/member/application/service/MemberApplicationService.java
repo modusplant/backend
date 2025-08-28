@@ -19,7 +19,7 @@ public class MemberApplicationService {
 
     public MemberResponse register(MemberRegisterRequest request) {
         Member member = Member.create(mapper.toNickname(request));
-        return mapper.toMemberResponse(memberRepository.saveMember(member));
+        return mapper.toMemberResponse(memberRepository.save(member));
     }
 
     public MemberResponse updateNickname(MemberNicknameUpdateRequest request) {

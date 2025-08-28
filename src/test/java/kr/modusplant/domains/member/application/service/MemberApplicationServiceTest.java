@@ -21,11 +21,22 @@ class MemberApplicationServiceTest implements MemberTestUtils, MemberRequestTest
     private final MemberApplicationService memberService = new MemberApplicationService(memberMapper, memberRepository);
 
     @Test
-    @DisplayName("register로 요청 등록")
-    void callRegister_withValidRequest_returnsMember() {
+    @DisplayName("updateNickname으로 닉네임 갱신")
+    void callUpdateNickname_withValidRequest_returnsResponse() {
         // given
         Member member = createMember();
-        given(memberRepository.saveMember(any())).willReturn(member);
+        given(memberRepository.updateNickname(any())).willReturn(member);
+
+        // when & then
+        assertThat(memberService.updateNickname(testMemberNicknameUpdateRequest).nickname()).isEqualTo(member.getMemberNickname().getValue());
+    }
+
+    @Test
+    @DisplayName("register로 회원 등록")
+    void callRegister_withValidRequest_returnsResponse() {
+        // given
+        Member member = createMember();
+        given(memberRepository.save(any())).willReturn(member);
 
         // when & then
         assertThat(memberService.register(testMemberRegisterRequest).nickname()).isEqualTo(member.getMemberNickname().getValue());

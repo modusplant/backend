@@ -31,4 +31,19 @@ class MemberRestControllerTest implements MemberTestUtils, MemberRequestTestUtil
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(memberResponseEntity.getBody()).isEqualTo(testMemberResponse);
     }
+
+    @Test
+    @DisplayName("updateMemberNickname으로 응답 반환")
+    void callUpdateMemberNickname_withValidRequest_returnsResponse() {
+        // given
+        given(memberService.updateNickname(testMemberNicknameUpdateRequest)).willReturn(testMemberResponse);
+
+        // when
+        ResponseEntity<MemberResponse> memberResponseEntity = memberRestController.updateMemberNickname(testMemberNicknameUpdateRequest);
+
+        // then
+        assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(memberResponseEntity.getBody()).isEqualTo(testMemberResponse);
+    }
+
 }

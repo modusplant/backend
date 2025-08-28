@@ -1,6 +1,5 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.domain.exception.EmptyMemberIdException;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberNicknameException;
 import lombok.AccessLevel;
 import lombok.Getter;
