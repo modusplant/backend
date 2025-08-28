@@ -8,9 +8,9 @@ import kr.modusplant.legacy.domains.communication.app.http.request.CommPostInser
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostUpdateRequest;
 import kr.modusplant.legacy.domains.communication.app.http.request.FileOrder;
 import kr.modusplant.legacy.domains.communication.error.AccessDeniedException;
-import kr.modusplant.legacy.domains.communication.persistence.entity.CommPostEntity;
-import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostRepository;
-import kr.modusplant.legacy.domains.communication.persistence.repository.CommSecondaryCategoryRepository;
+import kr.modusplant.framework.out.persistence.entity.CommPostEntity;
+import kr.modusplant.framework.out.persistence.repository.CommPostRepository;
+import kr.modusplant.framework.out.persistence.repository.CommSecondaryCategoryRepository;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.persistence.repository.supers.UuidPrimaryKeyRepository;

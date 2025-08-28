@@ -7,8 +7,8 @@ import kr.modusplant.legacy.domains.term.common.util.app.http.response.TermRespo
 import kr.modusplant.legacy.domains.term.common.util.entity.TermEntityTestUtils;
 import kr.modusplant.legacy.domains.term.mapper.TermAppInfraMapper;
 import kr.modusplant.legacy.domains.term.mapper.TermAppInfraMapperImpl;
-import kr.modusplant.legacy.domains.term.persistence.entity.TermEntity;
-import kr.modusplant.legacy.domains.term.persistence.repository.TermRepository;
+import kr.modusplant.framework.out.persistence.entity.TermEntity;
+import kr.modusplant.framework.out.persistence.repository.TermRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

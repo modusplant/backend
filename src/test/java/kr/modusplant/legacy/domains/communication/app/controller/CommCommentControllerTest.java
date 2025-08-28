@@ -3,6 +3,7 @@ package kr.modusplant.legacy.domains.communication.app.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import kr.modusplant.framework.out.persistence.entity.SiteMemberEntity;
 import kr.modusplant.legacy.domains.common.context.DomainsControllerOnlyContext;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommCommentInsertRequest;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommCommentResponse;
@@ -13,9 +14,8 @@ import kr.modusplant.legacy.domains.communication.common.util.domain.CommComment
 import kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
-import kr.modusplant.legacy.domains.communication.persistence.entity.CommPostEntity;
+import kr.modusplant.framework.out.persistence.entity.CommPostEntity;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberRoleTestUtils;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

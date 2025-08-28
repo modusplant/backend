@@ -1,10 +1,10 @@
 package kr.modusplant.legacy.domains.member.domain.service;
 
 import kr.modusplant.framework.out.persistence.constant.EntityName;
+import kr.modusplant.framework.out.persistence.repository.SiteMemberTermRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTermTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberTermEntityTestUtils;
-import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberTermRepository;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;

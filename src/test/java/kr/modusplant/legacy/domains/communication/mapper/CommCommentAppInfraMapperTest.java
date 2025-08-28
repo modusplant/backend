@@ -1,5 +1,7 @@
 package kr.modusplant.legacy.domains.communication.mapper;
 
+import kr.modusplant.framework.out.persistence.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.repository.SiteMemberRepository;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommCommentResponse;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommCommentInsertRequestTestUtils;
@@ -7,14 +9,12 @@ import kr.modusplant.legacy.domains.communication.common.util.app.http.response.
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommCommentEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
-import kr.modusplant.legacy.domains.communication.persistence.entity.CommCommentEntity;
-import kr.modusplant.legacy.domains.communication.persistence.entity.CommPostEntity;
-import kr.modusplant.legacy.domains.communication.persistence.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostRepository;
-import kr.modusplant.legacy.domains.communication.persistence.repository.CommSecondaryCategoryRepository;
+import kr.modusplant.framework.out.persistence.entity.CommCommentEntity;
+import kr.modusplant.framework.out.persistence.entity.CommPostEntity;
+import kr.modusplant.framework.out.persistence.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.out.persistence.repository.CommPostRepository;
+import kr.modusplant.framework.out.persistence.repository.CommSecondaryCategoryRepository;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

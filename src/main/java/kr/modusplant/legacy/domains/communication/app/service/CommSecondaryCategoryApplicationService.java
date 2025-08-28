@@ -5,8 +5,8 @@ import kr.modusplant.legacy.domains.communication.app.http.response.CommCategory
 import kr.modusplant.legacy.domains.communication.domain.service.CommCategoryValidationService;
 import kr.modusplant.legacy.domains.communication.mapper.CommSecondaryCategoryAppInfraMapper;
 import kr.modusplant.legacy.domains.communication.mapper.CommSecondaryCategoryAppInfraMapperImpl;
-import kr.modusplant.legacy.domains.communication.persistence.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.legacy.domains.communication.persistence.repository.CommSecondaryCategoryRepository;
+import kr.modusplant.framework.out.persistence.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.out.persistence.repository.CommSecondaryCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;

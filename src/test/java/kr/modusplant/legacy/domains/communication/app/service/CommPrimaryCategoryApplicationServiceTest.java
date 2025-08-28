@@ -6,8 +6,8 @@ import kr.modusplant.legacy.domains.communication.common.util.app.http.response.
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.mapper.CommPrimaryCategoryAppInfraMapper;
 import kr.modusplant.legacy.domains.communication.mapper.CommPrimaryCategoryAppInfraMapperImpl;
-import kr.modusplant.legacy.domains.communication.persistence.entity.CommPrimaryCategoryEntity;
-import kr.modusplant.legacy.domains.communication.persistence.repository.CommPrimaryCategoryRepository;
+import kr.modusplant.framework.out.persistence.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.framework.out.persistence.repository.CommPrimaryCategoryRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

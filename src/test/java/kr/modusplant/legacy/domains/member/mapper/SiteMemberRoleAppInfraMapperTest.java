@@ -1,14 +1,14 @@
 package kr.modusplant.legacy.domains.member.mapper;
 
+import kr.modusplant.framework.out.persistence.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.entity.SiteMemberRoleEntity;
+import kr.modusplant.framework.out.persistence.repository.SiteMemberRepository;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberRoleInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberRoleResponse;
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberRoleRequestTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberRoleResponseTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberRoleEntityTestUtils;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberRoleEntity;
-import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

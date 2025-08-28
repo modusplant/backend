@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.communication.common.util.entity;
 
 import kr.modusplant.legacy.domains.communication.common.util.domain.CommPrimaryCategoryTestUtils;
-import kr.modusplant.legacy.domains.communication.persistence.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.framework.out.persistence.entity.CommPrimaryCategoryEntity;
 
 public interface CommPrimaryCategoryEntityTestUtils extends CommPrimaryCategoryTestUtils {
     default CommPrimaryCategoryEntity createTestCommPrimaryCategoryEntity() {

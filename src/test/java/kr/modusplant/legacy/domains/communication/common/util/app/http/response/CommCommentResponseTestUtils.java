@@ -2,7 +2,7 @@ package kr.modusplant.legacy.domains.communication.common.util.app.http.response
 
 import kr.modusplant.legacy.domains.communication.app.http.response.CommCommentResponse;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommCommentEntityTestUtils;
-import kr.modusplant.legacy.domains.communication.persistence.entity.CommCommentEntity;
+import kr.modusplant.framework.out.persistence.entity.CommCommentEntity;
 
 import java.util.UUID;
 

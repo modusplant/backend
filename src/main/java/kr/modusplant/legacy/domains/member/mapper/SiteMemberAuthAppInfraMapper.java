@@ -1,10 +1,10 @@
 package kr.modusplant.legacy.domains.member.mapper;
 
+import kr.modusplant.framework.out.persistence.entity.SiteMemberAuthEntity;
+import kr.modusplant.framework.out.persistence.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.repository.SiteMemberRepository;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberAuthInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberAuthResponse;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberAuthEntity;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

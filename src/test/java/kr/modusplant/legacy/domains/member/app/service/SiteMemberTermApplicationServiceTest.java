@@ -1,5 +1,9 @@
 package kr.modusplant.legacy.domains.member.app.service;
 
+import kr.modusplant.framework.out.persistence.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.entity.SiteMemberTermEntity;
+import kr.modusplant.framework.out.persistence.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.persistence.repository.SiteMemberTermRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberTermUpdateRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberTermResponse;
@@ -9,10 +13,6 @@ import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMem
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberTermResponseTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberTermEntityTestUtils;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberTermEntity;
-import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberTermRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.member.common.util.entity;
 
+import kr.modusplant.framework.out.persistence.entity.SiteMemberEntity;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTestUtils;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
 
 public interface SiteMemberEntityTestUtils extends SiteMemberTestUtils {
     default SiteMemberEntity createMemberBasicAdminEntity() {

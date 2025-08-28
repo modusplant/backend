@@ -1,9 +1,9 @@
 package kr.modusplant.legacy.modules.jwt.domain.service;
 
+import kr.modusplant.framework.out.persistence.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.repository.SiteMemberRepository;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.legacy.modules.jwt.common.util.domain.RefreshTokenTestUtils;
 import kr.modusplant.legacy.modules.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.legacy.modules.jwt.domain.model.RefreshToken;

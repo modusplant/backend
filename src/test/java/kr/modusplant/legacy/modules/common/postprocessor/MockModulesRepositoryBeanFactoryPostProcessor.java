@@ -32,7 +32,7 @@ public class MockModulesRepositoryBeanFactoryPostProcessor implements BeanFactor
         scanner.addIncludeFilter(new AnnotationTypeFilter(Repository.class));
         ClassLoader classLoader = this.getClass().getClassLoader();
 
-        for (String reference: List.of(NOTATION_DOMAINS, NOTATION_MODULES)) {
+        for (String reference: List.of(NOTATION_DOMAINS, NOTATION_MODULES, "kr.modusplant.framework")) {
             for (BeanDefinition repositoryDef : scanner.findCandidateComponents(reference)) {
                 Class<?> clazz;
                 try {
