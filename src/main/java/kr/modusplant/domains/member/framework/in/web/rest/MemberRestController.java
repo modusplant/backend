@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "회원 API", description = "회원의 상태와 생명 주기를 관리하는 API 입니다.")
+@Tag(name = "회원 API", description = "회원의 생명 주기와 상태, 회원이 할 수 있는 단일한 기능을 관리하는 API 입니다.")
 @RestController
 @RequestMapping("/api/v1/members")
 @RequiredArgsConstructor
