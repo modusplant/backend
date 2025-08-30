@@ -20,10 +20,10 @@ public class MemberStatus {
         return new MemberStatus(Status.INACTIVE);
     }
 
-    public static MemberStatus fromBoolean(Boolean bool) {
-        if (bool == null) {
+    public static MemberStatus fromBoolean(Boolean isActive) {
+        if (isActive == null) {
             throw new EmptyMemberStatusException();
-        } else if (bool.equals(true)) {
+        } else if (isActive.equals(true)) {
             return MemberStatus.active();
         } else {
             return MemberStatus.inactive();
@@ -38,8 +38,12 @@ public class MemberStatus {
         return status == Status.INACTIVE;
     }
 
+    public String getValue() {
+        return status.getValue();
+    }
+
     @Getter
-    public enum Status {
+    private enum Status {
         ACTIVE("활동 중"),
         INACTIVE("활동 정지");
 

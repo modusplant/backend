@@ -1,6 +1,9 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
 import kr.modusplant.framework.out.persistence.constant.EntityName;
+import kr.modusplant.framework.out.persistence.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.out.persistence.jpa.repository.CommPostRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.CommSecondaryCategoryRepository;
 import kr.modusplant.legacy.domains.common.error.DataPairNumberMismatchException;
 import kr.modusplant.legacy.domains.common.error.DataPairOrderMismatchException;
 import kr.modusplant.legacy.domains.common.error.EmptyValueException;
@@ -8,9 +11,6 @@ import kr.modusplant.legacy.domains.communication.app.http.request.CommPostInser
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostUpdateRequest;
 import kr.modusplant.legacy.domains.communication.app.http.request.FileOrder;
 import kr.modusplant.legacy.domains.communication.error.AccessDeniedException;
-import kr.modusplant.framework.out.persistence.entity.CommPostEntity;
-import kr.modusplant.framework.out.persistence.repository.CommPostRepository;
-import kr.modusplant.framework.out.persistence.repository.CommSecondaryCategoryRepository;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.persistence.repository.supers.UuidPrimaryKeyRepository;

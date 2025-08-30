@@ -1,10 +1,10 @@
 package kr.modusplant.legacy.modules.auth.email.app.service;
 
 import kr.modusplant.framework.out.persistence.constant.EntityName;
-import kr.modusplant.framework.out.persistence.entity.SiteMemberAuthEntity;
-import kr.modusplant.framework.out.persistence.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberAuthEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberAuthRepository;
 import kr.modusplant.framework.out.persistence.redis.RedisHelper;
-import kr.modusplant.framework.out.persistence.repository.SiteMemberAuthRepository;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberAuthValidationService;
 import kr.modusplant.legacy.modules.auth.email.app.http.request.EmailRequest;

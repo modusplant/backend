@@ -1,5 +1,6 @@
 package kr.modusplant.framework.out.persistence.entity;
 
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;

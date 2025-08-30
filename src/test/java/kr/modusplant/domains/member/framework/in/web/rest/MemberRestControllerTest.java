@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.framework.in.web.rest;
 
-import kr.modusplant.domains.member.adapter.in.response.MemberResponse;
-import kr.modusplant.domains.member.application.service.MemberApplicationService;
+import kr.modusplant.domains.member.adapter.controller.MemberController;
+import kr.modusplant.domains.member.adapter.response.MemberResponse;
 import kr.modusplant.domains.member.test.utils.adapter.MemberRequestTestUtils;
 import kr.modusplant.domains.member.test.utils.adapter.MemberResponseTestUtils;
 import kr.modusplant.domains.member.test.utils.domain.MemberTestUtils;
@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 class MemberRestControllerTest implements MemberTestUtils, MemberRequestTestUtils, MemberResponseTestUtils {
-    private final MemberApplicationService memberService = Mockito.mock(MemberApplicationService.class);
+    private final MemberController memberService = Mockito.mock(MemberController.class);
     private final MemberRestController memberRestController = new MemberRestController(memberService);
 
     @Test

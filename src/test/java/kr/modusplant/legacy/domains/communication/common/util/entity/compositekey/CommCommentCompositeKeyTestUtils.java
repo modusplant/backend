@@ -1,8 +1,8 @@
 package kr.modusplant.legacy.domains.communication.common.util.entity.compositekey;
 
+import kr.modusplant.framework.out.persistence.jpa.entity.CommCommentEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.compositekey.CommCommentId;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommCommentEntityTestUtils;
-import kr.modusplant.framework.out.persistence.entity.CommCommentEntity;
-import kr.modusplant.framework.out.persistence.entity.compositekey.CommCommentId;
 
 public interface CommCommentCompositeKeyTestUtils extends CommCommentEntityTestUtils {
     default CommCommentId createCommCommentCompositeKey(String postUlid) {

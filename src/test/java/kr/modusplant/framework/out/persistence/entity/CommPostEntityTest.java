@@ -1,5 +1,9 @@
 package kr.modusplant.framework.out.persistence.entity;
 
+import kr.modusplant.framework.out.persistence.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;

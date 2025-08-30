@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.member.common.util.entity;
 
-import kr.modusplant.framework.out.persistence.entity.SiteMemberRoleEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberRoleEntity;
 
 import static kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberRoleTestUtils.*;
 

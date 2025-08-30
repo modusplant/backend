@@ -1,6 +1,7 @@
 package kr.modusplant.framework.out.persistence.repository;
 
-import kr.modusplant.framework.out.persistence.entity.SiteMemberTermEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberTermEntity;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberTermRepository;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberTermEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;

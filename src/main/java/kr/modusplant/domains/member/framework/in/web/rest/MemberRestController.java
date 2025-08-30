@@ -2,10 +2,10 @@ package kr.modusplant.domains.member.framework.in.web.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.modusplant.domains.member.adapter.in.request.MemberNicknameUpdateRequest;
-import kr.modusplant.domains.member.adapter.in.request.MemberRegisterRequest;
-import kr.modusplant.domains.member.adapter.in.response.MemberResponse;
-import kr.modusplant.domains.member.application.service.MemberApplicationService;
+import kr.modusplant.domains.member.adapter.controller.MemberController;
+import kr.modusplant.domains.member.adapter.request.MemberNicknameUpdateRequest;
+import kr.modusplant.domains.member.adapter.request.MemberRegisterRequest;
+import kr.modusplant.domains.member.adapter.response.MemberResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Validated
 public class MemberRestController {
-    private final MemberApplicationService memberService;
+    private final MemberController memberService;
 
     @Operation(summary = "회원 등록 API", description = "닉네임을 통해 회원을 등록합니다.")
     @PostMapping

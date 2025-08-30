@@ -1,5 +1,6 @@
 package kr.modusplant.framework.out.persistence.entity;
 
+import kr.modusplant.framework.out.persistence.jpa.entity.*;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommCommentEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;

@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.framework.out.persistence.jpa.mapper;
 
-import kr.modusplant.domains.member.domain.entity.Member;
+import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.vo.MemberBirthDate;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberNickname;
@@ -25,6 +25,6 @@ public class MemberJpaMapperImpl implements MemberJpaMapper {
         } else {
             status = MemberStatus.inactive();
         }
-        return Member.create(MemberId.fromUuid(entity.getUuid()), status, MemberNickname.of(entity.getNickname()), MemberBirthDate.of(entity.getBirthDate()));
+        return Member.create(MemberId.fromUuid(entity.getUuid()), status, MemberNickname.create(entity.getNickname()), MemberBirthDate.create(entity.getBirthDate()));
     }
 }

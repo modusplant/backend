@@ -1,8 +1,9 @@
 package kr.modusplant.framework.out.persistence.repository;
 
+import kr.modusplant.framework.out.persistence.jpa.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.out.persistence.jpa.repository.CommSecondaryCategoryRepository;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
-import kr.modusplant.framework.out.persistence.entity.CommSecondaryCategoryEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

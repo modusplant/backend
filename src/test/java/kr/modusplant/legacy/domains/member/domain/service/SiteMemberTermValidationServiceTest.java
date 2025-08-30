@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.member.domain.service;
 
 import kr.modusplant.framework.out.persistence.constant.EntityName;
-import kr.modusplant.framework.out.persistence.repository.SiteMemberTermRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberTermRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTermTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberTermEntityTestUtils;

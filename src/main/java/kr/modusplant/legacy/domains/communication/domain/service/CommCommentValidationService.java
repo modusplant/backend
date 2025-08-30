@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
 import kr.modusplant.framework.out.persistence.constant.EntityName;
-import kr.modusplant.framework.out.persistence.repository.CommCommentRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.CommCommentRepository;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;

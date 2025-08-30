@@ -1,11 +1,14 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
 import kr.modusplant.framework.out.persistence.constant.EntityName;
-import kr.modusplant.framework.out.persistence.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.persistence.repository.CommPostRepository;
-import kr.modusplant.framework.out.persistence.repository.CommPrimaryCategoryRepository;
-import kr.modusplant.framework.out.persistence.repository.CommSecondaryCategoryRepository;
-import kr.modusplant.framework.out.persistence.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.persistence.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.jpa.repository.CommPostRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.CommPrimaryCategoryRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.CommSecondaryCategoryRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.domains.common.app.service.MultipartDataProcessor;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostInsertRequest;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostUpdateRequest;
@@ -14,10 +17,8 @@ import kr.modusplant.legacy.domains.communication.domain.service.CommCategoryVal
 import kr.modusplant.legacy.domains.communication.domain.service.CommPostValidationService;
 import kr.modusplant.legacy.domains.communication.mapper.CommPostAppInfraMapper;
 import kr.modusplant.legacy.domains.communication.mapper.CommPostAppInfraMapperImpl;
-import kr.modusplant.framework.out.persistence.entity.CommPostEntity;
-import kr.modusplant.framework.out.persistence.entity.CommPrimaryCategoryEntity;
-import kr.modusplant.framework.out.persistence.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.legacy.domains.communication.persistence.repository.*;
+import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostViewCountRedisRepository;
+import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostViewLockRedisRepository;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;

@@ -1,7 +1,13 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
-import kr.modusplant.framework.out.persistence.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.persistence.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.persistence.jpa.entity.CommCommentEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.jpa.repository.CommCommentRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.CommPostRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.CommSecondaryCategoryRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommCommentInsertRequest;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommCommentResponse;
@@ -10,12 +16,6 @@ import kr.modusplant.legacy.domains.communication.common.util.app.http.response.
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommCommentEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
-import kr.modusplant.framework.out.persistence.entity.CommCommentEntity;
-import kr.modusplant.framework.out.persistence.entity.CommPostEntity;
-import kr.modusplant.framework.out.persistence.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.framework.out.persistence.repository.CommCommentRepository;
-import kr.modusplant.framework.out.persistence.repository.CommPostRepository;
-import kr.modusplant.framework.out.persistence.repository.CommSecondaryCategoryRepository;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

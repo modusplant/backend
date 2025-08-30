@@ -1,12 +1,12 @@
 package kr.modusplant.legacy.domains.term.domain.service;
 
+import kr.modusplant.framework.out.persistence.jpa.entity.TermEntity;
+import kr.modusplant.framework.out.persistence.jpa.repository.TermRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.legacy.domains.term.common.util.app.http.response.TermResponseTestUtils;
 import kr.modusplant.legacy.domains.term.common.util.entity.TermEntityTestUtils;
 import kr.modusplant.legacy.domains.term.error.TermExistsException;
 import kr.modusplant.legacy.domains.term.error.TermNotFoundException;
-import kr.modusplant.framework.out.persistence.entity.TermEntity;
-import kr.modusplant.framework.out.persistence.repository.TermRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

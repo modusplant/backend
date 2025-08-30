@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
 import kr.modusplant.framework.out.persistence.generator.UlidIdGenerator;
-import kr.modusplant.framework.out.persistence.repository.CommPostRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.CommPostRepository;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostViewCountRedisRepository;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;

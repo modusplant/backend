@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.modules.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.framework.out.persistence.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;

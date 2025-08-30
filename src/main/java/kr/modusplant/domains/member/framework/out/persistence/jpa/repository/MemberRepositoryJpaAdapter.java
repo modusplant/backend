@@ -1,9 +1,9 @@
 package kr.modusplant.domains.member.framework.out.persistence.jpa.repository;
 
-import kr.modusplant.domains.member.adapter.out.repository.MemberRepository;
-import kr.modusplant.domains.member.domain.entity.Member;
+import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.framework.out.persistence.jpa.mapper.MemberJpaMapperImpl;
 import kr.modusplant.domains.member.framework.out.persistence.jpa.repository.supers.MemberJpaRepository;
+import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

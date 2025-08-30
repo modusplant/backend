@@ -1,10 +1,10 @@
 package kr.modusplant.legacy.domains.communication.mapper;
 
-import kr.modusplant.framework.out.persistence.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommPostResponse;
-import kr.modusplant.framework.out.persistence.entity.CommPostEntity;
-import kr.modusplant.framework.out.persistence.entity.CommPrimaryCategoryEntity;
-import kr.modusplant.framework.out.persistence.entity.CommSecondaryCategoryEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

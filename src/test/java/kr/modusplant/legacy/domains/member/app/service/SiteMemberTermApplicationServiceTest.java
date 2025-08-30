@@ -1,9 +1,9 @@
 package kr.modusplant.legacy.domains.member.app.service;
 
-import kr.modusplant.framework.out.persistence.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.persistence.entity.SiteMemberTermEntity;
-import kr.modusplant.framework.out.persistence.repository.SiteMemberRepository;
-import kr.modusplant.framework.out.persistence.repository.SiteMemberTermRepository;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberTermEntity;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberTermRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberTermUpdateRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberTermResponse;

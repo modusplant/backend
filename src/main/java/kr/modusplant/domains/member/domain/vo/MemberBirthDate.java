@@ -13,7 +13,7 @@ import java.time.LocalDate;
 public class MemberBirthDate {
     private final LocalDate value;
 
-    public static MemberBirthDate of(LocalDate value) {
+    public static MemberBirthDate create(LocalDate value) {
         return new MemberBirthDate(value);
     }
 

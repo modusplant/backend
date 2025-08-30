@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.modules.security.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.framework.out.persistence.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.modules.auth.normal.login.common.util.app.http.request.NormalLoginRequestTestUtils;

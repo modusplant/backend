@@ -1,9 +1,10 @@
 package kr.modusplant.framework.out.persistence.repository;
 
+import kr.modusplant.framework.out.persistence.jpa.entity.CommLikeEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.compositekey.CommPostLikeId;
+import kr.modusplant.framework.out.persistence.jpa.repository.CommLikeRepository;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommLikeEntityTestUtils;
-import kr.modusplant.framework.out.persistence.entity.CommLikeEntity;
-import kr.modusplant.framework.out.persistence.entity.compositekey.CommPostLikeId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

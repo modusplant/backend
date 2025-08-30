@@ -1,10 +1,10 @@
 package kr.modusplant.legacy.domains.member.domain.service;
 
 import kr.modusplant.framework.out.persistence.constant.EntityName;
-import kr.modusplant.framework.out.persistence.entity.SiteMemberAuthEntity;
-import kr.modusplant.framework.out.persistence.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.persistence.repository.SiteMemberAuthRepository;
-import kr.modusplant.framework.out.persistence.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberAuthEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberAuthRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberAuthTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTestUtils;

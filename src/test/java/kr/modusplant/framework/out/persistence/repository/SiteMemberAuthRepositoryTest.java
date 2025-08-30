@@ -1,7 +1,9 @@
 package kr.modusplant.framework.out.persistence.repository;
 
-import kr.modusplant.framework.out.persistence.entity.SiteMemberAuthEntity;
-import kr.modusplant.framework.out.persistence.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberAuthEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberAuthRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;

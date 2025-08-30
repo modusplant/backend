@@ -12,7 +12,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class MemberNickname {
     private final String value;
 
-    public static MemberNickname of(String value) {
+    public static MemberNickname create(String value) {
         if (value == null) {
             throw new EmptyMemberNicknameException();
         }

@@ -1,8 +1,8 @@
 package kr.modusplant.legacy.domains.member.mapper;
 
-import kr.modusplant.framework.out.persistence.entity.SiteMemberAuthEntity;
-import kr.modusplant.framework.out.persistence.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.persistence.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberAuthEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberAuthInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberAuthResponse;
 import org.mapstruct.Context;

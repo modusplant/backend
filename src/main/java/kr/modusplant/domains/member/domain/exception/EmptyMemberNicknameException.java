@@ -5,6 +5,6 @@ import kr.modusplant.shared.exception.BusinessException;
 
 public class EmptyMemberNicknameException extends BusinessException {
     public EmptyMemberNicknameException() {
-        super(MemberErrorCode.EMPTY_NICKNAME);
+        super(MemberErrorCode.EMPTY_MEMBER_NICKNAME);
     }
 }

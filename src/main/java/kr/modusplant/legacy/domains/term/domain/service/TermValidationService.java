@@ -1,8 +1,8 @@
 package kr.modusplant.legacy.domains.term.domain.service;
 
+import kr.modusplant.framework.out.persistence.jpa.repository.TermRepository;
 import kr.modusplant.legacy.domains.term.error.TermExistsException;
 import kr.modusplant.legacy.domains.term.error.TermNotFoundException;
-import kr.modusplant.framework.out.persistence.repository.TermRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
