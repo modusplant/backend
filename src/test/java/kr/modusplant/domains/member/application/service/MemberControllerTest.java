@@ -19,7 +19,7 @@ import static org.mockito.BDDMockito.given;
 class MemberControllerTest implements MemberTestUtils, MemberRequestTestUtils {
     private final MemberMapper memberMapper = new MemberMapperImpl();
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryJpaAdapter.class);
-    private final MemberController memberService = new MemberController(memberMapper, memberRepository);
+    private final MemberController memberController = new MemberController(memberMapper, memberRepository);
 
     @Test
     @DisplayName("updateNickname으로 닉네임 갱신")
@@ -29,7 +29,7 @@ class MemberControllerTest implements MemberTestUtils, MemberRequestTestUtils {
         given(memberRepository.updateNickname(any())).willReturn(member);
 
         // when & then
-        assertThat(memberService.updateNickname(testMemberNicknameUpdateRequest).nickname()).isEqualTo(member.getMemberNickname().getValue());
+        assertThat(memberController.updateNickname(testMemberNicknameUpdateRequest).nickname()).isEqualTo(member.getMemberNickname().getValue());
     }
 
     @Test
@@ -40,6 +40,6 @@ class MemberControllerTest implements MemberTestUtils, MemberRequestTestUtils {
         given(memberRepository.save(any())).willReturn(member);
 
         // when & then
-        assertThat(memberService.register(testMemberRegisterRequest).nickname()).isEqualTo(member.getMemberNickname().getValue());
+        assertThat(memberController.register(testMemberRegisterRequest).nickname()).isEqualTo(member.getMemberNickname().getValue());
     }
 }

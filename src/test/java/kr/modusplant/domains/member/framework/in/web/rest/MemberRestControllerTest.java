@@ -15,14 +15,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 class MemberRestControllerTest implements MemberTestUtils, MemberRequestTestUtils, MemberResponseTestUtils {
-    private final MemberController memberService = Mockito.mock(MemberController.class);
-    private final MemberRestController memberRestController = new MemberRestController(memberService);
+    private final MemberController memberController = Mockito.mock(MemberController.class);
+    private final MemberRestController memberRestController = new MemberRestController(memberController);
 
     @Test
     @DisplayName("registerMember로 응답 반환")
     void callRegisterMember_withValidRequest_returnsResponse() {
         // given
-        given(memberService.register(testMemberRegisterRequest)).willReturn(testMemberResponse);
+        given(memberController.register(testMemberRegisterRequest)).willReturn(testMemberResponse);
 
         // when
         ResponseEntity<MemberResponse> memberResponseEntity = memberRestController.registerMember(testMemberRegisterRequest);
@@ -36,7 +36,7 @@ class MemberRestControllerTest implements MemberTestUtils, MemberRequestTestUtil
     @DisplayName("updateMemberNickname으로 응답 반환")
     void callUpdateMemberNickname_withValidRequest_returnsResponse() {
         // given
-        given(memberService.updateNickname(testMemberNicknameUpdateRequest)).willReturn(testMemberResponse);
+        given(memberController.updateNickname(testMemberNicknameUpdateRequest)).willReturn(testMemberResponse);
 
         // when
         ResponseEntity<MemberResponse> memberResponseEntity = memberRestController.updateMemberNickname(testMemberNicknameUpdateRequest);
