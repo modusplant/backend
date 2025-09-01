@@ -1,13 +1,16 @@
 package kr.modusplant.framework.out.jackson.http.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import kr.modusplant.framework.out.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.exception.enums.SuccessCode;
 import kr.modusplant.shared.exception.enums.supers.ResponseCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 @Getter
@@ -69,11 +72,26 @@ public class DataResponse<T> {
         return response;
     }
 
+    @SneakyThrows
+    @Override
+    public String toString() {
+        HashMap<String, Object> map = new HashMap<>(){{
+            put("status", status);
+            put("code", code);
+        }};
+        if (message != null) {
+            map.put("message", message);
+        }
+        if (data != null) {
+            map.put("data", data);
+        }
+        return ObjectMapperHolder.getObjectMapper().writeValueAsString(map);
+    }
+
     private static String generateErrorDetail(Collection<?> errorFieldNames) {
         String arrangedNames = errorFieldNames.stream()
                 .map(fieldName -> fieldName + ", ")
                 .collect(Collectors.joining());
         return arrangedNames.substring(0, arrangedNames.length() - 2);
     }
-
 }

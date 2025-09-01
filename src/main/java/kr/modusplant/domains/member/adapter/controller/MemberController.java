@@ -6,9 +6,14 @@ import kr.modusplant.domains.member.adapter.response.MemberResponse;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
+import kr.modusplant.infrastructure.event.bus.EventBus;
+import kr.modusplant.shared.event.CommPostLikeEvent;
+import kr.modusplant.shared.event.CommPostUnlikeEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -16,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberController {
     private final MemberMapper mapper;
     private final MemberRepository memberRepository;
+    private final EventBus eventBus;
 
     public MemberResponse register(MemberRegisterRequest request) {
         Member member = Member.create(mapper.toNickname(request));
@@ -25,5 +31,13 @@ public class MemberController {
     public MemberResponse updateNickname(MemberNicknameUpdateRequest request) {
         Member member = mapper.toMember(request);
         return mapper.toMemberResponse(memberRepository.updateNickname(member));
+    }
+
+    public void likePost(UUID memberId, String postUlid) {
+        eventBus.publish(CommPostLikeEvent.create(memberId, postUlid));
+    }
+
+    public void unlikePost(UUID memberId, String postUlid) {
+        eventBus.publish(CommPostUnlikeEvent.create(memberId, postUlid));
     }
 }
