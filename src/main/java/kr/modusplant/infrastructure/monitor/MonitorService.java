@@ -1,4 +1,4 @@
-package kr.modusplant.legacy.modules.monitor;
+package kr.modusplant.infrastructure.monitor;
 
 import kr.modusplant.framework.out.persistence.redis.RedisHelper;
 import lombok.RequiredArgsConstructor;

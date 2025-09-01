@@ -1,12 +1,10 @@
-package kr.modusplant.legacy.modules.monitor;
+package kr.modusplant.infrastructure.monitor;
 
 import kr.modusplant.framework.out.persistence.redis.RedisHelper;
-import kr.modusplant.legacy.modules.common.context.ModulesServiceWithoutValidationServiceContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.mockito.Mockito;
 
 import java.time.Duration;
 
@@ -14,28 +12,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-@ModulesServiceWithoutValidationServiceContext
 public class MonitorServiceTest {
-    @MockitoBean
-    RedisHelper redisHelper;
-
-    @Autowired
-    MonitorService monitorService;
+    RedisHelper redisHelper = Mockito.mock(RedisHelper.class);
+    MonitorService monitorService = new MonitorService(redisHelper);
 
     @Nested
     @DisplayName("performBusinessLogic 테스트")
     class PerformBusinessLogicTest {
 
         @Test
-        @DisplayName("정상 동작 시 성공 메시지 반환")
-        void shouldReturnSuccessMessageWhenNoError() {
+        @DisplayName("true와 함께 호출 시 성공 메시지 반환")
+        void callPerformBusinessLogic_withTrue_returnsSuccessMessage() {
             String result = monitorService.performBusinessLogic(true);
             assertThat(result).isEqualTo("Business logic executed successfully!");
         }
 
         @Test
-        @DisplayName("예외 플래그 시 RuntimeException 발생")
-        void shouldThrowExceptionWhenError() {
+        @DisplayName("false와 함께 호출 시 예외 발생")
+        void callPerformBusinessLogic_withFalse_throwsException() {
             assertThatThrownBy(() -> monitorService.performBusinessLogic(false))
                     .isInstanceOf(RuntimeException.class)
                     .hasMessageContaining("Exception occurred during the business logic execution");
@@ -47,8 +41,8 @@ public class MonitorServiceTest {
     class MonitorRedisHelperTest {
 
         @Test
-        @DisplayName("RedisHelper 정상 호출 시 성공 메시지 반환")
-        void shouldStoreStringsInRedisAndReturnSuccess() {
+        @DisplayName("정상 호출 시 성공 메시지 반환")
+        void callMonitorRedisHelper_withNormalState_returnsSuccessMessage() {
             // when
             String result = monitorService.monitorRedisHelper();
 
@@ -64,8 +58,8 @@ public class MonitorServiceTest {
         }
 
         @Test
-        @DisplayName("RedisHelper 예외 발생 시 RuntimeException 반환")
-        void shouldThrowRuntimeExceptionWhenRedisFails() {
+        @DisplayName("RedisHelper 가동 실패 시 예외 발생")
+        void callMonitorRedisHelper_withRedisHelperFailure_throwsException() {
             // given
             doThrow(new RuntimeException("Redis failure"))
                     .when(redisHelper).setString(eq("test-redis-key"), any());
