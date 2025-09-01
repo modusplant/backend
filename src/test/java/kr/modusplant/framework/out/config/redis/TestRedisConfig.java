@@ -2,7 +2,6 @@ package kr.modusplant.framework.out.config.redis;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
@@ -74,7 +73,7 @@ public class TestRedisConfig {
         ObjectMapper objectMapper = new ObjectMapper()
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                .activateDefaultTyping(typeValidator, DefaultTyping.NON_FINAL_AND_ENUMS)
+                .activateDefaultTyping(typeValidator, ObjectMapper.DefaultTyping.NON_FINAL_AND_ENUMS)
                 .registerModule(new JavaTimeModule());
 
         return new GenericJackson2JsonRedisSerializer(objectMapper);
