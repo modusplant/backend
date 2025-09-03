@@ -1,12 +1,12 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
 import kr.modusplant.framework.out.persistence.constant.EntityName;
+import kr.modusplant.framework.out.persistence.jpa.entity.CommLikeEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.out.persistence.jpa.repository.CommLikeRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.CommPostRepository;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommLikeResponse;
 import kr.modusplant.legacy.domains.communication.domain.service.CommLikeValidationService;
-import kr.modusplant.legacy.domains.communication.persistence.entity.CommLikeEntity;
-import kr.modusplant.legacy.domains.communication.persistence.entity.CommPostEntity;
-import kr.modusplant.legacy.domains.communication.persistence.repository.CommLikeRepository;
-import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostRepository;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;

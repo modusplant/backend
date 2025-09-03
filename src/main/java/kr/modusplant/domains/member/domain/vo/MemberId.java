@@ -1,5 +1,6 @@
 package kr.modusplant.domains.member.domain.vo;
 
+import kr.modusplant.domains.member.domain.exception.EmptyMemberIdException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +19,16 @@ public class MemberId {
     }
 
     public static MemberId fromUuid(UUID uuid) {
+        if (uuid == null) {
+            throw new EmptyMemberIdException();
+        }
         return new MemberId(uuid);
     }
 
     public static MemberId fromString(String value) {
+        if (value == null) {
+            throw new EmptyMemberIdException();
+        }
         return new MemberId(UUID.fromString(value));
     }
 

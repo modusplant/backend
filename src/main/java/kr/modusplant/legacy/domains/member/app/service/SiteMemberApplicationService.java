@@ -1,5 +1,7 @@
 package kr.modusplant.legacy.domains.member.app.service;
 
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.domains.common.app.service.supers.UuidCrudApplicationService;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberUpdateRequest;
@@ -7,8 +9,6 @@ import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberResponse;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAppInfraMapper;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAppInfraMapperImpl;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;

@@ -13,14 +13,12 @@ import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberRoleTest
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
 import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
-import kr.modusplant.legacy.modules.security.config.SecurityConfig;
 import kr.modusplant.legacy.modules.security.enums.SecurityErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -33,7 +31,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Import(SecurityConfig.class)
 public class AuthorizationFlowTest implements
         SiteMemberTestUtils, SiteMemberRoleTestUtils,
         CommCommentInsertRequestTestUtils, CommPostTestUtils, CommCommentResponseTestUtils {
@@ -105,5 +102,6 @@ public class AuthorizationFlowTest implements
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.status").value(SecurityErrorCode.ACCESS_DENIED.getHttpStatus().getValue()))
                 .andExpect(jsonPath("$.code").value(SecurityErrorCode.ACCESS_DENIED.getCode()))
-                .andExpect(jsonPath("$.message").isNotEmpty());    }
+                .andExpect(jsonPath("$.message").isNotEmpty());
+    }
 }

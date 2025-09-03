@@ -1,8 +1,8 @@
 package kr.modusplant.legacy.domains.member.common.util.entity;
 
+import static kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberAuthEntity.SiteMemberAuthEntityBuilder;
+import static kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberAuthEntity.builder;
 import static kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberAuthTestUtils.*;
-import static kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberAuthEntity.SiteMemberAuthEntityBuilder;
-import static kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberAuthEntity.builder;
 
 public interface SiteMemberAuthEntityTestUtils extends SiteMemberEntityTestUtils {
 

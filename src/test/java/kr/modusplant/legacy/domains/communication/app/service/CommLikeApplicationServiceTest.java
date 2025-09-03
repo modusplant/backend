@@ -1,19 +1,19 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
 import kr.modusplant.framework.out.persistence.constant.EntityName;
+import kr.modusplant.framework.out.persistence.jpa.entity.CommLikeEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.compositekey.CommPostLikeId;
+import kr.modusplant.framework.out.persistence.jpa.repository.CommLikeRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.CommPostRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommLikeResponse;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommLikeEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.domain.service.CommLikeValidationService;
-import kr.modusplant.legacy.domains.communication.persistence.entity.CommLikeEntity;
-import kr.modusplant.legacy.domains.communication.persistence.entity.CommLikeId;
-import kr.modusplant.legacy.domains.communication.persistence.entity.CommPostEntity;
-import kr.modusplant.legacy.domains.communication.persistence.repository.CommLikeRepository;
-import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostRepository;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
@@ -76,8 +76,8 @@ class CommLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         assertThat(response.liked()).isTrue();
         assertThat(response.likeCount()).isEqualTo(1);
 
-        when(commLikeRepository.findById(new CommLikeId(postId, memberId))).thenReturn(Optional.of(commLike));
-        CommLikeEntity saved = commLikeRepository.findById(new CommLikeId(postId, memberId)).orElse(null);
+        when(commLikeRepository.findById(new CommPostLikeId(postId, memberId))).thenReturn(Optional.of(commLike));
+        CommLikeEntity saved = commLikeRepository.findById(new CommPostLikeId(postId, memberId)).orElse(null);
 
         assertThat(saved).isNotNull();
     }

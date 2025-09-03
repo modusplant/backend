@@ -1,5 +1,9 @@
 package kr.modusplant.legacy.domains.member.app.service;
 
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberRoleEntity;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRoleRepository;
 import kr.modusplant.legacy.domains.common.app.service.supers.UuidCrudApplicationService;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberRoleInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberRoleUpdateRequest;
@@ -8,10 +12,6 @@ import kr.modusplant.legacy.domains.member.domain.service.SiteMemberRoleValidati
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberRoleAppInfraMapper;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberRoleAppInfraMapperImpl;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberRoleEntity;
-import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRoleRepository;
 import kr.modusplant.legacy.modules.security.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;

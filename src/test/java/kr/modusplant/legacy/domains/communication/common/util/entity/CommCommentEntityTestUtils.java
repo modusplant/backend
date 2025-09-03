@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.common.util.entity;
 
-import kr.modusplant.legacy.domains.communication.persistence.entity.CommCommentEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.CommCommentEntity;
 
 public interface CommCommentEntityTestUtils extends CommPostEntityTestUtils {
 

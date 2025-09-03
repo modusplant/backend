@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.modules.jwt.app.service;
 
 import kr.modusplant.framework.out.persistence.constant.EntityName;
-import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.legacy.modules.jwt.mapper.RefreshTokenAppInfraMapper;
 import kr.modusplant.legacy.modules.jwt.persistence.entity.RefreshTokenEntity;

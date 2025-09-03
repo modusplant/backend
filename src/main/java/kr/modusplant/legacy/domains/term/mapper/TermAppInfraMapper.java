@@ -1,8 +1,8 @@
 package kr.modusplant.legacy.domains.term.mapper;
 
+import kr.modusplant.framework.out.persistence.jpa.entity.TermEntity;
 import kr.modusplant.legacy.domains.term.app.http.request.TermInsertRequest;
 import kr.modusplant.legacy.domains.term.app.http.response.TermResponse;
-import kr.modusplant.legacy.domains.term.persistence.entity.TermEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.modules.jwt.persistence.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,13 +1,13 @@
 package kr.modusplant.legacy.domains.term.app.service;
 
+import kr.modusplant.framework.out.persistence.jpa.entity.TermEntity;
+import kr.modusplant.framework.out.persistence.jpa.repository.TermRepository;
 import kr.modusplant.legacy.domains.term.app.http.request.TermInsertRequest;
 import kr.modusplant.legacy.domains.term.app.http.request.TermUpdateRequest;
 import kr.modusplant.legacy.domains.term.app.http.response.TermResponse;
 import kr.modusplant.legacy.domains.term.domain.service.TermValidationService;
 import kr.modusplant.legacy.domains.term.mapper.TermAppInfraMapper;
 import kr.modusplant.legacy.domains.term.mapper.TermAppInfraMapperImpl;
-import kr.modusplant.legacy.domains.term.persistence.entity.TermEntity;
-import kr.modusplant.legacy.domains.term.persistence.repository.TermRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;

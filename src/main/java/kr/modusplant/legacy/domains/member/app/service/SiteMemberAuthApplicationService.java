@@ -1,5 +1,9 @@
 package kr.modusplant.legacy.domains.member.app.service;
 
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberAuthEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberAuthRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.domains.common.app.service.supers.UuidCrudApplicationService;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberAuthInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberAuthUpdateRequest;
@@ -9,10 +13,6 @@ import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationSe
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthAppInfraMapper;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthAppInfraMapperImpl;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberAuthEntity;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberAuthRepository;
-import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;

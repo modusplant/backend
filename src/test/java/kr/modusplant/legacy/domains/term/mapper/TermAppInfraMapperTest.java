@@ -1,11 +1,11 @@
 package kr.modusplant.legacy.domains.term.mapper;
 
+import kr.modusplant.framework.out.persistence.jpa.entity.TermEntity;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.term.app.http.response.TermResponse;
 import kr.modusplant.legacy.domains.term.common.util.app.http.request.TermRequestTestUtils;
 import kr.modusplant.legacy.domains.term.common.util.app.http.response.TermResponseTestUtils;
 import kr.modusplant.legacy.domains.term.common.util.entity.TermEntityTestUtils;
-import kr.modusplant.legacy.domains.term.persistence.entity.TermEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

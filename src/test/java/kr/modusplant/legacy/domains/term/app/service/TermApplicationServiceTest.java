@@ -1,5 +1,7 @@
 package kr.modusplant.legacy.domains.term.app.service;
 
+import kr.modusplant.framework.out.persistence.jpa.entity.TermEntity;
+import kr.modusplant.framework.out.persistence.jpa.repository.TermRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.term.app.http.response.TermResponse;
 import kr.modusplant.legacy.domains.term.common.util.app.http.request.TermRequestTestUtils;
@@ -7,8 +9,6 @@ import kr.modusplant.legacy.domains.term.common.util.app.http.response.TermRespo
 import kr.modusplant.legacy.domains.term.common.util.entity.TermEntityTestUtils;
 import kr.modusplant.legacy.domains.term.mapper.TermAppInfraMapper;
 import kr.modusplant.legacy.domains.term.mapper.TermAppInfraMapperImpl;
-import kr.modusplant.legacy.domains.term.persistence.entity.TermEntity;
-import kr.modusplant.legacy.domains.term.persistence.repository.TermRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

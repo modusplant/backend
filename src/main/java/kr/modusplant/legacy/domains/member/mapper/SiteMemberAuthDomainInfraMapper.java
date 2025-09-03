@@ -1,8 +1,8 @@
 package kr.modusplant.legacy.domains.member.mapper;
 
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberAuthEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
 import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberAuthEntity;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

@@ -1,5 +1,9 @@
 package kr.modusplant.legacy.domains.member.app.service;
 
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberTermEntity;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberTermRepository;
 import kr.modusplant.legacy.domains.common.app.service.supers.UuidCrudApplicationService;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberTermInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberTermUpdateRequest;
@@ -8,10 +12,6 @@ import kr.modusplant.legacy.domains.member.domain.service.SiteMemberTermValidati
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberTermAppInfraMapper;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberTermAppInfraMapperImpl;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberEntity;
-import kr.modusplant.legacy.domains.member.persistence.entity.SiteMemberTermEntity;
-import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberRepository;
-import kr.modusplant.legacy.domains.member.persistence.repository.SiteMemberTermRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
