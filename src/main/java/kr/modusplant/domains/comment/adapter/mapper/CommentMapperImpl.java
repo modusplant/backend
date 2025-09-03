@@ -21,4 +21,5 @@ public class CommentMapperImpl implements CommentMapper {
                 CommentContent.create(request.content())
         );
     }
+
 }

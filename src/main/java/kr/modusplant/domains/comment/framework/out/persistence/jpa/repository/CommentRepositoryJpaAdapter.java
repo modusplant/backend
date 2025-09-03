@@ -2,6 +2,7 @@ package kr.modusplant.domains.comment.framework.out.persistence.jpa.repository;
 
 import kr.modusplant.domains.comment.adapter.repository.CommentRepository;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.CommentCompositeKey;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper.CommentJpaMapper;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.supers.CommentJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,4 +18,8 @@ public class CommentRepositoryJpaAdapter implements CommentRepository {
     public void save(Comment comment) {
         jpaRepository.save(jpaMapper.toCommentEntity(comment));
     }
+
+    @Override
+    public void deleteById(CommentCompositeKey id) { jpaRepository.deleteById(id); }
+
 }
