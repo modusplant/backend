@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.CommentCompositeKey;
 import kr.modusplant.domains.member.framework.out.persistence.jpa.entity.MemberEntity;
 import kr.modusplant.framework.out.persistence.annotation.DefaultValue;
-import kr.modusplant.legacy.domains.communication.persistence.entity.CommCommentEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -57,19 +56,17 @@ public class CommentEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CommCommentEntity that)) return false;
+        if (!(o instanceof CommentEntity that)) return false;
 
         return new EqualsBuilder()
-                .append(id.getPostUlid(), that.getPostUlid())
-                .append(id.getPath(), that.getPath())
+                .append(getId(), that.getId())
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(id.getPostUlid())
-                .append(id.getPath())
+                .append(getId())
                 .toHashCode();
     }
 
