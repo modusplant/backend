@@ -1,6 +1,9 @@
 package kr.modusplant.domains.member.domain.aggregate;
 
+import kr.modusplant.domains.member.domain.exception.EmptyMemberBirthDateException;
+import kr.modusplant.domains.member.domain.exception.EmptyMemberIdException;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberNicknameException;
+import kr.modusplant.domains.member.domain.exception.EmptyMemberStatusException;
 import kr.modusplant.domains.member.domain.vo.MemberBirthDate;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberNickname;
@@ -19,19 +22,35 @@ public class Member {
     private MemberNickname memberNickname;
     private MemberBirthDate memberBirthDate;
 
-    public static Member create(MemberId memberId, MemberStatus memberStatus, MemberNickname memberNickname, MemberBirthDate memberBirthDate) {
-        return new Member(memberId, memberStatus, memberNickname, memberBirthDate);
+    public static Member create(MemberId id, MemberStatus status, MemberNickname nickname, MemberBirthDate birthDate) {
+        if (id == null) {
+            throw new EmptyMemberIdException();
+        } else if (status == null) {
+            throw new EmptyMemberStatusException();
+        } else if (nickname == null) {
+            throw new EmptyMemberNicknameException();
+        } else if (birthDate == null) {
+            throw new EmptyMemberBirthDateException();
+        }
+        return new Member(id, status, nickname, birthDate);
     }
 
-    public static Member create(MemberId memberId, MemberStatus status, MemberNickname memberNickname) {
-        return new Member(memberId, status, memberNickname, null);
-    }
-
-    public static Member create(MemberNickname memberNickname) {
-        if (memberNickname.isEmpty()) {
+    public static Member create(MemberId id, MemberStatus status, MemberNickname nickname) {
+        if (id == null) {
+            throw new EmptyMemberIdException();
+        } else if (status == null) {
+            throw new EmptyMemberStatusException();
+        } else if (nickname == null) {
             throw new EmptyMemberNicknameException();
         }
-        return new Member(MemberId.generate(), MemberStatus.active(), memberNickname, null);
+        return new Member(id, status, nickname, null);
+    }
+
+    public static Member create(MemberNickname nickname) {
+        if (nickname == null) {
+            throw new EmptyMemberNicknameException();
+        }
+        return new Member(MemberId.generate(), MemberStatus.active(), nickname, null);
     }
 
     @Override
