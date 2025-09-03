@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-@Tag(name = "회원 API", description = "회원의 생명 주기와 상태, 회원이 할 수 있는 단일한 기능을 관리하는 API 입니다.")
+@Tag(name = "회원 API", description = "회원의 생성과 갱신(상태 제외), 회원이 할 수 있는 단일한 기능을 관리하는 API 입니다.")
 @RestController
 @RequestMapping("/api/v1/members")
 @RequiredArgsConstructor
