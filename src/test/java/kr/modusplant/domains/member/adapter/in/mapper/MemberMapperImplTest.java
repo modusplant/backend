@@ -16,7 +16,7 @@ class MemberMapperImplTest implements MemberTestUtils, MemberRequestTestUtils, M
     @Test
     @DisplayName("toNickname으로 닉네임 반환")
     void callToNickname_withValidRegisterRequest_returnsNickname() {
-        assertThat(memberMapper.toNickname(testMemberRegisterRequest)).isEqualTo(TEST_MEMBER_NICKNAME);
+        assertThat(memberMapper.toNickname(testMemberRegisterRequest)).isEqualTo(testMemberNickname);
     }
 
     @Test

@@ -13,12 +13,12 @@ class MemberJpaMapperImplTest implements MemberEntityTestUtils {
     @Test
     @DisplayName("toMemberEntity로 엔터티 반환")
     void callToMemberEntity_withValidMember_returnsEntity() {
-        assertThat(memberJpaMapper.toMemberEntity(createMember())).isEqualTo(createMemberEntity());
+        assertThat(memberJpaMapper.toMemberEntity(createMember())).isEqualTo(createMemberEntityWithUuid());
     }
 
     @Test
     @DisplayName("toMember로 회원 반환")
     void callToMember_withValidMemberEntity_returnsMember() {
-        assertThat(memberJpaMapper.toMember(createMemberEntity())).isEqualTo(createMember());
+        assertThat(memberJpaMapper.toMember(createMemberEntityWithUuid())).isEqualTo(createMember());
     }
 }

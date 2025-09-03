@@ -22,7 +22,7 @@ class MemberRepositoryJpaAdapterTest implements MemberEntityTestUtils {
     void callUpdateNickname_withValidMember_returnsMember() {
         // given
         Member member = createMember();
-        MemberEntity memberEntity = createMemberEntity();
+        MemberEntity memberEntity = createMemberEntityWithUuid();
         given(memberJpaRepository.save(memberEntity)).willReturn(memberEntity);
 
         // when & then
@@ -34,7 +34,7 @@ class MemberRepositoryJpaAdapterTest implements MemberEntityTestUtils {
     void callSave_withValidMember_returns() {
         // given
         Member member = createMember();
-        MemberEntity memberEntity = createMemberEntity();
+        MemberEntity memberEntity = createMemberEntityWithUuid();
         given(memberJpaRepository.save(memberEntity)).willReturn(memberEntity);
 
         // when & then

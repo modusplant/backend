@@ -24,17 +24,17 @@ class SiteMemberEntityTest implements SiteMemberEntityTestUtils {
     @Test
     void prePersist() {
         // given
-        SiteMemberEntity member = SiteMemberEntity.builder().memberEntity(createMemberBasicUserEntity()).isActive(false).isDisabledByLinking(true).isBanned(true).isDeleted(true).build();
+        SiteMemberEntity member = SiteMemberEntity.builder().memberEntity(createMemberBasicUserEntity()).isActive(null).isDisabledByLinking(null).isBanned(null).isDeleted(null).build();
 
         // when
         entityManager.persist(member);
         entityManager.flush();
 
         // then
-        assertThat(member.getIsActive()).isEqualTo(false);
-        assertThat(member.getIsDisabledByLinking()).isEqualTo(true);
-        assertThat(member.getIsBanned()).isEqualTo(true);
-        assertThat(member.getIsDeleted()).isEqualTo(true);
+        assertThat(member.getIsActive()).isEqualTo(true);
+        assertThat(member.getIsDisabledByLinking()).isEqualTo(false);
+        assertThat(member.getIsBanned()).isEqualTo(false);
+        assertThat(member.getIsDeleted()).isEqualTo(false);
     }
 
     @DisplayName("회원 PreUpdate")
