@@ -12,11 +12,17 @@ import java.util.UUID;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Author {
     private UUID memberUuid;
-    // TODO: active user 인지 create user 인지 판단하는 로직을 넣어야 할까?
+    private String memberNickname;
 
     public static Author create(UUID memberUuid) {
         if(memberUuid == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR); }
-        return new Author(memberUuid);
+        return new Author(memberUuid, null);
+    }
+
+    public static Author create(UUID memberUuid, String memberNickname) {
+        if(memberUuid == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR); }
+        if(memberNickname == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_MEMBER_NICKNAME); }
+        return new Author(memberUuid, memberNickname);
     }
 
 }
