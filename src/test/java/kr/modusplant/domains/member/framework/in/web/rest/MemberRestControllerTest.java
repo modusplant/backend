@@ -2,9 +2,9 @@ package kr.modusplant.domains.member.framework.in.web.rest;
 
 import kr.modusplant.domains.member.adapter.controller.MemberController;
 import kr.modusplant.domains.member.adapter.response.MemberResponse;
-import kr.modusplant.domains.member.test.utils.adapter.MemberRequestTestUtils;
-import kr.modusplant.domains.member.test.utils.adapter.MemberResponseTestUtils;
-import kr.modusplant.domains.member.test.utils.domain.MemberTestUtils;
+import kr.modusplant.domains.member.common.utils.adapter.MemberRequestTestUtils;
+import kr.modusplant.domains.member.common.utils.adapter.MemberResponseTestUtils;
+import kr.modusplant.domains.member.common.utils.domain.MemberTestUtils;
 import kr.modusplant.framework.out.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import org.junit.jupiter.api.DisplayName;

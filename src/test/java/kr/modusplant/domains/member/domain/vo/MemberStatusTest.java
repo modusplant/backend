@@ -2,8 +2,8 @@ package kr.modusplant.domains.member.domain.vo;
 
 import kr.modusplant.domains.member.domain.exception.EmptyMemberStatusException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
-import kr.modusplant.domains.member.test.utils.domain.MemberIdTestUtils;
-import kr.modusplant.domains.member.test.utils.domain.MemberStatusTestUtils;
+import kr.modusplant.domains.member.common.utils.domain.MemberIdTestUtils;
+import kr.modusplant.domains.member.common.utils.domain.MemberStatusTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

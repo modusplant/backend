@@ -4,7 +4,7 @@ import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.framework.out.persistence.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.out.persistence.jpa.mapper.MemberJpaMapperImpl;
 import kr.modusplant.domains.member.framework.out.persistence.jpa.repository.supers.MemberJpaRepository;
-import kr.modusplant.domains.member.test.utils.framework.MemberEntityTestUtils;
+import kr.modusplant.domains.member.common.utils.framework.MemberEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
