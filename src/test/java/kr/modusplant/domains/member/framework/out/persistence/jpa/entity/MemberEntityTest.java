@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.framework.out.persistence.jpa.entity;
 
-import kr.modusplant.domains.member.test.utils.framework.MemberEntityTestUtils;
+import kr.modusplant.domains.member.common.utils.framework.MemberEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

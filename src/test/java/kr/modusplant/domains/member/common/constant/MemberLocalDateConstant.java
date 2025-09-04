@@ -1,4 +1,4 @@
-package kr.modusplant.domains.member.test.constant;
+package kr.modusplant.domains.member.common.constant;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
