@@ -16,7 +16,6 @@ import kr.modusplant.legacy.domains.communication.app.http.response.CommPostResp
 import kr.modusplant.legacy.domains.communication.domain.service.CommCategoryValidationService;
 import kr.modusplant.legacy.domains.communication.domain.service.CommPostValidationService;
 import kr.modusplant.legacy.domains.communication.mapper.CommPostAppInfraMapper;
-import kr.modusplant.legacy.domains.communication.mapper.CommPostAppInfraMapperImpl;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostViewCountRedisRepository;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostViewLockRedisRepository;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
@@ -48,7 +47,7 @@ public class CommPostApplicationService {
     private final CommSecondaryCategoryRepository commSecondaryCategoryRepository;
     private final CommPostViewCountRedisRepository commPostViewCountRedisRepository;
     private final CommPostViewLockRedisRepository commPostViewLockRedisRepository;
-    private final CommPostAppInfraMapper commPostAppInfraMapper = new CommPostAppInfraMapperImpl();
+    private final CommPostAppInfraMapper commPostAppInfraMapper;
 
     @Value("${redis.ttl.view_count}")
     private long ttlMinutes;

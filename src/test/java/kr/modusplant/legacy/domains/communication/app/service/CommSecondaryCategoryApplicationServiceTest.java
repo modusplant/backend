@@ -7,7 +7,6 @@ import kr.modusplant.legacy.domains.communication.common.util.app.http.request.C
 import kr.modusplant.legacy.domains.communication.common.util.app.http.response.CommCategoryResponseTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.mapper.CommSecondaryCategoryAppInfraMapper;
-import kr.modusplant.legacy.domains.communication.mapper.CommSecondaryCategoryAppInfraMapperImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +24,13 @@ class CommSecondaryCategoryApplicationServiceTest implements CommCategoryRequest
 
     private final CommSecondaryCategoryApplicationService commCategoryApplicationService;
     private final CommSecondaryCategoryRepository commCategoryRepository;
-    private final CommSecondaryCategoryAppInfraMapper commCategoryAppInfraMapper = new CommSecondaryCategoryAppInfraMapperImpl();
+    private final CommSecondaryCategoryAppInfraMapper commCategoryAppInfraMapper;
 
     @Autowired
-    CommSecondaryCategoryApplicationServiceTest(CommSecondaryCategoryApplicationService commCategoryApplicationService, CommSecondaryCategoryRepository commCategoryRepository) {
+    CommSecondaryCategoryApplicationServiceTest(CommSecondaryCategoryApplicationService commCategoryApplicationService, CommSecondaryCategoryRepository commCategoryRepository, CommSecondaryCategoryAppInfraMapper commCategoryAppInfraMapper) {
         this.commCategoryApplicationService = commCategoryApplicationService;
         this.commCategoryRepository = commCategoryRepository;
+        this.commCategoryAppInfraMapper = commCategoryAppInfraMapper;
     }
 
     @DisplayName("모든 컨텐츠 2차 항목 얻기")

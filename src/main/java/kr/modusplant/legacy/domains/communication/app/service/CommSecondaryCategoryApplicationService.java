@@ -6,7 +6,6 @@ import kr.modusplant.legacy.domains.communication.app.http.request.CommCategoryI
 import kr.modusplant.legacy.domains.communication.app.http.response.CommCategoryResponse;
 import kr.modusplant.legacy.domains.communication.domain.service.CommCategoryValidationService;
 import kr.modusplant.legacy.domains.communication.mapper.CommSecondaryCategoryAppInfraMapper;
-import kr.modusplant.legacy.domains.communication.mapper.CommSecondaryCategoryAppInfraMapperImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,7 +25,7 @@ public class CommSecondaryCategoryApplicationService {
 
     private final CommCategoryValidationService validationService;
     private final CommSecondaryCategoryRepository commCategoryRepository;
-    private final CommSecondaryCategoryAppInfraMapper commCategoryAppInfraMapper = new CommSecondaryCategoryAppInfraMapperImpl();
+    private final CommSecondaryCategoryAppInfraMapper commCategoryAppInfraMapper;
 
     @Cacheable(value = "comm_categories")
     public List<CommCategoryResponse> getAll() {
