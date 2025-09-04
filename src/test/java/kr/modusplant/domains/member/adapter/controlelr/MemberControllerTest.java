@@ -12,7 +12,7 @@ import kr.modusplant.framework.out.persistence.jpa.entity.CommLikeEntity;
 import kr.modusplant.framework.out.persistence.jpa.repository.CommLikeRepository;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.event.consumer.PostEventConsumer;
-import kr.modusplant.shared.event.CommPostLikeEventTestUtils;
+import kr.modusplant.shared.event.PostLikeEventTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -26,7 +26,7 @@ import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 
-class MemberControllerTest implements MemberTestUtils, MemberRequestTestUtils, CommPostLikeEventTestUtils {
+class MemberControllerTest implements MemberTestUtils, MemberRequestTestUtils, PostLikeEventTestUtils {
     private final MemberMapper memberMapper = new MemberMapperImpl();
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryJpaAdapter.class);
     private final CommLikeRepository commLikeRepository = Mockito.mock(CommLikeRepository.class);
@@ -60,8 +60,8 @@ class MemberControllerTest implements MemberTestUtils, MemberRequestTestUtils, C
     @DisplayName("likePost로 게시글 좋아요")
     void callLikePost_withValidParameter_returnsVoid() {
         // given
-        UUID memberId = testCommPostLikeEvent.getMemberId();
-        String postId = testCommPostLikeEvent.getPostId();
+        UUID memberId = TEST_POST_LIKE_EVENT.getMemberId();
+        String postId = TEST_POST_LIKE_EVENT.getPostId();
         CommLikeEntity entity = CommLikeEntity.of(postId, memberId);
         given(commLikeRepository.save(entity)).willReturn(entity);
 
@@ -76,8 +76,8 @@ class MemberControllerTest implements MemberTestUtils, MemberRequestTestUtils, C
     @DisplayName("unlikePost로 게시글 좋아요")
     void callUnlikePost_withValidParameter_returnsVoid() {
         // given
-        UUID memberId = testCommPostLikeEvent.getMemberId();
-        String postId = testCommPostLikeEvent.getPostId();
+        UUID memberId = TEST_POST_LIKE_EVENT.getMemberId();
+        String postId = TEST_POST_LIKE_EVENT.getPostId();
         CommLikeEntity entity = CommLikeEntity.of(postId, memberId);
         willDoNothing().given(commLikeRepository).delete(entity);
 

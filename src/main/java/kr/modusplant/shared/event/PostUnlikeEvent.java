@@ -10,17 +10,17 @@ import java.util.UUID;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class CommPostUnlikeEvent {
+public class PostUnlikeEvent {
     private final UUID memberId;
     private final String postId;
 
-    public static CommPostUnlikeEvent create(UUID memberId, String postId) {
+    public static PostUnlikeEvent create(UUID memberId, String postId) {
         if (memberId == null) {
             throw new InvalidDataException(ErrorCode.MEMBER_NOT_FOUND, "memberId");
         } else if (postId.isEmpty()) {
             throw new InvalidDataException(ErrorCode.POST_NOT_FOUND, "postId");
         } else {
-            return new CommPostUnlikeEvent(memberId, postId);
+            return new PostUnlikeEvent(memberId, postId);
         }
     }
 }
