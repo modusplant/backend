@@ -1,6 +1,5 @@
-package kr.modusplant.domains.member.adapter.controlelr;
+package kr.modusplant.domains.member.adapter.controller;
 
-import kr.modusplant.domains.member.adapter.controller.MemberController;
 import kr.modusplant.domains.member.adapter.mapper.MemberMapperImpl;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.framework.out.persistence.jpa.repository.MemberRepositoryJpaAdapter;
