@@ -1,6 +1,5 @@
-package kr.modusplant.domains.member.adapter.in.mapper;
+package kr.modusplant.domains.member.adapter.mapper;
 
-import kr.modusplant.domains.member.adapter.mapper.MemberMapperImpl;
 import kr.modusplant.domains.member.common.utils.adapter.MemberRequestTestUtils;
 import kr.modusplant.domains.member.common.utils.adapter.MemberResponseTestUtils;
 import kr.modusplant.domains.member.common.utils.domain.MemberTestUtils;

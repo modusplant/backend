@@ -1,4 +1,4 @@
-package kr.modusplant.domains.member.application.service;
+package kr.modusplant.domains.member.adapter.controlelr;
 
 import kr.modusplant.domains.member.adapter.controller.MemberController;
 import kr.modusplant.domains.member.adapter.mapper.MemberMapperImpl;
