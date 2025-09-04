@@ -8,7 +8,6 @@ import kr.modusplant.legacy.domains.term.common.util.app.http.request.TermReques
 import kr.modusplant.legacy.domains.term.common.util.app.http.response.TermResponseTestUtils;
 import kr.modusplant.legacy.domains.term.common.util.entity.TermEntityTestUtils;
 import kr.modusplant.legacy.domains.term.mapper.TermAppInfraMapper;
-import kr.modusplant.legacy.domains.term.mapper.TermAppInfraMapperImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +25,13 @@ class TermApplicationServiceTest implements TermRequestTestUtils, TermResponseTe
 
     private final TermApplicationService termApplicationService;
     private final TermRepository termRepository;
-    private final TermAppInfraMapper termAppInfraMapper = new TermAppInfraMapperImpl();
+    private final TermAppInfraMapper termAppInfraMapper;
 
     @Autowired
-    TermApplicationServiceTest(TermApplicationService termApplicationService, TermRepository termRepository) {
+    TermApplicationServiceTest(TermApplicationService termApplicationService, TermRepository termRepository, TermAppInfraMapper termAppInfraMapper) {
         this.termApplicationService = termApplicationService;
         this.termRepository = termRepository;
+        this.termAppInfraMapper = termAppInfraMapper;
     }
 
     @DisplayName("uuid로 약관 얻기")
