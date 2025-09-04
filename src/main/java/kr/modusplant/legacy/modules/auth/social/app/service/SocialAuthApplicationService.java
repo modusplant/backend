@@ -10,7 +10,6 @@ import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRoleRepo
 import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthDomainInfraMapper;
-import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthDomainInfraMapperImpl;
 import kr.modusplant.legacy.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.legacy.modules.auth.social.app.dto.supers.SocialUserInfo;
 import kr.modusplant.legacy.modules.auth.social.app.service.supers.SocialAuthClient;
@@ -34,7 +33,7 @@ public class SocialAuthApplicationService {
     private final SiteMemberRepository memberRepository;
     private final SiteMemberAuthRepository memberAuthRepository;
     private final SiteMemberRoleRepository memberRoleRepository;
-    private final SiteMemberAuthDomainInfraMapper memberAuthEntityMapper = new SiteMemberAuthDomainInfraMapperImpl();
+    private final SiteMemberAuthDomainInfraMapper memberAuthEntityMapper;
 
     public JwtUserPayload handleSocialLogin(AuthProvider provider, String code) {
         // 소셜 토큰 발급

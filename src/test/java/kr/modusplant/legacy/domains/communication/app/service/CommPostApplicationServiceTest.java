@@ -21,6 +21,7 @@ import kr.modusplant.legacy.domains.communication.common.util.entity.CommPrimary
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.domain.service.CommCategoryValidationService;
 import kr.modusplant.legacy.domains.communication.domain.service.CommPostValidationService;
+import kr.modusplant.legacy.domains.communication.mapper.CommPostAppInfraMapper;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostViewCountRedisRepository;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostViewLockRedisRepository;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
@@ -45,6 +46,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kr.modusplant.framework.out.persistence.jpa.entity.CommPostEntity.CommPostEntityBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -72,6 +74,8 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
     private CommPostViewCountRedisRepository commPostViewCountRedisRepository;
     @Mock
     private CommPostViewLockRedisRepository commPostViewLockRedisRepository;
+    @Mock
+    private CommPostAppInfraMapper commPostAppInfraMapper;
     @InjectMocks
     private CommPostApplicationService commPostApplicationService;
 
@@ -81,7 +85,7 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
     private SiteMemberEntity siteMemberEntity;
     private CommPrimaryCategoryEntity commPrimaryCategoryEntity;
     private CommSecondaryCategoryEntity commSecondaryCategoryEntity;
-    private CommPostEntity.CommPostEntityBuilder commPostEntityBuilder;
+    private CommPostEntityBuilder commPostEntityBuilder;
 
     @BeforeEach
     void setUp() {
@@ -109,6 +113,7 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
 
         given(commPostRepository.findByIsDeletedFalseOrderByCreatedAtDesc(pageable)).willReturn(page);
         given(multipartDataProcessor.convertFileSrcToBinaryData(any(JsonNode.class))).willReturn(mock(ArrayNode.class));
+        given(commPostAppInfraMapper.toCommPostResponse(any())).willReturn(mock(CommPostResponse.class));
 
         // when
         Page<CommPostResponse> result = commPostApplicationService.getAll(pageable);
@@ -137,6 +142,7 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         given(siteMemberRepository.findByUuid(memberUuid)).willReturn(Optional.of(siteMemberEntity));
         given(commPostRepository.findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(siteMemberEntity, pageable)).willReturn(page);
         given(multipartDataProcessor.convertFileSrcToBinaryData(any(JsonNode.class))).willReturn(mock(ArrayNode.class));
+        given(commPostAppInfraMapper.toCommPostResponse(any())).willReturn(mock(CommPostResponse.class));
 
         // when
         Page<CommPostResponse> result = commPostApplicationService.getByMemberUuid(memberUuid, pageable);
@@ -166,6 +172,7 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         given(commPrimaryCategoryRepository.findByUuid(commPrimaryCategoryEntity.getUuid())).willReturn(Optional.of(commPrimaryCategoryEntity));
         given(commPostRepository.findByPrimaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(commPrimaryCategoryEntity, pageable)).willReturn(page);
         given(multipartDataProcessor.convertFileSrcToBinaryData(any(JsonNode.class))).willReturn(mock(ArrayNode.class));
+        given(commPostAppInfraMapper.toCommPostResponse(any())).willReturn(mock(CommPostResponse.class));
 
         // when
         Page<CommPostResponse> result = commPostApplicationService.getByPrimaryCategoryUuid(commPrimaryCategoryEntity.getUuid(), pageable);
@@ -194,6 +201,7 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         given(commSecondaryCategoryRepository.findByUuid(commSecondaryCategoryEntity.getUuid())).willReturn(Optional.of(commSecondaryCategoryEntity));
         given(commPostRepository.findBySecondaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(commSecondaryCategoryEntity, pageable)).willReturn(page);
         given(multipartDataProcessor.convertFileSrcToBinaryData(any(JsonNode.class))).willReturn(mock(ArrayNode.class));
+        given(commPostAppInfraMapper.toCommPostResponse(any())).willReturn(mock(CommPostResponse.class));
 
         // when
         Page<CommPostResponse> result = commPostApplicationService.getBySecondaryCategoryUuid(commSecondaryCategoryEntity.getUuid(), pageable);
@@ -222,6 +230,7 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
 
         given(commPostRepository.searchByTitleOrContent(keyword,pageable)).willReturn(page);
         given(multipartDataProcessor.convertFileSrcToBinaryData(any(JsonNode.class))).willReturn(mock(ArrayNode.class));
+        given(commPostAppInfraMapper.toCommPostResponse(any())).willReturn(mock(CommPostResponse.class));
 
         // when
         Page<CommPostResponse> result = commPostApplicationService.searchByKeyword(keyword, pageable);
@@ -247,6 +256,7 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         given(commPostRepository.findByUlid(post.getUlid())).willReturn(Optional.of(post));
         given(multipartDataProcessor.convertFileSrcToBinaryData(any(JsonNode.class))).willReturn(mock(ArrayNode.class));
         given(commPostViewCountRedisRepository.read(anyString())).willReturn(56L);
+        given(commPostAppInfraMapper.toCommPostResponse(any())).willReturn(mock(CommPostResponse.class));
 
         // when
         Optional<CommPostResponse> result = commPostApplicationService.getByUlid(post.getUlid());

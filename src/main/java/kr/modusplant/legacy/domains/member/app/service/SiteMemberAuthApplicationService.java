@@ -12,7 +12,6 @@ import kr.modusplant.legacy.domains.member.domain.service.SiteMemberAuthValidati
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthAppInfraMapper;
-import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthAppInfraMapperImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -32,7 +31,7 @@ public class SiteMemberAuthApplicationService implements UuidCrudApplicationServ
     private final SiteMemberAuthValidationService memberAuthValidationService;
     private final SiteMemberAuthRepository memberAuthRepository;
     private final SiteMemberRepository memberRepository;
-    private final SiteMemberAuthAppInfraMapper memberAuthAppInfraMapper = new SiteMemberAuthAppInfraMapperImpl();
+    private final SiteMemberAuthAppInfraMapper memberAuthAppInfraMapper;
 
     @Override
     public List<SiteMemberAuthResponse> getAll() {

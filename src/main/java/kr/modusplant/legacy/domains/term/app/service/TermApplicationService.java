@@ -7,7 +7,6 @@ import kr.modusplant.legacy.domains.term.app.http.request.TermUpdateRequest;
 import kr.modusplant.legacy.domains.term.app.http.response.TermResponse;
 import kr.modusplant.legacy.domains.term.domain.service.TermValidationService;
 import kr.modusplant.legacy.domains.term.mapper.TermAppInfraMapper;
-import kr.modusplant.legacy.domains.term.mapper.TermAppInfraMapperImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,7 +26,7 @@ public class TermApplicationService {
 
     private final TermValidationService validationService;
     private final TermRepository termRepository;
-    private final TermAppInfraMapper termAppInfraMapper = new TermAppInfraMapperImpl();
+    private final TermAppInfraMapper termAppInfraMapper;
 
     @Cacheable(value = "terms")
     public List<TermResponse> getAll() {

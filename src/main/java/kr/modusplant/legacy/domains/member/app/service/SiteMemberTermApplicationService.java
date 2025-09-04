@@ -11,7 +11,6 @@ import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberTermRespo
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberTermValidationService;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberTermAppInfraMapper;
-import kr.modusplant.legacy.domains.member.mapper.SiteMemberTermAppInfraMapperImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -31,7 +30,7 @@ public class SiteMemberTermApplicationService implements UuidCrudApplicationServ
     private final SiteMemberValidationService memberValidationService;
     private final SiteMemberTermRepository memberTermRepository;
     private final SiteMemberRepository memberRepository;
-    private final SiteMemberTermAppInfraMapper memberTermAppInfraMapper = new SiteMemberTermAppInfraMapperImpl();
+    private final SiteMemberTermAppInfraMapper memberTermAppInfraMapper;
 
     @Override
     public List<SiteMemberTermResponse> getAll() {
