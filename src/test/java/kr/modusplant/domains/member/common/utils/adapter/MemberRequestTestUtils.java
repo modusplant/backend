@@ -1,11 +1,11 @@
-package kr.modusplant.domains.member.test.utils.adapter;
+package kr.modusplant.domains.member.common.utils.adapter;
 
 import kr.modusplant.domains.member.adapter.request.MemberNicknameUpdateRequest;
 import kr.modusplant.domains.member.adapter.request.MemberRegisterRequest;
 
-import static kr.modusplant.domains.member.test.constant.MemberBooleanConstant.TEST_MEMBER_IS_ACTIVE;
-import static kr.modusplant.domains.member.test.constant.MemberStringConstant.TEST_MEMBER_NICKNAME;
-import static kr.modusplant.domains.member.test.constant.MemberUuidConstant.TEST_MEMBER_UUID;
+import static kr.modusplant.domains.member.common.constant.MemberBooleanConstant.TEST_MEMBER_IS_ACTIVE;
+import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_MEMBER_NICKNAME;
+import static kr.modusplant.domains.member.common.constant.MemberUuidConstant.TEST_MEMBER_UUID;
 
 public interface MemberRequestTestUtils {
     MemberRegisterRequest testMemberRegisterRequest = new MemberRegisterRequest(TEST_MEMBER_NICKNAME);

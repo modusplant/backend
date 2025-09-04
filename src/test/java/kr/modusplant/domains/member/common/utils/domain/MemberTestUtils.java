@@ -1,4 +1,4 @@
-package kr.modusplant.domains.member.test.utils.domain;
+package kr.modusplant.domains.member.common.utils.domain;
 
 import kr.modusplant.domains.member.domain.aggregate.Member;
 
