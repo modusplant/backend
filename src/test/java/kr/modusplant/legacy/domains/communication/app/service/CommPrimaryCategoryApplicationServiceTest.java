@@ -7,7 +7,6 @@ import kr.modusplant.legacy.domains.communication.common.util.app.http.request.C
 import kr.modusplant.legacy.domains.communication.common.util.app.http.response.CommCategoryResponseTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.mapper.CommPrimaryCategoryAppInfraMapper;
-import kr.modusplant.legacy.domains.communication.mapper.CommPrimaryCategoryAppInfraMapperImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +24,13 @@ class CommPrimaryCategoryApplicationServiceTest implements CommCategoryRequestTe
 
     private final CommPrimaryCategoryApplicationService commCategoryApplicationService;
     private final CommPrimaryCategoryRepository commCategoryRepository;
-    private final CommPrimaryCategoryAppInfraMapper commCategoryAppInfraMapper = new CommPrimaryCategoryAppInfraMapperImpl();
+    private final CommPrimaryCategoryAppInfraMapper commCategoryAppInfraMapper;
 
     @Autowired
-    CommPrimaryCategoryApplicationServiceTest(CommPrimaryCategoryApplicationService commCategoryApplicationService, CommPrimaryCategoryRepository commCategoryRepository) {
+    CommPrimaryCategoryApplicationServiceTest(CommPrimaryCategoryApplicationService commCategoryApplicationService, CommPrimaryCategoryRepository commCategoryRepository, CommPrimaryCategoryAppInfraMapper commCategoryAppInfraMapper) {
         this.commCategoryApplicationService = commCategoryApplicationService;
         this.commCategoryRepository = commCategoryRepository;
+        this.commCategoryAppInfraMapper = commCategoryAppInfraMapper;
     }
 
     @DisplayName("모든 컨텐츠 1차 항목 얻기")

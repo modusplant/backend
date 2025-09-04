@@ -43,6 +43,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -125,7 +126,7 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         assertThat(result.getSize()).isEqualTo(2);
         assertThat(result.getTotalElements()).isEqualTo(3);
         assertThat(result.getTotalPages()).isEqualTo(2);
-        assertThat(result.getContent()).allMatch(r -> r instanceof CommPostResponse);
+        assertThat(result.getContent()).allMatch(Objects::nonNull);
         then(commPostRepository).should().findByIsDeletedFalseOrderByCreatedAtDesc(pageable);
         then(multipartDataProcessor).should(times(2)).convertFileSrcToBinaryData(any(JsonNode.class));
     }
@@ -154,7 +155,7 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         assertThat(result.getSize()).isEqualTo(2);
         assertThat(result.getTotalElements()).isEqualTo(3);
         assertThat(result.getTotalPages()).isEqualTo(2);
-        assertThat(result.getContent()).allMatch(r -> r instanceof CommPostResponse);
+        assertThat(result.getContent()).allMatch(Objects::nonNull);
         then(siteMemberRepository).should().findByUuid(memberUuid);
         then(commPostRepository).should().findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(siteMemberEntity, pageable);
         then(multipartDataProcessor).should(times(2)).convertFileSrcToBinaryData(any(JsonNode.class));
@@ -183,7 +184,7 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         assertThat(result.getNumber()).isEqualTo(0);
         assertThat(result.getTotalElements()).isEqualTo(3);
         assertThat(result.getTotalPages()).isEqualTo(2);
-        assertThat(result.getContent()).allMatch(r -> r instanceof CommPostResponse);
+        assertThat(result.getContent()).allMatch(Objects::nonNull);
         then(commPrimaryCategoryRepository).should().findByUuid(commPrimaryCategoryEntity.getUuid());
         then(commPostRepository).should().findByPrimaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(commPrimaryCategoryEntity, pageable);
         then(multipartDataProcessor).should(times(2)).convertFileSrcToBinaryData(any(JsonNode.class));
@@ -212,7 +213,7 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         assertThat(result.getNumber()).isEqualTo(0);
         assertThat(result.getTotalElements()).isEqualTo(3);
         assertThat(result.getTotalPages()).isEqualTo(2);
-        assertThat(result.getContent()).allMatch(r -> r instanceof CommPostResponse);
+        assertThat(result.getContent()).allMatch(Objects::nonNull);
         then(commSecondaryCategoryRepository).should().findByUuid(commSecondaryCategoryEntity.getUuid());
         then(commPostRepository).should().findBySecondaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(commSecondaryCategoryEntity, pageable);
         then(multipartDataProcessor).should(times(2)).convertFileSrcToBinaryData(any(JsonNode.class));
@@ -242,7 +243,7 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         assertThat(result.getSize()).isEqualTo(2);
         assertThat(result.getTotalElements()).isEqualTo(2);
         assertThat(result.getTotalPages()).isEqualTo(1);
-        assertThat(result.getContent()).allMatch(r -> r instanceof CommPostResponse);
+        assertThat(result.getContent()).allMatch(Objects::nonNull);
         then(commPostRepository).should().searchByTitleOrContent(keyword,pageable);
         then(multipartDataProcessor).should(times(2)).convertFileSrcToBinaryData(any(JsonNode.class));
     }

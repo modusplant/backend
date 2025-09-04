@@ -7,11 +7,12 @@ import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberAuthRepo
 import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
 import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRoleRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
+import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberAuthTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
+import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthDomainInfraMapper;
-import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthDomainInfraMapperImpl;
 import kr.modusplant.legacy.modules.auth.social.app.dto.GoogleUserInfo;
 import kr.modusplant.legacy.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.legacy.modules.auth.social.app.dto.KakaoUserInfo;
@@ -36,7 +37,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @DomainsServiceOnlyContext
-class SocialAuthApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntityTestUtils {
+class SocialAuthApplicationServiceTest implements SiteMemberAuthTestUtils, SiteMemberEntityTestUtils, SiteMemberAuthEntityTestUtils {
 
     private SocialAuthApplicationService socialAuthApplicationService;
     @Mock
@@ -49,8 +50,8 @@ class SocialAuthApplicationServiceTest implements SiteMemberEntityTestUtils, Sit
     private SiteMemberAuthRepository memberAuthRepository;
     @Mock
     private SiteMemberRoleRepository memberRoleRepository;
-
-    private final SiteMemberAuthDomainInfraMapper memberAuthEntityMapper = new SiteMemberAuthDomainInfraMapperImpl();
+    @Mock
+    private SiteMemberAuthDomainInfraMapper memberAuthEntityMapper;
 
     private final String code = "sample-code";
     private final AuthProvider provider = AuthProvider.GOOGLE;
@@ -135,7 +136,8 @@ class SocialAuthApplicationServiceTest implements SiteMemberEntityTestUtils, Sit
                 .member(memberEntity)
                 .role(Role.USER).build();
 
-        given(memberAuthRepository.findByProviderAndProviderId(provider,id)).willReturn(Optional.of(memberAuthEntity));
+        given(memberAuthRepository.findByProviderAndProviderId(provider, id)).willReturn(Optional.of(memberAuthEntity));
+        given(memberAuthEntityMapper.toSiteMemberAuth(memberAuthEntity)).willReturn(SiteMemberAuth.builder().memberAuth(memberAuthBasicUserWithUuid).activeMemberUuid(memberEntity.getUuid()).build());
         given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(any())).willReturn(memberEntity);
         given(memberRoleRepository.findByMember(memberEntity)).willReturn(Optional.of(memberRoleEntity));
