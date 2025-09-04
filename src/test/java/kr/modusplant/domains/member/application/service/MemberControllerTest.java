@@ -11,7 +11,7 @@ import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
 import kr.modusplant.framework.out.persistence.jpa.entity.CommLikeEntity;
 import kr.modusplant.framework.out.persistence.jpa.repository.CommLikeRepository;
 import kr.modusplant.infrastructure.event.bus.EventBus;
-import kr.modusplant.infrastructure.event.consumer.CommPostEventConsumer;
+import kr.modusplant.infrastructure.event.consumer.PostEventConsumer;
 import kr.modusplant.shared.event.CommPostLikeEventTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ class MemberControllerTest implements MemberTestUtils, MemberRequestTestUtils, C
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryJpaAdapter.class);
     private final CommLikeRepository commLikeRepository = Mockito.mock(CommLikeRepository.class);
     private final EventBus eventBus = new EventBus();
-    private final CommPostEventConsumer commPostEventConsumer = new CommPostEventConsumer(eventBus, commLikeRepository);
+    private final PostEventConsumer postEventConsumer = new PostEventConsumer(eventBus, commLikeRepository);
     private final MemberController memberController = new MemberController(memberMapper, memberRepository, eventBus);
 
     @Test

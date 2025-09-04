@@ -2,7 +2,6 @@ package kr.modusplant.domains.comment.framework.out.persistence.jpa.entity;
 
 import jakarta.persistence.*;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.CommentCompositeKey;
-import kr.modusplant.domains.member.framework.out.persistence.jpa.entity.MemberEntity;
 import kr.modusplant.framework.out.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -36,11 +35,11 @@ public class CommentEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = SNAKE_AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private MemberEntity authMember;
+    private CommentMemberEntity authMember;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = SNAKE_CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private MemberEntity createMember;
+    private CommentMemberEntity createMember;
 
     @Column(name = "content", nullable = false, length = 900)
     private String content;
@@ -79,7 +78,7 @@ public class CommentEntity {
 
     private CommentEntity(
             PostEntity postEntity, String path,
-            MemberEntity authMember, MemberEntity createMember,
+            CommentMemberEntity authMember, CommentMemberEntity createMember,
             String content, Boolean isDeleted
     ) {
         this.postEntity = postEntity;
@@ -97,8 +96,8 @@ public class CommentEntity {
     public static final class CommentEntityBuilder {
         private PostEntity postEntity;
         private CommentCompositeKey id;
-        private MemberEntity authMember;
-        private MemberEntity createMember;
+        private CommentMemberEntity authMember;
+        private CommentMemberEntity createMember;
         private String content;
         private Boolean isDeleted;
 
@@ -112,12 +111,12 @@ public class CommentEntity {
             return this;
         }
 
-        public CommentEntity.CommentEntityBuilder authMember(final MemberEntity authMember) {
+        public CommentEntity.CommentEntityBuilder authMember(final CommentMemberEntity authMember) {
             this.authMember = authMember;
             return this;
         }
 
-        public CommentEntity.CommentEntityBuilder createMember(final MemberEntity createMember) {
+        public CommentEntity.CommentEntityBuilder createMember(final CommentMemberEntity createMember) {
             this.createMember = createMember;
             return this;
         }

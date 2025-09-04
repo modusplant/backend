@@ -11,11 +11,7 @@ import kr.modusplant.domains.comment.adapter.controller.CommentController;
 import kr.modusplant.domains.comment.adapter.request.CommentDeleteRequest;
 import kr.modusplant.domains.comment.adapter.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.adapter.response.CommentResponse;
-import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
-import kr.modusplant.framework.out.persistence.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
-import kr.modusplant.legacy.domains.communication.app.http.response.CommCommentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +30,42 @@ import java.util.UUID;
 public class CommentRestController {
 
     private final CommentController controller;
+
+    @Operation(
+            summary = "게시글 식별자로 컨텐츠 댓글 조회 API",
+            description = "게시글 식별자에 맞는 컨텐츠 댓글을 조회합니다."
+    )
+    @GetMapping("/post/{ulid}")
+    public ResponseEntity<DataResponse<List<CommentResponse>>> gatherByPost(
+            @Parameter(schema = @Schema(
+                    description = "해당 댓글이 달린 게시글의 식별자",
+                    example = "01JY3PPG5YJ41H7BPD0DSQW2RD")
+            )
+            @PathVariable(required = false, value = "ulid")
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String postUlid) {
+        List<CommentResponse> commentResponses = controller.gatherByPost(postUlid);
+        return ResponseEntity.ok().body(
+                DataResponse.ok(commentResponses));
+    }
+
+    @Operation(
+            summary = "인가 회원 식별자로 컨텐츠 댓글 조회 API",
+            description = "인가 회원 식별자에 맞는 컨텐츠 댓글을 조회합니다."
+    )
+    @GetMapping("/member/auth/{uuid}")
+    public ResponseEntity<DataResponse<List<CommentResponse>>> gatherByAuthor(
+            @Parameter(schema = @Schema(
+                    description = "회원의 식별자",
+                    example = "038ae842-3c93-484f-b526-7c4645a195a7")
+            )
+            @PathVariable(required = false, value = "uuid")
+            @NotNull(message = "회원 식별자가 비어 있습니다.")
+            UUID memberUuid) {
+        List<CommentResponse> commentResponses = controller.gatherByAuthor(memberUuid);
+        return ResponseEntity.ok().body(
+                DataResponse.ok(commentResponses));
+    }
 
     @Operation(
             summary = "컨텐츠 댓글 삽입 API",

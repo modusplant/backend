@@ -1,21 +1,30 @@
 package kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper;
 
+import kr.modusplant.domains.comment.adapter.model.CommentReadModel;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.CommentCompositeKey;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentMemberEntity;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.PostEntity;
-import kr.modusplant.domains.member.framework.out.persistence.jpa.entity.MemberEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.springframework.stereotype.Component;
 
-//@Component
 @Mapper(componentModel = "spring")
 public interface CommentJpaMapper {
+
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(source = "id.postUlid", target = "postUlid")
+    @Mapping(source = "id.path", target = "path")
+    @Mapping(source = "authMember.uuid", target = "authMemberUuid")
+    @Mapping(source = "createMember.uuid", target = "createMemberUuid")
+    @Mapping(source = "content", target = "content")
+    @Mapping(source = "isDeleted", target = "isDeleted")
+    @Mapping(source = "createdAt", target = "createdAt", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    CommentReadModel toCommentReadModel(CommentEntity commentEntity);
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(source = ".", target = "id", qualifiedByName = "mapCommentId")
@@ -39,8 +48,8 @@ public interface CommentJpaMapper {
     }
 
     @Named("mapMember")
-    default MemberEntity mapCommentMember(Author author) {
-        return MemberEntity.builder()
+    default CommentMemberEntity mapCommentMember(Author author) {
+        return CommentMemberEntity.builder()
                 .uuid(author.getMemberUuid())
                 .build();
     }

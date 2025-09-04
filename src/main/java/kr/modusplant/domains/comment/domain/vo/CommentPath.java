@@ -12,8 +12,6 @@ import lombok.Getter;
 public class CommentPath {
     String path;
 
-    // TODO: 대댓글이 최대 얼마의 깊이까지 달릴 수 있는지를 create 에서 확인할 것.
-
     /**
      * @param path 의 형식은 반드시 숫자와 점(.)의 연속물이어야 합니다.
      */
