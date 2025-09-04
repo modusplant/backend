@@ -16,9 +16,13 @@ public class Comment {
     private CommentContent content;
     private CommentStatus status;
 
-    // TODO: PostID는 게시글 담당자가 개발한 PostId VO로 대체될 예정
+    // TODO: PostId는 게시글 담당자가 개발한 PostId VO로 대체될 예정
     public static Comment create(PostId postId, CommentPath path, Author author, CommentContent content) {
         return new Comment(postId, path, author, content, CommentStatus.setAsValid());
+    }
+
+    public static Comment create(PostId postId, CommentPath path, Author author, CommentContent content, CommentStatus status) {
+        return new Comment(postId, path, author, content, status);
     }
 
     @Override
