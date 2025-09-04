@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-public class CommPostEventConsumer {
+public class PostEventConsumer {
     private final CommLikeRepository commLikeRepository;
 
-    public CommPostEventConsumer(EventBus eventBus, CommLikeRepository commLikeRepository) {
+    public PostEventConsumer(EventBus eventBus, CommLikeRepository commLikeRepository) {
         eventBus.subscribe(event -> {
             if (event instanceof CommPostLikeEvent commPostLikeEvent) {
                 putCommPostLike(commPostLikeEvent.getMemberId(), commPostLikeEvent.getPostId());
