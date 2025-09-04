@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.framework.out.persistence.jpa.mapper;
 
 import kr.modusplant.domains.member.framework.out.persistence.jpa.mapper.supers.MemberJpaMapper;
-import kr.modusplant.domains.member.common.utils.framework.MemberEntityTestUtils;
+import kr.modusplant.domains.member.common.utils.framework.out.persistence.jpa.entity.MemberEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

@@ -1,7 +1,7 @@
-package kr.modusplant.domains.member.common.utils.framework;
+package kr.modusplant.domains.member.common.utils.framework.out.persistence.jpa.entity;
 
 import kr.modusplant.domains.member.framework.out.persistence.jpa.entity.MemberEntity;
-import kr.modusplant.domains.member.common.utils.domain.MemberTestUtils;
+import kr.modusplant.domains.member.common.utils.domain.aggregate.MemberTestUtils;
 
 import java.time.LocalDateTime;
 

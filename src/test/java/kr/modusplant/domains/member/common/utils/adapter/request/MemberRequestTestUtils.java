@@ -1,4 +1,4 @@
-package kr.modusplant.domains.member.common.utils.adapter;
+package kr.modusplant.domains.member.common.utils.adapter.request;
 
 import kr.modusplant.domains.member.adapter.request.MemberNicknameUpdateRequest;
 import kr.modusplant.domains.member.adapter.request.MemberRegisterRequest;

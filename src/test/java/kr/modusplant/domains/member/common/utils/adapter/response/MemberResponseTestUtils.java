@@ -1,4 +1,4 @@
-package kr.modusplant.domains.member.common.utils.adapter;
+package kr.modusplant.domains.member.common.utils.adapter.response;
 
 import kr.modusplant.domains.member.adapter.response.MemberResponse;
 
