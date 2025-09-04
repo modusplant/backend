@@ -8,7 +8,6 @@ import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberUpdateRequ
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberResponse;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAppInfraMapper;
-import kr.modusplant.legacy.domains.member.mapper.SiteMemberAppInfraMapperImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,7 @@ public class SiteMemberApplicationService implements UuidCrudApplicationService<
 
     private final SiteMemberValidationService validationService;
     private final SiteMemberRepository memberRepository;
-    private final SiteMemberAppInfraMapper memberAppInfraMapper = new SiteMemberAppInfraMapperImpl();
+    private final SiteMemberAppInfraMapper memberAppInfraMapper;
 
     @Override
     public List<SiteMemberResponse> getAll() {

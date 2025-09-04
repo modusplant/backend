@@ -11,7 +11,6 @@ import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberRoleRespo
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberRoleValidationService;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberRoleAppInfraMapper;
-import kr.modusplant.legacy.domains.member.mapper.SiteMemberRoleAppInfraMapperImpl;
 import kr.modusplant.legacy.modules.security.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -32,7 +31,7 @@ public class SiteMemberRoleApplicationService implements UuidCrudApplicationServ
     private final SiteMemberRoleValidationService memberRoleValidationService;
     private final SiteMemberRoleRepository memberRoleRepository;
     private final SiteMemberRepository memberRepository;
-    private final SiteMemberRoleAppInfraMapper memberRoleEntityMapper = new SiteMemberRoleAppInfraMapperImpl();
+    private final SiteMemberRoleAppInfraMapper memberRoleEntityMapper;
 
     @Override
     public List<SiteMemberRoleResponse> getAll() {

@@ -11,7 +11,6 @@ import kr.modusplant.legacy.domains.communication.app.http.response.CommCommentR
 import kr.modusplant.legacy.domains.communication.domain.service.CommCommentValidationService;
 import kr.modusplant.legacy.domains.communication.domain.service.CommPostValidationService;
 import kr.modusplant.legacy.domains.communication.mapper.CommCommentAppInfraMapper;
-import kr.modusplant.legacy.domains.communication.mapper.CommCommentAppInfraMapperImpl;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -31,7 +30,7 @@ public class CommCommentApplicationService {
     private final CommCommentValidationService commCommentValidationService;
     private final CommPostValidationService commPostValidationService;
     private final SiteMemberValidationService memberValidationService;
-    private final CommCommentAppInfraMapper commCommentAppInfraMapper = new CommCommentAppInfraMapperImpl();
+    private final CommCommentAppInfraMapper commCommentAppInfraMapper;
     private final CommCommentRepository commCommentRepository;
     private final CommPostRepository commPostRepository;
     private final SiteMemberRepository memberRepository;

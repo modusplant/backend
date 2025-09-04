@@ -62,7 +62,7 @@ class SocialAuthApplicationServiceTest implements SiteMemberEntityTestUtils, Sit
     void setUp() {
         socialAuthApplicationService = spy(new SocialAuthApplicationService(
                 kakaoAuthClient, googleAuthClient,
-                memberRepository, memberAuthRepository, memberRoleRepository
+                memberRepository, memberAuthRepository, memberRoleRepository, memberAuthEntityMapper
                 )
         );
     }
