@@ -55,6 +55,8 @@ dependencies {
 	implementation 'com.github.f4b6a3:ulid-creator:5.2.3'
 	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.9.10'
 	implementation 'software.amazon.awssdk:s3:2.31.61'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'

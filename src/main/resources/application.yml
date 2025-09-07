@@ -52,3 +52,12 @@ springdoc:
     enabled: true
   swagger-ui:
     enabled: true
+
+# Actuator, Prometheus
+management:
+  server:
+    port: 8080
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,prometheus"

@@ -139,6 +139,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/google/social-login").permitAll()
                         .requestMatchers("/api/members/register").permitAll()
                         .requestMatchers("/api/monitor/**").hasRole("ADMIN")
+                        .requestMatchers("/actuator/prometheus").permitAll()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(siteMemberAuthProvider())

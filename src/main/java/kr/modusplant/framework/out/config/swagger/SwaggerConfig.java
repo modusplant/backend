@@ -42,7 +42,7 @@ public class SwaggerConfig {
                         .description("Production Server")  // 프로덕션 서버 설명
                 )
                 .addServersItem(new Server() // 테스트 서버 정보 설정
-                        .url("http://localhost:8080")  // 테스트 서버 링크(http://localhost:8080/swagger-ui/index.html)
+                        .url("http://localhost:80")  // 테스트 서버 링크(http://localhost:80/swagger-ui/index.html)
                         .description("Test Server")  // 테스트 서버 설명
                 );
     }
