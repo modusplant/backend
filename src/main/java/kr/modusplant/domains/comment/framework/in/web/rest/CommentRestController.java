@@ -84,7 +84,7 @@ public class CommentRestController {
             description = "식별자로 컨텐츠 댓글을 제거합니다."
     )
     @DeleteMapping("/post/{ulid}/path/{path}")
-    public ResponseEntity<DataResponse<?>> delete(
+    public ResponseEntity<DataResponse<Void>> delete(
             @RequestBody @Valid
             CommentDeleteRequest deleteRequest
     ) {
