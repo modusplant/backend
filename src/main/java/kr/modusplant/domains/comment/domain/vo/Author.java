@@ -5,6 +5,8 @@ import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.UUID;
 
@@ -23,6 +25,23 @@ public class Author {
         if(memberUuid == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR); }
         if(memberNickname == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_MEMBER_NICKNAME); }
         return new Author(memberUuid, memberNickname);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof Author author)) return false;
+
+        return new EqualsBuilder()
+                .append(getMemberUuid(), author.getMemberUuid())
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(getMemberUuid()).toHashCode();
     }
 
 }
