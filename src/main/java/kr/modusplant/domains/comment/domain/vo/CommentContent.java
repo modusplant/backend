@@ -1,5 +1,7 @@
 package kr.modusplant.domains.comment.domain.vo;
 
+import kr.modusplant.domains.comment.domain.exception.EmptyValueException;
+import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +15,12 @@ public class CommentContent {
 
     public static CommentContent create(String content) {
         return new CommentContent(content);
+    }
+
+    public static void validateCommentContent(CommentContent commentContent) {
+        if(commentContent.getContent().isBlank()) {
+            throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_CONTENT);
+        }
     }
 
     @Override
