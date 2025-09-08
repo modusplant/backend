@@ -7,7 +7,7 @@ import static kr.modusplant.domains.member.test.constant.MemberUuidConstant.TEST
 
 public interface AuthorTestUtils {
 
-    Author testAuthorUuid = Author.create(TEST_MEMBER_UUID);
-    Author testAuthorUuidAndNickname = Author.create(TEST_MEMBER_UUID, TEST_MEMBER_NICKNAME);
+    Author testAuthor = Author.create(TEST_MEMBER_UUID, TEST_MEMBER_NICKNAME);
+    Author testAuthorWithUuid = Author.create(TEST_MEMBER_UUID);
 
 }
