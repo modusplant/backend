@@ -14,11 +14,15 @@ public class CommentStatus {
     private String status;
 
     public static CommentStatus create(String status) {
+        CommentStatus newStatus = new CommentStatus(status);
+        CommentStatus.validateCommentStatus(newStatus);
+        return new CommentStatus(status);
+    }
 
-        if(!CommentStatusType.isValidStatus(status)) {
+    public static void validateCommentStatus(CommentStatus commentStatus) {
+        if(!CommentStatusType.isValidStatus(commentStatus.getStatus())) {
             throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_STATUS);
         }
-        return new CommentStatus(status);
     }
 
     public static CommentStatus setAsValid() { return new CommentStatus("valid"); }
