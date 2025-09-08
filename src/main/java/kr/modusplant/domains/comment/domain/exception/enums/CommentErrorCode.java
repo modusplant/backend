@@ -13,6 +13,7 @@ public enum CommentErrorCode implements ResponseCode {
     EMPTY_COMMENT_PATH(HttpStatus.BAD_REQUEST, "empty_comment_path", "댓글의 경로 값이 비었습니다"),
     EMPTY_AUTHOR(HttpStatus.BAD_REQUEST, "empty_author", "작성자의 값이 비어 있습니다"),
     EMPTY_COMMENT_CONTENT(HttpStatus.BAD_REQUEST, "empty_comment_content", "댓글의 내용이 비어 있습니다"),
+    EMPTY_COMMENT_STATUS(HttpStatus.BAD_REQUEST, "empty_comment_status", "댓글의 상태 값이 비어 있습니다"),
     EMPTY_MEMBER_NICKNAME(HttpStatus.BAD_REQUEST, "empty_member_nickname", "작성자의 닉네임 값이 비어 있습니다"),
 
     INVALID_COMMENT_PATH(HttpStatus.BAD_REQUEST, "invalid_comment_path", "댓글 경로의 형식이 올바르지 않습니다"),

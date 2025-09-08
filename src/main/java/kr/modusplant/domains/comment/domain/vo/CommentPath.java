@@ -15,20 +15,18 @@ public class CommentPath {
     String path;
 
     public static CommentPath create(String path) {
-        CommentPath newPath = new CommentPath(path);
-        CommentPath.validateCommentPath(newPath);
-        return newPath;
+        CommentPath.checkSource(path);
+        return new CommentPath(path);
     }
 
     /**
-     * @param commentPath 의 형식은 반드시 숫자와 점(.)의 연속물이어야 합니다.
+     * @param source 의 형식은 반드시 숫자와 점(.)의 연속물이어야 합니다.
      */
-    public static void validateCommentPath(CommentPath commentPath) {
-        String path = commentPath.getPath();
-        if (path.isBlank()) {
+    public static void checkSource(String source) {
+        if (source.isBlank()) {
             throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_PATH);
         }
-        if (!path.matches("^\\d+(\\.\\d+)*$")) {
+        if (!source.matches("^\\d+(\\.\\d+)*$")) {
             throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_PATH);
         }
     }

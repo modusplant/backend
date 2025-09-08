@@ -1,5 +1,6 @@
 package kr.modusplant.domains.comment.domain.vo;
 
+import kr.modusplant.domains.comment.domain.exception.EmptyValueException;
 import kr.modusplant.domains.comment.domain.exception.InvalidValueException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentStatusType;
@@ -14,13 +15,14 @@ public class CommentStatus {
     private String status;
 
     public static CommentStatus create(String status) {
-        CommentStatus newStatus = new CommentStatus(status);
-        CommentStatus.validateCommentStatus(newStatus);
+        CommentStatus.checkSource(status);
         return new CommentStatus(status);
     }
 
-    public static void validateCommentStatus(CommentStatus commentStatus) {
-        if(!CommentStatusType.isValidStatus(commentStatus.getStatus())) {
+    public static void checkSource(String source) {
+        if(source.isBlank()) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_STATUS); }
+
+        if(!CommentStatusType.isValidStatus(source)) {
             throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_STATUS);
         }
     }

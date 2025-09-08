@@ -21,18 +21,18 @@ public class Comment {
     // TODO: PostId는 게시글 담당자가 개발한 PostId VO로 대체될 예정
     public static Comment create(PostId postId, CommentPath path, Author author, CommentContent content) {
         if(postId == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID); }
-        CommentPath.validateCommentPath(path);
+        if(path == null) { throw new EmptyValueException(CommentErrorCode.INVALID_COMMENT_PATH); }
         if(author == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR); }
-        CommentContent.validateCommentContent(content);
+        if(content == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_CONTENT); }
         return new Comment(postId, path, author, content, CommentStatus.setAsValid());
     }
 
     public static Comment create(PostId postId, CommentPath path, Author author, CommentContent content, CommentStatus status) {
         if(postId == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID); }
-        CommentPath.validateCommentPath(path);
+        if(path == null) { throw new EmptyValueException(CommentErrorCode.INVALID_COMMENT_PATH); }
         if(author == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR); }
-        CommentStatus.validateCommentStatus(status);
-        CommentContent.validateCommentContent(content);
+        if(content == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_CONTENT); }
+        if (status == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_STATUS); }
 
         return new Comment(postId, path, author, content, status);
     }
