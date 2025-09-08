@@ -1,5 +1,7 @@
 package kr.modusplant.domains.comment.domain.aggregate;
 
+import kr.modusplant.domains.comment.domain.exception.EmptyValueException;
+import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -18,10 +20,20 @@ public class Comment {
 
     // TODO: PostId는 게시글 담당자가 개발한 PostId VO로 대체될 예정
     public static Comment create(PostId postId, CommentPath path, Author author, CommentContent content) {
+        if(postId == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID); }
+        CommentPath.validateCommentPath(path);
+        if(author == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR); }
+        CommentContent.validateCommentContent(content);
         return new Comment(postId, path, author, content, CommentStatus.setAsValid());
     }
 
     public static Comment create(PostId postId, CommentPath path, Author author, CommentContent content, CommentStatus status) {
+        if(postId == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID); }
+        CommentPath.validateCommentPath(path);
+        if(author == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR); }
+        CommentStatus.validateCommentStatus(status);
+        CommentContent.validateCommentContent(content);
+
         return new Comment(postId, path, author, content, status);
     }
 
