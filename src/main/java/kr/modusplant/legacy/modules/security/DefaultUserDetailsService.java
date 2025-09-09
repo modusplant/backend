@@ -1,9 +1,9 @@
 package kr.modusplant.legacy.modules.security;
 
 import jakarta.transaction.Transactional;
-import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberAuthRepository;
-import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
-import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRoleRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleRepository;
 import kr.modusplant.legacy.domains.member.domain.model.SiteMember;
 import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.legacy.domains.member.domain.model.SiteMemberRole;

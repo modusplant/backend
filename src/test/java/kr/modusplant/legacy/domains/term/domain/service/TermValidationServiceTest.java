@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.term.domain.service;
 
-import kr.modusplant.framework.out.persistence.jpa.entity.TermEntity;
-import kr.modusplant.framework.out.persistence.jpa.repository.TermRepository;
+import kr.modusplant.framework.out.jpa.entity.TermEntity;
+import kr.modusplant.framework.out.jpa.repository.TermRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.legacy.domains.term.common.util.app.http.response.TermResponseTestUtils;
 import kr.modusplant.legacy.domains.term.common.util.entity.TermEntityTestUtils;

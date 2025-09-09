@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.term.mapper;
 
-import kr.modusplant.framework.out.persistence.jpa.entity.TermEntity;
+import kr.modusplant.framework.out.jpa.entity.TermEntity;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.term.app.http.response.TermResponse;
 import kr.modusplant.legacy.domains.term.common.util.app.http.request.TermRequestTestUtils;

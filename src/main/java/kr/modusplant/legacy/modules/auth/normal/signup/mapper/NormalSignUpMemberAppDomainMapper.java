@@ -6,7 +6,7 @@ import kr.modusplant.legacy.modules.auth.normal.signup.app.http.request.NormalSi
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import static kr.modusplant.framework.out.persistence.constant.EntityFieldName.*;
+import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.*;
 
 @Mapper
 public interface NormalSignUpMemberAppDomainMapper {

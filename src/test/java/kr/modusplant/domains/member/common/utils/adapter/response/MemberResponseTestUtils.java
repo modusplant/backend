@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.common.utils.adapter.response;
 
-import kr.modusplant.domains.member.adapter.response.MemberResponse;
+import kr.modusplant.domains.member.usecase.response.MemberResponse;
 
 import static kr.modusplant.domains.member.common.constant.MemberLocalDateConstant.TEST_MEMBER_BIRTHDATE;
 import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_MEMBER_ACTIVE_STATUS;

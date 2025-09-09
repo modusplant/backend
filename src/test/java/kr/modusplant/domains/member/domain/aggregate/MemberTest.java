@@ -1,11 +1,11 @@
 package kr.modusplant.domains.member.domain.aggregate;
 
+import kr.modusplant.domains.member.common.utils.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberBirthDateException;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberIdException;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberNicknameException;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberStatusException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
-import kr.modusplant.domains.member.common.utils.domain.aggregate.MemberTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
