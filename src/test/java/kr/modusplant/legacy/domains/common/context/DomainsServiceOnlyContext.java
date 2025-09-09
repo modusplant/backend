@@ -1,9 +1,9 @@
 package kr.modusplant.legacy.domains.common.context;
 
-import kr.modusplant.framework.out.config.aws.TestS3Config;
-import kr.modusplant.framework.out.config.jpa.TestJpaConfig;
-import kr.modusplant.framework.out.config.redis.TestRedisConfig;
-import kr.modusplant.framework.out.persistence.redis.initializer.MockRedisHelperInitializer;
+import kr.modusplant.framework.out.redis.initializer.MockRedisHelperInitializer;
+import kr.modusplant.infrastructure.config.aws.TestS3Config;
+import kr.modusplant.infrastructure.config.jpa.TestJpaConfig;
+import kr.modusplant.infrastructure.config.redis.TestRedisConfig;
 import kr.modusplant.legacy.domains.common.postprocessor.MockDomainsRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.legacy.domains.common.scan.ScanDomainsService;
 import org.junit.jupiter.api.extension.ExtendWith;

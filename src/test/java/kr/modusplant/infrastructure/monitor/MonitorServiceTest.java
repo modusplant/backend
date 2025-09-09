@@ -1,6 +1,6 @@
 package kr.modusplant.infrastructure.monitor;
 
-import kr.modusplant.framework.out.persistence.redis.RedisHelper;
+import kr.modusplant.framework.out.redis.RedisHelper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

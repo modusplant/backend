@@ -1,7 +1,7 @@
 package kr.modusplant.infrastructure.event.consumer;
 
-import kr.modusplant.framework.out.persistence.jpa.entity.CommLikeEntity;
-import kr.modusplant.framework.out.persistence.jpa.repository.CommLikeRepository;
+import kr.modusplant.framework.out.jpa.entity.CommLikeEntity;
+import kr.modusplant.framework.out.jpa.repository.CommLikeRepository;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.PostLikeEvent;
 import kr.modusplant.shared.event.PostUnlikeEvent;

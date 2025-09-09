@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
-import kr.modusplant.framework.out.persistence.jpa.repository.CommPostRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostViewCountRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;

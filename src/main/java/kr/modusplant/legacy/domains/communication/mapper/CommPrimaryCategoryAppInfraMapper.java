@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.mapper;
 
-import kr.modusplant.framework.out.persistence.jpa.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommCategoryInsertRequest;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommCategoryResponse;
 import org.mapstruct.Mapper;

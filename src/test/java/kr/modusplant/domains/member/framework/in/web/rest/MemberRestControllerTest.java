@@ -1,10 +1,10 @@
 package kr.modusplant.domains.member.framework.in.web.rest;
 
 import kr.modusplant.domains.member.adapter.controller.MemberController;
-import kr.modusplant.domains.member.adapter.response.MemberResponse;
 import kr.modusplant.domains.member.common.utils.adapter.request.MemberRequestTestUtils;
 import kr.modusplant.domains.member.common.utils.adapter.response.MemberResponseTestUtils;
 import kr.modusplant.domains.member.common.utils.domain.aggregate.MemberTestUtils;
+import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.out.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -13,7 +13,7 @@ import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static kr.modusplant.framework.out.config.jackson.TestJacksonConfig.objectMapper;
+import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;

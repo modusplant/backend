@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.term.domain.service;
 
-import kr.modusplant.framework.out.persistence.jpa.repository.TermRepository;
+import kr.modusplant.framework.out.jpa.repository.TermRepository;
 import kr.modusplant.legacy.domains.term.error.TermExistsException;
 import kr.modusplant.legacy.domains.term.error.TermNotFoundException;
 import lombok.RequiredArgsConstructor;

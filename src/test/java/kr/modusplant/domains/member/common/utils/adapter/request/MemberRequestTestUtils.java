@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.common.utils.adapter.request;
 
-import kr.modusplant.domains.member.adapter.request.MemberNicknameUpdateRequest;
-import kr.modusplant.domains.member.adapter.request.MemberRegisterRequest;
+import kr.modusplant.domains.member.usecase.request.MemberNicknameUpdateRequest;
+import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 
 import static kr.modusplant.domains.member.common.constant.MemberBooleanConstant.TEST_MEMBER_IS_ACTIVE;
 import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_MEMBER_NICKNAME;
