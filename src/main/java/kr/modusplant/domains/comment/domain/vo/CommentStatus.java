@@ -12,11 +12,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Getter
 @AllArgsConstructor
 public class CommentStatus {
-    private String status;
+    private CommentStatusType status;
 
     public static CommentStatus create(String status) {
         CommentStatus.checkSource(status);
-        return new CommentStatus(status);
+        return new CommentStatus(CommentStatusType.valueOf(status));
     }
 
     public static void checkSource(String source) {
@@ -27,8 +27,8 @@ public class CommentStatus {
         }
     }
 
-    public static CommentStatus setAsValid() { return new CommentStatus("valid"); }
-    public static CommentStatus setAsDeleted() { return new CommentStatus("deleted"); }
+    public static CommentStatus setAsValid() { return new CommentStatus(CommentStatusType.VALID); }
+    public static CommentStatus setAsDeleted() { return new CommentStatus(CommentStatusType.DELETED); }
 
     @Override
     public boolean equals(Object o) {
