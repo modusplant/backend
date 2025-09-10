@@ -2,7 +2,9 @@ package kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper;
 
 import kr.modusplant.domains.comment.adapter.model.CommentReadModel;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
+import kr.modusplant.domains.comment.domain.exception.enums.CommentStatusType;
 import kr.modusplant.domains.comment.domain.vo.Author;
+import kr.modusplant.domains.comment.domain.vo.CommentStatus;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.CommentCompositeKey;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
@@ -32,6 +34,7 @@ public interface CommentJpaMapper {
     @Mapping(source = "author", target = "authMember", qualifiedByName = "mapMember")
     @Mapping(source = "author", target = "createMember", qualifiedByName = "mapMember")
     @Mapping(source = "content.content", target = "content")
+    @Mapping(source = "status", target = "isDeleted", qualifiedByName = "mapIsDeleted")
     CommentEntity toCommentEntity(Comment comment);
 
     @Named("mapCommentId")
@@ -52,6 +55,16 @@ public interface CommentJpaMapper {
         return CommentMemberEntity.builder()
                 .uuid(author.getMemberUuid())
                 .build();
+    }
+
+    @Named("mapIsDeleted")
+    default boolean mapIsDeleted(CommentStatus status) {
+        CommentStatusType type = status.getStatus();
+
+        return switch (type) {
+            case CommentStatusType.VALID -> true;
+            case CommentStatusType.DELETED -> false;
+        };
     }
 
 }
