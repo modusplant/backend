@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class MemberTest implements MemberTestUtils {
     @DisplayName("null 값으로 create(MemberId id, MemberStatus status, MemberNickname nickname, MemberBirthDate birthDate) 호출")
     @Test
-    void callCreate_withNullToOneOfFourParameters_throwsException() {
+    void testCreate_givenNullToOneOfFourParameters_willThrowException() {
         // MemberId가 null일 때
         // given
         EmptyMemberIdException memberIdException = assertThrows(EmptyMemberIdException.class, () -> Member.create(null, testMemberActiveStatus, testMemberNickname, testMemberBirthDate));
@@ -48,7 +48,7 @@ class MemberTest implements MemberTestUtils {
 
     @DisplayName("null 값으로 create(MemberId id, MemberStatus status, MemberNickname nickname) 호출")
     @Test
-    void callCreate_withNullToOneOfThreeParameters_throwsException() {
+    void testCreate_givenNullToOneOfThreeParameters_willThrowException() {
         // MemberId가 null일 때
         // given
         EmptyMemberIdException memberIdException = assertThrows(EmptyMemberIdException.class, () -> Member.create(null, testMemberActiveStatus, testMemberNickname));
@@ -73,7 +73,7 @@ class MemberTest implements MemberTestUtils {
 
     @DisplayName("null 값으로 create(MemberNickname memberNickname) 호출")
     @Test
-    void callCreate_withNullToOneParameter_throwsException() {
+    void testCreate_givenNullToOneParameter_willThrowException() {
         // given
         EmptyMemberNicknameException exception = assertThrows(EmptyMemberNicknameException.class, () -> Member.create(null));
 
@@ -83,7 +83,7 @@ class MemberTest implements MemberTestUtils {
 
     @Test
     @DisplayName("같은 객체에 대한 equals 호출")
-    void useEqual_withSameObject_returnsTrue() {
+    void useEqual_givenSameObject_willReturnTrue() {
         // given
         Member member = createMember();
 
@@ -94,14 +94,14 @@ class MemberTest implements MemberTestUtils {
 
     @Test
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
-    void useEqual_withObjectOfDifferentClass_returnsFalse() {
+    void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
         assertNotEquals(createMember(), testMemberId);
     }
 
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
-    void useEqual_withObjectContainingDifferentProperty_returnsFalse() {
+    void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
         Member member = createMember();
         assertNotEquals(member, Member.create(testMemberNickname));
     }

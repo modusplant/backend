@@ -25,7 +25,7 @@ public class ControllerExceptionLoggingAspectTest {
 
     @Test
     @DisplayName("AOP 적용 컨트롤러 메소드 예외 상황 로깅")
-    void getMonitorControllerError_withRestController_returnErrorStatusWithAopLogging() throws Exception{
+    void getMonitorControllerError_givenRestController_returnErrorStatusWithAopLogging() throws Exception{
         LogCaptor logCaptor = LogCaptor.forClass(ControllerExceptionLoggingAspect.class);
         logCaptor.setLogLevelToInfo();
         mockMvc.perform(get("/api/monitor/monitor-error-controller")

@@ -36,7 +36,7 @@ class S3FileServiceTest {
 
     @Test
     @DisplayName("파일 업로드")
-    void uploadFile_withValidFile_returnActualRequest() throws IOException {
+    void uploadFile_givenValidFile_returnActualRequest() throws IOException {
         // given
         MultipartFile multipartFile = mock(MultipartFile.class);
         String fileKey = "test-file-key";
@@ -62,7 +62,7 @@ class S3FileServiceTest {
 
     @Test
     @DisplayName("파일 다운로드")
-    void downloadFile_withValidFile_returnFileContent() throws IOException {
+    void downloadFile_givenValidFile_returnFileContent() throws IOException {
         // given
         String fileKey = "test-file-key";
         byte[] fileContent = "test-download-content".getBytes();
@@ -83,7 +83,7 @@ class S3FileServiceTest {
 
     @Test
     @DisplayName("파일 삭제")
-    void deleteFile_withValidFile_returnActualRequest() {
+    void deleteFile_givenValidFile_returnActualRequest() {
         // given
         String fileKey = "test-file-key";
 

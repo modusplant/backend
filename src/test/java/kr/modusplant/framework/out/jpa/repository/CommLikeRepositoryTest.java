@@ -50,7 +50,7 @@ public class CommLikeRepositoryTest implements CommLikeEntityTestUtils {
 
         @Test
         @DisplayName("특정 사용자 컨텐츠 게시글 좋아요 여부 확인")
-        void isLikedByMember_returnsTrue() {
+        void isLikedByMember_willReturnTrue() {
             // given
             commLikeRepository.save(CommLikeEntity.of(postId, memberId));
 

@@ -28,7 +28,7 @@ class MemberRestControllerTest implements MemberTestUtils, MemberRequestTestUtil
 
     @Test
     @DisplayName("registerMember로 응답 반환")
-    void callRegisterMember_withValidRequest_returnsResponse() {
+    void testRegisterMember_givenValidRequest_willReturnResponse() {
         // given
         given(memberController.register(testMemberRegisterRequest)).willReturn(testMemberResponse);
 
@@ -42,7 +42,7 @@ class MemberRestControllerTest implements MemberTestUtils, MemberRequestTestUtil
 
     @Test
     @DisplayName("updateMemberNickname으로 응답 반환")
-    void callUpdateMemberNickname_withValidRequest_returnsResponse() {
+    void testUpdateMemberNickname_givenValidRequest_willReturnResponse() {
         // given
         given(memberController.updateNickname(testMemberNicknameUpdateRequest)).willReturn(testMemberResponse);
 
@@ -56,7 +56,7 @@ class MemberRestControllerTest implements MemberTestUtils, MemberRequestTestUtil
 
     @Test
     @DisplayName("likeCommunicationPost로 응답 반환")
-    void callLikeCommunicationPost_withValidRequest_returnsResponse() {
+    void testLikeCommunicationPost_givenValidRequest_willReturnResponse() {
         // given
         willDoNothing().given(memberController).likePost(testMemberId.getValue(), testPostId);
 
@@ -70,7 +70,7 @@ class MemberRestControllerTest implements MemberTestUtils, MemberRequestTestUtil
 
     @Test
     @DisplayName("unlikeCommunicationPost로 응답 반환")
-    void callUnlikeCommunicationPost_withValidRequest_returnsResponse() {
+    void testUnlikeCommunicationPost_givenValidRequest_willReturnResponse() {
         // given
         willDoNothing().given(memberController).unlikePost(testMemberId.getValue(), testPostId);
 

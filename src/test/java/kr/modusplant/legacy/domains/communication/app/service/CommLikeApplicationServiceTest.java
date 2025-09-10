@@ -120,7 +120,7 @@ class CommLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
 
     @Test
     @DisplayName("이미 좋아요 한 게시글을 또 좋아요 시도할 경우 예외 발생")
-    void likeCommPost_duplicateLike_throwsException() {
+    void likeCommPost_duplicateLike_willThrowException() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
         when(siteMemberRepository.save(member)).thenReturn(member);
@@ -152,7 +152,7 @@ class CommLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
 
     @Test
     @DisplayName("좋아요 하지 않은 게시글을 취소할 경우 예외 발생")
-    void unlikeCommPost_withoutLike_throwsException() {
+    void unlikeCommPost_givenoutLike_willThrowException() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
         when(siteMemberRepository.save(member)).thenReturn(member);

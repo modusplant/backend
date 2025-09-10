@@ -20,7 +20,7 @@ class UlidIdGeneratorTest {
 
     @Test
     @DisplayName("UlidIdGenerator가 올바른 형식의 ULID를 생성")
-    void generateUlid_withValidGenerator_returnsUlid() {
+    void generateUlid_givenValidGenerator_willReturnUlid() {
         // Given & When
         String ulid = generator.generate(null, null, null, EventType.INSERT);
 
@@ -30,7 +30,7 @@ class UlidIdGeneratorTest {
 
     @Test
     @DisplayName("UlidIdGenerator가 고유한 ULID를 생성")
-    void generateUlid_withValidGenerator_returnsUniqueUlid() {
+    void generateUlid_givenValidGenerator_willReturnUniqueUlid() {
         // Given
         int count = 10000;
 
@@ -47,7 +47,7 @@ class UlidIdGeneratorTest {
 
     @Test
     @DisplayName("UlidIdGenerator가 시간 순서에 따르는 ULID를 생성")
-    void generateUlid_withValidGenerator_returnsTimeOrderedUlid() throws InterruptedException {
+    void generateUlid_givenValidGenerator_willReturnTimeOrderedUlid() throws InterruptedException {
         // given
         int count = 5;
         List<String> ulids = new ArrayList<>();
@@ -73,7 +73,7 @@ class UlidIdGeneratorTest {
 
     @Test
     @DisplayName("UlidIdGenerator가 멀티스레드 환경에서도 고유한 ULID를 생성")
-    void generateUlidInMultiThread_withValidGenerator_returnsUlid() throws ExecutionException, InterruptedException {
+    void generateUlidInMultiThread_givenValidGenerator_willReturnUlid() throws ExecutionException, InterruptedException {
         // given
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         List<Future<List<String>>> futures = new ArrayList<>();

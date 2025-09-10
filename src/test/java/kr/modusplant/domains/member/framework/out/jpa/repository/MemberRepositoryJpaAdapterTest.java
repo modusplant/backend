@@ -19,7 +19,7 @@ class MemberRepositoryJpaAdapterTest implements MemberEntityTestUtils {
 
     @Test
     @DisplayName("updateNickname로 Member 반환")
-    void callUpdateNickname_withValidMember_returnsMember() {
+    void testUpdateNickname_givenValidMember_willReturnMember() {
         // given
         Member member = createMember();
         MemberEntity memberEntity = createMemberEntityWithUuid();
@@ -31,7 +31,7 @@ class MemberRepositoryJpaAdapterTest implements MemberEntityTestUtils {
 
     @Test
     @DisplayName("save로 Member 반환")
-    void callSave_withValidMember_returns() {
+    void testSave_givenValidMember_willReturn() {
         // given
         Member member = createMember();
         MemberEntity memberEntity = createMemberEntityWithUuid();

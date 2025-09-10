@@ -14,53 +14,53 @@ import static org.junit.jupiter.api.Assertions.*;
 class MemberIdTest implements MemberTestUtils {
     @Test
     @DisplayName("generate으로 회원 ID 반환")
-    void callGenerate_withNoParameter_returnsMemberId() {
+    void testGenerate_givenNoParameter_willReturnMemberId() {
         assertNotNull(MemberId.generate().getValue());
     }
 
     @Test
     @DisplayName("fromUuid로 회원 ID 반환")
-    void callFromUuid_withValidValue_returnsMemberId() {
+    void testFromUuid_givenValidValue_willReturnMemberId() {
         assertNotNull(MemberId.fromUuid(UUID.randomUUID()).getValue());
     }
 
     @Test
     @DisplayName("null로 fromUuid를 호출하여 오류 발생")
-    void callFromUuid_withNull_throwsException() {
+    void testFromUuid_givenNull_willThrowException() {
         EmptyMemberIdException exception = assertThrows(EmptyMemberIdException.class, () -> MemberId.fromUuid(null));
         assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_ID);
     }
 
     @Test
     @DisplayName("fromString으로 회원 ID 반환")
-    void callFromString_withValidValue_returnsMemberId() {
+    void testFromString_givenValidValue_willReturnMemberId() {
         assertNotNull(MemberId.fromString(UUID.randomUUID().toString()).getValue());
     }
 
     @Test
     @DisplayName("null로 fromString을 호출하여 오류 발생")
-    void callFromString_withNull_throwsException() {
+    void testFromString_givenNull_willThrowException() {
         EmptyMemberIdException exception = assertThrows(EmptyMemberIdException.class, () -> MemberId.fromString(null));
         assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_ID);
     }
 
     @Test
     @DisplayName("같은 객체에 대한 equals 호출")
-    void useEqual_withSameObject_returnsTrue() {
+    void useEqual_givenSameObject_willReturnTrue() {
         //noinspection EqualsWithItself
         assertEquals(testMemberId, testMemberId);
     }
 
     @Test
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
-    void useEqual_withObjectOfDifferentClass_returnsFalse() {
+    void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
         assertNotEquals(testMemberId, testMemberBirthDate);
     }
 
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
-    void useEqual_withObjectContainingDifferentProperty_returnsFalse() {
+    void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
         assertNotEquals(testMemberId, MemberId.generate());
     }
 }

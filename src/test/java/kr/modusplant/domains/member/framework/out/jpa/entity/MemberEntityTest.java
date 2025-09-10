@@ -25,7 +25,7 @@ class MemberEntityTest implements MemberEntityTestUtils {
 
     @DisplayName("null 값으로 PrePersist 호출")
     @Test
-    void callPrePersist_withNull_returnsVoid() {
+    void testPrePersist_givenNull_willInitializeFields() {
         // given
         MemberEntity member = MemberEntity.builder().memberEntity(createMemberEntity()).isActive(null).isDisabledByLinking(null).isBanned(null).isDeleted(null).build();
 
@@ -42,7 +42,7 @@ class MemberEntityTest implements MemberEntityTestUtils {
 
     @DisplayName("null이 아닌 값으로 PrePersist 호출")
     @Test
-    void callPrePersist_withNotNull_returnsVoid() {
+    void testPrePersist_givenNotNull_willInitializeFields() {
         // given
         MemberEntity member = MemberEntity.builder().memberEntity(createMemberEntity()).isActive(false).isDisabledByLinking(true).isBanned(false).isDeleted(false).build();
 
@@ -59,7 +59,7 @@ class MemberEntityTest implements MemberEntityTestUtils {
 
     @DisplayName("null 값으로 PreUpdate 호출")
     @Test
-    void callPreUpdate_withNull_returnsVoid() {
+    void testPreUpdate_givenNull_willInitializeFields() {
         // given
         MemberEntity member = MemberEntity.builder().memberEntity(createMemberEntity()).build();
         entityManager.persist(member);
@@ -77,7 +77,7 @@ class MemberEntityTest implements MemberEntityTestUtils {
 
     @DisplayName("null이 아닌 값으로 PreUpdate 호출")
     @Test
-    void callPreUpdate_withNotNull_returnsVoid() {
+    void testPreUpdate_givenNotNull_willInitializeFields() {
         // given
         MemberEntity member = MemberEntity.builder().memberEntity(createMemberEntity()).isActive(null).isDisabledByLinking(null).isBanned(null).isDeleted(null).build();
         entityManager.persist(member);
@@ -95,7 +95,7 @@ class MemberEntityTest implements MemberEntityTestUtils {
 
     @Test
     @DisplayName("같은 객체에 대한 equals 호출")
-    void useEqual_withSameObject_returnsTrue() {
+    void useEqual_givenSameObject_willReturnTrue() {
         // given
         MemberEntity memberEntity = createMemberEntityWithUuid();
 
@@ -106,14 +106,14 @@ class MemberEntityTest implements MemberEntityTestUtils {
 
     @Test
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
-    void useEqual_withObjectOfDifferentClass_returnsFalse() {
+    void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
         assertNotEquals(createMemberEntityWithUuid(), testMemberId);
     }
 
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
-    void useEqual_withObjectContainingDifferentProperty_returnsFalse() {
+    void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
         assertNotEquals(createMemberEntityWithUuid(), MemberEntity.builder().memberEntity(createMemberEntity()).uuid(UUID.randomUUID()).build());
     }
 }
