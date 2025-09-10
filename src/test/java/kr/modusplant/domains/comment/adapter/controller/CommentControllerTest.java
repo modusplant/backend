@@ -29,7 +29,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     @DisplayName("게시글로 댓글을 가져오는 API 테스트")
     public void testGatherByPost_givenValidPostUlid_willReturnResponseList() {
         // given
-        given(commentRepository.findByPost(testPostId)).willReturn(List.of(testCommentReadModel));
+        given(commentRepository.findByPost(testPostId)).willReturn(List.of(testCommentResponse));
         given(authorRepository.findByAuthor(testAuthorWithUuid)).willReturn(testMemberReadModel);
 
         // when
@@ -43,7 +43,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     @DisplayName("게시글로 댓글을 가져오는 API 테스트")
     public void testGatherByAuthor_givenValidPostUlid_willReturnResponseList() {
         // given
-        given(commentRepository.findByAuthor(testAuthorWithUuid)).willReturn(List.of(testCommentReadModel));
+        given(commentRepository.findByAuthor(testAuthorWithUuid)).willReturn(List.of(testCommentResponse));
         given(authorRepository.findByAuthor(testAuthorWithUuid)).willReturn(testMemberReadModel);
 
         // when

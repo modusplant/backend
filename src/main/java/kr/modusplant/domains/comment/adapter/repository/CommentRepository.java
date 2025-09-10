@@ -1,6 +1,6 @@
 package kr.modusplant.domains.comment.adapter.repository;
 
-import kr.modusplant.domains.comment.adapter.model.CommentReadModel;
+import kr.modusplant.domains.comment.adapter.response.CommentResponse;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.PostId;
@@ -10,9 +10,9 @@ import java.util.List;
 
 public interface CommentRepository {
 
-    List<CommentReadModel> findByPost(PostId postId);
+    List<CommentResponse> findByPost(PostId postId);
 
-    List<CommentReadModel> findByAuthor(Author author);
+    List<CommentResponse> findByAuthor(Author author);
 
     void save(Comment comment);
 
