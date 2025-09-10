@@ -10,7 +10,7 @@ class EncryptUtilsTest {
 
     @Test
     @DisplayName("null 입력 시 NullPointerException 발생")
-    void encrypt_withSha256NullInput_throwsNullPointerException() {
+    void encrypt_givenSha256NullInput_willThrowNullPointerException() {
         // given
         String input = null;
 
@@ -21,7 +21,7 @@ class EncryptUtilsTest {
 
     @Test
     @DisplayName("빈 문자열 입력 시 올바른 해시값 반환")
-    void encrypt_withSha256EmptyString_returnsCorrectHash() {
+    void encrypt_givenSha256EmptyString_willReturnCorrectHash() {
         // given
         String input = "";
         String expectedHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
@@ -36,7 +36,7 @@ class EncryptUtilsTest {
 
     @Test
     @DisplayName("같은 입력에 대해서는 항상 같은 해시값 반환")
-    void encrypt_withSha256SameInput_returnsSameHash() {
+    void encrypt_givenSha256SameInput_willReturnSameHash() {
         // given
         String input = "test input";
 
@@ -50,7 +50,7 @@ class EncryptUtilsTest {
 
     @Test
     @DisplayName("다른 입력에 대해서는 다른 해시값 반환")
-    void encrypt_withSha256DifferentInputs_returnsDifferentHashes() {
+    void encrypt_givenSha256DifferentInputs_willReturnDifferentHashes() {
         // given
         String input1 = "test1";
         String input2 = "test2";
@@ -65,7 +65,7 @@ class EncryptUtilsTest {
 
     @Test
     @DisplayName("sha256 정상 생성")
-    void encrypt_withSha256String_returnsCorrectHash() {
+    void encrypt_givenSha256String_willReturnCorrectHash() {
         // given
         String input = "test input";
         String expectedHash = "9dfe6f15d1ab73af898739394fd22fd72a03db01834582f24bb2e1c66c7aaeae";

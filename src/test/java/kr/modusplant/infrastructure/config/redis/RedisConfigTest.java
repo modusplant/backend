@@ -39,7 +39,7 @@ public class RedisConfigTest {
 
     @Test
     @DisplayName("문자열 Redis 템플릿으로 문자열 저장")
-    void storeString_withValidStringRedisTemplate_returnsString() {
+    void storeString_givenValidStringRedisTemplate_willReturnString() {
         stringRedisTemplate.opsForValue().set("testStringKey", "testStringValue");
 
         String result = stringRedisTemplate.opsForValue().get("testStringKey");
@@ -48,7 +48,7 @@ public class RedisConfigTest {
 
     @Test
     @DisplayName("Redis 템플릿으로 문자열 저장")
-    void storeString_withValidRedisTemplate_returnsString() {
+    void storeString_givenValidRedisTemplate_willReturnString() {
         redisTemplate.opsForValue().set("testStringKey", "testStringValue");
 
         String result = (String) redisTemplate.opsForValue().get("testStringKey");
@@ -57,7 +57,7 @@ public class RedisConfigTest {
 
     @Test
     @DisplayName("Redis 템플릿으로 객체 저장")
-    void storeObject_withValidRedisTemplate_returnsObject() {
+    void storeObject_givenValidRedisTemplate_willReturnObject() {
         TestObject testObject = new TestObject("John",28, LocalDateTime.now());
 
         redisTemplate.opsForValue().set("testObjectKey",testObject);
@@ -73,7 +73,7 @@ public class RedisConfigTest {
 
     @Test
     @DisplayName("Redis 템플릿으로 집합 저장")
-    void storeSet_withValidRedisTemplate_returnsSet() {
+    void storeSet_givenValidRedisTemplate_willReturnSet() {
         SetOperations<String, Object> setOps = redisTemplate.opsForSet();
         setOps.add("testSetKey","Item1", "Item2", "Item3");
 
@@ -86,7 +86,7 @@ public class RedisConfigTest {
 
     @Test
     @DisplayName("Redis 템플릿으로 리스트 저장")
-    void storeList_withValidRedisTemplate_returnsList() {
+    void storeList_givenValidRedisTemplate_willReturnList() {
         ListOperations<String, Object> listOps = redisTemplate.opsForList();
         listOps.rightPush("testListKey","Item1");
         listOps.rightPush("testListKey","Item2");
@@ -100,7 +100,7 @@ public class RedisConfigTest {
 
     @Test
     @DisplayName("Redis 템플릿으로 해시 저장")
-    void storeHash_withValidRedisTemplate_returnsHash() {
+    void storeHash_givenValidRedisTemplate_willReturnHash() {
         Date birthday = new Date();
 
         HashOperations<String, Object, Object> hashOps = redisTemplate.opsForHash();
@@ -118,7 +118,7 @@ public class RedisConfigTest {
 
     @Test
     @DisplayName("Redis 템플릿으로 열거형 저장")
-    void storeEnum_withValidRedisTemplate_returnsEnum() {
+    void storeEnum_givenValidRedisTemplate_willReturnEnum() {
         redisTemplate.opsForValue().set("testEnumKey", Role.USER);
 
         Role role = (Role) redisTemplate.opsForValue().get("testEnumKey");

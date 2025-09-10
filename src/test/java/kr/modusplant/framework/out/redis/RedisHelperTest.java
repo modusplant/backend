@@ -21,7 +21,7 @@ class RedisHelperTest {
 
     @Test
     @DisplayName("Redis 헬퍼로 문자열 저장")
-    void storeString_withValidRedisHelper_returnString() {
+    void storeString_givenValidRedisHelper_returnString() {
         String stringKey = "test:string";
         String stringValue = "stringValue";
 
@@ -33,7 +33,7 @@ class RedisHelperTest {
 
     @Test
     @DisplayName("Redis 헬퍼로 객체 저장")
-    void storeObject_withValidRedisHelper_returnObject() {
+    void storeObject_givenValidRedisHelper_returnObject() {
         String objectKey = "test:object";
         TestDto objectValue = new TestDto("John",30);
 
@@ -47,7 +47,7 @@ class RedisHelperTest {
 
     @Test
     @DisplayName("Redis 헬퍼로 객체 삭제 후 존재하지 않는지 확인")
-    void deleteString_withValidRedisHelper_assertNotExists() {
+    void deleteString_givenValidRedisHelper_assertNotExists() {
         String deleteKey = "test:delete";
         String deleteValue = "deleteValue";
 
@@ -60,7 +60,7 @@ class RedisHelperTest {
 
     @Test
     @DisplayName("Redis 헬퍼로 문자열 만료")
-    void expireString_withValidRedisHelper_returnTTL() throws InterruptedException {
+    void expireString_givenValidRedisHelper_returnTTL() throws InterruptedException {
         String expireKey = "test:expire";
         String expireValue = "expireValue";
 
@@ -79,7 +79,7 @@ class RedisHelperTest {
 
     @Test
     @DisplayName("Redis 헬퍼로 문자열 저장 후 TTL 확인")
-    void storeString_withValidRedisHelper_assertTTLGreaterThan() throws InterruptedException {
+    void storeString_givenValidRedisHelper_assertTTLGreaterThan() throws InterruptedException {
         String key = "test:ttl:exists";
         String value = "someValue";
 
@@ -93,7 +93,7 @@ class RedisHelperTest {
 
     @Test
     @DisplayName("Redis 헬퍼로 문자열 저장 후 TTL이 만료가 없음을 확인")
-    void storeString_withValidRedisHelper_assertTTLHasNoExpiration() {
+    void storeString_givenValidRedisHelper_assertTTLHasNoExpiration() {
         String key = "test:ttl:infinite";
         String value = "persistentValue";
 
@@ -106,7 +106,7 @@ class RedisHelperTest {
 
     @Test
     @DisplayName("Redis 헬퍼로 문자열 저장 후 TTL이 비어있음을 확인")
-    void storeString_withValidRedisHelper_assertTTLEmpty() {
+    void storeString_givenValidRedisHelper_assertTTLEmpty() {
         String key = "test:ttl:nonexistent";
 
         Optional<Duration> ttl = redisHelper.getTTL(key);

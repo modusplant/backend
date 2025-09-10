@@ -14,34 +14,34 @@ import static org.junit.jupiter.api.Assertions.*;
 class MemberNicknameTest implements MemberNicknameTestUtils {
     @Test
     @DisplayName("create으로 회원 닉네임 반환")
-    void callCreate_withValidValue_returnsMemberNickname() {
+    void testCreate_givenValidValue_willReturnMemberNickname() {
         assertThat(MemberNickname.create(TEST_MEMBER_NICKNAME)).isEqualTo(MemberNickname.create(TEST_MEMBER_NICKNAME));
     }
 
     @Test
     @DisplayName("null로 create을 호출하여 오류 발생")
-    void callCreate_withNull_throwsException() {
+    void testCreate_givenNull_willThrowException() {
         EmptyMemberNicknameException exception = assertThrows(EmptyMemberNicknameException.class, () -> MemberNickname.create(null));
         assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_NICKNAME);
     }
 
     @Test
     @DisplayName("같은 객체에 대한 equals 호출")
-    void useEqual_withSameObject_returnsTrue() {
+    void useEqual_givenSameObject_willReturnTrue() {
         //noinspection EqualsWithItself
         assertEquals(testMemberNickname, testMemberNickname);
     }
 
     @Test
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
-    void useEqual_withObjectOfDifferentClass_returnsFalse() {
+    void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
         assertNotEquals(testMemberNickname, testMemberId);
     }
 
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
-    void useEqual_withObjectContainingDifferentProperty_returnsFalse() {
+    void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
         assertNotEquals(testMemberNickname, MemberNickname.create(TEST_MEMBER_NICKNAME + "1"));
     }
 }
