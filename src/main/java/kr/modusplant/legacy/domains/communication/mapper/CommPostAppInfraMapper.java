@@ -1,9 +1,9 @@
 package kr.modusplant.legacy.domains.communication.mapper;
 
-import kr.modusplant.framework.out.persistence.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.out.persistence.jpa.entity.CommPrimaryCategoryEntity;
-import kr.modusplant.framework.out.persistence.jpa.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommPostResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -11,8 +11,8 @@ import org.mapstruct.Named;
 
 import java.util.UUID;
 
-import static kr.modusplant.framework.out.persistence.constant.EntityFieldName.AUTH_MEMBER;
-import static kr.modusplant.framework.out.persistence.constant.EntityFieldName.NICKNAME;
+import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.AUTH_MEMBER;
+import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.NICKNAME;
 import static kr.modusplant.legacy.domains.communication.vo.CommCategoryWord.PRIMARY_CATEGORY;
 import static kr.modusplant.legacy.domains.communication.vo.CommCategoryWord.SECONDARY_CATEGORY;
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.MEMBER_UUID;

@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.common.util.app.http.request;
 
-import kr.modusplant.framework.out.persistence.jpa.entity.CommCommentEntity;
+import kr.modusplant.framework.out.jpa.entity.CommCommentEntity;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommCommentInsertRequest;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommCommentEntityTestUtils;
 

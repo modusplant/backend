@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.member.domain.service;
 
-import kr.modusplant.framework.out.persistence.constant.EntityName;
-import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRoleRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleRepository;
+import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;

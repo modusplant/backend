@@ -1,11 +1,11 @@
 package kr.modusplant.domains.member.adapter.controller;
 
-import kr.modusplant.domains.member.adapter.request.MemberNicknameUpdateRequest;
-import kr.modusplant.domains.member.adapter.request.MemberRegisterRequest;
-import kr.modusplant.domains.member.adapter.response.MemberResponse;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
+import kr.modusplant.domains.member.usecase.request.MemberNicknameUpdateRequest;
+import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
+import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.PostLikeEvent;
 import kr.modusplant.shared.event.PostUnlikeEvent;

@@ -1,13 +1,13 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
-import kr.modusplant.framework.out.persistence.jpa.entity.CommCommentEntity;
-import kr.modusplant.framework.out.persistence.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.out.persistence.jpa.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.persistence.jpa.repository.CommCommentRepository;
-import kr.modusplant.framework.out.persistence.jpa.repository.CommPostRepository;
-import kr.modusplant.framework.out.persistence.jpa.repository.CommSecondaryCategoryRepository;
-import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.entity.CommCommentEntity;
+import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.repository.CommCommentRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
+import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommCommentInsertRequest;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommCommentResponse;

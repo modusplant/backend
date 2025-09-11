@@ -25,7 +25,7 @@ public class ApiLoggingAspectTest {
 
     @Test
     @DisplayName("AOP 적용 컨트롤러 메소드 호출")
-    void getMonitorSuccess_withRestController_returnsSuccessStatusWithAopLogging() throws Exception{
+    void getMonitorSuccess_givenRestController_willReturnSuccessStatusWithAopLogging() throws Exception{
         LogCaptor logCaptor = LogCaptor.forClass(ApiLoggingAspect.class);
         logCaptor.setLogLevelToInfo();
         mockMvc.perform(get("/api/monitor/monitor-success")
