@@ -26,7 +26,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     private final CommentController controller = new CommentController(mapper, commentRepository, authorRepository);
 
     @Test
-    @DisplayName("게시글로 댓글을 가져오는 API 테스트")
+    @DisplayName("유효한 게시글 id로 댓글 읽기")
     public void testGatherByPost_givenValidPostUlid_willReturnResponseList() {
         // given
         given(commentRepository.findByPost(testPostId)).willReturn(List.of(testCommentResponse));
@@ -40,7 +40,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     }
 
     @Test
-    @DisplayName("게시글로 댓글을 가져오는 API 테스트")
+    @DisplayName("유효한 작성자 id로 댓글 읽기")
     public void testGatherByAuthor_givenValidPostUlid_willReturnResponseList() {
         // given
         given(commentRepository.findByAuthor(testAuthorWithUuid)).willReturn(List.of(testCommentResponse));

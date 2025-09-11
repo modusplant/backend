@@ -30,8 +30,8 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     private final CommentRestController restController = new CommentRestController(controller);
 
     @Test
-    @DisplayName("게시글에 해당하는 댓글을 가져오는 API 호출")
-    public void callGatherByPost_whenValidPostUlid_WillReturnResponseEntity() {
+    @DisplayName("유효한 게시글 id로 게시글의 댓글 가져오기")
+    public void testGatherByPost_givenValidPostUlid_WillReturnResponseEntity() {
         // given
         given(controller.gatherByPost(testPostId.getId())).willReturn(List.of(testCommentResponse));
 
@@ -44,8 +44,8 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     }
 
     @Test
-    @DisplayName("게시글에 해당하는 댓글을 가져오는 API 호출")
-    public void callGatherByAuthor_whenValidMemberUuid_WillReturnResponseEntity() {
+    @DisplayName("유효한 작성자 id로 작성자에 해당하는 댓글 가져오기")
+    public void testGatherByAuthor_givenValidMemberUuid_WillReturnResponseEntity() {
         // given
         given(controller.gatherByAuthor(testMemberId.getValue())).willReturn(List.of(testCommentResponse));
 
@@ -58,8 +58,8 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     }
 
     @Test
-    @DisplayName("게시글에 해당하는 댓글을 가져오는 API 호출")
-    public void callRegister_whenValidRegisterRequest_WillReturnResponseEntity() {
+    @DisplayName("유효한 댓글 등록 객체로 댓글 저장")
+    public void testRegister_givenValidRegisterRequest_WillReturnResponseEntity() {
         // given
         doNothing().when(controller).register(testCommentRegisterRequest);
 
@@ -71,8 +71,8 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     }
 
     @Test
-    @DisplayName("게시글에 해당하는 댓글을 가져오는 API 호출")
-    public void callDelete_whenValidDeleteRequest_WillReturnResponseEntity() {
+    @DisplayName("유효한 삭제 요청으로 댓글 삭제")
+    public void testDelete_givenValidDeleteRequest_WillReturnResponseEntity() {
         // given
         doNothing().when(controller).delete(testCommentDeleteRequest);
 

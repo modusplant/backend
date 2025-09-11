@@ -14,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class AuthorTest implements AuthorTestUtils {
 
     @Test
-    @DisplayName("create() 메서드의 MemberUuid 가 null 인 경우 EmptyValueException 호출")
-    public void callCreate_whenInvalidMemberUuid_willThrowEmptyValueException() {
+    @DisplayName("null인 사용자의 id로 작성자 생성")
+    public void testCreate_givenInvalidMemberUuid_willThrowEmptyValueException() {
         // given
         EmptyValueException result = assertThrows(EmptyValueException.class, () -> Author.create(null));
 
@@ -24,8 +24,8 @@ public class AuthorTest implements AuthorTestUtils {
     }
 
     @Test
-    @DisplayName("create() 메서드의 MemberNickname 이 null 인 경우 EmptyValueException 호출")
-    public void callCreate_whenInvalidMemberNickname_willThrowEmptyValueException() {
+    @DisplayName("null인 작성자의 닉네임으로 작성자 생성")
+    public void testCreate_givenInvalidMemberNickname_willThrowEmptyValueException() {
         // given
         EmptyValueException result = assertThrows(EmptyValueException.class, () -> Author.create(testAuthor.getMemberUuid(), null));
 

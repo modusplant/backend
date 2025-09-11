@@ -13,8 +13,8 @@ public class CommentMapperImplTest implements
     private final CommentMapperImpl mapper = new CommentMapperImpl();
 
     @Test
-    @DisplayName("CommentRegisterRequest 를 Comment 로 변환")
-    public void callToComment_whenValidRegisterRequest_willReturnComment() {
+    @DisplayName("댓글 등록 객체를 댓글 객체로 변환")
+    public void testToComment_givenValidRegisterRequest_willReturnComment() {
         assertThat(mapper.toComment(testCommentRegisterRequest)).isEqualTo(testValidComment);
     }
 }

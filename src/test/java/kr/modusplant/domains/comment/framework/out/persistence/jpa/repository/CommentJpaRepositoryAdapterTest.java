@@ -31,7 +31,7 @@ public class CommentJpaRepositoryAdapterTest implements PostIdTestUtils,
     private final CommentRepositoryJpaAdapter repositoryJpaAdapter = new CommentRepositoryJpaAdapter(repository, mapper);
 
     @Test
-    @DisplayName("")
+    @DisplayName("유효한 게시글 id로 댓글 가져오기")
     public void testFindByPost_givenValidPostId_willReturnCommentResponseList() {
         // given
         given(repository.findByPostUlid(testPostId.getId())).willReturn(List.of(testCommentResponse));
@@ -44,7 +44,7 @@ public class CommentJpaRepositoryAdapterTest implements PostIdTestUtils,
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("유효한 작성자 id로 댓글 가져오기")
     public void testFindByAuthor_givenValidAuthor_willReturnCommentResponseList() {
         // given
         given(repository.findByAuthMemberUuid(testMemberId.getValue())).willReturn(List.of(testCommentResponse));
@@ -57,8 +57,8 @@ public class CommentJpaRepositoryAdapterTest implements PostIdTestUtils,
     }
 
     @Test
-    @DisplayName("")
-    public void testSave_givenValidCommentId_willSaveComment() {
+    @DisplayName("유효한 댓글로 댓글 저장")
+    public void testSave_givenValidComment_willSaveComment() {
         // given
         CommentEntity testCommentEntity = createCommentEntity();
 
@@ -73,7 +73,7 @@ public class CommentJpaRepositoryAdapterTest implements PostIdTestUtils,
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("댓글 id로 댓글 삭제")
     public void testDeleteById_givenValidCommentId_willDeleteComment() {
         // given
         doNothing().when(repository).deleteById(testCommentCompositeKey);

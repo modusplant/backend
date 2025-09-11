@@ -12,7 +12,7 @@ public class CommentJpaMapperTest implements CommentTestUtils, CommentEntityTest
     private final CommentJpaMapper mapper = new CommentJpaMapperImpl();
 
     @Test
-    @DisplayName("")
+    @DisplayName("유효한 댓글을 댓글 엔티티로 전환")
     public void testToCommentEntity_givenValidComment_willReturnCommentEntity() {
         // given & when
         CommentEntity result = mapper.toCommentEntity(testValidComment);

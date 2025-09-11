@@ -13,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class CommentPathTest implements CommentPathTestUtils {
 
     @Test
-    @DisplayName("빈 문자열로 댓글 경로를 생성할 시 커스텀 예외를 던짐")
-    public void callCreate_whenBlankPath_willThrowEmptyValueException() {
+    @DisplayName("빈 문자열로 댓글 경로 생성")
+    public void testCreate_givenBlankPath_willThrowEmptyValueException() {
         // given
         EmptyValueException result = assertThrows(EmptyValueException.class, () ->
                 CommentPath.create(""));
@@ -24,8 +24,8 @@ public class CommentPathTest implements CommentPathTestUtils {
     }
 
     @Test
-    @DisplayName("빈 문자열로 댓글 경로를 생성할 시 커스텀 예외를 던짐")
-    public void callCreate_whenInvalidPath_willThrowInvalidValueException() {
+    @DisplayName("빈 문자열로 댓글 경로 생성")
+    public void testCreate_givenInvalidPath_willThrowInvalidValueException() {
         // given
         InvalidValueException result = assertThrows(InvalidValueException.class, () ->
                 CommentPath.create("3/d.0"));
