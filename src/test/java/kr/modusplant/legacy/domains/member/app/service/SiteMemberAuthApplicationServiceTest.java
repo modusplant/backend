@@ -1,9 +1,9 @@
 package kr.modusplant.legacy.domains.member.app.service;
 
-import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberAuthEntity;
-import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberAuthRepository;
-import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberAuthUpdateRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberAuthResponse;

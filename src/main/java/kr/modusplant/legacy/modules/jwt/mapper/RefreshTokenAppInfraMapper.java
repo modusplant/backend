@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.modules.jwt.mapper;
 
-import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.legacy.modules.jwt.persistence.entity.RefreshTokenEntity;
 import org.mapstruct.*;
@@ -11,8 +11,8 @@ import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.UUID;
 
-import static kr.modusplant.framework.out.persistence.constant.EntityFieldName.EXPIRED_AT;
-import static kr.modusplant.framework.out.persistence.constant.EntityFieldName.ISSUED_AT;
+import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.EXPIRED_AT;
+import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.ISSUED_AT;
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.MEMBER_UUID;
 
 @Mapper

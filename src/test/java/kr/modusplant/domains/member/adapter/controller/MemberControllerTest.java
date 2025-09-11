@@ -1,14 +1,14 @@
 package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.adapter.mapper.MemberMapperImpl;
-import kr.modusplant.domains.member.domain.aggregate.Member;
-import kr.modusplant.domains.member.framework.out.persistence.jpa.repository.MemberRepositoryJpaAdapter;
 import kr.modusplant.domains.member.common.utils.adapter.request.MemberRequestTestUtils;
 import kr.modusplant.domains.member.common.utils.domain.aggregate.MemberTestUtils;
+import kr.modusplant.domains.member.domain.aggregate.Member;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberRepositoryJpaAdapter;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
-import kr.modusplant.framework.out.persistence.jpa.entity.CommLikeEntity;
-import kr.modusplant.framework.out.persistence.jpa.repository.CommLikeRepository;
+import kr.modusplant.framework.out.jpa.entity.CommLikeEntity;
+import kr.modusplant.framework.out.jpa.repository.CommLikeRepository;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.event.consumer.PostEventConsumer;
 import kr.modusplant.shared.event.PostLikeEventTestUtils;
@@ -35,7 +35,7 @@ class MemberControllerTest implements MemberTestUtils, MemberRequestTestUtils, P
 
     @Test
     @DisplayName("updateNickname으로 닉네임 갱신")
-    void callUpdateNickname_withValidRequest_returnsResponse() {
+    void testUpdateNickname_givenValidRequest_willReturnResponse() {
         // given
         Member member = createMember();
         given(memberRepository.updateNickname(any())).willReturn(member);
@@ -46,7 +46,7 @@ class MemberControllerTest implements MemberTestUtils, MemberRequestTestUtils, P
 
     @Test
     @DisplayName("register로 회원 등록")
-    void callRegister_withValidRequest_returnsResponse() {
+    void testRegister_givenValidRequest_willReturnResponse() {
         // given
         Member member = createMember();
         given(memberRepository.save(any())).willReturn(member);
@@ -57,7 +57,7 @@ class MemberControllerTest implements MemberTestUtils, MemberRequestTestUtils, P
 
     @Test
     @DisplayName("likePost로 게시글 좋아요")
-    void callLikePost_withValidParameter_returnsVoid() {
+    void testLikePost_givenValidParameter_willLikePost() {
         // given
         UUID memberId = TEST_POST_LIKE_EVENT.getMemberId();
         String postId = TEST_POST_LIKE_EVENT.getPostId();
@@ -73,7 +73,7 @@ class MemberControllerTest implements MemberTestUtils, MemberRequestTestUtils, P
 
     @Test
     @DisplayName("unlikePost로 게시글 좋아요")
-    void callUnlikePost_withValidParameter_returnsVoid() {
+    void testUnlikePost_givenValidParameter_willUnlikePost() {
         // given
         UUID memberId = TEST_POST_LIKE_EVENT.getMemberId();
         String postId = TEST_POST_LIKE_EVENT.getPostId();

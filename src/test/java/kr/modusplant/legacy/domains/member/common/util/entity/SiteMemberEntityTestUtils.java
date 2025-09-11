@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.member.common.util.entity;
 
-import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTestUtils;
 
 public interface SiteMemberEntityTestUtils extends SiteMemberTestUtils {

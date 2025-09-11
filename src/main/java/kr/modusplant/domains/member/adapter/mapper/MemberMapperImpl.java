@@ -1,13 +1,13 @@
 package kr.modusplant.domains.member.adapter.mapper;
 
-import kr.modusplant.domains.member.adapter.request.MemberNicknameUpdateRequest;
-import kr.modusplant.domains.member.adapter.request.MemberRegisterRequest;
-import kr.modusplant.domains.member.adapter.response.MemberResponse;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberNickname;
 import kr.modusplant.domains.member.domain.vo.MemberStatus;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
+import kr.modusplant.domains.member.usecase.request.MemberNicknameUpdateRequest;
+import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
+import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import org.springframework.stereotype.Component;
 
 @Component

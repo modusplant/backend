@@ -40,7 +40,7 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     @DisplayName("IllegalArgumentException으로 전역 예외 핸들러 호출")
-    public void callHandleIllegalArgumentException_withValidGlobalExceptionHandler_returnResponse() {
+    public void testHandleIllegalArgumentException_givenValidGlobalExceptionHandler_returnResponse() {
         // given & when
         ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleIllegalArgumentException();
         DataResponse<Void> errorResponse = response.getBody();
@@ -55,7 +55,7 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     @DisplayName("IllegalStateException으로 전역 예외 핸들러 호출")
-    public void callHandleIllegalStateException_withValidGlobalExceptionHandler_returnResponse() {
+    public void testHandleIllegalStateException_givenValidGlobalExceptionHandler_returnResponse() {
         // given & when
         ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleIllegalStateException();
         DataResponse<Void> errorResponse = response.getBody();
@@ -70,7 +70,7 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     @DisplayName("MethodArgumentNotValidException으로 전역 예외 핸들러 호출")
-    public void callHandleMethodArgumentNotValidException_withValidGlobalExceptionHandler_returnResponse() {
+    public void testHandleMethodArgumentNotValidException_givenValidGlobalExceptionHandler_returnResponse() {
         // given
         BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(new Object(), "테스트 객체");
         bindingResult.addError(new FieldError("testObject", "testField", "테스트 메시지"));
@@ -90,7 +90,7 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     @DisplayName("MethodArgumentTypeMismatchException으로 전역 예외 핸들러 호출")
-    public void callHandleMethodArgumentTypeMismatchException_withValidGlobalExceptionHandler_returnResponse() {
+    public void testHandleMethodArgumentTypeMismatchException_givenValidGlobalExceptionHandler_returnResponse() {
         // given
         MethodArgumentTypeMismatchException ex = mock(MethodArgumentTypeMismatchException.class);
         given(ex.getName()).willReturn("testRequestParam");
@@ -109,7 +109,7 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     @DisplayName("ConstraintViolationException으로 전역 예외 핸들러 호출")
-    public void callHandleConstraintViolationException_withValidGlobalExceptionHandler_returnResponse() {
+    public void testHandleConstraintViolationException_givenValidGlobalExceptionHandler_returnResponse() {
         // given
         ConstraintViolationException ex = mock(ConstraintViolationException.class);
 
@@ -143,7 +143,7 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     @DisplayName("UnrecognizedPropertyException으로 전역 예외 핸들러 호출")
-    void callHandleHttpMessageNotReadableException_withUnrecognizedPropertyException_returnResponse() {
+    void testHandleHttpMessageNotReadableException_givenUnrecognizedPropertyException_returnResponse() {
         // given
         UnrecognizedPropertyException upx = new UnrecognizedPropertyException(null, null, null, null, null, null);
         HttpInputMessage inputMessage = mock(HttpInputMessage.class);
@@ -163,7 +163,7 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     @DisplayName("JsonMappingException으로 전역 예외 핸들러 호출")
-    void callHandleHttpMessageNotReadableException_withJsonMappingException_returnResponse() {
+    void testHandleHttpMessageNotReadableException_givenJsonMappingException_returnResponse() {
         // given
         JsonMappingException jmx = mock(JsonMappingException.class);
         HttpInputMessage inputMessage = mock(HttpInputMessage.class);
@@ -183,7 +183,7 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     @DisplayName("JsonParseException으로 전역 예외 핸들러 호출")
-    void callHandleHttpMessageNotReadableException_withJsonParseException_returnResponse() {
+    void testHandleHttpMessageNotReadableException_givenJsonParseException_returnResponse() {
         // given
         JsonParseException jpx = mock(JsonParseException.class);
         HttpInputMessage inputMessage = mock(HttpInputMessage.class);
@@ -203,7 +203,7 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     @DisplayName("HttpMessageNotReadableException으로 전역 예외 핸들러 호출")
-    public void callHandleHttpMessageNotReadableException_withValidGlobalExceptionHandler_returnResponse() {
+    public void testHandleHttpMessageNotReadableException_givenValidGlobalExceptionHandler_returnResponse() {
         // given
         HttpInputMessage inputMessage = mock(HttpInputMessage.class);
         HttpMessageNotReadableException ex = new HttpMessageNotReadableException("", mock(HttpMessageNotReadableException.class), inputMessage);
@@ -222,7 +222,7 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     @DisplayName("HttpMessageNotWritableException으로 전역 예외 핸들러 호출")
-    public void callHandleHttpMessageNotWritableException_withValidGlobalExceptionHandler_returnResponse() {
+    public void testHandleHttpMessageNotWritableException_givenValidGlobalExceptionHandler_returnResponse() {
         // given & when
         ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleHttpMessageNotWritableException();
         DataResponse<Void> errorResponse = response.getBody();
@@ -237,7 +237,7 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     @DisplayName("BusinessException으로 전역 예외 핸들러 호출")
-    public void callHandleBusinessException_withValidGlobalExceptionHandler_returnResponse() {
+    public void testHandleBusinessException_givenValidGlobalExceptionHandler_returnResponse() {
         // given
         BusinessException ex = new BusinessException(ErrorCode.GENERIC_ERROR);
 
@@ -255,7 +255,7 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     @DisplayName("RuntimeException으로 전역 예외 핸들러 호출")
-    public void callHandleRuntimeException_withValidGlobalExceptionHandler_returnResponse() {
+    public void testHandleRuntimeException_givenValidGlobalExceptionHandler_returnResponse() {
         // given
         RuntimeException ex = mock(RuntimeException.class);
         HttpServletRequest servletRequest = mock(HttpServletRequest.class);
@@ -274,7 +274,7 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     @DisplayName("Exception으로 전역 예외 핸들러 호출")
-    public void callHandleException_withValidGlobalExceptionHandler_returnResponse() {
+    public void testHandleException_givenValidGlobalExceptionHandler_returnResponse() {
         // given
         Exception ex = mock(Exception.class);
         HttpServletRequest servletRequest = mock(HttpServletRequest.class);

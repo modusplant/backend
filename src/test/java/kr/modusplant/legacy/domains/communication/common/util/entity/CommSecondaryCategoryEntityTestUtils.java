@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.common.util.entity;
 
-import kr.modusplant.framework.out.persistence.jpa.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.legacy.domains.communication.common.util.domain.CommSecondaryCategoryTestUtils;
 
 public interface CommSecondaryCategoryEntityTestUtils extends CommSecondaryCategoryTestUtils {

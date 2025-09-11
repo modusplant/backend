@@ -1,12 +1,12 @@
 package kr.modusplant.legacy.domains.member.mapper;
 
-import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import static kr.modusplant.framework.out.persistence.constant.EntityFieldName.*;
+import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.*;
 
 @Mapper
 public interface SiteMemberAppInfraMapper {
