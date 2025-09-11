@@ -40,7 +40,7 @@ public class ApiLoggingAspect {
 
         MDC.put("uri", request.getRequestURI());
         MDC.put("method", request.getMethod());
-        MDC.put("clientIp", request.getRemoteAddr());
+        MDC.put("clientIp", getClientIp(request));
         MDC.put("traceId", UUID.randomUUID().toString()); // 추적용 ID
         MDC.put("methodName", joinPoint.getSignature().getName());
         MDC.put("isLogged", Boolean.FALSE.toString()); // 예외 로깅 중복 방지용
@@ -68,5 +68,13 @@ public class ApiLoggingAspect {
     public static boolean isSameThread() {
         Long original = THREAD_ID.get();
         return original != null && original.equals(Thread.currentThread().threadId());
+    }
+
+    public static String getClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
+            return ip.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
 }
