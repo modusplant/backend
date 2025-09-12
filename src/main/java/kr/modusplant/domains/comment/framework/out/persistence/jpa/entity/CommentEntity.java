@@ -3,6 +3,8 @@ package kr.modusplant.domains.comment.framework.out.persistence.jpa.entity;
 import jakarta.persistence.*;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.CommentCompositeKey;
 import kr.modusplant.framework.out.persistence.annotation.DefaultValue;
+import kr.modusplant.framework.out.persistence.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,15 +33,15 @@ public class CommentEntity {
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @MapsId("postUlid")
     @JoinColumn(name = "post_ulid", nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private PostEntity postEntity;
+    private CommPostEntity postEntity;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = SNAKE_AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private CommentMemberEntity authMember;
+    private SiteMemberEntity authMember;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = SNAKE_CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private CommentMemberEntity createMember;
+    private SiteMemberEntity createMember;
 
     @Column(name = "content", nullable = false, length = 900)
     private String content;
@@ -77,8 +79,8 @@ public class CommentEntity {
     }
 
     private CommentEntity(
-            PostEntity postEntity, String path,
-            CommentMemberEntity authMember, CommentMemberEntity createMember,
+            CommPostEntity postEntity, String path,
+            SiteMemberEntity authMember, SiteMemberEntity createMember,
             String content, Boolean isDeleted
     ) {
         this.postEntity = postEntity;
@@ -94,14 +96,14 @@ public class CommentEntity {
     }
 
     public static final class CommentEntityBuilder {
-        private PostEntity postEntity;
+        private CommPostEntity postEntity;
         private CommentCompositeKey id;
-        private CommentMemberEntity authMember;
-        private CommentMemberEntity createMember;
+        private SiteMemberEntity authMember;
+        private SiteMemberEntity createMember;
         private String content;
         private Boolean isDeleted;
 
-        public CommentEntity.CommentEntityBuilder postEntity(final PostEntity postEntity) {
+        public CommentEntity.CommentEntityBuilder postEntity(final CommPostEntity postEntity) {
             this.postEntity = postEntity;
             return this;
         }
@@ -111,12 +113,12 @@ public class CommentEntity {
             return this;
         }
 
-        public CommentEntity.CommentEntityBuilder authMember(final CommentMemberEntity authMember) {
+        public CommentEntity.CommentEntityBuilder authMember(final SiteMemberEntity authMember) {
             this.authMember = authMember;
             return this;
         }
 
-        public CommentEntity.CommentEntityBuilder createMember(final CommentMemberEntity createMember) {
+        public CommentEntity.CommentEntityBuilder createMember(final SiteMemberEntity createMember) {
             this.createMember = createMember;
             return this;
         }

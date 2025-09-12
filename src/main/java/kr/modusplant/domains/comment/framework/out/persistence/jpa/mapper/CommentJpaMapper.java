@@ -8,8 +8,8 @@ import kr.modusplant.domains.comment.domain.vo.CommentStatus;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.CommentCompositeKey;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
-import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentMemberEntity;
-import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.PostEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -46,13 +46,13 @@ public interface CommentJpaMapper {
     }
 
     @Named("mapPostEntity")
-    default PostEntity mapPostEntity(PostId postId) {
-        return PostEntity.create(postId.getId());
+    default CommPostEntity mapPostEntity(PostId postId) {
+        return CommPostEntity.builder().ulid(postId.getId()).build();
     }
 
     @Named("mapMember")
-    default CommentMemberEntity mapCommentMember(Author author) {
-        return CommentMemberEntity.builder()
+    default SiteMemberEntity mapCommentMember(Author author) {
+        return SiteMemberEntity.builder()
                 .uuid(author.getMemberUuid())
                 .build();
     }
@@ -62,8 +62,8 @@ public interface CommentJpaMapper {
         CommentStatusType type = status.getStatus();
 
         return switch (type) {
-            case CommentStatusType.VALID -> true;
-            case CommentStatusType.DELETED -> false;
+            case CommentStatusType.VALID -> false;
+            case CommentStatusType.DELETED -> true;
         };
     }
 
