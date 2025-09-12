@@ -47,7 +47,7 @@ public class CommentJpaRepositoryAdapterTest implements PostIdTestUtils,
     @DisplayName("유효한 작성자 id로 댓글 가져오기")
     public void testFindByAuthor_givenValidAuthor_willReturnCommentResponseList() {
         // given
-        given(repository.findByAuthMemberUuid(testMemberId.getValue())).willReturn(List.of(testCommentResponse));
+        given(repository.findByAuthMemberUuid(testAuthor.getMemberUuid())).willReturn(List.of(testCommentResponse));
 
         // when
         List<CommentResponse> result = repositoryJpaAdapter.findByAuthor(testAuthorWithUuid);
