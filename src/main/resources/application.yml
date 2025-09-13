@@ -68,3 +68,6 @@ logging:
     name: /var/log/app/app.log
   pattern:
     file: '{"timestamp":"%d{yyyy-MM-dd''T''HH:mm:ss.SSSZ}","level":"%level","logger":"%logger","thread":"%thread","message":"%msg","traceId":"%X{traceId}"}%n'
+
+# Nginx, HTTPS
+  forward-headers-strategy: framework
