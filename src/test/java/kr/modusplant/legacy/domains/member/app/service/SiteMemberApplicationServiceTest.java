@@ -21,13 +21,13 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
 @DomainsServiceWithoutValidationServiceContext
-class SiteMemberControllerTest implements SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityTestUtils {
+class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityTestUtils {
 
     private final SiteMemberApplicationService memberApplicationService;
     private final SiteMemberRepository memberRepository;
 
     @Autowired
-    SiteMemberControllerTest(SiteMemberApplicationService memberApplicationService, SiteMemberRepository memberRepository) {
+    SiteMemberApplicationServiceTest(SiteMemberApplicationService memberApplicationService, SiteMemberRepository memberRepository) {
         this.memberApplicationService = memberApplicationService;
         this.memberRepository = memberRepository;
     }
