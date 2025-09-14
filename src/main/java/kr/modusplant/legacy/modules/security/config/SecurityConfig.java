@@ -168,7 +168,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedOrigin("https://specified-jaquith-modusplant-0c942371.koyeb.app");
-        config.addAllowedOrigin("http://kormap.ddnsfree.com");
+        config.addAllowedOrigin("https://kormap.ddnsfree.com");
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
         config.setAllowCredentials(true);
