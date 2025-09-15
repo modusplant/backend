@@ -10,7 +10,7 @@ import kr.modusplant.domains.comment.support.utils.domain.CommentTestUtils;
 import kr.modusplant.domains.comment.support.utils.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.support.utils.framework.CommentCompositeKeyTestUtils;
 import kr.modusplant.domains.comment.support.utils.framework.CommentEntityTestUtils;
-import kr.modusplant.domains.member.test.utils.domain.MemberIdTestUtils;
+import kr.modusplant.domains.member.common.utils.domain.vo.MemberIdTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

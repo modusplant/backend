@@ -4,7 +4,7 @@ import kr.modusplant.domains.comment.adapter.response.CommentResponse;
 import kr.modusplant.domains.comment.support.utils.domain.CommentContentTestUtils;
 import kr.modusplant.domains.comment.support.utils.domain.CommentPathTestUtils;
 import kr.modusplant.domains.comment.support.utils.domain.PostIdTestUtils;
-import kr.modusplant.domains.member.test.utils.domain.MemberNicknameTestUtils;
+import kr.modusplant.domains.member.common.utils.domain.vo.MemberNicknameTestUtils;
 
 public interface CommentResponseTestUtils extends
         PostIdTestUtils, CommentPathTestUtils,

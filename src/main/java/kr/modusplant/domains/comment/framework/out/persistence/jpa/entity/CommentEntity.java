@@ -2,9 +2,9 @@ package kr.modusplant.domains.comment.framework.out.persistence.jpa.entity;
 
 import jakarta.persistence.*;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.CommentCompositeKey;
-import kr.modusplant.framework.out.persistence.annotation.DefaultValue;
-import kr.modusplant.framework.out.persistence.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.infrastructure.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
