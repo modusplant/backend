@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.term.common.util.entity;
 
-import kr.modusplant.framework.out.persistence.jpa.entity.TermEntity;
+import kr.modusplant.framework.out.jpa.entity.TermEntity;
 import kr.modusplant.legacy.domains.term.common.util.domain.TermTestUtils;
 
 public interface TermEntityTestUtils extends TermTestUtils {

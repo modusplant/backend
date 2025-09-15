@@ -1,12 +1,12 @@
 package kr.modusplant.legacy.modules.auth.social.app.service;
 
-import kr.modusplant.framework.out.persistence.constant.EntityName;
-import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberAuthEntity;
-import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberRoleEntity;
-import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberAuthRepository;
-import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
-import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRoleRepository;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleRepository;
+import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthDomainInfraMapper;

@@ -1,14 +1,14 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
-import kr.modusplant.framework.out.persistence.constant.EntityName;
-import kr.modusplant.framework.out.persistence.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.out.persistence.jpa.entity.CommPrimaryCategoryEntity;
-import kr.modusplant.framework.out.persistence.jpa.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.persistence.jpa.repository.CommPostRepository;
-import kr.modusplant.framework.out.persistence.jpa.repository.CommPrimaryCategoryRepository;
-import kr.modusplant.framework.out.persistence.jpa.repository.CommSecondaryCategoryRepository;
-import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPrimaryCategoryRepository;
+import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.app.service.MultipartDataProcessor;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostInsertRequest;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostUpdateRequest;

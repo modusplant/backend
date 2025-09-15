@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
-import kr.modusplant.framework.out.persistence.jpa.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.framework.out.persistence.jpa.repository.CommSecondaryCategoryRepository;
+import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommCategoryRequestTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.response.CommCategoryResponseTestUtils;

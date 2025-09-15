@@ -1,10 +1,10 @@
 package kr.modusplant.legacy.modules.auth.email.app.service;
 
-import kr.modusplant.framework.out.persistence.constant.EntityName;
-import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberAuthEntity;
-import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberAuthRepository;
-import kr.modusplant.framework.out.persistence.redis.RedisHelper;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
+import kr.modusplant.framework.out.redis.RedisHelper;
+import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberAuthValidationService;
 import kr.modusplant.legacy.modules.auth.email.app.http.request.EmailRequest;
@@ -22,7 +22,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import java.time.Duration;
 import java.util.Optional;
 
-import static kr.modusplant.framework.out.persistence.redis.RedisKeys.RESET_PASSWORD_PREFIX;
+import static kr.modusplant.framework.out.redis.RedisKeys.RESET_PASSWORD_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;

@@ -1,9 +1,9 @@
 package kr.modusplant.infrastructure.context;
 
-import kr.modusplant.framework.out.config.aws.TestS3Config;
-import kr.modusplant.framework.out.config.jpa.TestJpaConfig;
-import kr.modusplant.framework.out.config.redis.TestRedisConfig;
-import kr.modusplant.framework.out.persistence.redis.RedisHelper;
+import kr.modusplant.framework.out.redis.RedisHelper;
+import kr.modusplant.infrastructure.config.aws.TestS3Config;
+import kr.modusplant.infrastructure.config.jpa.TestJpaConfig;
+import kr.modusplant.infrastructure.config.redis.TestRedisConfig;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;

@@ -1,8 +1,8 @@
 package kr.modusplant.legacy.modules.auth.normal.login.app.service;
 
-import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberAuthEntity;
-import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberAuthRepository;
-import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.modules.auth.normal.login.persistence.repository.LockOutRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

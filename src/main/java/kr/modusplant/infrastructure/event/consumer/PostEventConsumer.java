@@ -1,10 +1,10 @@
 package kr.modusplant.infrastructure.event.consumer;
 
-import kr.modusplant.framework.out.persistence.jpa.entity.CommLikeEntity;
-import kr.modusplant.framework.out.persistence.jpa.repository.CommLikeRepository;
+import kr.modusplant.framework.out.jpa.entity.CommLikeEntity;
+import kr.modusplant.framework.out.jpa.repository.CommLikeRepository;
 import kr.modusplant.infrastructure.event.bus.EventBus;
-import kr.modusplant.shared.event.CommPostLikeEvent;
-import kr.modusplant.shared.event.CommPostUnlikeEvent;
+import kr.modusplant.shared.event.PostLikeEvent;
+import kr.modusplant.shared.event.PostUnlikeEvent;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -15,13 +15,13 @@ public class PostEventConsumer {
 
     public PostEventConsumer(EventBus eventBus, CommLikeRepository commLikeRepository) {
         eventBus.subscribe(event -> {
-            if (event instanceof CommPostLikeEvent commPostLikeEvent) {
-                putCommPostLike(commPostLikeEvent.getMemberId(), commPostLikeEvent.getPostId());
+            if (event instanceof PostLikeEvent postLikeEvent) {
+                putCommPostLike(postLikeEvent.getMemberId(), postLikeEvent.getPostId());
             }
         });
         eventBus.subscribe(event -> {
-            if (event instanceof CommPostUnlikeEvent commPostUnlikeEvent) {
-                deleteCommPostLike(commPostUnlikeEvent.getMemberId(), commPostUnlikeEvent.getPostId());
+            if (event instanceof PostUnlikeEvent postUnlikeEvent) {
+                deleteCommPostLike(postUnlikeEvent.getMemberId(), postUnlikeEvent.getPostId());
             }
         });
         this.commLikeRepository = commLikeRepository;

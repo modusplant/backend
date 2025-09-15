@@ -1,13 +1,13 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
-import kr.modusplant.framework.out.persistence.constant.EntityName;
-import kr.modusplant.framework.out.persistence.jpa.entity.CommLikeEntity;
-import kr.modusplant.framework.out.persistence.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.persistence.jpa.entity.compositekey.CommPostLikeId;
-import kr.modusplant.framework.out.persistence.jpa.repository.CommLikeRepository;
-import kr.modusplant.framework.out.persistence.jpa.repository.CommPostRepository;
-import kr.modusplant.framework.out.persistence.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.entity.CommLikeEntity;
+import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.entity.compositekey.CommPostLikeId;
+import kr.modusplant.framework.out.jpa.repository.CommLikeRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommLikeResponse;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommLikeEntityTestUtils;
@@ -120,7 +120,7 @@ class CommLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
 
     @Test
     @DisplayName("이미 좋아요 한 게시글을 또 좋아요 시도할 경우 예외 발생")
-    void likeCommPost_duplicateLike_throwsException() {
+    void likeCommPost_duplicateLike_willThrowException() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
         when(siteMemberRepository.save(member)).thenReturn(member);
@@ -152,7 +152,7 @@ class CommLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
 
     @Test
     @DisplayName("좋아요 하지 않은 게시글을 취소할 경우 예외 발생")
-    void unlikeCommPost_withoutLike_throwsException() {
+    void unlikeCommPost_givenoutLike_willThrowException() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
         when(siteMemberRepository.save(member)).thenReturn(member);

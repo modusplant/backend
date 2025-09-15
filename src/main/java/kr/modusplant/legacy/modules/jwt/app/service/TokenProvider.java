@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
-import static kr.modusplant.framework.out.persistence.constant.EntityFieldName.EMAIL;
+import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.EMAIL;
 
 @Service
 @RequiredArgsConstructor

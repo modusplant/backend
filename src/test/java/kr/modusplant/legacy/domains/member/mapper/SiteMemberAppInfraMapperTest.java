@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.member.mapper;
 
-import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberResponse;
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberRequestTestUtils;

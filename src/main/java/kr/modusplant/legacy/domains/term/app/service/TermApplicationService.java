@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.term.app.service;
 
-import kr.modusplant.framework.out.persistence.jpa.entity.TermEntity;
-import kr.modusplant.framework.out.persistence.jpa.repository.TermRepository;
+import kr.modusplant.framework.out.jpa.entity.TermEntity;
+import kr.modusplant.framework.out.jpa.repository.TermRepository;
 import kr.modusplant.legacy.domains.term.app.http.request.TermInsertRequest;
 import kr.modusplant.legacy.domains.term.app.http.request.TermUpdateRequest;
 import kr.modusplant.legacy.domains.term.app.http.response.TermResponse;
