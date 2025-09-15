@@ -30,7 +30,7 @@ public class SiteMemberEntity {
     @Column(nullable = false, updatable = false)
     private UUID uuid;
 
-    @Column(nullable = false, length = 40)
+    @Column(nullable = false, length = 40, unique = true)
     private String nickname;
 
     @Column(name = "birth_date")

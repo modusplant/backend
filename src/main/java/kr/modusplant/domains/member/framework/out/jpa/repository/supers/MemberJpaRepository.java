@@ -5,7 +5,11 @@ import kr.modusplant.shared.persistence.repository.supers.CreatedAtAndLastModifi
 import kr.modusplant.shared.persistence.repository.supers.UuidPrimaryKeyRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface MemberJpaRepository extends JpaRepository<MemberEntity, UUID>, CreatedAtAndLastModifiedAtRepository<MemberEntity>, UuidPrimaryKeyRepository<MemberEntity> {
+    Optional<MemberEntity> findByNickname(String nickname);
+
+    boolean existsByNickname(String nickname);
 }
