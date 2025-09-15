@@ -4,7 +4,8 @@ import kr.modusplant.domains.comment.domain.vo.Author;
 
 import java.util.UUID;
 
-import static kr.modusplant.domains.member.test.constant.MemberStringConstant.TEST_MEMBER_NICKNAME;
+import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_MEMBER_NICKNAME;
+
 
 public interface AuthorTestUtils {
 

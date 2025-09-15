@@ -1,12 +1,13 @@
 package kr.modusplant.domains.comment.framework.in.web.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.comment.adapter.controller.CommentController;
 import kr.modusplant.domains.comment.adapter.response.CommentResponse;
 import kr.modusplant.domains.comment.support.utils.adapter.CommentDeleteRequestTestUtils;
 import kr.modusplant.domains.comment.support.utils.adapter.CommentRegisterRequestTestUtils;
 import kr.modusplant.domains.comment.support.utils.adapter.CommentResponseTestUtils;
 import kr.modusplant.domains.comment.support.utils.domain.PostIdTestUtils;
-import kr.modusplant.domains.member.test.utils.domain.MemberIdTestUtils;
+import kr.modusplant.domains.member.common.utils.domain.vo.MemberIdTestUtils;
 import kr.modusplant.framework.out.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-import static kr.modusplant.framework.out.config.jackson.TestJacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.doNothing;
 public class CommentRestControllerTest implements PostIdTestUtils,
         CommentResponseTestUtils, CommentRegisterRequestTestUtils,
         CommentDeleteRequestTestUtils, MemberIdTestUtils {
-    private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
+    private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(new ObjectMapper());
     private final CommentController controller = Mockito.mock(CommentController.class);
     private final CommentRestController restController = new CommentRestController(controller);
 

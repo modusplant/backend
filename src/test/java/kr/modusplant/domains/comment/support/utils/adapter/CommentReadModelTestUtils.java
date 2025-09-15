@@ -4,9 +4,7 @@ import kr.modusplant.domains.comment.adapter.model.CommentReadModel;
 import kr.modusplant.domains.comment.support.utils.domain.CommentContentTestUtils;
 import kr.modusplant.domains.comment.support.utils.domain.CommentPathTestUtils;
 import kr.modusplant.domains.comment.support.utils.domain.PostIdTestUtils;
-import kr.modusplant.domains.member.test.utils.domain.MemberTestUtils;
-
-import java.time.LocalDateTime;
+import kr.modusplant.domains.member.common.utils.domain.aggregate.MemberTestUtils;
 
 public interface CommentReadModelTestUtils extends PostIdTestUtils, CommentPathTestUtils,
         MemberTestUtils, CommentContentTestUtils {

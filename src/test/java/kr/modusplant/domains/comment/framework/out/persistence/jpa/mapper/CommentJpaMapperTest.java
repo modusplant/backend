@@ -3,7 +3,7 @@ package kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
 import kr.modusplant.domains.comment.support.utils.domain.CommentTestUtils;
 import kr.modusplant.domains.comment.support.utils.framework.CommentEntityTestUtils;
-import kr.modusplant.framework.out.persistence.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

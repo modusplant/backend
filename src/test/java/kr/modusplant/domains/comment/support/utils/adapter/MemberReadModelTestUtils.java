@@ -1,8 +1,9 @@
 package kr.modusplant.domains.comment.support.utils.adapter;
 
 import kr.modusplant.domains.comment.adapter.model.MemberReadModel;
-import kr.modusplant.domains.member.test.utils.domain.MemberIdTestUtils;
-import kr.modusplant.domains.member.test.utils.domain.MemberNicknameTestUtils;
+import kr.modusplant.domains.member.common.utils.domain.vo.MemberIdTestUtils;
+import kr.modusplant.domains.member.common.utils.domain.vo.MemberNicknameTestUtils;
+
 
 public interface MemberReadModelTestUtils extends MemberIdTestUtils, MemberNicknameTestUtils {
     MemberReadModel testMemberReadModel =
