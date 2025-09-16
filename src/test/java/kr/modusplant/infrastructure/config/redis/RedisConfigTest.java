@@ -1,7 +1,7 @@
 package kr.modusplant.infrastructure.config.redis;
 
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
-import kr.modusplant.domains.security.framework.legacy.enums.Role;
+import kr.modusplant.domains.identity.framework.legacy.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

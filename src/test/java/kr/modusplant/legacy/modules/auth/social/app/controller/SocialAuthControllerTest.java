@@ -5,7 +5,7 @@ import kr.modusplant.legacy.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.legacy.modules.auth.social.app.service.SocialAuthApplicationService;
 import kr.modusplant.legacy.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
-import kr.modusplant.domains.security.framework.legacy.enums.Role;
+import kr.modusplant.domains.identity.framework.legacy.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

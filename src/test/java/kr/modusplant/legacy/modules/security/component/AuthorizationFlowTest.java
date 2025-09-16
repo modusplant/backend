@@ -13,7 +13,7 @@ import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberRoleTest
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
 import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
-import kr.modusplant.domains.security.domain.exception.enums.SecurityErrorCode;
+import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,8 +100,8 @@ public class AuthorizationFlowTest implements
 
                 // then
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.status").value(SecurityErrorCode.ACCESS_DENIED.getHttpStatus().getValue()))
-                .andExpect(jsonPath("$.code").value(SecurityErrorCode.ACCESS_DENIED.getCode()))
+                .andExpect(jsonPath("$.status").value(IdentityErrorCode.ACCESS_DENIED.getHttpStatus().getValue()))
+                .andExpect(jsonPath("$.code").value(IdentityErrorCode.ACCESS_DENIED.getCode()))
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
 }

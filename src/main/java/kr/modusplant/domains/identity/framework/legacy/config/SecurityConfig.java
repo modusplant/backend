@@ -1,21 +1,23 @@
-package kr.modusplant.legacy.modules.security.config;
+package kr.modusplant.domains.identity.framework.legacy.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.identity.framework.legacy.handler.*;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
+import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
+import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
 import kr.modusplant.domains.identity.framework.legacy.DefaultAuthProvider;
 import kr.modusplant.domains.identity.framework.legacy.DefaultAuthenticationEntryPoint;
 import kr.modusplant.domains.identity.framework.legacy.DefaultUserDetailsService;
 import kr.modusplant.domains.identity.framework.legacy.filter.EmailPasswordAuthenticationFilter;
+import kr.modusplant.domains.identity.framework.legacy.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,6 +25,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -31,22 +34,23 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-@TestConfiguration
+@Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class TestSecurityConfig {
+public class SecurityConfig {
 
     @Value("${security.debug.enabled}")
     private Boolean debugEnabled;
 
     private final AuthenticationConfiguration authConfiguration;
     private final DefaultUserDetailsService defaultUserDetailsService;
+    private final ObjectMapper objectMapper;
+    private final TokenProvider tokenProvider;
     private final TokenApplicationService tokenApplicationService;
     private final SiteMemberValidationService memberValidationService;
     private final SiteMemberRepository memberRepository;
-    private final ObjectMapper objectMapper;
     private final Validator validator;
-    private final PasswordEncoder passwordEncoder;
+    private final TokenRedisRepository tokenRedisRepository;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -58,22 +62,27 @@ public class TestSecurityConfig {
         return new DefaultAuthenticationEntryPoint(objectMapper); }
 
     @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         return authConfiguration.getAuthenticationManager();
     }
 
     @Bean
-    public AuthenticationProvider defaultAuthProvider() {
-        return new DefaultAuthProvider(defaultUserDetailsService, passwordEncoder);
+    public DefaultAuthProvider siteMemberAuthProvider() {
+        return new DefaultAuthProvider(defaultUserDetailsService, passwordEncoder());
     }
 
     @Bean
-    public ForwardRequestLoginSuccessHandler normalLoginSuccessHandler() {
+    public ForwardRequestLoginSuccessHandler forwardRequestLoginSuccessHandler() {
         return new ForwardRequestLoginSuccessHandler(memberRepository, memberValidationService, tokenApplicationService);
     }
 
     @Bean
-    public WriteResponseLoginFailureHandler normalLoginFailureHandler() {
+    public WriteResponseLoginFailureHandler writeResponseLoginFailureHandler() {
         return new WriteResponseLoginFailureHandler(objectMapper);
     }
 
@@ -86,24 +95,33 @@ public class TestSecurityConfig {
         return new ForwardRequestLogoutSuccessHandler(objectMapper); }
 
     @Bean
-    public DefaultAccessDeniedHandler defaultAccessDeniedHandler() {
-        return new DefaultAccessDeniedHandler(objectMapper);
+    public JwtAuthenticationFilter jwtAuthenticationFilter(HttpSecurity http) {
+        try {
+            return new JwtAuthenticationFilter(tokenProvider, defaultAuthenticationEntryPoint(), tokenRedisRepository);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Bean
     public EmailPasswordAuthenticationFilter emailPasswordAuthenticationFilter(HttpSecurity http) {
         try {
-            EmailPasswordAuthenticationFilter emailPasswordAuthenticationFilter = new EmailPasswordAuthenticationFilter(
-                    new ObjectMapper(), validator, authenticationManager());
+            EmailPasswordAuthenticationFilter filter = new EmailPasswordAuthenticationFilter(
+                    objectMapper, validator, authenticationManager());
 
-            emailPasswordAuthenticationFilter.setAuthenticationManager(authenticationManager());
-            emailPasswordAuthenticationFilter.setAuthenticationSuccessHandler(normalLoginSuccessHandler());
-            emailPasswordAuthenticationFilter.setAuthenticationFailureHandler(normalLoginFailureHandler());
+            filter.setAuthenticationManager(authenticationManager());
+            filter.setAuthenticationSuccessHandler(forwardRequestLoginSuccessHandler());
+            filter.setAuthenticationFailureHandler(writeResponseLoginFailureHandler());
 
-            return emailPasswordAuthenticationFilter;
+            return filter;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Bean
+    public DefaultAccessDeniedHandler defaultAccessDeniedHandler() {
+        return new DefaultAccessDeniedHandler(objectMapper);
     }
 
     @Bean
@@ -112,6 +130,7 @@ public class TestSecurityConfig {
                 .securityMatcher("/api/**")
                 .cors(Customizer.withDefaults())
                 .addFilterBefore(emailPasswordAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter(http), EmailPasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/v1/communication/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/terms/**").permitAll()
@@ -122,19 +141,19 @@ public class TestSecurityConfig {
                         .requestMatchers("/api/monitor/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .authenticationProvider(defaultAuthProvider())
+                .authenticationProvider(siteMemberAuthProvider())
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
                         .clearAuthentication(true)
                         .addLogoutHandler(JwtClearingLogoutHandler())
                         .logoutSuccessHandler(normalLogoutSuccessHandler()))
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(eh ->
                         eh.authenticationEntryPoint(defaultAuthenticationEntryPoint())
                                 .accessDeniedHandler(defaultAccessDeniedHandler())
                 )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers
                         .httpStrictTransportSecurity(hsts -> hsts
                                 .includeSubDomains(true)

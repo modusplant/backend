@@ -11,7 +11,7 @@ import kr.modusplant.legacy.modules.jwt.domain.service.TokenValidationService;
 import kr.modusplant.legacy.modules.jwt.error.InvalidTokenException;
 import kr.modusplant.legacy.modules.jwt.error.TokenNotFoundException;
 import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
-import kr.modusplant.domains.security.framework.legacy.enums.Role;
+import kr.modusplant.domains.identity.framework.legacy.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

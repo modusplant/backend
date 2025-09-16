@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.modules.auth.social.app.dto;
 
-import kr.modusplant.domains.security.framework.legacy.enums.Role;
+import kr.modusplant.domains.identity.framework.legacy.enums.Role;
 
 import java.util.UUID;
 

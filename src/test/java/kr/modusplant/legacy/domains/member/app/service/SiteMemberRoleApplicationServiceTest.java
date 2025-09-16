@@ -13,7 +13,7 @@ import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMem
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberRoleResponseTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberRoleEntityTestUtils;
-import kr.modusplant.domains.security.framework.legacy.enums.Role;
+import kr.modusplant.domains.identity.framework.legacy.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
