@@ -11,7 +11,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommentContent {
-    private String content;
+    private final String content;
 
     public static CommentContent create(String content) {
         CommentContent.checkSource(content);
