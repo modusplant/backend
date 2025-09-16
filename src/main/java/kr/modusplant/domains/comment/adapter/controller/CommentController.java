@@ -1,7 +1,6 @@
 package kr.modusplant.domains.comment.adapter.controller;
 
 import kr.modusplant.domains.comment.adapter.mapper.CommentMapperImpl;
-import kr.modusplant.domains.comment.adapter.repository.CommentAuthorRepository;
 import kr.modusplant.domains.comment.adapter.repository.CommentRepository;
 import kr.modusplant.domains.comment.adapter.request.CommentDeleteRequest;
 import kr.modusplant.domains.comment.adapter.request.CommentRegisterRequest;
