@@ -1,6 +1,6 @@
 package kr.modusplant.domains.security.framework.legacy.error;
 
-import kr.modusplant.domains.security.framework.legacy.enums.SecurityErrorCode;
+import kr.modusplant.domains.security.domain.exception.enums.SecurityErrorCode;
 import lombok.Getter;
 import org.springframework.security.core.AuthenticationException;
 

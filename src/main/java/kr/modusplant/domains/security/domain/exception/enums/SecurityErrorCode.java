@@ -1,4 +1,4 @@
-package kr.modusplant.domains.security.framework.legacy.enums;
+package kr.modusplant.domains.security.domain.exception.enums;
 
 import kr.modusplant.shared.exception.enums.supers.ResponseCode;
 import kr.modusplant.shared.http.enums.HttpStatus;

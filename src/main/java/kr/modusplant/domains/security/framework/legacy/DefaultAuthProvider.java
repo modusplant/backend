@@ -1,6 +1,6 @@
 package kr.modusplant.domains.security.framework.legacy;
 
-import kr.modusplant.domains.security.framework.legacy.enums.SecurityErrorCode;
+import kr.modusplant.domains.security.domain.exception.enums.SecurityErrorCode;
 import kr.modusplant.domains.security.framework.legacy.error.*;
 import kr.modusplant.domains.security.framework.legacy.models.DefaultAuthToken;
 import kr.modusplant.domains.security.framework.legacy.models.DefaultUserDetails;

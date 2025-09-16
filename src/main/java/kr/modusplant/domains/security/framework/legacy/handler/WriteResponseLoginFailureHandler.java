@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
-import kr.modusplant.domains.security.framework.legacy.enums.SecurityErrorCode;
+import kr.modusplant.domains.security.domain.exception.enums.SecurityErrorCode;
 import kr.modusplant.domains.security.framework.legacy.error.BusinessAuthenticationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
