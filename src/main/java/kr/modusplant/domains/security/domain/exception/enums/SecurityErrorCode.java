@@ -9,6 +9,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum SecurityErrorCode implements ResponseCode {
 
+    // domain
+    INVALID_ROLE(HttpStatus.BAD_REQUEST, "invalid_role", "올바른 사용자의 역할이 아닙니다"),
+
+    // authentication & authorization
     BAD_PASSWORD(HttpStatus.UNAUTHORIZED, "bad_password", "비밀번호가 틀렸습니다"),
     BANNED(HttpStatus.UNAUTHORIZED, "banned", "밴 처리 된 계정입니다"),
     DELETED(HttpStatus.UNAUTHORIZED, "deleted", "삭제된 계정입니다"),
