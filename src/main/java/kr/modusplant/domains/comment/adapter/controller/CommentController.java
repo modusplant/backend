@@ -22,7 +22,6 @@ public class CommentController {
 
     private final CommentMapperImpl mapper;
     private final CommentRepository repository;
-    private final CommentAuthorRepository authorRepository;
 
     public List<CommentResponse> gatherByPost(String postUlid) {
         return repository.findByPost(PostId.create(postUlid));
