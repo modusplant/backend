@@ -1,4 +1,4 @@
-package kr.modusplant.domains.comment.domain.exception.enums;
+package kr.modusplant.domains.comment.domain.vo.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
