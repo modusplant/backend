@@ -12,7 +12,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommentPath {
-    String path;
+    private final String path;
 
     public static CommentPath create(String path) {
         CommentPath.checkSource(path);

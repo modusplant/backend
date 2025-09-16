@@ -12,7 +12,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Getter
 @AllArgsConstructor
 public class CommentStatus {
-    private CommentStatusType status;
+    private final CommentStatusType status;
 
     public static CommentStatus create(String status) {
         CommentStatus.checkSource(status);

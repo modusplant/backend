@@ -9,7 +9,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PostId {
-    private String id;
+    private final String id;
 
     public static PostId create(String ulid) {
         return new PostId(ulid);

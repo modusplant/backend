@@ -12,11 +12,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Comment {
-    private PostId postId;
-    private CommentPath path;
-    private Author author;
-    private CommentContent content;
-    private CommentStatus status;
+    private final PostId postId;
+    private final CommentPath path;
+    private final Author author;
+    private final CommentContent content;
+    private final CommentStatus status;
 
     // TODO: PostId는 게시글 담당자가 개발한 PostId VO로 대체될 예정
     public static Comment create(PostId postId, CommentPath path, Author author, CommentContent content) {

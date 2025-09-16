@@ -13,8 +13,8 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Author {
-    private UUID memberUuid;
-    private String memberNickname;
+    private final UUID memberUuid;
+    private final String memberNickname;
 
     public static Author create(UUID memberUuid) {
         if(memberUuid == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR); }
