@@ -1,4 +1,4 @@
-package kr.modusplant.legacy.modules.security.handler;
+package kr.modusplant.domains.security.framework.legacy.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

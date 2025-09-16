@@ -11,7 +11,7 @@ import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberRoleRespo
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberRoleValidationService;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberRoleAppInfraMapper;
-import kr.modusplant.legacy.modules.security.enums.Role;
+import kr.modusplant.domains.security.framework.legacy.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;

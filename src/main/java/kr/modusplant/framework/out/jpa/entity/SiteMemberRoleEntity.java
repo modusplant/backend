@@ -2,7 +2,7 @@ package kr.modusplant.framework.out.jpa.entity;
 
 import jakarta.persistence.*;
 import kr.modusplant.infrastructure.persistence.annotation.DefaultValue;
-import kr.modusplant.legacy.modules.security.enums.Role;
+import kr.modusplant.domains.security.framework.legacy.enums.Role;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.UUID;
 
-import static kr.modusplant.legacy.modules.security.enums.Role.USER;
+import static kr.modusplant.domains.security.framework.legacy.enums.Role.USER;
 import static kr.modusplant.shared.persistence.vo.TableName.SITE_MEMBER_ROLE;
 
 @Entity

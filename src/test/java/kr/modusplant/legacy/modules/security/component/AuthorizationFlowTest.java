@@ -13,7 +13,7 @@ import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberRoleTest
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
 import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
-import kr.modusplant.legacy.modules.security.enums.SecurityErrorCode;
+import kr.modusplant.domains.security.framework.legacy.enums.SecurityErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

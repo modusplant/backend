@@ -2,7 +2,7 @@ package kr.modusplant.framework.out.jpa.repository;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
 import kr.modusplant.framework.out.jpa.repository.supers.SiteMemberUuidPrimaryKeyRepository;
-import kr.modusplant.legacy.modules.security.enums.Role;
+import kr.modusplant.domains.security.framework.legacy.enums.Role;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

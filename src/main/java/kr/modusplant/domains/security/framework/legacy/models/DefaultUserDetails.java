@@ -1,4 +1,4 @@
-package kr.modusplant.legacy.modules.security.models;
+package kr.modusplant.domains.security.framework.legacy.models;
 
 import kr.modusplant.legacy.domains.member.domain.model.SiteMember;
 import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;

@@ -1,4 +1,4 @@
-package kr.modusplant.legacy.modules.security.filter;
+package kr.modusplant.domains.security.framework.legacy.filter;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -8,9 +8,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
 import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
-import kr.modusplant.legacy.modules.security.DefaultAuthenticationEntryPoint;
-import kr.modusplant.legacy.modules.security.models.DefaultAuthToken;
-import kr.modusplant.legacy.modules.security.models.DefaultUserDetails;
+import kr.modusplant.domains.security.framework.legacy.DefaultAuthenticationEntryPoint;
+import kr.modusplant.domains.security.framework.legacy.models.DefaultAuthToken;
+import kr.modusplant.domains.security.framework.legacy.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.BadCredentialsException;
