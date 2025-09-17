@@ -1,4 +1,4 @@
-package kr.modusplant.domains.identity.constant;
+package kr.modusplant.domains.identity.domain.constant;
 
 public final class UserDataFormat {
     public static final String EMAIL_FORMAT = "^(?=.{2,255}$)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
