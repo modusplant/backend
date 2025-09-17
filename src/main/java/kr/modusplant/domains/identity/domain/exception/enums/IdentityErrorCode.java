@@ -14,10 +14,12 @@ public enum IdentityErrorCode implements ResponseCode {
     INVALID_EMAIL(HttpStatus.BAD_REQUEST, "invalid_email", "올바른 이메일 형식이 아닙니다"),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "invalid_password", "올바른 비밀번호 형식이 아닙니다"),
     INVALID_NICKNAME(HttpStatus.BAD_REQUEST, "invalid_nickname", "올바른 닉네임 형식이 아닙니다"),
+    INVALID_AGREED_TERMS_OF_VERSION(HttpStatus.BAD_REQUEST, "invalid_agreed_terms_of_version", "동의한 약관의 버전 값이 올바른 형식이 아닙니다"),
 
     EMPTY_EMAIL(HttpStatus.BAD_REQUEST, "empty_email", "이메일이 비어 있습니다"),
     EMPTY_PASSWORD(HttpStatus.BAD_REQUEST, "empty_password", "비밀번호가 비어 있습니다"),
     EMPTY_NICKNAME(HttpStatus.BAD_REQUEST, "empty_nickname", "닉네임이 비어 있습니다"),
+    EMPTY_AGREED_TERMS_OF_VERSION(HttpStatus.BAD_REQUEST, "empty_agreed_terms_of_version", "동의한 약관의 버전 값이 비어 있습니다"),
 
     // authentication & authorization
     BAD_PASSWORD(HttpStatus.UNAUTHORIZED, "bad_password", "비밀번호가 틀렸습니다"),
