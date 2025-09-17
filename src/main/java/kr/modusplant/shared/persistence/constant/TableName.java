@@ -16,4 +16,5 @@ public final class TableName {
     public static final String SITE_MEMBER_ROLE = "site_member_role";
     public static final String SITE_MEMBER_TERM = "site_member_term";
     public static final String TERM = "term";
+    public static final String POST_ARCHIVE = "post_archive";
 }
