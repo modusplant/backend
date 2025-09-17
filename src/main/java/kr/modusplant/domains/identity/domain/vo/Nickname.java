@@ -2,7 +2,7 @@ package kr.modusplant.domains.identity.domain.vo;
 
 import kr.modusplant.domains.comment.domain.exception.EmptyValueException;
 import kr.modusplant.domains.comment.domain.exception.InvalidValueException;
-import kr.modusplant.domains.identity.constant.UserDataFormat;
+import kr.modusplant.domains.identity.domain.constant.UserDataFormat;
 import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
