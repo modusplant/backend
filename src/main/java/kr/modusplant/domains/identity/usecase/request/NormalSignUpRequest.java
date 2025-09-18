@@ -23,7 +23,7 @@ public record NormalSignUpRequest(
         @NotBlank(message = "비밀번호가 비어 있습니다.")
         @Pattern(regexp = "^(?=\\S*[a-zA-Z])(?=\\S*[!@#$%^&*+\\-=_])(?=\\S*[0-9])\\S{8,64}$",
                 message = "비밀번호는 8 ~ 64자까지 가능하며, 최소 하나 이상의 영문, 숫자, 그리고 특수문자를 포함해야 합니다(공백 제외).")
-        String pw,
+        String password,
 
         @Schema(
                 description = "닉네임",
