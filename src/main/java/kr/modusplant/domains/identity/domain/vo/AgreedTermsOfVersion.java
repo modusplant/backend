@@ -2,11 +2,14 @@ package kr.modusplant.domains.identity.domain.vo;
 
 import kr.modusplant.domains.comment.domain.exception.EmptyValueException;
 import kr.modusplant.domains.comment.domain.exception.InvalidValueException;
+import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.identity.domain.constant.IdentityDataFormat;
 import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -23,5 +26,22 @@ public class AgreedTermsOfVersion {
         if(input.matches(IdentityDataFormat.AGREED_TERMS_OF_VERSION_FORMAT)) {
             throw new InvalidValueException(IdentityErrorCode.INVALID_AGREED_TERMS_OF_VERSION);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof AgreedTermsOfVersion agreed)) return false;
+
+        return new EqualsBuilder()
+                .append(getVersion(), agreed.getVersion())
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(getVersion()).toHashCode();
     }
 }
