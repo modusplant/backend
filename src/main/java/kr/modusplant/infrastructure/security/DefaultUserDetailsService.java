@@ -1,4 +1,4 @@
-package kr.modusplant.domains.identity.framework.legacy;
+package kr.modusplant.infrastructure.security;
 
 import jakarta.transaction.Transactional;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
@@ -14,7 +14,7 @@ import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthDomainInfraMapper;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberDomainInfraMapper;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberRoleDomainInfraMapper;
-import kr.modusplant.domains.identity.framework.legacy.models.DefaultUserDetails;
+import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -1,17 +1,17 @@
-package kr.modusplant.domains.identity.framework.legacy.config;
+package kr.modusplant.infrastructure.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.domains.identity.framework.legacy.handler.*;
+import kr.modusplant.infrastructure.security.handler.*;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
 import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
-import kr.modusplant.domains.identity.framework.legacy.DefaultAuthProvider;
-import kr.modusplant.domains.identity.framework.legacy.DefaultAuthenticationEntryPoint;
-import kr.modusplant.domains.identity.framework.legacy.DefaultUserDetailsService;
-import kr.modusplant.domains.identity.framework.legacy.filter.EmailPasswordAuthenticationFilter;
-import kr.modusplant.domains.identity.framework.legacy.filter.JwtAuthenticationFilter;
+import kr.modusplant.infrastructure.security.DefaultAuthProvider;
+import kr.modusplant.infrastructure.security.DefaultAuthenticationEntryPoint;
+import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
+import kr.modusplant.infrastructure.security.filter.EmailPasswordAuthenticationFilter;
+import kr.modusplant.infrastructure.security.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

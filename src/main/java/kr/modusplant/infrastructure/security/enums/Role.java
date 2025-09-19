@@ -1,4 +1,4 @@
-package kr.modusplant.domains.identity.framework.legacy.enums;
+package kr.modusplant.infrastructure.security.enums;
 
 import lombok.Getter;
 

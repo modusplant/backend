@@ -1,4 +1,4 @@
-package kr.modusplant.domains.identity.framework.legacy.handler;
+package kr.modusplant.infrastructure.security.handler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,8 +8,8 @@ import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
-import kr.modusplant.domains.identity.framework.legacy.enums.Role;
-import kr.modusplant.domains.identity.framework.legacy.models.DefaultUserDetails;
+import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

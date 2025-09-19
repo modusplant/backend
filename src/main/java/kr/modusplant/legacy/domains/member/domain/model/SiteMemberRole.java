@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.member.domain.model;
 
-import kr.modusplant.domains.identity.framework.legacy.enums.Role;
+import kr.modusplant.infrastructure.security.enums.Role;
 import lombok.*;
 
 import java.util.UUID;

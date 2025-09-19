@@ -1,4 +1,4 @@
-package kr.modusplant.domains.identity.framework.legacy.handler;
+package kr.modusplant.infrastructure.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;

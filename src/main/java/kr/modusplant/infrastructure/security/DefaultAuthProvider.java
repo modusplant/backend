@@ -1,9 +1,9 @@
-package kr.modusplant.domains.identity.framework.legacy;
+package kr.modusplant.infrastructure.security;
 
 import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
-import kr.modusplant.domains.identity.framework.legacy.error.*;
-import kr.modusplant.domains.identity.framework.legacy.models.DefaultAuthToken;
-import kr.modusplant.domains.identity.framework.legacy.models.DefaultUserDetails;
+import kr.modusplant.infrastructure.security.error.*;
+import kr.modusplant.infrastructure.security.models.DefaultAuthToken;
+import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;

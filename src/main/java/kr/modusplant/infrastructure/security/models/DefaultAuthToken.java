@@ -1,4 +1,4 @@
-package kr.modusplant.domains.identity.framework.legacy.models;
+package kr.modusplant.infrastructure.security.models;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;

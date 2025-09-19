@@ -13,7 +13,7 @@ import kr.modusplant.legacy.modules.jwt.domain.service.TokenValidationService;
 import kr.modusplant.legacy.modules.jwt.error.InvalidTokenException;
 import kr.modusplant.legacy.modules.jwt.error.TokenNotFoundException;
 import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
-import kr.modusplant.domains.identity.framework.legacy.enums.Role;
+import kr.modusplant.infrastructure.security.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

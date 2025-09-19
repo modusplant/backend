@@ -1,10 +1,10 @@
-package kr.modusplant.domains.identity.framework.legacy.filter;
+package kr.modusplant.infrastructure.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.legacy.modules.auth.normal.login.app.http.request.NormalLoginRequest;
-import kr.modusplant.domains.identity.framework.legacy.models.DefaultAuthToken;
+import kr.modusplant.infrastructure.security.models.DefaultAuthToken;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;

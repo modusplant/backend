@@ -1,4 +1,4 @@
-package kr.modusplant.domains.identity.framework.legacy.handler;
+package kr.modusplant.infrastructure.security.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

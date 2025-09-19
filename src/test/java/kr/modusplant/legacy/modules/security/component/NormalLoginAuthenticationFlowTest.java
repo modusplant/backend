@@ -8,10 +8,10 @@ import kr.modusplant.legacy.modules.auth.normal.login.common.util.app.http.reque
 import kr.modusplant.legacy.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.legacy.modules.jwt.app.service.RefreshTokenApplicationService;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
-import kr.modusplant.domains.identity.framework.legacy.DefaultUserDetailsService;
+import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
 import kr.modusplant.legacy.modules.security.common.util.SiteMemberUserDetailsTestUtils;
 import kr.modusplant.legacy.modules.security.context.SecurityOnlyContext;
-import kr.modusplant.domains.identity.framework.legacy.models.DefaultUserDetails;
+import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
