@@ -1,4 +1,4 @@
-package kr.modusplant.legacy.modules.security.component;
+package kr.modusplant.infrastructure.security.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
@@ -9,8 +9,8 @@ import kr.modusplant.legacy.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.legacy.modules.jwt.app.service.RefreshTokenApplicationService;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
 import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
-import kr.modusplant.legacy.modules.security.common.util.SiteMemberUserDetailsTestUtils;
-import kr.modusplant.legacy.modules.security.context.SecurityOnlyContext;
+import kr.modusplant.infrastructure.security.common.util.SiteMemberUserDetailsTestUtils;
+import kr.modusplant.infrastructure.security.context.SecurityOnlyContext;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

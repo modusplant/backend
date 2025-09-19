@@ -6,7 +6,7 @@
  import kr.modusplant.infrastructure.config.redis.TestRedisConfig;
  import kr.modusplant.legacy.domains.common.postprocessor.MockDomainsRepositoryBeanFactoryPostProcessor;
  import kr.modusplant.legacy.domains.common.postprocessor.MockDomainsServiceBeanFactoryPostProcessor;
- import kr.modusplant.legacy.modules.security.initializer.MockTokenProviderInitializer;
+ import kr.modusplant.infrastructure.security.initializer.MockTokenProviderInitializer;
  import org.junit.jupiter.api.extension.ExtendWith;
  import org.junit.jupiter.api.parallel.Execution;
  import org.junit.jupiter.api.parallel.ExecutionMode;

@@ -1,4 +1,4 @@
-package kr.modusplant.legacy.modules.security.initializer;
+package kr.modusplant.infrastructure.security.initializer;
 
 import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
 import org.springframework.boot.test.context.TestConfiguration;

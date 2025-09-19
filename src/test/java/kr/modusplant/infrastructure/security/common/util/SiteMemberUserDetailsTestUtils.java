@@ -1,4 +1,4 @@
-package kr.modusplant.legacy.modules.security.common.util;
+package kr.modusplant.infrastructure.security.common.util;
 
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;

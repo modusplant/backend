@@ -1,4 +1,4 @@
-package kr.modusplant.legacy.modules.security.initializer;
+package kr.modusplant.infrastructure.security.initializer;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContextInitializer;

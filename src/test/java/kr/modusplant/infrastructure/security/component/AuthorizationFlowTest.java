@@ -1,4 +1,4 @@
-package kr.modusplant.legacy.modules.security.component;
+package kr.modusplant.infrastructure.security.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
@@ -105,3 +105,4 @@ public class AuthorizationFlowTest implements
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
 }
+

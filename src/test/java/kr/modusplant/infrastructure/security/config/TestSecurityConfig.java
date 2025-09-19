@@ -1,4 +1,4 @@
-package kr.modusplant.legacy.modules.security.config;
+package kr.modusplant.infrastructure.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.infrastructure.security.handler.*;
