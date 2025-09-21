@@ -9,7 +9,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 class MemberRepositoryJpaAdapterTest implements MemberEntityTestUtils {
@@ -18,7 +21,27 @@ class MemberRepositoryJpaAdapterTest implements MemberEntityTestUtils {
     private final MemberRepositoryJpaAdapter memberRepositoryJpaAdapter = new MemberRepositoryJpaAdapter(memberJpaMapper, memberJpaRepository);
 
     @Test
-    @DisplayName("updateNickname로 Member 반환")
+    @DisplayName("getByNickname으로 가용한 Member 반환(가용할 때)")
+    void testGetByNickname_givenValidMemberNickname_willReturnOptionalAvailableMember() {
+        // given
+        given(memberJpaRepository.findByNickname(any())).willReturn(Optional.of(createMemberEntityWithUuid()));
+
+        // when & then
+        assertThat(memberRepositoryJpaAdapter.getByNickname(testMemberNickname)).isEqualTo(Optional.of(createMember()));
+    }
+
+    @Test
+    @DisplayName("getByNickname으로 가용한 Member 반환(가용하지 않을 때)")
+    void testGetByNickname_givenValidMemberNickname_willReturnOptionalEmptyMember() {
+        // given
+        given(memberJpaRepository.findByNickname(any())).willReturn(Optional.empty());
+
+        // when & then
+        assertThat(memberRepositoryJpaAdapter.getByNickname(testMemberNickname)).isEqualTo(Optional.empty());
+    }
+
+    @Test
+    @DisplayName("updateNickname으로 Member 반환")
     void testUpdateNickname_givenValidMember_willReturnMember() {
         // given
         Member member = createMember();
