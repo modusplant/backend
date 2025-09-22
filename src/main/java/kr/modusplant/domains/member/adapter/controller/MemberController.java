@@ -26,7 +26,7 @@ public class MemberController {
     private final EventBus eventBus;
 
     public MemberResponse register(MemberRegisterRequest request) {
-        Member member = Member.create(mapper.toNickname(request));
+        Member member = mapper.toMember(request);
         validateMemberBeforeRegister(member);
         return mapper.toMemberResponse(memberRepository.save(member));
     }

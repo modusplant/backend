@@ -1,13 +1,12 @@
 package kr.modusplant.domains.member.usecase.port.mapper;
 
 import kr.modusplant.domains.member.domain.aggregate.Member;
-import kr.modusplant.domains.member.domain.vo.MemberNickname;
 import kr.modusplant.domains.member.usecase.request.MemberNicknameUpdateRequest;
 import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 
 public interface MemberMapper {
-    MemberNickname toNickname(MemberRegisterRequest request);
+    Member toMember(MemberRegisterRequest request);
 
     Member toMember(MemberNicknameUpdateRequest request);
 

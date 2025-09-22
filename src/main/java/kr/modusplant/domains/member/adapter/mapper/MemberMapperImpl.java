@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 public class MemberMapperImpl implements MemberMapper {
 
     @Override
-    public MemberNickname toNickname(MemberRegisterRequest request) {
-        return MemberNickname.create(request.nickname());
+    public Member toMember(MemberRegisterRequest request) {
+        return Member.create(MemberNickname.create(request.nickname()));
     }
 
     @Override
