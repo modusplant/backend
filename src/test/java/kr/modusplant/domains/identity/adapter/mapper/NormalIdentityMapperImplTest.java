@@ -3,6 +3,7 @@ package kr.modusplant.domains.identity.adapter.mapper;
 import kr.modusplant.domains.identity.common.utils.domain.vo.SignUpDataTestUtils;
 import kr.modusplant.domains.identity.common.utils.usecase.request.NormalSignUpRequestTestUtils;
 import kr.modusplant.domains.identity.domain.vo.SignUpData;
+import kr.modusplant.domains.identity.usecase.port.mapper.NormalIdentityMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -11,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class NormalIdentityMapperImplTest implements
         NormalSignUpRequestTestUtils, SignUpDataTestUtils {
 
-    private final NormalIdentityMapperImpl mapper = new NormalIdentityMapperImpl();
+    private final NormalIdentityMapper mapper = new NormalIdentityMapperImpl();
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Test

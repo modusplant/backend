@@ -1,9 +1,10 @@
 package kr.modusplant.domains.identity.adapter.controller;
 
 import kr.modusplant.domains.identity.adapter.mapper.NormalIdentityMapperImpl;
-import kr.modusplant.domains.identity.usecase.port.repository.NormalIdentityRepository;
 import kr.modusplant.domains.identity.common.utils.domain.vo.SignUpDataTestUtils;
 import kr.modusplant.domains.identity.common.utils.usecase.request.NormalSignUpRequestTestUtils;
+import kr.modusplant.domains.identity.usecase.port.mapper.NormalIdentityMapper;
+import kr.modusplant.domains.identity.usecase.port.repository.NormalIdentityRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -13,7 +14,7 @@ import static org.mockito.Mockito.verify;
 
 public class NormalIdentityControllerTest implements
         NormalSignUpRequestTestUtils, SignUpDataTestUtils {
-    private final NormalIdentityMapperImpl mapper = Mockito.mock(NormalIdentityMapperImpl.class);
+    private final NormalIdentityMapper mapper = Mockito.mock(NormalIdentityMapperImpl.class);
     private final NormalIdentityRepository repository = Mockito.mock(NormalIdentityRepository.class);
     private final NormalIdentityController controller = new NormalIdentityController(mapper, repository);
 
