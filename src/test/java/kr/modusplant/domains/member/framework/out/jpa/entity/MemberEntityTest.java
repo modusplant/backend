@@ -83,7 +83,7 @@ class MemberEntityTest implements MemberEntityTestUtils {
         entityManager.persist(member);
 
         // when
-        entityManager.merge(MemberEntity.builder().memberEntity(createMemberEntity()).build());
+        entityManager.merge(MemberEntity.builder().memberEntity(member).build());
         entityManager.flush();
 
         // then
