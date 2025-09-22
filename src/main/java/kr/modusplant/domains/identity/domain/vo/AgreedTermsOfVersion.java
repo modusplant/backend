@@ -22,7 +22,7 @@ public class AgreedTermsOfVersion {
 
     public static void validateSource(String input) {
         if(input.isBlank()) { throw new EmptyValueException(IdentityErrorCode.EMPTY_AGREED_TERMS_OF_VERSION); }
-        if(input.matches(IdentityDataFormat.AGREED_TERMS_OF_VERSION_FORMAT)) {
+        if(!input.matches(IdentityDataFormat.AGREED_TERMS_OF_VERSION_FORMAT)) {
             throw new InvalidValueException(IdentityErrorCode.INVALID_AGREED_TERMS_OF_VERSION);
         }
     }
