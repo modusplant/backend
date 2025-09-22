@@ -3,17 +3,17 @@ package kr.modusplant.infrastructure.security.component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import kr.modusplant.legacy.domains.communication.app.http.request.CommCommentInsertRequest;
-import kr.modusplant.legacy.domains.communication.app.http.response.CommCommentResponse;
-import kr.modusplant.legacy.domains.communication.app.service.CommCommentApplicationService;
-import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommCommentInsertRequestTestUtils;
-import kr.modusplant.legacy.domains.communication.common.util.app.http.response.CommCommentResponseTestUtils;
+import kr.modusplant.domains.comment.adapter.controller.CommentController;
+import kr.modusplant.domains.comment.framework.in.web.rest.CommentRestController;
+import kr.modusplant.domains.comment.support.utils.adapter.CommentRegisterRequestTestUtils;
+import kr.modusplant.domains.comment.support.utils.adapter.CommentResponseTestUtils;
+import kr.modusplant.domains.identity.adapter.mapper.NormalIdentityMapperImpl;
+import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
 import kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberRoleTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
 import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
-import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +24,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -33,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class AuthorizationFlowTest implements
         SiteMemberTestUtils, SiteMemberRoleTestUtils,
-        CommCommentInsertRequestTestUtils, CommPostTestUtils, CommCommentResponseTestUtils {
+        CommentRegisterRequestTestUtils, CommentResponseTestUtils, CommPostTestUtils {
 
     @Autowired
     private MockMvc mockMvc;
@@ -45,7 +46,13 @@ public class AuthorizationFlowTest implements
     private TokenProvider tokenProvider;
 
     @MockitoBean
-    private CommCommentApplicationService commCommentApplicationService;
+    private CommentRestController commentRestController;
+
+    @MockitoBean
+    private CommentController commentController;
+
+    @MockitoBean
+    private NormalIdentityMapperImpl mapper;
 
     @MockitoBean
     private TokenRedisRepository tokenRedisRepository;
@@ -64,31 +71,25 @@ public class AuthorizationFlowTest implements
     }
 
     @Test
-    public void givenMatchingRole_willReturnSuccessResponse() throws Exception {
+    public void testCommentApiWithRole_givenMatchingRole_willReturnSuccessResponse() throws Exception {
         // given
-        CommCommentInsertRequest commentInsertRequest =
-                createCommCommentInsertRequest(TEST_COMM_POST_WITH_ULID.getUlid());
-        CommCommentResponse commentResponse = createCommCommentResponse(
-                TEST_COMM_POST_WITH_ULID.getUlid(), memberBasicUserWithUuid.getUuid(), memberBasicUserWithUuid.getNickname()
-        );
-
         given(tokenRedisRepository.isBlacklisted(rawAccessToken.substring(7))).willReturn(false);
         given(tokenProvider.validateToken(rawAccessToken.substring(7))).willReturn(true);
         given(tokenProvider.getClaimsFromToken(rawAccessToken.substring(7))).willReturn(accessTokenClaims);
-        given(commCommentApplicationService.insert(commentInsertRequest, memberBasicUserWithUuid.getUuid())).willReturn(commentResponse);
+        doNothing().when(commentController).register(testCommentRegisterRequest);
 
         // when
         mockMvc.perform(post("/api/v1/communication/comments")
                         .header("Authorization", rawAccessToken)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(commentInsertRequest)).characterEncoding("UTF-8"))
+                        .content(objectMapper.writeValueAsString(testCommentRegisterRequest)).characterEncoding("UTF-8"))
 
                 // then
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void givenMismatchingRole_willReturnErrorResponse() throws Exception {
+    public void testMonitorApiWithRole_givenMismatchingRole_willReturnErrorResponse() throws Exception {
         // given
         given(tokenRedisRepository.isBlacklisted(rawAccessToken.substring(7))).willReturn(false);
         given(tokenProvider.validateToken(rawAccessToken.substring(7))).willReturn(true);
@@ -105,4 +106,3 @@ public class AuthorizationFlowTest implements
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
 }
-
