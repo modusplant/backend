@@ -8,6 +8,9 @@ import org.slf4j.MDC;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import static kr.modusplant.infrastructure.aop.ApiLoggingAspect.MDC_SPAN_ID;
+import static kr.modusplant.infrastructure.aop.ApiLoggingAspect.MDC_TRACE_ID;
+
 /**
  * API 컨트롤러 예외 상황을 로깅하는 역할을 수행하는 AOP 클래스
  * 주요 기능:
@@ -38,12 +41,13 @@ public class ControllerExceptionLoggingAspect {
         String errorLocation = String.format("%s.%s(%s:%d)",
                 location.getClassName(), location.getMethodName(), fileName, lineNumber);
 
-        String traceId = MDC.get("traceId") != null ? MDC.get("traceId") : "N/A";
+        String traceId = MDC.get(MDC_TRACE_ID) != null ? MDC.get(MDC_TRACE_ID) : "N/A";
+        String spanId = MDC.get(MDC_SPAN_ID) != null ? MDC.get(MDC_SPAN_ID) : "N/A";
         String uri = MDC.get("uri") != null ? MDC.get("uri") : "N/A";
         String method = MDC.get("method") != null ? MDC.get("method") : "N/A";
         String clientIp = MDC.get("clientIp") != null ? MDC.get("clientIp") : "UNKNOWN";
 
-        log.error("[REST ERROR] traceId={}, method={} | uri={} | handler={} | ip={} | exception={} | message={} | location={} ",
-                traceId, method, uri, methodName, clientIp, ex.getClass().getSimpleName(), ex.getMessage(), errorLocation);
+        log.error("[REST ERROR] traceId={} | spanId={} | method={} | uri={} | handler={} | ip={} | exception={} | message={} | location={} ",
+                traceId, spanId, method, uri, methodName, clientIp, ex.getClass().getSimpleName(), ex.getMessage(), errorLocation);
     }
 }

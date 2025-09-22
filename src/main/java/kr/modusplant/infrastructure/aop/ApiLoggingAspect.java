@@ -1,5 +1,7 @@
 package kr.modusplant.infrastructure.aop;
 
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -30,6 +32,8 @@ import java.util.UUID;
 public class ApiLoggingAspect {
     private static final ThreadLocal<Long> THREAD_ID = new ThreadLocal<>();
     private static final long SLOW_API_THRESHOLD_MS = 500;     // TODO : SLOW 쿼리 로깅의 기준은 변경 가능
+    public static final String MDC_TRACE_ID = "traceId";
+    public static final String MDC_SPAN_ID  = "spanId";
 
     @Around("within(@org.springframework.web.bind.annotation.RestController *)")
     public Object traceApiCall(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -38,10 +42,15 @@ public class ApiLoggingAspect {
         ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attrs.getRequest();
 
+        SpanContext sc = Span.current().getSpanContext();
+        final String traceId = sc.isValid() ? sc.getTraceId() : "none";
+        final String spanId  = sc.isValid() ? sc.getSpanId()  : "none";
+
         MDC.put("uri", request.getRequestURI());
         MDC.put("method", request.getMethod());
         MDC.put("clientIp", getClientIp(request));
-        MDC.put("traceId", UUID.randomUUID().toString()); // 추적용 ID
+        MDC.put(MDC_TRACE_ID, traceId); // 추적용 ID
+        MDC.put(MDC_SPAN_ID, spanId); // 추적용 ID
         MDC.put("methodName", joinPoint.getSignature().getName());
         MDC.put("isLogged", Boolean.FALSE.toString()); // 예외 로깅 중복 방지용
 
@@ -52,10 +61,10 @@ public class ApiLoggingAspect {
             double durationInMs = duration / 1_000_000.0;
             String durationFormatted = String.format("%.2f", durationInMs);
 
-            log.info("[REST API] traceId={} | method={} | uri={} | handler={} | ip={} | duration:{}ms"
-                    , MDC.get("traceId"), MDC.get("method"), MDC.get("uri"), MDC.get("methodName"), MDC.get("clientIp"), durationFormatted);
+            log.info("[REST API] traceId={} | spanId={} | method={} | uri={} | handler={} | ip={} | duration:{}ms"
+                    , MDC.get(MDC_TRACE_ID), MDC.get(MDC_SPAN_ID), MDC.get("method"), MDC.get("uri"), MDC.get("methodName"), MDC.get("clientIp"), durationFormatted);
             if (durationInMs > SLOW_API_THRESHOLD_MS) {
-                log.warn("[SLOW API] traceId={} | duration:{}ms", MDC.get("traceId"), durationFormatted);
+                log.warn("[SLOW API] traceId={} | spanId={} | duration:{}ms", MDC.get(MDC_TRACE_ID), MDC.get(MDC_SPAN_ID), durationFormatted);
             }
 
             return result;

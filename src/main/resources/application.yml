@@ -53,7 +53,7 @@ springdoc:
   swagger-ui:
     enabled: true
 
-# Actuator, Prometheus
+# Actuator, Prometheus, OpenTelemetry(Log Tracing)
 management:
   server:
     port: 8080
@@ -61,13 +61,21 @@ management:
     web:
       exposure:
         include: "health,info,prometheus"
-
-# Log file
-logging:
-  file:
-    name: /var/log/app/app.log
-  pattern:
-    file: '{"timestamp":"%d{yyyy-MM-dd''T''HH:mm:ss.SSSZ}","level":"%level","logger":"%logger","thread":"%thread","message":"%msg","traceId":"%X{traceId}"}%n'
+  tracing:
+    enabled: true
+    sampling:
+      probability: 0.1
+  otlp:
+    tracing:
+      endpoint: http://otel-collector:4317
+      export:
+        enabled: false # 도커 환경에서만 사용
+        protocol: grpc
+  # 도커 환경에서만 환경변수 주입
+#  endpoint:
+#    web:
+#      exposure:
+#        include: health,info,metrics,prometheus
 
 # Nginx, HTTPS
   forward-headers-strategy: framework

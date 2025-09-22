@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
+import static kr.modusplant.infrastructure.aop.ApiLoggingAspect.MDC_SPAN_ID;
+import static kr.modusplant.infrastructure.aop.ApiLoggingAspect.MDC_TRACE_ID;
+
 /**
  * 서비스 레벨에서 발생한 예외를 로깅하는 역할을 수행하는 AOP 클래스
  * 주요 기능:
@@ -42,14 +45,15 @@ public class ServiceExceptionLoggingAspect {
             String errorLocation = String.format("%s.%s(%s:%d)",
                     location.getClassName(), location.getMethodName(), fileName, lineNumber);
 
-            String traceId = MDC.get("traceId") != null ? MDC.get("traceId") : "N/A";
+            String traceId = MDC.get(MDC_TRACE_ID) != null ? MDC.get(MDC_TRACE_ID) : "N/A";
+            String spanId = MDC.get(MDC_SPAN_ID) != null ? MDC.get(MDC_SPAN_ID) : "N/A";
             String clientIp = MDC.get("clientIp") != null ? MDC.get("clientIp") : "UNKNOWN";
             String uri = MDC.get("uri") != null ? MDC.get("uri") : "N/A";
             String method = MDC.get("method") != null ? MDC.get("method") : "N/A";
 
-            log.error("[BIZ ERROR] traceId={} | method={} | params={} | exception={} | message={} | location={}\n" +
+            log.error("[BIZ ERROR] traceId={} | spanId={} | method={} | params={} | exception={} | message={} | location={}\n" +
                             "[BIZ ERROR - HTTP_REQUEST_INFO] httpMethod={} | uri={} | clientIp={}",
-                    traceId, methodName, Arrays.toString(args), ex.getClass().getSimpleName(), ex.getMessage(), errorLocation,
+                    traceId, spanId, methodName, Arrays.toString(args), ex.getClass().getSimpleName(), ex.getMessage(), errorLocation,
                     uri, method, clientIp);
         }
         MDC.put("isLogged", Boolean.TRUE.toString());

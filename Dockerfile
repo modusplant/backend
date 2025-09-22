@@ -19,6 +19,9 @@ WORKDIR /workspace
 # Build stage copy
 COPY --from=builder /builder/build/libs/*.jar modusplant-backend.jar
 
+# OTel Java Agent 원격 다운로드
+ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar /otel/opentelemetry-javaagent.jar
+
 # SpringBoot/DataBase ENV (env/dev)
 ENV SPRING_PROFILES_ACTIVE=env
 ENV TZ="Asia/Seoul"
