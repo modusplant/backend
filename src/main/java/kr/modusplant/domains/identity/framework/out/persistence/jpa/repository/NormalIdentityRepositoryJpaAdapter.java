@@ -1,6 +1,6 @@
 package kr.modusplant.domains.identity.framework.out.persistence.jpa.repository;
 
-import kr.modusplant.domains.identity.adapter.repository.NormalIdentityRepository;
+import kr.modusplant.domains.identity.usecase.port.repository.NormalIdentityRepository;
 import kr.modusplant.domains.identity.domain.vo.SignUpData;
 import kr.modusplant.domains.identity.domain.vo.enums.UserRole;
 import kr.modusplant.domains.identity.framework.out.persistence.jpa.entity.MemberAuthEntity;
