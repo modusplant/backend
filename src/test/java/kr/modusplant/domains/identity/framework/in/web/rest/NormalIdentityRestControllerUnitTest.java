@@ -1,6 +1,7 @@
 package kr.modusplant.domains.identity.framework.in.web.rest;
 
 import kr.modusplant.domains.identity.adapter.controller.NormalIdentityController;
+import kr.modusplant.domains.identity.common.utils.usecase.request.NormalSignUpRequestTestUtils;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import kr.modusplant.legacy.modules.jwt.common.util.domain.RefreshTokenTestUtils;
 import org.junit.jupiter.api.Test;
@@ -13,13 +14,23 @@ import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class NormalIdentityRestControllerUnitTest implements RefreshTokenTestUtils {
+public class NormalIdentityRestControllerUnitTest implements
+        RefreshTokenTestUtils, NormalSignUpRequestTestUtils {
 
     private final NormalIdentityController controller = Mockito.mock(NormalIdentityController.class);
     private final NormalIdentityRestController restController = new NormalIdentityRestController(controller);
 
     @Test
-    public void testRespondToNormalLoginSuccess_givenValidToken_willReturnSuccess() throws Exception {
+    public void testRegisterNormalMember_givenValidRequest_willReturnSuccess() {
+        // given & when
+        ResponseEntity<DataResponse<Void>> response = restController.registerNormalMember(testNormalSignUpRequest);
+
+        // then
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+    }
+
+    @Test
+    public void testRespondToNormalLoginSuccess_givenValidToken_willReturnSuccess() {
         // given
         String testAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwianRpIjoiYWJjMTIzeHl6NDU2IiwiZXhwIjoxNjM4NzY4MDIyLCJpYXQiOjE2MzYxNzYwMjJ9.7Qm6ZxQz3XW6J8KvY1lTn4RfG2HsPpLq1DwYb5Nv0eE";
         String testRefreshToken = refreshTokenBasicUser.getRefreshToken();
