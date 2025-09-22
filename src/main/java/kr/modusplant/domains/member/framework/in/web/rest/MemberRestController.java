@@ -7,8 +7,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.member.adapter.controller.MemberController;
+import kr.modusplant.domains.member.domain.vo.MemberNickname;
 import kr.modusplant.domains.member.usecase.request.MemberNicknameUpdateRequest;
-import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,15 +31,18 @@ public class MemberRestController {
     @PostMapping
     public ResponseEntity<DataResponse<MemberResponse>> registerMember(
             @Parameter(schema = @Schema(
-                    description = "회원을 등록하기 위한 요청")
+                    description = "회원의 닉네임",
+                    example = "ModusPlantPlayer")
             )
-            MemberRegisterRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).body(DataResponse.ok(memberController.register(request)));
+            @NotBlank(message = "회원 닉네임이 비어 있습니다. ")
+            String nickname) {
+        return ResponseEntity.status(HttpStatus.OK).body(DataResponse.ok(memberController.register(MemberNickname.create(nickname))));
     }
 
     @Operation(summary = "회원 닉네임 갱신 API", description = "회원의 닉네임을 갱신합니다.")
     @PostMapping("/nickname")
     public ResponseEntity<DataResponse<MemberResponse>> updateMemberNickname(
+            @RequestBody
             @Parameter(schema = @Schema(
                     description = "회원의 닉네임을 갱신하기 위한 요청")
             )

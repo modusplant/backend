@@ -6,7 +6,6 @@ import kr.modusplant.domains.member.domain.vo.MemberNickname;
 import kr.modusplant.domains.member.domain.vo.MemberStatus;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.request.MemberNicknameUpdateRequest;
-import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import org.springframework.stereotype.Component;
 
@@ -14,8 +13,8 @@ import org.springframework.stereotype.Component;
 public class MemberMapperImpl implements MemberMapper {
 
     @Override
-    public Member toMember(MemberRegisterRequest request) {
-        return Member.create(MemberNickname.create(request.nickname()));
+    public Member toMember(MemberNickname nickname) {
+        return Member.create(nickname);
     }
 
     @Override

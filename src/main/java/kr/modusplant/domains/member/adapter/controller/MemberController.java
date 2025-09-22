@@ -2,10 +2,10 @@ package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.exception.AlreadyExistedNicknameException;
+import kr.modusplant.domains.member.domain.vo.MemberNickname;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
 import kr.modusplant.domains.member.usecase.request.MemberNicknameUpdateRequest;
-import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.PostLikeEvent;
@@ -25,8 +25,8 @@ public class MemberController {
     private final MemberRepository memberRepository;
     private final EventBus eventBus;
 
-    public MemberResponse register(MemberRegisterRequest request) {
-        Member member = mapper.toMember(request);
+    public MemberResponse register(MemberNickname nickname) {
+        Member member = mapper.toMember(nickname);
         validateMemberBeforeRegister(member);
         return mapper.toMemberResponse(memberRepository.save(member));
     }
