@@ -40,13 +40,13 @@ class MemberControllerTest implements MemberTestUtils, MemberRequestTestUtils, P
 
     @Test
     @DisplayName("register로 회원 등록")
-    void testRegister_givenValidRequest_willReturnResponse() {
+    void testRegister_givenValidNickname_willReturnResponse() {
         // given
         Member member = createMember();
         given(memberRepository.save(any())).willReturn(member);
 
         // when & then
-        assertThat(memberController.register(testMemberRegisterRequest).nickname()).isEqualTo(member.getMemberNickname().getValue());
+        assertThat(memberController.register(testMemberNickname).nickname()).isEqualTo(member.getMemberNickname().getValue());
     }
 
     @Test
@@ -57,7 +57,7 @@ class MemberControllerTest implements MemberTestUtils, MemberRequestTestUtils, P
 
         // when & then
         AlreadyExistedNicknameException alreadyExistedNicknameException = assertThrows(
-                AlreadyExistedNicknameException.class, () -> memberController.register(testMemberRegisterRequest));
+                AlreadyExistedNicknameException.class, () -> memberController.register(testMemberNickname));
         assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(ALREADY_EXISTED_NICKNAME.getMessage());
     }
 

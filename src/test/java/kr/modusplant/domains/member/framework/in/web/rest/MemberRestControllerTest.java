@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_MEMBER_NICKNAME;
 import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -28,12 +29,12 @@ class MemberRestControllerTest implements MemberTestUtils, MemberRequestTestUtil
 
     @Test
     @DisplayName("registerMember로 응답 반환")
-    void testRegisterMember_givenValidRequest_willReturnResponse() {
+    void testRegisterMember_givenValidNickname_willReturnResponse() {
         // given
-        given(memberController.register(testMemberRegisterRequest)).willReturn(testMemberResponse);
+        given(memberController.register(testMemberNickname)).willReturn(testMemberResponse);
 
         // when
-        ResponseEntity<DataResponse<MemberResponse>> memberResponseEntity = memberRestController.registerMember(testMemberRegisterRequest);
+        ResponseEntity<DataResponse<MemberResponse>> memberResponseEntity = memberRestController.registerMember(TEST_MEMBER_NICKNAME);
 
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
