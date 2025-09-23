@@ -1,6 +1,6 @@
-package kr.modusplant.domains.comment.adapter.repository;
+package kr.modusplant.domains.comment.usecase.port.repository;
 
-import kr.modusplant.domains.comment.adapter.model.MemberReadModel;
+import kr.modusplant.domains.comment.usecase.model.MemberReadModel;
 import kr.modusplant.domains.comment.domain.vo.Author;
 
 public interface CommentAuthorRepository {

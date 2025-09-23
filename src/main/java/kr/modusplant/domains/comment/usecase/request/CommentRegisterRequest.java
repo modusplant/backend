@@ -1,4 +1,4 @@
-package kr.modusplant.domains.comment.adapter.request;
+package kr.modusplant.domains.comment.usecase.request;
 
 import java.util.UUID;
 
