@@ -35,22 +35,20 @@ public class Member {
         return new Member(id, status, nickname, birthDate);
     }
 
-    public static Member create(MemberId id, MemberStatus status, MemberNickname nickname) {
+    public static Member create(MemberId id, MemberNickname nickname) {
         if (id == null) {
             throw new EmptyMemberIdException();
-        } else if (status == null) {
-            throw new EmptyMemberStatusException();
         } else if (nickname == null) {
             throw new EmptyMemberNicknameException();
         }
-        return new Member(id, status, nickname, null);
+        return new Member(id, MemberStatus.active(), nickname, MemberBirthDate.create(null));
     }
 
     public static Member create(MemberNickname nickname) {
         if (nickname == null) {
             throw new EmptyMemberNicknameException();
         }
-        return new Member(MemberId.generate(), MemberStatus.active(), nickname, null);
+        return new Member(MemberId.generate(), MemberStatus.active(), nickname, MemberBirthDate.create(null));
     }
 
     @Override

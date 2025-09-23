@@ -3,6 +3,8 @@ package kr.modusplant.domains.member.domain.vo;
 import kr.modusplant.domains.member.common.utils.domain.vo.MemberNicknameTestUtils;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberNicknameException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
+import kr.modusplant.shared.exception.InvalidDataException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +25,13 @@ class MemberNicknameTest implements MemberNicknameTestUtils {
     void testCreate_givenNull_willThrowException() {
         EmptyMemberNicknameException exception = assertThrows(EmptyMemberNicknameException.class, () -> MemberNickname.create(null));
         assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_NICKNAME);
+    }
+
+    @Test
+    @DisplayName("정규 표현식에 매칭되지 않는 값으로 create을 호출하여 오류 발생")
+    void testCreate_givenInvalidNickname_willThrowException() {
+        InvalidDataException exception = assertThrows(InvalidDataException.class, () -> MemberNickname.create("!유효하지않음!"));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_INPUT);
     }
 
     @Test

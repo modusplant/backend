@@ -10,8 +10,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import static kr.modusplant.shared.constant.Regex.REGEX_MATERIALIZED_PATH;
+
 @NotBlank(message = "경로가 비어 있습니다.")
-@Pattern(regexp = "^\\d+(?:\\.\\d+)*$", message = "경로 서식이 올바르지 않습니다.")
+@Pattern(regexp = REGEX_MATERIALIZED_PATH, message = "경로 서식이 올바르지 않습니다.")
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)

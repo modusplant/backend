@@ -2,10 +2,10 @@ package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.exception.AlreadyExistedNicknameException;
+import kr.modusplant.domains.member.domain.vo.MemberId;
+import kr.modusplant.domains.member.domain.vo.MemberNickname;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
-import kr.modusplant.domains.member.usecase.request.MemberNicknameUpdateRequest;
-import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.PostLikeEvent;
@@ -25,16 +25,16 @@ public class MemberController {
     private final MemberRepository memberRepository;
     private final EventBus eventBus;
 
-    public MemberResponse register(MemberRegisterRequest request) {
-        Member member = Member.create(mapper.toNickname(request));
+    public MemberResponse register(MemberNickname nickname) {
+        Member member = Member.create(nickname);
         validateMemberBeforeRegister(member);
         return mapper.toMemberResponse(memberRepository.save(member));
     }
 
-    public MemberResponse updateNickname(MemberNicknameUpdateRequest request) {
-        Member member = mapper.toMember(request);
+    public MemberResponse updateNickname(MemberId memberId, MemberNickname memberNickname) {
+        Member member = Member.create(memberId, memberNickname);
         validateMemberBeforeUpdateNickname(member);
-        return mapper.toMemberResponse(memberRepository.updateNickname(member));
+        return mapper.toMemberResponse(memberRepository.save(member));
     }
 
     public void likePost(UUID memberId, String postUlid) {
