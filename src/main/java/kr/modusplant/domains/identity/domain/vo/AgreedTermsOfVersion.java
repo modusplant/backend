@@ -1,8 +1,8 @@
 package kr.modusplant.domains.identity.domain.vo;
 
-import kr.modusplant.domains.comment.domain.exception.EmptyValueException;
-import kr.modusplant.domains.comment.domain.exception.InvalidValueException;
 import kr.modusplant.domains.identity.domain.constant.IdentityDataFormat;
+import kr.modusplant.domains.identity.domain.exception.EmptyValueException;
+import kr.modusplant.domains.identity.domain.exception.InvalidValueException;
 import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,7 +21,7 @@ public class AgreedTermsOfVersion {
     }
 
     public static void validateSource(String input) {
-        if(input.isBlank()) { throw new EmptyValueException(IdentityErrorCode.EMPTY_AGREED_TERMS_OF_VERSION); }
+        if(input == null || input.isBlank()) { throw new EmptyValueException(IdentityErrorCode.EMPTY_AGREED_TERMS_OF_VERSION); }
         if(!input.matches(IdentityDataFormat.AGREED_TERMS_OF_VERSION_FORMAT)) {
             throw new InvalidValueException(IdentityErrorCode.INVALID_AGREED_TERMS_OF_VERSION);
         }
