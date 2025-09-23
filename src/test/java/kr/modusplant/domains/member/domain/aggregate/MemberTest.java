@@ -51,21 +51,14 @@ class MemberTest implements MemberTestUtils {
     void testCreate_givenNullToOneOfThreeParameters_willThrowException() {
         // MemberId가 null일 때
         // given
-        EmptyMemberIdException memberIdException = assertThrows(EmptyMemberIdException.class, () -> Member.create(null, testMemberActiveStatus, testMemberNickname));
+        EmptyMemberIdException memberIdException = assertThrows(EmptyMemberIdException.class, () -> Member.create(null, testMemberNickname));
 
         // when & then
         assertThat(memberIdException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_ID);
 
-        // MemberStatus가 null일 때
-        // given
-        EmptyMemberStatusException memberStatusException = assertThrows(EmptyMemberStatusException.class, () -> Member.create(testMemberId, null, testMemberNickname));
-
-        // when & then
-        assertThat(memberStatusException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_STATUS);
-
         // MemberNickname이 null일 때
         // given
-        EmptyMemberNicknameException memberNicknameException = assertThrows(EmptyMemberNicknameException.class, () -> Member.create(testMemberId, testMemberActiveStatus, null));
+        EmptyMemberNicknameException memberNicknameException = assertThrows(EmptyMemberNicknameException.class, () -> Member.create(testMemberId, null));
 
         // when & then
         assertThat(memberNicknameException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_NICKNAME);
