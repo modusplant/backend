@@ -1,17 +1,17 @@
 package kr.modusplant.infrastructure.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.infrastructure.security.handler.*;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
-import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
-import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
-import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
-import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
 import kr.modusplant.infrastructure.security.DefaultAuthProvider;
 import kr.modusplant.infrastructure.security.DefaultAuthenticationEntryPoint;
 import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
 import kr.modusplant.infrastructure.security.filter.EmailPasswordAuthenticationFilter;
 import kr.modusplant.infrastructure.security.filter.JwtAuthenticationFilter;
+import kr.modusplant.infrastructure.security.handler.*;
+import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
+import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
+import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
+import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -132,7 +132,14 @@ public class SecurityConfig {
                 .addFilterBefore(emailPasswordAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(http), EmailPasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/communication/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/terms/**").permitAll()
+                        .requestMatchers("/api/members/verify-email/send/**").permitAll()
+                        .requestMatchers("/api/auth/kakao/social-login").permitAll()
+                        .requestMatchers("/api/auth/google/social-login").permitAll()
+                        .requestMatchers("/api/members/register").permitAll()
+                        .requestMatchers("/api/monitor/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
                 )
                 .authenticationProvider(siteMemberAuthProvider())
                 .logout(logout -> logout
