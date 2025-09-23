@@ -45,4 +45,9 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityReposit
                 .agreedTermsOfUseVersion(signUpData.getAgreedTermsOfUseVersion().getVersion())
                 .build());
     }
+
+    @Override
+    public boolean existsByEmailAndProvider(String email, String provider) {
+        return identityJpaRepository.existsByEmailAndProvider(email, provider);
+    }
 }

@@ -21,6 +21,8 @@ public enum IdentityErrorCode implements ResponseCode {
     EMPTY_NICKNAME(HttpStatus.BAD_REQUEST, "empty_nickname", "닉네임이 비어 있습니다"),
     EMPTY_AGREED_TERMS_OF_VERSION(HttpStatus.BAD_REQUEST, "empty_agreed_terms_of_version", "동의한 약관의 버전 값이 비어 있습니다"),
 
+    MEMBER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "member_already_exists", "해당 사용자가 이미 존재합니다"),
+
     // authentication & authorization
     BAD_PASSWORD(HttpStatus.UNAUTHORIZED, "bad_password", "비밀번호가 틀렸습니다"),
     BANNED(HttpStatus.UNAUTHORIZED, "banned", "밴 처리 된 계정입니다"),

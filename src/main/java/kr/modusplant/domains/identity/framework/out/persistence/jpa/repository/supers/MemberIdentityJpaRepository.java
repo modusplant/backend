@@ -15,4 +15,6 @@ public interface MemberIdentityJpaRepository extends JpaRepository<MemberIdentit
     @Query(value = "INSERT INTO site_member (nickname) VALUES (:#{#sign.nickname})",
             nativeQuery = true)
     MemberIdentityEntity saveIdentity(@Param("sign") SignUpData sign);
+
+    boolean existsByEmailAndProvider(String email, String provider);
 }
