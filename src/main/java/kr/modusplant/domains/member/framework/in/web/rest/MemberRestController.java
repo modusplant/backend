@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import kr.modusplant.domains.member.adapter.controller.MemberController;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberNickname;
@@ -18,6 +19,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+
+import static kr.modusplant.shared.constant.Regex.REGEX_NICKNAME;
 
 @Tag(name = "회원 API", description = "회원의 생성과 갱신(상태 제외), 회원이 할 수 있는 단일한 기능을 관리하는 API 입니다.")
 @RestController
@@ -35,6 +38,8 @@ public class MemberRestController {
                     example = "ModusPlantPlayer")
             )
             @NotBlank(message = "회원 닉네임이 비어 있습니다. ")
+            @Pattern(regexp = REGEX_NICKNAME,
+                    message = "회원 닉네임 서식이 올바르지 않습니다. ")
             String nickname) {
         return ResponseEntity.status(HttpStatus.OK).body(
                 DataResponse.ok(memberController.register(
@@ -56,6 +61,8 @@ public class MemberRestController {
                     example = "NewPlayer")
             )
             @NotBlank(message = "회원 닉네임이 비어 있습니다. ")
+            @Pattern(regexp = REGEX_NICKNAME,
+                    message = "회원 닉네임 서식이 올바르지 않습니다. ")
             String nickname) {
         return ResponseEntity.status(HttpStatus.OK).body(
                 DataResponse.ok(memberController.updateNickname(
