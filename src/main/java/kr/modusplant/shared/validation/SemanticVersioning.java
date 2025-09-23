@@ -10,8 +10,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import static kr.modusplant.shared.constant.Regex.REGEX_VERSION;
+
 @NotBlank(message = "버전이 비어 있습니다.")
-@Pattern(regexp = "^v\\d+.\\d+.\\d+$", message = "버전 서식이 올바르지 않습니다.")
+@Pattern(regexp = REGEX_VERSION, message = "버전 서식이 올바르지 않습니다.")
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
