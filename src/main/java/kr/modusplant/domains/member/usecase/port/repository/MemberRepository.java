@@ -8,8 +8,6 @@ import java.util.Optional;
 public interface MemberRepository {
     Optional<Member> getByNickname(MemberNickname nickname);
 
-    Member updateNickname(Member member);
-
     Member save(Member member);
 
     boolean isNicknameExist(MemberNickname nickname);
