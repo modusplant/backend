@@ -1,6 +1,6 @@
 package kr.modusplant.infrastructure.security;
 
-import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
+import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import kr.modusplant.infrastructure.security.error.*;
 import kr.modusplant.infrastructure.security.models.DefaultAuthToken;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
@@ -37,7 +37,7 @@ public class DefaultAuthProvider implements AuthenticationProvider {
 
     private boolean validateDefaultUserDetails(DefaultUserDetails userDetails, String password) {
         if(!passwordEncoder.matches(password, userDetails.getPassword())) {
-            throw new BadCredentialException(IdentityErrorCode.BAD_PASSWORD); }
+            throw new BadCredentialException(SecurityErrorCode.BAD_PASSWORD); }
         if (userDetails.isDisabledByLinking()) {
             throw new DisabledByLinkingException(); }
         if (userDetails.isBanned()) {

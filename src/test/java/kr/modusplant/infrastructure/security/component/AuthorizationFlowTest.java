@@ -7,8 +7,8 @@ import kr.modusplant.domains.comment.adapter.controller.CommentController;
 import kr.modusplant.domains.comment.framework.in.web.rest.CommentRestController;
 import kr.modusplant.domains.comment.support.utils.adapter.CommentRegisterRequestTestUtils;
 import kr.modusplant.domains.comment.support.utils.adapter.CommentResponseTestUtils;
-import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
 import kr.modusplant.domains.identity.usecase.port.mapper.NormalIdentityMapper;
+import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberRoleTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTestUtils;
@@ -101,8 +101,8 @@ public class AuthorizationFlowTest implements
 
                 // then
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.status").value(IdentityErrorCode.ACCESS_DENIED.getHttpStatus().getValue()))
-                .andExpect(jsonPath("$.code").value(IdentityErrorCode.ACCESS_DENIED.getCode()))
+                .andExpect(jsonPath("$.status").value(SecurityErrorCode.ACCESS_DENIED.getHttpStatus().getValue()))
+                .andExpect(jsonPath("$.code").value(SecurityErrorCode.ACCESS_DENIED.getCode()))
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
 }

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
-import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
+import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
@@ -25,7 +25,7 @@ public class DefaultAuthenticationEntryPoint implements AuthenticationEntryPoint
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.getWriter().write(
                 objectMapper.writeValueAsString(DataResponse
-                        .of(IdentityErrorCode.AUTHENTICATION_FAILED)
+                        .of(SecurityErrorCode.AUTHENTICATION_FAILED)
                 )
         );
     }

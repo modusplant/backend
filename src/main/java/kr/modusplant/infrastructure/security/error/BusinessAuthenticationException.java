@@ -1,20 +1,20 @@
 package kr.modusplant.infrastructure.security.error;
 
-import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
+import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import lombok.Getter;
 import org.springframework.security.core.AuthenticationException;
 
 @Getter
 public class BusinessAuthenticationException extends AuthenticationException {
 
-  private final IdentityErrorCode errorCode;
+  private final SecurityErrorCode errorCode;
 
-  public BusinessAuthenticationException(IdentityErrorCode errorCode) {
+  public BusinessAuthenticationException(SecurityErrorCode errorCode) {
     super(errorCode.getMessage());
     this.errorCode = errorCode;
   }
 
-  public BusinessAuthenticationException(IdentityErrorCode errorCode, String message) {
+  public BusinessAuthenticationException(SecurityErrorCode errorCode, String message) {
     super(message);
     this.errorCode = errorCode;
   }

@@ -1,16 +1,16 @@
 package kr.modusplant.infrastructure.security.error;
 
-import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
+import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import lombok.Getter;
 
 @Getter
 public class DeletedException extends BusinessAuthenticationException {
 
     public DeletedException() {
-        super(IdentityErrorCode.DELETED);
+        super(SecurityErrorCode.DELETED);
     }
 
     public DeletedException(String message) {
-        super(IdentityErrorCode.DELETED, message);
+        super(SecurityErrorCode.DELETED, message);
     }
 }

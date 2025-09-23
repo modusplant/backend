@@ -1,16 +1,16 @@
 package kr.modusplant.infrastructure.security.error;
 
-import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
+import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import lombok.Getter;
 
 @Getter
 public class BadCredentialException extends BusinessAuthenticationException {
 
-    public BadCredentialException(IdentityErrorCode errorCode) {
+    public BadCredentialException(SecurityErrorCode errorCode) {
         super(errorCode);
     }
 
-    public BadCredentialException(IdentityErrorCode errorCode, String message) {
+    public BadCredentialException(SecurityErrorCode errorCode, String message) {
         super(errorCode, message);
     }
 }

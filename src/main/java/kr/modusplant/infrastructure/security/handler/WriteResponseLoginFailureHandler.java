@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
-import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
+import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import kr.modusplant.infrastructure.security.error.BusinessAuthenticationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
@@ -30,10 +30,10 @@ public class WriteResponseLoginFailureHandler implements AuthenticationFailureHa
                     )
             );
         } else {
-            response.setStatus(IdentityErrorCode.AUTHENTICATION_FAILED.getHttpStatus().getValue());
+            response.setStatus(SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus().getValue());
             response.getWriter().write(
                     objectMapper.writeValueAsString(DataResponse
-                            .of(IdentityErrorCode.AUTHENTICATION_FAILED)
+                            .of(SecurityErrorCode.AUTHENTICATION_FAILED)
                     )
             );
         }

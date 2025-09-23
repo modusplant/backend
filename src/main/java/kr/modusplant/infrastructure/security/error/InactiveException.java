@@ -1,16 +1,16 @@
 package kr.modusplant.infrastructure.security.error;
 
-import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
+import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import lombok.Getter;
 
 @Getter
 public class InactiveException extends BusinessAuthenticationException {
 
     public InactiveException() {
-        super(IdentityErrorCode.INACTIVE);
+        super(SecurityErrorCode.INACTIVE);
     }
 
     public InactiveException(String message) {
-        super(IdentityErrorCode.INACTIVE, message);
+        super(SecurityErrorCode.INACTIVE, message);
     }
 }
