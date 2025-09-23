@@ -1,7 +1,6 @@
 package kr.modusplant.domains.member.framework.in.web.rest;
 
 import kr.modusplant.domains.member.adapter.controller.MemberController;
-import kr.modusplant.domains.member.common.utils.adapter.request.MemberRequestTestUtils;
 import kr.modusplant.domains.member.common.utils.adapter.response.MemberResponseTestUtils;
 import kr.modusplant.domains.member.common.utils.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
@@ -13,12 +12,14 @@ import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_MEMBER_NICKNAME;
+import static kr.modusplant.domains.member.common.constant.MemberUuidConstant.TEST_MEMBER_UUID;
 import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
-class MemberRestControllerTest implements MemberTestUtils, MemberRequestTestUtils, MemberResponseTestUtils {
+class MemberRestControllerTest implements MemberTestUtils, MemberResponseTestUtils {
     @SuppressWarnings({"unused", "InstantiationOfUtilityClass"})
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
     private final MemberController memberController = Mockito.mock(MemberController.class);
@@ -28,12 +29,12 @@ class MemberRestControllerTest implements MemberTestUtils, MemberRequestTestUtil
 
     @Test
     @DisplayName("registerMember로 응답 반환")
-    void testRegisterMember_givenValidRequest_willReturnResponse() {
+    void testRegisterMember_givenValidNickname_willReturnResponse() {
         // given
-        given(memberController.register(testMemberRegisterRequest)).willReturn(testMemberResponse);
+        given(memberController.register(testMemberNickname)).willReturn(testMemberResponse);
 
         // when
-        ResponseEntity<DataResponse<MemberResponse>> memberResponseEntity = memberRestController.registerMember(testMemberRegisterRequest);
+        ResponseEntity<DataResponse<MemberResponse>> memberResponseEntity = memberRestController.registerMember(TEST_MEMBER_NICKNAME);
 
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -44,10 +45,10 @@ class MemberRestControllerTest implements MemberTestUtils, MemberRequestTestUtil
     @DisplayName("updateMemberNickname으로 응답 반환")
     void testUpdateMemberNickname_givenValidRequest_willReturnResponse() {
         // given
-        given(memberController.updateNickname(testMemberNicknameUpdateRequest)).willReturn(testMemberResponse);
+        given(memberController.updateNickname(testMemberId, testMemberNickname)).willReturn(testMemberResponse);
 
         // when
-        ResponseEntity<DataResponse<MemberResponse>> memberResponseEntity = memberRestController.updateMemberNickname(testMemberNicknameUpdateRequest);
+        ResponseEntity<DataResponse<MemberResponse>> memberResponseEntity = memberRestController.updateMemberNickname(TEST_MEMBER_UUID, TEST_MEMBER_NICKNAME);
 
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);

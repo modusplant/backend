@@ -1,7 +1,6 @@
 package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.adapter.mapper.MemberMapperImpl;
-import kr.modusplant.domains.member.common.utils.adapter.request.MemberRequestTestUtils;
 import kr.modusplant.domains.member.common.utils.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.exception.AlreadyExistedNicknameException;
@@ -30,7 +29,7 @@ import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 
-class MemberControllerTest implements MemberTestUtils, MemberRequestTestUtils, PostLikeEventTestUtils {
+class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils {
     private final MemberMapper memberMapper = new MemberMapperImpl();
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryJpaAdapter.class);
     private final CommLikeRepository commLikeRepository = Mockito.mock(CommLikeRepository.class);
@@ -40,13 +39,13 @@ class MemberControllerTest implements MemberTestUtils, MemberRequestTestUtils, P
 
     @Test
     @DisplayName("register로 회원 등록")
-    void testRegister_givenValidRequest_willReturnResponse() {
+    void testRegister_givenValidNickname_willReturnResponse() {
         // given
         Member member = createMember();
         given(memberRepository.save(any())).willReturn(member);
 
         // when & then
-        assertThat(memberController.register(testMemberRegisterRequest).nickname()).isEqualTo(member.getMemberNickname().getValue());
+        assertThat(memberController.register(testMemberNickname).nickname()).isEqualTo(member.getMemberNickname().getValue());
     }
 
     @Test
@@ -57,7 +56,7 @@ class MemberControllerTest implements MemberTestUtils, MemberRequestTestUtils, P
 
         // when & then
         AlreadyExistedNicknameException alreadyExistedNicknameException = assertThrows(
-                AlreadyExistedNicknameException.class, () -> memberController.register(testMemberRegisterRequest));
+                AlreadyExistedNicknameException.class, () -> memberController.register(testMemberNickname));
         assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(ALREADY_EXISTED_NICKNAME.getMessage());
     }
 
@@ -66,10 +65,10 @@ class MemberControllerTest implements MemberTestUtils, MemberRequestTestUtils, P
     void testUpdateNickname_givenValidRequest_willReturnResponse() {
         // given
         Member member = createMember();
-        given(memberRepository.updateNickname(any())).willReturn(member);
+        given(memberRepository.save(any())).willReturn(member);
 
         // when & then
-        assertThat(memberController.updateNickname(testMemberNicknameUpdateRequest).nickname()).isEqualTo(member.getMemberNickname().getValue());
+        assertThat(memberController.updateNickname(testMemberId, testMemberNickname).nickname()).isEqualTo(member.getMemberNickname().getValue());
     }
 
     @Test
@@ -80,7 +79,7 @@ class MemberControllerTest implements MemberTestUtils, MemberRequestTestUtils, P
 
         // when & then
         AlreadyExistedNicknameException alreadyExistedNicknameException = assertThrows(
-                AlreadyExistedNicknameException.class, () -> memberController.updateNickname(testMemberNicknameUpdateRequest));
+                AlreadyExistedNicknameException.class, () -> memberController.updateNickname(testMemberId, testMemberNickname));
         assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(ALREADY_EXISTED_NICKNAME.getMessage());
     }
 

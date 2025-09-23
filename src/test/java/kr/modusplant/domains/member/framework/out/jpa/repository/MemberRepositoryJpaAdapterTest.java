@@ -41,18 +41,6 @@ class MemberRepositoryJpaAdapterTest implements MemberEntityTestUtils {
     }
 
     @Test
-    @DisplayName("updateNickname으로 Member 반환")
-    void testUpdateNickname_givenValidMember_willReturnMember() {
-        // given
-        Member member = createMember();
-        MemberEntity memberEntity = createMemberEntityWithUuid();
-        given(memberJpaRepository.save(memberEntity)).willReturn(memberEntity);
-
-        // when & then
-        assertThat(memberRepositoryJpaAdapter.updateNickname(member)).isEqualTo(member);
-    }
-
-    @Test
     @DisplayName("save로 Member 반환")
     void testSave_givenValidMember_willReturn() {
         // given
