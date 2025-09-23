@@ -16,5 +16,4 @@ public interface MemberIdentityJpaRepository extends JpaRepository<MemberIdentit
             nativeQuery = true)
     MemberIdentityEntity saveIdentity(@Param("sign") SignUpData sign);
 
-    boolean existsByEmailAndProvider(String email, String provider);
 }

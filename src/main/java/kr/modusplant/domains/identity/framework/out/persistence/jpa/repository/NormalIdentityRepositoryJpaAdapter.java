@@ -1,6 +1,5 @@
 package kr.modusplant.domains.identity.framework.out.persistence.jpa.repository;
 
-import kr.modusplant.domains.identity.usecase.port.repository.NormalIdentityRepository;
 import kr.modusplant.domains.identity.domain.vo.SignUpData;
 import kr.modusplant.domains.identity.domain.vo.enums.UserRole;
 import kr.modusplant.domains.identity.framework.out.persistence.jpa.entity.MemberAuthEntity;
@@ -10,6 +9,7 @@ import kr.modusplant.domains.identity.framework.out.persistence.jpa.repository.s
 import kr.modusplant.domains.identity.framework.out.persistence.jpa.repository.supers.MemberIdentityJpaRepository;
 import kr.modusplant.domains.identity.framework.out.persistence.jpa.repository.supers.MemberRoleJpaRepository;
 import kr.modusplant.domains.identity.framework.out.persistence.jpa.repository.supers.MemberTermJpaRepository;
+import kr.modusplant.domains.identity.usecase.port.repository.NormalIdentityRepository;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -48,6 +48,6 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityReposit
 
     @Override
     public boolean existsByEmailAndProvider(String email, String provider) {
-        return identityJpaRepository.existsByEmailAndProvider(email, provider);
+        return authJpaRepository.existsByEmailAndProvider(email, provider);
     }
 }

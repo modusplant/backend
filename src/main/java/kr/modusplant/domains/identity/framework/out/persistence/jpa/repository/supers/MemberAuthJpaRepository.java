@@ -17,4 +17,6 @@ public interface MemberAuthJpaRepository extends JpaRepository<MemberAuthEntity,
             ":#{#auth.password}, :#{#auth.provider})",
             nativeQuery = true)
     void saveAuth(@Param("auth") MemberAuthEntity auth);
+
+    boolean existsByEmailAndProvider(String email, String provider);
 }
