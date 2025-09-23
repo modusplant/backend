@@ -14,11 +14,11 @@ public class CommentContent {
     private final String content;
 
     public static CommentContent create(String content) {
-        CommentContent.checkSource(content);
+        CommentContent.validateSource(content);
         return new CommentContent(content);
     }
 
-    public static void checkSource(String source) {
+    public static void validateSource(String source) {
         if(source.isBlank()) {
             throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_CONTENT);
         }

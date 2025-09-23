@@ -15,11 +15,11 @@ public class CommentStatus {
     private final CommentStatusType status;
 
     public static CommentStatus create(String status) {
-        CommentStatus.checkSource(status);
+        CommentStatus.validateSource(status);
         return new CommentStatus(CommentStatusType.valueOf(status));
     }
 
-    public static void checkSource(String source) {
+    public static void validateSource(String source) {
         if(source.isBlank()) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_STATUS); }
 
         if(!CommentStatusType.isValidStatus(source)) {
