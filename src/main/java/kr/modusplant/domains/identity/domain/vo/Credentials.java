@@ -1,9 +1,9 @@
 package kr.modusplant.domains.identity.domain.vo;
 
-import kr.modusplant.domains.identity.domain.constant.IdentityDataFormat;
 import kr.modusplant.domains.identity.domain.exception.EmptyValueException;
 import kr.modusplant.domains.identity.domain.exception.InvalidValueException;
 import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
+import kr.modusplant.shared.constant.Regex;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,14 +24,14 @@ public class Credentials {
 
     public static void validateEmail(String email) {
         if (email == null || email.isBlank()) { throw new EmptyValueException(IdentityErrorCode.EMPTY_EMAIL); }
-        if (!email.matches(IdentityDataFormat.EMAIL_FORMAT)) {
+        if (!email.matches(Regex.REGEX_EMAIL)) {
             throw new InvalidValueException(IdentityErrorCode.INVALID_EMAIL);
         }
     }
 
     public static void validatePassword(String password) {
         if (password == null || password.isBlank()) { throw new EmptyValueException(IdentityErrorCode.EMPTY_PASSWORD); }
-        if (!password.matches(IdentityDataFormat.PASSWORD_FORMAT)) {
+        if (!password.matches(Regex.REGEX_PASSWORD)) {
             throw new InvalidValueException(IdentityErrorCode.INVALID_PASSWORD);
         }
     }

@@ -27,7 +27,7 @@ public record NormalSignUpRequest(
 
         @Schema(
                 description = "닉네임",
-                pattern = "^[0-9a-zA-Z가-힣]{2,10}$",
+                pattern = "^[0-9a-zA-Z가-힣]{2,16}$",
                 example = "여기우리함께"
         )
         @NotBlank(message = "닉네임이 비어 있습니다.")

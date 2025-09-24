@@ -1,9 +1,9 @@
 package kr.modusplant.domains.identity.domain.vo;
 
-import kr.modusplant.domains.identity.domain.constant.IdentityDataFormat;
 import kr.modusplant.domains.identity.domain.exception.EmptyValueException;
 import kr.modusplant.domains.identity.domain.exception.InvalidValueException;
 import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
+import kr.modusplant.shared.constant.Regex;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,7 +22,7 @@ public class Nickname {
 
     public static void validateSource(String input) {
         if (input == null || input.isBlank()) { throw new EmptyValueException(IdentityErrorCode.EMPTY_NICKNAME); }
-        if (!input.matches(IdentityDataFormat.NICKNAME_FORMAT)) {
+        if (!input.matches(Regex.REGEX_NICKNAME)) {
             throw new InvalidValueException(IdentityErrorCode.INVALID_NICKNAME);
         }
     }
