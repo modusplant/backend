@@ -4,6 +4,7 @@ import kr.modusplant.domains.identity.common.utils.domain.vo.SignUpDataTestUtils
 import kr.modusplant.domains.identity.common.utils.usecase.request.NormalSignUpRequestTestUtils;
 import kr.modusplant.domains.identity.domain.vo.SignUpData;
 import kr.modusplant.domains.identity.usecase.port.mapper.NormalIdentityMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -16,6 +17,7 @@ public class NormalIdentityMapperImplTest implements
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Test
+    @DisplayName("유효한 요청을 일반 회원가입 데이터 VO로 변환")
     public void tesToSignUpData_givenValidRequest_willReturnSignUpData() {
         // given & when
         SignUpData result = mapper.toSignUpData(testNormalSignUpRequest);

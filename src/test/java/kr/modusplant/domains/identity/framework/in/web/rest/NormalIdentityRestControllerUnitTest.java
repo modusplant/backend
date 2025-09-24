@@ -4,6 +4,7 @@ import kr.modusplant.domains.identity.adapter.controller.NormalIdentityControlle
 import kr.modusplant.domains.identity.common.utils.usecase.request.NormalSignUpRequestTestUtils;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import kr.modusplant.legacy.modules.jwt.common.util.domain.RefreshTokenTestUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ public class NormalIdentityRestControllerUnitTest implements
     private final NormalIdentityRestController restController = new NormalIdentityRestController(controller);
 
     @Test
+    @DisplayName("유효한 요청을 받으면 일반 회원가입 응답 반환")
     public void testRegisterNormalMember_givenValidRequest_willReturnSuccess() {
         // given & when
         ResponseEntity<DataResponse<Void>> response = restController.registerNormalMember(testNormalSignUpRequest);
@@ -30,6 +32,7 @@ public class NormalIdentityRestControllerUnitTest implements
     }
 
     @Test
+    @DisplayName("유효한 토큰을 받았을 시 일반 로그인 응답 반환")
     public void testRespondToNormalLoginSuccess_givenValidToken_willReturnSuccess() {
         // given
         String testAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwianRpIjoiYWJjMTIzeHl6NDU2IiwiZXhwIjoxNjM4NzY4MDIyLCJpYXQiOjE2MzYxNzYwMjJ9.7Qm6ZxQz3XW6J8KvY1lTn4RfG2HsPpLq1DwYb5Nv0eE";
