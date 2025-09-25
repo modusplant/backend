@@ -1,4 +1,4 @@
-package kr.modusplant.domains.comment.adapter.response;
+package kr.modusplant.domains.comment.usecase.response;
 
 public record CommentResponse(
         String postId,

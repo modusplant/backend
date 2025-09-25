@@ -1,4 +1,4 @@
-package kr.modusplant.domains.comment.adapter.request;
+package kr.modusplant.domains.comment.usecase.request;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;

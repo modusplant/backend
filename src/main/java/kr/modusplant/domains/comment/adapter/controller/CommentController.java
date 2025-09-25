@@ -1,14 +1,14 @@
 package kr.modusplant.domains.comment.adapter.controller;
 
 import kr.modusplant.domains.comment.adapter.mapper.CommentMapperImpl;
-import kr.modusplant.domains.comment.adapter.repository.CommentRepository;
-import kr.modusplant.domains.comment.adapter.request.CommentDeleteRequest;
-import kr.modusplant.domains.comment.adapter.request.CommentRegisterRequest;
-import kr.modusplant.domains.comment.adapter.response.CommentResponse;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.CommentCompositeKey;
+import kr.modusplant.domains.comment.usecase.port.repository.CommentRepository;
+import kr.modusplant.domains.comment.usecase.request.CommentDeleteRequest;
+import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
+import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

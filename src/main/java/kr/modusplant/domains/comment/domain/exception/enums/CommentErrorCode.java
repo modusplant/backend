@@ -17,7 +17,8 @@ public enum CommentErrorCode implements ResponseCode {
     EMPTY_MEMBER_NICKNAME(HttpStatus.BAD_REQUEST, "empty_member_nickname", "작성자의 닉네임 값이 비어 있습니다"),
 
     INVALID_COMMENT_PATH(HttpStatus.BAD_REQUEST, "invalid_comment_path", "댓글 경로의 형식이 올바르지 않습니다"),
-    INVALID_COMMENT_STATUS(HttpStatus.BAD_REQUEST, "invalid_comment_status", "댓글의 상태가 올바르지 않습니다");
+    INVALID_COMMENT_STATUS(HttpStatus.BAD_REQUEST, "invalid_comment_status", "댓글의 상태가 올바르지 않습니다"),
+    INVALID_AUTHOR_NICKNAME(HttpStatus.BAD_REQUEST, "invalid_author_nickname", "작성자의 닉네임 형식이 올바르지 않습니다");
 
     private final HttpStatus httpStatus;
     private final String code;

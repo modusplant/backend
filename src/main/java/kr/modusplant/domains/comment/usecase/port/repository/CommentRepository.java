@@ -1,6 +1,6 @@
-package kr.modusplant.domains.comment.adapter.repository;
+package kr.modusplant.domains.comment.usecase.port.repository;
 
-import kr.modusplant.domains.comment.adapter.response.CommentResponse;
+import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.PostId;

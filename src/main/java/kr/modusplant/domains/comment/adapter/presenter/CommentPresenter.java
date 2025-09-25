@@ -1,8 +1,8 @@
 package kr.modusplant.domains.comment.adapter.presenter;
 
-import kr.modusplant.domains.comment.adapter.model.CommentReadModel;
-import kr.modusplant.domains.comment.adapter.model.MemberReadModel;
-import kr.modusplant.domains.comment.adapter.response.CommentResponse;
+import kr.modusplant.domains.comment.usecase.model.CommentReadModel;
+import kr.modusplant.domains.comment.usecase.model.MemberReadModel;
+import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 
 public class CommentPresenter {
 
