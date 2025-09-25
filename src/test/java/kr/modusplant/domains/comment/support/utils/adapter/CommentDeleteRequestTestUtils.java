@@ -1,6 +1,6 @@
 package kr.modusplant.domains.comment.support.utils.adapter;
 
-import kr.modusplant.domains.comment.adapter.request.CommentDeleteRequest;
+import kr.modusplant.domains.comment.usecase.request.CommentDeleteRequest;
 import kr.modusplant.domains.comment.support.utils.domain.CommentPathTestUtils;
 import kr.modusplant.domains.comment.support.utils.domain.PostIdTestUtils;
 

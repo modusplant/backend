@@ -1,6 +1,6 @@
 package kr.modusplant.domains.comment.support.utils.adapter;
 
-import kr.modusplant.domains.comment.adapter.response.CommentResponse;
+import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.domains.comment.support.utils.domain.CommentContentTestUtils;
 import kr.modusplant.domains.comment.support.utils.domain.CommentPathTestUtils;
 import kr.modusplant.domains.comment.support.utils.domain.PostIdTestUtils;

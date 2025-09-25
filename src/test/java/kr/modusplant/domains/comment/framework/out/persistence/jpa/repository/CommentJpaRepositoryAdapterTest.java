@@ -1,6 +1,6 @@
 package kr.modusplant.domains.comment.framework.out.persistence.jpa.repository;
 
-import kr.modusplant.domains.comment.adapter.response.CommentResponse;
+import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper.CommentJpaMapper;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.supers.CommentJpaRepository;

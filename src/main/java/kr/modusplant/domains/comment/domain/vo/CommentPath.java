@@ -15,14 +15,14 @@ public class CommentPath {
     private final String path;
 
     public static CommentPath create(String path) {
-        CommentPath.checkSource(path);
+        CommentPath.validateSource(path);
         return new CommentPath(path);
     }
 
     /**
      * @param source 의 형식은 반드시 숫자와 점(.)의 연속물이어야 합니다.
      */
-    public static void checkSource(String source) {
+    public static void validateSource(String source) {
         if (source.isBlank()) {
             throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_PATH);
         }

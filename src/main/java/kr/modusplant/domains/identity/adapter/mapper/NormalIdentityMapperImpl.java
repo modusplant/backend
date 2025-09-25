@@ -4,7 +4,9 @@ import kr.modusplant.domains.identity.domain.vo.SignUpData;
 import kr.modusplant.domains.identity.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.domains.identity.usecase.request.NormalSignUpRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class NormalIdentityMapperImpl implements NormalIdentityMapper {
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();

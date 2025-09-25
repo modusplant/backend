@@ -1,7 +1,9 @@
 package kr.modusplant.domains.comment.domain.vo;
 
 import kr.modusplant.domains.comment.domain.exception.EmptyValueException;
+import kr.modusplant.domains.comment.domain.exception.InvalidValueException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
+import kr.modusplant.shared.constant.Regex;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,6 +26,7 @@ public class Author {
     public static Author create(UUID memberUuid, String memberNickname) {
         if(memberUuid == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR); }
         if(memberNickname == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_MEMBER_NICKNAME); }
+        if(!memberNickname.matches(Regex.REGEX_NICKNAME)) { throw new InvalidValueException(CommentErrorCode.INVALID_AUTHOR_NICKNAME); }
         return new Author(memberUuid, memberNickname);
     }
 
