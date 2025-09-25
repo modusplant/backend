@@ -23,7 +23,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     private final CommentMapperImpl mapper = Mockito.mock(CommentMapperImpl.class);
     private final CommentRepository commentRepository = Mockito.mock(CommentRepository.class);
     private final CommentAuthorRepository authorRepository = Mockito.mock(CommentAuthorRepository.class);
-    private final CommentController controller = new CommentController(mapper, commentRepository, authorRepository);
+    private final CommentController controller = new CommentController(mapper, commentRepository);
 
     @Test
     @DisplayName("유효한 게시글 id로 댓글 읽기")
