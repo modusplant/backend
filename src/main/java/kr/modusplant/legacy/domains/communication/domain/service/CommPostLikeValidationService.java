@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
-import kr.modusplant.framework.out.jpa.repository.CommLikeRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostLikeRepository;
 import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
@@ -16,10 +16,10 @@ import java.util.UUID;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class CommLikeValidationService {
+public class CommPostLikeValidationService {
     private final CommPostRepository commPostRepository;
     private final SiteMemberRepository memberRepository;
-    private final CommLikeRepository commLikeRepository;
+    private final CommPostLikeRepository commPostLikeRepository;
 
     public void validateNotFoundCommPostOrMember(String postId, UUID memberId) {
         if (!commPostRepository.existsById(postId)) {
@@ -30,14 +30,14 @@ public class CommLikeValidationService {
         }
     }
 
-    public void validateNotFoundCommLike(String postId, UUID memberId) {
-        if (!commLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
+    public void validateNotFoundCommPostLike(String postId, UUID memberId) {
+        if (!commPostLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
             throw new EntityNotFoundException(ErrorCode.LIKE_NOT_FOUND, EntityName.LIKE);
         }
     }
 
-    public void validateExistedCommLike(String postId, UUID memberId) {
-        if (commLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
+    public void validateExistedCommPostLike(String postId, UUID memberId) {
+        if (commPostLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
             throw new EntityExistsException(ErrorCode.LIKE_EXISTS, EntityName.LIKE);
         }
     }

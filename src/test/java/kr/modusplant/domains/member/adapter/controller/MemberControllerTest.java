@@ -8,8 +8,8 @@ import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.framework.out.jpa.repository.MemberRepositoryJpaAdapter;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
-import kr.modusplant.framework.out.jpa.entity.CommLikeEntity;
-import kr.modusplant.framework.out.jpa.repository.CommLikeRepository;
+import kr.modusplant.framework.out.jpa.entity.CommPostLikeEntity;
+import kr.modusplant.framework.out.jpa.repository.CommPostLikeRepository;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.event.consumer.PostEventConsumer;
 import kr.modusplant.shared.event.PostLikeEventTestUtils;
@@ -32,9 +32,9 @@ import static org.mockito.Mockito.verify;
 class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils {
     private final MemberMapper memberMapper = new MemberMapperImpl();
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryJpaAdapter.class);
-    private final CommLikeRepository commLikeRepository = Mockito.mock(CommLikeRepository.class);
+    private final CommPostLikeRepository commPostLikeRepository = Mockito.mock(CommPostLikeRepository.class);
     private final EventBus eventBus = new EventBus();
-    private final PostEventConsumer postEventConsumer = new PostEventConsumer(eventBus, commLikeRepository);
+    private final PostEventConsumer postEventConsumer = new PostEventConsumer(eventBus, commPostLikeRepository);
     private final MemberController memberController = new MemberController(memberMapper, memberRepository, eventBus);
 
     @Test
@@ -89,14 +89,14 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils {
         // given
         UUID memberId = TEST_POST_LIKE_EVENT.getMemberId();
         String postId = TEST_POST_LIKE_EVENT.getPostId();
-        CommLikeEntity entity = CommLikeEntity.of(postId, memberId);
-        given(commLikeRepository.save(entity)).willReturn(entity);
+        CommPostLikeEntity entity = CommPostLikeEntity.of(postId, memberId);
+        given(commPostLikeRepository.save(entity)).willReturn(entity);
 
         // when
         memberController.likePost(memberId, postId);
 
         // then
-        verify(commLikeRepository, atLeastOnce()).save(any());
+        verify(commPostLikeRepository, atLeastOnce()).save(any());
     }
 
     @Test
@@ -105,13 +105,13 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils {
         // given
         UUID memberId = TEST_POST_LIKE_EVENT.getMemberId();
         String postId = TEST_POST_LIKE_EVENT.getPostId();
-        CommLikeEntity entity = CommLikeEntity.of(postId, memberId);
-        willDoNothing().given(commLikeRepository).delete(entity);
+        CommPostLikeEntity entity = CommPostLikeEntity.of(postId, memberId);
+        willDoNothing().given(commPostLikeRepository).delete(entity);
 
         // when
         memberController.unlikePost(memberId, postId);
 
         // then
-        verify(commLikeRepository, atLeastOnce()).delete(any());
+        verify(commPostLikeRepository, atLeastOnce()).delete(any());
     }
 }

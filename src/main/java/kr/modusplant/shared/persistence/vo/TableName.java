@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TableName {
     public static final String COMM_COMMENT = "comm_comment";
-    public static final String COMM_LIKE = "comm_like";
     public static final String COMM_POST = "comm_post";
+    public static final String COMM_POST_LIKE = "comm_post_like";
     public static final String COMM_PRI_CATE = "comm_pri_cate";
     public static final String COMM_SECO_CATE = "comm_seco_cate";
     public static final String SITE_MEMBER = "site_member";

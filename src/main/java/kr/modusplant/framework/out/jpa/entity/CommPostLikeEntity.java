@@ -13,15 +13,15 @@ import java.util.UUID;
 
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.SNAKE_MEMB_UUID;
 import static kr.modusplant.shared.persistence.vo.TableColumnName.CREATED_AT;
-import static kr.modusplant.shared.persistence.vo.TableName.COMM_LIKE;
+import static kr.modusplant.shared.persistence.vo.TableName.COMM_POST_LIKE;
 
 @Entity
-@Table(name = COMM_LIKE)
+@Table(name = COMM_POST_LIKE)
 @IdClass(CommPostLikeId.class)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-public class CommLikeEntity {
+public class CommPostLikeEntity {
     @Id
     @Column(name = "post_ulid", nullable = false)
     private String postId;
@@ -34,12 +34,12 @@ public class CommLikeEntity {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    private CommLikeEntity(String postId, UUID memberId) {
+    private CommPostLikeEntity(String postId, UUID memberId) {
         this.postId = postId;
         this.memberId = memberId;
     }
 
-    public static CommLikeEntity of(String postId, UUID memberId) {
-        return new CommLikeEntity(postId, memberId);
+    public static CommPostLikeEntity of(String postId, UUID memberId) {
+        return new CommPostLikeEntity(postId, memberId);
     }
 }
