@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
-import kr.modusplant.framework.out.jpa.repository.CommLikeRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostLikeRepository;
 import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
 import kr.modusplant.shared.exception.EntityExistsException;
@@ -18,14 +18,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class CommLikeValidationServiceTest {
+class CommPostLikeValidationServiceTest {
 
     @Mock private CommPostRepository commPostRepository;
     @Mock private SiteMemberRepository memberRepository;
-    @Mock private CommLikeRepository commLikeRepository;
+    @Mock private CommPostLikeRepository commPostLikeRepository;
 
     @InjectMocks
-    private CommLikeValidationService validationService;
+    private CommPostLikeValidationService validationService;
 
     private final String QNA_POST_ID = "TEST_QNA_POST_ID";
     private final UUID MEMBER_ID = UUID.randomUUID();
@@ -51,19 +51,19 @@ class CommLikeValidationServiceTest {
 
     @Test
     @DisplayName("좋아요가 존재하지 않을 경우 예외 발생")
-    void validateNotFoundCommLike_notLiked() {
-        when(commLikeRepository.existsByPostIdAndMemberId(QNA_POST_ID, MEMBER_ID)).thenReturn(false);
+    void validateNotFoundCommPostLike_notLikedPost() {
+        when(commPostLikeRepository.existsByPostIdAndMemberId(QNA_POST_ID, MEMBER_ID)).thenReturn(false);
 
-        assertThatThrownBy(() -> validationService.validateNotFoundCommLike(QNA_POST_ID, MEMBER_ID))
+        assertThatThrownBy(() -> validationService.validateNotFoundCommPostLike(QNA_POST_ID, MEMBER_ID))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
     @DisplayName("좋아요가 이미 존재할 경우 예외 발생")
-    void validateExistedCommLike_alreadyLiked() {
-        when(commLikeRepository.existsByPostIdAndMemberId(QNA_POST_ID, MEMBER_ID)).thenReturn(true);
+    void validateExistedCommPostLike_alreadyLiked() {
+        when(commPostLikeRepository.existsByPostIdAndMemberId(QNA_POST_ID, MEMBER_ID)).thenReturn(true);
 
-        assertThatThrownBy(() -> validationService.validateExistedCommLike(QNA_POST_ID, MEMBER_ID))
+        assertThatThrownBy(() -> validationService.validateExistedCommPostLike(QNA_POST_ID, MEMBER_ID))
                 .isInstanceOf(EntityExistsException.class);
     }
 }

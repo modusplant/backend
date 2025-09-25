@@ -1,18 +1,18 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
-import kr.modusplant.framework.out.jpa.entity.CommLikeEntity;
+import kr.modusplant.framework.out.jpa.entity.CommPostLikeEntity;
 import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.compositekey.CommPostLikeId;
-import kr.modusplant.framework.out.jpa.repository.CommLikeRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostLikeRepository;
 import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
-import kr.modusplant.legacy.domains.communication.app.http.response.CommLikeResponse;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommLikeEntityTestUtils;
+import kr.modusplant.legacy.domains.communication.app.http.response.CommPostLikeResponse;
+import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostLikeEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;
-import kr.modusplant.legacy.domains.communication.domain.service.CommLikeValidationService;
+import kr.modusplant.legacy.domains.communication.domain.service.CommPostLikeValidationService;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
@@ -29,21 +29,21 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @DomainsServiceWithoutValidationServiceContext
-class CommLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommPostEntityTestUtils, CommLikeEntityTestUtils {
+class CommPostLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommPostEntityTestUtils, CommPostLikeEntityTestUtils {
 
     private final SiteMemberRepository siteMemberRepository;
     private final CommPostRepository commPostRepository;
-    private final CommLikeRepository commLikeRepository;
-    private final CommLikeApplicationService commLikeApplicationService;
-    private final CommLikeValidationService commLikeValidationService;
+    private final CommPostLikeRepository commPostLikeRepository;
+    private final CommPostLikeApplicationService commPostLikeApplicationService;
+    private final CommPostLikeValidationService commPostLikeValidationService;
 
     @Autowired
-    public CommLikeApplicationServiceTest(SiteMemberRepository siteMemberRepository, CommPostRepository commPostRepository, CommLikeRepository commLikeRepository, CommLikeApplicationService commLikeApplicationService, CommLikeValidationService commLikeValidationService) {
+    public CommPostLikeApplicationServiceTest(SiteMemberRepository siteMemberRepository, CommPostRepository commPostRepository, CommPostLikeRepository commPostLikeRepository, CommPostLikeApplicationService commPostLikeApplicationService, CommPostLikeValidationService commPostLikeValidationService) {
         this.siteMemberRepository = siteMemberRepository;
         this.commPostRepository = commPostRepository;
-        this.commLikeRepository = commLikeRepository;
-        this.commLikeApplicationService = commLikeApplicationService;
-        this.commLikeValidationService = commLikeValidationService;
+        this.commPostLikeRepository = commPostLikeRepository;
+        this.commPostLikeApplicationService = commPostLikeApplicationService;
+        this.commPostLikeValidationService = commPostLikeValidationService;
     }
 
     @Test
@@ -65,19 +65,19 @@ class CommLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         String postId = commPost.getUlid();
 
         // when
-        CommLikeEntity commLike = createCommLikeEntity();
-        doNothing().when(commLikeValidationService).validateNotFoundCommLike(postId, memberId);
-        doNothing().when(commLikeValidationService).validateExistedCommLike(postId, memberId);
+        CommPostLikeEntity commLike = createCommPostLikeEntity();
+        doNothing().when(commPostLikeValidationService).validateNotFoundCommPostLike(postId, memberId);
+        doNothing().when(commPostLikeValidationService).validateExistedCommPostLike(postId, memberId);
         when(commPostRepository.findById(postId)).thenReturn(Optional.of(commPost));
-        when(commLikeRepository.save(CommLikeEntity.of(postId, memberId))).thenReturn(commLike);
-        CommLikeResponse response = commLikeApplicationService.likeCommPost(postId, memberId);
+        when(commPostLikeRepository.save(CommPostLikeEntity.of(postId, memberId))).thenReturn(commLike);
+        CommPostLikeResponse response = commPostLikeApplicationService.likeCommPost(postId, memberId);
 
         // then
         assertThat(response.liked()).isTrue();
         assertThat(response.likeCount()).isEqualTo(1);
 
-        when(commLikeRepository.findById(new CommPostLikeId(postId, memberId))).thenReturn(Optional.of(commLike));
-        CommLikeEntity saved = commLikeRepository.findById(new CommPostLikeId(postId, memberId)).orElse(null);
+        when(commPostLikeRepository.findById(new CommPostLikeId(postId, memberId))).thenReturn(Optional.of(commLike));
+        CommPostLikeEntity saved = commPostLikeRepository.findById(new CommPostLikeId(postId, memberId)).orElse(null);
 
         assertThat(saved).isNotNull();
     }
@@ -101,21 +101,21 @@ class CommLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         String postId = commPost.getUlid();
 
         // when
-        CommLikeEntity commLike = createCommLikeEntity();
-        doNothing().when(commLikeValidationService).validateNotFoundCommLike(postId, memberId);
-        doNothing().when(commLikeValidationService).validateExistedCommLike(postId, memberId);
-        doNothing().when(commLikeValidationService).validateNotFoundCommPostOrMember(postId, memberId);
+        CommPostLikeEntity commLike = createCommPostLikeEntity();
+        doNothing().when(commPostLikeValidationService).validateNotFoundCommPostLike(postId, memberId);
+        doNothing().when(commPostLikeValidationService).validateExistedCommPostLike(postId, memberId);
+        doNothing().when(commPostLikeValidationService).validateNotFoundCommPostOrMember(postId, memberId);
         when(commPostRepository.findById(postId)).thenReturn(Optional.of(commPost));
-        when(commLikeRepository.save(CommLikeEntity.of(postId, memberId))).thenReturn(commLike);
-        doNothing().when(commLikeRepository).deleteByPostIdAndMemberId(postId, memberId);
-        commLikeApplicationService.likeCommPost(postId, memberId);
-        CommLikeResponse response = commLikeApplicationService.unlikeCommPost(postId, memberId);
+        when(commPostLikeRepository.save(CommPostLikeEntity.of(postId, memberId))).thenReturn(commLike);
+        doNothing().when(commPostLikeRepository).deleteByPostIdAndMemberId(postId, memberId);
+        commPostLikeApplicationService.likeCommPost(postId, memberId);
+        CommPostLikeResponse response = commPostLikeApplicationService.unlikeCommPost(postId, memberId);
 
         // then
         assertThat(response.liked()).isFalse();
         assertThat(response.likeCount()).isEqualTo(0);
-        when(commLikeRepository.existsByPostIdAndMemberId(postId, memberId)).thenReturn(false);
-        assertThat(commLikeRepository.existsByPostIdAndMemberId(postId, memberId)).isFalse();
+        when(commPostLikeRepository.existsByPostIdAndMemberId(postId, memberId)).thenReturn(false);
+        assertThat(commPostLikeRepository.existsByPostIdAndMemberId(postId, memberId)).isFalse();
     }
 
     @Test
@@ -137,17 +137,17 @@ class CommLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         String postId = commPost.getUlid();
 
         // when
-        CommLikeEntity commLike = createCommLikeEntity();
-        doNothing().when(commLikeValidationService).validateNotFoundCommLike(postId, memberId);
-        doNothing().when(commLikeValidationService).validateExistedCommLike(postId, memberId);
+        CommPostLikeEntity commLike = createCommPostLikeEntity();
+        doNothing().when(commPostLikeValidationService).validateNotFoundCommPostLike(postId, memberId);
+        doNothing().when(commPostLikeValidationService).validateExistedCommPostLike(postId, memberId);
         when(commPostRepository.findById(postId)).thenReturn(Optional.of(commPost));
-        when(commLikeRepository.save(CommLikeEntity.of(postId, memberId))).thenReturn(commLike);
-        commLikeApplicationService.likeCommPost(postId, memberId);
+        when(commPostLikeRepository.save(CommPostLikeEntity.of(postId, memberId))).thenReturn(commLike);
+        commPostLikeApplicationService.likeCommPost(postId, memberId);
 
         // then
-        doNothing().when(commLikeValidationService).validateNotFoundCommPostOrMember(postId, memberId);
-        doThrow(new EntityExistsException(ErrorCode.LIKE_EXISTS, EntityName.LIKE)).when(commLikeValidationService).validateExistedCommLike(postId, memberId);
-        assertThatThrownBy(() -> commLikeApplicationService.likeCommPost(postId, memberId)).isInstanceOf(EntityExistsException.class);
+        doNothing().when(commPostLikeValidationService).validateNotFoundCommPostOrMember(postId, memberId);
+        doThrow(new EntityExistsException(ErrorCode.LIKE_EXISTS, EntityName.LIKE)).when(commPostLikeValidationService).validateExistedCommPostLike(postId, memberId);
+        assertThatThrownBy(() -> commPostLikeApplicationService.likeCommPost(postId, memberId)).isInstanceOf(EntityExistsException.class);
     }
 
     @Test
@@ -169,19 +169,19 @@ class CommLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
         String postId = commPost.getUlid();
 
         // when
-        CommLikeEntity commLike = createCommLikeEntity();
-        doNothing().when(commLikeValidationService).validateNotFoundCommLike(postId, memberId);
-        doNothing().when(commLikeValidationService).validateExistedCommLike(postId, memberId);
+        CommPostLikeEntity commLike = createCommPostLikeEntity();
+        doNothing().when(commPostLikeValidationService).validateNotFoundCommPostLike(postId, memberId);
+        doNothing().when(commPostLikeValidationService).validateExistedCommPostLike(postId, memberId);
         when(commPostRepository.findById(postId)).thenReturn(Optional.of(commPost));
-        when(commLikeRepository.save(CommLikeEntity.of(postId, memberId))).thenReturn(commLike);
-        doNothing().when(commLikeRepository).deleteByPostIdAndMemberId(postId, memberId);
-        commLikeApplicationService.likeCommPost(postId, memberId);
-        commLikeApplicationService.unlikeCommPost(postId, memberId);
+        when(commPostLikeRepository.save(CommPostLikeEntity.of(postId, memberId))).thenReturn(commLike);
+        doNothing().when(commPostLikeRepository).deleteByPostIdAndMemberId(postId, memberId);
+        commPostLikeApplicationService.likeCommPost(postId, memberId);
+        commPostLikeApplicationService.unlikeCommPost(postId, memberId);
 
         // then
-        doNothing().when(commLikeValidationService).validateNotFoundCommPostOrMember(postId, memberId);
-        doThrow(new EntityNotFoundException(ErrorCode.LIKE_NOT_FOUND, EntityName.LIKE)).when(commLikeValidationService).validateNotFoundCommLike(postId, memberId);
-        assertThatThrownBy(() -> commLikeApplicationService.unlikeCommPost(postId, memberId))
+        doNothing().when(commPostLikeValidationService).validateNotFoundCommPostOrMember(postId, memberId);
+        doThrow(new EntityNotFoundException(ErrorCode.LIKE_NOT_FOUND, EntityName.LIKE)).when(commPostLikeValidationService).validateNotFoundCommPostLike(postId, memberId);
+        assertThatThrownBy(() -> commPostLikeApplicationService.unlikeCommPost(postId, memberId))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 }

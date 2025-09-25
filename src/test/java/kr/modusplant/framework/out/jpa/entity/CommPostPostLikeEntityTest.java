@@ -2,7 +2,7 @@ package kr.modusplant.framework.out.jpa.entity;
 
 import kr.modusplant.framework.out.jpa.entity.compositekey.CommPostLikeId;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommLikeEntityTestUtils;
+import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostLikeEntityTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
-public class CommLikeEntityTest implements CommLikeEntityTestUtils {
+public class CommPostPostLikeEntityTest implements CommPostLikeEntityTestUtils {
 
     @Autowired
     private TestEntityManager entityManager;
@@ -29,35 +29,35 @@ public class CommLikeEntityTest implements CommLikeEntityTestUtils {
         postId = TEST_COMM_POST_WITH_ULID.getUlid();
         memberId = createMemberBasicUserEntityWithUuid().getUuid();
 
-        CommLikeEntity commLikeEntity = CommLikeEntity.of(postId, memberId);
-        entityManager.persistAndFlush(commLikeEntity);
+        CommPostLikeEntity commPostLikeEntity = CommPostLikeEntity.of(postId, memberId);
+        entityManager.persistAndFlush(commPostLikeEntity);
     }
 
     @Test
     @DisplayName("소통 게시글 좋아요")
     void likeCommPost_success () {
         // when
-        CommLikeEntity commLikeEntity = entityManager.find(CommLikeEntity.class, new CommPostLikeId(postId, memberId));
+        CommPostLikeEntity commPostLikeEntity = entityManager.find(CommPostLikeEntity.class, new CommPostLikeId(postId, memberId));
 
         // then
-        assertThat(commLikeEntity).isNotNull();
-        assertThat(commLikeEntity.getPostId()).isEqualTo(postId);
-        assertThat(commLikeEntity.getMemberId()).isEqualTo(memberId);
-        assertThat(commLikeEntity.getCreatedAt()).isNotNull();
-        assertThat(commLikeEntity.getCreatedAt()).isBeforeOrEqualTo(LocalDateTime.now());
+        assertThat(commPostLikeEntity).isNotNull();
+        assertThat(commPostLikeEntity.getPostId()).isEqualTo(postId);
+        assertThat(commPostLikeEntity.getMemberId()).isEqualTo(memberId);
+        assertThat(commPostLikeEntity.getCreatedAt()).isNotNull();
+        assertThat(commPostLikeEntity.getCreatedAt()).isBeforeOrEqualTo(LocalDateTime.now());
     }
 
     @Test
     @DisplayName("소통 게시글 좋아요 삭제")
     void unlikeCommPost_success() {
         // when
-        CommLikeEntity commLikeEntity = entityManager.find(CommLikeEntity.class, new CommPostLikeId(postId, memberId));
-        entityManager.remove(commLikeEntity);
+        CommPostLikeEntity commPostLikeEntity = entityManager.find(CommPostLikeEntity.class, new CommPostLikeId(postId, memberId));
+        entityManager.remove(commPostLikeEntity);
         entityManager.flush();
         entityManager.clear();
 
         // then
-        CommLikeEntity deletedEntity = entityManager.find(CommLikeEntity.class, new CommPostLikeId(postId, memberId));
+        CommPostLikeEntity deletedEntity = entityManager.find(CommPostLikeEntity.class, new CommPostLikeId(postId, memberId));
         assertThat(deletedEntity).isNull();
     }
 }
