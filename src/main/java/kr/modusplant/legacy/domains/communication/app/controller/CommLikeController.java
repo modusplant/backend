@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-@Tag(name = "컨텐츠 좋아요 API", description = "컨텐츠 게시글 좋아요를 다루는 API입니다.")
+@Tag(name = "소통 게시글 좋아요 API", description = "소통 게시글 좋아요를 다루는 API입니다.")
 @RestController
 @RequestMapping("/api/v1/communication/posts")
 @RequiredArgsConstructor
@@ -30,8 +30,8 @@ public class CommLikeController {
     private UUID memberUuid;
 
     @Operation(
-            summary = "컨텐츠 게시글 좋아요 API",
-            description = "컨텐츠 게시글 좋아요 기능"
+            summary = "소통 게시글 좋아요 API",
+            description = "소통 게시글 좋아요 기능"
     )
     @PostMapping("/{ulid}/like")
     public ResponseEntity<DataResponse<CommLikeResponse>> likeCommPost(
@@ -46,8 +46,8 @@ public class CommLikeController {
     }
 
     @Operation(
-            summary = "컨텐츠 게시글 좋아요 취소 API",
-            description = "컨텐츠 게시글 좋아요 취소 기능"
+            summary = "소통 게시글 좋아요 취소 API",
+            description = "소통 게시글 좋아요 취소 기능"
     )
     @DeleteMapping("/{ulid}/like")
     public ResponseEntity<DataResponse<CommLikeResponse>> unlikeCommPost(
