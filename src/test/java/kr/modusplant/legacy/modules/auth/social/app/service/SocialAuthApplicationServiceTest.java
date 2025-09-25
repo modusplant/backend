@@ -18,7 +18,7 @@ import kr.modusplant.legacy.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.legacy.modules.auth.social.app.dto.KakaoUserInfo;
 import kr.modusplant.legacy.modules.auth.social.app.dto.supers.SocialUserInfo;
 import kr.modusplant.legacy.modules.auth.social.error.UnsupportedSocialProviderException;
-import kr.modusplant.legacy.modules.security.enums.Role;
+import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
