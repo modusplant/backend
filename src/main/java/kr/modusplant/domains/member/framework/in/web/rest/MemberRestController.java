@@ -69,7 +69,7 @@ public class MemberRestController {
                         MemberId.fromUuid(id), MemberNickname.create(nickname))));
     }
 
-    @Operation(summary = "소통 컨텐츠 게시글 좋아요 API", description = "소통 컨텐츠 게시글에 좋아요를 누릅니다.")
+    @Operation(summary = "소통 게시글 좋아요 API", description = "소통 게시글에 좋아요를 누릅니다.")
     @PutMapping("/like/communication/posts/{postUlid}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationPost(
             @Parameter(schema = @Schema(
@@ -90,7 +90,7 @@ public class MemberRestController {
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
-    @Operation(summary = "소통 컨텐츠 게시글 좋아요 취소 API", description = "소통 컨텐츠 게시글에 대한 좋아요를 취소합니다.")
+    @Operation(summary = "소통 게시글 좋아요 취소 API", description = "소통 게시글에 대한 좋아요를 취소합니다.")
     @DeleteMapping("/like/communication/posts/{postUlid}")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationPost(
             @Parameter(schema = @Schema(

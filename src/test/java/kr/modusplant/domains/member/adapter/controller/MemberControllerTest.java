@@ -84,7 +84,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils {
     }
 
     @Test
-    @DisplayName("likePost로 게시글 좋아요")
+    @DisplayName("likePost로 소통 게시글 좋아요")
     void testLikePost_givenValidParameter_willLikePost() {
         // given
         UUID memberId = TEST_POST_LIKE_EVENT.getMemberId();
@@ -100,7 +100,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils {
     }
 
     @Test
-    @DisplayName("unlikePost로 게시글 좋아요")
+    @DisplayName("unlikePost로 소통 게시글 좋아요")
     void testUnlikePost_givenValidParameter_willUnlikePost() {
         // given
         UUID memberId = TEST_POST_LIKE_EVENT.getMemberId();
