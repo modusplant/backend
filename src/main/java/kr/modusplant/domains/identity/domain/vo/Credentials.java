@@ -13,13 +13,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Credentials {
-    private final String email;
-    private final String password;
+    private final Email email;
+    private final Password password;
 
     public static Credentials create(String email, String password) {
-        Credentials.validateEmail(email);
-        Credentials.validatePassword(password);
-        return new Credentials(email, password);
+        return new Credentials(Email.create(email), Password.create(password));
     }
 
     public static void validateEmail(String email) {
