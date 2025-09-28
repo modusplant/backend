@@ -20,20 +20,6 @@ public class Credentials {
         return new Credentials(Email.create(email), Password.create(password));
     }
 
-    public static void validateEmail(String email) {
-        if (email == null || email.isBlank()) { throw new EmptyValueException(IdentityErrorCode.EMPTY_EMAIL); }
-        if (!email.matches(Regex.REGEX_EMAIL)) {
-            throw new InvalidValueException(IdentityErrorCode.INVALID_EMAIL);
-        }
-    }
-
-    public static void validatePassword(String password) {
-        if (password == null || password.isBlank()) { throw new EmptyValueException(IdentityErrorCode.EMPTY_PASSWORD); }
-        if (!password.matches(Regex.REGEX_PASSWORD)) {
-            throw new InvalidValueException(IdentityErrorCode.INVALID_PASSWORD);
-        }
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
