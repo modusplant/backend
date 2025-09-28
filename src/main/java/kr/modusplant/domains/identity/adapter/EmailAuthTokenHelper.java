@@ -4,7 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import kr.modusplant.domains.identity.framework.in.web.rest.EmailValidationRequest;
+import kr.modusplant.domains.identity.usecase.request.EmailValidationRequest;
 import kr.modusplant.legacy.modules.jwt.error.TokenExpiredException;
 import kr.modusplant.shared.exception.InvalidDataException;
 import kr.modusplant.shared.exception.enums.ErrorCode;

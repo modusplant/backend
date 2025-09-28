@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import kr.modusplant.domains.identity.adapter.controller.EmailAuthController;
 import kr.modusplant.domains.identity.usecase.request.EmailAuthRequest;
+import kr.modusplant.domains.identity.usecase.request.EmailValidationRequest;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

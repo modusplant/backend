@@ -3,7 +3,7 @@ package kr.modusplant.domains.identity.adapter.controller;
 import kr.modusplant.domains.identity.adapter.EmailAuthTokenHelper;
 import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
 import kr.modusplant.domains.identity.exception.DataAlreadyExistsException;
-import kr.modusplant.domains.identity.framework.in.web.rest.EmailValidationRequest;
+import kr.modusplant.domains.identity.usecase.request.EmailValidationRequest;
 import kr.modusplant.domains.identity.usecase.enums.EmailType;
 import kr.modusplant.domains.identity.usecase.port.contract.CallEmailSendApiGateway;
 import kr.modusplant.domains.identity.usecase.port.repository.NormalIdentityRepository;

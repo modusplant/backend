@@ -19,7 +19,7 @@ import java.util.HashMap;
 @Tag(name = "이메일 인증 API", description = "이메일 인증 메일 발송과 검증을 다루는 API입니다.")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/deprecate")
 @Validated
 public class EmailAuthController {
 
