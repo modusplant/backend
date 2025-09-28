@@ -4,7 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import kr.modusplant.legacy.modules.auth.email.app.http.request.VerifyEmailRequest;
+import kr.modusplant.domains.identity.framework.in.web.rest.EmailValidationRequest;
 import kr.modusplant.legacy.modules.jwt.error.TokenExpiredException;
 import kr.modusplant.shared.exception.InvalidDataException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
@@ -52,9 +52,9 @@ public class EmailAuthTokenHelper {
     }
 
     // TODO : Spring Security 적용 후 필터에서 쿠키 검증 로직 추가된 후 테스트 필요
-    public void validateVerifyAccessToken(String jwtToken, VerifyEmailRequest verifyEmailRequest) {
-        String verifyCode = verifyEmailRequest.getVerifyCode();
-        String email = verifyEmailRequest.getEmail();
+    public void validateVerifyAccessToken(EmailValidationRequest verifyEmailRequest, String jwtToken) {
+        String verifyCode = verifyEmailRequest.verifyCode();
+        String email = verifyEmailRequest.email();
 
         if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
             jwtToken = jwtToken.substring(7);
