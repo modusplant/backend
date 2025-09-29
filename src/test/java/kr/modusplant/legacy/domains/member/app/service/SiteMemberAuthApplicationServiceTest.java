@@ -11,8 +11,8 @@ import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemb
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberRequestTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberAuthResponseTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberResponseTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityConstant;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityConstant;
 import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import org.junit.jupiter.api.DisplayName;
@@ -28,7 +28,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
 @DomainsServiceWithoutValidationServiceContext
-class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestUtils, SiteMemberAuthResponseTestUtils, SiteMemberAuthEntityTestUtils, SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityTestUtils {
+class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestUtils, SiteMemberAuthResponseTestUtils, SiteMemberAuthEntityConstant, SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityConstant {
 
     private final SiteMemberAuthApplicationService memberAuthService;
     private final SiteMemberApplicationService memberService;

@@ -3,7 +3,7 @@ package kr.modusplant.framework.out.jpa.repository;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityConstant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
-class SiteMemberAuthRepositoryTest implements SiteMemberAuthEntityTestUtils {
+class SiteMemberAuthRepositoryTest implements SiteMemberAuthEntityConstant {
 
     private final SiteMemberAuthRepository memberAuthRepository;
     private final SiteMemberRepository memberRepository;

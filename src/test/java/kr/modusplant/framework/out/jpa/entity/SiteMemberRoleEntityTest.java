@@ -1,7 +1,7 @@
 package kr.modusplant.framework.out.jpa.entity;
 
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberRoleEntityTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberRoleEntityConstant;
 import kr.modusplant.infrastructure.security.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
-class SiteMemberRoleEntityTest implements SiteMemberRoleEntityTestUtils {
+class SiteMemberRoleEntityTest implements SiteMemberRoleEntityConstant {
 
     private final TestEntityManager entityManager;
 

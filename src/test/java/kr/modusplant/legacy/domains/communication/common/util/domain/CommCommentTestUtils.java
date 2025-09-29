@@ -3,7 +3,7 @@ package kr.modusplant.legacy.domains.communication.common.util.domain;
 import kr.modusplant.legacy.domains.communication.domain.model.CommComment;
 
 import static kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils.TEST_COMM_POST_WITH_ULID;
-import static kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTestUtils.memberBasicUserWithUuid;
+import static kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberConstant.memberBasicUserWithUuid;
 
 public interface CommCommentTestUtils {
     CommComment TEST_COMM_COMMENT = CommComment.builder()

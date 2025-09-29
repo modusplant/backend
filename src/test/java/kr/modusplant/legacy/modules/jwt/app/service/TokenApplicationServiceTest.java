@@ -5,7 +5,7 @@ import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberRoleRespo
 import kr.modusplant.legacy.domains.member.app.service.SiteMemberApplicationService;
 import kr.modusplant.legacy.domains.member.app.service.SiteMemberRoleApplicationService;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberRoleResponseTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityConstant;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.legacy.modules.jwt.domain.model.RefreshToken;
@@ -37,7 +37,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class TokenApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemberRoleResponseTestUtils {
+class TokenApplicationServiceTest implements SiteMemberEntityConstant, SiteMemberRoleResponseTestUtils {
     @InjectMocks
     @Spy
     private TokenApplicationService tokenApplicationService;

@@ -2,7 +2,7 @@ package kr.modusplant.infrastructure.security.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityConstant;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.modules.auth.normal.login.common.util.app.http.request.NormalLoginRequestTestUtils;
 import kr.modusplant.legacy.modules.jwt.app.dto.TokenPair;
@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SecurityOnlyContext
 public class NormalLoginAuthenticationFlowTest implements
-        SiteMemberUserDetailsTestUtils, NormalLoginRequestTestUtils, SiteMemberEntityTestUtils {
+        SiteMemberUserDetailsTestUtils, NormalLoginRequestTestUtils, SiteMemberEntityConstant {
 
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;

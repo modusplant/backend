@@ -11,8 +11,8 @@ import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemb
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberRoleRequestTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberResponseTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberRoleResponseTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberRoleEntityTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityConstant;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberRoleEntityConstant;
 import kr.modusplant.infrastructure.security.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
 @DomainsServiceWithoutValidationServiceContext
-class SiteMemberRoleApplicationServiceTest implements SiteMemberRoleRequestTestUtils, SiteMemberRoleResponseTestUtils, SiteMemberRoleEntityTestUtils, SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityTestUtils {
+class SiteMemberRoleApplicationServiceTest implements SiteMemberRoleRequestTestUtils, SiteMemberRoleResponseTestUtils, SiteMemberRoleEntityConstant, SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityConstant {
 
     private final SiteMemberRoleApplicationService memberRoleService;
     private final SiteMemberApplicationService memberService;
