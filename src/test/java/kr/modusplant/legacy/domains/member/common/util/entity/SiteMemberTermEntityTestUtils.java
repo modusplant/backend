@@ -9,36 +9,36 @@ public interface SiteMemberTermEntityTestUtils extends SiteMemberEntityTestUtils
     default SiteMemberTermEntity createMemberTermAdminEntity() {
         return SiteMemberTermEntity.builder()
                 .member(createMemberBasicAdminEntity())
-                .agreedTermsOfUseVersion(memberTermAdmin.getAgreedTermsOfUseVersion())
-                .agreedPrivacyPolicyVersion(memberTermAdmin.getAgreedPrivacyPolicyVersion())
-                .agreedAdInfoReceivingVersion(memberTermAdmin.getAgreedAdInfoReceivingVersion())
+                .agreedTermsOfUseVersion(MEMBER_TERM_ADMIN_AGREED_TERMS_OF_USE_VERSION)
+                .agreedPrivacyPolicyVersion(MEMBER_TERM_ADMIN_AGREED_PRIVACY_POLICY_VERSION)
+                .agreedAdInfoReceivingVersion(MEMBER_TERM_ADMIN_AGREED_AD_INFO_RECEIVING_VERSION)
                 .build();
     }
 
     default SiteMemberTermEntity createMemberTermAdminEntityWithUuid() {
         return SiteMemberTermEntity.builder()
                 .member(createMemberBasicAdminEntityWithUuid())
-                .agreedTermsOfUseVersion(memberTermAdminWithUuid.getAgreedTermsOfUseVersion())
-                .agreedPrivacyPolicyVersion(memberTermAdminWithUuid.getAgreedPrivacyPolicyVersion())
-                .agreedAdInfoReceivingVersion(memberTermAdminWithUuid.getAgreedAdInfoReceivingVersion())
+                .agreedTermsOfUseVersion(MEMBER_TERM_ADMIN_AGREED_TERMS_OF_USE_VERSION)
+                .agreedPrivacyPolicyVersion(MEMBER_TERM_ADMIN_AGREED_PRIVACY_POLICY_VERSION)
+                .agreedAdInfoReceivingVersion(MEMBER_TERM_ADMIN_AGREED_AD_INFO_RECEIVING_VERSION)
                 .build();
     }
 
     default SiteMemberTermEntity createMemberTermUserEntity() {
         return SiteMemberTermEntity.builder()
                 .member(createMemberBasicUserEntity())
-                .agreedTermsOfUseVersion(memberTermUser.getAgreedTermsOfUseVersion())
-                .agreedPrivacyPolicyVersion(memberTermUser.getAgreedPrivacyPolicyVersion())
-                .agreedAdInfoReceivingVersion(memberTermUser.getAgreedAdInfoReceivingVersion())
+                .agreedTermsOfUseVersion(MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION)
+                .agreedPrivacyPolicyVersion(MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION)
+                .agreedAdInfoReceivingVersion(MEMBER_TERM_USER_AGREED_AD_INFO_RECEIVING_VERSION)
                 .build();
     }
 
     default SiteMemberTermEntity createMemberTermUserEntityWithUuid() {
         return SiteMemberTermEntity.builder()
                 .member(createMemberBasicUserEntityWithUuid())
-                .agreedTermsOfUseVersion(memberTermUserWithUuid.getAgreedTermsOfUseVersion())
-                .agreedPrivacyPolicyVersion(memberTermUserWithUuid.getAgreedPrivacyPolicyVersion())
-                .agreedAdInfoReceivingVersion(memberTermUserWithUuid.getAgreedAdInfoReceivingVersion())
+                .agreedTermsOfUseVersion(MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION)
+                .agreedPrivacyPolicyVersion(MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION)
+                .agreedAdInfoReceivingVersion(MEMBER_TERM_USER_AGREED_AD_INFO_RECEIVING_VERSION)
                 .build();
     }
 }

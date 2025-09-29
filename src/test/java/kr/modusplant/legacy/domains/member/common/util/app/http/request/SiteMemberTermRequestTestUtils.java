@@ -5,7 +5,7 @@ import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberTermUpdate
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTermConstant;
 
 public interface SiteMemberTermRequestTestUtils extends SiteMemberTermConstant {
-    SiteMemberTermInsertRequest memberTermUserInsertRequest = new SiteMemberTermInsertRequest(memberTermUserWithUuid.getUuid(), memberTermUser.getAgreedTermsOfUseVersion(), memberTermUser.getAgreedPrivacyPolicyVersion(), memberTermUser.getAgreedAdInfoReceivingVersion());
+    SiteMemberTermInsertRequest memberTermUserInsertRequest = new SiteMemberTermInsertRequest(MEMBER_TERM_USER_UUID, MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION, MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION, MEMBER_TERM_USER_AGREED_AD_INFO_RECEIVING_VERSION);
 
-    SiteMemberTermUpdateRequest memberTermUserUpdateRequest = new SiteMemberTermUpdateRequest(memberTermUserWithUuid.getUuid(), memberTermUser.getAgreedTermsOfUseVersion(), memberTermUser.getAgreedPrivacyPolicyVersion(), memberTermUser.getAgreedAdInfoReceivingVersion());
+    SiteMemberTermUpdateRequest memberTermUserUpdateRequest = new SiteMemberTermUpdateRequest(MEMBER_TERM_USER_UUID, MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION, MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION, MEMBER_TERM_USER_AGREED_AD_INFO_RECEIVING_VERSION);
 }
