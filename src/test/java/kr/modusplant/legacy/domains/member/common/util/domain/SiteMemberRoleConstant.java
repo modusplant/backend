@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.member.common.util.domain;
 
-import kr.modusplant.legacy.domains.member.domain.model.SiteMemberRole;
 import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.legacy.domains.member.domain.model.SiteMemberRole;
 
 public interface SiteMemberRoleConstant extends SiteMemberConstant {
     SiteMemberRole memberRoleAdmin = SiteMemberRole.builder().role(Role.ADMIN).build();

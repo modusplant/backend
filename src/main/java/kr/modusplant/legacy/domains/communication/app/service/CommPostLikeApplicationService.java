@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
-import kr.modusplant.framework.out.jpa.entity.CommPostLikeEntity;
 import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.out.jpa.entity.CommPostLikeEntity;
 import kr.modusplant.framework.out.jpa.repository.CommPostLikeRepository;
 import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;

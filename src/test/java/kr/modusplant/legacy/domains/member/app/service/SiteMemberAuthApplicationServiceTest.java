@@ -13,7 +13,6 @@ import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMem
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberResponseTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityConstant;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityConstant;
-import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -231,12 +230,11 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
     @Test
     void getOptionalEmptyTest() {
         // given
-        SiteMemberAuth memberAuth = memberAuthBasicUserWithUuid;
-        UUID uuid = memberAuth.getOriginalMemberUuid();
+        UUID uuid = MEMBER_AUTH_BASIC_USER_ORIGINAL_MEMBER_UUID;
+        String email = MEMBER_AUTH_BASIC_USER_EMAIL;
+        AuthProvider provider = MEMBER_AUTH_BASIC_USER_PROVIDER;
+        String providerId = MEMBER_AUTH_BASIC_USER_PROVIDER_ID;
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        String email = memberAuth.getEmail();
-        AuthProvider provider = memberAuth.getProvider();
-        String providerId = memberAuth.getProviderId();
 
         // getByUuid
         // given & when

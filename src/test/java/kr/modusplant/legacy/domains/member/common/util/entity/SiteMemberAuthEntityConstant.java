@@ -8,16 +8,16 @@ public interface SiteMemberAuthEntityConstant extends SiteMemberEntityConstant {
 
     default SiteMemberAuthEntityBuilder createMemberAuthBasicAdminEntityBuilder() {
         return builder()
-                .email(memberAuthBasicAdmin.getEmail())
-                .pw(memberAuthBasicAdmin.getPw())
-                .provider(memberAuthBasicAdmin.getProvider());
+                .email(MEMBER_AUTH_BASIC_ADMIN_EMAIL)
+                .pw(MEMBER_AUTH_BASIC_ADMIN_PW)
+                .provider(MEMBER_AUTH_BASIC_ADMIN_PROVIDER);
     }
 
     default SiteMemberAuthEntityBuilder createMemberAuthBasicUserEntityBuilder() {
         return builder()
-                .email(memberAuthBasicUser.getEmail())
-                .pw(memberAuthBasicUser.getPw())
-                .provider(memberAuthBasicUser.getProvider());
+                .email(MEMBER_AUTH_BASIC_USER_EMAIL)
+                .pw(MEMBER_AUTH_BASIC_USER_PW)
+                .provider(MEMBER_AUTH_BASIC_USER_PROVIDER);
     }
 
     default SiteMemberAuthEntityBuilder createMemberAuthGoogleUserEntityBuilder() {

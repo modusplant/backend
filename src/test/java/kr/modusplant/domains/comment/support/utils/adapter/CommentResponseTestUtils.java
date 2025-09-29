@@ -1,9 +1,9 @@
 package kr.modusplant.domains.comment.support.utils.adapter;
 
-import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.domains.comment.support.utils.domain.CommentContentTestUtils;
 import kr.modusplant.domains.comment.support.utils.domain.CommentPathTestUtils;
 import kr.modusplant.domains.comment.support.utils.domain.PostIdTestUtils;
+import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.domains.member.common.utils.domain.vo.MemberNicknameTestUtils;
 
 public interface CommentResponseTestUtils extends
