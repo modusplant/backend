@@ -2,9 +2,9 @@ package kr.modusplant.legacy.domains.member.common.util.entity;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
 
-import static kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberRoleTestUtils.*;
+import static kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberRoleConstant.*;
 
-public interface SiteMemberRoleEntityTestUtils extends SiteMemberEntityTestUtils {
+public interface SiteMemberRoleEntityConstant extends SiteMemberEntityConstant {
     default SiteMemberRoleEntity createMemberRoleAdminEntity() {
         return SiteMemberRoleEntity.builder().member(createMemberBasicAdminEntity()).role(memberRoleAdmin.getRole()).build();
     }

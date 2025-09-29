@@ -14,7 +14,7 @@ import kr.modusplant.legacy.domains.communication.common.util.app.http.response.
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommCommentEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityConstant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @RepositoryOnlyContext
 public class CommCommentAppInfraMapperTest implements
         CommCommentInsertRequestTestUtils, CommCommentResponseTestUtils, CommCommentEntityTestUtils,
-        CommSecondaryCategoryEntityTestUtils, CommPostEntityTestUtils, SiteMemberEntityTestUtils {
+        CommSecondaryCategoryEntityTestUtils, CommPostEntityTestUtils, SiteMemberEntityConstant {
 
     private final CommCommentAppInfraMapper commentAppInfraMapper = new CommCommentAppInfraMapperImpl();
     private final CommSecondaryCategoryRepository categoryRepository;

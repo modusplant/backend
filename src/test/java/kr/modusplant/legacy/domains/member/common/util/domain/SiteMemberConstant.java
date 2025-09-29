@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public interface SiteMemberTestUtils {
+public interface SiteMemberConstant {
     SiteMember memberBasicAdmin = SiteMember.builder()
             .nickname("관리자")
             .birthDate(LocalDate.of(2000, 1, 1))

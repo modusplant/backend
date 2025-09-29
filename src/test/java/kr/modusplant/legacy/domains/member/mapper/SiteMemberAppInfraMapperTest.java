@@ -5,14 +5,14 @@ import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberResponse;
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberRequestTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberResponseTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityConstant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
-class SiteMemberAppInfraMapperTest implements SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityTestUtils {
+class SiteMemberAppInfraMapperTest implements SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityConstant {
 
     private final SiteMemberAppInfraMapper memberMapper =  new SiteMemberAppInfraMapperImpl();
 

@@ -4,7 +4,7 @@ import kr.modusplant.legacy.domains.member.domain.model.SiteMemberTerm;
 
 import static kr.modusplant.shared.util.VersionUtils.createVersion;
 
-public interface SiteMemberTermTestUtils extends SiteMemberTestUtils {
+public interface SiteMemberTermConstant extends SiteMemberConstant {
     SiteMemberTerm memberTermAdmin = SiteMemberTerm.builder()
             .agreedTermsOfUseVersion(createVersion(1, 0, 0))
             .agreedPrivacyPolicyVersion(createVersion(1, 0, 2))

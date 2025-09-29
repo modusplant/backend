@@ -11,8 +11,8 @@ import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemb
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberTermRequestTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberResponseTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberTermResponseTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberTermEntityTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityConstant;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberTermEntityConstant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
 @DomainsServiceWithoutValidationServiceContext
-class SiteMemberTermApplicationServiceTest implements SiteMemberTermRequestTestUtils, SiteMemberTermResponseTestUtils, SiteMemberTermEntityTestUtils, SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityTestUtils {
+class SiteMemberTermApplicationServiceTest implements SiteMemberTermRequestTestUtils, SiteMemberTermResponseTestUtils, SiteMemberTermEntityConstant, SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityConstant {
 
     private final SiteMemberTermApplicationService memberTermService;
     private final SiteMemberApplicationService memberService;

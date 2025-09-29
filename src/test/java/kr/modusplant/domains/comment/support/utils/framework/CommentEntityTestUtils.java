@@ -3,11 +3,11 @@ package kr.modusplant.domains.comment.support.utils.framework;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
 import kr.modusplant.domains.comment.support.utils.domain.CommentTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityConstant;
 
 public interface CommentEntityTestUtils extends
         CommentTestUtils, CommentCompositeKeyTestUtils,
-        CommPostEntityTestUtils, SiteMemberEntityTestUtils {
+        CommPostEntityTestUtils, SiteMemberEntityConstant {
 
     default CommentEntity createCommentEntity() {
         return CommentEntity.builder()

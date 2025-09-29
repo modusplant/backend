@@ -13,7 +13,7 @@ import kr.modusplant.legacy.domains.communication.app.http.response.CommPostResp
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityConstant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RepositoryOnlyContext
-class CommPostAppInfraMapperTest implements CommPostEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils, SiteMemberEntityTestUtils {
+class CommPostAppInfraMapperTest implements CommPostEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils, SiteMemberEntityConstant {
     private final CommPostAppInfraMapper commPostAppInfraMapper = new CommPostAppInfraMapperImpl();
     private final SiteMemberRepository siteMemberRepository;
     private final CommPrimaryCategoryRepository commPrimaryCategoryRepository;

@@ -4,7 +4,7 @@ import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-public interface SiteMemberAuthTestUtils {
+public interface SiteMemberAuthConstant {
     SiteMemberAuth memberAuthBasicAdmin = SiteMemberAuth.builder()
             .email("testAdmin1@gmail.com")
             .pw(new BCryptPasswordEncoder().encode("testPw12@"))
@@ -12,8 +12,8 @@ public interface SiteMemberAuthTestUtils {
             .build();
 
     SiteMemberAuth memberAuthBasicAdminWithUuid = SiteMemberAuth.builder()
-            .activeMemberUuid(SiteMemberTestUtils.memberBasicAdminWithUuid.getUuid())
-            .originalMemberUuid(SiteMemberTestUtils.memberBasicAdminWithUuid.getUuid())
+            .activeMemberUuid(SiteMemberConstant.memberBasicAdminWithUuid.getUuid())
+            .originalMemberUuid(SiteMemberConstant.memberBasicAdminWithUuid.getUuid())
             .email(memberAuthBasicAdmin.getEmail())
             .pw(memberAuthBasicAdmin.getPw())
             .provider(memberAuthBasicAdmin.getProvider())
@@ -26,8 +26,8 @@ public interface SiteMemberAuthTestUtils {
             .build();
 
     SiteMemberAuth memberAuthBasicUserWithUuid = SiteMemberAuth.builder()
-            .activeMemberUuid(SiteMemberTestUtils.memberBasicUserWithUuid.getUuid())
-            .originalMemberUuid(SiteMemberTestUtils.memberBasicUserWithUuid.getUuid())
+            .activeMemberUuid(SiteMemberConstant.memberBasicUserWithUuid.getUuid())
+            .originalMemberUuid(SiteMemberConstant.memberBasicUserWithUuid.getUuid())
             .email(memberAuthBasicUser.getEmail())
             .pw(memberAuthBasicUser.getPw())
             .provider(memberAuthBasicUser.getProvider())
@@ -40,8 +40,8 @@ public interface SiteMemberAuthTestUtils {
             .build();
 
     SiteMemberAuth memberAuthGoogleUserWithUuid = SiteMemberAuth.builder()
-            .activeMemberUuid(SiteMemberTestUtils.memberGoogleUserWithUuid.getUuid())
-            .originalMemberUuid(SiteMemberTestUtils.memberGoogleUserWithUuid.getUuid())
+            .activeMemberUuid(SiteMemberConstant.memberGoogleUserWithUuid.getUuid())
+            .originalMemberUuid(SiteMemberConstant.memberGoogleUserWithUuid.getUuid())
             .email(memberAuthGoogleUser.getEmail())
             .provider(memberAuthGoogleUser.getProvider())
             .providerId(memberAuthGoogleUser.getProviderId())
@@ -54,8 +54,8 @@ public interface SiteMemberAuthTestUtils {
             .build();
 
     SiteMemberAuth memberAuthKakaoUserWithUuid = SiteMemberAuth.builder()
-            .activeMemberUuid(SiteMemberTestUtils.memberKakaoUserWithUuid.getUuid())
-            .originalMemberUuid(SiteMemberTestUtils.memberKakaoUserWithUuid.getUuid())
+            .activeMemberUuid(SiteMemberConstant.memberKakaoUserWithUuid.getUuid())
+            .originalMemberUuid(SiteMemberConstant.memberKakaoUserWithUuid.getUuid())
             .email(memberAuthKakaoUser.getEmail())
             .provider(memberAuthKakaoUser.getProvider())
             .providerId(memberAuthKakaoUser.getProviderId())

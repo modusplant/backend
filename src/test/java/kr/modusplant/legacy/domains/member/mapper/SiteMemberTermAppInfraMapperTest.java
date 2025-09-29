@@ -8,7 +8,7 @@ import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberTermInsert
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberTermResponse;
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberTermRequestTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberTermResponseTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberTermEntityTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberTermEntityConstant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
-class SiteMemberTermAppInfraMapperTest implements SiteMemberTermRequestTestUtils, SiteMemberTermResponseTestUtils, SiteMemberTermEntityTestUtils {
+class SiteMemberTermAppInfraMapperTest implements SiteMemberTermRequestTestUtils, SiteMemberTermResponseTestUtils, SiteMemberTermEntityConstant {
 
     private final SiteMemberRepository memberRepository;
     private final SiteMemberTermAppInfraMapper memberTermMapper = new SiteMemberTermAppInfraMapperImpl();

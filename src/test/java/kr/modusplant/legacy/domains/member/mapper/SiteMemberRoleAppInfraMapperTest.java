@@ -8,7 +8,7 @@ import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberRoleInsert
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberRoleResponse;
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberRoleRequestTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberRoleResponseTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberRoleEntityTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberRoleEntityConstant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
-class SiteMemberRoleAppInfraMapperTest implements SiteMemberRoleRequestTestUtils, SiteMemberRoleResponseTestUtils, SiteMemberRoleEntityTestUtils {
+class SiteMemberRoleAppInfraMapperTest implements SiteMemberRoleRequestTestUtils, SiteMemberRoleResponseTestUtils, SiteMemberRoleEntityConstant {
 
     private final SiteMemberRepository memberRepository;
     private final SiteMemberRoleAppInfraMapper memberRoleMapper = new SiteMemberRoleAppInfraMapperImpl();

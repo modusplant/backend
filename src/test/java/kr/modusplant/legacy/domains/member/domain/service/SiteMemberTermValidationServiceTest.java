@@ -3,8 +3,8 @@ package kr.modusplant.legacy.domains.member.domain.service;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberTermRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
-import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTermTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberTermEntityTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTermConstant;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberTermEntityConstant;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @DomainsServiceOnlyContext
-class SiteMemberTermValidationServiceTest implements SiteMemberTermTestUtils, SiteMemberTermEntityTestUtils {
+class SiteMemberTermValidationServiceTest implements SiteMemberTermConstant, SiteMemberTermEntityConstant {
     private final SiteMemberTermValidationService memberTermValidationService;
     private final SiteMemberTermRepository memberTermRepository;
 

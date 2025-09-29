@@ -2,9 +2,9 @@ package kr.modusplant.legacy.domains.member.common.util.app.http.request;
 
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberAuthInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberAuthUpdateRequest;
-import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberAuthTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberAuthConstant;
 
-public interface SiteMemberAuthRequestTestUtils extends SiteMemberAuthTestUtils {
+public interface SiteMemberAuthRequestTestUtils extends SiteMemberAuthConstant {
     SiteMemberAuthInsertRequest memberAuthBasicUserInsertRequest = new SiteMemberAuthInsertRequest(memberAuthBasicUserWithUuid.getOriginalMemberUuid(), memberAuthBasicUser.getEmail(), memberAuthBasicUser.getPw(), memberAuthBasicUser.getProvider(), memberAuthBasicUser.getProviderId());
 
     SiteMemberAuthUpdateRequest memberAuthBasicUserUpdateRequest = new SiteMemberAuthUpdateRequest(memberAuthBasicUserWithUuid.getOriginalMemberUuid(), memberAuthBasicUser.getEmail(), memberAuthBasicUser.getPw());

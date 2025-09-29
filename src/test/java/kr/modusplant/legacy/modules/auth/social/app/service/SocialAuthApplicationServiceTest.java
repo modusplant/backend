@@ -7,9 +7,9 @@ import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
-import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberAuthTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberAuthConstant;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityConstant;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityConstant;
 import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthDomainInfraMapper;
@@ -37,7 +37,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @DomainsServiceOnlyContext
-class SocialAuthApplicationServiceTest implements SiteMemberAuthTestUtils, SiteMemberEntityTestUtils, SiteMemberAuthEntityTestUtils {
+class SocialAuthApplicationServiceTest implements SiteMemberAuthConstant, SiteMemberEntityConstant, SiteMemberAuthEntityConstant {
 
     private SocialAuthApplicationService socialAuthApplicationService;
     @Mock

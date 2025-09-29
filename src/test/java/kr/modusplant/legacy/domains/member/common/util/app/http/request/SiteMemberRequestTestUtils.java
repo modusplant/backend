@@ -2,9 +2,9 @@ package kr.modusplant.legacy.domains.member.common.util.app.http.request;
 
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberUpdateRequest;
-import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberConstant;
 
-public interface SiteMemberRequestTestUtils extends SiteMemberTestUtils {
+public interface SiteMemberRequestTestUtils extends SiteMemberConstant {
     SiteMemberInsertRequest memberBasicUserInsertRequest = new SiteMemberInsertRequest(memberBasicUser.getNickname());
 
     SiteMemberUpdateRequest memberBasicUserUpdateRequest = new SiteMemberUpdateRequest(memberBasicUserWithUuid.getUuid(), memberBasicUser.getNickname(), memberBasicUser.getBirthDate());

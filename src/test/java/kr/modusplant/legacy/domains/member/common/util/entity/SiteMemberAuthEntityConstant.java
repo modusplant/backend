@@ -2,9 +2,9 @@ package kr.modusplant.legacy.domains.member.common.util.entity;
 
 import static kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity.SiteMemberAuthEntityBuilder;
 import static kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity.builder;
-import static kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberAuthTestUtils.*;
+import static kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberAuthConstant.*;
 
-public interface SiteMemberAuthEntityTestUtils extends SiteMemberEntityTestUtils {
+public interface SiteMemberAuthEntityConstant extends SiteMemberEntityConstant {
 
     default SiteMemberAuthEntityBuilder createMemberAuthBasicAdminEntityBuilder() {
         return builder()

@@ -9,7 +9,7 @@ import kr.modusplant.legacy.domains.communication.common.util.entity.CommComment
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityConstant;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
@@ -29,7 +29,7 @@ import static org.mockito.BDDMockito.given;
 @Transactional
 public class CommCommentValidationServiceTest implements
         CommCommentEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils,
-        CommPostEntityTestUtils, SiteMemberEntityTestUtils {
+        CommPostEntityTestUtils, SiteMemberEntityConstant {
 
     @InjectMocks
     private final CommCommentValidationService commentValidationService;

@@ -2,7 +2,7 @@ package kr.modusplant.framework.out.jpa.repository;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberTermEntity;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberTermEntityTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberTermEntityConstant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
-class SiteMemberTermRepositoryTest implements SiteMemberTermEntityTestUtils {
+class SiteMemberTermRepositoryTest implements SiteMemberTermEntityConstant {
 
     private final SiteMemberTermRepository memberTermRepository;
 
