@@ -9,11 +9,11 @@ public interface SiteMemberAuthRequestTestUtils extends SiteMemberAuthConstant {
 
     SiteMemberAuthUpdateRequest memberAuthBasicUserUpdateRequest = new SiteMemberAuthUpdateRequest(MEMBER_AUTH_BASIC_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_BASIC_USER_EMAIL, MEMBER_AUTH_BASIC_USER_PW);
 
-    SiteMemberAuthInsertRequest memberAuthGoogleUserInsertRequest = new SiteMemberAuthInsertRequest(memberAuthGoogleUserWithUuid.getOriginalMemberUuid(), memberAuthGoogleUser.getEmail(), memberAuthGoogleUser.getPw(), memberAuthGoogleUser.getProvider(), memberAuthGoogleUser.getProviderId());
+    SiteMemberAuthInsertRequest memberAuthGoogleUserInsertRequest = new SiteMemberAuthInsertRequest(MEMBER_AUTH_GOOGLE_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_GOOGLE_USER_EMAIL, MEMBER_AUTH_GOOGLE_USER_PW, MEMBER_AUTH_GOOGLE_USER_PROVIDER, MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID);
 
-    SiteMemberAuthUpdateRequest memberAuthGoogleUserUpdateRequest = new SiteMemberAuthUpdateRequest(memberAuthGoogleUserWithUuid.getOriginalMemberUuid(), memberAuthGoogleUser.getEmail(), memberAuthGoogleUser.getPw());
+    SiteMemberAuthUpdateRequest memberAuthGoogleUserUpdateRequest = new SiteMemberAuthUpdateRequest(MEMBER_AUTH_GOOGLE_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_GOOGLE_USER_EMAIL, MEMBER_AUTH_GOOGLE_USER_PW);
 
-    SiteMemberAuthInsertRequest memberAuthKakaoUserInsertRequest = new SiteMemberAuthInsertRequest(memberAuthKakaoUserWithUuid.getOriginalMemberUuid(), memberAuthKakaoUser.getEmail(), memberAuthKakaoUser.getPw(), memberAuthKakaoUser.getProvider(), memberAuthKakaoUser.getProviderId());
+    SiteMemberAuthInsertRequest memberAuthKakaoUserInsertRequest = new SiteMemberAuthInsertRequest(MEMBER_AUTH_KAKAO_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_KAKAO_USER_EMAIL, MEMBER_AUTH_KAKAO_USER_PW, MEMBER_AUTH_KAKAO_USER_PROVIDER, MEMBER_AUTH_KAKAO_USER_PROVIDER_ID);
 
-    SiteMemberAuthUpdateRequest memberAuthKakaoUserUpdateRequest = new SiteMemberAuthUpdateRequest(memberAuthKakaoUserWithUuid.getOriginalMemberUuid(), memberAuthKakaoUser.getEmail(), memberAuthKakaoUser.getPw());
+    SiteMemberAuthUpdateRequest memberAuthKakaoUserUpdateRequest = new SiteMemberAuthUpdateRequest(MEMBER_AUTH_KAKAO_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_KAKAO_USER_EMAIL, MEMBER_AUTH_KAKAO_USER_PW);
 }

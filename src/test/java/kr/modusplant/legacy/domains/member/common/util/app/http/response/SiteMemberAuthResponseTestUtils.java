@@ -6,7 +6,7 @@ import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberAuthCons
 public interface SiteMemberAuthResponseTestUtils extends SiteMemberAuthConstant {
     SiteMemberAuthResponse memberAuthBasicUserResponse = new SiteMemberAuthResponse(MEMBER_AUTH_BASIC_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_BASIC_USER_ACTIVE_MEMBER_UUID, MEMBER_AUTH_BASIC_USER_EMAIL, MEMBER_AUTH_BASIC_USER_PROVIDER);
 
-    SiteMemberAuthResponse memberAuthGoogleUserResponse = new SiteMemberAuthResponse(memberAuthGoogleUserWithUuid.getOriginalMemberUuid(), memberAuthGoogleUserWithUuid.getActiveMemberUuid(), memberAuthGoogleUser.getEmail(), memberAuthGoogleUser.getProvider());
+    SiteMemberAuthResponse memberAuthGoogleUserResponse = new SiteMemberAuthResponse(MEMBER_AUTH_GOOGLE_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_GOOGLE_USER_ACTIVE_MEMBER_UUID, MEMBER_AUTH_GOOGLE_USER_EMAIL, MEMBER_AUTH_GOOGLE_USER_PROVIDER);
 
-    SiteMemberAuthResponse memberAuthKakaoUserResponse = new SiteMemberAuthResponse(memberAuthKakaoUserWithUuid.getOriginalMemberUuid(), memberAuthKakaoUserWithUuid.getActiveMemberUuid(), memberAuthKakaoUser.getEmail(), memberAuthKakaoUser.getProvider());
+    SiteMemberAuthResponse memberAuthKakaoUserResponse = new SiteMemberAuthResponse(MEMBER_AUTH_KAKAO_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_KAKAO_USER_ACTIVE_MEMBER_UUID, MEMBER_AUTH_KAKAO_USER_EMAIL, MEMBER_AUTH_KAKAO_USER_PROVIDER);
 }

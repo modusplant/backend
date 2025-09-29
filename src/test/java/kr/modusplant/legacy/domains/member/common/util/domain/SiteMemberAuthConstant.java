@@ -1,6 +1,5 @@
 package kr.modusplant.legacy.domains.member.common.util.domain;
 
-import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -19,31 +18,17 @@ public interface SiteMemberAuthConstant {
     AuthProvider MEMBER_AUTH_BASIC_USER_PROVIDER = AuthProvider.BASIC;
     String MEMBER_AUTH_BASIC_USER_PROVIDER_ID = "";
 
-    SiteMemberAuth memberAuthGoogleUser = SiteMemberAuth.builder()
-            .email("Test3gOogleUsser@gmail.com")
-            .provider(AuthProvider.GOOGLE)
-            .providerId("639796866968871286823")
-            .build();
+    UUID MEMBER_AUTH_GOOGLE_USER_ACTIVE_MEMBER_UUID = UUID.fromString("6ba6176c-bbc5-4767-9a25-598631918365");
+    UUID MEMBER_AUTH_GOOGLE_USER_ORIGINAL_MEMBER_UUID = MEMBER_AUTH_GOOGLE_USER_ACTIVE_MEMBER_UUID;
+    String MEMBER_AUTH_GOOGLE_USER_EMAIL = "Test3gOogleUsser@gmail.com";
+    String MEMBER_AUTH_GOOGLE_USER_PW = "";
+    AuthProvider MEMBER_AUTH_GOOGLE_USER_PROVIDER = AuthProvider.GOOGLE;
+    String MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID = "639796866968871286823";
 
-    SiteMemberAuth memberAuthGoogleUserWithUuid = SiteMemberAuth.builder()
-            .activeMemberUuid(SiteMemberConstant.memberGoogleUserWithUuid.getUuid())
-            .originalMemberUuid(SiteMemberConstant.memberGoogleUserWithUuid.getUuid())
-            .email(memberAuthGoogleUser.getEmail())
-            .provider(memberAuthGoogleUser.getProvider())
-            .providerId(memberAuthGoogleUser.getProviderId())
-            .build();
-
-    SiteMemberAuth memberAuthKakaoUser = SiteMemberAuth.builder()
-            .email("test2KaKao4Uzer@kakao.com")
-            .provider(AuthProvider.KAKAO)
-            .providerId("9348634889")
-            .build();
-
-    SiteMemberAuth memberAuthKakaoUserWithUuid = SiteMemberAuth.builder()
-            .activeMemberUuid(SiteMemberConstant.memberKakaoUserWithUuid.getUuid())
-            .originalMemberUuid(SiteMemberConstant.memberKakaoUserWithUuid.getUuid())
-            .email(memberAuthKakaoUser.getEmail())
-            .provider(memberAuthKakaoUser.getProvider())
-            .providerId(memberAuthKakaoUser.getProviderId())
-            .build();
+    UUID MEMBER_AUTH_KAKAO_USER_ACTIVE_MEMBER_UUID = UUID.fromString("4f9e87cd-ca94-4ca0-b32b-8f492ee4b93f");
+    UUID MEMBER_AUTH_KAKAO_USER_ORIGINAL_MEMBER_UUID = MEMBER_AUTH_KAKAO_USER_ACTIVE_MEMBER_UUID;
+    String MEMBER_AUTH_KAKAO_USER_EMAIL = "test2KaKao4Uzer@kakao.com";
+    String MEMBER_AUTH_KAKAO_USER_PW = "";
+    AuthProvider MEMBER_AUTH_KAKAO_USER_PROVIDER = AuthProvider.KAKAO;
+    String MEMBER_AUTH_KAKAO_USER_PROVIDER_ID = "9348634889";
 }
