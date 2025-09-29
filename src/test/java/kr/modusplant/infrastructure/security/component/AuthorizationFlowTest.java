@@ -10,8 +10,8 @@ import kr.modusplant.domains.comment.support.utils.adapter.CommentResponseTestUt
 import kr.modusplant.domains.identity.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberRoleConstant;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberConstant;
+import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberRoleConstant;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
 import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,6 +1,5 @@
 package kr.modusplant.domains.comment.framework.out.persistence.jpa.repository;
 
-import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper.CommentJpaMapper;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.supers.CommentJpaRepository;
@@ -10,6 +9,7 @@ import kr.modusplant.domains.comment.support.utils.domain.CommentTestUtils;
 import kr.modusplant.domains.comment.support.utils.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.support.utils.framework.CommentCompositeKeyTestUtils;
 import kr.modusplant.domains.comment.support.utils.framework.CommentEntityTestUtils;
+import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.domains.member.common.utils.domain.vo.MemberIdTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

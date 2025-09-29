@@ -1,13 +1,13 @@
 package kr.modusplant.domains.comment.framework.out.persistence.jpa.repository;
 
-import kr.modusplant.domains.comment.usecase.port.repository.CommentRepository;
-import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.CommentCompositeKey;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper.CommentJpaMapper;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.supers.CommentJpaRepository;
+import kr.modusplant.domains.comment.usecase.port.repository.CommentRepository;
+import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

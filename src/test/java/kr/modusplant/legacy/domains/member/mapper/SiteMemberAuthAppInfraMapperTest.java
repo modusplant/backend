@@ -47,9 +47,9 @@ class SiteMemberAuthAppInfraMapperTest implements SiteMemberAuthRequestTestUtils
         SiteMemberEntity memberEntity = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuthEntity = memberAuthMapper.toMemberAuthEntity(new SiteMemberAuthInsertRequest(memberEntity.getUuid(), memberAuthBasicUser.getEmail(), memberAuthBasicUser.getPw(), memberAuthBasicUser.getProvider(), memberAuthBasicUser.getProviderId()), memberRepository);
+        SiteMemberAuthEntity memberAuthEntity = memberAuthMapper.toMemberAuthEntity(new SiteMemberAuthInsertRequest(memberEntity.getUuid(), MEMBER_AUTH_BASIC_USER_EMAIL, MEMBER_AUTH_BASIC_USER_PW, MEMBER_AUTH_BASIC_USER_PROVIDER, MEMBER_AUTH_BASIC_USER_PROVIDER_ID), memberRepository);
 
         // then
-        assertThat(memberAuthEntity.getEmail()).isEqualTo(memberAuthBasicUser.getEmail());
+        assertThat(memberAuthEntity.getEmail()).isEqualTo(MEMBER_AUTH_BASIC_USER_EMAIL);
     }
 }

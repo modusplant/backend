@@ -4,34 +4,20 @@ import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.UUID;
+
 public interface SiteMemberAuthConstant {
-    SiteMemberAuth memberAuthBasicAdmin = SiteMemberAuth.builder()
-            .email("testAdmin1@gmail.com")
-            .pw(new BCryptPasswordEncoder().encode("testPw12@"))
-            .provider(AuthProvider.BASIC)
-            .build();
+    UUID MEMBER_AUTH_BASIC_ADMIN_UUID = UUID.fromString("48c75e56-34fb-4fc2-8e45-ee5669f79fdd");
+    String MEMBER_AUTH_BASIC_ADMIN_EMAIL = "testAdmin1@gmail.com";
+    String MEMBER_AUTH_BASIC_ADMIN_PW = new BCryptPasswordEncoder().encode("testPw12@");
+    AuthProvider MEMBER_AUTH_BASIC_ADMIN_PROVIDER = AuthProvider.BASIC;
 
-    SiteMemberAuth memberAuthBasicAdminWithUuid = SiteMemberAuth.builder()
-            .activeMemberUuid(SiteMemberConstant.memberBasicAdminWithUuid.getUuid())
-            .originalMemberUuid(SiteMemberConstant.memberBasicAdminWithUuid.getUuid())
-            .email(memberAuthBasicAdmin.getEmail())
-            .pw(memberAuthBasicAdmin.getPw())
-            .provider(memberAuthBasicAdmin.getProvider())
-            .build();
-
-    SiteMemberAuth memberAuthBasicUser = SiteMemberAuth.builder()
-            .email("TestBasicUser2@naver.com")
-            .pw(new BCryptPasswordEncoder().encode("Test!Pw14@"))
-            .provider(AuthProvider.BASIC)
-            .build();
-
-    SiteMemberAuth memberAuthBasicUserWithUuid = SiteMemberAuth.builder()
-            .activeMemberUuid(SiteMemberConstant.memberBasicUserWithUuid.getUuid())
-            .originalMemberUuid(SiteMemberConstant.memberBasicUserWithUuid.getUuid())
-            .email(memberAuthBasicUser.getEmail())
-            .pw(memberAuthBasicUser.getPw())
-            .provider(memberAuthBasicUser.getProvider())
-            .build();
+    UUID MEMBER_AUTH_BASIC_USER_ACTIVE_MEMBER_UUID = UUID.fromString("d6b716f1-60f7-4c79-aeaf-37037101f126");
+    UUID MEMBER_AUTH_BASIC_USER_ORIGINAL_MEMBER_UUID = MEMBER_AUTH_BASIC_USER_ACTIVE_MEMBER_UUID;
+    String MEMBER_AUTH_BASIC_USER_EMAIL = "TestBasicUser2@naver.com";
+    String MEMBER_AUTH_BASIC_USER_PW = new BCryptPasswordEncoder().encode("Test!Pw14@");
+    AuthProvider MEMBER_AUTH_BASIC_USER_PROVIDER = AuthProvider.BASIC;
+    String MEMBER_AUTH_BASIC_USER_PROVIDER_ID = "";
 
     SiteMemberAuth memberAuthGoogleUser = SiteMemberAuth.builder()
             .email("Test3gOogleUsser@gmail.com")

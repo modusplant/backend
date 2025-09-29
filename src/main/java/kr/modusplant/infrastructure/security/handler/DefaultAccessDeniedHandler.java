@@ -3,7 +3,6 @@ package kr.modusplant.infrastructure.security.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import lombok.RequiredArgsConstructor;

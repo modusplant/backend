@@ -6,6 +6,7 @@ import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleRepository;
+import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberAuthConstant;
 import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityConstant;
@@ -18,7 +19,6 @@ import kr.modusplant.legacy.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.legacy.modules.auth.social.app.dto.KakaoUserInfo;
 import kr.modusplant.legacy.modules.auth.social.app.dto.supers.SocialUserInfo;
 import kr.modusplant.legacy.modules.auth.social.error.UnsupportedSocialProviderException;
-import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -137,7 +137,14 @@ class SocialAuthApplicationServiceTest implements SiteMemberAuthConstant, SiteMe
                 .role(Role.USER).build();
 
         given(memberAuthRepository.findByProviderAndProviderId(provider, id)).willReturn(Optional.of(memberAuthEntity));
-        given(memberAuthEntityMapper.toSiteMemberAuth(memberAuthEntity)).willReturn(SiteMemberAuth.builder().memberAuth(memberAuthBasicUserWithUuid).activeMemberUuid(memberEntity.getUuid()).build());
+        given(memberAuthEntityMapper.toSiteMemberAuth(memberAuthEntity)).willReturn(SiteMemberAuth.builder()
+                .originalMemberUuid(MEMBER_AUTH_BASIC_USER_ORIGINAL_MEMBER_UUID)
+                .activeMemberUuid(memberEntity.getUuid())
+                .email(MEMBER_AUTH_BASIC_USER_EMAIL)
+                .pw(MEMBER_AUTH_BASIC_USER_PW)
+                .provider(MEMBER_AUTH_BASIC_USER_PROVIDER)
+                .providerId(MEMBER_AUTH_BASIC_USER_PROVIDER_ID)
+                .build());
         given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(any())).willReturn(memberEntity);
         given(memberRoleRepository.findByMember(memberEntity)).willReturn(Optional.of(memberRoleEntity));
