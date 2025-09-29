@@ -2,14 +2,14 @@ package kr.modusplant.legacy.domains.member.domain.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.entity.constant.SiteMemberAuthEntityConstant;
+import kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant;
+import kr.modusplant.framework.out.jpa.entity.util.SiteMemberAuthEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
-import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberAuthConstant;
-import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberConstant;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @DomainsServiceOnlyContext
-class SiteMemberAuthValidationServiceTest implements SiteMemberAuthConstant, SiteMemberAuthEntityTestUtils, SiteMemberConstant, SiteMemberEntityTestUtils {
+class SiteMemberAuthValidationServiceTest implements SiteMemberAuthEntityConstant, SiteMemberAuthEntityTestUtils, SiteMemberEntityConstant, SiteMemberEntityTestUtils {
 
     private final SiteMemberAuthValidationService memberAuthValidationService;
     private final SiteMemberAuthRepository memberAuthRepository;

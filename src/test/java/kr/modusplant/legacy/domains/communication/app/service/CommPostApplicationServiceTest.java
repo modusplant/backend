@@ -6,6 +6,7 @@ import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
 import kr.modusplant.framework.out.jpa.repository.CommPrimaryCategoryRepository;
 import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryRepository;
@@ -24,7 +25,6 @@ import kr.modusplant.legacy.domains.communication.domain.service.CommPostValidat
 import kr.modusplant.legacy.domains.communication.mapper.CommPostAppInfraMapper;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostViewCountRedisRepository;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostViewLockRedisRepository;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import org.hibernate.generator.EventType;

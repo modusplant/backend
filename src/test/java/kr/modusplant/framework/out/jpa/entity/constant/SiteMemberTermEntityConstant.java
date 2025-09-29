@@ -1,10 +1,10 @@
-package kr.modusplant.legacy.domains.member.common.util.domain;
+package kr.modusplant.framework.out.jpa.entity.constant;
 
 import java.util.UUID;
 
 import static kr.modusplant.shared.util.VersionUtils.createVersion;
 
-public interface SiteMemberTermConstant extends SiteMemberConstant {
+public interface SiteMemberTermEntityConstant extends SiteMemberEntityConstant {
     UUID MEMBER_TERM_ADMIN_UUID = MEMBER_BASIC_ADMIN_UUID;
     String MEMBER_TERM_ADMIN_AGREED_TERMS_OF_USE_VERSION = createVersion(1, 0, 0);
     String MEMBER_TERM_ADMIN_AGREED_PRIVACY_POLICY_VERSION = createVersion(2, 1, 2);

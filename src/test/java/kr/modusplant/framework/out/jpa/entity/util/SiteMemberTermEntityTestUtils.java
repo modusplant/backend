@@ -1,8 +1,8 @@
-package kr.modusplant.legacy.domains.member.common.util.entity;
+package kr.modusplant.framework.out.jpa.entity.util;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberTermEntity;
 
-import static kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTermConstant.*;
+import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberTermEntityConstant.*;
 
 public interface SiteMemberTermEntityTestUtils extends SiteMemberEntityTestUtils {
 

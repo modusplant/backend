@@ -1,10 +1,10 @@
-package kr.modusplant.legacy.domains.member.common.util.domain;
+package kr.modusplant.framework.out.jpa.entity.constant;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public interface SiteMemberConstant {
+public interface SiteMemberEntityConstant {
     UUID MEMBER_BASIC_ADMIN_UUID = UUID.fromString("48c75e56-34fb-4fc2-8e45-ee5669f79fdd");
     String MEMBER_BASIC_ADMIN_NICKNAME = "관리자";
     LocalDate MEMBER_BASIC_ADMIN_BIRTH_DATE = LocalDate.of(2001, 1, 1);

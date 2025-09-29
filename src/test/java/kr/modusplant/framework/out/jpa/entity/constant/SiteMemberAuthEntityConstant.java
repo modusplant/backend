@@ -1,11 +1,11 @@
-package kr.modusplant.legacy.domains.member.common.util.domain;
+package kr.modusplant.framework.out.jpa.entity.constant;
 
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.UUID;
 
-public interface SiteMemberAuthConstant {
+public interface SiteMemberAuthEntityConstant {
     UUID MEMBER_AUTH_BASIC_ADMIN_UUID = UUID.fromString("48c75e56-34fb-4fc2-8e45-ee5669f79fdd");
     String MEMBER_AUTH_BASIC_ADMIN_EMAIL = "testAdmin1@gmail.com";
     String MEMBER_AUTH_BASIC_ADMIN_PW = new BCryptPasswordEncoder().encode("testPw12@");

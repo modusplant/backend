@@ -2,8 +2,8 @@ package kr.modusplant.legacy.domains.communication.common.util.domain;
 
 import kr.modusplant.legacy.domains.communication.domain.model.CommComment;
 
+import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils.TEST_COMM_POST_WITH_ULID;
-import static kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 
 public interface CommCommentTestUtils {
     CommComment TEST_COMM_COMMENT = CommComment.builder()
