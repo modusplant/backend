@@ -1,13 +1,13 @@
 package kr.modusplant.legacy.domains.member.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberUpdateRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberResponse;
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberRequestTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberResponseTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

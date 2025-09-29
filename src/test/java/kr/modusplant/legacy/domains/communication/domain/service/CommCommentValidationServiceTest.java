@@ -2,6 +2,7 @@ package kr.modusplant.legacy.domains.communication.domain.service;
 
 import jakarta.persistence.EntityManager;
 import kr.modusplant.framework.out.jpa.entity.*;
+import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.CommCommentRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
@@ -9,7 +10,6 @@ import kr.modusplant.legacy.domains.communication.common.util.entity.CommComment
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;

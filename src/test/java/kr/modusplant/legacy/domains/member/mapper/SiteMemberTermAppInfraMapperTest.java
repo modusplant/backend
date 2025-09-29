@@ -2,13 +2,13 @@ package kr.modusplant.legacy.domains.member.mapper;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberTermEntity;
+import kr.modusplant.framework.out.jpa.entity.util.SiteMemberTermEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberTermInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberTermResponse;
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberTermRequestTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberTermResponseTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberTermEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

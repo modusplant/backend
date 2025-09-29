@@ -1,12 +1,12 @@
 package kr.modusplant.infrastructure.security.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
 import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
 import kr.modusplant.infrastructure.security.common.util.SiteMemberUserDetailsTestUtils;
 import kr.modusplant.infrastructure.security.context.SecurityOnlyContext;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.modules.auth.normal.login.common.util.app.http.request.NormalLoginRequestTestUtils;
 import kr.modusplant.legacy.modules.jwt.app.dto.TokenPair;

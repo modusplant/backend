@@ -1,9 +1,9 @@
 package kr.modusplant.legacy.domains.member.common.util.app.http.response;
 
+import kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberResponse;
-import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberConstant;
 
-public interface SiteMemberResponseTestUtils extends SiteMemberConstant {
+public interface SiteMemberResponseTestUtils extends SiteMemberEntityConstant {
     SiteMemberResponse memberBasicUserResponse = new SiteMemberResponse(MEMBER_BASIC_USER_UUID, MEMBER_BASIC_USER_NICKNAME, MEMBER_BASIC_USER_BIRTH_DATE, MEMBER_BASIC_USER_IS_ACTIVE);
 
     SiteMemberResponse memberGoogleUserResponse = new SiteMemberResponse(MEMBER_GOOGLE_USER_UUID, MEMBER_GOOGLE_USER_NICKNAME, MEMBER_GOOGLE_USER_BIRTH_DATE, MEMBER_GOOGLE_USER_IS_ACTIVE);

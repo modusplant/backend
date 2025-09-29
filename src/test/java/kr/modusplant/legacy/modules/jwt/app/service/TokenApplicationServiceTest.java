@@ -1,12 +1,12 @@
 package kr.modusplant.legacy.modules.jwt.app.service;
 
+import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberResponse;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberRoleResponse;
 import kr.modusplant.legacy.domains.member.app.service.SiteMemberApplicationService;
 import kr.modusplant.legacy.domains.member.app.service.SiteMemberRoleApplicationService;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberRoleResponseTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.legacy.modules.jwt.domain.model.RefreshToken;

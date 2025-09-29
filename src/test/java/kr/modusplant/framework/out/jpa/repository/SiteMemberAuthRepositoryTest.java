@@ -2,8 +2,8 @@ package kr.modusplant.framework.out.jpa.repository;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.entity.util.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

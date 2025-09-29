@@ -1,9 +1,9 @@
-package kr.modusplant.legacy.domains.member.common.util.entity;
+package kr.modusplant.framework.out.jpa.entity.util;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberConstant;
+import kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant;
 
-public interface SiteMemberEntityTestUtils extends SiteMemberConstant {
+public interface SiteMemberEntityTestUtils extends SiteMemberEntityConstant {
     default SiteMemberEntity createMemberBasicAdminEntity() {
         return SiteMemberEntity.builder()
                 .nickname(MEMBER_BASIC_ADMIN_NICKNAME)
