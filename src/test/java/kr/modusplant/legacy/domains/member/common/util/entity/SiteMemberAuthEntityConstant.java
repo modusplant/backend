@@ -22,15 +22,15 @@ public interface SiteMemberAuthEntityConstant extends SiteMemberEntityConstant {
 
     default SiteMemberAuthEntityBuilder createMemberAuthGoogleUserEntityBuilder() {
         return builder()
-                .email(memberAuthGoogleUser.getEmail())
-                .provider(memberAuthGoogleUser.getProvider())
-                .providerId(memberAuthGoogleUser.getProviderId());
+                .email(MEMBER_AUTH_GOOGLE_USER_EMAIL)
+                .provider(MEMBER_AUTH_GOOGLE_USER_PROVIDER)
+                .providerId(MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID);
     }
 
     default SiteMemberAuthEntityBuilder createMemberAuthKakaoUserEntityBuilder() {
         return builder()
-                .email(memberAuthKakaoUser.getEmail())
-                .provider(memberAuthKakaoUser.getProvider())
-                .providerId(memberAuthKakaoUser.getProviderId());
+                .email(MEMBER_AUTH_KAKAO_USER_EMAIL)
+                .provider(MEMBER_AUTH_KAKAO_USER_PROVIDER)
+                .providerId(MEMBER_AUTH_KAKAO_USER_PROVIDER_ID);
     }
 }
