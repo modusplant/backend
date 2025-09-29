@@ -4,7 +4,7 @@ import static kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity.SiteMe
 import static kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity.builder;
 import static kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberAuthConstant.*;
 
-public interface SiteMemberAuthEntityConstant extends SiteMemberEntityConstant {
+public interface SiteMemberAuthEntityTestUtils extends SiteMemberEntityTestUtils {
 
     default SiteMemberAuthEntityBuilder createMemberAuthBasicAdminEntityBuilder() {
         return builder()

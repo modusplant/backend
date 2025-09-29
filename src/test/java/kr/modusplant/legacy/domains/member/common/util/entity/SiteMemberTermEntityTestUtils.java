@@ -4,7 +4,7 @@ import kr.modusplant.framework.out.jpa.entity.SiteMemberTermEntity;
 
 import static kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTermConstant.*;
 
-public interface SiteMemberTermEntityConstant extends SiteMemberEntityConstant {
+public interface SiteMemberTermEntityTestUtils extends SiteMemberEntityTestUtils {
 
     default SiteMemberTermEntity createMemberTermAdminEntity() {
         return SiteMemberTermEntity.builder()

@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.modules.jwt.common.util.entity;
 
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityConstant;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.legacy.modules.jwt.common.util.domain.RefreshTokenTestUtils;
 import kr.modusplant.legacy.modules.jwt.persistence.entity.RefreshTokenEntity.RefreshTokenEntityBuilder;
 
@@ -10,7 +10,7 @@ import java.util.Date;
 
 import static kr.modusplant.legacy.modules.jwt.persistence.entity.RefreshTokenEntity.builder;
 
-public interface RefreshTokenEntityTestUtils extends SiteMemberEntityConstant {
+public interface RefreshTokenEntityTestUtils extends SiteMemberEntityTestUtils {
     default RefreshTokenEntityBuilder createRefreshTokenBasicEntityBuilder() {
         return builder()
                 .refreshToken(RefreshTokenTestUtils.refreshTokenBasicUser.getRefreshToken())

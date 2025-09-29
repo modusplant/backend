@@ -12,7 +12,7 @@ public interface SiteMemberTermConstant extends SiteMemberConstant {
             .build();
 
     SiteMemberTerm memberTermAdminWithUuid = SiteMemberTerm.builder()
-            .uuid(memberBasicAdminWithUuid.getUuid())
+            .uuid(MEMBER_BASIC_ADMIN_UUID)
             .agreedTermsOfUseVersion(memberTermAdmin.getAgreedTermsOfUseVersion())
             .agreedPrivacyPolicyVersion(memberTermAdmin.getAgreedPrivacyPolicyVersion())
             .agreedAdInfoReceivingVersion(memberTermAdmin.getAgreedAdInfoReceivingVersion())
@@ -25,7 +25,7 @@ public interface SiteMemberTermConstant extends SiteMemberConstant {
             .build();
 
     SiteMemberTerm memberTermUserWithUuid = SiteMemberTerm.builder()
-            .uuid(memberBasicUserWithUuid.getUuid())
+            .uuid(MEMBER_BASIC_USER_UUID)
             .agreedTermsOfUseVersion(memberTermUser.getAgreedTermsOfUseVersion())
             .agreedPrivacyPolicyVersion(memberTermUser.getAgreedPrivacyPolicyVersion())
             .agreedAdInfoReceivingVersion(memberTermUser.getAgreedAdInfoReceivingVersion())

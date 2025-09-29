@@ -7,8 +7,8 @@ import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberConstant;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberRoleConstant;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityConstant;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberRoleEntityConstant;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberRoleEntityTestUtils;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @DomainsServiceOnlyContext
-class SiteMemberRoleValidationServiceTest implements SiteMemberRoleConstant, SiteMemberRoleEntityConstant, SiteMemberConstant, SiteMemberEntityConstant {
+class SiteMemberRoleValidationServiceTest implements SiteMemberRoleConstant, SiteMemberRoleEntityTestUtils, SiteMemberConstant, SiteMemberEntityTestUtils {
 
     private final SiteMemberRoleValidationService memberRoleValidationService;
     private final SiteMemberRoleRepository memberRoleRepository;

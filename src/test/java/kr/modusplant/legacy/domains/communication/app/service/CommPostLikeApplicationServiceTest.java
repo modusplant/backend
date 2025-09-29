@@ -13,7 +13,7 @@ import kr.modusplant.legacy.domains.communication.app.http.response.CommPostLike
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostLikeEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.domain.service.CommPostLikeValidationService;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityConstant;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @DomainsServiceWithoutValidationServiceContext
-class CommPostLikeApplicationServiceTest implements SiteMemberEntityConstant, CommPostEntityTestUtils, CommPostLikeEntityTestUtils {
+class CommPostLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommPostEntityTestUtils, CommPostLikeEntityTestUtils {
 
     private final SiteMemberRepository siteMemberRepository;
     private final CommPostRepository commPostRepository;

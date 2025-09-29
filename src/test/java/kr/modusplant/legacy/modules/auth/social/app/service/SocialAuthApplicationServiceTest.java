@@ -9,8 +9,8 @@ import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleRepository;
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberAuthConstant;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityConstant;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityConstant;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthDomainInfraMapper;
@@ -37,7 +37,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @DomainsServiceOnlyContext
-class SocialAuthApplicationServiceTest implements SiteMemberAuthConstant, SiteMemberEntityConstant, SiteMemberAuthEntityConstant {
+class SocialAuthApplicationServiceTest implements SiteMemberAuthConstant, SiteMemberEntityTestUtils, SiteMemberAuthEntityTestUtils {
 
     private SocialAuthApplicationService socialAuthApplicationService;
     @Mock
@@ -54,10 +54,10 @@ class SocialAuthApplicationServiceTest implements SiteMemberAuthConstant, SiteMe
     private SiteMemberAuthDomainInfraMapper memberAuthEntityMapper;
 
     private final String code = "sample-code";
+    private final String id = MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID;
+    private final String email = MEMBER_AUTH_GOOGLE_USER_EMAIL;
+    private final String nickname = MEMBER_GOOGLE_USER_NICKNAME;
     private final AuthProvider provider = AuthProvider.GOOGLE;
-    private final String id = "639796866968871286823";
-    private final String email = "Test3gOogleUsser@gmail.com";
-    private final String nickname = "구글 유저";
 
     @BeforeEach
     void setUp() {
