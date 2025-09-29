@@ -5,6 +5,8 @@ import kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTes
 
 import java.time.LocalDateTime;
 
+import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant.MEMBER_BASIC_USER_NICKNAME;
+
 public interface CommPostResponseTestUtils extends CommPostTestUtils {
     LocalDateTime testDate = LocalDateTime.of(2025, 6, 1, 0, 0);
 

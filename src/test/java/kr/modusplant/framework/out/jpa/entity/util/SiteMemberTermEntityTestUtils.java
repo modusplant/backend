@@ -5,7 +5,6 @@ import kr.modusplant.framework.out.jpa.entity.SiteMemberTermEntity;
 import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberTermEntityConstant.*;
 
 public interface SiteMemberTermEntityTestUtils extends SiteMemberEntityTestUtils {
-
     default SiteMemberTermEntity createMemberTermAdminEntity() {
         return SiteMemberTermEntity.builder()
                 .member(createMemberBasicAdminEntity())

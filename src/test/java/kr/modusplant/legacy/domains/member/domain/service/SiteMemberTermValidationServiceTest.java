@@ -1,6 +1,5 @@
 package kr.modusplant.legacy.domains.member.domain.service;
 
-import kr.modusplant.framework.out.jpa.entity.constant.SiteMemberTermEntityConstant;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberTermEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberTermRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
@@ -14,12 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
+import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberTermEntityConstant.MEMBER_TERM_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @DomainsServiceOnlyContext
-class SiteMemberTermValidationServiceTest implements SiteMemberTermEntityConstant, SiteMemberTermEntityTestUtils {
+class SiteMemberTermValidationServiceTest implements SiteMemberTermEntityTestUtils {
     private final SiteMemberTermValidationService memberTermValidationService;
     private final SiteMemberTermRepository memberTermRepository;
 

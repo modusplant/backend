@@ -1,7 +1,6 @@
 package kr.modusplant.legacy.domains.member.domain.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
@@ -20,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @DomainsServiceOnlyContext
-class SiteMemberValidationServiceTest implements SiteMemberEntityConstant, SiteMemberEntityTestUtils {
+class SiteMemberValidationServiceTest implements SiteMemberEntityTestUtils {
     private final SiteMemberValidationService memberValidationService;
     private final SiteMemberRepository memberRepository;
 

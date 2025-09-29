@@ -2,8 +2,6 @@ package kr.modusplant.legacy.domains.member.domain.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.constant.SiteMemberAuthEntityConstant;
-import kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
@@ -26,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @DomainsServiceOnlyContext
-class SiteMemberAuthValidationServiceTest implements SiteMemberAuthEntityConstant, SiteMemberAuthEntityTestUtils, SiteMemberEntityConstant, SiteMemberEntityTestUtils {
+class SiteMemberAuthValidationServiceTest implements SiteMemberAuthEntityTestUtils, SiteMemberEntityTestUtils {
 
     private final SiteMemberAuthValidationService memberAuthValidationService;
     private final SiteMemberAuthRepository memberAuthRepository;

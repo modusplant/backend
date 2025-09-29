@@ -1,7 +1,6 @@
 package kr.modusplant.legacy.modules.jwt.domain.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.modules.jwt.common.util.domain.RefreshTokenTestUtils;
@@ -28,7 +27,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenEntityTestUtils, SiteMemberEntityConstant, SiteMemberEntityTestUtils {
+class TokenValidationServiceTest implements RefreshTokenTestUtils, RefreshTokenEntityTestUtils, SiteMemberEntityTestUtils {
     @Mock
     private RefreshTokenRepository tokenRepository;
     @Mock
