@@ -66,7 +66,7 @@ public class AuthorizationFlowTest implements
         accessTokenClaims = Jwts.claims()
                 .subject(MEMBER_BASIC_USER_UUID.toString())
                 .add("nickname", MEMBER_BASIC_USER_NICKNAME)
-                .add("roles", memberRoleUser.getRole())
+                .add("roles", MEMBER_ROLE_USER_ROLE)
                 .build();
     }
 

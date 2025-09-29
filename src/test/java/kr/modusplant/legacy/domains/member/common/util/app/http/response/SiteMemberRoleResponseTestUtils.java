@@ -4,5 +4,5 @@ import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberRoleRespo
 import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberRoleConstant;
 
 public interface SiteMemberRoleResponseTestUtils extends SiteMemberRoleConstant {
-    SiteMemberRoleResponse memberRoleUserResponse = new SiteMemberRoleResponse(memberRoleUserWithUuid.getUuid(), memberRoleUser.getRole());
+    SiteMemberRoleResponse memberRoleUserResponse = new SiteMemberRoleResponse(MEMBER_ROLE_USER_UUID, MEMBER_ROLE_USER_ROLE);
 }
