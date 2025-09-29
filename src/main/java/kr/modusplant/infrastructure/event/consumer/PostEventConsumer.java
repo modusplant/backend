@@ -2,6 +2,7 @@ package kr.modusplant.infrastructure.event.consumer;
 
 import kr.modusplant.framework.out.jpa.entity.CommPostLikeEntity;
 import kr.modusplant.framework.out.jpa.repository.CommPostLikeRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.PostLikeEvent;
 import kr.modusplant.shared.event.PostUnlikeEvent;
@@ -12,8 +13,9 @@ import java.util.UUID;
 @Component
 public class PostEventConsumer {
     private final CommPostLikeRepository commPostLikeRepository;
+    private final CommPostRepository commPostRepository;
 
-    public PostEventConsumer(EventBus eventBus, CommPostLikeRepository commPostLikeRepository) {
+    public PostEventConsumer(EventBus eventBus, CommPostLikeRepository commPostLikeRepository, CommPostRepository commPostRepository) {
         eventBus.subscribe(event -> {
             if (event instanceof PostLikeEvent postLikeEvent) {
                 putCommPostLike(postLikeEvent.getMemberId(), postLikeEvent.getPostId());
@@ -25,13 +27,16 @@ public class PostEventConsumer {
             }
         });
         this.commPostLikeRepository = commPostLikeRepository;
+        this.commPostRepository = commPostRepository;
     }
 
     private void putCommPostLike(UUID memberId, String postId) {
         commPostLikeRepository.save(CommPostLikeEntity.of(postId, memberId));
+        commPostRepository.findByUlid(postId).orElseThrow().increaseLikeCount();
     }
 
     private void deleteCommPostLike(UUID memberId, String postId) {
         commPostLikeRepository.delete(CommPostLikeEntity.of(postId, memberId));
+        commPostRepository.findByUlid(postId).orElseThrow().decreaseLikeCount();
     }
 }
