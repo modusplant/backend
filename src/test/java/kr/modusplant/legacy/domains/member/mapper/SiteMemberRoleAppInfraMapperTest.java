@@ -46,9 +46,9 @@ class SiteMemberRoleAppInfraMapperTest implements SiteMemberRoleRequestTestUtils
         SiteMemberEntity memberEntity = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberRoleEntity memberRoleEntity = memberRoleMapper.toMemberRoleEntity(new SiteMemberRoleInsertRequest(memberEntity.getUuid(), memberRoleUser.getRole()), memberRepository);
+        SiteMemberRoleEntity memberRoleEntity = memberRoleMapper.toMemberRoleEntity(new SiteMemberRoleInsertRequest(memberEntity.getUuid(), MEMBER_ROLE_USER_ROLE), memberRepository);
 
         // then
-        assertThat(memberRoleEntity.getRole()).isEqualTo(memberRoleUser.getRole());
+        assertThat(memberRoleEntity.getRole()).isEqualTo(MEMBER_ROLE_USER_ROLE);
     }
 }

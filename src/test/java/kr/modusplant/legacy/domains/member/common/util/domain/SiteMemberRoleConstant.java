@@ -1,20 +1,12 @@
 package kr.modusplant.legacy.domains.member.common.util.domain;
 
 import kr.modusplant.infrastructure.security.enums.Role;
-import kr.modusplant.legacy.domains.member.domain.model.SiteMemberRole;
+
+import java.util.UUID;
 
 public interface SiteMemberRoleConstant extends SiteMemberConstant {
-    SiteMemberRole memberRoleAdmin = SiteMemberRole.builder().role(Role.ADMIN).build();
-
-    SiteMemberRole memberRoleAdminWithUuid = SiteMemberRole.builder()
-            .uuid(MEMBER_BASIC_ADMIN_UUID)
-            .role(memberRoleAdmin.getRole())
-            .build();
-
-    SiteMemberRole memberRoleUser = SiteMemberRole.builder().role(Role.USER).build();
-
-    SiteMemberRole memberRoleUserWithUuid = SiteMemberRole.builder()
-            .uuid(MEMBER_BASIC_USER_UUID)
-            .role(memberRoleUser.getRole())
-            .build();
+    UUID MEMBER_ROLE_ADMIN_UUID = MEMBER_BASIC_ADMIN_UUID;
+    Role MEMBER_ROLE_ADMIN_ROLE = Role.ADMIN;
+    UUID MEMBER_ROLE_USER_UUID = MEMBER_BASIC_USER_UUID;
+    Role MEMBER_ROLE_USER_ROLE = Role.USER;
 }
