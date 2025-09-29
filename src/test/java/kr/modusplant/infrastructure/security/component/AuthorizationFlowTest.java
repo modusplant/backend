@@ -8,8 +8,6 @@ import kr.modusplant.domains.comment.framework.in.web.rest.CommentRestController
 import kr.modusplant.domains.comment.support.utils.adapter.CommentRegisterRequestTestUtils;
 import kr.modusplant.domains.comment.support.utils.adapter.CommentResponseTestUtils;
 import kr.modusplant.domains.identity.usecase.port.mapper.NormalIdentityMapper;
-import kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant;
-import kr.modusplant.framework.out.jpa.entity.constant.SiteMemberRoleEntityConstant;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
@@ -23,6 +21,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberRoleEntityConstant.MEMBER_ROLE_USER_ROLE;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -32,9 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class AuthorizationFlowTest implements
-        SiteMemberEntityConstant, SiteMemberRoleEntityConstant,
-        CommentRegisterRequestTestUtils, CommentResponseTestUtils, CommPostTestUtils {
+public class AuthorizationFlowTest implements CommentRegisterRequestTestUtils, CommentResponseTestUtils, CommPostTestUtils {
 
     @Autowired
     private MockMvc mockMvc;

@@ -3,7 +3,6 @@ package kr.modusplant.legacy.modules.auth.social.app.service;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
-import kr.modusplant.framework.out.jpa.entity.constant.SiteMemberAuthEntityConstant;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
@@ -28,6 +27,8 @@ import org.mockito.Mock;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberAuthEntityConstant.*;
+import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant.MEMBER_GOOGLE_USER_NICKNAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,7 +38,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @DomainsServiceOnlyContext
-class SocialAuthApplicationServiceTest implements SiteMemberAuthEntityConstant, SiteMemberEntityTestUtils, SiteMemberAuthEntityTestUtils {
+class SocialAuthApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntityTestUtils {
 
     private SocialAuthApplicationService socialAuthApplicationService;
     @Mock

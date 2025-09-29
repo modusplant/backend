@@ -2,7 +2,6 @@ package kr.modusplant.legacy.domains.communication.common.util.domain;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant;
 import kr.modusplant.infrastructure.persistence.generator.UlidIdGenerator;
 import kr.modusplant.legacy.domains.communication.domain.model.CommPost;
 import org.hibernate.generator.EventType;
@@ -10,7 +9,9 @@ import org.hibernate.generator.EventType;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 
-public interface CommPostTestUtils extends CommPrimaryCategoryTestUtils, CommSecondaryCategoryTestUtils, SiteMemberEntityConstant {
+import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant.MEMBER_BASIC_USER_UUID;
+
+public interface CommPostTestUtils extends CommPrimaryCategoryTestUtils, CommSecondaryCategoryTestUtils {
     ObjectMapper objectMapper = new ObjectMapper();
     UlidIdGenerator generator = new UlidIdGenerator();
 

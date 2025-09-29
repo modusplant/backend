@@ -1,8 +1,6 @@
 package kr.modusplant.legacy.domains.member.domain.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant;
-import kr.modusplant.framework.out.jpa.entity.constant.SiteMemberRoleEntityConstant;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberRoleEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
@@ -24,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @DomainsServiceOnlyContext
-class SiteMemberRoleValidationServiceTest implements SiteMemberRoleEntityConstant, SiteMemberRoleEntityTestUtils, SiteMemberEntityConstant, SiteMemberEntityTestUtils {
+class SiteMemberRoleValidationServiceTest implements SiteMemberRoleEntityTestUtils, SiteMemberEntityTestUtils {
 
     private final SiteMemberRoleValidationService memberRoleValidationService;
     private final SiteMemberRoleRepository memberRoleRepository;

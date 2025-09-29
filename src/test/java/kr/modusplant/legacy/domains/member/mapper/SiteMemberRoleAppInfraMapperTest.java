@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberRoleEntityConstant.MEMBER_ROLE_USER_ROLE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext

@@ -1,7 +1,6 @@
 package kr.modusplant.legacy.modules.jwt.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
 import kr.modusplant.legacy.domains.member.app.service.SiteMemberApplicationService;
@@ -29,7 +28,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
 @ExtendWith(MockitoExtension.class)
-class RefreshTokenApplicationServiceTest implements RefreshTokenTestUtils, RefreshTokenEntityTestUtils, SiteMemberEntityConstant, SiteMemberEntityTestUtils, SiteMemberRequestTestUtils {
+class RefreshTokenApplicationServiceTest implements RefreshTokenTestUtils, RefreshTokenEntityTestUtils, SiteMemberEntityTestUtils, SiteMemberRequestTestUtils {
 
     @InjectMocks
     private RefreshTokenApplicationService tokenApplicationService;
