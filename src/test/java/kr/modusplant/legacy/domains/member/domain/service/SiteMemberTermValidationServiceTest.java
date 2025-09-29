@@ -33,7 +33,7 @@ class SiteMemberTermValidationServiceTest implements SiteMemberTermConstant, Sit
     @Test
     void validateExistedUuidTest() {
         // given
-        UUID uuid = memberTermUserWithUuid.getUuid();
+        UUID uuid = MEMBER_TERM_USER_UUID;
 
         // when
         given(memberTermRepository.existsByUuid(uuid)).willReturn(true);
@@ -48,7 +48,7 @@ class SiteMemberTermValidationServiceTest implements SiteMemberTermConstant, Sit
     @Test
     void validateNotFoundUuidTest() {
         // given
-        UUID uuid = memberTermUserWithUuid.getUuid();
+        UUID uuid = MEMBER_TERM_USER_UUID;
 
         // when
         given(memberTermRepository.existsByUuid(uuid)).willReturn(false);

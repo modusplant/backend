@@ -46,9 +46,9 @@ class SiteMemberTermAppInfraMapperTest implements SiteMemberTermRequestTestUtils
         SiteMemberEntity memberEntity = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberTermEntity memberTermEntity = memberTermMapper.toMemberTermEntity(new SiteMemberTermInsertRequest(memberEntity.getUuid(), memberTermUser.getAgreedTermsOfUseVersion(), memberTermUser.getAgreedPrivacyPolicyVersion(), memberTermUser.getAgreedAdInfoReceivingVersion()), memberRepository);
+        SiteMemberTermEntity memberTermEntity = memberTermMapper.toMemberTermEntity(new SiteMemberTermInsertRequest(memberEntity.getUuid(), MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION, MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION, MEMBER_TERM_USER_AGREED_AD_INFO_RECEIVING_VERSION), memberRepository);
 
         // then
-        assertThat(memberTermEntity.getAgreedTermsOfUseVersion()).isEqualTo(memberTermUser.getAgreedTermsOfUseVersion());
+        assertThat(memberTermEntity.getAgreedTermsOfUseVersion()).isEqualTo(MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION);
     }
 }
