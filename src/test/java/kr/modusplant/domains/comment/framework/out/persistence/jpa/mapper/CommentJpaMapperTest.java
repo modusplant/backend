@@ -18,9 +18,9 @@ public class CommentJpaMapperTest implements CommentTestUtils, CommentEntityTest
         // given
         SiteMemberEntity testSiteMemberEntity = SiteMemberEntity.builder()
                 .uuid(testAuthor.getMemberUuid())
-                .nickname(memberBasicUser.getNickname())
-                .birthDate(memberBasicUser.getBirthDate())
-                .loggedInAt(memberBasicUser.getLoggedInAt())
+                .nickname(MEMBER_BASIC_USER_NICKNAME)
+                .birthDate(MEMBER_BASIC_USER_BIRTH_DATE)
+                .loggedInAt(MEMBER_BASIC_USER_LOGGED_IN_AT)
                 .build();
 
         CommentEntity compare = createCommentEntityBuilder()

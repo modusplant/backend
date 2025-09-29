@@ -6,7 +6,7 @@ import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
 import kr.modusplant.infrastructure.security.common.util.SiteMemberUserDetailsTestUtils;
 import kr.modusplant.infrastructure.security.context.SecurityOnlyContext;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityConstant;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.modules.auth.normal.login.common.util.app.http.request.NormalLoginRequestTestUtils;
 import kr.modusplant.legacy.modules.jwt.app.dto.TokenPair;
@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SecurityOnlyContext
 public class NormalLoginAuthenticationFlowTest implements
-        SiteMemberUserDetailsTestUtils, NormalLoginRequestTestUtils, SiteMemberEntityConstant {
+        SiteMemberUserDetailsTestUtils, NormalLoginRequestTestUtils, SiteMemberEntityTestUtils {
 
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;

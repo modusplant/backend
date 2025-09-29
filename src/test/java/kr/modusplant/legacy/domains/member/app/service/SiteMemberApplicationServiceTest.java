@@ -7,7 +7,7 @@ import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberUpdateRequ
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberResponse;
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberRequestTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberResponseTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityConstant;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 
 @DomainsServiceWithoutValidationServiceContext
-class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityConstant {
+class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityTestUtils {
 
     private final SiteMemberApplicationService memberApplicationService;
     private final SiteMemberRepository memberRepository;
@@ -164,7 +164,7 @@ class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, Si
     @Test
     void getOptionalEmptyTest() {
         // given
-        UUID uuid = memberBasicUserWithUuid.getUuid();
+        UUID uuid = MEMBER_BASIC_USER_UUID;
 
         // getByUuid
         // given & when

@@ -3,7 +3,7 @@ package kr.modusplant.legacy.domains.communication.common.util.domain;
 import kr.modusplant.legacy.domains.communication.domain.model.CommComment;
 
 import static kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils.TEST_COMM_POST_WITH_ULID;
-import static kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberConstant.memberBasicUserWithUuid;
+import static kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 
 public interface CommCommentTestUtils {
     CommComment TEST_COMM_COMMENT = CommComment.builder()
@@ -13,8 +13,8 @@ public interface CommCommentTestUtils {
     CommComment TEST_COMM_COMMENT_WITH_POST_ULID_AND_PATH = CommComment.builder()
             .postUlid(TEST_COMM_POST_WITH_ULID.getUlid())
             .path("1.6.2")
-            .authMemberUuid(memberBasicUserWithUuid.getUuid())
-            .createMemberUuid(memberBasicUserWithUuid.getUuid())
+            .authMemberUuid(MEMBER_BASIC_USER_UUID)
+            .createMemberUuid(MEMBER_BASIC_USER_UUID)
             .content("테스트 댓글 내용")
             .build();
 }

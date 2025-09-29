@@ -8,7 +8,7 @@ import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberAuthInsert
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberAuthResponse;
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberAuthRequestTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberAuthResponseTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityConstant;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
-class SiteMemberAuthAppInfraMapperTest implements SiteMemberAuthRequestTestUtils, SiteMemberAuthResponseTestUtils, SiteMemberAuthEntityConstant {
+class SiteMemberAuthAppInfraMapperTest implements SiteMemberAuthRequestTestUtils, SiteMemberAuthResponseTestUtils, SiteMemberAuthEntityTestUtils {
 
     private final SiteMemberRepository memberRepository;
     private final SiteMemberAuthAppInfraMapper memberAuthMapper = new SiteMemberAuthAppInfraMapperImpl();

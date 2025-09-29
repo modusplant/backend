@@ -1,61 +1,31 @@
 package kr.modusplant.legacy.domains.member.common.util.domain;
 
-import kr.modusplant.legacy.domains.member.domain.model.SiteMember;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 public interface SiteMemberConstant {
-    SiteMember memberBasicAdmin = SiteMember.builder()
-            .nickname("관리자")
-            .birthDate(LocalDate.of(2000, 1, 1))
-            .loggedInAt(LocalDateTime.now())
-            .build();
+    UUID MEMBER_BASIC_ADMIN_UUID = UUID.fromString("48c75e56-34fb-4fc2-8e45-ee5669f79fdd");
+    String MEMBER_BASIC_ADMIN_NICKNAME = "관리자";
+    LocalDate MEMBER_BASIC_ADMIN_BIRTH_DATE = LocalDate.of(2001, 1, 1);
+    Boolean MEMBER_BASIC_ADMIN_IS_ACTIVE = true;
+    LocalDateTime MEMBER_BASIC_ADMIN_LOGGED_IN_AT = LocalDateTime.now().minusDays(1);
 
-    SiteMember memberBasicAdminWithUuid = SiteMember.builder()
-            .uuid(UUID.fromString("48c75e56-34fb-4fc2-8e45-ee5669f79fdd"))
-            .nickname(memberBasicAdmin.getNickname())
-            .birthDate(memberBasicAdmin.getBirthDate())
-            .loggedInAt(memberBasicAdmin.getLoggedInAt())
-            .build();
+    UUID MEMBER_BASIC_USER_UUID = UUID.fromString("d6b716f1-60f7-4c79-aeaf-37037101f126");
+    String MEMBER_BASIC_USER_NICKNAME = "일반유저";
+    LocalDate MEMBER_BASIC_USER_BIRTH_DATE = LocalDate.of(2002, 2, 2);
+    Boolean MEMBER_BASIC_USER_IS_ACTIVE = true;
+    LocalDateTime MEMBER_BASIC_USER_LOGGED_IN_AT = LocalDateTime.now().minusDays(2);
 
-    SiteMember memberBasicUser = SiteMember.builder()
-            .nickname("일반 유저")
-            .birthDate(LocalDate.of(2000, 1, 1))
-            .loggedInAt(LocalDateTime.now().plusDays(1))
-            .build();
+    UUID MEMBER_GOOGLE_USER_UUID = UUID.fromString("6ba6176c-bbc5-4767-9a25-598631918365");
+    String MEMBER_GOOGLE_USER_NICKNAME = "구글유저";
+    LocalDate MEMBER_GOOGLE_USER_BIRTH_DATE = LocalDate.of(2003, 3, 3);
+    Boolean MEMBER_GOOGLE_USER_IS_ACTIVE = true;
+    LocalDateTime MEMBER_GOOGLE_USER_LOGGED_IN_AT = LocalDateTime.now().minusDays(3);
 
-    SiteMember memberBasicUserWithUuid = SiteMember.builder()
-            .uuid(UUID.fromString("d6b716f1-60f7-4c79-aeaf-37037101f126"))
-            .nickname(memberBasicUser.getNickname())
-            .birthDate(memberBasicUser.getBirthDate())
-            .loggedInAt(memberBasicUser.getLoggedInAt())
-            .build();
-
-    SiteMember memberGoogleUser = SiteMember.builder()
-            .nickname("구글 유저")
-            .birthDate(LocalDate.of(2000, 1, 1))
-            .loggedInAt(LocalDateTime.now().plusDays(2))
-            .build();
-
-    SiteMember memberGoogleUserWithUuid = SiteMember.builder()
-            .uuid(UUID.fromString("6ba6176c-bbc5-4767-9a25-598631918365"))
-            .nickname(memberGoogleUser.getNickname())
-            .birthDate(memberGoogleUser.getBirthDate())
-            .loggedInAt(memberGoogleUser.getLoggedInAt())
-            .build();
-
-    SiteMember memberKakaoUser = SiteMember.builder()
-            .nickname("카카오 유저")
-            .birthDate(LocalDate.of(2000, 1, 1))
-            .loggedInAt(LocalDateTime.now().plusDays(3))
-            .build();
-
-    SiteMember memberKakaoUserWithUuid = SiteMember.builder()
-            .uuid(UUID.fromString("4f9e87cd-ca94-4ca0-b32b-8f492ee4b93f"))
-            .nickname(memberKakaoUser.getNickname())
-            .birthDate(memberKakaoUser.getBirthDate())
-            .loggedInAt(memberKakaoUser.getLoggedInAt())
-            .build();
+    UUID MEMBER_KAKAO_USER_UUID = UUID.fromString("4f9e87cd-ca94-4ca0-b32b-8f492ee4b93f");
+    String MEMBER_KAKAO_USER_NICKNAME = "카카오유저";
+    LocalDate MEMBER_KAKAO_USER_BIRTH_DATE = LocalDate.of(2004, 4, 4);
+    Boolean MEMBER_KAKAO_USER_IS_ACTIVE = true;
+    LocalDateTime MEMBER_KAKAO_USER_LOGGED_IN_AT = LocalDateTime.now().minusDays(4);
 }

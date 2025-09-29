@@ -64,8 +64,8 @@ public class AuthorizationFlowTest implements
     void setUp() {
         rawAccessToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         accessTokenClaims = Jwts.claims()
-                .subject(memberBasicUserWithUuid.getUuid().toString())
-                .add("nickname", memberBasicUserWithUuid.getNickname())
+                .subject(MEMBER_BASIC_USER_UUID.toString())
+                .add("nickname", MEMBER_BASIC_USER_NICKNAME)
                 .add("roles", memberRoleUser.getRole())
                 .build();
     }

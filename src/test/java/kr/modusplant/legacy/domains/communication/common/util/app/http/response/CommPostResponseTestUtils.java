@@ -17,7 +17,7 @@ public interface CommPostResponseTestUtils extends CommPostTestUtils {
             TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getUuid(),
             TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getOrder(),
             TEST_COMM_POST_WITH_ULID.getAuthMemberUuid(),
-            memberBasicUserWithUuid.getNickname(),
+            MEMBER_BASIC_USER_NICKNAME,
             5,
             76L,
             TEST_COMM_POST_WITH_ULID.getTitle(),

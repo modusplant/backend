@@ -16,8 +16,8 @@ public interface SiteMemberUserDetailsTestUtils extends SiteMemberConstant {
     DefaultUserDetailsBuilder testDefaultMemberUserDetailsBuilder = DefaultUserDetails.builder()
             .email("test123@example.com")
             .password(passwordEncoder.encode("userPw2!"))
-            .activeUuid(memberBasicUserWithUuid.getUuid())
-            .nickname(memberBasicUserWithUuid.getNickname())
+            .activeUuid(MEMBER_BASIC_USER_UUID)
+            .nickname(MEMBER_BASIC_USER_NICKNAME)
             .provider(AuthProvider.BASIC)
             .authorities(List.of(new SimpleGrantedAuthority("ROLE_USER")));
 }

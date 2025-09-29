@@ -24,7 +24,7 @@ import kr.modusplant.legacy.domains.communication.domain.service.CommPostValidat
 import kr.modusplant.legacy.domains.communication.mapper.CommPostAppInfraMapper;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostViewCountRedisRepository;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostViewLockRedisRepository;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityConstant;
+import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import org.hibernate.generator.EventType;
@@ -54,7 +54,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class CommPostApplicationServiceTest implements SiteMemberEntityConstant, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils, CommPostEntityTestUtils, CommPostRequestTestUtils {
+class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils, CommPostEntityTestUtils, CommPostRequestTestUtils {
     @Mock
     private CommPostValidationService commPostValidationService;
     @Mock

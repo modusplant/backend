@@ -7,14 +7,14 @@ public interface SiteMemberRoleConstant extends SiteMemberConstant {
     SiteMemberRole memberRoleAdmin = SiteMemberRole.builder().role(Role.ADMIN).build();
 
     SiteMemberRole memberRoleAdminWithUuid = SiteMemberRole.builder()
-            .uuid(memberBasicAdminWithUuid.getUuid())
+            .uuid(MEMBER_BASIC_ADMIN_UUID)
             .role(memberRoleAdmin.getRole())
             .build();
 
     SiteMemberRole memberRoleUser = SiteMemberRole.builder().role(Role.USER).build();
 
     SiteMemberRole memberRoleUserWithUuid = SiteMemberRole.builder()
-            .uuid(memberBasicUserWithUuid.getUuid())
+            .uuid(MEMBER_BASIC_USER_UUID)
             .role(memberRoleUser.getRole())
             .build();
 }
