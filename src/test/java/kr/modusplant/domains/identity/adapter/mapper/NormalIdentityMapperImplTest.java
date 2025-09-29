@@ -1,5 +1,6 @@
 package kr.modusplant.domains.identity.adapter.mapper;
 
+import kr.modusplant.domains.identity.common.utils.domain.vo.CredentialsTestUtils;
 import kr.modusplant.domains.identity.common.utils.domain.vo.SignUpDataTestUtils;
 import kr.modusplant.domains.identity.common.utils.usecase.request.NormalSignUpRequestTestUtils;
 import kr.modusplant.domains.identity.domain.vo.SignUpData;
@@ -10,7 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class NormalIdentityMapperImplTest implements
+public class NormalIdentityMapperImplTest implements CredentialsTestUtils,
         NormalSignUpRequestTestUtils, SignUpDataTestUtils {
 
     private final NormalIdentityMapper mapper = new NormalIdentityMapperImpl();
@@ -25,8 +26,8 @@ public class NormalIdentityMapperImplTest implements
         // then
         assertThat(result.getCredentials().getEmail())
                 .isEqualTo(testSignUpData.getCredentials().getEmail());
-        assertThat(encoder.matches(testCredentials.getPassword(), result.getCredentials().getPassword()))
-                .isTrue();
+        assertThat(encoder.matches(testCredentials.getPassword().getPassword(),
+                result.getCredentials().getPassword().getPassword())).isTrue();
         assertThat(result.getNickname().getNickname())
                 .isEqualTo(testSignUpData.getNickname().getNickname());
         assertThat(result.getAgreedTermsOfUseVersion().getVersion())

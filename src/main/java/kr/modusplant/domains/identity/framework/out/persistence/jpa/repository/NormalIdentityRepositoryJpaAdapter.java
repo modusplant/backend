@@ -31,8 +31,8 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityReposit
         authJpaRepository.saveAuth(MemberAuthEntity.builder()
                 .originalMemberUuid(uuidOfSavedMember)
                 .activeMemberUuid(uuidOfSavedMember)
-                .email(signUpData.getCredentials().getEmail())
-                .password(signUpData.getCredentials().getPassword())
+                .email(signUpData.getCredentials().getEmail().getEmail())
+                .password(signUpData.getCredentials().getPassword().getPassword())
                 .provider(AuthProvider.BASIC)
                 .build());
         roleJpaRepository.saveRole(MemberRoleEntity.builder()

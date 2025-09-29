@@ -16,7 +16,7 @@ public class CredentialsTest implements CredentialsTestUtils {
     public void testCreate_givenNullEmailAndPassword_willThrowEmptyValueException() {
         // given
         EmptyValueException result = assertThrows(EmptyValueException.class, () ->
-                Credentials.create(null, null));
+                Credentials.createWithString(null, null));
 
         // when & then
         assertEquals(IdentityErrorCode.EMPTY_EMAIL, result.getErrorCode());
@@ -27,7 +27,7 @@ public class CredentialsTest implements CredentialsTestUtils {
     public void testCreate_givenInvalidEmail_willThrowInvalidValueException() {
         // given
         InvalidValueException result = assertThrows(InvalidValueException.class, () ->
-                Credentials.create("email", testCredentials.getPassword()));
+                Credentials.createWithString("email", testCredentials.getPassword().getPassword()));
 
         // when & then
         assertEquals(IdentityErrorCode.INVALID_EMAIL, result.getErrorCode());
@@ -38,7 +38,7 @@ public class CredentialsTest implements CredentialsTestUtils {
     public void testCreate_givenInvalidPassword_willThrowInvalidValueException() {
         // given
         InvalidValueException result = assertThrows(InvalidValueException.class, () ->
-                Credentials.create(testCredentials.getEmail(), "282933"));
+                Credentials.createWithString(testCredentials.getEmail().getEmail(), "282933"));
 
         // when & then
         assertEquals(IdentityErrorCode.INVALID_PASSWORD, result.getErrorCode());
@@ -65,7 +65,7 @@ public class CredentialsTest implements CredentialsTestUtils {
     @DisplayName("동일하고 다른 프로퍼티를 지닌 객체로 동등성 비교")
     void testEquals_givenDifferentProperty_willReturnFalse() {
         // given
-        Credentials credentials = Credentials.create("jeho123@email.com", "myPassword123!");
+        Credentials credentials = Credentials.createWithString("jeho123@email.com", "myPassword123!");
 
         assertNotEquals(testCredentials, credentials);
     }

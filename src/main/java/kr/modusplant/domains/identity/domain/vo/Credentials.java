@@ -1,9 +1,5 @@
 package kr.modusplant.domains.identity.domain.vo;
 
-import kr.modusplant.domains.identity.domain.exception.EmptyValueException;
-import kr.modusplant.domains.identity.domain.exception.InvalidValueException;
-import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;
-import kr.modusplant.shared.constant.Regex;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,8 +12,14 @@ public class Credentials {
     private final Email email;
     private final Password password;
 
-    public static Credentials create(String email, String password) {
+    public static Credentials createWithString(String email, String password) {
         return new Credentials(Email.create(email), Password.create(password));
+    }
+
+    public static Credentials createWithDomain(Email email, Password password) {
+        Email.validateSource(email.getEmail());
+        Password.validateSource(password.getPassword());
+        return new Credentials(email, password);
     }
 
     @Override

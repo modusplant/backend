@@ -18,7 +18,7 @@ public class SignUpData {
     public static SignUpData create(String email, String password, String nickname,
                                     String termsOfUseVersion, String privacyPolicyVersion,
                                     String adInfoReceivingVersion) {
-        return new SignUpData(Credentials.create(email, password),
+        return new SignUpData(Credentials.createWithString(email, password),
                 Nickname.create(nickname), AgreedTermsOfVersion.create(termsOfUseVersion),
                 AgreedTermsOfVersion.create(privacyPolicyVersion), AgreedTermsOfVersion.create(adInfoReceivingVersion));
     }
