@@ -1,4 +1,4 @@
-package kr.modusplant.shared.persistence.vo;
+package kr.modusplant.shared.persistence.constant;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.SNAKE_MEMB_UUID;
-import static kr.modusplant.shared.persistence.vo.TableColumnName.CREATED_AT;
-import static kr.modusplant.shared.persistence.vo.TableName.COMM_POST_LIKE;
+import static kr.modusplant.shared.persistence.constant.TableColumnName.CREATED_AT;
+import static kr.modusplant.shared.persistence.constant.TableName.COMM_POST_LIKE;
 
 @Entity
 @Table(name = COMM_POST_LIKE)

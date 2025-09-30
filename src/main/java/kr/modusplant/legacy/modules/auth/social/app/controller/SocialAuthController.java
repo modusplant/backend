@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
 
-import static kr.modusplant.shared.persistence.vo.TableColumnName.REFRESH_TOKEN;
+import static kr.modusplant.shared.persistence.constant.TableColumnName.REFRESH_TOKEN;
 
 @Tag(name = "소셜 로그인 API", description = "소셜 로그인을 다루는 API입니다.")
 @RestController

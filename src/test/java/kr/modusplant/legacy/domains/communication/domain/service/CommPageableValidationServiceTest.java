@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 
-import static kr.modusplant.legacy.domains.communication.vo.CommPageableValue.PAGE_SIZE;
+import static kr.modusplant.legacy.domains.communication.constant.CommPageableValue.PAGE_SIZE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;

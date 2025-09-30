@@ -19,7 +19,7 @@ import org.springframework.test.context.ContextConfiguration;
 
 import java.lang.annotation.*;
 
-import static kr.modusplant.legacy.modules.common.vo.Reference.NOTATION_MODULES;
+import static kr.modusplant.legacy.modules.common.constant.Reference.NOTATION_MODULES;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

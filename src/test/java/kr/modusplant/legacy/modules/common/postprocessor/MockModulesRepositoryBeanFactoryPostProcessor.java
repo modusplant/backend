@@ -15,8 +15,8 @@ import org.springframework.util.ClassUtils;
 import java.util.List;
 import java.util.Objects;
 
-import static kr.modusplant.legacy.domains.common.vo.Reference.NOTATION_DOMAINS;
-import static kr.modusplant.legacy.modules.common.vo.Reference.NOTATION_MODULES;
+import static kr.modusplant.legacy.domains.common.constant.Reference.NOTATION_DOMAINS;
+import static kr.modusplant.legacy.modules.common.constant.Reference.NOTATION_MODULES;
 
 @NonNullApi
 public class MockModulesRepositoryBeanFactoryPostProcessor implements BeanFactoryPostProcessor {

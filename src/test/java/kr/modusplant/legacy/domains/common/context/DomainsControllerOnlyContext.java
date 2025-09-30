@@ -20,7 +20,7 @@
 
  import java.lang.annotation.*;
 
- import static kr.modusplant.legacy.domains.common.vo.Reference.NOTATION_DOMAINS;
+ import static kr.modusplant.legacy.domains.common.constant.Reference.NOTATION_DOMAINS;
 
  @Target({ElementType.TYPE})
  @Retention(RetentionPolicy.RUNTIME)
