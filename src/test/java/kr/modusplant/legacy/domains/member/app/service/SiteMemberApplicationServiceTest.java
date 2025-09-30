@@ -56,7 +56,7 @@ class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, Si
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
 
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
-        given(memberRepository.findByNickname(memberEntity.getNickname())).willReturn(List.of(memberEntity));
+        given(memberRepository.findByNickname(memberEntity.getNickname())).willReturn(Optional.of(memberEntity));
 
         // when
         SiteMemberResponse memberResponse = memberApplicationService.insert(memberBasicUserInsertRequest);
@@ -189,7 +189,7 @@ class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, Si
         given(memberRepository.existsByUuid(uuid)).willReturn(true);
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(beforeUpdatedMemberEntity));
         given(memberRepository.save(updatedMemberEntity)).willReturn(updatedMemberEntity);
-        given(memberRepository.findByNickname(updatedNickname)).willReturn(List.of(updatedMemberEntity));
+        given(memberRepository.findByNickname(updatedNickname)).willReturn(Optional.of(updatedMemberEntity));
 
         // when
         memberApplicationService.insert(memberBasicUserInsertRequest);

@@ -10,13 +10,12 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 @Primary
 public interface SiteMemberJpaRepository extends CreatedAtAndLastModifiedAtRepository<SiteMemberEntity>, UuidPrimaryKeyRepository<SiteMemberEntity>, JpaRepository<SiteMemberEntity, UUID> {
-    List<SiteMemberEntity> findByNickname(String nickname);
-
     List<SiteMemberEntity> findByBirthDate(LocalDate birthDate);
 
     List<SiteMemberEntity> findByIsActive(Boolean isActive);
@@ -28,4 +27,6 @@ public interface SiteMemberJpaRepository extends CreatedAtAndLastModifiedAtRepos
     List<SiteMemberEntity> findByIsDeleted(Boolean isDeleted);
 
     List<SiteMemberEntity> findByLoggedInAt(LocalDateTime loggedInAt);
+
+    Optional<SiteMemberEntity> findByNickname(String nickname);
 }
