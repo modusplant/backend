@@ -1,4 +1,4 @@
-package kr.modusplant.legacy.domains.common.vo;
+package kr.modusplant.legacy.domains.common.constant;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

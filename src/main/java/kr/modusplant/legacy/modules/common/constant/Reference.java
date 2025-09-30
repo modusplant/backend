@@ -1,4 +1,4 @@
-package kr.modusplant.legacy.modules.common.vo;
+package kr.modusplant.legacy.modules.common.constant;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

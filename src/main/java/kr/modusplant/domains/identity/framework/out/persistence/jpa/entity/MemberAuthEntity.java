@@ -13,9 +13,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.vo.TableColumnName.LAST_MODIFIED_AT;
-import static kr.modusplant.shared.persistence.vo.TableColumnName.VER_NUM;
-import static kr.modusplant.shared.persistence.vo.TableName.SITE_MEMBER_AUTH;
+import static kr.modusplant.shared.persistence.constant.TableColumnName.LAST_MODIFIED_AT;
+import static kr.modusplant.shared.persistence.constant.TableColumnName.VER_NUM;
+import static kr.modusplant.shared.persistence.constant.TableName.SITE_MEMBER_AUTH;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)

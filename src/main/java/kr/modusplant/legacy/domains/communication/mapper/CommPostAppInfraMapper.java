@@ -13,8 +13,8 @@ import java.util.UUID;
 
 import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.AUTH_MEMBER;
 import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.NICKNAME;
-import static kr.modusplant.legacy.domains.communication.vo.CommCategoryWord.PRIMARY_CATEGORY;
-import static kr.modusplant.legacy.domains.communication.vo.CommCategoryWord.SECONDARY_CATEGORY;
+import static kr.modusplant.legacy.domains.communication.constant.CommCategoryWord.PRIMARY_CATEGORY;
+import static kr.modusplant.legacy.domains.communication.constant.CommCategoryWord.SECONDARY_CATEGORY;
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.MEMBER_UUID;
 
 @Mapper

@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static kr.modusplant.legacy.domains.member.vo.MemberUuid.SNAKE_MEMB_UUID;
-import static kr.modusplant.shared.persistence.vo.TableColumnName.REFRESH_TOKEN;
+import static kr.modusplant.shared.persistence.constant.TableColumnName.REFRESH_TOKEN;
 
 @Entity
 @Table(name = REFRESH_TOKEN)
