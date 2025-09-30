@@ -29,4 +29,6 @@ public interface SiteMemberJpaRepository extends CreatedAtAndLastModifiedAtRepos
     List<SiteMemberEntity> findByLoggedInAt(LocalDateTime loggedInAt);
 
     Optional<SiteMemberEntity> findByNickname(String nickname);
+
+    boolean existsByNickname(String nickname);
 }
