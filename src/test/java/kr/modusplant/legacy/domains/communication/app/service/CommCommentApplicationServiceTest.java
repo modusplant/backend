@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Optional;
 
+import static kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils.TEST_COMM_POST_ULID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -61,7 +62,7 @@ public class CommCommentApplicationServiceTest implements
         memberEntity = createMemberBasicUserEntityWithUuid();
         CommSecondaryCategoryEntity category = categoryRepository.save(createTestCommSecondaryCategoryEntityWithUuid());
         postEntity = createCommPostEntityBuilder()
-                .ulid(TEST_COMM_POST_WITH_ULID.getUlid())
+                .ulid(TEST_COMM_POST_ULID)
                 .secondaryCategory(category)
                 .authMember(memberEntity)
                 .createMember(memberEntity)

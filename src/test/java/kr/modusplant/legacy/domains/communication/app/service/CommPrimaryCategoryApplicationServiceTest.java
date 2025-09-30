@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kr.modusplant.legacy.domains.communication.common.util.domain.CommSecondaryCategoryTestUtils.TEST_COMM_SECONDARY_CATEGORY_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -144,7 +145,7 @@ class CommPrimaryCategoryApplicationServiceTest implements CommCategoryRequestTe
     @Test
     void removeByUuidTest() {
         // given
-        UUID uuid = TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getUuid();
+        UUID uuid = TEST_COMM_SECONDARY_CATEGORY_UUID;
         CommPrimaryCategoryEntity commPrimaryCategoryEntity = commCategoryAppInfraMapper.toCommCategoryEntity(TEST_COMM_PRIMARY_CATEGORY_INSERT_REQUEST);
 
         given(commCategoryRepository.save(commPrimaryCategoryEntity)).willReturn(commPrimaryCategoryEntity);

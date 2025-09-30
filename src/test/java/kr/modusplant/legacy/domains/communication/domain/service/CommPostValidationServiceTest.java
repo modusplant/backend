@@ -9,11 +9,9 @@ import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryJpaReposi
 import kr.modusplant.legacy.domains.common.error.DataPairOrderMismatchException;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostInsertRequest;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommPostRequestTestUtils;
-import kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.error.AccessDeniedException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
-import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils.TEST_COMM_POST_ULID;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -93,7 +92,7 @@ class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSec
     void validateAccessibleCommPostTestSuccess() {
         // given
         UUID memberUuid = UUID.randomUUID();
-        String ulid = CommPostTestUtils.generator.generate(null,null,null,EventType.INSERT);
+        String ulid = TEST_COMM_POST_ULID;
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         CommPostEntity commPostEntity = CommPostEntity.builder()
                 .authMember(memberEntity)
@@ -117,7 +116,7 @@ class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSec
     @DisplayName("삭제되지 않은 게시글이 존재하지 않을 때 예외 발생")
     void validateAccessibleCommPostNotFoundTest() {
         UUID memberUuid = UUID.randomUUID();
-        String ulid = CommPostTestUtils.generator.generate(null, null,null,EventType.INSERT);
+        String ulid = TEST_COMM_POST_ULID;
         when(commPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class,
                 () -> commPostValidationService.validateAccessibleCommPost(ulid,memberUuid));
@@ -128,7 +127,7 @@ class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSec
     void validateAccessibleCommPostTestFail() {
         // given
         UUID memberUuid = UUID.randomUUID();
-        String ulid = CommPostTestUtils.generator.generate(null, null,null,EventType.INSERT);
+        String ulid = TEST_COMM_POST_ULID;
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         CommPostEntity commPostEntity = CommPostEntity.builder()
                 .authMember(memberEntity)
@@ -152,7 +151,7 @@ class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSec
     @Test
     @DisplayName("ULID 존재할 경우 통과")
     void validateNotFoundUlidExists() {
-        String ulid = CommPostTestUtils.generator.generate(null, null, null, EventType.INSERT);
+        String ulid = TEST_COMM_POST_ULID;
         when(commPostRepository.existsByUlid(ulid)).thenReturn(true);
         assertDoesNotThrow(() -> commPostValidationService.validateNotFoundUlid(ulid));
     }
@@ -170,7 +169,7 @@ class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSec
 
         // Not Found ULID
         // given & when
-        String notFoundUlid = CommPostTestUtils.generator.generate(null, null, null, EventType.INSERT);
+        String notFoundUlid = TEST_COMM_POST_ULID;
         when(commPostRepository.existsByUlid(notFoundUlid)).thenReturn(false);
 
         // then

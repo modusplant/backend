@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils.TEST_COMM_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
@@ -26,7 +27,7 @@ public class CommPostLikeEntityTest implements CommPostLikeEntityTestUtils {
     @BeforeEach
     void setUp() {
         // given
-        postId = TEST_COMM_POST_WITH_ULID.getUlid();
+        postId = TEST_COMM_POST_ULID;
         memberId = createMemberBasicUserEntityWithUuid().getUuid();
 
         CommPostLikeEntity commPostLikeEntity = CommPostLikeEntity.of(postId, memberId);

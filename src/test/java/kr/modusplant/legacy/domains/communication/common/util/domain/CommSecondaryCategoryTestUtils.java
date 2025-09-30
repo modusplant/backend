@@ -1,18 +1,13 @@
 package kr.modusplant.legacy.domains.communication.common.util.domain;
 
-import kr.modusplant.legacy.domains.communication.domain.model.CommSecondaryCategory;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-public interface CommSecondaryCategoryTestUtils {
-    CommSecondaryCategory TEST_COMM_SECONDARY_CATEGORY = CommSecondaryCategory.builder()
-            .category("컨텐츠 2차 항목")
-            .order(2)
-            .build();
-
-    CommSecondaryCategory TEST_COMM_SECONDARY_CATEGORY_WITH_UUID = CommSecondaryCategory.builder()
-            .uuid(UUID.randomUUID())
-            .category(TEST_COMM_SECONDARY_CATEGORY.getCategory())
-            .order(TEST_COMM_SECONDARY_CATEGORY.getOrder())
-            .build();
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class CommSecondaryCategoryTestUtils {
+    public static final UUID TEST_COMM_SECONDARY_CATEGORY_UUID = UUID.fromString("bd7b287c-4a5b-4711-a641-0ed4e168ba56");
+    public static final String TEST_COMM_SECONDARY_CATEGORY_CATEGORY = "컨텐츠 2차 항목";
+    public static final Integer TEST_COMM_SECONDARY_CATEGORY_ORDER = 2;
 }
