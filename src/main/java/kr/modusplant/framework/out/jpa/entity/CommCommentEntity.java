@@ -1,8 +1,8 @@
 package kr.modusplant.framework.out.jpa.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.framework.out.jpa.entity.compositekey.CommCommentId;
 import kr.modusplant.infrastructure.persistence.annotation.DefaultValue;
+import kr.modusplant.shared.persistence.compositekey.CommCommentId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

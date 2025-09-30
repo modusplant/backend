@@ -1,4 +1,4 @@
-package kr.modusplant.framework.out.jpa.entity.compositekey;
+package kr.modusplant.shared.persistence.compositekey;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -9,9 +9,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
 
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = AccessLevel.PROTECTED)
-@Getter
 public class CommCommentId implements Serializable {
 
     private final String postUlid;

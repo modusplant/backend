@@ -1,7 +1,7 @@
 package kr.modusplant.framework.out.jpa.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.framework.out.jpa.entity.compositekey.CommPostLikeId;
+import kr.modusplant.shared.persistence.compositekey.CommPostLikeId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
