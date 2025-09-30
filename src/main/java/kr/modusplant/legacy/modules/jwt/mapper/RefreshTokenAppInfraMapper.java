@@ -13,7 +13,6 @@ import java.util.UUID;
 
 import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.EXPIRED_AT;
 import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.ISSUED_AT;
-import static kr.modusplant.legacy.domains.member.vo.MemberUuid.MEMBER_UUID;
 
 @Mapper
 public interface RefreshTokenAppInfraMapper {
@@ -27,7 +26,7 @@ public interface RefreshTokenAppInfraMapper {
                 .build();
     }
 
-    @Mapping(source = "member", target = MEMBER_UUID, qualifiedByName = "toMemberUuid")
+    @Mapping(source = "member", target = "memberUuid", qualifiedByName = "toMemberUuid")
     @Mapping(source = ISSUED_AT, target = ISSUED_AT, qualifiedByName = "toDate")
     @Mapping(source = EXPIRED_AT, target = EXPIRED_AT, qualifiedByName = "toDate")
     RefreshToken toRefreshToken(RefreshTokenEntity refreshTokenEntity);

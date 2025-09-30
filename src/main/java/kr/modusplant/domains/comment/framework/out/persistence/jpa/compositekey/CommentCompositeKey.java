@@ -11,6 +11,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
 
+import static kr.modusplant.shared.persistence.constant.TableColumnName.PATH;
+
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = AccessLevel.PROTECTED)
 @Getter
@@ -19,7 +21,7 @@ public class CommentCompositeKey implements Serializable {
 
     private final String postUlid;
 
-    @Column(name = "path", nullable = false, updatable = false)
+    @Column(name = PATH, nullable = false, updatable = false)
     private final String path;
 
     @Override

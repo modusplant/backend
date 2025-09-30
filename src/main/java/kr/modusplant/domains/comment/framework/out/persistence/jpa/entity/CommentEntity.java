@@ -15,9 +15,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-import static kr.modusplant.legacy.domains.member.vo.MemberUuid.SNAKE_AUTH_MEMB_UUID;
-import static kr.modusplant.legacy.domains.member.vo.MemberUuid.SNAKE_CREA_MEMB_UUID;
-import static kr.modusplant.shared.persistence.constant.TableColumnName.IS_DELETED;
+import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
 import static kr.modusplant.shared.persistence.constant.TableName.COMM_COMMENT;
 
 @Entity
@@ -32,25 +30,25 @@ public class CommentEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @MapsId("postUlid")
-    @JoinColumn(name = "post_ulid", nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = POST_ULID, nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private CommPostEntity postEntity;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = SNAKE_AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity authMember;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = SNAKE_CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity createMember;
 
-    @Column(name = "content", nullable = false, length = 900)
+    @Column(name = CONTENT, nullable = false, length = 900)
     private String content;
 
     @Column(name = IS_DELETED, nullable = false)
     @DefaultValue
     private Boolean isDeleted;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = CREATED_AT, nullable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 

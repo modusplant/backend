@@ -11,13 +11,11 @@ import java.util.UUID;
 
 import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.ACTIVE_MEMBER;
 import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.ORIGINAL_MEMBER;
-import static kr.modusplant.legacy.domains.member.vo.MemberUuid.ACTIVE_MEMBER_UUID;
-import static kr.modusplant.legacy.domains.member.vo.MemberUuid.ORIGINAL_MEMBER_UUID;
 
 @Mapper
 public interface SiteMemberAuthDomainInfraMapper {
-    @Mapping(source = ACTIVE_MEMBER, target = ACTIVE_MEMBER_UUID, qualifiedByName = "toActiveMemberUuid")
-    @Mapping(source = ORIGINAL_MEMBER, target = ORIGINAL_MEMBER_UUID, qualifiedByName = "toOriginalMemberUuid")
+    @Mapping(source = ACTIVE_MEMBER, target = "activeMemberUuid", qualifiedByName = "toActiveMemberUuid")
+    @Mapping(source = ORIGINAL_MEMBER, target = "originalMemberUuid", qualifiedByName = "toOriginalMemberUuid")
     @Mapping(target = "memberAuth", ignore = true)
     SiteMemberAuth toSiteMemberAuth(SiteMemberAuthEntity memberAuthEntity);
 

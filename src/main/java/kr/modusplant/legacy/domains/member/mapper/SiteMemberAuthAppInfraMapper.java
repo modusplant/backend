@@ -13,19 +13,17 @@ import org.mapstruct.Named;
 import java.util.UUID;
 
 import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.*;
-import static kr.modusplant.legacy.domains.member.vo.MemberUuid.ACTIVE_MEMBER_UUID;
-import static kr.modusplant.legacy.domains.member.vo.MemberUuid.ORIGINAL_MEMBER_UUID;
 
 @Mapper
 public interface SiteMemberAuthAppInfraMapper {
-    @Mapping(source = ORIGINAL_MEMBER_UUID, target = ACTIVE_MEMBER, qualifiedByName = "toActiveMember")
-    @Mapping(source = ORIGINAL_MEMBER_UUID , target = ORIGINAL_MEMBER, qualifiedByName = "toOriginalMember")
+    @Mapping(source = "originalMemberUuid", target = ACTIVE_MEMBER, qualifiedByName = "toActiveMember")
+    @Mapping(source = "originalMemberUuid", target = ORIGINAL_MEMBER, qualifiedByName = "toOriginalMember")
     @Mapping(target = "memberAuthEntity", ignore = true)
     @Mapping(target = LOCKOUT_UNTIL, ignore = true)
     SiteMemberAuthEntity toMemberAuthEntity(SiteMemberAuthInsertRequest memberAuthInsertRequest, @Context SiteMemberJpaRepository memberRepository);
 
-    @Mapping(source = ACTIVE_MEMBER, target = ACTIVE_MEMBER_UUID, qualifiedByName = "toActiveMemberUuid")
-    @Mapping(source = ORIGINAL_MEMBER, target = ORIGINAL_MEMBER_UUID, qualifiedByName = "toOriginalMemberUuid")
+    @Mapping(source = ACTIVE_MEMBER, target = "activeMemberUuid", qualifiedByName = "toActiveMemberUuid")
+    @Mapping(source = ORIGINAL_MEMBER, target = "originalMemberUuid", qualifiedByName = "toOriginalMemberUuid")
     SiteMemberAuthResponse toMemberAuthResponse(SiteMemberAuthEntity memberAuthEntity);
 
     @Named("toActiveMember")
