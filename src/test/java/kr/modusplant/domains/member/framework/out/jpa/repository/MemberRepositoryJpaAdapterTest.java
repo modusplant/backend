@@ -3,8 +3,8 @@ package kr.modusplant.domains.member.framework.out.jpa.repository;
 import kr.modusplant.domains.member.common.utils.framework.out.persistence.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberJpaMapperImpl;
-import kr.modusplant.domains.member.framework.out.jpa.repository.supers.MemberJpaRepository;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -17,7 +17,7 @@ import static org.mockito.BDDMockito.given;
 
 class MemberRepositoryJpaAdapterTest implements MemberEntityTestUtils {
     private final MemberJpaMapperImpl memberJpaMapper = new MemberJpaMapperImpl();
-    private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
+    private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
     private final MemberRepositoryJpaAdapter memberRepositoryJpaAdapter = new MemberRepositoryJpaAdapter(memberJpaMapper, memberJpaRepository);
 
     @Test
