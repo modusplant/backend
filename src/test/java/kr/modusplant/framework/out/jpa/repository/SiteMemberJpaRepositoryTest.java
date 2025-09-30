@@ -44,7 +44,7 @@ class SiteMemberJpaRepositoryTest implements SiteMemberEntityTestUtils {
         memberRepository.save(member);
 
         // then
-        assertThat(memberRepository.findByNickname(member.getNickname()).getFirst()).isEqualTo(member);
+        assertThat(memberRepository.findByNickname(member.getNickname()).orElseThrow()).isEqualTo(member);
     }
 
     @DisplayName("birthDate으로 회원 찾기")
