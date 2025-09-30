@@ -2,12 +2,12 @@ package kr.modusplant.legacy.domains.communication.app.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.framework.out.jpa.entity.common.constant.CommSecondaryCategoryConstant;
 import kr.modusplant.legacy.domains.common.context.DomainsControllerOnlyContext;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommCategoryResponse;
 import kr.modusplant.legacy.domains.communication.app.service.CommSecondaryCategoryApplicationService;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommCategoryRequestTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.response.CommCategoryResponseTestUtils;
+import kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
-import static kr.modusplant.framework.out.jpa.entity.common.constant.SiteMemberTermEntityConstant.MEMBER_TERM_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberTermConstant.MEMBER_TERM_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;

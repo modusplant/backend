@@ -2,7 +2,7 @@ package kr.modusplant.legacy.domains.member.common.util.app.http.response;
 
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberAuthResponse;
 
-import static kr.modusplant.framework.out.jpa.entity.common.constant.SiteMemberAuthEntityConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.*;
 
 public interface SiteMemberAuthResponseTestUtils {
     SiteMemberAuthResponse memberAuthBasicUserResponse = new SiteMemberAuthResponse(MEMBER_AUTH_BASIC_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_BASIC_USER_ACTIVE_MEMBER_UUID, MEMBER_AUTH_BASIC_USER_EMAIL, MEMBER_AUTH_BASIC_USER_PROVIDER);

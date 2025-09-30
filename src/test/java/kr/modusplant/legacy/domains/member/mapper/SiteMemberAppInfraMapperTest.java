@@ -9,7 +9,7 @@ import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMem
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.framework.out.jpa.entity.common.constant.SiteMemberEntityConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext

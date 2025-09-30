@@ -1,4 +1,4 @@
-package kr.modusplant.framework.out.jpa.entity.common.constant;
+package kr.modusplant.shared.persistence.common.util.constant;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class SiteMemberEntityConstant {
+public final class SiteMemberConstant {
     public static final UUID MEMBER_BASIC_ADMIN_UUID = UUID.fromString("48c75e56-34fb-4fc2-8e45-ee5669f79fdd");
     public static final String MEMBER_BASIC_ADMIN_NICKNAME = "관리자";
     public static final LocalDate MEMBER_BASIC_ADMIN_BIRTH_DATE = LocalDate.of(2001, 1, 1);

@@ -1,4 +1,4 @@
-package kr.modusplant.framework.out.jpa.entity.common.constant;
+package kr.modusplant.shared.persistence.common.util.constant;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

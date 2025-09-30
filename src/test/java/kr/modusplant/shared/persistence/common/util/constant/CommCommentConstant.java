@@ -1,12 +1,12 @@
-package kr.modusplant.framework.out.jpa.entity.common.constant;
+package kr.modusplant.shared.persistence.common.util.constant;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-import static kr.modusplant.framework.out.jpa.entity.common.constant.CommPostConstant.TEST_COMM_POST_ULID;
-import static kr.modusplant.framework.out.jpa.entity.common.constant.SiteMemberEntityConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CommCommentConstant {
