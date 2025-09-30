@@ -1,12 +1,12 @@
 package kr.modusplant.legacy.domains.communication.mapper;
 
-import kr.modusplant.framework.out.jpa.entity.util.CommSecondaryCategoryEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommCategoryRequestTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.response.CommCategoryResponseTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.framework.out.jpa.entity.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ORDER;
+import static kr.modusplant.framework.out.jpa.entity.common.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CommSecondaryCategoryAppInfraMapperTest implements CommCategoryRequestTestUtils, CommCategoryResponseTestUtils, CommSecondaryCategoryEntityTestUtils {

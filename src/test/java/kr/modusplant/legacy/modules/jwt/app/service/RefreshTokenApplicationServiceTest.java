@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.modules.jwt.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.legacy.domains.member.app.service.SiteMemberApplicationService;
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberRequestTestUtils;

@@ -1,7 +1,7 @@
 package kr.modusplant.framework.out.jpa.repository;
 
 import kr.modusplant.framework.out.jpa.entity.*;
-import kr.modusplant.framework.out.jpa.entity.util.*;
+import kr.modusplant.framework.out.jpa.entity.common.util.*;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

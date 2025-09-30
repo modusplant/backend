@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.adapter.mapper.MemberMapperImpl;
-import kr.modusplant.domains.member.common.utils.domain.aggregate.MemberTestUtils;
+import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.exception.AlreadyExistedNicknameException;
 import kr.modusplant.domains.member.domain.vo.MemberId;
@@ -14,7 +14,7 @@ import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.out.jpa.repository.CommPostLikeJpaRepository;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.event.consumer.PostEventConsumer;
-import kr.modusplant.shared.event.PostLikeEventTestUtils;
+import kr.modusplant.shared.event.common.util.PostLikeEventTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

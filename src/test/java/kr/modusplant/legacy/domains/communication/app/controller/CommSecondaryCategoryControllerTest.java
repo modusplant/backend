@@ -2,7 +2,7 @@ package kr.modusplant.legacy.domains.communication.app.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.framework.out.jpa.entity.constant.CommSecondaryCategoryConstant;
+import kr.modusplant.framework.out.jpa.entity.common.constant.CommSecondaryCategoryConstant;
 import kr.modusplant.legacy.domains.common.context.DomainsControllerOnlyContext;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommCategoryResponse;
 import kr.modusplant.legacy.domains.communication.app.service.CommSecondaryCategoryApplicationService;

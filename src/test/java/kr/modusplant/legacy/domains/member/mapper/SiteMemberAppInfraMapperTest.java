@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.member.mapper;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberResponse;
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberRequestTestUtils;
@@ -9,7 +9,7 @@ import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMem
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.framework.out.jpa.entity.common.constant.SiteMemberEntityConstant.MEMBER_BASIC_USER_NICKNAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext

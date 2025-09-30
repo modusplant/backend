@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.common.utils.domain.vo.MemberNicknameTestUtils;
+import kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberNicknameException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.shared.exception.InvalidDataException;
@@ -9,7 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_MEMBER_NICKNAME;
-import static kr.modusplant.domains.member.common.utils.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 

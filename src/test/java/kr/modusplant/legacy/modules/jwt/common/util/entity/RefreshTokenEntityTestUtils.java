@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.modules.jwt.common.util.entity;
 
-import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import kr.modusplant.legacy.modules.jwt.common.util.domain.RefreshTokenTestUtils;
 import kr.modusplant.legacy.modules.jwt.persistence.entity.RefreshTokenEntity.RefreshTokenEntityBuilder;
 

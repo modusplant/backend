@@ -1,7 +1,7 @@
 package kr.modusplant.infrastructure.security.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
 import kr.modusplant.infrastructure.security.common.util.SiteMemberUserDetailsTestUtils;

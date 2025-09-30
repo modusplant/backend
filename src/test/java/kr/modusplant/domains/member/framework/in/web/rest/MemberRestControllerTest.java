@@ -1,8 +1,8 @@
 package kr.modusplant.domains.member.framework.in.web.rest;
 
 import kr.modusplant.domains.member.adapter.controller.MemberController;
-import kr.modusplant.domains.member.common.utils.adapter.response.MemberResponseTestUtils;
-import kr.modusplant.domains.member.common.utils.domain.aggregate.MemberTestUtils;
+import kr.modusplant.domains.member.common.util.adapter.response.MemberResponseTestUtils;
+import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.out.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;

@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.member.domain.service;
 
-import kr.modusplant.framework.out.jpa.entity.util.SiteMemberTermEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberTermEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberTermJpaRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
-import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberTermEntityConstant.MEMBER_TERM_USER_UUID;
+import static kr.modusplant.framework.out.jpa.entity.common.constant.SiteMemberTermEntityConstant.MEMBER_TERM_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;

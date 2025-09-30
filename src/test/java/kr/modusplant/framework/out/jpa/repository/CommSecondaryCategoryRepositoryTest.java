@@ -1,7 +1,7 @@
 package kr.modusplant.framework.out.jpa.repository;
 
 import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.framework.out.jpa.entity.util.CommSecondaryCategoryEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

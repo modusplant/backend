@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
-import kr.modusplant.framework.out.jpa.entity.util.CommPrimaryCategoryEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.CommPrimaryCategoryJpaRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommCategoryRequestTestUtils;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.framework.out.jpa.entity.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_UUID;
+import static kr.modusplant.framework.out.jpa.entity.common.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;

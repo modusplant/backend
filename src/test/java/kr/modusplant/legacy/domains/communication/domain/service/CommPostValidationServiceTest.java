@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.util.CommSecondaryCategoryEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryJpaRepository;
 import kr.modusplant.legacy.domains.common.error.DataPairOrderMismatchException;
@@ -22,7 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.framework.out.jpa.entity.constant.CommPostConstant.TEST_COMM_POST_ULID;
+import static kr.modusplant.framework.out.jpa.entity.common.constant.CommPostConstant.TEST_COMM_POST_ULID;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;

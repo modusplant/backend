@@ -2,7 +2,7 @@ package kr.modusplant.legacy.domains.communication.domain.service;
 
 import jakarta.persistence.EntityManager;
 import kr.modusplant.framework.out.jpa.entity.*;
-import kr.modusplant.framework.out.jpa.entity.util.*;
+import kr.modusplant.framework.out.jpa.entity.common.util.*;
 import kr.modusplant.framework.out.jpa.repository.CommCommentJpaRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;

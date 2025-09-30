@@ -3,7 +3,7 @@ package kr.modusplant.legacy.domains.member.common.util.app.http.request;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberUpdateRequest;
 
-import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant.*;
+import static kr.modusplant.framework.out.jpa.entity.common.constant.SiteMemberEntityConstant.*;
 
 public interface SiteMemberRequestTestUtils {
     SiteMemberInsertRequest memberBasicUserInsertRequest = new SiteMemberInsertRequest(MEMBER_BASIC_USER_NICKNAME);

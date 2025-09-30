@@ -2,7 +2,7 @@ package kr.modusplant.legacy.modules.auth.email.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.util.SiteMemberAuthEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.out.redis.RedisHelper;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
