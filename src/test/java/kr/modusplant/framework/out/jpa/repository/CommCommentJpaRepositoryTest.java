@@ -1,12 +1,8 @@
 package kr.modusplant.framework.out.jpa.repository;
 
 import kr.modusplant.framework.out.jpa.entity.*;
-import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.util.*;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommCommentEntityTestUtils;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,8 +1,8 @@
 package kr.modusplant.framework.out.jpa.repository;
 
 import kr.modusplant.framework.out.jpa.entity.CommPostLikeEntity;
+import kr.modusplant.framework.out.jpa.entity.util.CommPostLikeEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostLikeEntityTestUtils;
 import kr.modusplant.shared.persistence.compositekey.CommPostLikeId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,4 +1,4 @@
-package kr.modusplant.legacy.domains.communication.common.util.entity;
+package kr.modusplant.framework.out.jpa.entity.util;
 
 import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
 
