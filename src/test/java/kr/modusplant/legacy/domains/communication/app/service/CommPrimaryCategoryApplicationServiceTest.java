@@ -1,11 +1,11 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.framework.out.jpa.entity.util.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.CommPrimaryCategoryJpaRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommCategoryRequestTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.response.CommCategoryResponseTestUtils;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.mapper.CommPrimaryCategoryAppInfraMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

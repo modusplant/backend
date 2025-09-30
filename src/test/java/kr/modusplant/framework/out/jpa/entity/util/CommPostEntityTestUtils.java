@@ -1,8 +1,7 @@
-package kr.modusplant.legacy.domains.communication.common.util.entity;
+package kr.modusplant.framework.out.jpa.entity.util;
 
 import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.CommPostEntity.CommPostEntityBuilder;
-import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
 
 import static kr.modusplant.framework.out.jpa.entity.constant.CommPostConstant.*;
 
