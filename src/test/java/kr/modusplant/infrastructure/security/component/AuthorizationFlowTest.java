@@ -9,7 +9,6 @@ import kr.modusplant.domains.comment.support.utils.adapter.CommentRegisterReques
 import kr.modusplant.domains.comment.support.utils.adapter.CommentResponseTestUtils;
 import kr.modusplant.domains.identity.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
-import kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
 import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class AuthorizationFlowTest implements CommentRegisterRequestTestUtils, CommentResponseTestUtils, CommPostTestUtils {
+public class AuthorizationFlowTest implements CommentRegisterRequestTestUtils, CommentResponseTestUtils {
 
     @Autowired
     private MockMvc mockMvc;

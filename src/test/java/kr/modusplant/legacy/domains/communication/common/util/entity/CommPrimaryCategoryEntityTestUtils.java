@@ -1,21 +1,22 @@
 package kr.modusplant.legacy.domains.communication.common.util.entity;
 
 import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
-import kr.modusplant.legacy.domains.communication.common.util.domain.CommPrimaryCategoryTestUtils;
 
-public interface CommPrimaryCategoryEntityTestUtils extends CommPrimaryCategoryTestUtils {
+import static kr.modusplant.legacy.domains.communication.common.util.domain.CommPrimaryCategoryTestUtils.*;
+
+public interface CommPrimaryCategoryEntityTestUtils {
     default CommPrimaryCategoryEntity createTestCommPrimaryCategoryEntity() {
         return CommPrimaryCategoryEntity.builder()
-                .category(TEST_COMM_PRIMARY_CATEGORY.getCategory())
-                .order(TEST_COMM_PRIMARY_CATEGORY.getOrder())
+                .category(TEST_COMM_PRIMARY_CATEGORY_CATEGORY)
+                .order(TEST_COMM_PRIMARY_CATEGORY_ORDER)
                 .build();
     }
 
     default CommPrimaryCategoryEntity createTestCommPrimaryCategoryEntityWithUuid() {
         return CommPrimaryCategoryEntity.builder()
-                .uuid(TEST_COMM_PRIMARY_CATEGORY_WITH_UUID.getUuid())
-                .category(TEST_COMM_PRIMARY_CATEGORY.getCategory())
-                .order(TEST_COMM_PRIMARY_CATEGORY.getOrder())
+                .uuid(TEST_COMM_PRIMARY_CATEGORY_UUID)
+                .category(TEST_COMM_PRIMARY_CATEGORY_CATEGORY)
+                .order(TEST_COMM_PRIMARY_CATEGORY_ORDER)
                 .build();
     }
 }

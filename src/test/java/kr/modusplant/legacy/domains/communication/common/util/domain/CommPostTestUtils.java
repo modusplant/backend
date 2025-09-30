@@ -2,39 +2,32 @@ package kr.modusplant.legacy.domains.communication.common.util.domain;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.infrastructure.persistence.generator.UlidIdGenerator;
-import kr.modusplant.legacy.domains.communication.domain.model.CommPost;
-import org.hibernate.generator.EventType;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.UUID;
 
 import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.legacy.domains.communication.common.util.domain.CommPrimaryCategoryTestUtils.TEST_COMM_PRIMARY_CATEGORY_UUID;
+import static kr.modusplant.legacy.domains.communication.common.util.domain.CommSecondaryCategoryTestUtils.TEST_COMM_SECONDARY_CATEGORY_UUID;
 
-public interface CommPostTestUtils extends CommPrimaryCategoryTestUtils, CommSecondaryCategoryTestUtils {
-    ObjectMapper objectMapper = new ObjectMapper();
-    UlidIdGenerator generator = new UlidIdGenerator();
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class CommPostTestUtils {
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    CommPost TEST_COMM_POST = CommPost.builder()
-            .likeCount(0)
-            .viewCount(0L)
-            .title("물 주는 타이밍, 이제 헷갈리지 마세요! 식물별 물 주기 가이드")
-            .content(createSampleContent())
-            .build();
+    public static final String TEST_COMM_POST_ULID = "01K6DH4YCJMS3NJ4JCY8TPXP4T";
+    public static final UUID TEST_COMM_POST_PRIMARY_CATEGORY_UUID = TEST_COMM_PRIMARY_CATEGORY_UUID;
+    public static final UUID TEST_COMM_POST_SECONDARY_CATEGORY_UUID = TEST_COMM_SECONDARY_CATEGORY_UUID;
+    public static final UUID TEST_COMM_POST_AUTH_MEMBER_UUID = MEMBER_BASIC_USER_UUID;
+    public static final UUID TEST_COMM_POST_CREATE_MEMBER_UUID = MEMBER_BASIC_USER_UUID;
+    public static final Integer TEST_COMM_POST_LIKE_COUNT = 0;
+    public static final Long TEST_COMM_POST_VIEW_COUNT = 0L;
+    public static final String TEST_COMM_POST_TITLE = "물 주는 타이밍, 이제 헷갈리지 마세요! 식물별 물 주기 가이드";
+    public static final JsonNode TEST_COMM_POST_CONTENT = createSampleContent();
 
-    CommPost TEST_COMM_POST_WITH_ULID = CommPost.builder()
-            .ulid(generator.generate(null, null,null, EventType.INSERT))
-            .primaryCategoryUuid(TEST_COMM_PRIMARY_CATEGORY_WITH_UUID.getUuid())
-            .secondaryCategoryUuid(TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getUuid())
-            .authMemberUuid(MEMBER_BASIC_USER_UUID)
-            .createMemberUuid(MEMBER_BASIC_USER_UUID)
-            .likeCount(TEST_COMM_POST.getLikeCount())
-            .viewCount(TEST_COMM_POST.getViewCount())
-            .title("물 주는 타이밍, 이제 헷갈리지 마세요! 식물별 물 주기 가이드")
-            .content(createSampleContent())
-            .build();
-
-    static JsonNode createSampleContent() {
+    private static JsonNode createSampleContent() {
         String json = """
                 [
                   {

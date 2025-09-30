@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant.*;
+import static kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils.TEST_COMM_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CommentJpaMapperTest implements CommentTestUtils, CommentEntityTestUtils {
@@ -25,7 +26,7 @@ public class CommentJpaMapperTest implements CommentTestUtils, CommentEntityTest
                 .build();
 
         CommentEntity compare = createCommentEntityBuilder()
-                .postEntity(createCommPostEntityBuilder().ulid(TEST_COMM_POST_WITH_ULID.getUlid()).build())
+                .postEntity(createCommPostEntityBuilder().ulid(TEST_COMM_POST_ULID).build())
                 .authMember(testSiteMemberEntity)
                 .createMember(testSiteMemberEntity).build();
 

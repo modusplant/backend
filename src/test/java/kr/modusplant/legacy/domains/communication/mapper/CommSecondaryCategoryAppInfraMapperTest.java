@@ -6,6 +6,7 @@ import kr.modusplant.legacy.domains.communication.common.util.entity.CommSeconda
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static kr.modusplant.legacy.domains.communication.common.util.domain.CommSecondaryCategoryTestUtils.TEST_COMM_SECONDARY_CATEGORY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CommSecondaryCategoryAppInfraMapperTest implements CommCategoryRequestTestUtils, CommCategoryResponseTestUtils, CommSecondaryCategoryEntityTestUtils {
@@ -21,6 +22,6 @@ class CommSecondaryCategoryAppInfraMapperTest implements CommCategoryRequestTest
     @DisplayName("요청을 엔터티로 전환")
     @Test
     void toCommCategoryEntityTest() {
-        assertThat(commCategoryAppInfraMapper.toCommCategoryEntity(TEST_COMM_SECONDARY_CATEGORY_INSERT_REQUEST).getOrder()).isEqualTo(TEST_COMM_SECONDARY_CATEGORY.getOrder());
+        assertThat(commCategoryAppInfraMapper.toCommCategoryEntity(TEST_COMM_SECONDARY_CATEGORY_INSERT_REQUEST).getOrder()).isEqualTo(TEST_COMM_SECONDARY_CATEGORY_ORDER);
     }
 }

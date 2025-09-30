@@ -8,6 +8,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Arrays;
 import java.util.List;
 
+import static kr.modusplant.legacy.domains.communication.common.util.domain.CommPrimaryCategoryTestUtils.TEST_COMM_PRIMARY_CATEGORY_UUID;
+import static kr.modusplant.legacy.domains.communication.common.util.domain.CommSecondaryCategoryTestUtils.TEST_COMM_SECONDARY_CATEGORY_UUID;
+
 public interface CommPostRequestTestUtils extends CommCategoryRequestTestUtils {
     /* MultipartFile, FileOrder Utils */
     MultipartFile textFile0 = new MockMultipartFile("content", "text_0.txt", "text/plain", "This is text for test".getBytes());
@@ -89,16 +92,16 @@ public interface CommPostRequestTestUtils extends CommCategoryRequestTestUtils {
 
     /* CommPostInsertRequest Utils */
     CommPostInsertRequest requestAllTypes = new CommPostInsertRequest(
-            TEST_COMM_PRIMARY_CATEGORY_WITH_UUID.getUuid(),
-            TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getUuid(),
+            TEST_COMM_PRIMARY_CATEGORY_UUID,
+            TEST_COMM_SECONDARY_CATEGORY_UUID,
             "유용한 컨텐츠 모음",
             allMediaFiles,
             allMediaFilesOrder
     );
 
     CommPostInsertRequest requestBasicTypes = new CommPostInsertRequest(
-            TEST_COMM_PRIMARY_CATEGORY_WITH_UUID.getUuid(),
-            TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getUuid(),
+            TEST_COMM_PRIMARY_CATEGORY_UUID,
+            TEST_COMM_SECONDARY_CATEGORY_UUID,
             "유용한 식물 기르기 컨텐츠",
             basicMediaFiles,
             basicMediaFilesOrder
