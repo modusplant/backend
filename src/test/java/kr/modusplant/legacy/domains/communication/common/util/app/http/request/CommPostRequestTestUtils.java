@@ -8,8 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Arrays;
 import java.util.List;
 
-import static kr.modusplant.framework.out.jpa.entity.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_UUID;
-import static kr.modusplant.framework.out.jpa.entity.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_UUID;
+import static kr.modusplant.framework.out.jpa.entity.common.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_UUID;
+import static kr.modusplant.framework.out.jpa.entity.common.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_UUID;
 
 public interface CommPostRequestTestUtils extends CommCategoryRequestTestUtils {
     /* MultipartFile, FileOrder Utils */

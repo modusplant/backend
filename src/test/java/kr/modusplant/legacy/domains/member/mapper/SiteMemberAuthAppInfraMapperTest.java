@@ -2,7 +2,7 @@ package kr.modusplant.legacy.domains.member.mapper;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.util.SiteMemberAuthEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberAuthInsertRequest;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberAuthEntityConstant.*;
+import static kr.modusplant.framework.out.jpa.entity.common.constant.SiteMemberAuthEntityConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext

@@ -1,6 +1,6 @@
 package kr.modusplant.domains.identity.domain.vo;
 
-import kr.modusplant.domains.identity.common.utils.domain.vo.AgreedTermsOfVersionTestUtils;
+import kr.modusplant.domains.identity.common.util.domain.vo.AgreedTermsOfVersionTestUtils;
 import kr.modusplant.domains.identity.domain.exception.EmptyValueException;
 import kr.modusplant.domains.identity.domain.exception.InvalidValueException;
 import kr.modusplant.domains.identity.domain.exception.enums.IdentityErrorCode;

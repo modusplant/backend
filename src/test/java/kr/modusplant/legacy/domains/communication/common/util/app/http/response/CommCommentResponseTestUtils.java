@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.communication.common.util.app.http.response;
 
 import kr.modusplant.framework.out.jpa.entity.CommCommentEntity;
-import kr.modusplant.framework.out.jpa.entity.util.CommCommentEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.CommCommentEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommCommentResponse;
 
 import java.util.UUID;

@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.adapter.mapper;
 
-import kr.modusplant.domains.member.common.utils.adapter.response.MemberResponseTestUtils;
-import kr.modusplant.domains.member.common.utils.domain.aggregate.MemberTestUtils;
+import kr.modusplant.domains.member.common.util.adapter.response.MemberResponseTestUtils;
+import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

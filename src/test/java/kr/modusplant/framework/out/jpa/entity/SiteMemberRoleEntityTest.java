@@ -1,6 +1,6 @@
 package kr.modusplant.framework.out.jpa.entity;
 
-import kr.modusplant.framework.out.jpa.entity.util.SiteMemberRoleEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberRoleEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.infrastructure.security.enums.Role;
 import org.junit.jupiter.api.DisplayName;

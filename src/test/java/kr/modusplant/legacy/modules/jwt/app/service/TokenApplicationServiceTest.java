@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.modules.jwt.app.service;
 
-import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberResponse;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberRoleResponse;

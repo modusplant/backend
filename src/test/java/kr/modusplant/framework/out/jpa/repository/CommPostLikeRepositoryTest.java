@@ -1,7 +1,7 @@
 package kr.modusplant.framework.out.jpa.repository;
 
 import kr.modusplant.framework.out.jpa.entity.CommPostLikeEntity;
-import kr.modusplant.framework.out.jpa.entity.util.CommPostLikeEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.CommPostLikeEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.shared.persistence.compositekey.CommPostLikeId;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.framework.out.jpa.entity.constant.CommPostConstant.TEST_COMM_POST_ULID;
+import static kr.modusplant.framework.out.jpa.entity.common.constant.CommPostConstant.TEST_COMM_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext

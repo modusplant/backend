@@ -1,6 +1,6 @@
 package kr.modusplant.framework.out.jpa.entity;
 
-import kr.modusplant.framework.out.jpa.entity.util.CommPostEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.CommPostEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,9 +1,9 @@
 package kr.modusplant.domains.comment.domain.aggregate;
 
+import kr.modusplant.domains.comment.common.util.domain.*;
 import kr.modusplant.domains.comment.domain.exception.EmptyValueException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
-import kr.modusplant.domains.comment.support.utils.domain.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
