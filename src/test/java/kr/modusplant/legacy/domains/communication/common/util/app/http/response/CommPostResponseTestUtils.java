@@ -4,10 +4,10 @@ import kr.modusplant.legacy.domains.communication.app.http.response.CommPostResp
 
 import java.time.LocalDateTime;
 
-import static kr.modusplant.framework.out.jpa.entity.common.constant.CommPostConstant.*;
-import static kr.modusplant.framework.out.jpa.entity.common.constant.CommPrimaryCategoryConstant.*;
-import static kr.modusplant.framework.out.jpa.entity.common.constant.CommSecondaryCategoryConstant.*;
-import static kr.modusplant.framework.out.jpa.entity.common.constant.SiteMemberEntityConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 
 public interface CommPostResponseTestUtils {
     LocalDateTime testDate = LocalDateTime.of(2025, 6, 1, 0, 0);

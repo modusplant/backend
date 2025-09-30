@@ -1,4 +1,4 @@
-package kr.modusplant.framework.out.jpa.entity.common.constant;
+package kr.modusplant.shared.persistence.common.util.constant;
 
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import lombok.AccessLevel;
@@ -8,7 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class SiteMemberAuthEntityConstant {
+public final class SiteMemberAuthConstant {
     public static final UUID MEMBER_AUTH_BASIC_ADMIN_UUID = UUID.fromString("48c75e56-34fb-4fc2-8e45-ee5669f79fdd");
     public static final String MEMBER_AUTH_BASIC_ADMIN_EMAIL = "testAdmin1@gmail.com";
     public static final String MEMBER_AUTH_BASIC_ADMIN_PW = new BCryptPasswordEncoder().encode("testPw12@");
