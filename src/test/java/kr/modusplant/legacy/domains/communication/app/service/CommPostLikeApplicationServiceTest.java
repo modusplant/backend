@@ -5,9 +5,9 @@ import kr.modusplant.framework.out.jpa.entity.CommPostLikeEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.compositekey.CommPostLikeId;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.out.jpa.repository.CommPostLikeRepository;
-import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostLikeJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommPostLikeResponse;
@@ -31,14 +31,14 @@ import static org.mockito.Mockito.*;
 @DomainsServiceWithoutValidationServiceContext
 class CommPostLikeApplicationServiceTest implements SiteMemberEntityTestUtils, CommPostEntityTestUtils, CommPostLikeEntityTestUtils {
 
-    private final SiteMemberRepository siteMemberRepository;
-    private final CommPostRepository commPostRepository;
-    private final CommPostLikeRepository commPostLikeRepository;
+    private final SiteMemberJpaRepository siteMemberRepository;
+    private final CommPostJpaRepository commPostRepository;
+    private final CommPostLikeJpaRepository commPostLikeRepository;
     private final CommPostLikeApplicationService commPostLikeApplicationService;
     private final CommPostLikeValidationService commPostLikeValidationService;
 
     @Autowired
-    public CommPostLikeApplicationServiceTest(SiteMemberRepository siteMemberRepository, CommPostRepository commPostRepository, CommPostLikeRepository commPostLikeRepository, CommPostLikeApplicationService commPostLikeApplicationService, CommPostLikeValidationService commPostLikeValidationService) {
+    public CommPostLikeApplicationServiceTest(SiteMemberJpaRepository siteMemberRepository, CommPostJpaRepository commPostRepository, CommPostLikeJpaRepository commPostLikeRepository, CommPostLikeApplicationService commPostLikeApplicationService, CommPostLikeValidationService commPostLikeValidationService) {
         this.siteMemberRepository = siteMemberRepository;
         this.commPostRepository = commPostRepository;
         this.commPostLikeRepository = commPostLikeRepository;

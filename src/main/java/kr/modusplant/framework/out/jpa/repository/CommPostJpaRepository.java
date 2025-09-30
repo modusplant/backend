@@ -17,7 +17,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface CommPostRepository extends UlidPrimaryRepository<CommPostEntity>, CreatedAtAndUpdatedAtRepository<CommPostEntity>, JpaRepository<CommPostEntity, String> {
+public interface CommPostJpaRepository extends UlidPrimaryRepository<CommPostEntity>, CreatedAtAndUpdatedAtRepository<CommPostEntity>, JpaRepository<CommPostEntity, String> {
 
     Page<CommPostEntity> findAllByOrderByCreatedAtDesc(Pageable pageable);
 

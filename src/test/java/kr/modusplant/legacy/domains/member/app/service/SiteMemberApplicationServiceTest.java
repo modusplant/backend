@@ -2,7 +2,7 @@ package kr.modusplant.legacy.domains.member.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberUpdateRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberResponse;
@@ -25,10 +25,10 @@ import static org.mockito.BDDMockito.willDoNothing;
 class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityTestUtils {
 
     private final SiteMemberApplicationService memberApplicationService;
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberJpaRepository memberRepository;
 
     @Autowired
-    SiteMemberApplicationServiceTest(SiteMemberApplicationService memberApplicationService, SiteMemberRepository memberRepository) {
+    SiteMemberApplicationServiceTest(SiteMemberApplicationService memberApplicationService, SiteMemberJpaRepository memberRepository) {
         this.memberApplicationService = memberApplicationService;
         this.memberRepository = memberRepository;
     }

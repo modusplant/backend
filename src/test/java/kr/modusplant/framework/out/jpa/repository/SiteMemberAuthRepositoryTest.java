@@ -15,11 +15,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RepositoryOnlyContext
 class SiteMemberAuthRepositoryTest implements SiteMemberAuthEntityTestUtils {
 
-    private final SiteMemberAuthRepository memberAuthRepository;
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberAuthJpaRepository memberAuthRepository;
+    private final SiteMemberJpaRepository memberRepository;
 
     @Autowired
-    SiteMemberAuthRepositoryTest(SiteMemberAuthRepository memberAuthRepository, SiteMemberRepository memberRepository) {
+    SiteMemberAuthRepositoryTest(SiteMemberAuthJpaRepository memberAuthRepository, SiteMemberJpaRepository memberRepository) {
         this.memberAuthRepository = memberAuthRepository;
         this.memberRepository = memberRepository;
     }

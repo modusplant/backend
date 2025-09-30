@@ -2,7 +2,7 @@ package kr.modusplant.legacy.modules.jwt.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.legacy.domains.member.app.service.SiteMemberApplicationService;
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberRequestTestUtils;
 import kr.modusplant.legacy.modules.jwt.common.util.domain.RefreshTokenTestUtils;
@@ -40,7 +40,7 @@ class RefreshTokenApplicationServiceTest implements RefreshTokenTestUtils, Refre
     private RefreshTokenRepository tokenRepository;
 
     @Mock
-    private SiteMemberRepository memberRepository;
+    private SiteMemberJpaRepository memberRepository;
 
     @Spy
     private final RefreshTokenAppInfraMapper tokenMapper = new RefreshTokenAppInfraMapperImpl();

@@ -2,7 +2,7 @@ package kr.modusplant.legacy.domains.member.mapper;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberAuthInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberAuthResponse;
 import org.mapstruct.Context;
@@ -22,19 +22,19 @@ public interface SiteMemberAuthAppInfraMapper {
     @Mapping(source = ORIGINAL_MEMBER_UUID , target = ORIGINAL_MEMBER, qualifiedByName = "toOriginalMember")
     @Mapping(target = "memberAuthEntity", ignore = true)
     @Mapping(target = LOCKOUT_UNTIL, ignore = true)
-    SiteMemberAuthEntity toMemberAuthEntity(SiteMemberAuthInsertRequest memberAuthInsertRequest, @Context SiteMemberRepository memberRepository);
+    SiteMemberAuthEntity toMemberAuthEntity(SiteMemberAuthInsertRequest memberAuthInsertRequest, @Context SiteMemberJpaRepository memberRepository);
 
     @Mapping(source = ACTIVE_MEMBER, target = ACTIVE_MEMBER_UUID, qualifiedByName = "toActiveMemberUuid")
     @Mapping(source = ORIGINAL_MEMBER, target = ORIGINAL_MEMBER_UUID, qualifiedByName = "toOriginalMemberUuid")
     SiteMemberAuthResponse toMemberAuthResponse(SiteMemberAuthEntity memberAuthEntity);
 
     @Named("toActiveMember")
-    default SiteMemberEntity toActiveMember(UUID originalMemberUuid, @Context SiteMemberRepository memberRepository) {
+    default SiteMemberEntity toActiveMember(UUID originalMemberUuid, @Context SiteMemberJpaRepository memberRepository) {
         return memberRepository.findByUuid(originalMemberUuid).orElseThrow();
     }
 
     @Named("toOriginalMember")
-    default SiteMemberEntity toOriginalMember(UUID originalMemberUuid, @Context SiteMemberRepository memberRepository) {
+    default SiteMemberEntity toOriginalMember(UUID originalMemberUuid, @Context SiteMemberJpaRepository memberRepository) {
         return memberRepository.findByUuid(originalMemberUuid).orElseThrow();
     }
 

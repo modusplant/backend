@@ -1,7 +1,7 @@
 package kr.modusplant.framework.out.jpa.repository;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberTermEntity;
-import kr.modusplant.framework.out.jpa.repository.supers.SiteMemberUuidPrimaryKeyRepository;
+import kr.modusplant.framework.out.jpa.repository.supers.SiteMemberUuidPrimaryKeyJpaRepository;
 import kr.modusplant.shared.persistence.repository.supers.LastModifiedAtRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Repository
 @Primary
-public interface SiteMemberTermRepository extends LastModifiedAtRepository<SiteMemberTermEntity>, SiteMemberUuidPrimaryKeyRepository<SiteMemberTermEntity>, JpaRepository<SiteMemberTermEntity, UUID> {
+public interface SiteMemberTermJpaRepository extends LastModifiedAtRepository<SiteMemberTermEntity>, SiteMemberUuidPrimaryKeyJpaRepository<SiteMemberTermEntity>, JpaRepository<SiteMemberTermEntity, UUID> {
     List<SiteMemberTermEntity> findByAgreedTermsOfUseVersion(String agreedTermsOfUseVersion);
 
     List<SiteMemberTermEntity> findByAgreedPrivacyPolicyVersion(String agreedPrivacyPolicyVersion);

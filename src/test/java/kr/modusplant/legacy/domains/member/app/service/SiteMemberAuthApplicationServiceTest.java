@@ -4,8 +4,8 @@ import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberAuthUpdateRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberAuthResponse;
@@ -32,11 +32,11 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
 
     private final SiteMemberAuthApplicationService memberAuthService;
     private final SiteMemberApplicationService memberService;
-    private final SiteMemberAuthRepository memberAuthRepository;
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberAuthJpaRepository memberAuthRepository;
+    private final SiteMemberJpaRepository memberRepository;
 
     @Autowired
-    SiteMemberAuthApplicationServiceTest(SiteMemberAuthApplicationService memberAuthService, SiteMemberApplicationService memberService, SiteMemberAuthRepository memberAuthRepository, SiteMemberRepository memberRepository) {
+    SiteMemberAuthApplicationServiceTest(SiteMemberAuthApplicationService memberAuthService, SiteMemberApplicationService memberService, SiteMemberAuthJpaRepository memberAuthRepository, SiteMemberJpaRepository memberRepository) {
         this.memberAuthService = memberAuthService;
         this.memberService = memberService;
         this.memberAuthRepository = memberAuthRepository;

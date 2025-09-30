@@ -1,6 +1,6 @@
 package kr.modusplant.framework.out.jpa.repository;
 
-import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.shared.persistence.repository.supers.CreatedAtRepository;
 import kr.modusplant.shared.persistence.repository.supers.UuidPrimaryKeyRepository;
 import org.springframework.context.annotation.Primary;
@@ -12,10 +12,10 @@ import java.util.UUID;
 
 @Repository
 @Primary
-public interface CommPrimaryCategoryRepository extends UuidPrimaryKeyRepository<CommPrimaryCategoryEntity>, CreatedAtRepository<CommPrimaryCategoryEntity>, JpaRepository<CommPrimaryCategoryEntity, UUID> {
-    Optional<CommPrimaryCategoryEntity> findByOrder(Integer order);
+public interface CommSecondaryCategoryJpaRepository extends UuidPrimaryKeyRepository<CommSecondaryCategoryEntity>, CreatedAtRepository<CommSecondaryCategoryEntity>, JpaRepository<CommSecondaryCategoryEntity, UUID> {
+    Optional<CommSecondaryCategoryEntity> findByOrder(Integer order);
 
-    Optional<CommPrimaryCategoryEntity> findByCategory(String category);
+    Optional<CommSecondaryCategoryEntity> findByCategory(String category);
 
     boolean existsByOrder(Integer order);
 

@@ -2,8 +2,8 @@ package kr.modusplant.legacy.domains.member.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleJpaRepository;
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.legacy.domains.common.app.service.supers.UuidCrudApplicationService;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberRoleInsertRequest;
@@ -29,8 +29,8 @@ public class SiteMemberRoleApplicationService implements UuidCrudApplicationServ
 
     private final SiteMemberValidationService memberValidationService;
     private final SiteMemberRoleValidationService memberRoleValidationService;
-    private final SiteMemberRoleRepository memberRoleRepository;
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberRoleJpaRepository memberRoleRepository;
+    private final SiteMemberJpaRepository memberRepository;
     private final SiteMemberRoleAppInfraMapper memberRoleEntityMapper;
 
     @Override

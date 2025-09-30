@@ -4,8 +4,8 @@ import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberTermEntity;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberTermEntityTestUtils;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberTermRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberTermJpaRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberTermUpdateRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberTermResponse;
@@ -31,11 +31,11 @@ class SiteMemberTermApplicationServiceTest implements SiteMemberTermRequestTestU
 
     private final SiteMemberTermApplicationService memberTermService;
     private final SiteMemberApplicationService memberService;
-    private final SiteMemberTermRepository memberTermRepository;
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberTermJpaRepository memberTermRepository;
+    private final SiteMemberJpaRepository memberRepository;
 
     @Autowired
-    SiteMemberTermApplicationServiceTest(SiteMemberTermApplicationService memberTermService, SiteMemberApplicationService memberService, SiteMemberTermRepository memberTermRepository, SiteMemberRepository memberRepository) {
+    SiteMemberTermApplicationServiceTest(SiteMemberTermApplicationService memberTermService, SiteMemberApplicationService memberService, SiteMemberTermJpaRepository memberTermRepository, SiteMemberJpaRepository memberRepository) {
         this.memberTermService = memberTermService;
         this.memberService = memberService;
         this.memberTermRepository = memberTermRepository;

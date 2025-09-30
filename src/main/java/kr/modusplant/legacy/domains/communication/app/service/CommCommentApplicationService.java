@@ -3,9 +3,9 @@ package kr.modusplant.legacy.domains.communication.app.service;
 import kr.modusplant.framework.out.jpa.entity.CommCommentEntity;
 import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.repository.CommCommentRepository;
-import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.CommCommentJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommCommentInsertRequest;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommCommentResponse;
 import kr.modusplant.legacy.domains.communication.domain.service.CommCommentValidationService;
@@ -31,9 +31,9 @@ public class CommCommentApplicationService {
     private final CommPostValidationService commPostValidationService;
     private final SiteMemberValidationService memberValidationService;
     private final CommCommentAppInfraMapper commCommentAppInfraMapper;
-    private final CommCommentRepository commCommentRepository;
-    private final CommPostRepository commPostRepository;
-    private final SiteMemberRepository memberRepository;
+    private final CommCommentJpaRepository commCommentRepository;
+    private final CommPostJpaRepository commPostRepository;
+    private final SiteMemberJpaRepository memberRepository;
 
     public List<CommCommentResponse> getAll() {
         return commCommentRepository.findAll()

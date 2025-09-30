@@ -17,18 +17,18 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RepositoryOnlyContext
-public class CommCommentRepositoryTest implements
+public class CommCommentJpaRepositoryTest implements
         CommCommentEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils, CommPostEntityTestUtils, SiteMemberEntityTestUtils {
 
-    private final CommCommentRepository commentRepository;
-    private final CommPrimaryCategoryRepository primaryCategoryRepository;
-    private final CommSecondaryCategoryRepository secondaryCategoryRepository;
-    private final CommPostRepository postRepository;
-    private final SiteMemberRepository memberRepository;
+    private final CommCommentJpaRepository commentRepository;
+    private final CommPrimaryCategoryJpaRepository primaryCategoryRepository;
+    private final CommSecondaryCategoryJpaRepository secondaryCategoryRepository;
+    private final CommPostJpaRepository postRepository;
+    private final SiteMemberJpaRepository memberRepository;
 
     @Autowired
-    public CommCommentRepositoryTest(CommCommentRepository commentRepository, CommPrimaryCategoryRepository primaryCategoryRepository, CommSecondaryCategoryRepository secondaryCategoryRepository,
-                                     CommPostRepository postRepository, SiteMemberRepository memberRepository) {
+    public CommCommentJpaRepositoryTest(CommCommentJpaRepository commentRepository, CommPrimaryCategoryJpaRepository primaryCategoryRepository, CommSecondaryCategoryJpaRepository secondaryCategoryRepository,
+                                        CommPostJpaRepository postRepository, SiteMemberJpaRepository memberRepository) {
         this.commentRepository = commentRepository;
         this.primaryCategoryRepository = primaryCategoryRepository;
         this.secondaryCategoryRepository = secondaryCategoryRepository;

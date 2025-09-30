@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Repository
 @Primary
-public interface TermRepository extends CreatedAtAndLastModifiedAtRepository<TermEntity>, UuidPrimaryKeyRepository<TermEntity>, JpaRepository<TermEntity, UUID> {
+public interface TermJpaRepository extends CreatedAtAndLastModifiedAtRepository<TermEntity>, UuidPrimaryKeyRepository<TermEntity>, JpaRepository<TermEntity, UUID> {
     List<TermEntity> findByVersion(String version);
 
     Optional<TermEntity> findByName(String name);

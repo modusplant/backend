@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RepositoryOnlyContext
 public class CommPostPostLikeRepositoryTest implements CommPostLikeEntityTestUtils {
     @Autowired
-    CommPostLikeRepository commPostLikeRepository;
+    CommPostLikeJpaRepository commPostLikeRepository;
 
     @Nested
     @DisplayName("setUp 사용 테스트 그룹")

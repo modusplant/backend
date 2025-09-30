@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.member.domain.service;
 
-import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.shared.exception.EntityExistsException;
@@ -19,8 +19,8 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class SiteMemberAuthValidationService {
-    private final SiteMemberRepository memberRepository;
-    private final SiteMemberAuthRepository memberAuthRepository;
+    private final SiteMemberJpaRepository memberRepository;
+    private final SiteMemberAuthJpaRepository memberAuthRepository;
 
     public void validateExistedOriginalMemberUuid(UUID uuid) {
         if (uuid == null) {

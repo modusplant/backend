@@ -14,10 +14,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RepositoryOnlyContext
 class CommPrimaryCategoryRepositoryTest implements CommPrimaryCategoryEntityTestUtils {
 
-    private final CommPrimaryCategoryRepository commCategoryRepository;
+    private final CommPrimaryCategoryJpaRepository commCategoryRepository;
 
     @Autowired
-    CommPrimaryCategoryRepositoryTest(CommPrimaryCategoryRepository commCategoryRepository) {
+    CommPrimaryCategoryRepositoryTest(CommPrimaryCategoryJpaRepository commCategoryRepository) {
         this.commCategoryRepository = commCategoryRepository;
     }
 

@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
-import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.infrastructure.persistence.generator.UlidIdGenerator;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostViewCountRedisRepository;
 import org.hibernate.generator.EventType;
@@ -21,7 +21,7 @@ class CommPostViewCountBackUpSchedulerTest {
     @Mock
     private CommPostViewCountRedisRepository viewCountRedisRepository;
     @Mock
-    private CommPostRepository commPostRepository;
+    private CommPostJpaRepository commPostRepository;
     @InjectMocks
     private CommPostViewCountBackUpScheduler viewCountBackUpScheduler;
 

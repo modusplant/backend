@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.modules.jwt.mapper;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.legacy.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.legacy.modules.jwt.persistence.entity.RefreshTokenEntity;
 import org.mapstruct.*;
@@ -18,7 +18,7 @@ import static kr.modusplant.legacy.domains.member.vo.MemberUuid.MEMBER_UUID;
 @Mapper
 public interface RefreshTokenAppInfraMapper {
     @BeanMapping(ignoreByDefault = true)
-    default RefreshTokenEntity toRefreshTokenEntity(RefreshToken refreshToken, @Context SiteMemberRepository memberRepository) {
+    default RefreshTokenEntity toRefreshTokenEntity(RefreshToken refreshToken, @Context SiteMemberJpaRepository memberRepository) {
         return RefreshTokenEntity.builder()
                 .member(memberRepository.findByUuid(refreshToken.getMemberUuid()).orElseThrow())
                 .refreshToken(refreshToken.getRefreshToken())

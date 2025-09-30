@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CommCommentRepository extends JpaRepository<CommCommentEntity, CommCommentId> {
+public interface CommCommentJpaRepository extends JpaRepository<CommCommentEntity, CommCommentId> {
     Optional<CommCommentEntity> findByPostUlidAndPath(String postUlid, String path);
 
     List<CommCommentEntity> findByPostEntity(CommPostEntity postEntity);

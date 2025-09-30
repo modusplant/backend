@@ -5,10 +5,10 @@ import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.out.jpa.repository.CommCommentRepository;
-import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
-import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.CommCommentJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommCommentInsertRequest;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommCommentResponse;
@@ -35,16 +35,16 @@ public class CommCommentApplicationServiceTest implements
         CommSecondaryCategoryEntityTestUtils, CommPostEntityTestUtils, SiteMemberEntityTestUtils {
 
     private final CommCommentApplicationService commentApplicationService;
-    private final CommCommentRepository commentRepository;
-    private final CommSecondaryCategoryRepository categoryRepository;
-    private final CommPostRepository postRepository;
-    private final SiteMemberRepository memberRepository;
+    private final CommCommentJpaRepository commentRepository;
+    private final CommSecondaryCategoryJpaRepository categoryRepository;
+    private final CommPostJpaRepository postRepository;
+    private final SiteMemberJpaRepository memberRepository;
 
     @Autowired
     public CommCommentApplicationServiceTest(
             CommCommentApplicationService commentApplicationService,
-            CommCommentRepository commentRepository, CommPostRepository postRepository,
-            CommSecondaryCategoryRepository categoryRepository, SiteMemberRepository memberRepository) {
+            CommCommentJpaRepository commentRepository, CommPostJpaRepository postRepository,
+            CommSecondaryCategoryJpaRepository categoryRepository, SiteMemberJpaRepository memberRepository) {
         this.commentApplicationService = commentApplicationService;
         this.commentRepository = commentRepository;
         this.categoryRepository = categoryRepository;

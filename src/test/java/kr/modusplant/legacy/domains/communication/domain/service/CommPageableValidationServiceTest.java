@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
-import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.shared.exception.InvalidDataException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
@@ -18,10 +18,10 @@ import static org.mockito.BDDMockito.given;
 class CommPageableValidationServiceTest {
 
     private final CommPageableValidationService pageableValidationService;
-    private final CommPostRepository postRepository;
+    private final CommPostJpaRepository postRepository;
 
     @Autowired
-    CommPageableValidationServiceTest(CommPageableValidationService pageableValidationService, CommPostRepository postRepository) {
+    CommPageableValidationServiceTest(CommPageableValidationService pageableValidationService, CommPostJpaRepository postRepository) {
         this.pageableValidationService = pageableValidationService;
         this.postRepository = postRepository;
     }

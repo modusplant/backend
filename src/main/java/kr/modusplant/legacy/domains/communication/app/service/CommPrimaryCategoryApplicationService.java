@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
-import kr.modusplant.framework.out.jpa.repository.CommPrimaryCategoryRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPrimaryCategoryJpaRepository;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommCategoryInsertRequest;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommCategoryResponse;
 import kr.modusplant.legacy.domains.communication.domain.service.CommCategoryValidationService;
@@ -24,7 +24,7 @@ import java.util.UUID;
 public class CommPrimaryCategoryApplicationService {
 
     private final CommCategoryValidationService validationService;
-    private final CommPrimaryCategoryRepository commCategoryRepository;
+    private final CommPrimaryCategoryJpaRepository commCategoryRepository;
     private final CommPrimaryCategoryAppInfraMapper commCategoryAppInfraMapper;
 
     @Cacheable(value = "comm_categories")

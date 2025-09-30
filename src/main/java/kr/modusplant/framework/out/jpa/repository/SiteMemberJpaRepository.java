@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Repository
 @Primary
-public interface SiteMemberRepository extends CreatedAtAndLastModifiedAtRepository<SiteMemberEntity>, UuidPrimaryKeyRepository<SiteMemberEntity>, JpaRepository<SiteMemberEntity, UUID> {
+public interface SiteMemberJpaRepository extends CreatedAtAndLastModifiedAtRepository<SiteMemberEntity>, UuidPrimaryKeyRepository<SiteMemberEntity>, JpaRepository<SiteMemberEntity, UUID> {
     List<SiteMemberEntity> findByNickname(String nickname);
 
     List<SiteMemberEntity> findByBirthDate(LocalDate birthDate);

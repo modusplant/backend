@@ -5,6 +5,6 @@ import kr.modusplant.shared.persistence.repository.supers.UuidPrimaryKeyReposito
 
 import java.util.Optional;
 
-public interface SiteMemberUuidPrimaryKeyRepository<T> extends UuidPrimaryKeyRepository<T> {
+public interface SiteMemberUuidPrimaryKeyJpaRepository<T> extends UuidPrimaryKeyRepository<T> {
     Optional<T> findByMember(SiteMemberEntity member);
 }

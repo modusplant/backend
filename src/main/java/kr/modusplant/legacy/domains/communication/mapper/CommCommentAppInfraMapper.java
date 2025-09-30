@@ -3,8 +3,8 @@ package kr.modusplant.legacy.domains.communication.mapper;
 import kr.modusplant.framework.out.jpa.entity.CommCommentEntity;
 import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommCommentResponse;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
@@ -27,12 +27,12 @@ public interface CommCommentAppInfraMapper {
     }
 
     @Named("toMemberEntity")
-    default SiteMemberEntity toMemberEntity(UUID memberUuid, @Context SiteMemberRepository memberRepository) {
+    default SiteMemberEntity toMemberEntity(UUID memberUuid, @Context SiteMemberJpaRepository memberRepository) {
         return memberRepository.findByUuid(memberUuid).orElseThrow();
     }
 
     @Named("toCommPostEntity")
-    default CommPostEntity toCommPostEntity(String ulid, @Context CommPostRepository commPostRepository) {
+    default CommPostEntity toCommPostEntity(String ulid, @Context CommPostJpaRepository commPostRepository) {
         return commPostRepository.findByUlid(ulid).orElseThrow();
     }
 

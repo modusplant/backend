@@ -2,7 +2,7 @@ package kr.modusplant.infrastructure.security.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
 import kr.modusplant.infrastructure.security.common.util.SiteMemberUserDetailsTestUtils;
 import kr.modusplant.infrastructure.security.context.SecurityOnlyContext;
@@ -41,11 +41,11 @@ public class NormalLoginAuthenticationFlowTest implements
     private final SiteMemberValidationService memberValidationService;
     private final TokenApplicationService tokenApplicationService;
     private final RefreshTokenApplicationService refreshTokenApplicationService;
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberJpaRepository memberRepository;
     private final PasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public NormalLoginAuthenticationFlowTest(MockMvc mockMvc, ObjectMapper objectMapper, FilterChainProxy filterChainProxy, DefaultUserDetailsService defaultUserDetailsService, SiteMemberValidationService memberValidationService, TokenApplicationService tokenApplicationService, RefreshTokenApplicationService refreshTokenApplicationService, SiteMemberRepository memberRepository, PasswordEncoder bCryptPasswordEncoder) {
+    public NormalLoginAuthenticationFlowTest(MockMvc mockMvc, ObjectMapper objectMapper, FilterChainProxy filterChainProxy, DefaultUserDetailsService defaultUserDetailsService, SiteMemberValidationService memberValidationService, TokenApplicationService tokenApplicationService, RefreshTokenApplicationService refreshTokenApplicationService, SiteMemberJpaRepository memberRepository, PasswordEncoder bCryptPasswordEncoder) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
         this.filterChainProxy = filterChainProxy;

@@ -3,8 +3,8 @@ package kr.modusplant.legacy.domains.member.domain.service;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberRoleEntityTestUtils;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleJpaRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.shared.exception.EntityExistsException;
@@ -25,11 +25,11 @@ import static org.mockito.BDDMockito.given;
 class SiteMemberRoleValidationServiceTest implements SiteMemberRoleEntityTestUtils, SiteMemberEntityTestUtils {
 
     private final SiteMemberRoleValidationService memberRoleValidationService;
-    private final SiteMemberRoleRepository memberRoleRepository;
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberRoleJpaRepository memberRoleRepository;
+    private final SiteMemberJpaRepository memberRepository;
 
     @Autowired
-    SiteMemberRoleValidationServiceTest(SiteMemberRoleValidationService memberRoleValidationService, SiteMemberRoleRepository memberRoleRepository, SiteMemberRepository memberRepository) {
+    SiteMemberRoleValidationServiceTest(SiteMemberRoleValidationService memberRoleValidationService, SiteMemberRoleJpaRepository memberRoleRepository, SiteMemberJpaRepository memberRepository) {
         this.memberRoleValidationService = memberRoleValidationService;
         this.memberRoleRepository = memberRoleRepository;
         this.memberRepository = memberRepository;
