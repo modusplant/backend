@@ -7,8 +7,8 @@ import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static kr.modusplant.framework.out.jpa.entity.constant.CommPostConstant.TEST_COMM_POST_ULID;
 import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant.*;
-import static kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils.TEST_COMM_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CommentJpaMapperTest implements CommentTestUtils, CommentEntityTestUtils {

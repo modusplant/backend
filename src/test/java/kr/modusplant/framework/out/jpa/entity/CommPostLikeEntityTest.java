@@ -12,7 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils.TEST_COMM_POST_ULID;
+import static kr.modusplant.framework.out.jpa.entity.constant.CommPostConstant.TEST_COMM_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext

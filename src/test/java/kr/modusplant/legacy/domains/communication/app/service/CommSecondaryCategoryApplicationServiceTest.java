@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.legacy.domains.communication.common.util.domain.CommSecondaryCategoryTestUtils.TEST_COMM_SECONDARY_CATEGORY_UUID;
+import static kr.modusplant.framework.out.jpa.entity.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;

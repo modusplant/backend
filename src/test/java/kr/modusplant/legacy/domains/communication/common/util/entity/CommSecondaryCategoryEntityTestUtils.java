@@ -2,7 +2,7 @@ package kr.modusplant.legacy.domains.communication.common.util.entity;
 
 import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
 
-import static kr.modusplant.legacy.domains.communication.common.util.domain.CommSecondaryCategoryTestUtils.*;
+import static kr.modusplant.framework.out.jpa.entity.constant.CommSecondaryCategoryConstant.*;
 
 public interface CommSecondaryCategoryEntityTestUtils {
     default CommSecondaryCategoryEntity createTestCommSecondaryCategoryEntity() {

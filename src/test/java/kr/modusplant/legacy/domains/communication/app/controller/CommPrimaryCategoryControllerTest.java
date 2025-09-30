@@ -18,8 +18,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kr.modusplant.framework.out.jpa.entity.constant.CommPrimaryCategoryConstant.*;
 import static kr.modusplant.legacy.domains.common.constant.FileSystem.DATA;
-import static kr.modusplant.legacy.domains.communication.common.util.domain.CommPrimaryCategoryTestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
