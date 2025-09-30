@@ -2,9 +2,9 @@ package kr.modusplant.domains.member.framework.out.jpa.repository;
 
 import kr.modusplant.domains.member.common.utils.framework.out.persistence.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
-import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberJpaMapperImpl;
 import kr.modusplant.domains.member.framework.out.jpa.repository.supers.MemberJpaRepository;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -45,7 +45,7 @@ class MemberRepositoryJpaAdapterTest implements MemberEntityTestUtils {
     void testSave_givenValidMember_willReturn() {
         // given
         Member member = createMember();
-        MemberEntity memberEntity = createMemberEntityWithUuid();
+        SiteMemberEntity memberEntity = createMemberEntityWithUuid();
         given(memberJpaRepository.save(memberEntity)).willReturn(memberEntity);
 
         // when & then
