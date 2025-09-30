@@ -15,7 +15,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
-public class CommPostPostLikeEntityTest implements CommPostLikeEntityTestUtils {
+public class CommPostLikeEntityTest implements CommPostLikeEntityTestUtils {
 
     @Autowired
     private TestEntityManager entityManager;
@@ -35,7 +35,7 @@ public class CommPostPostLikeEntityTest implements CommPostLikeEntityTestUtils {
 
     @Test
     @DisplayName("소통 게시글 좋아요")
-    void likeCommPost_success () {
+    void likeCommPost_success() {
         // when
         CommPostLikeEntity commPostLikeEntity = entityManager.find(CommPostLikeEntity.class, new CommPostLikeId(postId, memberId));
 

@@ -1,7 +1,7 @@
 package kr.modusplant.framework.out.jpa.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.shared.persistence.compositekey.CommPostLikeId;
+import kr.modusplant.shared.persistence.compositekey.CommCommentLikeId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,18 +12,22 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
-import static kr.modusplant.shared.persistence.constant.TableName.COMM_POST_LIKE;
+import static kr.modusplant.shared.persistence.constant.TableName.COMM_COMMENT_LIKE;
 
 @Entity
-@Table(name = COMM_POST_LIKE)
-@IdClass(CommPostLikeId.class)
+@Table(name = COMM_COMMENT_LIKE)
+@IdClass(CommCommentLikeId.class)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-public class CommPostLikeEntity {
+public class CommCommentLikeEntity {
     @Id
     @Column(name = POST_ULID, nullable = false)
     private String postId;
+
+    @Id
+    @Column(name = PATH, nullable = false)
+    private String path;
 
     @Id
     @Column(name = MEMB_UUID, nullable = false)
@@ -33,12 +37,13 @@ public class CommPostLikeEntity {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    private CommPostLikeEntity(String postId, UUID memberId) {
+    private CommCommentLikeEntity(String postId, String path, UUID memberId) {
         this.postId = postId;
+        this.path = path;
         this.memberId = memberId;
     }
 
-    public static CommPostLikeEntity of(String postId, UUID memberId) {
-        return new CommPostLikeEntity(postId, memberId);
+    public static CommCommentLikeEntity of(String postId, String path, UUID memberId) {
+        return new CommCommentLikeEntity(postId, path, memberId);
     }
 }
