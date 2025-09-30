@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
-import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.shared.exception.InvalidDataException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CommPageableValidationService {
 
-    private final CommPostRepository postRepository;
+    private final CommPostJpaRepository postRepository;
 
     public void validatePageExistence(Pageable pageable) {
         long totalElements = postRepository.count();

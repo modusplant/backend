@@ -5,10 +5,10 @@ import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
-import kr.modusplant.framework.out.jpa.repository.CommPrimaryCategoryRepository;
-import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPrimaryCategoryJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommPostResponse;
 import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;
@@ -23,13 +23,13 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @RepositoryOnlyContext
 class CommPostAppInfraMapperTest implements CommPostEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils, SiteMemberEntityTestUtils {
     private final CommPostAppInfraMapper commPostAppInfraMapper = new CommPostAppInfraMapperImpl();
-    private final SiteMemberRepository siteMemberRepository;
-    private final CommPrimaryCategoryRepository commPrimaryCategoryRepository;
-    private final CommSecondaryCategoryRepository commSecondaryCategoryRepository;
-    private final CommPostRepository commPostRepository;
+    private final SiteMemberJpaRepository siteMemberRepository;
+    private final CommPrimaryCategoryJpaRepository commPrimaryCategoryRepository;
+    private final CommSecondaryCategoryJpaRepository commSecondaryCategoryRepository;
+    private final CommPostJpaRepository commPostRepository;
 
     @Autowired
-    CommPostAppInfraMapperTest(SiteMemberRepository siteMemberRepository, CommPrimaryCategoryRepository commPrimaryCategoryRepository, CommSecondaryCategoryRepository commSecondaryCategoryRepository, CommPostRepository commPostRepository){
+    CommPostAppInfraMapperTest(SiteMemberJpaRepository siteMemberRepository, CommPrimaryCategoryJpaRepository commPrimaryCategoryRepository, CommSecondaryCategoryJpaRepository commSecondaryCategoryRepository, CommPostJpaRepository commPostRepository){
         this.siteMemberRepository = siteMemberRepository;
         this.commPrimaryCategoryRepository = commPrimaryCategoryRepository;
         this.commSecondaryCategoryRepository = commSecondaryCategoryRepository;

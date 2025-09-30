@@ -1,8 +1,8 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
-import kr.modusplant.framework.out.jpa.repository.CommPostLikeRepository;
-import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostLikeJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
@@ -17,9 +17,9 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CommPostLikeValidationService {
-    private final CommPostRepository commPostRepository;
-    private final SiteMemberRepository memberRepository;
-    private final CommPostLikeRepository commPostLikeRepository;
+    private final CommPostJpaRepository commPostRepository;
+    private final SiteMemberJpaRepository memberRepository;
+    private final CommPostLikeJpaRepository commPostLikeRepository;
 
     public void validateNotFoundCommPostOrMember(String postId, UUID memberId) {
         if (!commPostRepository.existsById(postId)) {

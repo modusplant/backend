@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
-import kr.modusplant.framework.out.jpa.repository.CommPrimaryCategoryRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPrimaryCategoryJpaRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommCategoryRequestTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.response.CommCategoryResponseTestUtils;
@@ -23,11 +23,11 @@ import static org.mockito.BDDMockito.willDoNothing;
 class CommPrimaryCategoryApplicationServiceTest implements CommCategoryRequestTestUtils, CommCategoryResponseTestUtils, CommPrimaryCategoryEntityTestUtils {
 
     private final CommPrimaryCategoryApplicationService commCategoryApplicationService;
-    private final CommPrimaryCategoryRepository commCategoryRepository;
+    private final CommPrimaryCategoryJpaRepository commCategoryRepository;
     private final CommPrimaryCategoryAppInfraMapper commCategoryAppInfraMapper;
 
     @Autowired
-    CommPrimaryCategoryApplicationServiceTest(CommPrimaryCategoryApplicationService commCategoryApplicationService, CommPrimaryCategoryRepository commCategoryRepository, CommPrimaryCategoryAppInfraMapper commCategoryAppInfraMapper) {
+    CommPrimaryCategoryApplicationServiceTest(CommPrimaryCategoryApplicationService commCategoryApplicationService, CommPrimaryCategoryJpaRepository commCategoryRepository, CommPrimaryCategoryAppInfraMapper commCategoryAppInfraMapper) {
         this.commCategoryApplicationService = commCategoryApplicationService;
         this.commCategoryRepository = commCategoryRepository;
         this.commCategoryAppInfraMapper = commCategoryAppInfraMapper;

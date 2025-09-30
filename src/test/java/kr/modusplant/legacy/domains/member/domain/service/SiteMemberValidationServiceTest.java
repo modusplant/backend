@@ -2,7 +2,7 @@ package kr.modusplant.legacy.domains.member.domain.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.shared.exception.EntityExistsException;
@@ -21,10 +21,10 @@ import static org.mockito.BDDMockito.given;
 @DomainsServiceOnlyContext
 class SiteMemberValidationServiceTest implements SiteMemberEntityTestUtils {
     private final SiteMemberValidationService memberValidationService;
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberJpaRepository memberRepository;
 
     @Autowired
-    SiteMemberValidationServiceTest(SiteMemberValidationService memberValidationService, SiteMemberRepository memberRepository) {
+    SiteMemberValidationServiceTest(SiteMemberValidationService memberValidationService, SiteMemberJpaRepository memberRepository) {
         this.memberValidationService = memberValidationService;
         this.memberRepository = memberRepository;
     }

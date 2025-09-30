@@ -5,9 +5,9 @@ import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleJpaRepository;
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
@@ -46,11 +46,11 @@ class SocialAuthApplicationServiceTest implements SiteMemberEntityTestUtils, Sit
     @Mock
     private GoogleAuthClient googleAuthClient;
     @Mock
-    private SiteMemberRepository memberRepository;
+    private SiteMemberJpaRepository memberRepository;
     @Mock
-    private SiteMemberAuthRepository memberAuthRepository;
+    private SiteMemberAuthJpaRepository memberAuthRepository;
     @Mock
-    private SiteMemberRoleRepository memberRoleRepository;
+    private SiteMemberRoleJpaRepository memberRoleRepository;
     @Mock
     private SiteMemberAuthDomainInfraMapper memberAuthEntityMapper;
 

@@ -3,7 +3,7 @@ package kr.modusplant.legacy.domains.member.mapper;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberTermEntity;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberTermEntityTestUtils;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberTermInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberTermResponse;
@@ -19,11 +19,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RepositoryOnlyContext
 class SiteMemberTermAppInfraMapperTest implements SiteMemberTermRequestTestUtils, SiteMemberTermResponseTestUtils, SiteMemberTermEntityTestUtils {
 
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberJpaRepository memberRepository;
     private final SiteMemberTermAppInfraMapper memberTermMapper = new SiteMemberTermAppInfraMapperImpl();
 
     @Autowired
-    SiteMemberTermAppInfraMapperTest(SiteMemberRepository memberRepository) {
+    SiteMemberTermAppInfraMapperTest(SiteMemberJpaRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
 

@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.modules.jwt.app.service;
 
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.legacy.modules.jwt.mapper.RefreshTokenAppInfraMapper;
@@ -22,7 +22,7 @@ import java.util.UUID;
 public class RefreshTokenApplicationService {
 
     private final RefreshTokenRepository tokenRepository;
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberJpaRepository memberRepository;
     private final RefreshTokenAppInfraMapper refreshTokenAppInfraMapper;
 
     public Optional<RefreshToken> getByUuid(UUID uuid) {

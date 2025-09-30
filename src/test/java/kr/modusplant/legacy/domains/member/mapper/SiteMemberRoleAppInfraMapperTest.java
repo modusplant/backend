@@ -3,7 +3,7 @@ package kr.modusplant.legacy.domains.member.mapper;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberRoleEntityTestUtils;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberRoleInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberRoleResponse;
@@ -19,11 +19,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RepositoryOnlyContext
 class SiteMemberRoleAppInfraMapperTest implements SiteMemberRoleRequestTestUtils, SiteMemberRoleResponseTestUtils, SiteMemberRoleEntityTestUtils {
 
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberJpaRepository memberRepository;
     private final SiteMemberRoleAppInfraMapper memberRoleMapper = new SiteMemberRoleAppInfraMapperImpl();
 
     @Autowired
-    SiteMemberRoleAppInfraMapperTest(SiteMemberRepository memberRepository) {
+    SiteMemberRoleAppInfraMapperTest(SiteMemberJpaRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
 

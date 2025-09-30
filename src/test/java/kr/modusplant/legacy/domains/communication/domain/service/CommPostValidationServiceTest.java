@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
-import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryJpaRepository;
 import kr.modusplant.legacy.domains.common.error.DataPairOrderMismatchException;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostInsertRequest;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommPostRequestTestUtils;
@@ -32,10 +32,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSecondaryCategoryEntityTestUtils {
     @Mock
-    private CommPostRepository commPostRepository;
+    private CommPostJpaRepository commPostRepository;
 
     @Mock
-    private CommSecondaryCategoryRepository commCategoryRepository;
+    private CommSecondaryCategoryJpaRepository commCategoryRepository;
 
     @InjectMocks
     private CommPostValidationService commPostValidationService;

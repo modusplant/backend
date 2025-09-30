@@ -1,8 +1,8 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
-import kr.modusplant.framework.out.jpa.repository.CommPostLikeRepository;
-import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostLikeJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
@@ -20,9 +20,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CommPostLikeValidationServiceTest {
 
-    @Mock private CommPostRepository commPostRepository;
-    @Mock private SiteMemberRepository memberRepository;
-    @Mock private CommPostLikeRepository commPostLikeRepository;
+    @Mock private CommPostJpaRepository commPostRepository;
+    @Mock private SiteMemberJpaRepository memberRepository;
+    @Mock private CommPostLikeJpaRepository commPostLikeRepository;
 
     @InjectMocks
     private CommPostLikeValidationService validationService;

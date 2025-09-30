@@ -12,12 +12,12 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
-class SiteMemberRepositoryTest implements SiteMemberEntityTestUtils {
+class SiteMemberJpaRepositoryTest implements SiteMemberEntityTestUtils {
 
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberJpaRepository memberRepository;
 
     @Autowired
-    SiteMemberRepositoryTest(SiteMemberRepository memberRepository) {
+    SiteMemberJpaRepositoryTest(SiteMemberJpaRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
 

@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.modules.jwt.mapper;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.modules.jwt.common.util.domain.RefreshTokenTestUtils;
 import kr.modusplant.legacy.modules.jwt.common.util.entity.RefreshTokenEntityTestUtils;
@@ -17,12 +17,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @RepositoryOnlyContext
 class RefreshTokenAppInfraMapperTest implements RefreshTokenTestUtils, RefreshTokenEntityTestUtils {
 
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberJpaRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenAppInfraMapper refreshTokenMapper = new RefreshTokenAppInfraMapperImpl();
 
     @Autowired
-    RefreshTokenAppInfraMapperTest(SiteMemberRepository memberRepository, RefreshTokenRepository refreshTokenRepository) {
+    RefreshTokenAppInfraMapperTest(SiteMemberJpaRepository memberRepository, RefreshTokenRepository refreshTokenRepository) {
         this.memberRepository = memberRepository;
         this.refreshTokenRepository = refreshTokenRepository;
     }

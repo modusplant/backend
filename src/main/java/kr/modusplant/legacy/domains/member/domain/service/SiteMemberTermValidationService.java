@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.member.domain.service;
 
-import kr.modusplant.framework.out.jpa.repository.SiteMemberTermRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberTermJpaRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class SiteMemberTermValidationService {
-    private final SiteMemberTermRepository memberTermRepository;
+    private final SiteMemberTermJpaRepository memberTermRepository;
 
     public void validateExistedUuid(UUID uuid) {
         if (memberTermRepository.existsByUuid(uuid)) {

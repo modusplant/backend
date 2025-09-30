@@ -1,8 +1,8 @@
 package kr.modusplant.infrastructure.event.consumer;
 
 import kr.modusplant.framework.out.jpa.entity.CommPostLikeEntity;
-import kr.modusplant.framework.out.jpa.repository.CommPostLikeRepository;
-import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostLikeJpaRepository;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.PostLikeEvent;
 import kr.modusplant.shared.event.PostUnlikeEvent;
@@ -12,10 +12,10 @@ import java.util.UUID;
 
 @Component
 public class PostEventConsumer {
-    private final CommPostLikeRepository commPostLikeRepository;
-    private final CommPostRepository commPostRepository;
+    private final CommPostLikeJpaRepository commPostLikeRepository;
+    private final CommPostJpaRepository commPostRepository;
 
-    public PostEventConsumer(EventBus eventBus, CommPostLikeRepository commPostLikeRepository, CommPostRepository commPostRepository) {
+    public PostEventConsumer(EventBus eventBus, CommPostLikeJpaRepository commPostLikeRepository, CommPostJpaRepository commPostRepository) {
         eventBus.subscribe(event -> {
             if (event instanceof PostLikeEvent postLikeEvent) {
                 putCommPostLike(postLikeEvent.getMemberId(), postLikeEvent.getPostId());

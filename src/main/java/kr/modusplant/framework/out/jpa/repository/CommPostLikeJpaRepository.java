@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface CommPostLikeRepository extends JpaRepository<CommPostLikeEntity, CommPostLikeId> {
+public interface CommPostLikeJpaRepository extends JpaRepository<CommPostLikeEntity, CommPostLikeId> {
 
     List<CommPostLikeEntity> findByMemberId(UUID memberId);
 

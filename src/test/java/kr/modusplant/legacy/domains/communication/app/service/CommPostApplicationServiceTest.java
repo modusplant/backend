@@ -7,10 +7,10 @@ import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
-import kr.modusplant.framework.out.jpa.repository.CommPrimaryCategoryRepository;
-import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPrimaryCategoryJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.persistence.generator.UlidIdGenerator;
 import kr.modusplant.legacy.domains.common.app.service.MultipartDataProcessor;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostInsertRequest;
@@ -62,13 +62,13 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
     @Mock
     private SiteMemberValidationService siteMemberValidationService;
     @Mock
-    private SiteMemberRepository siteMemberRepository;
+    private SiteMemberJpaRepository siteMemberRepository;
     @Mock
-    private CommPrimaryCategoryRepository commPrimaryCategoryRepository;
+    private CommPrimaryCategoryJpaRepository commPrimaryCategoryRepository;
     @Mock
-    private CommSecondaryCategoryRepository commSecondaryCategoryRepository;
+    private CommSecondaryCategoryJpaRepository commSecondaryCategoryRepository;
     @Mock
-    private CommPostRepository commPostRepository;
+    private CommPostJpaRepository commPostRepository;
     @Mock
     private MultipartDataProcessor multipartDataProcessor;
     @Mock

@@ -2,7 +2,7 @@ package kr.modusplant.legacy.domains.member.mapper;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberTermEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberTermInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberTermResponse;
 import org.mapstruct.Context;
@@ -17,13 +17,13 @@ public interface SiteMemberTermAppInfraMapper {
 
     @Mapping(target = "memberTermEntity", ignore = true)
     @Mapping(source = "uuid", target = "member", qualifiedByName = "toMember")
-    SiteMemberTermEntity toMemberTermEntity(SiteMemberTermInsertRequest memberTermInsertRequest, @Context SiteMemberRepository memberRepository);
+    SiteMemberTermEntity toMemberTermEntity(SiteMemberTermInsertRequest memberTermInsertRequest, @Context SiteMemberJpaRepository memberRepository);
 
     @Mapping(source = "member", target = "uuid", qualifiedByName = "toUuid")
     SiteMemberTermResponse toMemberTermResponse(SiteMemberTermEntity memberTermEntity);
 
     @Named("toMember")
-    default SiteMemberEntity toMember(UUID uuid, @Context SiteMemberRepository memberRepository) {
+    default SiteMemberEntity toMember(UUID uuid, @Context SiteMemberJpaRepository memberRepository) {
         return memberRepository.findByUuid(uuid).orElseThrow();
     }
 

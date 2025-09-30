@@ -2,8 +2,8 @@ package kr.modusplant.legacy.domains.communication.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.CommPostLikeEntity;
-import kr.modusplant.framework.out.jpa.repository.CommPostLikeRepository;
-import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostLikeJpaRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommPostLikeResponse;
 import kr.modusplant.legacy.domains.communication.domain.service.CommPostLikeValidationService;
@@ -18,8 +18,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class CommPostLikeApplicationService {
-    private final CommPostRepository commPostRepository;
-    private final CommPostLikeRepository commPostLikeRepository;
+    private final CommPostJpaRepository commPostRepository;
+    private final CommPostLikeJpaRepository commPostLikeRepository;
     private final CommPostLikeValidationService commPostLikeValidationService;
 
     @Transactional

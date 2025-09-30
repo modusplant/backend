@@ -5,9 +5,9 @@ import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
-import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommCommentResponse;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommCommentInsertRequestTestUtils;
@@ -28,13 +28,13 @@ public class CommCommentAppInfraMapperTest implements
         CommSecondaryCategoryEntityTestUtils, CommPostEntityTestUtils, SiteMemberEntityTestUtils {
 
     private final CommCommentAppInfraMapper commentAppInfraMapper = new CommCommentAppInfraMapperImpl();
-    private final CommSecondaryCategoryRepository categoryRepository;
-    private final CommPostRepository postRepository;
-    private final SiteMemberRepository memberRepository;
+    private final CommSecondaryCategoryJpaRepository categoryRepository;
+    private final CommPostJpaRepository postRepository;
+    private final SiteMemberJpaRepository memberRepository;
 
     @Autowired
-    public CommCommentAppInfraMapperTest(CommSecondaryCategoryRepository categoryRepository,
-                                         CommPostRepository postRepository, SiteMemberRepository memberRepository) {
+    public CommCommentAppInfraMapperTest(CommSecondaryCategoryJpaRepository categoryRepository,
+                                         CommPostJpaRepository postRepository, SiteMemberJpaRepository memberRepository) {
         this.categoryRepository = categoryRepository;
         this.postRepository = postRepository;
         this.memberRepository = memberRepository;
