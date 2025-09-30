@@ -3,7 +3,6 @@ package kr.modusplant.legacy.domains.communication.app.service;
 import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.CommPostLikeEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.compositekey.CommPostLikeId;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.out.jpa.repository.CommPostLikeJpaRepository;
@@ -17,6 +16,7 @@ import kr.modusplant.legacy.domains.communication.domain.service.CommPostLikeVal
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.persistence.compositekey.CommPostLikeId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

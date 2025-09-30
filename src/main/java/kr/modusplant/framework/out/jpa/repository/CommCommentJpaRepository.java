@@ -3,7 +3,7 @@ package kr.modusplant.framework.out.jpa.repository;
 import kr.modusplant.framework.out.jpa.entity.CommCommentEntity;
 import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.compositekey.CommCommentId;
+import kr.modusplant.shared.persistence.compositekey.CommCommentId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
