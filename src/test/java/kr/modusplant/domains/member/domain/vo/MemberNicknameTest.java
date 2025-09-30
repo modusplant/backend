@@ -28,6 +28,13 @@ class MemberNicknameTest implements MemberNicknameTestUtils {
     }
 
     @Test
+    @DisplayName("빈 문자열로 create을 호출하여 오류 발생")
+    void testCreate_givenEmptyString_willThrowException() {
+        EmptyMemberNicknameException exception = assertThrows(EmptyMemberNicknameException.class, () -> MemberNickname.create("   "));
+        assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_NICKNAME);
+    }
+
+    @Test
     @DisplayName("정규 표현식에 매칭되지 않는 값으로 create을 호출하여 오류 발생")
     void testCreate_givenInvalidNickname_willThrowException() {
         InvalidDataException exception = assertThrows(InvalidDataException.class, () -> MemberNickname.create("!유효하지않음!"));
