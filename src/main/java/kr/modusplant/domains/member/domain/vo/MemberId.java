@@ -26,7 +26,7 @@ public class MemberId {
     }
 
     public static MemberId fromString(String value) {
-        if (value == null) {
+        if (value == null || value.trim().isEmpty()) {
             throw new EmptyMemberIdException();
         }
         return new MemberId(UUID.fromString(value));

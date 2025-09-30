@@ -45,6 +45,13 @@ class MemberIdTest implements MemberTestUtils {
     }
 
     @Test
+    @DisplayName("빈 문자열로 fromString을 호출하여 오류 발생")
+    void testFromString_givenEmptyString_willThrowException() {
+        EmptyMemberIdException exception = assertThrows(EmptyMemberIdException.class, () -> MemberId.fromString("   "));
+        assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_ID);
+    }
+
+    @Test
     @DisplayName("같은 객체에 대한 equals 호출")
     void useEqual_givenSameObject_willReturnTrue() {
         //noinspection EqualsWithItself
