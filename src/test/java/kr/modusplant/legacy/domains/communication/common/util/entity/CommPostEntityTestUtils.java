@@ -4,7 +4,7 @@ import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.CommPostEntity.CommPostEntityBuilder;
 import kr.modusplant.framework.out.jpa.entity.util.SiteMemberEntityTestUtils;
 
-import static kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils.*;
+import static kr.modusplant.framework.out.jpa.entity.constant.CommPostConstant.*;
 
 public interface CommPostEntityTestUtils extends SiteMemberEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils {
     default CommPostEntityBuilder createCommPostEntityBuilder() {

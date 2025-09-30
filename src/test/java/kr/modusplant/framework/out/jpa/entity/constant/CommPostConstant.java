@@ -1,4 +1,4 @@
-package kr.modusplant.legacy.domains.communication.common.util.domain;
+package kr.modusplant.framework.out.jpa.entity.constant;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,12 +9,12 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.UUID;
 
+import static kr.modusplant.framework.out.jpa.entity.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_UUID;
+import static kr.modusplant.framework.out.jpa.entity.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_UUID;
 import static kr.modusplant.framework.out.jpa.entity.constant.SiteMemberEntityConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.legacy.domains.communication.common.util.domain.CommPrimaryCategoryTestUtils.TEST_COMM_PRIMARY_CATEGORY_UUID;
-import static kr.modusplant.legacy.domains.communication.common.util.domain.CommSecondaryCategoryTestUtils.TEST_COMM_SECONDARY_CATEGORY_UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class CommPostTestUtils {
+public final class CommPostConstant {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static final String TEST_COMM_POST_ULID = "01K6DH4YCJMS3NJ4JCY8TPXP4T";

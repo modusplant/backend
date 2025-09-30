@@ -2,10 +2,10 @@ package kr.modusplant.legacy.domains.communication.common.util.app.http.request;
 
 import kr.modusplant.legacy.domains.communication.app.http.request.CommCategoryInsertRequest;
 
-import static kr.modusplant.legacy.domains.communication.common.util.domain.CommPrimaryCategoryTestUtils.TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
-import static kr.modusplant.legacy.domains.communication.common.util.domain.CommPrimaryCategoryTestUtils.TEST_COMM_PRIMARY_CATEGORY_ORDER;
-import static kr.modusplant.legacy.domains.communication.common.util.domain.CommSecondaryCategoryTestUtils.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
-import static kr.modusplant.legacy.domains.communication.common.util.domain.CommSecondaryCategoryTestUtils.TEST_COMM_SECONDARY_CATEGORY_ORDER;
+import static kr.modusplant.framework.out.jpa.entity.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
+import static kr.modusplant.framework.out.jpa.entity.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ORDER;
+import static kr.modusplant.framework.out.jpa.entity.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
+import static kr.modusplant.framework.out.jpa.entity.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ORDER;
 
 public interface CommCategoryRequestTestUtils {
     CommCategoryInsertRequest TEST_COMM_PRIMARY_CATEGORY_INSERT_REQUEST = new CommCategoryInsertRequest(TEST_COMM_PRIMARY_CATEGORY_CATEGORY, TEST_COMM_PRIMARY_CATEGORY_ORDER);

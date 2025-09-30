@@ -2,12 +2,12 @@ package kr.modusplant.legacy.domains.communication.app.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.modusplant.framework.out.jpa.entity.constant.CommSecondaryCategoryConstant;
 import kr.modusplant.legacy.domains.common.context.DomainsControllerOnlyContext;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommCategoryResponse;
 import kr.modusplant.legacy.domains.communication.app.service.CommSecondaryCategoryApplicationService;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommCategoryRequestTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.response.CommCategoryResponseTestUtils;
-import kr.modusplant.legacy.domains.communication.common.util.domain.CommSecondaryCategoryTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +67,7 @@ class CommSecondaryCategoryControllerTest implements CommCategoryRequestTestUtil
     void getCommCategoryByUuidTest() throws Exception {
         // given
         ObjectMapper objectMapper = new ObjectMapper();
-        UUID uuid = CommSecondaryCategoryTestUtils.TEST_COMM_SECONDARY_CATEGORY_UUID;
+        UUID uuid = CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_UUID;
 
         when(commCategoryApplicationService.getByUuid(uuid)).thenReturn(Optional.of(TEST_COMM_SECONDARY_CATEGORY_RESPONSE));
 
@@ -90,7 +90,7 @@ class CommSecondaryCategoryControllerTest implements CommCategoryRequestTestUtil
     void getCommCategoryByOrderTest() throws Exception {
         // given
         ObjectMapper objectMapper = new ObjectMapper();
-        Integer order = CommSecondaryCategoryTestUtils.TEST_COMM_SECONDARY_CATEGORY_ORDER;
+        Integer order = CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ORDER;
 
         when(commCategoryApplicationService.getByOrder(order)).thenReturn(Optional.of(TEST_COMM_SECONDARY_CATEGORY_RESPONSE));
 
@@ -113,7 +113,7 @@ class CommSecondaryCategoryControllerTest implements CommCategoryRequestTestUtil
     void getCommCategoryByNameTest() throws Exception {
         // given
         ObjectMapper objectMapper = new ObjectMapper();
-        String category = CommSecondaryCategoryTestUtils.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
+        String category = CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
 
         when(commCategoryApplicationService.getByCategory(category)).thenReturn(Optional.of(TEST_COMM_SECONDARY_CATEGORY_RESPONSE));
 
@@ -136,8 +136,8 @@ class CommSecondaryCategoryControllerTest implements CommCategoryRequestTestUtil
     void getEmptyCommCategoryTest() throws Exception {
         // given
         ObjectMapper objectMapper = new ObjectMapper();
-        Integer order = CommSecondaryCategoryTestUtils.TEST_COMM_SECONDARY_CATEGORY_ORDER;
-        String category = CommSecondaryCategoryTestUtils.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
+        Integer order = CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ORDER;
+        String category = CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
 
         when(commCategoryApplicationService.getByOrder(order)).thenReturn(Optional.empty());
         when(commCategoryApplicationService.getByCategory(category)).thenReturn(Optional.empty());
@@ -196,7 +196,7 @@ class CommSecondaryCategoryControllerTest implements CommCategoryRequestTestUtil
     @Test
     void removeCommCategoryByOrderTest() throws Exception {
         // given
-        UUID order = CommSecondaryCategoryTestUtils.TEST_COMM_SECONDARY_CATEGORY_UUID;
+        UUID order = CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_UUID;
 
         doNothing().when(commCategoryApplicationService).removeByUuid(order);
 
