@@ -1,13 +1,13 @@
 package kr.modusplant.domains.member.common.utils.framework.out.persistence.jpa.entity;
 
 import kr.modusplant.domains.member.common.utils.domain.aggregate.MemberTestUtils;
-import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 
 import java.time.LocalDateTime;
 
 public interface MemberEntityTestUtils extends MemberTestUtils {
-    default MemberEntity createMemberEntity() {
-        return MemberEntity.builder()
+    default SiteMemberEntity createMemberEntity() {
+        return SiteMemberEntity.builder()
                 .nickname(testMemberNickname.getValue())
                 .birthDate(testMemberBirthDate.getValue())
                 .isActive(testMemberActiveStatus.isActive())
@@ -18,8 +18,8 @@ public interface MemberEntityTestUtils extends MemberTestUtils {
                 .build();
     }
 
-    default MemberEntity createMemberEntityWithUuid() {
-        return MemberEntity.builder()
+    default SiteMemberEntity createMemberEntityWithUuid() {
+        return SiteMemberEntity.builder()
                 .uuid(testMemberId.getValue())
                 .nickname(testMemberNickname.getValue())
                 .birthDate(testMemberBirthDate.getValue())

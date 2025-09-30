@@ -1,6 +1,7 @@
 package kr.modusplant.domains.member.framework.out.jpa.entity;
 
 import kr.modusplant.domains.member.common.utils.framework.out.persistence.jpa.entity.MemberEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ class MemberEntityTest implements MemberEntityTestUtils {
     @Test
     void testPrePersist_givenNull_willInitializeFields() {
         // given
-        MemberEntity member = MemberEntity.builder().memberEntity(createMemberEntity()).isActive(null).isDisabledByLinking(null).isBanned(null).isDeleted(null).build();
+        SiteMemberEntity member = SiteMemberEntity.builder().memberEntity(createMemberEntity()).isActive(null).isDisabledByLinking(null).isBanned(null).isDeleted(null).build();
 
         // when
         entityManager.persist(member);
@@ -44,7 +45,7 @@ class MemberEntityTest implements MemberEntityTestUtils {
     @Test
     void testPrePersist_givenNotNull_willInitializeFields() {
         // given
-        MemberEntity member = MemberEntity.builder().memberEntity(createMemberEntity()).isActive(false).isDisabledByLinking(true).isBanned(false).isDeleted(false).build();
+        SiteMemberEntity member = SiteMemberEntity.builder().memberEntity(createMemberEntity()).isActive(false).isDisabledByLinking(true).isBanned(false).isDeleted(false).build();
 
         // when
         entityManager.persist(member);
@@ -61,11 +62,11 @@ class MemberEntityTest implements MemberEntityTestUtils {
     @Test
     void testPreUpdate_givenNull_willInitializeFields() {
         // given
-        MemberEntity member = MemberEntity.builder().memberEntity(createMemberEntity()).build();
+        SiteMemberEntity member = SiteMemberEntity.builder().memberEntity(createMemberEntity()).build();
         entityManager.persist(member);
 
         // when
-        entityManager.merge(MemberEntity.builder().memberEntity(member).isActive(null).isDisabledByLinking(null).isBanned(null).isDeleted(null).build());
+        entityManager.merge(SiteMemberEntity.builder().memberEntity(member).isActive(null).isDisabledByLinking(null).isBanned(null).isDeleted(null).build());
         entityManager.flush();
 
         // then
@@ -79,11 +80,11 @@ class MemberEntityTest implements MemberEntityTestUtils {
     @Test
     void testPreUpdate_givenNotNull_willInitializeFields() {
         // given
-        MemberEntity member = MemberEntity.builder().memberEntity(createMemberEntity()).isActive(null).isDisabledByLinking(null).isBanned(null).isDeleted(null).build();
+        SiteMemberEntity member = SiteMemberEntity.builder().memberEntity(createMemberEntity()).isActive(null).isDisabledByLinking(null).isBanned(null).isDeleted(null).build();
         entityManager.persist(member);
 
         // when
-        entityManager.merge(MemberEntity.builder().memberEntity(member).build());
+        entityManager.merge(SiteMemberEntity.builder().memberEntity(member).build());
         entityManager.flush();
 
         // then
@@ -97,7 +98,7 @@ class MemberEntityTest implements MemberEntityTestUtils {
     @DisplayName("같은 객체에 대한 equals 호출")
     void useEqual_givenSameObject_willReturnTrue() {
         // given
-        MemberEntity memberEntity = createMemberEntityWithUuid();
+        SiteMemberEntity memberEntity = createMemberEntityWithUuid();
 
         // when & then
         //noinspection EqualsWithItself
@@ -114,6 +115,6 @@ class MemberEntityTest implements MemberEntityTestUtils {
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
     void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
-        assertNotEquals(createMemberEntityWithUuid(), MemberEntity.builder().memberEntity(createMemberEntity()).uuid(UUID.randomUUID()).build());
+        assertNotEquals(createMemberEntityWithUuid(), SiteMemberEntity.builder().memberEntity(createMemberEntity()).uuid(UUID.randomUUID()).build());
     }
 }
