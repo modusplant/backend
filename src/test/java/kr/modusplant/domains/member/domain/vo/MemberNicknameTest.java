@@ -8,7 +8,7 @@ import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_MEMBER_NICKNAME;
+import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_MEMBER_NICKNAME_STRING;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,7 +17,7 @@ class MemberNicknameTest implements MemberNicknameTestUtils {
     @Test
     @DisplayName("create으로 회원 닉네임 반환")
     void testCreate_givenValidValue_willReturnMemberNickname() {
-        assertThat(MemberNickname.create(TEST_MEMBER_NICKNAME)).isEqualTo(MemberNickname.create(TEST_MEMBER_NICKNAME));
+        assertThat(MemberNickname.create(TEST_MEMBER_NICKNAME_STRING)).isEqualTo(MemberNickname.create(TEST_MEMBER_NICKNAME_STRING));
     }
 
     @Test
@@ -39,6 +39,7 @@ class MemberNicknameTest implements MemberNicknameTestUtils {
     void testCreate_givenInvalidNickname_willThrowException() {
         InvalidDataException exception = assertThrows(InvalidDataException.class, () -> MemberNickname.create("!유효하지않음!"));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_INPUT);
+        assertThat(exception.getDataName()).isEqualTo("memberNickname");
     }
 
     @Test
@@ -58,6 +59,6 @@ class MemberNicknameTest implements MemberNicknameTestUtils {
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
     void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
-        assertNotEquals(testMemberNickname, MemberNickname.create(TEST_MEMBER_NICKNAME + "1"));
+        assertNotEquals(testMemberNickname, MemberNickname.create(TEST_MEMBER_NICKNAME_STRING + "1"));
     }
 }
