@@ -9,5 +9,5 @@ import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberCo
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MemberUuidConstant {
-    public static final UUID TEST_MEMBER_UUID = MEMBER_BASIC_USER_UUID;
+    public static final UUID TEST_MEMBER_ID_UUID = MEMBER_BASIC_USER_UUID;
 }

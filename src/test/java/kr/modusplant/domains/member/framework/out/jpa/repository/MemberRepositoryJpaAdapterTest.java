@@ -51,4 +51,44 @@ class MemberRepositoryJpaAdapterTest implements MemberEntityTestUtils {
         // when & then
         assertThat(memberRepositoryJpaAdapter.save(member)).isEqualTo(member);
     }
+
+    @Test
+    @DisplayName("isIdExist로 true 반환")
+    void testIsIdExist_givenIdThatExists_willReturnTrue() {
+        // given & when
+        given(memberJpaRepository.existsByUuid(testMemberId.getValue())).willReturn(true);
+
+        // when & then
+        assertThat(memberRepositoryJpaAdapter.isIdExist(testMemberId)).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("isIdExist로 false 반환")
+    void testIsIdExist_givenIdThatIsNotExist_willReturnFalse() {
+        // given & when
+        given(memberJpaRepository.existsByUuid(testMemberId.getValue())).willReturn(false);
+
+        // when & then
+        assertThat(memberRepositoryJpaAdapter.isIdExist(testMemberId)).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("isNicknameExist로 true 반환")
+    void testIsNicknameExist_givenNicknameThatExists_willReturnTrue() {
+        // given & when
+        given(memberJpaRepository.existsByNickname(testMemberNickname.getValue())).willReturn(true);
+
+        // when & then
+        assertThat(memberRepositoryJpaAdapter.isNicknameExist(testMemberNickname)).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("isNicknameExist로 false 반환")
+    void testIsNicknameExist_givenNicknameThatIsNotExist_willReturnFalse() {
+        // given & when
+        given(memberJpaRepository.existsByNickname(testMemberNickname.getValue())).willReturn(false);
+
+        // when & then
+        assertThat(memberRepositoryJpaAdapter.isNicknameExist(testMemberNickname)).isEqualTo(false);
+    }
 }
