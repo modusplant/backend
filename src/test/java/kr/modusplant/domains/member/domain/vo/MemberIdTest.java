@@ -3,6 +3,8 @@ package kr.modusplant.domains.member.domain.vo;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberIdException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
+import kr.modusplant.shared.exception.InvalidDataException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -49,6 +51,14 @@ class MemberIdTest implements MemberTestUtils {
     void testFromString_givenEmptyString_willThrowException() {
         EmptyMemberIdException exception = assertThrows(EmptyMemberIdException.class, () -> MemberId.fromString("   "));
         assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_ID);
+    }
+
+    @Test
+    @DisplayName("정규 표현식에 매칭되지 않는 값으로 fromString을 호출하여 오류 발생")
+    void testFromString_givenInvalidId_willThrowException() {
+        InvalidDataException exception = assertThrows(InvalidDataException.class, () -> MemberId.fromString("!유효하지않음!"));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_INPUT);
+        assertThat(exception.getDataName()).isEqualTo("memberId");
     }
 
     @Test

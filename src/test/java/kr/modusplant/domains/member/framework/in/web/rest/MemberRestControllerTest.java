@@ -12,8 +12,8 @@ import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_MEMBER_NICKNAME;
-import static kr.modusplant.domains.member.common.constant.MemberUuidConstant.TEST_MEMBER_UUID;
+import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_MEMBER_NICKNAME_STRING;
+import static kr.modusplant.domains.member.common.constant.MemberUuidConstant.TEST_MEMBER_ID_UUID;
 import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -34,7 +34,7 @@ class MemberRestControllerTest implements MemberTestUtils, MemberResponseTestUti
         given(memberController.register(testMemberNickname)).willReturn(testMemberResponse);
 
         // when
-        ResponseEntity<DataResponse<MemberResponse>> memberResponseEntity = memberRestController.registerMember(TEST_MEMBER_NICKNAME);
+        ResponseEntity<DataResponse<MemberResponse>> memberResponseEntity = memberRestController.registerMember(TEST_MEMBER_NICKNAME_STRING);
 
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -48,7 +48,7 @@ class MemberRestControllerTest implements MemberTestUtils, MemberResponseTestUti
         given(memberController.updateNickname(testMemberId, testMemberNickname)).willReturn(testMemberResponse);
 
         // when
-        ResponseEntity<DataResponse<MemberResponse>> memberResponseEntity = memberRestController.updateMemberNickname(TEST_MEMBER_UUID, TEST_MEMBER_NICKNAME);
+        ResponseEntity<DataResponse<MemberResponse>> memberResponseEntity = memberRestController.updateMemberNickname(TEST_MEMBER_ID_UUID, TEST_MEMBER_NICKNAME_STRING);
 
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);

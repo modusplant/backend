@@ -9,5 +9,5 @@ import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberCo
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MemberLocalDateConstant {
-    public static final LocalDate TEST_MEMBER_BIRTHDATE = MEMBER_BASIC_USER_BIRTH_DATE;
+    public static final LocalDate TEST_MEMBER_BIRTHDATE_LOCAL_DATE = MEMBER_BASIC_USER_BIRTH_DATE;
 }
