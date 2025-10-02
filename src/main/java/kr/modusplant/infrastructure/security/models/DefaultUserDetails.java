@@ -1,14 +1,10 @@
 package kr.modusplant.infrastructure.security.models;
 
-import kr.modusplant.legacy.domains.member.domain.model.SiteMember;
-import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
-import kr.modusplant.legacy.domains.member.domain.model.SiteMemberRole;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
@@ -68,6 +64,8 @@ public class DefaultUserDetails implements UserDetails {
 
     public boolean isDeleted() { return isDeleted; }
 
+    public static DefaultUserDetailsBuilder builder() { return new DefaultUserDetailsBuilder(); }
+
     public static class DefaultUserDetailsBuilder {
         private String email;
         private String password;
@@ -80,18 +78,53 @@ public class DefaultUserDetails implements UserDetails {
         private boolean isDeleted;
         private List<GrantedAuthority> authorities;
 
-        public DefaultUserDetailsBuilder member(
-                SiteMember member, SiteMemberAuth memberAuth, SiteMemberRole memberRole) {
-            this.email = memberAuth.getEmail();
-            this.password = memberAuth.getPw();
-            this.activeUuid = memberAuth.getActiveMemberUuid();
-            this.nickname = member.getNickname();
-            this.provider = memberAuth.getProvider();
-            this.isActive = member.getIsActive();
-            this.isDisabledByLinking = member.getIsDisabledByLinking();
-            this.isBanned = member.getIsBanned();
-            this.isDeleted = member.getIsDeleted();
-            this.authorities = List.of(new SimpleGrantedAuthority(memberRole.getRole().getValue()));
+        public DefaultUserDetailsBuilder email(String email) {
+            this.email = email;
+            return this;
+        }
+
+        public DefaultUserDetailsBuilder password(String password) {
+            this.password = password;
+            return this;
+        }
+
+        public DefaultUserDetailsBuilder activeUuid(UUID activeUuid) {
+            this.activeUuid = activeUuid;
+            return this;
+        }
+
+        public DefaultUserDetailsBuilder nickname(String nickname) {
+            this.nickname = nickname;
+            return this;
+        }
+
+        public DefaultUserDetailsBuilder provider(AuthProvider provider) {
+            this.provider = provider;
+            return this;
+        }
+
+        public DefaultUserDetailsBuilder isActive(boolean isActive) {
+            this.isActive = isActive;
+            return this;
+        }
+
+        public DefaultUserDetailsBuilder isDisabledByLinking(boolean isDisabledByLinking) {
+            this.isDisabledByLinking = isDisabledByLinking;
+            return this;
+        }
+
+        public DefaultUserDetailsBuilder isBanned(boolean isBanned) {
+            this.isBanned = isBanned;
+            return this;
+        }
+
+        public DefaultUserDetailsBuilder email(boolean isDeleted) {
+            this.isDeleted = isDeleted;
+            return this;
+        }
+
+        public DefaultUserDetailsBuilder email(List<GrantedAuthority> authorities) {
+            this.authorities = authorities;
             return this;
         }
 
