@@ -23,8 +23,7 @@ public class MemberStatus {
     public static MemberStatus fromBoolean(Boolean isActive) {
         if (isActive == null) {
             throw new EmptyMemberStatusException();
-        }
-        if (isActive.equals(true)) {
+        } else if (isActive.equals(true)) {
             return MemberStatus.active();
         } else {
             return MemberStatus.inactive();
