@@ -27,8 +27,8 @@ import org.mockito.Mock;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.*;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_GOOGLE_USER_NICKNAME;
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberAuthConstant.*;
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_GOOGLE_USER_NICKNAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;

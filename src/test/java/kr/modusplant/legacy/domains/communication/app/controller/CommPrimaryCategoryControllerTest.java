@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static kr.modusplant.legacy.domains.common.constant.FileSystem.DATA;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.*;
+import static kr.modusplant.shared.persistence.common.constant.CommPrimaryCategoryConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;

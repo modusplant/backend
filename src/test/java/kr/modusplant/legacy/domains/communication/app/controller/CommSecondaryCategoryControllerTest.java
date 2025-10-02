@@ -7,7 +7,7 @@ import kr.modusplant.legacy.domains.communication.app.http.response.CommCategory
 import kr.modusplant.legacy.domains.communication.app.service.CommSecondaryCategoryApplicationService;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommCategoryRequestTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.response.CommCategoryResponseTestUtils;
-import kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant;
+import kr.modusplant.shared.persistence.common.constant.CommSecondaryCategoryConstant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

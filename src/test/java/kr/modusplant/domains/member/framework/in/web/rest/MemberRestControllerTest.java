@@ -14,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 
 import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_MEMBER_NICKNAME_STRING;
 import static kr.modusplant.domains.member.common.constant.MemberUuidConstant.TEST_MEMBER_ID_UUID;
+import static kr.modusplant.domains.member.common.util.domain.vo.TargetCommentIdTestUtils.testTargetCommentId;
+import static kr.modusplant.domains.member.common.util.domain.vo.TargetCommentPathTestUtils.testTargetCommentPath;
+import static kr.modusplant.domains.member.common.util.domain.vo.TargetPostIdTestUtils.testTargetPostId;
 import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -24,8 +27,6 @@ class MemberRestControllerTest implements MemberTestUtils, MemberResponseTestUti
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
     private final MemberController memberController = Mockito.mock(MemberController.class);
     private final MemberRestController memberRestController = new MemberRestController(memberController);
-
-    private final String testPostId = "01K41TWHC1WNYAB9YKC8Q29GGM";
 
     @Test
     @DisplayName("registerMember로 응답 반환")
@@ -59,10 +60,10 @@ class MemberRestControllerTest implements MemberTestUtils, MemberResponseTestUti
     @DisplayName("likeCommunicationPost로 응답 반환")
     void testLikeCommunicationPost_givenValidRequest_willReturnResponse() {
         // given
-        willDoNothing().given(memberController).likePost(testMemberId.getValue(), testPostId);
+        willDoNothing().given(memberController).likePost(testMemberId, testTargetPostId);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.likeCommunicationPost(testMemberId.getValue(), testPostId);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.likeCommunicationPost(testMemberId.getValue(), testTargetPostId.getValue());
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -73,10 +74,38 @@ class MemberRestControllerTest implements MemberTestUtils, MemberResponseTestUti
     @DisplayName("unlikeCommunicationPost로 응답 반환")
     void testUnlikeCommunicationPost_givenValidRequest_willReturnResponse() {
         // given
-        willDoNothing().given(memberController).unlikePost(testMemberId.getValue(), testPostId);
+        willDoNothing().given(memberController).unlikePost(testMemberId, testTargetPostId);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.unlikeCommunicationPost(testMemberId.getValue(), testPostId);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.unlikeCommunicationPost(testMemberId.getValue(), testTargetPostId.getValue());
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok().toString());
+    }
+
+    @Test
+    @DisplayName("likeCommunicationComment로 응답 반환")
+    void testLikeCommunicationComment_givenValidRequest_willReturnResponse() {
+        // given
+        willDoNothing().given(memberController).likeComment(testMemberId, testTargetCommentId);
+
+        // when
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.likeCommunicationComment(testMemberId.getValue(), testTargetPostId.getValue(), testTargetCommentPath.getValue());
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok().toString());
+    }
+
+    @Test
+    @DisplayName("unlikeCommunicationComment로 응답 반환")
+    void testUnlikeCommunicationComment_givenValidRequest_willReturnResponse() {
+        // given
+        willDoNothing().given(memberController).unlikeComment(testMemberId, testTargetCommentId);
+
+        // when
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.unlikeCommunicationComment(testMemberId.getValue(), testTargetPostId.getValue(), testTargetCommentPath.getValue());
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);

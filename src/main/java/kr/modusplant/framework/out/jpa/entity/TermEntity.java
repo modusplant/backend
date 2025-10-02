@@ -80,13 +80,6 @@ public class TermEntity {
         }
     }
 
-    @PreUpdate
-    public void preUpdate() {
-        if (this.version == null) {
-            this.version = createVersion(1, 0, 0);
-        }
-    }
-
     private TermEntity(UUID uuid, String name, String content, String version) {
         this.uuid = uuid;
         this.name = name;

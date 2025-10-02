@@ -41,6 +41,10 @@ public class CommentEntity {
     @JoinColumn(name = CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity createMember;
 
+    @Column(name = "like_count", nullable = false)
+    @DefaultValue
+    private Integer likeCount;
+
     @Column(name = CONTENT, nullable = false, length = 900)
     private String content;
 
@@ -71,6 +75,9 @@ public class CommentEntity {
 
     @PrePersist
     public void prePersist() {
+        if (this.likeCount == null) {
+            this.likeCount = 0;
+        }
         if (this.isDeleted == null) {
             this.isDeleted = false;
         }
@@ -79,12 +86,13 @@ public class CommentEntity {
     private CommentEntity(
             CommPostEntity postEntity, String path,
             SiteMemberEntity authMember, SiteMemberEntity createMember,
-            String content, Boolean isDeleted
+            Integer likeCount, String content, Boolean isDeleted
     ) {
         this.postEntity = postEntity;
         this.id = CommentCompositeKey.builder().postUlid(postEntity.getUlid()).path(path).build();
         this.authMember = authMember;
         this.createMember = createMember;
+        this.likeCount = likeCount;
         this.content = content;
         this.isDeleted = isDeleted;
     }
@@ -98,6 +106,7 @@ public class CommentEntity {
         private CommentCompositeKey id;
         private SiteMemberEntity authMember;
         private SiteMemberEntity createMember;
+        private Integer likeCount;
         private String content;
         private Boolean isDeleted;
 
@@ -118,6 +127,11 @@ public class CommentEntity {
 
         public CommentEntity.CommentEntityBuilder createMember(final SiteMemberEntity createMember) {
             this.createMember = createMember;
+            return this;
+        }
+
+        public CommentEntity.CommentEntityBuilder likeCount(final Integer likeCount) {
+            this.likeCount = likeCount;
             return this;
         }
 
@@ -142,7 +156,7 @@ public class CommentEntity {
         }
 
         public CommentEntity build() {
-            return new CommentEntity(this.postEntity, this.id.getPath(), this.authMember, this.createMember, this.content, this.isDeleted
+            return new CommentEntity(this.postEntity, this.id.getPath(), this.authMember, this.createMember, this.likeCount, this.content, this.isDeleted
             );
         }
     }

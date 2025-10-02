@@ -1,4 +1,4 @@
-package kr.modusplant.shared.persistence.common.util.constant;
+package kr.modusplant.shared.persistence.common.constant;
 
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import lombok.AccessLevel;

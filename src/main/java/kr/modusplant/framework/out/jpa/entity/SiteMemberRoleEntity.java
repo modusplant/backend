@@ -57,13 +57,6 @@ public class SiteMemberRoleEntity {
         }
     }
 
-    @PreUpdate
-    public void preUpdate() {
-        if (this.role == null) {
-            this.role = USER;
-        }
-    }
-
     private SiteMemberRoleEntity(SiteMemberEntity member, Role role) {
         this.member = member;
         this.role = role;

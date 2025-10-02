@@ -19,8 +19,7 @@ public class TargetCommentPath {
     public static TargetCommentPath create(String value) {
         if (value == null || value.trim().isEmpty()) {
             throw new EmptyTargetCommentPathException();
-        }
-        if (!PATTERN_MATERIALIZED_PATH.matcher(value).matches()) {
+        } else if (!PATTERN_MATERIALIZED_PATH.matcher(value).matches()) {
             throw new InvalidDataException(ErrorCode.INVALID_INPUT, "targetCommentPath");
         }
         return new TargetCommentPath(value);

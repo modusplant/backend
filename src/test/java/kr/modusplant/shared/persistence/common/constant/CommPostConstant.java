@@ -1,4 +1,4 @@
-package kr.modusplant.shared.persistence.common.util.constant;
+package kr.modusplant.shared.persistence.common.constant;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,19 +9,17 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CommPostConstant {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static final String TEST_COMM_POST_ULID = "01K6DH4YCJMS3NJ4JCY8TPXP4T";
-    public static final UUID TEST_COMM_POST_PRIMARY_CATEGORY_UUID = TEST_COMM_PRIMARY_CATEGORY_UUID;
+    public static final UUID TEST_COMM_POST_PRIMARY_CATEGORY_UUID = CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_UUID;
     public static final UUID TEST_COMM_POST_SECONDARY_CATEGORY_UUID = TEST_COMM_SECONDARY_CATEGORY_UUID;
-    public static final UUID TEST_COMM_POST_AUTH_MEMBER_UUID = MEMBER_BASIC_USER_UUID;
-    public static final UUID TEST_COMM_POST_CREATE_MEMBER_UUID = MEMBER_BASIC_USER_UUID;
+    public static final UUID TEST_COMM_POST_AUTH_MEMBER_UUID = SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+    public static final UUID TEST_COMM_POST_CREATE_MEMBER_UUID = SiteMemberConstant.MEMBER_BASIC_USER_UUID;
     public static final Integer TEST_COMM_POST_LIKE_COUNT = 0;
     public static final Long TEST_COMM_POST_VIEW_COUNT = 0L;
     public static final String TEST_COMM_POST_TITLE = "물 주는 타이밍, 이제 헷갈리지 마세요! 식물별 물 주기 가이드";

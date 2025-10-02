@@ -13,7 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberTermConstant.*;
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberTermConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext

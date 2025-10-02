@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.*;
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberAuthConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
