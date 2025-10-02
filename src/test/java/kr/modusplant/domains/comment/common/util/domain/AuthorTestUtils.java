@@ -5,11 +5,12 @@ import kr.modusplant.domains.comment.domain.vo.Author;
 import java.util.UUID;
 
 import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_MEMBER_NICKNAME_STRING;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 
 
 public interface AuthorTestUtils {
 
-    Author testAuthor = Author.create(UUID.fromString("d6b716f1-60f7-4c79-aeaf-37037101f126"), TEST_MEMBER_NICKNAME_STRING);
-    Author testAuthorWithUuid = Author.create(UUID.fromString("d6b716f1-60f7-4c79-aeaf-37037101f126"));
+    Author testAuthor = Author.create(MEMBER_BASIC_USER_UUID, TEST_MEMBER_NICKNAME_STRING);
+    Author testAuthorWithUuid = Author.create(MEMBER_BASIC_USER_UUID);
 
 }

@@ -136,13 +136,13 @@ public class CommCommentEntity {
             return this;
         }
 
-        public CommCommentEntityBuilder CommCommentEntity(final CommCommentEntity commCommentEntity) {
-            this.postEntity = commCommentEntity.getPostEntity();
-            this.path = commCommentEntity.getPath();
-            this.authMember = commCommentEntity.getAuthMember();
-            this.createMember = commCommentEntity.getCreateMember();
-            this.content = commCommentEntity.getContent();
-            this.isDeleted = commCommentEntity.getIsDeleted();
+        public CommCommentEntityBuilder CommCommentEntity(final CommCommentEntity CommCommentEntity) {
+            this.postEntity = CommCommentEntity.getPostEntity();
+            this.path = CommCommentEntity.getPath();
+            this.authMember = CommCommentEntity.getAuthMember();
+            this.createMember = CommCommentEntity.getCreateMember();
+            this.content = CommCommentEntity.getContent();
+            this.isDeleted = CommCommentEntity.getIsDeleted();
             return this;
         }
 

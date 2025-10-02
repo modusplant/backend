@@ -36,25 +36,25 @@ public class CommCommentId implements Serializable {
                 .toHashCode();
     }
 
-    public static CommCommentCompositeKeyBuilder builder() {
-        return new CommCommentCompositeKeyBuilder();
+    public static CommCommCommentIdBuilder builder() {
+        return new CommCommCommentIdBuilder();
     }
 
-    public static final class CommCommentCompositeKeyBuilder {
+    public static final class CommCommCommentIdBuilder {
         private String postUlid;
         private String path;
 
-        public CommCommentCompositeKeyBuilder postUlid(final String postUlid) {
+        public CommCommCommentIdBuilder postUlid(final String postUlid) {
             this.postUlid = postUlid;
             return this;
         }
 
-        public CommCommentCompositeKeyBuilder path(final String path) {
+        public CommCommCommentIdBuilder path(final String path) {
             this.path = path;
             return this;
         }
 
-        public CommCommentCompositeKeyBuilder CommCommentCompositeKey(final CommCommentId compositeKey) {
+        public CommCommCommentIdBuilder CommCommCommentId(final CommCommentId compositeKey) {
             this.postUlid = compositeKey.postUlid;
             this.path = compositeKey.getPath();
             return this;
