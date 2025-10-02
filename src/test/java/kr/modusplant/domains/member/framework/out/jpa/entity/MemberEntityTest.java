@@ -58,42 +58,6 @@ class MemberEntityTest implements MemberEntityTestUtils {
         assertThat(member.getIsDeleted()).isEqualTo(false);
     }
 
-    @DisplayName("null 값으로 PreUpdate 호출")
-    @Test
-    void testPreUpdate_givenNull_willInitializeFields() {
-        // given
-        SiteMemberEntity member = SiteMemberEntity.builder().memberEntity(createMemberEntity()).build();
-        entityManager.persist(member);
-
-        // when
-        entityManager.merge(SiteMemberEntity.builder().memberEntity(member).isActive(null).isDisabledByLinking(null).isBanned(null).isDeleted(null).build());
-        entityManager.flush();
-
-        // then
-        assertThat(member.getIsActive()).isEqualTo(true);
-        assertThat(member.getIsDisabledByLinking()).isEqualTo(false);
-        assertThat(member.getIsBanned()).isEqualTo(false);
-        assertThat(member.getIsDeleted()).isEqualTo(false);
-    }
-
-    @DisplayName("null이 아닌 값으로 PreUpdate 호출")
-    @Test
-    void testPreUpdate_givenNotNull_willInitializeFields() {
-        // given
-        SiteMemberEntity member = SiteMemberEntity.builder().memberEntity(createMemberEntity()).isActive(null).isDisabledByLinking(null).isBanned(null).isDeleted(null).build();
-        entityManager.persist(member);
-
-        // when
-        entityManager.merge(SiteMemberEntity.builder().memberEntity(member).build());
-        entityManager.flush();
-
-        // then
-        assertThat(member.getIsActive()).isEqualTo(true);
-        assertThat(member.getIsDisabledByLinking()).isEqualTo(false);
-        assertThat(member.getIsBanned()).isEqualTo(false);
-        assertThat(member.getIsDeleted()).isEqualTo(false);
-    }
-
     @Test
     @DisplayName("같은 객체에 대한 equals 호출")
     void useEqual_givenSameObject_willReturnTrue() {

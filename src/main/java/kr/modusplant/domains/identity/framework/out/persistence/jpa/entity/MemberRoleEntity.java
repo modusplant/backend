@@ -55,13 +55,6 @@ public class MemberRoleEntity {
         }
     }
 
-    @PreUpdate
-    public void preUpdate() {
-        if (this.role == null) {
-            this.role = UserRole.USER;
-        }
-    }
-
     private MemberRoleEntity(UUID uuid, UserRole role) {
         this.uuid = uuid;
         this.role = role;

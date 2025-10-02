@@ -15,6 +15,7 @@ public interface CommentEntityTestUtils extends
                 .authMember(createMemberBasicUserEntity())
                 .createMember(createMemberBasicUserEntity())
                 .id(testCommentCompositeKey)
+                .likeCount(1)
                 .content(testCommentContent.getContent())
                 .isDeleted(false)
                 .build();
@@ -23,6 +24,7 @@ public interface CommentEntityTestUtils extends
     default CommentEntity.CommentEntityBuilder createCommentEntityBuilder() {
         return CommentEntity.builder()
                 .id(testCommentCompositeKey)
+                .likeCount(1)
                 .content(testCommentContent.getContent())
                 .isDeleted(false);
     }

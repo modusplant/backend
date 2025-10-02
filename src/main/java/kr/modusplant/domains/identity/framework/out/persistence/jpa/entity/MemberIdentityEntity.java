@@ -124,22 +124,6 @@ public class MemberIdentityEntity {
         }
     }
 
-    @PreUpdate
-    public void preUpdate() {
-        if (this.isActive == null) {
-            this.isActive = true;
-        }
-        if (this.isDisabledByLinking == null) {
-            this.isDisabledByLinking = false;
-        }
-        if (this.isBanned == null) {
-            this.isBanned = false;
-        }
-        if (this.isDeleted == null) {
-            this.isDeleted = false;
-        }
-    }
-
     private MemberIdentityEntity(UUID uuid, String nickname, LocalDate birthDate, Boolean isActive, Boolean isDisabledByLinking, Boolean isBanned, Boolean isDeleted, LocalDateTime loggedInAt) {
         this.uuid = uuid;
         this.nickname = nickname;

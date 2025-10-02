@@ -47,29 +47,6 @@ class CommPostEntityTest implements CommPostEntityTestUtils {
     }
 
     @Test
-    @DisplayName("컨텐츠 게시글 PreUpdate")
-    void preUpdate() {
-        // given
-        SiteMemberEntity member = createMemberBasicUserEntity();
-        CommPostEntity commPost = createCommPostEntityBuilder()
-                .primaryCategory(createTestCommPrimaryCategoryEntity())
-                .secondaryCategory(createTestCommSecondaryCategoryEntity())
-                .authMember(member)
-                .createMember(member)
-                .build();
-        entityManager.persist(commPost);
-
-        // when
-        commPost.updateViewCount(null);
-        commPost.updateIsDeleted(null);
-        entityManager.flush();
-
-        // then
-        assertThat(commPost.getViewCount()).isEqualTo(0L);
-        assertThat(commPost.getIsDeleted()).isEqualTo(false);
-    }
-
-    @Test
     @DisplayName("소통 게시글 좋아요 수 증가 테스트")
     void increaseLikeCountTest() {
         CommPostEntity commPost = createCommPostEntityBuilder()

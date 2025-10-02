@@ -32,6 +32,8 @@ public class MemberId {
     public static MemberId fromString(String value) {
         if (value == null || value.trim().isEmpty()) {
             throw new EmptyMemberIdException();
+        } else if (!PATTERN_UUID.matcher(value).matches()) {
+            throw new InvalidDataException(ErrorCode.INVALID_INPUT, "memberId");
         }
         if (!PATTERN_UUID.matcher(value).matches()) {
             throw new InvalidDataException(ErrorCode.INVALID_INPUT, "memberId");
