@@ -34,6 +34,11 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 	implementation 'com.mailjet:mailjet-client:5.2.5'
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+
+	implementation 'org.jooq:jooq' // Added by the jOOQ plugin, but can be explicitly declared
+	implementation 'org.jooq:jooq-meta' // For jOOQ code generation
+	implementation 'org.jooq:jooq-codegen' // For jOOQ code generation
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
