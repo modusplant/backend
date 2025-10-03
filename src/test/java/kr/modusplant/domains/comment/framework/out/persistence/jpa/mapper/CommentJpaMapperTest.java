@@ -29,14 +29,6 @@ public class CommentJpaMapperTest implements CommentTestUtils, CommCommentEntity
         CommCommentEntity result = mapper.toCommCommentEntity(testValidComment);
 
         // then
-        System.out.println("result postUlid: " + result.getPostUlid() + " compare: " + compare.getPostUlid());
-        System.out.println("result postEntity: " + result.getPostEntity() + " compare: " + compare.getPostEntity());
-        System.out.println("result path: " + result.getPath() + " compare: " + compare.getPath());
-        System.out.println("result authMember: " + result.getAuthMember() + " compare: " + compare.getAuthMember());
-        System.out.println("result createMember: " + result.getCreateMember() + " compare: " + compare.getCreateMember());
-        System.out.println("result content: " + result.getContent() + " compare: " + compare.getContent());
-        System.out.println("result isDeleted: " + result.getIsDeleted() + " compare: " + compare.getIsDeleted());
-        System.out.println("result createdAt: " + result.getCreatedAt() + " compare: " + compare.getCreatedAt());
         assertThat(result).isEqualTo(compare);
     }
 
