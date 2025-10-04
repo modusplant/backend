@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.3'
 	id 'io.spring.dependency-management' version '1.1.7'
-	id 'nu.studer.jooq' version '10.1.1'
+	id 'org.jooq.jooq-codegen-gradle' version '3.20.8'
 	id 'jacoco'
 }
 
@@ -27,11 +27,11 @@ repositories {
 
 dependencies {
 	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'org.postgresql:postgresql'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
 	annotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+	implementation 'org.postgresql:postgresql'
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -52,13 +52,21 @@ dependencies {
 	implementation 'org.mapstruct:mapstruct:1.5.3.Final'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 	implementation 'software.amazon.awssdk:s3:2.31.61'
-	jooqGenerator 'org.postgresql:postgresql'
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'io.github.hakky54:logcaptor:2.11.0'
+	jooqCodegen 'org.postgresql:postgresql:42.7.2'
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs = ['src/main/java', 'src/main/generated']
+		}
+	}
 }
 
 jacoco {
@@ -67,28 +75,24 @@ jacoco {
 
 jooq {
 	version = dependencyManagement.importedProperties['jooq.version']
-	configurations {
-		main {
-			generationTool {
-				jdbc {
-					driver = 'org.postgresql.Driver'
-					url = jdbcUrl
-					user = jdbcUser
-					password = jdbcPassword
-				}
-				generator {
-					database {
-						name = 'org.jooq.meta.postgres.PostgresDatabase'
-						inputSchema = 'public'
-						includes = '.*'
-						excludes = 'databasechangelog|databasechangeloglock|flyway_schema_history'
-					}
-					target {
-						packageName = 'kr.modusplant.jooq'
-						directory = 'src/main/generated'
-						encoding = 'UTF-8'
-					}
-				}
+	configuration {
+		jdbc {
+			driver = 'org.postgresql.Driver'
+			url = jdbcUrl
+			user = jdbcUser
+			password = jdbcPassword
+		}
+		generator {
+			database {
+				name = 'org.jooq.meta.postgres.PostgresDatabase'
+				inputSchema = 'public'
+				includes = '.*'
+				excludes = 'databasechangelog|databasechangeloglock|flyway_schema_history'
+			}
+			target {
+				packageName = 'kr.modusplant.jooq'
+				directory = 'src/main/generated'
+				encoding = 'UTF-8'
 			}
 		}
 	}
@@ -102,15 +106,15 @@ tasks.withType(JavaCompile).configureEach {
 	]
 }
 
-tasks.named('generateJooq') {
-	dependsOn 'flywayMigrate'
-}
-
 tasks.named('jacocoTestReport') {
 	reports {
 		html.required = true
 		xml.required = false
 	}
+}
+
+tasks.named('jooqCodegen') {
+	dependsOn tasks.named('flywayMigrate')
 }
 
 tasks.named('test') {
