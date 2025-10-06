@@ -1,8 +1,8 @@
-package kr.modusplant.domains.identity.common.utils.usecase.request;
+package kr.modusplant.domains.identity.common.util.usecase.request;
 
-import kr.modusplant.domains.identity.common.utils.domain.vo.EmailTestUtils;
-import kr.modusplant.domains.identity.common.utils.domain.vo.NicknameTestUtils;
-import kr.modusplant.domains.identity.common.utils.domain.vo.PasswordTestUtils;
+import kr.modusplant.domains.identity.common.util.domain.vo.EmailTestUtils;
+import kr.modusplant.domains.identity.common.util.domain.vo.NicknameTestUtils;
+import kr.modusplant.domains.identity.common.util.domain.vo.PasswordTestUtils;
 import kr.modusplant.domains.identity.usecase.request.NormalSignUpRequest;
 
 public interface NormalSignUpRequestTestUtils extends EmailTestUtils, PasswordTestUtils, NicknameTestUtils {
