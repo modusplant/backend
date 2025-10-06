@@ -26,13 +26,30 @@ repositories {
 }
 
 dependencies {
-	compileOnly 'org.projectlombok:lombok'
-	jooqCodegen 'org.postgresql:postgresql:42.7.2'
-	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
-	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+	// Lombok (Version managed by Spring Boot BOM)
 	annotationProcessor 'org.projectlombok:lombok'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
-	implementation 'org.postgresql:postgresql'
+	compileOnly 'org.projectlombok:lombok'
+	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0' // Version required
+	testAnnotationProcessor 'org.projectlombok:lombok'
+	testCompileOnly 'org.projectlombok:lombok'
+
+	// PostgreSQL
+	jooqCodegen 'org.postgresql:postgresql:42.7.2' // Tool dependency
+	implementation 'org.postgresql:postgresql' // Version managed by Spring Boot BOM
+
+	// JJWT
+	def jjwtVersion = "0.12.5"
+	runtimeOnly "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
+	runtimeOnly "io.jsonwebtoken:jjwt-jackson:$jjwtVersion"
+	implementation "io.jsonwebtoken:jjwt-api:$jjwtVersion"
+
+	// MapStruct
+	def mapstructVersion = "1.5.3.Final"
+	annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
+	implementation "org.mapstruct:mapstruct:$mapstructVersion"
+	testAnnotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
+
+	// Spring Boot Starters (Version managed by Spring Boot BOM)
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -41,23 +58,25 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.security:spring-security-crypto:6.4.4'
-	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// Spring Security (Version managed by Spring Boot BOM)
+	implementation 'org.springframework.security:spring-security-crypto'
+	testImplementation 'org.springframework.security:spring-security-test'
+
+	// Flyway (Versions managed by Spring Boot BOM)
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-database-postgresql'
+
+	// Other Main Dependencies (Version required)
 	implementation 'com.github.f4b6a3:ulid-creator:5.2.3'
 	implementation 'com.mailjet:mailjet-client:5.2.5'
 	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.9.10'
-	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
 	implementation 'org.apache.commons:commons-lang3:3.18.0'
-	implementation 'org.flywaydb:flyway-core'
-	implementation 'org.flywaydb:flyway-database-postgresql'
-	implementation 'org.mapstruct:mapstruct:1.5.3.Final'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 	implementation 'software.amazon.awssdk:s3:2.31.61'
-	testCompileOnly 'org.projectlombok:lombok'
-	testAnnotationProcessor 'org.projectlombok:lombok'
-	testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
+
+	// Other Test Dependencies (Versions required) ---
 	testImplementation 'io.github.hakky54:logcaptor:2.11.0'
 }
 
