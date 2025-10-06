@@ -27,6 +27,7 @@ repositories {
 
 dependencies {
 	compileOnly 'org.projectlombok:lombok'
+	jooqCodegen 'org.postgresql:postgresql:42.7.2'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -58,7 +59,6 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'io.github.hakky54:logcaptor:2.11.0'
-	jooqCodegen 'org.postgresql:postgresql:42.7.2'
 }
 
 sourceSets {
