@@ -1,10 +1,13 @@
 package kr.modusplant.legacy.domains.communication.common.util.app.http.request;
 
 import kr.modusplant.legacy.domains.communication.app.http.request.CommCategoryInsertRequest;
-import kr.modusplant.legacy.domains.communication.common.util.domain.CommPrimaryCategoryTestUtils;
-import kr.modusplant.legacy.domains.communication.common.util.domain.CommSecondaryCategoryTestUtils;
 
-public interface CommCategoryRequestTestUtils extends CommPrimaryCategoryTestUtils, CommSecondaryCategoryTestUtils {
-    CommCategoryInsertRequest TEST_COMM_PRIMARY_CATEGORY_INSERT_REQUEST = new CommCategoryInsertRequest(TEST_COMM_PRIMARY_CATEGORY.getCategory(), TEST_COMM_PRIMARY_CATEGORY.getOrder());
-    CommCategoryInsertRequest TEST_COMM_SECONDARY_CATEGORY_INSERT_REQUEST = new CommCategoryInsertRequest(TEST_COMM_SECONDARY_CATEGORY.getCategory(), TEST_COMM_SECONDARY_CATEGORY.getOrder());
+import static kr.modusplant.shared.persistence.common.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
+import static kr.modusplant.shared.persistence.common.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ORDER;
+import static kr.modusplant.shared.persistence.common.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
+import static kr.modusplant.shared.persistence.common.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ORDER;
+
+public interface CommCategoryRequestTestUtils {
+    CommCategoryInsertRequest TEST_COMM_PRIMARY_CATEGORY_INSERT_REQUEST = new CommCategoryInsertRequest(TEST_COMM_PRIMARY_CATEGORY_CATEGORY, TEST_COMM_PRIMARY_CATEGORY_ORDER);
+    CommCategoryInsertRequest TEST_COMM_SECONDARY_CATEGORY_INSERT_REQUEST = new CommCategoryInsertRequest(TEST_COMM_SECONDARY_CATEGORY_CATEGORY, TEST_COMM_SECONDARY_CATEGORY_ORDER);
 }

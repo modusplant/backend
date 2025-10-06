@@ -13,8 +13,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.vo.TableColumnName.CREATED_AT;
-import static kr.modusplant.shared.persistence.vo.TableName.COMM_SECO_CATE;
+import static kr.modusplant.shared.persistence.constant.TableColumnName.CREATED_AT;
+import static kr.modusplant.shared.persistence.constant.TableName.COMM_SECO_CATE;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)

@@ -17,10 +17,10 @@ public class MemberNickname {
     private final String value;
 
     public static MemberNickname create(String value) {
-        if (value == null) {
+        if (value == null || value.trim().isEmpty()) {
             throw new EmptyMemberNicknameException();
         } else if (!PATTERN_NICKNAME.matcher(value).matches()) {
-            throw new InvalidDataException(ErrorCode.INVALID_INPUT, "nickname");
+            throw new InvalidDataException(ErrorCode.INVALID_INPUT, "memberNickname");
         }
         return new MemberNickname(value);
     }

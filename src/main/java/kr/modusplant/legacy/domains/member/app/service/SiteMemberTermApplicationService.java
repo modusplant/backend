@@ -2,8 +2,8 @@ package kr.modusplant.legacy.domains.member.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberTermEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberTermRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberTermJpaRepository;
 import kr.modusplant.legacy.domains.common.app.service.supers.UuidCrudApplicationService;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberTermInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberTermUpdateRequest;
@@ -28,8 +28,8 @@ public class SiteMemberTermApplicationService implements UuidCrudApplicationServ
 
     private final SiteMemberTermValidationService memberTermValidationService;
     private final SiteMemberValidationService memberValidationService;
-    private final SiteMemberTermRepository memberTermRepository;
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberTermJpaRepository memberTermRepository;
+    private final SiteMemberJpaRepository memberRepository;
     private final SiteMemberTermAppInfraMapper memberTermAppInfraMapper;
 
     @Override

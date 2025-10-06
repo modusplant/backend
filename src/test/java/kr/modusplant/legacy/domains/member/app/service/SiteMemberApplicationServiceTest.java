@@ -1,13 +1,13 @@
 package kr.modusplant.legacy.domains.member.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberUpdateRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberResponse;
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberRequestTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberResponseTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -24,10 +25,10 @@ import static org.mockito.BDDMockito.willDoNothing;
 class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, SiteMemberResponseTestUtils, SiteMemberEntityTestUtils {
 
     private final SiteMemberApplicationService memberApplicationService;
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberJpaRepository memberRepository;
 
     @Autowired
-    SiteMemberApplicationServiceTest(SiteMemberApplicationService memberApplicationService, SiteMemberRepository memberRepository) {
+    SiteMemberApplicationServiceTest(SiteMemberApplicationService memberApplicationService, SiteMemberJpaRepository memberRepository) {
         this.memberApplicationService = memberApplicationService;
         this.memberRepository = memberRepository;
     }
@@ -55,7 +56,7 @@ class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, Si
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
 
         given(memberRepository.save(createMemberBasicUserEntity())).willReturn(memberEntity);
-        given(memberRepository.findByNickname(memberEntity.getNickname())).willReturn(List.of(memberEntity));
+        given(memberRepository.findByNickname(memberEntity.getNickname())).willReturn(Optional.of(memberEntity));
 
         // when
         SiteMemberResponse memberResponse = memberApplicationService.insert(memberBasicUserInsertRequest);
@@ -164,7 +165,7 @@ class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, Si
     @Test
     void getOptionalEmptyTest() {
         // given
-        UUID uuid = memberBasicUserWithUuid.getUuid();
+        UUID uuid = MEMBER_BASIC_USER_UUID;
 
         // getByUuid
         // given & when
@@ -188,7 +189,7 @@ class SiteMemberApplicationServiceTest implements SiteMemberRequestTestUtils, Si
         given(memberRepository.existsByUuid(uuid)).willReturn(true);
         given(memberRepository.findByUuid(uuid)).willReturn(Optional.of(beforeUpdatedMemberEntity));
         given(memberRepository.save(updatedMemberEntity)).willReturn(updatedMemberEntity);
-        given(memberRepository.findByNickname(updatedNickname)).willReturn(List.of(updatedMemberEntity));
+        given(memberRepository.findByNickname(updatedNickname)).willReturn(Optional.of(updatedMemberEntity));
 
         // when
         memberApplicationService.insert(memberBasicUserInsertRequest);

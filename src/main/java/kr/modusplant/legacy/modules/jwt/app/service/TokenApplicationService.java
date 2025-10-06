@@ -1,5 +1,6 @@
 package kr.modusplant.legacy.modules.jwt.app.service;
 
+import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberResponse;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberRoleResponse;
 import kr.modusplant.legacy.domains.member.app.service.SiteMemberApplicationService;
@@ -11,7 +12,6 @@ import kr.modusplant.legacy.modules.jwt.domain.service.TokenValidationService;
 import kr.modusplant.legacy.modules.jwt.error.InvalidTokenException;
 import kr.modusplant.legacy.modules.jwt.error.TokenNotFoundException;
 import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
-import kr.modusplant.infrastructure.security.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

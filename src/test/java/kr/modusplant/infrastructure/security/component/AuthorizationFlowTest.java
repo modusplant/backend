@@ -4,14 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import kr.modusplant.domains.comment.adapter.controller.CommentController;
+import kr.modusplant.domains.comment.common.util.adapter.CommentRegisterRequestTestUtils;
+import kr.modusplant.domains.comment.common.util.adapter.CommentResponseTestUtils;
 import kr.modusplant.domains.comment.framework.in.web.rest.CommentRestController;
-import kr.modusplant.domains.comment.support.utils.adapter.CommentRegisterRequestTestUtils;
-import kr.modusplant.domains.comment.support.utils.adapter.CommentResponseTestUtils;
 import kr.modusplant.domains.identity.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
-import kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberRoleTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTestUtils;
 import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
 import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +20,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberRoleConstant.MEMBER_ROLE_USER_ROLE;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -32,9 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class AuthorizationFlowTest implements
-        SiteMemberTestUtils, SiteMemberRoleTestUtils,
-        CommentRegisterRequestTestUtils, CommentResponseTestUtils, CommPostTestUtils {
+public class AuthorizationFlowTest implements CommentRegisterRequestTestUtils, CommentResponseTestUtils {
 
     @Autowired
     private MockMvc mockMvc;
@@ -64,9 +62,9 @@ public class AuthorizationFlowTest implements
     void setUp() {
         rawAccessToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         accessTokenClaims = Jwts.claims()
-                .subject(memberBasicUserWithUuid.getUuid().toString())
-                .add("nickname", memberBasicUserWithUuid.getNickname())
-                .add("roles", memberRoleUser.getRole())
+                .subject(MEMBER_BASIC_USER_UUID.toString())
+                .add("nickname", MEMBER_BASIC_USER_NICKNAME)
+                .add("roles", MEMBER_ROLE_USER_ROLE)
                 .build();
     }
 

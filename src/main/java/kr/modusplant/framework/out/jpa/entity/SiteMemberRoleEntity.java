@@ -13,7 +13,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.util.UUID;
 
 import static kr.modusplant.infrastructure.security.enums.Role.USER;
-import static kr.modusplant.shared.persistence.vo.TableName.SITE_MEMBER_ROLE;
+import static kr.modusplant.shared.persistence.constant.TableName.SITE_MEMBER_ROLE;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -52,13 +52,6 @@ public class SiteMemberRoleEntity {
 
     @PrePersist
     public void prePersist() {
-        if (this.role == null) {
-            this.role = USER;
-        }
-    }
-
-    @PreUpdate
-    public void preUpdate() {
         if (this.role == null) {
             this.role = USER;
         }

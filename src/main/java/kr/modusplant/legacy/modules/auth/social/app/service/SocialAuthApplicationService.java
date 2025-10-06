@@ -3,10 +3,11 @@ package kr.modusplant.legacy.modules.auth.social.app.service;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleJpaRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
+import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthDomainInfraMapper;
@@ -14,7 +15,6 @@ import kr.modusplant.legacy.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.legacy.modules.auth.social.app.dto.supers.SocialUserInfo;
 import kr.modusplant.legacy.modules.auth.social.app.service.supers.SocialAuthClient;
 import kr.modusplant.legacy.modules.auth.social.error.UnsupportedSocialProviderException;
-import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +30,9 @@ import java.util.UUID;
 public class SocialAuthApplicationService {
     private final KakaoAuthClient kakaoAuthClient;
     private final GoogleAuthClient googleAuthClient;
-    private final SiteMemberRepository memberRepository;
-    private final SiteMemberAuthRepository memberAuthRepository;
-    private final SiteMemberRoleRepository memberRoleRepository;
+    private final SiteMemberJpaRepository memberRepository;
+    private final SiteMemberAuthJpaRepository memberAuthRepository;
+    private final SiteMemberRoleJpaRepository memberRoleRepository;
     private final SiteMemberAuthDomainInfraMapper memberAuthEntityMapper;
 
     public JwtUserPayload handleSocialLogin(AuthProvider provider, String code) {

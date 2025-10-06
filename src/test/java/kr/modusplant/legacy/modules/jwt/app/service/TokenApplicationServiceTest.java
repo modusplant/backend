@@ -1,11 +1,12 @@
 package kr.modusplant.legacy.modules.jwt.app.service;
 
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
+import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberResponse;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberRoleResponse;
 import kr.modusplant.legacy.domains.member.app.service.SiteMemberApplicationService;
 import kr.modusplant.legacy.domains.member.app.service.SiteMemberRoleApplicationService;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberRoleResponseTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.modules.jwt.app.dto.TokenPair;
 import kr.modusplant.legacy.modules.jwt.domain.model.RefreshToken;
@@ -13,7 +14,6 @@ import kr.modusplant.legacy.modules.jwt.domain.service.TokenValidationService;
 import kr.modusplant.legacy.modules.jwt.error.InvalidTokenException;
 import kr.modusplant.legacy.modules.jwt.error.TokenNotFoundException;
 import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
-import kr.modusplant.infrastructure.security.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

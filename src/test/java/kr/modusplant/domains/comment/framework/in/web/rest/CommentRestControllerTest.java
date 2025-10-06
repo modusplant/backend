@@ -2,12 +2,12 @@ package kr.modusplant.domains.comment.framework.in.web.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.comment.adapter.controller.CommentController;
+import kr.modusplant.domains.comment.common.util.adapter.CommentDeleteRequestTestUtils;
+import kr.modusplant.domains.comment.common.util.adapter.CommentRegisterRequestTestUtils;
+import kr.modusplant.domains.comment.common.util.adapter.CommentResponseTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.usecase.response.CommentResponse;
-import kr.modusplant.domains.comment.support.utils.adapter.CommentDeleteRequestTestUtils;
-import kr.modusplant.domains.comment.support.utils.adapter.CommentRegisterRequestTestUtils;
-import kr.modusplant.domains.comment.support.utils.adapter.CommentResponseTestUtils;
-import kr.modusplant.domains.comment.support.utils.domain.PostIdTestUtils;
-import kr.modusplant.domains.member.common.utils.domain.vo.MemberIdTestUtils;
+import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
 import kr.modusplant.framework.out.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import org.junit.jupiter.api.DisplayName;

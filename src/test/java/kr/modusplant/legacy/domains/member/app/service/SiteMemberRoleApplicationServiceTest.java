@@ -2,8 +2,11 @@ package kr.modusplant.legacy.domains.member.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleRepository;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberRoleEntityTestUtils;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleJpaRepository;
+import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberRoleUpdateRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberRoleResponse;
@@ -11,9 +14,6 @@ import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemb
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberRoleRequestTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberResponseTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberRoleResponseTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberRoleEntityTestUtils;
-import kr.modusplant.infrastructure.security.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +31,11 @@ class SiteMemberRoleApplicationServiceTest implements SiteMemberRoleRequestTestU
 
     private final SiteMemberRoleApplicationService memberRoleService;
     private final SiteMemberApplicationService memberService;
-    private final SiteMemberRoleRepository memberRoleRepository;
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberRoleJpaRepository memberRoleRepository;
+    private final SiteMemberJpaRepository memberRepository;
 
     @Autowired
-    SiteMemberRoleApplicationServiceTest(SiteMemberRoleApplicationService memberRoleService, SiteMemberApplicationService memberService, SiteMemberRoleRepository memberRoleRepository, SiteMemberRepository memberRepository) {
+    SiteMemberRoleApplicationServiceTest(SiteMemberRoleApplicationService memberRoleService, SiteMemberApplicationService memberService, SiteMemberRoleJpaRepository memberRoleRepository, SiteMemberJpaRepository memberRepository) {
         this.memberRoleService = memberRoleService;
         this.memberService = memberService;
         this.memberRoleRepository = memberRoleRepository;

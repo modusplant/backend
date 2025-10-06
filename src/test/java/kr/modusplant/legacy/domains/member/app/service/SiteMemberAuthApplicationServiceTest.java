@@ -2,8 +2,10 @@ package kr.modusplant.legacy.domains.member.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberAuthEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberAuthUpdateRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberAuthResponse;
@@ -11,9 +13,6 @@ import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemb
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberRequestTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberAuthResponseTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberResponseTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
-import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberAuthConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -32,11 +32,11 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
 
     private final SiteMemberAuthApplicationService memberAuthService;
     private final SiteMemberApplicationService memberService;
-    private final SiteMemberAuthRepository memberAuthRepository;
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberAuthJpaRepository memberAuthRepository;
+    private final SiteMemberJpaRepository memberRepository;
 
     @Autowired
-    SiteMemberAuthApplicationServiceTest(SiteMemberAuthApplicationService memberAuthService, SiteMemberApplicationService memberService, SiteMemberAuthRepository memberAuthRepository, SiteMemberRepository memberRepository) {
+    SiteMemberAuthApplicationServiceTest(SiteMemberAuthApplicationService memberAuthService, SiteMemberApplicationService memberService, SiteMemberAuthJpaRepository memberAuthRepository, SiteMemberJpaRepository memberRepository) {
         this.memberAuthService = memberAuthService;
         this.memberService = memberService;
         this.memberAuthRepository = memberAuthRepository;
@@ -231,12 +231,11 @@ class SiteMemberAuthApplicationServiceTest implements SiteMemberAuthRequestTestU
     @Test
     void getOptionalEmptyTest() {
         // given
-        SiteMemberAuth memberAuth = memberAuthBasicUserWithUuid;
-        UUID uuid = memberAuth.getOriginalMemberUuid();
+        UUID uuid = MEMBER_AUTH_BASIC_USER_ORIGINAL_MEMBER_UUID;
+        String email = MEMBER_AUTH_BASIC_USER_EMAIL;
+        AuthProvider provider = MEMBER_AUTH_BASIC_USER_PROVIDER;
+        String providerId = MEMBER_AUTH_BASIC_USER_PROVIDER_ID;
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        String email = memberAuth.getEmail();
-        AuthProvider provider = memberAuth.getProvider();
-        String providerId = memberAuth.getProviderId();
 
         // getByUuid
         // given & when

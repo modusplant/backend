@@ -1,7 +1,7 @@
 package kr.modusplant.domains.comment.adapter.mapper;
 
-import kr.modusplant.domains.comment.support.utils.adapter.CommentRegisterRequestTestUtils;
-import kr.modusplant.domains.comment.support.utils.domain.CommentTestUtils;
+import kr.modusplant.domains.comment.common.util.adapter.CommentRegisterRequestTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.CommentTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

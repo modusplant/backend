@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.stereotype.Controller;
 
-import static kr.modusplant.legacy.modules.common.vo.Reference.NOTATION_MODULES;
+import static kr.modusplant.legacy.modules.common.constant.Reference.NOTATION_MODULES;
 
 @Configuration
 @ComponentScan(

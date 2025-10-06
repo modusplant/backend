@@ -1,10 +1,10 @@
 package kr.modusplant.domains.member.framework.out.jpa.repository;
 
-import kr.modusplant.domains.member.common.utils.framework.out.persistence.jpa.entity.MemberEntityTestUtils;
+import kr.modusplant.domains.member.common.util.framework.out.persistence.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
-import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberJpaMapperImpl;
-import kr.modusplant.domains.member.framework.out.jpa.repository.supers.MemberJpaRepository;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -17,7 +17,7 @@ import static org.mockito.BDDMockito.given;
 
 class MemberRepositoryJpaAdapterTest implements MemberEntityTestUtils {
     private final MemberJpaMapperImpl memberJpaMapper = new MemberJpaMapperImpl();
-    private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
+    private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
     private final MemberRepositoryJpaAdapter memberRepositoryJpaAdapter = new MemberRepositoryJpaAdapter(memberJpaMapper, memberJpaRepository);
 
     @Test
@@ -45,10 +45,50 @@ class MemberRepositoryJpaAdapterTest implements MemberEntityTestUtils {
     void testSave_givenValidMember_willReturn() {
         // given
         Member member = createMember();
-        MemberEntity memberEntity = createMemberEntityWithUuid();
+        SiteMemberEntity memberEntity = createMemberEntityWithUuid();
         given(memberJpaRepository.save(memberEntity)).willReturn(memberEntity);
 
         // when & then
         assertThat(memberRepositoryJpaAdapter.save(member)).isEqualTo(member);
+    }
+
+    @Test
+    @DisplayName("isIdExist로 true 반환")
+    void testIsIdExist_givenIdThatExists_willReturnTrue() {
+        // given & when
+        given(memberJpaRepository.existsByUuid(testMemberId.getValue())).willReturn(true);
+
+        // when & then
+        assertThat(memberRepositoryJpaAdapter.isIdExist(testMemberId)).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("isIdExist로 false 반환")
+    void testIsIdExist_givenIdThatIsNotExist_willReturnFalse() {
+        // given & when
+        given(memberJpaRepository.existsByUuid(testMemberId.getValue())).willReturn(false);
+
+        // when & then
+        assertThat(memberRepositoryJpaAdapter.isIdExist(testMemberId)).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("isNicknameExist로 true 반환")
+    void testIsNicknameExist_givenNicknameThatExists_willReturnTrue() {
+        // given & when
+        given(memberJpaRepository.existsByNickname(testMemberNickname.getValue())).willReturn(true);
+
+        // when & then
+        assertThat(memberRepositoryJpaAdapter.isNicknameExist(testMemberNickname)).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("isNicknameExist로 false 반환")
+    void testIsNicknameExist_givenNicknameThatIsNotExist_willReturnFalse() {
+        // given & when
+        given(memberJpaRepository.existsByNickname(testMemberNickname.getValue())).willReturn(false);
+
+        // when & then
+        assertThat(memberRepositoryJpaAdapter.isNicknameExist(testMemberNickname)).isEqualTo(false);
     }
 }

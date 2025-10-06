@@ -13,9 +13,8 @@ import java.util.UUID;
 
 import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.AUTH_MEMBER;
 import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.NICKNAME;
-import static kr.modusplant.legacy.domains.communication.vo.CommCategoryWord.PRIMARY_CATEGORY;
-import static kr.modusplant.legacy.domains.communication.vo.CommCategoryWord.SECONDARY_CATEGORY;
-import static kr.modusplant.legacy.domains.member.vo.MemberUuid.MEMBER_UUID;
+import static kr.modusplant.legacy.domains.communication.constant.CommCategoryWord.PRIMARY_CATEGORY;
+import static kr.modusplant.legacy.domains.communication.constant.CommCategoryWord.SECONDARY_CATEGORY;
 
 @Mapper
 public interface CommPostAppInfraMapper {
@@ -26,7 +25,7 @@ public interface CommPostAppInfraMapper {
     @Mapping(source = SECONDARY_CATEGORY, target = SECONDARY_CATEGORY, qualifiedByName = "toSecondaryCategory")
     @Mapping(source = SECONDARY_CATEGORY, target = "secondaryCategoryUuid", qualifiedByName = "toSecondaryCategoryUuid")
     @Mapping(source = SECONDARY_CATEGORY, target = "secondaryCategoryOrder", qualifiedByName = "toSecondaryCategoryOrder")
-    @Mapping(source = AUTH_MEMBER, target = MEMBER_UUID, qualifiedByName = "toMemberUuid")
+    @Mapping(source = AUTH_MEMBER, target = "memberUuid", qualifiedByName = "toMemberUuid")
     @Mapping(source = AUTH_MEMBER, target = NICKNAME, qualifiedByName = "toNickname")
     CommPostResponse toCommPostResponse(CommPostEntity commPostEntity);
 

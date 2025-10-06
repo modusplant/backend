@@ -1,10 +1,9 @@
 package kr.modusplant.legacy.domains.member.domain.service;
 
-import kr.modusplant.framework.out.jpa.repository.SiteMemberTermRepository;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberTermEntityTestUtils;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberTermJpaRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
-import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTermTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberTermEntityTestUtils;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
@@ -14,17 +13,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberTermConstant.MEMBER_TERM_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @DomainsServiceOnlyContext
-class SiteMemberTermValidationServiceTest implements SiteMemberTermTestUtils, SiteMemberTermEntityTestUtils {
+class SiteMemberTermValidationServiceTest implements SiteMemberTermEntityTestUtils {
     private final SiteMemberTermValidationService memberTermValidationService;
-    private final SiteMemberTermRepository memberTermRepository;
+    private final SiteMemberTermJpaRepository memberTermRepository;
 
     @Autowired
-    SiteMemberTermValidationServiceTest(SiteMemberTermValidationService memberTermValidationService, SiteMemberTermRepository memberTermRepository) {
+    SiteMemberTermValidationServiceTest(SiteMemberTermValidationService memberTermValidationService, SiteMemberTermJpaRepository memberTermRepository) {
         this.memberTermValidationService = memberTermValidationService;
         this.memberTermRepository = memberTermRepository;
     }
@@ -33,7 +33,7 @@ class SiteMemberTermValidationServiceTest implements SiteMemberTermTestUtils, Si
     @Test
     void validateExistedUuidTest() {
         // given
-        UUID uuid = memberTermUserWithUuid.getUuid();
+        UUID uuid = MEMBER_TERM_USER_UUID;
 
         // when
         given(memberTermRepository.existsByUuid(uuid)).willReturn(true);
@@ -48,7 +48,7 @@ class SiteMemberTermValidationServiceTest implements SiteMemberTermTestUtils, Si
     @Test
     void validateNotFoundUuidTest() {
         // given
-        UUID uuid = memberTermUserWithUuid.getUuid();
+        UUID uuid = MEMBER_TERM_USER_UUID;
 
         // when
         given(memberTermRepository.existsByUuid(uuid)).willReturn(false);

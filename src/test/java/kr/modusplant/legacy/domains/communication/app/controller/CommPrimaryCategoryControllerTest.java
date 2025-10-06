@@ -18,7 +18,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.legacy.domains.common.vo.FileSystem.DATA;
+import static kr.modusplant.legacy.domains.common.constant.FileSystem.DATA;
+import static kr.modusplant.shared.persistence.common.constant.CommPrimaryCategoryConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -66,7 +67,7 @@ class CommPrimaryCategoryControllerTest implements CommCategoryRequestTestUtils,
     void getCommCategoryByUuidTest() throws Exception {
         // given
         ObjectMapper objectMapper = new ObjectMapper();
-        UUID uuid = TEST_COMM_PRIMARY_CATEGORY_WITH_UUID.getUuid();
+        UUID uuid = TEST_COMM_PRIMARY_CATEGORY_UUID;
 
         when(commCategoryApplicationService.getByUuid(uuid)).thenReturn(Optional.of(TEST_COMM_PRIMARY_CATEGORY_RESPONSE));
 
@@ -89,7 +90,7 @@ class CommPrimaryCategoryControllerTest implements CommCategoryRequestTestUtils,
     void getCommCategoryByOrderTest() throws Exception {
         // given
         ObjectMapper objectMapper = new ObjectMapper();
-        Integer order = TEST_COMM_PRIMARY_CATEGORY.getOrder();
+        Integer order = TEST_COMM_PRIMARY_CATEGORY_ORDER;
 
         when(commCategoryApplicationService.getByOrder(order)).thenReturn(Optional.of(TEST_COMM_PRIMARY_CATEGORY_RESPONSE));
 
@@ -112,7 +113,7 @@ class CommPrimaryCategoryControllerTest implements CommCategoryRequestTestUtils,
     void getCommCategoryByNameTest() throws Exception {
         // given
         ObjectMapper objectMapper = new ObjectMapper();
-        String category = TEST_COMM_PRIMARY_CATEGORY.getCategory();
+        String category = TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
 
         when(commCategoryApplicationService.getByCategory(category)).thenReturn(Optional.of(TEST_COMM_PRIMARY_CATEGORY_RESPONSE));
 
@@ -135,8 +136,8 @@ class CommPrimaryCategoryControllerTest implements CommCategoryRequestTestUtils,
     void getEmptyCommCategoryTest() throws Exception {
         // given
         ObjectMapper objectMapper = new ObjectMapper();
-        Integer order = TEST_COMM_PRIMARY_CATEGORY.getOrder();
-        String category = TEST_COMM_PRIMARY_CATEGORY.getCategory();
+        Integer order = TEST_COMM_PRIMARY_CATEGORY_ORDER;
+        String category = TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
 
         when(commCategoryApplicationService.getByOrder(order)).thenReturn(Optional.empty());
         when(commCategoryApplicationService.getByCategory(category)).thenReturn(Optional.empty());
@@ -195,7 +196,7 @@ class CommPrimaryCategoryControllerTest implements CommCategoryRequestTestUtils,
     @Test
     void removeCommCategoryByOrderTest() throws Exception {
         // given
-        UUID order = TEST_COMM_PRIMARY_CATEGORY_WITH_UUID.getUuid();
+        UUID order = TEST_COMM_PRIMARY_CATEGORY_UUID;
 
         doNothing().when(commCategoryApplicationService).removeByUuid(order);
 

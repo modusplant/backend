@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.modules.jwt.persistence.repository;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.modules.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.legacy.modules.jwt.persistence.entity.RefreshTokenEntity;
@@ -19,10 +19,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class RefreshTokenRepositoryTest implements RefreshTokenEntityTestUtils {
 
     private final RefreshTokenRepository refreshTokenRepository;
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberJpaRepository memberRepository;
 
     @Autowired
-    RefreshTokenRepositoryTest(RefreshTokenRepository refreshTokenRepository, SiteMemberRepository memberRepository) {
+    RefreshTokenRepositoryTest(RefreshTokenRepository refreshTokenRepository, SiteMemberJpaRepository memberRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
         this.memberRepository = memberRepository;
     }

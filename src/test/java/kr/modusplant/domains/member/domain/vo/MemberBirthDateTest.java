@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.common.utils.domain.vo.MemberBirthDateTestUtils;
-import kr.modusplant.domains.member.common.utils.domain.vo.MemberIdTestUtils;
+import kr.modusplant.domains.member.common.util.domain.vo.MemberBirthDateTestUtils;
+import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

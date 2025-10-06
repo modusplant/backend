@@ -4,9 +4,9 @@
  import kr.modusplant.infrastructure.config.aws.TestS3Config;
  import kr.modusplant.infrastructure.config.jpa.TestJpaConfig;
  import kr.modusplant.infrastructure.config.redis.TestRedisConfig;
+ import kr.modusplant.infrastructure.security.initializer.MockTokenProviderInitializer;
  import kr.modusplant.legacy.domains.common.postprocessor.MockDomainsRepositoryBeanFactoryPostProcessor;
  import kr.modusplant.legacy.domains.common.postprocessor.MockDomainsServiceBeanFactoryPostProcessor;
- import kr.modusplant.infrastructure.security.initializer.MockTokenProviderInitializer;
  import org.junit.jupiter.api.extension.ExtendWith;
  import org.junit.jupiter.api.parallel.Execution;
  import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -20,7 +20,7 @@
 
  import java.lang.annotation.*;
 
- import static kr.modusplant.legacy.domains.common.vo.Reference.NOTATION_DOMAINS;
+ import static kr.modusplant.legacy.domains.common.constant.Reference.NOTATION_DOMAINS;
 
  @Target({ElementType.TYPE})
  @Retention(RetentionPolicy.RUNTIME)

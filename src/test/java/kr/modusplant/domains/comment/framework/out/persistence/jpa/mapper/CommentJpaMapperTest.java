@@ -1,12 +1,14 @@
 package kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper;
 
+import kr.modusplant.domains.comment.common.util.domain.CommentTestUtils;
+import kr.modusplant.domains.comment.common.util.framework.CommentEntityTestUtils;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
-import kr.modusplant.domains.comment.support.utils.domain.CommentTestUtils;
-import kr.modusplant.domains.comment.support.utils.framework.CommentEntityTestUtils;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static kr.modusplant.shared.persistence.common.constant.CommPostConstant.TEST_COMM_POST_ULID;
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CommentJpaMapperTest implements CommentTestUtils, CommentEntityTestUtils {
@@ -18,13 +20,13 @@ public class CommentJpaMapperTest implements CommentTestUtils, CommentEntityTest
         // given
         SiteMemberEntity testSiteMemberEntity = SiteMemberEntity.builder()
                 .uuid(testAuthor.getMemberUuid())
-                .nickname(memberBasicUser.getNickname())
-                .birthDate(memberBasicUser.getBirthDate())
-                .loggedInAt(memberBasicUser.getLoggedInAt())
+                .nickname(MEMBER_BASIC_USER_NICKNAME)
+                .birthDate(MEMBER_BASIC_USER_BIRTH_DATE)
+                .loggedInAt(MEMBER_BASIC_USER_LOGGED_IN_AT)
                 .build();
 
         CommentEntity compare = createCommentEntityBuilder()
-                .postEntity(createCommPostEntityBuilder().ulid(TEST_COMM_POST_WITH_ULID.getUlid()).build())
+                .postEntity(createCommPostEntityBuilder().ulid(TEST_COMM_POST_ULID).build())
                 .authMember(testSiteMemberEntity)
                 .createMember(testSiteMemberEntity).build();
 

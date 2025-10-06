@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.modules.jwt.mapper;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.legacy.modules.jwt.domain.model.RefreshToken;
 import kr.modusplant.legacy.modules.jwt.persistence.entity.RefreshTokenEntity;
 import org.mapstruct.*;
@@ -13,12 +13,11 @@ import java.util.UUID;
 
 import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.EXPIRED_AT;
 import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.ISSUED_AT;
-import static kr.modusplant.legacy.domains.member.vo.MemberUuid.MEMBER_UUID;
 
 @Mapper
 public interface RefreshTokenAppInfraMapper {
     @BeanMapping(ignoreByDefault = true)
-    default RefreshTokenEntity toRefreshTokenEntity(RefreshToken refreshToken, @Context SiteMemberRepository memberRepository) {
+    default RefreshTokenEntity toRefreshTokenEntity(RefreshToken refreshToken, @Context SiteMemberJpaRepository memberRepository) {
         return RefreshTokenEntity.builder()
                 .member(memberRepository.findByUuid(refreshToken.getMemberUuid()).orElseThrow())
                 .refreshToken(refreshToken.getRefreshToken())
@@ -27,7 +26,7 @@ public interface RefreshTokenAppInfraMapper {
                 .build();
     }
 
-    @Mapping(source = "member", target = MEMBER_UUID, qualifiedByName = "toMemberUuid")
+    @Mapping(source = "member", target = "memberUuid", qualifiedByName = "toMemberUuid")
     @Mapping(source = ISSUED_AT, target = ISSUED_AT, qualifiedByName = "toDate")
     @Mapping(source = EXPIRED_AT, target = EXPIRED_AT, qualifiedByName = "toDate")
     RefreshToken toRefreshToken(RefreshTokenEntity refreshTokenEntity);

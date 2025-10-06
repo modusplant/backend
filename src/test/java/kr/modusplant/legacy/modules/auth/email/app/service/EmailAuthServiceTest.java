@@ -2,10 +2,10 @@ package kr.modusplant.legacy.modules.auth.email.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberAuthEntityTestUtils;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.out.redis.RedisHelper;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberAuthValidationService;
 import kr.modusplant.legacy.modules.auth.email.app.http.request.EmailRequest;
 import kr.modusplant.legacy.modules.auth.email.app.http.request.VerifyEmailRequest;
@@ -33,7 +33,7 @@ import static org.springframework.test.util.ReflectionTestUtils.setField;
 class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
 
     private final EmailAuthService emailAuthService;
-    private final SiteMemberAuthRepository siteMemberAuthRepository;
+    private final SiteMemberAuthJpaRepository siteMemberAuthRepository;
     private final SiteMemberAuthValidationService siteMemberAuthValidationService;
     private final RedisHelper redisHelper;
 
@@ -47,7 +47,7 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
     private final String code = "123456";
 
     @Autowired
-    EmailAuthServiceTest(EmailAuthService emailAuthService, SiteMemberAuthRepository siteMemberAuthRepository, SiteMemberAuthValidationService siteMemberAuthValidationService, TokenProvider tokenProvider, RedisHelper redisHelper) {
+    EmailAuthServiceTest(EmailAuthService emailAuthService, SiteMemberAuthJpaRepository siteMemberAuthRepository, SiteMemberAuthValidationService siteMemberAuthValidationService, TokenProvider tokenProvider, RedisHelper redisHelper) {
         this.emailAuthService = emailAuthService;
         this.siteMemberAuthRepository = siteMemberAuthRepository;
         this.siteMemberAuthValidationService = siteMemberAuthValidationService;
