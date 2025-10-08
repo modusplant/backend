@@ -19,8 +19,7 @@ public class MemberNickname {
     public static MemberNickname create(String value) {
         if (value == null || value.trim().isEmpty()) {
             throw new EmptyMemberNicknameException();
-        }
-        if (!PATTERN_NICKNAME.matcher(value).matches()) {
+        } else if (!PATTERN_NICKNAME.matcher(value).matches()) {
             throw new InvalidDataException(ErrorCode.INVALID_INPUT, "memberNickname");
         }
         return new MemberNickname(value);
