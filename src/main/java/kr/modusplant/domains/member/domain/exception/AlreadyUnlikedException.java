@@ -5,6 +5,6 @@ import kr.modusplant.shared.exception.BusinessException;
 
 public class AlreadyUnlikedException extends BusinessException {
     public AlreadyUnlikedException() {
-        super(MemberErrorCode.ALREADY_UNLIKED);
+        super(MemberErrorCode.COMMENT_ALREADY_UNLIKED);
     }
 }
