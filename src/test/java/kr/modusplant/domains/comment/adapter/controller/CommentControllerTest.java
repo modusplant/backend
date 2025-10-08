@@ -6,7 +6,6 @@ import kr.modusplant.domains.comment.common.util.adapter.CommentResponseTestUtil
 import kr.modusplant.domains.comment.common.util.adapter.MemberReadModelTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
-import kr.modusplant.domains.comment.usecase.port.repository.CommentAuthorRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentRepository;
 import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +21,6 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         CommentReadModelTestUtils, MemberReadModelTestUtils, CommentResponseTestUtils {
     private final CommentMapperImpl mapper = Mockito.mock(CommentMapperImpl.class);
     private final CommentRepository commentRepository = Mockito.mock(CommentRepository.class);
-    private final CommentAuthorRepository authorRepository = Mockito.mock(CommentAuthorRepository.class);
     private final CommentController controller = new CommentController(mapper, commentRepository);
 
     @Test
@@ -30,7 +28,6 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     public void testGatherByPost_givenValidPostUlid_willReturnResponseList() {
         // given
         given(commentRepository.findByPost(testPostId)).willReturn(List.of(testCommentResponse));
-        given(authorRepository.findByAuthor(testAuthorWithUuid)).willReturn(testMemberReadModel);
 
         // when
         List<CommentResponse> result = controller.gatherByPost(testPostId.getId());
@@ -44,7 +41,6 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     public void testGatherByAuthor_givenValidPostUlid_willReturnResponseList() {
         // given
         given(commentRepository.findByAuthor(testAuthorWithUuid)).willReturn(List.of(testCommentResponse));
-        given(authorRepository.findByAuthor(testAuthorWithUuid)).willReturn(testMemberReadModel);
 
         // when
         List<CommentResponse> result = controller.gatherByAuthor(testAuthorWithUuid.getMemberUuid());
