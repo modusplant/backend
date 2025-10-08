@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.3'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.jooq.jooq-codegen-gradle' version '3.20.8'
 	id 'jacoco'
 }
 
@@ -12,10 +13,6 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
 	}
-}
-
-jacoco {
-	toolVersion = "0.8.12"
 }
 
 configurations {
@@ -29,39 +26,95 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
-	implementation 'com.mailjet:mailjet-client:5.2.5'
-	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'org.postgresql:postgresql'
-	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
-	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+	// Lombok (Version managed by Spring Boot BOM)
 	annotationProcessor 'org.projectlombok:lombok'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.security:spring-security-crypto:6.2.3'
-	implementation 'org.springframework.boot:spring-boot-starter-aop'
-	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-	implementation 'org.apache.commons:commons-lang3:3.17.0'
-	implementation 'org.mapstruct:mapstruct:1.5.3.Final'
-    implementation 'com.mailjet:mailjet-client:5.2.5'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.springframework.boot:spring-boot-starter-cache'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'com.github.f4b6a3:ulid-creator:5.2.3'
-	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.9.10'
-	implementation 'software.amazon.awssdk:s3:2.31.61'
-	testCompileOnly 'org.projectlombok:lombok'
+	compileOnly 'org.projectlombok:lombok'
+	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0' // Version required
 	testAnnotationProcessor 'org.projectlombok:lombok'
-	testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+	testCompileOnly 'org.projectlombok:lombok'
+
+	// PostgreSQL
+	jooqCodegen 'org.postgresql:postgresql:42.7.2' // Tool dependency
+	implementation 'org.postgresql:postgresql' // Version managed by Spring Boot BOM
+
+	// JJWT
+	def jjwtVersion = "0.12.5"
+	runtimeOnly "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
+	runtimeOnly "io.jsonwebtoken:jjwt-jackson:$jjwtVersion"
+	implementation "io.jsonwebtoken:jjwt-api:$jjwtVersion"
+
+	// MapStruct
+	def mapstructVersion = "1.5.3.Final"
+	annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
+	implementation "org.mapstruct:mapstruct:$mapstructVersion"
+	testAnnotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
+
+	// Spring Boot Starters (Version managed by Spring Boot BOM)
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.boot:spring-boot-starter-jooq'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// Spring Security (Version managed by Spring Boot BOM)
+	implementation 'org.springframework.security:spring-security-crypto'
 	testImplementation 'org.springframework.security:spring-security-test'
+
+	// Flyway (Versions managed by Spring Boot BOM)
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-database-postgresql'
+
+	// Other Main Dependencies (Version required)
+	implementation 'com.github.f4b6a3:ulid-creator:5.2.3'
+	implementation 'com.mailjet:mailjet-client:5.2.5'
+	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.9.10'
+	implementation 'org.apache.commons:commons-lang3:3.18.0'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+	implementation 'software.amazon.awssdk:s3:2.31.61'
+
+	// Other Test Dependencies (Versions required) ---
 	testImplementation 'io.github.hakky54:logcaptor:2.11.0'
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs = ['src/main/java', 'src/main/generated']
+		}
+	}
+}
+
+jacoco {
+	toolVersion = "0.8.12"
+}
+
+jooq {
+	version = dependencyManagement.importedProperties['jooq.version']
+	configuration {
+		jdbc {
+			driver = 'org.postgresql.Driver'
+			url = jdbcUrl
+			user = jdbcUser
+			password = jdbcPassword
+		}
+		generator {
+			database {
+				name = 'org.jooq.meta.postgres.PostgresDatabase'
+				inputSchema = 'public'
+				includes = '.*'
+				excludes = 'databasechangelog|databasechangeloglock|flyway_schema_history'
+			}
+			target {
+				packageName = 'kr.modusplant.jooq'
+				directory = 'src/main/generated'
+				encoding = 'UTF-8'
+			}
+		}
+	}
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -72,6 +125,17 @@ tasks.withType(JavaCompile).configureEach {
 	]
 }
 
+tasks.named('jacocoTestReport') {
+	reports {
+		html.required = true
+		xml.required = false
+	}
+}
+
+tasks.named('jooqCodegen') {
+	dependsOn tasks.named('flywayMigrate')
+}
+
 tasks.named('test') {
 	testClassesDirs = sourceSets.test.output.classesDirs
 	classpath = sourceSets.test.runtimeClasspath
@@ -79,13 +143,6 @@ tasks.named('test') {
 	useJUnitPlatform()
 
 	finalizedBy tasks.named('jacocoTestReport')
-}
-
-tasks.named('jacocoTestReport') {
-	reports {
-		html.required = true
-		xml.required = false
-	}
 }
 
 afterEvaluate {

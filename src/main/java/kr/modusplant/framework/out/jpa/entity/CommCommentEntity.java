@@ -44,6 +44,10 @@ public class CommCommentEntity {
     @JoinColumn(name = CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity createMember;
 
+    @Column(name = "like_count", nullable = false)
+    @DefaultValue
+    private Integer likeCount;
+
     @Column(name = CONTENT, nullable = false, length = 900)
     private String content;
 
@@ -54,6 +58,14 @@ public class CommCommentEntity {
     @Column(name = CREATED_AT, nullable = false)
     @CreatedDate
     private LocalDateTime createdAt;
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        this.likeCount = Math.max(0, this.likeCount - 1);
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -76,6 +88,9 @@ public class CommCommentEntity {
 
     @PrePersist
     public void prePersist() {
+        if (this.likeCount == null) {
+            this.likeCount = 0;
+        }
         if (this.isDeleted == null) {
             this.isDeleted = false;
         }
@@ -84,12 +99,13 @@ public class CommCommentEntity {
     private CommCommentEntity(
             CommPostEntity postEntity, String path,
             SiteMemberEntity authMember, SiteMemberEntity createMember,
-            String content, Boolean isDeleted
+            Integer likeCount, String content, Boolean isDeleted
     ) {
         this.postEntity = postEntity;
         this.path = path;
         this.authMember = authMember;
         this.createMember = createMember;
+        this.likeCount = likeCount;
         this.content = content;
         this.isDeleted = isDeleted;
     }
@@ -103,6 +119,7 @@ public class CommCommentEntity {
         private String path;
         private SiteMemberEntity authMember;
         private SiteMemberEntity createMember;
+        private Integer likeCount;
         private String content;
         private Boolean isDeleted;
 
@@ -126,6 +143,11 @@ public class CommCommentEntity {
             return this;
         }
 
+        public CommCommentEntityBuilder likeCount(final Integer likeCount) {
+            this.likeCount = likeCount;
+            return this;
+        }
+
         public CommCommentEntityBuilder content(final String content) {
             this.content = content;
             return this;
@@ -136,18 +158,19 @@ public class CommCommentEntity {
             return this;
         }
 
-        public CommCommentEntityBuilder CommCommentEntity(final CommCommentEntity CommCommentEntity) {
-            this.postEntity = CommCommentEntity.getPostEntity();
-            this.path = CommCommentEntity.getPath();
-            this.authMember = CommCommentEntity.getAuthMember();
-            this.createMember = CommCommentEntity.getCreateMember();
-            this.content = CommCommentEntity.getContent();
-            this.isDeleted = CommCommentEntity.getIsDeleted();
+        public CommCommentEntityBuilder CommCommentEntity(final CommCommentEntity commCommentEntity) {
+            this.postEntity = commCommentEntity.getPostEntity();
+            this.path = commCommentEntity.getPath();
+            this.authMember = commCommentEntity.getAuthMember();
+            this.createMember = commCommentEntity.getCreateMember();
+            this.likeCount = commCommentEntity.getLikeCount();
+            this.content = commCommentEntity.getContent();
+            this.isDeleted = commCommentEntity.getIsDeleted();
             return this;
         }
 
         public CommCommentEntity build() {
-            return new CommCommentEntity(this.postEntity, this.path, this.authMember, this.createMember, this.content, this.isDeleted
+            return new CommCommentEntity(this.postEntity, this.path, this.authMember, this.createMember, this.likeCount, this.content, this.isDeleted
             );
         }
     }

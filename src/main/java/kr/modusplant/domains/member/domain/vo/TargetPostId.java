@@ -19,8 +19,7 @@ public class TargetPostId {
     public static TargetPostId create(String value) {
         if (value == null || value.trim().isEmpty()) {
             throw new EmptyTargetPostIdException();
-        }
-        if (!PATTERN_ULID.matcher(value).matches()) {
+        } else if (!PATTERN_ULID.matcher(value).matches()) {
             throw new InvalidDataException(ErrorCode.INVALID_INPUT, "targetPostId");
         }
         return new TargetPostId(value);

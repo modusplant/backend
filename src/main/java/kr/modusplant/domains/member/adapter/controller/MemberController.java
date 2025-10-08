@@ -1,16 +1,22 @@
 package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.domain.aggregate.Member;
-import kr.modusplant.domains.member.domain.exception.AlreadyLikedException;
-import kr.modusplant.domains.member.domain.exception.AlreadyUnlikedException;
+import kr.modusplant.domains.member.domain.exception.CommentAlreadyLikedException;
+import kr.modusplant.domains.member.domain.exception.CommentAlreadyUnlikedException;
+import kr.modusplant.domains.member.domain.exception.PostAlreadyLikedException;
+import kr.modusplant.domains.member.domain.exception.PostAlreadyUnlikedException;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberNickname;
+import kr.modusplant.domains.member.domain.vo.TargetCommentId;
 import kr.modusplant.domains.member.domain.vo.TargetPostId;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
+import kr.modusplant.domains.member.usecase.port.repository.TargetCommentIdRepository;
 import kr.modusplant.domains.member.usecase.port.repository.TargetPostIdRepository;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.infrastructure.event.bus.EventBus;
+import kr.modusplant.shared.event.CommentLikeEvent;
+import kr.modusplant.shared.event.CommentUnlikeEvent;
 import kr.modusplant.shared.event.PostLikeEvent;
 import kr.modusplant.shared.event.PostUnlikeEvent;
 import kr.modusplant.shared.exception.EntityExistsException;
@@ -20,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 
@@ -31,6 +36,7 @@ public class MemberController {
     private final MemberMapper mapper;
     private final MemberRepository memberRepository;
     private final TargetPostIdRepository targetPostIdRepository;
+    private final TargetCommentIdRepository targetCommentIdRepository;
     private final EventBus eventBus;
 
     public MemberResponse register(MemberNickname nickname) {
@@ -45,14 +51,24 @@ public class MemberController {
         return mapper.toMemberResponse(memberRepository.save(member));
     }
 
-    public void likePost(UUID memberId, String postUlid) {
-        validateBeforeLikePost(memberId, postUlid);
-        eventBus.publish(PostLikeEvent.create(memberId, postUlid));
+    public void likePost(MemberId memberId, TargetPostId targetPostId) {
+        validateBeforeLikePost(memberId, targetPostId);
+        eventBus.publish(PostLikeEvent.create(memberId.getValue(), targetPostId.getValue()));
     }
 
-    public void unlikePost(UUID memberId, String postUlid) {
-        validateBeforeUnlikePost(memberId, postUlid);
-        eventBus.publish(PostUnlikeEvent.create(memberId, postUlid));
+    public void unlikePost(MemberId memberId, TargetPostId targetPostId) {
+        validateBeforeUnlikePost(memberId, targetPostId);
+        eventBus.publish(PostUnlikeEvent.create(memberId.getValue(), targetPostId.getValue()));
+    }
+
+    public void likeComment(MemberId memberId, TargetCommentId targetCommentId) {
+        validateBeforeLikeComment(memberId, targetCommentId);
+        eventBus.publish(CommentLikeEvent.create(memberId.getValue(), targetCommentId.getTargetPostId().getValue(), targetCommentId.getTargetCommentPath().getValue()));
+    }
+
+    public void unlikeComment(MemberId memberId, TargetCommentId targetCommentId) {
+        validateBeforeUnlikeComment(memberId, targetCommentId);
+        eventBus.publish(CommentUnlikeEvent.create(memberId.getValue(), targetCommentId.getTargetPostId().getValue(), targetCommentId.getTargetCommentPath().getValue()));
     }
 
     private void validateBeforeRegister(Member member) {
@@ -68,27 +84,51 @@ public class MemberController {
         }
     }
 
-    private void validateBeforeLikePost(UUID memberId, String postUlid) {
-        if (!memberRepository.isIdExist(MemberId.fromUuid(memberId))) {
+    private void validateBeforeLikePost(MemberId memberId, TargetPostId targetPostId) {
+        if (!memberRepository.isIdExist(memberId)) {
             throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
         }
-        if (!targetPostIdRepository.isIdExist(TargetPostId.create(postUlid))) {
+        if (!targetPostIdRepository.isIdExist(targetPostId)) {
             throw new EntityNotFoundException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
         }
-        if (targetPostIdRepository.isLiked(MemberId.fromUuid(memberId), TargetPostId.create(postUlid))) {
-            throw new AlreadyLikedException();
+        if (targetPostIdRepository.isLiked(memberId, targetPostId)) {
+            throw new PostAlreadyLikedException();
         }
     }
 
-    private void validateBeforeUnlikePost(UUID memberId, String postUlid) {
-        if (!memberRepository.isIdExist(MemberId.fromUuid(memberId))) {
+    private void validateBeforeUnlikePost(MemberId memberId, TargetPostId targetPostId) {
+        if (!memberRepository.isIdExist(memberId)) {
             throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
         }
-        if (!targetPostIdRepository.isIdExist(TargetPostId.create(postUlid))) {
+        if (!targetPostIdRepository.isIdExist(targetPostId)) {
             throw new EntityNotFoundException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
         }
-        if (targetPostIdRepository.isUnliked(MemberId.fromUuid(memberId), TargetPostId.create(postUlid))) {
-            throw new AlreadyUnlikedException();
+        if (targetPostIdRepository.isUnliked(memberId, targetPostId)) {
+            throw new PostAlreadyUnlikedException();
+        }
+    }
+
+    private void validateBeforeLikeComment(MemberId memberId, TargetCommentId targetCommentId) {
+        if (!memberRepository.isIdExist(memberId)) {
+            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+        }
+        if (!targetCommentIdRepository.isIdExist(targetCommentId)) {
+            throw new EntityNotFoundException(NOT_FOUND_TARGET_COMMENT_ID, "targetCommentId");
+        }
+        if (targetCommentIdRepository.isLiked(memberId, targetCommentId)) {
+            throw new CommentAlreadyLikedException();
+        }
+    }
+
+    private void validateBeforeUnlikeComment(MemberId memberId, TargetCommentId targetCommentId) {
+        if (!memberRepository.isIdExist(memberId)) {
+            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+        }
+        if (!targetCommentIdRepository.isIdExist(targetCommentId)) {
+            throw new EntityNotFoundException(NOT_FOUND_TARGET_COMMENT_ID, "targetCommentId");
+        }
+        if (targetCommentIdRepository.isUnliked(memberId, targetCommentId)) {
+            throw new CommentAlreadyUnlikedException();
         }
     }
 }

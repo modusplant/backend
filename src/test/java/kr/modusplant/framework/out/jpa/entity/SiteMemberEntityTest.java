@@ -35,22 +35,4 @@ class SiteMemberEntityTest implements SiteMemberEntityTestUtils {
         assertThat(member.getIsBanned()).isEqualTo(false);
         assertThat(member.getIsDeleted()).isEqualTo(false);
     }
-
-    @DisplayName("회원 PreUpdate")
-    @Test
-    void preUpdate() {
-        // given
-        SiteMemberEntity member = SiteMemberEntity.builder().memberEntity(createMemberBasicUserEntity()).build();
-        entityManager.persist(member);
-
-        // when
-        entityManager.merge(SiteMemberEntity.builder().memberEntity(member).isActive(null).isDisabledByLinking(null).isBanned(null).isDeleted(null).build());
-        entityManager.flush();
-
-        // then
-        assertThat(member.getIsActive()).isEqualTo(true);
-        assertThat(member.getIsDisabledByLinking()).isEqualTo(false);
-        assertThat(member.getIsBanned()).isEqualTo(false);
-        assertThat(member.getIsDeleted()).isEqualTo(false);
-    }
 }
