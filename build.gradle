@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.3'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.flywaydb.flyway' version '11.14.0'
 	id 'org.jooq.jooq-codegen-gradle' version '3.20.8'
 	id 'jacoco'
 }
@@ -38,13 +39,13 @@ dependencies {
 	implementation 'org.postgresql:postgresql' // Version managed by Spring Boot BOM
 
 	// JJWT
-	def jjwtVersion = "0.12.5"
+	def jjwtVersion = '0.12.5'
 	runtimeOnly "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
 	runtimeOnly "io.jsonwebtoken:jjwt-jackson:$jjwtVersion"
 	implementation "io.jsonwebtoken:jjwt-api:$jjwtVersion"
 
 	// MapStruct
-	def mapstructVersion = "1.5.3.Final"
+	def mapstructVersion = '1.5.3.Final'
 	annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
 	implementation "org.mapstruct:mapstruct:$mapstructVersion"
 	testAnnotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
@@ -88,8 +89,18 @@ sourceSets {
 	}
 }
 
+flyway {
+	url = jdbcUrl
+	user = jdbcUser
+	password = jdbcPassword
+	baselineVersion = '0.0.0'
+	outOfOrder = false
+	encoding = 'UTF-8'
+	detectEncoding = true
+}
+
 jacoco {
-	toolVersion = "0.8.12"
+	toolVersion = '0.8.12'
 }
 
 jooq {
@@ -130,10 +141,6 @@ tasks.named('jacocoTestReport') {
 		html.required = true
 		xml.required = false
 	}
-}
-
-tasks.named('jooqCodegen') {
-	dependsOn tasks.named('flywayMigrate')
 }
 
 tasks.named('test') {
