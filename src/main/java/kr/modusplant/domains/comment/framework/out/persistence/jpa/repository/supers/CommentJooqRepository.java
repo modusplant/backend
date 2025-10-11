@@ -19,14 +19,15 @@ public class CommentJooqRepository {
 ////            "INNER JOIN c.authMember m " +
 ////            "WHERE c.postEntity.ulid = :postUlid " +
 ////            "ORDER BY c.createdAt ASC")
-//    public List<CommentResponse> findByPostUlid() {
-//        return dsl.select(CommPost.ULID, CommComment.PATH, SiteMember.NICKNAME,
+//    public List<CommentResponse> findByPostUlid(String postId) {
+//        return dsl.select(CommComment.ULID, CommComment.PATH, SiteMember.NICKNAME,
 //                CommComment.CONTENT, CommComment.IS_DELETED, CommComment.CREATED_AT)
 //                .from(CommPost, CommComment, SiteMember)
 //                .join(SiteMember).on(CommComment.AUTH_MEMB_UUID.eq(SiteMember.UUID))
-//                .where(CommComment.POST_ULID.eq(CommPost.ULID))
+//                .where(CommComment.POST_ULID.eq(postId))
 //                .orderBy(CommComment.CREATED_AT.asc())
-//                .fetch();
+//                .fetch()
+//                .into(CommentResponse.class);
 //    }
 //
 ////    @Query("SELECT c.postEntity.ulid, c.id.path, m.nickname, c.content, c.isDeleted, c.createdAt " +
@@ -35,13 +36,14 @@ public class CommentJooqRepository {
 ////            "WHERE c.authMember.uuid = :memberUuid " +
 ////            "ORDER BY c.createdAt ASC")
 ////    List<CommentResponse> findByAuthMemberUuid(@Param("memberUuid") UUID memberUuid);
-//    public List<CommentResponse> findByAuthMemberUuid() {
+//    public List<CommentResponse> findByAuthMemberUuid(UUID authMemberUuid) {
 //        return dsl.select(CommPost.ULID, CommComment.PATH, SiteMember.NICKNAME,
 //                        CommComment.CONTENT, CommComment.IS_DELETED, CommComment.CREATED_AT)
 //                .from(CommPost, CommComment, SiteMember)
 //                .join(SiteMember).on(CommComment.AUTH_MEMB_UUID.eq(SiteMember.UUID))
-//                .where(CommComment.AUTH_MEMB_UUID.eq(SiteMember.UUID))
+//                .where(CommComment.AUTH_MEMB_UUID.eq(authMemberUuid))
 //                .orderBy(CommComment.CREATED_AT.asc())
-//                .fetch();
+//                .fetch()
+//                .into(CommentResponse.class);
 //    }
 }
