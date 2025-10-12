@@ -22,7 +22,7 @@ CREATE TABLE "refresh_token" (
 
 CREATE TABLE "site_member_role" (
 	"uuid"	uuid		NOT NULL,
-	"role"	site_member_role		NOT NULL
+	"role"	varchar(12)		NOT NULL
 );
 
 CREATE TABLE "prop_bug_rep" (
@@ -100,7 +100,7 @@ CREATE TABLE "site_member_auth" (
 	"act_memb_uuid"	uuid		NOT NULL,
 	"email"	varchar(255)		NOT NULL,
 	"pw"	varchar(64)		NULL,
-	"provider"	auth_provider		NOT NULL,
+	"provider"	varchar(10)		NOT NULL,
 	"provider_id"	text		NULL,
 	"lockout_until"	timestamp		NULL,
 	"last_modified_at"	timestamp		NOT NULL,
