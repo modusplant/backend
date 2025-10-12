@@ -2,9 +2,6 @@ package kr.modusplant.domains.comment.common.util.domain;
 
 import kr.modusplant.domains.comment.domain.vo.Author;
 
-import java.util.UUID;
-
-import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_MEMBER_NICKNAME_STRING;
 import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_MEMBER_NICKNAME_STRING;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 

@@ -8,7 +8,6 @@ import kr.modusplant.domains.comment.usecase.port.repository.CommentRepository;
 import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.shared.persistence.compositekey.CommCommentId;
 import lombok.RequiredArgsConstructor;
-import org.jooq.Result;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

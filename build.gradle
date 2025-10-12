@@ -1,3 +1,12 @@
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath 'org.flywaydb:flyway-database-postgresql:11.14.0'
+	}
+}
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.3'
@@ -36,7 +45,7 @@ dependencies {
 
 	// PostgreSQL
 	jooqCodegen 'org.postgresql:postgresql:42.7.2' // Tool dependency
-	implementation 'org.postgresql:postgresql' // Version managed by Spring Boot BOM
+	runtimeOnly 'org.postgresql:postgresql' // Version managed by Spring Boot BOM
 
 	// JJWT
 	def jjwtVersion = '0.12.5'
@@ -65,10 +74,6 @@ dependencies {
 	implementation 'org.springframework.security:spring-security-crypto'
 	testImplementation 'org.springframework.security:spring-security-test'
 
-	// Flyway (Versions managed by Spring Boot BOM)
-	implementation 'org.flywaydb:flyway-core'
-	implementation 'org.flywaydb:flyway-database-postgresql'
-
 	// Other Main Dependencies (Version required)
 	implementation 'com.github.f4b6a3:ulid-creator:5.2.3'
 	implementation 'com.mailjet:mailjet-client:5.2.5'
@@ -90,6 +95,7 @@ sourceSets {
 }
 
 flyway {
+	driver = 'org.postgresql.Driver'
 	url = jdbcUrl
 	user = jdbcUser
 	password = jdbcPassword
@@ -134,6 +140,10 @@ tasks.withType(JavaCompile).configureEach {
 							 "-Amapstruct.defaultComponentModel=spring",
 							 "-Amapstruct.unmappedTargetPolicy=ERROR"
 	]
+}
+
+tasks.named('jooqCodegen') {
+	dependsOn(':flywayMigrate')
 }
 
 tasks.named('jacocoTestReport') {

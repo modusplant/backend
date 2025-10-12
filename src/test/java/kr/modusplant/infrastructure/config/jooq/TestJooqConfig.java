@@ -3,13 +3,13 @@ package kr.modusplant.infrastructure.config.jooq;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
 
-@Configuration
-public class JooqConfig {
+@TestConfiguration
+public class TestJooqConfig {
 
     @Bean
     public DSLContext dsl(DataSource dataSource) {
