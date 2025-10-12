@@ -26,8 +26,10 @@ public class CommentJooqRepository {
 //                .join(SiteMember).on(CommComment.AUTH_MEMB_UUID.eq(SiteMember.UUID))
 //                .where(CommComment.POST_ULID.eq(postId))
 //                .orderBy(CommComment.CREATED_AT.asc())
-//                .fetch()
-//                .into(CommentResponse.class);
+//                .fetch(record -> new CommentResponse(
+//                    CommComment.ULID, CommComment.PATH, SiteMember.NICKNAME,
+//                    CommComment.CONTENT, CommComment.IS_DELETED, CommComment.CREATED_AT
+//                ));
 //    }
 //
 ////    @Query("SELECT c.postEntity.ulid, c.id.path, m.nickname, c.content, c.isDeleted, c.createdAt " +
@@ -43,7 +45,9 @@ public class CommentJooqRepository {
 //                .join(SiteMember).on(CommComment.AUTH_MEMB_UUID.eq(SiteMember.UUID))
 //                .where(CommComment.AUTH_MEMB_UUID.eq(authMemberUuid))
 //                .orderBy(CommComment.CREATED_AT.asc())
-//                .fetch()
-//                .into(CommentResponse.class);
+//                .fetch(record -> new CommentResponse(
+//                        CommComment.ULID, CommComment.PATH, SiteMember.NICKNAME,
+//                        CommComment.CONTENT, CommComment.IS_DELETED, CommComment.CREATED_AT
+//                ));
 //    }
 }
