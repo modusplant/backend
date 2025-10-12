@@ -1,5 +1,8 @@
 package kr.modusplant.infrastructure.config.jpa;
 
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -64,5 +67,10 @@ public class JpaConfig {
         JpaTransactionManager jpaTransactionManager = new JpaTransactionManager();
         jpaTransactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
         return jpaTransactionManager;
+    }
+
+    @Bean
+    public DSLContext dsl() {
+        return DSL.using(dataSource(), SQLDialect.POSTGRES);
     }
 }
