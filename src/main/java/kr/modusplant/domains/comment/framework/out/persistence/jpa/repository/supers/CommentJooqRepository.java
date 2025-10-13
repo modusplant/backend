@@ -1,12 +1,8 @@
 package kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.supers;
 
-import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
