@@ -31,7 +31,7 @@ public class TermEntity {
     @Column(nullable = false, updatable = false)
     private UUID uuid;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false, length = 40)
     private String name;
 
     @Column(nullable = false, length = 60000)
