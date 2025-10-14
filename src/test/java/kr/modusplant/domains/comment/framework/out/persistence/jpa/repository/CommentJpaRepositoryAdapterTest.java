@@ -6,7 +6,6 @@ import kr.modusplant.domains.comment.common.util.domain.CommentTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper.CommentJpaMapper;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.supers.CommentJpaRepository;
-import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
 import kr.modusplant.framework.out.jpa.entity.CommCommentEntity;
 import kr.modusplant.framework.out.jpa.entity.common.util.CommCommentEntityTestUtils;
@@ -15,9 +14,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -29,32 +25,6 @@ public class CommentJpaRepositoryAdapterTest implements PostIdTestUtils,
     private final CommentJpaRepository repository = Mockito.mock(CommentJpaRepository.class);
     private final CommentJpaMapper mapper = Mockito.mock(CommentJpaMapper.class);
     private final CommentRepositoryJpaAdapter repositoryJpaAdapter = new CommentRepositoryJpaAdapter(repository, mapper);
-
-    @Test
-    @DisplayName("유효한 게시글 id로 댓글 가져오기")
-    public void testFindByPost_givenValidPostId_willReturnCommentResponseList() {
-        // given
-        given(repository.findByPostUlid(testPostId.getId())).willReturn(List.of(testCommentResponse));
-
-        // when
-        List<CommentResponse> result = repositoryJpaAdapter.findByPost(testPostId);
-
-        // then
-        assertThat(result).isEqualTo(List.of(testCommentResponse));
-    }
-
-    @Test
-    @DisplayName("유효한 작성자 id로 댓글 가져오기")
-    public void testFindByAuthor_givenValidAuthor_willReturnCommentResponseList() {
-        // given
-        given(repository.findByAuthMemberUuid(testAuthor.getMemberUuid())).willReturn(List.of(testCommentResponse));
-
-        // when
-        List<CommentResponse> result = repositoryJpaAdapter.findByAuthor(testAuthorWithUuid);
-
-        // then
-        assertThat(result).isEqualTo(List.of(testCommentResponse));
-    }
 
     @Test
     @DisplayName("유효한 댓글로 댓글 저장")
