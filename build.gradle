@@ -86,6 +86,14 @@ dependencies {
 	testImplementation 'io.github.hakky54:logcaptor:2.11.0'
 }
 
+sourceSets {
+	main {
+		java {
+			srcDir 'build/classes/src/main/generated'
+		}
+	}
+}
+
 flyway {
 	driver = 'org.postgresql.Driver'
 	url = jdbcUrl
@@ -111,6 +119,9 @@ jooq {
 			password = jdbcPassword
 		}
 		generator {
+			generate {
+				javaTimeTypes = true
+			}
 			database {
 				name = 'org.jooq.meta.postgres.PostgresDatabase'
 				inputSchema = 'public'
