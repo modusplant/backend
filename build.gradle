@@ -102,7 +102,7 @@ jacoco {
 }
 
 jooq {
-	version = dependencyManagement.importedProperties['jooq.version']
+	version = '3.20.8'
 	configuration {
 		jdbc {
 			driver = 'org.postgresql.Driver'
