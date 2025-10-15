@@ -135,7 +135,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 tasks.named('jooqCodegen') {
-	dependsOn(':flywayMigrate')
+	dependsOn tasks.named('flywayMigrate')
 }
 
 tasks.named('jacocoTestReport') {
