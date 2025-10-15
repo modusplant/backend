@@ -89,7 +89,7 @@ dependencies {
 sourceSets {
 	main {
 		java {
-			srcDir 'build/classes/src/main/generated'
+			srcDir 'build/generated/sources/jooq/main'
 		}
 	}
 }
@@ -130,7 +130,7 @@ jooq {
 			}
 			target {
 				packageName = 'kr.modusplant.jooq'
-				directory = 'build/classes/src/main/generated'
+				directory = 'build/generated/sources/jooq/main'
 				encoding = 'UTF-8'
 			}
 		}
@@ -143,6 +143,20 @@ tasks.withType(JavaCompile).configureEach {
 							 "-Amapstruct.defaultComponentModel=spring",
 							 "-Amapstruct.unmappedTargetPolicy=ERROR"
 	]
+}
+
+tasks.named('compileJava') {
+	dependsOn tasks.named('jooqCodegen')
+	dependsOn tasks.named('flywayMigrate')
+
+	tasks.named('jooqCodegen').get().mustRunAfter(tasks.named('flywayMigrate'))
+}
+
+tasks.named('compileTestJava') {
+	dependsOn tasks.named('jooqCodegen')
+	dependsOn tasks.named('flywayMigrate')
+
+	tasks.named('jooqCodegen').get().mustRunAfter(tasks.named('flywayMigrate'))
 }
 
 tasks.named('jooqCodegen') {
