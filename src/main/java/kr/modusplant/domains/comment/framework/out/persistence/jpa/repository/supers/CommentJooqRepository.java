@@ -28,7 +28,7 @@ public class CommentJooqRepository {
                 .where(commComment.POST_ULID.eq(postId))
                 .orderBy(commComment.CREATED_AT.asc())
                 .fetch(record -> new CommentResponse(
-                    record.get(commComment.POST_ULID), record.get(commComment.PATH), record.get(siteMember.NICKNAME),
+                    record.get(commPost.ULID), record.get(commComment.PATH), record.get(siteMember.NICKNAME),
                     record.get(commComment.CONTENT), record.get(commComment.IS_DELETED), record.get(commComment.CREATED_AT).toString()
                 ));
     }
@@ -41,7 +41,7 @@ public class CommentJooqRepository {
                 .where(commComment.AUTH_MEMB_UUID.eq(authMemberUuid))
                 .orderBy(commComment.CREATED_AT.asc())
                 .fetch(record -> new CommentResponse(
-                        record.get(commComment.POST_ULID), record.get(commComment.PATH), record.get(siteMember.NICKNAME),
+                        record.get(commPost.ULID), record.get(commComment.PATH), record.get(siteMember.NICKNAME),
                         record.get(commComment.CONTENT), record.get(commComment.IS_DELETED), record.get(commComment.CREATED_AT).toString()
                 ));
     }
