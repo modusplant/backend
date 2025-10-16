@@ -17,14 +17,12 @@ public class CommentRepositoryJooqAdapter implements CommentReadRepository {
 
     @Override
     public List<CommentResponse> findByPost(PostId postId) {
-//        return repository.findByPostUlid(postId.getId());
-        return null;
+        return repository.findByPostUlid(postId.getId());
     }
 
     @Override
     public List<CommentResponse> findByAuthor(Author author) {
-//        return repository.findByAuthMemberUuid(author.getMemberUuid());
-        return null;
+        return repository.findByAuthMemberUuid(author.getMemberUuid());
     }
 
 }
