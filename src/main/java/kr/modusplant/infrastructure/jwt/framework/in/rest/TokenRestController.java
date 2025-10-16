@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
-import kr.modusplant.infrastructure.jwt.framework.in.response.TokenResponse;
+import kr.modusplant.shared.http.response.TokenResponse;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import lombok.RequiredArgsConstructor;
