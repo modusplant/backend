@@ -12,11 +12,12 @@ import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_MEMBER_NICKNAME_STRING;
-import static kr.modusplant.domains.member.common.constant.MemberUuidConstant.TEST_MEMBER_ID_UUID;
-import static kr.modusplant.domains.member.common.util.domain.vo.TargetCommentIdTestUtils.testTargetCommentId;
-import static kr.modusplant.domains.member.common.util.domain.vo.TargetCommentPathTestUtils.testTargetCommentPath;
-import static kr.modusplant.domains.member.common.util.domain.vo.TargetPostIdTestUtils.testTargetPostId;
+import static kr.modusplant.domains.member.common.util.usecase.request.MemberCommentLikeRequestTestUtils.testMemberCommentLikeRequest;
+import static kr.modusplant.domains.member.common.util.usecase.request.MemberCommentUnlikeRequestTestUtils.testMemberCommentUnlikeRequest;
+import static kr.modusplant.domains.member.common.util.usecase.request.MemberNicknameUpdateRequestTestUtils.testMemberNicknameUpdateRequest;
+import static kr.modusplant.domains.member.common.util.usecase.request.MemberPostLikeRequestTestUtils.testMemberPostLikeRequest;
+import static kr.modusplant.domains.member.common.util.usecase.request.MemberPostUnlikeRequestTestUtils.testMemberPostUnlikeRequest;
+import static kr.modusplant.domains.member.common.util.usecase.request.MemberRegisterRequestTestUtils.testMemberRegisterRequest;
 import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -32,10 +33,10 @@ class MemberRestControllerTest implements MemberTestUtils, MemberResponseTestUti
     @DisplayName("registerMember로 응답 반환")
     void testRegisterMember_givenValidNickname_willReturnResponse() {
         // given
-        given(memberController.register(testMemberNickname)).willReturn(testMemberResponse);
+        given(memberController.register(testMemberRegisterRequest)).willReturn(testMemberResponse);
 
         // when
-        ResponseEntity<DataResponse<MemberResponse>> memberResponseEntity = memberRestController.registerMember(TEST_MEMBER_NICKNAME_STRING);
+        ResponseEntity<DataResponse<MemberResponse>> memberResponseEntity = memberRestController.registerMember(testMemberRegisterRequest);
 
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -46,10 +47,10 @@ class MemberRestControllerTest implements MemberTestUtils, MemberResponseTestUti
     @DisplayName("updateMemberNickname으로 응답 반환")
     void testUpdateMemberNickname_givenValidRequest_willReturnResponse() {
         // given
-        given(memberController.updateNickname(testMemberId, testMemberNickname)).willReturn(testMemberResponse);
+        given(memberController.updateNickname(testMemberNicknameUpdateRequest)).willReturn(testMemberResponse);
 
         // when
-        ResponseEntity<DataResponse<MemberResponse>> memberResponseEntity = memberRestController.updateMemberNickname(TEST_MEMBER_ID_UUID, TEST_MEMBER_NICKNAME_STRING);
+        ResponseEntity<DataResponse<MemberResponse>> memberResponseEntity = memberRestController.updateMemberNickname(testMemberNicknameUpdateRequest);
 
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -60,10 +61,10 @@ class MemberRestControllerTest implements MemberTestUtils, MemberResponseTestUti
     @DisplayName("likeCommunicationPost로 응답 반환")
     void testLikeCommunicationPost_givenValidRequest_willReturnResponse() {
         // given
-        willDoNothing().given(memberController).likePost(testMemberId, testTargetPostId);
+        willDoNothing().given(memberController).likePost(testMemberPostLikeRequest);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.likeCommunicationPost(testMemberId.getValue(), testTargetPostId.getValue());
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.likeCommunicationPost(testMemberPostLikeRequest);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -74,10 +75,10 @@ class MemberRestControllerTest implements MemberTestUtils, MemberResponseTestUti
     @DisplayName("unlikeCommunicationPost로 응답 반환")
     void testUnlikeCommunicationPost_givenValidRequest_willReturnResponse() {
         // given
-        willDoNothing().given(memberController).unlikePost(testMemberId, testTargetPostId);
+        willDoNothing().given(memberController).unlikePost(testMemberPostUnlikeRequest);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.unlikeCommunicationPost(testMemberId.getValue(), testTargetPostId.getValue());
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.unlikeCommunicationPost(testMemberPostUnlikeRequest);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -88,10 +89,10 @@ class MemberRestControllerTest implements MemberTestUtils, MemberResponseTestUti
     @DisplayName("likeCommunicationComment로 응답 반환")
     void testLikeCommunicationComment_givenValidRequest_willReturnResponse() {
         // given
-        willDoNothing().given(memberController).likeComment(testMemberId, testTargetCommentId);
+        willDoNothing().given(memberController).likeComment(testMemberCommentLikeRequest);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.likeCommunicationComment(testMemberId.getValue(), testTargetPostId.getValue(), testTargetCommentPath.getValue());
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.likeCommunicationComment(testMemberCommentLikeRequest);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -102,10 +103,10 @@ class MemberRestControllerTest implements MemberTestUtils, MemberResponseTestUti
     @DisplayName("unlikeCommunicationComment로 응답 반환")
     void testUnlikeCommunicationComment_givenValidRequest_willReturnResponse() {
         // given
-        willDoNothing().given(memberController).unlikeComment(testMemberId, testTargetCommentId);
+        willDoNothing().given(memberController).unlikeComment(testMemberCommentUnlikeRequest);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.unlikeCommunicationComment(testMemberId.getValue(), testTargetPostId.getValue(), testTargetCommentPath.getValue());
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.unlikeCommunicationComment(testMemberCommentUnlikeRequest);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
