@@ -46,7 +46,7 @@ public class MemberRestController {
     }
 
     @Operation(summary = "회원 닉네임 갱신 API", description = "회원 닉네임을 갱신합니다.")
-    @PutMapping("/nickname")
+    @PostMapping("/nickname")
     public ResponseEntity<DataResponse<MemberResponse>> updateMemberNickname(
             @Parameter(schema = @Schema(
                     description = "기존에 저장된 회원의 아이디",
