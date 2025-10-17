@@ -13,12 +13,12 @@ import org.springframework.stereotype.Component;
 public class MemberMapperImpl implements MemberMapper {
     @Override
     public Member toMember(MemberRegisterRequest request) {
-        return Member.create(MemberNickname.create(request.nickname()));
+        return Member.createToRegister(MemberNickname.create(request.nickname()));
     }
 
     @Override
     public Member toMember(MemberNicknameUpdateRequest request) {
-        return Member.create(MemberId.fromUuid(request.id()), MemberNickname.create(request.nickname()));
+        return Member.createToUpdateNickname(MemberId.fromUuid(request.id()), MemberNickname.create(request.nickname()));
     }
 
     @Override

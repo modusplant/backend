@@ -14,7 +14,17 @@ public class MemberJpaMapperImpl implements MemberJpaMapper {
 
     @Override
     public SiteMemberEntity toMemberEntity(Member member) {
-        return SiteMemberEntity.builder().uuid(member.getMemberId().getValue()).isActive(member.getMemberStatus().isActive()).nickname(member.getMemberNickname().getValue()).birthDate(member.getMemberBirthDate().getValue()).build();
+        SiteMemberEntity.SiteMemberEntityBuilder builder = SiteMemberEntity.builder().nickname(member.getMemberNickname().getValue());
+        if (member.getMemberId() != null) {
+            builder.uuid(member.getMemberId().getValue());
+        }
+        if (member.getMemberStatus() != null) {
+            builder.isActive(member.getMemberStatus().isActive());
+        }
+        if (member.getMemberBirthDate() != null) {
+            builder.birthDate(member.getMemberBirthDate().getValue());
+        }
+        return builder.build();
     }
 
     @Override
