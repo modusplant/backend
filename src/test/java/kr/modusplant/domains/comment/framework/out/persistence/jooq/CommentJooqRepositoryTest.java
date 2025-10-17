@@ -4,7 +4,6 @@ import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentContentTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentPathTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
-import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqRepository;
 import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.domains.identity.normal.common.util.domain.vo.NicknameTestUtils;
 import org.jooq.DSLContext;
@@ -71,10 +70,10 @@ public class CommentJooqRepositoryTest implements
 
     @Test
     @DisplayName("게시글의 식별자로 댓글 응답 가져오기")
-    void testFindByPostUlid_givenValidPostUlid_willReturnCommentResponse() {
+    void testFindByPost_givenValidPostUlid_willReturnCommentResponse() {
 
         // given & when
-        List<CommentResponse> result = repository.findByPostUlid(testPostId.getId());
+        List<CommentResponse> result = repository.findByPost(testPostId);
 
         // then
         assertThat(result).isNotNull();
@@ -88,10 +87,10 @@ public class CommentJooqRepositoryTest implements
 
     @Test
     @DisplayName("사용자의 식별자로 댓글 응답 가져오기")
-    void testFindByAuthMemberUuid_givenValidAuthMemberUuid_willReturnCommentResponse() {
+    void testFindByAuthor_givenValidAuthMemberUuid_willReturnCommentResponse() {
 
         // given & when
-        List<CommentResponse> result = repository.findByAuthMemberUuid(testAuthorWithUuid.getMemberUuid());
+        List<CommentResponse> result = repository.findByAuthor(testAuthorWithUuid);
 
         // then
         assertThat(result).isNotNull();

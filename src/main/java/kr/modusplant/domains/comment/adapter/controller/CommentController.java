@@ -4,7 +4,7 @@ import kr.modusplant.domains.comment.adapter.mapper.CommentMapperImpl;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.PostId;
-import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentRepositoryJooqAdapter;
+import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqRepository;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJpaAdapter;
 import kr.modusplant.domains.comment.usecase.request.CommentDeleteRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
@@ -21,7 +21,7 @@ import java.util.UUID;
 public class CommentController {
 
     private final CommentMapperImpl mapper;
-    private final CommentRepositoryJooqAdapter jooqAdapter;
+    private final CommentJooqRepository jooqAdapter;
     private final CommentRepositoryJpaAdapter jpaAdapter;
 
     public List<CommentResponse> gatherByPost(String postUlid) {
