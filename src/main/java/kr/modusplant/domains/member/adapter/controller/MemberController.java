@@ -5,10 +5,7 @@ import kr.modusplant.domains.member.domain.exception.CommentAlreadyLikedExceptio
 import kr.modusplant.domains.member.domain.exception.CommentAlreadyUnlikedException;
 import kr.modusplant.domains.member.domain.exception.PostAlreadyLikedException;
 import kr.modusplant.domains.member.domain.exception.PostAlreadyUnlikedException;
-import kr.modusplant.domains.member.domain.vo.MemberId;
-import kr.modusplant.domains.member.domain.vo.TargetCommentId;
-import kr.modusplant.domains.member.domain.vo.TargetCommentPath;
-import kr.modusplant.domains.member.domain.vo.TargetPostId;
+import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
 import kr.modusplant.domains.member.usecase.port.repository.TargetCommentIdRepository;
@@ -41,15 +38,16 @@ public class MemberController {
     private final EventBus eventBus;
 
     public MemberResponse register(MemberRegisterRequest request) {
-        Member member = mapper.toMember(request);
-        validateBeforeRegister(member);
-        return mapper.toMemberResponse(memberRepository.save(member));
+        MemberNickname memberNickname = MemberNickname.create(request.nickname());
+        validateBeforeRegister(memberNickname);
+        return mapper.toMemberResponse(memberRepository.save(memberNickname));
     }
 
     public MemberResponse updateNickname(MemberNicknameUpdateRequest request) {
-        Member member = mapper.toMember(request);
-        validateBeforeUpdateNickname(member);
-        return mapper.toMemberResponse(memberRepository.save(member));
+        MemberId memberId = MemberId.fromUuid(request.id());
+        MemberNickname memberNickname = MemberNickname.create(request.nickname());
+        validateBeforeUpdateNickname(memberId, memberNickname);
+        return mapper.toMemberResponse(memberRepository.save(memberId, memberNickname));
     }
 
     public void likePost(MemberPostLikeRequest request) {
@@ -80,15 +78,15 @@ public class MemberController {
         eventBus.publish(CommentUnlikeEvent.create(memberId.getValue(), targetCommentId.getTargetPostId().getValue(), targetCommentId.getTargetCommentPath().getValue()));
     }
 
-    private void validateBeforeRegister(Member member) {
-        if (memberRepository.isNicknameExist(member.getMemberNickname())) {
+    private void validateBeforeRegister(MemberNickname memberNickname) {
+        if (memberRepository.isNicknameExist(memberNickname)) {
             throw new EntityExistsException(ALREADY_EXISTED_NICKNAME, "memberNickname");
         }
     }
 
-    private void validateBeforeUpdateNickname(Member member) {
-        Optional<Member> emptyOrMember = memberRepository.getByNickname(member.getMemberNickname());
-        if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(member.getMemberId())) {
+    private void validateBeforeUpdateNickname(MemberId memberId, MemberNickname memberNickname) {
+        Optional<Member> emptyOrMember = memberRepository.getByNickname(memberNickname);
+        if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
             throw new EntityExistsException(ALREADY_EXISTED_NICKNAME, "memberNickname");
         }
     }

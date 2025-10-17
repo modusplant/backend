@@ -25,8 +25,13 @@ public class MemberRepositoryJpaAdapter implements MemberRepository {
     }
 
     @Override
-    public Member save(Member member) {
-        return memberJpaMapper.toMember(memberJpaRepository.save(memberJpaMapper.toMemberEntity(member)));
+    public Member save(MemberNickname memberNickname) {
+        return memberJpaMapper.toMember(memberJpaRepository.save(memberJpaMapper.toMemberEntity(memberNickname)));
+    }
+
+    @Override
+    public Member save(MemberId memberId, MemberNickname memberNickname) {
+        return memberJpaMapper.toMember(memberJpaRepository.save(memberJpaMapper.toMemberEntity(memberId, memberNickname)));
     }
 
     @Override
