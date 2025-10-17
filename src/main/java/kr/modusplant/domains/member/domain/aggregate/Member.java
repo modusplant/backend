@@ -35,20 +35,20 @@ public class Member {
         return new Member(id, status, nickname, birthDate);
     }
 
-    public static Member create(MemberId id, MemberNickname nickname) {
+    public static Member createToRegister(MemberNickname nickname) {
+        if (nickname == null) {
+            throw new EmptyMemberNicknameException();
+        }
+        return new Member(null, null, nickname, null);
+    }
+
+    public static Member createToUpdateNickname(MemberId id, MemberNickname nickname) {
         if (id == null) {
             throw new EmptyMemberIdException();
         } else if (nickname == null) {
             throw new EmptyMemberNicknameException();
         }
-        return new Member(id, MemberStatus.active(), nickname, MemberBirthDate.create(null));
-    }
-
-    public static Member create(MemberNickname nickname) {
-        if (nickname == null) {
-            throw new EmptyMemberNicknameException();
-        }
-        return new Member(MemberId.generate(), MemberStatus.active(), nickname, MemberBirthDate.create(null));
+        return new Member(id, null, nickname, null);
     }
 
     @Override
