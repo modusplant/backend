@@ -183,9 +183,10 @@ afterEvaluate {
 	tasks.named('jacocoTestReport') {
 		classDirectories.setFrom(files(classDirectories.files.collect {
 			fileTree(dir: it, exclude: [
-					'**/generated/**',     // Exclude generated classes
-					'**/*_*',              // Exclude MapStruct-generated classes
-					'**/*Builder.*',       // Exclude builders
+					'**/generated/**',     		// Exclude generated classes
+					'**/*_*',           	   	// Exclude MapStruct-generated classes
+					'**/*Builder.*',	       	// Exclude builders
+					'**/kr/modusplant/jooq/**'	// Exclude jOOQ-generated classes
 			])
 		}))
 	}
