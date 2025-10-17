@@ -35,22 +35,6 @@ public class Member {
         return new Member(id, status, nickname, birthDate);
     }
 
-    public static Member createToRegister(MemberNickname nickname) {
-        if (nickname == null) {
-            throw new EmptyMemberNicknameException();
-        }
-        return new Member(null, null, nickname, null);
-    }
-
-    public static Member createToUpdateNickname(MemberId id, MemberNickname nickname) {
-        if (id == null) {
-            throw new EmptyMemberIdException();
-        } else if (nickname == null) {
-            throw new EmptyMemberNicknameException();
-        }
-        return new Member(id, null, nickname, null);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

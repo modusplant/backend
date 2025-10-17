@@ -1,26 +1,12 @@
 package kr.modusplant.domains.member.adapter.mapper;
 
 import kr.modusplant.domains.member.domain.aggregate.Member;
-import kr.modusplant.domains.member.domain.vo.MemberId;
-import kr.modusplant.domains.member.domain.vo.MemberNickname;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
-import kr.modusplant.domains.member.usecase.request.MemberNicknameUpdateRequest;
-import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MemberMapperImpl implements MemberMapper {
-    @Override
-    public Member toMember(MemberRegisterRequest request) {
-        return Member.createToRegister(MemberNickname.create(request.nickname()));
-    }
-
-    @Override
-    public Member toMember(MemberNicknameUpdateRequest request) {
-        return Member.createToUpdateNickname(MemberId.fromUuid(request.id()), MemberNickname.create(request.nickname()));
-    }
-
     @Override
     public MemberResponse toMemberResponse(Member member) {
         return new MemberResponse(

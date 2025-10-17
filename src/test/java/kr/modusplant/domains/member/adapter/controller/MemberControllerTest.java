@@ -8,6 +8,7 @@ import kr.modusplant.domains.member.domain.exception.CommentAlreadyUnlikedExcept
 import kr.modusplant.domains.member.domain.exception.PostAlreadyLikedException;
 import kr.modusplant.domains.member.domain.exception.PostAlreadyUnlikedException;
 import kr.modusplant.domains.member.domain.vo.MemberId;
+import kr.modusplant.domains.member.domain.vo.MemberNickname;
 import kr.modusplant.domains.member.framework.out.jpa.repository.MemberRepositoryJpaAdapter;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
@@ -66,17 +67,6 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     private final MemberController memberController = new MemberController(memberMapper, memberRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
 
     @Test
-    @DisplayName("register로 회원 등록")
-    void testRegister_givenValidNickname_willReturnResponse() {
-        // given
-        Member member = createMember();
-        given(memberRepository.save(any())).willReturn(member);
-
-        // when & then
-        assertThat(memberController.register(testMemberRegisterRequest).nickname()).isEqualTo(member.getMemberNickname().getValue());
-    }
-
-    @Test
     @DisplayName("중복된 닉네임으로 인해 register로 회원 등록 실패")
     void testValidateBeforeRegister_givenAlreadyExistedNickname_willThrowException() {
         // given
@@ -93,7 +83,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     void testUpdateNickname_givenValidRequest_willReturnResponse() {
         // given
         Member member = createMember();
-        given(memberRepository.save(any())).willReturn(member);
+        given(memberRepository.save(any(MemberId.class), any(MemberNickname.class))).willReturn(member);
 
         // 해당 닉네임이 존재하지 않는 경우
         // given
