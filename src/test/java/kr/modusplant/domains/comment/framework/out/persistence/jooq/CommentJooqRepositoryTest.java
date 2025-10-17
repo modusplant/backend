@@ -1,4 +1,4 @@
-package kr.modusplant.domains.comment.framework.out.jooq;
+package kr.modusplant.domains.comment.framework.out.persistence.jooq;
 
 import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentContentTestUtils;
