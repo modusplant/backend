@@ -1,4 +1,4 @@
-package kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.supers;
+package kr.modusplant.domains.comment.framework.out.persistence.jooq;
 
 import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.jooq.tables.CommComment;

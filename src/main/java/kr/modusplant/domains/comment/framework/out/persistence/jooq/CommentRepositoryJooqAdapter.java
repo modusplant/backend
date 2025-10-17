@@ -1,8 +1,7 @@
-package kr.modusplant.domains.comment.framework.out.persistence.jpa.repository;
+package kr.modusplant.domains.comment.framework.out.persistence.jooq;
 
 import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.PostId;
-import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.supers.CommentJooqRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentReadRepository;
 import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import lombok.RequiredArgsConstructor;

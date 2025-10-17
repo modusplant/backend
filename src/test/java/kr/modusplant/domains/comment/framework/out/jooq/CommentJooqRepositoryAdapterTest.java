@@ -1,10 +1,11 @@
-package kr.modusplant.domains.comment.framework.out.persistence.jpa.repository;
+package kr.modusplant.domains.comment.framework.out.jooq;
 
 import kr.modusplant.domains.comment.common.util.adapter.CommentResponseTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
-import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.supers.CommentJooqRepository;
+import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqRepository;
+import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentRepositoryJooqAdapter;
 import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
 import kr.modusplant.framework.out.jpa.entity.common.util.CommCommentEntityTestUtils;
 import kr.modusplant.framework.out.jpa.entity.common.util.CommCommentIdTestUtils;

@@ -6,7 +6,7 @@ import kr.modusplant.domains.comment.common.util.adapter.CommentResponseTestUtil
 import kr.modusplant.domains.comment.common.util.adapter.MemberReadModelTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
-import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJooqAdapter;
+import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentRepositoryJooqAdapter;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJpaAdapter;
 import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import org.junit.jupiter.api.DisplayName;
