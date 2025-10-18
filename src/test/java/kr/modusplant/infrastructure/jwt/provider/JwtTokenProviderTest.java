@@ -2,8 +2,7 @@ package kr.modusplant.infrastructure.jwt.provider;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
-import kr.modusplant.legacy.modules.jwt.error.TokenKeyCreationException;
+import kr.modusplant.infrastructure.jwt.exception.TokenKeyCreationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class JwtTokenProviderTest {
@@ -51,7 +49,7 @@ class JwtTokenProviderTest {
             mockedStatic.when(() -> KeyPairGenerator.getInstance("EC"))
                     .thenThrow(new NoSuchAlgorithmException("NoSuchAlgorithm"));
 
-            TokenProvider tokenProvider = new TokenProvider();
+            JwtTokenProvider tokenProvider = new JwtTokenProvider();
 
             assertThatThrownBy(tokenProvider::init)
                     .isInstanceOf(TokenKeyCreationException.class)
