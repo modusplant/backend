@@ -2,13 +2,13 @@ package kr.modusplant.infrastructure.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.DefaultAuthProvider;
 import kr.modusplant.infrastructure.security.DefaultAuthenticationEntryPoint;
 import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
 import kr.modusplant.infrastructure.security.filter.EmailPasswordAuthenticationFilter;
 import kr.modusplant.infrastructure.security.handler.*;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
-import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -41,7 +41,7 @@ public class TestSecurityConfig {
 
     private final AuthenticationConfiguration authConfiguration;
     private final DefaultUserDetailsService defaultUserDetailsService;
-    private final TokenApplicationService tokenApplicationService;
+    private final TokenService tokenService;
     private final SiteMemberValidationService memberValidationService;
     private final SiteMemberJpaRepository memberRepository;
     private final ObjectMapper objectMapper;
@@ -69,7 +69,7 @@ public class TestSecurityConfig {
 
     @Bean
     public ForwardRequestLoginSuccessHandler normalLoginSuccessHandler() {
-        return new ForwardRequestLoginSuccessHandler(memberRepository, memberValidationService, tokenApplicationService);
+        return new ForwardRequestLoginSuccessHandler(memberRepository, memberValidationService, tokenService);
     }
 
     @Bean
@@ -79,7 +79,7 @@ public class TestSecurityConfig {
 
     @Bean
     public JwtClearingLogoutHandler JwtClearingLogoutHandler() {
-        return new JwtClearingLogoutHandler(tokenApplicationService); }
+        return new JwtClearingLogoutHandler(tokenService); }
 
     @Bean
     public ForwardRequestLogoutSuccessHandler normalLogoutSuccessHandler() {

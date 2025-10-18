@@ -9,7 +9,9 @@ import java.util.Optional;
 public interface MemberRepository {
     Optional<Member> getByNickname(MemberNickname nickname);
 
-    Member save(Member member);
+    Member save(MemberNickname memberNickname);
+
+    Member save(MemberId memberId, MemberNickname memberNickname);
 
     boolean isIdExist(MemberId memberId);
 

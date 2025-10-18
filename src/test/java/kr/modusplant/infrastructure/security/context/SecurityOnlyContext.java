@@ -40,7 +40,7 @@ import java.lang.annotation.*;
 @AutoConfigureMockMvc
 @ComponentScan(
         // HACK: 임시 방편, 추후 보안 속박된 맥락을 대상으로 하는 어노테이션 개발 필요
-        basePackages = "kr.modusplant.infrastructure.security",
+        basePackages = {"kr.modusplant.infrastructure.security", "kr.modusplant.infrastructure.jwt"},
         includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = {
                 Controller.class,
                 RestControllerAdvice.class}),

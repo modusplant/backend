@@ -8,9 +8,9 @@ import kr.modusplant.domains.comment.common.util.adapter.CommentRegisterRequestT
 import kr.modusplant.domains.comment.common.util.adapter.CommentResponseTestUtils;
 import kr.modusplant.domains.comment.framework.in.web.rest.CommentRestController;
 import kr.modusplant.domains.identity.normal.usecase.port.mapper.NormalIdentityMapper;
+import kr.modusplant.infrastructure.jwt.framework.out.redis.AccessTokenRedisRepository;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
-import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
-import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ public class AuthorizationFlowTest implements CommentRegisterRequestTestUtils, C
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private TokenProvider tokenProvider;
+    private JwtTokenProvider tokenProvider;
 
     @MockitoBean
     private CommentRestController commentRestController;
@@ -53,7 +53,7 @@ public class AuthorizationFlowTest implements CommentRegisterRequestTestUtils, C
     private NormalIdentityMapper mapper;
 
     @MockitoBean
-    private TokenRedisRepository tokenRedisRepository;
+    private AccessTokenRedisRepository tokenRedisRepository;
 
     private String rawAccessToken;
     private Claims accessTokenClaims;
