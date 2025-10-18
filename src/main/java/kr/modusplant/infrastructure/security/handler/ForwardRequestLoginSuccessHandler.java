@@ -5,11 +5,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.infrastructure.jwt.dto.TokenPair;
+import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
-import kr.modusplant.legacy.modules.jwt.app.dto.TokenPair;
-import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,7 +24,7 @@ public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessH
 
     private final SiteMemberJpaRepository memberRepository;
     private final SiteMemberValidationService memberValidationService;
-    private final TokenApplicationService tokenApplicationService;
+    private final TokenService tokenService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -34,7 +34,7 @@ public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessH
 
         updateMemberLoggedInAt(currentMember.getActiveUuid());
 
-        TokenPair loginTokenPair = tokenApplicationService.issueToken(
+        TokenPair loginTokenPair = tokenService.issueToken(
                 currentMember.getActiveUuid(), currentMember.getNickname(), getMemberRole(currentMember));
 
         request.setAttribute("accessToken", loginTokenPair.accessToken());

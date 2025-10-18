@@ -1,7 +1,17 @@
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath 'org.flywaydb:flyway-database-postgresql:11.14.0'
+	}
+}
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.3'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.flywaydb.flyway' version '11.14.0'
 	id 'org.jooq.jooq-codegen-gradle' version '3.20.8'
 	id 'jacoco'
 }
@@ -35,16 +45,16 @@ dependencies {
 
 	// PostgreSQL
 	jooqCodegen 'org.postgresql:postgresql:42.7.2' // Tool dependency
-	implementation 'org.postgresql:postgresql' // Version managed by Spring Boot BOM
+	runtimeOnly 'org.postgresql:postgresql' // Version managed by Spring Boot BOM
 
 	// JJWT
-	def jjwtVersion = "0.12.5"
+	def jjwtVersion = '0.12.5'
 	runtimeOnly "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
 	runtimeOnly "io.jsonwebtoken:jjwt-jackson:$jjwtVersion"
 	implementation "io.jsonwebtoken:jjwt-api:$jjwtVersion"
 
 	// MapStruct
-	def mapstructVersion = "1.5.3.Final"
+	def mapstructVersion = '1.5.3.Final'
 	annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
 	implementation "org.mapstruct:mapstruct:$mapstructVersion"
 	testAnnotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
@@ -54,7 +64,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.springframework.boot:spring-boot-starter-jooq'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -64,15 +73,12 @@ dependencies {
 	implementation 'org.springframework.security:spring-security-crypto'
 	testImplementation 'org.springframework.security:spring-security-test'
 
-	// Flyway (Versions managed by Spring Boot BOM)
-	implementation 'org.flywaydb:flyway-core'
-	implementation 'org.flywaydb:flyway-database-postgresql'
-
 	// Other Main Dependencies (Version required)
 	implementation 'com.github.f4b6a3:ulid-creator:5.2.3'
 	implementation 'com.mailjet:mailjet-client:5.2.5'
 	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.9.10'
 	implementation 'org.apache.commons:commons-lang3:3.18.0'
+	implementation 'org.jooq:jooq:3.20.8'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 	implementation 'software.amazon.awssdk:s3:2.31.61'
 
@@ -83,17 +89,28 @@ dependencies {
 sourceSets {
 	main {
 		java {
-			srcDirs = ['src/main/java', 'src/main/generated']
+			srcDir 'build/generated/sources/jooq/main'
 		}
 	}
 }
 
+flyway {
+	driver = 'org.postgresql.Driver'
+	url = jdbcUrl
+	user = jdbcUser
+	password = jdbcPassword
+	baselineVersion = '0.0.0'
+	outOfOrder = false
+	encoding = 'UTF-8'
+	detectEncoding = true
+}
+
 jacoco {
-	toolVersion = "0.8.12"
+	toolVersion = '0.8.12'
 }
 
 jooq {
-	version = dependencyManagement.importedProperties['jooq.version']
+	version = '3.20.8'
 	configuration {
 		jdbc {
 			driver = 'org.postgresql.Driver'
@@ -102,6 +119,9 @@ jooq {
 			password = jdbcPassword
 		}
 		generator {
+			generate {
+				javaTimeTypes = true
+			}
 			database {
 				name = 'org.jooq.meta.postgres.PostgresDatabase'
 				inputSchema = 'public'
@@ -110,7 +130,7 @@ jooq {
 			}
 			target {
 				packageName = 'kr.modusplant.jooq'
-				directory = 'src/main/generated'
+				directory = 'build/generated/sources/jooq/main'
 				encoding = 'UTF-8'
 			}
 		}
@@ -125,15 +145,29 @@ tasks.withType(JavaCompile).configureEach {
 	]
 }
 
+tasks.named('compileJava') {
+	dependsOn tasks.named('jooqCodegen')
+	dependsOn tasks.named('flywayMigrate')
+
+	tasks.named('jooqCodegen').get().mustRunAfter(tasks.named('flywayMigrate'))
+}
+
+tasks.named('compileTestJava') {
+	dependsOn tasks.named('jooqCodegen')
+	dependsOn tasks.named('flywayMigrate')
+
+	tasks.named('jooqCodegen').get().mustRunAfter(tasks.named('flywayMigrate'))
+}
+
+tasks.named('jooqCodegen') {
+	dependsOn tasks.named('flywayMigrate')
+}
+
 tasks.named('jacocoTestReport') {
 	reports {
 		html.required = true
 		xml.required = false
 	}
-}
-
-tasks.named('jooqCodegen') {
-	dependsOn tasks.named('flywayMigrate')
 }
 
 tasks.named('test') {
@@ -149,9 +183,10 @@ afterEvaluate {
 	tasks.named('jacocoTestReport') {
 		classDirectories.setFrom(files(classDirectories.files.collect {
 			fileTree(dir: it, exclude: [
-					'**/generated/**',     // Exclude generated classes
-					'**/*_*',              // Exclude MapStruct-generated classes
-					'**/*Builder.*',       // Exclude builders
+					'**/generated/**',     		// Exclude generated classes
+					'**/*_*',           	   	// Exclude MapStruct-generated classes
+					'**/*Builder.*',	       	// Exclude builders
+					'**/kr/modusplant/jooq/**'	// Exclude jOOQ-generated classes
 			])
 		}))
 	}

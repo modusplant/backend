@@ -3,15 +3,14 @@ package kr.modusplant.infrastructure.security.component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.infrastructure.jwt.dto.TokenPair;
+import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
 import kr.modusplant.infrastructure.security.common.util.SiteMemberUserDetailsTestUtils;
 import kr.modusplant.infrastructure.security.context.SecurityOnlyContext;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.legacy.modules.auth.normal.login.common.util.app.http.request.NormalLoginRequestTestUtils;
-import kr.modusplant.legacy.modules.jwt.app.dto.TokenPair;
-import kr.modusplant.legacy.modules.jwt.app.service.RefreshTokenApplicationService;
-import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -39,20 +38,18 @@ public class NormalLoginAuthenticationFlowTest implements
     private final FilterChainProxy filterChainProxy;
     private final DefaultUserDetailsService defaultUserDetailsService;
     private final SiteMemberValidationService memberValidationService;
-    private final TokenApplicationService tokenApplicationService;
-    private final RefreshTokenApplicationService refreshTokenApplicationService;
+    private final TokenService tokenService;
     private final SiteMemberJpaRepository memberRepository;
     private final PasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public NormalLoginAuthenticationFlowTest(MockMvc mockMvc, ObjectMapper objectMapper, FilterChainProxy filterChainProxy, DefaultUserDetailsService defaultUserDetailsService, SiteMemberValidationService memberValidationService, TokenApplicationService tokenApplicationService, RefreshTokenApplicationService refreshTokenApplicationService, SiteMemberJpaRepository memberRepository, PasswordEncoder bCryptPasswordEncoder) {
+    public NormalLoginAuthenticationFlowTest(MockMvc mockMvc, ObjectMapper objectMapper, FilterChainProxy filterChainProxy, DefaultUserDetailsService defaultUserDetailsService, SiteMemberValidationService memberValidationService, TokenService tokenService, SiteMemberJpaRepository memberRepository, PasswordEncoder bCryptPasswordEncoder) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
         this.filterChainProxy = filterChainProxy;
         this.defaultUserDetailsService = defaultUserDetailsService;
         this.memberValidationService = memberValidationService;
-        this.tokenApplicationService = tokenApplicationService;
-        this.refreshTokenApplicationService = refreshTokenApplicationService;
+        this.tokenService = tokenService;
         this.memberRepository = memberRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
@@ -75,12 +72,11 @@ public class NormalLoginAuthenticationFlowTest implements
         given(defaultUserDetailsService.loadUserByUsername(testLoginRequest.email()))
                 .willReturn(validDefaultUserDetails);
         doNothing().when(memberValidationService).validateNotFoundUuid(null);
-        given(refreshTokenApplicationService.insert(any())).willReturn(null);
         doNothing().when(memberValidationService).validateNotFoundUuid(validDefaultUserDetails.getActiveUuid());
         given(memberRepository.findByUuid(validDefaultUserDetails.getActiveUuid()))
                 .willReturn(Optional.ofNullable(createMemberBasicUserEntityWithUuid()));
         given(memberRepository.save(any())).willReturn(null);
-        given(tokenApplicationService.issueToken(any(), any(), any()))
+        given(tokenService.issueToken(any(), any(), any()))
                 .willReturn(new TokenPair("TEST_ACCESS_TOKEN", "TEST_REFRESH_TOKEN"));
 
         // when

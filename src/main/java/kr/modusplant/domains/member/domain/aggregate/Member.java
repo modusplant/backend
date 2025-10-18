@@ -35,22 +35,6 @@ public class Member {
         return new Member(id, status, nickname, birthDate);
     }
 
-    public static Member create(MemberId id, MemberNickname nickname) {
-        if (id == null) {
-            throw new EmptyMemberIdException();
-        } else if (nickname == null) {
-            throw new EmptyMemberNicknameException();
-        }
-        return new Member(id, MemberStatus.active(), nickname, MemberBirthDate.create(null));
-    }
-
-    public static Member create(MemberNickname nickname) {
-        if (nickname == null) {
-            throw new EmptyMemberNicknameException();
-        }
-        return new Member(MemberId.generate(), MemberStatus.active(), nickname, MemberBirthDate.create(null));
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
