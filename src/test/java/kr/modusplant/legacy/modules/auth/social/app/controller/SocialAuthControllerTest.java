@@ -1,11 +1,11 @@
 package kr.modusplant.legacy.modules.auth.social.app.controller;
 
+import kr.modusplant.infrastructure.jwt.dto.TokenPair;
+import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.legacy.modules.auth.social.app.service.SocialAuthApplicationService;
-import kr.modusplant.legacy.modules.jwt.app.dto.TokenPair;
-import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +32,7 @@ class SocialAuthControllerTest {
     private SocialAuthApplicationService socialAuthApplicationService;
     
     @Mock
-    private TokenApplicationService tokenApplicationService;
+    private TokenService tokenService;
     
     @InjectMocks
     private SocialAuthController socialAuthController;
@@ -58,7 +58,7 @@ class SocialAuthControllerTest {
 
         given(socialAuthApplicationService.handleSocialLogin(eq(AuthProvider.KAKAO), eq(TEST_AUTH_CODE)))
                 .willReturn(mockUser);
-        given(tokenApplicationService.issueToken(eq(TEST_MEMBER_UUID), eq(TEST_NICKNAME), eq(TEST_ROLE)))
+        given(tokenService.issueToken(eq(TEST_MEMBER_UUID), eq(TEST_NICKNAME), eq(TEST_ROLE)))
                 .willReturn(mockTokenPair);
 
         // when & then
@@ -81,7 +81,7 @@ class SocialAuthControllerTest {
 
         given(socialAuthApplicationService.handleSocialLogin(eq(AuthProvider.GOOGLE), eq(TEST_AUTH_CODE)))
                 .willReturn(mockUser);
-        given(tokenApplicationService.issueToken(eq(TEST_MEMBER_UUID), eq(TEST_NICKNAME), eq(TEST_ROLE)))
+        given(tokenService.issueToken(eq(TEST_MEMBER_UUID), eq(TEST_NICKNAME), eq(TEST_ROLE)))
                 .willReturn(mockTokenPair);
 
         // when & then

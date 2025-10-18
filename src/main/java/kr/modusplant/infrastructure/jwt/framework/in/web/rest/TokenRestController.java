@@ -1,13 +1,13 @@
-package kr.modusplant.legacy.modules.jwt.app.controller;
+package kr.modusplant.infrastructure.jwt.framework.in.web.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
-import kr.modusplant.legacy.modules.jwt.app.dto.TokenPair;
-import kr.modusplant.legacy.modules.jwt.app.http.response.TokenResponse;
-import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
+import kr.modusplant.infrastructure.jwt.dto.TokenPair;
+import kr.modusplant.infrastructure.jwt.service.TokenService;
+import kr.modusplant.shared.http.response.TokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
@@ -20,12 +20,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class TokenController {
+public class TokenRestController {
 
     @Value("${jwt.refresh_duration}")
     private long refreshDuration;
 
-    private final TokenApplicationService tokenService;
+    private final TokenService tokenService;
 
     @Operation(summary = "JWT 토큰 갱신 API", description = "리프레시 토큰을 받아 처리합니다.")
     @ApiResponses(value = {
