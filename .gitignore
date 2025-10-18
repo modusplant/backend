@@ -27,6 +27,7 @@ out/
 !**/src/test/**/out/
 application-secrets.yml
 application-env.yml
+gradle.properties
 
 ### NetBeans ###
 /nbproject/private/

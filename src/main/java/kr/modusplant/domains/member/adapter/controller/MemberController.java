@@ -5,14 +5,12 @@ import kr.modusplant.domains.member.domain.exception.CommentAlreadyLikedExceptio
 import kr.modusplant.domains.member.domain.exception.CommentAlreadyUnlikedException;
 import kr.modusplant.domains.member.domain.exception.PostAlreadyLikedException;
 import kr.modusplant.domains.member.domain.exception.PostAlreadyUnlikedException;
-import kr.modusplant.domains.member.domain.vo.MemberId;
-import kr.modusplant.domains.member.domain.vo.MemberNickname;
-import kr.modusplant.domains.member.domain.vo.TargetCommentId;
-import kr.modusplant.domains.member.domain.vo.TargetPostId;
+import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
 import kr.modusplant.domains.member.usecase.port.repository.TargetCommentIdRepository;
 import kr.modusplant.domains.member.usecase.port.repository.TargetPostIdRepository;
+import kr.modusplant.domains.member.usecase.request.*;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.CommentLikeEvent;
@@ -39,47 +37,56 @@ public class MemberController {
     private final TargetCommentIdRepository targetCommentIdRepository;
     private final EventBus eventBus;
 
-    public MemberResponse register(MemberNickname nickname) {
-        Member member = Member.create(nickname);
-        validateBeforeRegister(member);
-        return mapper.toMemberResponse(memberRepository.save(member));
+    public MemberResponse register(MemberRegisterRequest request) {
+        MemberNickname memberNickname = MemberNickname.create(request.nickname());
+        validateBeforeRegister(memberNickname);
+        return mapper.toMemberResponse(memberRepository.save(memberNickname));
     }
 
-    public MemberResponse updateNickname(MemberId memberId, MemberNickname memberNickname) {
-        Member member = Member.create(memberId, memberNickname);
-        validateBeforeUpdateNickname(member);
-        return mapper.toMemberResponse(memberRepository.save(member));
+    public MemberResponse updateNickname(MemberNicknameUpdateRequest request) {
+        MemberId memberId = MemberId.fromUuid(request.id());
+        MemberNickname memberNickname = MemberNickname.create(request.nickname());
+        validateBeforeUpdateNickname(memberId, memberNickname);
+        return mapper.toMemberResponse(memberRepository.save(memberId, memberNickname));
     }
 
-    public void likePost(MemberId memberId, TargetPostId targetPostId) {
+    public void likePost(MemberPostLikeRequest request) {
+        MemberId memberId = MemberId.fromUuid(request.memberId());
+        TargetPostId targetPostId = TargetPostId.create(request.postUlid());
         validateBeforeLikePost(memberId, targetPostId);
         eventBus.publish(PostLikeEvent.create(memberId.getValue(), targetPostId.getValue()));
     }
 
-    public void unlikePost(MemberId memberId, TargetPostId targetPostId) {
+    public void unlikePost(MemberPostUnlikeRequest request) {
+        MemberId memberId = MemberId.fromUuid(request.memberId());
+        TargetPostId targetPostId = TargetPostId.create(request.postUlid());
         validateBeforeUnlikePost(memberId, targetPostId);
         eventBus.publish(PostUnlikeEvent.create(memberId.getValue(), targetPostId.getValue()));
     }
 
-    public void likeComment(MemberId memberId, TargetCommentId targetCommentId) {
+    public void likeComment(MemberCommentLikeRequest request) {
+        MemberId memberId = MemberId.fromUuid(request.memberId());
+        TargetCommentId targetCommentId = TargetCommentId.create(TargetPostId.create(request.postUlid()), TargetCommentPath.create(request.path()));
         validateBeforeLikeComment(memberId, targetCommentId);
         eventBus.publish(CommentLikeEvent.create(memberId.getValue(), targetCommentId.getTargetPostId().getValue(), targetCommentId.getTargetCommentPath().getValue()));
     }
 
-    public void unlikeComment(MemberId memberId, TargetCommentId targetCommentId) {
+    public void unlikeComment(MemberCommentUnlikeRequest request) {
+        MemberId memberId = MemberId.fromUuid(request.memberId());
+        TargetCommentId targetCommentId = TargetCommentId.create(TargetPostId.create(request.postUlid()), TargetCommentPath.create(request.path()));
         validateBeforeUnlikeComment(memberId, targetCommentId);
         eventBus.publish(CommentUnlikeEvent.create(memberId.getValue(), targetCommentId.getTargetPostId().getValue(), targetCommentId.getTargetCommentPath().getValue()));
     }
 
-    private void validateBeforeRegister(Member member) {
-        if (memberRepository.isNicknameExist(member.getMemberNickname())) {
+    private void validateBeforeRegister(MemberNickname memberNickname) {
+        if (memberRepository.isNicknameExist(memberNickname)) {
             throw new EntityExistsException(ALREADY_EXISTED_NICKNAME, "memberNickname");
         }
     }
 
-    private void validateBeforeUpdateNickname(Member member) {
-        Optional<Member> emptyOrMember = memberRepository.getByNickname(member.getMemberNickname());
-        if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(member.getMemberId())) {
+    private void validateBeforeUpdateNickname(MemberId memberId, MemberNickname memberNickname) {
+        Optional<Member> emptyOrMember = memberRepository.getByNickname(memberNickname);
+        if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
             throw new EntityExistsException(ALREADY_EXISTED_NICKNAME, "memberNickname");
         }
     }
