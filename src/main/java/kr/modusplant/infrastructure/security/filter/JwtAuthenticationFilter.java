@@ -6,11 +6,11 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.modusplant.infrastructure.jwt.framework.out.redis.AccessTokenRedisRepository;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.security.DefaultAuthenticationEntryPoint;
 import kr.modusplant.infrastructure.security.models.DefaultAuthToken;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
-import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
-import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -26,9 +26,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final TokenProvider tokenProvider;
+    private final JwtTokenProvider tokenProvider;
     private final DefaultAuthenticationEntryPoint entryPoint;
-    private final TokenRedisRepository tokenRedisRepository;
+    private final AccessTokenRedisRepository tokenRedisRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,

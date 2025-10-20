@@ -2,6 +2,9 @@ package kr.modusplant.infrastructure.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.infrastructure.jwt.framework.out.redis.AccessTokenRedisRepository;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
+import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.DefaultAuthProvider;
 import kr.modusplant.infrastructure.security.DefaultAuthenticationEntryPoint;
 import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
@@ -9,9 +12,6 @@ import kr.modusplant.infrastructure.security.filter.EmailPasswordAuthenticationF
 import kr.modusplant.infrastructure.security.filter.JwtAuthenticationFilter;
 import kr.modusplant.infrastructure.security.handler.*;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
-import kr.modusplant.legacy.modules.jwt.app.service.TokenApplicationService;
-import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
-import kr.modusplant.legacy.modules.jwt.persistence.repository.TokenRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -45,12 +45,12 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authConfiguration;
     private final DefaultUserDetailsService defaultUserDetailsService;
     private final ObjectMapper objectMapper;
-    private final TokenProvider tokenProvider;
-    private final TokenApplicationService tokenApplicationService;
+    private final JwtTokenProvider tokenProvider;
+    private final TokenService tokenService;
     private final SiteMemberValidationService memberValidationService;
     private final SiteMemberJpaRepository memberRepository;
     private final Validator validator;
-    private final TokenRedisRepository tokenRedisRepository;
+    private final AccessTokenRedisRepository tokenRedisRepository;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -78,7 +78,7 @@ public class SecurityConfig {
 
     @Bean
     public ForwardRequestLoginSuccessHandler forwardRequestLoginSuccessHandler() {
-        return new ForwardRequestLoginSuccessHandler(memberRepository, memberValidationService, tokenApplicationService);
+        return new ForwardRequestLoginSuccessHandler(memberRepository, memberValidationService, tokenService);
     }
 
     @Bean
@@ -88,7 +88,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtClearingLogoutHandler JwtClearingLogoutHandler() {
-        return new JwtClearingLogoutHandler(tokenApplicationService); }
+        return new JwtClearingLogoutHandler(tokenService); }
 
     @Bean
     public ForwardRequestLogoutSuccessHandler normalLogoutSuccessHandler() {

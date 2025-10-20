@@ -5,7 +5,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequest;
-import kr.modusplant.legacy.modules.jwt.error.TokenExpiredException;
+import kr.modusplant.infrastructure.jwt.exception.TokenExpiredException;
 import kr.modusplant.shared.exception.InvalidDataException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;

@@ -1,5 +1,6 @@
 package kr.modusplant.domains.member.domain.vo;
 
+import kr.modusplant.domains.member.domain.exception.EmptyMemberBirthDateException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,9 @@ public class MemberBirthDate {
     private final LocalDate value;
 
     public static MemberBirthDate create(LocalDate value) {
+        if (value == null) {
+            throw new EmptyMemberBirthDateException();
+        }
         return new MemberBirthDate(value);
     }
 
