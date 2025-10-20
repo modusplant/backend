@@ -1,0 +1,68 @@
+package kr.modusplant.domains.member.domain.vo;
+
+import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
+import kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils;
+import kr.modusplant.domains.member.domain.exception.EmptyMemberStatusException;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+
+class MemberStatusTest implements MemberStatusTestUtils, MemberIdTestUtils {
+    @Test
+    @DisplayName("active로 회원 상태 반환")
+    void testActive_givenNoParameter_willReturnMemberStatus() {
+        assertThat(MemberStatus.active()).isEqualTo(MemberStatus.active());
+    }
+
+    @Test
+    @DisplayName("inactive로 회원 상태 반환")
+    void testInactive_givenNoParameter_willReturnMemberStatus() {
+        assertThat(MemberStatus.inactive()).isEqualTo(MemberStatus.inactive());
+    }
+
+    @Test
+    @DisplayName("fromBoolean으로 회원 상태 반환")
+    void testFromBoolean_givenValidValue_willReturnMemberStatus() {
+        assertTrue(MemberStatus.fromBoolean(true).isActive());
+        assertTrue(MemberStatus.fromBoolean(false).isInactive());
+        assertFalse(MemberStatus.fromBoolean(true).isInactive());
+        assertFalse(MemberStatus.fromBoolean(false).isActive());
+    }
+
+    @Test
+    @DisplayName("null로 fromBoolean을 호출하여 오류 발생")
+    void testFromBoolean_givenNull_willThrowException() {
+        EmptyMemberStatusException exception = assertThrows(EmptyMemberStatusException.class, () -> MemberStatus.fromBoolean(null));
+        assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_STATUS);
+    }
+
+    @Test
+    @DisplayName("isActive로 불리언 상태 반환")
+    void testIsActive_givenNoParameter_willReturnBoolean() {
+        assertTrue(testMemberActiveStatus.isActive());
+        assertTrue(testMemberInactiveStatus.isInactive());
+    }
+
+    @Test
+    @DisplayName("같은 객체에 대한 equals 호출")
+    void useEqual_givenSameObject_willReturnTrue() {
+        //noinspection EqualsWithItself
+        assertEquals(testMemberActiveStatus, testMemberActiveStatus);
+    }
+
+    @Test
+    @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
+    void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
+        //noinspection AssertBetweenInconvertibleTypes
+        assertNotEquals(testMemberActiveStatus, testMemberId);
+    }
+
+    @Test
+    @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
+    void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
+        assertNotEquals(testMemberActiveStatus, testMemberInactiveStatus);
+    }
+}

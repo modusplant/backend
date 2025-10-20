@@ -1,0 +1,20 @@
+package kr.modusplant.legacy.domains.member.common.util.app.http.request;
+
+import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberAuthInsertRequest;
+import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberAuthUpdateRequest;
+
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberAuthConstant.*;
+
+public interface SiteMemberAuthRequestTestUtils {
+    SiteMemberAuthInsertRequest memberAuthBasicUserInsertRequest = new SiteMemberAuthInsertRequest(MEMBER_AUTH_BASIC_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_BASIC_USER_EMAIL, MEMBER_AUTH_BASIC_USER_PW, MEMBER_AUTH_BASIC_USER_PROVIDER, MEMBER_AUTH_BASIC_USER_PROVIDER_ID);
+
+    SiteMemberAuthUpdateRequest memberAuthBasicUserUpdateRequest = new SiteMemberAuthUpdateRequest(MEMBER_AUTH_BASIC_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_BASIC_USER_EMAIL, MEMBER_AUTH_BASIC_USER_PW);
+
+    SiteMemberAuthInsertRequest memberAuthGoogleUserInsertRequest = new SiteMemberAuthInsertRequest(MEMBER_AUTH_GOOGLE_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_GOOGLE_USER_EMAIL, MEMBER_AUTH_GOOGLE_USER_PW, MEMBER_AUTH_GOOGLE_USER_PROVIDER, MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID);
+
+    SiteMemberAuthUpdateRequest memberAuthGoogleUserUpdateRequest = new SiteMemberAuthUpdateRequest(MEMBER_AUTH_GOOGLE_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_GOOGLE_USER_EMAIL, MEMBER_AUTH_GOOGLE_USER_PW);
+
+    SiteMemberAuthInsertRequest memberAuthKakaoUserInsertRequest = new SiteMemberAuthInsertRequest(MEMBER_AUTH_KAKAO_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_KAKAO_USER_EMAIL, MEMBER_AUTH_KAKAO_USER_PW, MEMBER_AUTH_KAKAO_USER_PROVIDER, MEMBER_AUTH_KAKAO_USER_PROVIDER_ID);
+
+    SiteMemberAuthUpdateRequest memberAuthKakaoUserUpdateRequest = new SiteMemberAuthUpdateRequest(MEMBER_AUTH_KAKAO_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_KAKAO_USER_EMAIL, MEMBER_AUTH_KAKAO_USER_PW);
+}

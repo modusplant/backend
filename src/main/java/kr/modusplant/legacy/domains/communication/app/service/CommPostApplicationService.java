@@ -1,0 +1,190 @@
+package kr.modusplant.legacy.domains.communication.app.service;
+
+import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPrimaryCategoryJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.infrastructure.persistence.constant.EntityName;
+import kr.modusplant.legacy.domains.common.app.service.MultipartDataProcessor;
+import kr.modusplant.legacy.domains.communication.app.http.request.CommPostInsertRequest;
+import kr.modusplant.legacy.domains.communication.app.http.request.CommPostUpdateRequest;
+import kr.modusplant.legacy.domains.communication.app.http.response.CommPostResponse;
+import kr.modusplant.legacy.domains.communication.domain.service.CommCategoryValidationService;
+import kr.modusplant.legacy.domains.communication.domain.service.CommPostValidationService;
+import kr.modusplant.legacy.domains.communication.mapper.CommPostAppInfraMapper;
+import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostViewCountRedisRepository;
+import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostViewLockRedisRepository;
+import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
+import kr.modusplant.shared.exception.EntityNotFoundException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.util.Optional;
+import java.util.UUID;
+
+@Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+public class CommPostApplicationService {
+
+    private final CommPostValidationService commPostValidationService;
+    private final CommCategoryValidationService commCategoryValidationService;
+    private final SiteMemberValidationService siteMemberValidationService;
+    private final MultipartDataProcessor multipartDataProcessor;
+    private final CommPostJpaRepository commPostRepository;
+    private final SiteMemberJpaRepository siteMemberRepository;
+    private final CommPrimaryCategoryJpaRepository commPrimaryCategoryRepository;
+    private final CommSecondaryCategoryJpaRepository commSecondaryCategoryRepository;
+    private final CommPostViewCountRedisRepository commPostViewCountRedisRepository;
+    private final CommPostViewLockRedisRepository commPostViewLockRedisRepository;
+    private final CommPostAppInfraMapper commPostAppInfraMapper;
+
+    @Value("${redis.ttl.view_count}")
+    private long ttlMinutes;
+
+    public Page<CommPostResponse> getAll(Pageable pageable) {
+        return commPostRepository.findByIsDeletedFalseOrderByCreatedAtDesc(pageable).map(entity -> {
+            try {
+                entity.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(entity.getContent()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return commPostAppInfraMapper.toCommPostResponse(entity);
+        });
+    }
+
+    public Page<CommPostResponse> getByMemberUuid(UUID memberUuid, Pageable pageable) {
+        SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
+        return commPostRepository.findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(siteMember, pageable).map(entity -> {
+            try {
+                entity.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(entity.getContent()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return commPostAppInfraMapper.toCommPostResponse(entity);
+        });
+    }
+
+    public Page<CommPostResponse> getByPrimaryCategoryUuid(UUID categoryUuid, Pageable pageable) {
+        CommPrimaryCategoryEntity commCategory = commPrimaryCategoryRepository.findByUuid(categoryUuid).orElseThrow();
+        return commPostRepository.findByPrimaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(commCategory, pageable).map(entity -> {
+            try {
+                entity.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(entity.getContent()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return commPostAppInfraMapper.toCommPostResponse(entity);
+        });
+    }
+
+    public Page<CommPostResponse> getBySecondaryCategoryUuid(UUID categoryUuid, Pageable pageable) {
+        CommSecondaryCategoryEntity commCategory = commSecondaryCategoryRepository.findByUuid(categoryUuid).orElseThrow();
+        return commPostRepository.findBySecondaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(commCategory, pageable).map(entity -> {
+            try {
+                entity.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(entity.getContent()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return commPostAppInfraMapper.toCommPostResponse(entity);
+        });
+    }
+
+    public Page<CommPostResponse> searchByKeyword(String keyword, Pageable pageable) {
+        return commPostRepository.searchByTitleOrContent(keyword, pageable).map(entity -> {
+            try {
+                entity.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(entity.getContent()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return commPostAppInfraMapper.toCommPostResponse(entity);
+        });
+    }
+
+    public Optional<CommPostResponse> getByUlid(String ulid) {
+        return commPostRepository.findByUlid(ulid)
+                .map(commPost -> {
+                    try {
+                        commPost.updateContent(multipartDataProcessor.convertFileSrcToBinaryData(commPost.getContent()));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    Optional.ofNullable(commPostViewCountRedisRepository.read(ulid))
+                            .ifPresent(commPost::updateViewCount);
+                    return commPostAppInfraMapper.toCommPostResponse(commPost);
+                });
+    }
+
+    @Transactional
+    public void insert(CommPostInsertRequest commPostInsertRequest, UUID memberUuid) throws IOException {
+        commPostValidationService.validateCommPostInsertRequest(commPostInsertRequest);
+        commCategoryValidationService.validateNotFoundUuid(commPostInsertRequest.primaryCategoryUuid());
+        commCategoryValidationService.validateNotFoundUuid(commPostInsertRequest.secondaryCategoryUuid());
+        siteMemberValidationService.validateNotFoundUuid(memberUuid);
+        SiteMemberEntity siteMember = siteMemberRepository.findByUuid(memberUuid).orElseThrow();
+        CommPostEntity commPostEntity = CommPostEntity.builder()
+                .primaryCategory(commPrimaryCategoryRepository.findByUuid(commPostInsertRequest.primaryCategoryUuid()).orElseThrow())
+                .secondaryCategory(commSecondaryCategoryRepository.findByUuid(commPostInsertRequest.secondaryCategoryUuid()).orElseThrow())
+                .authMember(siteMember)
+                .createMember(siteMember)
+                .title(commPostInsertRequest.title())
+                .content(multipartDataProcessor.saveFilesAndGenerateContentJson(commPostInsertRequest.content()))
+                .build();
+        commPostRepository.save(commPostEntity);
+    }
+
+    @Transactional
+    public void update(CommPostUpdateRequest commPostUpdateRequest, UUID memberUuid) throws IOException {
+        commPostValidationService.validateCommPostUpdateRequest(commPostUpdateRequest);
+        commPostValidationService.validateAccessibleCommPost(commPostUpdateRequest.ulid(), memberUuid);
+        commCategoryValidationService.validateNotFoundUuid(commPostUpdateRequest.primaryCategoryUuid());
+        commCategoryValidationService.validateNotFoundUuid(commPostUpdateRequest.secondaryCategoryUuid());
+        CommPostEntity commPostEntity = commPostRepository.findByUlid(commPostUpdateRequest.ulid()).orElseThrow();
+        multipartDataProcessor.deleteFiles(commPostEntity.getContent());
+        commPostEntity.updatePrimaryCategory(commPrimaryCategoryRepository.findByUuid(commPostUpdateRequest.primaryCategoryUuid()).orElseThrow());
+        commPostEntity.updateSecondaryCategory(commSecondaryCategoryRepository.findByUuid(commPostUpdateRequest.secondaryCategoryUuid()).orElseThrow());
+        commPostEntity.updateTitle(commPostUpdateRequest.title());
+        commPostEntity.updateContent(multipartDataProcessor.saveFilesAndGenerateContentJson(commPostUpdateRequest.content()));
+        commPostRepository.save(commPostEntity);
+    }
+
+    @Transactional
+    public void removeByUlid(String ulid, UUID memberUuid) {
+        commPostValidationService.validateAccessibleCommPost(ulid,memberUuid);
+        CommPostEntity commPostEntity = commPostRepository.findByUlid(ulid).orElseThrow();
+        multipartDataProcessor.deleteFiles(commPostEntity.getContent());
+        commPostEntity.updateIsDeleted(true);
+        commPostRepository.save(commPostEntity);
+    }
+
+    public Long readViewCount(String ulid) {
+        Long redisViewCount = commPostViewCountRedisRepository.read(ulid);
+        if (redisViewCount != null) {
+            return redisViewCount;
+        }
+        Long dbViewCount = commPostRepository.findByUlid(ulid)
+                .map(commPostEntity -> Optional.ofNullable(commPostEntity.getViewCount()).orElseThrow())
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.POST_NOT_FOUND, EntityName.POST));
+        commPostViewCountRedisRepository.write(ulid, dbViewCount);
+        return dbViewCount;
+    }
+
+    @Transactional
+    public Long increaseViewCount(String ulid, UUID memberUuid) {
+        // 조회수 어뷰징 정책 - 사용자는 게시글 1개당 ttl에 1번 조회수 증가
+        if (!commPostViewLockRedisRepository.lock(ulid, memberUuid, ttlMinutes)) {
+            return commPostViewCountRedisRepository.read(ulid);
+        }
+        // 조회수 증가
+        return commPostViewCountRedisRepository.increase(ulid);
+    }
+}

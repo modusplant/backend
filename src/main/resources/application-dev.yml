@@ -1,0 +1,10 @@
+# Development-specific configuration
+spring:
+  jpa:
+    properties:
+      hibernate:
+        default_schema: ${DB_DEV_SCHEMA}
+
+security:
+  debug:
+    enabled: true
