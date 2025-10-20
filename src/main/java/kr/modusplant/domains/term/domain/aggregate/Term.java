@@ -24,19 +24,20 @@ public class Term {
 
     public static Term create(TermName name, TermContent content, TermVersion version) {
         if(name == null) throw new EmptyTermNameException();
-        else if(content == null) throw new EmptyTermContentException();
-        else if(version == null) throw new EmptyTermVersionException();
+        if(content == null) throw new EmptyTermContentException();
+        if(version == null) throw new EmptyTermVersionException();
 
-        return new Term(TermId.generate(), name, content, version);
+        return new Term(null, name, content, version);
     }
 
-    public static Term create(TermId id, TermName name, TermContent content, TermVersion version) {
-        if(id == null) throw new EmptyTermIdException();
-        else if(name == null) throw new EmptyTermNameException();
-        else if(content == null) throw new EmptyTermContentException();
-        else if(version == null) throw new EmptyTermVersionException();
+    public static Term create(TermId termId, TermName termName, TermContent termContent, TermVersion termVersion) {
+        return new Term(termId, termName, termContent, termVersion);
+    }
 
-        return new Term(id, name, content, version);
+    public Term create(TermContent content) {
+        if(content == null) throw new EmptyTermContentException();
+
+        return new Term(this.termId, this.termName, content, this.termVersion);
     }
 
     @Override

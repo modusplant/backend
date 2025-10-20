@@ -4,9 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import kr.modusplant.domains.member.usecase.request.TermCreateRequest;
+import kr.modusplant.domains.term.usecase.request.TermCreateRequest;
 import kr.modusplant.domains.term.adaptor.controller.TermController;
 import kr.modusplant.domains.term.domain.vo.TermId;
+import kr.modusplant.domains.term.usecase.request.TermUpdateRequest;
 import kr.modusplant.domains.term.usecase.response.TermResponse;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,14 @@ public class TermRestController {
             @RequestBody @Valid TermCreateRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(
                 DataResponse.ok(termController.register(request)));
+    }
+
+    @Operation(summary = "약관 수정 API", description = "약관을 수정합니다.")
+    @PutMapping
+    public ResponseEntity<DataResponse<TermResponse>> updateTerm(
+            @RequestBody @Valid TermUpdateRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                DataResponse.ok(termController.update(request)));
     }
 
     @Operation(summary = "약관 삭제 API", description = "약관을 삭제합니다.")

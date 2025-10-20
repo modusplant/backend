@@ -14,6 +14,7 @@ public enum TermErrorCode implements ResponseCode {
     EMPTY_TERM_VERSION(HttpStatus.BAD_REQUEST, "empty_term_version", "약관버전이 비어 있습니다. "),
     INVALID_TERM_VERSION(HttpStatus.BAD_REQUEST, "invalid_term_version", "약관버전 형식이 잘못되었습니다. (ex v1.0.1) "),
 
+    TERM_NOT_FOUND(HttpStatus.BAD_REQUEST, "term_not_found", "존재하지 않는 약관입니다. "),
     NOT_FOUND_TERM_ID(HttpStatus.BAD_REQUEST, "not_found_term_id", "약관 아이디를 찾을 수 없습니다. ");
 
     private final HttpStatus httpStatus;
