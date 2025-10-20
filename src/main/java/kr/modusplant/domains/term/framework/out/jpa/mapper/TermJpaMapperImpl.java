@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class TermJpaMapperImpl implements TermJpaMapper {
 
     @Override
-    public TermEntity toTermEntity(Term term) {
+    public TermEntity toTermNewEntity(Term term) {
         return TermEntity.builder()
                 .name(term.getTermName().getValue())
                 .content(term.getTermContent().getValue())

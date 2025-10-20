@@ -133,7 +133,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter(http), EmailPasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/v1/communication/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/terms/**").permitAll()
+                        .requestMatchers("/api/v1/terms/**").permitAll()
                         .requestMatchers("/api/members/verify-email/send/**").permitAll()
                         .requestMatchers("/api/auth/kakao/social-login").permitAll()
                         .requestMatchers("/api/auth/google/social-login").permitAll()
