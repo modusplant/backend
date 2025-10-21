@@ -13,8 +13,9 @@ import org.hibernate.annotations.Type;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.vo.TableColumnName.*;
-import static kr.modusplant.shared.persistence.vo.TableName.POST_ARCHIVE;
+import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
+import static kr.modusplant.shared.persistence.constant.TableName.POST_ARCHIVE;
+
 
 @Entity
 @Table(name = POST_ARCHIVE)
@@ -31,10 +32,10 @@ public class PostArchiveEntity {
     @Column(name = SECO_CATE_UUID, nullable = false)
     private UUID secondaryCategoryUuid;
 
-    @Column(name = "auth_memb_uuid", nullable = false)
+    @Column(name = AUTH_MEMB_UUID, nullable = false)
     private UUID authMemberUuid;
 
-    @Column(name = "crea_memb_uuid", nullable = false)
+    @Column(name = CREA_MEMB_UUID, nullable = false)
     private UUID createMemberUuid;
 
     @Column(nullable = false, length = 150)
