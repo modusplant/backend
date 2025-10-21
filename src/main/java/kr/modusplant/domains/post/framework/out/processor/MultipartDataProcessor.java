@@ -96,6 +96,47 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
         return newArray;
     }
 
+    public ArrayNode convertToPreviewData(JsonNode content) throws IOException {
+        ArrayNode newArray = objectMapper.createArrayNode();
+
+        JsonNode firstTextNode = null;
+        JsonNode firstImageNode = null;
+
+        for (JsonNode node : content) {
+            if (node.has(TYPE)) {
+                String type = node.get(TYPE).asText();
+                if (type.equals(FileType.TEXT.getValue()) && firstTextNode == null) {
+                    firstTextNode = node;
+                } else if (type.equals(FileType.IMAGE.getValue()) && firstImageNode == null) {
+                    firstImageNode = node;
+                }
+
+                if (firstTextNode != null && firstImageNode != null) {
+                    break;
+                }
+            }
+        }
+
+        if (firstTextNode != null) {
+            ObjectNode textObjectNode = firstTextNode.deepCopy();
+            newArray.add(textObjectNode);
+        }
+
+        if (firstImageNode != null) {
+            ObjectNode imageObjectNode = firstImageNode.deepCopy();
+            if (imageObjectNode.has(SRC)) {
+                String src = imageObjectNode.get(SRC).asText();
+                byte[] fileBytes = s3FileService.downloadFile(src);
+                String base64Encoded = Base64.getEncoder().encodeToString(fileBytes);
+                imageObjectNode.put(DATA, base64Encoded);
+                imageObjectNode.remove(SRC);
+            }
+            newArray.add(imageObjectNode);
+        }
+
+        return newArray;
+    }
+
     public void deleteFiles(JsonNode content) {
         for (JsonNode node : content) {
             if (node.has(SRC)) {

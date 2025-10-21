@@ -12,5 +12,7 @@ public interface MultipartDataProcessorPort {
 
     ArrayNode convertFileSrcToBinaryData(JsonNode content) throws IOException;
 
+    ArrayNode convertToPreviewData(JsonNode content) throws IOException;
+
     void deleteFiles(JsonNode content);
 }
