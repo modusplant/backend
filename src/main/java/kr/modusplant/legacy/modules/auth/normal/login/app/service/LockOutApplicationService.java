@@ -1,8 +1,8 @@
 package kr.modusplant.legacy.modules.auth.normal.login.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.legacy.modules.auth.normal.login.persistence.repository.LockOutRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,8 +14,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class LockOutApplicationService {
-    private final SiteMemberAuthRepository siteMemberAuthRepository;
-    private final SiteMemberRepository siteMemberRepository;
+    private final SiteMemberAuthJpaRepository siteMemberAuthRepository;
+    private final SiteMemberJpaRepository siteMemberRepository;
     private final LockOutRedisRepository lockOutRedisRepository;
 
     private final int MAX_FAILED_ATTEMPTS = 5;

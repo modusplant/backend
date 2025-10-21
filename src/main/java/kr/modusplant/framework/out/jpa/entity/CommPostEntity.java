@@ -17,10 +17,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-import static kr.modusplant.legacy.domains.member.vo.MemberUuid.SNAKE_AUTH_MEMB_UUID;
-import static kr.modusplant.legacy.domains.member.vo.MemberUuid.SNAKE_CREA_MEMB_UUID;
-import static kr.modusplant.shared.persistence.vo.TableColumnName.*;
-import static kr.modusplant.shared.persistence.vo.TableName.COMM_POST;
+import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
+import static kr.modusplant.shared.persistence.constant.TableName.COMM_POST;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -42,11 +40,11 @@ public class CommPostEntity {
     private CommSecondaryCategoryEntity secondaryCategory;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = SNAKE_AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity authMember;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = SNAKE_CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity createMember;
 
     @Column(name = "like_count", nullable = false)
@@ -129,16 +127,6 @@ public class CommPostEntity {
         if (this.likeCount == null) {
             this.likeCount = 0;
         }
-        if (this.viewCount == null) {
-            this.viewCount = 0L;
-        }
-        if (this.isDeleted == null) {
-            this.isDeleted = false;
-        }
-    }
-
-    @PreUpdate
-    public void preUpdate() {
         if (this.viewCount == null) {
             this.viewCount = 0L;
         }

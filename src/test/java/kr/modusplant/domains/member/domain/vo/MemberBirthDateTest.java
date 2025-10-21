@@ -1,19 +1,20 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.common.utils.domain.vo.MemberBirthDateTestUtils;
-import kr.modusplant.domains.member.common.utils.domain.vo.MemberIdTestUtils;
+import kr.modusplant.domains.member.common.util.domain.vo.MemberBirthDateTestUtils;
+import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
+import kr.modusplant.domains.member.domain.exception.EmptyMemberBirthDateException;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class MemberBirthDateTest implements MemberBirthDateTestUtils, MemberIdTestUtils {
     @Test
-    @DisplayName("create으로 회원 생일 반환")
+    @DisplayName("create로 회원 생일 반환")
     void testCreate_givenValidValue_willReturnMemberBirthDate() {
         // given
         LocalDate now = LocalDate.now();
@@ -21,6 +22,14 @@ class MemberBirthDateTest implements MemberBirthDateTestUtils, MemberIdTestUtils
         // when & then
         assertThat(MemberBirthDate.create(now)).isEqualTo(MemberBirthDate.create(now));
     }
+
+    @Test
+    @DisplayName("null로 create를 호출하여 오류 발생")
+    void testCreate_givenNull_willThrowException() {
+        EmptyMemberBirthDateException exception = assertThrows(EmptyMemberBirthDateException.class, () -> MemberBirthDate.create(null));
+        assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_BIRTH_DATE);
+    }
+
 
     @Test
     @DisplayName("같은 객체에 대한 equals 호출")

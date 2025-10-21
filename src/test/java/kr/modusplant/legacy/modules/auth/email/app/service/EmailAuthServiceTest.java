@@ -1,17 +1,18 @@
 package kr.modusplant.legacy.modules.auth.email.app.service;
 
+import kr.modusplant.domains.identity.normal.adapter.EmailAuthTokenHelper;
+import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequest;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberAuthEntityTestUtils;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.out.redis.RedisHelper;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberAuthValidationService;
 import kr.modusplant.legacy.modules.auth.email.app.http.request.EmailRequest;
 import kr.modusplant.legacy.modules.auth.email.app.http.request.VerifyEmailRequest;
 import kr.modusplant.legacy.modules.auth.email.enums.EmailType;
 import kr.modusplant.legacy.modules.common.context.ModulesServiceWithoutValidationServiceContext;
-import kr.modusplant.legacy.modules.jwt.app.service.TokenProvider;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
@@ -33,12 +34,12 @@ import static org.springframework.test.util.ReflectionTestUtils.setField;
 class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
 
     private final EmailAuthService emailAuthService;
-    private final SiteMemberAuthRepository siteMemberAuthRepository;
+    private final SiteMemberAuthJpaRepository siteMemberAuthRepository;
     private final SiteMemberAuthValidationService siteMemberAuthValidationService;
     private final RedisHelper redisHelper;
 
     @MockitoBean
-    private final TokenProvider tokenProvider;
+    private final EmailAuthTokenHelper emailAuthTokenHelper;
 
     @MockitoBean
     private MailService mailService;
@@ -47,11 +48,11 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
     private final String code = "123456";
 
     @Autowired
-    EmailAuthServiceTest(EmailAuthService emailAuthService, SiteMemberAuthRepository siteMemberAuthRepository, SiteMemberAuthValidationService siteMemberAuthValidationService, TokenProvider tokenProvider, RedisHelper redisHelper) {
+    EmailAuthServiceTest(EmailAuthService emailAuthService, SiteMemberAuthJpaRepository siteMemberAuthRepository, SiteMemberAuthValidationService siteMemberAuthValidationService, EmailAuthTokenHelper emailAuthTokenHelper, RedisHelper redisHelper) {
         this.emailAuthService = emailAuthService;
         this.siteMemberAuthRepository = siteMemberAuthRepository;
         this.siteMemberAuthValidationService = siteMemberAuthValidationService;
-        this.tokenProvider = tokenProvider;
+        this.emailAuthTokenHelper = emailAuthTokenHelper;
         this.redisHelper = redisHelper;
     }
 
@@ -62,16 +63,16 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
         EmailRequest request = new EmailRequest();
         setField(request, "email", email);
 
-        when(tokenProvider.generateVerifyCode()).thenReturn(code);
-        when(tokenProvider.generateVerifyAccessToken(email, code)).thenReturn("jwt-token");
+        when(emailAuthTokenHelper.generateVerifyCode()).thenReturn(code);
+        when(emailAuthTokenHelper.generateVerifyAccessToken(email, code)).thenReturn("jwt-token");
 
         // when
         String result = emailAuthService.sendVerifyEmail(request);
 
         // then
         assertThat(result).isEqualTo("jwt-token");
-        verify(tokenProvider).generateVerifyCode();
-        verify(tokenProvider).generateVerifyAccessToken(email, code);
+        verify(emailAuthTokenHelper).generateVerifyCode();
+        verify(emailAuthTokenHelper).generateVerifyAccessToken(email, code);
         verify(mailService).callSendEmail(eq(email), eq(code), eq(EmailType.SIGNUP_VERIFY_EMAIL));
     }
 
@@ -80,15 +81,13 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
     void verifyEmail_success() {
         // given
         String token = "mocked-jwt-token";
-        VerifyEmailRequest request = new VerifyEmailRequest();
-        setField(request, "email", email);
-        setField(request, "verifyCode", code);
+        EmailValidationRequest request = new EmailValidationRequest(email, code);
 
         // when
         emailAuthService.verifyEmail(request, token);
 
         // then
-        verify(tokenProvider).validateVerifyAccessToken(token, request);
+        verify(emailAuthTokenHelper).validateVerifyAccessToken(request, token);
     }
 
     @Test
@@ -107,7 +106,7 @@ class EmailAuthServiceTest implements SiteMemberAuthEntityTestUtils {
         EmailRequest request = new EmailRequest();
         setField(request, "email", email);
 
-        when(tokenProvider.generateVerifyCode()).thenReturn(code);
+        when(emailAuthTokenHelper.generateVerifyCode()).thenReturn(code);
 
         // when
         emailAuthService.sendResetPasswordCode(request);

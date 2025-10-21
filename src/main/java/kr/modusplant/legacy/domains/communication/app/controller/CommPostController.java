@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.legacy.domains.communication.vo.CommPageableValue.PAGE_SIZE;
+import static kr.modusplant.legacy.domains.communication.constant.CommPageableValue.PAGE_SIZE;
 
 @Tag(name = "컨텐츠 게시글 API", description = "컨텐츠 게시글을 다루는 API입니다.")
 @RestController

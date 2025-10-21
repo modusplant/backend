@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.term.domain.service;
 
 import kr.modusplant.framework.out.jpa.entity.TermEntity;
-import kr.modusplant.framework.out.jpa.repository.TermRepository;
+import kr.modusplant.framework.out.jpa.repository.TermJpaRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.legacy.domains.term.common.util.app.http.response.TermResponseTestUtils;
 import kr.modusplant.legacy.domains.term.common.util.entity.TermEntityTestUtils;
@@ -22,10 +22,10 @@ import static org.mockito.BDDMockito.given;
 class TermValidationServiceTest implements TermResponseTestUtils, TermEntityTestUtils {
 
     private final TermValidationService termValidationService;
-    private final TermRepository termRepository;
+    private final TermJpaRepository termRepository;
 
     @Autowired
-    TermValidationServiceTest(TermValidationService termValidationService, TermRepository termRepository) {
+    TermValidationServiceTest(TermValidationService termValidationService, TermJpaRepository termRepository) {
         this.termValidationService = termValidationService;
         this.termRepository = termRepository;
     }

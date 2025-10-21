@@ -1,8 +1,8 @@
 package kr.modusplant.framework.out.jpa.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.framework.out.jpa.entity.compositekey.CommCommentId;
 import kr.modusplant.infrastructure.persistence.annotation.DefaultValue;
+import kr.modusplant.shared.persistence.compositekey.CommCommentId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,10 +13,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-import static kr.modusplant.legacy.domains.member.vo.MemberUuid.SNAKE_AUTH_MEMB_UUID;
-import static kr.modusplant.legacy.domains.member.vo.MemberUuid.SNAKE_CREA_MEMB_UUID;
-import static kr.modusplant.shared.persistence.vo.TableColumnName.IS_DELETED;
-import static kr.modusplant.shared.persistence.vo.TableName.COMM_COMMENT;
+import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
+import static kr.modusplant.shared.persistence.constant.TableName.COMM_COMMENT;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -31,31 +29,43 @@ public class CommCommentEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @MapsId("postUlid")
-    @JoinColumn(name = "post_ulid", nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = POST_ULID, nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private CommPostEntity postEntity;
 
     @Id
-    @Column(name = "path", nullable = false, updatable = false)
+    @Column(name = PATH, nullable = false, updatable = false)
     private String path;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = SNAKE_AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity authMember;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = SNAKE_CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity createMember;
 
-    @Column(name = "content", nullable = false, length = 900)
+    @Column(name = "like_count", nullable = false)
+    @DefaultValue
+    private Integer likeCount;
+
+    @Column(name = CONTENT, nullable = false, length = 900)
     private String content;
 
     @Column(name = IS_DELETED, nullable = false)
     @DefaultValue
     private Boolean isDeleted;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = CREATED_AT, nullable = false)
     @CreatedDate
     private LocalDateTime createdAt;
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        this.likeCount = Math.max(0, this.likeCount - 1);
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -78,6 +88,9 @@ public class CommCommentEntity {
 
     @PrePersist
     public void prePersist() {
+        if (this.likeCount == null) {
+            this.likeCount = 0;
+        }
         if (this.isDeleted == null) {
             this.isDeleted = false;
         }
@@ -86,12 +99,13 @@ public class CommCommentEntity {
     private CommCommentEntity(
             CommPostEntity postEntity, String path,
             SiteMemberEntity authMember, SiteMemberEntity createMember,
-            String content, Boolean isDeleted
+            Integer likeCount, String content, Boolean isDeleted
     ) {
         this.postEntity = postEntity;
         this.path = path;
         this.authMember = authMember;
         this.createMember = createMember;
+        this.likeCount = likeCount;
         this.content = content;
         this.isDeleted = isDeleted;
     }
@@ -105,6 +119,7 @@ public class CommCommentEntity {
         private String path;
         private SiteMemberEntity authMember;
         private SiteMemberEntity createMember;
+        private Integer likeCount;
         private String content;
         private Boolean isDeleted;
 
@@ -128,6 +143,11 @@ public class CommCommentEntity {
             return this;
         }
 
+        public CommCommentEntityBuilder likeCount(final Integer likeCount) {
+            this.likeCount = likeCount;
+            return this;
+        }
+
         public CommCommentEntityBuilder content(final String content) {
             this.content = content;
             return this;
@@ -143,13 +163,14 @@ public class CommCommentEntity {
             this.path = commCommentEntity.getPath();
             this.authMember = commCommentEntity.getAuthMember();
             this.createMember = commCommentEntity.getCreateMember();
+            this.likeCount = commCommentEntity.getLikeCount();
             this.content = commCommentEntity.getContent();
             this.isDeleted = commCommentEntity.getIsDeleted();
             return this;
         }
 
         public CommCommentEntity build() {
-            return new CommCommentEntity(this.postEntity, this.path, this.authMember, this.createMember, this.content, this.isDeleted
+            return new CommCommentEntity(this.postEntity, this.path, this.authMember, this.createMember, this.likeCount, this.content, this.isDeleted
             );
         }
     }

@@ -16,8 +16,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.vo.TableColumnName.*;
-import static kr.modusplant.shared.persistence.vo.TableName.SITE_MEMBER;
+import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
+import static kr.modusplant.shared.persistence.constant.TableName.SITE_MEMBER;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -30,7 +30,7 @@ public class SiteMemberEntity {
     @Column(nullable = false, updatable = false)
     private UUID uuid;
 
-    @Column(nullable = false, length = 40)
+    @Column(nullable = false, length = 40, unique = true)
     private String nickname;
 
     @Column(name = "birth_date")
@@ -109,22 +109,6 @@ public class SiteMemberEntity {
 
     @PrePersist
     public void prePersist() {
-        if (this.isActive == null) {
-            this.isActive = true;
-        }
-        if (this.isDisabledByLinking == null) {
-            this.isDisabledByLinking = false;
-        }
-        if (this.isBanned == null) {
-            this.isBanned = false;
-        }
-        if (this.isDeleted == null) {
-            this.isDeleted = false;
-        }
-    }
-
-    @PreUpdate
-    public void preUpdate() {
         if (this.isActive == null) {
             this.isActive = true;
         }

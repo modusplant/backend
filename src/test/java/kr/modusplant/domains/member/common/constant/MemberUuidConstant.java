@@ -5,7 +5,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MemberUuidConstant {
-    public static final UUID TEST_MEMBER_UUID = UUID.fromString("7a071932-b666-4c37-925e-ede1593ba9b8");
+    public static final UUID TEST_MEMBER_ID_UUID = MEMBER_BASIC_USER_UUID;
 }

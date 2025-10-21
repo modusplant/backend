@@ -1,8 +1,8 @@
 package kr.modusplant.framework.out.jpa.repository;
 
 import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.framework.out.jpa.entity.common.util.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +14,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RepositoryOnlyContext
 class CommPrimaryCategoryRepositoryTest implements CommPrimaryCategoryEntityTestUtils {
 
-    private final CommPrimaryCategoryRepository commCategoryRepository;
+    private final CommPrimaryCategoryJpaRepository commCategoryRepository;
 
     @Autowired
-    CommPrimaryCategoryRepositoryTest(CommPrimaryCategoryRepository commCategoryRepository) {
+    CommPrimaryCategoryRepositoryTest(CommPrimaryCategoryJpaRepository commCategoryRepository) {
         this.commCategoryRepository = commCategoryRepository;
     }
 

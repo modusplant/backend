@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.term.domain.service;
 
-import kr.modusplant.framework.out.jpa.repository.TermRepository;
+import kr.modusplant.framework.out.jpa.repository.TermJpaRepository;
 import kr.modusplant.legacy.domains.term.error.TermExistsException;
 import kr.modusplant.legacy.domains.term.error.TermNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TermValidationService {
 
-    private final TermRepository termRepository;
+    private final TermJpaRepository termRepository;
 
     public void validateExistedUuid(UUID uuid) {
         if (uuid == null) {

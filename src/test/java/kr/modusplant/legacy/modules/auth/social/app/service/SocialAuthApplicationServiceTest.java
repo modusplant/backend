@@ -3,13 +3,13 @@ package kr.modusplant.legacy.modules.auth.social.app.service;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleRepository;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberAuthEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleJpaRepository;
+import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
-import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberAuthTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.legacy.domains.member.domain.model.SiteMemberAuth;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthDomainInfraMapper;
@@ -18,7 +18,6 @@ import kr.modusplant.legacy.modules.auth.social.app.dto.JwtUserPayload;
 import kr.modusplant.legacy.modules.auth.social.app.dto.KakaoUserInfo;
 import kr.modusplant.legacy.modules.auth.social.app.dto.supers.SocialUserInfo;
 import kr.modusplant.legacy.modules.auth.social.error.UnsupportedSocialProviderException;
-import kr.modusplant.legacy.modules.security.enums.Role;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,6 +27,8 @@ import org.mockito.Mock;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberAuthConstant.*;
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_GOOGLE_USER_NICKNAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,7 +38,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @DomainsServiceOnlyContext
-class SocialAuthApplicationServiceTest implements SiteMemberAuthTestUtils, SiteMemberEntityTestUtils, SiteMemberAuthEntityTestUtils {
+class SocialAuthApplicationServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntityTestUtils {
 
     private SocialAuthApplicationService socialAuthApplicationService;
     @Mock
@@ -45,19 +46,19 @@ class SocialAuthApplicationServiceTest implements SiteMemberAuthTestUtils, SiteM
     @Mock
     private GoogleAuthClient googleAuthClient;
     @Mock
-    private SiteMemberRepository memberRepository;
+    private SiteMemberJpaRepository memberRepository;
     @Mock
-    private SiteMemberAuthRepository memberAuthRepository;
+    private SiteMemberAuthJpaRepository memberAuthRepository;
     @Mock
-    private SiteMemberRoleRepository memberRoleRepository;
+    private SiteMemberRoleJpaRepository memberRoleRepository;
     @Mock
     private SiteMemberAuthDomainInfraMapper memberAuthEntityMapper;
 
     private final String code = "sample-code";
+    private final String id = MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID;
+    private final String email = MEMBER_AUTH_GOOGLE_USER_EMAIL;
+    private final String nickname = MEMBER_GOOGLE_USER_NICKNAME;
     private final AuthProvider provider = AuthProvider.GOOGLE;
-    private final String id = "639796866968871286823";
-    private final String email = "Test3gOogleUsser@gmail.com";
-    private final String nickname = "구글 유저";
 
     @BeforeEach
     void setUp() {
@@ -137,7 +138,14 @@ class SocialAuthApplicationServiceTest implements SiteMemberAuthTestUtils, SiteM
                 .role(Role.USER).build();
 
         given(memberAuthRepository.findByProviderAndProviderId(provider, id)).willReturn(Optional.of(memberAuthEntity));
-        given(memberAuthEntityMapper.toSiteMemberAuth(memberAuthEntity)).willReturn(SiteMemberAuth.builder().memberAuth(memberAuthBasicUserWithUuid).activeMemberUuid(memberEntity.getUuid()).build());
+        given(memberAuthEntityMapper.toSiteMemberAuth(memberAuthEntity)).willReturn(SiteMemberAuth.builder()
+                .originalMemberUuid(MEMBER_AUTH_BASIC_USER_ORIGINAL_MEMBER_UUID)
+                .activeMemberUuid(memberEntity.getUuid())
+                .email(MEMBER_AUTH_BASIC_USER_EMAIL)
+                .pw(MEMBER_AUTH_BASIC_USER_PW)
+                .provider(MEMBER_AUTH_BASIC_USER_PROVIDER)
+                .providerId(MEMBER_AUTH_BASIC_USER_PROVIDER_ID)
+                .build());
         given(memberRepository.findByUuid(memberEntity.getUuid())).willReturn(Optional.of(memberEntity));
         given(memberRepository.save(any())).willReturn(memberEntity);
         given(memberRoleRepository.findByMember(memberEntity)).willReturn(Optional.of(memberRoleEntity));

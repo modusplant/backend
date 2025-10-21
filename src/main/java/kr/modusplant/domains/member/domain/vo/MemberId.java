@@ -1,6 +1,8 @@
 package kr.modusplant.domains.member.domain.vo;
 
 import kr.modusplant.domains.member.domain.exception.EmptyMemberIdException;
+import kr.modusplant.shared.exception.InvalidDataException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +10,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.UUID;
+
+import static kr.modusplant.shared.constant.Regex.PATTERN_UUID;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -26,8 +30,10 @@ public class MemberId {
     }
 
     public static MemberId fromString(String value) {
-        if (value == null) {
+        if (value == null || value.trim().isEmpty()) {
             throw new EmptyMemberIdException();
+        } else if (!PATTERN_UUID.matcher(value).matches()) {
+            throw new InvalidDataException(ErrorCode.INVALID_INPUT, "memberId");
         }
         return new MemberId(UUID.fromString(value));
     }

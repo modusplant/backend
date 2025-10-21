@@ -1,27 +1,31 @@
 package kr.modusplant.legacy.domains.communication.common.util.app.http.response;
 
 import kr.modusplant.legacy.domains.communication.app.http.response.CommPostResponse;
-import kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils;
 
 import java.time.LocalDateTime;
 
-public interface CommPostResponseTestUtils extends CommPostTestUtils {
+import static kr.modusplant.shared.persistence.common.constant.CommPostConstant.*;
+import static kr.modusplant.shared.persistence.common.constant.CommPrimaryCategoryConstant.*;
+import static kr.modusplant.shared.persistence.common.constant.CommSecondaryCategoryConstant.*;
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
+
+public interface CommPostResponseTestUtils {
     LocalDateTime testDate = LocalDateTime.of(2025, 6, 1, 0, 0);
 
     CommPostResponse TEST_COMM_POST_RESPONSE = new CommPostResponse(
-            TEST_COMM_POST_WITH_ULID.getUlid(),
-            TEST_COMM_PRIMARY_CATEGORY_WITH_UUID.getCategory(),
-            TEST_COMM_PRIMARY_CATEGORY_WITH_UUID.getUuid(),
-            TEST_COMM_PRIMARY_CATEGORY_WITH_UUID.getOrder(),
-            TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getCategory(),
-            TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getUuid(),
-            TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getOrder(),
-            TEST_COMM_POST_WITH_ULID.getAuthMemberUuid(),
-            memberBasicUserWithUuid.getNickname(),
+            TEST_COMM_POST_ULID,
+            TEST_COMM_PRIMARY_CATEGORY_CATEGORY,
+            TEST_COMM_PRIMARY_CATEGORY_UUID,
+            TEST_COMM_PRIMARY_CATEGORY_ORDER,
+            TEST_COMM_SECONDARY_CATEGORY_CATEGORY,
+            TEST_COMM_SECONDARY_CATEGORY_UUID,
+            TEST_COMM_SECONDARY_CATEGORY_ORDER,
+            TEST_COMM_POST_AUTH_MEMBER_UUID,
+            MEMBER_BASIC_USER_NICKNAME,
             5,
             76L,
-            TEST_COMM_POST_WITH_ULID.getTitle(),
-            TEST_COMM_POST_WITH_ULID.getContent(),
+            TEST_COMM_POST_TITLE,
+            TEST_COMM_POST_CONTENT,
             testDate,
             testDate.plusMinutes(24)
     );
