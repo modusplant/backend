@@ -1,13 +1,16 @@
 package kr.modusplant.domains.post.adapter.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.post.domain.vo.*;
 import kr.modusplant.domains.post.usecase.port.repository.*;
+import kr.modusplant.domains.post.usecase.request.PostFilterRequest;
 import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
 import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
-import kr.modusplant.domains.post.usecase.response.PostResponse;
+import kr.modusplant.domains.post.usecase.response.PostDetailResponse;
 import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
 import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
+import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -33,119 +36,98 @@ public class PostController {
     @Value("${redis.ttl.view_count}")
     private long ttlMinutes;
 
-    public Page<PostResponse> getAll(Pageable pageable) {
-        return postRepository.getPublishedPosts(pageable)
-                .map(post -> {
+    public Page<PostSummaryResponse> getAll(PostFilterRequest postFilterRequest, Pageable pageable) {
+        return postRepository.getPublishedPosts(
+                    PrimaryCategoryId.fromUuid(postFilterRequest.primaryCategoryUuid()),
+                    postFilterRequest.secondaryCategoryUuids().stream().map(SecondaryCategoryId::fromUuid).toList(),
+                    postFilterRequest.keyword(),
+                    pageable
+                ).map(postModel -> {
+                    JsonNode contentPreview;
                     try {
-                        post.updateContent(postMapper.toContentJson(post));
+                        contentPreview = multipartDataProcessorPort.convertToPreviewData(postModel.content());
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                    return postMapper.toPostResponse(post,postViewCountRepository.read(PostId.create(post.getPostId().getValue())));
+                    return postMapper.toPostSummaryResponse(postModel,contentPreview);
                 });
     }
 
-    public Page<PostResponse> getByMemberUuid(UUID memberUuid, Pageable pageable) {
-        return postRepository.getPublishedPostsByAuthor(AuthorId.fromUuid(memberUuid),pageable)
-                .map(post -> {
+    public Page<PostSummaryResponse> getByMemberUuid(UUID memberUuid, PostFilterRequest postFilterRequest, Pageable pageable) {
+        return postRepository.getPublishedPostsByAuthor(
+                    AuthorId.fromUuid(memberUuid),
+                    PrimaryCategoryId.fromUuid(postFilterRequest.primaryCategoryUuid()),
+                    postFilterRequest.secondaryCategoryUuids().stream().map(SecondaryCategoryId::fromUuid).toList(),
+                    postFilterRequest.keyword(),
+                    pageable
+                ).map(postModel -> {
+                    JsonNode contentPreview;
                     try {
-                        post.updateContent(postMapper.toContentJson(post));
+                        contentPreview = multipartDataProcessorPort.convertToPreviewData(postModel.content());
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                    return postMapper.toPostResponse(post,postViewCountRepository.read(PostId.create(post.getPostId().getValue())));
+                    return postMapper.toPostSummaryResponse(postModel,contentPreview);
                 });
     }
 
-    public Page<PostResponse> getDraftByMemberUuid(UUID currentMemberUuid, Pageable pageable) {
+    public Page<PostSummaryResponse> getDraftByMemberUuid(UUID currentMemberUuid, Pageable pageable) {
         return postRepository.getDraftPostsByAuthor(AuthorId.fromUuid(currentMemberUuid), pageable)
-                .map(post -> {
+                .map(postModel -> {
+                    JsonNode contentPreview;
                     try {
-                        post.updateContent(postMapper.toContentJson(post));
+                        contentPreview = multipartDataProcessorPort.convertToPreviewData(postModel.content());
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                    return postMapper.toPostResponse(post, 0L);
+                    return postMapper.toPostSummaryResponse(postModel, contentPreview);
                 });
     }
 
-    public Page<PostResponse> getByPrimaryCategoryUuid(UUID categoryUuid, Pageable pageable) {
-        return postRepository.getPublishedPostsByPrimaryCategory(PrimaryCategoryId.fromUuid(categoryUuid),pageable)
-                .map(post -> {
+    public Optional<PostDetailResponse> getByUlid(String ulid, UUID currentMemberUuid) {
+        return postRepository.getPostDetailByUlid(PostId.create(ulid))
+                .filter(postDetail -> postDetail.isPublished() ||
+                        (!postDetail.isPublished() && postDetail.authorUuid().equals(currentMemberUuid)))
+                .map(postDetail -> {
+                    JsonNode content;
                     try {
-                        post.updateContent(postMapper.toContentJson(post));
+                        content = multipartDataProcessorPort.convertFileSrcToBinaryData(postDetail.content());
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                    return postMapper.toPostResponse(post,postViewCountRepository.read(PostId.create(post.getPostId().getValue())));
-                });
-    }
-
-    public Page<PostResponse> getBySecondaryCategoryUuid(UUID categoryUuid, Pageable pageable) {
-        return postRepository.getPublishedPostsBySecondaryCategory(SecondaryCategoryId.fromUuid(categoryUuid),pageable)
-                .map(post -> {
-                    try {
-                        post.updateContent(postMapper.toContentJson(post));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    return postMapper.toPostResponse(post,postViewCountRepository.read(PostId.create(post.getPostId().getValue())));
-                });
-    }
-
-    public Page<PostResponse> searchByKeyword(String keyword, Pageable pageable) {
-        return postRepository.getPublishedPostsByTitleOrContent(keyword,pageable)
-                .map(post -> {
-                    try {
-                        post.updateContent(postMapper.toContentJson(post));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    return postMapper.toPostResponse(post,postViewCountRepository.read(PostId.create(post.getPostId().getValue())));
-                });
-    }
-
-    public Optional<PostResponse> getByUlid(String ulid,UUID currentMemberUuid) {
-        return postRepository.getPostByUlid(PostId.create(ulid))
-                .filter(post -> post.getStatus().isPublished() ||
-                        (post.getStatus().isDraft() && post.getAuthorId().equals(AuthorId.fromUuid(currentMemberUuid))))
-                .map(post -> {
-                    try {
-                        post.updateContent(postMapper.toContentJson(post));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    return postMapper.toPostResponse(
-                            post,
-                            post.getStatus().isPublished() ? postViewCountRepository.read(PostId.create(ulid)) : 0L);
+                    return postMapper.toPostDetailResponse(
+                            postDetail,
+                            content,
+                            postDetail.isPublished() ? postViewCountRepository.read(PostId.create(ulid)) : 0L);
                 });
     }
 
     @Transactional
-    public PostResponse createPost(PostInsertRequest postInsertRequest, UUID currentMemberUuid) throws IOException {
+    public void createPost(PostInsertRequest postInsertRequest, UUID currentMemberUuid) throws IOException {
         AuthorId authorId = AuthorId.fromUuid(currentMemberUuid);
         PrimaryCategoryId primaryCategoryId = PrimaryCategoryId.fromUuid(postInsertRequest.primaryCategoryUuid());
         SecondaryCategoryId secondaryCategoryId = SecondaryCategoryId.fromUuid(postInsertRequest.secondaryCategoryUuid());
-        PostContent postContent = postMapper.toPostContent(postInsertRequest);
+        PostContent postContent = PostContent.create(postInsertRequest.title(), multipartDataProcessorPort.saveFilesAndGenerateContentJson(postInsertRequest.content()));
         Post post = postInsertRequest.isPublished()
                 ? Post.createPublished(authorId, primaryCategoryId, secondaryCategoryId, postContent)
                 : Post.createDraft(authorId, primaryCategoryId, secondaryCategoryId, postContent);
-        return postMapper.toPostResponse(postRepository.save(post),0L);
+        postRepository.save(post);
     }
 
     @Transactional
-    public PostResponse updatePost(PostUpdateRequest postUpdateRequest, UUID currentMemberUuid) throws IOException {
+    public void updatePost(PostUpdateRequest postUpdateRequest, UUID currentMemberUuid) throws IOException {
         Post post = postRepository.getPostByUlid(PostId.create(postUpdateRequest.ulid()))
                 .filter(p -> p.getAuthorId().equals(AuthorId.fromUuid(currentMemberUuid))).orElseThrow();
         multipartDataProcessorPort.deleteFiles(post.getPostContent().getContent());
+        PostContent postContent = PostContent.create(postUpdateRequest.title(),multipartDataProcessorPort.saveFilesAndGenerateContentJson(postUpdateRequest.content()));
         post.update(
                 AuthorId.fromUuid(currentMemberUuid),
                 PrimaryCategoryId.fromUuid(postUpdateRequest.primaryCategoryUuid()),
                 SecondaryCategoryId.fromUuid(postUpdateRequest.secondaryCategoryUuid()),
-                postMapper.toPostContent(postUpdateRequest),
+                postContent,
                 postUpdateRequest.isPublished() ? PostStatus.published() : PostStatus.draft()
         );
-        return postMapper.toPostResponse(postRepository.save(post),postViewCountRepository.read(PostId.create(post.getPostId().getValue())));
+        postRepository.save(post);
     }
 
     @Transactional
