@@ -3,6 +3,9 @@ package kr.modusplant.domains.post.framework.out.jpa.entity;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
+import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.infrastructure.persistence.annotation.DefaultValue;
 import kr.modusplant.infrastructure.persistence.generator.UlidGenerator;
 import lombok.AccessLevel;
@@ -14,11 +17,9 @@ import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import java.time.LocalDateTime;
-
-import static kr.modusplant.shared.persistence.vo.TableColumnName.*;
-import static kr.modusplant.shared.persistence.vo.TableName.COMM_POST;
+import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
+import static kr.modusplant.shared.persistence.constant.TableName.COMM_POST;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -33,25 +34,25 @@ public class PostEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = PRI_CATE_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private PrimaryCategoryEntity primaryCategory;
+    private CommPrimaryCategoryEntity primaryCategory;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = SECO_CATE_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private SecondaryCategoryEntity secondaryCategory;
+    private CommSecondaryCategoryEntity secondaryCategory;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = "auth_memb_uuid", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private AuthorEntity authMember;
+    @JoinColumn(name = AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private SiteMemberEntity authMember;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "crea_memb_uuid", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private AuthorEntity createMember;
+    @JoinColumn(name = CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private SiteMemberEntity createMember;
 
-    @Column(name = "like_count", nullable = false)
+    @Column(name = LIKE_COUNT, nullable = false)
     @DefaultValue
     private Integer likeCount;
 
-    @Column(name = "view_count", nullable = false)
+    @Column(name = VIEW_COUNT, nullable = false)
     @DefaultValue
     private Long viewCount;
 
@@ -62,11 +63,11 @@ public class PostEntity {
     @Column(nullable = false, columnDefinition = "jsonb")
     private JsonNode content;
 
-    @Column(name = "is_published", nullable = false)
+    @Column(name = IS_PUBLISHED, nullable = false)
     @DefaultValue
     private Boolean isPublished;
 
-    @Column(name = "published_at", nullable = true)
+    @Column(name = PUBLISHED_AT)
     private LocalDateTime publishedAt;
 
     @Column(name = CREATED_AT, nullable = false, updatable = false)
@@ -116,7 +117,7 @@ public class PostEntity {
         }
     }
 
-    private PostEntity(String ulid, PrimaryCategoryEntity primaryCategory, SecondaryCategoryEntity secondaryCategory, AuthorEntity authMember, AuthorEntity createMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isPublished, LocalDateTime publishedAt) {
+    private PostEntity(String ulid, CommPrimaryCategoryEntity primaryCategory, CommSecondaryCategoryEntity secondaryCategory, SiteMemberEntity authMember, SiteMemberEntity createMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isPublished, LocalDateTime publishedAt) {
         this.ulid = ulid;
         this.primaryCategory = primaryCategory;
         this.secondaryCategory = secondaryCategory;
@@ -136,10 +137,10 @@ public class PostEntity {
 
     public static final class CommPostEntityBuilder {
         private String ulid;
-        private PrimaryCategoryEntity primaryCategory;
-        private SecondaryCategoryEntity secondaryCategory;
-        private AuthorEntity authMember;
-        private AuthorEntity createMember;
+        private CommPrimaryCategoryEntity primaryCategory;
+        private CommSecondaryCategoryEntity secondaryCategory;
+        private SiteMemberEntity authMember;
+        private SiteMemberEntity createMember;
         private Integer likeCount;
         private Long viewCount;
         private String title;
@@ -152,22 +153,22 @@ public class PostEntity {
             return this;
         }
 
-        public CommPostEntityBuilder primaryCategory(final PrimaryCategoryEntity primaryCategory) {
+        public CommPostEntityBuilder primaryCategory(final CommPrimaryCategoryEntity primaryCategory) {
             this.primaryCategory = primaryCategory;
             return this;
         }
 
-        public CommPostEntityBuilder secondaryCategory(final SecondaryCategoryEntity secondaryCategory) {
+        public CommPostEntityBuilder secondaryCategory(final CommSecondaryCategoryEntity secondaryCategory) {
             this.secondaryCategory = secondaryCategory;
             return this;
         }
 
-        public CommPostEntityBuilder authMember(final AuthorEntity authMember) {
+        public CommPostEntityBuilder authMember(final SiteMemberEntity authMember) {
             this.authMember = authMember;
             return this;
         }
 
-        public CommPostEntityBuilder createMember(final AuthorEntity createMember) {
+        public CommPostEntityBuilder createMember(final SiteMemberEntity createMember) {
             this.createMember = createMember;
             return this;
         }

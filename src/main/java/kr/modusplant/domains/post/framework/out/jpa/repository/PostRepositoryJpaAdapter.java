@@ -5,16 +5,16 @@ import kr.modusplant.domains.post.domain.vo.AuthorId;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.domain.vo.PrimaryCategoryId;
 import kr.modusplant.domains.post.domain.vo.SecondaryCategoryId;
-import kr.modusplant.domains.post.framework.out.jpa.entity.AuthorEntity;
-import kr.modusplant.domains.post.framework.out.jpa.entity.PrimaryCategoryEntity;
-import kr.modusplant.domains.post.framework.out.jpa.entity.SecondaryCategoryEntity;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.PostJpaMapperImpl;
-import kr.modusplant.domains.post.framework.out.jpa.repository.supers.AuthorJpaRepository;
 import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostJpaRepository;
-import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PrimaryCategoryJpaRepository;
-import kr.modusplant.domains.post.framework.out.jpa.repository.supers.SecondaryCategoryJpaRepository;
 import kr.modusplant.domains.post.framework.out.redis.PostViewCountRedisRepository;
 import kr.modusplant.domains.post.usecase.port.repository.PostRepository;
+import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.repository.CommPrimaryCategoryJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,9 +27,9 @@ import java.util.Optional;
 public class PostRepositoryJpaAdapter implements PostRepository {
     private final PostJpaMapperImpl postJpaMapper;
     private final PostJpaRepository postJpaRepository;
-    private final AuthorJpaRepository authorJpaRepository;
-    private final PrimaryCategoryJpaRepository primaryCategoryJpaRepository;
-    private final SecondaryCategoryJpaRepository secondaryCategoryJpaRepository;
+    private final SiteMemberJpaRepository authorJpaRepository;
+    private final CommPrimaryCategoryJpaRepository primaryCategoryJpaRepository;
+    private final CommSecondaryCategoryJpaRepository secondaryCategoryJpaRepository;
     private final PostViewCountRedisRepository postViewCountRedisRepository;
 
     @Override
@@ -39,6 +39,10 @@ public class PostRepositoryJpaAdapter implements PostRepository {
         PrimaryCategoryEntity primaryCategoryEntity = primaryCategoryJpaRepository.findByUuid(post.getPrimaryCategoryId().getValue()).orElseThrow();
         SecondaryCategoryEntity secondaryCategoryEntity = secondaryCategoryJpaRepository.findByUuid(post.getSecondaryCategoryId().getValue()).orElseThrow();
         return postJpaMapper.toPost(postJpaRepository.save(
+        SiteMemberEntity authorEntity = authorJpaRepository.findByUuid(post.getAuthorId().getValue()).orElseThrow();
+        SiteMemberEntity createMember = authorJpaRepository.findByUuid(post.getCreateAuthorId().getValue()).orElseThrow();
+        CommPrimaryCategoryEntity primaryCategoryEntity = primaryCategoryJpaRepository.findByUuid(post.getPrimaryCategoryId().getValue()).orElseThrow();
+        CommSecondaryCategoryEntity secondaryCategoryEntity = secondaryCategoryJpaRepository.findByUuid(post.getSecondaryCategoryId().getValue()).orElseThrow();
                 postJpaMapper.toPostEntity(post, authorEntity,createMember,primaryCategoryEntity,secondaryCategoryEntity,postViewCountRedisRepository.read(post.getPostId()))
         ));
     }
