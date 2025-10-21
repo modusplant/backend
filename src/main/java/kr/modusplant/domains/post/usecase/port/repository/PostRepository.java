@@ -5,31 +5,29 @@ import kr.modusplant.domains.post.domain.vo.AuthorId;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.domain.vo.PrimaryCategoryId;
 import kr.modusplant.domains.post.domain.vo.SecondaryCategoryId;
+import kr.modusplant.domains.post.usecase.model.PostDetailReadModel;
+import kr.modusplant.domains.post.usecase.model.PostSummaryReadModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
-
 
 public interface PostRepository {
 
-    Post save(Post post);
+    PostDetailReadModel save(Post post);
 
     void delete(Post post);
 
-    Page<Post> getPublishedPosts(Pageable pageable);
+    Page<PostSummaryReadModel> getPublishedPosts(PrimaryCategoryId primaryCategoryId, List<SecondaryCategoryId> secondaryCategoryIds, String keyword, Pageable pageable);
 
-    Page<Post> getPublishedPostsByPrimaryCategory(PrimaryCategoryId primaryCategoryId, Pageable pageable);
+    Page<PostSummaryReadModel> getPublishedPostsByAuthor(AuthorId authorId, PrimaryCategoryId primaryCategoryId, List<SecondaryCategoryId> secondaryCategoryIds, String keyword, Pageable pageable);
 
-    Page<Post> getPublishedPostsBySecondaryCategory(SecondaryCategoryId secondaryCategoryId, Pageable pageable);
-
-    Page<Post> getPublishedPostsByAuthor(AuthorId authorId, Pageable pageable);
-
-    Page<Post> getDraftPostsByAuthor(AuthorId authorId, Pageable pageable);
+    Page<PostSummaryReadModel> getDraftPostsByAuthor(AuthorId authorId, Pageable pageable);
 
     Optional<Post> getPostByUlid(PostId postId);
 
-    Page<Post> getPublishedPostsByTitleOrContent(String keyword, Pageable pageable);
+    Optional<PostDetailReadModel> getPostDetailByUlid(PostId postId);
 
     Long getViewCountByUlid(PostId postId);
 

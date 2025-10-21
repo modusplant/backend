@@ -8,6 +8,8 @@ import kr.modusplant.domains.post.domain.vo.SecondaryCategoryId;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.PostJpaMapperImpl;
 import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostJpaRepository;
 import kr.modusplant.domains.post.framework.out.redis.PostViewCountRedisRepository;
+import kr.modusplant.domains.post.usecase.model.PostDetailReadModel;
+import kr.modusplant.domains.post.usecase.model.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.port.repository.PostRepository;
 import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -33,16 +36,12 @@ public class PostRepositoryJpaAdapter implements PostRepository {
     private final PostViewCountRedisRepository postViewCountRedisRepository;
 
     @Override
-    public Post save(Post post) {
-        AuthorEntity authorEntity = authorJpaRepository.findByUuid(post.getAuthorId().getValue()).orElseThrow();
-        AuthorEntity createMember = authorJpaRepository.findByUuid(post.getCreateAuthorId().getValue()).orElseThrow();
-        PrimaryCategoryEntity primaryCategoryEntity = primaryCategoryJpaRepository.findByUuid(post.getPrimaryCategoryId().getValue()).orElseThrow();
-        SecondaryCategoryEntity secondaryCategoryEntity = secondaryCategoryJpaRepository.findByUuid(post.getSecondaryCategoryId().getValue()).orElseThrow();
-        return postJpaMapper.toPost(postJpaRepository.save(
+    public PostDetailReadModel save(Post post) {
         SiteMemberEntity authorEntity = authorJpaRepository.findByUuid(post.getAuthorId().getValue()).orElseThrow();
         SiteMemberEntity createMember = authorJpaRepository.findByUuid(post.getCreateAuthorId().getValue()).orElseThrow();
         CommPrimaryCategoryEntity primaryCategoryEntity = primaryCategoryJpaRepository.findByUuid(post.getPrimaryCategoryId().getValue()).orElseThrow();
         CommSecondaryCategoryEntity secondaryCategoryEntity = secondaryCategoryJpaRepository.findByUuid(post.getSecondaryCategoryId().getValue()).orElseThrow();
+        return postJpaMapper.toPostDetailReadModel(postJpaRepository.save(
                 postJpaMapper.toPostEntity(post, authorEntity,createMember,primaryCategoryEntity,secondaryCategoryEntity,postViewCountRedisRepository.read(post.getPostId()))
         ));
     }
@@ -54,37 +53,32 @@ public class PostRepositoryJpaAdapter implements PostRepository {
 
 
     @Override
-    public Page<Post> getPublishedPosts(Pageable pageable) {
-        return postJpaRepository.findByIsPublishedTrueOrderByPublishedAtDesc(pageable)
-                .map(postJpaMapper::toPost);
+    public Page<PostSummaryReadModel> getPublishedPosts(PrimaryCategoryId primaryCategoryId, List<SecondaryCategoryId> secondaryCategoryIds, String keyword, Pageable pageable) {
+        return postJpaRepository.findByDynamicConditionsAndIsPublishedTrue(
+                primaryCategoryId.getValue(),
+                secondaryCategoryIds.stream().map(SecondaryCategoryId::getValue).toList(),
+                keyword,
+                pageable
+        );
     }
 
     @Override
-    public Page<Post> getPublishedPostsByPrimaryCategory(PrimaryCategoryId primaryCategoryId, Pageable pageable) {
-        PrimaryCategoryEntity primaryCategory = primaryCategoryJpaRepository.findByUuid(primaryCategoryId.getValue()).orElseThrow();
-        return postJpaRepository.findByPrimaryCategoryAndIsPublishedTrueOrderByPublishedAtDesc(primaryCategory, pageable)
-                .map(postJpaMapper::toPost);
+    public Page<PostSummaryReadModel> getPublishedPostsByAuthor(AuthorId authorId, PrimaryCategoryId primaryCategoryId, List<SecondaryCategoryId> secondaryCategoryIds, String keyword, Pageable pageable) {
+        return postJpaRepository.findByAuthMemberAndDynamicConditionsAndIsPublishedTrue(
+                authorId.getValue(),
+                primaryCategoryId.getValue(),
+                secondaryCategoryIds.stream().map(SecondaryCategoryId::getValue).toList(),
+                keyword,
+                pageable
+        );
     }
 
     @Override
-    public Page<Post> getPublishedPostsBySecondaryCategory(SecondaryCategoryId secondaryCategoryId, Pageable pageable) {
-        SecondaryCategoryEntity secondaryCategory = secondaryCategoryJpaRepository.findByUuid(secondaryCategoryId.getValue()).orElseThrow();
-        return postJpaRepository.findBySecondaryCategoryAndIsPublishedTrueOrderByPublishedAtDesc(secondaryCategory, pageable)
-                .map(postJpaMapper::toPost);
-    }
-
-    @Override
-    public Page<Post> getPublishedPostsByAuthor(AuthorId authorId, Pageable pageable) {
-        AuthorEntity authorEntity = authorJpaRepository.findByUuid(authorId.getValue()).orElseThrow();
-        return postJpaRepository.findByAuthMemberAndIsPublishedTrueOrderByPublishedAtDesc(authorEntity, pageable)
-                .map(postJpaMapper::toPost);
-    }
-
-    @Override
-    public Page<Post> getDraftPostsByAuthor(AuthorId authorId, Pageable pageable) {
-        AuthorEntity authorEntity = authorJpaRepository.findByUuid(authorId.getValue()).orElseThrow();
-        return postJpaRepository.findByAuthMemberAndIsPublishedFalseOrderByUpdatedAtDesc(authorEntity, pageable)
-                .map(postJpaMapper::toPost);
+    public Page<PostSummaryReadModel> getDraftPostsByAuthor(AuthorId authorId, Pageable pageable) {
+        return postJpaRepository.findByAuthMemberAndIsPublishedFalseOrderByUpdatedAtDesc(
+                authorJpaRepository.findByUuid(authorId.getValue()).orElseThrow(),
+                pageable
+        ).map(postJpaMapper::toPostSummaryReadModel);
     }
 
     @Override
@@ -93,9 +87,8 @@ public class PostRepositoryJpaAdapter implements PostRepository {
     }
 
     @Override
-    public Page<Post> getPublishedPostsByTitleOrContent(String keyword, Pageable pageable) {
-        return postJpaRepository.searchByTitleOrContent(keyword, pageable)
-                .map(postJpaMapper::toPost);
+    public Optional<PostDetailReadModel> getPostDetailByUlid(PostId postId) {
+        return postJpaRepository.findByUlid(postId.getValue()).map(postJpaMapper::toPostDetailReadModel);
     }
 
     @Override
