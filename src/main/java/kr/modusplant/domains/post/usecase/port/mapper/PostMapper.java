@@ -1,19 +1,13 @@
 package kr.modusplant.domains.post.usecase.port.mapper;
 
-import kr.modusplant.domains.post.domain.aggregate.Post;
-import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
-import kr.modusplant.domains.post.domain.vo.PostContent;
-import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
-import kr.modusplant.domains.post.usecase.response.PostResponse;
-
-import java.io.IOException;
+import com.fasterxml.jackson.databind.JsonNode;
+import kr.modusplant.domains.post.usecase.model.PostDetailReadModel;
+import kr.modusplant.domains.post.usecase.model.PostSummaryReadModel;
+import kr.modusplant.domains.post.usecase.response.PostDetailResponse;
+import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;
 
 public interface PostMapper {
-    PostContent toPostContent(PostInsertRequest request) throws IOException;
+    PostDetailResponse toPostDetailResponse(PostDetailReadModel postDetailReadModel, JsonNode content, Long viewCount);
 
-    PostContent toPostContent(PostUpdateRequest request) throws IOException;
-
-    PostContent toContentJson(Post post) throws IOException;
-
-    PostResponse toPostResponse(Post post,Long viewCount);
+    PostSummaryResponse toPostSummaryResponse(PostSummaryReadModel postSummaryReadModel, JsonNode content);
 }
