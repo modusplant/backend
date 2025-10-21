@@ -5,15 +5,16 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.post.adapter.controller.PostController;
 import kr.modusplant.domains.post.usecase.request.FileOrder;
+import kr.modusplant.domains.post.usecase.request.PostFilterRequest;
 import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
 import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
 import kr.modusplant.domains.post.usecase.response.PostPageResponse;
-import kr.modusplant.domains.post.usecase.response.PostResponse;
-import kr.modusplant.domains.post.framework.in.web.validation.CommunicationPageNumber;
+import kr.modusplant.domains.post.usecase.response.PostDetailResponse;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
@@ -51,11 +52,27 @@ public class PostRestController {
     )
     @GetMapping
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getAllPosts(
+            @Parameter(schema = @Schema(description = "1차 항목 식별자", example = "2d9f462d-b50f-4394-928e-5c864f60b09a"))
+            @RequestParam(name = "primary_category_id", required = false)
+            UUID primaryCategoryUuid,
+
+            @Parameter(schema = @Schema(description = "2차 항목 식별자 (복수 선택 가능)", example = "4803f4e8-c982-4631-ba82-234d4fa6e824"))
+            @RequestParam(name = "secondary_category_id", required = false)
+            List<UUID> secondaryCategoryUuids,
+
+            @Parameter(schema = @Schema(description = "{제목+본문} 검색어 키워드", example = "벌레"))
+            @RequestParam(required = false)
+            String keyword,
+
             @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
-            @RequestParam
-            @CommunicationPageNumber
-            Integer page) {
-        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(postController.getAll(PageRequest.of(page, PAGE_SIZE)))));
+            @RequestParam(defaultValue = "1")
+            @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
+            Integer page
+    ) {
+        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(postController.getAll(
+                new PostFilterRequest(primaryCategoryUuid, secondaryCategoryUuids, keyword),
+                PageRequest.of(page-1, PAGE_SIZE)
+        ))));
     }
 
     @Operation(
@@ -65,82 +82,46 @@ public class PostRestController {
     @GetMapping("/member/{memberUuid}")
     public ResponseEntity<DataResponse<PostPageResponse<?>>> getPostsByMember(
             @Parameter(schema = @Schema(description = "회원의 식별자", example = "038ae842-3c93-484f-b526-7c4645a195a7"))
-            @PathVariable(required = false)
+            @PathVariable
             @NotNull(message = "회원 식별자가 비어 있습니다.")
             UUID memberUuid,
-            @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
-            @RequestParam
-            @CommunicationPageNumber
-            Integer page) {
-        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(postController.getByMemberUuid(memberUuid, PageRequest.of(page, PAGE_SIZE)))));
-    }
 
-    @GetMapping("/me/drafts")
-    public ResponseEntity<DataResponse<PostPageResponse<?>>> getDraftPostsByMember(
-            @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
-            @RequestParam
-            @CommunicationPageNumber
-            Integer page
-    ) {
-        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(postController.getDraftByMemberUuid(currentMemberUuid,PageRequest.of(page,PAGE_SIZE)))));
-    }
-
-    @Operation(
-            summary = "1차 항목별 컨텐츠 게시글 목록 조회 API",
-            description = "1차 항목별 컨텐츠 게시글의 목록과 페이지 정보를 조회합니다."
-    )
-    @GetMapping("/category/primary/{primaryCategoryUuid}")
-    public ResponseEntity<DataResponse<PostPageResponse<?>>> getPostsByPrimaryCategory(
             @Parameter(schema = @Schema(description = "1차 항목 식별자", example = "2d9f462d-b50f-4394-928e-5c864f60b09a"))
-            @PathVariable(required = false)
-            @NotNull(message = "1차 항목 식별자가 비어 있습니다.")
+            @RequestParam(name = "primary_category_id", required = false)
             UUID primaryCategoryUuid,
 
-            @Parameter(schema = @Schema(
-                    description = "페이지 숫자",
-                    minimum = "1",
-                    example = "4")
-            )
-            @RequestParam
-            @CommunicationPageNumber
-            Integer page) {
-        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(postController.getByPrimaryCategoryUuid(primaryCategoryUuid, PageRequest.of(page, PAGE_SIZE)))));
-    }
+            @Parameter(schema = @Schema(description = "2차 항목 식별자 (복수 선택 가능)", example = "4803f4e8-c982-4631-ba82-234d4fa6e824"))
+            @RequestParam(name = "secondary_category_id", required = false)
+            List<UUID> secondaryCategoryUuids,
 
-    @Operation(
-            summary = "2차 항목별 컨텐츠 게시글 목록 조회 API",
-            description = "2차 항목별 컨텐츠 게시글의 목록과 페이지 정보를 조회합니다."
-    )
-    @GetMapping("/category/secondary/{secondaryCategoryUuid}")
-    public ResponseEntity<DataResponse<PostPageResponse<?>>> getPostsBySecondaryCategory(
-            @Parameter(schema = @Schema(description = "2차 항목 식별자", example = "4803f4e8-c982-4631-ba82-234d4fa6e824"))
-            @PathVariable(required = false)
-            @NotNull(message = "2차 항목 식별자가 비어 있습니다.")
-            UUID secondaryCategoryUuid,
-
-            @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
-            @RequestParam
-            @CommunicationPageNumber
-            Integer page) {
-        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(postController.getBySecondaryCategoryUuid(secondaryCategoryUuid, PageRequest.of(page, PAGE_SIZE)))));
-    }
-
-    @Operation(
-            summary = "제목 + 본문 검색어로 컨텐츠 게시글 목록 조회 API",
-            description = "제목 + 본문 검색어로 컨텐츠 게시글의 목록과 페이지 정보를 조회합니다."
-    )
-    @GetMapping("/search")
-    public ResponseEntity<DataResponse<PostPageResponse<?>>> searchPosts(
-            @Parameter(schema = @Schema(description = "검색 키워드", example = "벌레"))
-            @RequestParam
-            @NotBlank(message = "키워드가 비어 있습니다.")
+            @Parameter(schema = @Schema(description = "{제목+본문} 검색어 키워드", example = "벌레"))
+            @RequestParam(required = false)
             String keyword,
 
             @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
-            @RequestParam
-            @CommunicationPageNumber
-            Integer page) {
-        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(postController.searchByKeyword(keyword, PageRequest.of(page, PAGE_SIZE)))));
+            @RequestParam(defaultValue = "1")
+            @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
+            Integer page
+    ) {
+        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(postController.getByMemberUuid(
+                memberUuid,
+                new PostFilterRequest(primaryCategoryUuid, secondaryCategoryUuids, keyword),
+                PageRequest.of(page-1, PAGE_SIZE)
+        ))));
+    }
+
+    @Operation(
+            summary = "로그인한 회원의 임시저장된 게시글 목록 조회 API",
+            description = "로그인한 회원의 임시저장된 게시글의 목록과 페이지 정보를 조회합니다."
+    )
+    @GetMapping("/me/drafts")
+    public ResponseEntity<DataResponse<PostPageResponse<?>>> getDraftPostsByMember(
+            @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
+            @RequestParam(defaultValue = "1")
+            @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
+            Integer page
+    ) {
+        return ResponseEntity.ok().body(DataResponse.ok(PostPageResponse.from(postController.getDraftByMemberUuid(currentMemberUuid,PageRequest.of(page-1, PAGE_SIZE)))));
     }
 
     @Operation(
@@ -150,10 +131,11 @@ public class PostRestController {
     @GetMapping("/{ulid}")
     public ResponseEntity<DataResponse<?>> getPostByUlid(
             @Parameter(schema = @Schema(description = "게시글의 식별자", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
-            @PathVariable(required = false)
+            @PathVariable
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
-            String ulid) {
-        Optional<PostResponse> optionalPostResponse = postController.getByUlid(ulid,currentMemberUuid);
+            String ulid
+    ) {
+        Optional<PostDetailResponse> optionalPostResponse = postController.getByUlid(ulid,currentMemberUuid);
         if (optionalPostResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
         }
@@ -167,19 +149,19 @@ public class PostRestController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> insertPost(
             @Parameter(schema = @Schema(description = "게시글이 포함된 1차 항목의 식별자", example = "148d6e33-102d-4df4-a4d0-5ff233665548"))
-            @RequestParam
+            @RequestParam(name = "primary_category_id")
             @NotNull(message = "1차 항목 식별자가 비어 있습니다.")
             UUID primaryCategoryUuid,
 
             @Parameter(schema = @Schema(description = "게시글이 포함된 2차 항목의 식별자", example = "148d6e33-102d-4df4-a4d0-5ff233665548"))
-            @RequestParam
+            @RequestParam(name = "secondary_category_id")
             @NotNull(message = "2차 항목 식별자가 비어 있습니다.")
             UUID secondaryCategoryUuid,
 
-            @Parameter(schema = @Schema(description = "게시글의 제목", maximum = "150", example = "이거 과습인가요?"))
+            @Parameter(schema = @Schema(description = "게시글의 제목", maximum = "60", example = "이거 과습인가요?"))
             @RequestParam
             @NotBlank(message = "게시글 제목이 비어 있습니다.")
-            @Length(max = 150, message = "게시글 제목은 최대 150글자까지 작성할 수 있습니다.")
+            @Length(max = 60, message = "게시글 제목은 최대 60글자까지 작성할 수 있습니다.")
             String title,
 
             @Parameter(schema = @Schema(description = "게시글 컨텐츠"))
@@ -188,12 +170,12 @@ public class PostRestController {
             List<MultipartFile> content,
 
             @Parameter(schema = @Schema(description = "게시글에 속한 파트들의 순서에 대한 정보"))
-            @RequestPart
+            @RequestPart(name = "order_info")
             @NotNull(message = "순서 정보가 비어 있습니다.")
             List<@Valid FileOrder> orderInfo,
 
-            @RequestParam
             @Parameter(schema = @Schema(description = "게시글 발행 유무"))
+            @RequestParam(name = "is_published")
             @NotNull(message = "게시글 발행 유무가 비어 있습니다.")
             Boolean isPublished
     ) throws IOException {
@@ -207,39 +189,39 @@ public class PostRestController {
     )
     @PutMapping(value = "/{ulid}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> updatePost(
-            @Parameter(schema = @Schema(description = "갱신을 위한 1차 항목 식별자", example = "e493d48f-0ae6-4572-b624-f8f468515c71"))
-            @RequestParam
-            @NotNull(message = "1차 항목 식별자가 비어 있습니다.")
-            UUID primaryCategoryUuid,
-
-            @Parameter(schema = @Schema(description = "갱신을 위한 2차 항목 식별자", example = "bde79fd5-083d-425c-b71b-69a157fc5739"))
-            @RequestParam
-            @NotNull(message = "2차 항목 식별자가 비어 있습니다.")
-            UUID secondaryCategoryUuid,
-
-            @Parameter(schema = @Schema(description = "갱신을 위한 게시글 제목", example = "이거 과습인지 아시는 분!"))
-            @RequestParam
-            @NotBlank(message = "게시글 제목이 비어 있습니다.")
-            @Length(max = 150, message = "게시글 제목은 최대 150글자까지 작성할 수 있습니다.")
-            String title,
-
-            @Parameter(schema = @Schema(description = "갱신을 위한 게시글 컨텐츠"))
-            @RequestPart
-            @NotNull(message = "컨텐츠가 비어 있습니다.")
-            List<MultipartFile> content,
-
-            @Parameter(schema = @Schema(description = "게시글에 속한 파트들의 순서에 대한 정보"))
-            @RequestPart
-            @NotNull(message = "순서 정보가 비어 있습니다.")
-            List<@Valid FileOrder> orderInfo,
-
             @Parameter(schema = @Schema(description = "게시글 식별을 위한 게시글 식별자", example = "01JXEDF9SNSMAVBY8Z3P5YXK5J"))
-            @PathVariable(required = false)
+            @PathVariable
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String ulid,
 
+            @Parameter(schema = @Schema(description = "게시글이 포함된 1차 항목의 식별자", example = "148d6e33-102d-4df4-a4d0-5ff233665548"))
+            @RequestParam(name = "primary_category_id")
+            @NotNull(message = "1차 항목 식별자가 비어 있습니다.")
+            UUID primaryCategoryUuid,
+
+            @Parameter(schema = @Schema(description = "게시글이 포함된 2차 항목의 식별자", example = "148d6e33-102d-4df4-a4d0-5ff233665548"))
+            @RequestParam(name = "secondary_category_id")
+            @NotNull(message = "2차 항목 식별자가 비어 있습니다.")
+            UUID secondaryCategoryUuid,
+
+            @Parameter(schema = @Schema(description = "게시글의 제목", maximum = "60", example = "이거 과습인가요?"))
             @RequestParam
+            @NotBlank(message = "게시글 제목이 비어 있습니다.")
+            @Length(max = 60, message = "게시글 제목은 최대 60글자까지 작성할 수 있습니다.")
+            String title,
+
+            @Parameter(schema = @Schema(description = "게시글 컨텐츠"))
+            @RequestPart
+            @NotNull(message = "게시글이 비어 있습니다.")
+            List<MultipartFile> content,
+
+            @Parameter(schema = @Schema(description = "게시글에 속한 파트들의 순서에 대한 정보"))
+            @RequestPart(name = "order_info")
+            @NotNull(message = "순서 정보가 비어 있습니다.")
+            List<@Valid FileOrder> orderInfo,
+
             @Parameter(schema = @Schema(description = "게시글 발행 유무"))
+            @RequestParam(name = "is_published")
             @NotNull(message = "게시글 발행 유무가 비어 있습니다.")
             Boolean isPublished
     ) throws IOException {
@@ -254,9 +236,10 @@ public class PostRestController {
     @DeleteMapping("/{ulid}")
     public ResponseEntity<DataResponse<Void>> removePostByUlid(
             @Parameter(schema = @Schema(description = "게시글의 식별자", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
-            @PathVariable(required = false)
+            @PathVariable
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
-            String ulid) throws IOException {
+            String ulid
+    ) {
         postController.deletePost(ulid, currentMemberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -268,9 +251,10 @@ public class PostRestController {
     @GetMapping("/{ulid}/views")
     public ResponseEntity<DataResponse<Long>> countViewCount(
             @Parameter(schema = @Schema(description = "게시글의 식별자", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
-            @PathVariable(required = false)
+            @PathVariable
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
-            String ulid) {
+            String ulid
+    ) {
         return ResponseEntity.ok().body(DataResponse.ok(postController.readViewCount(ulid)));
     }
 
@@ -281,9 +265,10 @@ public class PostRestController {
     @PatchMapping("/{ulid}/views")
     public ResponseEntity<DataResponse<Long>> increaseViewCount(
             @Parameter(schema = @Schema(description = "게시글의 식별자", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
-            @PathVariable(required = false)
+            @PathVariable
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
-            String ulid) {
+            String ulid
+    ) {
         return ResponseEntity.ok().body(DataResponse.ok(postController.increaseViewCount(ulid, currentMemberUuid)));
     }
 }
