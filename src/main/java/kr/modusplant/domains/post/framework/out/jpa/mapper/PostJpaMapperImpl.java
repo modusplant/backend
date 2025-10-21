@@ -2,11 +2,11 @@ package kr.modusplant.domains.post.framework.out.jpa.mapper;
 
 import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.vo.*;
-import kr.modusplant.domains.post.framework.out.jpa.entity.AuthorEntity;
 import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
-import kr.modusplant.domains.post.framework.out.jpa.entity.PrimaryCategoryEntity;
-import kr.modusplant.domains.post.framework.out.jpa.entity.SecondaryCategoryEntity;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
+import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class PostJpaMapperImpl implements PostJpaMapper {
 
     @Override
-    public PostEntity toPostEntity(Post post, AuthorEntity authorEntity, AuthorEntity createAuthorEntity, PrimaryCategoryEntity primaryCategoryEntity, SecondaryCategoryEntity secondaryCategoryEntity, Long viewCount) {
+    public PostEntity toPostEntity(Post post, SiteMemberEntity authorEntity, SiteMemberEntity createAuthorEntity, CommPrimaryCategoryEntity primaryCategoryEntity, CommSecondaryCategoryEntity secondaryCategoryEntity, Long viewCount) {
         LocalDateTime publishedAt = post.getStatus().isPublished() ? LocalDateTime.now() : null;
         return PostEntity.builder()
                 .ulid(post.getPostId().getValue())
