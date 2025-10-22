@@ -4,11 +4,12 @@ import kr.modusplant.domains.comment.adapter.mapper.CommentMapperImpl;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.PostId;
-import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.CommentCompositeKey;
-import kr.modusplant.domains.comment.usecase.port.repository.CommentRepository;
+import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqRepository;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJpaAdapter;
 import kr.modusplant.domains.comment.usecase.request.CommentDeleteRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentResponse;
+import kr.modusplant.shared.persistence.compositekey.CommCommentId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,23 +21,24 @@ import java.util.UUID;
 public class CommentController {
 
     private final CommentMapperImpl mapper;
-    private final CommentRepository repository;
+    private final CommentJooqRepository jooqAdapter;
+    private final CommentRepositoryJpaAdapter jpaAdapter;
 
     public List<CommentResponse> gatherByPost(String postUlid) {
-        return repository.findByPost(PostId.create(postUlid));
+        return jooqAdapter.findByPost(PostId.create(postUlid));
     }
 
     public List<CommentResponse> gatherByAuthor(UUID memberUuid) {
-        return repository.findByAuthor(Author.create(memberUuid));
+        return jooqAdapter.findByAuthor(Author.create(memberUuid));
     }
 
     public void register(CommentRegisterRequest request) {
         Comment comment = mapper.toComment(request);
-        repository.save(comment);
+        jpaAdapter.save(comment);
     }
 
     public void delete(CommentDeleteRequest request) {
-        repository.deleteById(CommentCompositeKey.builder()
+        jpaAdapter.deleteById(CommCommentId.builder()
                 .postUlid(request.postUlid())
                 .path(request.path())
                 .build());

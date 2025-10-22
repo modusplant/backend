@@ -2,11 +2,11 @@ package kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper;
 
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.vo.Author;
+import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.CommentStatus;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.domain.vo.enums.CommentStatusType;
-import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.CommentCompositeKey;
-import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
+import kr.modusplant.framework.out.jpa.entity.CommCommentEntity;
 import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import org.mapstruct.BeanMapping;
@@ -18,20 +18,17 @@ import org.mapstruct.Named;
 public interface CommentJpaMapper {
 
     @BeanMapping(ignoreByDefault = true)
-    @Mapping(source = ".", target = "id", qualifiedByName = "mapCommentId")
+    @Mapping(source = "path", target = "path", qualifiedByName = "mapPath")
     @Mapping(source = "postId", target = "postEntity", qualifiedByName = "mapPostEntity")
     @Mapping(source = "author", target = "authMember", qualifiedByName = "mapMember")
     @Mapping(source = "author", target = "createMember", qualifiedByName = "mapMember")
     @Mapping(source = "content.content", target = "content")
     @Mapping(source = "status", target = "isDeleted", qualifiedByName = "mapIsDeleted")
-    CommentEntity toCommentEntity(Comment comment);
+    CommCommentEntity toCommCommentEntity(Comment comment);
 
-    @Named("mapCommentId")
-    default CommentCompositeKey mapCommentId(Comment comment) {
-        return CommentCompositeKey.builder()
-                .postUlid(comment.getPostId().getId())
-                .path(comment.getPath().getPath())
-                .build();
+    @Named("mapPath")
+    default String mapPath(CommentPath commentPath) {
+        return commentPath.getPath();
     }
 
     @Named("mapPostEntity")
