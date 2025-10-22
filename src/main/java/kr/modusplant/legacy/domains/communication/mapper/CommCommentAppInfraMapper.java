@@ -19,7 +19,7 @@ public interface CommCommentAppInfraMapper {
     @Mapping(source = "postEntity", target = "postUlid", qualifiedByName = "toPostUlid")
     @Mapping(source = "authMember", target = "memberUuid", qualifiedByName = "toMemberUuid")
     @Mapping(source = "authMember", target = "nickname", qualifiedByName = "toNickname")
-    CommCommentResponse toCommCommentResponse(CommCommentEntity commCommentEntity);
+    CommCommentResponse toCommCommentResponse(CommCommentEntity commCommCommentEntity);
 
     @Named("toPostUlid")
     default String toPostUlid(CommPostEntity postEntity) {

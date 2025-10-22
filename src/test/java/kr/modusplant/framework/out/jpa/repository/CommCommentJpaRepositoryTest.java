@@ -66,12 +66,12 @@ public class CommCommentJpaRepositoryTest implements
                 .build();
 
         // when
-        CommCommentEntity savedCommentEntity = commentRepository.save(commentEntity);
+        CommCommentEntity savedCommCommentEntity = commentRepository.save(commentEntity);
         CommCommentEntity result = commentRepository.findByPostUlidAndPath(
-                savedCommentEntity.getPostUlid(), savedCommentEntity.getPath()).orElseThrow();
+                savedCommCommentEntity.getPostUlid(), savedCommCommentEntity.getPath()).orElseThrow();
 
         // then
-        assertThat(savedCommentEntity).isEqualTo(result);
+        assertThat(savedCommCommentEntity).isEqualTo(result);
     }
 
     @Test
@@ -86,11 +86,11 @@ public class CommCommentJpaRepositoryTest implements
                 .build();
 
         // when
-        CommCommentEntity savedCommentEntity = commentRepository.save(commentEntity);
+        CommCommentEntity savedCommCommentEntity = commentRepository.save(commentEntity);
         List<CommCommentEntity> result = commentRepository.findByPostEntity(savedPostEntity);
 
         // then
-        assertThat(List.of(savedCommentEntity)).isEqualTo(result);
+        assertThat(List.of(savedCommCommentEntity)).isEqualTo(result);
     }
 
     @Test
@@ -105,11 +105,11 @@ public class CommCommentJpaRepositoryTest implements
                 .build();
 
         // when
-        CommCommentEntity savedCommentEntity = commentRepository.save(commentEntity);
+        CommCommentEntity savedCommCommentEntity = commentRepository.save(commentEntity);
         List<CommCommentEntity> result = commentRepository.findByAuthMember(savedMemberEntity);
 
         // then
-        assertThat(List.of(savedCommentEntity)).isEqualTo(result);
+        assertThat(List.of(savedCommCommentEntity)).isEqualTo(result);
     }
 
     @Test
@@ -124,11 +124,11 @@ public class CommCommentJpaRepositoryTest implements
                 .build();
 
         // when
-        CommCommentEntity savedCommentEntity = commentRepository.save(commentEntity);
+        CommCommentEntity savedCommCommentEntity = commentRepository.save(commentEntity);
         List<CommCommentEntity> result = commentRepository.findByAuthMember(savedMemberEntity);
 
         // then
-        assertThat(List.of(savedCommentEntity)).isEqualTo(result);
+        assertThat(List.of(savedCommCommentEntity)).isEqualTo(result);
     }
 
     @Test
@@ -143,11 +143,11 @@ public class CommCommentJpaRepositoryTest implements
                 .build();
 
         // when
-        CommCommentEntity savedCommentEntity = commentRepository.save(commentEntity);
-        List<CommCommentEntity> result = commentRepository.findByContent(savedCommentEntity.getContent());
+        CommCommentEntity savedCommCommentEntity = commentRepository.save(commentEntity);
+        List<CommCommentEntity> result = commentRepository.findByContent(savedCommCommentEntity.getContent());
 
         // then
-        assertThat(List.of(savedCommentEntity)).isEqualTo(result);
+        assertThat(List.of(savedCommCommentEntity)).isEqualTo(result);
     }
 
 }

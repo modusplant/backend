@@ -1,6 +1,7 @@
 package kr.modusplant.infrastructure.security.context;
 
 import kr.modusplant.infrastructure.config.aws.TestS3Config;
+import kr.modusplant.infrastructure.config.jdbc.TestDataSourceConfig;
 import kr.modusplant.infrastructure.config.jpa.TestJpaConfig;
 import kr.modusplant.infrastructure.config.redis.TestRedisConfig;
 import kr.modusplant.infrastructure.security.config.TestSecurityConfig;
@@ -27,6 +28,7 @@ import java.lang.annotation.*;
 @WebMvcTest(useDefaultFilters = false)
 @ContextConfiguration(
         classes = {
+                TestDataSourceConfig.class,
                 TestJpaConfig.class,
                 TestRedisConfig.class,
                 TestS3Config.class,
