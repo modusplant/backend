@@ -129,9 +129,13 @@ public class SecurityConfig {
         http
                 .securityMatcher("/api/**")
                 .cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(emailPasswordAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(http), EmailPasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
+
                         .requestMatchers(HttpMethod.GET, "/api/v1/communication/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/terms/**").permitAll()
                         .requestMatchers("/api/members/verify-email/send/**").permitAll()
@@ -153,7 +157,6 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers
                         .httpStrictTransportSecurity(hsts -> hsts
                                 .includeSubDomains(true)
@@ -166,7 +169,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("https://specified-jaquith-modusplant-0c942371.koyeb.app");
+        config.addAllowedOriginPattern("https://specified-jaquith-modusplant-0c942371.koyeb.app");
+        config.addAllowedOriginPattern("http://localhost:8080/swagger-ui/**");
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
         config.setAllowCredentials(true);
