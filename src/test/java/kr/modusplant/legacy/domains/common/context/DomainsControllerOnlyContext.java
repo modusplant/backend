@@ -2,6 +2,7 @@
 
  import kr.modusplant.framework.out.redis.initializer.MockRedisHelperInitializer;
  import kr.modusplant.infrastructure.config.aws.TestS3Config;
+ import kr.modusplant.infrastructure.config.jdbc.TestDataSourceConfig;
  import kr.modusplant.infrastructure.config.jpa.TestJpaConfig;
  import kr.modusplant.infrastructure.config.redis.TestRedisConfig;
  import kr.modusplant.infrastructure.security.initializer.MockTokenProviderInitializer;
@@ -29,6 +30,7 @@
  @AutoConfigureMockMvc(addFilters = false)
  @ContextConfiguration(
          classes = {
+                 TestDataSourceConfig.class,
                  TestJpaConfig.class,
                  TestRedisConfig.class,
                  TestS3Config.class,
