@@ -13,8 +13,13 @@ import org.springframework.stereotype.Component;
 public class MemberJpaMapperImpl implements MemberJpaMapper {
 
     @Override
-    public SiteMemberEntity toMemberEntity(Member member) {
-        return SiteMemberEntity.builder().uuid(member.getMemberId().getValue()).isActive(member.getMemberStatus().isActive()).nickname(member.getMemberNickname().getValue()).birthDate(member.getMemberBirthDate().getValue()).build();
+    public SiteMemberEntity toMemberEntity(MemberNickname memberNickname) {
+        return SiteMemberEntity.builder().nickname(memberNickname.getValue()).build();
+    }
+
+    @Override
+    public SiteMemberEntity toMemberEntity(MemberId memberId, MemberNickname memberNickname) {
+        return SiteMemberEntity.builder().uuid(memberId.getValue()).nickname(memberNickname.getValue()).build();
     }
 
     @Override
