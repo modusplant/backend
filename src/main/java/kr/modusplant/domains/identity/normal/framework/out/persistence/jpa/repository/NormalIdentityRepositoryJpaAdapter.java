@@ -1,53 +1,46 @@
 package kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository;
 
 import kr.modusplant.domains.identity.normal.domain.vo.SignUpData;
-import kr.modusplant.domains.identity.normal.domain.vo.enums.UserRole;
-import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.entity.MemberAuthEntity;
-import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.entity.MemberRoleEntity;
-import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.entity.MemberTermEntity;
-import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.supers.MemberAuthJpaRepository;
-import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.supers.MemberIdentityJpaRepository;
-import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.supers.MemberRoleJpaRepository;
-import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.supers.MemberTermJpaRepository;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.IdentityAuthJpaMapper;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.IdentityJpaMapper;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.IdentityRoleJpaMapper;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.IdentityTermJpaMapper;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.supers.IdentityAuthJpaRepository;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.supers.IdentityJpaRepository;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.supers.IdentityRoleJpaRepository;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.supers.IdentityTermJpaRepository;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityRepository;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
 public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityRepository {
+    private final IdentityJpaRepository identityRepository;
+    private final IdentityAuthJpaRepository authRepository;
+    private final IdentityRoleJpaRepository roleRepository;
+    private final IdentityTermJpaRepository termRepository;
 
-    private final MemberIdentityJpaRepository identityJpaRepository;
-    private final MemberAuthJpaRepository authJpaRepository;
-    private final MemberRoleJpaRepository roleJpaRepository;
-    private final MemberTermJpaRepository termJpaRepository;
+    private final IdentityJpaMapper identityMapper;
+    private final IdentityAuthJpaMapper authMapper;
+    private final IdentityRoleJpaMapper roleMapper;
+    private final IdentityTermJpaMapper termMapper;
 
     @Override
+    @Transactional
     public void save(SignUpData signUpData) {
-        UUID uuidOfSavedMember = identityJpaRepository.saveIdentity(signUpData).getUuid();
-        authJpaRepository.saveAuth(MemberAuthEntity.builder()
-                .originalMemberUuid(uuidOfSavedMember)
-                .activeMemberUuid(uuidOfSavedMember)
-                .email(signUpData.getCredentials().getEmail().getEmail())
-                .password(signUpData.getCredentials().getPassword().getPassword())
-                .provider(AuthProvider.BASIC)
-                .build());
-        roleJpaRepository.saveRole(MemberRoleEntity.builder()
-                .uuid(uuidOfSavedMember)
-                .role(UserRole.USER).build());
-        termJpaRepository.saveTerm(MemberTermEntity.builder()
-                .uuid(uuidOfSavedMember)
-                .agreedPrivacyPolicyVersion(signUpData.getAgreedPrivacyPolicyVersion().getVersion())
-                .agreedAdInfoReceivingVersion(signUpData.getAgreedAdInfoReceivingVersion().getVersion())
-                .agreedTermsOfUseVersion(signUpData.getAgreedTermsOfUseVersion().getVersion())
-                .build());
+        SiteMemberEntity savedMember = identityRepository.save(identityMapper.toSiteMemberEntity(signUpData));
+        authRepository.save(authMapper.toSiteMemberAuthEntity(savedMember, signUpData));
+        roleRepository.save(roleMapper.toSiteMemberRoleEntity(savedMember));
+        termRepository.save(termMapper.toSiteMemberTermEntity(savedMember, signUpData));
+
     }
 
     @Override
     public boolean existsByEmailAndProvider(String email, String provider) {
-        return authJpaRepository.existsByEmailAndProvider(email, provider);
+        return authRepository.existsByEmailAndProvider(email, AuthProvider.valueOf(provider.toUpperCase()));
     }
 }
