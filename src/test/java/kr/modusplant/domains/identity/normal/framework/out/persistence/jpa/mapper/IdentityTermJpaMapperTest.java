@@ -16,8 +16,8 @@ public class IdentityTermJpaMapperTest implements SiteMemberEntityTestUtils {
     private final IdentityTermJpaMapper mapper = new IdentityTermJpaMapperImpl();
 
     @Test
-    @DisplayName("유효한 사용자 식별자와 회원가입 정보를 사용자 권한 엔티티로 전환")
-    public void testToSiteMemberAuthEntity_givenValidMemberUuidAndSignUpData_willReturnSiteMemberAuthEntity() {
+    @DisplayName("유효한 사용자 엔티티와 회원가입 정보를 사용자 약관 엔티티로 전환")
+    public void testToSiteMemberTermEntity_givenValidSiteMemberEntityAndSignUpData_willReturnSiteMemberTermEntity() {
         // given
         SignUpData testSign = SignUpData.create(MEMBER_AUTH_BASIC_USER_EMAIL,
                 MEMBER_AUTH_BASIC_USER_PW, MEMBER_BASIC_USER_NICKNAME, MEMBER_TERM_ADMIN_AGREED_TERMS_OF_USE_VERSION,

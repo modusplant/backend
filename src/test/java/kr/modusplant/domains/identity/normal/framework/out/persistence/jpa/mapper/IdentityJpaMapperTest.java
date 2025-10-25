@@ -15,8 +15,8 @@ public class IdentityJpaMapperTest {
     private final IdentityJpaMapper mapper = new IdentityJpaMapperImpl();
 
     @Test
-    @DisplayName("유효한 회원가입 정보를 사용자 권한 엔티티로 전환")
-    public void testToSiteMemberEntity_givenValidMemberUuidAndSignUpData_willReturnSiteMemberAuthEntity() {
+    @DisplayName("유효한 사용자 닉네임을 사용자 엔티티로 전환")
+    public void testToSiteMemberEntity_givenValidNickname_willReturnSiteMemberEntity() {
         // given
         SiteMemberEntity compare = SiteMemberEntity.builder()
                 .nickname(MEMBER_BASIC_USER_NICKNAME).build();

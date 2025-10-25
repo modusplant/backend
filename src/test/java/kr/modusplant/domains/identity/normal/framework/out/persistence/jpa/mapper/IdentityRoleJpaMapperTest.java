@@ -13,8 +13,8 @@ public class IdentityRoleJpaMapperTest {
     private final IdentityRoleJpaMapper mapper = new IdentityRoleJpaMapperImpl();
 
     @Test
-    @DisplayName("유효한 회원가입 정보를 사용자 권한 엔티티로 전환")
-    public void testToSiteMemberEntity_givenValidMemberUuidAndSignUpData_willReturnSiteMemberAuthEntity() {
+    @DisplayName("유효한 사용자 엔티티를 사용자 역할 엔티티로 전환")
+    public void testToSiteMemberRoleEntity_givenValidSiteMemberEntity_willReturnSiteMemberRoleEntity() {
         // given
         SiteMemberEntity testMember = SiteMemberEntity.builder()
                 .nickname(MEMBER_BASIC_USER_NICKNAME).build();
