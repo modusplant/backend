@@ -1,5 +1,6 @@
 package kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper;
 
+import kr.modusplant.domains.identity.normal.domain.vo.Nickname;
 import kr.modusplant.domains.identity.normal.domain.vo.SignUpData;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import org.mapstruct.BeanMapping;
@@ -10,6 +11,6 @@ import org.mapstruct.Mapping;
 public interface IdentityJpaMapper {
 
     @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "nickname", source = "nickname.nickname")
-    SiteMemberEntity toSiteMemberEntity(SignUpData sign);
+    @Mapping(target = "nickname", source = "memberNickname.nickname")
+    SiteMemberEntity toSiteMemberEntity(Nickname memberNickname);
 }
