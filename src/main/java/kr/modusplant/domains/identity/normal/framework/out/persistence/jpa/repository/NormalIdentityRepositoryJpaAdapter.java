@@ -36,7 +36,6 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityReposit
         authRepository.save(authMapper.toSiteMemberAuthEntity(savedMember, signUpData));
         roleRepository.save(roleMapper.toSiteMemberRoleEntity(savedMember));
         termRepository.save(termMapper.toSiteMemberTermEntity(savedMember, signUpData));
-
     }
 
     @Override
