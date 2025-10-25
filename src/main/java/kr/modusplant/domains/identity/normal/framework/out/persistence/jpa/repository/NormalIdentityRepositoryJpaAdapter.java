@@ -32,7 +32,7 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityReposit
     @Override
     @Transactional
     public void save(SignUpData signUpData) {
-        SiteMemberEntity savedMember = identityRepository.save(identityMapper.toSiteMemberEntity(signUpData));
+        SiteMemberEntity savedMember = identityRepository.save(identityMapper.toSiteMemberEntity(signUpData.getNickname()));
         authRepository.save(authMapper.toSiteMemberAuthEntity(savedMember, signUpData));
         roleRepository.save(roleMapper.toSiteMemberRoleEntity(savedMember));
         termRepository.save(termMapper.toSiteMemberTermEntity(savedMember, signUpData));
