@@ -1,7 +1,6 @@
 package kr.modusplant.domains.term.domain.aggregate;
 
 import kr.modusplant.domains.term.domain.exception.EmptyTermContentException;
-import kr.modusplant.domains.term.domain.exception.EmptyTermIdException;
 import kr.modusplant.domains.term.domain.exception.EmptyTermNameException;
 import kr.modusplant.domains.term.domain.exception.EmptyTermVersionException;
 import kr.modusplant.domains.term.domain.vo.TermContent;
