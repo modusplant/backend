@@ -16,9 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
-@Tag(name = "약관 API", description = "약관의 생성, 수정 기능을 관리하는 API 입니다.")
+@Tag(name = "약관 API", description = "약관의 생성, 수정, 조회 기능을 관리하는 API 입니다.")
 @RestController
 @RequestMapping("/api/v1/terms")
 @RequiredArgsConstructor
@@ -48,5 +49,18 @@ public class TermRestController {
         @PathVariable @NotNull UUID uuid) {
         termController.delete(TermId.fromUuid(uuid));
         return ResponseEntity.status(HttpStatus.OK).body(DataResponse.ok());
+    }
+
+    @Operation(summary = "약관 조회 API", description = "약관을 조회합니다.")
+    @GetMapping("/{uuid}")
+    public ResponseEntity<DataResponse<TermResponse>> getTerm(@PathVariable @NotNull UUID uuid) {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                DataResponse.ok(termController.getTerm(TermId.fromUuid(uuid))));
+    }
+    @Operation(summary = "약관 목록조회 API", description = "약관 목록을 조회합니다.")
+    @GetMapping
+    public ResponseEntity<DataResponse<List<TermResponse>>> getTermList() {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                DataResponse.ok(termController.getTermList()));
     }
 }

@@ -4,16 +4,18 @@ import jakarta.transaction.Transactional;
 import kr.modusplant.domains.term.domain.aggregate.Term;
 import kr.modusplant.domains.term.domain.exception.TermNotFoundException;
 import kr.modusplant.domains.term.domain.vo.TermContent;
+import kr.modusplant.domains.term.domain.vo.TermId;
 import kr.modusplant.domains.term.domain.vo.TermName;
 import kr.modusplant.domains.term.domain.vo.TermVersion;
-import kr.modusplant.domains.term.usecase.request.TermCreateRequest;
-import kr.modusplant.domains.term.domain.vo.TermId;
 import kr.modusplant.domains.term.usecase.port.mapper.TermMapper;
 import kr.modusplant.domains.term.usecase.port.repository.TermRepository;
+import kr.modusplant.domains.term.usecase.request.TermCreateRequest;
 import kr.modusplant.domains.term.usecase.request.TermUpdateRequest;
 import kr.modusplant.domains.term.usecase.response.TermResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -45,6 +47,17 @@ public class TermController {
 
     public void delete(TermId termId) {
         termRepository.deleteById(termId);
+    }
+
+    public TermResponse getTerm(TermId termId) {
+        Term term = termRepository.findById(termId)
+                .orElseThrow(TermNotFoundException::new);
+        return mapper.toTermResponse(term);
+    }
+
+    public List<TermResponse> getTermList() {
+        List<Term> responses = termRepository.findAll();
+        return mapper.toTermListResponse(responses);
     }
 
     // TODO: 버전 validation(ex : 1.0.1 -> 1.0.1 이상으로 입력)

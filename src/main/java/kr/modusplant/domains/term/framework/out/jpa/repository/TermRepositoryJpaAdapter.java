@@ -10,6 +10,7 @@ import kr.modusplant.framework.out.jpa.repository.TermJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -35,6 +36,11 @@ public class TermRepositoryJpaAdapter implements TermRepository {
     }
 
     @Override
+    public List<Term> findAll() {
+        return termJpaRepository.findAll().stream().map(termJpaMapper::toTerm).toList();
+    }
+
+    @Override
     public boolean isIdExist(TermId termId) {
         return termJpaRepository.existsById(termId.getValue());
     }
@@ -43,4 +49,6 @@ public class TermRepositoryJpaAdapter implements TermRepository {
     public void deleteById(TermId termId) {
         termJpaRepository.deleteById(termId.getValue());
     }
+
+
 }
