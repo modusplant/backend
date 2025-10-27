@@ -1,6 +1,6 @@
 package kr.modusplant.domains.post.domain.vo;
 
-import kr.modusplant.domains.post.common.utils.domain.aggregate.PostTestUtils;
+import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
 import kr.modusplant.domains.post.domain.exception.EmptyAuthorIdException;
 import kr.modusplant.domains.post.domain.exception.InvalidAuthorIdException;
 import org.junit.jupiter.api.DisplayName;

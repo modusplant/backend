@@ -1,6 +1,6 @@
 package kr.modusplant.domains.post.domain.vo;
 
-import kr.modusplant.domains.post.common.utils.domain.aggregate.PostTestUtils;
+import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
 import kr.modusplant.domains.post.domain.exception.EmptyPostIdException;
 import kr.modusplant.domains.post.domain.exception.InvalidPostIdException;
 import org.apache.commons.lang3.StringUtils;
