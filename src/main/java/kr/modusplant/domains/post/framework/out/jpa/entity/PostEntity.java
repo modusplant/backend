@@ -56,7 +56,7 @@ public class PostEntity {
     @DefaultValue
     private Long viewCount;
 
-    @Column(nullable = false, length = 150)
+    @Column(nullable = false, length = 60)
     private String title;
 
     @Type(JsonBinaryType.class)
@@ -131,11 +131,11 @@ public class PostEntity {
         this.publishedAt = publishedAt;
     }
 
-    public static CommPostEntityBuilder builder() {
-        return new CommPostEntityBuilder();
+    public static PostEntityBuilder builder() {
+        return new PostEntityBuilder();
     }
 
-    public static final class CommPostEntityBuilder {
+    public static final class PostEntityBuilder {
         private String ulid;
         private CommPrimaryCategoryEntity primaryCategory;
         private CommSecondaryCategoryEntity secondaryCategory;
@@ -148,62 +148,62 @@ public class PostEntity {
         private Boolean isPublished;
         private LocalDateTime publishedAt;
 
-        public CommPostEntityBuilder ulid(final String ulid) {
+        public PostEntityBuilder ulid(final String ulid) {
             this.ulid = ulid;
             return this;
         }
 
-        public CommPostEntityBuilder primaryCategory(final CommPrimaryCategoryEntity primaryCategory) {
+        public PostEntityBuilder primaryCategory(final CommPrimaryCategoryEntity primaryCategory) {
             this.primaryCategory = primaryCategory;
             return this;
         }
 
-        public CommPostEntityBuilder secondaryCategory(final CommSecondaryCategoryEntity secondaryCategory) {
+        public PostEntityBuilder secondaryCategory(final CommSecondaryCategoryEntity secondaryCategory) {
             this.secondaryCategory = secondaryCategory;
             return this;
         }
 
-        public CommPostEntityBuilder authMember(final SiteMemberEntity authMember) {
+        public PostEntityBuilder authMember(final SiteMemberEntity authMember) {
             this.authMember = authMember;
             return this;
         }
 
-        public CommPostEntityBuilder createMember(final SiteMemberEntity createMember) {
+        public PostEntityBuilder createMember(final SiteMemberEntity createMember) {
             this.createMember = createMember;
             return this;
         }
 
-        public CommPostEntityBuilder likeCount(final Integer likeCount) {
+        public PostEntityBuilder likeCount(final Integer likeCount) {
             this.likeCount = likeCount;
             return this;
         }
 
-        public CommPostEntityBuilder viewCount(final Long viewCount) {
+        public PostEntityBuilder viewCount(final Long viewCount) {
             this.viewCount = viewCount;
             return this;
         }
 
-        public CommPostEntityBuilder title(final String title) {
+        public PostEntityBuilder title(final String title) {
             this.title = title;
             return this;
         }
 
-        public CommPostEntityBuilder content(final JsonNode content) {
+        public PostEntityBuilder content(final JsonNode content) {
             this.content = content;
             return this;
         }
 
-        public CommPostEntityBuilder isPublished(final Boolean isPublished) {
+        public PostEntityBuilder isPublished(final Boolean isPublished) {
             this.isPublished = isPublished;
             return this;
         }
 
-        public CommPostEntityBuilder publishedAt(final LocalDateTime publishedAt) {
+        public PostEntityBuilder publishedAt(final LocalDateTime publishedAt) {
             this.publishedAt = publishedAt;
             return this;
         }
 
-        public CommPostEntityBuilder commPostEntity(final PostEntity postEntity) {
+        public PostEntityBuilder commPostEntity(final PostEntity postEntity) {
             this.ulid = postEntity.ulid;
             this.primaryCategory = postEntity.primaryCategory;
             this.secondaryCategory = postEntity.secondaryCategory;
