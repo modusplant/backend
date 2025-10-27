@@ -1,4 +1,12 @@
 spring:
+  application:
+    name: ${SPRING_APPLICATION_NAME:modusplant}
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  config:
+    import:
+      - "aws-parameterstore:/config/${spring.application.name}/"
+      - "aws-parameterstore:/config/${spring.application.name}_${spring.profiles.active}/"
   cache:
     type: redis
   data:
@@ -78,6 +86,9 @@ springdoc:
 
 # Wasabi
 cloud:
+  aws:
+    region:
+      static: ap-northeast-2
   wasabi:
     s3:
       endpoint: ${WASABI_ENDPOINT}
