@@ -5,7 +5,7 @@ import kr.modusplant.domains.post.domain.vo.AuthorId;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.domain.vo.PrimaryCategoryId;
 import kr.modusplant.domains.post.domain.vo.SecondaryCategoryId;
-import kr.modusplant.domains.post.framework.out.jpa.mapper.PostJpaMapperImpl;
+import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
 import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostJpaRepository;
 import kr.modusplant.domains.post.framework.out.redis.PostViewCountRedisRepository;
 import kr.modusplant.domains.post.usecase.model.PostDetailReadModel;
@@ -28,7 +28,7 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class PostRepositoryJpaAdapter implements PostRepository {
-    private final PostJpaMapperImpl postJpaMapper;
+    private final PostJpaMapper postJpaMapper;
     private final PostJpaRepository postJpaRepository;
     private final SiteMemberJpaRepository authorJpaRepository;
     private final CommPrimaryCategoryJpaRepository primaryCategoryJpaRepository;
