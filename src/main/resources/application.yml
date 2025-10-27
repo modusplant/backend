@@ -1,9 +1,4 @@
-# Common configuration across all environments
 spring:
-  profiles:
-    active: env
-  application:
-    name: modusplant
   cache:
     type: redis
   data:
@@ -45,15 +40,19 @@ spring:
           batch_size: 50
           batch_versioned_data: true
         order_inserts: true
+        default_schema: ${DB_SCHEMA}
 
-# Logging level
+# Debugging & Logging
 logging:
   level:
     root: INFO
     io:
       lettuce: INFO
+security:
+  debug:
+    enabled: false
 
-# Scheduler interval
+# Scheduler
 scheduler:
   sync-interval-ms : 300000           # 5분
   token-cleanup-cron : "0 0 3 * * *"  # 새벽 3시
@@ -65,7 +64,7 @@ jwt:
   access_duration: 1800000      # 30분
   refresh_duration: 604800000   # 7일
 
-# Redis TTL
+# Redis
 redis:
   ttl:
     view_count: 10
@@ -81,8 +80,8 @@ springdoc:
 cloud:
   wasabi:
     s3:
-      endpoint: ${S3_ENDPOINT}
-      region: ${S3_REGION}
-      access-key: ${S3_ACCESS_KEY}
-      secret-key: ${S3_SECRET_KEY}
-      bucket: ${S3_BUCKET}
+      endpoint: ${WASABI_ENDPOINT}
+      region: ${WASABI_REGION}
+      access-key: ${WASABI_ACCESS_KEY}
+      secret-key: ${WASABI_SECRET_KEY}
+      bucket: ${WASABI_BUCKET}
