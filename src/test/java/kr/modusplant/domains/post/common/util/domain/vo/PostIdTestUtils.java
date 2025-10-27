@@ -1,4 +1,4 @@
-package kr.modusplant.domains.post.common.utils.domain.vo;
+package kr.modusplant.domains.post.common.util.domain.vo;
 
 import kr.modusplant.domains.post.domain.vo.PostId;
 
