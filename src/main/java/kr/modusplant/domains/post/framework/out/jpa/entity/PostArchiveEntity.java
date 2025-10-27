@@ -38,7 +38,7 @@ public class PostArchiveEntity {
     @Column(name = CREA_MEMB_UUID, nullable = false)
     private UUID createMemberUuid;
 
-    @Column(nullable = false, length = 150)
+    @Column(nullable = false, length = 60)
     private String title;
 
     @Type(JsonBinaryType.class)
