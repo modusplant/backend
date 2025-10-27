@@ -1,7 +1,7 @@
 package kr.modusplant.domains.post.framework.out.jpa.repository;
 
 import kr.modusplant.domains.post.domain.vo.PostId;
-import kr.modusplant.domains.post.framework.out.jpa.mapper.PostArchiveJpaMapperImpl;
+import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostArchiveJpaMapper;
 import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostArchiveJpaRepository;
 import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostJpaRepository;
 import kr.modusplant.domains.post.usecase.port.repository.PostArchiveRepository;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class PostArchiveRepositoryJpaAdapter implements PostArchiveRepository {
     private final PostArchiveJpaRepository postArchiveJpaRepository;
-    private final PostArchiveJpaMapperImpl postArchiveJpaMapper;
+    private final PostArchiveJpaMapper postArchiveJpaMapper;
     private final PostJpaRepository postJpaRepository;
 
     @Override
