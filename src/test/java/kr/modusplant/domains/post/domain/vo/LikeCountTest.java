@@ -1,6 +1,6 @@
 package kr.modusplant.domains.post.domain.vo;
 
-import kr.modusplant.domains.post.common.utils.domain.aggregate.PostTestUtils;
+import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
 import kr.modusplant.domains.post.domain.exception.InvalidLikeCountException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

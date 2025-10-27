@@ -1,22 +1,23 @@
 package kr.modusplant.domains.post.domain.vo;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import kr.modusplant.domains.post.common.utils.domain.aggregate.PostTestUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
 import kr.modusplant.domains.post.domain.exception.EmptyPostContentException;
 import kr.modusplant.domains.post.domain.exception.InvalidPostContentException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT;
 import static kr.modusplant.domains.post.common.constant.PostStringConstant.TEST_POST_TITLE;
-import static kr.modusplant.legacy.domains.communication.common.util.domain.CommPostTestUtils.objectMapper;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PostContentTest implements PostTestUtils {
 
-    private static final String MAX_LENGTH_TITLE = "a".repeat(150); // 150자
-    private static final String OVER_MAX_LENGTH_TITLE = "a".repeat(151); // 151자
+    private static final String MAX_LENGTH_TITLE = "a".repeat(60); // 60자
+    private static final String OVER_MAX_LENGTH_TITLE = "a".repeat(61); // 61자
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
 
     @Nested
     @DisplayName("PostContent 생성 테스트")
@@ -34,7 +35,7 @@ class PostContentTest implements PostTestUtils {
             assertEquals(TEST_POST_CONTENT, testPostContent.getContent());
             assertNotNull(postContent);
             assertEquals(MAX_LENGTH_TITLE, postContent.getTitle());
-            assertEquals(150, postContent.getTitle().length());
+            assertEquals(60, postContent.getTitle().length());
         }
 
         @Test
@@ -84,7 +85,7 @@ class PostContentTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("제목 길이가 150자를 초과할 때 InvalidPostContentException을 발생시킨다")
+        @DisplayName("제목 길이가 60자를 초과할 때 InvalidPostContentException을 발생시킨다")
         void testCreate_givenOverMaxLengthTitle_willThrowException() {
             // when & then
             InvalidPostContentException exception = assertThrows(InvalidPostContentException.class,

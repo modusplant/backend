@@ -1,6 +1,6 @@
 package kr.modusplant.domains.post.domain.aggregate;
 
-import kr.modusplant.domains.post.common.utils.domain.aggregate.PostTestUtils;
+import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
 import kr.modusplant.domains.post.domain.exception.*;
 import kr.modusplant.domains.post.domain.vo.LikeCount;
 import kr.modusplant.domains.post.domain.vo.PostContent;
