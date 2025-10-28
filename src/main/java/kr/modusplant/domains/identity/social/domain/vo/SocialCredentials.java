@@ -53,10 +53,6 @@ public class SocialCredentials {
         }
     }
 
-    public boolean isSameProvider(AuthProvider provider) {
-        return this.provider == provider;
-    }
-
     public boolean isGoogle() {
         return this.provider == AuthProvider.GOOGLE;
     }
