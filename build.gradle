@@ -3,7 +3,8 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath 'org.flywaydb:flyway-database-postgresql:11.14.0'
+		classpath 'software.amazon.awssdk:ssm:2.36.0'
+		classpath 'org.flywaydb:flyway-database-postgresql:11.15.0'
 	}
 }
 
@@ -11,7 +12,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.3'
 	id 'io.spring.dependency-management' version '1.1.7'
-	id 'org.flywaydb.flyway' version '11.14.0'
+	id 'org.flywaydb.flyway' version '11.15.0'
 	id 'org.jooq.jooq-codegen-gradle' version '3.20.8'
 	id 'jacoco'
 }
@@ -76,6 +77,7 @@ dependencies {
 	// Other Main Dependencies (Version required)
 	implementation 'com.github.f4b6a3:ulid-creator:5.2.3'
 	implementation 'com.mailjet:mailjet-client:5.2.5'
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store:3.2.0'
 	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.9.10'
 	implementation 'org.apache.commons:commons-lang3:3.18.0'
 	implementation 'org.jooq:jooq:3.20.8'
@@ -94,11 +96,38 @@ sourceSets {
 	}
 }
 
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.ssm.SsmClient
+import software.amazon.awssdk.services.ssm.model.GetParameterRequest
+
+def getSsmParameter(String paramName, String region = 'ap-northeast-2') {
+	try {
+		def ssmClient = SsmClient.builder()
+				.region(Region.of(region))
+				.build()
+		def request = GetParameterRequest.builder()
+				.name(paramName)
+				.withDecryption(true)
+				.build()
+		def response = ssmClient.getParameter(request)
+		return response.parameter().value()
+	} catch (Exception e) {
+		println "Failed to load SSM parameter $paramName: ${e.message}"
+		return null
+	}
+}
+
+def activeProfile = getSsmParameter('/config/modusplant/SPRING_PROFILES_ACTIVE')
+def jdbcConnectionUrl = getSsmParameter("/config/modusplant_${activeProfile}/DB_CONNECTION_URL")
+def jdbcUsername = getSsmParameter("/config/modusplant_${activeProfile}/DB_USERNAME")
+def jdbcPassword = getSsmParameter("/config/modusplant_${activeProfile}/DB_PASSWORD")
+
 flyway {
 	driver = 'org.postgresql.Driver'
-	url = jdbcUrl
-	user = jdbcUser
+	url = jdbcConnectionUrl
+	user = jdbcUsername
 	password = jdbcPassword
+	baselineOnMigrate = true
 	baselineVersion = '0.0.0'
 	outOfOrder = false
 	encoding = 'UTF-8'
@@ -114,8 +143,8 @@ jooq {
 	configuration {
 		jdbc {
 			driver = 'org.postgresql.Driver'
-			url = jdbcUrl
-			user = jdbcUser
+			url = jdbcConnectionUrl
+			user = jdbcUsername
 			password = jdbcPassword
 		}
 		generator {

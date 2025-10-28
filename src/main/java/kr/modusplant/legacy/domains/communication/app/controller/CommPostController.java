@@ -44,7 +44,7 @@ public class CommPostController {
     // 임시로 Spring Security 적용 전 인증 우회를 위해 사용
     // gitignore 처리된 yml 파일에 임의로 값을 추가하여 사용
     // TODO : Spring Security 적용 후 정상 인증 로직으로 대체할 것
-    @Value("${fake-auth-uuid}")
+    @Value("${TEMP_USER_UUID}")
     private UUID memberUuid;
 
     @Operation(
