@@ -118,13 +118,13 @@ def getSsmParameter(String paramName, String region = 'ap-northeast-2') {
 }
 
 def activeProfile = getSsmParameter('/config/modusplant/SPRING_PROFILES_ACTIVE')
-def jdbcHostname = getSsmParameter("/config/modusplant_${activeProfile}/DB_HOSTNAME")
+def jdbcConnectionUrl = getSsmParameter("/config/modusplant_${activeProfile}/DB_CONNECTION_URL")
 def jdbcUsername = getSsmParameter("/config/modusplant_${activeProfile}/DB_USERNAME")
 def jdbcPassword = getSsmParameter("/config/modusplant_${activeProfile}/DB_PASSWORD")
 
 flyway {
 	driver = 'org.postgresql.Driver'
-	url = jdbcHostname
+	url = jdbcConnectionUrl
 	user = jdbcUsername
 	password = jdbcPassword
 	baselineOnMigrate = true
@@ -143,7 +143,7 @@ jooq {
 	configuration {
 		jdbc {
 			driver = 'org.postgresql.Driver'
-			url = jdbcHostname
+			url = jdbcConnectionUrl
 			user = jdbcUsername
 			password = jdbcPassword
 		}
