@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper
-public interface IdentityAuthJpaMapper {
+public interface NormalIdentityAuthJpaMapper {
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "originalMember", source = "savedMember")

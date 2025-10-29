@@ -1,14 +1,14 @@
 package kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository;
 
 import kr.modusplant.domains.normalidentity.normal.domain.vo.SignUpData;
-import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper.IdentityAuthJpaMapper;
-import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper.IdentityJpaMapper;
-import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper.IdentityRoleJpaMapper;
-import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper.IdentityTermJpaMapper;
-import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository.supers.IdentityAuthJpaRepository;
-import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository.supers.IdentityJpaRepository;
-import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository.supers.IdentityRoleJpaRepository;
-import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository.supers.IdentityTermJpaRepository;
+import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper.NormalIdentityAuthJpaMapper;
+import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper.NormalIdentityJpaMapper;
+import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper.NormalIdentityRoleJpaMapper;
+import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper.NormalIdentityTermJpaMapper;
+import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository.supers.NormalIdentityAuthJpaRepository;
+import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository.supers.NormalIdentityJpaRepository;
+import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository.supers.NormalIdentityRoleJpaRepository;
+import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository.supers.NormalIdentityTermJpaRepository;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
@@ -32,15 +32,15 @@ import static org.mockito.Mockito.times;
 
 public class NormalIdentityRepositoryJpaAdapterTest implements SiteMemberEntityTestUtils,
         SiteMemberAuthEntityTestUtils, SiteMemberRoleEntityTestUtils, SiteMemberTermEntityTestUtils {
-    private final IdentityJpaRepository identityRepository = Mockito.mock(IdentityJpaRepository.class);
-    private final IdentityAuthJpaRepository authRepository = Mockito.mock(IdentityAuthJpaRepository.class);
-    private final IdentityRoleJpaRepository roleRepository = Mockito.mock(IdentityRoleJpaRepository.class);
-    private final IdentityTermJpaRepository termRepository = Mockito.mock(IdentityTermJpaRepository.class);
+    private final NormalIdentityJpaRepository identityRepository = Mockito.mock(NormalIdentityJpaRepository.class);
+    private final NormalIdentityAuthJpaRepository authRepository = Mockito.mock(NormalIdentityAuthJpaRepository.class);
+    private final NormalIdentityRoleJpaRepository roleRepository = Mockito.mock(NormalIdentityRoleJpaRepository.class);
+    private final NormalIdentityTermJpaRepository termRepository = Mockito.mock(NormalIdentityTermJpaRepository.class);
 
-    private final IdentityJpaMapper identityMapper = Mockito.mock(IdentityJpaMapper.class);
-    private final IdentityAuthJpaMapper authMapper = Mockito.mock(IdentityAuthJpaMapper.class);
-    private final IdentityRoleJpaMapper roleMapper = Mockito.mock(IdentityRoleJpaMapper.class);
-    private final IdentityTermJpaMapper termMapper = Mockito.mock(IdentityTermJpaMapper.class);
+    private final NormalIdentityJpaMapper identityMapper = Mockito.mock(NormalIdentityJpaMapper.class);
+    private final NormalIdentityAuthJpaMapper authMapper = Mockito.mock(NormalIdentityAuthJpaMapper.class);
+    private final NormalIdentityRoleJpaMapper roleMapper = Mockito.mock(NormalIdentityRoleJpaMapper.class);
+    private final NormalIdentityTermJpaMapper termMapper = Mockito.mock(NormalIdentityTermJpaMapper.class);
     private final NormalIdentityRepositoryJpaAdapter adapter = new NormalIdentityRepositoryJpaAdapter(identityRepository,
             authRepository, roleRepository, termRepository, identityMapper, authMapper, roleMapper, termMapper);
 

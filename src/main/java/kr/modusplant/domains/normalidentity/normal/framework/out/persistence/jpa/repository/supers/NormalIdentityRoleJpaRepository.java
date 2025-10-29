@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
 
-public interface IdentityRoleJpaRepository extends JpaRepository<SiteMemberRoleEntity, UUID> {
+public interface NormalIdentityRoleJpaRepository extends JpaRepository<SiteMemberRoleEntity, UUID> {
 }

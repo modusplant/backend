@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper
-public interface IdentityTermJpaMapper {
+public interface NormalIdentityTermJpaMapper {
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "member", source = "savedMember")

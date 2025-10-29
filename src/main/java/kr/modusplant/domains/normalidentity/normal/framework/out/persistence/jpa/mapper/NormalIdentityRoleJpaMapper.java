@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper
-public interface IdentityRoleJpaMapper {
+public interface NormalIdentityRoleJpaMapper {
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "member", source = "savedMember")

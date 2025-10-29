@@ -1,9 +1,10 @@
 package kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository.supers;
 
-import kr.modusplant.framework.out.jpa.entity.SiteMemberTermEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
 
-public interface IdentityTermJpaRepository extends JpaRepository<SiteMemberTermEntity, UUID> {
+public interface NormalIdentityJpaRepository extends JpaRepository<SiteMemberEntity, UUID> {
+
 }

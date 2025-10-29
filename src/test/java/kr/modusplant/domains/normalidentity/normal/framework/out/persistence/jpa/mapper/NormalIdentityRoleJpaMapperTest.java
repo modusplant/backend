@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class IdentityRoleJpaMapperTest {
-    private final IdentityRoleJpaMapper mapper = new IdentityRoleJpaMapperImpl();
+public class NormalIdentityRoleJpaMapperTest {
+    private final NormalIdentityRoleJpaMapper mapper = new NormalIdentityRoleJpaMapperImpl();
 
     @Test
     @DisplayName("유효한 사용자 엔티티를 사용자 역할 엔티티로 전환")

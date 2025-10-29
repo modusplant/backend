@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
 
-public interface IdentityAuthJpaRepository extends JpaRepository<SiteMemberAuthEntity, UUID> {
+public interface NormalIdentityAuthJpaRepository extends JpaRepository<SiteMemberAuthEntity, UUID> {
 
     boolean existsByEmailAndProvider(String email, AuthProvider provider);
 }

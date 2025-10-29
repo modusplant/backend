@@ -1,14 +1,14 @@
 package kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository;
 
 import kr.modusplant.domains.normalidentity.normal.domain.vo.SignUpData;
-import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper.IdentityAuthJpaMapper;
-import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper.IdentityJpaMapper;
-import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper.IdentityRoleJpaMapper;
-import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper.IdentityTermJpaMapper;
-import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository.supers.IdentityAuthJpaRepository;
-import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository.supers.IdentityJpaRepository;
-import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository.supers.IdentityRoleJpaRepository;
-import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository.supers.IdentityTermJpaRepository;
+import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper.NormalIdentityAuthJpaMapper;
+import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper.NormalIdentityJpaMapper;
+import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper.NormalIdentityRoleJpaMapper;
+import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper.NormalIdentityTermJpaMapper;
+import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository.supers.NormalIdentityAuthJpaRepository;
+import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository.supers.NormalIdentityJpaRepository;
+import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository.supers.NormalIdentityRoleJpaRepository;
+import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository.supers.NormalIdentityTermJpaRepository;
 import kr.modusplant.domains.normalidentity.normal.usecase.port.repository.NormalIdentityRepository;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.legacy.domains.member.enums.AuthProvider;
@@ -19,15 +19,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @RequiredArgsConstructor
 public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityRepository {
-    private final IdentityJpaRepository identityRepository;
-    private final IdentityAuthJpaRepository authRepository;
-    private final IdentityRoleJpaRepository roleRepository;
-    private final IdentityTermJpaRepository termRepository;
+    private final NormalIdentityJpaRepository identityRepository;
+    private final NormalIdentityAuthJpaRepository authRepository;
+    private final NormalIdentityRoleJpaRepository roleRepository;
+    private final NormalIdentityTermJpaRepository termRepository;
 
-    private final IdentityJpaMapper identityMapper;
-    private final IdentityAuthJpaMapper authMapper;
-    private final IdentityRoleJpaMapper roleMapper;
-    private final IdentityTermJpaMapper termMapper;
+    private final NormalIdentityJpaMapper identityMapper;
+    private final NormalIdentityAuthJpaMapper authMapper;
+    private final NormalIdentityRoleJpaMapper roleMapper;
+    private final NormalIdentityTermJpaMapper termMapper;
 
     @Override
     @Transactional

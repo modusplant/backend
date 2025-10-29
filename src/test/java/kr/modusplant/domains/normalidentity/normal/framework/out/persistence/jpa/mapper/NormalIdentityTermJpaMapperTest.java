@@ -12,8 +12,8 @@ import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstan
 import static kr.modusplant.shared.persistence.common.constant.SiteMemberTermConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class IdentityTermJpaMapperTest implements SiteMemberEntityTestUtils {
-    private final IdentityTermJpaMapper mapper = new IdentityTermJpaMapperImpl();
+public class NormalIdentityTermJpaMapperTest implements SiteMemberEntityTestUtils {
+    private final NormalIdentityTermJpaMapper mapper = new NormalIdentityTermJpaMapperImpl();
 
     @Test
     @DisplayName("유효한 사용자 엔티티와 회원가입 정보를 사용자 약관 엔티티로 전환")

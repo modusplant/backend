@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper
-public interface IdentityJpaMapper {
+public interface NormalIdentityJpaMapper {
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "nickname", source = "memberNickname.nickname")

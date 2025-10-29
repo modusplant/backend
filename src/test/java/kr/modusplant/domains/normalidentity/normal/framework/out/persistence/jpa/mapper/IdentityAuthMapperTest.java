@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class IdentityAuthMapperTest implements SiteMemberAuthEntityTestUtils,
         SiteMemberEntityTestUtils, SiteMemberTermEntityTestUtils {
-    private final IdentityAuthJpaMapper mapper = new IdentityAuthJpaMapperImpl();
+    private final NormalIdentityAuthJpaMapper mapper = new NormalIdentityAuthJpaMapperImpl();
 
     @Test
     @DisplayName("유효한 사용자 식별자와 회원가입 정보를 사용자 권한 엔티티로 전환")
