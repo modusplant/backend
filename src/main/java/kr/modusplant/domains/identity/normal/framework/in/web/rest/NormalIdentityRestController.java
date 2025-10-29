@@ -1,8 +1,6 @@
 package kr.modusplant.domains.identity.normal.framework.in.web.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -54,7 +52,7 @@ public class NormalIdentityRestController {
      * Spring Security 의 일반 로그인 필터 체인의
      * 성공 핸들러인 {@link kr.modusplant.infrastructure.security.handler.ForwardRequestLoginSuccessHandler} 가
      * 인증 완료 후 forward 하는 메서드입니다.
-     * <p>클라이언트의 요청을 받는 도입부 역할을 하지 않으며, Swagger 어노테이션을 사용하지 않습니다. <p/>
+     * <p>클라이언트의 요청을 받는 도입부 역할을 하지 않으며, 따라서 Swagger 어노테이션을 사용하지 않습니다. <p/>
      *
      * @param accessToken 클라이언트에게 보내는 접근 토큰입니다.
      * @param refreshToken 클라이언트에게 보내는 갱신 토큰입니다.
@@ -88,7 +86,7 @@ public class NormalIdentityRestController {
 
 
     /**
-     * Spring Security 필터인 EmailPasswordAuthenticationFilter 에 등록된
+     * Spring Security 필터인 {@link kr.modusplant.infrastructure.security.filter.EmailPasswordAuthenticationFilter} 에 등록된
      * 일반 로그인 API 의 경로를 Swagger UI에 등록하기 위해 만들어진 더미 메서드입니다.
      * <p>"절대로" 호출되거나, 사용될 일이 없습니다.<p/>
      * @param loginRequest 일반 회원가입에서 사용되는 이메일, 비밀번호로 구성되었습니다.
