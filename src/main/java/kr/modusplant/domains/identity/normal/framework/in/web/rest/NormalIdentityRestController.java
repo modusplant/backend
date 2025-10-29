@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import kr.modusplant.domains.identity.normal.adapter.controller.NormalIdentityController;
 import kr.modusplant.domains.identity.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
+import kr.modusplant.infrastructure.security.models.NormalLoginRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -84,4 +85,21 @@ public class NormalIdentityRestController {
                 .cacheControl(CacheControl.noStore())
                 .body(DataResponse.ok(accessTokenData));
     }
+
+
+    /**
+     * Spring Security 필터인 EmailPasswordAuthenticationFilter 에 등록된
+     * 일반 로그인 API 의 경로를 Swagger UI에 등록하기 위해 만들어진 더미 메서드입니다.
+     * "절대로" 호출되거나, 사용될 일이 없습니다.
+     * @param loginRequest 일반 회원가입에서 사용되는 이메일, 비밀번호로 구성되었습니다.
+     */
+    @Operation(
+            summary = "일반 로그인 API",
+            description = "이메일과 비밀번호로 일반 로그인 절차를 수행합니다."
+    )
+    @PostMapping("/api/auth/login")
+    public void addLoginApiPathToSwaggerUi(@RequestBody @Valid NormalLoginRequest loginRequest) {
+
+    }
+
 }
