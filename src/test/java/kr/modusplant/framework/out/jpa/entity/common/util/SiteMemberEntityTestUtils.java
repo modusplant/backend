@@ -2,7 +2,7 @@ package kr.modusplant.framework.out.jpa.entity.common.util;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.*;
 
 public interface SiteMemberEntityTestUtils {
     default SiteMemberEntity createMemberBasicAdminEntity() {

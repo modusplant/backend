@@ -4,9 +4,9 @@ import kr.modusplant.domains.member.domain.vo.MemberStatus;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import static kr.modusplant.shared.persistence.common.constant.CommCommentConstant.TEST_COMM_COMMENT_PATH;
-import static kr.modusplant.shared.persistence.common.constant.CommPostConstant.TEST_COMM_POST_ULID;
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.shared.persistence.common.util.constant.CommCommentConstant.TEST_COMM_COMMENT_PATH;
+import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MemberStringConstant {
