@@ -5,11 +5,11 @@ import kr.modusplant.legacy.domains.member.app.service.SiteMemberApplicationServ
 import kr.modusplant.legacy.domains.member.app.service.SiteMemberAuthApplicationService;
 import kr.modusplant.legacy.domains.member.app.service.SiteMemberTermApplicationService;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberAuthValidationService;
-import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.modules.auth.normal.signup.app.http.request.NormalSignUpRequest;
 import kr.modusplant.legacy.modules.auth.normal.signup.mapper.NormalSignUpMemberAppDomainMapper;
 import kr.modusplant.legacy.modules.auth.normal.signup.mapper.NormalSignupAuthAppDomainMapper;
 import kr.modusplant.legacy.modules.auth.normal.signup.mapper.NormalSignupTermAppDomainMapper;
+import kr.modusplant.shared.enums.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
