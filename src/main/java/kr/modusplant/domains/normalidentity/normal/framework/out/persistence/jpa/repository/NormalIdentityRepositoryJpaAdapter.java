@@ -11,7 +11,7 @@ import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa
 import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository.supers.NormalIdentityTermJpaRepository;
 import kr.modusplant.domains.normalidentity.normal.usecase.port.repository.NormalIdentityRepository;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.legacy.domains.member.enums.AuthProvider;
+import kr.modusplant.shared.enums.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;

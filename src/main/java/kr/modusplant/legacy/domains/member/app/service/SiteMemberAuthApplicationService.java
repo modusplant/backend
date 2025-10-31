@@ -10,8 +10,8 @@ import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberAuthUpdate
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberAuthResponse;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberAuthValidationService;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
-import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthAppInfraMapper;
+import kr.modusplant.shared.enums.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;

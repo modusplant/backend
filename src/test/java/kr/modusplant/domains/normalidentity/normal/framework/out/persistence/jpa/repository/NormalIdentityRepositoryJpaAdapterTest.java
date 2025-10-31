@@ -17,7 +17,7 @@ import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberAuthEntityTe
 import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberRoleEntityTestUtils;
 import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberTermEntityTestUtils;
-import kr.modusplant.legacy.domains.member.enums.AuthProvider;
+import kr.modusplant.shared.enums.AuthProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

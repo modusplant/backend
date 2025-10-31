@@ -1,7 +1,7 @@
 package kr.modusplant.framework.out.jpa.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.legacy.domains.member.enums.AuthProvider;
+import kr.modusplant.shared.enums.AuthProvider;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

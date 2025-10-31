@@ -15,7 +15,7 @@ public interface NormalIdentityAuthJpaMapper {
     @Mapping(target = "activeMember", source = "savedMember")
     @Mapping(target = "email", source = "sign.credentials.email.email")
     @Mapping(target = "pw", source = "sign.credentials.password.password")
-    @Mapping(target = "provider", expression = "java( kr.modusplant.legacy.domains.member.enums.AuthProvider.BASIC )")
+    @Mapping(target = "provider", expression = "java( kr.modusplant.shared.enums.AuthProvider.BASIC )")
     SiteMemberAuthEntity toSiteMemberAuthEntity(SiteMemberEntity savedMember, SignUpData sign);
 
 }
