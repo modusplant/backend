@@ -120,7 +120,7 @@ def getSsmParameter(String paramName, String region = 'ap-northeast-2') {
 	}
 }
 
-def activeProfile = getSsmParameter('/config/modusplant/SPRING_PROFILES_ACTIVE')
+def activeProfile = System.getenv("SPRING_PROFILES_ACTIVE")
 def jdbcConnectionUrl = getSsmParameter("/config/modusplant_${activeProfile}/DB_CONNECTION_URL")
 def jdbcUsername = getSsmParameter("/config/modusplant_${activeProfile}/DB_USERNAME")
 def jdbcPassword = getSsmParameter("/config/modusplant_${activeProfile}/DB_PASSWORD")
