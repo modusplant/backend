@@ -1,12 +1,12 @@
 spring:
   application:
-    name: ${SPRING_APPLICATION_NAME:modusplant}
+    name: modusplant
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:dev}
+    active: ${SPRING_PROFILES_ACTIVE}
   config:
     import:
-      - "aws-parameterstore:/config/${spring.application.name}/"
-      - "aws-parameterstore:/config/${spring.application.name}_${spring.profiles.active}/"
+      - "aws-parameterstore:/config/modusplant/"
+      - "aws-parameterstore:/config/modusplant_${spring.profiles.active}/"
   cache:
     type: redis
   data:
