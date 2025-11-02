@@ -2,11 +2,7 @@ spring:
   application:
     name: modusplant
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE}
-  config:
-    import:
-      - "aws-parameterstore:/config/modusplant/"
-      - "aws-parameterstore:/config/modusplant_${spring.profiles.active}/"
+    active: secrets
   cache:
     type: redis
   data:
