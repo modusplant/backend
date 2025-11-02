@@ -2,14 +2,10 @@ package kr.modusplant.legacy.domains.communication.domain.service;
 
 import jakarta.persistence.EntityManager;
 import kr.modusplant.framework.out.jpa.entity.*;
-import kr.modusplant.framework.out.jpa.repository.CommCommentRepository;
+import kr.modusplant.framework.out.jpa.entity.common.util.*;
+import kr.modusplant.framework.out.jpa.repository.CommCommentJpaRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommCommentEntityTestUtils;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
@@ -35,13 +31,13 @@ public class CommCommentValidationServiceTest implements
     private final CommCommentValidationService commentValidationService;
 
     @Spy
-    private final CommCommentRepository commentRepository;
+    private final CommCommentJpaRepository commentRepository;
 
     private final EntityManager entityManager;
 
     @Autowired
     public CommCommentValidationServiceTest(
-            CommCommentValidationService commentValidationService, CommCommentRepository commentRepository,
+            CommCommentValidationService commentValidationService, CommCommentJpaRepository commentRepository,
             EntityManager entityManager) {
         this.commentValidationService = commentValidationService;
         this.commentRepository = commentRepository;

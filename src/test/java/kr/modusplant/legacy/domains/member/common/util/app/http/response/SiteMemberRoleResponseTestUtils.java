@@ -1,8 +1,10 @@
 package kr.modusplant.legacy.domains.member.common.util.app.http.response;
 
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberRoleResponse;
-import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberRoleTestUtils;
 
-public interface SiteMemberRoleResponseTestUtils extends SiteMemberRoleTestUtils {
-    SiteMemberRoleResponse memberRoleUserResponse = new SiteMemberRoleResponse(memberRoleUserWithUuid.getUuid(), memberRoleUser.getRole());
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberRoleConstant.MEMBER_ROLE_USER_ROLE;
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberRoleConstant.MEMBER_ROLE_USER_UUID;
+
+public interface SiteMemberRoleResponseTestUtils {
+    SiteMemberRoleResponse memberRoleUserResponse = new SiteMemberRoleResponse(MEMBER_ROLE_USER_UUID, MEMBER_ROLE_USER_ROLE);
 }

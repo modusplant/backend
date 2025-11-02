@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
-import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostViewCountRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,7 +13,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CommPostViewCountBackUpScheduler {
     private final CommPostViewCountRedisRepository viewCountRedisRepository;
-    private final CommPostRepository commPostRepository;
+    private final CommPostJpaRepository commPostRepository;
 
     @Transactional
     @Scheduled(fixedRateString = "${scheduler.sync-interval-ms}")

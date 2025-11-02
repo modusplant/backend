@@ -1,10 +1,10 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
-import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryRepository;
+import kr.modusplant.framework.out.jpa.entity.common.util.CommSecondaryCategoryEntityTestUtils;
+import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryJpaRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceOnlyContext;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.response.CommCategoryResponseTestUtils;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
@@ -22,10 +22,10 @@ import static org.mockito.BDDMockito.given;
 class CommCategoryValidationServiceTest implements CommCategoryResponseTestUtils, CommSecondaryCategoryEntityTestUtils {
 
     private final CommCategoryValidationService commCategoryValidationService;
-    private final CommSecondaryCategoryRepository commCategoryRepository;
+    private final CommSecondaryCategoryJpaRepository commCategoryRepository;
 
     @Autowired
-    CommCategoryValidationServiceTest(CommCategoryValidationService commCategoryValidationService, CommSecondaryCategoryRepository commCategoryRepository) {
+    CommCategoryValidationServiceTest(CommCategoryValidationService commCategoryValidationService, CommSecondaryCategoryJpaRepository commCategoryRepository) {
         this.commCategoryValidationService = commCategoryValidationService;
         this.commCategoryRepository = commCategoryRepository;
     }

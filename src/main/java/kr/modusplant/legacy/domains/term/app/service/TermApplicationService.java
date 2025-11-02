@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.term.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.TermEntity;
-import kr.modusplant.framework.out.jpa.repository.TermRepository;
+import kr.modusplant.framework.out.jpa.repository.TermJpaRepository;
 import kr.modusplant.legacy.domains.term.app.http.request.TermInsertRequest;
 import kr.modusplant.legacy.domains.term.app.http.request.TermUpdateRequest;
 import kr.modusplant.legacy.domains.term.app.http.response.TermResponse;
@@ -25,7 +25,7 @@ import java.util.UUID;
 public class TermApplicationService {
 
     private final TermValidationService validationService;
-    private final TermRepository termRepository;
+    private final TermJpaRepository termRepository;
     private final TermAppInfraMapper termAppInfraMapper;
 
     @Cacheable(value = "terms")

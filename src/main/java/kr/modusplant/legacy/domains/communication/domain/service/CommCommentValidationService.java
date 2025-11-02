@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
-import kr.modusplant.framework.out.jpa.repository.CommCommentRepository;
+import kr.modusplant.framework.out.jpa.repository.CommCommentJpaRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CommCommentValidationService {
-    private final CommCommentRepository commentRepository;
+    private final CommCommentJpaRepository commentRepository;
 
     public void validateExistedCommCommentEntity(String postUlid, String path) {
         if (commentRepository.existsByPostUlidAndPath(postUlid, path)) {

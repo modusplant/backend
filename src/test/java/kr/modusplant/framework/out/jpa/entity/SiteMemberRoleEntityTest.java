@@ -1,8 +1,8 @@
 package kr.modusplant.framework.out.jpa.entity;
 
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberRoleEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberRoleEntityTestUtils;
-import kr.modusplant.legacy.modules.security.enums.Role;
+import kr.modusplant.infrastructure.security.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,23 +33,5 @@ class SiteMemberRoleEntityTest implements SiteMemberRoleEntityTestUtils {
 
         // then
         assertThat(memberRole.getRole()).isEqualTo(Role.ADMIN);
-    }
-
-    @DisplayName("회원 역할 PreUpdate")
-    @Test
-    void preUpdate() {
-        // given
-        SiteMemberEntity member = SiteMemberEntity.builder().memberEntity(createMemberBasicUserEntity()).build();
-        SiteMemberRoleEntity memberRoleEntity = SiteMemberRoleEntity.builder().member(member).build();
-        entityManager.persist(memberRoleEntity);
-        entityManager.flush();
-        entityManager.detach(memberRoleEntity);
-
-        // when
-        memberRoleEntity = SiteMemberRoleEntity.builder().member(member).role(null).build();
-        entityManager.persist(memberRoleEntity);
-
-        // then
-        assertThat(memberRoleEntity.getRole()).isEqualTo(Role.USER);
     }
 }

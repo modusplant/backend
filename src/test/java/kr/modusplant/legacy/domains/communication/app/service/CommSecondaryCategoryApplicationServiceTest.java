@@ -1,11 +1,11 @@
 package kr.modusplant.legacy.domains.communication.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryRepository;
+import kr.modusplant.framework.out.jpa.entity.common.util.CommSecondaryCategoryEntityTestUtils;
+import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryJpaRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommCategoryRequestTestUtils;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.response.CommCategoryResponseTestUtils;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.mapper.CommSecondaryCategoryAppInfraMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kr.modusplant.shared.persistence.common.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -23,11 +24,11 @@ import static org.mockito.BDDMockito.willDoNothing;
 class CommSecondaryCategoryApplicationServiceTest implements CommCategoryRequestTestUtils, CommCategoryResponseTestUtils, CommSecondaryCategoryEntityTestUtils {
 
     private final CommSecondaryCategoryApplicationService commCategoryApplicationService;
-    private final CommSecondaryCategoryRepository commCategoryRepository;
+    private final CommSecondaryCategoryJpaRepository commCategoryRepository;
     private final CommSecondaryCategoryAppInfraMapper commCategoryAppInfraMapper;
 
     @Autowired
-    CommSecondaryCategoryApplicationServiceTest(CommSecondaryCategoryApplicationService commCategoryApplicationService, CommSecondaryCategoryRepository commCategoryRepository, CommSecondaryCategoryAppInfraMapper commCategoryAppInfraMapper) {
+    CommSecondaryCategoryApplicationServiceTest(CommSecondaryCategoryApplicationService commCategoryApplicationService, CommSecondaryCategoryJpaRepository commCategoryRepository, CommSecondaryCategoryAppInfraMapper commCategoryAppInfraMapper) {
         this.commCategoryApplicationService = commCategoryApplicationService;
         this.commCategoryRepository = commCategoryRepository;
         this.commCategoryAppInfraMapper = commCategoryAppInfraMapper;
@@ -144,7 +145,7 @@ class CommSecondaryCategoryApplicationServiceTest implements CommCategoryRequest
     @Test
     void removeByUuidTest() {
         // given
-        UUID uuid = TEST_COMM_SECONDARY_CATEGORY_WITH_UUID.getUuid();
+        UUID uuid = TEST_COMM_SECONDARY_CATEGORY_UUID;
         CommSecondaryCategoryEntity commSecondaryCategoryEntity = commCategoryAppInfraMapper.toCommCategoryEntity(TEST_COMM_SECONDARY_CATEGORY_INSERT_REQUEST);
 
         given(commCategoryRepository.save(commSecondaryCategoryEntity)).willReturn(commSecondaryCategoryEntity);

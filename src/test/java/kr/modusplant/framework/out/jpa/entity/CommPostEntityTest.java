@@ -1,7 +1,7 @@
 package kr.modusplant.framework.out.jpa.entity;
 
+import kr.modusplant.framework.out.jpa.entity.common.util.CommPostEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,30 +47,7 @@ class CommPostEntityTest implements CommPostEntityTestUtils {
     }
 
     @Test
-    @DisplayName("컨텐츠 게시글 PreUpdate")
-    void preUpdate() {
-        // given
-        SiteMemberEntity member = createMemberBasicUserEntity();
-        CommPostEntity commPost = createCommPostEntityBuilder()
-                .primaryCategory(createTestCommPrimaryCategoryEntity())
-                .secondaryCategory(createTestCommSecondaryCategoryEntity())
-                .authMember(member)
-                .createMember(member)
-                .build();
-        entityManager.persist(commPost);
-
-        // when
-        commPost.updateViewCount(null);
-        commPost.updateIsDeleted(null);
-        entityManager.flush();
-
-        // then
-        assertThat(commPost.getViewCount()).isEqualTo(0L);
-        assertThat(commPost.getIsDeleted()).isEqualTo(false);
-    }
-
-    @Test
-    @DisplayName("좋아요 수 증가 테스트")
+    @DisplayName("소통 게시글 좋아요 수 증가 테스트")
     void increaseLikeCountTest() {
         CommPostEntity commPost = createCommPostEntityBuilder()
                 .likeCount(0)
@@ -82,7 +59,7 @@ class CommPostEntityTest implements CommPostEntityTestUtils {
     }
 
     @Test
-    @DisplayName("좋아요 수 감소 테스트")
+    @DisplayName("소통 게시글 좋아요 수 감소 테스트")
     void decreaseLikeCountTest() {
         CommPostEntity commPost = createCommPostEntityBuilder()
                 .likeCount(1)

@@ -15,8 +15,8 @@ import org.springframework.util.ClassUtils;
 import java.util.List;
 import java.util.Objects;
 
-import static kr.modusplant.legacy.domains.common.vo.Reference.NOTATION_DOMAINS;
-import static kr.modusplant.legacy.modules.common.vo.Reference.NOTATION_MODULES;
+import static kr.modusplant.legacy.domains.common.constant.Reference.NOTATION_DOMAINS;
+import static kr.modusplant.legacy.modules.common.constant.Reference.NOTATION_MODULES;
 
 @NonNullApi
 public class MockModulesServiceBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
@@ -32,7 +32,7 @@ public class MockModulesServiceBeanFactoryPostProcessor implements BeanFactoryPo
         scanner.addIncludeFilter(new AnnotationTypeFilter(Service.class));
         ClassLoader classLoader = this.getClass().getClassLoader();
 
-        for (String reference: List.of(NOTATION_DOMAINS, NOTATION_MODULES, "kr.modusplant.infrastructure.security")) {
+        for (String reference: List.of(NOTATION_DOMAINS, NOTATION_MODULES, "kr.modusplant.framework", "kr.modusplant.infrastructure")) {
             for (BeanDefinition serviceDef : scanner.findCandidateComponents(reference)) {
                 Class<?> clazz;
                 try {

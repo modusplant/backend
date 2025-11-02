@@ -2,27 +2,28 @@ package kr.modusplant.legacy.domains.member.mapper;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberAuthEntityTestUtils;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberAuthInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberAuthResponse;
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberAuthRequestTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberAuthResponseTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberAuthEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberAuthConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
 class SiteMemberAuthAppInfraMapperTest implements SiteMemberAuthRequestTestUtils, SiteMemberAuthResponseTestUtils, SiteMemberAuthEntityTestUtils {
 
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberJpaRepository memberRepository;
     private final SiteMemberAuthAppInfraMapper memberAuthMapper = new SiteMemberAuthAppInfraMapperImpl();
 
     @Autowired
-    SiteMemberAuthAppInfraMapperTest(SiteMemberRepository memberRepository) {
+    SiteMemberAuthAppInfraMapperTest(SiteMemberJpaRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
 
@@ -47,9 +48,9 @@ class SiteMemberAuthAppInfraMapperTest implements SiteMemberAuthRequestTestUtils
         SiteMemberEntity memberEntity = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuthEntity = memberAuthMapper.toMemberAuthEntity(new SiteMemberAuthInsertRequest(memberEntity.getUuid(), memberAuthBasicUser.getEmail(), memberAuthBasicUser.getPw(), memberAuthBasicUser.getProvider(), memberAuthBasicUser.getProviderId()), memberRepository);
+        SiteMemberAuthEntity memberAuthEntity = memberAuthMapper.toMemberAuthEntity(new SiteMemberAuthInsertRequest(memberEntity.getUuid(), MEMBER_AUTH_BASIC_USER_EMAIL, MEMBER_AUTH_BASIC_USER_PW, MEMBER_AUTH_BASIC_USER_PROVIDER, MEMBER_AUTH_BASIC_USER_PROVIDER_ID), memberRepository);
 
         // then
-        assertThat(memberAuthEntity.getEmail()).isEqualTo(memberAuthBasicUser.getEmail());
+        assertThat(memberAuthEntity.getEmail()).isEqualTo(MEMBER_AUTH_BASIC_USER_EMAIL);
     }
 }

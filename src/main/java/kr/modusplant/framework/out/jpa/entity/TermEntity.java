@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.VER;
-import static kr.modusplant.shared.persistence.vo.TableColumnName.*;
-import static kr.modusplant.shared.persistence.vo.TableName.TERM;
+import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
+import static kr.modusplant.shared.persistence.constant.TableName.TERM;
 import static kr.modusplant.shared.util.VersionUtils.createVersion;
 
 @Entity
@@ -75,13 +75,6 @@ public class TermEntity {
 
     @PrePersist
     public void prePersist() {
-        if (this.version == null) {
-            this.version = createVersion(1, 0, 0);
-        }
-    }
-
-    @PreUpdate
-    public void preUpdate() {
         if (this.version == null) {
             this.version = createVersion(1, 0, 0);
         }

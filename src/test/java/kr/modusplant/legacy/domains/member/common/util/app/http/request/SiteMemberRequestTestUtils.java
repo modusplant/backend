@@ -2,18 +2,19 @@ package kr.modusplant.legacy.domains.member.common.util.app.http.request;
 
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberUpdateRequest;
-import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberTestUtils;
 
-public interface SiteMemberRequestTestUtils extends SiteMemberTestUtils {
-    SiteMemberInsertRequest memberBasicUserInsertRequest = new SiteMemberInsertRequest(memberBasicUser.getNickname());
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.*;
 
-    SiteMemberUpdateRequest memberBasicUserUpdateRequest = new SiteMemberUpdateRequest(memberBasicUserWithUuid.getUuid(), memberBasicUser.getNickname(), memberBasicUser.getBirthDate());
+public interface SiteMemberRequestTestUtils {
+    SiteMemberInsertRequest memberBasicUserInsertRequest = new SiteMemberInsertRequest(MEMBER_BASIC_USER_NICKNAME);
 
-    SiteMemberInsertRequest memberGoogleUserInsertRequest = new SiteMemberInsertRequest(memberGoogleUser.getNickname());
+    SiteMemberUpdateRequest memberBasicUserUpdateRequest = new SiteMemberUpdateRequest(MEMBER_BASIC_USER_UUID, MEMBER_BASIC_USER_NICKNAME, MEMBER_BASIC_USER_BIRTH_DATE);
 
-    SiteMemberUpdateRequest memberGoogleUserUpdateRequest = new SiteMemberUpdateRequest(memberGoogleUserWithUuid.getUuid(), memberGoogleUser.getNickname(), memberGoogleUser.getBirthDate());
+    SiteMemberInsertRequest memberGoogleUserInsertRequest = new SiteMemberInsertRequest(MEMBER_GOOGLE_USER_NICKNAME);
 
-    SiteMemberInsertRequest memberKakaoUserInsertRequest = new SiteMemberInsertRequest(memberKakaoUser.getNickname());
+    SiteMemberUpdateRequest memberGoogleUserUpdateRequest = new SiteMemberUpdateRequest(MEMBER_GOOGLE_USER_UUID, MEMBER_GOOGLE_USER_NICKNAME, MEMBER_GOOGLE_USER_BIRTH_DATE);
 
-    SiteMemberUpdateRequest memberKakaoUserUpdateRequest = new SiteMemberUpdateRequest(memberKakaoUserWithUuid.getUuid(), memberKakaoUser.getNickname(), memberKakaoUser.getBirthDate());
+    SiteMemberInsertRequest memberKakaoUserInsertRequest = new SiteMemberInsertRequest(MEMBER_KAKAO_USER_NICKNAME);
+
+    SiteMemberUpdateRequest memberKakaoUserUpdateRequest = new SiteMemberUpdateRequest(MEMBER_KAKAO_USER_UUID, MEMBER_KAKAO_USER_NICKNAME, MEMBER_KAKAO_USER_BIRTH_DATE);
 }

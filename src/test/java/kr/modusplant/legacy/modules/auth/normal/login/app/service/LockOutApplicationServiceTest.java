@@ -2,8 +2,8 @@ package kr.modusplant.legacy.modules.auth.normal.login.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.legacy.modules.auth.normal.login.persistence.repository.LockOutRedisRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,10 +26,10 @@ import static org.mockito.Mockito.mock;
 @ExtendWith(MockitoExtension.class)
 class LockOutApplicationServiceTest {
     @Mock
-    private SiteMemberRepository siteMemberRepository;
+    private SiteMemberJpaRepository siteMemberRepository;
 
     @Mock
-    private SiteMemberAuthRepository siteMemberAuthRepository;
+    private SiteMemberAuthJpaRepository siteMemberAuthRepository;
 
     @Mock
     private LockOutRedisRepository lockOutRedisRepository;

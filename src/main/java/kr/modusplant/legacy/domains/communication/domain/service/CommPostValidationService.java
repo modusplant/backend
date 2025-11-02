@@ -1,8 +1,8 @@
 package kr.modusplant.legacy.domains.communication.domain.service;
 
 import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
-import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryJpaRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.legacy.domains.common.error.DataPairNumberMismatchException;
 import kr.modusplant.legacy.domains.common.error.DataPairOrderMismatchException;
@@ -29,8 +29,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CommPostValidationService {
 
-    private final CommPostRepository commPostRepository;
-    private final CommSecondaryCategoryRepository commCategoryRepository;
+    private final CommPostJpaRepository commPostRepository;
+    private final CommSecondaryCategoryJpaRepository commCategoryRepository;
 
     public void validateCommPostInsertRequest(CommPostInsertRequest request) {
         validateNotFoundCategoryUuid(request.primaryCategoryUuid(), commCategoryRepository);

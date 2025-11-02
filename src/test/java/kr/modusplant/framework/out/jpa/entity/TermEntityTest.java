@@ -34,19 +34,4 @@ class TermEntityTest implements TermEntityTestUtils {
         // then
         assertThat(term.getVersion()).isEqualTo(version);
     }
-
-    @DisplayName("약관 PreUpdate")
-    @Test
-    void preUpdate() {
-        // given
-        TermEntity term = TermEntity.builder().termEntity(createTermsOfUseEntity()).build();
-        entityManager.persist(term);
-
-        // when
-        entityManager.merge(TermEntity.builder().termEntity(term).version(null).build());
-        entityManager.flush();
-
-        // then
-        assertThat(term.getVersion()).isEqualTo(createVersion(1, 0, 0));
-    }
 }

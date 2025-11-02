@@ -2,8 +2,10 @@ package kr.modusplant.legacy.domains.member.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberTermEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberTermRepository;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberTermEntityTestUtils;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberTermJpaRepository;
 import kr.modusplant.legacy.domains.common.context.DomainsServiceWithoutValidationServiceContext;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberTermUpdateRequest;
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberTermResponse;
@@ -11,8 +13,6 @@ import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemb
 import kr.modusplant.legacy.domains.member.common.util.app.http.request.SiteMemberTermRequestTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberResponseTestUtils;
 import kr.modusplant.legacy.domains.member.common.util.app.http.response.SiteMemberTermResponseTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberTermEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +31,11 @@ class SiteMemberTermApplicationServiceTest implements SiteMemberTermRequestTestU
 
     private final SiteMemberTermApplicationService memberTermService;
     private final SiteMemberApplicationService memberService;
-    private final SiteMemberTermRepository memberTermRepository;
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberTermJpaRepository memberTermRepository;
+    private final SiteMemberJpaRepository memberRepository;
 
     @Autowired
-    SiteMemberTermApplicationServiceTest(SiteMemberTermApplicationService memberTermService, SiteMemberApplicationService memberService, SiteMemberTermRepository memberTermRepository, SiteMemberRepository memberRepository) {
+    SiteMemberTermApplicationServiceTest(SiteMemberTermApplicationService memberTermService, SiteMemberApplicationService memberService, SiteMemberTermJpaRepository memberTermRepository, SiteMemberJpaRepository memberRepository) {
         this.memberTermService = memberTermService;
         this.memberService = memberService;
         this.memberTermRepository = memberTermRepository;

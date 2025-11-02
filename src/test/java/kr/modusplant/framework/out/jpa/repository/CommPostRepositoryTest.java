@@ -6,11 +6,11 @@ import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.entity.common.util.CommPostEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.CommPrimaryCategoryEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.CommSecondaryCategoryEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,16 +29,16 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RepositoryOnlyContext
 class CommPostRepositoryTest implements CommPostEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils, SiteMemberEntityTestUtils {
-    private final CommPostRepository commPostRepository;
-    private final CommPrimaryCategoryRepository commPrimaryCategoryRepository;
-    private final CommSecondaryCategoryRepository commSecondaryCategoryRepository;
-    private final SiteMemberRepository siteMemberRepository;
+    private final CommPostJpaRepository commPostRepository;
+    private final CommPrimaryCategoryJpaRepository commPrimaryCategoryRepository;
+    private final CommSecondaryCategoryJpaRepository commSecondaryCategoryRepository;
+    private final SiteMemberJpaRepository siteMemberRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Autowired
-    CommPostRepositoryTest(CommPostRepository commPostRepository, CommPrimaryCategoryRepository commPrimaryCategoryRepository, CommSecondaryCategoryRepository commSecondaryCategoryRepository, SiteMemberRepository siteMemberRepository) {
+    CommPostRepositoryTest(CommPostJpaRepository commPostRepository, CommPrimaryCategoryJpaRepository commPrimaryCategoryRepository, CommSecondaryCategoryJpaRepository commSecondaryCategoryRepository, SiteMemberJpaRepository siteMemberRepository) {
         this.commPostRepository = commPostRepository;
         this.commPrimaryCategoryRepository = commPrimaryCategoryRepository;
         this.commSecondaryCategoryRepository = commSecondaryCategoryRepository;

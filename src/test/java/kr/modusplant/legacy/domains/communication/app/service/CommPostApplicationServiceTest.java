@@ -6,25 +6,25 @@ import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.repository.CommPostRepository;
-import kr.modusplant.framework.out.jpa.repository.CommPrimaryCategoryRepository;
-import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.entity.common.util.CommPostEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.CommPrimaryCategoryEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.CommSecondaryCategoryEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommPrimaryCategoryJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.persistence.generator.UlidIdGenerator;
 import kr.modusplant.legacy.domains.common.app.service.MultipartDataProcessor;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostInsertRequest;
 import kr.modusplant.legacy.domains.communication.app.http.request.CommPostUpdateRequest;
 import kr.modusplant.legacy.domains.communication.app.http.response.CommPostResponse;
 import kr.modusplant.legacy.domains.communication.common.util.app.http.request.CommPostRequestTestUtils;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommPostEntityTestUtils;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommPrimaryCategoryEntityTestUtils;
-import kr.modusplant.legacy.domains.communication.common.util.entity.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.legacy.domains.communication.domain.service.CommCategoryValidationService;
 import kr.modusplant.legacy.domains.communication.domain.service.CommPostValidationService;
 import kr.modusplant.legacy.domains.communication.mapper.CommPostAppInfraMapper;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostViewCountRedisRepository;
 import kr.modusplant.legacy.domains.communication.persistence.repository.CommPostViewLockRedisRepository;
-import kr.modusplant.legacy.domains.member.common.util.entity.SiteMemberEntityTestUtils;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import org.hibernate.generator.EventType;
@@ -62,13 +62,13 @@ class CommPostApplicationServiceTest implements SiteMemberEntityTestUtils, CommP
     @Mock
     private SiteMemberValidationService siteMemberValidationService;
     @Mock
-    private SiteMemberRepository siteMemberRepository;
+    private SiteMemberJpaRepository siteMemberRepository;
     @Mock
-    private CommPrimaryCategoryRepository commPrimaryCategoryRepository;
+    private CommPrimaryCategoryJpaRepository commPrimaryCategoryRepository;
     @Mock
-    private CommSecondaryCategoryRepository commSecondaryCategoryRepository;
+    private CommSecondaryCategoryJpaRepository commSecondaryCategoryRepository;
     @Mock
-    private CommPostRepository commPostRepository;
+    private CommPostJpaRepository commPostRepository;
     @Mock
     private MultipartDataProcessor multipartDataProcessor;
     @Mock

@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.legacy.domains.communication.vo.CommPageableValue.PAGE_SIZE;
+import static kr.modusplant.legacy.domains.communication.constant.CommPageableValue.PAGE_SIZE;
 
 @Tag(name = "컨텐츠 게시글 API", description = "컨텐츠 게시글을 다루는 API입니다.")
 @RestController
@@ -44,7 +44,7 @@ public class CommPostController {
     // 임시로 Spring Security 적용 전 인증 우회를 위해 사용
     // gitignore 처리된 yml 파일에 임의로 값을 추가하여 사용
     // TODO : Spring Security 적용 후 정상 인증 로직으로 대체할 것
-    @Value("${fake-auth-uuid}")
+    @Value("${TEMP_USER_UUID}")
     private UUID memberUuid;
 
     @Operation(

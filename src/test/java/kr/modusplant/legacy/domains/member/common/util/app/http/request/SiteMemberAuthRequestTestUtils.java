@@ -2,18 +2,19 @@ package kr.modusplant.legacy.domains.member.common.util.app.http.request;
 
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberAuthInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberAuthUpdateRequest;
-import kr.modusplant.legacy.domains.member.common.util.domain.SiteMemberAuthTestUtils;
 
-public interface SiteMemberAuthRequestTestUtils extends SiteMemberAuthTestUtils {
-    SiteMemberAuthInsertRequest memberAuthBasicUserInsertRequest = new SiteMemberAuthInsertRequest(memberAuthBasicUserWithUuid.getOriginalMemberUuid(), memberAuthBasicUser.getEmail(), memberAuthBasicUser.getPw(), memberAuthBasicUser.getProvider(), memberAuthBasicUser.getProviderId());
+import static kr.modusplant.shared.persistence.common.constant.SiteMemberAuthConstant.*;
 
-    SiteMemberAuthUpdateRequest memberAuthBasicUserUpdateRequest = new SiteMemberAuthUpdateRequest(memberAuthBasicUserWithUuid.getOriginalMemberUuid(), memberAuthBasicUser.getEmail(), memberAuthBasicUser.getPw());
+public interface SiteMemberAuthRequestTestUtils {
+    SiteMemberAuthInsertRequest memberAuthBasicUserInsertRequest = new SiteMemberAuthInsertRequest(MEMBER_AUTH_BASIC_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_BASIC_USER_EMAIL, MEMBER_AUTH_BASIC_USER_PW, MEMBER_AUTH_BASIC_USER_PROVIDER, MEMBER_AUTH_BASIC_USER_PROVIDER_ID);
 
-    SiteMemberAuthInsertRequest memberAuthGoogleUserInsertRequest = new SiteMemberAuthInsertRequest(memberAuthGoogleUserWithUuid.getOriginalMemberUuid(), memberAuthGoogleUser.getEmail(), memberAuthGoogleUser.getPw(), memberAuthGoogleUser.getProvider(), memberAuthGoogleUser.getProviderId());
+    SiteMemberAuthUpdateRequest memberAuthBasicUserUpdateRequest = new SiteMemberAuthUpdateRequest(MEMBER_AUTH_BASIC_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_BASIC_USER_EMAIL, MEMBER_AUTH_BASIC_USER_PW);
 
-    SiteMemberAuthUpdateRequest memberAuthGoogleUserUpdateRequest = new SiteMemberAuthUpdateRequest(memberAuthGoogleUserWithUuid.getOriginalMemberUuid(), memberAuthGoogleUser.getEmail(), memberAuthGoogleUser.getPw());
+    SiteMemberAuthInsertRequest memberAuthGoogleUserInsertRequest = new SiteMemberAuthInsertRequest(MEMBER_AUTH_GOOGLE_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_GOOGLE_USER_EMAIL, MEMBER_AUTH_GOOGLE_USER_PW, MEMBER_AUTH_GOOGLE_USER_PROVIDER, MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID);
 
-    SiteMemberAuthInsertRequest memberAuthKakaoUserInsertRequest = new SiteMemberAuthInsertRequest(memberAuthKakaoUserWithUuid.getOriginalMemberUuid(), memberAuthKakaoUser.getEmail(), memberAuthKakaoUser.getPw(), memberAuthKakaoUser.getProvider(), memberAuthKakaoUser.getProviderId());
+    SiteMemberAuthUpdateRequest memberAuthGoogleUserUpdateRequest = new SiteMemberAuthUpdateRequest(MEMBER_AUTH_GOOGLE_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_GOOGLE_USER_EMAIL, MEMBER_AUTH_GOOGLE_USER_PW);
 
-    SiteMemberAuthUpdateRequest memberAuthKakaoUserUpdateRequest = new SiteMemberAuthUpdateRequest(memberAuthKakaoUserWithUuid.getOriginalMemberUuid(), memberAuthKakaoUser.getEmail(), memberAuthKakaoUser.getPw());
+    SiteMemberAuthInsertRequest memberAuthKakaoUserInsertRequest = new SiteMemberAuthInsertRequest(MEMBER_AUTH_KAKAO_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_KAKAO_USER_EMAIL, MEMBER_AUTH_KAKAO_USER_PW, MEMBER_AUTH_KAKAO_USER_PROVIDER, MEMBER_AUTH_KAKAO_USER_PROVIDER_ID);
+
+    SiteMemberAuthUpdateRequest memberAuthKakaoUserUpdateRequest = new SiteMemberAuthUpdateRequest(MEMBER_AUTH_KAKAO_USER_ORIGINAL_MEMBER_UUID, MEMBER_AUTH_KAKAO_USER_EMAIL, MEMBER_AUTH_KAKAO_USER_PW);
 }

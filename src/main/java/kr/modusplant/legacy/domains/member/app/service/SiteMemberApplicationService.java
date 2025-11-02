@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.domains.member.app.service;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.legacy.domains.common.app.service.supers.UuidCrudApplicationService;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberInsertRequest;
 import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberUpdateRequest;
@@ -26,7 +26,7 @@ import java.util.UUID;
 public class SiteMemberApplicationService implements UuidCrudApplicationService<SiteMemberResponse, SiteMemberInsertRequest, SiteMemberUpdateRequest> {
 
     private final SiteMemberValidationService validationService;
-    private final SiteMemberRepository memberRepository;
+    private final SiteMemberJpaRepository memberRepository;
     private final SiteMemberAppInfraMapper memberAppInfraMapper;
 
     @Override
