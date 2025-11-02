@@ -74,15 +74,18 @@ dependencies {
 	implementation 'org.springframework.security:spring-security-crypto'
 	testImplementation 'org.springframework.security:spring-security-test'
 
+	// Spring Cloud AWS (Version managed by Spring Cloud AWS Dependencies)
+	implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.2.0')
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store'
+	implementation 'software.amazon.awssdk:s3'
+
 	// Other Main Dependencies (Version required)
 	implementation 'com.github.f4b6a3:ulid-creator:5.2.3'
 	implementation 'com.mailjet:mailjet-client:5.2.5'
-	implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store:3.2.0'
 	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.9.10'
 	implementation 'org.apache.commons:commons-lang3:3.18.0'
 	implementation 'org.jooq:jooq:3.20.8'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
-	implementation 'software.amazon.awssdk:s3:2.31.61'
 
 	// Other Test Dependencies (Versions required) ---
 	testImplementation 'io.github.hakky54:logcaptor:2.11.0'
@@ -95,32 +98,6 @@ sourceSets {
 		}
 	}
 }
-
-import software.amazon.awssdk.regions.Region
-import software.amazon.awssdk.services.ssm.SsmClient
-import software.amazon.awssdk.services.ssm.model.GetParameterRequest
-
-def getSsmParameter(String paramName, String region = 'ap-northeast-2') {
-	try {
-		def ssmClient = SsmClient.builder()
-				.region(Region.of(region))
-				.build()
-		def request = GetParameterRequest.builder()
-				.name(paramName)
-				.withDecryption(true)
-				.build()
-		def response = ssmClient.getParameter(request)
-		return response.parameter().value()
-	} catch (Exception e) {
-		println "Failed to load SSM parameter $paramName: ${e.message}"
-		return null
-	}
-}
-
-def activeProfile = getSsmParameter('/config/modusplant/SPRING_PROFILES_ACTIVE')
-def jdbcConnectionUrl = getSsmParameter("/config/modusplant_${activeProfile}/DB_CONNECTION_URL")
-def jdbcUsername = getSsmParameter("/config/modusplant_${activeProfile}/DB_USERNAME")
-def jdbcPassword = getSsmParameter("/config/modusplant_${activeProfile}/DB_PASSWORD")
 
 flyway {
 	driver = 'org.postgresql.Driver'
