@@ -9,7 +9,6 @@ import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.domain.vo.SecondaryCategoryId;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
 import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostRepositoryCustom;
-import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostRepositoryCustomImpl;
 import kr.modusplant.domains.post.framework.out.redis.PostViewCountRedisRepository;
 import kr.modusplant.domains.post.usecase.model.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.model.PostSummaryReadModel;
