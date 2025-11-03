@@ -1,7 +1,7 @@
 package kr.modusplant.legacy.modules.auth.email.app.service;
 
-import kr.modusplant.domains.identity.normal.adapter.EmailAuthTokenHelper;
-import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequest;
+import kr.modusplant.domains.normalidentity.normal.adapter.EmailAuthTokenHelper;
+import kr.modusplant.domains.normalidentity.normal.usecase.request.EmailValidationRequest;
 import kr.modusplant.framework.out.redis.RedisHelper;
 import kr.modusplant.framework.out.redis.RedisKeys;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberAuthValidationService;

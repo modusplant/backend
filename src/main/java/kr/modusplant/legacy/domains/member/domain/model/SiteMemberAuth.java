@@ -1,6 +1,6 @@
 package kr.modusplant.legacy.domains.member.domain.model;
 
-import kr.modusplant.legacy.domains.member.enums.AuthProvider;
+import kr.modusplant.shared.enums.AuthProvider;
 import lombok.*;
 
 import java.time.LocalDateTime;
