@@ -10,8 +10,8 @@ import kr.modusplant.legacy.domains.member.app.http.request.SiteMemberAuthUpdate
 import kr.modusplant.legacy.domains.member.app.http.response.SiteMemberAuthResponse;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberAuthValidationService;
 import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
-import kr.modusplant.legacy.domains.member.enums.AuthProvider;
 import kr.modusplant.legacy.domains.member.mapper.SiteMemberAuthAppInfraMapper;
+import kr.modusplant.shared.enums.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -47,7 +47,7 @@ public class SiteMemberAuthApplicationService implements UuidCrudApplicationServ
         return memberAuthRepository.findByEmail(email).stream().map(memberAuthAppInfraMapper::toMemberAuthResponse).toList();
     }
 
-    public List<SiteMemberAuthResponse> getByProvider(AuthProvider provider) {
+    public List<SiteMemberAuthResponse> getByProvider(kr.modusplant.shared.enums.AuthProvider provider) {
         return memberAuthRepository.findByProvider(provider).stream().map(memberAuthAppInfraMapper::toMemberAuthResponse).toList();
     }
 
