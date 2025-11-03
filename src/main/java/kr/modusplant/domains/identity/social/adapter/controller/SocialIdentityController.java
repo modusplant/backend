@@ -1,6 +1,8 @@
 package kr.modusplant.domains.identity.social.adapter.controller;
 
-import kr.modusplant.domains.identity.social.domain.vo.*;
+import kr.modusplant.domains.identity.social.domain.vo.MemberId;
+import kr.modusplant.domains.identity.social.domain.vo.SocialUserProfile;
+import kr.modusplant.domains.identity.social.domain.vo.UserPayload;
 import kr.modusplant.domains.identity.social.usecase.port.client.SocialAuthClientFactory;
 import kr.modusplant.domains.identity.social.usecase.port.client.dto.SocialUserInfo;
 import kr.modusplant.domains.identity.social.usecase.port.mapper.SocialIdentityMapper;

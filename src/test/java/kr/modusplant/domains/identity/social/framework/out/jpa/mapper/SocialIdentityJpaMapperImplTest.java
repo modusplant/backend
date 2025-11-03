@@ -4,16 +4,17 @@ import kr.modusplant.domains.identity.social.common.util.domain.vo.SocialUserPro
 import kr.modusplant.domains.identity.social.common.util.domain.vo.UserPayloadTestUtils;
 import kr.modusplant.domains.identity.social.common.util.framework.out.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.identity.social.domain.vo.UserPayload;
-import kr.modusplant.domains.identity.social.framework.out.jpa.entity.MemberAuthEntity;
-import kr.modusplant.domains.identity.social.framework.out.jpa.entity.MemberEntity;
-import kr.modusplant.domains.identity.social.framework.out.jpa.entity.MemberRoleEntity;
 import kr.modusplant.domains.identity.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.shared.enums.AuthProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialUserProfileTestUtils, UserPayloadTestUtils {
     private final SocialIdentityJpaMapper socialIdentityJpaMapper = new SocialIdentityJpaMapperImpl();
@@ -22,7 +23,7 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialUs
     @DisplayName("Nickname으로 MemberEntity를 생성")
     void testToMemberEntity_givenNickname_willReturnMemberEntity() {
         // when
-        MemberEntity result = socialIdentityJpaMapper.toMemberEntity(testSocialKakaoNickname);
+        SiteMemberEntity result = socialIdentityJpaMapper.toMemberEntity(testSocialKakaoNickname);
 
         // then
         assertNotNull(result);
@@ -34,12 +35,12 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialUs
     @DisplayName("MemberEntity와 SocialUserProfile로 MemberAuthEntity를 생성")
     void testToMemberAuthEntity_givenMemberEntityAndProfile_willReturnMemberAuthEntity() {
         // given
-        MemberEntity memberEntity = createKakaoMemberEntityWithUuid();
+        SiteMemberEntity memberEntity = createKakaoMemberEntityWithUuid();
         String providerId = testKakaoSocialUserProfile.getSocialCredentials().getProviderId();
         String email = testKakaoSocialUserProfile.getEmail().getEmail();
 
         // when
-        MemberAuthEntity result = socialIdentityJpaMapper.toMemberAuthEntity(memberEntity, testKakaoSocialUserProfile);
+        SiteMemberAuthEntity result = socialIdentityJpaMapper.toMemberAuthEntity(memberEntity, testKakaoSocialUserProfile);
 
         // then
         assertNotNull(result);
@@ -54,11 +55,11 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialUs
     @DisplayName("MemberEntity와 Role로 MemberRoleEntity를 생성")
     void testToMemberRoleEntity_givenMemberEntityAndRole_willReturnMemberRoleEntity() {
         // given
-        MemberEntity memberEntity = createKakaoMemberEntityWithUuid();
+        SiteMemberEntity memberEntity = createKakaoMemberEntityWithUuid();
         Role role = Role.USER;
 
         // when
-        MemberRoleEntity result = socialIdentityJpaMapper.toMemberRoleEntity(memberEntity, role);
+        SiteMemberRoleEntity result = socialIdentityJpaMapper.toMemberRoleEntity(memberEntity, role);
 
         // then
         assertNotNull(result);
@@ -70,8 +71,8 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialUs
     @DisplayName("MemberEntity와 MemberRoleEntity로 UserPayload를 생성")
     void testToUserPayload_givenMemberEntityAndMemberRoleEntity_willReturnUserPayload() {
         // given
-        MemberEntity memberEntity = createKakaoMemberEntityWithUuid();
-        MemberRoleEntity memberRoleEntity = MemberRoleEntity.builder()
+        SiteMemberEntity memberEntity = createKakaoMemberEntityWithUuid();
+        SiteMemberRoleEntity memberRoleEntity = SiteMemberRoleEntity.builder()
                 .member(memberEntity)
                 .role(Role.USER)
                 .build();
@@ -90,7 +91,7 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialUs
     @DisplayName("MemberEntity, Nickname, Role로 UserPayload를 생성")
     void testToUserPayload_givenMemberEntityNicknameAndRole_willReturnUserPayload() {
         // given
-        MemberEntity memberEntity = createKakaoMemberEntityWithUuid();
+        SiteMemberEntity memberEntity = createKakaoMemberEntityWithUuid();
         Role role = Role.USER;
 
         // when

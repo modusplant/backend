@@ -23,7 +23,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 
 @ExtendWith(MockitoExtension.class)
 class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, UserPayloadTestUtils {

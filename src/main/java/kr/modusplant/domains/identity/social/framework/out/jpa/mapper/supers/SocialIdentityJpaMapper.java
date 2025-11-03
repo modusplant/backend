@@ -3,20 +3,20 @@ package kr.modusplant.domains.identity.social.framework.out.jpa.mapper.supers;
 import kr.modusplant.domains.identity.social.domain.vo.Nickname;
 import kr.modusplant.domains.identity.social.domain.vo.SocialUserProfile;
 import kr.modusplant.domains.identity.social.domain.vo.UserPayload;
-import kr.modusplant.domains.identity.social.framework.out.jpa.entity.MemberAuthEntity;
-import kr.modusplant.domains.identity.social.framework.out.jpa.entity.MemberEntity;
-import kr.modusplant.domains.identity.social.framework.out.jpa.entity.MemberRoleEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
 import kr.modusplant.infrastructure.security.enums.Role;
 
 public interface SocialIdentityJpaMapper {
 
-    MemberEntity toMemberEntity(Nickname nickname);
+    SiteMemberEntity toMemberEntity(Nickname nickname);
 
-    MemberAuthEntity toMemberAuthEntity(MemberEntity memberEntity, SocialUserProfile profile);
+    SiteMemberAuthEntity toMemberAuthEntity(SiteMemberEntity memberEntity, SocialUserProfile profile);
 
-    MemberRoleEntity toMemberRoleEntity(MemberEntity memberEntity, Role role);
+    SiteMemberRoleEntity toMemberRoleEntity(SiteMemberEntity memberEntity, Role role);
 
-    UserPayload toUserPayload(MemberEntity memberEntity, MemberRoleEntity memberRoleEntity);
+    UserPayload toUserPayload(SiteMemberEntity memberEntity, SiteMemberRoleEntity memberRoleEntity);
 
-    UserPayload toUserPayload(MemberEntity memberEntity, Nickname nickname, Role role);
+    UserPayload toUserPayload(SiteMemberEntity memberEntity, Nickname nickname, Role role);
 }

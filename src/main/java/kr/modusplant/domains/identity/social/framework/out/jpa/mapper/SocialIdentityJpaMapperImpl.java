@@ -4,10 +4,10 @@ import kr.modusplant.domains.identity.social.domain.vo.MemberId;
 import kr.modusplant.domains.identity.social.domain.vo.Nickname;
 import kr.modusplant.domains.identity.social.domain.vo.SocialUserProfile;
 import kr.modusplant.domains.identity.social.domain.vo.UserPayload;
-import kr.modusplant.domains.identity.social.framework.out.jpa.entity.MemberAuthEntity;
-import kr.modusplant.domains.identity.social.framework.out.jpa.entity.MemberEntity;
-import kr.modusplant.domains.identity.social.framework.out.jpa.entity.MemberRoleEntity;
 import kr.modusplant.domains.identity.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
 import kr.modusplant.infrastructure.security.enums.Role;
 import org.springframework.stereotype.Component;
 
@@ -17,16 +17,16 @@ import java.time.LocalDateTime;
 public class SocialIdentityJpaMapperImpl implements SocialIdentityJpaMapper {
 
     @Override
-    public MemberEntity toMemberEntity(Nickname nickname) {
-        return MemberEntity.builder()
+    public SiteMemberEntity toMemberEntity(Nickname nickname) {
+        return SiteMemberEntity.builder()
                 .nickname(nickname.getNickname())
                 .loggedInAt(LocalDateTime.now())
                 .build();
     }
 
     @Override
-    public MemberAuthEntity toMemberAuthEntity(MemberEntity memberEntity, SocialUserProfile profile) {
-        return MemberAuthEntity.builder()
+    public SiteMemberAuthEntity toMemberAuthEntity(SiteMemberEntity memberEntity, SocialUserProfile profile) {
+        return SiteMemberAuthEntity.builder()
                 .activeMember(memberEntity)
                 .originalMember(memberEntity)
                 .email(profile.getEmail().getEmail())
@@ -36,15 +36,15 @@ public class SocialIdentityJpaMapperImpl implements SocialIdentityJpaMapper {
     }
 
     @Override
-    public MemberRoleEntity toMemberRoleEntity(MemberEntity memberEntity, Role role) {
-        return MemberRoleEntity.builder()
+    public SiteMemberRoleEntity toMemberRoleEntity(SiteMemberEntity memberEntity, Role role) {
+        return SiteMemberRoleEntity.builder()
                 .member(memberEntity)
                 .role(role)
                 .build();
     }
 
     @Override
-    public UserPayload toUserPayload(MemberEntity memberEntity, MemberRoleEntity memberRoleEntity) {
+    public UserPayload toUserPayload(SiteMemberEntity memberEntity, SiteMemberRoleEntity memberRoleEntity) {
         return UserPayload.create(
                 MemberId.fromUuid(memberEntity.getUuid()),
                 Nickname.create(memberEntity.getNickname()),
@@ -53,7 +53,7 @@ public class SocialIdentityJpaMapperImpl implements SocialIdentityJpaMapper {
     }
 
     @Override
-    public UserPayload toUserPayload(MemberEntity memberEntity, Nickname nickname, Role role) {
+    public UserPayload toUserPayload(SiteMemberEntity memberEntity, Nickname nickname, Role role) {
         return UserPayload.create(
                 MemberId.fromUuid(memberEntity.getUuid()),
                 nickname,

@@ -1,7 +1,7 @@
 package kr.modusplant.domains.identity.social.framework.out.client;
 
-import kr.modusplant.domains.identity.social.framework.out.exception.OAuthRequestFailException;
 import kr.modusplant.domains.identity.social.framework.out.client.dto.GoogleUserInfo;
+import kr.modusplant.domains.identity.social.framework.out.exception.OAuthRequestFailException;
 import kr.modusplant.domains.identity.social.usecase.port.client.SocialAuthClient;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;

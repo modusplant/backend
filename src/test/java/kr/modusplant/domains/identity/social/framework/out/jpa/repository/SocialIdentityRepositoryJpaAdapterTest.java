@@ -1,19 +1,18 @@
 package kr.modusplant.domains.identity.social.framework.out.jpa.repository;
 
 import kr.modusplant.domains.identity.social.common.util.domain.vo.EmailTestUtils;
-import kr.modusplant.domains.identity.social.common.util.domain.vo.NicknameTestUtils;
 import kr.modusplant.domains.identity.social.common.util.domain.vo.SocialCredentialsTestUtils;
 import kr.modusplant.domains.identity.social.common.util.domain.vo.UserPayloadTestUtils;
 import kr.modusplant.domains.identity.social.domain.vo.MemberId;
 import kr.modusplant.domains.identity.social.domain.vo.SocialUserProfile;
 import kr.modusplant.domains.identity.social.domain.vo.UserPayload;
-import kr.modusplant.domains.identity.social.framework.out.jpa.entity.MemberAuthEntity;
-import kr.modusplant.domains.identity.social.framework.out.jpa.entity.MemberEntity;
-import kr.modusplant.domains.identity.social.framework.out.jpa.entity.MemberRoleEntity;
 import kr.modusplant.domains.identity.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
-import kr.modusplant.domains.identity.social.framework.out.jpa.repository.supers.MemberAuthJpaRepository;
-import kr.modusplant.domains.identity.social.framework.out.jpa.repository.supers.MemberJpaRepository;
-import kr.modusplant.domains.identity.social.framework.out.jpa.repository.supers.MemberRoleJpaRepository;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleJpaRepository;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.shared.exception.EntityNotFoundException;
@@ -33,9 +32,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUtils, UserPayloadTestUtils, EmailTestUtils {
-    private final MemberJpaRepository memberJpaRepository = mock(MemberJpaRepository.class);
-    private final MemberAuthJpaRepository memberAuthJpaRepository = mock(MemberAuthJpaRepository.class);
-    private final MemberRoleJpaRepository memberRoleJpaRepository = mock(MemberRoleJpaRepository.class);
+    private final SiteMemberJpaRepository memberJpaRepository = mock(SiteMemberJpaRepository.class);
+    private final SiteMemberAuthJpaRepository memberAuthJpaRepository = mock(SiteMemberAuthJpaRepository.class);
+    private final SiteMemberRoleJpaRepository memberRoleJpaRepository = mock(SiteMemberRoleJpaRepository.class);
     private final SocialIdentityJpaMapper socialIdentityJpaMapper = mock(SocialIdentityJpaMapper.class);
     private final SocialIdentityRepositoryJpaAdapter socialIdentityRepositoryJpaAdapter = new SocialIdentityRepositoryJpaAdapter(
             memberJpaRepository,memberAuthJpaRepository,memberRoleJpaRepository,socialIdentityJpaMapper
@@ -45,8 +44,8 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
     @DisplayName("유효한 SocialCredentials로 MemberId를 조회")
     void testGetMemberIdBySocialCredentials_givenValidCredentials_willReturnMemberId() {
         // given
-        MemberEntity memberEntity = mock(MemberEntity.class);
-        MemberAuthEntity memberAuthEntity = mock(MemberAuthEntity.class);
+        SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
+        SiteMemberAuthEntity memberAuthEntity = mock(SiteMemberAuthEntity.class);
 
         given(memberAuthEntity.getActiveMember()).willReturn(memberEntity);
         given(memberEntity.getUuid()).willReturn(TEST_SOCIAL_KAKAO_MEMBER_ID_UUID);
@@ -84,8 +83,8 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
     @DisplayName("유효한 MemberId로 UserPayload를 조회")
     void testGetUserPayloadByMemberId_givenValidMemberId_willReturnUserPayload() {
         // given
-        MemberEntity memberEntity = mock(MemberEntity.class);
-        MemberRoleEntity memberRoleEntity = mock(MemberRoleEntity.class);
+        SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
+        SiteMemberRoleEntity memberRoleEntity = mock(SiteMemberRoleEntity.class);
 
         given(memberJpaRepository.findByUuid(testSocialKakaoMemberId.getValue())).willReturn(Optional.of(memberEntity));
         given(memberRoleJpaRepository.findByMember(memberEntity)).willReturn(Optional.of(memberRoleEntity));
@@ -120,7 +119,7 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
     @DisplayName("MemberRole이 존재하지 않을 때 예외 발생")
     void testGetUserPayloadByMemberId_givenMemberWithoutRole_willThrowException() {
         // given
-        MemberEntity memberEntity = mock(MemberEntity.class);
+        SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
 
         given(memberJpaRepository.findByUuid(testSocialKakaoMemberId.getValue())).willReturn(Optional.of(memberEntity));
         given(memberRoleJpaRepository.findByMember(memberEntity)).willReturn(Optional.empty());
@@ -136,7 +135,7 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
     @DisplayName("유효한 MemberId로 로그인 시간을 업데이트")
     void testUpdateLoggedInAt_givenValidMemberId_willUpdateLoggedInAt() {
         // given
-        MemberEntity memberEntity = mock(MemberEntity.class);
+        SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         given(memberJpaRepository.findByUuid(testSocialKakaoMemberId.getValue())).willReturn(Optional.of(memberEntity));
         given(memberJpaRepository.save(memberEntity)).willReturn(memberEntity);
 
@@ -155,9 +154,9 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
         // given
         SocialUserProfile profile = SocialUserProfile.create(testKakaoSocialCredentials, testSocialKakaoEmail, testSocialKakaoNickname);
         Role role = Role.USER;
-        MemberEntity memberEntity = mock(MemberEntity.class);
-        MemberAuthEntity memberAuthEntity = mock(MemberAuthEntity.class);
-        MemberRoleEntity memberRoleEntity = mock(MemberRoleEntity.class);
+        SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
+        SiteMemberAuthEntity memberAuthEntity = mock(SiteMemberAuthEntity.class);
+        SiteMemberRoleEntity memberRoleEntity = mock(SiteMemberRoleEntity.class);
 
         given(socialIdentityJpaMapper.toMemberEntity(testSocialKakaoNickname)).willReturn(memberEntity);
         given(memberJpaRepository.save(memberEntity)).willReturn(memberEntity);
