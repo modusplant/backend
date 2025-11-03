@@ -12,12 +12,12 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
-class CommPrimaryCategoryRepositoryTest implements CommPrimaryCategoryEntityTestUtils {
+class CommPrimaryCategoryJpaRepositoryTest implements CommPrimaryCategoryEntityTestUtils {
 
     private final CommPrimaryCategoryJpaRepository commCategoryRepository;
 
     @Autowired
-    CommPrimaryCategoryRepositoryTest(CommPrimaryCategoryJpaRepository commCategoryRepository) {
+    CommPrimaryCategoryJpaRepositoryTest(CommPrimaryCategoryJpaRepository commCategoryRepository) {
         this.commCategoryRepository = commCategoryRepository;
     }
 

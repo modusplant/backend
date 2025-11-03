@@ -1,8 +1,11 @@
-package kr.modusplant.domains.post.framework.out.jpa.entity;
+package kr.modusplant.framework.out.jpa.entity;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,14 +17,14 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
-import static kr.modusplant.shared.persistence.constant.TableName.POST_ARCHIVE;
+import static kr.modusplant.shared.persistence.constant.TableName.COMM_POST_ARCHIVE;
 
 
 @Entity
-@Table(name = POST_ARCHIVE)
+@Table(name = COMM_POST_ARCHIVE)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostArchiveEntity {
+public class CommPostArchiveEntity {
     @Id
     @Column(nullable = false, updatable = false)
     private String ulid;
@@ -57,7 +60,7 @@ public class PostArchiveEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PostArchiveEntity that)) return false;
+        if (!(o instanceof CommPostArchiveEntity that)) return false;
         return new EqualsBuilder().append(getUlid(), that.getUlid()).isEquals();
     }
 
@@ -66,7 +69,7 @@ public class PostArchiveEntity {
         return new HashCodeBuilder(17,37).append(getUlid()).toHashCode();
     }
 
-    private PostArchiveEntity(String ulid, UUID primaryCategoryUuid, UUID secondaryCategoryUuid, UUID authMemberUuid, UUID createMemberUuid,  String title, JsonNode content, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime publishedAt) {
+    private CommPostArchiveEntity(String ulid, UUID primaryCategoryUuid, UUID secondaryCategoryUuid, UUID authMemberUuid, UUID createMemberUuid, String title, JsonNode content, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime publishedAt) {
         this.ulid = ulid;
         this.primaryCategoryUuid = primaryCategoryUuid;
         this.secondaryCategoryUuid = secondaryCategoryUuid;
@@ -79,11 +82,11 @@ public class PostArchiveEntity {
         this.publishedAt = publishedAt;
     }
 
-    public static PostArchiveEntityBuilder builder() {
-        return new PostArchiveEntityBuilder();
+    public static CommPostArchiveEntityBuilder builder() {
+        return new CommPostArchiveEntityBuilder();
     }
 
-    public static final class PostArchiveEntityBuilder {
+    public static final class CommPostArchiveEntityBuilder {
         private String ulid;
         private UUID primaryCategoryUuid;
         private UUID secondaryCategoryUuid;
@@ -95,57 +98,57 @@ public class PostArchiveEntity {
         private LocalDateTime updatedAt;
         private LocalDateTime publishedAt;
 
-        public PostArchiveEntityBuilder ulid(final String ulid) {
+        public CommPostArchiveEntityBuilder ulid(final String ulid) {
             this.ulid = ulid;
             return this;
         }
 
-        public PostArchiveEntityBuilder primaryCategoryUuid(UUID primaryCategoryUuid) {
+        public CommPostArchiveEntityBuilder primaryCategoryUuid(UUID primaryCategoryUuid) {
             this.primaryCategoryUuid = primaryCategoryUuid;
             return this;
         }
 
-        public PostArchiveEntityBuilder secondaryCategoryUuid(UUID secondaryCategoryUuid) {
+        public CommPostArchiveEntityBuilder secondaryCategoryUuid(UUID secondaryCategoryUuid) {
             this.secondaryCategoryUuid = secondaryCategoryUuid;
             return this;
         }
 
-        public PostArchiveEntityBuilder authMemberUuid(UUID authMemberUuid) {
+        public CommPostArchiveEntityBuilder authMemberUuid(UUID authMemberUuid) {
             this.authMemberUuid = authMemberUuid;
             return this;
         }
 
-        public PostArchiveEntityBuilder createMemberUuid(UUID createMemberUuid) {
+        public CommPostArchiveEntityBuilder createMemberUuid(UUID createMemberUuid) {
             this.createMemberUuid = createMemberUuid;
             return this;
         }
 
-        public PostArchiveEntityBuilder title(String title) {
+        public CommPostArchiveEntityBuilder title(String title) {
             this.title = title;
             return this;
         }
 
-        public PostArchiveEntityBuilder content(JsonNode content) {
+        public CommPostArchiveEntityBuilder content(JsonNode content) {
             this.content = content;
             return this;
         }
 
-        public PostArchiveEntityBuilder createdAt(LocalDateTime createdAt) {
+        public CommPostArchiveEntityBuilder createdAt(LocalDateTime createdAt) {
             this.createdAt = createdAt;
             return this;
         }
 
-        public PostArchiveEntityBuilder updatedAt(LocalDateTime updatedAt) {
+        public CommPostArchiveEntityBuilder updatedAt(LocalDateTime updatedAt) {
             this.updatedAt = updatedAt;
             return this;
         }
 
-        public PostArchiveEntityBuilder publishedAt(LocalDateTime publishedAt) {
+        public CommPostArchiveEntityBuilder publishedAt(LocalDateTime publishedAt) {
             this.publishedAt = publishedAt;
             return this;
         }
 
-        public PostArchiveEntityBuilder commPostEntity(final PostArchiveEntity postEntity) {
+        public CommPostArchiveEntityBuilder commPostEntity(final CommPostArchiveEntity postEntity) {
             this.ulid = postEntity.ulid;
             this.primaryCategoryUuid = postEntity.primaryCategoryUuid;
             this.secondaryCategoryUuid = postEntity.secondaryCategoryUuid;
@@ -159,8 +162,8 @@ public class PostArchiveEntity {
             return this;
         }
 
-        public PostArchiveEntity build() {
-            return new PostArchiveEntity(this.ulid, this.primaryCategoryUuid, this.secondaryCategoryUuid, this.authMemberUuid, this.createMemberUuid, this.title, this.content, this.createdAt, this.updatedAt, this.publishedAt);
+        public CommPostArchiveEntity build() {
+            return new CommPostArchiveEntity(this.ulid, this.primaryCategoryUuid, this.secondaryCategoryUuid, this.authMemberUuid, this.createMemberUuid, this.title, this.content, this.createdAt, this.updatedAt, this.publishedAt);
         }
 
     }

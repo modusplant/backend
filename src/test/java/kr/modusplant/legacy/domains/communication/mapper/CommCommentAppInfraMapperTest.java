@@ -53,7 +53,7 @@ public class CommCommentAppInfraMapperTest implements
                 .createMember(member)
                 .likeCount(1)
                 .viewCount(1L)
-                .isDeleted(true)
+                .isPublished(true)
                 .build();
 
         savedPostEntity = postRepository.save(postEntity);

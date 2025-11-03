@@ -1,8 +1,8 @@
 package kr.modusplant.domains.post.framework.out.jpa.mapper.supers;
 
-import kr.modusplant.domains.post.framework.out.jpa.entity.PostArchiveEntity;
-import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
+import kr.modusplant.framework.out.jpa.entity.CommPostArchiveEntity;
+import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 
 public interface PostArchiveJpaMapper {
-    PostArchiveEntity toPostArchiveEntity(PostEntity postEntity);
+    CommPostArchiveEntity toPostArchiveEntity(CommPostEntity postEntity);
 }

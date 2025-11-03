@@ -6,20 +6,21 @@ import kr.modusplant.domains.post.common.util.usecase.model.PostReadModelTestUti
 import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.vo.AuthorId;
 import kr.modusplant.domains.post.domain.vo.PostId;
-import kr.modusplant.domains.post.domain.vo.PrimaryCategoryId;
 import kr.modusplant.domains.post.domain.vo.SecondaryCategoryId;
-import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
-import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostRepositoryCustom;
+import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostRepositoryCustomImpl;
 import kr.modusplant.domains.post.framework.out.redis.PostViewCountRedisRepository;
 import kr.modusplant.domains.post.usecase.model.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.model.PostSummaryReadModel;
+import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.entity.common.util.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.framework.out.jpa.entity.common.util.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.out.jpa.repository.CommPrimaryCategoryJpaRepository;
 import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryJpaRepository;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
@@ -42,15 +43,16 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils, SiteMemberEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils, PostReadModelTestUtils {
+class CommPostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils, SiteMemberEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils, PostReadModelTestUtils {
     private final PostJpaMapper postJpaMapper = Mockito.mock(PostJpaMapper.class);
-    private final PostJpaRepository postJpaRepository = Mockito.mock(PostJpaRepository.class);
+    private final PostRepositoryCustom postRepositoryCustom = Mockito.mock(PostRepositoryCustomImpl.class);
+    private final CommPostJpaRepository postJpaRepository = Mockito.mock(CommPostJpaRepository.class);
     private final SiteMemberJpaRepository authorJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
     private final CommPrimaryCategoryJpaRepository primaryCategoryJpaRepository = Mockito.mock(CommPrimaryCategoryJpaRepository.class);
     private final CommSecondaryCategoryJpaRepository secondaryCategoryJpaRepository = Mockito.mock(CommSecondaryCategoryJpaRepository.class);
     private final PostViewCountRedisRepository postViewCountRedisRepository = Mockito.mock(PostViewCountRedisRepository.class);
     private final PostRepositoryJpaAdapter postRepositoryJpaAdapter = new PostRepositoryJpaAdapter(
-            postJpaMapper, postJpaRepository, authorJpaRepository, primaryCategoryJpaRepository, secondaryCategoryJpaRepository, postViewCountRedisRepository
+            postJpaMapper, postRepositoryCustom, postJpaRepository, authorJpaRepository, primaryCategoryJpaRepository, secondaryCategoryJpaRepository, postViewCountRedisRepository
     );
 
     @Test
@@ -58,10 +60,10 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
     void testSave_givenPost_willReturnPostDetailReadModel() {
         // given
         Post post = createPublishedPost();
-        PostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
-        SiteMemberEntity memberEntity = createMemberBasicUserEntity().builder().uuid(post.getAuthorId().getValue()).build();
-        CommPrimaryCategoryEntity primaryCategoryEntity = createTestCommPrimaryCategoryEntity().builder().uuid(post.getPrimaryCategoryId().getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = createTestCommSecondaryCategoryEntity().builder().uuid(post.getSecondaryCategoryId().getValue()).build();
+        CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
+        SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(post.getAuthorId().getValue()).build();
+        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().uuid(post.getPrimaryCategoryId().getValue()).build();
+        CommSecondaryCategoryEntity secondaryCategoryEntity = CommSecondaryCategoryEntity.builder().uuid(post.getSecondaryCategoryId().getValue()).build();
         long viewCount = 0L;
         PostDetailReadModel expectedReadModel = new PostDetailReadModel(
                 post.getPostId().getValue(),
@@ -119,13 +121,12 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
     @DisplayName("필터 조건과 페이지 정보로 PostSummaryReadModel 가져오기")
     void testGetPublishedPosts_givenFiltersAndPageable_willReturnPostSummaryReadModelList() {
         // given
-        PrimaryCategoryId primaryCategoryId = testPrimaryCategoryId;
         List<SecondaryCategoryId> secondaryCategoryIds = List.of(testSecondaryCategoryId,testSecondaryCategoryId2);
         String keyword = "식물";
         Pageable pageable = PageRequest.of(0, 10);
         Page<PostSummaryReadModel> expectedPage = new PageImpl<>(List.of(TEST_POST_SUMMARY_READ_MODEL), PageRequest.of(0, 10), 1);
 
-        given(postJpaRepository.findByDynamicConditionsAndIsPublishedTrue(
+        given(postRepositoryCustom.findByDynamicConditionsAndIsPublishedTrue(
                 testPrimaryCategoryId.getValue(),
                 List.of(testSecondaryCategoryId.getValue(),testSecondaryCategoryId2.getValue()),
                 keyword,
@@ -134,11 +135,11 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
 
 
         // when
-        Page<PostSummaryReadModel> result = postRepositoryJpaAdapter.getPublishedPosts(primaryCategoryId, secondaryCategoryIds,keyword, pageable);
+        Page<PostSummaryReadModel> result = postRepositoryJpaAdapter.getPublishedPosts(testPrimaryCategoryId, secondaryCategoryIds,keyword, pageable);
 
         // then
         assertThat(result).isEqualTo(expectedPage);
-        verify(postJpaRepository).findByDynamicConditionsAndIsPublishedTrue(
+        verify(postRepositoryCustom).findByDynamicConditionsAndIsPublishedTrue(
                 testPrimaryCategoryId.getValue(),
                 List.of(testSecondaryCategoryId.getValue(),testSecondaryCategoryId2.getValue()),
                 keyword,
@@ -150,14 +151,12 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
     @DisplayName("사용자id, 필터조건, 페이지 정보로 PostSummaryReadModel 가져오기")
     void testGetPublishedPostsByAuthor_givenAuthorIdAndFilterAndPageable_willReturnPostSummaryReadModelList() {
         // given
-        AuthorId authorId = testAuthorId;
-        PrimaryCategoryId primaryCategoryId = testPrimaryCategoryId;
         List<SecondaryCategoryId> secondaryCategoryIds = List.of(testSecondaryCategoryId,testSecondaryCategoryId2);
         String keyword = "식물";
         Pageable pageable = PageRequest.of(0, 10);
         Page<PostSummaryReadModel> expectedPage = new PageImpl<>(List.of(TEST_POST_SUMMARY_READ_MODEL), PageRequest.of(0, 10), 1);
 
-        given(postJpaRepository.findByAuthMemberAndDynamicConditionsAndIsPublishedTrue(
+        given(postRepositoryCustom.findByAuthMemberAndDynamicConditionsAndIsPublishedTrue(
                 testAuthorId.getValue(),
                 testPrimaryCategoryId.getValue(),
                 List.of(testSecondaryCategoryId.getValue(),testSecondaryCategoryId2.getValue()),
@@ -166,11 +165,11 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
         )).willReturn(expectedPage);
 
         // when
-        Page<PostSummaryReadModel> result = postRepositoryJpaAdapter.getPublishedPostsByAuthor(authorId,primaryCategoryId,secondaryCategoryIds,keyword,pageable);
+        Page<PostSummaryReadModel> result = postRepositoryJpaAdapter.getPublishedPostsByAuthor(testAuthorId, testPrimaryCategoryId,secondaryCategoryIds,keyword,pageable);
 
         // then
         assertThat(result).isEqualTo(expectedPage);
-        verify(postJpaRepository).findByAuthMemberAndDynamicConditionsAndIsPublishedTrue(
+        verify(postRepositoryCustom).findByAuthMemberAndDynamicConditionsAndIsPublishedTrue(
                 testAuthorId.getValue(),
                 testPrimaryCategoryId.getValue(),
                 List.of(testSecondaryCategoryId.getValue(),testSecondaryCategoryId2.getValue()),
@@ -184,14 +183,14 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
     void testGetDraftPostsByAuthor_givenAuthorIdAndPageable_willReturnPostSummaryReadModelList() {
         // given
         AuthorId authorId = testAuthorId;
-        SiteMemberEntity memberEntity = createMemberBasicUserEntity().builder().uuid(testAuthorId.getValue()).build();
+        SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(testAuthorId.getValue()).build();
         Pageable pageable = PageRequest.of(0, 10);
-        PostEntity postEntity = createDraftPostEntityBuilderWithUuid().build();
-        Page<PostEntity> postEntityPage = new PageImpl<>(List.of(postEntity),pageable,1);
+        CommPostEntity postEntity = createDraftPostEntityBuilderWithUuid().build();
+        Page<CommPostEntity> postEntityPage = new PageImpl<>(List.of(postEntity),pageable,1);
         Page<PostSummaryReadModel> expectedPage = new PageImpl<>(List.of(TEST_POST_SUMMARY_READ_MODEL), PageRequest.of(0, 10), 1);
 
         given(authorJpaRepository.findByUuid(authorId.getValue())).willReturn(Optional.of(memberEntity));
-        given(postJpaRepository.findByAuthMemberAndIsPublishedFalseOrderByUpdatedAtDesc(memberEntity, pageable))
+        given(postJpaRepository.findByAuthMemberAndIsPublishedTrueOrderByUpdatedAtDesc(memberEntity, pageable))
                 .willReturn(postEntityPage);
         given(postJpaMapper.toPostSummaryReadModel(postEntity)).willReturn(TEST_POST_SUMMARY_READ_MODEL);
 
@@ -201,7 +200,7 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
         // then
         assertThat(result).isEqualTo(expectedPage);
         verify(authorJpaRepository).findByUuid(authorId.getValue());
-        verify(postJpaRepository).findByAuthMemberAndIsPublishedFalseOrderByUpdatedAtDesc(memberEntity, pageable);
+        verify(postJpaRepository).findByAuthMemberAndIsPublishedTrueOrderByUpdatedAtDesc(memberEntity, pageable);
         verify(postJpaMapper).toPostSummaryReadModel(postEntity);
     }
 
@@ -209,7 +208,7 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
     @DisplayName("postid로 Post 가져오기")
     void testGetPostByUlid_givenPostId_willReturnPost() {
         // given
-        PostEntity postEntity = createDraftPostEntityBuilder().ulid(testPostId.getValue()).build();
+        CommPostEntity postEntity = createDraftPostEntityBuilder().ulid(testPostId.getValue()).build();
         Post expectedPost = createPublishedPost();
 
         given(postJpaRepository.findByUlid(testPostId.getValue())).willReturn(Optional.of(postEntity));
@@ -229,7 +228,7 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
     @DisplayName("postid로 PostDetailReadModel 가져오기")
     void testGetPostDetailByUlid_givenPostId_willReturnPostDetailReadModel() {
         // given
-        PostEntity postEntity = createDraftPostEntityBuilder().ulid(testPostId.getValue()).build();
+        CommPostEntity postEntity = createDraftPostEntityBuilder().ulid(testPostId.getValue()).build();
         PostDetailReadModel expectedPostDetailReadModel = TEST_PUBLISHED_POST_DETAIL_READ_MODEL;
 
         given(postJpaRepository.findByUlid(testPostId.getValue())).willReturn(Optional.of(postEntity));
@@ -249,7 +248,7 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
     @DisplayName("postid로 조회수 가져오기")
     void testGetViewCountByUlid_givenPostId_willReturnViewCount() {
         // given
-        PostEntity postEntity = createDraftPostEntityBuilder().ulid(testPostId.getValue()).build();
+        CommPostEntity postEntity = createDraftPostEntityBuilder().ulid(testPostId.getValue()).build();
         given(postJpaRepository.findByUlid(testPostId.getValue())).willReturn(Optional.of(postEntity));
 
         // when

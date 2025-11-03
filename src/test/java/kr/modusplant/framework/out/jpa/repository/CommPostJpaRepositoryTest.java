@@ -28,7 +28,7 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RepositoryOnlyContext
-class CommPostRepositoryTest implements CommPostEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils, SiteMemberEntityTestUtils {
+class CommPostJpaRepositoryTest implements CommPostEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils, SiteMemberEntityTestUtils {
     private final CommPostJpaRepository commPostRepository;
     private final CommPrimaryCategoryJpaRepository commPrimaryCategoryRepository;
     private final CommSecondaryCategoryJpaRepository commSecondaryCategoryRepository;
@@ -38,7 +38,7 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommPrimaryCate
     private EntityManager entityManager;
 
     @Autowired
-    CommPostRepositoryTest(CommPostJpaRepository commPostRepository, CommPrimaryCategoryJpaRepository commPrimaryCategoryRepository, CommSecondaryCategoryJpaRepository commSecondaryCategoryRepository, SiteMemberJpaRepository siteMemberRepository) {
+    CommPostJpaRepositoryTest(CommPostJpaRepository commPostRepository, CommPrimaryCategoryJpaRepository commPrimaryCategoryRepository, CommSecondaryCategoryJpaRepository commSecondaryCategoryRepository, SiteMemberJpaRepository siteMemberRepository) {
         this.commPostRepository = commPostRepository;
         this.commPrimaryCategoryRepository = commPrimaryCategoryRepository;
         this.commSecondaryCategoryRepository = commSecondaryCategoryRepository;
@@ -107,8 +107,8 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommPrimaryCate
     }
 
     @Test
-    @DisplayName("삭제되지 않은 모든 컨텐츠 게시글 찾기(최신순)")
-    void findByIsDeletedFalseOrderByCreatedAtDescTest() {
+    @DisplayName("발행된 모든 컨텐츠 게시글 찾기(최신순)")
+    void findByIsPublishedTrueOrderByCreatedAtDescTest() {
         // given
         List<CommPostEntity> commPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createCommPostEntityBuilder()
@@ -118,17 +118,17 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommPrimaryCate
                         .createMember(testSiteMember)
                         .build()
                 ).collect(Collectors.toList());
-        commPosts.getFirst().updateIsDeleted(true);
+        commPosts.getFirst().updateIsPublished(false);
         commPostRepository.saveAll(commPosts);
 
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // when
-        Page<CommPostEntity> result = commPostRepository.findByIsDeletedFalseOrderByCreatedAtDesc(pageable);
+        Page<CommPostEntity> result = commPostRepository.findByIsPublishedTrueOrderByCreatedAtDesc(pageable);
 
         // then
-        assertThat(result.getTotalElements()).isEqualTo(4); // 삭제된 1건 제외
-        assertThat(result.getContent().stream().noneMatch(CommPostEntity::getIsDeleted)).isTrue();
+        assertThat(result.getTotalElements()).isEqualTo(4); // 발행된 게시글 4건
+        assertThat(result.getContent().stream().noneMatch(CommPostEntity::getIsPublished)).isFalse();
 
         List<CommPostEntity> content = result.getContent();
         for (int i = 0; i < content.size() - 1; i++) {
@@ -138,8 +138,8 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommPrimaryCate
     }
 
     @Test
-    @DisplayName("1차 항목으로 삭제되지 않은 모든 컨텐츠 게시글 찾기(최신순)")
-    void findByPrimaryCategoryAndIsDeletedFalseOrderByCreatedAtDescTest() {
+    @DisplayName("1차 항목으로 발행된 모든 컨텐츠 게시글 찾기(최신순)")
+    void findByPrimaryCategoryAndIsPublishedTrueOrderByCreatedAtDescTest() {
         // given
         CommPrimaryCategoryEntity testOtherGroup = commPrimaryCategoryRepository.save(
                 CommPrimaryCategoryEntity.builder().order(3).category("기타").build());
@@ -151,18 +151,18 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommPrimaryCate
                         .createMember(testSiteMember)
                         .build()
                 ).collect(Collectors.toList());
-        commPosts.getFirst().updateIsDeleted(true);
+        commPosts.getFirst().updateIsPublished(false);
         commPostRepository.saveAll(commPosts);
 
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // when
-        Page<CommPostEntity> result = commPostRepository.findByPrimaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(testCommPrimaryCategory, pageable);
+        Page<CommPostEntity> result = commPostRepository.findByPrimaryCategoryAndIsPublishedTrueOrderByCreatedAtDesc(testCommPrimaryCategory, pageable);
 
         // then
-        // i = 0, 2, 4 → testCommCategory로 생성됨 (0번은 삭제됨)
+        // i = 0, 2, 4 → testCommCategory로 생성됨 (0번은 발행되지 않음)
         assertThat(result.getTotalElements()).isEqualTo(2);
-        assertThat(result.getContent().stream().allMatch(post -> post.getPrimaryCategory().equals(testCommPrimaryCategory) && !post.getIsDeleted())).isTrue();
+        assertThat(result.getContent().stream().allMatch(post -> post.getPrimaryCategory().equals(testCommPrimaryCategory) && !post.getIsPublished())).isFalse();
 
         List<CommPostEntity> content = result.getContent();
         for (int i = 0; i < content.size() - 1; i++) {
@@ -172,8 +172,8 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommPrimaryCate
     }
 
     @Test
-    @DisplayName("2차 항목으로 삭제되지 않은 모든 컨텐츠 게시글 찾기(최신순)")
-    void findBySecondaryCategoryAndIsDeletedFalseOrderByCreatedAtDescTest() {
+    @DisplayName("2차 항목으로 발행되지 않은 모든 컨텐츠 게시글 찾기(최신순)")
+    void findBySecondaryCategoryAndIsPublishedTrueOrderByCreatedAtDescTest() {
         // given
         CommSecondaryCategoryEntity testOtherGroup = commSecondaryCategoryRepository.save(
                 CommSecondaryCategoryEntity.builder().order(3).category("기타").build());
@@ -185,18 +185,18 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommPrimaryCate
                         .createMember(testSiteMember)
                         .build()
                 ).collect(Collectors.toList());
-        commPosts.getFirst().updateIsDeleted(true);
+        commPosts.getFirst().updateIsPublished(false);
         commPostRepository.saveAll(commPosts);
 
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // when
-        Page<CommPostEntity> result = commPostRepository.findBySecondaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(testCommSecondaryCategory, pageable);
+        Page<CommPostEntity> result = commPostRepository.findBySecondaryCategoryAndIsPublishedTrueOrderByCreatedAtDesc(testCommSecondaryCategory, pageable);
 
         // then
-        // i = 0, 2, 4 → testCommCategory로 생성됨 (0번은 삭제됨)
+        // i = 0, 2, 4 → testCommCategory로 생성됨 (0번은 발행되지 않음)
         assertThat(result.getTotalElements()).isEqualTo(2);
-        assertThat(result.getContent().stream().allMatch(post -> post.getSecondaryCategory().equals(testCommSecondaryCategory) && !post.getIsDeleted())).isTrue();
+        assertThat(result.getContent().stream().allMatch(post -> post.getSecondaryCategory().equals(testCommSecondaryCategory) && !post.getIsPublished())).isFalse();
 
         List<CommPostEntity> content = result.getContent();
         for (int i = 0; i < content.size() - 1; i++) {
@@ -206,8 +206,8 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommPrimaryCate
     }
 
     @Test
-    @DisplayName("인가 회원으로 삭제되지 않은 모든 컨텐츠 게시글 찾기(최신순)")
-    void findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDescTest() {
+    @DisplayName("인가 회원으로 발행되지 않은 모든 컨텐츠 게시글 찾기(최신순)")
+    void findByAuthMemberAndIsPublishedTrueOrderByCreatedAtDescTest() {
         // given
         SiteMemberEntity testSiteMember2 = siteMemberRepository.save(createMemberGoogleUserEntity());
         List<CommPostEntity> commPosts = IntStream.range(0, 5)
@@ -218,18 +218,18 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommPrimaryCate
                         .createMember(i % 2 == 0 ? testSiteMember : testSiteMember2)
                         .build()
                 ).collect(Collectors.toList());
-        commPosts.getFirst().updateIsDeleted(true);
+        commPosts.getFirst().updateIsPublished(false);
         commPostRepository.saveAll(commPosts);
 
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // when
-        Page<CommPostEntity> result = commPostRepository.findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(testSiteMember,pageable);
+        Page<CommPostEntity> result = commPostRepository.findByAuthMemberAndIsPublishedTrueOrderByCreatedAtDesc(testSiteMember,pageable);
 
         // then
-        // i = 0, 2, 4 → testSiteMember로 생성됨 (0번은 삭제됨)
+        // i = 0, 2, 4 → testSiteMember로 생성됨 (0번은 발행되지 않음)
         assertThat(result.getTotalElements()).isEqualTo(2);
-        assertThat(result.getContent().stream().allMatch(post -> post.getAuthMember().equals(testSiteMember) && !post.getIsDeleted())).isTrue();
+        assertThat(result.getContent().stream().allMatch(post -> post.getAuthMember().equals(testSiteMember) && !post.getIsPublished())).isFalse();
 
         List<CommPostEntity> content = result.getContent();
         for (int i = 0; i < content.size() - 1; i++) {
@@ -274,7 +274,7 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommPrimaryCate
     }
 
     @Test
-    @DisplayName("ULID로 컨텐츠 게시글 삭제")
+    @DisplayName("ULID로 컨텐츠 게시글 발행")
     void deleteByUlidTest() {
         // given
         CommPostEntity commPostEntity = commPostRepository.save(
@@ -312,8 +312,8 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommPrimaryCate
     }
 
     @Test
-    @DisplayName("ulid로 삭제되지 않은 게시글 조회")
-    void findByUlidAndIsDeletedFalseTest() {
+    @DisplayName("ulid로 발행된 게시글 조회")
+    void findByUlidAndIsPublishedTrueTest() {
         // given
         CommPostEntity commPostEntity1 = commPostRepository.save(
                 createCommPostEntityBuilder()
@@ -329,13 +329,13 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommPrimaryCate
                         .secondaryCategory(testCommSecondaryCategory)
                         .authMember(testSiteMember)
                         .createMember(testSiteMember)
-                        .isDeleted(true)
+                        .isPublished(false)
                         .build()
         );
 
         // when
-        Optional<CommPostEntity> found = commPostRepository.findByUlidAndIsDeletedFalse(commPostEntity1.getUlid());
-        Optional<CommPostEntity> notFound = commPostRepository.findByUlidAndIsDeletedFalse(commPostEntity2.getUlid());
+        Optional<CommPostEntity> found = commPostRepository.findByUlidAndIsPublishedTrue(commPostEntity1.getUlid());
+        Optional<CommPostEntity> notFound = commPostRepository.findByUlidAndIsPublishedTrue(commPostEntity2.getUlid());
 
         // then
         assertThat(found).isPresent();
@@ -357,9 +357,9 @@ class CommPostRepositoryTest implements CommPostEntityTestUtils, CommPrimaryCate
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<CommPostEntity> result1 = commPostRepository.searchByTitleOrContent("물",pageable);
-        Page<CommPostEntity> result2 = commPostRepository.searchByTitleOrContent("this",pageable);
-        Page<CommPostEntity> result3 = commPostRepository.searchByTitleOrContent("erd",pageable);
+        Page<CommPostEntity> result1 = commPostRepository.searchByTitleOrContent("물", pageable);
+        Page<CommPostEntity> result2 = commPostRepository.searchByTitleOrContent("this", pageable);
+        Page<CommPostEntity> result3 = commPostRepository.searchByTitleOrContent("erd", pageable);
 
         // then
         assertThat(result1.getTotalElements()).isEqualTo(1);

@@ -18,7 +18,7 @@ import static kr.modusplant.shared.persistence.common.constant.CommPostConstant.
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
-public class CommPostLikeRepositoryTest implements CommPostLikeEntityTestUtils {
+public class CommPostLikeJpaRepositoryTest implements CommPostLikeEntityTestUtils {
     @Autowired
     CommPostLikeJpaRepository commPostLikeRepository;
 
