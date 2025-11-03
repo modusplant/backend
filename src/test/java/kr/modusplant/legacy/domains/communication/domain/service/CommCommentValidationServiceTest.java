@@ -59,7 +59,7 @@ public class CommCommentValidationServiceTest implements
                 .createMember(memberEntity)
                 .likeCount(1)
                 .viewCount(1L)
-                .isDeleted(true)
+                .isPublished(true)
                 .build();
 
         entityManager.persist(memberEntity);
