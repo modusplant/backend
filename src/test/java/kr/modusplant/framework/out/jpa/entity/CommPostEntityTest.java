@@ -33,7 +33,7 @@ class CommPostEntityTest implements CommPostEntityTestUtils {
                 .createMember(member)
                 .likeCount(1)
                 .viewCount(1L)
-                .isDeleted(true)
+                .isPublished(true)
                 .build();
 
         // when
@@ -43,7 +43,6 @@ class CommPostEntityTest implements CommPostEntityTestUtils {
         // then
         assertThat(commPost.getLikeCount()).isEqualTo(1);
         assertThat(commPost.getViewCount()).isEqualTo(1L);
-        assertThat(commPost.getIsDeleted()).isEqualTo(true);
     }
 
     @Test

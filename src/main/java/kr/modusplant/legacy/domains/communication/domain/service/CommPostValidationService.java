@@ -57,7 +57,7 @@ public class CommPostValidationService {
         if (ulid == null) {
             throw new EntityNotFoundException(ErrorCode.POST_NOT_FOUND, EntityName.POST);
         }
-        return commPostRepository.findByUlidAndIsDeletedFalse(ulid)
+        return commPostRepository.findByUlidAndIsPublishedTrue(ulid)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.POST_NOT_FOUND, EntityName.POST));
     }
 

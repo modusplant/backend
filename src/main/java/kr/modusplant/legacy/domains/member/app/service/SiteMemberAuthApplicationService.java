@@ -47,7 +47,7 @@ public class SiteMemberAuthApplicationService implements UuidCrudApplicationServ
         return memberAuthRepository.findByEmail(email).stream().map(memberAuthAppInfraMapper::toMemberAuthResponse).toList();
     }
 
-    public List<SiteMemberAuthResponse> getByProvider(AuthProvider provider) {
+    public List<SiteMemberAuthResponse> getByProvider(kr.modusplant.shared.enums.AuthProvider provider) {
         return memberAuthRepository.findByProvider(provider).stream().map(memberAuthAppInfraMapper::toMemberAuthResponse).toList();
     }
 

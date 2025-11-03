@@ -102,11 +102,11 @@ class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSec
                 .viewCount(0L)
                 .title("테스트 제목")
                 .content(mock(JsonNode.class))
-                .isDeleted(false)
+                .isPublished(false)
                 .build();
 
         // when
-        when(commPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.of(commPostEntity));
+        when(commPostRepository.findByUlidAndIsPublishedTrue(ulid)).thenReturn(Optional.of(commPostEntity));
         when(commPostEntity.getAuthMember().getUuid()).thenReturn(memberUuid);
 
         assertDoesNotThrow(() -> commPostValidationService.validateAccessibleCommPost(ulid,memberUuid));
@@ -117,7 +117,7 @@ class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSec
     void validateAccessibleCommPostNotFoundTest() {
         UUID memberUuid = UUID.randomUUID();
         String ulid = TEST_COMM_POST_ULID;
-        when(commPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.empty());
+        when(commPostRepository.findByUlidAndIsPublishedTrue(ulid)).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class,
                 () -> commPostValidationService.validateAccessibleCommPost(ulid,memberUuid));
     }
@@ -137,11 +137,11 @@ class CommPostValidationServiceTest implements CommPostRequestTestUtils, CommSec
                 .viewCount(0L)
                 .title("테스트 제목")
                 .content(mock(JsonNode.class))
-                .isDeleted(false)
+                .isPublished(false)
                 .build();
 
         // when
-        when(commPostRepository.findByUlidAndIsDeletedFalse(ulid)).thenReturn(Optional.of(commPostEntity));
+        when(commPostRepository.findByUlidAndIsPublishedTrue(ulid)).thenReturn(Optional.of(commPostEntity));
         when(commPostEntity.getAuthMember().getUuid()).thenReturn(UUID.randomUUID());
 
         assertThrows(AccessDeniedException.class,
