@@ -2,6 +2,7 @@ package kr.modusplant.legacy.domains.common.context;
 
 import kr.modusplant.framework.out.redis.initializer.MockRedisHelperInitializer;
 import kr.modusplant.infrastructure.config.aws.TestS3Config;
+import kr.modusplant.infrastructure.config.jdbc.TestDataSourceConfig;
 import kr.modusplant.infrastructure.config.jpa.TestJpaConfig;
 import kr.modusplant.infrastructure.config.redis.TestRedisConfig;
 import kr.modusplant.legacy.domains.common.postprocessor.MockDomainsRepositoryBeanFactoryPostProcessor;
@@ -26,6 +27,7 @@ import java.lang.annotation.*;
 @EnableJpaRepositories(excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
 @ContextConfiguration(
         classes = {
+                TestDataSourceConfig.class,
                 TestJpaConfig.class,
                 TestRedisConfig.class,
                 TestS3Config.class,
