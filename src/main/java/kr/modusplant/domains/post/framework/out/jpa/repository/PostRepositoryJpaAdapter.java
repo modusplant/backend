@@ -6,7 +6,7 @@ import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.domain.vo.PrimaryCategoryId;
 import kr.modusplant.domains.post.domain.vo.SecondaryCategoryId;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
-import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostRepositoryCustom;
 import kr.modusplant.domains.post.framework.out.redis.PostViewCountRedisRepository;
 import kr.modusplant.domains.post.usecase.model.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.model.PostSummaryReadModel;
@@ -14,6 +14,7 @@ import kr.modusplant.domains.post.usecase.port.repository.PostRepository;
 import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.out.jpa.repository.CommPrimaryCategoryJpaRepository;
 import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryJpaRepository;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
@@ -29,7 +30,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostRepositoryJpaAdapter implements PostRepository {
     private final PostJpaMapper postJpaMapper;
-    private final PostJpaRepository postJpaRepository;
+    private final PostRepositoryCustom postRepositoryCustom;
+    private final CommPostJpaRepository postJpaRepository;
     private final SiteMemberJpaRepository authorJpaRepository;
     private final CommPrimaryCategoryJpaRepository primaryCategoryJpaRepository;
     private final CommSecondaryCategoryJpaRepository secondaryCategoryJpaRepository;
@@ -54,7 +56,7 @@ public class PostRepositoryJpaAdapter implements PostRepository {
 
     @Override
     public Page<PostSummaryReadModel> getPublishedPosts(PrimaryCategoryId primaryCategoryId, List<SecondaryCategoryId> secondaryCategoryIds, String keyword, Pageable pageable) {
-        return postJpaRepository.findByDynamicConditionsAndIsPublishedTrue(
+        return postRepositoryCustom.findByDynamicConditionsAndIsPublishedTrue(
                 primaryCategoryId.getValue(),
                 secondaryCategoryIds.stream().map(SecondaryCategoryId::getValue).toList(),
                 keyword,
@@ -64,7 +66,7 @@ public class PostRepositoryJpaAdapter implements PostRepository {
 
     @Override
     public Page<PostSummaryReadModel> getPublishedPostsByAuthor(AuthorId authorId, PrimaryCategoryId primaryCategoryId, List<SecondaryCategoryId> secondaryCategoryIds, String keyword, Pageable pageable) {
-        return postJpaRepository.findByAuthMemberAndDynamicConditionsAndIsPublishedTrue(
+        return postRepositoryCustom.findByAuthMemberAndDynamicConditionsAndIsPublishedTrue(
                 authorId.getValue(),
                 primaryCategoryId.getValue(),
                 secondaryCategoryIds.stream().map(SecondaryCategoryId::getValue).toList(),
@@ -75,7 +77,7 @@ public class PostRepositoryJpaAdapter implements PostRepository {
 
     @Override
     public Page<PostSummaryReadModel> getDraftPostsByAuthor(AuthorId authorId, Pageable pageable) {
-        return postJpaRepository.findByAuthMemberAndIsPublishedFalseOrderByUpdatedAtDesc(
+        return postJpaRepository.findByAuthMemberAndIsPublishedTrueOrderByUpdatedAtDesc(
                 authorJpaRepository.findByUuid(authorId.getValue()).orElseThrow(),
                 pageable
         ).map(postJpaMapper::toPostSummaryReadModel);

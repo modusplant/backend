@@ -2,10 +2,10 @@ package kr.modusplant.domains.post.framework.out.jpa.mapper;
 
 import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.vo.*;
-import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
 import kr.modusplant.domains.post.usecase.model.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.model.PostSummaryReadModel;
+import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
@@ -17,9 +17,9 @@ import java.time.LocalDateTime;
 public class PostJpaMapperImpl implements PostJpaMapper {
 
     @Override
-    public PostEntity toPostEntity(Post post, SiteMemberEntity authorEntity, SiteMemberEntity createAuthorEntity, CommPrimaryCategoryEntity primaryCategoryEntity, CommSecondaryCategoryEntity secondaryCategoryEntity, Long viewCount) {
+    public CommPostEntity toPostEntity(Post post, SiteMemberEntity authorEntity, SiteMemberEntity createAuthorEntity, CommPrimaryCategoryEntity primaryCategoryEntity, CommSecondaryCategoryEntity secondaryCategoryEntity, Long viewCount) {
         LocalDateTime publishedAt = post.getStatus().isPublished() ? LocalDateTime.now() : null;
-        return PostEntity.builder()
+        return CommPostEntity.builder()
                 .ulid(post.getPostId().getValue())
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)
@@ -35,7 +35,7 @@ public class PostJpaMapperImpl implements PostJpaMapper {
     }
 
     @Override
-    public Post toPost(PostEntity postEntity) {
+    public Post toPost(CommPostEntity postEntity) {
         PostStatus postStatus;
         if (postEntity.getIsPublished()) {
             postStatus = PostStatus.published();
@@ -57,7 +57,7 @@ public class PostJpaMapperImpl implements PostJpaMapper {
     }
 
     @Override
-    public PostSummaryReadModel toPostSummaryReadModel(PostEntity postEntity) {
+    public PostSummaryReadModel toPostSummaryReadModel(CommPostEntity postEntity) {
         return new PostSummaryReadModel(
                 postEntity.getUlid(),
                 postEntity.getPrimaryCategory().getCategory(),
@@ -70,7 +70,7 @@ public class PostJpaMapperImpl implements PostJpaMapper {
     }
 
     @Override
-    public PostDetailReadModel toPostDetailReadModel(PostEntity postEntity) {
+    public PostDetailReadModel toPostDetailReadModel(CommPostEntity postEntity) {
         return new PostDetailReadModel(
                 postEntity.getUlid(),
                 postEntity.getPrimaryCategory().getUuid(),

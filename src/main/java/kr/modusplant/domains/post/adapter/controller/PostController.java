@@ -1,15 +1,18 @@
 package kr.modusplant.domains.post.adapter.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.vo.*;
-import kr.modusplant.domains.post.usecase.port.repository.*;
+import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
+import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
+import kr.modusplant.domains.post.usecase.port.repository.PostArchiveRepository;
+import kr.modusplant.domains.post.usecase.port.repository.PostRepository;
+import kr.modusplant.domains.post.usecase.port.repository.PostViewCountRepository;
+import kr.modusplant.domains.post.usecase.port.repository.PostViewLockRepository;
 import kr.modusplant.domains.post.usecase.request.PostFilterRequest;
 import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
 import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
 import kr.modusplant.domains.post.usecase.response.PostDetailResponse;
-import kr.modusplant.domains.post.domain.aggregate.Post;
-import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
-import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
 import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

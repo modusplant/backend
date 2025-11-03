@@ -8,6 +8,7 @@ import kr.modusplant.domains.post.domain.exception.InvalidPostContentException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT;
 import static kr.modusplant.domains.post.common.constant.PostStringConstant.TEST_POST_TITLE;
 import static org.junit.jupiter.api.Assertions.*;

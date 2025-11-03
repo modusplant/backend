@@ -2,13 +2,14 @@ package kr.modusplant.domains.post.framework.out.jpa.repository.supers;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.usecase.model.PostSummaryReadModel;
+import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,7 +107,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
 
         sqlBuilder.append("ORDER BY p.published_at DESC");
 
-        Query query = em.createNativeQuery(sqlBuilder.toString(), PostEntity.class);
+        Query query = em.createNativeQuery(sqlBuilder.toString(), CommPostEntity.class);
         Query countQuery = em.createQuery(countSqlBuilder.toString());
 
         parameters.forEach((key, value) -> {

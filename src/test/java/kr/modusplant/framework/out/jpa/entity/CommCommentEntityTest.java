@@ -38,7 +38,7 @@ public class CommCommentEntityTest implements CommCommentEntityTestUtils,
                 .createMember(member)
                 .likeCount(1)
                 .viewCount(1L)
-                .isDeleted(true)
+                .isPublished(true)
                 .build();
 
         CommCommentEntity commentEntity = createCommCommentEntityBuilder()

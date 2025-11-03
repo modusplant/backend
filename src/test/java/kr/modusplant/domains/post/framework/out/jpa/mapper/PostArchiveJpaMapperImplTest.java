@@ -1,13 +1,9 @@
 package kr.modusplant.domains.post.framework.out.jpa.mapper;
 
 import kr.modusplant.domains.post.common.util.framework.out.jpa.entity.PostArchiveEntityTestUtils;
-import kr.modusplant.domains.post.framework.out.jpa.entity.PostArchiveEntity;
-import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
-import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostArchiveJpaMapper;
-import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
-import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.domains.post.common.util.framework.out.jpa.entity.PostEntityTestUtils;
+import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostArchiveJpaMapper;
+import kr.modusplant.framework.out.jpa.entity.*;
 import kr.modusplant.framework.out.jpa.entity.common.util.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.framework.out.jpa.entity.common.util.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
@@ -28,7 +24,7 @@ class PostArchiveJpaMapperImplTest implements PostEntityTestUtils, PostArchiveEn
         SiteMemberEntity memberEntity = createMemberBasicUserEntity().builder().uuid(testAuthorId.getValue()).build();
         CommPrimaryCategoryEntity primaryCategoryEntity = createTestCommPrimaryCategoryEntity().builder().uuid(testPrimaryCategoryId.getValue()).build();
         CommSecondaryCategoryEntity secondaryCategoryEntity = createTestCommSecondaryCategoryEntity().builder().uuid(testSecondaryCategoryId.getValue()).build();
-        PostEntity postEntity = createPublishedPostEntityBuilderWithUuid()
+        CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid()
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)
                 .authMember(memberEntity)
@@ -37,7 +33,7 @@ class PostArchiveJpaMapperImplTest implements PostEntityTestUtils, PostArchiveEn
                 .build();
 
         // when
-        PostArchiveEntity result = postArchiveJpaMapper.toPostArchiveEntity(postEntity);
+        CommPostArchiveEntity result = postArchiveJpaMapper.toPostArchiveEntity(postEntity);
 
         // then
         assertThat(result.getUlid()).isEqualTo(postEntity.getUlid());
