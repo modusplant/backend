@@ -133,17 +133,7 @@ public class SecurityConfig {
                 .addFilterBefore(emailPasswordAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(http), EmailPasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
-
-                        .requestMatchers(HttpMethod.GET, "/api/v1/communication/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/terms/**").permitAll()
-                        .requestMatchers("/api/members/verify-email/send/**").permitAll()
-                        .requestMatchers("/api/auth/kakao/social-login").permitAll()
-                        .requestMatchers("/api/auth/google/social-login").permitAll()
-                        .requestMatchers("/api/members/register").permitAll()
-                        .requestMatchers("/api/monitor/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .authenticationProvider(siteMemberAuthProvider())
                 .logout(logout -> logout
@@ -169,11 +159,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOriginPattern("https://specified-jaquith-modusplant-0c942371.koyeb.app");
-        config.addAllowedOriginPattern("http://localhost:8080/swagger-ui/**");
+        config.addAllowedOriginPattern("*");
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
-        config.setAllowCredentials(true);
+        config.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
