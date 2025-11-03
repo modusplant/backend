@@ -26,7 +26,7 @@ public class CommPostLikeController {
     private final CommPostLikeApplicationService commPostLikeApplicationService;
 
     // TODO : Spring Security 적용 후 SecurityUtil의 회원ID 사용
-    @Value("${fake-auth-uuid}")
+    @Value("${TEMP_USER_UUID}")
     private UUID memberUuid;
 
     @Operation(
