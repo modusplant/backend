@@ -3,6 +3,7 @@ package kr.modusplant.domains.post.framework.out.jpa.repository.supers;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import kr.modusplant.domains.post.common.util.usecase.model.PostReadModelTestUtils;
+import kr.modusplant.domains.post.framework.out.jpa.repository.PostRepositoryCustomImpl;
 import kr.modusplant.domains.post.usecase.model.PostSummaryReadModel;
 import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import org.junit.jupiter.api.DisplayName;

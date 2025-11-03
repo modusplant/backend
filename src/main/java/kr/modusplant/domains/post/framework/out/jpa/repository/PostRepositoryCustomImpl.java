@@ -1,7 +1,8 @@
-package kr.modusplant.domains.post.framework.out.jpa.repository.supers;
+package kr.modusplant.domains.post.framework.out.jpa.repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
+import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostRepositoryCustom;
 import kr.modusplant.domains.post.usecase.model.PostSummaryReadModel;
 import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
-public class PostRepositoryCustomImpl implements PostRepositoryCustom{
+public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
     private final EntityManager em;
 
