@@ -3,7 +3,7 @@ package kr.modusplant.framework.out.jpa.entity.common.util;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 
 import static kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity.SiteMemberAuthEntityBuilder;
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberAuthConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.*;
 
 public interface SiteMemberAuthEntityTestUtils extends SiteMemberEntityTestUtils {
     default SiteMemberAuthEntityBuilder createMemberAuthBasicAdminEntityBuilder() {

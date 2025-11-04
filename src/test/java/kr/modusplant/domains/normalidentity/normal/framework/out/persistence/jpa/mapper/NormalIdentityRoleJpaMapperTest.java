@@ -6,7 +6,7 @@ import kr.modusplant.infrastructure.security.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class NormalIdentityRoleJpaMapperTest {

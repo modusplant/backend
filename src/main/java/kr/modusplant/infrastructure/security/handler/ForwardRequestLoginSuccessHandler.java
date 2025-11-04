@@ -7,9 +7,11 @@ import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
+import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
-import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
+import kr.modusplant.shared.exception.EntityExistsException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,7 +25,6 @@ import java.util.UUID;
 public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final SiteMemberJpaRepository memberRepository;
-    private final SiteMemberValidationService memberValidationService;
     private final TokenService tokenService;
 
     @Override
@@ -56,7 +57,12 @@ public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessH
     }
 
     private void updateMemberLoggedInAt(UUID currentMemberUuid) {
-        memberValidationService.validateNotFoundUuid(currentMemberUuid);
+        if (currentMemberUuid == null) {
+            return;
+        }
+        if (memberRepository.existsByUuid(currentMemberUuid)) {
+            throw new EntityExistsException(ErrorCode.MEMBER_EXISTS, EntityName.SITE_MEMBER);
+        }
         SiteMemberEntity memberEntity = memberRepository.findByUuid(currentMemberUuid).orElseThrow();
         memberEntity.updateLoggedInAt(LocalDateTime.now());
         memberRepository.save(memberEntity);

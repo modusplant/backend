@@ -1,0 +1,32 @@
+# Local configuration
+spring:
+  config:
+    import:
+      - classpath:application-secrets.yml
+      - classpath:application-test.yml
+  datasource:
+    hikari:
+      pool-name: DevHikariPool
+      maximum-pool-size: 10
+      minimum-idle: 3
+      idle-timeout: 60000             # 10분
+      max-lifetime: 1800000           # 30분
+      connection-timeout: 30000       # 30초
+      auto-commit: true
+
+# Default logging configuration
+logging:
+  level:
+    root: INFO
+    io:
+      lettuce: INFO
+
+# Scheduler interval
+scheduler:
+  sync-interval-ms : 300000   # 5분
+  token-cleanup-cron : "0 0 3 * * *"    # 새벽 3시
+
+# Redis TTL
+redis:
+  ttl:
+    view_count: 10

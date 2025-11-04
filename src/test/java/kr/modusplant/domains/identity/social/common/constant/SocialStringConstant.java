@@ -3,9 +3,9 @@ package kr.modusplant.domains.identity.social.common.constant;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberAuthConstant.*;
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_GOOGLE_USER_NICKNAME;
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_KAKAO_USER_NICKNAME;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_GOOGLE_USER_NICKNAME;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_KAKAO_USER_NICKNAME;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SocialStringConstant {
