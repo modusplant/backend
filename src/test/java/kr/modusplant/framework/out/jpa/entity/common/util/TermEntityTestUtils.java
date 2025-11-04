@@ -2,7 +2,7 @@ package kr.modusplant.framework.out.jpa.entity.common.util;
 
 import kr.modusplant.framework.out.jpa.entity.TermEntity;
 
-import static kr.modusplant.shared.persistence.common.constant.TermConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.TermConstant.*;
 
 public interface TermEntityTestUtils {
     default TermEntity createTermsOfUseEntity() {

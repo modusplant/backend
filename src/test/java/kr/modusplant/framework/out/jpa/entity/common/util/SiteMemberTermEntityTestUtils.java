@@ -2,7 +2,7 @@ package kr.modusplant.framework.out.jpa.entity.common.util;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberTermEntity;
 
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberTermConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberTermConstant.*;
 
 public interface SiteMemberTermEntityTestUtils extends SiteMemberEntityTestUtils {
     default SiteMemberTermEntity createMemberTermAdminEntity() {
