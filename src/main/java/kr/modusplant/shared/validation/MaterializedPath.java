@@ -1,4 +1,4 @@
-package kr.modusplant.legacy.domains.communication.domain.validation;
+package kr.modusplant.shared.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -17,7 +17,7 @@ import static kr.modusplant.shared.constant.Regex.REGEX_MATERIALIZED_PATH;
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CommunicationPath {
+public @interface MaterializedPath {
     String message() default "경로에서 오류가 발생했습니다.";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
