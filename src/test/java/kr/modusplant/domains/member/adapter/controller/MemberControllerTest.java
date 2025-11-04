@@ -3,10 +3,6 @@ package kr.modusplant.domains.member.adapter.controller;
 import kr.modusplant.domains.member.adapter.mapper.MemberMapperImpl;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
-import kr.modusplant.domains.member.domain.exception.CommentAlreadyLikedException;
-import kr.modusplant.domains.member.domain.exception.CommentAlreadyUnlikedException;
-import kr.modusplant.domains.member.domain.exception.PostAlreadyLikedException;
-import kr.modusplant.domains.member.domain.exception.PostAlreadyUnlikedException;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberNickname;
 import kr.modusplant.domains.member.framework.out.jpa.repository.MemberRepositoryJpaAdapter;
@@ -120,7 +116,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         String postId = testPostLikeEvent.getPostId();
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetPostIdRepository.isIdExist(any())).willReturn(true);
-        given(targetPostIdRepository.isLiked(any(), any())).willReturn(false);
+        given(targetPostIdRepository.isUnliked(any(), any())).willReturn(true);
         CommPostLikeEntity postLikeEntity = CommPostLikeEntity.of(postId, memberId);
         given(commPostLikeRepository.save(postLikeEntity)).willReturn(postLikeEntity);
         Optional<CommPostEntity> postEntity = Optional.of(CommPostEntity.builder().ulid(postId).likeCount(1).build());
@@ -133,6 +129,22 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         verify(commPostLikeRepository, times(1)).save(any());
         verify(commPostRepository, times(1)).findByUlid(any());
         assertThat(postEntity.orElseThrow().getLikeCount()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("이미 좋아요를 누른 상태로 likePost로 게시글 좋아요")
+    void testValidateBeforeLikePost_givenAlreadyLikedValue_willDoNothing() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isUnliked(any(), any())).willReturn(false);
+
+        // when
+        memberController.likePost(testMemberPostLikeRequest);
+
+        // then
+        verify(commPostLikeRepository, times(0)).save(any());
+        verify(commPostRepository, times(0)).findByUlid(any());
     }
 
     @Test
@@ -165,22 +177,6 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("이미 좋아요를 누른 상태여서 likePost로 게시글 좋아요 실패")
-    void testValidateBeforeLikePost_givenAlreadyLikedValue_willThrowException() {
-        // given
-        given(memberRepository.isIdExist(any())).willReturn(true);
-        given(targetPostIdRepository.isIdExist(any())).willReturn(true);
-        given(targetPostIdRepository.isLiked(any(), any())).willReturn(true);
-
-        // when
-        PostAlreadyLikedException entityExistsException = assertThrows(PostAlreadyLikedException.class,
-                () -> memberController.likePost(testMemberPostLikeRequest));
-
-        // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(POST_ALREADY_LIKED.getMessage());
-    }
-
-    @Test
     @DisplayName("unlikePost로 게시글 좋아요 취소")
     void testUnlikePost_givenValidParameter_willUnlikePost() {
         // given
@@ -188,7 +184,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         String postId = testPostLikeEvent.getPostId();
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetPostIdRepository.isIdExist(any())).willReturn(true);
-        given(targetPostIdRepository.isUnliked(any(), any())).willReturn(false);
+        given(targetPostIdRepository.isLiked(any(), any())).willReturn(true);
         CommPostLikeEntity postLikeEntity = CommPostLikeEntity.of(postId, memberId);
         willDoNothing().given(commPostLikeRepository).delete(postLikeEntity);
         Optional<CommPostEntity> postEntity = Optional.of(CommPostEntity.builder().ulid(postId).likeCount(1).build());
@@ -201,6 +197,22 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         verify(commPostLikeRepository, times(1)).delete(any());
         verify(commPostRepository, times(1)).findByUlid(any());
         assertThat(postEntity.orElseThrow().getLikeCount()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("이미 좋아요를 취소한 상태로 unlikePost로 게시글 좋아요 취소")
+    void testValidateBeforeLikePost_givenAlreadyUnlikedValue_willDoNothing() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isLiked(any(), any())).willReturn(false);
+
+        // when
+        memberController.unlikePost(testMemberPostUnlikeRequest);
+
+        // then
+        verify(commPostLikeRepository, times(0)).delete(any());
+        verify(commPostRepository, times(0)).findByUlid(any());
     }
 
     @Test
@@ -233,22 +245,6 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("이미 좋아요를 취소한 상태여서 unlikePost로 게시글 좋아요 취소 실패")
-    void testValidateBeforeLikePost_givenAlreadyUnlikedValue_willThrowException() {
-        // given
-        given(memberRepository.isIdExist(any())).willReturn(true);
-        given(targetPostIdRepository.isIdExist(any())).willReturn(true);
-        given(targetPostIdRepository.isUnliked(any(), any())).willReturn(true);
-
-        // when
-        PostAlreadyUnlikedException entityExistsException = assertThrows(PostAlreadyUnlikedException.class,
-                () -> memberController.unlikePost(testMemberPostUnlikeRequest));
-
-        // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(POST_ALREADY_UNLIKED.getMessage());
-    }
-
-    @Test
     @DisplayName("likeComment로 댓글 좋아요")
     void testLikeComment_givenValidParameter_willLikeComment() {
         // given
@@ -257,7 +253,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         String path = testCommentLikeEvent.getPath();
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetCommentIdRepository.isIdExist(any())).willReturn(true);
-        given(targetCommentIdRepository.isLiked(any(), any())).willReturn(false);
+        given(targetCommentIdRepository.isUnliked(any(), any())).willReturn(true);
         CommCommentLikeEntity commentLikeEntity = CommCommentLikeEntity.of(postId, path, memberId);
         given(commCommentLikeRepository.save(commentLikeEntity)).willReturn(commentLikeEntity);
         Optional<CommCommentEntity> commentEntity = Optional.of(CommCommentEntity.builder().postEntity(createCommPostEntityBuilder().ulid(postId).build()).path(path).likeCount(1).build());
@@ -270,6 +266,22 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         verify(commCommentLikeRepository, times(1)).save(any());
         verify(commCommentRepository, times(1)).findByPostUlidAndPath(any(), any());
         assertThat(commentEntity.orElseThrow().getLikeCount()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("이미 좋아요를 누른 상태로 likeComment로 댓글 좋아요")
+    void testValidateBeforeLikeComment_givenAlreadyLikedValue_willDoNothing() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetCommentIdRepository.isIdExist(any())).willReturn(true);
+        given(targetCommentIdRepository.isUnliked(any(), any())).willReturn(false);
+
+        // when
+        memberController.likeComment(testMemberCommentLikeRequest);
+
+        // then
+        verify(commCommentLikeRepository, times(0)).save(any());
+        verify(commCommentRepository, times(0)).findByPostUlidAndPath(any(), any());
     }
 
     @Test
@@ -302,22 +314,6 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("이미 좋아요를 누른 상태여서 likeComment로 댓글 좋아요 실패")
-    void testValidateBeforeLikeComment_givenAlreadyLikedValue_willThrowException() {
-        // given
-        given(memberRepository.isIdExist(any())).willReturn(true);
-        given(targetCommentIdRepository.isIdExist(any())).willReturn(true);
-        given(targetCommentIdRepository.isLiked(any(), any())).willReturn(true);
-
-        // when
-        CommentAlreadyLikedException entityExistsException = assertThrows(CommentAlreadyLikedException.class,
-                () -> memberController.likeComment(testMemberCommentLikeRequest));
-
-        // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(COMMENT_ALREADY_LIKED.getMessage());
-    }
-
-    @Test
     @DisplayName("unlikeComment로 댓글 좋아요 취소")
     void testUnlikeComment_givenValidParameter_willUnlikeComment() {
         // given
@@ -326,7 +322,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         String path = testCommentLikeEvent.getPath();
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetCommentIdRepository.isIdExist(any())).willReturn(true);
-        given(targetCommentIdRepository.isUnliked(any(), any())).willReturn(false);
+        given(targetCommentIdRepository.isLiked(any(), any())).willReturn(true);
         CommCommentLikeEntity commentLikeEntity = CommCommentLikeEntity.of(postId, path, memberId);
         given(commCommentLikeRepository.save(commentLikeEntity)).willReturn(commentLikeEntity);
         Optional<CommCommentEntity> commentEntity = Optional.of(CommCommentEntity.builder().postEntity(createCommPostEntityBuilder().ulid(postId).build()).path(path).likeCount(1).build());
@@ -339,6 +335,22 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         verify(commCommentLikeRepository, times(1)).delete(any());
         verify(commCommentRepository, times(1)).findByPostUlidAndPath(any(), any());
         assertThat(commentEntity.orElseThrow().getLikeCount()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("이미 좋아요를 취소한 상태로 unlikeComment로 댓글 좋아요 취소")
+    void testValidateBeforeLikeComment_givenAlreadyUnlikedValue_willDoNothing() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetCommentIdRepository.isIdExist(any())).willReturn(true);
+        given(targetCommentIdRepository.isLiked(any(), any())).willReturn(false);
+
+        // when
+        memberController.unlikeComment(testMemberCommentUnlikeRequest);
+
+        // then
+        verify(commCommentLikeRepository, times(0)).delete(any());
+        verify(commCommentRepository, times(0)).findByPostUlidAndPath(any(), any());
     }
 
     @Test
@@ -368,21 +380,5 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
 
         // then
         assertThat(entityExistsException.getMessage()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID.getMessage());
-    }
-
-    @Test
-    @DisplayName("이미 좋아요를 취소한 상태여서 unlikeComment로 댓글 좋아요 취소 실패")
-    void testValidateBeforeLikeComment_givenAlreadyUnlikedValue_willThrowException() {
-        // given
-        given(memberRepository.isIdExist(any())).willReturn(true);
-        given(targetCommentIdRepository.isIdExist(any())).willReturn(true);
-        given(targetCommentIdRepository.isUnliked(any(), any())).willReturn(true);
-
-        // when
-        CommentAlreadyUnlikedException entityExistsException = assertThrows(CommentAlreadyUnlikedException.class,
-                () -> memberController.unlikeComment(testMemberCommentUnlikeRequest));
-
-        // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(COMMENT_ALREADY_UNLIKED.getMessage());
     }
 }
