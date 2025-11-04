@@ -1,4 +1,4 @@
-package kr.modusplant.legacy.modules.common.postprocessor;
+package kr.modusplant.shared.common.postprocessor;
 
 import io.micrometer.common.lang.NonNullApi;
 import org.mockito.Mockito;
@@ -15,11 +15,8 @@ import org.springframework.util.ClassUtils;
 import java.util.List;
 import java.util.Objects;
 
-import static kr.modusplant.legacy.domains.common.constant.Reference.NOTATION_DOMAINS;
-import static kr.modusplant.legacy.modules.common.constant.Reference.NOTATION_MODULES;
-
 @NonNullApi
-public class MockModulesServiceBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
+public class MockGlobalServiceBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
@@ -32,7 +29,7 @@ public class MockModulesServiceBeanFactoryPostProcessor implements BeanFactoryPo
         scanner.addIncludeFilter(new AnnotationTypeFilter(Service.class));
         ClassLoader classLoader = this.getClass().getClassLoader();
 
-        for (String reference: List.of(NOTATION_DOMAINS, NOTATION_MODULES, "kr.modusplant.framework", "kr.modusplant.infrastructure")) {
+        for (String reference: List.of("kr.modusplant.framework", "kr.modusplant.infrastructure")) {
             for (BeanDefinition serviceDef : scanner.findCandidateComponents(reference)) {
                 Class<?> clazz;
                 try {
