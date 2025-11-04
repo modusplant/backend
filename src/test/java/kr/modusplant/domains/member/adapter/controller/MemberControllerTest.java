@@ -113,7 +113,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("likePost로 소통 게시글 좋아요")
+    @DisplayName("likePost로 게시글 좋아요")
     void testLikePost_givenValidParameter_willLikePost() {
         // given
         UUID memberId = testPostLikeEvent.getMemberId();
@@ -136,7 +136,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("존재하지 않는 회원으로 인해 likePost로 소통 게시글 좋아요 실패")
+    @DisplayName("존재하지 않는 회원으로 인해 likePost로 게시글 좋아요 실패")
     void testValidateBeforeLikePost_givenNotFoundMemberId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(false);
@@ -150,7 +150,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 likePost로 소통 게시글 좋아요 실패")
+    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 likePost로 게시글 좋아요 실패")
     void testValidateBeforeLikePost_givenNotFoundTargetPostId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
@@ -165,7 +165,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("이미 좋아요를 누른 상태여서 likePost로 소통 게시글 좋아요 실패")
+    @DisplayName("이미 좋아요를 누른 상태여서 likePost로 게시글 좋아요 실패")
     void testValidateBeforeLikePost_givenAlreadyLikedValue_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
@@ -181,7 +181,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("unlikePost로 소통 게시글 좋아요 취소")
+    @DisplayName("unlikePost로 게시글 좋아요 취소")
     void testUnlikePost_givenValidParameter_willUnlikePost() {
         // given
         UUID memberId = testPostLikeEvent.getMemberId();
@@ -204,7 +204,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("존재하지 않는 회원으로 인해 unlikePost로 소통 게시글 좋아요 취소 실패")
+    @DisplayName("존재하지 않는 회원으로 인해 unlikePost로 게시글 좋아요 취소 실패")
     void testValidateBeforeUnlikePost_givenNotFoundMemberId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(false);
@@ -218,7 +218,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 unlikePost로 소통 게시글 좋아요 취소 실패")
+    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 unlikePost로 게시글 좋아요 취소 실패")
     void testValidateBeforeUnlikePost_givenNotFoundTargetPostId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
@@ -233,7 +233,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("이미 좋아요를 취소한 상태여서 unlikePost로 소통 게시글 좋아요 취소 실패")
+    @DisplayName("이미 좋아요를 취소한 상태여서 unlikePost로 게시글 좋아요 취소 실패")
     void testValidateBeforeLikePost_givenAlreadyUnlikedValue_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
@@ -249,7 +249,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("likeComment로 소통 댓글 좋아요")
+    @DisplayName("likeComment로 댓글 좋아요")
     void testLikeComment_givenValidParameter_willLikeComment() {
         // given
         UUID memberId = testCommentLikeEvent.getMemberId();
@@ -273,7 +273,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("존재하지 않는 회원으로 인해 likeComment로 소통 댓글 좋아요 실패")
+    @DisplayName("존재하지 않는 회원으로 인해 likeComment로 댓글 좋아요 실패")
     void testValidateBeforeLikeComment_givenNotFoundMemberId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(false);
@@ -287,7 +287,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 likeComment로 소통 댓글 좋아요 실패")
+    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 likeComment로 댓글 좋아요 실패")
     void testValidateBeforeLikeComment_givenNotFoundTargetPostId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
@@ -302,7 +302,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("이미 좋아요를 누른 상태여서 likeComment로 소통 댓글 좋아요 실패")
+    @DisplayName("이미 좋아요를 누른 상태여서 likeComment로 댓글 좋아요 실패")
     void testValidateBeforeLikeComment_givenAlreadyLikedValue_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
@@ -318,7 +318,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("unlikeComment로 소통 댓글 좋아요 취소")
+    @DisplayName("unlikeComment로 댓글 좋아요 취소")
     void testUnlikeComment_givenValidParameter_willUnlikeComment() {
         // given
         UUID memberId = testCommentLikeEvent.getMemberId();
@@ -342,7 +342,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("존재하지 않는 회원으로 인해 unlikeComment로 소통 댓글 좋아요 취소 실패")
+    @DisplayName("존재하지 않는 회원으로 인해 unlikeComment로 댓글 좋아요 취소 실패")
     void testValidateBeforeUnlikeComment_givenNotFoundMemberId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(false);
@@ -356,7 +356,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 unlikeComment로 소통 댓글 좋아요 취소 실패")
+    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 unlikeComment로 댓글 좋아요 취소 실패")
     void testValidateBeforeUnlikeComment_givenNotFoundTargetPostId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
@@ -371,7 +371,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("이미 좋아요를 취소한 상태여서 unlikeComment로 소통 댓글 좋아요 취소 실패")
+    @DisplayName("이미 좋아요를 취소한 상태여서 unlikeComment로 댓글 좋아요 취소 실패")
     void testValidateBeforeLikeComment_givenAlreadyUnlikedValue_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);

@@ -37,7 +37,7 @@ public class MemberRestController {
                 DataResponse.ok(memberController.updateNickname(request)));
     }
 
-    @Operation(summary = "소통 게시글 좋아요 API", description = "소통 게시글에 좋아요를 누릅니다.")
+    @Operation(summary = "게시글 좋아요 API", description = "게시글에 좋아요를 누릅니다.")
     @PutMapping("/like/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationPost(
             @RequestBody @Valid MemberPostLikeRequest request) {
@@ -45,7 +45,7 @@ public class MemberRestController {
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
-    @Operation(summary = "소통 게시글 좋아요 취소 API", description = "소통 게시글에 대한 좋아요를 취소합니다.")
+    @Operation(summary = "게시글 좋아요 취소 API", description = "게시글에 대한 좋아요를 취소합니다.")
     @DeleteMapping("/like/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationPost(
             @RequestBody @Valid MemberPostUnlikeRequest request) {
@@ -53,7 +53,7 @@ public class MemberRestController {
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
-    @Operation(summary = "소통 댓글 좋아요 API", description = "소통 댓글에 좋아요를 누릅니다.")
+    @Operation(summary = "댓글 좋아요 API", description = "댓글에 좋아요를 누릅니다.")
     @PutMapping("/like/communication/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationComment(
             @RequestBody @Valid MemberCommentLikeRequest request) {
@@ -61,7 +61,7 @@ public class MemberRestController {
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
-    @Operation(summary = "소통 댓글 좋아요 취소 API", description = "소통 댓글에 대한 좋아요를 취소합니다.")
+    @Operation(summary = "댓글 좋아요 취소 API", description = "댓글에 대한 좋아요를 취소합니다.")
     @DeleteMapping("/like/communication/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationComment(
             @RequestBody @Valid MemberCommentUnlikeRequest request) {

@@ -46,7 +46,7 @@ class CommPostEntityTest implements CommPostEntityTestUtils {
     }
 
     @Test
-    @DisplayName("소통 게시글 좋아요 수 증가 테스트")
+    @DisplayName("게시글 좋아요 수 증가 테스트")
     void increaseLikeCountTest() {
         CommPostEntity commPost = createCommPostEntityBuilder()
                 .likeCount(0)
@@ -58,7 +58,7 @@ class CommPostEntityTest implements CommPostEntityTestUtils {
     }
 
     @Test
-    @DisplayName("소통 게시글 좋아요 수 감소 테스트")
+    @DisplayName("게시글 좋아요 수 감소 테스트")
     void decreaseLikeCountTest() {
         CommPostEntity commPost = createCommPostEntityBuilder()
                 .likeCount(1)
