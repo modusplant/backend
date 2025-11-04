@@ -1,7 +1,7 @@
 package kr.modusplant.framework.out.jpa.entity;
 
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
-import kr.modusplant.legacy.domains.term.common.util.entity.TermEntityTestUtils;
+import kr.modusplant.framework.out.jpa.entity.common.util.TermEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
