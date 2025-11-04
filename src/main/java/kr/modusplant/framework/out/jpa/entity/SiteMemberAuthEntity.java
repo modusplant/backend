@@ -43,7 +43,7 @@ public class SiteMemberAuthEntity {
 
     @Column(nullable = false, updatable = false)
     @Enumerated(value = EnumType.STRING)
-    private AuthProvider provider;
+    private kr.modusplant.shared.enums.AuthProvider provider;
 
     @Column(unique = true, updatable = false, name = "provider_id")
     private String providerId;
