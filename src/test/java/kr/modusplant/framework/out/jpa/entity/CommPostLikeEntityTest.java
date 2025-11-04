@@ -35,7 +35,7 @@ public class CommPostLikeEntityTest implements CommPostLikeEntityTestUtils {
     }
 
     @Test
-    @DisplayName("소통 게시글 좋아요")
+    @DisplayName("게시글 좋아요")
     void likeCommPost_success() {
         // when
         CommPostLikeEntity commPostLikeEntity = entityManager.find(CommPostLikeEntity.class, new CommPostLikeId(postId, memberId));
@@ -49,7 +49,7 @@ public class CommPostLikeEntityTest implements CommPostLikeEntityTestUtils {
     }
 
     @Test
-    @DisplayName("소통 게시글 좋아요 삭제")
+    @DisplayName("게시글 좋아요 삭제")
     void unlikeCommPost_success() {
         // when
         CommPostLikeEntity commPostLikeEntity = entityManager.find(CommPostLikeEntity.class, new CommPostLikeId(postId, memberId));

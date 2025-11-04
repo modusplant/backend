@@ -22,7 +22,7 @@ public class CommCommentEntityTest implements CommCommentEntityTestUtils,
     CommCommentEntityTest(TestEntityManager entityManager) {
         this.entityManager = entityManager;}
 
-    @DisplayName("소통 컨텐츠 댓글 PrePersist")
+    @DisplayName("컨텐츠 댓글 PrePersist")
     @Test
     void prePersist() {
         // given

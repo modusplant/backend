@@ -36,7 +36,7 @@ public class CommPostLikeJpaRepositoryTest implements CommPostLikeEntityTestUtil
         }
 
         @Test
-        @DisplayName("소통 게시글 좋아요 후 조회")
+        @DisplayName("게시글 좋아요 후 조회")
         void likeCommPost_success() {
             // when
             commPostLikeRepository.save(CommPostLikeEntity.of(postId, memberId));
@@ -50,7 +50,7 @@ public class CommPostLikeJpaRepositoryTest implements CommPostLikeEntityTestUtil
         }
 
         @Test
-        @DisplayName("특정 사용자 소통 게시글 좋아요 여부 확인")
+        @DisplayName("특정 사용자 게시글 좋아요 여부 확인")
         void isLikedByMember_willReturnTrue() {
             // given
             commPostLikeRepository.save(CommPostLikeEntity.of(postId, memberId));
@@ -63,7 +63,7 @@ public class CommPostLikeJpaRepositoryTest implements CommPostLikeEntityTestUtil
         }
 
         @Test
-        @DisplayName("소통 게시글 좋아요 취소")
+        @DisplayName("게시글 좋아요 취소")
         void unlikeCommPost_success() {
             // given
             commPostLikeRepository.save(CommPostLikeEntity.of(postId, memberId));
@@ -77,7 +77,7 @@ public class CommPostLikeJpaRepositoryTest implements CommPostLikeEntityTestUtil
     }
 
     @Test
-    @DisplayName("사용자별 소통 게시글 좋아요 전체 리스트 조회")
+    @DisplayName("사용자별 게시글 좋아요 전체 리스트 조회")
     void findCommPostLikesByMemberId() {
         // given
         UUID memberId = createMemberBasicUserEntityWithUuid().getUuid();
@@ -101,7 +101,7 @@ public class CommPostLikeJpaRepositoryTest implements CommPostLikeEntityTestUtil
     }
 
     @Test
-    @DisplayName("사용자별 소통 게시글 좋아요 리스트 조회")
+    @DisplayName("사용자별 게시글 좋아요 리스트 조회")
     void findCommPostLikesByMemberIdAndPostIds() {
         // given
         UUID memberId = createMemberBasicUserEntityWithUuid().getUuid();
