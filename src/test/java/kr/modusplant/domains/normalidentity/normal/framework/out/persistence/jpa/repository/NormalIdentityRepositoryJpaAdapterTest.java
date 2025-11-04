@@ -23,10 +23,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_EMAIL;
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_PW;
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberTermConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_EMAIL;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_PW;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberTermConstant.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 
