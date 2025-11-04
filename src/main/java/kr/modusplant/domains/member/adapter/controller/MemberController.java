@@ -49,7 +49,7 @@ public class MemberController {
     public void likePost(MemberPostLikeRequest request) {
         MemberId memberId = MemberId.fromUuid(request.memberId());
         TargetPostId targetPostId = TargetPostId.create(request.postUlid());
-        validateBeforeLikePost(memberId, targetPostId);
+        validateBeforeLikeOrUnlikePost(memberId, targetPostId);
         if (targetPostIdRepository.isUnliked(memberId, targetPostId)) {
             eventBus.publish(PostLikeEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
@@ -58,7 +58,7 @@ public class MemberController {
     public void unlikePost(MemberPostUnlikeRequest request) {
         MemberId memberId = MemberId.fromUuid(request.memberId());
         TargetPostId targetPostId = TargetPostId.create(request.postUlid());
-        validateBeforeUnlikePost(memberId, targetPostId);
+        validateBeforeLikeOrUnlikePost(memberId, targetPostId);
         if (targetPostIdRepository.isLiked(memberId, targetPostId)) {
             eventBus.publish(PostUnlikeEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
@@ -67,7 +67,7 @@ public class MemberController {
     public void likeComment(MemberCommentLikeRequest request) {
         MemberId memberId = MemberId.fromUuid(request.memberId());
         TargetCommentId targetCommentId = TargetCommentId.create(TargetPostId.create(request.postUlid()), TargetCommentPath.create(request.path()));
-        validateBeforeLikeComment(memberId, targetCommentId);
+        validateBeforeLikeOrUnlikeComment(memberId, targetCommentId);
         if (targetCommentIdRepository.isUnliked(memberId, targetCommentId)) {
             eventBus.publish(CommentLikeEvent.create(memberId.getValue(), targetCommentId.getTargetPostId().getValue(), targetCommentId.getTargetCommentPath().getValue()));
         }
@@ -76,7 +76,7 @@ public class MemberController {
     public void unlikeComment(MemberCommentUnlikeRequest request) {
         MemberId memberId = MemberId.fromUuid(request.memberId());
         TargetCommentId targetCommentId = TargetCommentId.create(TargetPostId.create(request.postUlid()), TargetCommentPath.create(request.path()));
-        validateBeforeUnlikeComment(memberId, targetCommentId);
+        validateBeforeLikeOrUnlikeComment(memberId, targetCommentId);
         if (targetCommentIdRepository.isLiked(memberId, targetCommentId)) {
             eventBus.publish(CommentUnlikeEvent.create(memberId.getValue(), targetCommentId.getTargetPostId().getValue(), targetCommentId.getTargetCommentPath().getValue()));
         }
@@ -95,7 +95,7 @@ public class MemberController {
         }
     }
 
-    private void validateBeforeLikePost(MemberId memberId, TargetPostId targetPostId) {
+    private void validateBeforeLikeOrUnlikePost(MemberId memberId, TargetPostId targetPostId) {
         if (!memberRepository.isIdExist(memberId)) {
             throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
         }
@@ -104,25 +104,7 @@ public class MemberController {
         }
     }
 
-    private void validateBeforeUnlikePost(MemberId memberId, TargetPostId targetPostId) {
-        if (!memberRepository.isIdExist(memberId)) {
-            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
-        }
-        if (!targetPostIdRepository.isIdExist(targetPostId)) {
-            throw new EntityNotFoundException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
-        }
-    }
-
-    private void validateBeforeLikeComment(MemberId memberId, TargetCommentId targetCommentId) {
-        if (!memberRepository.isIdExist(memberId)) {
-            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
-        }
-        if (!targetCommentIdRepository.isIdExist(targetCommentId)) {
-            throw new EntityNotFoundException(NOT_FOUND_TARGET_COMMENT_ID, "targetCommentId");
-        }
-    }
-
-    private void validateBeforeUnlikeComment(MemberId memberId, TargetCommentId targetCommentId) {
+    private void validateBeforeLikeOrUnlikeComment(MemberId memberId, TargetCommentId targetCommentId) {
         if (!memberRepository.isIdExist(memberId)) {
             throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
         }

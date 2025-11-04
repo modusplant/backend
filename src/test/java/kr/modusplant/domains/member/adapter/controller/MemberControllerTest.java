@@ -133,7 +133,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
 
     @Test
     @DisplayName("이미 좋아요를 누른 상태로 likePost로 게시글 좋아요")
-    void testValidateBeforeLikePost_givenAlreadyLikedValue_willDoNothing() {
+    void testValidateBeforeLikeOrUnlikePost_givenAlreadyLikedValue_willDoNothing() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetPostIdRepository.isIdExist(any())).willReturn(true);
@@ -145,35 +145,6 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         // then
         verify(commPostLikeRepository, times(0)).save(any());
         verify(commPostRepository, times(0)).findByUlid(any());
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 회원으로 인해 likePost로 게시글 좋아요 실패")
-    void testValidateBeforeLikePost_givenNotFoundMemberId_willThrowException() {
-        // given
-        given(memberRepository.isIdExist(any())).willReturn(false);
-
-        // when
-        EntityNotFoundException entityExistsException = assertThrows(EntityNotFoundException.class,
-                () -> memberController.likePost(testMemberPostLikeRequest));
-
-        // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 likePost로 게시글 좋아요 실패")
-    void testValidateBeforeLikePost_givenNotFoundTargetPostId_willThrowException() {
-        // given
-        given(memberRepository.isIdExist(any())).willReturn(true);
-        given(targetPostIdRepository.isIdExist(any())).willReturn(false);
-
-        // when
-        EntityNotFoundException entityExistsException = assertThrows(EntityNotFoundException.class,
-                () -> memberController.likePost(testMemberPostLikeRequest));
-
-        // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
     }
 
     @Test
@@ -201,7 +172,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
 
     @Test
     @DisplayName("이미 좋아요를 취소한 상태로 unlikePost로 게시글 좋아요 취소")
-    void testValidateBeforeLikePost_givenAlreadyUnlikedValue_willDoNothing() {
+    void testValidateBeforeLikeOrUnlikePost_givenAlreadyUnlikedValue_willDoNothing() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetPostIdRepository.isIdExist(any())).willReturn(true);
@@ -216,32 +187,38 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("존재하지 않는 회원으로 인해 unlikePost로 게시글 좋아요 취소 실패")
-    void testValidateBeforeUnlikePost_givenNotFoundMemberId_willThrowException() {
+    @DisplayName("존재하지 않는 회원으로 인해 likePost 또는 unlikePost 실패")
+    void testValidateBeforeLikeOrUnlikePost_givenNotFoundMemberId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(false);
 
         // when
-        EntityNotFoundException entityExistsException = assertThrows(EntityNotFoundException.class,
+        EntityNotFoundException entityNotFoundExceptionForLike = assertThrows(EntityNotFoundException.class,
+                () -> memberController.likePost(testMemberPostLikeRequest));
+        EntityNotFoundException entityNotFoundExceptionForUnlike = assertThrows(EntityNotFoundException.class,
                 () -> memberController.unlikePost(testMemberPostUnlikeRequest));
 
         // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
+        assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
+        assertThat(entityNotFoundExceptionForUnlike.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
     }
 
     @Test
-    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 unlikePost로 게시글 좋아요 취소 실패")
-    void testValidateBeforeUnlikePost_givenNotFoundTargetPostId_willThrowException() {
+    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 likePost 또는 unlikePost 실패")
+    void testValidateBeforeLikeOrUnlikePost_givenNotFoundTargetPostId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetPostIdRepository.isIdExist(any())).willReturn(false);
 
         // when
-        EntityNotFoundException entityExistsException = assertThrows(EntityNotFoundException.class,
+        EntityNotFoundException entityNotFoundExceptionForLike = assertThrows(EntityNotFoundException.class,
+                () -> memberController.likePost(testMemberPostLikeRequest));
+        EntityNotFoundException entityNotFoundExceptionForUnlike = assertThrows(EntityNotFoundException.class,
                 () -> memberController.unlikePost(testMemberPostUnlikeRequest));
 
         // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
+        assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
+        assertThat(entityNotFoundExceptionForUnlike.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
     }
 
     @Test
@@ -270,7 +247,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
 
     @Test
     @DisplayName("이미 좋아요를 누른 상태로 likeComment로 댓글 좋아요")
-    void testValidateBeforeLikeComment_givenAlreadyLikedValue_willDoNothing() {
+    void testValidateBeforeLikeOrUnlikeComment_givenAlreadyLikedValue_willDoNothing() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetCommentIdRepository.isIdExist(any())).willReturn(true);
@@ -282,35 +259,6 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         // then
         verify(commCommentLikeRepository, times(0)).save(any());
         verify(commCommentRepository, times(0)).findByPostUlidAndPath(any(), any());
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 회원으로 인해 likeComment로 댓글 좋아요 실패")
-    void testValidateBeforeLikeComment_givenNotFoundMemberId_willThrowException() {
-        // given
-        given(memberRepository.isIdExist(any())).willReturn(false);
-
-        // when
-        EntityNotFoundException entityExistsException = assertThrows(EntityNotFoundException.class,
-                () -> memberController.likeComment(testMemberCommentLikeRequest));
-
-        // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 likeComment로 댓글 좋아요 실패")
-    void testValidateBeforeLikeComment_givenNotFoundTargetPostId_willThrowException() {
-        // given
-        given(memberRepository.isIdExist(any())).willReturn(true);
-        given(targetCommentIdRepository.isIdExist(any())).willReturn(false);
-
-        // when
-        EntityNotFoundException entityExistsException = assertThrows(EntityNotFoundException.class,
-                () -> memberController.likeComment(testMemberCommentLikeRequest));
-
-        // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID.getMessage());
     }
 
     @Test
@@ -339,7 +287,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
 
     @Test
     @DisplayName("이미 좋아요를 취소한 상태로 unlikeComment로 댓글 좋아요 취소")
-    void testValidateBeforeLikeComment_givenAlreadyUnlikedValue_willDoNothing() {
+    void testValidateBeforeLikeOrUnlikeComment_givenAlreadyUnlikedValue_willDoNothing() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetCommentIdRepository.isIdExist(any())).willReturn(true);
@@ -354,31 +302,37 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("존재하지 않는 회원으로 인해 unlikeComment로 댓글 좋아요 취소 실패")
-    void testValidateBeforeUnlikeComment_givenNotFoundMemberId_willThrowException() {
+    @DisplayName("존재하지 않는 회원으로 인해 likeComment 또는 unlikeComment 실패")
+    void testValidateBeforeLikeOrUnlikeComment_givenNotFoundMemberId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(false);
 
         // when
-        EntityNotFoundException entityExistsException = assertThrows(EntityNotFoundException.class,
+        EntityNotFoundException entityNotFoundExceptionForLike = assertThrows(EntityNotFoundException.class,
+                () -> memberController.likeComment(testMemberCommentLikeRequest));
+        EntityNotFoundException entityNotFoundExceptionForUnlike = assertThrows(EntityNotFoundException.class,
                 () -> memberController.unlikeComment(testMemberCommentUnlikeRequest));
 
         // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
+        assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
+        assertThat(entityNotFoundExceptionForUnlike.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
     }
 
     @Test
-    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 unlikeComment로 댓글 좋아요 취소 실패")
-    void testValidateBeforeUnlikeComment_givenNotFoundTargetPostId_willThrowException() {
+    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 likeComment 또는 unlikeComment 실패")
+    void testValidateBeforeLikeOrUnlikeComment_givenNotFoundTargetPostId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetCommentIdRepository.isIdExist(any())).willReturn(false);
 
         // when
-        EntityNotFoundException entityExistsException = assertThrows(EntityNotFoundException.class,
+        EntityNotFoundException entityNotFoundExceptionForLike = assertThrows(EntityNotFoundException.class,
+                () -> memberController.likeComment(testMemberCommentLikeRequest));
+        EntityNotFoundException entityNotFoundExceptionForUnlike = assertThrows(EntityNotFoundException.class,
                 () -> memberController.unlikeComment(testMemberCommentUnlikeRequest));
 
         // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID.getMessage());
+        assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID.getMessage());
+        assertThat(entityNotFoundExceptionForUnlike.getMessage()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID.getMessage());
     }
 }
