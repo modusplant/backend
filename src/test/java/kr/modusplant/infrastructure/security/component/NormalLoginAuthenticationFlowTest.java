@@ -6,11 +6,10 @@ import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
+import kr.modusplant.infrastructure.security.common.util.NormalLoginRequestTestUtils;
 import kr.modusplant.infrastructure.security.common.util.SiteMemberUserDetailsTestUtils;
 import kr.modusplant.infrastructure.security.context.SecurityOnlyContext;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
-import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
-import kr.modusplant.legacy.modules.auth.normal.login.common.util.app.http.request.NormalLoginRequestTestUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -24,7 +23,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -37,18 +35,16 @@ public class NormalLoginAuthenticationFlowTest implements
     private final ObjectMapper objectMapper;
     private final FilterChainProxy filterChainProxy;
     private final DefaultUserDetailsService defaultUserDetailsService;
-    private final SiteMemberValidationService memberValidationService;
     private final TokenService tokenService;
     private final SiteMemberJpaRepository memberRepository;
     private final PasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public NormalLoginAuthenticationFlowTest(MockMvc mockMvc, ObjectMapper objectMapper, FilterChainProxy filterChainProxy, DefaultUserDetailsService defaultUserDetailsService, SiteMemberValidationService memberValidationService, TokenService tokenService, SiteMemberJpaRepository memberRepository, PasswordEncoder bCryptPasswordEncoder) {
+    public NormalLoginAuthenticationFlowTest(MockMvc mockMvc, ObjectMapper objectMapper, FilterChainProxy filterChainProxy, DefaultUserDetailsService defaultUserDetailsService, TokenService tokenService, SiteMemberJpaRepository memberRepository, PasswordEncoder bCryptPasswordEncoder) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
         this.filterChainProxy = filterChainProxy;
         this.defaultUserDetailsService = defaultUserDetailsService;
-        this.memberValidationService = memberValidationService;
         this.tokenService = tokenService;
         this.memberRepository = memberRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
@@ -71,8 +67,7 @@ public class NormalLoginAuthenticationFlowTest implements
 
         given(defaultUserDetailsService.loadUserByUsername(testLoginRequest.email()))
                 .willReturn(validDefaultUserDetails);
-        doNothing().when(memberValidationService).validateNotFoundUuid(null);
-        doNothing().when(memberValidationService).validateNotFoundUuid(validDefaultUserDetails.getActiveUuid());
+        given(memberRepository.existsByUuid(validDefaultUserDetails.getActiveUuid())).willReturn(false);
         given(memberRepository.findByUuid(validDefaultUserDetails.getActiveUuid()))
                 .willReturn(Optional.ofNullable(createMemberBasicUserEntityWithUuid()));
         given(memberRepository.save(any())).willReturn(null);

@@ -2,8 +2,6 @@ package kr.modusplant.framework.out.jpa.entity.common.util;
 
 import kr.modusplant.framework.out.jpa.entity.CommPostLikeEntity;
 
-import kr.modusplant.shared.persistence.common.util.constant.CommPostConstant;
-
 import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 

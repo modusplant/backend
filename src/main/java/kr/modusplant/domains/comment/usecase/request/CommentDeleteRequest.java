@@ -3,7 +3,7 @@ package kr.modusplant.domains.comment.usecase.request;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import kr.modusplant.legacy.domains.communication.domain.validation.CommunicationPath;
+import kr.modusplant.shared.validation.MaterializedPath;
 
 public record CommentDeleteRequest(
         @Parameter(schema = @Schema(
@@ -18,7 +18,7 @@ public record CommentDeleteRequest(
                 pattern = "^\\d+(?:\\.\\d+)*$",
                 example = "4.8.12")
         )
-        @CommunicationPath
+        @MaterializedPath
         String path
 ) {
 }

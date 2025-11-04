@@ -26,6 +26,7 @@ public final class CommPostConstant {
     public static final Long TEST_COMM_POST_VIEW_COUNT = 0L;
     public static final String TEST_COMM_POST_TITLE = "물 주는 타이밍, 이제 헷갈리지 마세요! 식물별 물 주기 가이드";
     public static final JsonNode TEST_COMM_POST_CONTENT = createSampleContent();
+    public static final Boolean TEST_COMM_POST_IS_PUBLISHED = true;
 
     private static JsonNode createSampleContent() {
         String json = """
