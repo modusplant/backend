@@ -50,44 +50,44 @@ public class MemberRestController {
     }
 
     @Operation(summary = "게시글 좋아요 API", description = "게시글에 좋아요를 누릅니다.")
-    @PutMapping("/{memberId}/like/communication/post/{postUlid}")
+    @PutMapping("/{id}/like/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationPost(
             @Schema(description = "회원 아이디", type = "UUID")
             @PathVariable(required = false)
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
-            UUID memberId,
+            UUID id,
 
             @Schema(description = "좋아요를 누를 게시글의 식별자", type = "ULID")
             @PathVariable(required = false)
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid) {
-        memberController.likePost(new MemberPostLikeRecord(memberId, postUlid));
+        memberController.likePost(new MemberPostLikeRecord(id, postUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
     @Operation(summary = "게시글 좋아요 취소 API", description = "게시글에 대한 좋아요를 취소합니다.")
-    @DeleteMapping("/{memberId}/like/communication/post/{postUlid}")
+    @DeleteMapping("/{id}/like/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationPost(
             @Schema(description = "회원 아이디", type = "UUID")
             @PathVariable(required = false)
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
-            UUID memberId,
+            UUID id,
 
             @Schema(description = "좋아요를 취소할 게시글의 식별자", type = "ULID")
             @PathVariable(required = false)
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid) {
-        memberController.unlikePost(new MemberPostUnlikeRecord(memberId, postUlid));
+        memberController.unlikePost(new MemberPostUnlikeRecord(id, postUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
     @Operation(summary = "댓글 좋아요 API", description = "댓글에 좋아요를 누릅니다.")
-    @PutMapping("/{memberId}/like/communication/post/{postUlid}/path/{path}")
+    @PutMapping("/{id}/like/communication/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationComment(
             @Schema(description = "회원 아이디", type = "UUID")
             @PathVariable(required = false)
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
-            UUID memberId,
+            UUID id,
 
             @Schema(description = "좋아요를 누를 댓글의 게시글 식별자", type = "ULID")
             @PathVariable(required = false)
@@ -98,17 +98,17 @@ public class MemberRestController {
             @PathVariable(required = false)
             @NotBlank(message = "댓글 경로가 비어 있습니다.")
             String path) {
-        memberController.likeComment(new MemberCommentLikeRecord(memberId, postUlid, path));
+        memberController.likeComment(new MemberCommentLikeRecord(id, postUlid, path));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
     @Operation(summary = "댓글 좋아요 취소 API", description = "댓글에 대한 좋아요를 취소합니다.")
-    @DeleteMapping("/{memberId}/like/communication/post/{postUlid}/path/{path}")
+    @DeleteMapping("/{id}/like/communication/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationComment(
             @Schema(description = "회원 아이디", type = "UUID")
             @PathVariable(required = false)
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
-            UUID memberId,
+            UUID id,
 
             @Schema(description = "좋아요를 취소할 댓글의 게시글 식별자", type = "ULID")
             @PathVariable(required = false)
@@ -119,7 +119,7 @@ public class MemberRestController {
             @PathVariable(required = false)
             @NotBlank(message = "댓글 경로가 비어 있습니다.")
             String path) {
-        memberController.unlikeComment(new MemberCommentUnlikeRecord(memberId, postUlid, path));
+        memberController.unlikeComment(new MemberCommentUnlikeRecord(id, postUlid, path));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 }
