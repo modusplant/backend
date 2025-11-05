@@ -8,6 +8,7 @@ import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqR
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJpaAdapter;
 import kr.modusplant.domains.comment.usecase.request.CommentDeleteRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
+import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.shared.persistence.compositekey.CommCommentId;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class CommentController {
     private final CommentJooqRepository jooqAdapter;
     private final CommentRepositoryJpaAdapter jpaAdapter;
 
-    public List<CommentResponse> gatherByPost(String postUlid) {
+    public List<CommentOfPostResponse> gatherByPost(String postUlid) {
         return jooqAdapter.findByPost(PostId.create(postUlid));
     }
 

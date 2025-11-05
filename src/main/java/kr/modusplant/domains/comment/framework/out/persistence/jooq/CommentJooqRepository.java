@@ -3,6 +3,7 @@ package kr.modusplant.domains.comment.framework.out.persistence.jooq;
 import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentReadRepository;
+import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.jooq.tables.CommComment;
 import kr.modusplant.jooq.tables.CommPost;
@@ -22,17 +23,18 @@ public class CommentJooqRepository implements CommentReadRepository {
     private final CommComment commComment = CommComment.COMM_COMMENT;
     private final SiteMember siteMember = SiteMember.SITE_MEMBER;
 
-    public List<CommentResponse> findByPost(PostId postId) {
-        return dsl.select(commPost.ULID, commComment.PATH, siteMember.NICKNAME,
-                commComment.CONTENT, commComment.IS_DELETED, commComment.CREATED_AT)
+    public List<CommentOfPostResponse> findByPost(PostId postId) {
+        return dsl.select(siteMember.NICKNAME, commComment.PATH, commComment.CONTENT,
+                        commComment.LIKE_COUNT, commComment.CREATED_AT, commComment.IS_DELETED)
                 .from(commPost, commComment, siteMember)
-                .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
+                .join(commPost).on(commComment.POST_ULID.eq(commPost.ULID))
                 .where(commComment.POST_ULID.eq(postId.getId()))
-                .orderBy(commComment.CREATED_AT.asc())
-                .fetch(record -> new CommentResponse(
-                    record.get(commPost.ULID), record.get(commComment.PATH), record.get(siteMember.NICKNAME),
-                    record.get(commComment.CONTENT), record.get(commComment.IS_DELETED), record.get(commComment.CREATED_AT).toString()
-                ));
+                .orderBy(commComment.CREATED_AT.desc())
+                .fetch(record -> new CommentOfPostResponse(
+                        record.get(siteMember.NICKNAME), record.get(commComment.PATH),
+                        record.get(commComment.CONTENT), record.get(commComment.LIKE_COUNT),
+                        record.get(commComment.CREATED_AT).toString(), record.get(commComment.IS_DELETED)
+                        ));
     }
 
     public List<CommentResponse> findByAuthor(Author author) {
