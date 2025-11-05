@@ -2,7 +2,7 @@ package kr.modusplant.framework.out.jpa.entity.common.util;
 
 import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
 
-import static kr.modusplant.shared.persistence.common.constant.CommPrimaryCategoryConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.*;
 
 public interface CommPrimaryCategoryEntityTestUtils {
     default CommPrimaryCategoryEntity createTestCommPrimaryCategoryEntity() {

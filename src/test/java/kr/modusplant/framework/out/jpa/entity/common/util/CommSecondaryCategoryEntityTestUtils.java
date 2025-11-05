@@ -2,7 +2,7 @@ package kr.modusplant.framework.out.jpa.entity.common.util;
 
 import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
 
-import static kr.modusplant.shared.persistence.common.constant.CommSecondaryCategoryConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.*;
 
 public interface CommSecondaryCategoryEntityTestUtils {
     default CommSecondaryCategoryEntity createTestCommSecondaryCategoryEntity() {

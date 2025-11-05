@@ -2,8 +2,8 @@ package kr.modusplant.framework.out.jpa.entity.common.util;
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
 
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberRoleConstant.MEMBER_ROLE_ADMIN_ROLE;
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberRoleConstant.MEMBER_ROLE_USER_ROLE;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberRoleConstant.MEMBER_ROLE_ADMIN_ROLE;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberRoleConstant.MEMBER_ROLE_USER_ROLE;
 
 public interface SiteMemberRoleEntityTestUtils extends SiteMemberEntityTestUtils {
     default SiteMemberRoleEntity createMemberRoleAdminEntity() {

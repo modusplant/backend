@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_BASIC_USER_BIRTH_DATE;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_BIRTH_DATE;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MemberLocalDateConstant {

@@ -15,4 +15,5 @@ public final class CommCommentConstant {
     public static final UUID TEST_COMM_COMMENT_AUTH_MEMBER_UUID = MEMBER_BASIC_USER_UUID;
     public static final UUID TEST_COMM_COMMENT_CREATE_MEMBER_UUID = MEMBER_BASIC_USER_UUID;
     public static final String TEST_COMM_COMMENT_CONTENT = "테스트 댓글 내용";
+    public static final Integer TEST_COMM_COMMENT_LIKE_COUNT = 1;
 }

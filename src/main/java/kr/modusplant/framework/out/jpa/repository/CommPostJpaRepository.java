@@ -21,19 +21,23 @@ public interface CommPostJpaRepository extends UlidPrimaryRepository<CommPostEnt
 
     Page<CommPostEntity> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
-    Page<CommPostEntity> findByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
+    Page<CommPostEntity> findByIsPublishedTrueOrderByCreatedAtDesc(Pageable pageable);
 
-    Page<CommPostEntity> findByPrimaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(CommPrimaryCategoryEntity primaryCategory, Pageable pageable);
+    Page<CommPostEntity> findByPrimaryCategoryAndIsPublishedTrueOrderByCreatedAtDesc(CommPrimaryCategoryEntity primaryCategory, Pageable pageable);
 
-    Page<CommPostEntity> findBySecondaryCategoryAndIsDeletedFalseOrderByCreatedAtDesc(CommSecondaryCategoryEntity secondaryCategory, Pageable pageable);
+    Page<CommPostEntity> findBySecondaryCategoryAndIsPublishedTrueOrderByCreatedAtDesc(CommSecondaryCategoryEntity secondaryCategory, Pageable pageable);
 
-    Page<CommPostEntity> findByAuthMemberAndIsDeletedFalseOrderByCreatedAtDesc(SiteMemberEntity authMember, Pageable pageable);
+    Page<CommPostEntity> findByAuthMemberAndIsPublishedTrueOrderByCreatedAtDesc(SiteMemberEntity authMember, Pageable pageable);
 
-    Optional<CommPostEntity> findByUlidAndIsDeletedFalse(String ulid);
+    Page<CommPostEntity> findByAuthMemberAndIsPublishedTrueOrderByUpdatedAtDesc(SiteMemberEntity authMember, Pageable pageable);
+
+    Optional<CommPostEntity> findByUlid(String ulid);
+
+    Optional<CommPostEntity> findByUlidAndIsPublishedTrue(String ulid);
 
     @Query(
             value = "SELECT * FROM comm_post p " +
-                    "WHERE p.is_deleted = false AND (" +
+                    "WHERE p.is_published = true AND (" +
                     "p.title ILIKE %:keyword% OR " +
                     "EXISTS (" +
                     "   SELECT 1 FROM jsonb_array_elements(p.content) c " +
@@ -41,7 +45,7 @@ public interface CommPostJpaRepository extends UlidPrimaryRepository<CommPostEnt
                     ")) " +
                     "ORDER BY p.created_at desc",
             countQuery = "SELECT COUNT(*) FROM comm_post p " +
-                    "WHERE p.is_deleted = false AND (" +
+                    "WHERE p.is_published = true AND (" +
                     "p.title ILIKE %:keyword% OR " +
                     "EXISTS (" +
                     "   SELECT 1 FROM jsonb_array_elements(p.content) c " +

@@ -47,7 +47,6 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper;
     private final JwtTokenProvider tokenProvider;
     private final TokenService tokenService;
-    private final SiteMemberValidationService memberValidationService;
     private final SiteMemberJpaRepository memberRepository;
     private final Validator validator;
     private final AccessTokenRedisRepository tokenRedisRepository;
@@ -78,7 +77,7 @@ public class SecurityConfig {
 
     @Bean
     public ForwardRequestLoginSuccessHandler forwardRequestLoginSuccessHandler() {
-        return new ForwardRequestLoginSuccessHandler(memberRepository, memberValidationService, tokenService);
+        return new ForwardRequestLoginSuccessHandler(memberRepository, tokenService);
     }
 
     @Bean
@@ -129,18 +128,11 @@ public class SecurityConfig {
         http
                 .securityMatcher("/api/**")
                 .cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(emailPasswordAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(http), EmailPasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/api/v1/communication/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/terms/**").permitAll()
-                        .requestMatchers("/api/members/verify-email/send/**").permitAll()
-                        .requestMatchers("/api/auth/kakao/social-login").permitAll()
-                        .requestMatchers("/api/auth/google/social-login").permitAll()
-                        .requestMatchers("/api/members/register").permitAll()
-                        .requestMatchers("/api/monitor/**").hasRole("ADMIN")
-                        .requestMatchers("/actuator/prometheus").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .authenticationProvider(siteMemberAuthProvider())
                 .logout(logout -> logout
@@ -154,7 +146,6 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers
                         .httpStrictTransportSecurity(hsts -> hsts
                                 .includeSubDomains(true)
@@ -167,11 +158,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("https://specified-jaquith-modusplant-0c942371.koyeb.app");
-        config.addAllowedOrigin("https://kormap.ddnsfree.com");
+        config.addAllowedOriginPattern("*");
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
-        config.setAllowCredentials(true);
+        config.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
