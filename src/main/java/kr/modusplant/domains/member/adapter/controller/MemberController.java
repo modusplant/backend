@@ -6,7 +6,8 @@ import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
 import kr.modusplant.domains.member.usecase.port.repository.TargetCommentIdRepository;
 import kr.modusplant.domains.member.usecase.port.repository.TargetPostIdRepository;
-import kr.modusplant.domains.member.usecase.request.*;
+import kr.modusplant.domains.member.usecase.record.*;
+import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.CommentLikeEvent;
@@ -39,14 +40,14 @@ public class MemberController {
         return mapper.toMemberResponse(memberRepository.save(memberNickname));
     }
 
-    public MemberResponse updateNickname(MemberNicknameUpdateRequest request) {
+    public MemberResponse updateNickname(MemberNicknameUpdateRecord request) {
         MemberId memberId = MemberId.fromUuid(request.id());
         MemberNickname memberNickname = MemberNickname.create(request.nickname());
         validateBeforeUpdateNickname(memberId, memberNickname);
         return mapper.toMemberResponse(memberRepository.save(memberId, memberNickname));
     }
 
-    public void likePost(MemberPostLikeRequest request) {
+    public void likePost(MemberPostLikeRecord request) {
         MemberId memberId = MemberId.fromUuid(request.memberId());
         TargetPostId targetPostId = TargetPostId.create(request.postUlid());
         validateBeforeLikeOrUnlikePost(memberId, targetPostId);
@@ -55,7 +56,7 @@ public class MemberController {
         }
     }
 
-    public void unlikePost(MemberPostUnlikeRequest request) {
+    public void unlikePost(MemberPostUnlikeRecord request) {
         MemberId memberId = MemberId.fromUuid(request.memberId());
         TargetPostId targetPostId = TargetPostId.create(request.postUlid());
         validateBeforeLikeOrUnlikePost(memberId, targetPostId);
@@ -64,7 +65,7 @@ public class MemberController {
         }
     }
 
-    public void likeComment(MemberCommentLikeRequest request) {
+    public void likeComment(MemberCommentLikeRecord request) {
         MemberId memberId = MemberId.fromUuid(request.memberId());
         TargetCommentId targetCommentId = TargetCommentId.create(TargetPostId.create(request.postUlid()), TargetCommentPath.create(request.path()));
         validateBeforeLikeOrUnlikeComment(memberId, targetCommentId);
@@ -73,7 +74,7 @@ public class MemberController {
         }
     }
 
-    public void unlikeComment(MemberCommentUnlikeRequest request) {
+    public void unlikeComment(MemberCommentUnlikeRecord request) {
         MemberId memberId = MemberId.fromUuid(request.memberId());
         TargetCommentId targetCommentId = TargetCommentId.create(TargetPostId.create(request.postUlid()), TargetCommentPath.create(request.path()));
         validateBeforeLikeOrUnlikeComment(memberId, targetCommentId);

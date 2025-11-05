@@ -32,11 +32,11 @@ import org.mockito.Mockito;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.domains.member.common.util.usecase.request.MemberCommentLikeRequestTestUtils.testMemberCommentLikeRequest;
-import static kr.modusplant.domains.member.common.util.usecase.request.MemberCommentUnlikeRequestTestUtils.testMemberCommentUnlikeRequest;
-import static kr.modusplant.domains.member.common.util.usecase.request.MemberNicknameUpdateRequestTestUtils.testMemberNicknameUpdateRequest;
-import static kr.modusplant.domains.member.common.util.usecase.request.MemberPostLikeRequestTestUtils.testMemberPostLikeRequest;
-import static kr.modusplant.domains.member.common.util.usecase.request.MemberPostUnlikeRequestTestUtils.testMemberPostUnlikeRequest;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.TEST_MEMBER_COMMENT_LIKE_RECORD;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.TEST_MEMBER_COMMENT_UNLIKE_RECORD;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberNicknameUpdateRecordTestUtils.TEST_MEMBER_NICKNAME_UPDATE_RECORD;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostLikeRecordTestUtils.TEST_MEMBER_POST_LIKE_DTO;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.TEST_MEMBER_POST_UNLIKE_RECORD;
 import static kr.modusplant.domains.member.common.util.usecase.request.MemberRegisterRequestTestUtils.testMemberRegisterRequest;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 import static kr.modusplant.shared.event.common.util.CommentLikeEventTestUtils.testCommentLikeEvent;
@@ -86,14 +86,14 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
 
         // when & then
-        assertThat(memberController.updateNickname(testMemberNicknameUpdateRequest).nickname()).isEqualTo(member.getMemberNickname().getValue());
+        assertThat(memberController.updateNickname(TEST_MEMBER_NICKNAME_UPDATE_RECORD).nickname()).isEqualTo(member.getMemberNickname().getValue());
 
         // 해당 닉네임이 수정되지 않은 경우
         // given
         given(memberRepository.getByNickname(any())).willReturn(Optional.of(createMember()));
 
         // when & then
-        assertThat(memberController.updateNickname(testMemberNicknameUpdateRequest).nickname()).isEqualTo(member.getMemberNickname().getValue());
+        assertThat(memberController.updateNickname(TEST_MEMBER_NICKNAME_UPDATE_RECORD).nickname()).isEqualTo(member.getMemberNickname().getValue());
     }
 
     @Test
@@ -104,7 +104,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
 
         // when & then
         EntityExistsException alreadyExistedNicknameException = assertThrows(
-                EntityExistsException.class, () -> memberController.updateNickname(testMemberNicknameUpdateRequest));
+                EntityExistsException.class, () -> memberController.updateNickname(TEST_MEMBER_NICKNAME_UPDATE_RECORD));
         assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(ALREADY_EXISTED_NICKNAME.getMessage());
     }
 
@@ -123,7 +123,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         given(commPostRepository.findByUlid(postId)).willReturn(postEntity);
 
         // when
-        memberController.likePost(testMemberPostLikeRequest);
+        memberController.likePost(TEST_MEMBER_POST_LIKE_DTO);
 
         // then
         verify(commPostLikeRepository, times(1)).save(any());
@@ -140,7 +140,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         given(targetPostIdRepository.isUnliked(any(), any())).willReturn(false);
 
         // when
-        memberController.likePost(testMemberPostLikeRequest);
+        memberController.likePost(TEST_MEMBER_POST_LIKE_DTO);
 
         // then
         verify(commPostLikeRepository, times(0)).save(any());
@@ -162,7 +162,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         given(commPostRepository.findByUlid(postId)).willReturn(postEntity);
 
         // when
-        memberController.unlikePost(testMemberPostUnlikeRequest);
+        memberController.unlikePost(TEST_MEMBER_POST_UNLIKE_RECORD);
 
         // then
         verify(commPostLikeRepository, times(1)).delete(any());
@@ -179,7 +179,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         given(targetPostIdRepository.isLiked(any(), any())).willReturn(false);
 
         // when
-        memberController.unlikePost(testMemberPostUnlikeRequest);
+        memberController.unlikePost(TEST_MEMBER_POST_UNLIKE_RECORD);
 
         // then
         verify(commPostLikeRepository, times(0)).delete(any());
@@ -194,9 +194,9 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
 
         // when
         EntityNotFoundException entityNotFoundExceptionForLike = assertThrows(EntityNotFoundException.class,
-                () -> memberController.likePost(testMemberPostLikeRequest));
+                () -> memberController.likePost(TEST_MEMBER_POST_LIKE_DTO));
         EntityNotFoundException entityNotFoundExceptionForUnlike = assertThrows(EntityNotFoundException.class,
-                () -> memberController.unlikePost(testMemberPostUnlikeRequest));
+                () -> memberController.unlikePost(TEST_MEMBER_POST_UNLIKE_RECORD));
 
         // then
         assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
@@ -212,9 +212,9 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
 
         // when
         EntityNotFoundException entityNotFoundExceptionForLike = assertThrows(EntityNotFoundException.class,
-                () -> memberController.likePost(testMemberPostLikeRequest));
+                () -> memberController.likePost(TEST_MEMBER_POST_LIKE_DTO));
         EntityNotFoundException entityNotFoundExceptionForUnlike = assertThrows(EntityNotFoundException.class,
-                () -> memberController.unlikePost(testMemberPostUnlikeRequest));
+                () -> memberController.unlikePost(TEST_MEMBER_POST_UNLIKE_RECORD));
 
         // then
         assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
@@ -237,7 +237,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         given(commCommentRepository.findByPostUlidAndPath(postId, path)).willReturn(commentEntity);
 
         // when
-        memberController.likeComment(testMemberCommentLikeRequest);
+        memberController.likeComment(TEST_MEMBER_COMMENT_LIKE_RECORD);
 
         // then
         verify(commCommentLikeRepository, times(1)).save(any());
@@ -254,7 +254,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         given(targetCommentIdRepository.isUnliked(any(), any())).willReturn(false);
 
         // when
-        memberController.likeComment(testMemberCommentLikeRequest);
+        memberController.likeComment(TEST_MEMBER_COMMENT_LIKE_RECORD);
 
         // then
         verify(commCommentLikeRepository, times(0)).save(any());
@@ -277,7 +277,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         given(commCommentRepository.findByPostUlidAndPath(postId, path)).willReturn(commentEntity);
 
         // when
-        memberController.unlikeComment(testMemberCommentUnlikeRequest);
+        memberController.unlikeComment(TEST_MEMBER_COMMENT_UNLIKE_RECORD);
 
         // then
         verify(commCommentLikeRepository, times(1)).delete(any());
@@ -294,7 +294,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         given(targetCommentIdRepository.isLiked(any(), any())).willReturn(false);
 
         // when
-        memberController.unlikeComment(testMemberCommentUnlikeRequest);
+        memberController.unlikeComment(TEST_MEMBER_COMMENT_UNLIKE_RECORD);
 
         // then
         verify(commCommentLikeRepository, times(0)).delete(any());
@@ -309,9 +309,9 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
 
         // when
         EntityNotFoundException entityNotFoundExceptionForLike = assertThrows(EntityNotFoundException.class,
-                () -> memberController.likeComment(testMemberCommentLikeRequest));
+                () -> memberController.likeComment(TEST_MEMBER_COMMENT_LIKE_RECORD));
         EntityNotFoundException entityNotFoundExceptionForUnlike = assertThrows(EntityNotFoundException.class,
-                () -> memberController.unlikeComment(testMemberCommentUnlikeRequest));
+                () -> memberController.unlikeComment(TEST_MEMBER_COMMENT_UNLIKE_RECORD));
 
         // then
         assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
@@ -327,9 +327,9 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
 
         // when
         EntityNotFoundException entityNotFoundExceptionForLike = assertThrows(EntityNotFoundException.class,
-                () -> memberController.likeComment(testMemberCommentLikeRequest));
+                () -> memberController.likeComment(TEST_MEMBER_COMMENT_LIKE_RECORD));
         EntityNotFoundException entityNotFoundExceptionForUnlike = assertThrows(EntityNotFoundException.class,
-                () -> memberController.unlikeComment(testMemberCommentUnlikeRequest));
+                () -> memberController.unlikeComment(TEST_MEMBER_COMMENT_UNLIKE_RECORD));
 
         // then
         assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID.getMessage());

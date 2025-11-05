@@ -12,11 +12,15 @@ import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static kr.modusplant.domains.member.common.util.usecase.request.MemberCommentLikeRequestTestUtils.testMemberCommentLikeRequest;
-import static kr.modusplant.domains.member.common.util.usecase.request.MemberCommentUnlikeRequestTestUtils.testMemberCommentUnlikeRequest;
-import static kr.modusplant.domains.member.common.util.usecase.request.MemberNicknameUpdateRequestTestUtils.testMemberNicknameUpdateRequest;
-import static kr.modusplant.domains.member.common.util.usecase.request.MemberPostLikeRequestTestUtils.testMemberPostLikeRequest;
-import static kr.modusplant.domains.member.common.util.usecase.request.MemberPostUnlikeRequestTestUtils.testMemberPostUnlikeRequest;
+import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_TARGET_COMMENT_PATH_STRING;
+import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_TARGET_POST_ID_STRING;
+import static kr.modusplant.domains.member.common.constant.MemberUuidConstant.TEST_MEMBER_ID_UUID;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.TEST_MEMBER_COMMENT_LIKE_RECORD;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.TEST_MEMBER_COMMENT_UNLIKE_RECORD;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberNicknameUpdateRecordTestUtils.TEST_MEMBER_NICKNAME_UPDATE_RECORD;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostLikeRecordTestUtils.TEST_MEMBER_POST_LIKE_DTO;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.TEST_MEMBER_POST_UNLIKE_RECORD;
+import static kr.modusplant.domains.member.common.util.usecase.request.MemberNicknameUpdateRequestTestUtils.TEST_MEMBER_NICKNAME_UPDATE_REQUEST;
 import static kr.modusplant.domains.member.common.util.usecase.request.MemberRegisterRequestTestUtils.testMemberRegisterRequest;
 import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,10 +51,10 @@ class MemberRestControllerTest implements MemberTestUtils, MemberResponseTestUti
     @DisplayName("updateMemberNickname으로 응답 반환")
     void testUpdateMemberNickname_givenValidRequest_willReturnResponse() {
         // given
-        given(memberController.updateNickname(testMemberNicknameUpdateRequest)).willReturn(testMemberResponse);
+        given(memberController.updateNickname(TEST_MEMBER_NICKNAME_UPDATE_RECORD)).willReturn(testMemberResponse);
 
         // when
-        ResponseEntity<DataResponse<MemberResponse>> memberResponseEntity = memberRestController.updateMemberNickname(testMemberNicknameUpdateRequest);
+        ResponseEntity<DataResponse<MemberResponse>> memberResponseEntity = memberRestController.updateMemberNickname(TEST_MEMBER_ID_UUID, TEST_MEMBER_NICKNAME_UPDATE_REQUEST);
 
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -61,10 +65,10 @@ class MemberRestControllerTest implements MemberTestUtils, MemberResponseTestUti
     @DisplayName("likeCommunicationPost로 응답 반환")
     void testLikeCommunicationPost_givenValidRequest_willReturnResponse() {
         // given
-        willDoNothing().given(memberController).likePost(testMemberPostLikeRequest);
+        willDoNothing().given(memberController).likePost(TEST_MEMBER_POST_LIKE_DTO);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.likeCommunicationPost(testMemberPostLikeRequest);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.likeCommunicationPost(TEST_MEMBER_ID_UUID, TEST_TARGET_POST_ID_STRING);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -75,10 +79,10 @@ class MemberRestControllerTest implements MemberTestUtils, MemberResponseTestUti
     @DisplayName("unlikeCommunicationPost로 응답 반환")
     void testUnlikeCommunicationPost_givenValidRequest_willReturnResponse() {
         // given
-        willDoNothing().given(memberController).unlikePost(testMemberPostUnlikeRequest);
+        willDoNothing().given(memberController).unlikePost(TEST_MEMBER_POST_UNLIKE_RECORD);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.unlikeCommunicationPost(testMemberPostUnlikeRequest);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.unlikeCommunicationPost(TEST_MEMBER_ID_UUID, TEST_TARGET_POST_ID_STRING);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -89,10 +93,10 @@ class MemberRestControllerTest implements MemberTestUtils, MemberResponseTestUti
     @DisplayName("likeCommunicationComment로 응답 반환")
     void testLikeCommunicationComment_givenValidRequest_willReturnResponse() {
         // given
-        willDoNothing().given(memberController).likeComment(testMemberCommentLikeRequest);
+        willDoNothing().given(memberController).likeComment(TEST_MEMBER_COMMENT_LIKE_RECORD);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.likeCommunicationComment(testMemberCommentLikeRequest);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.likeCommunicationComment(TEST_MEMBER_ID_UUID, TEST_TARGET_POST_ID_STRING, TEST_TARGET_COMMENT_PATH_STRING);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -103,10 +107,10 @@ class MemberRestControllerTest implements MemberTestUtils, MemberResponseTestUti
     @DisplayName("unlikeCommunicationComment로 응답 반환")
     void testUnlikeCommunicationComment_givenValidRequest_willReturnResponse() {
         // given
-        willDoNothing().given(memberController).unlikeComment(testMemberCommentUnlikeRequest);
+        willDoNothing().given(memberController).unlikeComment(TEST_MEMBER_COMMENT_UNLIKE_RECORD);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.unlikeCommunicationComment(testMemberCommentUnlikeRequest);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.unlikeCommunicationComment(TEST_MEMBER_ID_UUID, TEST_TARGET_POST_ID_STRING, TEST_TARGET_COMMENT_PATH_STRING);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
