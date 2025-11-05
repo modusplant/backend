@@ -30,11 +30,11 @@ public class SiteMemberProfileEntity {
     @JoinColumn(name = "uuid", nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity member;
 
-    @Column(name = "intro")
-    private String introduction;
-
     @Column(name = "image_url")
     private String imageUrl;
+
+    @Column(name = "intro")
+    private String introduction;
 
     @Column(name = LAST_MODIFIED_AT, nullable = false)
     @LastModifiedDate
@@ -44,14 +44,14 @@ public class SiteMemberProfileEntity {
     @Column(name = VER_NUM, nullable = false)
     private Long versionNumber;
 
+    public void updateImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     public void updateIntroduction(String introduction) {
         this.introduction = introduction;
     }
 
-    public void updateImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -64,10 +64,10 @@ public class SiteMemberProfileEntity {
         return new HashCodeBuilder(17, 37).append(getMember()).toHashCode();
     }
 
-    private SiteMemberProfileEntity(SiteMemberEntity member, String introduction, String imageUrl) {
+    private SiteMemberProfileEntity(SiteMemberEntity member, String imageUrl, String introduction) {
         this.member = member;
-        this.introduction = introduction;
         this.imageUrl = imageUrl;
+        this.introduction = introduction;
     }
 
     public static SiteMemberProfileEntityBuilder builder() {
@@ -76,11 +76,16 @@ public class SiteMemberProfileEntity {
 
     public static final class SiteMemberProfileEntityBuilder {
         private SiteMemberEntity member;
-        private String introduction;
         private String imageUrl;
+        private String introduction;
 
         public SiteMemberProfileEntityBuilder member(final SiteMemberEntity member) {
             this.member = member;
+            return this;
+        }
+
+        public SiteMemberProfileEntityBuilder imageUrl(final String imageUrl) {
+            this.imageUrl = imageUrl;
             return this;
         }
 
@@ -89,20 +94,15 @@ public class SiteMemberProfileEntity {
             return this;
         }
 
-        public SiteMemberProfileEntityBuilder imageUrl(final String imageUrl) {
-            this.imageUrl = imageUrl;
-            return this;
-        }
-        
         public SiteMemberProfileEntityBuilder memberProfileEntity(final SiteMemberProfileEntity memberProfile) {
             this.member = memberProfile.getMember();
-            this.introduction = memberProfile.getIntroduction();
             this.imageUrl = memberProfile.getImageUrl();
+            this.introduction = memberProfile.getIntroduction();
             return this;
         }
 
         public SiteMemberProfileEntity build() {
-            return new SiteMemberProfileEntity(this.member, this.introduction, this.imageUrl);
+            return new SiteMemberProfileEntity(this.member, this.imageUrl, this.introduction);
         }
     }
 }
