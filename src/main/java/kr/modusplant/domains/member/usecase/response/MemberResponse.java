@@ -8,7 +8,7 @@ import java.util.UUID;
 public record MemberResponse(
         @Schema(description = "회원 아이디",
                 type = "UUID")
-        UUID uuid,
+        UUID id,
 
         @Schema(description = "회원 상태",
                 example = "활동 중")
