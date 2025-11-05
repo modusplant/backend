@@ -1,5 +1,5 @@
 ### Build Stage
-FROM openjdk:21-jdk-slim AS builder
+FROM eclipse-temurin:21-jdk AS builder
 WORKDIR /builder
 # Gradle build tool copy
 COPY /src/main /builder/src/main
@@ -20,7 +20,7 @@ RUN ./gradlew --no-daemon clean flywayMigrate jooqCodegen bootJar \
 
 
 ### RUN Stage
-FROM openjdk:21-jdk-slim AS run
+FROM eclipse-temurin:21-jdk AS run
 WORKDIR /workspace
 # Build stage copy
 COPY --from=builder /builder/build/libs/*.jar modusplant-backend.jar
