@@ -14,6 +14,7 @@ public final class TableName {
     public static final String COMM_SECO_CATE = "comm_seco_cate";
     public static final String SITE_MEMBER = "site_member";
     public static final String SITE_MEMBER_AUTH = "site_member_auth";
+    public static final String SITE_MEMBER_PROF = "site_member_prof";
     public static final String SITE_MEMBER_ROLE = "site_member_role";
     public static final String SITE_MEMBER_TERM = "site_member_term";
     public static final String TERM = "term";
