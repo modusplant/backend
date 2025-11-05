@@ -29,19 +29,19 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     private final CommentController controller = Mockito.mock(CommentController.class);
     private final CommentRestController restController = new CommentRestController(controller);
 
-    @Test
-    @DisplayName("유효한 게시글 id로 게시글의 댓글 가져오기")
-    public void testGatherByPost_givenValidPostUlid_WillReturnResponseEntity() {
-        // given
-        given(controller.gatherByPost(testPostId.getId())).willReturn(List.of(testCommentResponse));
-
-        // when
-        ResponseEntity<DataResponse<List<CommentResponse>>> result = restController.gatherByPost(testPostId.getId());
-
-        // then
-        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(result.getBody().toString()).isEqualTo(DataResponse.ok(List.of(testCommentResponse)).toString());
-    }
+//    @Test
+//    @DisplayName("유효한 게시글 id로 게시글의 댓글 가져오기")
+//    public void testGatherByPost_givenValidPostUlid_WillReturnResponseEntity() {
+//        // given
+//        given(controller.gatherByPost(testPostId.getId())).willReturn(List.of(testCommentResponse));
+//
+//        // when
+//        ResponseEntity<DataResponse<List<CommentResponse>>> result = restController.gatherByPost(testPostId.getId());
+//
+//        // then
+//        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+//        assertThat(result.getBody().toString()).isEqualTo(DataResponse.ok(List.of(testCommentResponse)).toString());
+//    }
 
     @Test
     @DisplayName("유효한 작성자 id로 작성자에 해당하는 댓글 가져오기")

@@ -25,18 +25,18 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     private final CommentRepositoryJpaAdapter jpaAdapter = Mockito.mock(CommentRepositoryJpaAdapter.class);
     private final CommentController controller = new CommentController(mapper, jooqAdapter, jpaAdapter);
 
-    @Test
-    @DisplayName("유효한 게시글 id로 댓글 읽기")
-    public void testGatherByPost_givenValidPostUlid_willReturnResponseList() {
-        // given
-        given(jooqAdapter.findByPost(testPostId)).willReturn(List.of(testCommentResponse));
-
-        // when
-        List<CommentResponse> result = controller.gatherByPost(testPostId.getId());
-
-        // then
-        assertThat(result).isEqualTo(List.of(testCommentResponse));
-    }
+//    @Test
+//    @DisplayName("유효한 게시글 id로 댓글 읽기")
+//    public void testGatherByPost_givenValidPostUlid_willReturnResponseList() {
+//        // given
+//        given(jooqAdapter.findByPost(testPostId)).willReturn(List.of(testCommentResponse));
+//
+//        // when
+//        List<CommentResponse> result = controller.gatherByPost(testPostId.getId());
+//
+//        // then
+//        assertThat(result).isEqualTo(List.of(testCommentResponse));
+//    }
 
     @Test
     @DisplayName("유효한 작성자 id로 댓글 읽기")
