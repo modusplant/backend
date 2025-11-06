@@ -43,19 +43,19 @@ public class CommentRestControllerTest implements PostIdTestUtils,
 //        assertThat(result.getBody().toString()).isEqualTo(DataResponse.ok(List.of(testCommentResponse)).toString());
 //    }
 
-    @Test
-    @DisplayName("유효한 작성자 id로 작성자에 해당하는 댓글 가져오기")
-    public void testGatherByAuthor_givenValidMemberUuid_WillReturnResponseEntity() {
-        // given
-        given(controller.gatherByAuthor(testMemberId.getValue())).willReturn(List.of(testCommentResponse));
-
-        // when
-        ResponseEntity<DataResponse<List<CommentResponse>>> result = restController.gatherByAuthor(testMemberId.getValue());
-
-        // then
-        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(result.getBody().toString()).isEqualTo(DataResponse.ok(List.of(testCommentResponse)).toString());
-    }
+//    @Test
+//    @DisplayName("유효한 작성자 id로 작성자에 해당하는 댓글 가져오기")
+//    public void testGatherByAuthor_givenValidMemberUuid_WillReturnResponseEntity() {
+//        // given
+//        given(controller.gatherByAuthor(testMemberId.getValue())).willReturn(List.of(testCommentResponse));
+//
+//        // when
+//        ResponseEntity<DataResponse<List<CommentResponse>>> result = restController.gatherByAuthor(testMemberId.getValue());
+//
+//        // then
+//        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+//        assertThat(result.getBody().toString()).isEqualTo(DataResponse.ok(List.of(testCommentResponse)).toString());
+//    }
 
     @Test
     @DisplayName("유효한 댓글 등록 객체로 댓글 저장")

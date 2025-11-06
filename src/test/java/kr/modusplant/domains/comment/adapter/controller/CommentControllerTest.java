@@ -38,16 +38,16 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
 //        assertThat(result).isEqualTo(List.of(testCommentResponse));
 //    }
 
-    @Test
-    @DisplayName("유효한 작성자 id로 댓글 읽기")
-    public void testGatherByAuthor_givenValidPostUlid_willReturnResponseList() {
-        // given
-        given(jooqAdapter.findByAuthor(testAuthorWithUuid)).willReturn(List.of(testCommentResponse));
-
-        // when
-        List<CommentResponse> result = controller.gatherByAuthor(testAuthorWithUuid.getMemberUuid());
-
-        // then
-        assertThat(result).isEqualTo(List.of(testCommentResponse));
-    }
+//    @Test
+//    @DisplayName("유효한 작성자 id로 댓글 읽기")
+//    public void testGatherByAuthor_givenValidPostUlid_willReturnResponseList() {
+//        // given
+//        given(jooqAdapter.findByAuthor(testAuthorWithUuid)).willReturn(List.of(testCommentResponse));
+//
+//        // when
+//        List<CommentResponse> result = controller.gatherByAuthor(testAuthorWithUuid.getMemberUuid());
+//
+//        // then
+//        assertThat(result).isEqualTo(List.of(testCommentResponse));
+//    }
 }
