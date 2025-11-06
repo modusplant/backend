@@ -5,6 +5,7 @@ import kr.modusplant.domains.member.domain.vo.MemberBirthDate;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberNickname;
 import kr.modusplant.domains.member.domain.vo.MemberStatus;
+import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyBirthDate;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.supers.MemberJpaMapper;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import org.springframework.stereotype.Component;
@@ -30,6 +31,12 @@ public class MemberJpaMapperImpl implements MemberJpaMapper {
         } else {
             status = MemberStatus.inactive();
         }
-        return Member.create(MemberId.fromUuid(entity.getUuid()), status, MemberNickname.create(entity.getNickname()), MemberBirthDate.create(entity.getBirthDate()));
+        MemberBirthDate birthDate;
+        if (entity.getBirthDate() == null) {
+            birthDate = MemberEmptyBirthDate.create();
+        } else {
+            birthDate = MemberBirthDate.create(entity.getBirthDate());
+        }
+        return Member.create(MemberId.fromUuid(entity.getUuid()), status, MemberNickname.create(entity.getNickname()), birthDate);
     }
 }

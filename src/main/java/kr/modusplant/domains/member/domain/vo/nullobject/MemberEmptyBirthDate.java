@@ -1,26 +1,23 @@
-package kr.modusplant.domains.member.domain.vo;
+package kr.modusplant.domains.member.domain.vo.nullobject;
 
-import kr.modusplant.domains.member.domain.exception.EmptyMemberBirthDateException;
+import kr.modusplant.domains.member.domain.vo.MemberBirthDate;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.time.LocalDate;
 
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class MemberBirthDate {
-    private final LocalDate value;
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class MemberEmptyBirthDate extends MemberBirthDate {
 
-    public static MemberBirthDate create(LocalDate value) {
-        if (value == null) {
-            throw new EmptyMemberBirthDateException();
-        }
-        return new MemberBirthDate(value);
+    public static MemberEmptyBirthDate create() {
+        return new MemberEmptyBirthDate();
+    }
+
+    @Override
+    public LocalDate getValue() {
+        return null;
     }
 
     @Override
