@@ -8,8 +8,8 @@ import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqR
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJpaAdapter;
 import kr.modusplant.domains.comment.usecase.request.CommentDeleteRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
+import kr.modusplant.domains.comment.usecase.response.CommentOfAuthorResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
-import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.shared.persistence.compositekey.CommCommentId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class CommentController {
         return jooqAdapter.findByPost(PostId.create(postUlid));
     }
 
-    public List<CommentResponse> gatherByAuthor(UUID memberUuid) {
+    public List<CommentOfAuthorResponse> gatherByAuthor(UUID memberUuid) {
         return jooqAdapter.findByAuthor(Author.create(memberUuid));
     }
 

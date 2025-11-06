@@ -10,8 +10,8 @@ import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.comment.adapter.controller.CommentController;
 import kr.modusplant.domains.comment.usecase.request.CommentDeleteRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
+import kr.modusplant.domains.comment.usecase.response.CommentOfAuthorResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
-import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -60,7 +60,7 @@ public class CommentRestController {
             description = "인가 회원 식별자에 맞는 컨텐츠 댓글을 조회합니다."
     )
     @GetMapping("/member/auth/{uuid}")
-    public ResponseEntity<DataResponse<List<CommentResponse>>> gatherByAuthor(
+    public ResponseEntity<DataResponse<List<CommentOfAuthorResponse>>> gatherByAuthor(
             @Parameter(schema = @Schema(
                     description = "회원의 식별자",
                     example = "038ae842-3c93-484f-b526-7c4645a195a7")
@@ -68,7 +68,7 @@ public class CommentRestController {
             @PathVariable(required = false, value = "uuid")
             @NotNull(message = "회원 식별자가 비어 있습니다.")
             UUID memberUuid) {
-        List<CommentResponse> commentResponses = controller.gatherByAuthor(memberUuid);
+        List<CommentOfAuthorResponse> commentResponses = controller.gatherByAuthor(memberUuid);
         return ResponseEntity.ok().body(
                 DataResponse.ok(commentResponses));
     }
