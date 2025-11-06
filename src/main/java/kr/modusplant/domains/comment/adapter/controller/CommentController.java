@@ -22,15 +22,15 @@ import java.util.UUID;
 public class CommentController {
 
     private final CommentMapperImpl mapper;
-    private final CommentJooqRepository jooqAdapter;
+    private final CommentJooqRepository jooqRepository;
     private final CommentRepositoryJpaAdapter jpaAdapter;
 
     public List<CommentOfPostResponse> gatherByPost(String postUlid) {
-        return jooqAdapter.findByPost(PostId.create(postUlid));
+        return jooqRepository.findByPost(PostId.create(postUlid));
     }
 
     public List<CommentOfAuthorResponse> gatherByAuthor(UUID memberUuid) {
-        return jooqAdapter.findByAuthor(Author.create(memberUuid));
+        return jooqRepository.findByAuthor(Author.create(memberUuid));
     }
 
     public void register(CommentRegisterRequest request) {
