@@ -1,15 +1,18 @@
 package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.adapter.mapper.MemberMapperImpl;
+import kr.modusplant.domains.member.adapter.mapper.MemberProfileMapperImpl;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.vo.MemberId;
-import kr.modusplant.domains.member.domain.vo.MemberNickname;
 import kr.modusplant.domains.member.framework.out.jpa.repository.MemberRepositoryJpaAdapter;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
+import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
+import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
 import kr.modusplant.domains.member.usecase.port.repository.TargetCommentIdRepository;
 import kr.modusplant.domains.member.usecase.port.repository.TargetPostIdRepository;
+import kr.modusplant.framework.out.aws.service.S3FileService;
 import kr.modusplant.framework.out.jpa.entity.CommCommentEntity;
 import kr.modusplant.framework.out.jpa.entity.CommCommentLikeEntity;
 import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
@@ -49,8 +52,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, CommPostEntityTestUtils {
+    private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
     private final MemberMapper memberMapper = new MemberMapperImpl();
+    private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl();
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryJpaAdapter.class);
+    private final MemberProfileRepository memberProfileRepository = Mockito.mock(MemberProfileRepository.class);
     private final CommPostLikeJpaRepository commPostLikeRepository = Mockito.mock(CommPostLikeJpaRepository.class);
     private final CommPostJpaRepository commPostRepository = Mockito.mock(CommPostJpaRepository.class);
     private final CommCommentLikeJpaRepository commCommentLikeRepository = Mockito.mock(CommCommentLikeJpaRepository.class);
@@ -60,7 +66,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     private final EventBus eventBus = new EventBus();
     private final PostEventConsumer postEventConsumer = new PostEventConsumer(eventBus, commPostLikeRepository, commPostRepository);
     private final CommentEventConsumer commentEventConsumer = new CommentEventConsumer(eventBus, commCommentLikeRepository, commCommentRepository);
-    private final MemberController memberController = new MemberController(memberMapper, memberRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
+    private final MemberController memberController = new MemberController(s3FileService, memberMapper, memberProfileMapper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
 
     @Test
     @DisplayName("중복된 닉네임으로 인해 register로 회원 등록 실패")
@@ -75,36 +81,16 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("updateNickname으로 닉네임 갱신")
-    void testUpdateNickname_givenValidRequest_willReturnResponse() {
+    @DisplayName("중복된 닉네임으로 인해 updateProfile로 닉네임 갱신 실패")
+    void testValidateBeforeUpdateProfile_givenAlreadyExistedProfile_willThrowException() {
         // given
-        Member member = createMember();
-        given(memberRepository.save(any(MemberId.class), any(MemberNickname.class))).willReturn(member);
-
-        // 해당 닉네임이 존재하지 않는 경우
-        // given
-        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-
-        // when & then
-        assertThat(memberController.updateNickname(TEST_MEMBER_NICKNAME_UPDATE_RECORD).nickname()).isEqualTo(member.getMemberNickname().getValue());
-
-        // 해당 닉네임이 수정되지 않은 경우
-        // given
-        given(memberRepository.getByNickname(any())).willReturn(Optional.of(createMember()));
-
-        // when & then
-        assertThat(memberController.updateNickname(TEST_MEMBER_NICKNAME_UPDATE_RECORD).nickname()).isEqualTo(member.getMemberNickname().getValue());
-    }
-
-    @Test
-    @DisplayName("중복된 닉네임으로 인해 updateNickname으로 닉네임 갱신 실패")
-    void testValidateBeforeUpdateNickname_givenAlreadyExistedNickname_willThrowException() {
-        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(memberProfileRepository.isIdExist(any())).willReturn(true);
         given(memberRepository.getByNickname(any())).willReturn(Optional.of(Member.create(MemberId.generate(), testMemberActiveStatus, testMemberNickname, testMemberBirthDate)));
 
         // when & then
         EntityExistsException alreadyExistedNicknameException = assertThrows(
-                EntityExistsException.class, () -> memberController.updateNickname(TEST_MEMBER_NICKNAME_UPDATE_RECORD));
+                EntityExistsException.class, () -> memberController.updateProfile(TEST_MEMBER_NICKNAME_UPDATE_RECORD));
         assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(ALREADY_EXISTED_NICKNAME.getMessage());
     }
 

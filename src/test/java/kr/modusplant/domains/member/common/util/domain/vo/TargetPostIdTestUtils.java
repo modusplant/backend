@@ -2,8 +2,8 @@ package kr.modusplant.domains.member.common.util.domain.vo;
 
 import kr.modusplant.domains.member.domain.vo.TargetPostId;
 
-import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_TARGET_POST_ID_STRING;
+import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
 
 public interface TargetPostIdTestUtils {
-    TargetPostId testTargetPostId = TargetPostId.create(TEST_TARGET_POST_ID_STRING);
+    TargetPostId testTargetPostId = TargetPostId.create(TEST_COMM_POST_ULID);
 }

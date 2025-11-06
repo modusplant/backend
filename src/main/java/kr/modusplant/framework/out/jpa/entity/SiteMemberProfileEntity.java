@@ -30,8 +30,8 @@ public class SiteMemberProfileEntity {
     @JoinColumn(name = "uuid", nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity member;
 
-    @Column(name = "image_url")
-    private String imageUrl;
+    @Column(name = "image_path")
+    private String imagePath;
 
     @Column(name = "intro")
     private String introduction;
@@ -45,7 +45,7 @@ public class SiteMemberProfileEntity {
     private Long versionNumber;
 
     public void updateImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+        this.imagePath = imageUrl;
     }
 
     public void updateIntroduction(String introduction) {
@@ -64,9 +64,9 @@ public class SiteMemberProfileEntity {
         return new HashCodeBuilder(17, 37).append(getMember()).toHashCode();
     }
 
-    private SiteMemberProfileEntity(SiteMemberEntity member, String imageUrl, String introduction) {
+    private SiteMemberProfileEntity(SiteMemberEntity member, String imagePath, String introduction) {
         this.member = member;
-        this.imageUrl = imageUrl;
+        this.imagePath = imagePath;
         this.introduction = introduction;
     }
 
@@ -76,7 +76,7 @@ public class SiteMemberProfileEntity {
 
     public static final class SiteMemberProfileEntityBuilder {
         private SiteMemberEntity member;
-        private String imageUrl;
+        private String imagePath;
         private String introduction;
 
         public SiteMemberProfileEntityBuilder member(final SiteMemberEntity member) {
@@ -84,8 +84,8 @@ public class SiteMemberProfileEntity {
             return this;
         }
 
-        public SiteMemberProfileEntityBuilder imageUrl(final String imageUrl) {
-            this.imageUrl = imageUrl;
+        public SiteMemberProfileEntityBuilder imagePath(final String imagePath) {
+            this.imagePath = imagePath;
             return this;
         }
 
@@ -96,13 +96,13 @@ public class SiteMemberProfileEntity {
 
         public SiteMemberProfileEntityBuilder memberProfileEntity(final SiteMemberProfileEntity memberProfile) {
             this.member = memberProfile.getMember();
-            this.imageUrl = memberProfile.getImageUrl();
+            this.imagePath = memberProfile.getImagePath();
             this.introduction = memberProfile.getIntroduction();
             return this;
         }
 
         public SiteMemberProfileEntity build() {
-            return new SiteMemberProfileEntity(this.member, this.imageUrl, this.introduction);
+            return new SiteMemberProfileEntity(this.member, this.imagePath, this.introduction);
         }
     }
 }

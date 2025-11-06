@@ -1,14 +1,20 @@
 package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.domain.aggregate.Member;
+import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
+import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
+import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
+import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
 import kr.modusplant.domains.member.usecase.port.repository.TargetCommentIdRepository;
 import kr.modusplant.domains.member.usecase.port.repository.TargetPostIdRepository;
 import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
+import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
+import kr.modusplant.framework.out.aws.service.S3FileService;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.CommentLikeEvent;
 import kr.modusplant.shared.event.CommentUnlikeEvent;
@@ -20,16 +26,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.Optional;
 
+import static kr.modusplant.domains.member.adapter.util.MemberProfileImageUtils.generateMemberProfileImagePath;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 
 @RequiredArgsConstructor
 @Service
 @Transactional
 public class MemberController {
-    private final MemberMapper mapper;
+    private final S3FileService s3FileService;
+    private final MemberMapper memberMapper;
+    private final MemberProfileMapper memberProfileMapper;
     private final MemberRepository memberRepository;
+    private final MemberProfileRepository memberProfileRepository;
     private final TargetPostIdRepository targetPostIdRepository;
     private final TargetCommentIdRepository targetCommentIdRepository;
     private final EventBus eventBus;
@@ -37,14 +48,20 @@ public class MemberController {
     public MemberResponse register(MemberRegisterRequest request) {
         MemberNickname memberNickname = MemberNickname.create(request.nickname());
         validateBeforeRegister(memberNickname);
-        return mapper.toMemberResponse(memberRepository.save(memberNickname));
+        return memberMapper.toMemberResponse(memberRepository.save(memberNickname));
     }
 
-    public MemberResponse updateNickname(MemberNicknameUpdateRecord request) {
+    public MemberProfileResponse updateProfile(MemberProfileUpdateRecord request) throws IOException {
         MemberId memberId = MemberId.fromUuid(request.id());
-        MemberNickname memberNickname = MemberNickname.create(request.nickname());
-        validateBeforeUpdateNickname(memberId, memberNickname);
-        return mapper.toMemberResponse(memberRepository.save(memberId, memberNickname));
+        validateBeforeUpdateProfile(memberId, MemberNickname.create(request.nickname()));
+        MemberProfile memberProfile = memberProfileRepository.getById(memberId);
+        memberProfileRepository.deleteImage(memberProfile.getMemberProfileImage());
+        String newImagePath = generateMemberProfileImagePath(memberId.getValue(), request.image().getOriginalFilename());
+        s3FileService.uploadFile(request.image(), newImagePath);
+        memberProfile.updateProfileImage(MemberProfileImage.create(
+                MemberProfileImagePath.create(newImagePath), MemberProfileImageBytes.create(request.image().getBytes())
+        ));
+        return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.save(memberProfile));
     }
 
     public void likePost(MemberPostLikeRecord request) {
@@ -89,7 +106,10 @@ public class MemberController {
         }
     }
 
-    private void validateBeforeUpdateNickname(MemberId memberId, MemberNickname memberNickname) {
+    private void validateBeforeUpdateProfile(MemberId memberId, MemberNickname memberNickname) {
+        if (!memberRepository.isIdExist(memberId) || !memberProfileRepository.isIdExist(memberId)) {
+            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+        }
         Optional<Member> emptyOrMember = memberRepository.getByNickname(memberNickname);
         if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
             throw new EntityExistsException(ALREADY_EXISTED_NICKNAME, "memberNickname");

@@ -12,6 +12,10 @@ public enum MemberErrorCode implements ResponseCode {
     EMPTY_MEMBER_ID(HttpStatus.BAD_REQUEST, "empty_member_id", "회원 아이디가 비어 있습니다. "),
     EMPTY_MEMBER_NICKNAME(HttpStatus.BAD_REQUEST, "empty_member_nickname", "회원 닉네임이 비어 있습니다. "),
     EMPTY_MEMBER_STATUS(HttpStatus.BAD_REQUEST, "empty_member_status", "회원 상태가 비어 있습니다. "),
+    EMPTY_MEMBER_PROFILE_IMAGE(HttpStatus.BAD_REQUEST, "empty_member_profile_image", "회원 프로필 이미지가 비어 있습니다. "),
+    EMPTY_MEMBER_PROFILE_IMAGE_BYTES(HttpStatus.BAD_REQUEST, "empty_member_profile_image_bytes", "회원 프로필 이미지 바이트 값이 비어 있습니다. "),
+    EMPTY_MEMBER_PROFILE_IMAGE_PATH(HttpStatus.BAD_REQUEST, "empty_member_profile_image_path", "회원 프로필 이미지 경로가 비어 있습니다. "),
+    EMPTY_MEMBER_PROFILE_INTRODUCTION(HttpStatus.BAD_REQUEST, "empty_member_profile_introduction", "회원 프로필 소개가 비어 있습니다. "),
     EMPTY_TARGET_COMMENT_PATH(HttpStatus.BAD_REQUEST, "empty_target_path", "대상 댓글 경로가 비어 있습니다. "),
     EMPTY_TARGET_POST_ID(HttpStatus.BAD_REQUEST, "empty_target_post_id", "대상 게시글 아이디가 비어 있습니다. "),
 
