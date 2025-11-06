@@ -34,11 +34,6 @@ public class CommentJooqRepository implements CommentReadRepository {
                 .where(commComment.POST_ULID.eq(postId.getId()))
                 .orderBy(commComment.CREATED_AT.desc())
                 .fetchInto(CommentOfPostResponse.class);
-//                .fetch(record -> new CommentOfPostResponse(
-//                        record.get(siteMember.NICKNAME), record.get(commComment.PATH),
-//                        record.get(commComment.CONTENT), record.get(commComment.LIKE_COUNT),
-//                        record.get(commComment.CREATED_AT).toString(), record.get(commComment.IS_DELETED)
-//                        ));
     }
 
     public List<CommentOfAuthorResponse> findByAuthor(Author author) {
@@ -50,9 +45,5 @@ public class CommentJooqRepository implements CommentReadRepository {
                 .where(commComment.AUTH_MEMB_UUID.eq(author.getMemberUuid()))
                 .orderBy(commComment.CREATED_AT.desc())
                 .fetchInto(CommentOfAuthorResponse.class);
-//                .fetch(record -> new CommentOfAuthorResponse(
-//                        record.get(commComment.CONTENT), record.get(commComment.CREATED_AT).toString(),
-//                        record.get(commPost.TITLE), record.get(count(commComment.POST_ULID))
-//                ));
     }
 }
