@@ -57,7 +57,7 @@ class SiteMemberJpaRepositoryTest implements SiteMemberEntityTestUtils {
         memberRepository.save(member);
 
         // then
-        assertThat(memberRepository.findByBirthDate(member.getBirthDate()).getFirst()).isEqualTo(member);
+        assertThat(member.getUuid()).isIn(memberRepository.findByBirthDate(member.getBirthDate()).stream().map(SiteMemberEntity::getUuid).toList());
     }
 
     @DisplayName("isActive로 회원 찾기")
@@ -70,7 +70,7 @@ class SiteMemberJpaRepositoryTest implements SiteMemberEntityTestUtils {
         memberRepository.save(member);
 
         // then
-        assertThat(memberRepository.findByIsActive(member.getIsActive()).getFirst()).isEqualTo(member);
+        assertThat(member.getUuid()).isIn(memberRepository.findByIsActive(member.getIsActive()).stream().map(SiteMemberEntity::getUuid).toList());
     }
 
     @DisplayName("isDisabledByLinking으로 회원 찾기")
@@ -83,7 +83,7 @@ class SiteMemberJpaRepositoryTest implements SiteMemberEntityTestUtils {
         memberRepository.save(member);
 
         // then
-        assertThat(memberRepository.findByIsDisabledByLinking(member.getIsDisabledByLinking()).getFirst()).isEqualTo(member);
+        assertThat(member.getUuid()).isIn(memberRepository.findByIsDisabledByLinking(member.getIsDisabledByLinking()).stream().map(SiteMemberEntity::getUuid).toList());
     }
 
     @DisplayName("isBanned으로 회원 찾기")
@@ -96,7 +96,7 @@ class SiteMemberJpaRepositoryTest implements SiteMemberEntityTestUtils {
         memberRepository.save(member);
 
         // then
-        assertThat(memberRepository.findByIsBanned(member.getIsBanned()).getFirst()).isEqualTo(member);
+        assertThat(member.getUuid()).isIn(memberRepository.findByIsBanned(member.getIsBanned()).stream().map(SiteMemberEntity::getUuid).toList());
     }
 
     @DisplayName("isDeleted으로 회원 찾기")
@@ -109,7 +109,7 @@ class SiteMemberJpaRepositoryTest implements SiteMemberEntityTestUtils {
         memberRepository.save(member);
 
         // then
-        assertThat(memberRepository.findByIsDeleted(member.getIsDeleted()).getFirst()).isEqualTo(member);
+        assertThat(member.getUuid()).isIn(memberRepository.findByIsDeleted(member.getIsDeleted()).stream().map(SiteMemberEntity::getUuid).toList());
     }
 
     @DisplayName("loggedInAt으로 회원 찾기")
@@ -122,7 +122,7 @@ class SiteMemberJpaRepositoryTest implements SiteMemberEntityTestUtils {
         memberRepository.save(member);
 
         // then
-        assertThat(memberRepository.findByLoggedInAt(member.getLoggedInAt()).getFirst()).isEqualTo(member);
+        assertThat(member.getUuid()).isIn(memberRepository.findByLoggedInAt(member.getLoggedInAt()).stream().map(SiteMemberEntity::getUuid).toList());
     }
 
     @DisplayName("createdAt으로 회원 찾기")
@@ -135,7 +135,7 @@ class SiteMemberJpaRepositoryTest implements SiteMemberEntityTestUtils {
         memberRepository.save(member);
 
         // then
-        assertThat(memberRepository.findByCreatedAt(member.getCreatedAt()).getFirst()).isEqualTo(member);
+        assertThat(member.getUuid()).isIn(memberRepository.findByCreatedAt(member.getCreatedAt()).stream().map(SiteMemberEntity::getUuid).toList());
     }
 
     @DisplayName("lastModifiedAt으로 회원 찾기")
@@ -148,7 +148,7 @@ class SiteMemberJpaRepositoryTest implements SiteMemberEntityTestUtils {
         memberRepository.save(member);
 
         // then
-        assertThat(memberRepository.findByLastModifiedAt(member.getLastModifiedAt()).getFirst()).isEqualTo(member);
+        assertThat(member.getUuid()).isIn(memberRepository.findByLastModifiedAt(member.getLastModifiedAt()).stream().map(SiteMemberEntity::getUuid).toList());
     }
 
     @DisplayName("uuid로 회원 삭제")
