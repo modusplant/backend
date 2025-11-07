@@ -25,7 +25,7 @@ class CommPrimaryCategoryJpaRepositoryTest implements CommPrimaryCategoryEntityT
     @Test
     void findByUuidTest() {
         // given & when
-        CommPrimaryCategoryEntity entity = commCategoryRepository.save(createTestCommPrimaryCategoryEntity());
+        CommPrimaryCategoryEntity entity = commCategoryRepository.save(createCommPrimaryCategoryEntity());
 
         // then
         assertThat(commCategoryRepository.findByUuid(entity.getUuid()).orElseThrow()).isEqualTo(entity);
@@ -35,7 +35,7 @@ class CommPrimaryCategoryJpaRepositoryTest implements CommPrimaryCategoryEntityT
     @Test
     void findByCategoryTest() {
         // given & when
-        CommPrimaryCategoryEntity entity = commCategoryRepository.save(createTestCommPrimaryCategoryEntity());
+        CommPrimaryCategoryEntity entity = commCategoryRepository.save(createCommPrimaryCategoryEntity());
 
         // then
         assertThat(commCategoryRepository.findByCategory(entity.getCategory()).orElseThrow()).isEqualTo(entity);
@@ -45,7 +45,7 @@ class CommPrimaryCategoryJpaRepositoryTest implements CommPrimaryCategoryEntityT
     @Test
     void findByOrderTest() {
         // given & when
-        CommPrimaryCategoryEntity entity = commCategoryRepository.save(createTestCommPrimaryCategoryEntity());
+        CommPrimaryCategoryEntity entity = commCategoryRepository.save(createCommPrimaryCategoryEntity());
 
         // then
         assertThat(commCategoryRepository.findByOrder(entity.getOrder()).orElseThrow()).isEqualTo(entity);
@@ -55,7 +55,7 @@ class CommPrimaryCategoryJpaRepositoryTest implements CommPrimaryCategoryEntityT
     @Test
     void findByCreatedAtTest() {
         // given & when
-        CommPrimaryCategoryEntity entity = commCategoryRepository.save(createTestCommPrimaryCategoryEntity());
+        CommPrimaryCategoryEntity entity = commCategoryRepository.save(createCommPrimaryCategoryEntity());
 
         // then
         assertThat(commCategoryRepository.findByCreatedAt(entity.getCreatedAt()).getFirst()).isEqualTo(entity);
@@ -65,7 +65,7 @@ class CommPrimaryCategoryJpaRepositoryTest implements CommPrimaryCategoryEntityT
     @Test
     void deleteByUuidTest() {
         // given
-        CommPrimaryCategoryEntity entity = commCategoryRepository.save(createTestCommPrimaryCategoryEntity());
+        CommPrimaryCategoryEntity entity = commCategoryRepository.save(createCommPrimaryCategoryEntity());
         UUID uuid = entity.getUuid();
 
         // when
@@ -79,7 +79,7 @@ class CommPrimaryCategoryJpaRepositoryTest implements CommPrimaryCategoryEntityT
     @Test
     void existsByUuidTest() {
         // given & when
-        CommPrimaryCategoryEntity entity = commCategoryRepository.save(createTestCommPrimaryCategoryEntity());
+        CommPrimaryCategoryEntity entity = commCategoryRepository.save(createCommPrimaryCategoryEntity());
 
         // then
         assertThat(commCategoryRepository.existsByUuid(entity.getUuid())).isEqualTo(true);

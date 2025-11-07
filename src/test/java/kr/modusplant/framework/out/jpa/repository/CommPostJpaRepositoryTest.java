@@ -51,8 +51,8 @@ class CommPostJpaRepositoryTest implements CommPostEntityTestUtils, CommPrimaryC
 
     @BeforeEach
     void setUp() {
-        testCommPrimaryCategory = commPrimaryCategoryRepository.save(createTestCommPrimaryCategoryEntity());
-        testCommSecondaryCategory = commSecondaryCategoryRepository.save(createTestCommSecondaryCategoryEntity());
+        testCommPrimaryCategory = commPrimaryCategoryRepository.save(createCommPrimaryCategoryEntity());
+        testCommSecondaryCategory = commSecondaryCategoryRepository.save(createCommSecondaryCategoryEntityBuilder().primaryCategoryEntity(testCommPrimaryCategory).build());
         testSiteMember = siteMemberRepository.save(createMemberBasicUserEntity());
     }
 
@@ -172,11 +172,11 @@ class CommPostJpaRepositoryTest implements CommPostEntityTestUtils, CommPrimaryC
     }
 
     @Test
-    @DisplayName("2차 항목으로 발행되지 않은 모든 컨텐츠 게시글 찾기(최신순)")
+    @DisplayName("2차 항목으로 발행된 모든 컨텐츠 게시글 찾기(최신순)")
     void findBySecondaryCategoryAndIsPublishedTrueOrderByCreatedAtDescTest() {
         // given
         CommSecondaryCategoryEntity testOtherGroup = commSecondaryCategoryRepository.save(
-                CommSecondaryCategoryEntity.builder().order(3).category("기타").build());
+                CommSecondaryCategoryEntity.builder().primaryCategoryEntity(testCommPrimaryCategory).order(3).category("기타").build());
         List<CommPostEntity> commPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createCommPostEntityBuilder()
                         .primaryCategory(testCommPrimaryCategory)
@@ -206,7 +206,7 @@ class CommPostJpaRepositoryTest implements CommPostEntityTestUtils, CommPrimaryC
     }
 
     @Test
-    @DisplayName("인가 회원으로 발행되지 않은 모든 컨텐츠 게시글 찾기(최신순)")
+    @DisplayName("인가 회원으로 발행된 모든 컨텐츠 게시글 찾기(최신순)")
     void findByAuthMemberAndIsPublishedTrueOrderByCreatedAtDescTest() {
         // given
         SiteMemberEntity testSiteMember2 = siteMemberRepository.save(createMemberGoogleUserEntity());
