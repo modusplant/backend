@@ -6,11 +6,13 @@ import java.util.UUID;
 
 public record MemberProfileResponse(
         @Schema(description = "회원 아이디",
-                type = "UUID")
+                type = "string",
+                format = "uuid")
         UUID id,
 
         @Schema(description = "회원 프로필 이미지",
-                type = "byte[]")
+                type = "string",
+                format = "byte")
         byte[] image,
 
         @Schema(description = "회원 프로필 소개",
