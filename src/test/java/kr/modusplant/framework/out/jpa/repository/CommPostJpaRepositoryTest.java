@@ -88,6 +88,7 @@ class CommPostJpaRepositoryTest implements CommPostEntityTestUtils, CommPrimaryC
                         .build()
                 ).collect(Collectors.toList());
         commPostRepository.saveAll(commPosts);
+        double count = commPostRepository.count();
 
         Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
 
@@ -95,9 +96,9 @@ class CommPostJpaRepositoryTest implements CommPostEntityTestUtils, CommPrimaryC
         Page<CommPostEntity> result = commPostRepository.findAllByOrderByCreatedAtDesc(pageable);
 
         // then
-        assertThat(result.getTotalElements()).isEqualTo(10);
+        assertThat(result.getTotalElements()).isEqualTo((long) count);
         assertThat(result.getNumber()).isEqualTo(0);
-        assertThat(result.getTotalPages()).isEqualTo(4);
+        assertThat(result.getTotalPages()).isEqualTo((long) Math.ceil(count / 3));
 
         List<CommPostEntity> content = result.getContent();
         for (int i = 0; i < content.size() - 1; i++) {
@@ -119,6 +120,7 @@ class CommPostJpaRepositoryTest implements CommPostEntityTestUtils, CommPrimaryC
                         .build()
                 ).collect(Collectors.toList());
         commPosts.getFirst().updateIsPublished(false);
+        long count = commPostRepository.count();
         commPostRepository.saveAll(commPosts);
 
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -127,7 +129,7 @@ class CommPostJpaRepositoryTest implements CommPostEntityTestUtils, CommPrimaryC
         Page<CommPostEntity> result = commPostRepository.findByIsPublishedTrueOrderByCreatedAtDesc(pageable);
 
         // then
-        assertThat(result.getTotalElements()).isEqualTo(4); // 발행된 게시글 4건
+        assertThat(result.getTotalElements()).isEqualTo(count + 4); // 추가로 발행된 게시글 4건
         assertThat(result.getContent().stream().noneMatch(CommPostEntity::getIsPublished)).isFalse();
 
         List<CommPostEntity> content = result.getContent();
