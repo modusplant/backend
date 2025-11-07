@@ -11,7 +11,7 @@ public record MemberResponse(
         UUID id,
 
         @Schema(description = "회원 상태",
-                example = "활동 중")
+                example = "active")
         String status,
 
         @Schema(description = "회원 닉네임",
