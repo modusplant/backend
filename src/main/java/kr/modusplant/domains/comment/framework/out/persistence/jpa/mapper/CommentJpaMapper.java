@@ -29,18 +29,6 @@ public interface CommentJpaMapper {
         return commentPath.getPath();
     }
 
-//    @Named("mapPostEntity")
-//    default CommPostEntity mapPostEntity(PostId postId) {
-//        return CommPostEntity.builder().ulid(postId.getId()).build();
-//    }
-
-//    @Named("mapMember")
-//    default SiteMemberEntity mapCommentMember(Author author) {
-//        return SiteMemberEntity.builder()
-//                .uuid(author.getMemberUuid())
-//                .build();
-//    }
-
     @Named("mapIsDeleted")
     default boolean mapIsDeleted(CommentStatus status) {
         CommentStatusType type = status.getStatus();
