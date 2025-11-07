@@ -15,15 +15,15 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PostArchiveJpaMapperImplTest implements PostEntityTestUtils, PostArchiveEntityTestUtils, SiteMemberEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils {
-    private PostArchiveJpaMapper postArchiveJpaMapper = new PostArchiveJpaMapperImpl();
+    private final PostArchiveJpaMapper postArchiveJpaMapper = new PostArchiveJpaMapperImpl();
 
     @Test
     @DisplayName("toPostArchiveEntity로 엔티티 반환하기")
     void testToPostArchiveEntity_givenPostEntity_willReturnPostArchiveEntity() {
         // given
-        SiteMemberEntity memberEntity = createMemberBasicUserEntity().builder().uuid(testAuthorId.getValue()).build();
-        CommPrimaryCategoryEntity primaryCategoryEntity = createTestCommPrimaryCategoryEntity().builder().uuid(testPrimaryCategoryId.getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = createTestCommSecondaryCategoryEntity().builder().uuid(testSecondaryCategoryId.getValue()).build();
+        SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(testAuthorId.getValue()).build();
+        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().uuid(testPrimaryCategoryId.getValue()).build();
+        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().uuid(testSecondaryCategoryId.getValue()).build();
         CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid()
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)

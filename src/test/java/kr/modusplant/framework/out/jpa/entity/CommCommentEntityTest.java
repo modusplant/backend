@@ -27,8 +27,8 @@ public class CommCommentEntityTest implements CommCommentEntityTestUtils,
     void prePersist() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        CommPrimaryCategoryEntity primaryCategory = createTestCommPrimaryCategoryEntity();
-        CommSecondaryCategoryEntity secondaryCategory = createTestCommSecondaryCategoryEntity();
+        CommPrimaryCategoryEntity primaryCategory = createCommPrimaryCategoryEntity();
+        CommSecondaryCategoryEntity secondaryCategory = createCommSecondaryCategoryEntityBuilder().primaryCategoryEntity(primaryCategory).build();
         entityManager.persist(primaryCategory);
         entityManager.persist(secondaryCategory);
         CommPostEntity postEntity = createCommPostEntityBuilder()

@@ -25,7 +25,7 @@ class CommSecondaryCategoryJpaRepositoryTest implements CommSecondaryCategoryEnt
     @Test
     void findByUuidTest() {
         // given & when
-        CommSecondaryCategoryEntity entity = commCategoryRepository.save(createTestCommSecondaryCategoryEntity());
+        CommSecondaryCategoryEntity entity = commCategoryRepository.save(createCommSecondaryCategoryEntityBuilder().primaryCategoryEntity(createCommPrimaryCategoryEntity()).build());
 
         // then
         assertThat(commCategoryRepository.findByUuid(entity.getUuid()).orElseThrow()).isEqualTo(entity);
@@ -35,7 +35,7 @@ class CommSecondaryCategoryJpaRepositoryTest implements CommSecondaryCategoryEnt
     @Test
     void findByCategoryTest() {
         // given & when
-        CommSecondaryCategoryEntity entity = commCategoryRepository.save(createTestCommSecondaryCategoryEntity());
+        CommSecondaryCategoryEntity entity = commCategoryRepository.save(createCommSecondaryCategoryEntityBuilder().primaryCategoryEntity(createCommPrimaryCategoryEntity()).build());
 
         // then
         assertThat(commCategoryRepository.findByCategory(entity.getCategory()).orElseThrow()).isEqualTo(entity);
@@ -45,7 +45,7 @@ class CommSecondaryCategoryJpaRepositoryTest implements CommSecondaryCategoryEnt
     @Test
     void findByOrderTest() {
         // given & when
-        CommSecondaryCategoryEntity entity = commCategoryRepository.save(createTestCommSecondaryCategoryEntity());
+        CommSecondaryCategoryEntity entity = commCategoryRepository.save(createCommSecondaryCategoryEntityBuilder().primaryCategoryEntity(createCommPrimaryCategoryEntity()).build());
 
         // then
         assertThat(commCategoryRepository.findByOrder(entity.getOrder()).orElseThrow()).isEqualTo(entity);
@@ -55,7 +55,7 @@ class CommSecondaryCategoryJpaRepositoryTest implements CommSecondaryCategoryEnt
     @Test
     void findByCreatedAtTest() {
         // given & when
-        CommSecondaryCategoryEntity entity = commCategoryRepository.save(createTestCommSecondaryCategoryEntity());
+        CommSecondaryCategoryEntity entity = commCategoryRepository.save(createCommSecondaryCategoryEntityBuilder().primaryCategoryEntity(createCommPrimaryCategoryEntity()).build());
 
         // then
         assertThat(commCategoryRepository.findByCreatedAt(entity.getCreatedAt()).getFirst()).isEqualTo(entity);
@@ -65,7 +65,7 @@ class CommSecondaryCategoryJpaRepositoryTest implements CommSecondaryCategoryEnt
     @Test
     void deleteByUuidTest() {
         // given
-        CommSecondaryCategoryEntity entity = commCategoryRepository.save(createTestCommSecondaryCategoryEntity());
+        CommSecondaryCategoryEntity entity = commCategoryRepository.save(createCommSecondaryCategoryEntityBuilder().primaryCategoryEntity(createCommPrimaryCategoryEntity()).build());
         UUID uuid = entity.getUuid();
 
         // when
@@ -79,7 +79,7 @@ class CommSecondaryCategoryJpaRepositoryTest implements CommSecondaryCategoryEnt
     @Test
     void existsByUuidTest() {
         // given & when
-        CommSecondaryCategoryEntity entity = commCategoryRepository.save(createTestCommSecondaryCategoryEntity());
+        CommSecondaryCategoryEntity entity = commCategoryRepository.save(createCommSecondaryCategoryEntityBuilder().primaryCategoryEntity(createCommPrimaryCategoryEntity()).build());
 
         // then
         assertThat(commCategoryRepository.existsByUuid(entity.getUuid())).isEqualTo(true);
