@@ -1,13 +1,13 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE "term" (
-	"uuid"	uuid		NOT NULL,
-	"name"	varchar(40)		NOT NULL,
-	"content"	text		NOT NULL,
-	"ver"	varchar(10)		NOT NULL,
-	"created_at"	timestamp		NOT NULL,
-	"last_modified_at"	timestamp		NOT NULL,
-	"ver_num"	int		NOT NULL
+	"uuid"	            uuid		    NOT NULL,
+	"name"	            varchar(40)		NOT NULL,
+	"content"	        text		    NOT NULL,
+	"ver"	            varchar(10)		NOT NULL,
+	"created_at"	    timestamp		NOT NULL,
+	"last_modified_at"	timestamp	    NOT NULL,
+    "ver_num"	        int		        NOT NULL
 );
 
 COMMENT ON COLUMN "term"."name" IS 'UNIQUE';
@@ -74,10 +74,24 @@ CREATE TABLE "comm_post" (
 	"view_count"	int		NOT NULL,
 	"title"	varchar(60)		NOT NULL,
 	"content"	jsonb		NOT NULL,
-	"is_deleted"	boolean		NOT NULL,
+	"is_published"	boolean		NOT NULL,
 	"created_at"	timestamp		NOT NULL,
 	"updated_at"	timestamp		NOT NULL,
+	"published_at" timestamp,
 	"ver"	int		NOT NULL
+);
+
+CREATE TABLE comm_post_archive (
+    "ulid"           varchar(26)  NOT NULL PRIMARY KEY,
+    "pri_cate_uuid"  uuid         NOT NULL,
+    "seco_cate_uuid" uuid         NOT NULL,
+    "auth_memb_uuid" uuid         NOT NULL,
+    "crea_memb_uuid" uuid         NOT NULL,
+    "title"          varchar(60)  NOT NULL,
+    "content"        jsonb        NOT NULL,
+    "created_at"     timestamp    NOT NULL,
+    "updated_at"     timestamp    NOT NULL,
+    "published_at"   timestamp
 );
 
 CREATE TABLE "site_member_term" (
@@ -111,14 +125,11 @@ COMMENT ON COLUMN "site_member_auth"."provider_id" IS 'UNIQUE';
 
 CREATE TABLE "comm_seco_cate" (
 	"uuid"	uuid		NOT NULL,
+	"pri_cate_uuid" uuid NOT NULL,
 	"category"	varchar(40)		NOT NULL,
 	"order"	int		NOT NULL,
 	"created_at"	timestamp		NOT NULL
 );
-
-COMMENT ON COLUMN "comm_seco_cate"."category" IS 'UNIQUE';
-
-COMMENT ON COLUMN "comm_seco_cate"."order" IS 'UNIQUE';
 
 CREATE TABLE "site_member" (
 	"uuid"	uuid		NOT NULL,
@@ -139,7 +150,7 @@ COMMENT ON COLUMN "site_member"."nickname" IS 'UNIQUE';
 CREATE TABLE "site_member_prof" (
 	"uuid"	uuid		NOT NULL,
 	"intro"	text		NULL,
-	"image_url"	varchar(255)		NULL,
+	"image_path"	varchar(255)		NULL,
 	"last_modified_at"	timestamp		NOT NULL,
 	"ver_num"	int		NOT NULL
 );
