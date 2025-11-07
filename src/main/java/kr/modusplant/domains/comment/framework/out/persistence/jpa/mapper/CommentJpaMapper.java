@@ -18,13 +18,13 @@ import org.mapstruct.Named;
 public interface CommentJpaMapper {
 
     @BeanMapping(ignoreByDefault = true)
-    @Mapping(source = "path", target = "path", qualifiedByName = "mapPath")
-    @Mapping(source = "postId", target = "postEntity", qualifiedByName = "mapPostEntity")
-    @Mapping(source = "author", target = "authMember", qualifiedByName = "mapMember")
-    @Mapping(source = "author", target = "createMember", qualifiedByName = "mapMember")
-    @Mapping(source = "content.content", target = "content")
-    @Mapping(source = "status", target = "isDeleted", qualifiedByName = "mapIsDeleted")
-    CommCommentEntity toCommCommentEntity(Comment comment);
+    @Mapping(source = "comment.path", target = "path", qualifiedByName = "mapPath")
+    @Mapping(source = "comment.postId", target = "postEntity", qualifiedByName = "mapPostEntity")
+    @Mapping(source = "commentAuthor", target = "authMember")
+    @Mapping(source = "commentAuthor", target = "createMember")
+    @Mapping(source = "comment.content.content", target = "content")
+    @Mapping(source = "comment.status", target = "isDeleted", qualifiedByName = "mapIsDeleted")
+    CommCommentEntity toCommCommentEntity(Comment comment, SiteMemberEntity commentAuthor);
 
     @Named("mapPath")
     default String mapPath(CommentPath commentPath) {
@@ -36,12 +36,12 @@ public interface CommentJpaMapper {
         return CommPostEntity.builder().ulid(postId.getId()).build();
     }
 
-    @Named("mapMember")
-    default SiteMemberEntity mapCommentMember(Author author) {
-        return SiteMemberEntity.builder()
-                .uuid(author.getMemberUuid())
-                .build();
-    }
+//    @Named("mapMember")
+//    default SiteMemberEntity mapCommentMember(Author author) {
+//        return SiteMemberEntity.builder()
+//                .uuid(author.getMemberUuid())
+//                .build();
+//    }
 
     @Named("mapIsDeleted")
     default boolean mapIsDeleted(CommentStatus status) {
