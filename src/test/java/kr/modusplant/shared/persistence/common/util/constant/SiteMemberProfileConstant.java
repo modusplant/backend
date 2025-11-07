@@ -15,12 +15,12 @@ public final class SiteMemberProfileConstant {
     public static final UUID MEMBER_PROFILE_BASIC_ADMIN_UUID = MEMBER_BASIC_ADMIN_UUID;
     public static final byte[] MEMBER_PROFILE_BASIC_ADMIN_IMAGE_BYTES = "Image for basic admin".getBytes();
     public static final MultipartFile MEMBER_PROFILE_BASIC_ADMIN_IMAGE = new MockMultipartFile("image", "image.png", "image/png", MEMBER_PROFILE_BASIC_ADMIN_IMAGE_BYTES);
-    public static final String MEMBER_PROFILE_BASIC_ADMIN_IMAGE_URL = "member/" + MEMBER_BASIC_ADMIN_UUID + "/profile/image.png";
+    public static final String MEMBER_PROFILE_BASIC_ADMIN_IMAGE_PATH = "member/" + MEMBER_BASIC_ADMIN_UUID + "/profile/image.png";
     public static final String MEMBER_PROFILE_BASIC_ADMIN_INTRODUCTION = "기본 관리자 프로필 소개";
 
     public static final UUID MEMBER_PROFILE_BASIC_USER_UUID = MEMBER_BASIC_USER_UUID;
     public static final byte[] MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES = "Image for basic user".getBytes();
     public static final MultipartFile MEMBER_PROFILE_BASIC_USER_IMAGE = new MockMultipartFile("image", "image.png", "image/png", MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
-    public static final String MEMBER_PROFILE_BASIC_USER_IMAGE_URL = "member/" + MEMBER_BASIC_USER_UUID + "/profile/image.png";
+    public static final String MEMBER_PROFILE_BASIC_USER_IMAGE_PATH = "member/" + MEMBER_BASIC_USER_UUID + "/profile/image.png";
     public static final String MEMBER_PROFILE_BASIC_USER_INTRODUCTION = "기본 유저 프로필 소개";
 }
