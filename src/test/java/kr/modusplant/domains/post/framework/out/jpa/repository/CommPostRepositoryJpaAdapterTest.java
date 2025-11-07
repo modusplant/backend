@@ -55,7 +55,7 @@ class CommPostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestU
     );
 
     @Test
-    @DisplayName("")
+    @DisplayName("게시글 세부 사항 읽기 모델 저장하기")
     void testSave_givenPost_willReturnPostDetailReadModel() {
         // given
         Post post = createPublishedPost();
