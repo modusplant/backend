@@ -14,6 +14,7 @@ import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.shared.persistence.compositekey.CommCommentId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class CommentRepositoryJpaAdapter implements CommentWriteRepository {
     private final CommentJpaMapper mapper;
 
     @Override
+    @Transactional
     public void save(Comment comment) {
         SiteMemberEntity commentAuthorEntity = memberRepository.findByUuid(comment.getAuthor().getMemberUuid())
                 .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_AUTHOR));
