@@ -25,16 +25,6 @@ CREATE TABLE "site_member_role" (
 	"role"	varchar(12)		NOT NULL
 );
 
-CREATE TABLE "prop_bug_rep" (
-	"uuid"	uuid		NOT NULL,
-	"memb_uuid"	uuid		NOT NULL,
-	"category"	varchar(10)		NOT NULL,
-	"title"	varchar(60)		NOT NULL,
-	"image_url"	varchar(200)		NULL,
-	"content"	varchar(6000)		NOT NULL,
-	"created_at"	timestamp		NOT NULL
-);
-
 CREATE TABLE "comm_comment_like" (
 	"post_ulid"	varchar(26)		NOT NULL,
 	"path"	text		NOT NULL,
