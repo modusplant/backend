@@ -21,7 +21,10 @@ public enum CommentErrorCode implements ResponseCode {
     INVALID_COMMENT_STATUS(HttpStatus.BAD_REQUEST, "invalid_comment_status", "댓글의 상태가 올바르지 않습니다"),
     INVALID_AUTHOR_NICKNAME(HttpStatus.BAD_REQUEST, "invalid_author_nickname", "작성자의 닉네임 형식이 올바르지 않습니다"),
 
-    NOT_EXIST_AUTHOR(HttpStatus.NOT_FOUND, "not_exist_author", "댓글의 작성자 데이터가 없습니다");
+    NOT_EXIST_AUTHOR(HttpStatus.NOT_FOUND, "not_exist_author", "댓글 작성자의 데이터가 없습니다"),
+    NOT_EXIST_POST(HttpStatus.NOT_FOUND, "not_exist_post", "댓글이 작성된 게시글의 데이터를 찾을 수 없습니다"),
+
+    EXIST_COMMENT(HttpStatus.CONFLICT, "exist_comment", "댓글이 이미 존재합니다");
 
     private final HttpStatus httpStatus;
     private final String code;

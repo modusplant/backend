@@ -7,7 +7,9 @@ import kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper.Commen
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.supers.CommentJpaRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentWriteRepository;
 import kr.modusplant.framework.out.jpa.entity.CommCommentEntity;
+import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.shared.persistence.compositekey.CommCommentId;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class CommentRepositoryJpaAdapter implements CommentWriteRepository {
     private final SiteMemberJpaRepository memberRepository;
+    private final CommPostJpaRepository postRepository;
     private final CommentJpaRepository commentRepository;
     private final CommentJpaMapper mapper;
 
@@ -24,7 +27,12 @@ public class CommentRepositoryJpaAdapter implements CommentWriteRepository {
     public void save(Comment comment) {
         SiteMemberEntity commentAuthorEntity = memberRepository.findByUuid(comment.getAuthor().getMemberUuid())
                 .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_AUTHOR));
-        CommCommentEntity commentEntity = mapper.toCommCommentEntity(comment, commentAuthorEntity);
+        CommPostEntity commentPostEntity = postRepository.findByUlid(comment.getPostId().getId())
+                .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_POST));
+        CommCommentEntity commentEntity = mapper.toCommCommentEntity(comment, commentAuthorEntity, commentPostEntity);
+        if(commentRepository.existsById(new CommCommentId(comment.getPostId().getId(), comment.getPath().getPath()))) {
+            throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT);
+        }
         commentRepository.save(commentEntity);
     }
 
