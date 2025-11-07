@@ -9,6 +9,7 @@ import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.su
 import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
 import kr.modusplant.framework.out.jpa.entity.common.util.CommCommentEntityTestUtils;
 import kr.modusplant.framework.out.jpa.entity.common.util.CommCommentIdTestUtils;
+import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,8 +24,10 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
         CommCommentEntityTestUtils, CommCommentIdTestUtils {
     private final SiteMemberJpaRepository memberRepository = Mockito.mock(SiteMemberJpaRepository.class);
     private final CommentJpaRepository commentRepository = Mockito.mock(CommentJpaRepository.class);
+    private final CommPostJpaRepository postRepository = Mockito.mock(CommPostJpaRepository.class);
     private final CommentJpaMapper mapper = Mockito.mock(CommentJpaMapper.class);
-    private final CommentRepositoryJpaAdapter repositoryJpaAdapter = new CommentRepositoryJpaAdapter(memberRepository, commentRepository, mapper);
+    private final CommentRepositoryJpaAdapter repositoryJpaAdapter =
+            new CommentRepositoryJpaAdapter(memberRepository,postRepository, commentRepository, mapper);
 
 //    @Test
 //    @DisplayName("유효한 댓글로 댓글 저장")
