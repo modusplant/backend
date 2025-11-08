@@ -4,5 +4,5 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
-public record MemberProfileUpdateRecord(UUID id, String introduction, MultipartFile image, String nickname) {
+public record MemberProfileOverrideRecord(UUID id, String introduction, MultipartFile image, String nickname) {
 }
