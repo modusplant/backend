@@ -19,7 +19,7 @@ public class MemberProfileImage {
     public static MemberProfileImage create(MemberProfileImagePath profileImagePath, MemberProfileImageBytes profileImageBytes) {
         if (profileImagePath == null) {
             throw new EmptyMemberProfileImagePathException();
-        } else if (profileImageBytes.isEmpty()) {
+        } else if (profileImageBytes == null) {
             throw new EmptyMemberProfileImageBytesException();
         }
         return new MemberProfileImage(profileImagePath, profileImageBytes);
