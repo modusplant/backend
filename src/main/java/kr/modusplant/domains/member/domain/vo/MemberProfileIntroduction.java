@@ -3,11 +3,13 @@ package kr.modusplant.domains.member.domain.vo;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileIntroductionException;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class MemberProfileIntroduction {
     private final String value;
@@ -17,10 +19,6 @@ public class MemberProfileIntroduction {
             throw new EmptyMemberProfileIntroductionException();
         }
         return new MemberProfileIntroduction(value);
-    }
-
-    public boolean isEmpty() {
-        return value.isEmpty();
     }
 
     @Override

@@ -2,7 +2,9 @@ package kr.modusplant.domains.member.framework.out.jpa.mapper;
 
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
+import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
 import kr.modusplant.domains.member.domain.vo.*;
+import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.supers.MemberProfileJpaMapper;
 import kr.modusplant.framework.out.aws.service.S3FileService;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberProfileEntity;
@@ -29,12 +31,24 @@ public class MemberProfileJpaMapperImpl implements MemberProfileJpaMapper {
 
     @Override
     public MemberProfile toMemberProfile(SiteMemberProfileEntity entity) throws IOException {
+        MemberProfileImage memberProfileImage;
+        if (entity.getImagePath() == null) {
+            memberProfileImage = MemberEmptyProfileImage.create();
+        } else {
+            memberProfileImage = MemberProfileImage.create(
+                    MemberProfileImagePath.create(entity.getImagePath()),
+                    MemberProfileImageBytes.create(s3FileService.downloadFile(entity.getImagePath())));
+        }
+        MemberProfileIntroduction memberProfileIntroduction;
+        if (entity.getIntroduction() == null) {
+            memberProfileIntroduction = MemberEmptyProfileIntroduction.create();
+        } else {
+            memberProfileIntroduction = MemberProfileIntroduction.create(entity.getIntroduction());
+        }
         return MemberProfile.create(
                 MemberId.fromUuid(entity.getMember().getUuid()),
-                MemberProfileImage.create(
-                        MemberProfileImagePath.create(entity.getImagePath()),
-                        MemberProfileImageBytes.create(s3FileService.downloadFile(entity.getImagePath()))),
-                MemberProfileIntroduction.create(entity.getIntroduction()),
+                memberProfileImage,
+                memberProfileIntroduction,
                 MemberNickname.create(entity.getMember().getNickname()));
         }
 }
