@@ -1,24 +1,23 @@
-package kr.modusplant.domains.member.domain.vo;
+package kr.modusplant.domains.member.domain.vo.nullobject;
 
-import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileImageBytesException;
+import kr.modusplant.domains.member.domain.vo.MemberProfileImageBytes;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class MemberProfileImageBytes {
-    private final byte[] value;
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class MemberEmptyProfileImageBytes extends MemberProfileImageBytes {
 
-    public static MemberProfileImageBytes create(byte[] value) {
-        if (value == null) {
-            throw new EmptyMemberProfileImageBytesException();
-        }
-        return new MemberProfileImageBytes(value);
+    public static MemberEmptyProfileImageBytes create() {
+        return new MemberEmptyProfileImageBytes();
+    }
+
+    @Override
+    public byte[] getValue() {
+        return null;
     }
 
     @Override
