@@ -42,9 +42,9 @@ public class MemberRestController {
                 DataResponse.ok(memberController.register(request)));
     }
 
-    @Operation(summary = "회원 프로필 갱신 API", description = "회원 프로필을 갱신합니다.")
-    @PostMapping("/{id}/profile")
-    public ResponseEntity<DataResponse<MemberProfileResponse>> updateMemberProfile(
+    @Operation(summary = "회원 프로필 덮어쓰기 API", description = "기존 회원 프로필을 덮어씁니다.")
+    @PutMapping("/{id}/profile")
+    public ResponseEntity<DataResponse<MemberProfileResponse>> overrideMemberProfile(
             @Parameter(description = "기존에 저장된 회원의 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
             @PathVariable(required = false)
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
@@ -52,21 +52,21 @@ public class MemberRestController {
 
             @Parameter(description = "갱신할 회원의 프로필 이미지", schema = @Schema(type = "string", format = "binary"))
             @RequestPart(name = "image")
-            @NotNull(message = "회원 프로필 이미지가 비어 있습니다. ")
+            @NotNull(message = "회원 프로필 이미지가 누락되었습니다. ")
             MultipartFile image,
 
             @Parameter(description = "갱신할 회원의 프로필 소개", example = "프로필 소개")
             @RequestPart(name = "introduction")
-            @NotNull(message = "회원 프로필 소개가 비어 있습니다. ")
+            @NotNull(message = "회원 프로필 소개가 누락되었습니다. ")
             String introduction,
 
-            @Parameter(description = "갱신할 회원의 닉네임", example = "NewPlayer")
+            @Parameter(description = "갱신할 회원의 닉네임", example = "NewPlayer", schema = @Schema(type = "string", pattern = REGEX_NICKNAME))
             @RequestPart(name = "nickname")
             @NotBlank(message = "회원 닉네임이 비어 있습니다. ")
             @Pattern(regexp = REGEX_NICKNAME, message = "회원 닉네임 서식이 올바르지 않습니다. ")
             String nickname) throws IOException {
         return ResponseEntity.status(HttpStatus.OK).body(
-                DataResponse.ok(memberController.updateProfile(new MemberProfileUpdateRecord(id, introduction, image, nickname))));
+                DataResponse.ok(memberController.overrideProfile(new MemberProfileOverrideRecord(id, introduction, image, nickname))));
     }
 
     @Operation(summary = "게시글 좋아요 API", description = "게시글에 좋아요를 누릅니다.")

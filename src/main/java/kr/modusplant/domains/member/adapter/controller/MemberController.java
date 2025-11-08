@@ -51,9 +51,9 @@ public class MemberController {
         return memberMapper.toMemberResponse(memberRepository.save(memberNickname));
     }
 
-    public MemberProfileResponse updateProfile(MemberProfileUpdateRecord request) throws IOException {
+    public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord request) throws IOException {
         MemberId memberId = MemberId.fromUuid(request.id());
-        validateBeforeUpdateProfile(memberId, MemberNickname.create(request.nickname()));
+        validateBeforeOverrideProfile(memberId, MemberNickname.create(request.nickname()));
         MemberProfile memberProfile = memberProfileRepository.getById(memberId);
         memberProfileRepository.deleteImage(memberProfile.getMemberProfileImage());
         String newImagePath = generateMemberProfileImagePath(memberId.getValue(), request.image().getOriginalFilename());
@@ -106,7 +106,7 @@ public class MemberController {
         }
     }
 
-    private void validateBeforeUpdateProfile(MemberId memberId, MemberNickname memberNickname) {
+    private void validateBeforeOverrideProfile(MemberId memberId, MemberNickname memberNickname) {
         if (!memberRepository.isIdExist(memberId) || !memberProfileRepository.isIdExist(memberId)) {
             throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
         }

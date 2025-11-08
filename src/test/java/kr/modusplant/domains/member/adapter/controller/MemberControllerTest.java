@@ -81,8 +81,8 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("중복된 닉네임으로 인해 updateProfile로 닉네임 갱신 실패")
-    void testValidateBeforeUpdateProfile_givenAlreadyExistedProfile_willThrowException() {
+    @DisplayName("중복된 닉네임으로 인해 overrideProfile로 닉네임 갱신 실패")
+    void testValidateBeforeOverrideProfile_givenAlreadyExistedProfile_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(memberProfileRepository.isIdExist(any())).willReturn(true);
@@ -90,7 +90,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
 
         // when & then
         EntityExistsException alreadyExistedNicknameException = assertThrows(
-                EntityExistsException.class, () -> memberController.updateProfile(TEST_MEMBER_NICKNAME_UPDATE_RECORD));
+                EntityExistsException.class, () -> memberController.overrideProfile(TEST_MEMBER_NICKNAME_UPDATE_RECORD));
         assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(ALREADY_EXISTED_NICKNAME.getMessage());
     }
 
