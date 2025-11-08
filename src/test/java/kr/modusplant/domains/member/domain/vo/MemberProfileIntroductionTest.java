@@ -1,6 +1,5 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileIntroductionException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import org.junit.jupiter.api.DisplayName;
@@ -9,11 +8,12 @@ import org.junit.jupiter.api.Test;
 import java.util.UUID;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils.testMemberProfileIntroduction;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-class MemberProfileIntroductionTest implements MemberProfileIntroductionTestUtils {
+class MemberProfileIntroductionTest {
     @Test
     @DisplayName("create으로 회원 프로필 소개 반환")
     void testCreate_givenValidValue_willReturnMemberProfileIntroduction() {

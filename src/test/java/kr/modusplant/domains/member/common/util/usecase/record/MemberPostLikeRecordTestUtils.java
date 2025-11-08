@@ -6,5 +6,5 @@ import static kr.modusplant.shared.persistence.common.util.constant.CommPostCons
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 
 public interface MemberPostLikeRecordTestUtils {
-    MemberPostLikeRecord TEST_MEMBER_POST_LIKE_DTO = new MemberPostLikeRecord(MEMBER_BASIC_USER_UUID, TEST_COMM_POST_ULID);
+    MemberPostLikeRecord testMemberPostLikeRecord = new MemberPostLikeRecord(MEMBER_BASIC_USER_UUID, TEST_COMM_POST_ULID);
 }

@@ -2,9 +2,13 @@ package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.adapter.mapper.MemberMapperImpl;
 import kr.modusplant.domains.member.adapter.mapper.MemberProfileMapperImpl;
+import kr.modusplant.domains.member.common.util.domain.aggregate.MemberProfileTestUtils;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
+import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
+import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
 import kr.modusplant.domains.member.domain.vo.MemberId;
+import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
 import kr.modusplant.domains.member.framework.out.jpa.repository.MemberRepositoryJpaAdapter;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
@@ -12,6 +16,8 @@ import kr.modusplant.domains.member.usecase.port.repository.MemberProfileReposit
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
 import kr.modusplant.domains.member.usecase.port.repository.TargetCommentIdRepository;
 import kr.modusplant.domains.member.usecase.port.repository.TargetPostIdRepository;
+import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord;
+import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.framework.out.aws.service.S3FileService;
 import kr.modusplant.framework.out.jpa.entity.CommCommentEntity;
 import kr.modusplant.framework.out.jpa.entity.CommCommentLikeEntity;
@@ -31,18 +37,29 @@ import kr.modusplant.shared.exception.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.mock.web.MockMultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.TEST_MEMBER_COMMENT_LIKE_RECORD;
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.TEST_MEMBER_COMMENT_UNLIKE_RECORD;
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberNicknameUpdateRecordTestUtils.TEST_MEMBER_NICKNAME_UPDATE_RECORD;
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostLikeRecordTestUtils.TEST_MEMBER_POST_LIKE_DTO;
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.TEST_MEMBER_POST_UNLIKE_RECORD;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberBirthDateTestUtils.testMemberBirthDate;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils.testMemberNickname;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.testMemberCommentLikeRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.testMemberCommentUnlikeRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostLikeRecordTestUtils.testMemberPostLikeRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecord;
 import static kr.modusplant.domains.member.common.util.usecase.request.MemberRegisterRequestTestUtils.testMemberRegisterRequest;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberResponseTestUtils.testMemberResponse;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 import static kr.modusplant.shared.event.common.util.CommentLikeEventTestUtils.testCommentLikeEvent;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,7 +68,7 @@ import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, CommPostEntityTestUtils {
+class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, PostLikeEventTestUtils, CommPostEntityTestUtils {
     private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
     private final MemberMapper memberMapper = new MemberMapperImpl();
     private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl();
@@ -69,6 +86,17 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     private final MemberController memberController = new MemberController(s3FileService, memberMapper, memberProfileMapper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
 
     @Test
+    @DisplayName("register로 회원 등록")
+    void testRegister_givenValidRegisterRequest_willReturnResponse() {
+        // given
+        given(memberRepository.isNicknameExist(any())).willReturn(false);
+        given(memberRepository.save(any())).willReturn(createMember());
+
+        // when & then
+        assertThat(memberController.register(testMemberRegisterRequest)).isEqualTo(testMemberResponse);
+    }
+
+    @Test
     @DisplayName("중복된 닉네임으로 인해 register로 회원 등록 실패")
     void testValidateBeforeRegister_givenAlreadyExistedNickname_willThrowException() {
         // given
@@ -81,16 +109,74 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("중복된 닉네임으로 인해 overrideProfile로 닉네임 갱신 실패")
-    void testValidateBeforeOverrideProfile_givenAlreadyExistedProfile_willThrowException() {
+    @DisplayName("존재하는 모든 데이터로 overrideProfile로 프로필 덮어쓰기")
+    void testOverrideProfile_givenExistedData_willReturnResponse() throws IOException {
+        // given
+        MemberProfile memberProfile = createMemberProfile();
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        given(memberProfileRepository.getById(any())).willReturn(Optional.of(memberProfile));
+        willDoNothing().given(s3FileService).deleteFiles(any());
+        willDoNothing().given(s3FileService).uploadFile(any(), any());
+        given(memberProfileRepository.save(any())).willReturn(memberProfile);
+
+        // when
+        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecord);
+
+        // then
+        assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
+        assertThat(memberProfileResponse.image()).isEqualTo(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
+        assertThat(memberProfileResponse.introduction()).isEqualTo(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
+        assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+    }
+
+    @Test
+    @DisplayName("존재하는 않는 데이터로 overrideProfile로 프로필 덮어쓰기")
+    void testOverrideProfile_givenNotFoundData_willReturnResponse() throws IOException {
+        // given
+        MemberProfile memberProfile = MemberProfile.create(testMemberId, MemberEmptyProfileImage.create(), MemberEmptyProfileIntroduction.create(), testMemberNickname);
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        given(memberProfileRepository.getById(any())).willReturn(Optional.empty());
+        given(memberProfileRepository.save(any())).willReturn(memberProfile);
+
+        // when
+        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(
+                new MemberProfileOverrideRecord(
+                        MEMBER_BASIC_USER_UUID,
+                        "",
+                        new MockMultipartFile("image", "image.png", "image/png", new byte[0]),
+                        MEMBER_BASIC_USER_NICKNAME));
+
+        // then
+        assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
+        assertThat(memberProfileResponse.image()).isEqualTo(null);
+        assertThat(memberProfileResponse.introduction()).isEqualTo(null);
+        assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+    }
+    
+    @Test
+    @DisplayName("존재하지 않는 아이디로 인해 overrideProfile로 프로필 덮어쓰기 실패")
+    void testValidateBeforeOverrideProfile_givenNotFoundId_willThrowException() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(false);
+
+        // when & then
+        EntityNotFoundException alreadyExistedNicknameException = assertThrows(
+                EntityNotFoundException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
+        assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
+    }
+
+    @Test
+    @DisplayName("이미 존재하는 닉네임으로 인해 overrideProfile로 프로필 덮어쓰기 실패")
+    void testValidateBeforeOverrideProfile_givenAlreadyExistedNickname_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
-        given(memberProfileRepository.isIdExist(any())).willReturn(true);
         given(memberRepository.getByNickname(any())).willReturn(Optional.of(Member.create(MemberId.generate(), testMemberActiveStatus, testMemberNickname, testMemberBirthDate)));
 
         // when & then
         EntityExistsException alreadyExistedNicknameException = assertThrows(
-                EntityExistsException.class, () -> memberController.overrideProfile(TEST_MEMBER_NICKNAME_UPDATE_RECORD));
+                EntityExistsException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
         assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(ALREADY_EXISTED_NICKNAME.getMessage());
     }
 
@@ -109,7 +195,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         given(commPostRepository.findByUlid(postId)).willReturn(postEntity);
 
         // when
-        memberController.likePost(TEST_MEMBER_POST_LIKE_DTO);
+        memberController.likePost(testMemberPostLikeRecord);
 
         // then
         verify(commPostLikeRepository, times(1)).save(any());
@@ -126,7 +212,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         given(targetPostIdRepository.isUnliked(any(), any())).willReturn(false);
 
         // when
-        memberController.likePost(TEST_MEMBER_POST_LIKE_DTO);
+        memberController.likePost(testMemberPostLikeRecord);
 
         // then
         verify(commPostLikeRepository, times(0)).save(any());
@@ -148,7 +234,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         given(commPostRepository.findByUlid(postId)).willReturn(postEntity);
 
         // when
-        memberController.unlikePost(TEST_MEMBER_POST_UNLIKE_RECORD);
+        memberController.unlikePost(testMemberPostUnlikeRecord);
 
         // then
         verify(commPostLikeRepository, times(1)).delete(any());
@@ -165,7 +251,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         given(targetPostIdRepository.isLiked(any(), any())).willReturn(false);
 
         // when
-        memberController.unlikePost(TEST_MEMBER_POST_UNLIKE_RECORD);
+        memberController.unlikePost(testMemberPostUnlikeRecord);
 
         // then
         verify(commPostLikeRepository, times(0)).delete(any());
@@ -180,9 +266,9 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
 
         // when
         EntityNotFoundException entityNotFoundExceptionForLike = assertThrows(EntityNotFoundException.class,
-                () -> memberController.likePost(TEST_MEMBER_POST_LIKE_DTO));
+                () -> memberController.likePost(testMemberPostLikeRecord));
         EntityNotFoundException entityNotFoundExceptionForUnlike = assertThrows(EntityNotFoundException.class,
-                () -> memberController.unlikePost(TEST_MEMBER_POST_UNLIKE_RECORD));
+                () -> memberController.unlikePost(testMemberPostUnlikeRecord));
 
         // then
         assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
@@ -198,9 +284,9 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
 
         // when
         EntityNotFoundException entityNotFoundExceptionForLike = assertThrows(EntityNotFoundException.class,
-                () -> memberController.likePost(TEST_MEMBER_POST_LIKE_DTO));
+                () -> memberController.likePost(testMemberPostLikeRecord));
         EntityNotFoundException entityNotFoundExceptionForUnlike = assertThrows(EntityNotFoundException.class,
-                () -> memberController.unlikePost(TEST_MEMBER_POST_UNLIKE_RECORD));
+                () -> memberController.unlikePost(testMemberPostUnlikeRecord));
 
         // then
         assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
@@ -223,7 +309,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         given(commCommentRepository.findByPostUlidAndPath(postId, path)).willReturn(commentEntity);
 
         // when
-        memberController.likeComment(TEST_MEMBER_COMMENT_LIKE_RECORD);
+        memberController.likeComment(testMemberCommentLikeRecord);
 
         // then
         verify(commCommentLikeRepository, times(1)).save(any());
@@ -240,7 +326,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         given(targetCommentIdRepository.isUnliked(any(), any())).willReturn(false);
 
         // when
-        memberController.likeComment(TEST_MEMBER_COMMENT_LIKE_RECORD);
+        memberController.likeComment(testMemberCommentLikeRecord);
 
         // then
         verify(commCommentLikeRepository, times(0)).save(any());
@@ -263,7 +349,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         given(commCommentRepository.findByPostUlidAndPath(postId, path)).willReturn(commentEntity);
 
         // when
-        memberController.unlikeComment(TEST_MEMBER_COMMENT_UNLIKE_RECORD);
+        memberController.unlikeComment(testMemberCommentUnlikeRecord);
 
         // then
         verify(commCommentLikeRepository, times(1)).delete(any());
@@ -280,7 +366,7 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         given(targetCommentIdRepository.isLiked(any(), any())).willReturn(false);
 
         // when
-        memberController.unlikeComment(TEST_MEMBER_COMMENT_UNLIKE_RECORD);
+        memberController.unlikeComment(testMemberCommentUnlikeRecord);
 
         // then
         verify(commCommentLikeRepository, times(0)).delete(any());
@@ -295,9 +381,9 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
 
         // when
         EntityNotFoundException entityNotFoundExceptionForLike = assertThrows(EntityNotFoundException.class,
-                () -> memberController.likeComment(TEST_MEMBER_COMMENT_LIKE_RECORD));
+                () -> memberController.likeComment(testMemberCommentLikeRecord));
         EntityNotFoundException entityNotFoundExceptionForUnlike = assertThrows(EntityNotFoundException.class,
-                () -> memberController.unlikeComment(TEST_MEMBER_COMMENT_UNLIKE_RECORD));
+                () -> memberController.unlikeComment(testMemberCommentUnlikeRecord));
 
         // then
         assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
@@ -313,9 +399,9 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
 
         // when
         EntityNotFoundException entityNotFoundExceptionForLike = assertThrows(EntityNotFoundException.class,
-                () -> memberController.likeComment(TEST_MEMBER_COMMENT_LIKE_RECORD));
+                () -> memberController.likeComment(testMemberCommentLikeRecord));
         EntityNotFoundException entityNotFoundExceptionForUnlike = assertThrows(EntityNotFoundException.class,
-                () -> memberController.unlikeComment(TEST_MEMBER_COMMENT_UNLIKE_RECORD));
+                () -> memberController.unlikeComment(testMemberCommentUnlikeRecord));
 
         // then
         assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID.getMessage());

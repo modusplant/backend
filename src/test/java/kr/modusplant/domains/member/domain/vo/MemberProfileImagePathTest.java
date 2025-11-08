@@ -1,6 +1,5 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.common.util.domain.vo.MemberProfileImagePathTestUtils;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileImagePathException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import org.junit.jupiter.api.DisplayName;
@@ -10,11 +9,12 @@ import java.util.UUID;
 
 import static kr.modusplant.domains.member.adapter.util.MemberProfileImageUtils.generateMemberProfileImagePath;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileImagePathTestUtils.testMemberProfileImagePath;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-class MemberProfileImagePathTest implements MemberProfileImagePathTestUtils {
+class MemberProfileImagePathTest {
     @Test
     @DisplayName("create으로 회원 프로필 이미지 경로 반환")
     void testCreate_givenValidValue_willReturnMemberProfileImagePath() {
