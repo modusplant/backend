@@ -6,6 +6,8 @@ import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.usecase.model.CommentReadModel;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+
 public interface CommentReadModelTestUtils extends PostIdTestUtils, CommentPathTestUtils,
         MemberTestUtils, CommentContentTestUtils {
     CommentReadModel testCommentReadModel = new CommentReadModel(

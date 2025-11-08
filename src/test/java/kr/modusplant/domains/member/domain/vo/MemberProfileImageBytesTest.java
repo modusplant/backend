@@ -1,6 +1,5 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.common.util.domain.vo.MemberProfileImageBytesTestUtils;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileImageBytesException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import org.junit.jupiter.api.DisplayName;
@@ -9,11 +8,12 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileImageBytesTestUtils.testMemberProfileImageBytes;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-class MemberProfileImageBytesTest implements MemberProfileImageBytesTestUtils {
+class MemberProfileImageBytesTest {
     @Test
     @DisplayName("create으로 회원 프로필 이미지 바이트 반환")
     void testCreate_givenValidValue_willReturnMemberProfileImageBytes() {

@@ -1,7 +1,5 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.common.util.domain.vo.MemberBirthDateTestUtils;
-import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberBirthDateException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import org.junit.jupiter.api.DisplayName;
@@ -9,10 +7,12 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberBirthDateTestUtils.testMemberBirthDate;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-class MemberBirthDateTest implements MemberBirthDateTestUtils, MemberIdTestUtils {
+class MemberBirthDateTest {
     @Test
     @DisplayName("create로 회원 생일 반환")
     void testCreate_givenValidValue_willReturnMemberBirthDate() {

@@ -7,5 +7,5 @@ import static kr.modusplant.shared.persistence.common.util.constant.CommPostCons
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 
 public interface MemberCommentUnlikeRecordTestUtils {
-    MemberCommentUnlikeRecord TEST_MEMBER_COMMENT_UNLIKE_RECORD = new MemberCommentUnlikeRecord(MEMBER_BASIC_USER_UUID, TEST_COMM_POST_ULID, TEST_COMM_COMMENT_PATH);
+    MemberCommentUnlikeRecord testMemberCommentUnlikeRecord = new MemberCommentUnlikeRecord(MEMBER_BASIC_USER_UUID, TEST_COMM_POST_ULID, TEST_COMM_COMMENT_PATH);
 }

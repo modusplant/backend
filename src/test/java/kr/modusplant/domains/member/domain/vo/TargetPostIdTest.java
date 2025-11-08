@@ -1,6 +1,5 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.common.util.domain.vo.TargetPostIdTestUtils;
 import kr.modusplant.domains.member.domain.exception.EmptyTargetPostIdException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.shared.exception.InvalidDataException;
@@ -9,11 +8,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberBirthDateTestUtils.testMemberBirthDate;
+import static kr.modusplant.domains.member.common.util.domain.vo.TargetPostIdTestUtils.testTargetPostId;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-class TargetPostIdTest implements TargetPostIdTestUtils {
+class TargetPostIdTest {
     @Test
     @DisplayName("create으로 대상 게시글 아이디 반환")
     void testCreate_givenValidValue_willReturnTargetPostId() {

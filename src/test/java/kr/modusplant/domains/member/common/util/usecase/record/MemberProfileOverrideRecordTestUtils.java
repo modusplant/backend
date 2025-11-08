@@ -7,6 +7,6 @@ import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberCo
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
 
-public interface MemberNicknameUpdateRecordTestUtils {
-    MemberProfileOverrideRecord TEST_MEMBER_NICKNAME_UPDATE_RECORD = new MemberProfileOverrideRecord(MEMBER_BASIC_USER_UUID, MEMBER_PROFILE_BASIC_USER_INTRODUCTION, MEMBER_PROFILE_BASIC_USER_IMAGE, MEMBER_BASIC_USER_NICKNAME);
+public interface MemberProfileOverrideRecordTestUtils {
+    MemberProfileOverrideRecord testMemberProfileOverrideRecord = new MemberProfileOverrideRecord(MEMBER_BASIC_USER_UUID, MEMBER_PROFILE_BASIC_USER_INTRODUCTION, MEMBER_PROFILE_BASIC_USER_IMAGE, MEMBER_BASIC_USER_NICKNAME);
 }
