@@ -1,8 +1,9 @@
 package kr.modusplant.domains.member.framework.out.jpa.mapper;
 
-import kr.modusplant.domains.member.common.util.framework.out.persistence.jpa.entity.MemberEntityTestUtils;
+import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.supers.MemberJpaMapper;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +11,7 @@ import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberCo
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class MemberJpaMapperImplTest implements MemberEntityTestUtils {
+class MemberJpaMapperImplTest implements MemberTestUtils, SiteMemberEntityTestUtils {
     private final MemberJpaMapper memberJpaMapper = new MemberJpaMapperImpl();
 
     @Test
@@ -31,6 +32,6 @@ class MemberJpaMapperImplTest implements MemberEntityTestUtils {
     @Test
     @DisplayName("toMember로 회원 반환")
     void testToMember_givenValidMemberEntity_willReturnMember() {
-        assertThat(memberJpaMapper.toMember(createMemberEntityWithUuid())).isEqualTo(createMember());
+        assertThat(memberJpaMapper.toMember(createMemberBasicUserEntityWithUuid())).isEqualTo(createMember());
     }
 }
