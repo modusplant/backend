@@ -16,6 +16,7 @@ import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +44,7 @@ public class MemberRestController {
     }
 
     @Operation(summary = "회원 프로필 덮어쓰기 API", description = "기존 회원 프로필을 덮어씁니다.")
-    @PutMapping("/{id}/profile")
+    @PutMapping(value = "/{id}/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<MemberProfileResponse>> overrideMemberProfile(
             @Parameter(description = "기존에 저장된 회원의 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
             @PathVariable(required = false)

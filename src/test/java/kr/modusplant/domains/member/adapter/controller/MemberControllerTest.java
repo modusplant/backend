@@ -118,7 +118,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(memberProfileRepository.getById(any())).willReturn(Optional.of(memberProfile));
         willDoNothing().given(s3FileService).deleteFiles(any());
         willDoNothing().given(s3FileService).uploadFile(any(), any());
-        given(memberProfileRepository.save(any())).willReturn(memberProfile);
+        given(memberProfileRepository.addOrUpdate(any())).willReturn(memberProfile);
 
         // when
         MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecord);
@@ -138,7 +138,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(memberProfileRepository.getById(any())).willReturn(Optional.empty());
-        given(memberProfileRepository.save(any())).willReturn(memberProfile);
+        given(memberProfileRepository.addOrUpdate(any())).willReturn(memberProfile);
 
         // when
         MemberProfileResponse memberProfileResponse = memberController.overrideProfile(
