@@ -65,9 +65,10 @@ public class MemberController {
         Optional<MemberProfile> optionalMemberProfile = memberProfileRepository.getById(memberId);
         if (optionalMemberProfile.isPresent()) {
             memberProfile = optionalMemberProfile.orElseThrow();
-            s3FileService.deleteFiles(
-                    memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue()
-            );
+            String imagePath = memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue();
+            if (imagePath != null) {
+                s3FileService.deleteFiles(imagePath);
+            }
         }
         if (isImageExist) {
             String newImagePath = uploadImage(memberId, record);

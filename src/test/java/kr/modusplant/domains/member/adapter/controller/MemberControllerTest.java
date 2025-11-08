@@ -46,6 +46,7 @@ import java.util.UUID;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberBirthDateTestUtils.testMemberBirthDate;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils.testMemberNickname;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils.testMemberProfileIntroduction;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.testMemberCommentLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.testMemberCommentUnlikeRecord;
@@ -109,13 +110,41 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     }
 
     @Test
-    @DisplayName("존재하는 모든 데이터로 overrideProfile로 프로필 덮어쓰기")
+    @DisplayName("이미지 경로를 포함해서 존재하는 모든 데이터로 overrideProfile로 프로필 덮어쓰기")
     void testOverrideProfile_givenExistedData_willReturnResponse() throws IOException {
         // given
         MemberProfile memberProfile = createMemberProfile();
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(memberProfileRepository.getById(any())).willReturn(Optional.of(memberProfile));
+        willDoNothing().given(s3FileService).deleteFiles(any());
+        willDoNothing().given(s3FileService).uploadFile(any(), any());
+        given(memberProfileRepository.addOrUpdate(any())).willReturn(memberProfile);
+
+        // when
+        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecord);
+
+        // then
+        assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
+        assertThat(memberProfileResponse.image()).isEqualTo(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
+        assertThat(memberProfileResponse.introduction()).isEqualTo(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
+        assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+    }
+
+    @Test
+    @DisplayName("이미지 경로를 제외한 존재하는 모든 데이터로 overrideProfile로 프로필 덮어쓰기")
+    void testOverrideProfile_givenExistedDataExceptOfImagePath_willReturnResponse() throws IOException {
+        // given
+        MemberProfile memberProfile = createMemberProfile();
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        given(memberProfileRepository.getById(any())).willReturn(Optional.of(
+                MemberProfile.create(
+                        testMemberId,
+                        MemberEmptyProfileImage.create(),
+                        testMemberProfileIntroduction,
+                        testMemberNickname))
+        );
         willDoNothing().given(s3FileService).deleteFiles(any());
         willDoNothing().given(s3FileService).uploadFile(any(), any());
         given(memberProfileRepository.addOrUpdate(any())).willReturn(memberProfile);
