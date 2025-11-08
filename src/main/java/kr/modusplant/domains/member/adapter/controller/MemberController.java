@@ -51,49 +51,49 @@ public class MemberController {
         return memberMapper.toMemberResponse(memberRepository.save(memberNickname));
     }
 
-    public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord request) throws IOException {
-        MemberId memberId = MemberId.fromUuid(request.id());
-        validateBeforeOverrideProfile(memberId, MemberNickname.create(request.nickname()));
+    public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord record) throws IOException {
+        MemberId memberId = MemberId.fromUuid(record.id());
+        validateBeforeOverrideProfile(memberId, MemberNickname.create(record.nickname()));
         MemberProfile memberProfile = memberProfileRepository.getById(memberId);
         memberProfileRepository.deleteImage(memberProfile.getMemberProfileImage());
-        String newImagePath = generateMemberProfileImagePath(memberId.getValue(), request.image().getOriginalFilename());
-        s3FileService.uploadFile(request.image(), newImagePath);
+        String newImagePath = generateMemberProfileImagePath(memberId.getValue(), record.image().getOriginalFilename());
+        s3FileService.uploadFile(record.image(), newImagePath);
         memberProfile.updateProfileImage(MemberProfileImage.create(
-                MemberProfileImagePath.create(newImagePath), MemberProfileImageBytes.create(request.image().getBytes())
+                MemberProfileImagePath.create(newImagePath), MemberProfileImageBytes.create(record.image().getBytes())
         ));
         return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.save(memberProfile));
     }
 
-    public void likePost(MemberPostLikeRecord request) {
-        MemberId memberId = MemberId.fromUuid(request.memberId());
-        TargetPostId targetPostId = TargetPostId.create(request.postUlid());
+    public void likePost(MemberPostLikeRecord record) {
+        MemberId memberId = MemberId.fromUuid(record.memberId());
+        TargetPostId targetPostId = TargetPostId.create(record.postUlid());
         validateBeforeLikeOrUnlikePost(memberId, targetPostId);
         if (targetPostIdRepository.isUnliked(memberId, targetPostId)) {
             eventBus.publish(PostLikeEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
     }
 
-    public void unlikePost(MemberPostUnlikeRecord request) {
-        MemberId memberId = MemberId.fromUuid(request.memberId());
-        TargetPostId targetPostId = TargetPostId.create(request.postUlid());
+    public void unlikePost(MemberPostUnlikeRecord record) {
+        MemberId memberId = MemberId.fromUuid(record.memberId());
+        TargetPostId targetPostId = TargetPostId.create(record.postUlid());
         validateBeforeLikeOrUnlikePost(memberId, targetPostId);
         if (targetPostIdRepository.isLiked(memberId, targetPostId)) {
             eventBus.publish(PostUnlikeEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
     }
 
-    public void likeComment(MemberCommentLikeRecord request) {
-        MemberId memberId = MemberId.fromUuid(request.memberId());
-        TargetCommentId targetCommentId = TargetCommentId.create(TargetPostId.create(request.postUlid()), TargetCommentPath.create(request.path()));
+    public void likeComment(MemberCommentLikeRecord record) {
+        MemberId memberId = MemberId.fromUuid(record.memberId());
+        TargetCommentId targetCommentId = TargetCommentId.create(TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
         validateBeforeLikeOrUnlikeComment(memberId, targetCommentId);
         if (targetCommentIdRepository.isUnliked(memberId, targetCommentId)) {
             eventBus.publish(CommentLikeEvent.create(memberId.getValue(), targetCommentId.getTargetPostId().getValue(), targetCommentId.getTargetCommentPath().getValue()));
         }
     }
 
-    public void unlikeComment(MemberCommentUnlikeRecord request) {
-        MemberId memberId = MemberId.fromUuid(request.memberId());
-        TargetCommentId targetCommentId = TargetCommentId.create(TargetPostId.create(request.postUlid()), TargetCommentPath.create(request.path()));
+    public void unlikeComment(MemberCommentUnlikeRecord record) {
+        MemberId memberId = MemberId.fromUuid(record.memberId());
+        TargetCommentId targetCommentId = TargetCommentId.create(TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
         validateBeforeLikeOrUnlikeComment(memberId, targetCommentId);
         if (targetCommentIdRepository.isLiked(memberId, targetCommentId)) {
             eventBus.publish(CommentUnlikeEvent.create(memberId.getValue(), targetCommentId.getTargetPostId().getValue(), targetCommentId.getTargetCommentPath().getValue()));
