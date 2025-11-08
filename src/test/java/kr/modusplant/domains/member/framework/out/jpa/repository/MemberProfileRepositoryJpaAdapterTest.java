@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-class MemberProfileProfileRepositoryJpaAdapterTest implements MemberProfileTestUtils, SiteMemberProfileEntityTestUtils, SiteMemberEntityTestUtils {
+class MemberProfileRepositoryJpaAdapterTest implements MemberProfileTestUtils, SiteMemberProfileEntityTestUtils, SiteMemberEntityTestUtils {
     private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
     private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
     private final SiteMemberProfileJpaRepository memberProfileJpaRepository = Mockito.mock(SiteMemberProfileJpaRepository.class);
