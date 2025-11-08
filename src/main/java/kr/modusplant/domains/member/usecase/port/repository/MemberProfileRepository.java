@@ -9,7 +9,9 @@ import java.util.Optional;
 public interface MemberProfileRepository {
     Optional<MemberProfile> getById(MemberId memberId) throws IOException;
 
-    MemberProfile save(MemberProfile memberProfile) throws IOException;
+    MemberProfile add(MemberProfile memberProfile) throws IOException;
+
+    MemberProfile addOrUpdate(MemberProfile memberProfile) throws IOException;
 
     boolean isIdExist(MemberId memberId);
 }

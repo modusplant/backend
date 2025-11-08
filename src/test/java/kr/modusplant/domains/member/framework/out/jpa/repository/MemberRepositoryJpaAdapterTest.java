@@ -45,7 +45,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, SiteMemberEntit
 
     @Test
     @DisplayName("save(MemberNickname memberNickname)로 Member 반환")
-    void testSave_givenValidMemberNickname_willReturn() {
+    void testSave_givenValidMemberNickname_willReturnMember() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         given(memberJpaRepository.save(any())).willReturn(memberEntity);
@@ -56,7 +56,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, SiteMemberEntit
 
     @Test
     @DisplayName("save(MemberId memberId, MemberNickname memberNickname)로 Member 반환")
-    void testSave_givenValidMemberIdAndNickname_willReturn() {
+    void testSave_givenValidMemberIdAndNickname_willReturnMember() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         given(memberJpaRepository.save(any())).willReturn(memberEntity);

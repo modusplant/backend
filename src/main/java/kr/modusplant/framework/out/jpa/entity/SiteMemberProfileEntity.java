@@ -44,8 +44,8 @@ public class SiteMemberProfileEntity {
     @Column(name = VER_NUM, nullable = false)
     private Long versionNumber;
 
-    public void updateImageUrl(String imageUrl) {
-        this.imagePath = imageUrl;
+    public void updateImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
     public void updateIntroduction(String introduction) {

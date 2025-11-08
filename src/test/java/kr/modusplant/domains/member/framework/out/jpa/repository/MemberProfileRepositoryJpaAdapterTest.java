@@ -52,8 +52,8 @@ class MemberProfileRepositoryJpaAdapterTest implements MemberProfileTestUtils, S
     }
 
     @Test
-    @DisplayName("save로 MemberProfile 반환")
-    void testSave_givenValidMemberProfileNickname_willReturn() throws IOException {
+    @DisplayName("add로 MemberProfile 반환")
+    void testAdd_givenValidMemberProfile_willReturnMemberProfile() throws IOException {
         // given
         SiteMemberEntity memberBasicUserEntity = createMemberBasicUserEntityWithUuid();
         SiteMemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder().member(memberBasicUserEntity).build();
@@ -65,7 +65,51 @@ class MemberProfileRepositoryJpaAdapterTest implements MemberProfileTestUtils, S
         MemberProfile memberProfile = createMemberProfile();
 
         // then
-        assertThat(memberProfileRepositoryJpaAdapter.save(memberProfile)).isEqualTo(memberProfile);
+        assertThat(memberProfileRepositoryJpaAdapter.add(memberProfile)).isEqualTo(memberProfile);
+    }
+
+    @Test
+    @DisplayName("회원 프로필이 있을 때 addOrUpdate로 MemberProfile 반환")
+    void testAddOrUpdate_givenValidProfileAndProfileStored_willReturnMemberProfile() throws IOException {
+        // given
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        SiteMemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder().member(memberEntity).build();
+        SiteMemberEntity updatedMemberEntity = SiteMemberEntity.builder().member(memberEntity).nickname("abcNickname").build();
+        SiteMemberProfileEntity updatedMemberProfileEntity =
+                SiteMemberProfileEntity.builder().member(updatedMemberEntity).introduction("abcIntroduction").build();
+        given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(memberProfileEntity));
+        given(memberProfileJpaRepository.save(updatedMemberProfileEntity)).willReturn(updatedMemberProfileEntity);
+        given(s3FileService.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
+
+        // when
+        MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity);
+        MemberProfile result = memberProfileRepositoryJpaAdapter.addOrUpdate(updatedMemberProfile);
+
+        // then
+        assertThat(result.getMemberNickname().getValue()).isEqualTo("abcNickname");
+        assertThat(result.getMemberProfileIntroduction().getValue()).isEqualTo("abcIntroduction");
+    }
+
+    @Test
+    @DisplayName("회원 프로필이 없을 때 addOrUpdate로 MemberProfile 반환")
+    void testAddOrUpdate_givenValidProfileAndNoProfileStored_willReturnMemberProfile() throws IOException {
+        // given
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        SiteMemberEntity updatedMemberEntity = SiteMemberEntity.builder().member(memberEntity).nickname("abcNickname").build();
+        SiteMemberProfileEntity updatedMemberProfileEntity =
+                SiteMemberProfileEntity.builder().member(updatedMemberEntity).introduction("abcIntroduction").build();
+        given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.empty());
+        given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
+        given(memberProfileJpaRepository.save(updatedMemberProfileEntity)).willReturn(updatedMemberProfileEntity);
+        given(s3FileService.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
+
+        // when
+        MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity);
+        MemberProfile result = memberProfileRepositoryJpaAdapter.addOrUpdate(updatedMemberProfile);
+
+        // then
+        assertThat(result.getMemberNickname().getValue()).isEqualTo("abcNickname");
+        assertThat(result.getMemberProfileIntroduction().getValue()).isEqualTo("abcIntroduction");
     }
 
     @Test

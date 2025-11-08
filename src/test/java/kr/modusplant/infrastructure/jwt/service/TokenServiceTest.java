@@ -155,7 +155,7 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberRoleEntit
     class testVerifyAndReissueToken {
         @Test
         @DisplayName("유효한 access token과 refresh token으로 검증 시 토큰 그대로 반환")
-        void testVerifyAndReissueToken_givenValidAccessTokenAndRefreshToken_willReturn() {
+        void testVerifyAndReissueToken_givenValidAccessTokenAndRefreshToken_willReturnToken() {
             // given
             given(accessTokenRedisRepository.isBlacklisted(accessToken)).willReturn(false);
             given(jwtTokenProvider.validateToken(refreshToken)).willReturn(true);
