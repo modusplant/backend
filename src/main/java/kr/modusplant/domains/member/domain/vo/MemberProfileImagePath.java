@@ -1,13 +1,12 @@
 package kr.modusplant.domains.member.domain.vo;
 
 import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileImagePathException;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class MemberProfileImagePath {
     private final String value;
@@ -17,10 +16,6 @@ public class MemberProfileImagePath {
             throw new EmptyMemberProfileImagePathException();
         }
         return new MemberProfileImagePath(value);
-    }
-
-    public boolean isEmpty() {
-        return value.isEmpty();
     }
 
     @Override

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class MemberEmptyProfileIntroductionTest implements MemberEmptyProfileIntroductionTestUtils {
     @Test
-    @DisplayName("create로 비어 있는 회원 생일 반환")
+    @DisplayName("create로 비어 있는 회원 프로필 소개 반환")
     void testCreate_givenNothing_willReturnMemberEmptyProfileIntroduction() {
         assertThat(MemberEmptyProfileIntroduction.create()).isEqualTo(MemberEmptyProfileIntroduction.create());
     }

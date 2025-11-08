@@ -7,13 +7,11 @@ import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberProfileImage {
     private final MemberProfileImagePath memberProfileImagePath;
     private MemberProfileImageBytes memberProfileImageBytes;
