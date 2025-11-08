@@ -15,7 +15,7 @@ public class MemberProfileIntroduction {
     private final String value;
 
     public static MemberProfileIntroduction create(String value) {
-        if (value == null) {
+        if (value == null || value.trim().isEmpty()) {
             throw new EmptyMemberProfileIntroductionException();
         }
         return new MemberProfileIntroduction(value);

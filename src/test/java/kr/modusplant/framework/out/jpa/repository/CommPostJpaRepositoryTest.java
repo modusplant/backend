@@ -52,7 +52,7 @@ class CommPostJpaRepositoryTest implements CommPostEntityTestUtils, CommPrimaryC
     @BeforeEach
     void setUp() {
         testCommPrimaryCategory = commPrimaryCategoryRepository.save(createCommPrimaryCategoryEntity());
-        testCommSecondaryCategory = commSecondaryCategoryRepository.save(createCommSecondaryCategoryEntityBuilder().primaryCategoryEntity(testCommPrimaryCategory).build());
+        testCommSecondaryCategory = commSecondaryCategoryRepository.save(createCommSecondaryCategoryEntityBuilder().primaryCategory(testCommPrimaryCategory).build());
         testSiteMember = siteMemberRepository.save(createMemberBasicUserEntity());
     }
 
@@ -178,7 +178,7 @@ class CommPostJpaRepositoryTest implements CommPostEntityTestUtils, CommPrimaryC
     void findBySecondaryCategoryAndIsPublishedTrueOrderByCreatedAtDescTest() {
         // given
         CommSecondaryCategoryEntity testOtherGroup = commSecondaryCategoryRepository.save(
-                CommSecondaryCategoryEntity.builder().primaryCategoryEntity(testCommPrimaryCategory).order(3).category("기타").build());
+                CommSecondaryCategoryEntity.builder().primaryCategory(testCommPrimaryCategory).order(3).category("기타").build());
         List<CommPostEntity> commPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createCommPostEntityBuilder()
                         .primaryCategory(testCommPrimaryCategory)

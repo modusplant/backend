@@ -23,7 +23,7 @@ class SiteMemberEntityTest implements SiteMemberEntityTestUtils {
     @Test
     void prePersist() {
         // given
-        SiteMemberEntity member = SiteMemberEntity.builder().memberEntity(createMemberBasicUserEntity()).isActive(null).isDisabledByLinking(null).isBanned(null).isDeleted(null).build();
+        SiteMemberEntity member = SiteMemberEntity.builder().member(createMemberBasicUserEntity()).isActive(null).isDisabledByLinking(null).isBanned(null).isDeleted(null).build();
 
         // when
         entityManager.persist(member);

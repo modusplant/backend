@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -23,14 +24,19 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
     private final SiteMemberProfileJpaRepository memberProfileJpaRepository;
 
     @Override
-    public MemberProfile getById(MemberId memberId) throws IOException {
-        SiteMemberProfileEntity memberProfileEntity = memberProfileJpaRepository.findByMember(memberJpaRepository.findByUuid(memberId.getValue()).orElseThrow()).orElseThrow();
-        return MemberProfile.create(memberId,
-                MemberProfileImage.create(
-                        MemberProfileImagePath.create(memberProfileEntity.getImagePath()),
-                        MemberProfileImageBytes.create(s3FileService.downloadFile(memberProfileEntity.getImagePath()))),
-                MemberProfileIntroduction.create(memberProfileEntity.getIntroduction()),
-                MemberNickname.create(memberProfileEntity.getMember().getNickname()));
+    public Optional<MemberProfile> getById(MemberId memberId) throws IOException {
+        Optional<SiteMemberProfileEntity> memberProfileEntityOrEmpty = memberProfileJpaRepository.findByUuid(memberId.getValue());
+        if (memberProfileEntityOrEmpty.isPresent()) {
+            SiteMemberProfileEntity memberProfileEntity = memberProfileEntityOrEmpty.orElseThrow();
+            return Optional.of(MemberProfile.create(memberId,
+                    MemberProfileImage.create(
+                            MemberProfileImagePath.create(memberProfileEntity.getImagePath()),
+                            MemberProfileImageBytes.create(s3FileService.downloadFile(memberProfileEntity.getImagePath()))),
+                    MemberProfileIntroduction.create(memberProfileEntity.getIntroduction()),
+                    MemberNickname.create(memberProfileEntity.getMember().getNickname())));
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -41,11 +47,6 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
                         .imagePath(memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue())
                         .introduction(memberProfile.getMemberProfileIntroduction().getValue())
                         .build()));
-    }
-
-    @Override
-    public void deleteImage(MemberProfileImage image) {
-        s3FileService.deleteFiles(image.getMemberProfileImagePath().getValue());
     }
 
     @Override

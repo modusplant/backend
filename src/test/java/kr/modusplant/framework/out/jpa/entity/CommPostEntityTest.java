@@ -25,7 +25,7 @@ class CommPostEntityTest implements CommPostEntityTestUtils {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
         CommPrimaryCategoryEntity commPrimaryCategoryEntity = entityManager.merge(createCommPrimaryCategoryEntity());
-        CommSecondaryCategoryEntity commSecondaryCategoryEntity = entityManager.merge(createCommSecondaryCategoryEntityBuilder().primaryCategoryEntity(commPrimaryCategoryEntity).build());
+        CommSecondaryCategoryEntity commSecondaryCategoryEntity = entityManager.merge(createCommSecondaryCategoryEntityBuilder().primaryCategory(commPrimaryCategoryEntity).build());
         CommPostEntity commPost = createCommPostEntityBuilder()
                 .primaryCategory(commPrimaryCategoryEntity)
                 .secondaryCategory(commSecondaryCategoryEntity)

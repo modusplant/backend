@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TargetCommentIdTest implements TargetCommentIdTestUtils {
-    @DisplayName("null 값으로 create(TargetPostId targetPostId, TargetCommentPath targetCommentPath) 호출")
+    @DisplayName("null 값으로 create 호출")
     @Test
     void testCreate_givenNullToOneOfTwoParameters_willThrowException() {
         // TargetPostId가 null일 때

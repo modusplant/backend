@@ -1,8 +1,8 @@
 package kr.modusplant.domains.member.common.util.domain.aggregate;
 
+import kr.modusplant.domains.member.common.util.domain.entity.MemberProfileImageTestUtils;
 import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
 import kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils;
-import kr.modusplant.domains.member.common.util.domain.entity.MemberProfileImageTestUtils;
 import kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 

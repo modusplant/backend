@@ -80,7 +80,7 @@ public class CommSecondaryCategoryEntity {
             return this;
         }
 
-        public CommSecondaryCategoryEntityBuilder primaryCategoryEntity(CommPrimaryCategoryEntity primaryCategoryEntity) {
+        public CommSecondaryCategoryEntityBuilder primaryCategory(CommPrimaryCategoryEntity primaryCategoryEntity) {
             this.primaryCategoryEntity = primaryCategoryEntity;
             return this;
         }
@@ -95,7 +95,7 @@ public class CommSecondaryCategoryEntity {
             return this;
         }
 
-        public CommSecondaryCategoryEntityBuilder commCategoryEntity(final CommSecondaryCategoryEntity commCategory) {
+        public CommSecondaryCategoryEntityBuilder commSecondaryCategory(final CommSecondaryCategoryEntity commCategory) {
             this.uuid = commCategory.getUuid();
             this.primaryCategoryEntity = commCategory.getPrimaryCategoryEntity();
             this.category = commCategory.getCategory();

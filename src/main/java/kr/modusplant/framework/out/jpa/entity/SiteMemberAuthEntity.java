@@ -145,7 +145,7 @@ public class SiteMemberAuthEntity {
             return this;
         }
 
-        public SiteMemberAuthEntityBuilder memberAuthEntity(final SiteMemberAuthEntity memberAuth) {
+        public SiteMemberAuthEntityBuilder memberAuth(final SiteMemberAuthEntity memberAuth) {
             this.originalMember = memberAuth.getOriginalMember();
             this.activeMember = memberAuth.getActiveMember();
             this.email = memberAuth.getEmail();
