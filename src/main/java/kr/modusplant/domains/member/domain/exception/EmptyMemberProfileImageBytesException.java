@@ -5,6 +5,6 @@ import kr.modusplant.shared.exception.BusinessException;
 
 public class EmptyMemberProfileImageBytesException extends BusinessException {
     public EmptyMemberProfileImageBytesException() {
-        super(MemberErrorCode.EMPTY_MEMBER_PROFILE_IMAGE);
+        super(MemberErrorCode.EMPTY_MEMBER_PROFILE_IMAGE_BYTES);
     }
 }
