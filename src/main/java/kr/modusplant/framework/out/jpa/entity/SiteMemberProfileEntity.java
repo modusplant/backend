@@ -94,7 +94,7 @@ public class SiteMemberProfileEntity {
             return this;
         }
 
-        public SiteMemberProfileEntityBuilder memberProfileEntity(final SiteMemberProfileEntity memberProfile) {
+        public SiteMemberProfileEntityBuilder memberProfile(final SiteMemberProfileEntity memberProfile) {
             this.member = memberProfile.getMember();
             this.imagePath = memberProfile.getImagePath();
             this.introduction = memberProfile.getIntroduction();

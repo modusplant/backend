@@ -1,7 +1,10 @@
 package kr.modusplant.domains.member.domain.vo;
 
 import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileImagePathException;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -12,7 +15,7 @@ public class MemberProfileImagePath {
     private final String value;
 
     public static MemberProfileImagePath create(String value) {
-        if (value == null) {
+        if (value == null || value.trim().isEmpty()) {
             throw new EmptyMemberProfileImagePathException();
         }
         return new MemberProfileImagePath(value);

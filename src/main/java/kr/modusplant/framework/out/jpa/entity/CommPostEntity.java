@@ -209,7 +209,7 @@ public class CommPostEntity {
             return this;
         }
 
-        public CommPostEntityBuilder commPostEntity(final CommPostEntity postEntity) {
+        public CommPostEntityBuilder commPost(final CommPostEntity postEntity) {
             this.ulid = postEntity.ulid;
             this.primaryCategory = postEntity.primaryCategory;
             this.secondaryCategory = postEntity.secondaryCategory;

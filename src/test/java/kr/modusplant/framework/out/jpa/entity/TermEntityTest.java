@@ -25,7 +25,7 @@ class TermEntityTest implements TermEntityTestUtils {
     void prePersist() {
         // given
         String version = createVersion(1, 0, 1);
-        TermEntity term = TermEntity.builder().termEntity(createTermsOfUseEntity()).version(version).build();
+        TermEntity term = TermEntity.builder().term(createTermsOfUseEntity()).version(version).build();
 
         // when
         entityManager.persist(term);

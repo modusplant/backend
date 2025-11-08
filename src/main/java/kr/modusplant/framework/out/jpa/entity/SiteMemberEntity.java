@@ -188,7 +188,7 @@ public class SiteMemberEntity {
             return this;
         }
 
-        public SiteMemberEntityBuilder memberEntity(final SiteMemberEntity member) {
+        public SiteMemberEntityBuilder member(final SiteMemberEntity member) {
             this.uuid = member.getUuid();
             this.nickname = member.getNickname();
             this.birthDate = member.getBirthDate();

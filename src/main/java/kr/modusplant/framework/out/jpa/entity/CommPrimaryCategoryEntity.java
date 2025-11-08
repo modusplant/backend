@@ -83,7 +83,7 @@ public class CommPrimaryCategoryEntity {
             return this;
         }
 
-        public CommCategoryEntityBuilder commCategoryEntity(final CommPrimaryCategoryEntity commCategory) {
+        public CommCategoryEntityBuilder commPrimaryCategory(final CommPrimaryCategoryEntity commCategory) {
             this.uuid = commCategory.getUuid();
             this.category = commCategory.getCategory();
             this.order = commCategory.getOrder();

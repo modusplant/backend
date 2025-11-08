@@ -3,7 +3,9 @@ package kr.modusplant.domains.member.adapter.controller;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
+import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
 import kr.modusplant.domains.member.domain.vo.*;
+import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
@@ -53,14 +55,35 @@ public class MemberController {
 
     public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
-        validateBeforeOverrideProfile(memberId, MemberNickname.create(record.nickname()));
-        MemberProfile memberProfile = memberProfileRepository.getById(memberId);
-        memberProfileRepository.deleteImage(memberProfile.getMemberProfileImage());
-        String newImagePath = generateMemberProfileImagePath(memberId.getValue(), record.image().getOriginalFilename());
-        s3FileService.uploadFile(record.image(), newImagePath);
-        memberProfile.updateProfileImage(MemberProfileImage.create(
-                MemberProfileImagePath.create(newImagePath), MemberProfileImageBytes.create(record.image().getBytes())
-        ));
+        MemberNickname memberNickname = MemberNickname.create(record.nickname());
+        validateBeforeOverrideProfile(memberId, memberNickname);
+        MemberProfile memberProfile;
+        MemberProfileImage memberProfileImage;
+        MemberProfileIntroduction memberProfileIntroduction;
+        boolean isImageExist = !record.image().isEmpty();
+        boolean isIntroductionExist = !record.introduction().trim().isEmpty();
+        Optional<MemberProfile> optionalMemberProfile = memberProfileRepository.getById(memberId);
+        if (optionalMemberProfile.isPresent()) {
+            memberProfile = optionalMemberProfile.orElseThrow();
+            s3FileService.deleteFiles(
+                    memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue()
+            );
+        }
+        if (isImageExist) {
+            String newImagePath = uploadImage(memberId, record);
+            memberProfileImage = MemberProfileImage.create(
+                    MemberProfileImagePath.create(newImagePath),
+                    MemberProfileImageBytes.create(record.image().getBytes())
+            );
+        } else {
+            memberProfileImage = MemberEmptyProfileImage.create();
+        }
+        if (isIntroductionExist) {
+            memberProfileIntroduction = MemberProfileIntroduction.create(record.introduction());
+        } else {
+            memberProfileIntroduction = MemberEmptyProfileIntroduction.create();
+        }
+        memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
         return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.save(memberProfile));
     }
 
@@ -107,7 +130,7 @@ public class MemberController {
     }
 
     private void validateBeforeOverrideProfile(MemberId memberId, MemberNickname memberNickname) {
-        if (!memberRepository.isIdExist(memberId) || !memberProfileRepository.isIdExist(memberId)) {
+        if (!memberRepository.isIdExist(memberId)) {
             throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
         }
         Optional<Member> emptyOrMember = memberRepository.getByNickname(memberNickname);
@@ -133,4 +156,11 @@ public class MemberController {
             throw new EntityNotFoundException(NOT_FOUND_TARGET_COMMENT_ID, "targetCommentId");
         }
     }
+
+    private String uploadImage(MemberId memberId, MemberProfileOverrideRecord record) throws IOException {
+        String newImagePath = generateMemberProfileImagePath(memberId.getValue(), record.image().getOriginalFilename());
+        s3FileService.uploadFile(record.image(), newImagePath);
+        return newImagePath;
+    }
+
 }

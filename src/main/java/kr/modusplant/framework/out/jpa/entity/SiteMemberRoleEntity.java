@@ -80,7 +80,7 @@ public class SiteMemberRoleEntity {
             return this;
         }
 
-        public SiteMemberRoleEntityBuilder memberRoleEntity(final SiteMemberRoleEntity memberRole) {
+        public SiteMemberRoleEntityBuilder memberRole(final SiteMemberRoleEntity memberRole) {
             this.member = memberRole.getMember();
             this.role = memberRole.getRole();
             return this;
