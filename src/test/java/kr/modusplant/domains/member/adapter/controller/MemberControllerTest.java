@@ -37,7 +37,6 @@ import kr.modusplant.shared.exception.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -171,11 +170,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
 
         // when
         MemberProfileResponse memberProfileResponse = memberController.overrideProfile(
-                new MemberProfileOverrideRecord(
-                        MEMBER_BASIC_USER_UUID,
-                        "",
-                        new MockMultipartFile("image", "image.png", "image/png", new byte[0]),
-                        MEMBER_BASIC_USER_NICKNAME));
+                new MemberProfileOverrideRecord(MEMBER_BASIC_USER_UUID, null, null, MEMBER_BASIC_USER_NICKNAME));
 
         // then
         assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);

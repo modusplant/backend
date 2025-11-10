@@ -52,13 +52,11 @@ public class MemberRestController {
             UUID id,
 
             @Parameter(description = "갱신할 회원의 프로필 이미지", schema = @Schema(type = "string", format = "binary"))
-            @RequestPart(name = "image")
-            @NotNull(message = "회원 프로필 이미지가 누락되었습니다. ")
+            @RequestPart(name = "image", required = false)
             MultipartFile image,
 
             @Parameter(description = "갱신할 회원의 프로필 소개", example = "프로필 소개")
-            @RequestPart(name = "introduction")
-            @NotNull(message = "회원 프로필 소개가 누락되었습니다. ")
+            @RequestPart(name = "introduction", required = false)
             String introduction,
 
             @Parameter(description = "갱신할 회원의 닉네임", example = "NewPlayer", schema = @Schema(type = "string", pattern = REGEX_NICKNAME))
