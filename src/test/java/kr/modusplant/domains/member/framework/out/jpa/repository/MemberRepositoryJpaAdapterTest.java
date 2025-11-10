@@ -24,6 +24,26 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, SiteMemberEntit
     private final MemberRepositoryJpaAdapter memberRepositoryJpaAdapter = new MemberRepositoryJpaAdapter(memberJpaMapper, memberJpaRepository);
 
     @Test
+    @DisplayName("getById로 가용한 Member 반환(가용할 때)")
+    void testGetById_givenValidMemberId_willReturnOptionalAvailableMember() {
+        // given
+        given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(createMemberBasicUserEntityWithUuid()));
+
+        // when & then
+        assertThat(memberRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(Optional.of(createMember()));
+    }
+
+    @Test
+    @DisplayName("getByNickname으로 가용한 Member 반환(가용하지 않을 때)")
+    void testGetById_givenValidMemberId_willReturnOptionalEmptyMember() {
+        // given
+        given(memberJpaRepository.findByUuid(any())).willReturn(Optional.empty());
+
+        // when & then
+        assertThat(memberRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(Optional.empty());
+    }
+
+    @Test
     @DisplayName("getByNickname으로 가용한 Member 반환(가용할 때)")
     void testGetByNickname_givenValidMemberNickname_willReturnOptionalAvailableMember() {
         // given

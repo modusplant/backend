@@ -18,6 +18,7 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberComm
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.testMemberCommentUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostLikeRecordTestUtils.testMemberPostLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileGetRecordTestUtils.testMemberProfileGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecord;
 import static kr.modusplant.domains.member.common.util.usecase.request.MemberRegisterRequestTestUtils.testMemberRegisterRequest;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
@@ -51,6 +52,20 @@ class MemberRestControllerTest implements MemberTestUtils {
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(memberResponseEntity.getBody().toString()).isEqualTo(DataResponse.ok(testMemberResponse).toString());
+    }
+
+    @Test
+    @DisplayName("getMemberProfile로 응답 반환")
+    void testGetMemberProfile_givenValidId_willReturnResponse() throws IOException {
+        // given
+        given(memberController.getProfile(testMemberProfileGetRecord)).willReturn(testMemberProfileResponse);
+
+        // when
+        ResponseEntity<DataResponse<MemberProfileResponse>> memberResponseEntity = memberRestController.getMemberProfile(MEMBER_BASIC_USER_UUID);
+
+        // then
+        assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(memberResponseEntity.getBody().toString()).isEqualTo(DataResponse.ok(testMemberProfileResponse).toString());
     }
 
     @Test

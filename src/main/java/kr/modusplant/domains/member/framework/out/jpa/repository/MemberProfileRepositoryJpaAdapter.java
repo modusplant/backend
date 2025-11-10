@@ -2,7 +2,9 @@ package kr.modusplant.domains.member.framework.out.jpa.repository;
 
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
+import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
 import kr.modusplant.domains.member.domain.vo.*;
+import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberProfileJpaMapperImpl;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
 import kr.modusplant.framework.out.aws.service.S3FileService;
@@ -20,21 +22,33 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepository {
     private final S3FileService s3FileService;
-    private final MemberProfileJpaMapperImpl memberProfileJpaMapper;
-    private final SiteMemberJpaRepository memberJpaRepository;
-    private final SiteMemberProfileJpaRepository memberProfileJpaRepository;
+    private final MemberProfileJpaMapperImpl profileJpaMapper;
+    private final SiteMemberJpaRepository jpaRepository;
+    private final SiteMemberProfileJpaRepository profileJpaRepository;
 
     @Override
     public Optional<MemberProfile> getById(MemberId memberId) throws IOException {
-        Optional<SiteMemberProfileEntity> memberProfileEntityOrEmpty = memberProfileJpaRepository.findByUuid(memberId.getValue());
-        if (memberProfileEntityOrEmpty.isPresent()) {
-            SiteMemberProfileEntity memberProfileEntity = memberProfileEntityOrEmpty.orElseThrow();
+        Optional<SiteMemberProfileEntity> profileEntityOrEmpty = profileJpaRepository.findByUuid(memberId.getValue());
+        if (profileEntityOrEmpty.isPresent()) {
+            SiteMemberProfileEntity profileEntity = profileEntityOrEmpty.orElseThrow();
+            MemberProfileImage profileImage;
+            MemberProfileIntroduction profileIntroduction;
+            if (profileEntity.getImagePath() == null) {
+                profileImage = MemberEmptyProfileImage.create();
+            } else {
+                profileImage = MemberProfileImage.create(
+                        MemberProfileImagePath.create(profileEntity.getImagePath()),
+                        MemberProfileImageBytes.create(s3FileService.downloadFile(profileEntity.getImagePath())));
+            }
+            if (profileEntity.getIntroduction() == null) {
+                profileIntroduction = MemberEmptyProfileIntroduction.create();
+            } else {
+                profileIntroduction = MemberProfileIntroduction.create(profileEntity.getIntroduction());
+            }
             return Optional.of(MemberProfile.create(memberId,
-                    MemberProfileImage.create(
-                            MemberProfileImagePath.create(memberProfileEntity.getImagePath()),
-                            MemberProfileImageBytes.create(s3FileService.downloadFile(memberProfileEntity.getImagePath()))),
-                    MemberProfileIntroduction.create(memberProfileEntity.getIntroduction()),
-                    MemberNickname.create(memberProfileEntity.getMember().getNickname())));
+                    profileImage,
+                    profileIntroduction,
+                    MemberNickname.create(profileEntity.getMember().getNickname())));
         } else {
             return Optional.empty();
         }
@@ -42,9 +56,9 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
 
     @Override
     public MemberProfile add(MemberProfile memberProfile) throws IOException {
-        return memberProfileJpaMapper.toMemberProfile(memberProfileJpaRepository.save(
+        return profileJpaMapper.toMemberProfile(profileJpaRepository.save(
                 SiteMemberProfileEntity.builder()
-                        .member(memberJpaRepository.findByUuid(memberProfile.getMemberId().getValue()).orElseThrow())
+                        .member(jpaRepository.findByUuid(memberProfile.getMemberId().getValue()).orElseThrow())
                         .imagePath(memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue())
                         .introduction(memberProfile.getMemberProfileIntroduction().getValue())
                         .build()));
@@ -55,7 +69,7 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
         String imagePath = memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue();
         String introduction = memberProfile.getMemberProfileIntroduction().getValue();
         String nickname = memberProfile.getMemberNickname().getValue();
-        Optional<SiteMemberProfileEntity> optionalMemberProfileEntity = memberProfileJpaRepository.findByUuid(
+        Optional<SiteMemberProfileEntity> optionalMemberProfileEntity = profileJpaRepository.findByUuid(
                 memberProfile.getMemberId().getValue());
         SiteMemberProfileEntity memberProfileEntity;
         if (optionalMemberProfileEntity.isPresent()) {
@@ -64,7 +78,7 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
             memberProfileEntity.updateIntroduction(introduction);
             memberProfileEntity.getMember().updateNickname(nickname);
         } else {
-            SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberProfile.getMemberId().getValue()).orElseThrow();
+            SiteMemberEntity memberEntity = jpaRepository.findByUuid(memberProfile.getMemberId().getValue()).orElseThrow();
             memberEntity.updateNickname(nickname);
             memberProfileEntity = SiteMemberProfileEntity.builder()
                     .member(memberEntity)
@@ -72,12 +86,12 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
                     .introduction(introduction)
                     .build();
         }
-        return memberProfileJpaMapper.toMemberProfile(memberProfileJpaRepository.save(
+        return profileJpaMapper.toMemberProfile(profileJpaRepository.save(
                 memberProfileEntity));
     }
 
     @Override
     public boolean isIdExist(MemberId memberId) {
-        return memberProfileJpaRepository.existsByUuid(memberId.getValue());
+        return profileJpaRepository.existsByUuid(memberId.getValue());
     }
 }
