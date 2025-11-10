@@ -37,9 +37,9 @@ public class SwaggerConfig {
                                 new License().name("MIT License").url("https://github.com/modusplant/backend/blob/develop/LICENSE")
                         )
                 )
-                .addServersItem(new Server() // 프로덕션 서버 정보 설정
-                        .url("https://kormap.ddnsfree.com") // 프로덕션 서버 링크
-                        .description("Dev Server")  // 프로덕션 서버 설명
+                .addServersItem(new Server() // 개발 서버 정보 설정
+                        .url("https://kormap.ddnsfree.com") // 개발 서버 링크
+                        .description("Dev Server")  // 개발 서버 설명
                 )
                 .addServersItem(new Server() // 테스트 서버 정보 설정
                         .url("http://localhost:8080")  // 테스트 서버 링크(http://localhost:8080/swagger-ui/index.html)
