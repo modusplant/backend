@@ -26,6 +26,7 @@ import kr.modusplant.shared.event.PostUnlikeEvent;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,7 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 @RequiredArgsConstructor
 @Service
 @Transactional
+@Slf4j
 public class MemberController {
     private final S3FileService s3FileService;
     private final MemberMapper memberMapper;
@@ -84,6 +86,8 @@ public class MemberController {
             if (imagePath != null) {
                 s3FileService.deleteFiles(imagePath);
             }
+        } else {
+            log.warn("Not found member profile, member uuid: {}. Please check it out. ", memberId.getValue());
         }
         if (isImageExist) {
             String newImagePath = uploadImage(memberId, record);
