@@ -47,24 +47,27 @@ public class CommPostEntity {
     @JoinColumn(name = CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity createMember;
 
-    @Column(name = "like_count", nullable = false)
+    @Column(name = LIKE_COUNT, nullable = false)
     @DefaultValue
     private Integer likeCount;
 
-    @Column(name = "view_count", nullable = false)
+    @Column(name = VIEW_COUNT, nullable = false)
     @DefaultValue
     private Long viewCount;
 
-    @Column(nullable = false, length = 150)
+    @Column(nullable = false, length = 60)
     private String title;
 
     @Type(JsonBinaryType.class)
     @Column(nullable = false, columnDefinition = "jsonb")
     private JsonNode content;
 
-    @Column(name = IS_DELETED, nullable = false)
+    @Column(name = IS_PUBLISHED, nullable = false)
     @DefaultValue
-    private Boolean isDeleted;
+    private Boolean isPublished;
+
+    @Column(name = PUBLISHED_AT)
+    private LocalDateTime publishedAt;
 
     @Column(name = CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
@@ -86,28 +89,16 @@ public class CommPostEntity {
         this.secondaryCategory = secondaryCategory;
     }
 
+    public void updateIsPublished(Boolean isPublished) {
+        this.isPublished = isPublished;
+    }
+
     public void increaseLikeCount() {
         this.likeCount++;
     }
 
     public void decreaseLikeCount() {
         this.likeCount = Math.max(0, this.likeCount - 1);
-    }
-
-    public void updateViewCount(Long viewCount) {
-        this.viewCount = viewCount;
-    }
-
-    public void updateTitle(String title) {
-        this.title = title;
-    }
-
-    public void updateContent(JsonNode content) {
-        this.content = content;
-    }
-
-    public void updateIsDeleted(Boolean isDeleted) {
-        this.isDeleted = isDeleted;
     }
 
     @Override
@@ -130,12 +121,9 @@ public class CommPostEntity {
         if (this.viewCount == null) {
             this.viewCount = 0L;
         }
-        if (this.isDeleted == null) {
-            this.isDeleted = false;
-        }
     }
 
-    private CommPostEntity(String ulid, CommPrimaryCategoryEntity primaryCategory, CommSecondaryCategoryEntity secondaryCategory, SiteMemberEntity authMember, SiteMemberEntity createMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isDeleted) {
+    private CommPostEntity(String ulid, CommPrimaryCategoryEntity primaryCategory, CommSecondaryCategoryEntity secondaryCategory, SiteMemberEntity authMember, SiteMemberEntity createMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isPublished, LocalDateTime publishedAt) {
         this.ulid = ulid;
         this.primaryCategory = primaryCategory;
         this.secondaryCategory = secondaryCategory;
@@ -145,7 +133,8 @@ public class CommPostEntity {
         this.viewCount = viewCount;
         this.title = title;
         this.content = content;
-        this.isDeleted = isDeleted;
+        this.isPublished = isPublished;
+        this.publishedAt = publishedAt;
     }
 
     public static CommPostEntityBuilder builder() {
@@ -162,7 +151,8 @@ public class CommPostEntity {
         private Long viewCount;
         private String title;
         private JsonNode content;
-        private Boolean isDeleted;
+        private Boolean isPublished;
+        private LocalDateTime publishedAt;
 
         public CommPostEntityBuilder ulid(final String ulid) {
             this.ulid = ulid;
@@ -209,27 +199,33 @@ public class CommPostEntity {
             return this;
         }
 
-        public CommPostEntityBuilder isDeleted(final Boolean isDeleted) {
-            this.isDeleted = isDeleted;
+        public CommPostEntityBuilder isPublished(final Boolean isPublished) {
+            this.isPublished = isPublished;
             return this;
         }
 
-        public CommPostEntityBuilder commPostEntity(final CommPostEntity commPostEntity) {
-            this.ulid = commPostEntity.ulid;
-            this.primaryCategory = commPostEntity.primaryCategory;
-            this.secondaryCategory = commPostEntity.secondaryCategory;
-            this.authMember = commPostEntity.authMember;
-            this.createMember = commPostEntity.createMember;
-            this.likeCount = commPostEntity.likeCount;
-            this.viewCount = commPostEntity.viewCount;
-            this.title = commPostEntity.title;
-            this.content = commPostEntity.content;
-            this.isDeleted = commPostEntity.isDeleted;
+        public CommPostEntityBuilder publishedAt(final LocalDateTime publishedAt) {
+            this.publishedAt = publishedAt;
+            return this;
+        }
+
+        public CommPostEntityBuilder commPost(final CommPostEntity postEntity) {
+            this.ulid = postEntity.ulid;
+            this.primaryCategory = postEntity.primaryCategory;
+            this.secondaryCategory = postEntity.secondaryCategory;
+            this.authMember = postEntity.authMember;
+            this.createMember = postEntity.createMember;
+            this.likeCount = postEntity.likeCount;
+            this.viewCount = postEntity.viewCount;
+            this.title = postEntity.title;
+            this.content = postEntity.content;
+            this.isPublished = postEntity.isPublished;
+            this.publishedAt = postEntity.publishedAt;
             return this;
         }
 
         public CommPostEntity build() {
-            return new CommPostEntity(this.ulid, this.primaryCategory, this.secondaryCategory, this.authMember, this.createMember, this.likeCount, this.viewCount, this.title, this.content, this.isDeleted);
+            return new CommPostEntity(this.ulid, this.primaryCategory, this.secondaryCategory, this.authMember, this.createMember, this.likeCount, this.viewCount, this.title, this.content, this.isPublished, this.publishedAt);
         }
 
     }

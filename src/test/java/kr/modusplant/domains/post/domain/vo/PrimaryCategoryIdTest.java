@@ -6,7 +6,9 @@ import kr.modusplant.domains.post.domain.exception.InvalidCategoryIdException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
 import java.util.UUID;
+
 import static kr.modusplant.domains.post.common.constant.PostStringConstant.TEST_UUID_STRING;
 import static kr.modusplant.domains.post.common.constant.PostUuidConstant.TEST_POST_UUID;
 import static org.junit.jupiter.api.Assertions.*;

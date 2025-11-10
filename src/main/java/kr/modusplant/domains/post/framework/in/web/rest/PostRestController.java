@@ -13,8 +13,8 @@ import kr.modusplant.domains.post.usecase.request.FileOrder;
 import kr.modusplant.domains.post.usecase.request.PostFilterRequest;
 import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
 import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
-import kr.modusplant.domains.post.usecase.response.PostPageResponse;
 import kr.modusplant.domains.post.usecase.response.PostDetailResponse;
+import kr.modusplant.domains.post.usecase.response.PostPageResponse;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
@@ -41,7 +41,7 @@ public class PostRestController {
     private final PostController postController;
 
     // TODO : Spring Security 적용 후 정상 인증 로직으로 대체할 것 (현재는 gitignore 처리된 yml 파일에 임의로 값을 추가하여 사용)
-    @Value("${fake-auth-uuid}")
+    @Value("${TEMP_USER_UUID}")
     private UUID currentMemberUuid;
     // TODO: PAGE_SIZE 별도의 파일로 추출하기
     private static final int PAGE_SIZE = 10;

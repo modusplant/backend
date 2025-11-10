@@ -1,7 +1,7 @@
 package kr.modusplant.framework.out.jpa.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.legacy.domains.member.enums.AuthProvider;
+import kr.modusplant.shared.enums.AuthProvider;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,7 +42,7 @@ public class SiteMemberAuthEntity {
     private String pw;
 
     @Column(nullable = false, updatable = false)
-    @Enumerated(value = EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private AuthProvider provider;
 
     @Column(unique = true, updatable = false, name = "provider_id")
@@ -145,7 +145,7 @@ public class SiteMemberAuthEntity {
             return this;
         }
 
-        public SiteMemberAuthEntityBuilder memberAuthEntity(final SiteMemberAuthEntity memberAuth) {
+        public SiteMemberAuthEntityBuilder memberAuth(final SiteMemberAuthEntity memberAuth) {
             this.originalMember = memberAuth.getOriginalMember();
             this.activeMember = memberAuth.getActiveMember();
             this.email = memberAuth.getEmail();

@@ -3,8 +3,9 @@ package kr.modusplant.domains.post.framework.out.jpa.repository.supers;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import kr.modusplant.domains.post.common.util.usecase.model.PostReadModelTestUtils;
-import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
+import kr.modusplant.domains.post.framework.out.jpa.repository.PostRepositoryCustomImpl;
 import kr.modusplant.domains.post.usecase.model.PostSummaryReadModel;
+import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,9 +19,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.common.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_UUID;
-import static kr.modusplant.shared.persistence.common.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_UUID;
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -45,7 +46,7 @@ class PostRepositoryCustomImplTest implements PostReadModelTestUtils {
         List<PostSummaryReadModel> expectedResults = List.of(TEST_POST_SUMMARY_READ_MODEL);
         Long totalCount = 1L;
 
-        given(em.createNativeQuery(anyString(), eq(PostEntity.class))).willReturn(query);
+        given(em.createNativeQuery(anyString(), eq(CommPostEntity.class))).willReturn(query);
         given(em.createQuery(anyString())).willReturn(countQuery);
         given(query.setFirstResult(anyInt())).willReturn(query);
         given(query.setMaxResults(anyInt())).willReturn(query);
@@ -62,7 +63,7 @@ class PostRepositoryCustomImplTest implements PostReadModelTestUtils {
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getTotalElements()).isEqualTo(totalCount);
 
-        verify(em).createNativeQuery(anyString(), eq(PostEntity.class));
+        verify(em).createNativeQuery(anyString(), eq(CommPostEntity.class));
         verify(query).setFirstResult(0);
         verify(query).setMaxResults(10);
     }
@@ -77,7 +78,7 @@ class PostRepositoryCustomImplTest implements PostReadModelTestUtils {
         String keyword = "식물";
         Long totalCount = 1L;
 
-        given(em.createNativeQuery(anyString(), eq(PostEntity.class))).willReturn(query);
+        given(em.createNativeQuery(anyString(), eq(CommPostEntity.class))).willReturn(query);
         given(em.createQuery(anyString())).willReturn(countQuery);
         given(query.setParameter(anyString(), any())).willReturn(query);
         given(countQuery.setParameter(anyString(), any())).willReturn(countQuery);
@@ -110,7 +111,7 @@ class PostRepositoryCustomImplTest implements PostReadModelTestUtils {
         String keyword = "식물";
         Long totalCount = 1L;
 
-        given(em.createNativeQuery(anyString(), eq(PostEntity.class))).willReturn(query);
+        given(em.createNativeQuery(anyString(), eq(CommPostEntity.class))).willReturn(query);
         given(em.createQuery(anyString())).willReturn(countQuery);
         given(query.setParameter(anyString(), any())).willReturn(query);
         given(countQuery.setParameter(anyString(), any())).willReturn(countQuery);

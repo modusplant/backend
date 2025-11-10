@@ -12,7 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.common.constant.CommPostConstant.TEST_COMM_POST_ULID;
+import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
@@ -35,7 +35,7 @@ public class CommPostLikeEntityTest implements CommPostLikeEntityTestUtils {
     }
 
     @Test
-    @DisplayName("소통 게시글 좋아요")
+    @DisplayName("게시글 좋아요")
     void likeCommPost_success() {
         // when
         CommPostLikeEntity commPostLikeEntity = entityManager.find(CommPostLikeEntity.class, new CommPostLikeId(postId, memberId));
@@ -49,7 +49,7 @@ public class CommPostLikeEntityTest implements CommPostLikeEntityTestUtils {
     }
 
     @Test
-    @DisplayName("소통 게시글 좋아요 삭제")
+    @DisplayName("게시글 좋아요 삭제")
     void unlikeCommPost_success() {
         // when
         CommPostLikeEntity commPostLikeEntity = entityManager.find(CommPostLikeEntity.class, new CommPostLikeId(postId, memberId));

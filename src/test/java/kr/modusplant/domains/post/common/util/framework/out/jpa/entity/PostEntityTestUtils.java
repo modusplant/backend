@@ -1,12 +1,12 @@
 package kr.modusplant.domains.post.common.util.framework.out.jpa.entity;
 
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
-import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
-import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity.*;
+import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.out.jpa.entity.CommPostEntity.CommPostEntityBuilder;
 
 public interface PostEntityTestUtils extends PostTestUtils {
-    default PostEntityBuilder createPublishedPostEntityBuilder() {
-        return PostEntity.builder()
+    default CommPostEntityBuilder createPublishedPostEntityBuilder() {
+        return CommPostEntity.builder()
                 .likeCount(testLikeCount.getValue())
                 .viewCount(5L)
                 .title(testPostContent.getTitle())
@@ -14,8 +14,8 @@ public interface PostEntityTestUtils extends PostTestUtils {
                 .isPublished(true);
     }
 
-    default PostEntityBuilder createPublishedPostEntityBuilderWithUuid() {
-        return PostEntity.builder()
+    default CommPostEntityBuilder createPublishedPostEntityBuilderWithUuid() {
+        return CommPostEntity.builder()
                 .ulid(testPostId.getValue())
                 .likeCount(testLikeCount.getValue())
                 .viewCount(5L)
@@ -24,8 +24,8 @@ public interface PostEntityTestUtils extends PostTestUtils {
                 .isPublished(true);
     }
 
-    default PostEntityBuilder createDraftPostEntityBuilder() {
-        return PostEntity.builder()
+    default CommPostEntityBuilder createDraftPostEntityBuilder() {
+        return CommPostEntity.builder()
                 .likeCount(testLikeCount.getValue())
                 .viewCount(5L)
                 .title(testPostContent.getTitle())
@@ -33,8 +33,8 @@ public interface PostEntityTestUtils extends PostTestUtils {
                 .isPublished(false);
     }
 
-    default PostEntityBuilder createDraftPostEntityBuilderWithUuid() {
-        return PostEntity.builder()
+    default CommPostEntityBuilder createDraftPostEntityBuilderWithUuid() {
+        return CommPostEntity.builder()
                 .ulid(testPostId.getValue())
                 .likeCount(testLikeCount.getValue())
                 .viewCount(5L)

@@ -12,19 +12,19 @@ public enum MemberErrorCode implements ResponseCode {
     EMPTY_MEMBER_ID(HttpStatus.BAD_REQUEST, "empty_member_id", "회원 아이디가 비어 있습니다. "),
     EMPTY_MEMBER_NICKNAME(HttpStatus.BAD_REQUEST, "empty_member_nickname", "회원 닉네임이 비어 있습니다. "),
     EMPTY_MEMBER_STATUS(HttpStatus.BAD_REQUEST, "empty_member_status", "회원 상태가 비어 있습니다. "),
+    EMPTY_MEMBER_PROFILE_IMAGE(HttpStatus.BAD_REQUEST, "empty_member_profile_image", "회원 프로필 이미지가 비어 있습니다. "),
+    EMPTY_MEMBER_PROFILE_IMAGE_BYTES(HttpStatus.BAD_REQUEST, "empty_member_profile_image_bytes", "회원 프로필 이미지 바이트 값이 비어 있습니다. "),
+    EMPTY_MEMBER_PROFILE_IMAGE_PATH(HttpStatus.BAD_REQUEST, "empty_member_profile_image_path", "회원 프로필 이미지 경로가 비어 있습니다. "),
+    EMPTY_MEMBER_PROFILE_INTRODUCTION(HttpStatus.BAD_REQUEST, "empty_member_profile_introduction", "회원 프로필 소개가 비어 있습니다. "),
     EMPTY_TARGET_COMMENT_PATH(HttpStatus.BAD_REQUEST, "empty_target_path", "대상 댓글 경로가 비어 있습니다. "),
     EMPTY_TARGET_POST_ID(HttpStatus.BAD_REQUEST, "empty_target_post_id", "대상 게시글 아이디가 비어 있습니다. "),
+    NOT_ACCESSIBLE_POST_LIKE(HttpStatus.BAD_REQUEST, "not_accessible_post_like", "대상 게시글에 대한 좋아요 기능을 이용할 수 없습니다. "),
 
     ALREADY_EXISTED_NICKNAME(HttpStatus.BAD_REQUEST, "already_existed_nickname", "이미 동일한 닉네임이 존재합니다. "),
 
     NOT_FOUND_MEMBER_ID(HttpStatus.BAD_REQUEST, "not_found_member_id", "회원 아이디를 찾을 수 없습니다. "),
     NOT_FOUND_TARGET_POST_ID(HttpStatus.BAD_REQUEST, "not_found_target_post_id", "대상 게시글 아이디를 찾을 수 없습니다. "),
-    NOT_FOUND_TARGET_COMMENT_ID(HttpStatus.BAD_REQUEST, "not_found_target_comment_id", "대상 댓글 아이디를 찾을 수 없습니다. "),
-
-    POST_ALREADY_LIKED(HttpStatus.BAD_REQUEST, "post_already_liked", "이미 해당 회원이 대상 게시글에 좋아요를 눌렀습니다. "),
-    POST_ALREADY_UNLIKED(HttpStatus.BAD_REQUEST, "post_already_unliked", "이미 해당 회원이 대상 게시글에서 좋아요를 취소했습니다. "),
-    COMMENT_ALREADY_LIKED(HttpStatus.BAD_REQUEST, "comment_already_liked", "이미 해당 회원이 대상 댓글에 좋아요를 눌렀습니다. "),
-    COMMENT_ALREADY_UNLIKED(HttpStatus.BAD_REQUEST, "comment_already_unliked", "이미 해당 회원이 대상 댓글에서 좋아요를 취소했습니다. ");
+    NOT_FOUND_TARGET_COMMENT_ID(HttpStatus.BAD_REQUEST, "not_found_target_comment_id", "대상 댓글 아이디를 찾을 수 없습니다. ");
 
     private final HttpStatus httpStatus;
     private final String code;

@@ -158,7 +158,7 @@ public class CommCommentEntity {
             return this;
         }
 
-        public CommCommentEntityBuilder CommCommentEntity(final CommCommentEntity commCommentEntity) {
+        public CommCommentEntityBuilder commComment(final CommCommentEntity commCommentEntity) {
             this.postEntity = commCommentEntity.getPostEntity();
             this.path = commCommentEntity.getPath();
             this.authMember = commCommentEntity.getAuthMember();

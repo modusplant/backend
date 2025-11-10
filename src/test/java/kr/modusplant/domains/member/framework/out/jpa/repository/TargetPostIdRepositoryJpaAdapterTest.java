@@ -1,17 +1,20 @@
 package kr.modusplant.domains.member.framework.out.jpa.repository;
 
+import kr.modusplant.framework.out.jpa.entity.common.util.CommPostEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.out.jpa.repository.CommPostLikeJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Optional;
+
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.TargetPostIdTestUtils.testTargetPostId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
-class TargetPostIdRepositoryJpaAdapterTest {
+class TargetPostIdRepositoryJpaAdapterTest implements CommPostEntityTestUtils {
     CommPostJpaRepository commPostJpaRepository = Mockito.mock(CommPostJpaRepository.class);
     CommPostLikeJpaRepository commPostLikeJpaRepository = Mockito.mock(CommPostLikeJpaRepository.class);
     TargetPostIdRepositoryJpaAdapter targetPostIdRepositoryJpaAdapter = new TargetPostIdRepositoryJpaAdapter(commPostJpaRepository, commPostLikeJpaRepository);
@@ -34,6 +37,26 @@ class TargetPostIdRepositoryJpaAdapterTest {
 
         // when & then
         assertThat(targetPostIdRepositoryJpaAdapter.isIdExist(testTargetPostId)).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("isPublished로 true 반환")
+    void testIsPublished_givenIdThatIsPublished_willReturnTrue() {
+        // given & when
+        given(commPostJpaRepository.findByUlid(testTargetPostId.getValue())).willReturn(Optional.of(createCommPostEntityBuilder().build()));
+
+        // when & then
+        assertThat(targetPostIdRepositoryJpaAdapter.isPublished(testTargetPostId)).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("isPublished로 false 반환")
+    void testIsPublished_givenIdThatIsNotPublished_willReturnFalse() {
+        // given & when
+        given(commPostJpaRepository.findByUlid(testTargetPostId.getValue())).willReturn(Optional.of(createCommPostEntityBuilder().isPublished(false).build()));
+
+        // when & then
+        assertThat(targetPostIdRepositoryJpaAdapter.isPublished(testTargetPostId)).isEqualTo(false);
     }
 
     @Test

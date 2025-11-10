@@ -1,16 +1,17 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
-import kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberStatusException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberInactiveStatus;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-class MemberStatusTest implements MemberStatusTestUtils, MemberIdTestUtils {
+class MemberStatusTest {
     @Test
     @DisplayName("active로 회원 상태 반환")
     void testActive_givenNoParameter_willReturnMemberStatus() {
