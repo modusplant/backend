@@ -54,6 +54,20 @@ public class MemberController {
         return memberMapper.toMemberResponse(memberRepository.save(memberNickname));
     }
 
+    public MemberProfileResponse getProfile(MemberProfileGetRecord record) throws IOException {
+        MemberId memberId = MemberId.fromUuid(record.id());
+        Optional<Member> optionalMember = memberRepository.getById(memberId);
+        if (optionalMember.isEmpty()) {
+            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+        }
+        Optional<MemberProfile> optionalMemberProfile = memberProfileRepository.getById(memberId);
+        if (optionalMemberProfile.isPresent()) {
+            return memberProfileMapper.toMemberProfileResponse(optionalMemberProfile.orElseThrow());
+        } else {
+            return new MemberProfileResponse(memberId.getValue(), null, null, optionalMember.orElseThrow().getMemberNickname().getValue());
+        }
+    }
+
     public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         MemberNickname memberNickname = MemberNickname.create(record.nickname());

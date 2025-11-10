@@ -52,8 +52,10 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberComm
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.testMemberCommentUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostLikeRecordTestUtils.testMemberPostLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileGetRecordTestUtils.testMemberProfileGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecord;
 import static kr.modusplant.domains.member.common.util.usecase.request.MemberRegisterRequestTestUtils.testMemberRegisterRequest;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberResponseTestUtils.testMemberResponse;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 import static kr.modusplant.shared.event.common.util.CommentLikeEventTestUtils.testCommentLikeEvent;
@@ -107,6 +109,44 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         EntityExistsException alreadyExistedNicknameException = assertThrows(
                 EntityExistsException.class, () -> memberController.register(testMemberRegisterRequest));
         assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(ALREADY_EXISTED_NICKNAME.getMessage());
+    }
+
+    @Test
+    @DisplayName("기존에 저장된 회원 프로필이 있을 때 getProfile로 회원 프로필 조회")
+    void testGetProfile_givenValidGetRecordAndStoredMemberProfile_willReturnResponse() throws IOException {
+        // given
+        given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
+        given(memberProfileRepository.getById(any())).willReturn(Optional.of(createMemberProfile()));
+
+        // when & then
+        assertThat(memberController.getProfile(testMemberProfileGetRecord)).isEqualTo(testMemberProfileResponse);
+    }
+
+    @Test
+    @DisplayName("기존에 저장된 회원 프로필이 없을 때 getProfile로 회원 프로필 조회")
+    void testGetProfile_givenValidGetRecordAndNoStoredMemberProfile_willReturnResponse() throws IOException {
+        // given
+        given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
+        given(memberProfileRepository.getById(any())).willReturn(Optional.empty());
+
+        // when & then
+        assertThat(memberController.getProfile(testMemberProfileGetRecord)).isEqualTo(
+                new MemberProfileResponse(MEMBER_BASIC_USER_UUID, null, null, MEMBER_BASIC_USER_NICKNAME)
+        );
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원으로 인해 getProfile로 회원 프로필 조회 실패")
+    void testGetProfile_givenNotFoundMemberId_willThrowException() {
+        // given
+        given(memberRepository.getById(any())).willReturn(Optional.empty());
+
+        // when
+        EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class,
+                () -> memberController.getProfile(testMemberProfileGetRecord));
+
+        // then
+        assertThat(entityNotFoundException.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
     }
 
     @Test

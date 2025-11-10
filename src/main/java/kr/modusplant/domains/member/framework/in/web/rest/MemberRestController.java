@@ -43,6 +43,17 @@ public class MemberRestController {
                 DataResponse.ok(memberController.register(request)));
     }
 
+    @Operation(summary = "회원 프로필 조회 API", description = "기존 회원 프로필을 조회합니다. ")
+    @GetMapping(value = "/{id}/profile")
+    public ResponseEntity<DataResponse<MemberProfileResponse>> getMemberProfile(
+            @Parameter(description = "기존에 저장된 회원의 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
+            @PathVariable(required = false)
+            @NotNull(message = "회원 아이디가 비어 있습니다. ")
+            UUID id) throws IOException {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                DataResponse.ok(memberController.getProfile(new MemberProfileGetRecord(id))));
+    }
+
     @Operation(summary = "회원 프로필 덮어쓰기 API", description = "기존 회원 프로필을 덮어씁니다.")
     @PutMapping(value = "/{id}/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<MemberProfileResponse>> overrideMemberProfile(

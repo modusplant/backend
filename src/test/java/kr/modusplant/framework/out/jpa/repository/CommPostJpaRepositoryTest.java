@@ -120,7 +120,7 @@ class CommPostJpaRepositoryTest implements CommPostEntityTestUtils, CommPrimaryC
                         .build()
                 ).collect(Collectors.toList());
         commPosts.getFirst().updateIsPublished(false);
-        long count = commPostRepository.count();
+        long count = commPostRepository.countByIsPublishedTrue();
         commPostRepository.saveAll(commPosts);
 
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));

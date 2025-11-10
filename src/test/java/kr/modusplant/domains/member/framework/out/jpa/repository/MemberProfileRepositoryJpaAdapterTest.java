@@ -31,11 +31,21 @@ class MemberProfileRepositoryJpaAdapterTest implements MemberProfileTestUtils, S
     private final MemberProfileRepositoryJpaAdapter memberProfileRepositoryJpaAdapter = new MemberProfileRepositoryJpaAdapter(s3FileService, memberProfileJpaMapper, memberJpaRepository, memberProfileJpaRepository);
 
     @Test
-    @DisplayName("getById로 가용한 MemberProfile 반환(가용할 때)")
-    void testGetById_givenValidMemberId_willReturnOptionalAvailableMemberProfile() throws IOException {
+    @DisplayName("선택적인 데이터가 모두 있을 때 getById로 가용한 MemberProfile 반환(가용할 때)")
+    void testGetById_givenValidMemberIdAndNotNullImageAndIntro_willReturnOptionalAvailableMemberProfile() throws IOException {
         // given & when
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntityWithUuid()).build()));
         given(s3FileService.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
+
+        // then
+        assertThat(memberProfileRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(Optional.of(createMemberProfile()));
+    }
+
+    @Test
+    @DisplayName("선택적인 데이터가 모두 없을 때 getById로 가용한 MemberProfile 반환(가용할 때)")
+    void testGetById_givenValidMemberIdAndNullImageAndIntro_willReturnOptionalAvailableMemberProfile() throws IOException {
+        // given & when
+        given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(SiteMemberProfileEntity.builder().member(createMemberBasicUserEntityWithUuid()).imagePath(null).introduction(null).build()));
 
         // then
         assertThat(memberProfileRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(Optional.of(createMemberProfile()));
