@@ -27,40 +27,41 @@ import java.util.UUID;
 public class TermRestController {
     private final TermController termController;
 
-    @Operation(summary = "약관 등록 API", description = "약관을 등록합니다.")
-    @PostMapping
-    public ResponseEntity<DataResponse<TermResponse>> registerTerm(
-            @RequestBody @Valid TermCreateRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                DataResponse.ok(termController.register(request)));
-    }
-
-    @Operation(summary = "약관 수정 API", description = "약관을 수정합니다.")
-    @PutMapping
-    public ResponseEntity<DataResponse<TermResponse>> updateTerm(
-            @RequestBody @Valid TermUpdateRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                DataResponse.ok(termController.update(request)));
-    }
-
-    @Operation(summary = "약관 삭제 API", description = "약관을 삭제합니다.")
-    @DeleteMapping("/{uuid}")
-    public ResponseEntity<DataResponse<Void>> deleteTerm(
-        @PathVariable @NotNull UUID uuid) {
-        termController.delete(TermId.fromUuid(uuid));
-        return ResponseEntity.status(HttpStatus.OK).body(DataResponse.ok());
-    }
-
-    @Operation(summary = "약관 조회 API", description = "약관을 조회합니다.")
-    @GetMapping("/{uuid}")
-    public ResponseEntity<DataResponse<TermResponse>> getTerm(@PathVariable @NotNull UUID uuid) {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                DataResponse.ok(termController.getTerm(TermId.fromUuid(uuid))));
-    }
-    @Operation(summary = "약관 목록조회 API", description = "약관 목록을 조회합니다.")
+    @Operation(summary = "약관 목록조회 API", description = "세가지 약관 목록을 조회합니다.(이용약관, 개인정보처리방침, 광고성 정보)")
     @GetMapping
     public ResponseEntity<DataResponse<List<TermResponse>>> getTermList() {
         return ResponseEntity.status(HttpStatus.OK).body(
                 DataResponse.ok(termController.getTermList()));
     }
+//
+//    @Operation(summary = "약관 등록 API", description = "약관을 등록합니다.")
+//    @PostMapping
+//    public ResponseEntity<DataResponse<TermResponse>> registerTerm(
+//            @RequestBody @Valid TermCreateRequest request) {
+//        return ResponseEntity.status(HttpStatus.OK).body(
+//                DataResponse.ok(termController.register(request)));
+//    }
+//
+//    @Operation(summary = "약관 수정 API", description = "약관을 수정합니다.")
+//    @PutMapping
+//    public ResponseEntity<DataResponse<TermResponse>> updateTerm(
+//            @RequestBody @Valid TermUpdateRequest request) {
+//        return ResponseEntity.status(HttpStatus.OK).body(
+//                DataResponse.ok(termController.update(request)));
+//    }
+//
+//    @Operation(summary = "약관 삭제 API", description = "약관을 삭제합니다.")
+//    @DeleteMapping("/{uuid}")
+//    public ResponseEntity<DataResponse<Void>> deleteTerm(
+//        @PathVariable @NotNull UUID uuid) {
+//        termController.delete(TermId.fromUuid(uuid));
+//        return ResponseEntity.status(HttpStatus.OK).body(DataResponse.ok());
+//    }
+//
+//    @Operation(summary = "약관 조회 API", description = "약관을 조회합니다.")
+//    @GetMapping("/{uuid}")
+//    public ResponseEntity<DataResponse<TermResponse>> getTerm(@PathVariable @NotNull UUID uuid) {
+//        return ResponseEntity.status(HttpStatus.OK).body(
+//                DataResponse.ok(termController.getTerm(TermId.fromUuid(uuid))));
+//    }
 }

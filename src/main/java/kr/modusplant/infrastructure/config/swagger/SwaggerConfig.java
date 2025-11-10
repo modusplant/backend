@@ -38,12 +38,12 @@ public class SwaggerConfig {
                         )
                 )
                 .addServersItem(new Server() // 프로덕션 서버 정보 설정
-                        .url("https://specified-jaquith-modusplant-0c942371.koyeb.app") // 프로덕션 서버 링크
-                        .description("Production Server")  // 프로덕션 서버 설명
+                        .url("https://kormap.ddnsfree.com") // 프로덕션 서버 링크
+                        .description("Dev Server")  // 프로덕션 서버 설명
                 )
                 .addServersItem(new Server() // 테스트 서버 정보 설정
                         .url("http://localhost:8080")  // 테스트 서버 링크(http://localhost:8080/swagger-ui/index.html)
-                        .description("Test Server")  // 테스트 서버 설명
+                        .description("Test Local Server")  // 테스트 서버 설명
                 );
     }
 }
