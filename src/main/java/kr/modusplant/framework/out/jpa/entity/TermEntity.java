@@ -31,7 +31,7 @@ public class TermEntity {
     @Column(nullable = false, updatable = false)
     private UUID uuid;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false, length = 40)
     private String name;
 
     @Column(nullable = false, length = 60000)
@@ -53,9 +53,7 @@ public class TermEntity {
     @Column(name = VER_NUM, nullable = false)
     private Long versionNumber;
 
-    public void updateContent(String content) {
-        this.content = content;
-    }
+    public void updateContent(String content) { this.content = content; }
 
     public void updateVersion(String version) {
         this.version = version;
