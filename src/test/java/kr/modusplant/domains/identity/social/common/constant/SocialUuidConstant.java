@@ -5,8 +5,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_GOOGLE_USER_UUID;
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_KAKAO_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_GOOGLE_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_KAKAO_USER_UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SocialUuidConstant {

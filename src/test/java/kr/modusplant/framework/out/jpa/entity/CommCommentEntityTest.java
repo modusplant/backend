@@ -22,13 +22,13 @@ public class CommCommentEntityTest implements CommCommentEntityTestUtils,
     CommCommentEntityTest(TestEntityManager entityManager) {
         this.entityManager = entityManager;}
 
-    @DisplayName("소통 컨텐츠 댓글 PrePersist")
+    @DisplayName("컨텐츠 댓글 PrePersist")
     @Test
     void prePersist() {
         // given
         SiteMemberEntity member = createMemberBasicUserEntity();
-        CommPrimaryCategoryEntity primaryCategory = createTestCommPrimaryCategoryEntity();
-        CommSecondaryCategoryEntity secondaryCategory = createTestCommSecondaryCategoryEntity();
+        CommPrimaryCategoryEntity primaryCategory = createCommPrimaryCategoryEntity();
+        CommSecondaryCategoryEntity secondaryCategory = createCommSecondaryCategoryEntityBuilder().primaryCategory(primaryCategory).build();
         entityManager.persist(primaryCategory);
         entityManager.persist(secondaryCategory);
         CommPostEntity postEntity = createCommPostEntityBuilder()

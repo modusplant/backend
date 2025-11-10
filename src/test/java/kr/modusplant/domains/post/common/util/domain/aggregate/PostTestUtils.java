@@ -5,7 +5,7 @@ import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.vo.AuthorId;
 import kr.modusplant.domains.post.domain.vo.PostStatus;
 
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 
 public interface PostTestUtils extends PostIdTestUtils, AuthorIdTestUtils, PrimaryCategoryIdTestUtils, SecondaryCategoryIdTestUtils, PostContentTestUtils, LikeCountTestUtils {
     default Post createDraftPost() {

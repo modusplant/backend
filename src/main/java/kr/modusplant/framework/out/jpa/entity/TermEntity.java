@@ -117,7 +117,7 @@ public class TermEntity {
             return this;
         }
 
-        public TermEntityBuilder termEntity(final TermEntity term) {
+        public TermEntityBuilder term(final TermEntity term) {
             this.uuid = term.getUuid();
             this.name = term.getName();
             this.content = term.getContent();

@@ -148,7 +148,7 @@ public class CommPostArchiveEntity {
             return this;
         }
 
-        public CommPostArchiveEntityBuilder commPostEntity(final CommPostArchiveEntity postEntity) {
+        public CommPostArchiveEntityBuilder commPost(final CommPostArchiveEntity postEntity) {
             this.ulid = postEntity.ulid;
             this.primaryCategoryUuid = postEntity.primaryCategoryUuid;
             this.secondaryCategoryUuid = postEntity.secondaryCategoryUuid;

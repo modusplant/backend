@@ -1,9 +1,10 @@
 package kr.modusplant.domains.member.framework.out.jpa.repository;
 
-import kr.modusplant.domains.member.common.util.framework.out.persistence.jpa.entity.MemberEntityTestUtils;
+import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberJpaMapperImpl;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,20 +12,42 @@ import org.mockito.Mockito;
 
 import java.util.Optional;
 
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils.testMemberNickname;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-class MemberRepositoryJpaAdapterTest implements MemberEntityTestUtils {
+class MemberRepositoryJpaAdapterTest implements MemberTestUtils, SiteMemberEntityTestUtils {
     private final MemberJpaMapperImpl memberJpaMapper = new MemberJpaMapperImpl();
     private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
     private final MemberRepositoryJpaAdapter memberRepositoryJpaAdapter = new MemberRepositoryJpaAdapter(memberJpaMapper, memberJpaRepository);
 
     @Test
+    @DisplayName("getById로 가용한 Member 반환(가용할 때)")
+    void testGetById_givenValidMemberId_willReturnOptionalAvailableMember() {
+        // given
+        given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(createMemberBasicUserEntityWithUuid()));
+
+        // when & then
+        assertThat(memberRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(Optional.of(createMember()));
+    }
+
+    @Test
+    @DisplayName("getByNickname으로 가용한 Member 반환(가용하지 않을 때)")
+    void testGetById_givenValidMemberId_willReturnOptionalEmptyMember() {
+        // given
+        given(memberJpaRepository.findByUuid(any())).willReturn(Optional.empty());
+
+        // when & then
+        assertThat(memberRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(Optional.empty());
+    }
+
+    @Test
     @DisplayName("getByNickname으로 가용한 Member 반환(가용할 때)")
     void testGetByNickname_givenValidMemberNickname_willReturnOptionalAvailableMember() {
         // given
-        given(memberJpaRepository.findByNickname(any())).willReturn(Optional.of(createMemberEntityWithUuid()));
+        given(memberJpaRepository.findByNickname(any())).willReturn(Optional.of(createMemberBasicUserEntityWithUuid()));
 
         // when & then
         assertThat(memberRepositoryJpaAdapter.getByNickname(testMemberNickname)).isEqualTo(Optional.of(createMember()));
@@ -42,9 +65,9 @@ class MemberRepositoryJpaAdapterTest implements MemberEntityTestUtils {
 
     @Test
     @DisplayName("save(MemberNickname memberNickname)로 Member 반환")
-    void testSave_givenValidMemberNickname_willReturn() {
+    void testSave_givenValidMemberNickname_willReturnMember() {
         // given
-        SiteMemberEntity memberEntity = createMemberEntityWithUuid();
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         given(memberJpaRepository.save(any())).willReturn(memberEntity);
 
         // when & then
@@ -53,9 +76,9 @@ class MemberRepositoryJpaAdapterTest implements MemberEntityTestUtils {
 
     @Test
     @DisplayName("save(MemberId memberId, MemberNickname memberNickname)로 Member 반환")
-    void testSave_givenValidMemberIdAndNickname_willReturn() {
+    void testSave_givenValidMemberIdAndNickname_willReturnMember() {
         // given
-        SiteMemberEntity memberEntity = createMemberEntityWithUuid();
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         given(memberJpaRepository.save(any())).willReturn(memberEntity);
 
         // when & then

@@ -108,7 +108,7 @@ public class SiteMemberTermEntity {
             return this;
         }
 
-        public SiteMemberTermEntityBuilder memberTermEntity(final SiteMemberTermEntity memberTerm) {
+        public SiteMemberTermEntityBuilder memberTerm(final SiteMemberTermEntity memberTerm) {
             this.member = memberTerm.getMember();
             this.agreedTermsOfUseVersion = memberTerm.getAgreedTermsOfUseVersion();
             this.agreedPrivacyPolicyVersion = memberTerm.getAgreedPrivacyPolicyVersion();

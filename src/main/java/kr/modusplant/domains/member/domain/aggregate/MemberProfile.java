@@ -1,0 +1,58 @@
+package kr.modusplant.domains.member.domain.aggregate;
+
+import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
+import kr.modusplant.domains.member.domain.exception.EmptyMemberIdException;
+import kr.modusplant.domains.member.domain.exception.EmptyMemberNicknameException;
+import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileImageException;
+import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileIntroductionException;
+import kr.modusplant.domains.member.domain.vo.MemberId;
+import kr.modusplant.domains.member.domain.vo.MemberNickname;
+import kr.modusplant.domains.member.domain.vo.MemberProfileIntroduction;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+@Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class MemberProfile {
+    private final MemberId memberId;
+    private MemberProfileImage memberProfileImage;
+    private MemberProfileIntroduction memberProfileIntroduction;
+    private MemberNickname memberNickname;
+
+    public static MemberProfile create(MemberId id, MemberProfileImage profileImage, MemberProfileIntroduction profileIntroduction, MemberNickname nickname) {
+        if (id == null) {
+            throw new EmptyMemberIdException();
+        } else if (profileImage == null) {
+            throw new EmptyMemberProfileImageException();
+        } else if (profileIntroduction == null) {
+            throw new EmptyMemberProfileIntroductionException();
+        } else if (nickname == null) {
+            throw new EmptyMemberNicknameException();
+        }
+        return new MemberProfile(id, profileImage, profileIntroduction, nickname);
+    }
+
+    public void updateProfileImage(MemberProfileImage profileImage) {
+        if (profileImage == null) {
+            throw new EmptyMemberProfileImageException();
+        }
+        this.memberProfileImage = profileImage;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof MemberProfile member)) return false;
+
+        return new EqualsBuilder().append(getMemberId(), member.getMemberId()).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(getMemberId()).toHashCode();
+    }
+}

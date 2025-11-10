@@ -2,7 +2,7 @@ package kr.modusplant.framework.out.jpa.entity.common.util;
 
 import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 
-import static kr.modusplant.shared.persistence.common.constant.CommPostConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.*;
 
 public interface CommPostEntityTestUtils extends SiteMemberEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils {
     default CommPostEntity.CommPostEntityBuilder createCommPostEntityBuilder() {

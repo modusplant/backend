@@ -7,6 +7,8 @@ import kr.modusplant.domains.member.domain.vo.MemberNickname;
 import java.util.Optional;
 
 public interface MemberRepository {
+    Optional<Member> getById(MemberId memberId);
+
     Optional<Member> getByNickname(MemberNickname nickname);
 
     Member save(MemberNickname memberNickname);

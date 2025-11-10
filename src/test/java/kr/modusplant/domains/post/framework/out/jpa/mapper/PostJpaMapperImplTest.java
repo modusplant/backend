@@ -27,9 +27,9 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
     void testToPostEntity_givenPostAndMemberEntityAndCategoryEntityAndViewCount_willReturnPostEntity() {
         // given
         Post post = createPublishedPost();
-        SiteMemberEntity memberEntity = createMemberBasicUserEntity().builder().uuid(testAuthorId.getValue()).build();
-        CommPrimaryCategoryEntity primaryCategoryEntity = createTestCommPrimaryCategoryEntity().builder().uuid(testPrimaryCategoryId.getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = createTestCommSecondaryCategoryEntity().builder().uuid(testSecondaryCategoryId.getValue()).build();
+        SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(testAuthorId.getValue()).build();
+        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().uuid(testPrimaryCategoryId.getValue()).build();
+        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().uuid(testSecondaryCategoryId.getValue()).build();
         long viewCount = 5L;
 
         // when
@@ -59,9 +59,9 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
     @DisplayName("toPost로 aggregate 반환하기")
     void testToPost_givenPostEntity_willReturnPost() {
         // given
-        SiteMemberEntity memberEntity = createMemberBasicUserEntity().builder().uuid(testAuthorId.getValue()).build();
-        CommPrimaryCategoryEntity primaryCategoryEntity = createTestCommPrimaryCategoryEntity().builder().uuid(testPrimaryCategoryId.getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = createTestCommSecondaryCategoryEntity().builder().uuid(testSecondaryCategoryId.getValue()).build();
+        SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(testAuthorId.getValue()).build();
+        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().uuid(testPrimaryCategoryId.getValue()).build();
+        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().uuid(testSecondaryCategoryId.getValue()).build();
         CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid()
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)
@@ -89,9 +89,9 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
     void testToPostSummaryReadModel_givenPostEntity_willReturnPostSummaryReadModel() {
         // given
         LocalDateTime publishedAt = LocalDateTime.now();
-        SiteMemberEntity memberEntity = createMemberBasicUserEntity().builder().uuid(testAuthorId.getValue()).build();
-        CommPrimaryCategoryEntity primaryCategoryEntity = createTestCommPrimaryCategoryEntity().builder().uuid(testPrimaryCategoryId.getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = createTestCommSecondaryCategoryEntity().builder().uuid(testSecondaryCategoryId.getValue()).build();
+        SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(testAuthorId.getValue()).build();
+        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().uuid(testPrimaryCategoryId.getValue()).build();
+        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().uuid(testSecondaryCategoryId.getValue()).build();
         CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid()
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)
@@ -119,9 +119,9 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
     void testToPostDetailReadModel_givenPostEntity_willReturnPostDetailReadModel() {
         // given
         LocalDateTime publishedAt = LocalDateTime.now();
-        SiteMemberEntity memberEntity = createMemberBasicUserEntity().builder().uuid(testAuthorId.getValue()).build();
-        CommPrimaryCategoryEntity primaryCategoryEntity = createTestCommPrimaryCategoryEntity().builder().uuid(testPrimaryCategoryId.getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = createTestCommSecondaryCategoryEntity().builder().uuid(testSecondaryCategoryId.getValue()).build();
+        SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(testAuthorId.getValue()).build();
+        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().uuid(testPrimaryCategoryId.getValue()).build();
+        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().uuid(testSecondaryCategoryId.getValue()).build();
         CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid()
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)

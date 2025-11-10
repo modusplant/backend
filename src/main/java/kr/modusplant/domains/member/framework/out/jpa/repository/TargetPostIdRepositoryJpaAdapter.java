@@ -20,6 +20,11 @@ public class TargetPostIdRepositoryJpaAdapter implements TargetPostIdRepository 
     }
 
     @Override
+    public boolean isPublished(TargetPostId targetPostId) {
+        return commPostJpaRepository.findByUlid(targetPostId.getValue()).orElseThrow().getIsPublished().equals(true);
+    }
+
+    @Override
     public boolean isLiked(MemberId memberId, TargetPostId targetPostId) {
         return commPostLikeJpaRepository.existsByPostIdAndMemberId(targetPostId.getValue(), memberId.getValue());
     }

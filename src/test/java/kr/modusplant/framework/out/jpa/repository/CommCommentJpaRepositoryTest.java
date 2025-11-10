@@ -38,8 +38,8 @@ public class CommCommentJpaRepositoryTest implements
     @BeforeEach
     void setUp() {
         SiteMemberEntity member = createMemberBasicUserEntity();
-        CommPrimaryCategoryEntity primaryCategory = primaryCategoryRepository.save(createTestCommPrimaryCategoryEntity());
-        CommSecondaryCategoryEntity secondaryCategory = secondaryCategoryRepository.save(createTestCommSecondaryCategoryEntity());
+        CommPrimaryCategoryEntity primaryCategory = primaryCategoryRepository.save(createCommPrimaryCategoryEntity());
+        CommSecondaryCategoryEntity secondaryCategory = secondaryCategoryRepository.save(createCommSecondaryCategoryEntityBuilder().primaryCategory(primaryCategory).build());
         CommPostEntity postEntity = createCommPostEntityBuilder()
                 .primaryCategory(primaryCategory)
                 .secondaryCategory(secondaryCategory)
