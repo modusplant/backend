@@ -7,6 +7,7 @@ import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
+import kr.modusplant.domains.member.domain.exception.NotAccessiblePostLikeException;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
 import kr.modusplant.domains.member.framework.out.jpa.repository.MemberRepositoryJpaAdapter;
@@ -212,6 +213,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         String postId = testPostLikeEvent.getPostId();
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(true);
         given(targetPostIdRepository.isUnliked(any(), any())).willReturn(true);
         CommPostLikeEntity postLikeEntity = CommPostLikeEntity.of(postId, memberId);
         given(commPostLikeRepository.save(postLikeEntity)).willReturn(postLikeEntity);
@@ -233,6 +235,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(true);
         given(targetPostIdRepository.isUnliked(any(), any())).willReturn(false);
 
         // when
@@ -251,6 +254,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         String postId = testPostLikeEvent.getPostId();
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(true);
         given(targetPostIdRepository.isLiked(any(), any())).willReturn(true);
         CommPostLikeEntity postLikeEntity = CommPostLikeEntity.of(postId, memberId);
         willDoNothing().given(commPostLikeRepository).delete(postLikeEntity);
@@ -272,6 +276,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(true);
         given(targetPostIdRepository.isLiked(any(), any())).willReturn(false);
 
         // when
@@ -315,6 +320,25 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         // then
         assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
         assertThat(entityNotFoundExceptionForUnlike.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
+    }
+
+    @Test
+    @DisplayName("발행되지 않은 대상 게시글로 인해 likePost 또는 unlikePost 실패")
+    void testValidateBeforeLikeOrUnlikePost_givenNotPublishedTargetPost_willThrowException() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(false);
+
+        // when
+        NotAccessiblePostLikeException entityNotFoundExceptionForLike = assertThrows(NotAccessiblePostLikeException.class,
+                () -> memberController.likePost(testMemberPostLikeRecord));
+        NotAccessiblePostLikeException entityNotFoundExceptionForUnlike = assertThrows(NotAccessiblePostLikeException.class,
+                () -> memberController.unlikePost(testMemberPostUnlikeRecord));
+
+        // then
+        assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_ACCESSIBLE_POST_LIKE.getMessage());
+        assertThat(entityNotFoundExceptionForUnlike.getMessage()).isEqualTo(NOT_ACCESSIBLE_POST_LIKE.getMessage());
     }
 
     @Test

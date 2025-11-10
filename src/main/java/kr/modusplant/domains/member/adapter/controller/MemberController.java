@@ -4,6 +4,7 @@ import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
+import kr.modusplant.domains.member.domain.exception.NotAccessiblePostLikeException;
 import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
@@ -146,6 +147,9 @@ public class MemberController {
         }
         if (!targetPostIdRepository.isIdExist(targetPostId)) {
             throw new EntityNotFoundException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
+        }
+        if (!targetPostIdRepository.isPublished(targetPostId)) {
+            throw new NotAccessiblePostLikeException();
         }
     }
 

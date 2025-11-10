@@ -18,6 +18,7 @@ public enum MemberErrorCode implements ResponseCode {
     EMPTY_MEMBER_PROFILE_INTRODUCTION(HttpStatus.BAD_REQUEST, "empty_member_profile_introduction", "회원 프로필 소개가 비어 있습니다. "),
     EMPTY_TARGET_COMMENT_PATH(HttpStatus.BAD_REQUEST, "empty_target_path", "대상 댓글 경로가 비어 있습니다. "),
     EMPTY_TARGET_POST_ID(HttpStatus.BAD_REQUEST, "empty_target_post_id", "대상 게시글 아이디가 비어 있습니다. "),
+    NOT_ACCESSIBLE_POST_LIKE(HttpStatus.BAD_REQUEST, "not_accessible_post_like", "대상 게시글에 대한 좋아요 기능을 이용할 수 없습니다. "),
 
     ALREADY_EXISTED_NICKNAME(HttpStatus.BAD_REQUEST, "already_existed_nickname", "이미 동일한 닉네임이 존재합니다. "),
 
