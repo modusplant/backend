@@ -56,6 +56,11 @@ public class MemberController {
         return memberMapper.toMemberResponse(memberRepository.save(memberNickname));
     }
 
+    public boolean checkExistedNickname(MemberCheckNicknameRecord record) {
+        MemberNickname memberNickname = MemberNickname.create(record.nickname());
+        return memberRepository.isNicknameExist(memberNickname);
+    }
+
     public MemberProfileResponse getProfile(MemberProfileGetRecord record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Optional<Member> optionalMember = memberRepository.getById(memberId);

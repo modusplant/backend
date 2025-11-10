@@ -48,6 +48,7 @@ import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUti
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils.testMemberNickname;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils.testMemberProfileIntroduction;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCheckNicknameRecordTestUtils.testMemberCheckNicknameRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.testMemberCommentLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.testMemberCommentUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostLikeRecordTestUtils.testMemberPostLikeRecord;
@@ -109,6 +110,16 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         EntityExistsException alreadyExistedNicknameException = assertThrows(
                 EntityExistsException.class, () -> memberController.register(testMemberRegisterRequest));
         assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(ALREADY_EXISTED_NICKNAME.getMessage());
+    }
+
+    @Test
+    @DisplayName("checkExistedNickname으로 회원 닉네임 중복 확인")
+    void testCheckExistedNickname_givenValidCheckNicknameRequest_willReturnResponse() {
+        // given
+        given(memberRepository.isNicknameExist(any())).willReturn(true);
+
+        // when & then
+        assertThat(memberController.checkExistedNickname(testMemberCheckNicknameRecord)).isEqualTo(true);
     }
 
     @Test
