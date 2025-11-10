@@ -60,8 +60,8 @@ public class MemberController {
         MemberProfile memberProfile;
         MemberProfileImage memberProfileImage;
         MemberProfileIntroduction memberProfileIntroduction;
-        boolean isImageExist = !record.image().isEmpty();
-        boolean isIntroductionExist = !record.introduction().trim().isEmpty();
+        boolean isImageExist = !(record.image() == null);
+        boolean isIntroductionExist = !(record.introduction() == null);
         Optional<MemberProfile> optionalMemberProfile = memberProfileRepository.getById(memberId);
         if (optionalMemberProfile.isPresent()) {
             memberProfile = optionalMemberProfile.orElseThrow();
