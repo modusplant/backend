@@ -2,14 +2,14 @@ package kr.modusplant.infrastructure.security.common.util;
 
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails.DefaultUserDetailsBuilder;
-import kr.modusplant.legacy.domains.member.enums.AuthProvider;
+import kr.modusplant.shared.enums.AuthProvider;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
 
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 
 public interface SiteMemberUserDetailsTestUtils {
 

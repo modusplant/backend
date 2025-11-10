@@ -1,6 +1,6 @@
 package kr.modusplant.infrastructure.security.models;
 
-import kr.modusplant.legacy.domains.member.enums.AuthProvider;
+import kr.modusplant.shared.enums.AuthProvider;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
