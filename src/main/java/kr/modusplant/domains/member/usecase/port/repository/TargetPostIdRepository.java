@@ -6,6 +6,8 @@ import kr.modusplant.domains.member.domain.vo.TargetPostId;
 public interface TargetPostIdRepository {
     boolean isIdExist(TargetPostId targetPostId);
 
+    boolean isPublished(TargetPostId targetPostId);
+
     boolean isLiked(MemberId memberId, TargetPostId targetPostId);
 
     boolean isUnliked(MemberId memberId, TargetPostId targetPostId);
