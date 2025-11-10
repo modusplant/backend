@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.UUID;
 
 import static kr.modusplant.shared.constant.Regex.*;
@@ -41,6 +42,20 @@ public class MemberRestController {
             @RequestBody @Valid MemberRegisterRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(
                 DataResponse.ok(memberController.register(request)));
+    }
+
+    @Operation(summary = "회원 닉네임 중복 확인 API", description = "이미 등록된 닉네임이 있는지 조회합니다.")
+    @GetMapping(value = "/check/nickname/{nickname}")
+    public ResponseEntity<DataResponse<Map<String, Boolean>>> checkExistedMemberNickname(
+            @Parameter(description = "중복을 확인하려는 회원의 닉네임", example = "IsThisNickname", schema = @Schema(type = "string", pattern = REGEX_NICKNAME))
+            @PathVariable(required = false)
+            @NotBlank(message = "회원 닉네임이 비어 있습니다. ")
+            @Pattern(regexp = REGEX_NICKNAME,
+                    message = "회원 닉네임 서식이 올바르지 않습니다. ")
+            String nickname) {
+        return ResponseEntity.status(HttpStatus.OK).body(DataResponse.ok(Map.of(
+                "isNicknameExisted", memberController.checkExistedNickname(new MemberCheckNicknameRecord(nickname))))
+        );
     }
 
     @Operation(summary = "회원 프로필 조회 API", description = "기존 회원 프로필을 조회합니다. ")
@@ -82,7 +97,7 @@ public class MemberRestController {
     @Operation(summary = "게시글 좋아요 API", description = "게시글에 좋아요를 누릅니다.")
     @PutMapping("/{id}/like/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationPost(
-            @Parameter(description = "회원 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
+            @Parameter(description = "회원의 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
             @PathVariable(required = false)
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
             UUID id,
@@ -98,7 +113,7 @@ public class MemberRestController {
     @Operation(summary = "게시글 좋아요 취소 API", description = "게시글에 대한 좋아요를 취소합니다.")
     @DeleteMapping("/{id}/like/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationPost(
-            @Parameter(description = "회원 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
+            @Parameter(description = "회원의 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
             @PathVariable(required = false)
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
             UUID id,
@@ -114,7 +129,7 @@ public class MemberRestController {
     @Operation(summary = "댓글 좋아요 API", description = "댓글에 좋아요를 누릅니다.")
     @PutMapping("/{id}/like/communication/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationComment(
-            @Parameter(description = "회원 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
+            @Parameter(description = "회원의 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
             @PathVariable(required = false)
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
             UUID id,
@@ -135,7 +150,7 @@ public class MemberRestController {
     @Operation(summary = "댓글 좋아요 취소 API", description = "댓글에 대한 좋아요를 취소합니다.")
     @DeleteMapping("/{id}/like/communication/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationComment(
-            @Parameter(description = "회원 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
+            @Parameter(description = "회원의 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
             @PathVariable(required = false)
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
             UUID id,

@@ -13,7 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
+import java.util.Map;
 
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCheckNicknameRecordTestUtils.testMemberCheckNicknameRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.testMemberCommentLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.testMemberCommentUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostLikeRecordTestUtils.testMemberPostLikeRecord;
@@ -42,7 +44,7 @@ class MemberRestControllerTest implements MemberTestUtils {
 
     @Test
     @DisplayName("register로 응답 반환")
-    void testRegister_givenValidNickname_willReturnResponse() {
+    void testRegister_givenValidRequest_willReturnResponse() {
         // given
         given(memberController.register(testMemberRegisterRequest)).willReturn(testMemberResponse);
 
@@ -52,6 +54,21 @@ class MemberRestControllerTest implements MemberTestUtils {
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(memberResponseEntity.getBody().toString()).isEqualTo(DataResponse.ok(testMemberResponse).toString());
+    }
+
+    @Test
+    @DisplayName("checkExistedMemberNickname으로 응답 반환")
+    void testCheckExistedMemberNickname_givenValidRequest_willReturnResponse() {
+        // given
+        given(memberController.checkExistedNickname(testMemberCheckNicknameRecord)).willReturn(true);
+
+        // when
+        ResponseEntity<DataResponse<Map<String, Boolean>>> isExistedMemberNickname =
+                memberRestController.checkExistedMemberNickname(MEMBER_BASIC_USER_NICKNAME);
+
+        // then
+        assertThat(isExistedMemberNickname.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(isExistedMemberNickname.getBody().getData().toString()).isEqualTo(Map.of("isNicknameExisted", true).toString());
     }
 
     @Test
