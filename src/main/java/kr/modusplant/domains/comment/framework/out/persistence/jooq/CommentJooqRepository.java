@@ -43,6 +43,7 @@ public class CommentJooqRepository implements CommentReadRepository {
                 .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
                 .join(commPost).on(commComment.POST_ULID.eq(commPost.ULID))
                 .where(commComment.AUTH_MEMB_UUID.eq(author.getMemberUuid()))
+                .groupBy(commComment.CONTENT, commComment.CREATED_AT, commPost.TITLE)
                 .orderBy(commComment.CREATED_AT.desc())
                 .fetchInto(CommentOfAuthorResponse.class);
     }
