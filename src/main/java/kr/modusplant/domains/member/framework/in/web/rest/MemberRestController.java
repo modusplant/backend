@@ -150,7 +150,7 @@ public class MemberRestController {
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
             UUID id,
 
-            @Parameter(description = "좋아요를 취소할 게시글의 식별자", schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID))
+            @Parameter(description = "북마크를 취소할 게시글의 식별자", schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID))
             @PathVariable(required = false)
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid) {
