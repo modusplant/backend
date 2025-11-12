@@ -4,6 +4,7 @@ import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
+import kr.modusplant.domains.member.domain.exception.NotAccessiblePostBookmarkException;
 import kr.modusplant.domains.member.domain.exception.NotAccessiblePostLikeException;
 import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
@@ -112,7 +113,7 @@ public class MemberController {
     public void likePost(MemberPostLikeRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());
-        validateBeforeUsingLikeOrBookmarkFunction(memberId, targetPostId);
+        validateBeforeLikeOrUnlikePost(memberId, targetPostId);
         if (targetPostIdRepository.isUnliked(memberId, targetPostId)) {
             eventBus.publish(PostLikeEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
@@ -121,7 +122,7 @@ public class MemberController {
     public void unlikePost(MemberPostUnlikeRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());
-        validateBeforeUsingLikeOrBookmarkFunction(memberId, targetPostId);
+        validateBeforeLikeOrUnlikePost(memberId, targetPostId);
         if (targetPostIdRepository.isLiked(memberId, targetPostId)) {
             eventBus.publish(PostUnlikeEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
@@ -130,7 +131,7 @@ public class MemberController {
     public void bookmarkPost(MemberPostBookmarkRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());
-        validateBeforeUsingLikeOrBookmarkFunction(memberId, targetPostId);
+        validateBeforeBookmarkOrCancelBookmark(memberId, targetPostId);
         if (targetPostIdRepository.isNotBookmarked(memberId, targetPostId)) {
             eventBus.publish(PostBookmarkEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
@@ -139,7 +140,7 @@ public class MemberController {
     public void cancelPostBookmark(MemberPostBookmarkCancelRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());
-        validateBeforeUsingLikeOrBookmarkFunction(memberId, targetPostId);
+        validateBeforeBookmarkOrCancelBookmark(memberId, targetPostId);
         if (targetPostIdRepository.isBookmarked(memberId, targetPostId)) {
             eventBus.publish(PostBookmarkCancelEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
@@ -179,7 +180,7 @@ public class MemberController {
         }
     }
 
-    private void validateBeforeUsingLikeOrBookmarkFunction(MemberId memberId, TargetPostId targetPostId) {
+    private void validateBeforeLikeOrUnlikePost(MemberId memberId, TargetPostId targetPostId) {
         if (!memberRepository.isIdExist(memberId)) {
             throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
         }
@@ -188,6 +189,18 @@ public class MemberController {
         }
         if (!targetPostIdRepository.isPublished(targetPostId)) {
             throw new NotAccessiblePostLikeException();
+        }
+    }
+
+    private void validateBeforeBookmarkOrCancelBookmark(MemberId memberId, TargetPostId targetPostId) {
+        if (!memberRepository.isIdExist(memberId)) {
+            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+        }
+        if (!targetPostIdRepository.isIdExist(targetPostId)) {
+            throw new EntityNotFoundException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
+        }
+        if (!targetPostIdRepository.isPublished(targetPostId)) {
+            throw new NotAccessiblePostBookmarkException();
         }
     }
 
