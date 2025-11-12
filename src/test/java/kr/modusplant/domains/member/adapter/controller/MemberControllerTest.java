@@ -42,8 +42,8 @@ import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUti
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils.testMemberNickname;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils.testMemberProfileIntroduction;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.testMemberCancelPostBookmarkRecord;
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberCheckNicknameRecordTestUtils.testMemberCheckNicknameRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCheckNicknameRecordTestUtils.TEST_MEMBER_NICKNAME_CHECK_RECORD;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.testMemberCommentLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.testMemberCommentUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostBookmarkRecordTestUtils.testMemberPostBookmarkRecord;
@@ -118,7 +118,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(memberRepository.isNicknameExist(any())).willReturn(true);
 
         // when & then
-        assertThat(memberController.checkExistedNickname(testMemberCheckNicknameRecord)).isEqualTo(true);
+        assertThat(memberController.checkExistedNickname(TEST_MEMBER_NICKNAME_CHECK_RECORD)).isEqualTo(true);
     }
 
     @Test
@@ -387,7 +387,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         willDoNothing().given(commPostBookmarkRepository).delete(postBookmarkEntity);
 
         // when
-        memberController.cancelPostBookmark(testMemberCancelPostBookmarkRecord);
+        memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD);
 
         // then
         verify(commPostBookmarkRepository, times(1)).delete(any());
@@ -403,7 +403,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(targetPostIdRepository.isBookmarked(any(), any())).willReturn(false);
 
         // when
-        memberController.cancelPostBookmark(testMemberCancelPostBookmarkRecord);
+        memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD);
 
         // then
         verify(commPostBookmarkRepository, times(0)).delete(any());
@@ -423,7 +423,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         EntityNotFoundException entityNotFoundExceptionForBookmark = assertThrows(EntityNotFoundException.class,
                 () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
         EntityNotFoundException entityNotFoundExceptionForCancelBookmark = assertThrows(EntityNotFoundException.class,
-                () -> memberController.cancelPostBookmark(testMemberCancelPostBookmarkRecord));
+                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
 
         // then
         assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
@@ -447,7 +447,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         EntityNotFoundException entityNotFoundExceptionForBookmark = assertThrows(EntityNotFoundException.class,
                 () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
         EntityNotFoundException entityNotFoundExceptionForCancelBookmark = assertThrows(EntityNotFoundException.class,
-                () -> memberController.cancelPostBookmark(testMemberCancelPostBookmarkRecord));
+                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
 
         // then
         assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
@@ -472,7 +472,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         NotAccessiblePostLikeException entityNotFoundExceptionForBookmark = assertThrows(NotAccessiblePostLikeException.class,
                 () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
         NotAccessiblePostLikeException entityNotFoundExceptionForCancelBookmark = assertThrows(NotAccessiblePostLikeException.class,
-                () -> memberController.cancelPostBookmark(testMemberCancelPostBookmarkRecord));
+                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
 
         // then
         assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_ACCESSIBLE_POST_LIKE.getMessage());

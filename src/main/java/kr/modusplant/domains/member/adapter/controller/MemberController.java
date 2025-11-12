@@ -53,7 +53,7 @@ public class MemberController {
         return memberMapper.toMemberResponse(memberRepository.save(memberNickname));
     }
 
-    public boolean checkExistedNickname(MemberCheckNicknameRecord record) {
+    public boolean checkExistedNickname(MemberNicknameCheckRecord record) {
         MemberNickname memberNickname = MemberNickname.create(record.nickname());
         return memberRepository.isNicknameExist(memberNickname);
     }
@@ -136,7 +136,7 @@ public class MemberController {
         }
     }
 
-    public void cancelPostBookmark(MemberCancelPostBookmarkRecord record) {
+    public void cancelPostBookmark(MemberPostBookmarkCancelRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());
         validateBeforeUsingLikeOrBookmarkFunction(memberId, targetPostId);

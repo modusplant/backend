@@ -15,8 +15,8 @@ import org.springframework.http.ResponseEntity;
 import java.io.IOException;
 import java.util.Map;
 
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.testMemberCancelPostBookmarkRecord;
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberCheckNicknameRecordTestUtils.testMemberCheckNicknameRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCheckNicknameRecordTestUtils.TEST_MEMBER_NICKNAME_CHECK_RECORD;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.testMemberCommentLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.testMemberCommentUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostBookmarkRecordTestUtils.testMemberPostBookmarkRecord;
@@ -62,7 +62,7 @@ class MemberRestControllerTest implements MemberTestUtils {
     @DisplayName("checkExistedMemberNickname으로 응답 반환")
     void testCheckExistedMemberNickname_givenValidRequest_willReturnResponse() {
         // given
-        given(memberController.checkExistedNickname(testMemberCheckNicknameRecord)).willReturn(true);
+        given(memberController.checkExistedNickname(TEST_MEMBER_NICKNAME_CHECK_RECORD)).willReturn(true);
 
         // when
         ResponseEntity<DataResponse<Map<String, Boolean>>> isExistedMemberNickname =
@@ -147,7 +147,7 @@ class MemberRestControllerTest implements MemberTestUtils {
     @DisplayName("cancelCommunicationPostBookmark로 응답 반환")
     void testCancelCommunicationPostBookmark_givenValidRequest_willReturnResponse() {
         // given
-        willDoNothing().given(memberController).cancelPostBookmark(testMemberCancelPostBookmarkRecord);
+        willDoNothing().given(memberController).cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD);
 
         // when
         ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.cancelCommunicationPostBookmark(MEMBER_BASIC_USER_UUID, TEST_COMM_POST_ULID);

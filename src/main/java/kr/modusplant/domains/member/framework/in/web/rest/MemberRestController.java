@@ -54,7 +54,7 @@ public class MemberRestController {
                     message = "회원 닉네임 서식이 올바르지 않습니다. ")
             String nickname) {
         return ResponseEntity.status(HttpStatus.OK).body(DataResponse.ok(Map.of(
-                "isNicknameExisted", memberController.checkExistedNickname(new MemberCheckNicknameRecord(nickname))))
+                "isNicknameExisted", memberController.checkExistedNickname(new MemberNicknameCheckRecord(nickname))))
         );
     }
 
@@ -154,7 +154,7 @@ public class MemberRestController {
             @PathVariable(required = false)
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid) {
-        memberController.cancelPostBookmark(new MemberCancelPostBookmarkRecord(id, postUlid));
+        memberController.cancelPostBookmark(new MemberPostBookmarkCancelRecord(id, postUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
