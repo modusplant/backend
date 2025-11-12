@@ -33,7 +33,7 @@ public class SiteMemberProfileEntity {
     @Column(name = "image_path")
     private String imagePath;
 
-    @Column(name = "intro")
+    @Column(name = "intro", length = 60)
     private String introduction;
 
     @Column(name = LAST_MODIFIED_AT, nullable = false)

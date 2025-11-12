@@ -145,7 +145,7 @@ COMMENT ON COLUMN "site_member"."nickname" IS 'UNIQUE';
 
 CREATE TABLE "site_member_prof" (
 	"uuid"	uuid		NOT NULL,
-	"intro"	text		NULL,
+	"intro"	varchar(60)		NULL,
 	"image_path"	varchar(255)		NULL,
 	"last_modified_at"	timestamp		NOT NULL,
 	"ver_num"	int		NOT NULL
