@@ -126,6 +126,38 @@ public class MemberRestController {
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
+    @Operation(summary = "게시글 북마크 API", description = "게시글에 북마크를 누릅니다.")
+    @PutMapping("/{id}/bookmark/communication/post/{postUlid}")
+    public ResponseEntity<DataResponse<Void>> bookmarkCommunicationPost(
+            @Parameter(description = "회원의 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
+            @PathVariable(required = false)
+            @NotNull(message = "회원 아이디가 비어 있습니다. ")
+            UUID id,
+
+            @Parameter(description = "북마크를 누를 게시글의 식별자", schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID))
+            @PathVariable(required = false)
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String postUlid) {
+        memberController.bookmarkPost(new MemberPostBookmarkRecord(id, postUlid));
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Operation(summary = "게시글 북마크 취소 API", description = "게시글에 대한 북마크를 취소합니다.")
+    @DeleteMapping("/{id}/bookmark/communication/post/{postUlid}")
+    public ResponseEntity<DataResponse<Void>> cancelCommunicationPostBookmark(
+            @Parameter(description = "회원의 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
+            @PathVariable(required = false)
+            @NotNull(message = "회원 아이디가 비어 있습니다. ")
+            UUID id,
+
+            @Parameter(description = "좋아요를 취소할 게시글의 식별자", schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID))
+            @PathVariable(required = false)
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String postUlid) {
+        memberController.cancelPostBookmark(new MemberCancelPostBookmarkRecord(id, postUlid));
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
     @Operation(summary = "댓글 좋아요 API", description = "댓글에 좋아요를 누릅니다.")
     @PutMapping("/{id}/like/communication/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationComment(

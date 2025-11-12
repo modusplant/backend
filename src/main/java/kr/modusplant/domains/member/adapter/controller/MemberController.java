@@ -19,10 +19,7 @@ import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.out.aws.service.S3FileService;
 import kr.modusplant.infrastructure.event.bus.EventBus;
-import kr.modusplant.shared.event.CommentLikeEvent;
-import kr.modusplant.shared.event.CommentUnlikeEvent;
-import kr.modusplant.shared.event.PostLikeEvent;
-import kr.modusplant.shared.event.PostUnlikeEvent;
+import kr.modusplant.shared.event.*;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -115,7 +112,7 @@ public class MemberController {
     public void likePost(MemberPostLikeRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());
-        validateBeforeLikeOrUnlikePost(memberId, targetPostId);
+        validateBeforeUsingLikeOrBookmarkFunction(memberId, targetPostId);
         if (targetPostIdRepository.isUnliked(memberId, targetPostId)) {
             eventBus.publish(PostLikeEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
@@ -124,9 +121,27 @@ public class MemberController {
     public void unlikePost(MemberPostUnlikeRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());
-        validateBeforeLikeOrUnlikePost(memberId, targetPostId);
+        validateBeforeUsingLikeOrBookmarkFunction(memberId, targetPostId);
         if (targetPostIdRepository.isLiked(memberId, targetPostId)) {
             eventBus.publish(PostUnlikeEvent.create(memberId.getValue(), targetPostId.getValue()));
+        }
+    }
+
+    public void bookmarkPost(MemberPostBookmarkRecord record) {
+        MemberId memberId = MemberId.fromUuid(record.memberId());
+        TargetPostId targetPostId = TargetPostId.create(record.postUlid());
+        validateBeforeUsingLikeOrBookmarkFunction(memberId, targetPostId);
+        if (targetPostIdRepository.isNotBookmarked(memberId, targetPostId)) {
+            eventBus.publish(PostBookmarkEvent.create(memberId.getValue(), targetPostId.getValue()));
+        }
+    }
+
+    public void cancelPostBookmark(MemberCancelPostBookmarkRecord record) {
+        MemberId memberId = MemberId.fromUuid(record.memberId());
+        TargetPostId targetPostId = TargetPostId.create(record.postUlid());
+        validateBeforeUsingLikeOrBookmarkFunction(memberId, targetPostId);
+        if (targetPostIdRepository.isBookmarked(memberId, targetPostId)) {
+            eventBus.publish(PostBookmarkCancelEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
     }
 
@@ -164,7 +179,7 @@ public class MemberController {
         }
     }
 
-    private void validateBeforeLikeOrUnlikePost(MemberId memberId, TargetPostId targetPostId) {
+    private void validateBeforeUsingLikeOrBookmarkFunction(MemberId memberId, TargetPostId targetPostId) {
         if (!memberRepository.isIdExist(memberId)) {
             throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
         }
