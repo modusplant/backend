@@ -24,7 +24,9 @@ public enum MemberErrorCode implements ResponseCode {
 
     NOT_FOUND_MEMBER_ID(HttpStatus.BAD_REQUEST, "not_found_member_id", "회원 아이디를 찾을 수 없습니다. "),
     NOT_FOUND_TARGET_POST_ID(HttpStatus.BAD_REQUEST, "not_found_target_post_id", "대상 게시글 아이디를 찾을 수 없습니다. "),
-    NOT_FOUND_TARGET_COMMENT_ID(HttpStatus.BAD_REQUEST, "not_found_target_comment_id", "대상 댓글 아이디를 찾을 수 없습니다. ");
+    NOT_FOUND_TARGET_COMMENT_ID(HttpStatus.BAD_REQUEST, "not_found_target_comment_id", "대상 댓글 아이디를 찾을 수 없습니다. "),
+
+    MEMBER_PROFILE_INTRODUCTION_OVER_LENGTH(HttpStatus.BAD_REQUEST, "member_profile_introduction_over_length", "회원 프로필 소개가 허용되는 길이를 초과하였습니다. ");
 
     private final HttpStatus httpStatus;
     private final String code;

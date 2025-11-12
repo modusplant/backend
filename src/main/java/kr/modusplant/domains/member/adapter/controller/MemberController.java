@@ -205,5 +205,4 @@ public class MemberController {
         s3FileService.uploadFile(record.image(), newImagePath);
         return newImagePath;
     }
-
 }
