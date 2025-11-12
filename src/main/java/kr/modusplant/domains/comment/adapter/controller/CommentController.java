@@ -6,7 +6,6 @@ import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqRepository;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJpaAdapter;
-import kr.modusplant.domains.comment.usecase.request.CommentDeleteRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfAuthorResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
@@ -38,10 +37,10 @@ public class CommentController {
         jpaAdapter.save(comment);
     }
 
-    public void delete(CommentDeleteRequest request) {
-        jpaAdapter.deleteById(CommCommentId.builder()
-                .postUlid(request.postUlid())
-                .path(request.path())
+    public void delete(String postUlid, String commentPath) {
+        jpaAdapter.setCommentAsDeleted(CommCommentId.builder()
+                .postUlid(postUlid)
+                .path(commentPath)
                 .build());
     }
 

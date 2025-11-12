@@ -8,7 +8,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.comment.adapter.controller.CommentController;
-import kr.modusplant.domains.comment.usecase.request.CommentDeleteRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfAuthorResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
@@ -91,10 +90,15 @@ public class CommentRestController {
     )
     @DeleteMapping("/post/{ulid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> delete(
-            @RequestBody @Valid
-            CommentDeleteRequest deleteRequest
+            @Parameter(schema = @Schema(description = "게시글의 식별자", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
+            @PathVariable
+            String ulid,
+
+            @Parameter(schema = @Schema(description = "댓글의 경로", example = "4.8.12"))
+            @PathVariable
+            String path
     ) {
-        controller.delete(deleteRequest);
+        controller.delete(ulid, path);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 }

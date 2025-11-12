@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class CommentRepositoryJpaAdapter implements CommentWriteRepository {
@@ -39,6 +41,14 @@ public class CommentRepositoryJpaAdapter implements CommentWriteRepository {
     }
 
     @Override
-    public void deleteById(CommCommentId id) { commentRepository.deleteById(id); }
+    @Transactional
+    public void setCommentAsDeleted(CommCommentId id) {
+        Optional<CommCommentEntity> comment = commentRepository.findById(id);
+        if (comment.isPresent()) {
+            CommCommentEntity actualComment = comment.get();
+            actualComment.setAsDeleted();
+            commentRepository.save(actualComment);
+        }
+    }
 
 }
