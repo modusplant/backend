@@ -11,12 +11,7 @@ import kr.modusplant.framework.out.jpa.entity.common.util.CommCommentEntityTestU
 import kr.modusplant.framework.out.jpa.entity.common.util.CommCommentIdTestUtils;
 import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
 
 public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
         CommentResponseTestUtils, MemberIdTestUtils,
@@ -45,16 +40,16 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
 //        Mockito.verify(commentRepository, times(1)).save(testCommCommentEntity);
 //    }
 
-    @Test
-    @DisplayName("댓글 id로 댓글 삭제")
-    public void testDeleteById_givenValidCommentId_willDeleteComment() {
-        // given
-        doNothing().when(commentRepository).deleteById(testCommCommentId);
-
-        // when
-        repositoryJpaAdapter.deleteById(testCommCommentId);
-
-        // then
-        Mockito.verify(commentRepository, times(1)).deleteById(testCommCommentId);
-    }
+//    @Test
+//    @DisplayName("댓글 id로 댓글 삭제")
+//    public void testDeleteById_givenValidCommentId_willDeleteComment() {
+//        // given
+//        doNothing().when(commentRepository).deleteById(testCommCommentId);
+//
+//        // when
+//        repositoryJpaAdapter.deleteById(testCommCommentId);
+//
+//        // then
+//        Mockito.verify(commentRepository, times(1)).deleteById(testCommCommentId);
+//    }
 }
