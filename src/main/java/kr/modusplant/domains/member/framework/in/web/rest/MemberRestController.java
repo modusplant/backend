@@ -54,7 +54,7 @@ public class MemberRestController {
                     message = "회원 닉네임 서식이 올바르지 않습니다. ")
             String nickname) {
         return ResponseEntity.status(HttpStatus.OK).body(DataResponse.ok(Map.of(
-                "isNicknameExisted", memberController.checkExistedNickname(new MemberCheckNicknameRecord(nickname))))
+                "isNicknameExisted", memberController.checkExistedNickname(new MemberNicknameCheckRecord(nickname))))
         );
     }
 
@@ -123,6 +123,38 @@ public class MemberRestController {
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid) {
         memberController.unlikePost(new MemberPostUnlikeRecord(id, postUlid));
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Operation(summary = "게시글 북마크 API", description = "게시글에 북마크를 누릅니다.")
+    @PutMapping("/{id}/bookmark/communication/post/{postUlid}")
+    public ResponseEntity<DataResponse<Void>> bookmarkCommunicationPost(
+            @Parameter(description = "회원의 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
+            @PathVariable(required = false)
+            @NotNull(message = "회원 아이디가 비어 있습니다. ")
+            UUID id,
+
+            @Parameter(description = "북마크를 누를 게시글의 식별자", schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID))
+            @PathVariable(required = false)
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String postUlid) {
+        memberController.bookmarkPost(new MemberPostBookmarkRecord(id, postUlid));
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Operation(summary = "게시글 북마크 취소 API", description = "게시글에 대한 북마크를 취소합니다.")
+    @DeleteMapping("/{id}/bookmark/communication/post/{postUlid}")
+    public ResponseEntity<DataResponse<Void>> cancelCommunicationPostBookmark(
+            @Parameter(description = "회원의 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
+            @PathVariable(required = false)
+            @NotNull(message = "회원 아이디가 비어 있습니다. ")
+            UUID id,
+
+            @Parameter(description = "북마크를 취소할 게시글의 식별자", schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID))
+            @PathVariable(required = false)
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String postUlid) {
+        memberController.cancelPostBookmark(new MemberPostBookmarkCancelRecord(id, postUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

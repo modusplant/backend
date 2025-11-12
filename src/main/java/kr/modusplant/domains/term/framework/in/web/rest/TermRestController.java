@@ -2,22 +2,18 @@ package kr.modusplant.domains.term.framework.in.web.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import kr.modusplant.domains.term.usecase.request.TermCreateRequest;
 import kr.modusplant.domains.term.adaptor.controller.TermController;
-import kr.modusplant.domains.term.domain.vo.TermId;
-import kr.modusplant.domains.term.usecase.request.TermUpdateRequest;
 import kr.modusplant.domains.term.usecase.response.TermResponse;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.UUID;
 
 @Tag(name = "약관 API", description = "약관의 생성, 수정, 조회 기능을 관리하는 API 입니다.")
 @RestController

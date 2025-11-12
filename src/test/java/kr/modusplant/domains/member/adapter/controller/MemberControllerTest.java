@@ -7,6 +7,7 @@ import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
+import kr.modusplant.domains.member.domain.exception.NotAccessiblePostBookmarkException;
 import kr.modusplant.domains.member.domain.exception.NotAccessiblePostLikeException;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
@@ -20,15 +21,9 @@ import kr.modusplant.domains.member.usecase.port.repository.TargetPostIdReposito
 import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.framework.out.aws.service.S3FileService;
-import kr.modusplant.framework.out.jpa.entity.CommCommentEntity;
-import kr.modusplant.framework.out.jpa.entity.CommCommentLikeEntity;
-import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.out.jpa.entity.CommPostLikeEntity;
+import kr.modusplant.framework.out.jpa.entity.*;
 import kr.modusplant.framework.out.jpa.entity.common.util.CommPostEntityTestUtils;
-import kr.modusplant.framework.out.jpa.repository.CommCommentJpaRepository;
-import kr.modusplant.framework.out.jpa.repository.CommCommentLikeJpaRepository;
-import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
-import kr.modusplant.framework.out.jpa.repository.CommPostLikeJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.*;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.event.consumer.CommentEventConsumer;
 import kr.modusplant.infrastructure.event.consumer.PostEventConsumer;
@@ -48,9 +43,11 @@ import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUti
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils.testMemberNickname;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils.testMemberProfileIntroduction;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberCheckNicknameRecordTestUtils.testMemberCheckNicknameRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCheckNicknameRecordTestUtils.TEST_MEMBER_NICKNAME_CHECK_RECORD;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.testMemberCommentLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.testMemberCommentUnlikeRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostBookmarkRecordTestUtils.testMemberPostBookmarkRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostLikeRecordTestUtils.testMemberPostLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileGetRecordTestUtils.testMemberProfileGetRecord;
@@ -60,6 +57,8 @@ import static kr.modusplant.domains.member.common.util.usecase.response.MemberPr
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberResponseTestUtils.testMemberResponse;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 import static kr.modusplant.shared.event.common.util.CommentLikeEventTestUtils.testCommentLikeEvent;
+import static kr.modusplant.shared.event.common.util.PostBookmarkEventTestUtils.testPostBookmarkEvent;
+import static kr.modusplant.shared.event.common.util.PostCancelPostBookmarkEventTestUtils.testPostBookmarkCancelEvent;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES;
@@ -79,13 +78,14 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryJpaAdapter.class);
     private final MemberProfileRepository memberProfileRepository = Mockito.mock(MemberProfileRepository.class);
     private final CommPostLikeJpaRepository commPostLikeRepository = Mockito.mock(CommPostLikeJpaRepository.class);
+    private final CommPostBookmarkJpaRepository commPostBookmarkRepository = Mockito.mock(CommPostBookmarkJpaRepository.class);
     private final CommPostJpaRepository commPostRepository = Mockito.mock(CommPostJpaRepository.class);
     private final CommCommentLikeJpaRepository commCommentLikeRepository = Mockito.mock(CommCommentLikeJpaRepository.class);
     private final CommCommentJpaRepository commCommentRepository = Mockito.mock(CommCommentJpaRepository.class);
     private final TargetPostIdRepository targetPostIdRepository = Mockito.mock(TargetPostIdRepository.class);
     private final TargetCommentIdRepository targetCommentIdRepository = Mockito.mock(TargetCommentIdRepository.class);
     private final EventBus eventBus = new EventBus();
-    private final PostEventConsumer postEventConsumer = new PostEventConsumer(eventBus, commPostLikeRepository, commPostRepository);
+    private final PostEventConsumer postEventConsumer = new PostEventConsumer(eventBus, commPostLikeRepository, commPostBookmarkRepository, commPostRepository);
     private final CommentEventConsumer commentEventConsumer = new CommentEventConsumer(eventBus, commCommentLikeRepository, commCommentRepository);
     private final MemberController memberController = new MemberController(s3FileService, memberMapper, memberProfileMapper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
 
@@ -119,7 +119,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(memberRepository.isNicknameExist(any())).willReturn(true);
 
         // when & then
-        assertThat(memberController.checkExistedNickname(testMemberCheckNicknameRecord)).isEqualTo(true);
+        assertThat(memberController.checkExistedNickname(TEST_MEMBER_NICKNAME_CHECK_RECORD)).isEqualTo(true);
     }
 
     @Test
@@ -282,7 +282,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
 
     @Test
     @DisplayName("이미 좋아요를 누른 상태로 likePost로 게시글 좋아요")
-    void testValidateBeforeLikeOrUnlikePost_givenAlreadyLikedValue_willDoNothing() {
+    void testValidateBeforeUsingLikeOrBookmarkFunction_givenAlreadyLikedValue_willDoNothing() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetPostIdRepository.isIdExist(any())).willReturn(true);
@@ -323,7 +323,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
 
     @Test
     @DisplayName("이미 좋아요를 취소한 상태로 unlikePost로 게시글 좋아요 취소")
-    void testValidateBeforeLikeOrUnlikePost_givenAlreadyUnlikedValue_willDoNothing() {
+    void testValidateBeforeUsingLikeOrBookmarkFunction_givenAlreadyUnlikedValue_willDoNothing() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetPostIdRepository.isIdExist(any())).willReturn(true);
@@ -336,6 +336,78 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         // then
         verify(commPostLikeRepository, times(0)).delete(any());
         verify(commPostRepository, times(0)).findByUlid(any());
+    }
+
+    @Test
+    @DisplayName("bookmarkPost로 게시글 북마크")
+    void testBookmarkPost_givenValidParameter_willBookmarkPost() {
+        // given
+        UUID memberId = testPostBookmarkEvent.getMemberId();
+        String postId = testPostBookmarkEvent.getPostId();
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(true);
+        given(targetPostIdRepository.isNotBookmarked(any(), any())).willReturn(true);
+        CommPostBookmarkEntity postBookmarkEntity = CommPostBookmarkEntity.of(postId, memberId);
+        given(commPostBookmarkRepository.save(postBookmarkEntity)).willReturn(postBookmarkEntity);
+
+        // when
+        memberController.bookmarkPost(testMemberPostBookmarkRecord);
+
+        // then
+        verify(commPostBookmarkRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("이미 북마크를 누른 상태로 bookmarkPost로 게시글 북마크")
+    void testValidateBeforeUsingLikeOrBookmarkFunction_givenAlreadyBookmarkedValue_willDoNothing() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(true);
+        given(targetPostIdRepository.isNotBookmarked(any(), any())).willReturn(false);
+
+        // when
+        memberController.bookmarkPost(testMemberPostBookmarkRecord);
+
+        // then
+        verify(commPostBookmarkRepository, times(0)).save(any());
+    }
+
+    @Test
+    @DisplayName("cancelPostBookmark로 게시글 북마크 취소")
+    void testCancelPostBookmark_givenValidParameter_willCancelPostBookmark() {
+        // given
+        UUID memberId = testPostBookmarkCancelEvent.getMemberId();
+        String postId = testPostBookmarkCancelEvent.getPostId();
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(true);
+        given(targetPostIdRepository.isBookmarked(any(), any())).willReturn(true);
+        CommPostBookmarkEntity postBookmarkEntity = CommPostBookmarkEntity.of(postId, memberId);
+        willDoNothing().given(commPostBookmarkRepository).delete(postBookmarkEntity);
+
+        // when
+        memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD);
+
+        // then
+        verify(commPostBookmarkRepository, times(1)).delete(any());
+    }
+
+    @Test
+    @DisplayName("이미 북마크를 취소한 상태로 cancelPostBookmark로 게시글 북마크 취소")
+    void testValidateBeforeUsingLikeOrBookmarkFunction_givenAlreadyCancelledBookmarkValue_willDoNothing() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(true);
+        given(targetPostIdRepository.isBookmarked(any(), any())).willReturn(false);
+
+        // when
+        memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD);
+
+        // then
+        verify(commPostBookmarkRepository, times(0)).delete(any());
     }
 
     @Test
@@ -390,6 +462,60 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         // then
         assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_ACCESSIBLE_POST_LIKE.getMessage());
         assertThat(entityNotFoundExceptionForUnlike.getMessage()).isEqualTo(NOT_ACCESSIBLE_POST_LIKE.getMessage());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원으로 인해 bookmarkPost 또는 cancelPostBookmark 실패")
+    void testValidateBeforeBookmarkOrCancelBookmark_givenNotFoundMemberId_willThrowException() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(false);
+
+        // when
+        EntityNotFoundException entityNotFoundExceptionForBookmark = assertThrows(EntityNotFoundException.class,
+                () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
+        EntityNotFoundException entityNotFoundExceptionForCancelBookmark = assertThrows(EntityNotFoundException.class,
+                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
+
+        // then
+        assertThat(entityNotFoundExceptionForBookmark.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
+        assertThat(entityNotFoundExceptionForCancelBookmark.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 bookmarkPost 또는 cancelPostBookmark 실패")
+    void testValidateBeforeBookmarkOrCancelBookmark_givenNotFoundTargetPostId_willThrowException() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(false);
+
+        // when
+        EntityNotFoundException entityNotFoundExceptionForBookmark = assertThrows(EntityNotFoundException.class,
+                () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
+        EntityNotFoundException entityNotFoundExceptionForCancelBookmark = assertThrows(EntityNotFoundException.class,
+                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
+
+        // then
+        assertThat(entityNotFoundExceptionForBookmark.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
+        assertThat(entityNotFoundExceptionForCancelBookmark.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
+    }
+
+    @Test
+    @DisplayName("발행되지 않은 대상 게시글로 인해 bookmarkPost 또는 cancelPostBookmark 실패")
+    void testValidateBeforeBookmarkOrCancelBookmark_givenNotPublishedTargetPost_willThrowException() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(false);
+
+        // when
+        NotAccessiblePostBookmarkException entityNotFoundExceptionForBookmark = assertThrows(NotAccessiblePostBookmarkException.class,
+                () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
+        NotAccessiblePostBookmarkException entityNotFoundExceptionForCancelBookmark = assertThrows(NotAccessiblePostBookmarkException.class,
+                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
+
+        // then
+        assertThat(entityNotFoundExceptionForBookmark.getMessage()).isEqualTo(NOT_ACCESSIBLE_POST_BOOKMARK.getMessage());
+        assertThat(entityNotFoundExceptionForCancelBookmark.getMessage()).isEqualTo(NOT_ACCESSIBLE_POST_BOOKMARK.getMessage());
     }
 
     @Test

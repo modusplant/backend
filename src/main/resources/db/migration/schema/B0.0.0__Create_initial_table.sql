@@ -99,6 +99,12 @@ CREATE TABLE "comm_post_like" (
 	"created_at"	timestamp		NOT NULL
 );
 
+CREATE TABLE "comm_post_bookmark" (
+	"post_ulid"	varchar(26)		NOT NULL,
+	"memb_uuid"	uuid		NOT NULL,
+	"created_at"	timestamp		NOT NULL
+);
+
 CREATE TABLE "site_member_auth" (
 	"uuid"	uuid		NOT NULL,
 	"act_memb_uuid"	uuid		NOT NULL,
@@ -139,7 +145,7 @@ COMMENT ON COLUMN "site_member"."nickname" IS 'UNIQUE';
 
 CREATE TABLE "site_member_prof" (
 	"uuid"	uuid		NOT NULL,
-	"intro"	text		NULL,
+	"intro"	varchar(60)		NULL,
 	"image_path"	varchar(255)		NULL,
 	"last_modified_at"	timestamp		NOT NULL,
 	"ver_num"	int		NOT NULL
@@ -185,6 +191,11 @@ ALTER TABLE "site_member_term" ADD CONSTRAINT "PK_SITE_MEMBER_TERM" PRIMARY KEY 
 );
 
 ALTER TABLE "comm_post_like" ADD CONSTRAINT "PK_COMM_POST_LIKE" PRIMARY KEY (
+	"post_ulid",
+	"memb_uuid"
+);
+
+ALTER TABLE "comm_post_bookmark" ADD CONSTRAINT "PK_COMM_POST_BOOKMARK" PRIMARY KEY (
 	"post_ulid",
 	"memb_uuid"
 );
