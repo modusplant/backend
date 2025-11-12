@@ -7,6 +7,7 @@ import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
+import kr.modusplant.domains.member.domain.exception.NotAccessiblePostBookmarkException;
 import kr.modusplant.domains.member.domain.exception.NotAccessiblePostLikeException;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
@@ -410,8 +411,8 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     }
 
     @Test
-    @DisplayName("존재하지 않는 회원으로 인해 likePost, unlikePost, bookmarkPost 또는 cancelPostBookmark 실패")
-    void testValidateBeforeUsingLikeOrBookmarkFunction_givenNotFoundMemberId_willThrowException() {
+    @DisplayName("존재하지 않는 회원으로 인해 likePost 또는 unlikePost 실패")
+    void testValidateBeforeLikeOrUnlikePost_givenNotFoundMemberId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(false);
 
@@ -420,21 +421,15 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
                 () -> memberController.likePost(testMemberPostLikeRecord));
         EntityNotFoundException entityNotFoundExceptionForUnlike = assertThrows(EntityNotFoundException.class,
                 () -> memberController.unlikePost(testMemberPostUnlikeRecord));
-        EntityNotFoundException entityNotFoundExceptionForBookmark = assertThrows(EntityNotFoundException.class,
-                () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
-        EntityNotFoundException entityNotFoundExceptionForCancelBookmark = assertThrows(EntityNotFoundException.class,
-                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
 
         // then
         assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
         assertThat(entityNotFoundExceptionForUnlike.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
-        assertThat(entityNotFoundExceptionForBookmark.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
-        assertThat(entityNotFoundExceptionForCancelBookmark.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
     }
 
     @Test
-    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 likePost, unlikePost, bookmarkPost 또는 cancelPostBookmark 실패")
-    void testValidateBeforeUsingLikeOrBookmarkFunctionId_willThrowException() {
+    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 likePost 또는 unlikePost 실패")
+    void testValidateBeforeLikeOrUnlikePost_givenNotFoundTargetPostId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetPostIdRepository.isIdExist(any())).willReturn(false);
@@ -444,21 +439,15 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
                 () -> memberController.likePost(testMemberPostLikeRecord));
         EntityNotFoundException entityNotFoundExceptionForUnlike = assertThrows(EntityNotFoundException.class,
                 () -> memberController.unlikePost(testMemberPostUnlikeRecord));
-        EntityNotFoundException entityNotFoundExceptionForBookmark = assertThrows(EntityNotFoundException.class,
-                () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
-        EntityNotFoundException entityNotFoundExceptionForCancelBookmark = assertThrows(EntityNotFoundException.class,
-                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
 
         // then
         assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
         assertThat(entityNotFoundExceptionForUnlike.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
-        assertThat(entityNotFoundExceptionForBookmark.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
-        assertThat(entityNotFoundExceptionForCancelBookmark.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
     }
 
     @Test
-    @DisplayName("발행되지 않은 대상 게시글로 인해 likePost, unlikePost, bookmarkPost 또는 cancelPostBookmark 실패")
-    void testValidateBeforeUsingLikeOrBookmarkFunction_willThrowException() {
+    @DisplayName("발행되지 않은 대상 게시글로 인해 likePost 또는 unlikePost 실패")
+    void testValidateBeforeLikeOrUnlikePost_givenNotPublishedTargetPost_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetPostIdRepository.isIdExist(any())).willReturn(true);
@@ -469,16 +458,64 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
                 () -> memberController.likePost(testMemberPostLikeRecord));
         NotAccessiblePostLikeException entityNotFoundExceptionForUnlike = assertThrows(NotAccessiblePostLikeException.class,
                 () -> memberController.unlikePost(testMemberPostUnlikeRecord));
-        NotAccessiblePostLikeException entityNotFoundExceptionForBookmark = assertThrows(NotAccessiblePostLikeException.class,
-                () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
-        NotAccessiblePostLikeException entityNotFoundExceptionForCancelBookmark = assertThrows(NotAccessiblePostLikeException.class,
-                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
 
         // then
         assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_ACCESSIBLE_POST_LIKE.getMessage());
         assertThat(entityNotFoundExceptionForUnlike.getMessage()).isEqualTo(NOT_ACCESSIBLE_POST_LIKE.getMessage());
-        assertThat(entityNotFoundExceptionForBookmark.getMessage()).isEqualTo(NOT_ACCESSIBLE_POST_LIKE.getMessage());
-        assertThat(entityNotFoundExceptionForCancelBookmark.getMessage()).isEqualTo(NOT_ACCESSIBLE_POST_LIKE.getMessage());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원으로 인해 bookmarkPost 또는 cancelPostBookmark 실패")
+    void testValidateBeforeBookmarkOrCancelBookmark_givenNotFoundMemberId_willThrowException() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(false);
+
+        // when
+        EntityNotFoundException entityNotFoundExceptionForBookmark = assertThrows(EntityNotFoundException.class,
+                () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
+        EntityNotFoundException entityNotFoundExceptionForCancelBookmark = assertThrows(EntityNotFoundException.class,
+                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
+
+        // then
+        assertThat(entityNotFoundExceptionForBookmark.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
+        assertThat(entityNotFoundExceptionForCancelBookmark.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 bookmarkPost 또는 cancelPostBookmark 실패")
+    void testValidateBeforeBookmarkOrCancelBookmark_givenNotFoundTargetPostId_willThrowException() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(false);
+
+        // when
+        EntityNotFoundException entityNotFoundExceptionForBookmark = assertThrows(EntityNotFoundException.class,
+                () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
+        EntityNotFoundException entityNotFoundExceptionForCancelBookmark = assertThrows(EntityNotFoundException.class,
+                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
+
+        // then
+        assertThat(entityNotFoundExceptionForBookmark.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
+        assertThat(entityNotFoundExceptionForCancelBookmark.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
+    }
+
+    @Test
+    @DisplayName("발행되지 않은 대상 게시글로 인해 bookmarkPost 또는 cancelPostBookmark 실패")
+    void testValidateBeforeBookmarkOrCancelBookmark_givenNotPublishedTargetPost_willThrowException() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(false);
+
+        // when
+        NotAccessiblePostBookmarkException entityNotFoundExceptionForBookmark = assertThrows(NotAccessiblePostBookmarkException.class,
+                () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
+        NotAccessiblePostBookmarkException entityNotFoundExceptionForCancelBookmark = assertThrows(NotAccessiblePostBookmarkException.class,
+                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
+
+        // then
+        assertThat(entityNotFoundExceptionForBookmark.getMessage()).isEqualTo(NOT_ACCESSIBLE_POST_BOOKMARK.getMessage());
+        assertThat(entityNotFoundExceptionForCancelBookmark.getMessage()).isEqualTo(NOT_ACCESSIBLE_POST_BOOKMARK.getMessage());
     }
 
     @Test
