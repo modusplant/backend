@@ -42,7 +42,7 @@ public class EmailAuthController {
         String email = request.email();
 
         if(identityRepository.existsByEmailAndProvider(email, "Basic")) {
-            throw new DataAlreadyExistsException(IdentityErrorCode.MEMBER_ALREADY_EXISTS);
+            throw new DataAlreadyExistsException(IdentityErrorCode.ALREADY_EXISTS_MEMBER);
         }
 
         String verifyCode = tokenHelper.generateVerifyCode();
@@ -57,7 +57,7 @@ public class EmailAuthController {
         String email = request.email();
 
         if(identityRepository.existsByEmailAndProvider(email, "Basic")) {
-            throw new DataAlreadyExistsException(IdentityErrorCode.MEMBER_ALREADY_EXISTS);
+            throw new DataAlreadyExistsException(IdentityErrorCode.ALREADY_EXISTS_MEMBER);
         }
 
         String redisKey = RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, email);
