@@ -9,8 +9,11 @@ import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.Co
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfAuthorResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
+import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
 import kr.modusplant.shared.persistence.compositekey.CommCommentId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,8 +31,12 @@ public class CommentController {
         return jooqRepository.findByPost(PostId.create(postUlid));
     }
 
-    public List<CommentOfAuthorResponse> gatherByAuthor(UUID memberUuid) {
-        return jooqRepository.findByAuthor(Author.create(memberUuid));
+    public CommentPageResponse<CommentOfAuthorResponse> gatherByAuthor(UUID memberUuid, Pageable pageable) {
+//        return jooqRepository.findByAuthor(Author.create(memberUuid), pageable);
+        PageImpl<CommentOfAuthorResponse> result = jooqRepository.findByAuthor(Author.create(memberUuid), pageable);
+
+        return new CommentPageResponse<>(result.getContent(), result.getNumber(),
+                result.getSize(), result.getTotalElements(), result.getTotalPages());
     }
 
     public void register(CommentRegisterRequest request) {

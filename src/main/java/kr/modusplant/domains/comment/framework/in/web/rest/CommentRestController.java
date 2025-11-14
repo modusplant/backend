@@ -11,9 +11,12 @@ import kr.modusplant.domains.comment.adapter.controller.CommentController;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfAuthorResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
+import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +33,7 @@ import java.util.UUID;
 public class CommentRestController {
 
     private final CommentController controller;
+    private final JwtTokenProvider tokenProvider;
 
     /**
      * 소통 상세 페이지에 띄워지는 댓글에 대한 API입니다.
@@ -54,22 +58,40 @@ public class CommentRestController {
                 DataResponse.ok(commentResponses));
     }
 
+    /**
+     * 마이페이지의 내 댓글 보기에 사용되는 API 입니다.
+     * @param page 사용자가 현재 위치한 페이지의 번호입니다.
+     * @param size 한 페이지 당 들어가는 댓글들의 수 입니다.
+     * @return 페이지네이션 된 댓글 데이터들을 반환합니다.
+     */
     @Operation(
             summary = "인가 회원 식별자로 컨텐츠 댓글 조회 API",
             description = "인가 회원 식별자에 맞는 컨텐츠 댓글을 조회합니다."
     )
     @GetMapping("/member/auth/{uuid}")
-    public ResponseEntity<DataResponse<List<CommentOfAuthorResponse>>> gatherByAuthor(
-            @Parameter(schema = @Schema(
-                    description = "회원의 식별자",
-                    example = "038ae842-3c93-484f-b526-7c4645a195a7")
+    public ResponseEntity<DataResponse<CommentPageResponse<CommentOfAuthorResponse>>> gatherByAuthor(
+            @RequestHeader("Authorization")
+            @NotNull(message = "접근 토큰이 비어 있습니다.")
+            String accessToken,
+
+            @Parameter(
+                    description = "현재 페이지의 숫자",
+                    example = "0"
             )
-            @PathVariable(required = false, value = "uuid")
-            @NotNull(message = "회원 식별자가 비어 있습니다.")
-            UUID memberUuid) {
-        List<CommentOfAuthorResponse> commentResponses = controller.gatherByAuthor(memberUuid);
-        return ResponseEntity.ok().body(
-                DataResponse.ok(commentResponses));
+            @RequestParam(value = "page", defaultValue = "10")
+            int page,
+
+            @Parameter(
+                    description = "페이지 당 들어갈 댓글의 수",
+                    example = "10"
+            )
+            @RequestParam(value = "size", defaultValue = "10")
+            int size
+            ) {
+        UUID memberUuid = tokenProvider.getMemberUuidFromToken(accessToken.substring(7));
+
+        CommentPageResponse<CommentOfAuthorResponse> commentResponses = controller.gatherByAuthor(memberUuid, PageRequest.of(page, size));
+        return ResponseEntity.ok().body(DataResponse.ok(commentResponses));
     }
 
     @Operation(

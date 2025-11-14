@@ -10,9 +10,14 @@ import kr.modusplant.jooq.tables.CommPost;
 import kr.modusplant.jooq.tables.SiteMember;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.jooq.impl.DSL.count;
 
@@ -36,15 +41,32 @@ public class CommentJooqRepository implements CommentReadRepository {
                 .fetchInto(CommentOfPostResponse.class);
     }
 
-    public List<CommentOfAuthorResponse> findByAuthor(Author author) {
-        return dsl.select(commComment.CONTENT, commComment.CREATED_AT,
-                commPost.TITLE, count(commComment.POST_ULID))
+    public PageImpl<CommentOfAuthorResponse> findByAuthor(Author author, Pageable pageable) {
+
+        Optional<Record1<Integer>> totalComments = dsl.selectCount()
                 .from(commComment)
                 .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
-                .join(commPost).on(commComment.POST_ULID.eq(commPost.ULID))
                 .where(commComment.AUTH_MEMB_UUID.eq(author.getMemberUuid()))
-                .groupBy(commComment.CONTENT, commComment.CREATED_AT, commPost.TITLE)
-                .orderBy(commComment.CREATED_AT.desc())
-                .fetchInto(CommentOfAuthorResponse.class);
+                .fetchOptional();
+
+        if(totalComments.isPresent()) {
+            int totalComment = totalComments.get().component1();
+
+            List<CommentOfAuthorResponse> commentList = dsl.select(commComment.CONTENT, commComment.CREATED_AT,
+                            commPost.TITLE, count(commComment.POST_ULID))
+                    .from(commComment)
+                    .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
+                    .join(commPost).on(commComment.POST_ULID.eq(commPost.ULID))
+                    .where(commComment.AUTH_MEMB_UUID.eq(author.getMemberUuid()))
+                    .groupBy(commComment.CONTENT, commComment.CREATED_AT, commPost.TITLE)
+                    .orderBy(commComment.CREATED_AT.desc())
+                    .limit(pageable.getPageSize())
+                    .offset(pageable.getOffset())
+                    .fetchInto(CommentOfAuthorResponse.class);
+
+            return new PageImpl<>(commentList, pageable, totalComment);
+        } else {
+            return new PageImpl<>(new ArrayList<>(), pageable, 0);
+        }
     }
 }
