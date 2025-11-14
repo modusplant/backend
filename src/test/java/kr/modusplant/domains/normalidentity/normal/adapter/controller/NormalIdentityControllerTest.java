@@ -1,10 +1,11 @@
 package kr.modusplant.domains.normalidentity.normal.adapter.controller;
 
-import kr.modusplant.domains.normalidentity.normal.adapter.mapper.NormalIdentityMapperImpl;
+import kr.modusplant.domains.identity.normal.adapter.controller.NormalIdentityController;
+import kr.modusplant.domains.identity.normal.adapter.mapper.NormalIdentityMapperImpl;
 import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.SignUpDataTestUtils;
 import kr.modusplant.domains.normalidentity.normal.common.util.usecase.request.NormalSignUpRequestTestUtils;
-import kr.modusplant.domains.normalidentity.normal.usecase.port.mapper.NormalIdentityMapper;
-import kr.modusplant.domains.normalidentity.normal.usecase.port.repository.NormalIdentityRepository;
+import kr.modusplant.domains.identity.normal.usecase.port.mapper.NormalIdentityMapper;
+import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

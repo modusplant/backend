@@ -1,9 +1,10 @@
 package kr.modusplant.domains.normalidentity.normal.domain.vo;
 
+import kr.modusplant.domains.identity.normal.domain.vo.Nickname;
 import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.NicknameTestUtils;
-import kr.modusplant.domains.normalidentity.normal.domain.exception.EmptyValueException;
-import kr.modusplant.domains.normalidentity.normal.domain.exception.InvalidValueException;
-import kr.modusplant.domains.normalidentity.normal.domain.exception.enums.IdentityErrorCode;
+import kr.modusplant.domains.identity.normal.domain.exception.EmptyValueException;
+import kr.modusplant.domains.identity.normal.domain.exception.InvalidValueException;
+import kr.modusplant.domains.identity.normal.domain.exception.enums.IdentityErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
