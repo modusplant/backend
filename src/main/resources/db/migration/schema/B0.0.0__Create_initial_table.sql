@@ -143,10 +143,10 @@ CREATE TABLE public.term (
 );
 
 ALTER TABLE ONLY public.comm_comment
-    ADD CONSTRAINT "PK_COMM_COMMENT" PRIMARY KEY (post_ulid, path);
+    ADD CONSTRAINT "PK_COMM_COMMENT" PRIMARY KEY (post_ulid, "path");
 
 ALTER TABLE ONLY public.comm_comment_like
-    ADD CONSTRAINT "PK_COMM_COMMENT_LIKE" PRIMARY KEY (post_ulid, path, memb_uuid);
+    ADD CONSTRAINT "PK_COMM_COMMENT_LIKE" PRIMARY KEY (post_ulid, "path", memb_uuid);
 
 ALTER TABLE ONLY public.comm_post
     ADD CONSTRAINT "PK_COMM_POST" PRIMARY KEY (ulid);
@@ -186,3 +186,15 @@ ALTER TABLE ONLY public.term
 
 ALTER TABLE ONLY public.comm_post_archive
     ADD CONSTRAINT comm_post_archive_pkey PRIMARY KEY (ulid);
+
+ALTER TABLE ONLY public.term
+    ADD CONSTRAINT "UK_TERM" UNIQUE ("name");
+
+ALTER TABLE ONLY public.site_member_auth
+    ADD CONSTRAINT "UK_SITE_MEMBER_AUTH" UNIQUE (provider_id);
+
+ALTER TABLE ONLY public.site_member
+    ADD CONSTRAINT "UK_SITE_MEMBER" UNIQUE (nickname);
+
+ALTER TABLE ONLY public.comm_pri_cate
+    ADD CONSTRAINT "UK_COMM_PRI_CATE" UNIQUE (category, "order");
