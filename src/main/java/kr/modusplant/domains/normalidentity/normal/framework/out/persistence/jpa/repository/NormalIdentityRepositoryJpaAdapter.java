@@ -1,5 +1,6 @@
 package kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.repository;
 
+import kr.modusplant.domains.normalidentity.normal.domain.vo.Nickname;
 import kr.modusplant.domains.normalidentity.normal.domain.vo.SignUpData;
 import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper.NormalIdentityAuthJpaMapper;
 import kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper.NormalIdentityJpaMapper;
@@ -41,5 +42,10 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityReposit
     @Override
     public boolean existsByEmailAndProvider(String email, String provider) {
         return authRepository.existsByEmailAndProvider(email, AuthProvider.valueOf(provider.toUpperCase()));
+    }
+
+    @Override
+    public boolean isNicknameExists(Nickname nickname) {
+        return identityRepository.existsByNickname(nickname.getNickname());
     }
 }

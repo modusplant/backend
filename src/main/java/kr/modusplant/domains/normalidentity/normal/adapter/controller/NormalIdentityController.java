@@ -1,6 +1,7 @@
 package kr.modusplant.domains.normalidentity.normal.adapter.controller;
 
 import kr.modusplant.domains.normalidentity.normal.domain.exception.enums.IdentityErrorCode;
+import kr.modusplant.domains.normalidentity.normal.domain.vo.Nickname;
 import kr.modusplant.domains.normalidentity.normal.exception.DataAlreadyExistsException;
 import kr.modusplant.domains.normalidentity.normal.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.domains.normalidentity.normal.usecase.port.repository.NormalIdentityRepository;
@@ -18,7 +19,9 @@ public class NormalIdentityController {
     public void registerNormalMember(NormalSignUpRequest request) {
         if(repository.existsByEmailAndProvider(request.email(), "Basic")) {
             throw new DataAlreadyExistsException(IdentityErrorCode.MEMBER_ALREADY_EXISTS);
-        } else {
+        } else if(repository.isNicknameExists(Nickname.create(request.nickname()))) {
+            throw new DataAlreadyExistsException(IdentityErrorCode.NICKNAME_ALREADY_EXISTS);
+        }  else {
             repository.save(mapper.toSignUpData(request));
         }
     }
