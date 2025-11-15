@@ -1,9 +1,10 @@
 package kr.modusplant.domains.normalidentity.normal.domain.vo;
 
+import kr.modusplant.domains.identity.normal.domain.exception.EmptyValueException;
+import kr.modusplant.domains.identity.normal.domain.exception.InvalidValueException;
+import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
+import kr.modusplant.domains.identity.normal.domain.vo.Credentials;
 import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.CredentialsTestUtils;
-import kr.modusplant.domains.normalidentity.normal.domain.exception.EmptyValueException;
-import kr.modusplant.domains.normalidentity.normal.domain.exception.InvalidValueException;
-import kr.modusplant.domains.normalidentity.normal.domain.exception.enums.IdentityErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +20,7 @@ public class CredentialsTest implements CredentialsTestUtils {
                 Credentials.createWithString(null, null));
 
         // when & then
-        assertEquals(IdentityErrorCode.EMPTY_EMAIL, result.getErrorCode());
+        assertEquals(NormalIdentityErrorCode.EMPTY_EMAIL, result.getErrorCode());
     }
 
     @Test
@@ -30,7 +31,7 @@ public class CredentialsTest implements CredentialsTestUtils {
                 Credentials.createWithString("email", testCredentials.getPassword().getPassword()));
 
         // when & then
-        assertEquals(IdentityErrorCode.INVALID_EMAIL, result.getErrorCode());
+        assertEquals(NormalIdentityErrorCode.INVALID_EMAIL, result.getErrorCode());
     }
 
     @Test
@@ -41,7 +42,7 @@ public class CredentialsTest implements CredentialsTestUtils {
                 Credentials.createWithString(testCredentials.getEmail().getEmail(), "282933"));
 
         // when & then
-        assertEquals(IdentityErrorCode.INVALID_PASSWORD, result.getErrorCode());
+        assertEquals(NormalIdentityErrorCode.INVALID_PASSWORD, result.getErrorCode());
     }
 
     @Test
@@ -57,7 +58,7 @@ public class CredentialsTest implements CredentialsTestUtils {
     @Test
     @DisplayName("다른 객체로 동등성 비교")
     void testEquals_givenDifferentObject_willReturnFalse() {
-        EmptyValueException different = new EmptyValueException(IdentityErrorCode.EMPTY_NICKNAME);
+        EmptyValueException different = new EmptyValueException(NormalIdentityErrorCode.EMPTY_NICKNAME);
         assertNotEquals(testCredentials, different);
     }
 

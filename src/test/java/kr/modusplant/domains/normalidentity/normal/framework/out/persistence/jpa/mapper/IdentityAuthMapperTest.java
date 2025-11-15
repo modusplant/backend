@@ -1,6 +1,8 @@
 package kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper;
 
-import kr.modusplant.domains.normalidentity.normal.domain.vo.SignUpData;
+import kr.modusplant.domains.identity.normal.domain.vo.SignUpData;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.NormalIdentityAuthJpaMapper;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.NormalIdentityAuthJpaMapperImpl;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;

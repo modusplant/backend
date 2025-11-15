@@ -6,7 +6,7 @@ import kr.modusplant.domains.comment.adapter.controller.CommentController;
 import kr.modusplant.domains.comment.common.util.adapter.CommentRegisterRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.adapter.CommentResponseTestUtils;
 import kr.modusplant.domains.comment.framework.in.web.rest.CommentRestController;
-import kr.modusplant.domains.normalidentity.normal.usecase.port.mapper.NormalIdentityMapper;
+import kr.modusplant.domains.identity.normal.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.infrastructure.jwt.framework.out.redis.AccessTokenRedisRepository;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
