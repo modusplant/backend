@@ -13,7 +13,6 @@ import kr.modusplant.domains.comment.usecase.response.CommentOfAuthorResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
-import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.PageRequest;
@@ -33,7 +32,6 @@ import java.util.UUID;
 public class CommentRestController {
 
     private final CommentController controller;
-    private final JwtTokenProvider tokenProvider;
 
     /**
      * 소통 상세 페이지에 띄워지는 댓글에 대한 API입니다.
@@ -70,9 +68,13 @@ public class CommentRestController {
     )
     @GetMapping("/member/auth/{uuid}")
     public ResponseEntity<DataResponse<CommentPageResponse<CommentOfAuthorResponse>>> gatherByAuthor(
-            @RequestHeader("Authorization")
-            @NotNull(message = "접근 토큰이 비어 있습니다.")
-            String accessToken,
+            @Parameter(schema = @Schema(
+                    description = "댓글을 작성한 사용자의 식별자",
+                    example = "038ae842-3c93-484f-b526-7c4645a195a7")
+            )
+            @PathVariable(required = false, value = "uuid")
+            @NotNull(message = "댓글을 작성한 사용자의 식별자가 비어 있습니다.")
+            UUID memberUuid,
 
             @Parameter(
                     description = "현재 페이지의 숫자",
@@ -88,8 +90,6 @@ public class CommentRestController {
             @RequestParam(value = "size", defaultValue = "10")
             int size
             ) {
-        UUID memberUuid = tokenProvider.getMemberUuidFromToken(accessToken.substring(7));
-
         CommentPageResponse<CommentOfAuthorResponse> commentResponses = controller.gatherByAuthor(memberUuid, PageRequest.of(page, size));
         return ResponseEntity.ok().body(DataResponse.ok(commentResponses));
     }
