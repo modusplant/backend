@@ -1,6 +1,8 @@
 package kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jpa.mapper;
 
-import kr.modusplant.domains.normalidentity.normal.domain.vo.SignUpData;
+import kr.modusplant.domains.identity.normal.domain.vo.SignUpData;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.NormalIdentityTermJpaMapper;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.NormalIdentityTermJpaMapperImpl;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberTermEntity;
 import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;

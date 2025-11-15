@@ -1,10 +1,11 @@
 package kr.modusplant.domains.normalidentity.normal.adapter.mapper;
 
+import kr.modusplant.domains.identity.normal.adapter.mapper.NormalIdentityMapperImpl;
+import kr.modusplant.domains.identity.normal.domain.vo.SignUpData;
+import kr.modusplant.domains.identity.normal.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.CredentialsTestUtils;
 import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.SignUpDataTestUtils;
 import kr.modusplant.domains.normalidentity.normal.common.util.usecase.request.NormalSignUpRequestTestUtils;
-import kr.modusplant.domains.normalidentity.normal.domain.vo.SignUpData;
-import kr.modusplant.domains.normalidentity.normal.usecase.port.mapper.NormalIdentityMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
