@@ -1,4 +1,4 @@
-package kr.modusplant.domains.identity.normal.exception;
+package kr.modusplant.domains.identity.normal.domain.exception;
 
 import kr.modusplant.shared.exception.BusinessException;
 import kr.modusplant.shared.exception.enums.supers.ResponseCode;

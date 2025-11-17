@@ -1,8 +1,8 @@
 package kr.modusplant.domains.identity.normal.adapter.controller;
 
 import kr.modusplant.domains.identity.normal.adapter.EmailAuthTokenHelper;
-import kr.modusplant.domains.identity.normal.domain.exception.enums.IdentityErrorCode;
-import kr.modusplant.domains.identity.normal.exception.DataAlreadyExistsException;
+import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
+import kr.modusplant.domains.identity.normal.domain.exception.DataAlreadyExistsException;
 import kr.modusplant.domains.identity.normal.usecase.enums.EmailType;
 import kr.modusplant.domains.identity.normal.usecase.port.contract.CallEmailSendApiGateway;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityRepository;
@@ -42,7 +42,7 @@ public class EmailAuthController {
         String email = request.email();
 
         if(identityRepository.existsByEmailAndProvider(email, "Basic")) {
-            throw new DataAlreadyExistsException(IdentityErrorCode.ALREADY_EXISTS_MEMBER);
+            throw new DataAlreadyExistsException(NormalIdentityErrorCode.ALREADY_EXISTS_MEMBER);
         }
 
         String verifyCode = tokenHelper.generateVerifyCode();
@@ -57,7 +57,7 @@ public class EmailAuthController {
         String email = request.email();
 
         if(identityRepository.existsByEmailAndProvider(email, "Basic")) {
-            throw new DataAlreadyExistsException(IdentityErrorCode.ALREADY_EXISTS_MEMBER);
+            throw new DataAlreadyExistsException(NormalIdentityErrorCode.ALREADY_EXISTS_MEMBER);
         }
 
         String redisKey = RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, email);

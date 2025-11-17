@@ -2,7 +2,7 @@ package kr.modusplant.domains.identity.normal.domain.vo;
 
 import kr.modusplant.domains.identity.normal.domain.exception.EmptyValueException;
 import kr.modusplant.domains.identity.normal.domain.exception.InvalidValueException;
-import kr.modusplant.domains.identity.normal.domain.exception.enums.IdentityErrorCode;
+import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
 import kr.modusplant.shared.constant.Regex;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,9 +21,9 @@ public class Email {
     }
 
     public static void validateSource(String email) {
-        if (email == null || email.isBlank()) { throw new EmptyValueException(IdentityErrorCode.EMPTY_EMAIL); }
+        if (email == null || email.isBlank()) { throw new EmptyValueException(NormalIdentityErrorCode.EMPTY_EMAIL); }
         if (!email.matches(Regex.REGEX_EMAIL)) {
-            throw new InvalidValueException(IdentityErrorCode.INVALID_EMAIL);
+            throw new InvalidValueException(NormalIdentityErrorCode.INVALID_EMAIL);
         }
     }
 

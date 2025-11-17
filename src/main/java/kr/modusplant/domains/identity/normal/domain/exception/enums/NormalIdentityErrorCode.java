@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum IdentityErrorCode implements ResponseCode {
+public enum NormalIdentityErrorCode implements ResponseCode {
 
     INVALID_ROLE(HttpStatus.BAD_REQUEST, "invalid_role", "올바른 사용자의 역할이 아닙니다"),
     INVALID_EMAIL(HttpStatus.BAD_REQUEST, "invalid_email", "올바른 이메일 형식이 아닙니다"),
