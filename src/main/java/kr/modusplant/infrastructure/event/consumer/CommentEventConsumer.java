@@ -1,8 +1,8 @@
 package kr.modusplant.infrastructure.event.consumer;
 
-import kr.modusplant.framework.out.jpa.entity.CommCommentLikeEntity;
-import kr.modusplant.framework.out.jpa.repository.CommCommentJpaRepository;
-import kr.modusplant.framework.out.jpa.repository.CommCommentLikeJpaRepository;
+import kr.modusplant.framework.jpa.entity.CommCommentLikeEntity;
+import kr.modusplant.framework.jpa.repository.CommCommentJpaRepository;
+import kr.modusplant.framework.jpa.repository.CommCommentLikeJpaRepository;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.CommentLikeEvent;
 import kr.modusplant.shared.event.CommentUnlikeEvent;

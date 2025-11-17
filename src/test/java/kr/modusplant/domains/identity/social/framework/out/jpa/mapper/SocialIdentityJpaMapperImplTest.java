@@ -5,9 +5,9 @@ import kr.modusplant.domains.identity.social.common.util.domain.vo.UserPayloadTe
 import kr.modusplant.domains.identity.social.common.util.framework.out.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.identity.social.domain.vo.UserPayload;
 import kr.modusplant.domains.identity.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.shared.enums.AuthProvider;
 import org.junit.jupiter.api.DisplayName;

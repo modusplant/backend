@@ -6,7 +6,7 @@ import jakarta.validation.Valid;
 import kr.modusplant.domains.identity.social.adapter.controller.SocialIdentityController;
 import kr.modusplant.domains.identity.social.domain.vo.UserPayload;
 import kr.modusplant.domains.identity.social.usecase.request.SocialLoginRequest;
-import kr.modusplant.framework.out.jackson.http.response.DataResponse;
+import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.shared.enums.AuthProvider;

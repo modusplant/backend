@@ -1,7 +1,7 @@
 package kr.modusplant.domains.post.common.util.framework.out.jpa.entity;
 
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
-import kr.modusplant.framework.out.jpa.entity.CommPostArchiveEntity;
+import kr.modusplant.framework.jpa.entity.CommPostArchiveEntity;
 
 import java.time.LocalDateTime;
 

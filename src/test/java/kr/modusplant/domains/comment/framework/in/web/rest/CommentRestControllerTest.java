@@ -8,8 +8,8 @@ import kr.modusplant.domains.comment.common.util.adapter.CommentResponseTestUtil
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
-import kr.modusplant.framework.out.jackson.holder.ObjectMapperHolder;
-import kr.modusplant.framework.out.jackson.http.response.DataResponse;
+import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
+import kr.modusplant.framework.jackson.http.response.DataResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

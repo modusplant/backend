@@ -1,7 +1,7 @@
 package kr.modusplant.infrastructure.jwt.framework.out.jpa.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

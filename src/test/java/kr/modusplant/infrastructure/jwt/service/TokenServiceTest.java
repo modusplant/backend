@@ -1,10 +1,10 @@
 package kr.modusplant.infrastructure.jwt.service;
 
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberRoleEntityTestUtils;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleJpaRepository;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.common.util.SiteMemberRoleEntityTestUtils;
+import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
 import kr.modusplant.infrastructure.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
 import kr.modusplant.infrastructure.jwt.exception.InvalidTokenException;

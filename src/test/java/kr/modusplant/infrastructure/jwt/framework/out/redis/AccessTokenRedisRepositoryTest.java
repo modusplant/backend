@@ -1,6 +1,6 @@
 package kr.modusplant.infrastructure.jwt.framework.out.redis;
 
-import kr.modusplant.framework.out.redis.RedisHelper;
+import kr.modusplant.framework.redis.RedisHelper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
