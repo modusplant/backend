@@ -1,9 +1,10 @@
 package kr.modusplant.domains.normalidentity.normal.domain.vo;
 
+import kr.modusplant.domains.identity.normal.domain.exception.EmptyValueException;
+import kr.modusplant.domains.identity.normal.domain.exception.InvalidValueException;
+import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
+import kr.modusplant.domains.identity.normal.domain.vo.AgreedTermsOfVersion;
 import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.AgreedTermsOfVersionTestUtils;
-import kr.modusplant.domains.normalidentity.normal.domain.exception.EmptyValueException;
-import kr.modusplant.domains.normalidentity.normal.domain.exception.InvalidValueException;
-import kr.modusplant.domains.normalidentity.normal.domain.exception.enums.IdentityErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +20,7 @@ public class AgreedTermsOfVersionTest implements AgreedTermsOfVersionTestUtils {
                 AgreedTermsOfVersion.create(null));
 
         // when & then
-        assertEquals(IdentityErrorCode.EMPTY_AGREED_TERMS_OF_VERSION, result.getErrorCode());
+        assertEquals(NormalIdentityErrorCode.EMPTY_AGREED_TERMS_OF_VERSION, result.getErrorCode());
     }
 
     @Test
@@ -30,7 +31,7 @@ public class AgreedTermsOfVersionTest implements AgreedTermsOfVersionTestUtils {
                 AgreedTermsOfVersion.create("va11223"));
 
         // when & then
-        assertEquals(IdentityErrorCode.INVALID_AGREED_TERMS_OF_VERSION, result.getErrorCode());
+        assertEquals(NormalIdentityErrorCode.INVALID_AGREED_TERMS_OF_VERSION, result.getErrorCode());
     }
 
     @Test
@@ -46,7 +47,7 @@ public class AgreedTermsOfVersionTest implements AgreedTermsOfVersionTestUtils {
     @Test
     @DisplayName("다른 객체로 동등성 비교")
     void testEquals_givenDifferentObject_willReturnFalse() {
-        EmptyValueException different = new EmptyValueException(IdentityErrorCode.EMPTY_NICKNAME);
+        EmptyValueException different = new EmptyValueException(NormalIdentityErrorCode.EMPTY_NICKNAME);
         assertNotEquals(testAgreedTermsOfVersion, different);
     }
 
