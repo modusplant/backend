@@ -37,7 +37,9 @@ public class RedisConfig {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
         config.setHostName(host);
         config.setPort(port);
-        config.setPassword(password);
+        if (!password.isEmpty()) {
+            config.setPassword(password);
+        }
 
         LettuceClientConfiguration.LettuceClientConfigurationBuilder builder = LettuceClientConfiguration.builder();
         if (sslEnabled) {
