@@ -11,12 +11,10 @@ import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
 import kr.modusplant.infrastructure.security.filter.EmailPasswordAuthenticationFilter;
 import kr.modusplant.infrastructure.security.filter.JwtAuthenticationFilter;
 import kr.modusplant.infrastructure.security.handler.*;
-import kr.modusplant.legacy.domains.member.domain.service.SiteMemberValidationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -47,7 +45,6 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper;
     private final JwtTokenProvider tokenProvider;
     private final TokenService tokenService;
-    private final SiteMemberValidationService memberValidationService;
     private final SiteMemberJpaRepository memberRepository;
     private final Validator validator;
     private final AccessTokenRedisRepository tokenRedisRepository;
@@ -78,7 +75,7 @@ public class SecurityConfig {
 
     @Bean
     public ForwardRequestLoginSuccessHandler forwardRequestLoginSuccessHandler() {
-        return new ForwardRequestLoginSuccessHandler(memberRepository, memberValidationService, tokenService);
+        return new ForwardRequestLoginSuccessHandler(memberRepository, tokenService);
     }
 
     @Bean

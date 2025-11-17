@@ -13,7 +13,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import java.time.Duration;
 
 import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;

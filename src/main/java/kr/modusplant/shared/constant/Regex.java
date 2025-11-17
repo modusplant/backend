@@ -19,5 +19,7 @@ public final class Regex {
     public static final String REGEX_MATERIALIZED_PATH = "^\\d+(?:\\.\\d+)*$";
     public static final String REGEX_NICKNAME = "^[가-힣A-Za-z0-9]{2,16}$";
     public static final String REGEX_PASSWORD = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&()_\\-+=\\[\\]{}|\\\\;:'\",.<>/?]).{8,64}$";
+    public static final String REGEX_ULID = "^[0-9A-HJKMNP-TV-Z]{26}$";
+    public static final String REGEX_UUID = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
     public static final String REGEX_VERSION = "^v\\d+.\\d+.\\d+$";
 }

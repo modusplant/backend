@@ -42,8 +42,8 @@ public class SiteMemberAuthEntity {
     private String pw;
 
     @Column(nullable = false, updatable = false)
-    @Enumerated(value = EnumType.STRING)
-    private kr.modusplant.shared.enums.AuthProvider provider;
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider;
 
     @Column(unique = true, updatable = false, name = "provider_id")
     private String providerId;
@@ -145,7 +145,7 @@ public class SiteMemberAuthEntity {
             return this;
         }
 
-        public SiteMemberAuthEntityBuilder memberAuthEntity(final SiteMemberAuthEntity memberAuth) {
+        public SiteMemberAuthEntityBuilder memberAuth(final SiteMemberAuthEntity memberAuth) {
             this.originalMember = memberAuth.getOriginalMember();
             this.activeMember = memberAuth.getActiveMember();
             this.email = memberAuth.getEmail();

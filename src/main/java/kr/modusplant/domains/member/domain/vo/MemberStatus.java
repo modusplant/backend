@@ -45,8 +45,8 @@ public class MemberStatus {
 
     @Getter
     private enum Status {
-        ACTIVE("활동 중"),
-        INACTIVE("활동 정지");
+        ACTIVE("active"),
+        INACTIVE("inactive");
 
         private final String value;
 

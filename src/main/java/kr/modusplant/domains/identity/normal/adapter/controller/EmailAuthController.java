@@ -1,8 +1,8 @@
 package kr.modusplant.domains.identity.normal.adapter.controller;
 
 import kr.modusplant.domains.identity.normal.adapter.EmailAuthTokenHelper;
-import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
 import kr.modusplant.domains.identity.normal.domain.exception.DataAlreadyExistsException;
+import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
 import kr.modusplant.domains.identity.normal.usecase.enums.EmailType;
 import kr.modusplant.domains.identity.normal.usecase.port.contract.CallEmailSendApiGateway;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityRepository;

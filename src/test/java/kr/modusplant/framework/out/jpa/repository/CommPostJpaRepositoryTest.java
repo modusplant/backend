@@ -51,8 +51,8 @@ class CommPostJpaRepositoryTest implements CommPostEntityTestUtils, CommPrimaryC
 
     @BeforeEach
     void setUp() {
-        testCommPrimaryCategory = commPrimaryCategoryRepository.save(createTestCommPrimaryCategoryEntity());
-        testCommSecondaryCategory = commSecondaryCategoryRepository.save(createTestCommSecondaryCategoryEntity());
+        testCommPrimaryCategory = commPrimaryCategoryRepository.save(createCommPrimaryCategoryEntity());
+        testCommSecondaryCategory = commSecondaryCategoryRepository.save(createCommSecondaryCategoryEntityBuilder().primaryCategory(testCommPrimaryCategory).build());
         testSiteMember = siteMemberRepository.save(createMemberBasicUserEntity());
     }
 
@@ -88,6 +88,7 @@ class CommPostJpaRepositoryTest implements CommPostEntityTestUtils, CommPrimaryC
                         .build()
                 ).collect(Collectors.toList());
         commPostRepository.saveAll(commPosts);
+        double count = commPostRepository.count();
 
         Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
 
@@ -95,9 +96,9 @@ class CommPostJpaRepositoryTest implements CommPostEntityTestUtils, CommPrimaryC
         Page<CommPostEntity> result = commPostRepository.findAllByOrderByCreatedAtDesc(pageable);
 
         // then
-        assertThat(result.getTotalElements()).isEqualTo(10);
+        assertThat(result.getTotalElements()).isEqualTo((long) count);
         assertThat(result.getNumber()).isEqualTo(0);
-        assertThat(result.getTotalPages()).isEqualTo(4);
+        assertThat(result.getTotalPages()).isEqualTo((long) Math.ceil(count / 3));
 
         List<CommPostEntity> content = result.getContent();
         for (int i = 0; i < content.size() - 1; i++) {
@@ -119,6 +120,7 @@ class CommPostJpaRepositoryTest implements CommPostEntityTestUtils, CommPrimaryC
                         .build()
                 ).collect(Collectors.toList());
         commPosts.getFirst().updateIsPublished(false);
+        long count = commPostRepository.countByIsPublishedTrue();
         commPostRepository.saveAll(commPosts);
 
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -127,7 +129,7 @@ class CommPostJpaRepositoryTest implements CommPostEntityTestUtils, CommPrimaryC
         Page<CommPostEntity> result = commPostRepository.findByIsPublishedTrueOrderByCreatedAtDesc(pageable);
 
         // then
-        assertThat(result.getTotalElements()).isEqualTo(4); // 발행된 게시글 4건
+        assertThat(result.getTotalElements()).isEqualTo(count + 4); // 추가로 발행된 게시글 4건
         assertThat(result.getContent().stream().noneMatch(CommPostEntity::getIsPublished)).isFalse();
 
         List<CommPostEntity> content = result.getContent();
@@ -172,11 +174,11 @@ class CommPostJpaRepositoryTest implements CommPostEntityTestUtils, CommPrimaryC
     }
 
     @Test
-    @DisplayName("2차 항목으로 발행되지 않은 모든 컨텐츠 게시글 찾기(최신순)")
+    @DisplayName("2차 항목으로 발행된 모든 컨텐츠 게시글 찾기(최신순)")
     void findBySecondaryCategoryAndIsPublishedTrueOrderByCreatedAtDescTest() {
         // given
         CommSecondaryCategoryEntity testOtherGroup = commSecondaryCategoryRepository.save(
-                CommSecondaryCategoryEntity.builder().order(3).category("기타").build());
+                CommSecondaryCategoryEntity.builder().primaryCategory(testCommPrimaryCategory).order(3).category("기타").build());
         List<CommPostEntity> commPosts = IntStream.range(0, 5)
                 .mapToObj(i -> createCommPostEntityBuilder()
                         .primaryCategory(testCommPrimaryCategory)
@@ -206,7 +208,7 @@ class CommPostJpaRepositoryTest implements CommPostEntityTestUtils, CommPrimaryC
     }
 
     @Test
-    @DisplayName("인가 회원으로 발행되지 않은 모든 컨텐츠 게시글 찾기(최신순)")
+    @DisplayName("인가 회원으로 발행된 모든 컨텐츠 게시글 찾기(최신순)")
     void findByAuthMemberAndIsPublishedTrueOrderByCreatedAtDescTest() {
         // given
         SiteMemberEntity testSiteMember2 = siteMemberRepository.save(createMemberGoogleUserEntity());

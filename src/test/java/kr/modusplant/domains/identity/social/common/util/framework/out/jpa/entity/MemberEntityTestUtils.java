@@ -2,7 +2,7 @@ package kr.modusplant.domains.identity.social.common.util.framework.out.jpa.enti
 
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 
-import static kr.modusplant.shared.persistence.common.constant.SiteMemberConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.*;
 
 public interface MemberEntityTestUtils {
     default SiteMemberEntity createKakaoMemberEntity() {

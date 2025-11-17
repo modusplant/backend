@@ -10,7 +10,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.UUID;
 
-import static kr.modusplant.shared.constant.IdPattern.UUID_PATTERN;
+import static kr.modusplant.shared.constant.Regex.PATTERN_UUID;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -28,7 +28,7 @@ public class AuthorId {
         if (value == null || value.trim().isEmpty()) {
             throw new EmptyAuthorIdException();
         }
-        if (!UUID_PATTERN.matcher(value).matches()) {
+        if (!PATTERN_UUID.matcher(value).matches()) {
             throw new InvalidAuthorIdException();
         }
         return new AuthorId(UUID.fromString(value));

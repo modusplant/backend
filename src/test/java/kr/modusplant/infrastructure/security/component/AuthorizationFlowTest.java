@@ -2,6 +2,7 @@ package kr.modusplant.infrastructure.security.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import kr.modusplant.domains.comment.adapter.controller.CommentController;
 import kr.modusplant.domains.comment.common.util.adapter.CommentRegisterRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.adapter.CommentResponseTestUtils;

@@ -35,6 +35,8 @@ public interface CommPostJpaRepository extends UlidPrimaryRepository<CommPostEnt
 
     Optional<CommPostEntity> findByUlidAndIsPublishedTrue(String ulid);
 
+    long countByIsPublishedTrue();
+
     @Query(
             value = "SELECT * FROM comm_post p " +
                     "WHERE p.is_published = true AND (" +

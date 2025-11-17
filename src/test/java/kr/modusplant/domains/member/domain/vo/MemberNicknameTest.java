@@ -1,6 +1,5 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberNicknameException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.shared.exception.InvalidDataException;
@@ -8,16 +7,17 @@ import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.domains.member.common.constant.MemberStringConstant.TEST_MEMBER_NICKNAME_STRING;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils.testMemberNickname;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-class MemberNicknameTest implements MemberNicknameTestUtils {
+class MemberNicknameTest {
     @Test
     @DisplayName("create으로 회원 닉네임 반환")
     void testCreate_givenValidValue_willReturnMemberNickname() {
-        assertThat(MemberNickname.create(TEST_MEMBER_NICKNAME_STRING)).isEqualTo(MemberNickname.create(TEST_MEMBER_NICKNAME_STRING));
+        assertThat(MemberNickname.create(MEMBER_BASIC_USER_NICKNAME)).isEqualTo(MemberNickname.create(MEMBER_BASIC_USER_NICKNAME));
     }
 
     @Test
@@ -59,6 +59,6 @@ class MemberNicknameTest implements MemberNicknameTestUtils {
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
     void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
-        assertNotEquals(testMemberNickname, MemberNickname.create(TEST_MEMBER_NICKNAME_STRING + "1"));
+        assertNotEquals(testMemberNickname, MemberNickname.create(MEMBER_BASIC_USER_NICKNAME + "1"));
     }
 }

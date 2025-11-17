@@ -1,28 +1,29 @@
 package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.adapter.mapper.MemberMapperImpl;
+import kr.modusplant.domains.member.adapter.mapper.MemberProfileMapperImpl;
+import kr.modusplant.domains.member.common.util.domain.aggregate.MemberProfileTestUtils;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
-import kr.modusplant.domains.member.domain.exception.CommentAlreadyLikedException;
-import kr.modusplant.domains.member.domain.exception.CommentAlreadyUnlikedException;
-import kr.modusplant.domains.member.domain.exception.PostAlreadyLikedException;
-import kr.modusplant.domains.member.domain.exception.PostAlreadyUnlikedException;
+import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
+import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
+import kr.modusplant.domains.member.domain.exception.NotAccessiblePostBookmarkException;
+import kr.modusplant.domains.member.domain.exception.NotAccessiblePostLikeException;
 import kr.modusplant.domains.member.domain.vo.MemberId;
-import kr.modusplant.domains.member.domain.vo.MemberNickname;
+import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
 import kr.modusplant.domains.member.framework.out.jpa.repository.MemberRepositoryJpaAdapter;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
+import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
+import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
 import kr.modusplant.domains.member.usecase.port.repository.TargetCommentIdRepository;
 import kr.modusplant.domains.member.usecase.port.repository.TargetPostIdRepository;
-import kr.modusplant.framework.out.jpa.entity.CommCommentEntity;
-import kr.modusplant.framework.out.jpa.entity.CommCommentLikeEntity;
-import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.out.jpa.entity.CommPostLikeEntity;
+import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord;
+import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
+import kr.modusplant.framework.out.aws.service.S3FileService;
+import kr.modusplant.framework.out.jpa.entity.*;
 import kr.modusplant.framework.out.jpa.entity.common.util.CommPostEntityTestUtils;
-import kr.modusplant.framework.out.jpa.repository.CommCommentJpaRepository;
-import kr.modusplant.framework.out.jpa.repository.CommCommentLikeJpaRepository;
-import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
-import kr.modusplant.framework.out.jpa.repository.CommPostLikeJpaRepository;
+import kr.modusplant.framework.out.jpa.repository.*;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.event.consumer.CommentEventConsumer;
 import kr.modusplant.infrastructure.event.consumer.PostEventConsumer;
@@ -33,17 +34,35 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.domains.member.common.util.usecase.request.MemberCommentLikeRequestTestUtils.testMemberCommentLikeRequest;
-import static kr.modusplant.domains.member.common.util.usecase.request.MemberCommentUnlikeRequestTestUtils.testMemberCommentUnlikeRequest;
-import static kr.modusplant.domains.member.common.util.usecase.request.MemberNicknameUpdateRequestTestUtils.testMemberNicknameUpdateRequest;
-import static kr.modusplant.domains.member.common.util.usecase.request.MemberPostLikeRequestTestUtils.testMemberPostLikeRequest;
-import static kr.modusplant.domains.member.common.util.usecase.request.MemberPostUnlikeRequestTestUtils.testMemberPostUnlikeRequest;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberBirthDateTestUtils.testMemberBirthDate;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils.testMemberNickname;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils.testMemberProfileIntroduction;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCheckNicknameRecordTestUtils.TEST_MEMBER_NICKNAME_CHECK_RECORD;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.testMemberCommentLikeRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.testMemberCommentUnlikeRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostBookmarkRecordTestUtils.testMemberPostBookmarkRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostLikeRecordTestUtils.testMemberPostLikeRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileGetRecordTestUtils.testMemberProfileGetRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecord;
 import static kr.modusplant.domains.member.common.util.usecase.request.MemberRegisterRequestTestUtils.testMemberRegisterRequest;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberResponseTestUtils.testMemberResponse;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 import static kr.modusplant.shared.event.common.util.CommentLikeEventTestUtils.testCommentLikeEvent;
+import static kr.modusplant.shared.event.common.util.PostBookmarkEventTestUtils.testPostBookmarkEvent;
+import static kr.modusplant.shared.event.common.util.PostCancelPostBookmarkEventTestUtils.testPostBookmarkCancelEvent;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -52,19 +71,34 @@ import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, CommPostEntityTestUtils {
+class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, PostLikeEventTestUtils, CommPostEntityTestUtils {
+    private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
     private final MemberMapper memberMapper = new MemberMapperImpl();
+    private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl();
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryJpaAdapter.class);
+    private final MemberProfileRepository memberProfileRepository = Mockito.mock(MemberProfileRepository.class);
     private final CommPostLikeJpaRepository commPostLikeRepository = Mockito.mock(CommPostLikeJpaRepository.class);
+    private final CommPostBookmarkJpaRepository commPostBookmarkRepository = Mockito.mock(CommPostBookmarkJpaRepository.class);
     private final CommPostJpaRepository commPostRepository = Mockito.mock(CommPostJpaRepository.class);
     private final CommCommentLikeJpaRepository commCommentLikeRepository = Mockito.mock(CommCommentLikeJpaRepository.class);
     private final CommCommentJpaRepository commCommentRepository = Mockito.mock(CommCommentJpaRepository.class);
     private final TargetPostIdRepository targetPostIdRepository = Mockito.mock(TargetPostIdRepository.class);
     private final TargetCommentIdRepository targetCommentIdRepository = Mockito.mock(TargetCommentIdRepository.class);
     private final EventBus eventBus = new EventBus();
-    private final PostEventConsumer postEventConsumer = new PostEventConsumer(eventBus, commPostLikeRepository, commPostRepository);
+    private final PostEventConsumer postEventConsumer = new PostEventConsumer(eventBus, commPostLikeRepository, commPostBookmarkRepository, commPostRepository);
     private final CommentEventConsumer commentEventConsumer = new CommentEventConsumer(eventBus, commCommentLikeRepository, commCommentRepository);
-    private final MemberController memberController = new MemberController(memberMapper, memberRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
+    private final MemberController memberController = new MemberController(s3FileService, memberMapper, memberProfileMapper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
+
+    @Test
+    @DisplayName("register로 회원 등록")
+    void testRegister_givenValidRegisterRequest_willReturnResponse() {
+        // given
+        given(memberRepository.isNicknameExist(any())).willReturn(false);
+        given(memberRepository.save(any())).willReturn(createMember());
+
+        // when & then
+        assertThat(memberController.register(testMemberRegisterRequest)).isEqualTo(testMemberResponse);
+    }
 
     @Test
     @DisplayName("중복된 닉네임으로 인해 register로 회원 등록 실패")
@@ -79,55 +113,166 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("updateNickname으로 닉네임 갱신")
-    void testUpdateNickname_givenValidRequest_willReturnResponse() {
+    @DisplayName("checkExistedNickname으로 회원 닉네임 중복 확인")
+    void testCheckExistedNickname_givenValidCheckNicknameRequest_willReturnResponse() {
         // given
-        Member member = createMember();
-        given(memberRepository.save(any(MemberId.class), any(MemberNickname.class))).willReturn(member);
-
-        // 해당 닉네임이 존재하지 않는 경우
-        // given
-        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        given(memberRepository.isNicknameExist(any())).willReturn(true);
 
         // when & then
-        assertThat(memberController.updateNickname(testMemberNicknameUpdateRequest).nickname()).isEqualTo(member.getMemberNickname().getValue());
-
-        // 해당 닉네임이 수정되지 않은 경우
-        // given
-        given(memberRepository.getByNickname(any())).willReturn(Optional.of(createMember()));
-
-        // when & then
-        assertThat(memberController.updateNickname(testMemberNicknameUpdateRequest).nickname()).isEqualTo(member.getMemberNickname().getValue());
+        assertThat(memberController.checkExistedNickname(TEST_MEMBER_NICKNAME_CHECK_RECORD)).isEqualTo(true);
     }
 
     @Test
-    @DisplayName("중복된 닉네임으로 인해 updateNickname으로 닉네임 갱신 실패")
-    void testValidateBeforeUpdateNickname_givenAlreadyExistedNickname_willThrowException() {
+    @DisplayName("기존에 저장된 회원 프로필이 있을 때 getProfile로 회원 프로필 조회")
+    void testGetProfile_givenValidGetRecordAndStoredMemberProfile_willReturnResponse() throws IOException {
         // given
+        given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
+        given(memberProfileRepository.getById(any())).willReturn(Optional.of(createMemberProfile()));
+
+        // when & then
+        assertThat(memberController.getProfile(testMemberProfileGetRecord)).isEqualTo(testMemberProfileResponse);
+    }
+
+    @Test
+    @DisplayName("기존에 저장된 회원 프로필이 없을 때 getProfile로 회원 프로필 조회")
+    void testGetProfile_givenValidGetRecordAndNoStoredMemberProfile_willReturnResponse() throws IOException {
+        // given
+        given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
+        given(memberProfileRepository.getById(any())).willReturn(Optional.empty());
+
+        // when & then
+        assertThat(memberController.getProfile(testMemberProfileGetRecord)).isEqualTo(
+                new MemberProfileResponse(MEMBER_BASIC_USER_UUID, null, null, MEMBER_BASIC_USER_NICKNAME)
+        );
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원으로 인해 getProfile로 회원 프로필 조회 실패")
+    void testGetProfile_givenNotFoundMemberId_willThrowException() {
+        // given
+        given(memberRepository.getById(any())).willReturn(Optional.empty());
+
+        // when
+        EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class,
+                () -> memberController.getProfile(testMemberProfileGetRecord));
+
+        // then
+        assertThat(entityNotFoundException.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
+    }
+
+    @Test
+    @DisplayName("이미지 경로를 포함해서 존재하는 모든 데이터로 overrideProfile로 프로필 덮어쓰기")
+    void testOverrideProfile_givenExistedData_willReturnResponse() throws IOException {
+        // given
+        MemberProfile memberProfile = createMemberProfile();
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        given(memberProfileRepository.getById(any())).willReturn(Optional.of(memberProfile));
+        willDoNothing().given(s3FileService).deleteFiles(any());
+        willDoNothing().given(s3FileService).uploadFile(any(), any());
+        given(memberProfileRepository.addOrUpdate(any())).willReturn(memberProfile);
+
+        // when
+        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecord);
+
+        // then
+        assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
+        assertThat(memberProfileResponse.image()).isEqualTo(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
+        assertThat(memberProfileResponse.introduction()).isEqualTo(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
+        assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+    }
+
+    @Test
+    @DisplayName("이미지 경로를 제외한 존재하는 모든 데이터로 overrideProfile로 프로필 덮어쓰기")
+    void testOverrideProfile_givenExistedDataExceptOfImagePath_willReturnResponse() throws IOException {
+        // given
+        MemberProfile memberProfile = createMemberProfile();
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        given(memberProfileRepository.getById(any())).willReturn(Optional.of(
+                MemberProfile.create(
+                        testMemberId,
+                        MemberEmptyProfileImage.create(),
+                        testMemberProfileIntroduction,
+                        testMemberNickname))
+        );
+        willDoNothing().given(s3FileService).deleteFiles(any());
+        willDoNothing().given(s3FileService).uploadFile(any(), any());
+        given(memberProfileRepository.addOrUpdate(any())).willReturn(memberProfile);
+
+        // when
+        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecord);
+
+        // then
+        assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
+        assertThat(memberProfileResponse.image()).isEqualTo(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
+        assertThat(memberProfileResponse.introduction()).isEqualTo(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
+        assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+    }
+
+    @Test
+    @DisplayName("존재하는 않는 데이터로 overrideProfile로 프로필 덮어쓰기")
+    void testOverrideProfile_givenNotFoundData_willReturnResponse() throws IOException {
+        // given
+        MemberProfile memberProfile = MemberProfile.create(testMemberId, MemberEmptyProfileImage.create(), MemberEmptyProfileIntroduction.create(), testMemberNickname);
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        given(memberProfileRepository.getById(any())).willReturn(Optional.empty());
+        given(memberProfileRepository.addOrUpdate(any())).willReturn(memberProfile);
+
+        // when
+        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(
+                new MemberProfileOverrideRecord(MEMBER_BASIC_USER_UUID, null, null, MEMBER_BASIC_USER_NICKNAME));
+
+        // then
+        assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
+        assertThat(memberProfileResponse.image()).isEqualTo(null);
+        assertThat(memberProfileResponse.introduction()).isEqualTo(null);
+        assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+    }
+    
+    @Test
+    @DisplayName("존재하지 않는 아이디로 인해 overrideProfile로 프로필 덮어쓰기 실패")
+    void testValidateBeforeOverrideProfile_givenNotFoundId_willThrowException() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(false);
+
+        // when & then
+        EntityNotFoundException alreadyExistedNicknameException = assertThrows(
+                EntityNotFoundException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
+        assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
+    }
+
+    @Test
+    @DisplayName("이미 존재하는 닉네임으로 인해 overrideProfile로 프로필 덮어쓰기 실패")
+    void testValidateBeforeOverrideProfile_givenAlreadyExistedNickname_willThrowException() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
         given(memberRepository.getByNickname(any())).willReturn(Optional.of(Member.create(MemberId.generate(), testMemberActiveStatus, testMemberNickname, testMemberBirthDate)));
 
         // when & then
         EntityExistsException alreadyExistedNicknameException = assertThrows(
-                EntityExistsException.class, () -> memberController.updateNickname(testMemberNicknameUpdateRequest));
+                EntityExistsException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
         assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(ALREADY_EXISTED_NICKNAME.getMessage());
     }
 
     @Test
-    @DisplayName("likePost로 소통 게시글 좋아요")
+    @DisplayName("likePost로 게시글 좋아요")
     void testLikePost_givenValidParameter_willLikePost() {
         // given
         UUID memberId = testPostLikeEvent.getMemberId();
         String postId = testPostLikeEvent.getPostId();
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetPostIdRepository.isIdExist(any())).willReturn(true);
-        given(targetPostIdRepository.isLiked(any(), any())).willReturn(false);
+        given(targetPostIdRepository.isPublished(any())).willReturn(true);
+        given(targetPostIdRepository.isUnliked(any(), any())).willReturn(true);
         CommPostLikeEntity postLikeEntity = CommPostLikeEntity.of(postId, memberId);
         given(commPostLikeRepository.save(postLikeEntity)).willReturn(postLikeEntity);
         Optional<CommPostEntity> postEntity = Optional.of(CommPostEntity.builder().ulid(postId).likeCount(1).build());
         given(commPostRepository.findByUlid(postId)).willReturn(postEntity);
 
         // when
-        memberController.likePost(testMemberPostLikeRequest);
+        memberController.likePost(testMemberPostLikeRecord);
 
         // then
         verify(commPostLikeRepository, times(1)).save(any());
@@ -136,66 +281,39 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("존재하지 않는 회원으로 인해 likePost로 소통 게시글 좋아요 실패")
-    void testValidateBeforeLikePost_givenNotFoundMemberId_willThrowException() {
-        // given
-        given(memberRepository.isIdExist(any())).willReturn(false);
-
-        // when
-        EntityNotFoundException entityExistsException = assertThrows(EntityNotFoundException.class,
-                () -> memberController.likePost(testMemberPostLikeRequest));
-
-        // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 likePost로 소통 게시글 좋아요 실패")
-    void testValidateBeforeLikePost_givenNotFoundTargetPostId_willThrowException() {
-        // given
-        given(memberRepository.isIdExist(any())).willReturn(true);
-        given(targetPostIdRepository.isIdExist(any())).willReturn(false);
-
-        // when
-        EntityNotFoundException entityExistsException = assertThrows(EntityNotFoundException.class,
-                () -> memberController.likePost(testMemberPostLikeRequest));
-
-        // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
-    }
-
-    @Test
-    @DisplayName("이미 좋아요를 누른 상태여서 likePost로 소통 게시글 좋아요 실패")
-    void testValidateBeforeLikePost_givenAlreadyLikedValue_willThrowException() {
+    @DisplayName("이미 좋아요를 누른 상태로 likePost로 게시글 좋아요")
+    void testValidateBeforeUsingLikeOrBookmarkFunction_givenAlreadyLikedValue_willDoNothing() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetPostIdRepository.isIdExist(any())).willReturn(true);
-        given(targetPostIdRepository.isLiked(any(), any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(true);
+        given(targetPostIdRepository.isUnliked(any(), any())).willReturn(false);
 
         // when
-        PostAlreadyLikedException entityExistsException = assertThrows(PostAlreadyLikedException.class,
-                () -> memberController.likePost(testMemberPostLikeRequest));
+        memberController.likePost(testMemberPostLikeRecord);
 
         // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(POST_ALREADY_LIKED.getMessage());
+        verify(commPostLikeRepository, times(0)).save(any());
+        verify(commPostRepository, times(0)).findByUlid(any());
     }
 
     @Test
-    @DisplayName("unlikePost로 소통 게시글 좋아요 취소")
+    @DisplayName("unlikePost로 게시글 좋아요 취소")
     void testUnlikePost_givenValidParameter_willUnlikePost() {
         // given
         UUID memberId = testPostLikeEvent.getMemberId();
         String postId = testPostLikeEvent.getPostId();
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetPostIdRepository.isIdExist(any())).willReturn(true);
-        given(targetPostIdRepository.isUnliked(any(), any())).willReturn(false);
+        given(targetPostIdRepository.isPublished(any())).willReturn(true);
+        given(targetPostIdRepository.isLiked(any(), any())).willReturn(true);
         CommPostLikeEntity postLikeEntity = CommPostLikeEntity.of(postId, memberId);
         willDoNothing().given(commPostLikeRepository).delete(postLikeEntity);
         Optional<CommPostEntity> postEntity = Optional.of(CommPostEntity.builder().ulid(postId).likeCount(1).build());
         given(commPostRepository.findByUlid(postId)).willReturn(postEntity);
 
         // when
-        memberController.unlikePost(testMemberPostUnlikeRequest);
+        memberController.unlikePost(testMemberPostUnlikeRecord);
 
         // then
         verify(commPostLikeRepository, times(1)).delete(any());
@@ -204,52 +322,204 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("존재하지 않는 회원으로 인해 unlikePost로 소통 게시글 좋아요 취소 실패")
-    void testValidateBeforeUnlikePost_givenNotFoundMemberId_willThrowException() {
+    @DisplayName("이미 좋아요를 취소한 상태로 unlikePost로 게시글 좋아요 취소")
+    void testValidateBeforeUsingLikeOrBookmarkFunction_givenAlreadyUnlikedValue_willDoNothing() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(true);
+        given(targetPostIdRepository.isLiked(any(), any())).willReturn(false);
+
+        // when
+        memberController.unlikePost(testMemberPostUnlikeRecord);
+
+        // then
+        verify(commPostLikeRepository, times(0)).delete(any());
+        verify(commPostRepository, times(0)).findByUlid(any());
+    }
+
+    @Test
+    @DisplayName("bookmarkPost로 게시글 북마크")
+    void testBookmarkPost_givenValidParameter_willBookmarkPost() {
+        // given
+        UUID memberId = testPostBookmarkEvent.getMemberId();
+        String postId = testPostBookmarkEvent.getPostId();
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(true);
+        given(targetPostIdRepository.isNotBookmarked(any(), any())).willReturn(true);
+        CommPostBookmarkEntity postBookmarkEntity = CommPostBookmarkEntity.of(postId, memberId);
+        given(commPostBookmarkRepository.save(postBookmarkEntity)).willReturn(postBookmarkEntity);
+
+        // when
+        memberController.bookmarkPost(testMemberPostBookmarkRecord);
+
+        // then
+        verify(commPostBookmarkRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("이미 북마크를 누른 상태로 bookmarkPost로 게시글 북마크")
+    void testValidateBeforeUsingLikeOrBookmarkFunction_givenAlreadyBookmarkedValue_willDoNothing() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(true);
+        given(targetPostIdRepository.isNotBookmarked(any(), any())).willReturn(false);
+
+        // when
+        memberController.bookmarkPost(testMemberPostBookmarkRecord);
+
+        // then
+        verify(commPostBookmarkRepository, times(0)).save(any());
+    }
+
+    @Test
+    @DisplayName("cancelPostBookmark로 게시글 북마크 취소")
+    void testCancelPostBookmark_givenValidParameter_willCancelPostBookmark() {
+        // given
+        UUID memberId = testPostBookmarkCancelEvent.getMemberId();
+        String postId = testPostBookmarkCancelEvent.getPostId();
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(true);
+        given(targetPostIdRepository.isBookmarked(any(), any())).willReturn(true);
+        CommPostBookmarkEntity postBookmarkEntity = CommPostBookmarkEntity.of(postId, memberId);
+        willDoNothing().given(commPostBookmarkRepository).delete(postBookmarkEntity);
+
+        // when
+        memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD);
+
+        // then
+        verify(commPostBookmarkRepository, times(1)).delete(any());
+    }
+
+    @Test
+    @DisplayName("이미 북마크를 취소한 상태로 cancelPostBookmark로 게시글 북마크 취소")
+    void testValidateBeforeUsingLikeOrBookmarkFunction_givenAlreadyCancelledBookmarkValue_willDoNothing() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(true);
+        given(targetPostIdRepository.isBookmarked(any(), any())).willReturn(false);
+
+        // when
+        memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD);
+
+        // then
+        verify(commPostBookmarkRepository, times(0)).delete(any());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원으로 인해 likePost 또는 unlikePost 실패")
+    void testValidateBeforeLikeOrUnlikePost_givenNotFoundMemberId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(false);
 
         // when
-        EntityNotFoundException entityExistsException = assertThrows(EntityNotFoundException.class,
-                () -> memberController.unlikePost(testMemberPostUnlikeRequest));
+        EntityNotFoundException entityNotFoundExceptionForLike = assertThrows(EntityNotFoundException.class,
+                () -> memberController.likePost(testMemberPostLikeRecord));
+        EntityNotFoundException entityNotFoundExceptionForUnlike = assertThrows(EntityNotFoundException.class,
+                () -> memberController.unlikePost(testMemberPostUnlikeRecord));
 
         // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
+        assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
+        assertThat(entityNotFoundExceptionForUnlike.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
     }
 
     @Test
-    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 unlikePost로 소통 게시글 좋아요 취소 실패")
-    void testValidateBeforeUnlikePost_givenNotFoundTargetPostId_willThrowException() {
+    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 likePost 또는 unlikePost 실패")
+    void testValidateBeforeLikeOrUnlikePost_givenNotFoundTargetPostId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetPostIdRepository.isIdExist(any())).willReturn(false);
 
         // when
-        EntityNotFoundException entityExistsException = assertThrows(EntityNotFoundException.class,
-                () -> memberController.unlikePost(testMemberPostUnlikeRequest));
+        EntityNotFoundException entityNotFoundExceptionForLike = assertThrows(EntityNotFoundException.class,
+                () -> memberController.likePost(testMemberPostLikeRecord));
+        EntityNotFoundException entityNotFoundExceptionForUnlike = assertThrows(EntityNotFoundException.class,
+                () -> memberController.unlikePost(testMemberPostUnlikeRecord));
 
         // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
+        assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
+        assertThat(entityNotFoundExceptionForUnlike.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
     }
 
     @Test
-    @DisplayName("이미 좋아요를 취소한 상태여서 unlikePost로 소통 게시글 좋아요 취소 실패")
-    void testValidateBeforeLikePost_givenAlreadyUnlikedValue_willThrowException() {
+    @DisplayName("발행되지 않은 대상 게시글로 인해 likePost 또는 unlikePost 실패")
+    void testValidateBeforeLikeOrUnlikePost_givenNotPublishedTargetPost_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetPostIdRepository.isIdExist(any())).willReturn(true);
-        given(targetPostIdRepository.isUnliked(any(), any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(false);
 
         // when
-        PostAlreadyUnlikedException entityExistsException = assertThrows(PostAlreadyUnlikedException.class,
-                () -> memberController.unlikePost(testMemberPostUnlikeRequest));
+        NotAccessiblePostLikeException entityNotFoundExceptionForLike = assertThrows(NotAccessiblePostLikeException.class,
+                () -> memberController.likePost(testMemberPostLikeRecord));
+        NotAccessiblePostLikeException entityNotFoundExceptionForUnlike = assertThrows(NotAccessiblePostLikeException.class,
+                () -> memberController.unlikePost(testMemberPostUnlikeRecord));
 
         // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(POST_ALREADY_UNLIKED.getMessage());
+        assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_ACCESSIBLE_POST_LIKE.getMessage());
+        assertThat(entityNotFoundExceptionForUnlike.getMessage()).isEqualTo(NOT_ACCESSIBLE_POST_LIKE.getMessage());
     }
 
     @Test
-    @DisplayName("likeComment로 소통 댓글 좋아요")
+    @DisplayName("존재하지 않는 회원으로 인해 bookmarkPost 또는 cancelPostBookmark 실패")
+    void testValidateBeforeBookmarkOrCancelBookmark_givenNotFoundMemberId_willThrowException() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(false);
+
+        // when
+        EntityNotFoundException entityNotFoundExceptionForBookmark = assertThrows(EntityNotFoundException.class,
+                () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
+        EntityNotFoundException entityNotFoundExceptionForCancelBookmark = assertThrows(EntityNotFoundException.class,
+                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
+
+        // then
+        assertThat(entityNotFoundExceptionForBookmark.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
+        assertThat(entityNotFoundExceptionForCancelBookmark.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 bookmarkPost 또는 cancelPostBookmark 실패")
+    void testValidateBeforeBookmarkOrCancelBookmark_givenNotFoundTargetPostId_willThrowException() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(false);
+
+        // when
+        EntityNotFoundException entityNotFoundExceptionForBookmark = assertThrows(EntityNotFoundException.class,
+                () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
+        EntityNotFoundException entityNotFoundExceptionForCancelBookmark = assertThrows(EntityNotFoundException.class,
+                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
+
+        // then
+        assertThat(entityNotFoundExceptionForBookmark.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
+        assertThat(entityNotFoundExceptionForCancelBookmark.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
+    }
+
+    @Test
+    @DisplayName("발행되지 않은 대상 게시글로 인해 bookmarkPost 또는 cancelPostBookmark 실패")
+    void testValidateBeforeBookmarkOrCancelBookmark_givenNotPublishedTargetPost_willThrowException() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(false);
+
+        // when
+        NotAccessiblePostBookmarkException entityNotFoundExceptionForBookmark = assertThrows(NotAccessiblePostBookmarkException.class,
+                () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
+        NotAccessiblePostBookmarkException entityNotFoundExceptionForCancelBookmark = assertThrows(NotAccessiblePostBookmarkException.class,
+                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
+
+        // then
+        assertThat(entityNotFoundExceptionForBookmark.getMessage()).isEqualTo(NOT_ACCESSIBLE_POST_BOOKMARK.getMessage());
+        assertThat(entityNotFoundExceptionForCancelBookmark.getMessage()).isEqualTo(NOT_ACCESSIBLE_POST_BOOKMARK.getMessage());
+    }
+
+    @Test
+    @DisplayName("likeComment로 댓글 좋아요")
     void testLikeComment_givenValidParameter_willLikeComment() {
         // given
         UUID memberId = testCommentLikeEvent.getMemberId();
@@ -257,14 +527,14 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         String path = testCommentLikeEvent.getPath();
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetCommentIdRepository.isIdExist(any())).willReturn(true);
-        given(targetCommentIdRepository.isLiked(any(), any())).willReturn(false);
+        given(targetCommentIdRepository.isUnliked(any(), any())).willReturn(true);
         CommCommentLikeEntity commentLikeEntity = CommCommentLikeEntity.of(postId, path, memberId);
         given(commCommentLikeRepository.save(commentLikeEntity)).willReturn(commentLikeEntity);
         Optional<CommCommentEntity> commentEntity = Optional.of(CommCommentEntity.builder().postEntity(createCommPostEntityBuilder().ulid(postId).build()).path(path).likeCount(1).build());
         given(commCommentRepository.findByPostUlidAndPath(postId, path)).willReturn(commentEntity);
 
         // when
-        memberController.likeComment(testMemberCommentLikeRequest);
+        memberController.likeComment(testMemberCommentLikeRecord);
 
         // then
         verify(commCommentLikeRepository, times(1)).save(any());
@@ -273,52 +543,23 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("존재하지 않는 회원으로 인해 likeComment로 소통 댓글 좋아요 실패")
-    void testValidateBeforeLikeComment_givenNotFoundMemberId_willThrowException() {
-        // given
-        given(memberRepository.isIdExist(any())).willReturn(false);
-
-        // when
-        EntityNotFoundException entityExistsException = assertThrows(EntityNotFoundException.class,
-                () -> memberController.likeComment(testMemberCommentLikeRequest));
-
-        // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 likeComment로 소통 댓글 좋아요 실패")
-    void testValidateBeforeLikeComment_givenNotFoundTargetPostId_willThrowException() {
-        // given
-        given(memberRepository.isIdExist(any())).willReturn(true);
-        given(targetCommentIdRepository.isIdExist(any())).willReturn(false);
-
-        // when
-        EntityNotFoundException entityExistsException = assertThrows(EntityNotFoundException.class,
-                () -> memberController.likeComment(testMemberCommentLikeRequest));
-
-        // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID.getMessage());
-    }
-
-    @Test
-    @DisplayName("이미 좋아요를 누른 상태여서 likeComment로 소통 댓글 좋아요 실패")
-    void testValidateBeforeLikeComment_givenAlreadyLikedValue_willThrowException() {
+    @DisplayName("이미 좋아요를 누른 상태로 likeComment로 댓글 좋아요")
+    void testValidateBeforeLikeOrUnlikeComment_givenAlreadyLikedValue_willDoNothing() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetCommentIdRepository.isIdExist(any())).willReturn(true);
-        given(targetCommentIdRepository.isLiked(any(), any())).willReturn(true);
+        given(targetCommentIdRepository.isUnliked(any(), any())).willReturn(false);
 
         // when
-        CommentAlreadyLikedException entityExistsException = assertThrows(CommentAlreadyLikedException.class,
-                () -> memberController.likeComment(testMemberCommentLikeRequest));
+        memberController.likeComment(testMemberCommentLikeRecord);
 
         // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(COMMENT_ALREADY_LIKED.getMessage());
+        verify(commCommentLikeRepository, times(0)).save(any());
+        verify(commCommentRepository, times(0)).findByPostUlidAndPath(any(), any());
     }
 
     @Test
-    @DisplayName("unlikeComment로 소통 댓글 좋아요 취소")
+    @DisplayName("unlikeComment로 댓글 좋아요 취소")
     void testUnlikeComment_givenValidParameter_willUnlikeComment() {
         // given
         UUID memberId = testCommentLikeEvent.getMemberId();
@@ -326,14 +567,14 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
         String path = testCommentLikeEvent.getPath();
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetCommentIdRepository.isIdExist(any())).willReturn(true);
-        given(targetCommentIdRepository.isUnliked(any(), any())).willReturn(false);
+        given(targetCommentIdRepository.isLiked(any(), any())).willReturn(true);
         CommCommentLikeEntity commentLikeEntity = CommCommentLikeEntity.of(postId, path, memberId);
         given(commCommentLikeRepository.save(commentLikeEntity)).willReturn(commentLikeEntity);
         Optional<CommCommentEntity> commentEntity = Optional.of(CommCommentEntity.builder().postEntity(createCommPostEntityBuilder().ulid(postId).build()).path(path).likeCount(1).build());
         given(commCommentRepository.findByPostUlidAndPath(postId, path)).willReturn(commentEntity);
 
         // when
-        memberController.unlikeComment(testMemberCommentUnlikeRequest);
+        memberController.unlikeComment(testMemberCommentUnlikeRecord);
 
         // then
         verify(commCommentLikeRepository, times(1)).delete(any());
@@ -342,47 +583,53 @@ class MemberControllerTest implements MemberTestUtils, PostLikeEventTestUtils, C
     }
 
     @Test
-    @DisplayName("존재하지 않는 회원으로 인해 unlikeComment로 소통 댓글 좋아요 취소 실패")
-    void testValidateBeforeUnlikeComment_givenNotFoundMemberId_willThrowException() {
+    @DisplayName("이미 좋아요를 취소한 상태로 unlikeComment로 댓글 좋아요 취소")
+    void testValidateBeforeLikeOrUnlikeComment_givenAlreadyUnlikedValue_willDoNothing() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetCommentIdRepository.isIdExist(any())).willReturn(true);
+        given(targetCommentIdRepository.isLiked(any(), any())).willReturn(false);
+
+        // when
+        memberController.unlikeComment(testMemberCommentUnlikeRecord);
+
+        // then
+        verify(commCommentLikeRepository, times(0)).delete(any());
+        verify(commCommentRepository, times(0)).findByPostUlidAndPath(any(), any());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원으로 인해 likeComment 또는 unlikeComment 실패")
+    void testValidateBeforeLikeOrUnlikeComment_givenNotFoundMemberId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(false);
 
         // when
-        EntityNotFoundException entityExistsException = assertThrows(EntityNotFoundException.class,
-                () -> memberController.unlikeComment(testMemberCommentUnlikeRequest));
+        EntityNotFoundException entityNotFoundExceptionForLike = assertThrows(EntityNotFoundException.class,
+                () -> memberController.likeComment(testMemberCommentLikeRecord));
+        EntityNotFoundException entityNotFoundExceptionForUnlike = assertThrows(EntityNotFoundException.class,
+                () -> memberController.unlikeComment(testMemberCommentUnlikeRecord));
 
         // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
+        assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
+        assertThat(entityNotFoundExceptionForUnlike.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
     }
 
     @Test
-    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 unlikeComment로 소통 댓글 좋아요 취소 실패")
-    void testValidateBeforeUnlikeComment_givenNotFoundTargetPostId_willThrowException() {
+    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 likeComment 또는 unlikeComment 실패")
+    void testValidateBeforeLikeOrUnlikeComment_givenNotFoundTargetPostId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(targetCommentIdRepository.isIdExist(any())).willReturn(false);
 
         // when
-        EntityNotFoundException entityExistsException = assertThrows(EntityNotFoundException.class,
-                () -> memberController.unlikeComment(testMemberCommentUnlikeRequest));
+        EntityNotFoundException entityNotFoundExceptionForLike = assertThrows(EntityNotFoundException.class,
+                () -> memberController.likeComment(testMemberCommentLikeRecord));
+        EntityNotFoundException entityNotFoundExceptionForUnlike = assertThrows(EntityNotFoundException.class,
+                () -> memberController.unlikeComment(testMemberCommentUnlikeRecord));
 
         // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID.getMessage());
-    }
-
-    @Test
-    @DisplayName("이미 좋아요를 취소한 상태여서 unlikeComment로 소통 댓글 좋아요 취소 실패")
-    void testValidateBeforeLikeComment_givenAlreadyUnlikedValue_willThrowException() {
-        // given
-        given(memberRepository.isIdExist(any())).willReturn(true);
-        given(targetCommentIdRepository.isIdExist(any())).willReturn(true);
-        given(targetCommentIdRepository.isUnliked(any(), any())).willReturn(true);
-
-        // when
-        CommentAlreadyUnlikedException entityExistsException = assertThrows(CommentAlreadyUnlikedException.class,
-                () -> memberController.unlikeComment(testMemberCommentUnlikeRequest));
-
-        // then
-        assertThat(entityExistsException.getMessage()).isEqualTo(COMMENT_ALREADY_UNLIKED.getMessage());
+        assertThat(entityNotFoundExceptionForLike.getMessage()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID.getMessage());
+        assertThat(entityNotFoundExceptionForUnlike.getMessage()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID.getMessage());
     }
 }

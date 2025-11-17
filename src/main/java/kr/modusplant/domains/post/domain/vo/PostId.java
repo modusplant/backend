@@ -11,7 +11,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.generator.EventType;
 
-import static kr.modusplant.shared.constant.IdPattern.ULID_PATTERN;
+import static kr.modusplant.shared.constant.Regex.PATTERN_ULID;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -38,7 +38,7 @@ public class PostId {
         if (StringUtils.isBlank(ulid) || ulid.length() != 26) {
             return false;
         }
-        return ULID_PATTERN.matcher(ulid).matches();
+        return PATTERN_ULID.matcher(ulid).matches();
     }
 
     @Override

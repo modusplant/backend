@@ -2,21 +2,20 @@ package kr.modusplant.framework.out.jpa.entity.common.util;
 
 import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
 
-import static kr.modusplant.shared.persistence.common.constant.CommSecondaryCategoryConstant.*;
+import static kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity.CommSecondaryCategoryEntityBuilder;
+import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.*;
 
-public interface CommSecondaryCategoryEntityTestUtils {
-    default CommSecondaryCategoryEntity createTestCommSecondaryCategoryEntity() {
+public interface CommSecondaryCategoryEntityTestUtils extends CommPrimaryCategoryEntityTestUtils {
+    default CommSecondaryCategoryEntityBuilder createCommSecondaryCategoryEntityBuilder() {
         return CommSecondaryCategoryEntity.builder()
                 .category(TEST_COMM_SECONDARY_CATEGORY_CATEGORY)
-                .order(TEST_COMM_SECONDARY_CATEGORY_ORDER)
-                .build();
+                .order(TEST_COMM_SECONDARY_CATEGORY_ORDER);
     }
 
-    default CommSecondaryCategoryEntity createTestCommSecondaryCategoryEntityWithUuid() {
+    default CommSecondaryCategoryEntityBuilder createCommSecondaryCategoryEntityBuilderWithUuid() {
         return CommSecondaryCategoryEntity.builder()
                 .uuid(TEST_COMM_SECONDARY_CATEGORY_UUID)
                 .category(TEST_COMM_SECONDARY_CATEGORY_CATEGORY)
-                .order(TEST_COMM_SECONDARY_CATEGORY_ORDER)
-                .build();
+                .order(TEST_COMM_SECONDARY_CATEGORY_ORDER);
     }
 }
