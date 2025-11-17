@@ -22,10 +22,15 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig {
     @Value("${spring.data.redis.host}")
     private String host;
+
     @Value("${spring.data.redis.port}")
     private int port;
+
     @Value("${spring.data.redis.password}")
     private String password;
+
+    @Value("${spring.data.redis.ssl.enabled}")
+    private boolean sslEnabled;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
@@ -34,10 +39,11 @@ public class RedisConfig {
         config.setPort(port);
         config.setPassword(password);
 
-        LettuceClientConfiguration clientConfig =
-                LettuceClientConfiguration.builder()
-                        .useSsl()
-                        .build();
+        LettuceClientConfiguration.LettuceClientConfigurationBuilder builder = LettuceClientConfiguration.builder();
+        if (sslEnabled) {
+            builder.useSsl();
+        }
+        LettuceClientConfiguration clientConfig = builder.build();
         return new LettuceConnectionFactory(config, clientConfig);
     }
 
