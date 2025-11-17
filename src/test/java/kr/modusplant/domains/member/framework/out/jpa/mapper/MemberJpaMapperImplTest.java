@@ -2,8 +2,8 @@ package kr.modusplant.domains.member.framework.out.jpa.mapper;
 
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.supers.MemberJpaMapper;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

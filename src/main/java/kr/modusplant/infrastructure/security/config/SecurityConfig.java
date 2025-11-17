@@ -1,7 +1,7 @@
 package kr.modusplant.infrastructure.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.framework.out.redis.AccessTokenRedisRepository;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;

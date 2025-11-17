@@ -3,9 +3,9 @@ package kr.modusplant.domains.identity.social.framework.out.jpa.mapper.supers;
 import kr.modusplant.domains.identity.social.domain.vo.Nickname;
 import kr.modusplant.domains.identity.social.domain.vo.SocialUserProfile;
 import kr.modusplant.domains.identity.social.domain.vo.UserPayload;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
 import kr.modusplant.infrastructure.security.enums.Role;
 
 public interface SocialIdentityJpaMapper {

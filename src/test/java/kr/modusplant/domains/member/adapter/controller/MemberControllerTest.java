@@ -20,10 +20,10 @@ import kr.modusplant.domains.member.usecase.port.repository.TargetCommentIdRepos
 import kr.modusplant.domains.member.usecase.port.repository.TargetPostIdRepository;
 import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
-import kr.modusplant.framework.out.aws.service.S3FileService;
-import kr.modusplant.framework.out.jpa.entity.*;
-import kr.modusplant.framework.out.jpa.entity.common.util.CommPostEntityTestUtils;
-import kr.modusplant.framework.out.jpa.repository.*;
+import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.framework.jpa.entity.*;
+import kr.modusplant.framework.jpa.entity.common.util.CommPostEntityTestUtils;
+import kr.modusplant.framework.jpa.repository.*;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.event.consumer.CommentEventConsumer;
 import kr.modusplant.infrastructure.event.consumer.PostEventConsumer;

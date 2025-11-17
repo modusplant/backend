@@ -1,10 +1,10 @@
 package kr.modusplant.infrastructure.jwt.service;
 
 
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleJpaRepository;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
+import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
 import kr.modusplant.infrastructure.jwt.exception.InvalidTokenException;
 import kr.modusplant.infrastructure.jwt.exception.TokenNotFoundException;

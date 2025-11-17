@@ -2,8 +2,8 @@ package kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jp
 
 import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.NormalIdentityRoleJpaMapper;
 import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.NormalIdentityRoleJpaMapperImpl;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
 import kr.modusplant.infrastructure.security.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

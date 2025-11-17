@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import kr.modusplant.domains.post.framework.out.processor.enums.FileType;
 import kr.modusplant.domains.post.framework.out.processor.exception.UnsupportedFileException;
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
-import kr.modusplant.framework.out.aws.service.S3FileService;
+import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.infrastructure.persistence.generator.UlidIdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.generator.EventType;

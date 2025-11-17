@@ -1,8 +1,8 @@
 package kr.modusplant.domains.post.framework.out.jpa.mapper;
 
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostArchiveJpaMapper;
-import kr.modusplant.framework.out.jpa.entity.CommPostArchiveEntity;
-import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.jpa.entity.CommPostArchiveEntity;
+import kr.modusplant.framework.jpa.entity.CommPostEntity;
 import org.springframework.stereotype.Component;
 
 @Component

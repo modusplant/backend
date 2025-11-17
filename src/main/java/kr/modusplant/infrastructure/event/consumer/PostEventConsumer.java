@@ -1,10 +1,10 @@
 package kr.modusplant.infrastructure.event.consumer;
 
-import kr.modusplant.framework.out.jpa.entity.CommPostBookmarkEntity;
-import kr.modusplant.framework.out.jpa.entity.CommPostLikeEntity;
-import kr.modusplant.framework.out.jpa.repository.CommPostBookmarkJpaRepository;
-import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
-import kr.modusplant.framework.out.jpa.repository.CommPostLikeJpaRepository;
+import kr.modusplant.framework.jpa.entity.CommPostBookmarkEntity;
+import kr.modusplant.framework.jpa.entity.CommPostLikeEntity;
+import kr.modusplant.framework.jpa.repository.CommPostBookmarkJpaRepository;
+import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
+import kr.modusplant.framework.jpa.repository.CommPostLikeJpaRepository;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.PostBookmarkCancelEvent;
 import kr.modusplant.shared.event.PostBookmarkEvent;

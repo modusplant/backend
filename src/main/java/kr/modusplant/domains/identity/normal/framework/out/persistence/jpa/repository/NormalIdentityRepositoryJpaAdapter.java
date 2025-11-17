@@ -10,7 +10,7 @@ import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repos
 import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.supers.NormalIdentityRoleJpaRepository;
 import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.supers.NormalIdentityTermJpaRepository;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityRepository;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.shared.enums.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

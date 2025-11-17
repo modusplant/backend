@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.framework.out.jpa.repository;
 
-import kr.modusplant.framework.out.jpa.repository.CommCommentJpaRepository;
-import kr.modusplant.framework.out.jpa.repository.CommCommentLikeJpaRepository;
+import kr.modusplant.framework.jpa.repository.CommCommentJpaRepository;
+import kr.modusplant.framework.jpa.repository.CommCommentLikeJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

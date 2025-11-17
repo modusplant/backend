@@ -8,15 +8,15 @@ import kr.modusplant.domains.identity.normal.usecase.port.contract.CallEmailSend
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityRepository;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailAuthRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequest;
-import kr.modusplant.framework.out.redis.RedisHelper;
-import kr.modusplant.framework.out.redis.RedisKeys;
+import kr.modusplant.framework.redis.RedisHelper;
+import kr.modusplant.framework.redis.RedisKeys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
-import static kr.modusplant.framework.out.redis.RedisKeys.RESET_PASSWORD_PREFIX;
+import static kr.modusplant.framework.redis.RedisKeys.RESET_PASSWORD_PREFIX;
 
 @Slf4j
 @RequiredArgsConstructor
