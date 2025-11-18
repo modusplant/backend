@@ -47,6 +47,10 @@ public class AccountRestController {
      * @param refreshToken 클라이언트가 쿠키로서 발송한 리프레시 토큰입니다.
      * @param accessToken 로그인한 사용자의 접근 토큰입니다.
      */
+    @Operation(
+            summary = "로그아웃 API",
+            description = "리프레시 토큰과 접근 토큰으로 로그아웃합니다."
+    )
     @PostMapping("/auth/logout")
     public void processLogout(
             @Parameter(schema = @Schema(
