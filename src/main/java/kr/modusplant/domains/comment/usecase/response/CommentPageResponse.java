@@ -4,9 +4,11 @@ import java.util.List;
 
 public record CommentPageResponse<T>(
         List<T> commentList,
-        int currentPage,
-        int pageSize,
-        long totalComments,
-        int totalPages
+        int page,
+        int size,
+        long totalElements,
+        int totalPages,
+        boolean hasNext,
+        boolean hasPrevious
 ) {
 }
