@@ -29,7 +29,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(new ObjectMapper());
     private final CommentController controller = Mockito.mock(CommentController.class);
     private final JwtTokenProvider tokenProvider = Mockito.mock(JwtTokenProvider.class);
-    private final CommentRestController restController = new CommentRestController(controller, tokenProvider);
+    private final CommentRestController restController = new CommentRestController(controller);
 
 //    @Test
 //    @DisplayName("유효한 게시글 id로 게시글의 댓글 가져오기")
