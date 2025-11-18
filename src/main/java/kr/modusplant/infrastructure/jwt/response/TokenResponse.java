@@ -1,4 +1,4 @@
-package kr.modusplant.shared.http.response;
+package kr.modusplant.infrastructure.jwt.response;
 
 import jakarta.validation.constraints.NotBlank;
 
