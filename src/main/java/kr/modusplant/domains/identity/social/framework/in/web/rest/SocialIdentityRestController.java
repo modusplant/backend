@@ -10,7 +10,7 @@ import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.shared.enums.AuthProvider;
-import kr.modusplant.shared.http.response.TokenResponse;
+import kr.modusplant.infrastructure.jwt.response.TokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
