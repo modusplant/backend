@@ -90,7 +90,8 @@ public class CommentRestController {
             @RequestParam(value = "size", defaultValue = "10")
             int size
             ) {
-        CommentPageResponse<CommentOfAuthorResponse> commentResponses = controller.gatherByAuthor(memberUuid, PageRequest.of(page, size));
+        CommentPageResponse<CommentOfAuthorResponse> commentResponses =
+                controller.gatherByAuthor(memberUuid, PageRequest.of(page, size));
         return ResponseEntity.ok().body(DataResponse.ok(commentResponses));
     }
 
