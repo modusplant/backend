@@ -9,7 +9,7 @@ import kr.modusplant.domains.term.domain.vo.SiteMemberTermId;
 import kr.modusplant.domains.term.usecase.request.SiteMemberTermCreateRequest;
 import kr.modusplant.domains.term.usecase.request.SiteMemberTermUpdateRequest;
 import kr.modusplant.domains.term.usecase.response.SiteMemberTermResponse;
-import kr.modusplant.framework.out.jackson.http.response.DataResponse;
+import kr.modusplant.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

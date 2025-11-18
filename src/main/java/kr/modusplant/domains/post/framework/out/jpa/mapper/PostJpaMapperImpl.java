@@ -5,10 +5,10 @@ import kr.modusplant.domains.post.domain.vo.*;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
 import kr.modusplant.domains.post.usecase.model.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.model.PostSummaryReadModel;
-import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
-import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.jpa.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.framework.jpa.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

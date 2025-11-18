@@ -4,7 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostRepositoryCustom;
 import kr.modusplant.domains.post.usecase.model.PostSummaryReadModel;
-import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.jpa.entity.CommPostEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

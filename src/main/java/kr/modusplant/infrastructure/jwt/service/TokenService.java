@@ -1,10 +1,10 @@
 package kr.modusplant.infrastructure.jwt.service;
 
 
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleJpaRepository;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
+import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
 import kr.modusplant.infrastructure.jwt.exception.InvalidTokenException;
 import kr.modusplant.infrastructure.jwt.exception.TokenNotFoundException;
@@ -12,10 +12,10 @@ import kr.modusplant.infrastructure.jwt.framework.out.jpa.entity.RefreshTokenEnt
 import kr.modusplant.infrastructure.jwt.framework.out.jpa.repository.RefreshTokenJpaRepository;
 import kr.modusplant.infrastructure.jwt.framework.out.redis.AccessTokenRedisRepository;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
-import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -48,7 +48,7 @@ public class TokenService {
     public TokenPair issueToken(UUID memberUuid, String nickname, Role role) {
         // memberUuid 검증
         if (memberUuid == null || !siteMemberJpaRepository.existsByUuid(memberUuid)) {
-            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER);
+            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER);
         }
 
         // accessToken , refresh token 생성
@@ -77,7 +77,7 @@ public class TokenService {
 
         // refresh token 조회
         UUID memberUuid = jwtTokenProvider.getMemberUuidFromToken(refreshToken);
-        SiteMemberEntity memberEntity = siteMemberJpaRepository.findByUuid(memberUuid).orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER));
+        SiteMemberEntity memberEntity = siteMemberJpaRepository.findByUuid(memberUuid).orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER));
         RefreshTokenEntity refreshTokenEntity = refreshTokenJpaRepository.findByMemberAndRefreshToken(memberEntity,refreshToken).orElseThrow(TokenNotFoundException::new);
 
         // 토큰 삭제

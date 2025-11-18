@@ -1,8 +1,8 @@
 package kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper;
 
 import kr.modusplant.domains.identity.normal.domain.vo.SignUpData;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberTermEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberTermEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -1,9 +1,9 @@
 package kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper;
 
 import kr.modusplant.domains.comment.common.util.domain.CommentTestUtils;
-import kr.modusplant.framework.out.jpa.entity.CommCommentEntity;
-import kr.modusplant.framework.out.jpa.entity.common.util.CommCommentEntityTestUtils;
-import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.CommCommentEntity;
+import kr.modusplant.framework.jpa.entity.common.util.CommCommentEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

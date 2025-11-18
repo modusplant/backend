@@ -1,6 +1,6 @@
 package kr.modusplant.infrastructure.jwt.common.util.entity;
 
-import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.framework.out.jpa.entity.RefreshTokenEntity.RefreshTokenEntityBuilder;
 
 import java.time.LocalDateTime;

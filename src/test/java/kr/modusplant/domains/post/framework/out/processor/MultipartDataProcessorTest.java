@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import kr.modusplant.domains.post.common.util.usecase.request.PostRequestTestUtils;
 import kr.modusplant.domains.post.framework.out.processor.enums.FileType;
 import kr.modusplant.domains.post.framework.out.processor.exception.UnsupportedFileException;
-import kr.modusplant.framework.out.aws.service.S3FileService;
+import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
