@@ -10,10 +10,7 @@ import kr.modusplant.domains.identity.account.usecase.response.AccountAuthRespon
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -41,5 +38,29 @@ public class AccountRestController {
     ) {
         AccountAuthResponse response = controller.getAuthInfo(memberActiveUuid);
         return ResponseEntity.ok(DataResponse.ok(response));
+    }
+
+    /**
+     * Spring Security의 보안 필터 체인에 설정된 로그아웃 URL을
+     * Swagger UI에 등록하기 위해 만들어진 더미 메서드입니다.
+     * <p>"절대로" 호출되거나, 사용될 일이 없습니다.<p/>
+     * @param refreshToken 클라이언트가 쿠키로서 발송한 리프레시 토큰입니다.
+     * @param accessToken 로그인한 사용자의 접근 토큰입니다.
+     */
+    @PostMapping("/auth/logout")
+    public void processLogout(
+            @Parameter(schema = @Schema(
+                    description = "리프레시 토큰",
+                    example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIn0.sFzQWkpK8HG2xKcI1vNH3oW7nIO9QaX3ghTkfT2Yq3s"))
+            @CookieValue("Cookie")
+            String refreshToken,
+
+            @Parameter(schema = @Schema(
+                    description = "접근 토큰",
+                    example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE1MTYyNDI2MjIsInJvbGUiOiJhZG1pbiJ9.4Adcj3UFYzPUVaVF43FmMab6RlaQD4u-Vd4GcSANrLo"))
+            @RequestHeader("Authorization")
+            String accessToken
+    ) {
+
     }
 }
