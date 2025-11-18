@@ -12,6 +12,7 @@ import org.hibernate.annotations.UuidGenerator;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static kr.modusplant.shared.persistence.constant.TableColumnName.MEMB_UUID;
 import static kr.modusplant.shared.persistence.constant.TableColumnName.REFRESH_TOKEN;
 
 @Entity
@@ -25,7 +26,7 @@ public class RefreshTokenEntity {
     private UUID uuid;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(nullable = false, name = "memb_uuid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(nullable = false, name = MEMB_UUID, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity member;
 
     @Column(name = REFRESH_TOKEN, nullable = false)

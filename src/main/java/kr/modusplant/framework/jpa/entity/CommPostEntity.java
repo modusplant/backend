@@ -3,8 +3,8 @@ package kr.modusplant.framework.jpa.entity;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
-import kr.modusplant.infrastructure.persistence.annotation.DefaultValue;
-import kr.modusplant.infrastructure.persistence.generator.UlidGenerator;
+import kr.modusplant.framework.jpa.generator.UlidGenerator;
+import kr.modusplant.shared.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,7 +36,7 @@ public class CommPostEntity {
     private CommPrimaryCategoryEntity primaryCategory;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = SECO_CATE_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "seco_cate_uuid", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private CommSecondaryCategoryEntity secondaryCategory;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
@@ -47,11 +47,11 @@ public class CommPostEntity {
     @JoinColumn(name = CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity createMember;
 
-    @Column(name = LIKE_COUNT, nullable = false)
+    @Column(name = "like_count", nullable = false)
     @DefaultValue
     private Integer likeCount;
 
-    @Column(name = VIEW_COUNT, nullable = false)
+    @Column(name = "view_count", nullable = false)
     @DefaultValue
     private Long viewCount;
 
@@ -62,18 +62,18 @@ public class CommPostEntity {
     @Column(nullable = false, columnDefinition = "jsonb")
     private JsonNode content;
 
-    @Column(name = IS_PUBLISHED, nullable = false)
+    @Column(name = "is_published", nullable = false)
     @DefaultValue
     private Boolean isPublished;
 
-    @Column(name = PUBLISHED_AT)
+    @Column(name = "published_at")
     private LocalDateTime publishedAt;
 
     @Column(name = CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 
-    @Column(name = UPDATED_AT, nullable = false)
+    @Column(name = "updated_at", nullable = false)
     @LastModifiedDate
     private LocalDateTime updatedAt;
 

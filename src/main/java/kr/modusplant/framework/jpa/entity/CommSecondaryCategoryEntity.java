@@ -13,8 +13,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.constant.TableColumnName.CREATED_AT;
-import static kr.modusplant.shared.persistence.constant.TableColumnName.PRI_CATE_UUID;
+import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
 import static kr.modusplant.shared.persistence.constant.TableName.COMM_SECO_CATE;
 
 @Entity
@@ -35,7 +34,7 @@ public class CommSecondaryCategoryEntity {
     @Column(nullable = false, updatable = false)
     private String category;
 
-    @Column(name = "\"order\"", nullable = false, updatable = false)
+    @Column(name = ORDER, nullable = false, updatable = false)
     private Integer order;
 
     @Column(name = CREATED_AT, nullable = false, updatable = false)

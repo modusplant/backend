@@ -32,7 +32,7 @@ public class CommPostArchiveEntity {
     @Column(name = PRI_CATE_UUID, nullable = false)
     private UUID primaryCategoryUuid;
 
-    @Column(name = SECO_CATE_UUID, nullable = false)
+    @Column(name = "seco_cate_uuid", nullable = false)
     private UUID secondaryCategoryUuid;
 
     @Column(name = AUTH_MEMB_UUID, nullable = false)
@@ -51,10 +51,10 @@ public class CommPostArchiveEntity {
     @Column(name = CREATED_AT, nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = UPDATED_AT, nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @Column(name = "published_at", nullable = true)
+    @Column(name = "published_at")
     private LocalDateTime publishedAt;
 
     @Override

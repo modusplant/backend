@@ -2,7 +2,7 @@ package kr.modusplant.domains.post.domain.vo;
 
 import kr.modusplant.domains.post.domain.exception.EmptyPostIdException;
 import kr.modusplant.domains.post.domain.exception.InvalidPostIdException;
-import kr.modusplant.infrastructure.persistence.generator.UlidIdGenerator;
+import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

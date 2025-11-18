@@ -1,7 +1,7 @@
 package kr.modusplant.framework.jpa.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.infrastructure.persistence.annotation.DefaultValue;
+import kr.modusplant.shared.persistence.annotation.DefaultValue;
 import kr.modusplant.shared.persistence.compositekey.CommCommentId;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -33,7 +33,7 @@ public class CommCommentEntity {
     private CommPostEntity postEntity;
 
     @Id
-    @Column(name = PATH, nullable = false, updatable = false)
+    @Column(name = "path", nullable = false, updatable = false)
     private String path;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
@@ -48,10 +48,10 @@ public class CommCommentEntity {
     @DefaultValue
     private Integer likeCount;
 
-    @Column(name = CONTENT, nullable = false, length = 900)
+    @Column(name = "content", nullable = false, length = 900)
     private String content;
 
-    @Column(name = IS_DELETED, nullable = false)
+    @Column(name = "is_deleted", nullable = false)
     @DefaultValue
     private Boolean isDeleted;
 

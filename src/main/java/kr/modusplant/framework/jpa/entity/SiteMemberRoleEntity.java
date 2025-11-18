@@ -1,8 +1,8 @@
 package kr.modusplant.framework.jpa.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.infrastructure.persistence.annotation.DefaultValue;
 import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.shared.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

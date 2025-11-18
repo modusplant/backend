@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.CREATED_AT;
+import static kr.modusplant.shared.persistence.constant.TableColumnName.ORDER;
 import static kr.modusplant.shared.persistence.constant.TableName.COMM_PRI_CATE;
 
 @Entity
@@ -30,7 +31,7 @@ public class CommPrimaryCategoryEntity {
     @Column(nullable = false, updatable = false, unique = true)
     private String category;
 
-    @Column(name = "\"order\"", nullable = false, updatable = false, unique = true)
+    @Column(name = ORDER, nullable = false, updatable = false, unique = true)
     private Integer order;
 
     @Column(name = CREATED_AT, nullable = false, updatable = false)

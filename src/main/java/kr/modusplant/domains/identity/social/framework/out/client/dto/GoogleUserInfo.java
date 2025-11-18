@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import kr.modusplant.domains.identity.social.usecase.port.client.dto.SocialUserInfo;
 import lombok.Getter;
 
-import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.NAME;
-
 @Getter
 public class GoogleUserInfo implements SocialUserInfo {
     private String id;
@@ -13,7 +11,7 @@ public class GoogleUserInfo implements SocialUserInfo {
 
     private Boolean verifiedEmail;
 
-    @JsonProperty(NAME)
+    @JsonProperty("name")
     private String nickname;
 
     @Override

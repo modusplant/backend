@@ -1,7 +1,7 @@
 package kr.modusplant.framework.jpa.repository.supers;
 
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.shared.persistence.repository.supers.UuidPrimaryKeyRepository;
+import kr.modusplant.shared.persistence.repository.UuidPrimaryKeyRepository;
 
 import java.util.Optional;
 
