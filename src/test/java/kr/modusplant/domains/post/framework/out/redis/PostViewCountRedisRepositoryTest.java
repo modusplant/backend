@@ -1,7 +1,7 @@
 package kr.modusplant.domains.post.framework.out.redis;
 
 import kr.modusplant.domains.post.common.util.domain.vo.PostIdTestUtils;
-import kr.modusplant.infrastructure.persistence.generator.UlidIdGenerator;
+import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

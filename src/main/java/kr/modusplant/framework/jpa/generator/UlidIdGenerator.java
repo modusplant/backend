@@ -1,4 +1,4 @@
-package kr.modusplant.infrastructure.persistence.generator;
+package kr.modusplant.framework.jpa.generator;
 
 import com.github.f4b6a3.ulid.UlidCreator;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;

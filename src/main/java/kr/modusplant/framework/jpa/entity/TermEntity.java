@@ -1,7 +1,7 @@
 package kr.modusplant.framework.jpa.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.infrastructure.persistence.annotation.DefaultValue;
+import kr.modusplant.shared.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +15,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.VER;
 import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
 import static kr.modusplant.shared.persistence.constant.TableName.TERM;
 import static kr.modusplant.shared.util.VersionUtils.createVersion;
@@ -37,7 +36,7 @@ public class TermEntity {
     @Column(nullable = false, length = 60000)
     private String content;
 
-    @Column(name = VER, nullable = false, length = 10)
+    @Column(name = "ver", nullable = false, length = 10)
     @DefaultValue
     private String version;
 

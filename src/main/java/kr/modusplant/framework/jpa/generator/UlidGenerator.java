@@ -1,4 +1,4 @@
-package kr.modusplant.infrastructure.persistence.generator;
+package kr.modusplant.framework.jpa.generator;
 
 import org.hibernate.annotations.IdGeneratorType;
 

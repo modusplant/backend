@@ -1,7 +1,7 @@
 package kr.modusplant.framework.jpa.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.infrastructure.persistence.annotation.DefaultValue;
+import kr.modusplant.shared.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,7 +48,7 @@ public class SiteMemberEntity {
     @DefaultValue
     private Boolean isBanned;
 
-    @Column(name = IS_DELETED, nullable = false)
+    @Column(name = "is_deleted", nullable = false)
     @DefaultValue
     private Boolean isDeleted;
 

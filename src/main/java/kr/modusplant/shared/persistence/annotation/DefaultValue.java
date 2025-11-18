@@ -1,4 +1,4 @@
-package kr.modusplant.infrastructure.persistence.annotation;
+package kr.modusplant.shared.persistence.annotation;
 
 import java.lang.annotation.*;
 

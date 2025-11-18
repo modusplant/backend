@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.Random;
 
-import static kr.modusplant.infrastructure.persistence.constant.EntityFieldName.EMAIL;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -44,7 +42,7 @@ public class EmailAuthTokenHelper {
                 .claims()
                 .issuedAt(now)
                 .expiration(expirationDate)
-                .add(EMAIL, email)
+                .add("email", email)
                 .add(VERIFY_CODE, verifyCode)
                 .and()
                 .signWith(Keys.hmacShaKeyFor(MAIL_API_JWT_SECRET_KEY.getBytes()))
@@ -75,7 +73,7 @@ public class EmailAuthTokenHelper {
             if (!verifyCode.equals(payloadVerifyCode)) {
                 throw new InvalidDataException(ErrorCode.INVALID_EMAIL_VERIFY_CODE, "verifyCode");
             }
-            if (!email.equals(claims.get(EMAIL, String.class))) {
+            if (!email.equals(claims.get("email", String.class))) {
                 throw new InvalidDataException(ErrorCode.INVALID_EMAIL, "email");
             }
         } catch (ExpiredJwtException e) {
