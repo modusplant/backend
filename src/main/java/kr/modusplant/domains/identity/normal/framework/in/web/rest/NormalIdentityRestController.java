@@ -1,5 +1,6 @@
 package kr.modusplant.domains.identity.normal.framework.in.web.rest;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -52,12 +53,13 @@ public class NormalIdentityRestController {
      * Spring Security 의 일반 로그인 필터 체인의
      * 성공 핸들러인 {@link kr.modusplant.infrastructure.security.handler.ForwardRequestLoginSuccessHandler} 가
      * 인증 완료 후 forward 하는 메서드입니다.
-     * <p>클라이언트의 요청을 받는 도입부 역할을 하지 않으며, 따라서 Swagger 어노테이션을 사용하지 않습니다. <p/>
+     * <p>클라이언트의 요청을 받는 도입부 역할을 하지 않으며, 따라서 Swagger UI에 표시하지 않습니다. <p/>
      *
      * @param accessToken 클라이언트에게 보내는 접근 토큰입니다.
      * @param refreshToken 클라이언트에게 보내는 갱신 토큰입니다.
      * @return 클라이언트에게 로그인에 대한 성공 응답을 반환합니다.
      */
+    @Hidden
     @PostMapping("/api/auth/login-success")
     public ResponseEntity<DataResponse<Map<String, Object>>> respondToNormalLoginSuccess(
             @RequestAttribute("accessToken")
