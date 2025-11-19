@@ -5,11 +5,14 @@ import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdenti
 import kr.modusplant.domains.identity.normal.domain.vo.Email;
 import kr.modusplant.domains.identity.normal.domain.vo.MemberId;
 import kr.modusplant.domains.identity.normal.domain.vo.Nickname;
+import kr.modusplant.domains.identity.normal.domain.vo.Password;
 import kr.modusplant.domains.identity.normal.usecase.port.mapper.NormalIdentityMapper;
+import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityReadRepository;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityRepository;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityUpdateRepository;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailModificationRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.NormalSignUpRequest;
+import kr.modusplant.domains.identity.normal.usecase.request.PasswordModificationRequest;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.exception.EntityNotFoundException;
@@ -26,6 +29,7 @@ public class NormalIdentityController {
     private final NormalIdentityMapper mapper;
     private final NormalIdentityRepository repository;
     private final NormalIdentityUpdateRepository updateRepository;
+    private final NormalIdentityReadRepository readRepository;
 
     public void registerNormalMember(NormalSignUpRequest request) {
         if(repository.existsByEmailAndProvider(request.email(), "Basic")) {
@@ -42,6 +46,14 @@ public class NormalIdentityController {
             throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER);
         } else {
             updateRepository.updateEmail(MemberId.create(memberActiveUuid), Email.create(request.newEmail()));
+        }
+    }
+
+    public void modifyPassword(UUID memberActiveUuid, PasswordModificationRequest request) {
+        if(!readRepository.existsByMemberId(MemberId.create(memberActiveUuid))) {
+            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER);
+        } else {
+            updateRepository.updatePassword(MemberId.create(memberActiveUuid), Password.create(request.newPw()));
         }
     }
 }

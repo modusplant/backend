@@ -3,6 +3,7 @@ package kr.modusplant.domains.normalidentity.normal.adapter.controller;
 import kr.modusplant.domains.identity.normal.adapter.controller.NormalIdentityController;
 import kr.modusplant.domains.identity.normal.adapter.mapper.NormalIdentityMapperImpl;
 import kr.modusplant.domains.identity.normal.usecase.port.mapper.NormalIdentityMapper;
+import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityReadRepository;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityRepository;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityUpdateRepository;
 import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.SignUpDataTestUtils;
@@ -20,7 +21,8 @@ public class NormalIdentityControllerTest implements
     private final NormalIdentityMapper mapper = Mockito.mock(NormalIdentityMapperImpl.class);
     private final NormalIdentityRepository repository = Mockito.mock(NormalIdentityRepository.class);
     private final NormalIdentityUpdateRepository updateRepository = Mockito.mock(NormalIdentityUpdateRepository.class);
-    private final NormalIdentityController controller = new NormalIdentityController(mapper, repository, updateRepository);
+    private final NormalIdentityReadRepository readRepository = Mockito.mock(NormalIdentityReadRepository.class);
+    private final NormalIdentityController controller = new NormalIdentityController(mapper, repository, updateRepository, readRepository);
 
     @Test
     @DisplayName("유효한 요청 데이터를 받았을 시 일반 회원가입 진행")

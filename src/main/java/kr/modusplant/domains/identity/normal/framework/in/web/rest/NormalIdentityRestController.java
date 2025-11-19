@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.identity.normal.adapter.controller.NormalIdentityController;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailModificationRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.NormalSignUpRequest;
+import kr.modusplant.domains.identity.normal.usecase.request.PasswordModificationRequest;
 import kr.modusplant.framework.out.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.models.NormalLoginRequest;
 import lombok.RequiredArgsConstructor;
@@ -69,6 +70,28 @@ public class NormalIdentityRestController {
             EmailModificationRequest request
     ) {
         controller.modifyEmail(memberActiveUuid, request);
+
+        return ResponseEntity.ok(DataResponse.ok());
+    }
+
+    @Operation(
+            summary = "일반 회원의 비밀번호 수정 API",
+            description = "사용자의 식별자, 새로운 비밀번호로 사용자의 이메일을 갱신합니다."
+    )
+    @PostMapping("/api/v1/members/{id}/password/modify")
+    public ResponseEntity<DataResponse<Void>> modifyPassword(
+            @Parameter(schema = @Schema(
+                    description = "회원의 식별자",
+                    example = "038ae842-3c93-484f-b526-7c4645a195a7")
+            )
+            @PathVariable("id")
+            @NotNull(message = "사용자의 식별자 값이 비어 있습니다")
+            UUID memberActiveUuid,
+
+            @RequestBody @Valid
+            PasswordModificationRequest request
+    ) {
+        controller.modifyPassword(memberActiveUuid, request);
 
         return ResponseEntity.ok(DataResponse.ok());
     }
