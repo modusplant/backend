@@ -33,8 +33,8 @@ public class DefaultUserDetailsService implements UserDetailsService {
                 .findByEmailAndProvider(email, AuthProvider.BASIC).orElseThrow();
         SiteMemberEntity member = memberRepository
                 .findByUuid(auth.getActiveMember().getUuid()).orElseThrow();
-        SiteMemberRoleEntity role = memberRoleRepository
-                .findByUuid(auth.getActiveMember().getUuid()).orElseThrow();
+        SiteMemberRoleEntity role = memberRoleRepository.findByMember(auth.getActiveMember())
+                .orElseThrow();
 
         return DefaultUserDetails.builder()
                 .email(auth.getEmail())
