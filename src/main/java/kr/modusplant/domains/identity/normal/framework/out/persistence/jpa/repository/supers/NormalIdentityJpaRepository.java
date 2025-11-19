@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 public interface NormalIdentityJpaRepository extends JpaRepository<SiteMemberEntity, UUID> {
+
     boolean existsByNickname(String nickname);
 }
