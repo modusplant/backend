@@ -43,5 +43,8 @@ gradle.properties
 **/generated/**
 /uploads/
 
+### Local KeyStore ###
+keystore.p12
+
 ### Local Redis Setting ###
 redis.*
