@@ -73,7 +73,6 @@ public class MemberRestController {
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
             UUID id,
 
-            @Parameter(description = "헤더로 전송되는 접근 토큰")
             @RequestHeader(name = "Authorization")
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) throws IOException {
@@ -104,7 +103,6 @@ public class MemberRestController {
             @Pattern(regexp = REGEX_NICKNAME, message = "회원 닉네임 서식이 올바르지 않습니다. ")
             String nickname,
 
-            @Parameter(description = "헤더로 전송되는 접근 토큰")
             @RequestHeader(name = "Authorization")
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) throws IOException {
@@ -126,7 +124,6 @@ public class MemberRestController {
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid,
 
-            @Parameter(description = "헤더로 전송되는 접근 토큰")
             @RequestHeader(name = "Authorization")
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
@@ -148,7 +145,6 @@ public class MemberRestController {
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid,
 
-            @Parameter(description = "헤더로 전송되는 접근 토큰")
             @RequestHeader(name = "Authorization")
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
@@ -170,7 +166,6 @@ public class MemberRestController {
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid,
 
-            @Parameter(description = "헤더로 전송되는 접근 토큰")
             @RequestHeader(name = "Authorization")
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
@@ -192,7 +187,6 @@ public class MemberRestController {
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid,
 
-            @Parameter(description = "헤더로 전송되는 접근 토큰")
             @RequestHeader(name = "Authorization")
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
@@ -219,7 +213,6 @@ public class MemberRestController {
             @NotBlank(message = "댓글 경로가 비어 있습니다.")
             String path,
 
-            @Parameter(description = "헤더로 전송되는 접근 토큰")
             @RequestHeader(name = "Authorization")
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
@@ -246,7 +239,6 @@ public class MemberRestController {
             @NotBlank(message = "댓글 경로가 비어 있습니다.")
             String path,
 
-            @Parameter(description = "헤더로 전송되는 접근 토큰")
             @RequestHeader(name = "Authorization")
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
