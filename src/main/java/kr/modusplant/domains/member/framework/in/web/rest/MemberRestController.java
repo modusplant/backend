@@ -1,5 +1,6 @@
 package kr.modusplant.domains.member.framework.in.web.rest;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -41,6 +42,7 @@ public class MemberRestController {
     private final MemberController memberController;
     private final JwtTokenProvider jwtTokenProvider;
 
+    @Hidden
     @Operation(summary = "회원 등록 API", description = "닉네임을 통해 회원을 등록합니다.")
     @PostMapping
     public ResponseEntity<DataResponse<MemberResponse>> registerMember(
