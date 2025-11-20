@@ -7,8 +7,8 @@ import kr.modusplant.domains.identity.normal.domain.vo.MemberId;
 import kr.modusplant.domains.identity.normal.domain.vo.Nickname;
 import kr.modusplant.domains.identity.normal.domain.vo.Password;
 import kr.modusplant.domains.identity.normal.usecase.port.mapper.NormalIdentityMapper;
-import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityReadRepository;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityCreateRepository;
+import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityReadRepository;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityUpdateRepository;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailModificationRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.NormalSignUpRequest;
@@ -43,7 +43,7 @@ public class NormalIdentityController {
 
     public void modifyEmail(UUID memberActiveUuid, EmailModificationRequest request) {
         if(!readRepository.existsByEmailAndProvider(Email.create(request.currentEmail()), AuthProvider.BASIC)) {
-            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER);
+            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER_AUTH);
         } else {
             updateRepository.updateEmail(MemberId.create(memberActiveUuid), Email.create(request.newEmail()));
         }
@@ -51,7 +51,7 @@ public class NormalIdentityController {
 
     public void modifyPassword(UUID memberActiveUuid, PasswordModificationRequest request) {
         if(!readRepository.existsByMemberId(MemberId.create(memberActiveUuid))) {
-            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER);
+            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER_AUTH);
         } else {
             updateRepository.updatePassword(MemberId.create(memberActiveUuid), Password.create(request.newPw()));
         }
