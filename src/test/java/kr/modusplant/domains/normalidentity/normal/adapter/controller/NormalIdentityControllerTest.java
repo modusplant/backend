@@ -4,7 +4,7 @@ import kr.modusplant.domains.identity.normal.adapter.controller.NormalIdentityCo
 import kr.modusplant.domains.identity.normal.adapter.mapper.NormalIdentityMapperImpl;
 import kr.modusplant.domains.identity.normal.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityReadRepository;
-import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityRepository;
+import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityCreateRepository;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityUpdateRepository;
 import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.SignUpDataTestUtils;
 import kr.modusplant.domains.normalidentity.normal.common.util.usecase.request.NormalSignUpRequestTestUtils;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.verify;
 public class NormalIdentityControllerTest implements
         NormalSignUpRequestTestUtils, SignUpDataTestUtils {
     private final NormalIdentityMapper mapper = Mockito.mock(NormalIdentityMapperImpl.class);
-    private final NormalIdentityRepository repository = Mockito.mock(NormalIdentityRepository.class);
+    private final NormalIdentityCreateRepository repository = Mockito.mock(NormalIdentityCreateRepository.class);
     private final NormalIdentityUpdateRepository updateRepository = Mockito.mock(NormalIdentityUpdateRepository.class);
     private final NormalIdentityReadRepository readRepository = Mockito.mock(NormalIdentityReadRepository.class);
     private final NormalIdentityController controller = new NormalIdentityController(mapper, repository, updateRepository, readRepository);

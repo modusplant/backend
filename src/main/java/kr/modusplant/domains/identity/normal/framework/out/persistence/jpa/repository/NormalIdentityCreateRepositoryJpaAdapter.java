@@ -3,7 +3,7 @@ package kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repo
 import kr.modusplant.domains.identity.normal.domain.vo.SignUpData;
 import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.*;
 import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.supers.*;
-import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityRepository;
+import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityCreateRepository;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
-public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityRepository {
+public class NormalIdentityCreateRepositoryJpaAdapter implements NormalIdentityCreateRepository {
     private final NormalIdentityJpaRepository identityRepository;
     private final NormalIdentityAuthJpaRepository authRepository;
     private final NormalIdentityRoleJpaRepository roleRepository;

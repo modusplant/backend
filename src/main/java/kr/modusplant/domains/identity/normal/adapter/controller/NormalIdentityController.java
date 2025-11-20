@@ -8,7 +8,7 @@ import kr.modusplant.domains.identity.normal.domain.vo.Nickname;
 import kr.modusplant.domains.identity.normal.domain.vo.Password;
 import kr.modusplant.domains.identity.normal.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityReadRepository;
-import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityRepository;
+import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityCreateRepository;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityUpdateRepository;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailModificationRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.NormalSignUpRequest;
@@ -27,7 +27,7 @@ import java.util.UUID;
 public class NormalIdentityController {
 
     private final NormalIdentityMapper mapper;
-    private final NormalIdentityRepository repository;
+    private final NormalIdentityCreateRepository repository;
     private final NormalIdentityUpdateRepository updateRepository;
     private final NormalIdentityReadRepository readRepository;
 

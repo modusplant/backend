@@ -2,7 +2,7 @@ package kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jp
 
 import kr.modusplant.domains.identity.normal.domain.vo.SignUpData;
 import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.*;
-import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.NormalIdentityRepositoryJpaAdapter;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.NormalIdentityCreateRepositoryJpaAdapter;
 import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.supers.*;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
@@ -25,7 +25,7 @@ import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberTe
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 
-public class NormalIdentityRepositoryJpaAdapterTest implements SiteMemberEntityTestUtils,
+public class NormalIdentityCreateRepositoryJpaAdapterTest implements SiteMemberEntityTestUtils,
         SiteMemberAuthEntityTestUtils, SiteMemberRoleEntityTestUtils, SiteMemberTermEntityTestUtils {
     private final NormalIdentityJpaRepository identityRepository = Mockito.mock(NormalIdentityJpaRepository.class);
     private final NormalIdentityAuthJpaRepository authRepository = Mockito.mock(NormalIdentityAuthJpaRepository.class);
@@ -38,7 +38,7 @@ public class NormalIdentityRepositoryJpaAdapterTest implements SiteMemberEntityT
     private final NormalIdentityRoleJpaMapper roleMapper = Mockito.mock(NormalIdentityRoleJpaMapper.class);
     private final NormalIdentityTermJpaMapper termMapper = Mockito.mock(NormalIdentityTermJpaMapper.class);
     private final NormalIdentityProfileJpaMapper profileMapper = Mockito.mock(NormalIdentityProfileJpaMapper.class);
-    private final NormalIdentityRepositoryJpaAdapter adapter = new NormalIdentityRepositoryJpaAdapter(
+    private final NormalIdentityCreateRepositoryJpaAdapter adapter = new NormalIdentityCreateRepositoryJpaAdapter(
             identityRepository, authRepository, roleRepository, termRepository, profileRepository,
             identityMapper, authMapper, roleMapper, termMapper, profileMapper);
 
