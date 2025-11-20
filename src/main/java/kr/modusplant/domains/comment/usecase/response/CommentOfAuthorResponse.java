@@ -4,6 +4,6 @@ public record CommentOfAuthorResponse(
         String content,
         String createdAt,
         String postTitle,
-        int totalElements
+        int totalCommentsOfPost
 ) {
 }
