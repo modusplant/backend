@@ -87,7 +87,7 @@ public class CommentRestController {
                     description = "페이지 당 들어갈 댓글의 수",
                     example = "10"
             )
-            @RequestParam(value = "size", defaultValue = "10")
+            @RequestParam(value = "size", defaultValue = "8")
             int size
             ) {
         CommentPageResponse<CommentOfAuthorPageModel> commentResponses =
