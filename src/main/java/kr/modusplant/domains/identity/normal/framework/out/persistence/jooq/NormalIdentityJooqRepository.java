@@ -53,7 +53,7 @@ public class NormalIdentityJooqRepository implements
     public boolean existsByEmailAndProvider(Email email, AuthProvider provider) {
         return dsl.selectOne()
                 .from(memberAuth)
-                .where(memberAuth.EMAIL.eq(email.getEmail())).and(memberAuth.PROVIDER.eq(provider.getValue()))
+                .where(memberAuth.EMAIL.eq(email.getEmail())).and(memberAuth.PROVIDER.eq(provider.name()))
                 .fetch()
                 .isNotEmpty();
     }
