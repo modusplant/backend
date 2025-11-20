@@ -2,17 +2,14 @@ package kr.modusplant.domains.comment.adapter.controller;
 
 import kr.modusplant.domains.comment.adapter.mapper.CommentMapperImpl;
 import kr.modusplant.domains.comment.common.util.adapter.CommentResponseTestUtils;
-import kr.modusplant.domains.comment.common.util.adapter.MemberReadModelTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqRepository;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJpaAdapter;
 import org.mockito.Mockito;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
-        MemberReadModelTestUtils, CommentResponseTestUtils {
+        CommentResponseTestUtils {
     private final CommentMapperImpl mapper = Mockito.mock(CommentMapperImpl.class);
     private final CommentJooqRepository jooqAdapter = Mockito.mock(CommentJooqRepository.class);
     private final CommentRepositoryJpaAdapter jpaAdapter = Mockito.mock(CommentRepositoryJpaAdapter.class);
