@@ -54,16 +54,16 @@ public class JwtTokenProvider {
     @Value("${jwt.refresh_duration}")
     private long refreshDuration;
 
-    @Value("${server.ssl.key-store}")
+    @Value("${keystore.key-store}")
     private String keyStorePath;
 
-    @Value("${server.ssl.key-store-password}")
+    @Value("${keystore.key-store-password}")
     private String keyStorePassword;
 
-    @Value("${server.ssl.key-store-type}")
+    @Value("${keystore.key-store-type}")
     private String keyStoreType;
 
-    @Value("${server.ssl.key-alias}")
+    @Value("${keystore.key-alias}")
     private String keyAlias;
 
     private PrivateKey privateKey;
