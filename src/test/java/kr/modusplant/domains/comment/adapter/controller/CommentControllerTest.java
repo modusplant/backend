@@ -1,25 +1,18 @@
 package kr.modusplant.domains.comment.adapter.controller;
 
 import kr.modusplant.domains.comment.adapter.mapper.CommentMapperImpl;
-import kr.modusplant.domains.comment.common.util.adapter.CommentReadModelTestUtils;
 import kr.modusplant.domains.comment.common.util.adapter.CommentResponseTestUtils;
 import kr.modusplant.domains.comment.common.util.adapter.MemberReadModelTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqRepository;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJpaAdapter;
-import kr.modusplant.domains.comment.usecase.response.CommentResponse;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
-        CommentReadModelTestUtils, MemberReadModelTestUtils, CommentResponseTestUtils {
+        MemberReadModelTestUtils, CommentResponseTestUtils {
     private final CommentMapperImpl mapper = Mockito.mock(CommentMapperImpl.class);
     private final CommentJooqRepository jooqAdapter = Mockito.mock(CommentJooqRepository.class);
     private final CommentRepositoryJpaAdapter jpaAdapter = Mockito.mock(CommentRepositoryJpaAdapter.class);

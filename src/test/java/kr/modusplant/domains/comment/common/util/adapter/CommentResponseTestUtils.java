@@ -6,12 +6,14 @@ import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils;
 
+import java.time.LocalDateTime;
+
 public interface CommentResponseTestUtils extends
         PostIdTestUtils, CommentPathTestUtils,
-        MemberNicknameTestUtils, CommentContentTestUtils, CommentReadModelTestUtils{
+        MemberNicknameTestUtils, CommentContentTestUtils {
 
     CommentResponse testCommentResponse = new CommentResponse(
             testPostId.getId(), testCommentPath.getPath(), testMemberNickname.getValue(),
-            testCommentContent.getContent(), false, testCommentReadModel.createdAt()
+            testCommentContent.getContent(), false, LocalDateTime.now().toString()
     );
 }
