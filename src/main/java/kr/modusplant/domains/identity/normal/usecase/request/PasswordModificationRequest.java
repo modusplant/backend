@@ -8,7 +8,17 @@ import static kr.modusplant.shared.constant.Regex.REGEX_PASSWORD;
 
 public record PasswordModificationRequest(
         @Schema(
-                description = "비밀번호",
+                description = "기존의 비밀번호",
+                pattern = REGEX_PASSWORD,
+                example = "12!excellent"
+        )
+        @NotBlank(message = "기존의 비밀번호가 비어 있습니다.")
+        @Pattern(regexp = REGEX_PASSWORD,
+                message = "비밀번호는 8 ~ 64자까지 가능하며, 최소 하나 이상의 영문, 숫자, 그리고 특수문자를 포함해야 합니다(공백 제외).")
+        String currentPw,
+
+        @Schema(
+                description = "변경된 비밀번호",
                 pattern = REGEX_PASSWORD,
                 example = "12!excellent"
         )

@@ -7,6 +7,8 @@ import kr.modusplant.shared.enums.AuthProvider;
 
 public interface NormalIdentityReadRepository {
 
+    String getMemberPassword(MemberId memberId, AuthProvider provider);
+
     boolean existsByMemberId(MemberId memberId);
 
     boolean existsByEmailAndProvider(Email email, AuthProvider provider);

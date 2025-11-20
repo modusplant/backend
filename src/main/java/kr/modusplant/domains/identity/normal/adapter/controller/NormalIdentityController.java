@@ -16,8 +16,10 @@ import kr.modusplant.domains.identity.normal.usecase.request.PasswordModificatio
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.exception.EntityNotFoundException;
+import kr.modusplant.shared.exception.InvalidDataException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -30,6 +32,8 @@ public class NormalIdentityController {
     private final NormalIdentityCreateRepository repository;
     private final NormalIdentityUpdateRepository updateRepository;
     private final NormalIdentityReadRepository readRepository;
+
+    private final BCryptPasswordEncoder encoder;
 
     public void registerNormalMember(NormalSignUpRequest request) {
         if(readRepository.existsByEmailAndProvider(Email.create(request.email()), AuthProvider.BASIC)) {
@@ -52,8 +56,16 @@ public class NormalIdentityController {
     public void modifyPassword(UUID memberActiveUuid, PasswordModificationRequest request) {
         if(!readRepository.existsByMemberId(MemberId.create(memberActiveUuid))) {
             throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER_AUTH);
+        } else if(!isPasswordsMatch(MemberId.create(memberActiveUuid), Password.create(request.currentPw()))) {
+            throw new InvalidDataException(ErrorCode.INVALID_PASSWORD, request.currentPw());
         } else {
             updateRepository.updatePassword(MemberId.create(memberActiveUuid), Password.create(request.newPw()));
         }
+    }
+
+    private boolean isPasswordsMatch(MemberId memberActiveUuid, Password currentPassword) {
+        Password storedPw = Password.create(readRepository.getMemberPassword(memberActiveUuid, AuthProvider.BASIC));
+
+        return encoder.matches(currentPassword.getPassword(), storedPw.getPassword());
     }
 }

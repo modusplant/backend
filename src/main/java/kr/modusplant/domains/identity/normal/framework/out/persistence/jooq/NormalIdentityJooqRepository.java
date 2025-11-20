@@ -41,6 +41,14 @@ public class NormalIdentityJooqRepository implements
     }
 
     @Override
+    public String getMemberPassword(MemberId memberId, AuthProvider provider) {
+        return dsl.select(memberAuth.PW)
+                .from(memberAuth)
+                .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue())).and(memberAuth.PROVIDER.eq(provider.name()))
+                .fetchOne(memberAuth.PW);
+    }
+
+    @Override
     public boolean existsByMemberId(MemberId memberId) {
         return dsl.selectOne()
                 .from(memberAuth)
