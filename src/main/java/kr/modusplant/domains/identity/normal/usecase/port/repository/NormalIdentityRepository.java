@@ -9,5 +9,5 @@ public interface NormalIdentityRepository {
 
     boolean existsByEmailAndProvider(String email, String provider);
 
-    boolean isNicknameExists(Nickname nickname);
+    boolean existsByNickname(Nickname nickname);
 }

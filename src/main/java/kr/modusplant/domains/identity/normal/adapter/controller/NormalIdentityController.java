@@ -34,7 +34,7 @@ public class NormalIdentityController {
     public void registerNormalMember(NormalSignUpRequest request) {
         if(repository.existsByEmailAndProvider(request.email(), "Basic")) {
             throw new DataAlreadyExistsException(NormalIdentityErrorCode.ALREADY_EXISTS_MEMBER);
-        } else if(repository.isNicknameExists(Nickname.create(request.nickname()))) {
+        } else if(repository.existsByNickname(Nickname.create(request.nickname()))) {
             throw new DataAlreadyExistsException(NormalIdentityErrorCode.ALREADY_EXISTS_NICKNAME);
         }  else {
             repository.save(mapper.toSignUpData(request));

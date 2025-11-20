@@ -42,7 +42,7 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityReposit
     }
 
     @Override
-    public boolean isNicknameExists(Nickname nickname) {
+    public boolean existsByNickname(Nickname nickname) {
         return identityRepository.existsByNickname(nickname.getNickname());
     }
 }
