@@ -3,7 +3,7 @@ package kr.modusplant.domains.comment.framework.out.persistence.jooq;
 import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentReadRepository;
-import kr.modusplant.domains.comment.usecase.response.CommentOfAuthorResponse;
+import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.jooq.tables.CommComment;
 import kr.modusplant.jooq.tables.CommPost;
@@ -41,7 +41,7 @@ public class CommentJooqRepository implements CommentReadRepository {
                 .fetchInto(CommentOfPostResponse.class);
     }
 
-    public PageImpl<CommentOfAuthorResponse> findByAuthor(Author author, Pageable pageable) {
+    public PageImpl<CommentOfAuthorPageModel> findByAuthor(Author author, Pageable pageable) {
 
         Optional<Record1<Integer>> totalComments = dsl.selectCount()
                 .from(commComment)
@@ -52,7 +52,7 @@ public class CommentJooqRepository implements CommentReadRepository {
         if(totalComments.isPresent()) {
             int totalComment = totalComments.get().component1();
 
-            List<CommentOfAuthorResponse> commentList = dsl.select(commComment.CONTENT, commComment.CREATED_AT,
+            List<CommentOfAuthorPageModel> commentList = dsl.select(commComment.CONTENT, commComment.CREATED_AT,
                             commPost.TITLE, count(commComment.POST_ULID))
                     .from(commComment)
                     .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
@@ -62,7 +62,7 @@ public class CommentJooqRepository implements CommentReadRepository {
                     .orderBy(commComment.CREATED_AT.desc())
                     .limit(pageable.getPageSize())
                     .offset(pageable.getOffset())
-                    .fetchInto(CommentOfAuthorResponse.class);
+                    .fetchInto(CommentOfAuthorPageModel.class);
 
             return new PageImpl<>(commentList, pageable, totalComment);
         } else {

@@ -1,6 +1,6 @@
-package kr.modusplant.domains.comment.usecase.response;
+package kr.modusplant.domains.comment.usecase.model;
 
-public record CommentOfAuthorResponse(
+public record CommentOfAuthorPageModel(
         String content,
         String createdAt,
         String postTitle,

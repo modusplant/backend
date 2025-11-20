@@ -7,7 +7,7 @@ import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqRepository;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJpaAdapter;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
-import kr.modusplant.domains.comment.usecase.response.CommentOfAuthorResponse;
+import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
 import kr.modusplant.shared.persistence.compositekey.CommCommentId;
@@ -31,8 +31,8 @@ public class CommentController {
         return jooqRepository.findByPost(PostId.create(postUlid));
     }
 
-    public CommentPageResponse<CommentOfAuthorResponse> gatherByAuthor(UUID memberUuid, Pageable pageable) {
-        PageImpl<CommentOfAuthorResponse> result = jooqRepository.findByAuthor(Author.create(memberUuid), pageable);
+    public CommentPageResponse<CommentOfAuthorPageModel> gatherByAuthor(UUID memberUuid, Pageable pageable) {
+        PageImpl<CommentOfAuthorPageModel> result = jooqRepository.findByAuthor(Author.create(memberUuid), pageable);
 
         return new CommentPageResponse<>(result.getContent(), result.getNumber(),
                 result.getSize(), result.getTotalElements(), result.getTotalPages(),
