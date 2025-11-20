@@ -46,9 +46,7 @@ public class NormalIdentityRestController {
     public ResponseEntity<DataResponse<Void>> registerNormalMember(@RequestBody @Valid NormalSignUpRequest registerRequest) {
 
         controller.registerNormalMember(registerRequest);
-        DataResponse<Void> successDataResponse = DataResponse.ok();
-
-        return ResponseEntity.ok(successDataResponse);
+        return ResponseEntity.ok(DataResponse.ok());
 
     }
 
