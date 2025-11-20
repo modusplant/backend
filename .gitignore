@@ -44,7 +44,7 @@ gradle.properties
 /uploads/
 
 ### Local KeyStore ###
-keystore.p12
+src/main/resources/security/cert/keystore.p12
 
 ### Local Redis Setting ###
 redis.*

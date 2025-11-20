@@ -71,12 +71,13 @@ public class JwtTokenProvider {
 
     @PostConstruct
     public void init() throws Exception {
+        String relativeKeyStorePath = "src/main/resources/" + keyStorePath;
         ClassPathResource classPathResource = new ClassPathResource(keyStorePath);
         try {
             KeyStore keyStore = KeyStore.getInstance(keyStoreType);
             char[] password = keyStorePassword.toCharArray();
             if (classPathResource.exists()) {
-                FileInputStream fis = new FileInputStream(keyStorePath);
+                FileInputStream fis = new FileInputStream(relativeKeyStorePath);
                 keyStore.load(fis, password);
                 KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry)
                         keyStore.getEntry(keyAlias, new KeyStore.PasswordProtection(password));
@@ -96,7 +97,7 @@ public class JwtTokenProvider {
                 keyStore.load(null, password);
                 keyStore.setKeyEntry(keyAlias, privateKey, password, certChain);
 
-                FileOutputStream fos = new FileOutputStream(keyStorePath);
+                FileOutputStream fos = new FileOutputStream(relativeKeyStorePath);
                 keyStore.store(fos, password);
             }
         } catch (KeyStoreException e) {
