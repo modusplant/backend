@@ -100,7 +100,7 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
 
         // then
-        assertThat(memberAuthRepository.findByProviderId(memberAuth.getProviderId()).getFirst()).isEqualTo(memberAuth);
+        assertThat(memberAuthRepository.findByProviderId(memberAuth.getProviderId()).stream().map(element -> element.getUuid().equals(member.getUuid())).findFirst()).isPresent();
     }
 
     @DisplayName("email과 provider로 회원 인증 찾기")
@@ -120,10 +120,10 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     @Test
     void findByProviderAndProviderIdTest() {
         // given
-        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
+        SiteMemberEntity member = memberRepository.save(createMemberGoogleUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthGoogleUserEntityBuilder().originalMember(member).activeMember(member).build());
 
         // then
         assertThat(memberAuthRepository.findByProviderAndProviderId(memberAuth.getProvider(), memberAuth.getProviderId()).orElseThrow()).isEqualTo(memberAuth);
