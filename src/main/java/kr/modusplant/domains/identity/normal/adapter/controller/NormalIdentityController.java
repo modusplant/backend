@@ -32,9 +32,9 @@ public class NormalIdentityController {
     private final NormalIdentityReadRepository readRepository;
 
     public void registerNormalMember(NormalSignUpRequest request) {
-        if(repository.existsByEmailAndProvider(request.email(), "Basic")) {
+        if(readRepository.existsByEmailAndProvider(Email.create(request.email()), AuthProvider.BASIC)) {
             throw new DataAlreadyExistsException(NormalIdentityErrorCode.ALREADY_EXISTS_MEMBER);
-        } else if(repository.existsByNickname(Nickname.create(request.nickname()))) {
+        } else if(readRepository.existsByNickname(Nickname.create(request.nickname()))) {
             throw new DataAlreadyExistsException(NormalIdentityErrorCode.ALREADY_EXISTS_NICKNAME);
         }  else {
             repository.save(mapper.toSignUpData(request));
@@ -42,7 +42,7 @@ public class NormalIdentityController {
     }
 
     public void modifyEmail(UUID memberActiveUuid, EmailModificationRequest request) {
-        if(!repository.existsByEmailAndProvider(request.currentEmail(), AuthProvider.BASIC.getValue())) {
+        if(!readRepository.existsByEmailAndProvider(Email.create(request.currentEmail()), AuthProvider.BASIC)) {
             throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER);
         } else {
             updateRepository.updateEmail(MemberId.create(memberActiveUuid), Email.create(request.newEmail()));

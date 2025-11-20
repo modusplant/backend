@@ -1,12 +1,10 @@
 package kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository;
 
-import kr.modusplant.domains.identity.normal.domain.vo.Nickname;
 import kr.modusplant.domains.identity.normal.domain.vo.SignUpData;
 import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.*;
 import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.supers.*;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityRepository;
 import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.shared.enums.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,15 +32,5 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityReposit
         roleRepository.save(roleMapper.toSiteMemberRoleEntity(savedMember));
         termRepository.save(termMapper.toSiteMemberTermEntity(savedMember, signUpData));
         profileRepository.save(profileMapper.toSiteMemberProfileEntity(savedMember));
-    }
-
-    @Override
-    public boolean existsByEmailAndProvider(String email, String provider) {
-        return authRepository.existsByEmailAndProvider(email, AuthProvider.valueOf(provider.toUpperCase()));
-    }
-
-    @Override
-    public boolean existsByNickname(Nickname nickname) {
-        return identityRepository.existsByNickname(nickname.getNickname());
     }
 }

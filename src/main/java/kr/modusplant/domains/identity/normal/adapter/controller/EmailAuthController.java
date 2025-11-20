@@ -3,13 +3,15 @@ package kr.modusplant.domains.identity.normal.adapter.controller;
 import kr.modusplant.domains.identity.normal.adapter.EmailAuthTokenHelper;
 import kr.modusplant.domains.identity.normal.domain.exception.DataAlreadyExistsException;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
+import kr.modusplant.domains.identity.normal.domain.vo.Email;
 import kr.modusplant.domains.identity.normal.usecase.enums.EmailType;
 import kr.modusplant.domains.identity.normal.usecase.port.contract.CallEmailSendApiGateway;
-import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityRepository;
+import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityReadRepository;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailAuthRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequest;
 import kr.modusplant.framework.out.redis.RedisHelper;
 import kr.modusplant.framework.out.redis.RedisKeys;
+import kr.modusplant.shared.enums.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,7 +28,7 @@ public class EmailAuthController {
     private final EmailAuthTokenHelper tokenHelper;
     private final RedisHelper redisHelper;
     private final CallEmailSendApiGateway apiGateway;
-    private final NormalIdentityRepository identityRepository;
+    private final NormalIdentityReadRepository readRepository;
 
     public String sendAuthEmail(EmailAuthRequest request) {
         String verificationCode = tokenHelper.generateVerifyCode();
@@ -41,7 +43,7 @@ public class EmailAuthController {
     public void sendResetPasswordCode(EmailAuthRequest request) {
         String email = request.email();
 
-        if(identityRepository.existsByEmailAndProvider(email, "Basic")) {
+        if(readRepository.existsByEmailAndProvider(Email.create(email), AuthProvider.BASIC)) {
             throw new DataAlreadyExistsException(NormalIdentityErrorCode.ALREADY_EXISTS_MEMBER);
         }
 
@@ -56,7 +58,7 @@ public class EmailAuthController {
     public void verifyResetPasswordCode(EmailValidationRequest request) {
         String email = request.email();
 
-        if(identityRepository.existsByEmailAndProvider(email, "Basic")) {
+        if(readRepository.existsByEmailAndProvider(Email.create(email), AuthProvider.BASIC)) {
             throw new DataAlreadyExistsException(NormalIdentityErrorCode.ALREADY_EXISTS_MEMBER);
         }
 
