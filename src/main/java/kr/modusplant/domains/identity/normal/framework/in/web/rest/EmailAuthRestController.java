@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.identity.normal.adapter.controller.EmailAuthController;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailAuthRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequest;
+import kr.modusplant.domains.identity.normal.usecase.request.InputValidationRequest;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -92,6 +93,17 @@ public class EmailAuthRestController {
                                 String.format("https://www.modusplant.kr/reset-password?uuid=%s", uuid))
                 )
                 .build();
+    }
+
+    @Operation(summary = "비밀번호 재설정 입력 검증 API", description = "인증을 위해 입력으로부터 검증합니다.")
+    @PostMapping("/auth/reset-password-request/verify/input")
+    public ResponseEntity<DataResponse<?>> verifyInputForResetPassword(
+            @RequestBody @Valid InputValidationRequest request,
+            @CookieValue(value = "Authorization", required = false) String accessToken,
+            HttpServletResponse httpResponse
+    ) {
+        controller.verifyInputForResetPassword(request, accessToken);
+        return ResponseEntity.ok(DataResponse.ok());
     }
 
     public void setHttpOnlyCookie(String accessToken, HttpServletResponse httpResponse) {
