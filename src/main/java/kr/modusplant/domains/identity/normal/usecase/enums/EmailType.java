@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum EmailType {
-    SIGNUP_VERIFY_EMAIL("signupVerifyEmail"),
+    AUTHENTICATION_CODE_EMAIL("authenticationCodeEmail"),
     RESET_PASSWORD_EMAIL("resetPasswordEmail");
 
     private final String value;

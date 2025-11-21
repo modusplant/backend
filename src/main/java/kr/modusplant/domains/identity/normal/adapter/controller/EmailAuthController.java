@@ -30,7 +30,7 @@ public class EmailAuthController {
 
     public String sendAuthEmail(EmailAuthRequest request) {
         String verificationCode = tokenHelper.generateVerifyCode();
-        apiGateway.execute(request.email(), verificationCode, EmailType.SIGNUP_VERIFY_EMAIL);
+        apiGateway.execute(request.email(), verificationCode, EmailType.AUTHENTICATION_CODE_EMAIL);
         return tokenHelper.generateVerifyAccessToken(request.email(), verificationCode);
     }
 
