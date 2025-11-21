@@ -1,7 +1,6 @@
 package kr.modusplant.domains.identity.normal.adapter.controller;
 
 import kr.modusplant.domains.identity.normal.adapter.EmailAuthTokenHelper;
-import kr.modusplant.domains.identity.normal.domain.exception.DataAlreadyExistsException;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
 import kr.modusplant.domains.identity.normal.usecase.enums.EmailType;
 import kr.modusplant.domains.identity.normal.usecase.port.contract.CallEmailSendApiGateway;
@@ -10,12 +9,17 @@ import kr.modusplant.domains.identity.normal.usecase.request.EmailAuthRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequest;
 import kr.modusplant.framework.redis.RedisHelper;
 import kr.modusplant.framework.redis.RedisKeys;
+import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.exception.EntityNotFoundException;
+import kr.modusplant.shared.exception.InvalidDataException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.UUID;
 
+import static kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode.INVALID_CODE;
 import static kr.modusplant.framework.redis.RedisKeys.RESET_PASSWORD_PREFIX;
 
 @Slf4j
@@ -31,39 +35,34 @@ public class EmailAuthController {
     public String sendAuthEmail(EmailAuthRequest request) {
         String verificationCode = tokenHelper.generateVerifyCode();
         apiGateway.execute(request.email(), verificationCode, EmailType.AUTHENTICATION_CODE_EMAIL);
-        return tokenHelper.generateVerifyAccessToken(request.email(), verificationCode);
+        return tokenHelper.generateEmailAuthVerifyAccessToken(request.email(), verificationCode);
     }
 
     public void verifyAuthEmailCode(EmailValidationRequest request, String accessToken) {
-        tokenHelper.validateVerifyAccessToken(request, accessToken);
+        tokenHelper.validateEmailAuthVerifyAccessToken(request, accessToken);
     }
 
-    public void sendResetPasswordCode(EmailAuthRequest request) {
+    public String sendResetPasswordCode(EmailAuthRequest request) {
         String email = request.email();
 
-        if(identityRepository.existsByEmailAndProvider(email, "Basic")) {
-            throw new DataAlreadyExistsException(NormalIdentityErrorCode.MEMBER_ALREADY_EXISTS);
+        if (!identityRepository.existsByEmailAndProvider(email, AuthProvider.BASIC.getValue())) {
+            throw new EntityNotFoundException(NormalIdentityErrorCode.MEMBER_NOT_FOUND_WITH_EMAIL, "email");
         }
 
-        String verifyCode = tokenHelper.generateVerifyCode();
+        UUID uuid = UUID.randomUUID();
+        String stringUuid = String.valueOf(uuid);
+        String redisKey = RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, stringUuid);
+        redisHelper.setString(redisKey, email, Duration.ofMinutes(3));
 
-        String redisKey = RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, email);
-        redisHelper.setString(redisKey, verifyCode, Duration.ofMinutes(5));
-
-        apiGateway.execute(email, verifyCode, EmailType.RESET_PASSWORD_EMAIL);
+        apiGateway.execute(email, stringUuid, EmailType.RESET_PASSWORD_EMAIL);
+        return tokenHelper.generateResetPasswordAccessToken(email, "resetPasswordEmail");
     }
 
-    public void verifyResetPasswordCode(EmailValidationRequest request) {
-        String email = request.email();
-
-        if(identityRepository.existsByEmailAndProvider(email, "Basic")) {
-            throw new DataAlreadyExistsException(NormalIdentityErrorCode.MEMBER_ALREADY_EXISTS);
-        }
-
-        String redisKey = RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, email);
-        String storedCode = redisHelper.getString(redisKey).orElseThrow(() -> new RuntimeException("코드를 잘못 입력하였습니다."));
-        if (!storedCode.equals(request.verifyCode())) {
-            throw new RuntimeException("코드를 잘못 입력하였습니다.");
-        }
+    public String verifyEmailForResetPassword(UUID uuid, String accessToken) {
+        String stringUuid = String.valueOf(uuid);
+        String redisKey = RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, stringUuid);
+        String storedEmail = redisHelper.getString(redisKey).orElseThrow(() -> new InvalidDataException(INVALID_CODE, "uuid"));
+        tokenHelper.validateResetPasswordAccessToken(storedEmail, accessToken, "resetPasswordEmail");
+        return tokenHelper.generateResetPasswordAccessToken(storedEmail, "resetPasswordRequest");
     }
 }

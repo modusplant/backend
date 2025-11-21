@@ -25,20 +25,8 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
 
     @Override
     public MailjetResponse execute(String email, String verifyCode, EmailType type) {
-        int templateId = 0;
-        String subject = null;
-
-        switch (type) {
-            case AUTHENTICATION_CODE_EMAIL:   // 인증 코드를 포함하는 메일 발송
-                templateId = 6747014;
-                subject = "[ModusPlant] 인증 코드를 포함하는 메일입니다.";
-                break;
-            case RESET_PASSWORD_EMAIL:
-                templateId = 7011045; // 비밀번호 재설정 전용 메일 발송
-                subject = "[ModusPlant] 비밀번호 재설정 전용 메일입니다.";
-                break;
-            default:break;
-        }
+        int templateId;
+        String subject;
 
         // ClientOptions 생성
         ClientOptions clientOptions = ClientOptions.builder()
@@ -50,32 +38,73 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
         MailjetClient client = new MailjetClient(clientOptions);
 
         // 요청 생성
-        MailjetRequest request = new MailjetRequest(Emailv31.resource)
-                .property(
-                        Emailv31.MESSAGES,
-                        new JSONArray()
-                                .put(
-                                        new JSONObject()
-                                                .put(
-                                                        Emailv31.Message.FROM, new JSONObject()
-                                                                .put("Email", "modusplant.master@gmail.com")
-                                                                .put("Name", "ModusPlant")
-                                                )
-                                                .put(
-                                                        Emailv31.Message.TO, new JSONArray()
-                                                                .put(
-                                                                        new JSONObject()
-                                                                                .put("Email", email)
-                                                                )
-                                                )
-                                                .put("TemplateID", templateId)
-                                                .put("TemplateLanguage", true)
-                                                .put(Emailv31.Message.SUBJECT, subject)
-                                                .put(Emailv31.Message.VARS, new JSONObject()
-                                                        .put("verifyCode", verifyCode)
-                                                )
-                                )
-                );
+        MailjetRequest request = new MailjetRequest(Emailv31.resource);
+
+        switch (type) {
+            case AUTHENTICATION_CODE_EMAIL:   // 인증 코드를 포함하는 메일 발송
+                templateId = 6747014;
+                subject = "[ModusPlant] 인증 코드를 포함하는 메일입니다.";
+
+                // 요청 생성
+                request.property(
+                                Emailv31.MESSAGES,
+                                new JSONArray()
+                                        .put(
+                                                new JSONObject()
+                                                        .put(
+                                                                Emailv31.Message.FROM, new JSONObject()
+                                                                        .put("Email", "modusplant.master@gmail.com")
+                                                                        .put("Name", "ModusPlant")
+                                                        )
+                                                        .put(
+                                                                Emailv31.Message.TO, new JSONArray()
+                                                                        .put(
+                                                                                new JSONObject()
+                                                                                        .put("Email", email)
+                                                                        )
+                                                        )
+                                                        .put("TemplateID", templateId)
+                                                        .put("TemplateLanguage", true)
+                                                        .put(Emailv31.Message.SUBJECT, subject)
+                                                        .put(Emailv31.Message.VARS, new JSONObject()
+                                                                .put("verifyCode", verifyCode)
+                                                        )
+                                        )
+                        );
+                break;
+            case RESET_PASSWORD_EMAIL:
+                templateId = 7011045; // 비밀번호 재설정 전용 메일 발송
+                subject = "[ModusPlant] 비밀번호 재설정 전용 메일입니다.";
+
+                // 요청 생성
+                request.property(
+                                Emailv31.MESSAGES,
+                                new JSONArray()
+                                        .put(
+                                                new JSONObject()
+                                                        .put(
+                                                                Emailv31.Message.FROM, new JSONObject()
+                                                                        .put("Email", "modusplant.master@gmail.com")
+                                                                        .put("Name", "ModusPlant")
+                                                        )
+                                                        .put(
+                                                                Emailv31.Message.TO, new JSONArray()
+                                                                        .put(
+                                                                                new JSONObject()
+                                                                                        .put("Email", email)
+                                                                        )
+                                                        )
+                                                        .put("TemplateID", templateId)
+                                                        .put("TemplateLanguage", true)
+                                                        .put(Emailv31.Message.SUBJECT, subject)
+                                                        .put(Emailv31.Message.VARS, new JSONObject()
+                                                                .put("verifyCode", verifyCode)
+                                                        )
+                                        )
+                        );
+                break;
+            default:break;
+        }
 
         // 요청 전송 및 응답 받기
         MailjetResponse response;
