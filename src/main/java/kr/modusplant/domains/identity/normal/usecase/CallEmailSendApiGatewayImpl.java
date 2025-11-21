@@ -29,13 +29,13 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
         String subject = null;
 
         switch (type) {
-            case SIGNUP_VERIFY_EMAIL:   // 회원가입 인증메일 발송
+            case AUTHENTICATION_CODE_EMAIL:   // 인증 코드를 포함하는 메일 발송
                 templateId = 6747014;
-                subject = "[ModusPlant] 회원가입 본인인증 메일입니다.";
+                subject = "[ModusPlant] 인증 코드를 포함하는 메일입니다.";
                 break;
             case RESET_PASSWORD_EMAIL:
-                templateId = 7011045; // 비밀번호 재설정 인증메일 발송
-                subject = "[ModusPlant] 비밀번호 재설정 메일입니다.";
+                templateId = 7011045; // 비밀번호 재설정 전용 메일 발송
+                subject = "[ModusPlant] 비밀번호 재설정 전용 메일입니다.";
                 break;
             default:break;
         }
