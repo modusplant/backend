@@ -80,12 +80,12 @@ public class CommentRestController {
                     description = "현재 페이지의 숫자",
                     example = "0"
             )
-            @RequestParam(value = "page", defaultValue = "10")
+            @RequestParam(value = "page", defaultValue = "0")
             int page,
 
             @Parameter(
                     description = "페이지 당 들어갈 댓글의 수",
-                    example = "10"
+                    example = "8"
             )
             @RequestParam(value = "size", defaultValue = "8")
             int size
