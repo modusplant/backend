@@ -108,7 +108,7 @@ public class EmailAuthTokenHelper {
     }
 
     // TODO : Spring Security 적용 후 필터에서 쿠키 검증 로직 추가된 후 테스트 필요
-    public void validateResetPasswordAccessToken(String email, String jwtToken, String scope) {
+    public void validateResetPasswordAccessTokenForEmail(String email, String jwtToken) {
         if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
             jwtToken = jwtToken.substring(7);
         }
@@ -118,13 +118,34 @@ public class EmailAuthTokenHelper {
 
             // JWT 범위 검증
             String[] payloadScope = claims.get(SCOPE, String[].class);
-            if (!List.of(payloadScope).contains(scope)) {
+            if (!List.of(payloadScope).contains("resetPasswordEmail")) {
                 throw new InvalidTokenException();
             }
 
             // 이메일 일치 검증
             if (!email.equals(claims.get("email", String.class))) {
                 throw new InvalidDataException(ErrorCode.INVALID_EMAIL_VERIFY_CODE, "email");
+            }
+        } catch (ExpiredJwtException e) {
+            throw new TokenExpiredException();
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    // TODO : Spring Security 적용 후 필터에서 쿠키 검증 로직 추가된 후 테스트 필요
+    public void validateResetPasswordAccessTokenForInput(String jwtToken) {
+        if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
+            jwtToken = jwtToken.substring(7);
+        }
+
+        try {
+            Claims claims = getClaims(jwtToken);
+
+            // JWT 범위 검증
+            String[] payloadScope = claims.get(SCOPE, String[].class);
+            if (!List.of(payloadScope).contains("resetPasswordInput")) {
+                throw new InvalidTokenException();
             }
         } catch (ExpiredJwtException e) {
             throw new TokenExpiredException();

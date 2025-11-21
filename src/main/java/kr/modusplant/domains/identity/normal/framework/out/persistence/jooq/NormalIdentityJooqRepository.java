@@ -14,6 +14,8 @@ import org.jooq.DSLContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
+import java.util.UUID;
+
 @Repository
 @RequiredArgsConstructor
 public class NormalIdentityJooqRepository implements
@@ -46,6 +48,14 @@ public class NormalIdentityJooqRepository implements
                 .from(memberAuth)
                 .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue())).and(memberAuth.PROVIDER.eq(provider.name()))
                 .fetchOne(memberAuth.PW);
+    }
+
+    @Override
+    public UUID getMemberId(Email email, AuthProvider provider) {
+        return dsl.select(memberAuth.UUID)
+                .from(memberAuth)
+                .where(memberAuth.EMAIL.eq(email.getEmail())).and(memberAuth.PROVIDER.eq(provider.name()))
+                .fetchOne(memberAuth.UUID);
     }
 
     @Override
