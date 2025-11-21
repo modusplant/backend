@@ -1,20 +1,28 @@
 package kr.modusplant.domains.identity.normal.framework.in.web.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.identity.normal.adapter.controller.EmailAuthController;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailAuthRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequest;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.HashMap;
+import java.util.UUID;
+
+import static kr.modusplant.shared.constant.Regex.REGEX_UUID;
 
 @Tag(name = "이메일 API", description = "이메일 인증 메일 발송과 검증을 다루는 API입니다.")
 @RestController
@@ -55,22 +63,35 @@ public class EmailAuthRestController {
     @Operation(summary = "비밀번호 재설정 메일 전송 API", description = "비밀번호 재설정 전용 하이퍼링크를 포함하는 메일을 발송합니다.")
     @PostMapping("/auth/reset-password-request/send")
     public ResponseEntity<DataResponse<?>> sendResetPasswordCode(
-            @RequestBody @Valid EmailAuthRequest request
+            @RequestBody @Valid EmailAuthRequest request, HttpServletResponse httpResponse
     ) {
-        controller.sendResetPasswordCode(request);
+        String accessToken = controller.sendResetPasswordCode(request);
+
+        // JWT AccessToken 설정
+        setHttpOnlyCookie(accessToken, httpResponse);
         return ResponseEntity.ok(DataResponse.ok());
     }
 
-    @Operation(summary = "비밀번호 재설정 메일 검증 API", description = "인증을 위해 하이퍼링크를 검증합니다.")
-    @PostMapping("/auth/reset-password-request/verify")
-    public ResponseEntity<DataResponse<?>> verifyResetPasswordCode(
-            @RequestBody @Valid EmailValidationRequest request
+    @Operation(summary = "비밀번호 재설정 메일 검증 API", description = "인증을 위해 메일로부터 검증합니다.")
+    @PostMapping("/auth/reset-password-request/verify/email")
+    public ResponseEntity<DataResponse<?>> verifyEmailForResetPassword(
+            @Parameter(
+                    description = "비밀번호를 저장하려는 회원에 대해서 저장된 ID",
+                    schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
+            @NotNull(message = "식별자가 비어 있습니다. ") UUID uuid,
+            @CookieValue(value = "Authorization", required = false) String accessToken,
+            HttpServletResponse httpResponse
     ) {
-        controller.verifyResetPasswordCode(request);
-        return ResponseEntity.ok(
-                DataResponse.ok(new HashMap<>() {{
-                    put("hasEmailAuth", true);
-                }}));
+        String resultAccessToken = controller.verifyEmailForResetPassword(uuid, accessToken);
+
+        setHttpOnlyCookie(resultAccessToken, httpResponse);
+        return ResponseEntity
+                .status(HttpStatus.SEE_OTHER)
+                .location(
+                        URI.create(
+                                String.format("https://www.modusplant.kr/reset-password?uuid=%s", uuid))
+                )
+                .build();
     }
 
     public void setHttpOnlyCookie(String accessToken, HttpServletResponse httpResponse) {
