@@ -54,7 +54,7 @@ public class NormalIdentityRestController {
             summary = "일반 회원의 이메일 수정 API",
             description = "사용자의 식별자, 현재 이메일, 새로운 이메일로 사용자의 이메일을 갱신합니다."
     )
-    @PostMapping("/api/v1/members/{id}/email/modify")
+    @PostMapping("/api/v1/members/{id}/modify/email")
     public ResponseEntity<DataResponse<Void>> modifyEmail(
             @Parameter(schema = @Schema(
                     description = "회원의 식별자",
@@ -76,7 +76,7 @@ public class NormalIdentityRestController {
             summary = "일반 회원의 비밀번호 수정 API",
             description = "사용자의 식별자, 새로운 비밀번호로 사용자의 이메일을 갱신합니다."
     )
-    @PostMapping("/api/v1/members/{id}/password/modify")
+    @PostMapping("/api/v1/members/{id}/modify/password")
     public ResponseEntity<DataResponse<Void>> modifyPassword(
             @Parameter(schema = @Schema(
                     description = "회원의 식별자",
