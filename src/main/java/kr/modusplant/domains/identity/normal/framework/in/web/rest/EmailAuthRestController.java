@@ -51,6 +51,7 @@ public class EmailAuthRestController {
     @PostMapping("/members/verify-email")
     public ResponseEntity<DataResponse<?>> verifyAuthCodeEmail(
             @RequestBody @Valid EmailValidationRequest request,
+            @Parameter(hidden = true)
             @CookieValue(value = "Authorization", required = false) String accessToken
     ) {
         controller.verifyAuthCodeEmail(request, accessToken);
@@ -80,6 +81,7 @@ public class EmailAuthRestController {
                     description = "비밀번호를 저장하려는 회원에 대해서 저장된 ID",
                     schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
             @NotNull(message = "식별자가 비어 있습니다. ") UUID uuid,
+            @Parameter(hidden = true)
             @CookieValue(value = "Authorization", required = false) String accessToken,
             HttpServletResponse httpResponse
     ) {
@@ -99,6 +101,7 @@ public class EmailAuthRestController {
     @PostMapping("/auth/reset-password-request/verify/input")
     public ResponseEntity<DataResponse<?>> verifyResetPasswordInput(
             @RequestBody @Valid InputValidationRequest request,
+            @Parameter(hidden = true)
             @CookieValue(value = "Authorization", required = false) String accessToken,
             HttpServletResponse httpResponse
     ) {
