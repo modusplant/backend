@@ -108,7 +108,7 @@ public class EmailAuthTokenHelper {
     }
 
     // TODO : Spring Security 적용 후 필터에서 쿠키 검증 로직 추가된 후 테스트 필요
-    public void validateResetPasswordAccessTokenForEmail(String email, String jwtToken) {
+    public void validateResetPasswordAccessToken(String email, String jwtToken) {
         if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
             jwtToken = jwtToken.substring(7);
         }
@@ -124,7 +124,7 @@ public class EmailAuthTokenHelper {
 
             // 이메일 일치 검증
             if (!email.equals(claims.get("email", String.class))) {
-                throw new InvalidDataException(ErrorCode.INVALID_EMAIL_VERIFY_CODE, "email");
+                throw new InvalidDataException(ErrorCode.INVALID_EMAIL, "email");
             }
         } catch (ExpiredJwtException e) {
             throw new TokenExpiredException();

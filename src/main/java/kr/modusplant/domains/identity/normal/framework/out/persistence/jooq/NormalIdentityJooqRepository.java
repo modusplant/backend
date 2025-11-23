@@ -31,6 +31,7 @@ public class NormalIdentityJooqRepository implements
         return dsl.update(memberAuth)
                 .set(memberAuth.EMAIL, newEmail.getEmail())
                 .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue()))
+                .and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
                 .execute();
     }
 
@@ -39,6 +40,16 @@ public class NormalIdentityJooqRepository implements
         return dsl.update(memberAuth)
                 .set(memberAuth.PW, passwordEncoder.encode(pw.getPassword()))
                 .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue()))
+                .and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
+                .execute();
+    }
+
+    @Override
+    public int updatePassword(Email email, Password pw) {
+        return dsl.update(memberAuth)
+                .set(memberAuth.PW, passwordEncoder.encode(pw.getPassword()))
+                .where(memberAuth.EMAIL.eq(email.getEmail()))
+                .and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
                 .execute();
     }
 
@@ -46,7 +57,8 @@ public class NormalIdentityJooqRepository implements
     public String getMemberPassword(MemberId memberId, AuthProvider provider) {
         return dsl.select(memberAuth.PW)
                 .from(memberAuth)
-                .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue())).and(memberAuth.PROVIDER.eq(provider.name()))
+                .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue()))
+                .and(memberAuth.PROVIDER.eq(provider.name()))
                 .fetchOne(memberAuth.PW);
     }
 
