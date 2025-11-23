@@ -10,7 +10,7 @@ import kr.modusplant.infrastructure.jwt.framework.out.redis.AccessTokenRedisRepo
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.security.DefaultAuthenticationEntryPoint;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
-import kr.modusplant.infrastructure.security.error.BadCredentialException;
+import kr.modusplant.infrastructure.security.exception.BadCredentialException;
 import kr.modusplant.infrastructure.security.models.DefaultAuthToken;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
