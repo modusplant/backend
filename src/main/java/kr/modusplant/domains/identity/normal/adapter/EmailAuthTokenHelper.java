@@ -5,6 +5,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequest;
+import kr.modusplant.infrastructure.jwt.enums.TokenScope;
 import kr.modusplant.infrastructure.jwt.exception.InvalidTokenException;
 import kr.modusplant.infrastructure.jwt.exception.TokenExpiredException;
 import kr.modusplant.shared.exception.InvalidDataException;
@@ -18,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+import static kr.modusplant.infrastructure.jwt.enums.TokenScope.*;
 import static kr.modusplant.infrastructure.jwt.util.TokenUtils.getTokenFromAuthorizationHeader;
 
 @Service
@@ -47,7 +49,7 @@ public class EmailAuthTokenHelper {
                 .claims()
                 .issuedAt(now)
                 .expiration(expirationDate)
-                .add(SCOPE, new String[]{"EmailAuthVerify"})
+                .add(SCOPE, new String[]{AUTH_CODE_EMAIL.getValue()})
                 .add("email", email)
                 .add(VERIFY_CODE, verifyCode)
                 .and()
@@ -67,7 +69,7 @@ public class EmailAuthTokenHelper {
 
             // JWT 범위 검증
             String[] payloadScope = claims.get(SCOPE, String[].class);
-            if (!List.of(payloadScope).contains("EmailAuthVerify")) {
+            if (!List.of(payloadScope).contains(AUTH_CODE_EMAIL.getValue())) {
                 throw new InvalidTokenException();
             }
 
@@ -88,7 +90,7 @@ public class EmailAuthTokenHelper {
         }
     }
 
-    public String generateResetPasswordAccessToken(String email, String scope) {
+    public String generateResetPasswordAccessToken(String email, TokenScope scope) {
         // 만료 시간 설정 (3분 뒤)
         Date now = new Date();
         Date expirationDate = new Date(now.getTime() + 3 * 60 * 1000);
@@ -100,7 +102,7 @@ public class EmailAuthTokenHelper {
                 .claims()
                 .issuedAt(now)
                 .expiration(expirationDate)
-                .add(SCOPE, new String[]{scope})
+                .add(SCOPE, new String[]{scope.getValue()})
                 .add("email", email)
                 .and()
                 .signWith(Keys.hmacShaKeyFor(MAIL_API_JWT_SECRET_KEY.getBytes()))
@@ -116,7 +118,7 @@ public class EmailAuthTokenHelper {
 
             // JWT 범위 검증
             String[] payloadScope = claims.get(SCOPE, String[].class);
-            if (!List.of(payloadScope).contains("resetPasswordEmail")) {
+            if (!List.of(payloadScope).contains(RESET_PASSWORD_EMAIL.getValue())) {
                 throw new InvalidTokenException();
             }
 
@@ -140,7 +142,7 @@ public class EmailAuthTokenHelper {
 
             // JWT 범위 검증
             String[] payloadScope = claims.get(SCOPE, String[].class);
-            if (!List.of(payloadScope).contains("resetPasswordInput")) {
+            if (!List.of(payloadScope).contains(RESET_PASSWORD_INPUT.getValue())) {
                 throw new InvalidTokenException();
             }
         } catch (ExpiredJwtException e) {
