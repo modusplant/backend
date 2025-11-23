@@ -37,17 +37,17 @@ public class EmailAuthController {
     private final NormalIdentityRepository identityRepository;
     private final NormalIdentityUpdateRepository identityUpdateRepository;
 
-    public String sendAuthEmail(EmailAuthRequest request) {
+    public String sendAuthCodeEmail(EmailAuthRequest request) {
         String verificationCode = tokenHelper.generateVerifyCode();
         apiGateway.execute(request.email(), verificationCode, EmailType.AUTHENTICATION_CODE_EMAIL);
-        return tokenHelper.generateEmailAuthVerifyAccessToken(request.email(), verificationCode);
+        return tokenHelper.generateAuthCodeAccessToken(request.email(), verificationCode);
     }
 
-    public void verifyAuthEmailCode(EmailValidationRequest request, String accessToken) {
-        tokenHelper.validateEmailAuthVerifyAccessToken(request, accessToken);
+    public void verifyAuthCodeEmail(EmailValidationRequest request, String accessToken) {
+        tokenHelper.validateAuthCodeAccessToken(request, accessToken);
     }
 
-    public String sendResetPasswordCode(EmailAuthRequest request) {
+    public String sendResetPasswordEmail(EmailAuthRequest request) {
         String email = request.email();
 
         if (!identityRepository.existsByEmailAndProvider(email, AuthProvider.BASIC.getValue())) {
@@ -63,16 +63,16 @@ public class EmailAuthController {
         return tokenHelper.generateResetPasswordAccessToken(email, "resetPasswordEmail");
     }
 
-    public String verifyEmailForResetPassword(UUID uuid, String accessToken) {
+    public String verifyResetPasswordEmail(UUID uuid, String accessToken) {
         String stringUuid = String.valueOf(uuid);
         String redisKey = RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, stringUuid);
         String storedEmail = redisHelper.getString(redisKey).orElseThrow(() -> new InvalidDataException(INVALID_ID, "uuid"));
-        tokenHelper.validateResetPasswordAccessToken(storedEmail, accessToken);
+        tokenHelper.validateResetPasswordEmailAccessToken(storedEmail, accessToken);
         return tokenHelper.generateResetPasswordAccessToken(storedEmail, "resetPasswordInput");
     }
 
-    public void verifyInputForResetPassword(InputValidationRequest request, String accessToken) {
-        tokenHelper.validateResetPasswordAccessTokenForInput(accessToken);
+    public void verifyResetPasswordInput(InputValidationRequest request, String accessToken) {
+        tokenHelper.validateResetPasswordInputAccessToken(accessToken);
         String email = tokenHelper.getClaims(accessToken).get("email", String.class);
         String password = request.password();
         identityUpdateRepository.updatePassword(Email.create(email), Password.create(password));
