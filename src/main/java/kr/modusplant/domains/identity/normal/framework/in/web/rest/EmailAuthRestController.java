@@ -75,7 +75,7 @@ public class EmailAuthRestController {
 
     @Operation(summary = "비밀번호 재설정 메일 검증 API", description = "인증을 위해 메일로부터 검증합니다.")
     @PostMapping("/auth/reset-password-request/verify/email")
-    public ResponseEntity<DataResponse<?>> verifyResetPasswordEmail(
+    public ResponseEntity<?> verifyResetPasswordEmail(
             @Parameter(
                     description = "비밀번호를 저장하려는 회원에 대해서 저장된 ID",
                     schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
