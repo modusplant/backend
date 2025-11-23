@@ -18,6 +18,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+import static kr.modusplant.infrastructure.jwt.util.TokenUtils.getTokenFromAuthorizationHeader;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -58,9 +60,7 @@ public class EmailAuthTokenHelper {
         String verifyCode = verifyEmailRequest.verifyCode();
         String email = verifyEmailRequest.email();
 
-        if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
-            jwtToken = jwtToken.substring(7);
-        }
+        jwtToken = getTokenFromAuthorizationHeader(jwtToken);
 
         try {
             Claims claims = getClaims(jwtToken);
@@ -109,9 +109,7 @@ public class EmailAuthTokenHelper {
 
     // TODO : Spring Security 적용 후 필터에서 쿠키 검증 로직 추가된 후 테스트 필요
     public void validateResetPasswordAccessToken(String email, String jwtToken) {
-        if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
-            jwtToken = jwtToken.substring(7);
-        }
+        jwtToken = getTokenFromAuthorizationHeader(jwtToken);
 
         try {
             Claims claims = getClaims(jwtToken);
@@ -135,9 +133,7 @@ public class EmailAuthTokenHelper {
 
     // TODO : Spring Security 적용 후 필터에서 쿠키 검증 로직 추가된 후 테스트 필요
     public void validateResetPasswordAccessTokenForInput(String jwtToken) {
-        if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
-            jwtToken = jwtToken.substring(7);
-        }
+        jwtToken = getTokenFromAuthorizationHeader(jwtToken);
 
         try {
             Claims claims = getClaims(jwtToken);
