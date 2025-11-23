@@ -4,5 +4,5 @@ import com.mailjet.client.MailjetResponse;
 import kr.modusplant.domains.identity.normal.usecase.enums.EmailType;
 
 public interface CallEmailSendApiGateway {
-    MailjetResponse execute(String email, String verifyCode, EmailType type);
+    MailjetResponse execute(String email, String varValue, EmailType type);
 }

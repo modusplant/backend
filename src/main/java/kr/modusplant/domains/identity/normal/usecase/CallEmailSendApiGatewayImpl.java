@@ -24,7 +24,7 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
     private String API_SECRET_KEY;
 
     @Override
-    public MailjetResponse execute(String email, String verifyCode, EmailType type) {
+    public MailjetResponse execute(String email, String varValue, EmailType type) {
         int templateId;
         String subject;
 
@@ -67,7 +67,7 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
                                                         .put("TemplateLanguage", true)
                                                         .put(Emailv31.Message.SUBJECT, subject)
                                                         .put(Emailv31.Message.VARS, new JSONObject()
-                                                                .put("verifyCode", verifyCode)
+                                                                .put("verifyCode", varValue)
                                                         )
                                         )
                         );
@@ -98,7 +98,7 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
                                                         .put("TemplateLanguage", true)
                                                         .put(Emailv31.Message.SUBJECT, subject)
                                                         .put(Emailv31.Message.VARS, new JSONObject()
-                                                                .put("verifyCode", verifyCode)
+                                                                .put("resetUrl", String.format("/api/auth/reset-password-request/verify/email?uuid={%s}", varValue))
                                                         )
                                         )
                         );
