@@ -16,6 +16,8 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static kr.modusplant.infrastructure.jwt.util.TokenUtils.getTokenFromAuthorizationHeader;
+
 @Tag(name="Token API", description = "JWT API")
 @RestController
 @RequiredArgsConstructor
@@ -35,7 +37,7 @@ public class TokenRestController {
     public ResponseEntity<DataResponse<?>> refreshToken(@CookieValue("Cookie") String refreshToken,
                                                         @RequestHeader("Authorization") String rawAccessToken) {
 
-        String accessToken = rawAccessToken.substring(7);
+        String accessToken = getTokenFromAuthorizationHeader(rawAccessToken);
 
         TokenPair tokenPair = tokenService.verifyAndReissueToken(accessToken, refreshToken);
 
