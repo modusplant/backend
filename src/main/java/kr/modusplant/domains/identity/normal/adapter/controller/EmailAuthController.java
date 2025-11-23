@@ -25,6 +25,8 @@ import java.util.UUID;
 
 import static kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode.INVALID_ID;
 import static kr.modusplant.framework.redis.RedisKeys.RESET_PASSWORD_PREFIX;
+import static kr.modusplant.infrastructure.jwt.enums.TokenScope.RESET_PASSWORD_EMAIL;
+import static kr.modusplant.infrastructure.jwt.enums.TokenScope.RESET_PASSWORD_INPUT;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -60,7 +62,7 @@ public class EmailAuthController {
         redisHelper.setString(redisKey, email, Duration.ofMinutes(3));
 
         apiGateway.execute(email, stringUuid, EmailType.RESET_PASSWORD_EMAIL);
-        return tokenHelper.generateResetPasswordAccessToken(email, "resetPasswordEmail");
+        return tokenHelper.generateResetPasswordAccessToken(email, RESET_PASSWORD_EMAIL);
     }
 
     public String verifyResetPasswordEmail(UUID uuid, String accessToken) {
@@ -68,7 +70,7 @@ public class EmailAuthController {
         String redisKey = RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, stringUuid);
         String storedEmail = redisHelper.getString(redisKey).orElseThrow(() -> new InvalidDataException(INVALID_ID, "uuid"));
         tokenHelper.validateResetPasswordEmailAccessToken(storedEmail, accessToken);
-        return tokenHelper.generateResetPasswordAccessToken(storedEmail, "resetPasswordInput");
+        return tokenHelper.generateResetPasswordAccessToken(storedEmail, RESET_PASSWORD_INPUT);
     }
 
     public void verifyResetPasswordInput(InputValidationRequest request, String accessToken) {
