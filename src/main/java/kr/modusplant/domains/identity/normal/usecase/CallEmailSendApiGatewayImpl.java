@@ -41,7 +41,7 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
         MailjetRequest request = new MailjetRequest(Emailv31.resource);
 
         switch (type) {
-            case AUTHENTICATION_CODE_EMAIL:   // 인증 코드를 포함하는 메일 발송
+            case AUTHENTICATION_CODE_EMAIL: // 회원가입 인증 코드 메일 발송
                 templateId = 6747014;
                 subject = "[ModusPlant] 인증 코드를 포함하는 메일입니다.";
 
@@ -73,7 +73,7 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
                         );
                 break;
             case RESET_PASSWORD_EMAIL:
-                templateId = 7011045; // 비밀번호 재설정 전용 메일 발송
+                templateId = 7011045; // 비밀번호 재설정 메일 발송
                 subject = "[ModusPlant] 비밀번호 재설정 전용 메일입니다.";
 
                 // 요청 생성
