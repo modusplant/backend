@@ -11,7 +11,6 @@ import kr.modusplant.domains.identity.normal.usecase.request.EmailAuthRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequest;
 import kr.modusplant.framework.out.redis.RedisHelper;
 import kr.modusplant.framework.out.redis.RedisKeys;
-import kr.modusplant.shared.enums.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,7 +42,7 @@ public class EmailAuthController {
     public void sendResetPasswordCode(EmailAuthRequest request) {
         String email = request.email();
 
-        if(readRepository.existsByEmailAndProvider(Email.create(email), AuthProvider.BASIC)) {
+        if(readRepository.existsByEmailAndProvider(Email.create(email))) {
             throw new DataAlreadyExistsException(NormalIdentityErrorCode.ALREADY_EXISTS_MEMBER);
         }
 
@@ -58,7 +57,7 @@ public class EmailAuthController {
     public void verifyResetPasswordCode(EmailValidationRequest request) {
         String email = request.email();
 
-        if(readRepository.existsByEmailAndProvider(Email.create(email), AuthProvider.BASIC)) {
+        if(readRepository.existsByEmailAndProvider(Email.create(email))) {
             throw new DataAlreadyExistsException(NormalIdentityErrorCode.ALREADY_EXISTS_MEMBER);
         }
 

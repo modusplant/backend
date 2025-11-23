@@ -14,7 +14,6 @@ import kr.modusplant.domains.identity.normal.usecase.request.EmailModificationRe
 import kr.modusplant.domains.identity.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.PasswordModificationRequest;
 import kr.modusplant.infrastructure.persistence.constant.EntityName;
-import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.InvalidDataException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
@@ -36,7 +35,7 @@ public class NormalIdentityController {
     private final BCryptPasswordEncoder encoder;
 
     public void registerNormalMember(NormalSignUpRequest request) {
-        if(readRepository.existsByEmailAndProvider(Email.create(request.email()), AuthProvider.BASIC)) {
+        if(readRepository.existsByEmailAndProvider(Email.create(request.email()))) {
             throw new DataAlreadyExistsException(NormalIdentityErrorCode.ALREADY_EXISTS_MEMBER);
         } else if(readRepository.existsByNickname(Nickname.create(request.nickname()))) {
             throw new DataAlreadyExistsException(NormalIdentityErrorCode.ALREADY_EXISTS_NICKNAME);
@@ -46,7 +45,7 @@ public class NormalIdentityController {
     }
 
     public void modifyEmail(UUID memberActiveUuid, EmailModificationRequest request) {
-        if(!readRepository.existsByEmailAndProvider(Email.create(request.currentEmail()), AuthProvider.BASIC)) {
+        if(!readRepository.existsByEmailAndProvider(Email.create(request.currentEmail()))) {
             throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER_AUTH);
         } else {
             updateRepository.updateEmail(MemberId.create(memberActiveUuid), Email.create(request.newEmail()));
@@ -64,7 +63,7 @@ public class NormalIdentityController {
     }
 
     private boolean isPasswordsMatch(MemberId memberActiveUuid, Password currentPassword) {
-        Password storedPw = Password.create(readRepository.getMemberPassword(memberActiveUuid, AuthProvider.BASIC));
+        Password storedPw = Password.create(readRepository.getMemberPassword(memberActiveUuid));
 
         return encoder.matches(currentPassword.getPassword(), storedPw.getPassword());
     }
