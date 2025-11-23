@@ -1,4 +1,4 @@
-package kr.modusplant.domains.identity.normal.usecase;
+package kr.modusplant.domains.identity.normal.framework.out.mailjet;
 
 import com.mailjet.client.ClientOptions;
 import com.mailjet.client.MailjetClient;
