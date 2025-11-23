@@ -13,6 +13,7 @@ public enum NormalIdentityErrorCode implements ResponseCode {
     INVALID_CODE(HttpStatus.BAD_REQUEST, "invalid_code", "올바른 코드가 아닙니다"),
     INVALID_ROLE(HttpStatus.BAD_REQUEST, "invalid_role", "올바른 사용자의 역할이 아닙니다"),
     INVALID_EMAIL(HttpStatus.BAD_REQUEST, "invalid_email", "올바른 이메일 형식이 아닙니다"),
+    INVALID_ID(HttpStatus.BAD_REQUEST, "invalid_id", "올바른 ID가 아닙니다"),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "invalid_password", "올바른 비밀번호 형식이 아닙니다"),
     INVALID_NICKNAME(HttpStatus.BAD_REQUEST, "invalid_nickname", "올바른 닉네임 형식이 아닙니다"),
     INVALID_AGREED_TERMS_OF_VERSION(HttpStatus.BAD_REQUEST, "invalid_agreed_terms_of_version", "동의한 약관의 버전 값이 올바른 형식이 아닙니다"),
