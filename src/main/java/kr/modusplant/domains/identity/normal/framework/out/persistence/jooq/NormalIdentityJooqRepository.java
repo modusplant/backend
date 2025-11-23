@@ -11,7 +11,7 @@ import kr.modusplant.jooq.tables.SiteMemberAuth;
 import kr.modusplant.shared.enums.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -22,7 +22,7 @@ public class NormalIdentityJooqRepository implements
     private final DSLContext dsl;
     private final SiteMemberAuth memberAuth = SiteMemberAuth.SITE_MEMBER_AUTH;
     private final SiteMember member = SiteMember.SITE_MEMBER;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public int updateEmail(MemberId memberId, Email newEmail) {

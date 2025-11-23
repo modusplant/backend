@@ -1,22 +1,23 @@
 package kr.modusplant.domains.normalidentity.normal.adapter.mapper;
 
 import kr.modusplant.domains.identity.normal.adapter.mapper.NormalIdentityMapperImpl;
+import kr.modusplant.domains.identity.normal.domain.vo.SignUpData;
+import kr.modusplant.domains.identity.normal.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.CredentialsTestUtils;
 import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.SignUpDataTestUtils;
 import kr.modusplant.domains.normalidentity.normal.common.util.usecase.request.NormalSignUpRequestTestUtils;
-import kr.modusplant.domains.identity.normal.domain.vo.SignUpData;
-import kr.modusplant.domains.identity.normal.usecase.port.mapper.NormalIdentityMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class NormalIdentityMapperImplTest implements CredentialsTestUtils,
         NormalSignUpRequestTestUtils, SignUpDataTestUtils {
 
-    private final NormalIdentityMapper mapper = new NormalIdentityMapperImpl();
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final NormalIdentityMapper mapper = new NormalIdentityMapperImpl(encoder);
 
     @Test
     @DisplayName("유효한 요청을 일반 회원가입 데이터 VO로 변환")

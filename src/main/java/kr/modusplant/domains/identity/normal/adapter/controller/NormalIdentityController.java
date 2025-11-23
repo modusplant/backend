@@ -13,12 +13,12 @@ import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdent
 import kr.modusplant.domains.identity.normal.usecase.request.EmailModificationRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.PasswordModificationRequest;
-import kr.modusplant.infrastructure.persistence.constant.EntityName;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.InvalidDataException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -32,7 +32,7 @@ public class NormalIdentityController {
     private final NormalIdentityUpdateRepository updateRepository;
     private final NormalIdentityReadRepository readRepository;
 
-    private final BCryptPasswordEncoder encoder;
+    private final PasswordEncoder encoder;
 
     public void registerNormalMember(NormalSignUpRequest request) {
         if(readRepository.existsByEmailAndProvider(Email.create(request.email()))) {
@@ -46,7 +46,7 @@ public class NormalIdentityController {
 
     public void modifyEmail(UUID memberActiveUuid, EmailModificationRequest request) {
         if(!readRepository.existsByEmailAndProvider(Email.create(request.currentEmail()))) {
-            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER_AUTH);
+            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER_AUTH);
         } else {
             updateRepository.updateEmail(MemberId.create(memberActiveUuid), Email.create(request.newEmail()));
         }
@@ -54,7 +54,7 @@ public class NormalIdentityController {
 
     public void modifyPassword(UUID memberActiveUuid, PasswordModificationRequest request) {
         if(!readRepository.existsByMemberId(MemberId.create(memberActiveUuid))) {
-            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, EntityName.SITE_MEMBER_AUTH);
+            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER_AUTH);
         } else if(!isPasswordsMatch(MemberId.create(memberActiveUuid), Password.create(request.currentPw()))) {
             throw new InvalidDataException(ErrorCode.INVALID_PASSWORD, request.currentPw());
         } else {

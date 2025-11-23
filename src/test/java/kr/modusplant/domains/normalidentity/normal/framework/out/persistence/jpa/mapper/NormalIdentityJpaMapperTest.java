@@ -3,7 +3,7 @@ package kr.modusplant.domains.normalidentity.normal.framework.out.persistence.jp
 import kr.modusplant.domains.identity.normal.domain.vo.SignUpData;
 import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.NormalIdentityJpaMapper;
 import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.NormalIdentityJpaMapperImpl;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

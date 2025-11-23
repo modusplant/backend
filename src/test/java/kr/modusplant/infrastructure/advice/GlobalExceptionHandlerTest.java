@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import kr.modusplant.framework.out.jackson.http.response.DataResponse;
+import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.shared.exception.BusinessException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.hibernate.validator.internal.engine.path.PathImpl;

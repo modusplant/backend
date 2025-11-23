@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.framework.out.jpa.mapper.supers;
 
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberProfileEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberProfileEntity;
 
 import java.io.IOException;
 

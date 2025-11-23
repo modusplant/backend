@@ -1,5 +1,6 @@
 package kr.modusplant.infrastructure.persistence.generator;
 
+import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,6 @@
 package kr.modusplant.domains.identity.social.common.util.framework.out.jpa.entity;
 
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.*;
 

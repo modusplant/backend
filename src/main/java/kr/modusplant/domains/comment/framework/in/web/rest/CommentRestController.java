@@ -11,7 +11,7 @@ import kr.modusplant.domains.comment.adapter.controller.CommentController;
 import kr.modusplant.domains.comment.usecase.request.CommentDeleteRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentResponse;
-import kr.modusplant.framework.out.jackson.http.response.DataResponse;
+import kr.modusplant.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseEntity;

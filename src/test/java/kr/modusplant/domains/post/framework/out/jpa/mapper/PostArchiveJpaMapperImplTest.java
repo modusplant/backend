@@ -3,10 +3,10 @@ package kr.modusplant.domains.post.framework.out.jpa.mapper;
 import kr.modusplant.domains.post.common.util.framework.out.jpa.entity.PostArchiveEntityTestUtils;
 import kr.modusplant.domains.post.common.util.framework.out.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostArchiveJpaMapper;
-import kr.modusplant.framework.out.jpa.entity.*;
-import kr.modusplant.framework.out.jpa.entity.common.util.CommPrimaryCategoryEntityTestUtils;
-import kr.modusplant.framework.out.jpa.entity.common.util.CommSecondaryCategoryEntityTestUtils;
-import kr.modusplant.framework.out.jpa.entity.common.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.*;
+import kr.modusplant.framework.jpa.entity.common.util.CommPrimaryCategoryEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.common.util.CommSecondaryCategoryEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

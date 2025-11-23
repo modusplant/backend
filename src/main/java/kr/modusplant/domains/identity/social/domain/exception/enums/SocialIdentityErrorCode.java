@@ -1,7 +1,7 @@
 package kr.modusplant.domains.identity.social.domain.exception.enums;
 
 import kr.modusplant.shared.exception.enums.supers.ResponseCode;
-import kr.modusplant.shared.http.enums.HttpStatus;
+import kr.modusplant.shared.http.HttpStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

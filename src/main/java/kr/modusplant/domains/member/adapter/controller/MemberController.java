@@ -18,7 +18,7 @@ import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
-import kr.modusplant.framework.out.aws.service.S3FileService;
+import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.*;
 import kr.modusplant.shared.exception.EntityExistsException;

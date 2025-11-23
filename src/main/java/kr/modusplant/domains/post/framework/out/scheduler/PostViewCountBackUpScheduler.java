@@ -1,7 +1,7 @@
 package kr.modusplant.domains.post.framework.out.scheduler;
 
 import kr.modusplant.domains.post.framework.out.redis.PostViewCountRedisRepository;
-import kr.modusplant.framework.out.jpa.repository.CommPostJpaRepository;
+import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

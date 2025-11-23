@@ -4,8 +4,8 @@ import kr.modusplant.domains.term.domain.aggregate.SiteMemberTerm;
 import kr.modusplant.domains.term.domain.vo.SiteMemberTermId;
 import kr.modusplant.domains.term.framework.out.jpa.mapper.SiteMemberTermJpaMapperImpl;
 import kr.modusplant.domains.term.usecase.port.repository.SiteMemberTermRepository;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberTermEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberTermJpaRepository;
+import kr.modusplant.framework.jpa.entity.SiteMemberTermEntity;
+import kr.modusplant.framework.jpa.repository.SiteMemberTermJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

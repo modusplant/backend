@@ -5,7 +5,7 @@ import jakarta.persistence.Query;
 import kr.modusplant.domains.post.common.util.usecase.model.PostReadModelTestUtils;
 import kr.modusplant.domains.post.framework.out.jpa.repository.PostRepositoryCustomImpl;
 import kr.modusplant.domains.post.usecase.model.PostSummaryReadModel;
-import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.jpa.entity.CommPostEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

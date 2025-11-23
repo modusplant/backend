@@ -7,16 +7,16 @@ import kr.modusplant.domains.identity.social.domain.vo.MemberId;
 import kr.modusplant.domains.identity.social.domain.vo.SocialUserProfile;
 import kr.modusplant.domains.identity.social.domain.vo.UserPayload;
 import kr.modusplant.domains.identity.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberAuthEntity;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberRoleEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberAuthJpaRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberRoleJpaRepository;
-import kr.modusplant.infrastructure.persistence.constant.EntityName;
+import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
+import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
+import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.persistence.constant.TableName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -111,7 +111,7 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
         // when & then
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> socialIdentityRepositoryJpaAdapter.getUserPayloadByMemberId(testSocialKakaoMemberId));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.MEMBER_NOT_FOUND);
-        assertThat(exception.getEntityName()).isEqualTo(EntityName.SITE_MEMBER);
+        assertThat(exception.getEntityName()).isEqualTo(TableName.SITE_MEMBER);
         verify(memberJpaRepository).findByUuid(testSocialKakaoMemberId.getValue());
     }
 
@@ -127,7 +127,7 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
         // when & then
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> socialIdentityRepositoryJpaAdapter.getUserPayloadByMemberId(testSocialKakaoMemberId));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.MEMBER_ROLE_NOT_FOUND);
-        assertThat(exception.getEntityName()).isEqualTo(EntityName.SITE_MEMBER_ROLE);
+        assertThat(exception.getEntityName()).isEqualTo(TableName.SITE_MEMBER_ROLE);
         verify(memberRoleJpaRepository).findByMember(memberEntity);
     }
 

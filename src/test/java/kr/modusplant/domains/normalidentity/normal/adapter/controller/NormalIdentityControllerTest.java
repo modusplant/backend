@@ -11,7 +11,7 @@ import kr.modusplant.domains.normalidentity.normal.common.util.usecase.request.N
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -23,7 +23,7 @@ public class NormalIdentityControllerTest implements
     private final NormalIdentityCreateRepository repository = Mockito.mock(NormalIdentityCreateRepository.class);
     private final NormalIdentityUpdateRepository updateRepository = Mockito.mock(NormalIdentityUpdateRepository.class);
     private final NormalIdentityReadRepository readRepository = Mockito.mock(NormalIdentityReadRepository.class);
-    private final BCryptPasswordEncoder encoder = Mockito.mock(BCryptPasswordEncoder.class);
+    private final PasswordEncoder encoder = Mockito.mock(PasswordEncoder.class);
     private final NormalIdentityController controller = new NormalIdentityController(
             mapper, repository, updateRepository, readRepository, encoder);
 
