@@ -35,7 +35,7 @@ public class EmailAuthTokenHelper {
     /**
      *  이메일 인증 관련 JWT 토큰 메소드
      */
-    public String generateEmailAuthVerifyAccessToken(String email, String verifyCode) {
+    public String generateAuthCodeAccessToken(String email, String verifyCode) {
         // 만료 시간 설정 (3분 뒤)
         Date now = new Date();
         Date expirationDate = new Date(now.getTime() + 3 * 60 * 1000);
@@ -56,7 +56,7 @@ public class EmailAuthTokenHelper {
     }
 
     // TODO : Spring Security 적용 후 필터에서 쿠키 검증 로직 추가된 후 테스트 필요
-    public void validateEmailAuthVerifyAccessToken(EmailValidationRequest verifyEmailRequest, String jwtToken) {
+    public void validateAuthCodeAccessToken(EmailValidationRequest verifyEmailRequest, String jwtToken) {
         String verifyCode = verifyEmailRequest.verifyCode();
         String email = verifyEmailRequest.email();
 
@@ -108,7 +108,7 @@ public class EmailAuthTokenHelper {
     }
 
     // TODO : Spring Security 적용 후 필터에서 쿠키 검증 로직 추가된 후 테스트 필요
-    public void validateResetPasswordAccessToken(String email, String jwtToken) {
+    public void validateResetPasswordEmailAccessToken(String email, String jwtToken) {
         jwtToken = getTokenFromAuthorizationHeader(jwtToken);
 
         try {
@@ -132,7 +132,7 @@ public class EmailAuthTokenHelper {
     }
 
     // TODO : Spring Security 적용 후 필터에서 쿠키 검증 로직 추가된 후 테스트 필요
-    public void validateResetPasswordAccessTokenForInput(String jwtToken) {
+    public void validateResetPasswordInputAccessToken(String jwtToken) {
         jwtToken = getTokenFromAuthorizationHeader(jwtToken);
 
         try {

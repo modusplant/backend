@@ -36,11 +36,11 @@ public class EmailAuthRestController {
 
     @Operation(summary = "인증 코드 메일 전송 API", description = "인증 코드를 포함하는 메일을 발송합니다.")
     @PostMapping("/members/verify-email/send")
-    public ResponseEntity<DataResponse<?>> sendAuthEmail(
+    public ResponseEntity<DataResponse<?>> sendAuthCodeEmail(
             @RequestBody @Valid EmailAuthRequest request,
             HttpServletResponse httpResponse
     ) {
-        String accessToken = controller.sendAuthEmail(request);
+        String accessToken = controller.sendAuthCodeEmail(request);
 
         // JWT AccessToken 설정
         setHttpOnlyCookie(accessToken, httpResponse);
@@ -49,11 +49,11 @@ public class EmailAuthRestController {
 
     @Operation(summary = "인증 코드 메일 검증 API", description = "인증을 위해 인증 코드를 검증합니다.")
     @PostMapping("/members/verify-email")
-    public ResponseEntity<DataResponse<?>> verifyAuthEmailCode(
+    public ResponseEntity<DataResponse<?>> verifyAuthCodeEmail(
             @RequestBody @Valid EmailValidationRequest request,
             @CookieValue(value = "Authorization", required = false) String accessToken
     ) {
-        controller.verifyAuthEmailCode(request, accessToken);
+        controller.verifyAuthCodeEmail(request, accessToken);
 
         return ResponseEntity.ok(
                 DataResponse.ok(new HashMap<>() {{
@@ -63,10 +63,10 @@ public class EmailAuthRestController {
 
     @Operation(summary = "비밀번호 재설정 메일 전송 API", description = "비밀번호 재설정 전용 하이퍼링크를 포함하는 메일을 발송합니다.")
     @PostMapping("/auth/reset-password-request/send")
-    public ResponseEntity<DataResponse<?>> sendResetPasswordCode(
+    public ResponseEntity<DataResponse<?>> sendResetPasswordEmail(
             @RequestBody @Valid EmailAuthRequest request, HttpServletResponse httpResponse
     ) {
-        String accessToken = controller.sendResetPasswordCode(request);
+        String accessToken = controller.sendResetPasswordEmail(request);
 
         // JWT AccessToken 설정
         setHttpOnlyCookie(accessToken, httpResponse);
@@ -75,7 +75,7 @@ public class EmailAuthRestController {
 
     @Operation(summary = "비밀번호 재설정 메일 검증 API", description = "인증을 위해 메일로부터 검증합니다.")
     @PostMapping("/auth/reset-password-request/verify/email")
-    public ResponseEntity<DataResponse<?>> verifyEmailForResetPassword(
+    public ResponseEntity<DataResponse<?>> verifyResetPasswordEmail(
             @Parameter(
                     description = "비밀번호를 저장하려는 회원에 대해서 저장된 ID",
                     schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
@@ -83,7 +83,7 @@ public class EmailAuthRestController {
             @CookieValue(value = "Authorization", required = false) String accessToken,
             HttpServletResponse httpResponse
     ) {
-        String resultAccessToken = controller.verifyEmailForResetPassword(uuid, accessToken);
+        String resultAccessToken = controller.verifyResetPasswordEmail(uuid, accessToken);
 
         setHttpOnlyCookie(resultAccessToken, httpResponse);
         return ResponseEntity
@@ -97,12 +97,12 @@ public class EmailAuthRestController {
 
     @Operation(summary = "비밀번호 재설정 입력 검증 API", description = "인증을 위해 입력으로부터 검증합니다.")
     @PostMapping("/auth/reset-password-request/verify/input")
-    public ResponseEntity<DataResponse<?>> verifyInputForResetPassword(
+    public ResponseEntity<DataResponse<?>> verifyResetPasswordInput(
             @RequestBody @Valid InputValidationRequest request,
             @CookieValue(value = "Authorization", required = false) String accessToken,
             HttpServletResponse httpResponse
     ) {
-        controller.verifyInputForResetPassword(request, accessToken);
+        controller.verifyResetPasswordInput(request, accessToken);
         return ResponseEntity.ok(DataResponse.ok());
     }
 
