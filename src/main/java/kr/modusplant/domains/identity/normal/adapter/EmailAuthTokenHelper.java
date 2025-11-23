@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Random;
 
 import static kr.modusplant.infrastructure.jwt.enums.TokenScope.*;
-import static kr.modusplant.infrastructure.jwt.util.TokenUtils.getTokenFromAuthorizationHeader;
 
 @Service
 @RequiredArgsConstructor
@@ -61,8 +60,6 @@ public class EmailAuthTokenHelper {
     public void validateAuthCodeAccessToken(EmailValidationRequest verifyEmailRequest, String jwtToken) {
         String verifyCode = verifyEmailRequest.verifyCode();
         String email = verifyEmailRequest.email();
-
-        jwtToken = getTokenFromAuthorizationHeader(jwtToken);
 
         try {
             Claims claims = getClaims(jwtToken);
@@ -111,8 +108,6 @@ public class EmailAuthTokenHelper {
 
     // TODO : Spring Security 적용 후 필터에서 쿠키 검증 로직 추가된 후 테스트 필요
     public void validateResetPasswordEmailAccessToken(String email, String jwtToken) {
-        jwtToken = getTokenFromAuthorizationHeader(jwtToken);
-
         try {
             Claims claims = getClaims(jwtToken);
 
@@ -135,8 +130,6 @@ public class EmailAuthTokenHelper {
 
     // TODO : Spring Security 적용 후 필터에서 쿠키 검증 로직 추가된 후 테스트 필요
     public void validateResetPasswordInputAccessToken(String jwtToken) {
-        jwtToken = getTokenFromAuthorizationHeader(jwtToken);
-
         try {
             Claims claims = getClaims(jwtToken);
 
