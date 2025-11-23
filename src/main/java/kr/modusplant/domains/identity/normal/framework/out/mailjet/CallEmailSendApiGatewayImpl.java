@@ -98,7 +98,7 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
                                                         .put("TemplateLanguage", true)
                                                         .put(Emailv31.Message.SUBJECT, subject)
                                                         .put(Emailv31.Message.VARS, new JSONObject()
-                                                                .put("resetUrl", String.format("https://app.modusplant.kr/api/auth/reset-password-request/verify/email?uuid={%s}", varValue))
+                                                                .put("resetUrl", String.format("https://app.modusplant.kr/api/auth/reset-password-request/verify/email?uuid=%s", varValue))
                                                         )
                                         )
                         );
