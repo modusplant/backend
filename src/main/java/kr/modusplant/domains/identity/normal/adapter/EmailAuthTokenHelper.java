@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 import static kr.modusplant.infrastructure.jwt.enums.TokenScope.*;
+import static kr.modusplant.shared.util.CastUtils.downcastToStringList;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +49,7 @@ public class EmailAuthTokenHelper {
                 .claims()
                 .issuedAt(now)
                 .expiration(expirationDate)
-                .add(SCOPE, new String[]{AUTH_CODE_EMAIL.getValue()})
+                .add(SCOPE, List.of(AUTH_CODE_EMAIL.getValue()))
                 .add("email", email)
                 .add(VERIFY_CODE, verifyCode)
                 .and()
@@ -65,8 +66,8 @@ public class EmailAuthTokenHelper {
             Claims claims = getClaims(jwtToken);
 
             // JWT 범위 검증
-            String[] payloadScope = claims.get(SCOPE, String[].class);
-            if (!List.of(payloadScope).contains(AUTH_CODE_EMAIL.getValue())) {
+            List<String> scope = downcastToStringList(claims.get(SCOPE));
+            if (!scope.contains(AUTH_CODE_EMAIL.getValue())) {
                 throw new InvalidTokenException();
             }
 
@@ -99,7 +100,7 @@ public class EmailAuthTokenHelper {
                 .claims()
                 .issuedAt(now)
                 .expiration(expirationDate)
-                .add(SCOPE, new String[]{scope.getValue()})
+                .add(SCOPE, List.of(scope.getValue()))
                 .add("email", email)
                 .and()
                 .signWith(Keys.hmacShaKeyFor(MAIL_API_JWT_SECRET_KEY.getBytes()))
@@ -112,8 +113,8 @@ public class EmailAuthTokenHelper {
             Claims claims = getClaims(jwtToken);
 
             // JWT 범위 검증
-            String[] payloadScope = claims.get(SCOPE, String[].class);
-            if (!List.of(payloadScope).contains(RESET_PASSWORD_EMAIL.getValue())) {
+            List<String> scope = downcastToStringList(claims.get(SCOPE));
+            if (!scope.contains(RESET_PASSWORD_EMAIL.getValue())) {
                 throw new InvalidTokenException();
             }
 
@@ -134,8 +135,8 @@ public class EmailAuthTokenHelper {
             Claims claims = getClaims(jwtToken);
 
             // JWT 범위 검증
-            String[] payloadScope = claims.get(SCOPE, String[].class);
-            if (!List.of(payloadScope).contains(RESET_PASSWORD_INPUT.getValue())) {
+            List<String> scope = downcastToStringList(claims.get(SCOPE));
+            if (!scope.contains(RESET_PASSWORD_INPUT.getValue())) {
                 throw new InvalidTokenException();
             }
         } catch (ExpiredJwtException e) {
