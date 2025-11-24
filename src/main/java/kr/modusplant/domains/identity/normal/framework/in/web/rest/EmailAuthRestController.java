@@ -34,7 +34,7 @@ public class EmailAuthRestController {
 
     private final EmailAuthController controller;
 
-    @Operation(summary = "인증 코드 메일 전송 API", description = "인증 코드를 포함하는 메일을 발송합니다.")
+    @Operation(summary = "인증 코드 메일 전송 API", description = "인증 코드를 포함하는 메일을 발송합니다. ")
     @PostMapping("/members/verify-email/send")
     public ResponseEntity<DataResponse<?>> sendAuthCodeEmail(
             @RequestBody @Valid EmailAuthRequest request,
@@ -47,11 +47,12 @@ public class EmailAuthRestController {
         return ResponseEntity.ok(DataResponse.ok());
     }
 
-    @Operation(summary = "인증 코드 메일 검증 API", description = "인증을 위해 인증 코드를 검증합니다.")
+    @Operation(summary = "인증 코드 메일 검증 API", description = "인증을 위해 인증 코드를 검증합니다. ")
     @PostMapping("/members/verify-email")
     public ResponseEntity<DataResponse<?>> verifyAuthCodeEmail(
             @RequestBody @Valid EmailValidationRequest request,
             @Parameter(hidden = true)
+            @NotNull(message = "인증 토큰이 비어 있습니다. ")
             @CookieValue(value = "Authorization", required = false) String accessToken
     ) {
         controller.verifyAuthCodeEmail(request, accessToken);
@@ -82,6 +83,7 @@ public class EmailAuthRestController {
                     schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
             @NotNull(message = "식별자가 비어 있습니다. ") UUID uuid,
             @Parameter(hidden = true)
+            @NotNull(message = "인증 토큰이 비어 있습니다. ")
             @CookieValue(value = "Authorization", required = false) String accessToken,
             HttpServletResponse httpResponse
     ) {
@@ -102,6 +104,7 @@ public class EmailAuthRestController {
     public ResponseEntity<DataResponse<?>> verifyResetPasswordInput(
             @RequestBody @Valid InputValidationRequest request,
             @Parameter(hidden = true)
+            @NotNull(message = "인증 토큰이 비어 있습니다. ")
             @CookieValue(value = "Authorization", required = false) String accessToken,
             HttpServletResponse httpResponse
     ) {
