@@ -2,10 +2,13 @@ package kr.modusplant.infrastructure.config.swagger;
 
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.media.StringSchema;
+import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,6 +47,14 @@ public class SwaggerConfig {
                 .addServersItem(new Server() // 테스트 서버 정보 설정
                         .url("http://localhost:8080")  // 테스트 서버 링크(http://localhost:8080/swagger-ui/index.html)
                         .description("Test Local Server")  // 테스트 서버 설명
-                );
+                )
+                .components(new Components()
+                        .addParameters(
+                                "authCookie", new Parameter()
+                                        .in("cookie")
+                                        .name("Authorization")
+                                        .description("보안 조치가 적용된 토큰 전용 쿠키")
+                                        .required(false)
+                                        .schema(new StringSchema())));
     }
 }
