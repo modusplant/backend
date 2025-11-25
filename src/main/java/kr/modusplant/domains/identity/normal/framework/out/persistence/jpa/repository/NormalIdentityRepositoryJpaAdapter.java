@@ -5,13 +5,21 @@ import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mappe
 import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.supers.*;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityCreateRepository;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.NormalIdentityAuthJpaMapper;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.NormalIdentityJpaMapper;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.NormalIdentityRoleJpaMapper;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.NormalIdentityTermJpaMapper;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.supers.NormalIdentityAuthJpaRepository;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.supers.NormalIdentityJpaRepository;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.supers.NormalIdentityRoleJpaRepository;
+import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.supers.NormalIdentityTermJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
-public class NormalIdentityCreateRepositoryJpaAdapter implements NormalIdentityCreateRepository {
+public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityCreateRepository{
     private final NormalIdentityJpaRepository identityRepository;
     private final NormalIdentityAuthJpaRepository authRepository;
     private final NormalIdentityRoleJpaRepository roleRepository;
@@ -33,4 +41,5 @@ public class NormalIdentityCreateRepositoryJpaAdapter implements NormalIdentityC
         termRepository.save(termMapper.toSiteMemberTermEntity(savedMember, signUpData));
         profileRepository.save(profileMapper.toSiteMemberProfileEntity(savedMember));
     }
+
 }

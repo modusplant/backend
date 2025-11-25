@@ -14,6 +14,8 @@ import org.jooq.DSLContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
+import java.util.UUID;
+
 @Repository
 @RequiredArgsConstructor
 public class NormalIdentityJooqRepository implements
@@ -28,7 +30,8 @@ public class NormalIdentityJooqRepository implements
     public int updateEmail(MemberId memberId, Email newEmail) {
         return dsl.update(memberAuth)
                 .set(memberAuth.EMAIL, newEmail.getEmail())
-                .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
+                .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue()))
+                .and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
                 .execute();
     }
 
@@ -36,7 +39,17 @@ public class NormalIdentityJooqRepository implements
     public int updatePassword(MemberId memberId, Password pw) {
         return dsl.update(memberAuth)
                 .set(memberAuth.PW, passwordEncoder.encode(pw.getPassword()))
-                .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
+                .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue()))
+                .and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
+                .execute();
+    }
+
+    @Override
+    public int updatePassword(Email email, Password pw) {
+        return dsl.update(memberAuth)
+                .set(memberAuth.PW, passwordEncoder.encode(pw.getPassword()))
+                .where(memberAuth.EMAIL.eq(email.getEmail()))
+                .and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
                 .execute();
     }
 
@@ -46,6 +59,14 @@ public class NormalIdentityJooqRepository implements
                 .from(memberAuth)
                 .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
                 .fetchOne(memberAuth.PW);
+    }
+
+    @Override
+    public UUID getMemberId(Email email, AuthProvider provider) {
+        return dsl.select(memberAuth.UUID)
+                .from(memberAuth)
+                .where(memberAuth.EMAIL.eq(email.getEmail())).and(memberAuth.PROVIDER.eq(provider.name()))
+                .fetchOne(memberAuth.UUID);
     }
 
     @Override
