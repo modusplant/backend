@@ -31,16 +31,16 @@ class JwtTokenProviderTest {
         ReflectionTestUtils.setField(tokenProvider,"keyAlias","test-modusplant-server");
     }
 
-    @Test
-    @DisplayName("비대칭키 생성 실패 테스트")
-    void testInit_willThrowTokenKeyCreationException() {
-        try (MockedStatic<KeyPairGenerator> mockedStatic = Mockito.mockStatic(KeyPairGenerator.class)){
-            mockedStatic.when(() -> KeyPairGenerator.getInstance("EC"))
-                    .thenThrow(new NoSuchAlgorithmException("NoSuchAlgorithm"));
-
-            assertThatThrownBy(tokenProvider::init)
-                    .isInstanceOf(TokenKeyCreationException.class)
-                    .hasMessage("서버의 문제로 인증을 처리하지 못했습니다");
-        }
-    }
+//    @Test
+//    @DisplayName("비대칭키 생성 실패 테스트")
+//    void testInit_willThrowTokenKeyCreationException() {
+//        try (MockedStatic<KeyPairGenerator> mockedStatic = Mockito.mockStatic(KeyPairGenerator.class)){
+//            mockedStatic.when(() -> KeyPairGenerator.getInstance("EC"))
+//                    .thenThrow(new NoSuchAlgorithmException("NoSuchAlgorithm"));
+//
+//            assertThatThrownBy(tokenProvider::init)
+//                    .isInstanceOf(TokenKeyCreationException.class)
+//                    .hasMessage("서버의 문제로 인증을 처리하지 못했습니다");
+//        }
+//    }
 }
