@@ -1,7 +1,7 @@
 package kr.modusplant.domains.post.framework.out.jpa.repository.supers;
 
-import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
-import kr.modusplant.shared.persistence.repository.supers.UlidPrimaryRepository;
+import kr.modusplant.framework.jpa.entity.CommPostEntity;
+import kr.modusplant.shared.persistence.repository.UlidPrimaryRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

@@ -7,7 +7,7 @@ import kr.modusplant.domains.member.domain.vo.MemberNickname;
 import kr.modusplant.domains.member.domain.vo.MemberStatus;
 import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyBirthDate;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.supers.MemberJpaMapper;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import org.springframework.stereotype.Component;
 
 @Component

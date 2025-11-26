@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String rawAccessToken = request.getHeader("Authorization");
 
-        if(rawAccessToken != null) {
+        if (rawAccessToken != null) {
             String accessToken = rawAccessToken.substring(7);
             evaluateAccessToken(request, response, accessToken);
         }

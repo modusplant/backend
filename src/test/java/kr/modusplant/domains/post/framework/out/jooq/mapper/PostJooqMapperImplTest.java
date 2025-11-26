@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.post.common.util.framework.out.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.domains.post.framework.out.jooq.mapper.supers.PostJooqMapper;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
-import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.jpa.entity.CommPostEntity;
 import org.jooq.Record;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

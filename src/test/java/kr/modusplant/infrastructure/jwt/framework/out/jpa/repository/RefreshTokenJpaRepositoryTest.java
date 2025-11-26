@@ -1,7 +1,7 @@
 package kr.modusplant.infrastructure.jwt.framework.out.jpa.repository;
 
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.framework.out.jpa.entity.RefreshTokenEntity;
 import org.junit.jupiter.api.BeforeEach;

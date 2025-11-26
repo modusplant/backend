@@ -7,22 +7,36 @@ import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
 import kr.modusplant.infrastructure.jwt.exception.InvalidTokenException;
 import kr.modusplant.infrastructure.jwt.exception.TokenKeyCreationException;
+import kr.modusplant.infrastructure.jwt.exception.TokenKeyStorageException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.X500NameBuilder;
+import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.math.BigInteger;
 import java.security.*;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
-
 /**
  * 순수 JWT 제어 Provider
- *
+ * <p>
  * 기능 : 순수 JWT 암호화 토큰 발급/검증/추출만 담당 (비즈니스 로직 없음)
- * 사용법 : TokenService로 해결되지 않는 세밀한 토큰 제어가 필요할 때 사용
+ * 사용법 : TokenService 로 해결되지 않는 세밀한 토큰 제어가 필요할 때 사용
  */
 @Service
 @RequiredArgsConstructor
@@ -40,36 +54,73 @@ public class JwtTokenProvider {
     @Value("${jwt.refresh_duration}")
     private long refreshDuration;
 
+    @Value("${keystore.key-store}")
+    private String keyStorePath;
+
+    @Value("${keystore.key-store-password}")
+    private String keyStorePassword;
+
+    @Value("${keystore.key-store-type}")
+    private String keyStoreType;
+
+    @Value("${keystore.key-alias}")
+    private String keyAlias;
+
     private PrivateKey privateKey;
     private PublicKey publicKey;
 
     @PostConstruct
-    public void init() {
+    public void init() throws Exception {
+        System.out.println("current working directory"+System.getProperty("user.dir"));
+        String relativeKeyStorePath = "src/main/resources/" + keyStorePath;
+        ClassPathResource classPathResource = new ClassPathResource(keyStorePath);
         try {
-            // ECDSA 키 생성
-            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
-            keyGen.initialize(256);
-            KeyPair keyPair = keyGen.generateKeyPair();
-            privateKey = keyPair.getPrivate();
-            publicKey = keyPair.getPublic();
+            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+            char[] password = keyStorePassword.toCharArray();
+            if (classPathResource.exists()) {
+                FileInputStream fis = new FileInputStream(relativeKeyStorePath);
+                keyStore.load(fis, password);
+                KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry)
+                        keyStore.getEntry(keyAlias, new KeyStore.PasswordProtection(password));
+                privateKey = privateKeyEntry.getPrivateKey();
+                publicKey = privateKeyEntry.getCertificate().getPublicKey();
+            } else {
+                // ECDSA 키 생성
+                KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
+                keyGen.initialize(256);
+                KeyPair keyPair = keyGen.generateKeyPair();
+                privateKey = keyPair.getPrivate();
+                publicKey = keyPair.getPublic();
+
+                X509Certificate selfSignedCert = generateSelfSignedCertificate(keyPair, "SHA256withECDSA");
+                Certificate[] certChain = new Certificate[]{selfSignedCert};
+
+                keyStore.load(null, password);
+                keyStore.setKeyEntry(keyAlias, privateKey, password, certChain);
+
+                FileOutputStream fos = new FileOutputStream(relativeKeyStorePath);
+                keyStore.store(fos, password);
+            }
+        } catch (KeyStoreException e) {
+            throw new TokenKeyStorageException();
         } catch (NoSuchAlgorithmException e) {
             throw new TokenKeyCreationException();
         }
     }
 
     // Access RefreshToken 생성
-    public String generateAccessToken(UUID uuid, Map<String,String> privateClaims) {
+    public String generateAccessToken(UUID uuid, Map<String, String> privateClaims) {
         Date now = new Date();
         Date iat = new Date(now.getTime());
         Date exp = new Date(iat.getTime() + accessDuration);
 
         return Jwts.builder()
+                .claims(privateClaims)
                 .issuer(iss)
                 .subject(String.valueOf(uuid))
                 .audience().add(aud).and()
                 .issuedAt(iat)
                 .expiration(exp)
-                .claims(privateClaims)
                 .signWith(privateKey)
                 .compact();
     }
@@ -95,10 +146,11 @@ public class JwtTokenProvider {
         try {
             Jwts.parser()
                     .verifyWith(publicKey)
+                    .clockSkewSeconds(3) // iat / exp 에 대해서 3초의 오차 허용
                     .build()
                     .parseSignedClaims(token);
             return true;
-        } catch(ExpiredJwtException e) {
+        } catch (ExpiredJwtException e) {
             return false;
         } catch (JwtException e) {
             throw new InvalidTokenException();
@@ -110,6 +162,7 @@ public class JwtTokenProvider {
         try {
             return Jwts.parser()
                     .verifyWith(publicKey)
+                    .clockSkewSeconds(3) // iat / exp 에 대해서 3초의 오차 허용
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
@@ -130,5 +183,37 @@ public class JwtTokenProvider {
         return getClaimsFromToken(token).getExpiration();
     }
 
-    // TODO: EMAIL 인증 관련 JWT 추가 필요
+    // 자가 서명된 인증서 만들기
+    public X509Certificate generateSelfSignedCertificate(KeyPair keyPair, String signatureAlgorithm) throws Exception {
+        long now = System.currentTimeMillis();
+        Date startDate = new Date(now);
+        Date endDate = new Date(now + (1000L * 60 * 60 * 24 * 365)); // 1년 간 유효함
+
+        X500NameBuilder nameBuilder = new X500NameBuilder(BCStyle.INSTANCE);
+        nameBuilder.addRDN(BCStyle.CN, "ModusPlant Server");    // Common Name
+        nameBuilder.addRDN(BCStyle.O, "ModusPlant");            // Organization
+        nameBuilder.addRDN(BCStyle.C, "KR");                    // Country
+        nameBuilder.addRDN(BCStyle.L, "Seoul");                 // Locality
+        X500Name x500Name = nameBuilder.build();
+
+        SecureRandom random = new SecureRandom();
+        int byteCount = 20;
+        byte[] bytes = new byte[byteCount];
+        random.nextBytes(bytes);
+        BigInteger serialNumber = new BigInteger(1, bytes);
+
+        X509v3CertificateBuilder builder = new JcaX509v3CertificateBuilder(
+                x500Name,            // 발행자
+                serialNumber,        // 시리얼 넘버
+                startDate,           // 시작일
+                endDate,             // 종료일
+                x500Name,            // 대상
+                keyPair.getPublic()  // 대상 공공 키 정보
+        );
+
+        ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(keyPair.getPrivate()); // 개인 키로 인증서 서명
+
+        return new JcaX509CertificateConverter().getCertificate(builder.build(contentSigner));
+    }
+
 }

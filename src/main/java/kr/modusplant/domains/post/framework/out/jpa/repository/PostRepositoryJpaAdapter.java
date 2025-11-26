@@ -6,12 +6,12 @@ import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
 import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostJpaRepository;
 import kr.modusplant.domains.post.framework.out.redis.PostViewCountRedisRepository;
 import kr.modusplant.domains.post.usecase.port.repository.PostRepository;
-import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
-import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.repository.CommPrimaryCategoryJpaRepository;
-import kr.modusplant.framework.out.jpa.repository.CommSecondaryCategoryJpaRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.framework.jpa.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.repository.CommPrimaryCategoryJpaRepository;
+import kr.modusplant.framework.jpa.repository.CommSecondaryCategoryJpaRepository;
+import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

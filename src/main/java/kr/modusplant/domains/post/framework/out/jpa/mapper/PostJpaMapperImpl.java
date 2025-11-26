@@ -3,10 +3,10 @@ package kr.modusplant.domains.post.framework.out.jpa.mapper;
 import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.vo.*;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
-import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
-import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.jpa.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.framework.jpa.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

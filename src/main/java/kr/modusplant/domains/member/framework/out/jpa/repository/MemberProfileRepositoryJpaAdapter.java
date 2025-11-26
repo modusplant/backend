@@ -7,11 +7,11 @@ import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberProfileJpaMapperImpl;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
-import kr.modusplant.framework.out.aws.service.S3FileService;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.out.jpa.entity.SiteMemberProfileEntity;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberJpaRepository;
-import kr.modusplant.framework.out.jpa.repository.SiteMemberProfileJpaRepository;
+import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberProfileEntity;
+import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.SiteMemberProfileJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

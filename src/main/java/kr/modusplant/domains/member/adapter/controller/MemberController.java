@@ -4,6 +4,7 @@ import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
+import kr.modusplant.domains.member.domain.exception.NotAccessiblePostBookmarkException;
 import kr.modusplant.domains.member.domain.exception.NotAccessiblePostLikeException;
 import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
@@ -17,12 +18,9 @@ import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
-import kr.modusplant.framework.out.aws.service.S3FileService;
+import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.infrastructure.event.bus.EventBus;
-import kr.modusplant.shared.event.CommentLikeEvent;
-import kr.modusplant.shared.event.CommentUnlikeEvent;
-import kr.modusplant.shared.event.PostLikeEvent;
-import kr.modusplant.shared.event.PostUnlikeEvent;
+import kr.modusplant.shared.event.*;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +54,7 @@ public class MemberController {
         return memberMapper.toMemberResponse(memberRepository.save(memberNickname));
     }
 
-    public boolean checkExistedNickname(MemberCheckNicknameRecord record) {
+    public boolean checkExistedNickname(MemberNicknameCheckRecord record) {
         MemberNickname memberNickname = MemberNickname.create(record.nickname());
         return memberRepository.isNicknameExist(memberNickname);
     }
@@ -130,6 +128,24 @@ public class MemberController {
         }
     }
 
+    public void bookmarkPost(MemberPostBookmarkRecord record) {
+        MemberId memberId = MemberId.fromUuid(record.memberId());
+        TargetPostId targetPostId = TargetPostId.create(record.postUlid());
+        validateBeforeBookmarkOrCancelBookmark(memberId, targetPostId);
+        if (targetPostIdRepository.isNotBookmarked(memberId, targetPostId)) {
+            eventBus.publish(PostBookmarkEvent.create(memberId.getValue(), targetPostId.getValue()));
+        }
+    }
+
+    public void cancelPostBookmark(MemberPostBookmarkCancelRecord record) {
+        MemberId memberId = MemberId.fromUuid(record.memberId());
+        TargetPostId targetPostId = TargetPostId.create(record.postUlid());
+        validateBeforeBookmarkOrCancelBookmark(memberId, targetPostId);
+        if (targetPostIdRepository.isBookmarked(memberId, targetPostId)) {
+            eventBus.publish(PostBookmarkCancelEvent.create(memberId.getValue(), targetPostId.getValue()));
+        }
+    }
+
     public void likeComment(MemberCommentLikeRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         TargetCommentId targetCommentId = TargetCommentId.create(TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
@@ -176,6 +192,18 @@ public class MemberController {
         }
     }
 
+    private void validateBeforeBookmarkOrCancelBookmark(MemberId memberId, TargetPostId targetPostId) {
+        if (!memberRepository.isIdExist(memberId)) {
+            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+        }
+        if (!targetPostIdRepository.isIdExist(targetPostId)) {
+            throw new EntityNotFoundException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
+        }
+        if (!targetPostIdRepository.isPublished(targetPostId)) {
+            throw new NotAccessiblePostBookmarkException();
+        }
+    }
+
     private void validateBeforeLikeOrUnlikeComment(MemberId memberId, TargetCommentId targetCommentId) {
         if (!memberRepository.isIdExist(memberId)) {
             throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
@@ -190,5 +218,4 @@ public class MemberController {
         s3FileService.uploadFile(record.image(), newImagePath);
         return newImagePath;
     }
-
 }

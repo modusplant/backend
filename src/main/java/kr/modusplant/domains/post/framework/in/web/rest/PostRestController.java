@@ -14,7 +14,7 @@ import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
 import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
 import kr.modusplant.domains.post.usecase.response.CursorPageResponse;
 import kr.modusplant.domains.post.usecase.response.PostDetailResponse;
-import kr.modusplant.framework.out.jackson.http.response.DataResponse;
+import kr.modusplant.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;

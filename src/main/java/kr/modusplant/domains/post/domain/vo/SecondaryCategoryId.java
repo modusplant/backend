@@ -10,7 +10,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.UUID;
 
-import static kr.modusplant.shared.constant.IdPattern.UUID_PATTERN;
+import static kr.modusplant.shared.constant.Regex.PATTERN_UUID;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -28,7 +28,7 @@ public class SecondaryCategoryId {
         if (value == null || value.trim().isEmpty()) {
             throw new EmptyCategoryIdException();
         }
-        if (!UUID_PATTERN.matcher(value).matches()) {
+        if (!PATTERN_UUID.matcher(value).matches()) {
             throw new InvalidCategoryIdException();
         }
         return new SecondaryCategoryId(UUID.fromString(value));

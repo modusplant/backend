@@ -5,8 +5,8 @@ import kr.modusplant.domains.post.common.util.framework.out.jpa.entity.PostEntit
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostArchiveJpaMapper;
 import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostArchiveJpaRepository;
 import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostJpaRepository;
-import kr.modusplant.framework.out.jpa.entity.CommPostArchiveEntity;
-import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.jpa.entity.CommPostArchiveEntity;
+import kr.modusplant.framework.jpa.entity.CommPostEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

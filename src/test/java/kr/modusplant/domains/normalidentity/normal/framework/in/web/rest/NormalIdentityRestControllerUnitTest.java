@@ -1,8 +1,9 @@
 package kr.modusplant.domains.normalidentity.normal.framework.in.web.rest;
 
-import kr.modusplant.domains.normalidentity.normal.adapter.controller.NormalIdentityController;
+import kr.modusplant.domains.identity.normal.adapter.controller.NormalIdentityController;
+import kr.modusplant.domains.identity.normal.framework.in.web.rest.NormalIdentityRestController;
 import kr.modusplant.domains.normalidentity.normal.common.util.usecase.request.NormalSignUpRequestTestUtils;
-import kr.modusplant.framework.out.jackson.http.response.DataResponse;
+import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

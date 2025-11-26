@@ -4,10 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.modusplant.framework.out.jackson.http.response.DataResponse;
+import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
+import kr.modusplant.infrastructure.jwt.response.TokenResponse;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
-import kr.modusplant.shared.http.response.TokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
@@ -15,6 +15,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import static kr.modusplant.infrastructure.jwt.util.TokenUtils.getTokenFromAuthorizationHeader;
 
 @Tag(name="Token API", description = "JWT API")
 @RestController
@@ -35,7 +37,7 @@ public class TokenRestController {
     public ResponseEntity<DataResponse<?>> refreshToken(@CookieValue("Cookie") String refreshToken,
                                                         @RequestHeader("Authorization") String rawAccessToken) {
 
-        String accessToken = rawAccessToken.substring(7);
+        String accessToken = getTokenFromAuthorizationHeader(rawAccessToken);
 
         TokenPair tokenPair = tokenService.verifyAndReissueToken(accessToken, refreshToken);
 

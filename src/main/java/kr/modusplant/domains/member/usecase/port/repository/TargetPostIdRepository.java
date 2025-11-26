@@ -11,4 +11,8 @@ public interface TargetPostIdRepository {
     boolean isLiked(MemberId memberId, TargetPostId targetPostId);
 
     boolean isUnliked(MemberId memberId, TargetPostId targetPostId);
+
+    boolean isBookmarked(MemberId memberId, TargetPostId targetPostId);
+
+    boolean isNotBookmarked(MemberId memberId, TargetPostId targetPostId);
 }

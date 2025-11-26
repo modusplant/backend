@@ -105,9 +105,9 @@ public class RedisConfigTest {
 
         HashOperations<String, Object, Object> hashOps = redisTemplate.opsForHash();
         Map<String, Object> map = new HashMap<>();
-        map.put("name","John");
-        map.put("age",28);
-        map.put("birthday",birthday);
+        map.put("name", "John");
+        map.put("age", 28);
+        map.put("birthday", birthday);
 
         hashOps.putAll("testHashKey",map);
 
