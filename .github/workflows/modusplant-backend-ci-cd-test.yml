@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - develop-ci-cd-test
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:
@@ -147,10 +149,21 @@ jobs:
           docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${GITHUB_SHA}
           docker push ${IMAGE_NAME}:${GITHUB_SHA}
 
+      # 태그 푸시일 때 버전 태그로도 GHCR에 이미지 푸시
+      - name: Push version-tagged image on tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
+        run: |
+          VERSION_TAG="${GITHUB_REF##*/}"   # refs/tags/v1.2.3 -> v1.2.3
+          docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${VERSION_TAG}
+          docker push ${IMAGE_NAME}:${VERSION_TAG}
+
   # 3. DEPLOY: EC2 배포 (EC2에서 SSM → .env.prod → docker run --env-file)
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
 
     env:
       IMAGE_NAME: ghcr.io/modusplant/backend
@@ -163,7 +176,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
-      - name: Load deploy params from SSM # CI용: GHCR, EC2 접속, 로그 경로
+      - name: Load deploy params from SSM
         uses: dkershner6/aws-ssm-getparameters-action@v2
         with:
           parameterPairs: |
@@ -309,8 +322,6 @@ jobs:
           echo "[EC2] Deploy finished."
           EOF
 
-      
-
       - name: Cleanup SSH key
         if: always()
         run: rm -f _ci_tmp_ssh_key.pem
@@ -319,7 +330,7 @@ jobs:
   github_release:
     needs: deploy
     runs-on: ubuntu-latest
-    # if: startsWith(github.ref, 'refs/tags/v')  # v태그일 때만
+    if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
       - name: Create GitHub Release with auto notes
@@ -327,6 +338,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref_name }}   # 예: v1.2.3
+          tag_name: ${{ github.ref_name }}
           release_name: ${{ github.ref_name }}
           generate_release_notes: true
