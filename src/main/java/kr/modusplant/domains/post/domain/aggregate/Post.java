@@ -77,6 +77,9 @@ public class Post {
         } else if (postStatus == null) {
             throw new EmptyPostStatusException();
         }
+        if(this.status.isPublished() && postStatus.isDraft()) {
+            throw new InvalidPostStatusException();
+        }
         this.authorId = authorId;
         this.primaryCategoryId = primaryCategoryId;
         this.secondaryCategoryId = secondaryCategoryId;

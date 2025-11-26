@@ -8,14 +8,13 @@ import java.time.LocalDateTime;
 
 public record PostSummaryResponse(
         @Schema(description = "게시글의 식별자", example = "01JXEDF9SNSMAVBY8Z3P5YXK5J")
+        @JsonProperty("postId")
         String ulid,
 
         @Schema(description = "게시글이 속한 1차 항목", example = "팁")
-        @JsonProperty("primary_category")
         String primaryCategory,
 
         @Schema(description = "게시글이 속한 2차 항목", example = "물꽂이 + 잎꽂이")
-        @JsonProperty("secondary_category")
         String secondaryCategory,
 
         @Schema(description = "게시글을 작성한 회원의 닉네임", example = "제트드랍")
@@ -27,8 +26,19 @@ public record PostSummaryResponse(
         @Schema(description = "게시글 컨텐츠 미리보기")
         JsonNode content,
 
+        @Schema(description = "게시글 좋아요 수")
+        Integer likeCount,
+
         @Schema(description = "게시글이 게시된 날짜 및 시간")
-        @JsonProperty("published_at")
-        LocalDateTime publishedAt
+        LocalDateTime publishedAt,
+
+        @Schema(description = "게시글의 댓글수")
+        Integer commentCount,
+
+        @Schema(description = "게시글 좋아요 여부")
+        Boolean isLiked,
+
+        @Schema(description = "게시글 북마크 여부")
+        Boolean isBookmarked
 ) {
 }

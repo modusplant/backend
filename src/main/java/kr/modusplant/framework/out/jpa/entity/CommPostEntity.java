@@ -121,6 +121,19 @@ public class CommPostEntity {
         if (this.viewCount == null) {
             this.viewCount = 0L;
         }
+        if (this.isPublished == null) {
+            this.isPublished = false;
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        if (this.viewCount == null) {
+            this.viewCount = 0L;
+        }
+        if (this.isPublished == null) {
+            this.isPublished = false;
+        }
     }
 
     private CommPostEntity(String ulid, CommPrimaryCategoryEntity primaryCategory, CommSecondaryCategoryEntity secondaryCategory, SiteMemberEntity authMember, SiteMemberEntity createMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isPublished, LocalDateTime publishedAt) {

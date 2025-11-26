@@ -1,11 +1,12 @@
 package kr.modusplant.domains.post.usecase.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import kr.modusplant.domains.post.usecase.response.supers.PageResponse;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-public record PostPageResponse<T> (
+public record OffsetPageResponse<T> (
         @Schema(description = "조회된 포스트")
         List<T> posts,
 
@@ -26,9 +27,9 @@ public record PostPageResponse<T> (
 
         @Schema(description = "이전 페이지가 존재하는지", example = "true")
         boolean hasPrevious
-){
-    public static <T> PostPageResponse<T> from(Page<T> page) {
-        return new PostPageResponse<>(
+) implements PageResponse<T> {
+    public static <T> OffsetPageResponse<T> from(Page<T> page) {
+        return new OffsetPageResponse<>(
                 page.getContent(),
                 page.getNumber(),
                 page.getSize(),
