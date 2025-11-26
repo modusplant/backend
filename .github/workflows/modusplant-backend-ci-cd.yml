@@ -1,0 +1,366 @@
+name: CI/CD - modusplant-backend
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  # 1. TEST: dev용 application.yml + Gradle test
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (for SSM)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Load test env from SSM
+        uses: dkershner6/aws-ssm-getparameters-action@v2
+        with:
+          parameterPairs: |
+            /config/modusplant_dev/DB_CONNECTION_URL    = JDBC_CONNECTION_URL,
+            /config/modusplant_dev/DB_USERNAME          = JDBC_USERNAME,
+            /config/modusplant_dev/DB_PASSWORD          = JDBC_PASSWORD,
+            /config/modusplant_dev/REDIS_HOST           = REDIS_HOST,
+            /config/modusplant_dev/REDIS_PASSWORD       = REDIS_PASSWORD,
+            /config/modusplant_dev/REDIS_PORT           = REDIS_PORT,
+            /config/modusplant_dev/REDIS_SSL_ENABLED    = REDIS_SSL_ENABLED,
+            /config/modusplant_dev/WASABI_ENDPOINT      = WASABI_ENDPOINT,
+            /config/modusplant_dev/WASABI_REGION        = WASABI_REGION,
+            /config/modusplant_dev/WASABI_ACCESS_KEY    = WASABI_ACCESS_KEY,
+            /config/modusplant_dev/WASABI_SECRET_KEY    = WASABI_SECRET_KEY,
+            /config/modusplant_dev/WASABI_BUCKET        = WASABI_BUCKET
+          withDecryption: "true"
+
+      - name: Debug DB env
+        run: |
+          echo "JDBC_CONNECTION_URL=$JDBC_CONNECTION_URL"
+          echo "JDBC_USERNAME=$JDBC_USERNAME"
+          echo "JDBC_PASSWORD is set? -> ${JDBC_PASSWORD:+YES}"
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission to gradlew
+        run: chmod +x ./gradlew
+
+      - name: Run Gradle tests
+        env:
+          DB_CONNECTION_URL: ${{ env.JDBC_CONNECTION_URL }}
+          DB_USERNAME: ${{ env.JDBC_USERNAME }}
+          DB_PASSWORD: ${{ env.JDBC_PASSWORD }}
+
+          REDIS_HOST: ${{ env.REDIS_HOST }}
+          REDIS_PORT: ${{ env.REDIS_PORT }}
+          REDIS_PASSWORD: ${{ env.REDIS_PASSWORD }}
+          REDIS_SSL_ENABLED: ${{ env.REDIS_SSL_ENABLED }}
+
+          WASABI_ENDPOINT: ${{ env.WASABI_ENDPOINT }}
+          WASABI_REGION: ${{ env.WASABI_REGION }}
+          WASABI_ACCESS_KEY: ${{ env.WASABI_ACCESS_KEY }}
+          WASABI_SECRET_KEY: ${{ env.WASABI_SECRET_KEY }}
+          WASABI_BUCKET: ${{ env.WASABI_BUCKET }}
+
+          # ---- Kakao dummy ----
+          KAKAO_API_KEY: DUMMY_KAKAO_KEY_1234567890
+          KAKAO_REDIRECT_URI: http://localhost:3000/oauth/kakao/callback
+
+          # ---- Google dummy ----
+          GOOGLE_API_KEY: DUMMY_GOOGLE_CLIENT_ID_1234567890
+          GOOGLE_SECRET: DUMMY_GOOGLE_SECRET_ABCDEF
+          GOOGLE_REDIRECT_URI: http://localhost:3000/oauth/google/callback
+
+          # ---- MailJet dummy ----
+          MAIL_API_KEY: DUMMY_MAILJET_KEY_ABC123
+          MAIL_API_SECRET_KEY: DUMMY_MAILJET_SECRET_ABC123
+          MAIL_API_JWT_SECRET_KEY: DUMMY_JWT_SECRET_KEY_ABC1234567890
+
+          # ---- TEMP USER dummy ----
+          TEMP_USER_UUID: 00000000-0000-0000-0000-000000000000
+
+          # ---- dummy ----
+          SPRINGDOC_API_DOCS_ENABLED: true
+          SPRINGDOC_SWAGGER_UI_ENABLED: true
+          LOGGING_LEVEL_ROOT: INFO
+          LOGGING_LEVEL_IO_LETTUCE: INFO
+          SECURITY_DEBUG_ENABLED: false
+        run: |
+          ./gradlew test \
+            -PjdbcConnectionUrl="$JDBC_CONNECTION_URL" \
+            -PjdbcUsername="$JDBC_USERNAME" \
+            -PjdbcPassword="$JDBC_PASSWORD"
+
+  # 2. BUILD: GHCR_PAT + 이미지 빌드/푸시
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: ghcr.io/modusplant/backend
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (for SSM)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Load CI params from SSM (GHCR_PAT, dev/prod yml)
+        uses: dkershner6/aws-ssm-getparameters-action@v2
+        with:
+          parameterPairs: |
+            /config/modusplant/GHCR_PAT               = GHCR_PAT,
+            /config/modusplant_dev/DB_CONNECTION_URL = JDBC_CONNECTION_URL,
+            /config/modusplant_dev/DB_USERNAME = JDBC_USERNAME,
+            /config/modusplant_dev/DB_PASSWORD = JDBC_PASSWORD
+          withDecryption: "true"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        env:
+          GHCR_PAT: ${{ env.GHCR_PAT }}
+        run: |
+          echo "${GHCR_PAT}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Docker Compose build backend image
+        env:
+          JDBC_CONNECTION_URL: ${{ env.JDBC_CONNECTION_URL }}
+          JDBC_USERNAME: ${{ env.JDBC_USERNAME }}
+          JDBC_PASSWORD: ${{ env.JDBC_PASSWORD }}
+        run: |
+          docker compose -f docker-compose.yml build backend
+
+      - name: Push Docker image (latest + sha)
+        run: |
+          docker push ${IMAGE_NAME}:latest
+          docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${GITHUB_SHA}
+          docker push ${IMAGE_NAME}:${GITHUB_SHA}
+
+      # 태그 푸시일 때 버전 태그로도 GHCR에 이미지 푸시
+      - name: Push version-tagged image on tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
+        run: |
+          VERSION_TAG="${GITHUB_REF##*/}"   # refs/tags/v1.2.3 -> v1.2.3
+          docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${VERSION_TAG}
+          docker push ${IMAGE_NAME}:${VERSION_TAG}
+
+  # 3. DEPLOY: EC2 배포 (EC2에서 SSM → .env.prod → docker run --env-file)
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    env:
+      IMAGE_NAME: ghcr.io/modusplant/backend
+
+    steps:
+      - name: Configure AWS credentials (for SSM)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Load deploy params from SSM
+        uses: dkershner6/aws-ssm-getparameters-action@v2
+        with:
+          parameterPairs: |
+            /config/modusplant/GHCR_PAT        = GHCR_PAT,
+            /config/modusplant/AWS_EC2_IP      = MODUSPLANT_EC2_IP,
+            /config/modusplant/AWS_SSH_KEY     = MODUSPLANT_SSH_KEY,
+            /config/modusplant_prod/backend_logpath = MODUSPLANT_BACKEND_LOGPATH,
+            /config/modusplant_prod/docker_logpath  = MODUSPLANT_DOCKER_LOGPATH
+          withDecryption: "true"
+
+      - name: Write SSH key from env
+        env:
+          MODUSPLANT_SSH_KEY: ${{ env.MODUSPLANT_SSH_KEY }}
+        run: |
+          echo "${MODUSPLANT_SSH_KEY}" > _ci_tmp_ssh_key.pem
+          chmod 600 _ci_tmp_ssh_key.pem
+
+      - name: Deploy to EC2 via SSH
+        env:
+          EC2_INSTANCE_IP: ${{ env.MODUSPLANT_EC2_IP }}
+          GHCR_PAT: ${{ env.GHCR_PAT }}
+          BACKEND_LOGPATH: ${{ env.MODUSPLANT_BACKEND_LOGPATH }}
+          DOCKER_LOGPATH: ${{ env.MODUSPLANT_DOCKER_LOGPATH }}
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+        run: |
+          IMAGE="${IMAGE_NAME}:${GITHUB_SHA}"
+          
+          echo "[CI] IMAGE=${IMAGE}"
+          echo "[CI] EC2_INSTANCE_IP=${EC2_INSTANCE_IP}"
+          echo "[CI] GITHUB_REPOSITORY_OWNER=${GITHUB_REPOSITORY_OWNER}"
+          
+          ssh -i "_ci_tmp_ssh_key.pem" -o StrictHostKeyChecking=no \
+            ec2-user@"${EC2_INSTANCE_IP}" \
+            "IMAGE=${IMAGE} GHCR_PAT=${GHCR_PAT} BACKEND_LOGPATH=${BACKEND_LOGPATH} DOCKER_LOGPATH=${DOCKER_LOGPATH} GITHUB_REPOSITORY_OWNER=${GITHUB_REPOSITORY_OWNER} bash -s" <<'EOF'
+          set -euo pipefail
+          
+          ENV_FILE="/opt/modusplant/.env.prod"
+          
+          echo "[EC2] IMAGE=${IMAGE}"
+          echo "[EC2] ENV_FILE=${ENV_FILE}"
+          echo "[EC2] BACKEND_LOGPATH=${BACKEND_LOGPATH:-<empty>}"
+          echo "[EC2] DOCKER_LOGPATH=${DOCKER_LOGPATH:-<empty>}"
+          
+          echo "[EC2] Docker login to GHCR..."
+          echo "${GHCR_PAT}" | docker login ghcr.io -u "${GITHUB_REPOSITORY_OWNER}" --password-stdin
+          
+          echo "[EC2] Ensure docker network 'nginx_proxy' exists..."
+          docker network create nginx_proxy || true
+          
+          echo "[EC2] Fetch runtime secrets from SSM (DB / Redis / Wasabi)..."
+          
+          # === DB (application.yml: DB_* ) ===
+          DB_CONNECTION_URL=$(aws ssm get-parameter --name "/config/modusplant_prod/DB_CONNECTION_URL"  --with-decryption --query "Parameter.Value" --output text)
+          DB_USERNAME=$(aws ssm get-parameter       --name "/config/modusplant_prod/DB_USERNAME"        --with-decryption --query "Parameter.Value" --output text)
+          DB_PASSWORD=$(aws ssm get-parameter       --name "/config/modusplant_prod/DB_PASSWORD"        --with-decryption --query "Parameter.Value" --output text)
+          DB_SCHEMA=$(aws ssm get-parameter         --name "/config/modusplant_prod/DB_SCHEMA"          --with-decryption --query "Parameter.Value" --output text)
+          
+          # === Redis (application.yml: REDIS_* ) ===
+          REDIS_HOST=$(aws ssm get-parameter        --name "/config/modusplant_prod/REDIS_HOST"         --with-decryption --query "Parameter.Value" --output text)
+          REDIS_PORT=$(aws ssm get-parameter        --name "/config/modusplant_prod/REDIS_PORT"         --with-decryption --query "Parameter.Value" --output text)
+          REDIS_PASSWORD=$(aws ssm get-parameter    --name "/config/modusplant_prod/REDIS_PASSWORD"     --with-decryption --query "Parameter.Value" --output text)
+          REDIS_SSL_ENABLED=$(aws ssm get-parameter --name "/config/modusplant_prod/REDIS_SSL_ENABLED"  --with-decryption --query "Parameter.Value" --output text)
+          
+          # === Wasabi (application.yml: WASABI_* ) ===
+          WASABI_ENDPOINT=$(aws ssm get-parameter   --name "/config/modusplant_prod/WASABI_ENDPOINT"    --with-decryption --query "Parameter.Value" --output text)
+          WASABI_REGION=$(aws ssm get-parameter     --name "/config/modusplant_prod/WASABI_REGION"      --with-decryption --query "Parameter.Value" --output text)
+          WASABI_ACCESS_KEY=$(aws ssm get-parameter --name "/config/modusplant_prod/WASABI_ACCESS_KEY"  --with-decryption --query "Parameter.Value" --output text)
+          WASABI_SECRET_KEY=$(aws ssm get-parameter --name "/config/modusplant_prod/WASABI_SECRET_KEY"  --with-decryption --query "Parameter.Value" --output text)
+          WASABI_BUCKET=$(aws ssm get-parameter     --name "/config/modusplant_prod/WASABI_BUCKET"      --with-decryption --query "Parameter.Value" --output text)
+          
+          # === Kakao Login ===
+          KAKAO_API_KEY=$(aws ssm get-parameter      --name "/config/modusplant_prod/KAKAO_API_KEY"            --with-decryption --query "Parameter.Value" --output text)
+          KAKAO_REDIRECT_URI=$(aws ssm get-parameter --name "/config/modusplant_prod/KAKAO_REDIRECT_URI"       --with-decryption --query "Parameter.Value" --output text)
+
+
+          # === Google Login ===
+          GOOGLE_API_KEY=$(aws ssm get-parameter      --name "/config/modusplant_prod/GOOGLE_API_KEY"           --with-decryption --query "Parameter.Value" --output text)
+          GOOGLE_SECRET=$(aws ssm get-parameter       --name "/config/modusplant_prod/GOOGLE_SECRET"            --with-decryption --query "Parameter.Value" --output text)
+          GOOGLE_REDIRECT_URI=$(aws ssm get-parameter --name "/config/modusplant_prod/GOOGLE_REDIRECT_URI"      --with-decryption --query "Parameter.Value" --output text)
+
+
+          # === MailJet ===
+          MAIL_API_KEY=$(aws ssm get-parameter            --name "/config/modusplant_prod/MAIL_API_KEY"            --with-decryption --query "Parameter.Value" --output text)
+          MAIL_API_SECRET_KEY=$(aws ssm get-parameter     --name "/config/modusplant_prod/MAIL_API_SECRET_KEY"     --with-decryption --query "Parameter.Value" --output text)
+          MAIL_API_JWT_SECRET_KEY=$(aws ssm get-parameter --name "/config/modusplant_prod/MAIL_API_JWT_SECRET_KEY" --with-decryption --query "Parameter.Value" --output text)
+          
+          KEYSTORE_PASSWORD=$(aws ssm get-parameter --name "/config/modusplant_prod/KEYSTORE_PASSWORD"             --with-decryption --query "Parameter.Value" --output text)
+          
+          echo "[EC2] Write env file: ${ENV_FILE}"
+          mkdir -p /opt/modusplant
+          cat > "${ENV_FILE}" <<EOT
+          DB_CONNECTION_URL=${DB_CONNECTION_URL}
+          DB_USERNAME=${DB_USERNAME}
+          DB_PASSWORD=${DB_PASSWORD}
+          DB_SCHEMA=${DB_SCHEMA}
+          
+          REDIS_HOST=${REDIS_HOST}
+          REDIS_PORT=${REDIS_PORT}
+          REDIS_PASSWORD=${REDIS_PASSWORD}
+          REDIS_SSL_ENABLED=${REDIS_SSL_ENABLED}
+          
+          WASABI_ENDPOINT=${WASABI_ENDPOINT}
+          WASABI_REGION=${WASABI_REGION}
+          WASABI_ACCESS_KEY=${WASABI_ACCESS_KEY}
+          WASABI_SECRET_KEY=${WASABI_SECRET_KEY}
+          WASABI_BUCKET=${WASABI_BUCKET}
+          
+          KAKAO_API_KEY=${KAKAO_API_KEY}
+          KAKAO_REDIRECT_URI=${KAKAO_REDIRECT_URI}
+          
+          GOOGLE_API_KEY=${GOOGLE_API_KEY}
+          GOOGLE_SECRET=${GOOGLE_SECRET}
+          GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
+          
+          MAIL_API_KEY=${MAIL_API_KEY}
+          MAIL_API_SECRET_KEY=${MAIL_API_SECRET_KEY}
+          MAIL_API_JWT_SECRET_KEY=${MAIL_API_JWT_SECRET_KEY}
+          
+          # === TEMP_USER_UUID ===
+          TEMP_USER_UUID=d6b716f1-60f7-4c79-aeaf-37037101f126
+          
+          # === KEYSTORE_PASSWORD ===
+          KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
+          
+          SPRINGDOC_API_DOCS_ENABLED=true
+          SPRINGDOC_SWAGGER_UI_ENABLED=true
+          LOGGING_LEVEL_ROOT=INFO
+          LOGGING_LEVEL_IO_LETTUCE=INFO
+          SECURITY_DEBUG_ENABLED=false
+          EOT
+          
+          echo "[EC2] Pull image: ${IMAGE}"
+          docker pull "${IMAGE}"
+          
+          echo "[EC2] Stop & remove existing container..."
+          docker stop modusplant-be || true
+          docker rm modusplant-be || true
+          
+          echo "[EC2] Run new container with env-file..."
+          docker run -d \
+          --name modusplant-be \
+          --restart unless-stopped \
+          --network nginx_proxy \
+          --env-file "${ENV_FILE}" \
+          -e SPRING_PROFILES_ACTIVE=prod \
+          -v "${BACKEND_LOGPATH}:${DOCKER_LOGPATH}" \
+          "${IMAGE}"
+          
+          echo "[EC2] Check container status..."
+          docker ps | grep modusplant-be || (echo "Container failed to start" && exit 1)
+          
+          echo "[EC2] Deploy finished."
+          EOF
+
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f _ci_tmp_ssh_key.pem
+
+  # 4. GitHub Release 자동 릴리즈 노트
+  github_release:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create GitHub Release with auto notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "${GITHUB_REF_NAME}" \
+            --generate-notes
+  
