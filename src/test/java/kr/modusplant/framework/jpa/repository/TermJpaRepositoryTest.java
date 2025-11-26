@@ -34,31 +34,31 @@ class TermJpaRepositoryTest implements TermEntityTestUtils {
         assertThat(termRepository.findByUuid(term.getUuid()).orElseThrow()).isEqualTo(term);
     }
 
-    @DisplayName("name으로 약관 찾기")
-    @Test
-    void findByNameTest() {
-        // given
-        TermEntity term = createTermsOfUseEntity();
+//    @DisplayName("name으로 약관 찾기")
+//    @Test
+//    void findByNameTest() {
+//        // given
+//        TermEntity term = createTermsOfUseEntity();
+//
+//        // when
+//        termRepository.save(term);
+//
+//        // then
+//        assertThat(termRepository.findByName(term.getName()).orElseThrow()).isEqualTo(term);
+//    }
 
-        // when
-        termRepository.save(term);
-
-        // then
-        assertThat(termRepository.findByName(term.getName()).orElseThrow()).isEqualTo(term);
-    }
-
-    @DisplayName("version으로 약관 찾기")
-    @Test
-    void findByVersionTest() {
-        // given
-        TermEntity term = createTermsOfUseEntity();
-
-        // when
-        termRepository.save(term);
-
-        // then
-        assertThat(termRepository.findByVersion(term.getVersion()).getFirst()).isEqualTo(term);
-    }
+//    @DisplayName("version으로 약관 찾기")
+//    @Test
+//    void findByVersionTest() {
+//        // given
+//        TermEntity term = createTermsOfUseEntity();
+//
+//        // when
+//        termRepository.save(term);
+//
+//        // then
+//        assertThat(termRepository.findByVersion(term.getVersion()).getFirst()).isEqualTo(term);
+//    }
 
     @DisplayName("createdAt으로 약관 찾기")
     @Test

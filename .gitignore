@@ -1,6 +1,7 @@
 HELP.md
 .gradle
 .env
+.env.local
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
@@ -45,3 +46,4 @@ gradle.properties
 
 ### Local Redis Setting ###
 redis.*
+/.env.local-ci

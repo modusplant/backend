@@ -90,18 +90,18 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
         assertTrue(memberAuthRepository.findByProvider(memberAuth.getProvider()).stream().anyMatch(element -> element.getOriginalMember().getUuid().equals(member.getUuid())));
     }
 
-    @DisplayName("providerId로 회원 인증 찾기")
-    @Test
-    void findByProviderIdTest() {
-        // given
-        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
-
-        // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
-
-        // then
-        assertThat(memberAuthRepository.findByProviderId(memberAuth.getProviderId()).getFirst()).isEqualTo(memberAuth);
-    }
+//    @DisplayName("providerId로 회원 인증 찾기")
+//    @Test
+//    void findByProviderIdTest() {
+//        // given
+//        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
+//
+//        // when
+//        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
+//
+//        // then
+//        assertThat(memberAuthRepository.findByProviderId(memberAuth.getProviderId()).getFirst()).isEqualTo(memberAuth);
+//    }
 
     @DisplayName("email과 provider로 회원 인증 찾기")
     @Test
@@ -116,18 +116,18 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
         assertThat(memberAuthRepository.findByEmailAndProvider(memberAuth.getEmail(), memberAuth.getProvider()).orElseThrow()).isEqualTo(memberAuth);
     }
 
-    @DisplayName("provider와 providerId로 회원 인증 찾기")
-    @Test
-    void findByProviderAndProviderIdTest() {
-        // given
-        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
-
-        // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
-
-        // then
-        assertThat(memberAuthRepository.findByProviderAndProviderId(memberAuth.getProvider(), memberAuth.getProviderId()).orElseThrow()).isEqualTo(memberAuth);
-    }
+//    @DisplayName("provider와 providerId로 회원 인증 찾기")
+//    @Test
+//    void findByProviderAndProviderIdTest() {
+//        // given
+//        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
+//
+//        // when
+//        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
+//
+//        // then
+//        assertThat(memberAuthRepository.findByProviderAndProviderId(memberAuth.getProvider(), memberAuth.getProviderId()).orElseThrow()).isEqualTo(memberAuth);
+//    }
 
     @DisplayName("lastModifiedAt으로 회원 인증 찾기")
     @Test

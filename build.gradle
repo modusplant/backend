@@ -36,6 +36,27 @@ repositories {
 	mavenCentral()
 }
 
+// DB 설정
+def requiredEnvOrProp = { String envName, String propName ->
+    def envVal = System.getenv(envName)
+    if (envVal != null && !envVal.trim().isEmpty()) {
+        return envVal.trim()
+    }
+
+    def propVal = project.hasProperty(propName) ? project.property(propName) : null
+    if (propVal != null && !propVal.toString().trim().isEmpty()) {
+        return propVal.toString().trim()
+    }
+
+    throw new GradleException("환경변수 ${envName} 또는 -P${propName} 중 하나는 반드시 설정되어야 합니다.")
+}
+
+ext {
+    jdbcConnectionUrl = requiredEnvOrProp('JDBC_CONNECTION_URL', 'jdbcConnectionUrl')
+    jdbcUsername      = requiredEnvOrProp('JDBC_USERNAME', 'jdbcUsername')
+    jdbcPassword      = requiredEnvOrProp('JDBC_PASSWORD', 'jdbcPassword')
+}
+
 dependencies {
 	// Lombok (Version managed by Spring Boot BOM)
 	annotationProcessor 'org.projectlombok:lombok'
