@@ -3,8 +3,6 @@ package kr.modusplant.domains.post.framework.out.jpa.mapper;
 import kr.modusplant.domains.post.common.util.framework.out.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
-import kr.modusplant.domains.post.usecase.model.PostDetailReadModel;
-import kr.modusplant.domains.post.usecase.model.PostSummaryReadModel;
 import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.out.jpa.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.framework.out.jpa.entity.CommSecondaryCategoryEntity;
@@ -82,70 +80,6 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
         assertThat(result.getPostContent().getContent()).isEqualTo(postEntity.getContent());
         assertThat(result.getLikeCount().getValue()).isEqualTo(postEntity.getLikeCount());
         assertThat(result.getStatus().isPublished()).isTrue();
-    }
-
-    @Test
-    @DisplayName("toPostSummaryReadModel로 PostSummaryReadModel 반환하기")
-    void testToPostSummaryReadModel_givenPostEntity_willReturnPostSummaryReadModel() {
-        // given
-        LocalDateTime publishedAt = LocalDateTime.now();
-        SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(testAuthorId.getValue()).build();
-        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().uuid(testPrimaryCategoryId.getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().uuid(testSecondaryCategoryId.getValue()).build();
-        CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid()
-                .primaryCategory(primaryCategoryEntity)
-                .secondaryCategory(secondaryCategoryEntity)
-                .authMember(memberEntity)
-                .createMember(memberEntity)
-                .publishedAt(publishedAt)
-                .build();
-
-        // when
-        PostSummaryReadModel result = postJpaMapper.toPostSummaryReadModel(postEntity);
-
-        // then
-        assertThat(result.ulid()).isEqualTo(postEntity.getUlid());
-        assertThat(result.primaryCategory()).isEqualTo(primaryCategoryEntity.getCategory());
-        assertThat(result.secondaryCategory()).isEqualTo(secondaryCategoryEntity.getCategory());
-        assertThat(result.nickname()).isEqualTo(memberEntity.getNickname());
-        assertThat(result.title()).isEqualTo(postEntity.getTitle());
-        assertThat(result.content()).isEqualTo(postEntity.getContent());
-        assertThat(result.publishedAt()).isEqualTo(publishedAt);
-
-    }
-
-    @Test
-    @DisplayName("toPostDetailReadModel로 PostDetailReadModel 반환하기")
-    void testToPostDetailReadModel_givenPostEntity_willReturnPostDetailReadModel() {
-        // given
-        LocalDateTime publishedAt = LocalDateTime.now();
-        SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(testAuthorId.getValue()).build();
-        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().uuid(testPrimaryCategoryId.getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().uuid(testSecondaryCategoryId.getValue()).build();
-        CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid()
-                .primaryCategory(primaryCategoryEntity)
-                .secondaryCategory(secondaryCategoryEntity)
-                .authMember(memberEntity)
-                .createMember(memberEntity)
-                .publishedAt(publishedAt)
-                .build();
-
-                // when
-        PostDetailReadModel result = postJpaMapper.toPostDetailReadModel(postEntity);
-
-        // then
-        assertThat(result.ulid()).isEqualTo(postEntity.getUlid());
-        assertThat(result.primaryCategoryUuid()).isEqualTo(testPrimaryCategoryId.getValue());
-        assertThat(result.primaryCategory()).isEqualTo(primaryCategoryEntity.getCategory());
-        assertThat(result.secondaryCategoryUuid()).isEqualTo(testSecondaryCategoryId.getValue());
-        assertThat(result.secondaryCategory()).isEqualTo(secondaryCategoryEntity.getCategory());
-        assertThat(result.authorUuid()).isEqualTo(testAuthorId.getValue());
-        assertThat(result.nickname()).isEqualTo(memberEntity.getNickname());
-        assertThat(result.title()).isEqualTo(postEntity.getTitle());
-        assertThat(result.content()).isEqualTo(postEntity.getContent());
-        assertThat(result.likeCount()).isEqualTo(postEntity.getLikeCount());
-        assertThat(result.isPublished()).isEqualTo(postEntity.getIsPublished());
-        assertThat(result.publishedAt()).isEqualTo(publishedAt);
     }
 
 }

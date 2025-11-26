@@ -2,11 +2,11 @@ package kr.modusplant.domains.post.framework.out.jpa.repository;
 
 import kr.modusplant.domains.post.common.util.framework.out.jpa.entity.PostArchiveEntityTestUtils;
 import kr.modusplant.domains.post.common.util.framework.out.jpa.entity.PostEntityTestUtils;
-import kr.modusplant.domains.post.framework.out.jpa.entity.PostArchiveEntity;
-import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostArchiveJpaMapper;
 import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostArchiveJpaRepository;
 import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostJpaRepository;
+import kr.modusplant.framework.out.jpa.entity.CommPostArchiveEntity;
+import kr.modusplant.framework.out.jpa.entity.CommPostEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -28,8 +28,8 @@ class PostArchiveRepositoryJpaAdapterTest implements PostEntityTestUtils, PostAr
     @DisplayName("게시글 아카이브로 게시글 저장")
     void testSave_givenPostId_willSavePostArchive() {
         // given
-        PostArchiveEntity postArchiveEntity = createPostArchieveEntity();
-        PostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
+        CommPostArchiveEntity postArchiveEntity = createPostArchieveEntity();
+        CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
 
         given(postJpaRepository.findByUlid(testPostId.getValue())).willReturn(Optional.of(postEntity));
         given(postArchiveJpaMapper.toPostArchiveEntity(postEntity)).willReturn(postArchiveEntity);
