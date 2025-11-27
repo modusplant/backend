@@ -2,6 +2,7 @@ package kr.modusplant.domains.post.adapter.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.post.domain.aggregate.Post;
+import kr.modusplant.domains.post.domain.exception.ContentProcessingException;
 import kr.modusplant.domains.post.domain.exception.PostAccessDeniedException;
 import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
 import kr.modusplant.domains.post.domain.vo.*;
@@ -30,7 +31,7 @@ public class PostController {
     private final PostMapper postMapper;
     private final PostRepository postRepository;
     private final PostQueryRepository postQueryRepository;
-//    private final PostQueryForMemberRepository postQueryForMemberRepository;
+    private final PostQueryForMemberRepository postQueryForMemberRepository;
     private final MultipartDataProcessorPort multipartDataProcessorPort;
     private final PostViewCountRepository postViewCountRepository;
     private final PostViewLockRepository postViewLockRepository;
@@ -51,7 +52,7 @@ public class PostController {
                     try {
                         contentPreview = multipartDataProcessorPort.convertToPreviewData(readModel.content());
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        throw new ContentProcessingException();
                     }
                     return postMapper.toPostSummaryResponse(readModel,contentPreview);
                 }).toList();
@@ -69,7 +70,7 @@ public class PostController {
                     try {
                         contentPreview = multipartDataProcessorPort.convertToPreviewData(readModel.content());
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        throw new ContentProcessingException();
                     }
                     return postMapper.toPostSummaryResponse(readModel,contentPreview);
                 }).toList();
@@ -86,7 +87,7 @@ public class PostController {
                     try {
                         content = multipartDataProcessorPort.convertFileSrcToBinaryData(postDetail.content());
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        throw new ContentProcessingException();
                     }
                     return postMapper.toPostDetailResponse(
                             postDetail,
@@ -155,5 +156,63 @@ public class PostController {
         }
         // 조회수 증가
         return postViewCountRepository.increase(PostId.create(ulid));
+    }
+
+    public OffsetPageResponse<PostSummaryResponse> getByMemberUuid(UUID memberUuid, int page, int size) {
+        return OffsetPageResponse.from(
+                postQueryForMemberRepository.findPublishedByAuthMemberWithOffset(AuthorId.fromUuid(memberUuid),page,size)
+                        .map(postModel -> {
+                            JsonNode contentPreview;
+                            try {
+                                contentPreview = multipartDataProcessorPort.convertToPreviewData(postModel.content());
+                            } catch (IOException e) {
+                                throw new ContentProcessingException();
+                            }
+                            return postMapper.toPostSummaryResponse(postModel,contentPreview);
+                        }));
+    }
+
+    public OffsetPageResponse<DraftPostResponse> getDraftByMemberUuid(UUID currentMemberUuid, int page, int size) {
+        return OffsetPageResponse.from(
+                postQueryForMemberRepository.findDraftByAuthMemberWithOffset(AuthorId.fromUuid(currentMemberUuid),page,size)
+                        .map(postModel -> {
+                            JsonNode contentPreview;
+                            try {
+                                contentPreview = multipartDataProcessorPort.convertToPreviewData(postModel.content());
+                            } catch (IOException e) {
+                                throw new ContentProcessingException();
+                            }
+                            return postMapper.toDraftPostResponse(postModel, contentPreview);
+                        }));
+    }
+
+    public OffsetPageResponse<PostSummaryResponse> getLikedByMemberUuid(UUID currentMemberUuid, int page, int size) {
+        return OffsetPageResponse.from(
+                postQueryForMemberRepository.findLikedByMemberWithOffset(currentMemberUuid,page,size)
+                        .map(postModel -> {
+                            JsonNode contentPreview;
+                            try {
+                                contentPreview = multipartDataProcessorPort.convertToPreviewData(postModel.content());
+                            } catch (IOException e) {
+                                throw new ContentProcessingException();
+                            }
+                            return postMapper.toPostSummaryResponse(postModel, contentPreview);
+                        })
+        );
+    }
+
+    public OffsetPageResponse<PostSummaryResponse> getBookmarkedByMemberUuid(UUID currentMemberUuid, int page, int size) {
+        return OffsetPageResponse.from(
+                postQueryForMemberRepository.findBookmarkedByMemberWithOffset(currentMemberUuid,page,size)
+                        .map(postModel -> {
+                            JsonNode contentPreview;
+                            try {
+                                contentPreview = multipartDataProcessorPort.convertToPreviewData(postModel.content());
+                            } catch (IOException e) {
+                                throw new ContentProcessingException();
+                            }
+                            return postMapper.toPostSummaryResponse(postModel, contentPreview);
+                        })
+        );
     }
 }

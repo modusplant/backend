@@ -10,7 +10,7 @@ public record OffsetPageResponse<T> (
         @Schema(description = "조회된 포스트")
         List<T> posts,
 
-        @Schema(description = "현재 페이지 번호(0부터 시작)", example = "2")
+        @Schema(description = "현재 페이지 번호(1부터 시작)", example = "2")
         int page,
 
         @Schema(description = "페이지 크기", example = "10")
@@ -31,7 +31,7 @@ public record OffsetPageResponse<T> (
     public static <T> OffsetPageResponse<T> from(Page<T> page) {
         return new OffsetPageResponse<>(
                 page.getContent(),
-                page.getNumber(),
+                page.getNumber()+1,
                 page.getSize(),
                 page.getTotalElements(),
                 page.getTotalPages(),
