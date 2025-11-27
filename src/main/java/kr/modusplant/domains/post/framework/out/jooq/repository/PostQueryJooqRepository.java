@@ -1,5 +1,6 @@
 package kr.modusplant.domains.post.framework.out.jooq.repository;
 
+import kr.modusplant.domains.post.domain.exception.EmptyCategoryIdException;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.framework.out.jooq.mapper.supers.PostJooqMapper;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
@@ -151,6 +152,9 @@ public class PostQueryJooqRepository implements PostQueryRepository {
     }
 
     private Condition buildCategoryConditions(UUID primaryCategoryUuid, List<UUID> secondaryCategoryUuids) {
+        if (primaryCategoryUuid == null && secondaryCategoryUuids != null && !secondaryCategoryUuids.isEmpty()) {
+            throw new EmptyCategoryIdException();
+        }
         Condition condition = noCondition();
         if(primaryCategoryUuid != null) {
             condition = condition.and(COMM_POST.PRI_CATE_UUID.eq(primaryCategoryUuid));
@@ -170,12 +174,10 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         Name alias = name("c");
         Condition contentCondition = exists(
                 selectOne()
-                        .from(table(
-                                function("jsonb_array_elements", JSONB.class, COMM_POST.CONTENT)
-                        ).as(alias))
+                        .from(table("jsonb_array_elements({0})", COMM_POST.CONTENT).as(alias))
                         .where(
-                                field("{0}->>'type",String.class, field(alias)).eq("text")
-                                        .and(field("{0}->>'data'", String.class, field(alias)).likeIgnoreCase(searchKeyword))
+                                field("{0}->>'type'", String.class, field(alias)).eq(val("text"))
+                                        .and(field("{0}->>'data'", String.class, field(alias)).likeIgnoreCase(val(searchKeyword)))
                         )
         );
         return titleCondition.or(contentCondition);
