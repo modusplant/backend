@@ -26,8 +26,6 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
     private final PostJooqMapper postJooqMapper;
     private static final JsonNodeConverter JSON_CONVERTER = new JsonNodeConverter();
 
-    // 쿼리 짜보기
-
     public Page<PostSummaryReadModel> findPublishedByAuthMemberWithOffset(AuthorId authorId, int page, int size) {
         long offset = (long) page * size;
 
@@ -153,7 +151,7 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                 ).on(COMM_POST.ULID.eq(field("cc.post_ulid", String.class)))
                 .where(COMM_POST.IS_PUBLISHED.isTrue())
                 .and(COMM_POST_LIKE.MEMB_UUID.eq(currentMemberUuid))
-                .orderBy(COMM_POST_LIKE.CREATED_AT.desc(), COMM_POST.PUBLISHED_AT.desc())
+                .orderBy(COMM_POST_LIKE.CREATED_AT.desc(), COMM_POST.ULID.desc())
                 .limit(size)
                 .offset(offset)
                 .fetch()
@@ -204,7 +202,7 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                 ).on(COMM_POST.ULID.eq(field("cc.post_ulid", String.class)))
                 .where(COMM_POST.IS_PUBLISHED.isTrue())
                 .and(COMM_POST_BOOKMARK.MEMB_UUID.eq(currentMemberUuid))
-                .orderBy(COMM_POST_BOOKMARK.CREATED_AT.desc(), COMM_POST.PUBLISHED_AT.desc())
+                .orderBy(COMM_POST_BOOKMARK.CREATED_AT.desc(), COMM_POST.ULID.desc())
                 .limit(size)
                 .offset(offset)
                 .fetch()

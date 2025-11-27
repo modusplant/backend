@@ -10,7 +10,6 @@ import kr.modusplant.infrastructure.converter.JsonNodeConverter;
 import lombok.RequiredArgsConstructor;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.JSONB;
 import org.jooq.Name;
 import org.springframework.stereotype.Repository;
 
