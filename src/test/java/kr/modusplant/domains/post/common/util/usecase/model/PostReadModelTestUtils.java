@@ -1,5 +1,6 @@
 package kr.modusplant.domains.post.common.util.usecase.model;
 
+import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 
@@ -67,5 +68,14 @@ public interface PostReadModelTestUtils {
             5,
             true,
             false
+    );
+
+    DraftPostReadModel TEST_DRAFT_POST_READ_MODEL = new DraftPostReadModel(
+            TEST_POST_ULID,
+            TEST_COMM_PRIMARY_CATEGORY_CATEGORY,
+            TEST_COMM_SECONDARY_CATEGORY_CATEGORY,
+            TEST_POST_TITLE,
+            TEST_POST_CONTENT,
+            testDate
     );
 }

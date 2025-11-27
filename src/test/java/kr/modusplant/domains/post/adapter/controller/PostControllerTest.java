@@ -7,19 +7,22 @@ import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
 import kr.modusplant.domains.post.common.util.usecase.model.PostReadModelTestUtils;
 import kr.modusplant.domains.post.common.util.usecase.request.PostRequestTestUtils;
 import kr.modusplant.domains.post.domain.aggregate.Post;
+import kr.modusplant.domains.post.domain.vo.AuthorId;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
 import kr.modusplant.domains.post.usecase.port.repository.*;
+import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
-import kr.modusplant.domains.post.usecase.response.CursorPageResponse;
-import kr.modusplant.domains.post.usecase.response.PostDetailResponse;
-import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;
+import kr.modusplant.domains.post.usecase.response.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
@@ -41,11 +44,12 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     private final PostMapper postMapper = new PostMapperImpl();
     private final PostRepository postRepository = Mockito.mock(PostRepository.class);
     private final PostQueryRepository postQueryRepository = Mockito.mock(PostQueryRepository.class);
+    private final PostQueryForMemberRepository postQueryForMemberRepository = Mockito.mock(PostQueryForMemberRepository.class);
     private final MultipartDataProcessorPort multipartDataProcessorPort = Mockito.mock(MultipartDataProcessorPort.class);
     private final PostViewCountRepository postViewCountRepository = Mockito.mock(PostViewCountRepository.class);
     private final PostViewLockRepository postViewLockRepository = Mockito.mock(PostViewLockRepository.class);
     private final PostArchiveRepository postArchiveRepository = Mockito.mock(PostArchiveRepository.class);
-    private final PostController postController = new PostController(postMapper, postRepository, postQueryRepository, multipartDataProcessorPort, postViewCountRepository,postViewLockRepository,postArchiveRepository);
+    private final PostController postController = new PostController(postMapper, postRepository, postQueryRepository, postQueryForMemberRepository, multipartDataProcessorPort, postViewCountRepository,postViewLockRepository,postArchiveRepository);
 
     @BeforeEach
     void setUp() {
@@ -332,6 +336,119 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         verify(postViewLockRepository).lock(any(PostId.class), eq(MEMBER_BASIC_USER_UUID), eq(ttl));
         verify(postViewCountRepository).read(any(PostId.class));
         verify(postViewCountRepository, never()).increase(any(PostId.class));
+    }
+
+    @Test
+    @DisplayName("특정 회원의 발행된 게시글 조회")
+    void testGetByMemberUuid_givenMemberUuidAndPage_willReturnOffsetPageResponse() throws IOException {
+        // given
+        int page = 1;
+        int size = 5;
+        long totalElements = 1;
+        Page<PostSummaryReadModel> readModelPage = new PageImpl<>(List.of(TEST_POST_SUMMARY_READ_MODEL), PageRequest.of(page-1,size),totalElements);
+
+        given(postQueryForMemberRepository.findPublishedByAuthMemberWithOffset(any(AuthorId.class), eq(page-1), eq(size))).willReturn(readModelPage);
+        given(multipartDataProcessorPort.convertToPreviewData(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
+
+        // when
+        OffsetPageResponse<PostSummaryResponse> result = postController.getByMemberUuid(MEMBER_BASIC_USER_UUID, page-1, size);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.posts()).hasSize(1);
+        assertThat(result.posts().getFirst().ulid()).isEqualTo(TEST_POST_SUMMARY_READ_MODEL.ulid());
+        assertThat(result.page()).isEqualTo(page);
+        assertThat(result.totalElements()).isEqualTo(totalElements);
+        assertThat(result.totalPages()).isEqualTo(1);
+        assertThat(result.hasNext()).isFalse();
+        assertThat(result.hasPrevious()).isFalse();
+        verify(postQueryForMemberRepository).findPublishedByAuthMemberWithOffset(any(AuthorId.class),eq(page-1),eq(size));
+        verify(multipartDataProcessorPort).convertToPreviewData(any(JsonNode.class));
+    }
+
+    @Test
+    @DisplayName("특정 회원의 임시저장 게시글 조회")
+    void testGetDraftByMemberUuid_givenMemberUuidAndPage_willReturnOffsetPageResponse() throws IOException {
+        // given
+        int page = 1;
+        int size = 5;
+        long totalElements = 1;
+        Page<DraftPostReadModel> readModelPage = new PageImpl<>(List.of(TEST_DRAFT_POST_READ_MODEL), PageRequest.of(page-1,size),totalElements);
+
+        given(postQueryForMemberRepository.findDraftByAuthMemberWithOffset(any(AuthorId.class), eq(page-1),eq(size))).willReturn(readModelPage);
+        given(multipartDataProcessorPort.convertToPreviewData(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
+
+        // when
+        OffsetPageResponse<DraftPostResponse> result = postController.getDraftByMemberUuid(MEMBER_BASIC_USER_UUID,page-1,size);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.posts()).hasSize(1);
+        assertThat(result.posts().getFirst().ulid()).isEqualTo(TEST_DRAFT_POST_READ_MODEL.ulid());
+        assertThat(result.page()).isEqualTo(page);
+        assertThat(result.totalElements()).isEqualTo(totalElements);
+        assertThat(result.totalPages()).isEqualTo(1);
+        assertThat(result.hasNext()).isFalse();
+        assertThat(result.hasPrevious()).isFalse();
+
+        verify(postQueryForMemberRepository).findDraftByAuthMemberWithOffset(any(AuthorId.class), eq(page-1),eq(size));
+        verify(multipartDataProcessorPort).convertToPreviewData(any(JsonNode.class));
+    }
+
+    @Test
+    @DisplayName("특정 회원의 좋아요한 게시글 목록 조회")
+    void testGetLikedByMemberUuid_givenMemberUuidAndPage_willReturnOffsetPageResponse() throws IOException {
+        // given
+        int page = 1;
+        int size = 5;
+        long totalElements = 1;
+        Page<PostSummaryReadModel> readModelPage = new PageImpl<>(List.of(TEST_POST_SUMMARY_READ_MODEL), PageRequest.of(page-1,size),totalElements);
+
+        given(postQueryForMemberRepository.findLikedByMemberWithOffset(eq(MEMBER_BASIC_USER_UUID), eq(page-1), eq(size))).willReturn(readModelPage);
+        given(multipartDataProcessorPort.convertToPreviewData(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
+
+        // when
+        OffsetPageResponse<PostSummaryResponse> result = postController.getLikedByMemberUuid(MEMBER_BASIC_USER_UUID,page-1,size);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.posts()).hasSize(1);
+        assertThat(result.posts().getFirst().ulid()).isEqualTo(TEST_POST_SUMMARY_READ_MODEL.ulid());
+        assertThat(result.page()).isEqualTo(page);
+        assertThat(result.totalElements()).isEqualTo(totalElements);
+        assertThat(result.totalPages()).isEqualTo(1);
+        assertThat(result.hasNext()).isFalse();
+        assertThat(result.hasPrevious()).isFalse();
+        verify(postQueryForMemberRepository).findLikedByMemberWithOffset(eq(MEMBER_BASIC_USER_UUID),eq(page-1),eq(size));
+        verify(multipartDataProcessorPort).convertToPreviewData(any(JsonNode.class));
+    }
+
+    @Test
+    @DisplayName("특정 회원의 북마크한 게시글 목록 조회")
+    void testGetBookmarkedByMemberUuid_givenMemberUuidAndPage_willReturnOffsetPageResponse() throws IOException {
+        // given
+        int page = 1;
+        int size = 5;
+        long totalElements = 1;
+        Page<PostSummaryReadModel> readModelPage = new PageImpl<>(List.of(TEST_POST_SUMMARY_READ_MODEL), PageRequest.of(page-1,size),totalElements);
+
+        given(postQueryForMemberRepository.findBookmarkedByMemberWithOffset(eq(MEMBER_BASIC_USER_UUID), eq(page-1), eq(size))).willReturn(readModelPage);
+        given(multipartDataProcessorPort.convertToPreviewData(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
+
+        // when
+        OffsetPageResponse<PostSummaryResponse> result = postController.getBookmarkedByMemberUuid(MEMBER_BASIC_USER_UUID,page-1,size);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.posts()).hasSize(1);
+        assertThat(result.posts().getFirst().ulid()).isEqualTo(TEST_POST_SUMMARY_READ_MODEL.ulid());
+        assertThat(result.page()).isEqualTo(page);
+        assertThat(result.totalElements()).isEqualTo(totalElements);
+        assertThat(result.totalPages()).isEqualTo(1);
+        assertThat(result.hasNext()).isFalse();
+        assertThat(result.hasPrevious()).isFalse();
+        verify(postQueryForMemberRepository).findBookmarkedByMemberWithOffset(eq(MEMBER_BASIC_USER_UUID),eq(page-1),eq(size));
+        verify(multipartDataProcessorPort).convertToPreviewData(any(JsonNode.class));
     }
 
 }

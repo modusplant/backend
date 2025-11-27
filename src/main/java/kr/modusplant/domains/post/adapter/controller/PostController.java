@@ -186,6 +186,10 @@ public class PostController {
                         }));
     }
 
+    /*public OffsetPageResponse<PostSummaryResponse> getRecentViewedByMemberUuid(UUID currentMemberUuid, PageRequest pageRequest) {
+        // redis 저장소 사용
+    }*/
+
     public OffsetPageResponse<PostSummaryResponse> getLikedByMemberUuid(UUID currentMemberUuid, int page, int size) {
         return OffsetPageResponse.from(
                 postQueryForMemberRepository.findLikedByMemberWithOffset(currentMemberUuid,page,size)
