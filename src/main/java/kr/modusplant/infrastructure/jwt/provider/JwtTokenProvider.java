@@ -19,12 +19,14 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -54,9 +56,6 @@ public class JwtTokenProvider {
     @Value("${jwt.refresh_duration}")
     private long refreshDuration;
 
-    @Value("${keystore.key-store}")
-    private String keyStorePath;
-
     @Value("${keystore.key-store-password}")
     private String keyStorePassword;
 
@@ -66,18 +65,20 @@ public class JwtTokenProvider {
     @Value("${keystore.key-alias}")
     private String keyAlias;
 
+    @Value("${keystore.key-store-filename}")
+    private String keyStoreFilename;
+
     private PrivateKey privateKey;
     private PublicKey publicKey;
 
     @PostConstruct
     public void init() throws Exception {
-        String relativeKeyStorePath = "src/main/resources/" + keyStorePath;
-        ClassPathResource classPathResource = new ClassPathResource(keyStorePath);
+        Path keyStorePath = Paths.get(System.getProperty("user.home")).resolve(keyStoreFilename);
         try {
             KeyStore keyStore = KeyStore.getInstance(keyStoreType);
             char[] password = keyStorePassword.toCharArray();
-            if (classPathResource.exists()) {
-                FileInputStream fis = new FileInputStream(relativeKeyStorePath);
+            if (Files.exists(keyStorePath)) {
+                InputStream fis = Files.newInputStream(keyStorePath);
                 keyStore.load(fis, password);
                 KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry)
                         keyStore.getEntry(keyAlias, new KeyStore.PasswordProtection(password));
@@ -97,7 +98,7 @@ public class JwtTokenProvider {
                 keyStore.load(null, password);
                 keyStore.setKeyEntry(keyAlias, privateKey, password, certChain);
 
-                FileOutputStream fos = new FileOutputStream(relativeKeyStorePath);
+                OutputStream fos = Files.newOutputStream(keyStorePath);
                 keyStore.store(fos, password);
             }
         } catch (KeyStoreException e) {
