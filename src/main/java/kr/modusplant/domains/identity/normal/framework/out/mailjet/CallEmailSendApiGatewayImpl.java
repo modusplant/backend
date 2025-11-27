@@ -6,6 +6,7 @@ import com.mailjet.client.MailjetRequest;
 import com.mailjet.client.MailjetResponse;
 import com.mailjet.client.errors.MailjetException;
 import com.mailjet.client.resource.Emailv31;
+import kr.modusplant.domains.identity.normal.domain.exception.NotSendableEmailException;
 import kr.modusplant.domains.identity.normal.usecase.enums.EmailType;
 import kr.modusplant.domains.identity.normal.usecase.port.contract.CallEmailSendApiGateway;
 import lombok.extern.slf4j.Slf4j;
@@ -110,6 +111,9 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
         MailjetResponse response;
         try {
             response = client.post(request);
+            if (response == null || !(200 <= response.getStatus() && response.getStatus() < 300)) {
+                throw new NotSendableEmailException();
+            }
         } catch (MailjetException e) {
             throw new RuntimeException(e.getMessage());
         }
