@@ -93,6 +93,7 @@ jobs:
           TEMP_USER_UUID: 00000000-0000-0000-0000-000000000000
 
           # ---- dummy ----
+          KEYSTORE_PASSWORD: keystore_dummy_password
           SPRINGDOC_API_DOCS_ENABLED: true
           SPRINGDOC_SWAGGER_UI_ENABLED: true
           LOGGING_LEVEL_ROOT: INFO
