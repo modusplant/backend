@@ -19,12 +19,14 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -54,39 +56,57 @@ public class JwtTokenProvider {
     @Value("${jwt.refresh_duration}")
     private long refreshDuration;
 
-//    @Value("${keystore.key-store}")
-//    private String keyStorePath;
-//
-//    @Value("${keystore.key-store-password}")
-//    private String keyStorePassword;
-//
-//    @Value("${keystore.key-store-type}")
-//    private String keyStoreType;
-//
-//    @Value("${keystore.key-alias}")
-//    private String keyAlias;
+    @Value("${keystore.key-store-password}")
+    private String keyStorePassword;
+
+    @Value("${keystore.key-store-type}")
+    private String keyStoreType;
+
+    @Value("${keystore.key-alias}")
+    private String keyAlias;
+
+    @Value("${keystore.key-store-filename}")
+    private String keyStoreFilename;
 
     private PrivateKey privateKey;
     private PublicKey publicKey;
 
     @PostConstruct
-    public void init() {
+    public void init() throws Exception {
+        Path keyStorePath = Paths.get(System.getProperty("user.home")).resolve(keyStoreFilename);
         try {
-            // 그냥 EC 키 한 쌍 메모리에만 생성해서 사용 (파일 X)
-            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
-            keyGen.initialize(256);
-            KeyPair keyPair = keyGen.generateKeyPair();
+            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+            char[] password = keyStorePassword.toCharArray();
+            if (Files.exists(keyStorePath)) {
+                InputStream fis = Files.newInputStream(keyStorePath);
+                keyStore.load(fis, password);
+                KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry)
+                        keyStore.getEntry(keyAlias, new KeyStore.PasswordProtection(password));
+                privateKey = privateKeyEntry.getPrivateKey();
+                publicKey = privateKeyEntry.getCertificate().getPublicKey();
+            } else {
+                // ECDSA 키 생성
+                KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
+                keyGen.initialize(256);
+                KeyPair keyPair = keyGen.generateKeyPair();
+                privateKey = keyPair.getPrivate();
+                publicKey = keyPair.getPublic();
 
-            this.privateKey = keyPair.getPrivate();
-            this.publicKey = keyPair.getPublic();
+                X509Certificate selfSignedCert = generateSelfSignedCertificate(keyPair, "SHA256withECDSA");
+                Certificate[] certChain = new Certificate[]{selfSignedCert};
 
-            log.warn("[JWT] Keystore 파일 없이 인메모리 키 페어를 사용합니다. (로컬/테스트용)");
-        } catch (Exception e) {
-            log.error("[JWT] JwtTokenProvider 초기화 실패", e);
-            throw new IllegalStateException("Failed to initialize JwtTokenProvider", e);
+                keyStore.load(null, password);
+                keyStore.setKeyEntry(keyAlias, privateKey, password, certChain);
+
+                OutputStream fos = Files.newOutputStream(keyStorePath);
+                keyStore.store(fos, password);
+            }
+        } catch (KeyStoreException e) {
+            throw new TokenKeyStorageException();
+        } catch (NoSuchAlgorithmException e) {
+            throw new TokenKeyCreationException();
         }
     }
-
 
     // Access RefreshToken 생성
     public String generateAccessToken(UUID uuid, Map<String, String> privateClaims) {
