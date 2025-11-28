@@ -1,5 +1,6 @@
 package kr.modusplant.framework.redis;
 
+import kr.modusplant.framework.redis.RedisHelper;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

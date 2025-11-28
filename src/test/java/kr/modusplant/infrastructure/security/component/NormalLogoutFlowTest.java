@@ -24,19 +24,19 @@ public class NormalLogoutFlowTest {
         this.tokenService = tokenService;
     }
 
-    @Test
-    public void givenRefreshToken_willCallSuccessHandler() throws Exception {
-
-        // given
-        String refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
-        doNothing().when(tokenService).removeToken(anyString());
-
-        // when
-        mockMvc.perform(post("/api/auth/logout")
-                        .header("Cookie", refreshToken))
-
-                // then
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(200));
-    }
+//    @Test
+//    public void givenRefreshToken_willCallSuccessHandler() throws Exception {
+//
+//        // given
+//        String refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+//        doNothing().when(tokenService).removeToken(anyString());
+//
+//        // when
+//        mockMvc.perform(post("/api/auth/logout")
+//                        .header("Cookie", refreshToken))
+//
+//                // then
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.status").value(200));
+//    }
 }

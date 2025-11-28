@@ -24,6 +24,8 @@ public enum NormalIdentityErrorCode implements ResponseCode {
     EMPTY_NICKNAME(HttpStatus.BAD_REQUEST, "empty_nickname", "닉네임이 비어 있습니다"),
     EMPTY_AGREED_TERMS_OF_VERSION(HttpStatus.BAD_REQUEST, "empty_agreed_terms_of_version", "동의한 약관의 버전 값이 비어 있습니다"),
 
+    ALREADY_EXISTS_NICKNAME(HttpStatus.BAD_REQUEST, "already_exists_nickname", "해당 닉네임이 이미 존재합니다"),
+    ALREADY_EXISTS_MEMBER(HttpStatus.BAD_REQUEST, "already_exists_member", "해당 사용자가 이미 존재합니다"),
     MEMBER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "member_already_exists", "해당 사용자가 이미 존재합니다"),
     MEMBER_NOT_FOUND_WITH_EMAIL(HttpStatus.BAD_REQUEST, "member_not_found_with_email", "해당 이메일을 가진 사용자가 존재하지 않습니다"),
 

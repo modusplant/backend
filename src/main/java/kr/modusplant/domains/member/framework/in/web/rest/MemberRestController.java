@@ -19,6 +19,11 @@ import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.jwt.exception.TokenExpiredException;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
+import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.infrastructure.jwt.exception.InvalidTokenException;
+import kr.modusplant.infrastructure.jwt.exception.TokenExpiredException;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
+import kr.modusplant.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -288,8 +293,23 @@ public class MemberRestController {
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
+//    private void validateTokenAndAccessToId(UUID id, String auth) {
+//        String accessToken = getTokenFromAuthorizationHeader(auth);
+//        if (!jwtTokenProvider.validateToken(accessToken)) {
+//            throw new TokenExpiredException();
+//        }
+//        if (!jwtTokenProvider.getMemberUuidFromToken(accessToken).equals(id)) {
+//            throw new IncorrectMemberIdException();
+//        }
+//    }
+
     private void validateTokenAndAccessToId(UUID id, String auth) {
-        String accessToken = getTokenFromAuthorizationHeader(auth);
+        String accessToken;
+        if (auth.startsWith("Bearer ")) {
+            accessToken = auth.substring(7);
+        } else {
+            throw new InvalidTokenException();
+        }
         if (!jwtTokenProvider.validateToken(accessToken)) {
             throw new TokenExpiredException();
         }

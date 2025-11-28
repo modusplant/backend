@@ -5,6 +5,7 @@ import kr.modusplant.infrastructure.security.models.DefaultUserDetails.DefaultUs
 import kr.modusplant.shared.enums.AuthProvider;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberCo
 
 public interface SiteMemberUserDetailsTestUtils {
 
-    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     DefaultUserDetailsBuilder testDefaultMemberUserDetailsBuilder = DefaultUserDetails.builder()
             .email("test123@example.com")

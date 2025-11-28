@@ -1,5 +1,6 @@
 package kr.modusplant.framework.aws.service;
 
+import kr.modusplant.framework.aws.service.S3FileService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

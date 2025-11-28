@@ -6,7 +6,7 @@ import kr.modusplant.domains.identity.normal.domain.vo.Email;
 import kr.modusplant.domains.identity.normal.domain.vo.Password;
 import kr.modusplant.domains.identity.normal.usecase.enums.EmailType;
 import kr.modusplant.domains.identity.normal.usecase.port.contract.CallEmailSendApiGateway;
-import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityRepository;
+import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityReadRepository;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityUpdateRepository;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailAuthRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequest;
@@ -36,7 +36,7 @@ public class EmailAuthController {
     private final EmailAuthTokenHelper tokenHelper;
     private final RedisHelper redisHelper;
     private final CallEmailSendApiGateway apiGateway;
-    private final NormalIdentityRepository identityRepository;
+    private final NormalIdentityReadRepository readRepository;
     private final NormalIdentityUpdateRepository identityUpdateRepository;
 
     public String sendAuthCodeEmail(EmailAuthRequest request) {
@@ -52,7 +52,7 @@ public class EmailAuthController {
     public String sendResetPasswordEmail(EmailAuthRequest request) {
         String email = request.email();
 
-        if (!identityRepository.existsByEmailAndProvider(email, AuthProvider.BASIC.getValue())) {
+        if (!readRepository.existsByEmailAndProvider(Email.create(email))) {
             throw new EntityNotFoundException(NormalIdentityErrorCode.MEMBER_NOT_FOUND_WITH_EMAIL, "email");
         }
 

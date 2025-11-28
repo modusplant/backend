@@ -54,11 +54,10 @@ public class NormalIdentityJooqRepository implements
     }
 
     @Override
-    public String getMemberPassword(MemberId memberId, AuthProvider provider) {
+    public String getMemberPassword(MemberId memberId) {
         return dsl.select(memberAuth.PW)
                 .from(memberAuth)
-                .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue()))
-                .and(memberAuth.PROVIDER.eq(provider.name()))
+                .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
                 .fetchOne(memberAuth.PW);
     }
 
@@ -74,16 +73,16 @@ public class NormalIdentityJooqRepository implements
     public boolean existsByMemberId(MemberId memberId) {
         return dsl.selectOne()
                 .from(memberAuth)
-                .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue()))
+                .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
                 .fetch()
                 .isNotEmpty();
     }
 
     @Override
-    public boolean existsByEmailAndProvider(Email email, AuthProvider provider) {
+    public boolean existsByEmailAndProvider(Email email) {
         return dsl.selectOne()
                 .from(memberAuth)
-                .where(memberAuth.EMAIL.eq(email.getEmail())).and(memberAuth.PROVIDER.eq(provider.name()))
+                .where(memberAuth.EMAIL.eq(email.getEmail())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
                 .fetch()
                 .isNotEmpty();
     }

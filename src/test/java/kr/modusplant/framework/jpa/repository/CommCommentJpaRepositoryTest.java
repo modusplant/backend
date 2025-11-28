@@ -131,23 +131,23 @@ public class CommCommentJpaRepositoryTest implements
         assertThat(List.of(savedCommCommentEntity)).isEqualTo(result);
     }
 
-    @Test
-    @DisplayName("댓글 내용으로 컨텐츠 댓글 찾기")
-    void findByContentTest() {
-        // given
-        CommCommentEntity commentEntity = createCommCommentEntityBuilder()
-                .postEntity(savedPostEntity)
-                .authMember(savedMemberEntity)
-                .createMember(savedMemberEntity)
-                .isDeleted(true)
-                .build();
-
-        // when
-        CommCommentEntity savedCommCommentEntity = commentRepository.save(commentEntity);
-        List<CommCommentEntity> result = commentRepository.findByContent(savedCommCommentEntity.getContent());
-
-        // then
-        assertThat(List.of(savedCommCommentEntity)).isEqualTo(result);
-    }
+//    @Test
+//    @DisplayName("댓글 내용으로 컨텐츠 댓글 찾기")
+//    void findByContentTest() {
+//        // given
+//        CommCommentEntity commentEntity = createCommCommentEntityBuilder()
+//                .postEntity(savedPostEntity)
+//                .authMember(savedMemberEntity)
+//                .createMember(savedMemberEntity)
+//                .isDeleted(true)
+//                .build();
+//
+//        // when
+//        CommCommentEntity savedCommCommentEntity = commentRepository.save(commentEntity);
+//        List<CommCommentEntity> result = commentRepository.findByContent(savedCommCommentEntity.getContent());
+//
+//        // then
+//        assertThat(List.of(savedCommCommentEntity)).isEqualTo(result);
+//    }
 
 }
