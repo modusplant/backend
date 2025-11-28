@@ -6,11 +6,14 @@ import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqRepository;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJpaAdapter;
-import kr.modusplant.domains.comment.usecase.request.CommentDeleteRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
-import kr.modusplant.domains.comment.usecase.response.CommentResponse;
+import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
+import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
+import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
 import kr.modusplant.shared.persistence.compositekey.CommCommentId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,15 +24,19 @@ import java.util.UUID;
 public class CommentController {
 
     private final CommentMapperImpl mapper;
-    private final CommentJooqRepository jooqAdapter;
+    private final CommentJooqRepository jooqRepository;
     private final CommentRepositoryJpaAdapter jpaAdapter;
 
-    public List<CommentResponse> gatherByPost(String postUlid) {
-        return jooqAdapter.findByPost(PostId.create(postUlid));
+    public List<CommentOfPostResponse> gatherByPost(String postUlid) {
+        return jooqRepository.findByPost(PostId.create(postUlid));
     }
 
-    public List<CommentResponse> gatherByAuthor(UUID memberUuid) {
-        return jooqAdapter.findByAuthor(Author.create(memberUuid));
+    public CommentPageResponse<CommentOfAuthorPageModel> gatherByAuthor(UUID memberUuid, Pageable pageable) {
+        PageImpl<CommentOfAuthorPageModel> result = jooqRepository.findByAuthor(Author.create(memberUuid), pageable);
+
+        return new CommentPageResponse<>(result.getContent(), result.getNumber(),
+                result.getSize(), result.getTotalElements(), result.getTotalPages(),
+                result.hasNext(), result.hasPrevious());
     }
 
     public void register(CommentRegisterRequest request) {
@@ -37,10 +44,10 @@ public class CommentController {
         jpaAdapter.save(comment);
     }
 
-    public void delete(CommentDeleteRequest request) {
-        jpaAdapter.deleteById(CommCommentId.builder()
-                .postUlid(request.postUlid())
-                .path(request.path())
+    public void delete(String postUlid, String commentPath) {
+        jpaAdapter.setCommentAsDeleted(CommCommentId.builder()
+                .postUlid(postUlid)
+                .path(commentPath)
                 .build());
     }
 

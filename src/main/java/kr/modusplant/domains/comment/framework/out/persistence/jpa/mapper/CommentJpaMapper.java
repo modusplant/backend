@@ -1,10 +1,7 @@
 package kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper;
 
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
-import kr.modusplant.domains.comment.domain.vo.Author;
-import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.CommentStatus;
-import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.domain.vo.enums.CommentStatusType;
 import kr.modusplant.framework.jpa.entity.CommCommentEntity;
 import kr.modusplant.framework.jpa.entity.CommPostEntity;
@@ -18,30 +15,13 @@ import org.mapstruct.Named;
 public interface CommentJpaMapper {
 
     @BeanMapping(ignoreByDefault = true)
-    @Mapping(source = "path", target = "path", qualifiedByName = "mapPath")
-    @Mapping(source = "postId", target = "postEntity", qualifiedByName = "mapPostEntity")
-    @Mapping(source = "author", target = "authMember", qualifiedByName = "mapMember")
-    @Mapping(source = "author", target = "createMember", qualifiedByName = "mapMember")
-    @Mapping(source = "content.content", target = "content")
-    @Mapping(source = "status", target = "isDeleted", qualifiedByName = "mapIsDeleted")
-    CommCommentEntity toCommCommentEntity(Comment comment);
-
-    @Named("mapPath")
-    default String mapPath(CommentPath commentPath) {
-        return commentPath.getPath();
-    }
-
-    @Named("mapPostEntity")
-    default CommPostEntity mapPostEntity(PostId postId) {
-        return CommPostEntity.builder().ulid(postId.getId()).build();
-    }
-
-    @Named("mapMember")
-    default SiteMemberEntity mapCommentMember(Author author) {
-        return SiteMemberEntity.builder()
-                .uuid(author.getMemberUuid())
-                .build();
-    }
+    @Mapping(source = "comment.path.path", target = "path")
+    @Mapping(source = "commentPost", target = "postEntity")
+    @Mapping(source = "commentAuthor", target = "authMember")
+    @Mapping(source = "commentAuthor", target = "createMember")
+    @Mapping(source = "comment.content.content", target = "content")
+    @Mapping(source = "comment.status", target = "isDeleted", qualifiedByName = "mapIsDeleted")
+    CommCommentEntity toCommCommentEntity(Comment comment, SiteMemberEntity commentAuthor, CommPostEntity commentPost);
 
     @Named("mapIsDeleted")
     default boolean mapIsDeleted(CommentStatus status) {
