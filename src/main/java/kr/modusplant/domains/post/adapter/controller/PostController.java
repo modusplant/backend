@@ -30,7 +30,6 @@ public class PostController {
     private final PostMapper postMapper;
     private final PostRepository postRepository;
     private final PostQueryRepository postQueryRepository;
-//    private final PostQueryForMemberRepository postQueryForMemberRepository;
     private final MultipartDataProcessorPort multipartDataProcessorPort;
     private final PostViewCountRepository postViewCountRepository;
     private final PostViewLockRepository postViewLockRepository;

@@ -12,8 +12,7 @@ import kr.modusplant.domains.post.usecase.request.FileOrder;
 import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
 import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
 import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
-import kr.modusplant.domains.post.usecase.response.CursorPageResponse;
-import kr.modusplant.domains.post.usecase.response.PostDetailResponse;
+import kr.modusplant.domains.post.usecase.response.*;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
@@ -50,7 +49,7 @@ public class PostRestController {
             description = "전체 게시글의 목록과 페이지 정보를 조회합니다."
     )
     @GetMapping
-    public ResponseEntity<DataResponse<CursorPageResponse<?>>> getAllPosts(
+    public ResponseEntity<DataResponse<CursorPageResponse<PostSummaryResponse>>> getAllPosts(
             @Parameter(schema = @Schema(description = "마지막 게시글 ID (첫 요청 시 생략)", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
             @RequestParam(name = "lastPostId", required = false)
             @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
@@ -80,7 +79,7 @@ public class PostRestController {
             description = "키워드별 컨텐츠 게시글의 목록과 페이지 정보를 조회합니다."
     )
     @GetMapping("/search")
-    public ResponseEntity<DataResponse<CursorPageResponse<?>>> getPostsByKeyword(
+    public ResponseEntity<DataResponse<CursorPageResponse<PostSummaryResponse>>> getPostsByKeyword(
             @Parameter(schema = @Schema(description = "마지막 게시글 ID (첫 요청 시 생략)", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
             @RequestParam(name = "lastPostId", required = false)
             @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")

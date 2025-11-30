@@ -13,9 +13,7 @@ import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorP
 import kr.modusplant.domains.post.usecase.port.repository.*;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
-import kr.modusplant.domains.post.usecase.response.CursorPageResponse;
-import kr.modusplant.domains.post.usecase.response.PostDetailResponse;
-import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;
+import kr.modusplant.domains.post.usecase.response.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
