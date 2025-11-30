@@ -1,4 +1,4 @@
-package kr.modusplant.infrastructure.converter;
+package kr.modusplant.framework.jooq.converter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,7 +10,7 @@ import org.jooq.exception.DataAccessException;
 import java.io.IOException;
 
 
-public class JsonNodeConverter implements Converter<JSONB, JsonNode> {
+public class JsonbJsonNodeConverter implements Converter<JSONB, JsonNode> {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override

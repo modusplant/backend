@@ -2,7 +2,7 @@ package kr.modusplant.domains.post.common.helper;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
-import kr.modusplant.infrastructure.converter.JsonNodeConverter;
+import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
 import kr.modusplant.jooq.tables.records.*;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.generator.EventType;
@@ -72,7 +72,7 @@ public class PostTestDataHelper {
                 .set(COMM_POST.LIKE_COUNT,30)
                 .set(COMM_POST.VIEW_COUNT,251)
                 .set(COMM_POST.TITLE,title)
-                .set(COMM_POST.CONTENT,new JsonNodeConverter().to(content))
+                .set(COMM_POST.CONTENT,new JsonbJsonNodeConverter().to(content))
                 .set(COMM_POST.IS_PUBLISHED,true)
                 .set(COMM_POST.PUBLISHED_AT,dateTime)
                 .set(COMM_POST.CREATED_AT,dateTime)
@@ -96,7 +96,7 @@ public class PostTestDataHelper {
                 .set(COMM_POST.LIKE_COUNT,0)
                 .set(COMM_POST.VIEW_COUNT,0)
                 .set(COMM_POST.TITLE,title)
-                .set(COMM_POST.CONTENT,new JsonNodeConverter().to(content))
+                .set(COMM_POST.CONTENT,new JsonbJsonNodeConverter().to(content))
                 .set(COMM_POST.IS_PUBLISHED,false)
                 .set(COMM_POST.CREATED_AT,dateTime)
                 .set(COMM_POST.UPDATED_AT,dateTime)
