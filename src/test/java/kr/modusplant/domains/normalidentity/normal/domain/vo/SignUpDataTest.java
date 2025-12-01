@@ -3,7 +3,10 @@ package kr.modusplant.domains.normalidentity.normal.domain.vo;
 import kr.modusplant.domains.identity.normal.domain.exception.EmptyValueException;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
 import kr.modusplant.domains.identity.normal.domain.vo.SignUpData;
-import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.*;
+import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.AgreedTermsOfVersionTestUtils;
+import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.NicknameTestUtils;
+import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.PasswordTestUtils;
+import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.SignUpDataTestUtils;
 import kr.modusplant.shared.exception.EmptyEmailException;
 import kr.modusplant.shared.exception.InvalidEmailException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
@@ -12,7 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, PasswordTestUtils,
+public class SignUpDataTest implements SignUpDataTestUtils, PasswordTestUtils,
         NicknameTestUtils, AgreedTermsOfVersionTestUtils {
 
     @Test
