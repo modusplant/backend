@@ -1,7 +1,9 @@
 package kr.modusplant.domains.identity.normal.framework.in.web.rest;
 
 import kr.modusplant.domains.identity.normal.adapter.controller.NormalIdentityController;
+import kr.modusplant.domains.identity.normal.common.util.usecase.request.EmailModificationRequestTestUtils;
 import kr.modusplant.domains.identity.normal.common.util.usecase.request.NormalSignUpRequestTestUtils;
+import kr.modusplant.domains.identity.normal.common.util.usecase.request.PasswordModificationRequestTestUtils;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
@@ -13,16 +15,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_ACTIVE_MEMBER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class NormalIdentityRestControllerUnitTest implements
-        RefreshTokenEntityTestUtils, NormalSignUpRequestTestUtils {
+        RefreshTokenEntityTestUtils, NormalSignUpRequestTestUtils,
+        EmailModificationRequestTestUtils, PasswordModificationRequestTestUtils {
 
     private final NormalIdentityController controller = Mockito.mock(NormalIdentityController.class);
     private final NormalIdentityRestController restController = new NormalIdentityRestController(controller);
 
     @Test
-    @DisplayName("유효한 요청을 받으면 일반 회원가입 응답 반환")
+    @DisplayName("유효한 요청을 받으면 일반 회원가입 후 성공 응답 반환")
     public void testRegisterNormalMember_givenValidRequest_willReturnSuccess() {
         // given & when
         ResponseEntity<DataResponse<Void>> response = restController.registerNormalMember(testNormalSignUpRequest);
@@ -32,8 +36,30 @@ public class NormalIdentityRestControllerUnitTest implements
     }
 
     @Test
-    @DisplayName("유효한 토큰을 받았을 시 일반 로그인 응답 반환")
-    public void testRespondToNormalLoginSuccess_givenValidToken_willReturnSuccess() {
+    @DisplayName("유효한 요청을 받으면 사용자의 이메일 갱신 후 성공 응답 반환")
+    public void testModifyEmail_givenValidRequest_willReturnSuccess() {
+        // given & when
+        ResponseEntity<DataResponse<Void>> response =
+                restController.modifyEmail(MEMBER_AUTH_BASIC_USER_ACTIVE_MEMBER_UUID, testEmailModificationRequest);
+
+        // then
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+    }
+
+    @Test
+    @DisplayName("유효한 요청을 받으면 사용자의 비밀번호 갱신 후 성공 응답 반환")
+    public void testModifyPassword_givenValidRequest_willReturnSuccess() {
+        // given & when
+        ResponseEntity<DataResponse<Void>> response =
+                restController.modifyPassword(MEMBER_AUTH_BASIC_USER_ACTIVE_MEMBER_UUID, testPasswordModificationRequest);
+
+        // then
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+    }
+
+    @Test
+    @DisplayName("유효한 토큰을 받으면 일반 로그인 응답 반환")
+    public void testModifyPassword_givenValidToken_willReturnSuccess() {
         // given
         String testAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwianRpIjoiYWJjMTIzeHl6NDU2IiwiZXhwIjoxNjM4NzY4MDIyLCJpYXQiOjE2MzYxNzYwMjJ9.7Qm6ZxQz3XW6J8KvY1lTn4RfG2HsPpLq1DwYb5Nv0eE";
         String testRefreshToken = createRefreshTokenBasicEntityBuilder().build().getRefreshToken();
