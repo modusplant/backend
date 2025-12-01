@@ -1,10 +1,10 @@
-package kr.modusplant.domains.identity.normal.adapter;
+package kr.modusplant.domains.identity.email.adapter;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequest;
+import kr.modusplant.domains.identity.email.usecase.request.EmailValidationRequest;
 import kr.modusplant.infrastructure.jwt.enums.TokenScope;
 import kr.modusplant.infrastructure.jwt.exception.InvalidTokenException;
 import kr.modusplant.infrastructure.jwt.exception.TokenExpiredException;

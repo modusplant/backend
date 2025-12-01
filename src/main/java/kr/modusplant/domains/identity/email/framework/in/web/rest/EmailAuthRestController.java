@@ -1,4 +1,4 @@
-package kr.modusplant.domains.identity.normal.framework.in.web.rest;
+package kr.modusplant.domains.identity.email.framework.in.web.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -8,11 +8,10 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import kr.modusplant.domains.identity.normal.adapter.controller.EmailAuthController;
-import kr.modusplant.domains.identity.normal.usecase.request.EmailAuthRequest;
-import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequest;
-import kr.modusplant.domains.identity.normal.usecase.request.InputValidationRequest;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.domains.identity.email.adapter.controller.EmailAuthController;
+import kr.modusplant.domains.identity.email.usecase.request.EmailAuthRequest;
+import kr.modusplant.domains.identity.email.usecase.request.EmailValidationRequest;
+import kr.modusplant.domains.identity.email.usecase.request.InputValidationRequest;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

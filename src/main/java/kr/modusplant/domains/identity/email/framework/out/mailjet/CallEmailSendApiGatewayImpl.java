@@ -1,4 +1,4 @@
-package kr.modusplant.domains.identity.normal.framework.out.mailjet;
+package kr.modusplant.domains.identity.email.framework.out.mailjet;
 
 import com.mailjet.client.ClientOptions;
 import com.mailjet.client.MailjetClient;
@@ -6,9 +6,9 @@ import com.mailjet.client.MailjetRequest;
 import com.mailjet.client.MailjetResponse;
 import com.mailjet.client.errors.MailjetException;
 import com.mailjet.client.resource.Emailv31;
-import kr.modusplant.domains.identity.normal.domain.exception.NotSendableEmailException;
-import kr.modusplant.domains.identity.normal.usecase.enums.EmailType;
-import kr.modusplant.domains.identity.normal.usecase.port.contract.CallEmailSendApiGateway;
+import kr.modusplant.domains.identity.email.domain.exception.NotSendableEmailException;
+import kr.modusplant.domains.identity.email.usecase.enums.EmailType;
+import kr.modusplant.domains.identity.email.usecase.port.gateway.CallEmailSendApiGateway;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;

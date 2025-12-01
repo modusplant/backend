@@ -1,4 +1,4 @@
-package kr.modusplant.domains.identity.normal.usecase.enums;
+package kr.modusplant.domains.identity.email.usecase.enums;
 
 import lombok.Getter;
 

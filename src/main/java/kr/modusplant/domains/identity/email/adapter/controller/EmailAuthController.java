@@ -1,19 +1,18 @@
-package kr.modusplant.domains.identity.normal.adapter.controller;
+package kr.modusplant.domains.identity.email.adapter.controller;
 
-import kr.modusplant.domains.identity.normal.adapter.EmailAuthTokenHelper;
+import kr.modusplant.domains.identity.email.adapter.EmailAuthTokenHelper;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
 import kr.modusplant.domains.identity.normal.domain.vo.Email;
 import kr.modusplant.domains.identity.normal.domain.vo.Password;
-import kr.modusplant.domains.identity.normal.usecase.enums.EmailType;
-import kr.modusplant.domains.identity.normal.usecase.port.contract.CallEmailSendApiGateway;
+import kr.modusplant.domains.identity.email.usecase.enums.EmailType;
+import kr.modusplant.domains.identity.email.usecase.port.gateway.CallEmailSendApiGateway;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityReadRepository;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityUpdateRepository;
-import kr.modusplant.domains.identity.normal.usecase.request.EmailAuthRequest;
-import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequest;
-import kr.modusplant.domains.identity.normal.usecase.request.InputValidationRequest;
+import kr.modusplant.domains.identity.email.usecase.request.EmailAuthRequest;
+import kr.modusplant.domains.identity.email.usecase.request.EmailValidationRequest;
+import kr.modusplant.domains.identity.email.usecase.request.InputValidationRequest;
 import kr.modusplant.framework.redis.RedisHelper;
 import kr.modusplant.framework.redis.RedisKeys;
-import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.InvalidDataException;
 import lombok.RequiredArgsConstructor;
