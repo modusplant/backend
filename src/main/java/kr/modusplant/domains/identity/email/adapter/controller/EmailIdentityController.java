@@ -1,15 +1,15 @@
 package kr.modusplant.domains.identity.email.adapter.controller;
 
 import kr.modusplant.domains.identity.email.adapter.EmailIdentityTokenHelper;
+import kr.modusplant.domains.identity.email.domain.exception.enums.EmailIdentityErrorCode;
+import kr.modusplant.domains.identity.email.domain.vo.Email;
+import kr.modusplant.domains.identity.email.domain.vo.Password;
 import kr.modusplant.domains.identity.email.usecase.enums.EmailType;
 import kr.modusplant.domains.identity.email.usecase.port.gateway.CallEmailSendApiGateway;
 import kr.modusplant.domains.identity.email.usecase.port.repository.EmailIdentityRepository;
 import kr.modusplant.domains.identity.email.usecase.request.EmailIdentityRequest;
 import kr.modusplant.domains.identity.email.usecase.request.EmailValidationRequest;
 import kr.modusplant.domains.identity.email.usecase.request.InputValidationRequest;
-import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
-import kr.modusplant.domains.identity.normal.domain.vo.Email;
-import kr.modusplant.domains.identity.normal.domain.vo.Password;
 import kr.modusplant.framework.redis.RedisHelper;
 import kr.modusplant.framework.redis.RedisKeys;
 import kr.modusplant.shared.exception.EntityNotFoundException;
@@ -50,7 +50,7 @@ public class EmailIdentityController {
         String email = request.email();
 
         if (!repository.existsByEmailAndProvider(Email.create(email))) {
-            throw new EntityNotFoundException(NormalIdentityErrorCode.MEMBER_NOT_FOUND_WITH_EMAIL, "email");
+            throw new EntityNotFoundException(EmailIdentityErrorCode.MEMBER_NOT_FOUND_WITH_EMAIL, "email");
         }
 
         String stringUuid = String.valueOf(UUID.randomUUID());

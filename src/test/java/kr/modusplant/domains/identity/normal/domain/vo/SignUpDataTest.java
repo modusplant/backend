@@ -1,7 +1,6 @@
 package kr.modusplant.domains.identity.normal.domain.vo;
 
 import kr.modusplant.domains.identity.normal.common.util.domain.vo.*;
-import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.*;
 import kr.modusplant.domains.identity.normal.domain.exception.EmptyValueException;
 import kr.modusplant.domains.identity.normal.domain.exception.InvalidValueException;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
