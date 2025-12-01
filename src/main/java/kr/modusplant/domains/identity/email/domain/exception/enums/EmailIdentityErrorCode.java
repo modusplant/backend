@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum EmailErrorCode implements ResponseCode {
+public enum EmailIdentityErrorCode implements ResponseCode {
 
     NOT_SENDABLE_EMAIL(HttpStatus.INTERNAL_SERVER_ERROR, "not_sendable_email", "서버에서 이메일을 보낼 수 없습니다");
 

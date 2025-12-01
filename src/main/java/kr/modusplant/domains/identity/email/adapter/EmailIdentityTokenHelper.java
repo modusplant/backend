@@ -25,7 +25,7 @@ import static kr.modusplant.shared.util.CastUtils.downcastToStringList;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class EmailAuthTokenHelper {
+public class EmailIdentityTokenHelper {
 
     // 메일 API 비밀키 설정
     @Value("${mail-api.jwt-secret-key}")
