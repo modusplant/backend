@@ -12,7 +12,6 @@ import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdent
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityUpdateRepository;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailModificationRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.NormalSignUpRequest;
-import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.domains.identity.normal.usecase.request.PasswordModificationRequest;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.InvalidDataException;
@@ -29,7 +28,7 @@ import java.util.UUID;
 public class NormalIdentityController {
 
     private final NormalIdentityMapper mapper;
-    private final NormalIdentityCreateRepository repository;
+    private final NormalIdentityCreateRepository createRepository;
     private final NormalIdentityUpdateRepository updateRepository;
     private final NormalIdentityReadRepository readRepository;
 
@@ -41,7 +40,7 @@ public class NormalIdentityController {
         } else if(readRepository.existsByNickname(Nickname.create(request.nickname()))) {
             throw new DataAlreadyExistsException(NormalIdentityErrorCode.ALREADY_EXISTS_NICKNAME);
         }  else {
-            repository.save(mapper.toSignUpData(request));
+            createRepository.save(mapper.toSignUpData(request));
         }
     }
 
