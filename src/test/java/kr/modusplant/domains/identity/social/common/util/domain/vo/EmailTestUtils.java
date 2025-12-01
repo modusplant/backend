@@ -1,6 +1,6 @@
 package kr.modusplant.domains.identity.social.common.util.domain.vo;
 
-import kr.modusplant.domains.identity.social.domain.vo.Email;
+import kr.modusplant.shared.kernel.Email;
 
 import static kr.modusplant.domains.identity.social.common.constant.SocialStringConstant.TEST_SOCIAL_GOOGLE_EMAIL_STRING;
 import static kr.modusplant.domains.identity.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_EMAIL_STRING;

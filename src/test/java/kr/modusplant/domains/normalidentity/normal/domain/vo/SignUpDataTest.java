@@ -1,10 +1,12 @@
 package kr.modusplant.domains.normalidentity.normal.domain.vo;
 
 import kr.modusplant.domains.identity.normal.domain.exception.EmptyValueException;
-import kr.modusplant.domains.identity.normal.domain.exception.InvalidValueException;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
 import kr.modusplant.domains.identity.normal.domain.vo.SignUpData;
 import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.*;
+import kr.modusplant.shared.exception.EmptyEmailException;
+import kr.modusplant.shared.exception.InvalidEmailException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -17,26 +19,26 @@ public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, Pass
     @DisplayName("null 값으로 회원가입 정보 생성")
     public void testCreate_givenNullEmail_willThrowEmptyValueException() {
         // given
-        EmptyValueException result = assertThrows(EmptyValueException.class, () ->
+        EmptyEmailException result = assertThrows(EmptyEmailException.class, () ->
                 SignUpData.create(null, testPassword.getPassword(),
                         testNickname.getNickname(), testAgreedTermsOfVersion.getVersion(),
                         testAgreedTermsOfVersion.getVersion(), testAgreedTermsOfVersion.getVersion()));
 
         // when & then
-        assertEquals(NormalIdentityErrorCode.EMPTY_EMAIL, result.getErrorCode());
+        assertEquals(ErrorCode.EMAIL_EMPTY, result.getErrorCode());
     }
 
     @Test
     @DisplayName("형식에 맞지 않는 값으로 회원가입 정보 생성")
     public void testCreate_givenInvalidEmail_willThrowInvalidValueException() {
         // given
-        InvalidValueException result = assertThrows(InvalidValueException.class, () ->
+        InvalidEmailException result = assertThrows(InvalidEmailException.class, () ->
                 SignUpData.create("testCredentials.getEmail()", testPassword.getPassword(),
                         testNickname.getNickname(), testAgreedTermsOfVersion.getVersion(),
                         testAgreedTermsOfVersion.getVersion(), testAgreedTermsOfVersion.getVersion()));
 
         // when & then
-        assertEquals(NormalIdentityErrorCode.INVALID_EMAIL, result.getErrorCode());
+        assertEquals(ErrorCode.INVALID_EMAIL, result.getErrorCode());
     }
 
     @Test

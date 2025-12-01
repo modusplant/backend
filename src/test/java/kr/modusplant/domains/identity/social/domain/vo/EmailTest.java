@@ -1,9 +1,10 @@
 package kr.modusplant.domains.identity.social.domain.vo;
 
 import kr.modusplant.domains.identity.social.common.util.domain.vo.EmailTestUtils;
-import kr.modusplant.domains.identity.social.domain.exception.EmptyEmailException;
-import kr.modusplant.domains.identity.social.domain.exception.InvalidEmailException;
-import kr.modusplant.domains.identity.social.domain.exception.enums.SocialIdentityErrorCode;
+import kr.modusplant.shared.exception.EmptyEmailException;
+import kr.modusplant.shared.exception.InvalidEmailException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.kernel.Email;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -28,9 +29,9 @@ class EmailTest implements EmailTestUtils {
         EmptyEmailException exception1 = assertThrows(EmptyEmailException.class, () -> Email.create(null));
         EmptyEmailException exception2 = assertThrows(EmptyEmailException.class, () -> Email.create(""));
         EmptyEmailException exception3 = assertThrows(EmptyEmailException.class, () -> Email.create("   "));
-        assertThat(exception1.getErrorCode()).isEqualTo(SocialIdentityErrorCode.EMPTY_EMAIL);
-        assertThat(exception2.getErrorCode()).isEqualTo(SocialIdentityErrorCode.EMPTY_EMAIL);
-        assertThat(exception3.getErrorCode()).isEqualTo(SocialIdentityErrorCode.EMPTY_EMAIL);
+        assertThat(exception1.getErrorCode()).isEqualTo(ErrorCode.EMAIL_EMPTY);
+        assertThat(exception2.getErrorCode()).isEqualTo(ErrorCode.EMAIL_EMPTY);
+        assertThat(exception3.getErrorCode()).isEqualTo(ErrorCode.EMAIL_EMPTY);
     }
 
     @Test
@@ -38,8 +39,8 @@ class EmailTest implements EmailTestUtils {
     void testCreate_givenInvalidEmailFormat_willThrowException() {
         InvalidEmailException exception1 = assertThrows(InvalidEmailException.class, () -> Email.create("invalid-email"));
         InvalidEmailException exception2 = assertThrows(InvalidEmailException.class, () -> Email.create("@example.com"));
-        assertThat(exception1.getErrorCode()).isEqualTo(SocialIdentityErrorCode.INVALID_EMAIL);
-        assertThat(exception2.getErrorCode()).isEqualTo(SocialIdentityErrorCode.INVALID_EMAIL);
+        assertThat(exception1.getErrorCode()).isEqualTo(ErrorCode.INVALID_EMAIL);
+        assertThat(exception2.getErrorCode()).isEqualTo(ErrorCode.INVALID_EMAIL);
     }
 
     @Test

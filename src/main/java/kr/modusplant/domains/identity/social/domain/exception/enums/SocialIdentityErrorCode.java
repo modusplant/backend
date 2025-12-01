@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum SocialIdentityErrorCode implements ResponseCode {
-    EMPTY_EMAIL(HttpStatus.BAD_REQUEST, "empty_email","이메일이 비어 있습니다. "),
-    INVALID_EMAIL(HttpStatus.BAD_REQUEST, "invalid_email", "이메일이 유효하지 않습니다. "),
     EMPTY_NICKNAME(HttpStatus.BAD_REQUEST,"empty_nickname", "닉네임이 비어 있습니다. "),
     INVALID_NICKNAME(HttpStatus.BAD_REQUEST, "invalid_nickname", "닉네임이 유효하지 않습니다. "),
     EMPTY_PROVIDER(HttpStatus.BAD_REQUEST, "empty_provider", "제공자가 비어 있습니다. "),
