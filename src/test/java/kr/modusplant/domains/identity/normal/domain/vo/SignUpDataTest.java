@@ -18,8 +18,8 @@ public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, Pass
         // given
         EmptyValueException result = assertThrows(EmptyValueException.class, () ->
                 SignUpData.create(null, testPassword.getPassword(),
-                        testNickname.getNickname(), testAgreedTermsOfVersion.getVersion(),
-                        testAgreedTermsOfVersion.getVersion(), testAgreedTermsOfVersion.getVersion()));
+                        testNickname.getNickname(), testAgreedTermsOfUse.getVersion(),
+                        testAgreedPrivacyPolicy.getVersion(), testAgreedAdReceiving.getVersion()));
 
         // when & then
         assertEquals(NormalIdentityErrorCode.EMPTY_EMAIL, result.getErrorCode());
@@ -31,8 +31,8 @@ public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, Pass
         // given
         InvalidValueException result = assertThrows(InvalidValueException.class, () ->
                 SignUpData.create("testCredentials.getEmail()", testPassword.getPassword(),
-                        testNickname.getNickname(), testAgreedTermsOfVersion.getVersion(),
-                        testAgreedTermsOfVersion.getVersion(), testAgreedTermsOfVersion.getVersion()));
+                        testNickname.getNickname(), testAgreedTermsOfUse.getVersion(),
+                        testAgreedPrivacyPolicy.getVersion(), testAgreedAdReceiving.getVersion()));
 
         // when & then
         assertEquals(NormalIdentityErrorCode.INVALID_EMAIL, result.getErrorCode());
@@ -59,9 +59,9 @@ public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, Pass
     @DisplayName("동일하고 다른 프로퍼티를 지닌 객체로 동등성 비교")
     void testEquals_givenDifferentProperty_willReturnFalse() {
         // given
-        SignUpData signUpData = SignUpData.create("fame@example.com", testPassword.getPassword(),
-                testNickname.getNickname(), testAgreedTermsOfVersion.getVersion(),
-                testAgreedTermsOfVersion.getVersion(), testAgreedTermsOfVersion.getVersion());
+        SignUpData signUpData = SignUpData.create(testEmail.getEmail(), testPassword.getPassword(),
+                testNickname.getNickname(), testAgreedPrivacyPolicy.getVersion(),
+                testAgreedTermsOfUse.getVersion(), testAgreedAdReceiving.getVersion());
 
         assertNotEquals(testNickname, signUpData);
     }
