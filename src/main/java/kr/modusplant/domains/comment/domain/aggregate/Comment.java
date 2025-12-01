@@ -18,7 +18,6 @@ public class Comment {
     private final CommentContent content;
     private final CommentStatus status;
 
-    // TODO: PostId는 게시글 담당자가 개발한 PostId VO로 대체될 예정
     public static Comment create(PostId postId, CommentPath path, Author author, CommentContent content) {
         if(postId == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID); }
         if(path == null) { throw new EmptyValueException(CommentErrorCode.INVALID_COMMENT_PATH); }
