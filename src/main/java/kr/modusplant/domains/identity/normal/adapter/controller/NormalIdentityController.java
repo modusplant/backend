@@ -12,7 +12,6 @@ import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdent
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityUpdateRepository;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailModificationRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.NormalSignUpRequest;
-import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.domains.identity.normal.usecase.request.PasswordModificationRequest;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.InvalidDataException;

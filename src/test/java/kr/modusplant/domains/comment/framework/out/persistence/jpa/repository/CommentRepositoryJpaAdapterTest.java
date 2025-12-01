@@ -7,18 +7,11 @@ import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper.CommentJpaMapper;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.supers.CommentJpaRepository;
 import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
-import kr.modusplant.framework.jpa.entity.CommCommentEntity;
 import kr.modusplant.framework.jpa.entity.common.util.CommCommentEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.CommCommentIdTestUtils;
 import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
 
 public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
         CommentResponseTestUtils, MemberIdTestUtils,

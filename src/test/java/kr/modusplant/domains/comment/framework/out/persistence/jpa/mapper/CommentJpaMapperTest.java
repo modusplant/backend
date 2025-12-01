@@ -1,15 +1,8 @@
 package kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper;
 
 import kr.modusplant.domains.comment.common.util.domain.CommentTestUtils;
-import kr.modusplant.framework.jpa.entity.CommCommentEntity;
 import kr.modusplant.framework.jpa.entity.common.util.CommCommentEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import static kr.modusplant.shared.persistence.common.util.constant.CommCommentConstant.TEST_COMM_COMMENT_PATH;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class CommentJpaMapperTest implements CommentTestUtils, CommCommentEntityTestUtils,
         SiteMemberEntityTestUtils {

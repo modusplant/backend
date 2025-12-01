@@ -1,10 +1,10 @@
 package kr.modusplant.domains.normalidentity.normal.domain.vo;
 
-import kr.modusplant.domains.identity.normal.domain.vo.Credentials;
-import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.CredentialsTestUtils;
 import kr.modusplant.domains.identity.normal.domain.exception.EmptyValueException;
 import kr.modusplant.domains.identity.normal.domain.exception.InvalidValueException;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
+import kr.modusplant.domains.identity.normal.domain.vo.Credentials;
+import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.CredentialsTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

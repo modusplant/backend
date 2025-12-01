@@ -14,17 +14,12 @@ import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.shared.enums.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.Duration;
-
-import static kr.modusplant.shared.persistence.constant.TableColumnName.REFRESH_TOKEN;
 
 @Tag(name = "소셜 로그인 API", description = "소셜 로그인을 다루는 API입니다.")
 @RestController

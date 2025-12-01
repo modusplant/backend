@@ -13,7 +13,6 @@ import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequ
 import kr.modusplant.domains.identity.normal.usecase.request.InputValidationRequest;
 import kr.modusplant.framework.redis.RedisHelper;
 import kr.modusplant.framework.redis.RedisKeys;
-import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.InvalidDataException;
 import lombok.RequiredArgsConstructor;

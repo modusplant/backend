@@ -17,13 +17,9 @@ import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
-import kr.modusplant.infrastructure.jwt.exception.TokenExpiredException;
-import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.jwt.exception.InvalidTokenException;
 import kr.modusplant.infrastructure.jwt.exception.TokenExpiredException;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,7 +32,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
-import static kr.modusplant.infrastructure.jwt.util.TokenUtils.getTokenFromAuthorizationHeader;
 import static kr.modusplant.shared.constant.Regex.*;
 
 @Tag(name = "회원 API", description = "회원의 생성과 갱신(상태 제외), 회원이 할 수 있는 단일한 기능을 관리하는 API 입니다.")
