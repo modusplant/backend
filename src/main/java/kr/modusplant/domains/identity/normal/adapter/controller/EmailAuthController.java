@@ -59,7 +59,7 @@ public class EmailAuthController {
         UUID uuid = UUID.randomUUID();
         String stringUuid = String.valueOf(uuid);
         String redisKey = RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, stringUuid);
-        redisHelper.setString(redisKey, email, Duration.ofMinutes(3));
+        redisHelper.setString(redisKey, email, Duration.ofMinutes(5));
 
         apiGateway.execute(email, stringUuid, EmailType.RESET_PASSWORD_EMAIL);
         return tokenHelper.generateResetPasswordAccessToken(email, RESET_PASSWORD_EMAIL);
