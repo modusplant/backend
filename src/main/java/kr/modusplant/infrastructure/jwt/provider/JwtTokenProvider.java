@@ -78,8 +78,8 @@ public class JwtTokenProvider {
             KeyStore keyStore = KeyStore.getInstance(keyStoreType);
             char[] password = keyStorePassword.toCharArray();
             if (Files.exists(keyStorePath)) {
-                InputStream fis = Files.newInputStream(keyStorePath);
-                keyStore.load(fis, password);
+                InputStream inputStream = Files.newInputStream(keyStorePath);
+                keyStore.load(inputStream, password);
                 KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry)
                         keyStore.getEntry(keyAlias, new KeyStore.PasswordProtection(password));
                 privateKey = privateKeyEntry.getPrivateKey();
@@ -98,8 +98,8 @@ public class JwtTokenProvider {
                 keyStore.load(null, password);
                 keyStore.setKeyEntry(keyAlias, privateKey, password, certChain);
 
-                OutputStream fos = Files.newOutputStream(keyStorePath);
-                keyStore.store(fos, password);
+                OutputStream outputStream = Files.newOutputStream(keyStorePath);
+                keyStore.store(outputStream, password);
             }
         } catch (KeyStoreException e) {
             throw new TokenKeyStorageException();
