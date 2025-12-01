@@ -7,5 +7,5 @@ public interface CommentWriteRepository {
 
     void save(Comment comment);
 
-    void deleteById(CommCommentId id);
+    void setCommentAsDeleted(CommCommentId id);
 }
