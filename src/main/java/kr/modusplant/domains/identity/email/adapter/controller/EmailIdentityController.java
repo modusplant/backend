@@ -1,16 +1,15 @@
 package kr.modusplant.domains.identity.email.adapter.controller;
 
 import kr.modusplant.domains.identity.email.adapter.EmailIdentityTokenHelper;
-import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
-import kr.modusplant.domains.identity.normal.domain.vo.Email;
-import kr.modusplant.domains.identity.normal.domain.vo.Password;
 import kr.modusplant.domains.identity.email.usecase.enums.EmailType;
 import kr.modusplant.domains.identity.email.usecase.port.gateway.CallEmailSendApiGateway;
-import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityReadRepository;
-import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityUpdateRepository;
+import kr.modusplant.domains.identity.email.usecase.port.repository.EmailIdentityRepository;
 import kr.modusplant.domains.identity.email.usecase.request.EmailIdentityRequest;
 import kr.modusplant.domains.identity.email.usecase.request.EmailValidationRequest;
 import kr.modusplant.domains.identity.email.usecase.request.InputValidationRequest;
+import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
+import kr.modusplant.domains.identity.normal.domain.vo.Email;
+import kr.modusplant.domains.identity.normal.domain.vo.Password;
 import kr.modusplant.framework.redis.RedisHelper;
 import kr.modusplant.framework.redis.RedisKeys;
 import kr.modusplant.shared.exception.EntityNotFoundException;
@@ -35,8 +34,7 @@ public class EmailIdentityController {
     private final EmailIdentityTokenHelper tokenHelper;
     private final RedisHelper redisHelper;
     private final CallEmailSendApiGateway apiGateway;
-    private final NormalIdentityReadRepository readRepository;
-    private final NormalIdentityUpdateRepository identityUpdateRepository;
+    private final EmailIdentityRepository repository;
 
     public String sendAuthCodeEmail(EmailIdentityRequest request) {
         String verificationCode = tokenHelper.generateVerifyCode();
@@ -51,12 +49,11 @@ public class EmailIdentityController {
     public String sendResetPasswordEmail(EmailIdentityRequest request) {
         String email = request.email();
 
-        if (!readRepository.existsByEmailAndProvider(Email.create(email))) {
+        if (!repository.existsByEmailAndProvider(Email.create(email))) {
             throw new EntityNotFoundException(NormalIdentityErrorCode.MEMBER_NOT_FOUND_WITH_EMAIL, "email");
         }
 
-        UUID uuid = UUID.randomUUID();
-        String stringUuid = String.valueOf(uuid);
+        String stringUuid = String.valueOf(UUID.randomUUID());
         String redisKey = RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, stringUuid);
         redisHelper.setString(redisKey, email, Duration.ofMinutes(3));
 
@@ -76,6 +73,6 @@ public class EmailIdentityController {
         tokenHelper.validateResetPasswordInputAccessToken(accessToken);
         String email = tokenHelper.getClaims(accessToken).get("email", String.class);
         String password = request.password();
-        identityUpdateRepository.updatePassword(Email.create(email), Password.create(password));
+        repository.updatePassword(Email.create(email), Password.create(password));
     }
 }
