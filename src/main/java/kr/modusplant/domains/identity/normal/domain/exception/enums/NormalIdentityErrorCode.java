@@ -27,9 +27,7 @@ public enum NormalIdentityErrorCode implements ResponseCode {
     ALREADY_EXISTS_NICKNAME(HttpStatus.BAD_REQUEST, "already_exists_nickname", "해당 닉네임이 이미 존재합니다"),
     ALREADY_EXISTS_MEMBER(HttpStatus.BAD_REQUEST, "already_exists_member", "해당 사용자가 이미 존재합니다"),
     MEMBER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "member_already_exists", "해당 사용자가 이미 존재합니다"),
-    MEMBER_NOT_FOUND_WITH_EMAIL(HttpStatus.BAD_REQUEST, "member_not_found_with_email", "해당 이메일을 가진 사용자가 존재하지 않습니다"),
-
-    NOT_SENDABLE_EMAIL(HttpStatus.INTERNAL_SERVER_ERROR, "not_sendable_email", "서버에서 이메일을 보낼 수 없습니다");
+    MEMBER_NOT_FOUND_WITH_EMAIL(HttpStatus.BAD_REQUEST, "member_not_found_with_email", "해당 이메일을 가진 사용자가 존재하지 않습니다");
 
     private final HttpStatus httpStatus;
     private final String code;

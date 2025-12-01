@@ -1,4 +1,4 @@
-package kr.modusplant.domains.identity.normal.usecase.request;
+package kr.modusplant.domains.identity.email.usecase.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

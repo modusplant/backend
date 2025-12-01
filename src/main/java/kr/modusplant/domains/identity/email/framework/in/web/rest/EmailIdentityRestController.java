@@ -1,4 +1,4 @@
-package kr.modusplant.domains.identity.normal.framework.in.web.rest;
+package kr.modusplant.domains.identity.email.framework.in.web.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -8,11 +8,10 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import kr.modusplant.domains.identity.normal.adapter.controller.EmailAuthController;
-import kr.modusplant.domains.identity.normal.usecase.request.EmailAuthRequest;
-import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequest;
-import kr.modusplant.domains.identity.normal.usecase.request.InputValidationRequest;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.domains.identity.email.adapter.controller.EmailIdentityController;
+import kr.modusplant.domains.identity.email.usecase.request.EmailIdentityRequest;
+import kr.modusplant.domains.identity.email.usecase.request.EmailValidationRequest;
+import kr.modusplant.domains.identity.email.usecase.request.InputValidationRequest;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,14 +30,14 @@ import static kr.modusplant.shared.constant.Regex.REGEX_UUID;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 @Validated
-public class EmailAuthRestController {
+public class EmailIdentityRestController {
 
-    private final EmailAuthController controller;
+    private final EmailIdentityController controller;
 
     @Operation(summary = "인증 코드 메일 전송 API", description = "인증 코드를 포함하는 메일을 발송합니다. ")
     @PostMapping("/members/verify-email/send")
     public ResponseEntity<DataResponse<?>> sendAuthCodeEmail(
-            @RequestBody @Valid EmailAuthRequest request,
+            @RequestBody @Valid EmailIdentityRequest request,
             HttpServletResponse httpResponse
     ) {
         String accessToken = controller.sendAuthCodeEmail(request);
@@ -67,7 +66,7 @@ public class EmailAuthRestController {
     @Operation(summary = "비밀번호 재설정 메일 전송 API", description = "비밀번호 재설정 전용 하이퍼링크를 포함하는 메일을 발송합니다.")
     @PostMapping("/auth/reset-password-request/send")
     public ResponseEntity<DataResponse<?>> sendResetPasswordEmail(
-            @RequestBody @Valid EmailAuthRequest request, HttpServletResponse httpResponse
+            @RequestBody @Valid EmailIdentityRequest request, HttpServletResponse httpResponse
     ) {
         String accessToken = controller.sendResetPasswordEmail(request);
 

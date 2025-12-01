@@ -1,4 +1,4 @@
-package kr.modusplant.domains.identity.normal.usecase.request;
+package kr.modusplant.domains.identity.email.usecase.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Pattern;
 
 import static kr.modusplant.shared.constant.Regex.REGEX_EMAIL;
 
-public record EmailAuthRequest(
+public record EmailIdentityRequest(
         @Schema(
                 description = "이메일",
                 pattern = REGEX_EMAIL,
