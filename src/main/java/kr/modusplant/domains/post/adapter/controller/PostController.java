@@ -5,6 +5,7 @@ import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.exception.PostAccessDeniedException;
 import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
 import kr.modusplant.domains.post.domain.vo.*;
+import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
@@ -45,15 +46,7 @@ public class PostController {
         boolean hasNext = readModels.size() > size;
         List<PostSummaryResponse> responses = readModels.stream()
                 .limit(size)
-                .map(readModel -> {
-                    JsonNode contentPreview;
-                    try {
-                        contentPreview = multipartDataProcessorPort.convertToPreviewData(readModel.content());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    return postMapper.toPostSummaryResponse(readModel,contentPreview);
-                }).toList();
+                .map(readModel -> postMapper.toPostSummaryResponse(readModel,getJsonNodeContentPreview(readModel))).toList();
         String nextUlid = hasNext && !responses.isEmpty() ? responses.get(responses.size() - 1).ulid() : null;
         return CursorPageResponse.of(responses, nextUlid, hasNext);
     }
@@ -63,15 +56,7 @@ public class PostController {
         boolean hasNext = readModels.size() > size;
         List<PostSummaryResponse> responses = readModels.stream()
                 .limit(size)
-                .map(readModel -> {
-                    JsonNode contentPreview;
-                    try {
-                        contentPreview = multipartDataProcessorPort.convertToPreviewData(readModel.content());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    return postMapper.toPostSummaryResponse(readModel,contentPreview);
-                }).toList();
+                .map(readModel -> postMapper.toPostSummaryResponse(readModel,getJsonNodeContentPreview(readModel))).toList();
         String nextUlid = hasNext && !responses.isEmpty() ? responses.get(responses.size() - 1).ulid() : null;
         return CursorPageResponse.of(responses, nextUlid, hasNext);
     }
@@ -80,19 +65,11 @@ public class PostController {
         return postQueryRepository.findPostDetailByPostId(PostId.create(ulid),currentMemberUuid)
                 .filter(postDetail -> postDetail.isPublished() ||
                         (!postDetail.isPublished() && postDetail.authorUuid().equals(currentMemberUuid)))
-                .map(postDetail -> {
-                    JsonNode content;
-                    try {
-                        content = multipartDataProcessorPort.convertFileSrcToBinaryData(postDetail.content());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    return postMapper.toPostDetailResponse(
-                            postDetail,
-                            content,
-                            postDetail.isPublished() ? postViewCountRepository.read(PostId.create(ulid)) : 0L
-                    );
-                });
+                .map(postDetail -> postMapper.toPostDetailResponse(
+                        postDetail,
+                        getJsonNodeContent(postDetail),
+                        postDetail.isPublished() ? postViewCountRepository.read(PostId.create(ulid)) : 0L
+                ));
     }
 
     @Transactional
@@ -154,5 +131,25 @@ public class PostController {
         }
         // 조회수 증가
         return postViewCountRepository.increase(PostId.create(ulid));
+    }
+
+    private JsonNode getJsonNodeContentPreview(PostSummaryReadModel readModel) {
+        JsonNode contentPreview;
+        try {
+            contentPreview = multipartDataProcessorPort.convertToPreview(readModel.content());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return contentPreview;
+    }
+
+    private JsonNode getJsonNodeContent(PostDetailReadModel readModel) {
+        JsonNode content;
+        try {
+            content = multipartDataProcessorPort.convertFileSrcToFullFileSrc(readModel.content());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return content;
     }
 }

@@ -70,7 +70,7 @@ public class PostRestController {
             @RequestParam(name = "secondaryCategoryId", required = false)
             List<UUID> secondaryCategoryUuids
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
         if(primaryCategoryUuid == null && secondaryCategoryUuids != null && !secondaryCategoryUuids.isEmpty()) {
             throw new EmptyCategoryIdException();
         }
@@ -99,7 +99,7 @@ public class PostRestController {
             @RequestParam(required = false)
             String keyword
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
         return ResponseEntity.ok().body(DataResponse.ok(postController.getByKeyword(keyword, currentMemberUuid, lastUlid, size)));
     }
 
@@ -117,7 +117,7 @@ public class PostRestController {
             @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
             String ulid
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
         Optional<PostDetailResponse> optionalPostResponse = postController.getByUlid(ulid,currentMemberUuid);
         if (optionalPostResponse.isEmpty()) {
             return ResponseEntity.ok().body(DataResponse.ok());
@@ -129,7 +129,6 @@ public class PostRestController {
             summary = "컨텐츠 게시글 추가 API",
             description = "컨텐츠 게시글을 작성합니다."
     )
-    @SecurityRequirement(name = "Authorization")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> insertPost(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
@@ -178,7 +177,6 @@ public class PostRestController {
             summary = "특정 컨텐츠 게시글 수정 API",
             description = "특정 컨텐츠 게시글을 수정합니다."
     )
-    @SecurityRequirement(name = "Authorization")
     @PutMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> updatePost(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
@@ -233,7 +231,6 @@ public class PostRestController {
             summary = "특정 컨텐츠 게시글 삭제 API",
             description = "특정 컨텐츠 게시글을 삭제합니다."
     )
-    @SecurityRequirement(name = "Authorization")
     @DeleteMapping("/{postId}")
     public ResponseEntity<DataResponse<Void>> removePostByUlid(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
@@ -278,7 +275,7 @@ public class PostRestController {
             @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
             String ulid
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
         return ResponseEntity.ok().body(DataResponse.ok(postController.increaseViewCount(ulid, currentMemberUuid)));
     }
 }

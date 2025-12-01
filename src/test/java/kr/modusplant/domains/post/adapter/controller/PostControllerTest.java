@@ -61,7 +61,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         List<PostSummaryReadModel> readModels = List.of(TEST_POST_SUMMARY_READ_MODEL);
 
         given(postQueryRepository.findByCategoryWithCursor(testPrimaryCategoryId.getValue(), List.of(testSecondaryCategoryId.getValue()), memberUuid, ulid, size)).willReturn(readModels);
-        given(multipartDataProcessorPort.convertToPreviewData(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
+        given(multipartDataProcessorPort.convertToPreview(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
 
         // when
         CursorPageResponse<PostSummaryResponse> result = postController.getAll(categoryRequest, memberUuid, ulid, size);
@@ -74,7 +74,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         assertThat(result.hasNext()).isFalse();
 
         verify(postQueryRepository).findByCategoryWithCursor(testPrimaryCategoryId.getValue(), List.of(testSecondaryCategoryId.getValue()), memberUuid, ulid, size);
-        verify(multipartDataProcessorPort).convertToPreviewData(TEST_POST_SUMMARY_READ_MODEL.content());
+        verify(multipartDataProcessorPort).convertToPreview(TEST_POST_SUMMARY_READ_MODEL.content());
     }
 
     @Test
@@ -88,7 +88,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         List<PostSummaryReadModel> readModels = List.of(TEST_POST_SUMMARY_READ_MODEL);
 
         given(postQueryRepository.findByKeywordWithCursor(keyword, memberUuid, ulid, size)).willReturn(readModels);
-        given(multipartDataProcessorPort.convertToPreviewData(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
+        given(multipartDataProcessorPort.convertToPreview(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
 
         // when
         CursorPageResponse<PostSummaryResponse> result = postController.getByKeyword(keyword, memberUuid, ulid, size);
@@ -101,7 +101,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         assertThat(result.hasNext()).isFalse();
 
         verify(postQueryRepository).findByKeywordWithCursor(keyword, memberUuid, ulid, size);
-        verify(multipartDataProcessorPort).convertToPreviewData(TEST_POST_SUMMARY_READ_MODEL.content());
+        verify(multipartDataProcessorPort).convertToPreview(TEST_POST_SUMMARY_READ_MODEL.content());
     }
 
     @Test
@@ -111,7 +111,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         Long viewCount = 100L;
 
         given(postQueryRepository.findPostDetailByPostId(any(PostId.class), eq(MEMBER_BASIC_USER_UUID))).willReturn(Optional.of(TEST_PUBLISHED_POST_DETAIL_READ_MODEL));
-        given(multipartDataProcessorPort.convertFileSrcToBinaryData(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
+        given(multipartDataProcessorPort.convertFileSrcToFullFileSrc(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
         given(postViewCountRepository.read(any(PostId.class))).willReturn(viewCount);
 
         // when
@@ -121,7 +121,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         assertThat(result).isPresent();
         assertThat(result.get().ulid()).isEqualTo(TEST_POST_ULID);
         verify(postQueryRepository).findPostDetailByPostId(any(PostId.class), eq(MEMBER_BASIC_USER_UUID));
-        verify(multipartDataProcessorPort).convertFileSrcToBinaryData(any(JsonNode.class));
+        verify(multipartDataProcessorPort).convertFileSrcToFullFileSrc(any(JsonNode.class));
         verify(postViewCountRepository).read(any(PostId.class));
     }
 
@@ -130,7 +130,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     void testGetByUlid_givenDraftPostAndAuthor_willReturnPostDetail() throws IOException {
         // given
         given(postQueryRepository.findPostDetailByPostId(any(PostId.class), eq(MEMBER_BASIC_USER_UUID))).willReturn(Optional.of(TEST_DRAFT_POST_DETAIL_READ_MODEL));
-        given(multipartDataProcessorPort.convertFileSrcToBinaryData(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
+        given(multipartDataProcessorPort.convertFileSrcToFullFileSrc(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
 
         // when
         Optional<PostDetailResponse> result = postController.getByUlid(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
@@ -138,7 +138,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         // then
         assertThat(result).isPresent();
         verify(postQueryRepository).findPostDetailByPostId(any(PostId.class), eq(MEMBER_BASIC_USER_UUID));
-        verify(multipartDataProcessorPort).convertFileSrcToBinaryData(any(JsonNode.class));
+        verify(multipartDataProcessorPort).convertFileSrcToFullFileSrc(any(JsonNode.class));
         verify(postViewCountRepository, never()).read(any(PostId.class));
     }
 
@@ -156,7 +156,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         // then
         assertThat(result).isEmpty();
         verify(postQueryRepository).findPostDetailByPostId(any(PostId.class), eq(otherMemberUuid));
-        verify(multipartDataProcessorPort, never()).convertFileSrcToBinaryData(any(JsonNode.class));
+        verify(multipartDataProcessorPort, never()).convertFileSrcToFullFileSrc(any(JsonNode.class));
     }
 
     @Test
