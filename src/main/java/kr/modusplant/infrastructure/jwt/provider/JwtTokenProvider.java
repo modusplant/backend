@@ -19,6 +19,7 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -139,6 +140,17 @@ public class JwtTokenProvider {
                 .expiration(exp)
                 .signWith(privateKey)
                 .compact();
+    }
+
+    public String generateRefreshTokenCookieAsString(String refreshToken) {
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(refreshDuration)
+                .sameSite("Lax")
+                .build();
+        return refreshCookie.toString();
     }
 
     // 토큰 검증하기
