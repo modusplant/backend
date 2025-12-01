@@ -41,7 +41,7 @@ public class SwaggerConfig {
                         )
                 )
                 .addServersItem(new Server() // 운영 서버 정보 설정
-                        .url("http://43.203.86.156/") // 운영 서버 링크
+                        .url("http://app.modusplant.kr") // 운영 서버 링크
                         .description("Prod Server")
                 )
                 .addServersItem(new Server() // 개발 서버 정보 설정
