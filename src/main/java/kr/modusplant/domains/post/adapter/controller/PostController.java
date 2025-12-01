@@ -120,7 +120,7 @@ public class PostController {
                 postContent,
                 postUpdateRequest.isPublished() ? PostStatus.published() : PostStatus.draft()
         );
-        postRepository.save(post);
+        postRepository.update(post);
     }
 
     @Transactional

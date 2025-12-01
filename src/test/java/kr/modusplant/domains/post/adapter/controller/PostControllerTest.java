@@ -210,7 +210,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         verify(postRepository).getPostByUlid(any(PostId.class));
         verify(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
         verify(multipartDataProcessorPort).saveFilesAndGenerateContentJson(anyList());
-        verify(postRepository).save(any(Post.class));
+        verify(postRepository).update(any(Post.class));
     }
 
     @Test
