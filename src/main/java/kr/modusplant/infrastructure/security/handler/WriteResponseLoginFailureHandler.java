@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
-import kr.modusplant.infrastructure.security.error.BusinessAuthenticationException;
+import kr.modusplant.infrastructure.security.exception.BusinessAuthenticationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;

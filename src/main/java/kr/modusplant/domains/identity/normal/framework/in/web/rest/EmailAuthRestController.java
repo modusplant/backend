@@ -13,6 +13,7 @@ import kr.modusplant.domains.identity.normal.usecase.request.EmailAuthRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.InputValidationRequest;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

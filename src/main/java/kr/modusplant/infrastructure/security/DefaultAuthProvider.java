@@ -1,7 +1,7 @@
 package kr.modusplant.infrastructure.security;
 
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
-import kr.modusplant.infrastructure.security.error.*;
+import kr.modusplant.infrastructure.security.exception.*;
 import kr.modusplant.infrastructure.security.models.DefaultAuthToken;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;

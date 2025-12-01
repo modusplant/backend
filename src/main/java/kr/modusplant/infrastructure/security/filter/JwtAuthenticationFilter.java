@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.infrastructure.jwt.framework.out.redis.AccessTokenRedisRepository;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.security.DefaultAuthenticationEntryPoint;
+import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
+import kr.modusplant.infrastructure.security.exception.BadCredentialException;
 import kr.modusplant.infrastructure.security.models.DefaultAuthToken;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +39,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String rawAccessToken = request.getHeader("Authorization");
 
-        if (rawAccessToken != null) {
+        if(rawAccessToken != null) {
+            if(!rawAccessToken.substring(7).equals("Bearer ")){
+                throw new BadCredentialException(SecurityErrorCode.AUTHENTICATION_FAILED);
+            }
             String accessToken = rawAccessToken.substring(7);
             evaluateAccessToken(request, response, accessToken);
         }
