@@ -15,6 +15,9 @@ public class JwtClearingLogoutHandler implements LogoutHandler {
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         String refreshToken = request.getHeader("Cookie");
+        String accessToken = request.getHeader("Authorization").substring(7);
+
         tokenService.removeToken(refreshToken);
+        tokenService.blacklistAccessToken(accessToken);
     }
 }

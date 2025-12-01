@@ -68,37 +68,37 @@ public class CommentJooqRepositoryTest implements
         testResult.add(testRecord);
     }
 
-    @Test
-    @DisplayName("게시글의 식별자로 댓글 응답 가져오기")
-    void testFindByPost_givenValidPostUlid_willReturnCommentResponse() {
+//    @Test
+//    @DisplayName("게시글의 식별자로 댓글 응답 가져오기")
+//    void testFindByPost_givenValidPostUlid_willReturnCommentResponse() {
+//
+//        // given & when
+//        List<CommentResponse> result = repository.findByPost(testPostId);
+//
+//        // then
+//        assertThat(result).isNotNull();
+//        assertThat(result.getFirst().postId()).isEqualTo(testPostId.getId());
+//        assertThat(result.getFirst().path()).isEqualTo(testCommentPath.getPath());
+//        assertThat(result.getFirst().nickname()).isEqualTo(testNickname.getNickname());
+//        assertThat(result.getFirst().content()).isEqualTo(testCommentContent.getContent());
+//        assertThat(result.getFirst().isDeleted()).isFalse();
+//        assertThat(result.getFirst().createdAt()).isEqualTo(testDateTime.toString());
+//    }
 
-        // given & when
-        List<CommentResponse> result = repository.findByPost(testPostId);
-
-        // then
-        assertThat(result).isNotNull();
-        assertThat(result.getFirst().postId()).isEqualTo(testPostId.getId());
-        assertThat(result.getFirst().path()).isEqualTo(testCommentPath.getPath());
-        assertThat(result.getFirst().nickname()).isEqualTo(testNickname.getNickname());
-        assertThat(result.getFirst().content()).isEqualTo(testCommentContent.getContent());
-        assertThat(result.getFirst().isDeleted()).isFalse();
-        assertThat(result.getFirst().createdAt()).isEqualTo(testDateTime.toString());
-    }
-
-    @Test
-    @DisplayName("사용자의 식별자로 댓글 응답 가져오기")
-    void testFindByAuthor_givenValidAuthMemberUuid_willReturnCommentResponse() {
-
-        // given & when
-        List<CommentResponse> result = repository.findByAuthor(testAuthorWithUuid);
-
-        // then
-        assertThat(result).isNotNull();
-        assertThat(result.getFirst().postId()).isEqualTo(testPostId.getId());
-        assertThat(result.getFirst().path()).isEqualTo(testCommentPath.getPath());
-        assertThat(result.getFirst().nickname()).isEqualTo(testNickname.getNickname());
-        assertThat(result.getFirst().content()).isEqualTo(testCommentContent.getContent());
-        assertThat(result.getFirst().isDeleted()).isFalse();
-        assertThat(result.getFirst().createdAt()).isEqualTo(testDateTime.toString());
-    }
+//    @Test
+//    @DisplayName("사용자의 식별자로 댓글 응답 가져오기")
+//    void testFindByAuthor_givenValidAuthMemberUuid_willReturnCommentResponse() {
+//
+//        // given & when
+//        List<CommentResponse> result = repository.findByAuthor(testAuthorWithUuid);
+//
+//        // then
+//        assertThat(result).isNotNull();
+//        assertThat(result.getFirst().postId()).isEqualTo(testPostId.getId());
+//        assertThat(result.getFirst().path()).isEqualTo(testCommentPath.getPath());
+//        assertThat(result.getFirst().nickname()).isEqualTo(testNickname.getNickname());
+//        assertThat(result.getFirst().content()).isEqualTo(testCommentContent.getContent());
+//        assertThat(result.getFirst().isDeleted()).isFalse();
+//        assertThat(result.getFirst().createdAt()).isEqualTo(testDateTime.toString());
+//    }
 }

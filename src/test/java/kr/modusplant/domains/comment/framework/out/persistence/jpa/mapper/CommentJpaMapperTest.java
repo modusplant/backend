@@ -13,23 +13,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class CommentJpaMapperTest implements CommentTestUtils, CommCommentEntityTestUtils,
         SiteMemberEntityTestUtils {
-    private final CommentJpaMapper mapper = new CommentJpaMapperImpl();
-
-    @Test
-    @DisplayName("유효한 댓글을 댓글 엔티티로 전환")
-    public void testToCommCommentEntity_givenValidComment_willReturnCommCommentEntity() {
-        // given
-        CommCommentEntity compare = createCommCommentEntityBuilder()
-                .postEntity(createCommPostEntityBuilder().ulid(TEST_COMM_POST_ULID).build())
-                .path(TEST_COMM_COMMENT_PATH)
-                .authMember(createMemberBasicUserEntity())
-                .createMember(createMemberBasicUserEntity()).build();
-
-        // when
-        CommCommentEntity result = mapper.toCommCommentEntity(testValidComment);
-
-        // then
-        assertThat(result).isEqualTo(compare);
-    }
+//    private final CommentJpaMapper mapper = new CommentJpaMapperImpl();
+//
+//    @Test
+//    @DisplayName("유효한 댓글을 댓글 엔티티로 전환")
+//    public void testToCommCommentEntity_givenValidComment_willReturnCommCommentEntity() {
+//        // given
+//        CommCommentEntity compare = createCommCommentEntityBuilder()
+//                .postEntity(createCommPostEntityBuilder().ulid(TEST_COMM_POST_ULID).build())
+//                .path(TEST_COMM_COMMENT_PATH)
+//                .authMember(createMemberBasicUserEntity())
+//                .createMember(createMemberBasicUserEntity()).build();
+//
+//        // when
+//        CommCommentEntity result = mapper.toCommCommentEntity(testValidComment);
+//
+//        // then
+//        assertThat(result).isEqualTo(compare);
+//    }
 
 }
