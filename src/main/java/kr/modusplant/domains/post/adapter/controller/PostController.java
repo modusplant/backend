@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -61,15 +60,15 @@ public class PostController {
         return CursorPageResponse.of(responses, nextUlid, hasNext);
     }
 
-    public Optional<PostDetailResponse> getByUlid(String ulid, UUID currentMemberUuid) {
+    public PostDetailResponse getByUlid(String ulid, UUID currentMemberUuid) {
         return postQueryRepository.findPostDetailByPostId(PostId.create(ulid),currentMemberUuid)
                 .filter(postDetail -> postDetail.isPublished() ||
                         (!postDetail.isPublished() && postDetail.authorUuid().equals(currentMemberUuid)))
                 .map(postDetail -> postMapper.toPostDetailResponse(
                         postDetail,
                         getJsonNodeContent(postDetail),
-                        postDetail.isPublished() ? postViewCountRepository.read(PostId.create(ulid)) : 0L
-                ));
+                        postDetail.isPublished() ? readViewCount(ulid) : 0L
+                )).orElseThrow(() -> new PostNotFoundException());
     }
 
     @Transactional

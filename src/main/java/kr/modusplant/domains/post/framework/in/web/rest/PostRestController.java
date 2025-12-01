@@ -29,7 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static kr.modusplant.shared.constant.Regex.REGEX_ULID;
@@ -118,11 +117,7 @@ public class PostRestController {
             String ulid
     ) {
         UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
-        Optional<PostDetailResponse> optionalPostResponse = postController.getByUlid(ulid,currentMemberUuid);
-        if (optionalPostResponse.isEmpty()) {
-            return ResponseEntity.ok().body(DataResponse.ok());
-        }
-        return ResponseEntity.ok().body(DataResponse.ok(optionalPostResponse.orElseThrow()));
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getByUlid(ulid,currentMemberUuid)));
     }
 
     @Operation(

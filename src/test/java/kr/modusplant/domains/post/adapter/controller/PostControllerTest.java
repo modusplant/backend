@@ -7,6 +7,7 @@ import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
 import kr.modusplant.domains.post.common.util.usecase.model.PostReadModelTestUtils;
 import kr.modusplant.domains.post.common.util.usecase.request.PostRequestTestUtils;
 import kr.modusplant.domains.post.domain.aggregate.Post;
+import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
@@ -29,6 +30,7 @@ import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TE
 import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -115,11 +117,11 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         given(postViewCountRepository.read(any(PostId.class))).willReturn(viewCount);
 
         // when
-        Optional<PostDetailResponse> result = postController.getByUlid(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
+        PostDetailResponse result = postController.getByUlid(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
 
         // then
-        assertThat(result).isPresent();
-        assertThat(result.get().ulid()).isEqualTo(TEST_POST_ULID);
+        assertThat(result).isNotNull();
+        assertThat(result.ulid()).isEqualTo(TEST_POST_ULID);
         verify(postQueryRepository).findPostDetailByPostId(any(PostId.class), eq(MEMBER_BASIC_USER_UUID));
         verify(multipartDataProcessorPort).convertFileSrcToFullFileSrc(any(JsonNode.class));
         verify(postViewCountRepository).read(any(PostId.class));
@@ -133,10 +135,10 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         given(multipartDataProcessorPort.convertFileSrcToFullFileSrc(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
 
         // when
-        Optional<PostDetailResponse> result = postController.getByUlid(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
+        PostDetailResponse result = postController.getByUlid(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
 
         // then
-        assertThat(result).isPresent();
+        assertThat(result).isNotNull();
         verify(postQueryRepository).findPostDetailByPostId(any(PostId.class), eq(MEMBER_BASIC_USER_UUID));
         verify(multipartDataProcessorPort).convertFileSrcToFullFileSrc(any(JsonNode.class));
         verify(postViewCountRepository, never()).read(any(PostId.class));
@@ -150,15 +152,12 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
 
         given(postQueryRepository.findPostDetailByPostId(any(PostId.class), eq(otherMemberUuid))).willReturn(Optional.of(TEST_DRAFT_POST_DETAIL_READ_MODEL));
 
-        // when
-        Optional<PostDetailResponse> result = postController.getByUlid(TEST_POST_ULID, otherMemberUuid);
-
-        // then
-        assertThat(result).isEmpty();
+        // when & then
+        assertThatThrownBy(() -> postController.getByUlid(TEST_POST_ULID, otherMemberUuid))
+                .isInstanceOf(PostNotFoundException.class);
         verify(postQueryRepository).findPostDetailByPostId(any(PostId.class), eq(otherMemberUuid));
         verify(multipartDataProcessorPort, never()).convertFileSrcToFullFileSrc(any(JsonNode.class));
     }
-
     @Test
     @DisplayName("게시글 생성 및 발행")
     void testCreatePost_givenPublishedPostRequest_willCreatePost() throws IOException {
