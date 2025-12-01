@@ -149,7 +149,7 @@ public class PostController {
     @Transactional
     public Long increaseViewCount(String ulid, UUID currentMemberUuid) {
         // 조회수 어뷰징 정책 - 사용자는 게시글 1개당 ttl에 1번 조회수 증가
-        if (!postViewLockRepository.lock(PostId.create(ulid), currentMemberUuid, ttlMinutes)) {
+        if (currentMemberUuid != null && !postViewLockRepository.lock(PostId.create(ulid), currentMemberUuid, ttlMinutes)) {
             return postViewCountRepository.read(PostId.create(ulid));
         }
         // 조회수 증가

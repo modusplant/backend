@@ -83,6 +83,7 @@ class PostQueryJooqRepositoryIntegrationTest {
         int size = 2;
         List<PostSummaryReadModel> firstPage = postQueryJooqRepository.findByCategoryWithCursor(null, null,testMember2.getUuid(),null,size);
         List<PostSummaryReadModel> secondPage = postQueryJooqRepository.findByCategoryWithCursor(null, null,testMember2.getUuid(),firstPage.get(size-1).ulid(),size);
+        List<PostSummaryReadModel> pageWithAnonymousUser = postQueryJooqRepository.findByCategoryWithCursor(null,null,null,null,size);
 
         // then
         assertThat(firstPage).hasSize(size+1);
@@ -100,6 +101,7 @@ class PostQueryJooqRepositoryIntegrationTest {
                 .filter(post -> post.ulid().equals(testPost1.getUlid()))
                 .findFirst()
                 .orElseThrow();
+        PostSummaryReadModel pageWithAnonymousUserResult = pageWithAnonymousUser.stream().findFirst().orElseThrow();
 
         assertThat(firstPostResult.commentCount()).isEqualTo(0);
         assertThat(firstPostResult.isLiked()).isTrue();
@@ -107,6 +109,8 @@ class PostQueryJooqRepositoryIntegrationTest {
         assertThat(secondPostResult.commentCount()).isEqualTo(2);
         assertThat(secondPostResult.isLiked()).isTrue();
         assertThat(secondPostResult.isBookmarked()).isTrue();
+        assertThat(pageWithAnonymousUserResult.isLiked()).isFalse();
+        assertThat(pageWithAnonymousUserResult.isBookmarked()).isFalse();
     }
 
     @Test
