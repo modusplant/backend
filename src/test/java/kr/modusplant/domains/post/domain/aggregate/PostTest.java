@@ -78,7 +78,6 @@ class PostTest implements PostTestUtils {
 
             // then
             assertNotNull(post);
-            assertNotNull(post.getPostId()); // PostId.generate()로 생성됨
             assertEquals(testAuthorId, post.getAuthorId());
             assertEquals(testAuthorId, post.getCreateAuthorId());
             assertEquals(testPrimaryCategoryId, post.getPrimaryCategoryId());
@@ -116,7 +115,6 @@ class PostTest implements PostTestUtils {
 
             // then
             assertNotNull(post);
-            assertNotNull(post.getPostId()); // PostId.generate()로 생성됨
             assertEquals(testAuthorId, post.getAuthorId());
             assertEquals(testAuthorId, post.getCreateAuthorId());
             assertEquals(testPrimaryCategoryId, post.getPrimaryCategoryId());

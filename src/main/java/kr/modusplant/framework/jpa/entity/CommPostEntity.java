@@ -79,7 +79,7 @@ public class CommPostEntity {
 
     @Version
     @Column(nullable = false)
-    private Long ver;
+    private long ver;
 
     public void updatePrimaryCategory(CommPrimaryCategoryEntity primaryCategory) {
         this.primaryCategory = primaryCategory;

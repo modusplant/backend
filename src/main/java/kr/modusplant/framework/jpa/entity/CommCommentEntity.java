@@ -67,6 +67,10 @@ public class CommCommentEntity {
         this.likeCount = Math.max(0, this.likeCount - 1);
     }
 
+    public void markAsDeleted() {
+        this.isDeleted = true;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

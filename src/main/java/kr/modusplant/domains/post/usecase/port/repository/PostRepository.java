@@ -9,6 +9,8 @@ public interface PostRepository {
 
     void save(Post post);
 
+    void update(Post post);
+
     void delete(Post post);
 
     Optional<Post> getPostByUlid(PostId postId);

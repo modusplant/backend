@@ -57,12 +57,41 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
         given(authorJpaRepository.findByUuid(post.getCreateAuthorId().getValue())).willReturn(Optional.of(memberEntity));
         given(primaryCategoryJpaRepository.findByUuid(post.getPrimaryCategoryId().getValue())).willReturn(Optional.of(primaryCategoryEntity));
         given(secondaryCategoryJpaRepository.findByUuid(post.getSecondaryCategoryId().getValue())).willReturn(Optional.of(secondaryCategoryEntity));
-        given(postViewCountRedisRepository.read(post.getPostId())).willReturn(viewCount);
         given(postJpaMapper.toPostEntity(post, memberEntity, memberEntity, primaryCategoryEntity, secondaryCategoryEntity, viewCount)).willReturn(postEntity);
         given(postJpaRepository.save(postEntity)).willReturn(postEntity);
 
         // when
         postRepositoryJpaAdapter.save(post);
+
+        // then
+        verify(authorJpaRepository, times(2)).findByUuid(any(UUID.class));
+        verify(primaryCategoryJpaRepository).findByUuid(post.getPrimaryCategoryId().getValue());
+        verify(secondaryCategoryJpaRepository).findByUuid(post.getSecondaryCategoryId().getValue());
+        verify(postJpaMapper).toPostEntity(post, memberEntity, memberEntity, primaryCategoryEntity, secondaryCategoryEntity, viewCount);
+        verify(postJpaRepository).save(postEntity);
+    }
+
+    @Test
+    @DisplayName("게시글 수정하기")
+    void testUpdate_givenPost_willReturnPostDetailReadModel() {
+        // given
+        Post post = createPublishedPost();
+        CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
+        SiteMemberEntity memberEntity = createMemberBasicUserEntity().builder().uuid(post.getAuthorId().getValue()).build();
+        CommPrimaryCategoryEntity primaryCategoryEntity = createCommPrimaryCategoryEntity().builder().uuid(post.getPrimaryCategoryId().getValue()).build();
+        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().uuid(post.getSecondaryCategoryId().getValue()).build();
+        long viewCount = 0L;
+
+        given(authorJpaRepository.findByUuid(post.getAuthorId().getValue())).willReturn(Optional.of(memberEntity));
+        given(authorJpaRepository.findByUuid(post.getCreateAuthorId().getValue())).willReturn(Optional.of(memberEntity));
+        given(primaryCategoryJpaRepository.findByUuid(post.getPrimaryCategoryId().getValue())).willReturn(Optional.of(primaryCategoryEntity));
+        given(secondaryCategoryJpaRepository.findByUuid(post.getSecondaryCategoryId().getValue())).willReturn(Optional.of(secondaryCategoryEntity));
+        given(postViewCountRedisRepository.read(post.getPostId())).willReturn(viewCount);
+        given(postJpaMapper.toPostEntity(post, memberEntity, memberEntity, primaryCategoryEntity, secondaryCategoryEntity, viewCount)).willReturn(postEntity);
+        given(postJpaRepository.save(postEntity)).willReturn(postEntity);
+
+        // when
+        postRepositoryJpaAdapter.update(post);
 
         // then
         verify(authorJpaRepository, times(2)).findByUuid(any(UUID.class));

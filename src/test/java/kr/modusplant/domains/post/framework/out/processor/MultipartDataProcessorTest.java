@@ -42,6 +42,8 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
     private static final String ORDER = "order";
     private static final String SRC = "src";
     private static final String TYPE = "type";
+    private static final String BASIC_PATH = "https://mocked-url.com/mock-bucket/";
+    private static final String FILE_KEY = "post/test-ulid/image/test-file.jpg";
 
     @Test
     @DisplayName("멀티파트 데이터를 저장하고 Json 반환값 받기")
@@ -104,36 +106,37 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
     }
 
     @Test
-    @DisplayName("저장된 파일 경로로 파일 바이너리 데이터 읽기")
-    void testConvertFileSrcToBinaryData_givenJsonContent_willReturnArrayNodeContent() throws IOException {
+    @DisplayName("저장된 파일 경로를 전체 파일 경로로 변환하기")
+    void testConvertFileSrcToFullFileSrc_givenJsonContent_willReturnArrayNodeContent() throws IOException {
         // given
         List<MultipartFile> imageFiles = List.of(imageFile);
         JsonNode content = multipartDataProcessor.saveFilesAndGenerateContentJson(imageFiles);
-        given(s3FileService.downloadFile(content.get(0).get(SRC).asText())).willReturn(jpegData);
+        String fullSrcUrl = BASIC_PATH + FILE_KEY;
+        given(s3FileService.generateS3SrcUrl(anyString())).willReturn(fullSrcUrl);
 
         // when
-        JsonNode result = multipartDataProcessor.convertFileSrcToBinaryData(content);
+        JsonNode result = multipartDataProcessor.convertFileSrcToFullFileSrc(content);
 
         // then
         assertTrue(result.isArray());
         assertThat(result.size()).isEqualTo(1);
 
         JsonNode imageNode = result.get(0);
-        assertFalse(imageNode.has(SRC));
+        assertTrue(imageNode.has(SRC));
+        assertFalse(imageNode.has(DATA));
         assertThat(imageNode.get(TYPE).asText()).isEqualTo(FileType.IMAGE.getValue());
-        assertTrue(imageNode.has(DATA));
-        assertThat(imageNode.get(DATA).asText()).isEqualTo(Base64.getEncoder().encodeToString(jpegData));
+        assertThat(imageNode.get(SRC).asText()).isEqualTo(fullSrcUrl);
     }
 
     @Test
-    @DisplayName("저장된 텍스트와 이미지 파일 경로로 텍스트 및 이미지 바이너리 데이터 미리보기 읽기")
-    void testConvertToPreviewData_givenJsonContent_willReturnArrayNodePreviewContent() throws IOException {
+    @DisplayName("저장된 텍스트와 이미지 파일 경로로 텍스트 및 이미지 미리보기 읽기")
+    void testConvertToPreview_givenJsonContent_willReturnArrayNodePreviewContent() throws IOException {
         // given
-        String expectedBase64 = Base64.getEncoder().encodeToString(jpegData);
-        given(s3FileService.downloadFile(anyString())).willReturn(jpegData);
+        String fullSrcUrl = BASIC_PATH + FILE_KEY;
+        given(s3FileService.generateS3SrcUrl(anyString())).willReturn(fullSrcUrl);
 
         // when
-        ArrayNode result = multipartDataProcessor.convertToPreviewData(TEST_POST_CONTENT_TEXT_AND_IMAGE);
+        ArrayNode result = multipartDataProcessor.convertToPreview(TEST_POST_CONTENT_TEXT_AND_IMAGE);
 
         // then
         assertThat(result).hasSize(2);
@@ -144,18 +147,18 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
 
         JsonNode imageNode = result.get(1);
         assertThat(imageNode.get(TYPE).asText()).isEqualTo("image");
-        assertThat(imageNode.has(DATA)).isTrue();
-        assertThat(imageNode.get(DATA).asText()).isEqualTo(expectedBase64);
-        assertThat(imageNode.has(SRC)).isFalse();
+        assertThat(imageNode.has(SRC)).isTrue();
+        assertThat(imageNode.has(DATA)).isFalse();
+        assertThat(imageNode.get(SRC).asText()).isEqualTo(fullSrcUrl);
 
-        verify(s3FileService).downloadFile(anyString());
+        verify(s3FileService).generateS3SrcUrl(anyString());
     }
 
     @Test
     @DisplayName("저장된 텍스트만 있을 경우, 저장된 텍스트 미리보기 읽기")
     void testConvertToPreviewData_givenJsonContentText_willReturnArrayNodePreviewContent() throws IOException {
         // when
-        ArrayNode result = multipartDataProcessor.convertToPreviewData(TEST_POST_CONTENT_TEXT_AND_VIDEO);
+        ArrayNode result = multipartDataProcessor.convertToPreview(TEST_POST_CONTENT_TEXT_AND_VIDEO);
 
         // then
         assertThat(result).hasSize(1);
@@ -164,40 +167,40 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
         assertThat(textNode.get(TYPE).asText()).isEqualTo("text");
         assertThat(textNode.has(DATA)).isTrue();
 
-        verify(s3FileService, never()).downloadFile(anyString());
+        verify(s3FileService, never()).generateS3SrcUrl(anyString());
     }
 
     @Test
     @DisplayName("저장된 이미지만 있을 경우, 저장된 이미지 바이너리 데이터 미리보기 읽기")
     void testConvertToPreviewData_givenJsonContentImage_willReturnArrayNodePreviewContent() throws IOException {
         // given
-        String expectedBase64 = Base64.getEncoder().encodeToString(jpegData);
-        given(s3FileService.downloadFile(anyString())).willReturn(jpegData);
+        String fullSrcUrl = BASIC_PATH + FILE_KEY;
+        given(s3FileService.generateS3SrcUrl(anyString())).willReturn(fullSrcUrl);
 
         // when
-        ArrayNode result = multipartDataProcessor.convertToPreviewData(TEST_POST_CONTENT_IMAGE_AND_VIDEO);
+        ArrayNode result = multipartDataProcessor.convertToPreview(TEST_POST_CONTENT_IMAGE_AND_VIDEO);
 
         // then
         assertThat(result).hasSize(1);
 
         JsonNode imageNode = result.get(0);
         assertThat(imageNode.get(TYPE).asText()).isEqualTo("image");
-        assertThat(imageNode.has(DATA)).isTrue();
-        assertThat(imageNode.get(DATA).asText()).isEqualTo(expectedBase64);
-        assertThat(imageNode.has(SRC)).isFalse();
+        assertThat(imageNode.has(SRC)).isTrue();
+        assertThat(imageNode.get(SRC).asText()).isEqualTo(fullSrcUrl);
+        assertThat(imageNode.has(DATA)).isFalse();
 
-        verify(s3FileService).downloadFile(anyString());
+        verify(s3FileService).generateS3SrcUrl(anyString());
     }
 
     @Test
     @DisplayName("저장된 텍스트와 이미지가 모두 없을 때, 빈 배열을 반환하기")
-    void testConvertToPreviewData_givenJsonContentWithoutTextAndImage_willReturnEmptyArrayNode() throws IOException {
+    void testConvertToPreview_givenJsonContentWithoutTextAndImage_willReturnEmptyArrayNode() throws IOException {
         // when
-        ArrayNode result = multipartDataProcessor.convertToPreviewData(TEST_POST_CONTENT_VIDEO_AND_FILE);
+        ArrayNode result = multipartDataProcessor.convertToPreview(TEST_POST_CONTENT_VIDEO_AND_FILE);
 
         // then
         assertThat(result).isEmpty();
-        verify(s3FileService, never()).downloadFile(anyString());
+        verify(s3FileService, never()).generateS3SrcUrl(anyString());
     }
 
     @Test

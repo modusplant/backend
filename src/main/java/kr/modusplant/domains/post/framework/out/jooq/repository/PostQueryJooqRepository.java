@@ -6,7 +6,7 @@ import kr.modusplant.domains.post.framework.out.jooq.mapper.supers.PostJooqMappe
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.port.repository.PostQueryRepository;
-import kr.modusplant.infrastructure.converter.JsonNodeConverter;
+import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
 import lombok.RequiredArgsConstructor;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -27,7 +27,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
 
     private final DSLContext dsl;
     private final PostJooqMapper postJooqMapper;
-    private static final JsonNodeConverter JSON_CONVERTER = new JsonNodeConverter();
+    private static final JsonbJsonNodeConverter JSON_CONVERTER = new JsonbJsonNodeConverter();
 
     public List<PostSummaryReadModel> findByCategoryWithCursor(UUID primaryCategoryUuid, List<UUID> secondaryCategoryUuids, UUID currentMemberUuid, String cursorUlid, int size) {
         return dsl
