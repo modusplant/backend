@@ -9,6 +9,8 @@ import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TE
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT_PREVIEW;
 import static kr.modusplant.domains.post.common.constant.PostStringConstant.TEST_POST_TITLE;
 import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
+import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID2;
+import static kr.modusplant.domains.post.common.util.usecase.model.PostReadModelTestUtils.likeCount;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_UUID;
 import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
@@ -45,9 +47,23 @@ public interface PostResponseTestUtils {
             MEMBER_BASIC_USER_NICKNAME,
             TEST_POST_TITLE,
             TEST_POST_CONTENT_PREVIEW,
-            5,
+            likeCount,
             testDate,
-            6,
+            5,
+            true,
+            false
+    );
+
+    PostSummaryResponse TEST_POST_SUMMARY_RESPONSE2 = new PostSummaryResponse(
+            TEST_POST_ULID2,
+            TEST_COMM_PRIMARY_CATEGORY_CATEGORY,
+            TEST_COMM_SECONDARY_CATEGORY_CATEGORY,
+            MEMBER_BASIC_USER_NICKNAME,
+            TEST_POST_TITLE,
+            TEST_POST_CONTENT_PREVIEW,
+            likeCount,
+            testDate,
+            5,
             true,
             false
     );

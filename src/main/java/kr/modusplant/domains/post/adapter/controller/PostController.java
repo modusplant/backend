@@ -71,6 +71,7 @@ public class PostController {
         return postQueryRepository.findPostDetailByPostId(postId,currentMemberUuid)
                 .filter(PostDetailReadModel::isPublished)
                 .map(postDetail -> {
+                    increaseViewCount(ulid,currentMemberUuid);
                     postRecentlyViewRepository.recordViewPost(currentMemberUuid,postId);
                     return postMapper.toPostDetailResponse(
                             postDetail,
