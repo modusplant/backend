@@ -32,7 +32,10 @@ public interface PostResponseTestUtils {
             TEST_POST_TITLE,
             TEST_POST_CONTENT,
             true,
-            testDate
+            testDate,
+            testDate,
+            true,
+            false
     );
 
     PostSummaryResponse TEST_POST_SUMMARY_RESPONSE = new PostSummaryResponse(
@@ -42,6 +45,10 @@ public interface PostResponseTestUtils {
             MEMBER_BASIC_USER_NICKNAME,
             TEST_POST_TITLE,
             TEST_POST_CONTENT_PREVIEW,
-            testDate
+            5,
+            testDate,
+            6,
+            true,
+            false
     );
 }

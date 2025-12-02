@@ -1,7 +1,7 @@
 package kr.modusplant.domains.post.common.util.usecase.model;
 
-import kr.modusplant.domains.post.usecase.model.PostDetailReadModel;
-import kr.modusplant.domains.post.usecase.model.PostSummaryReadModel;
+import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
+import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 
 import java.time.LocalDateTime;
 
@@ -31,7 +31,10 @@ public interface PostReadModelTestUtils {
             TEST_POST_CONTENT,
             likeCount,
             true,
-            testDate
+            testDate,
+            testDate,
+            true,
+            false
     );
 
     PostDetailReadModel TEST_DRAFT_POST_DETAIL_READ_MODEL = new PostDetailReadModel(
@@ -46,7 +49,10 @@ public interface PostReadModelTestUtils {
             TEST_POST_CONTENT,
             likeCount,
             false,
-            testDate
+            null,
+            testDate,
+            false,
+            false
     );
 
     PostSummaryReadModel TEST_POST_SUMMARY_READ_MODEL = new PostSummaryReadModel(
@@ -56,6 +62,10 @@ public interface PostReadModelTestUtils {
             MEMBER_BASIC_USER_NICKNAME,
             TEST_POST_TITLE,
             TEST_POST_CONTENT,
-            testDate
+            likeCount,
+            testDate,
+            5,
+            true,
+            false
     );
 }

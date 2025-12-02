@@ -1,7 +1,7 @@
 package kr.modusplant.domains.post.framework.out.scheduler;
 
+import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostJpaRepository;
 import kr.modusplant.domains.post.framework.out.redis.PostViewCountRedisRepository;
-import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PostViewCountBackUpScheduler {
     private final PostViewCountRedisRepository postViewCountRedisRepository;
-    private final CommPostJpaRepository postJpaRepository;
+    private final PostJpaRepository postJpaRepository;
 
 
     @Transactional

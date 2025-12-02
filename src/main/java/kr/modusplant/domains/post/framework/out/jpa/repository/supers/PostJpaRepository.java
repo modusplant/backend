@@ -1,0 +1,20 @@
+package kr.modusplant.domains.post.framework.out.jpa.repository.supers;
+
+import kr.modusplant.framework.jpa.entity.CommPostEntity;
+import kr.modusplant.shared.persistence.repository.UlidPrimaryRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.Optional;
+
+public interface PostJpaRepository extends UlidPrimaryRepository<CommPostEntity>, JpaRepository<CommPostEntity, String> {
+
+    Optional<CommPostEntity> findByUlid(String ulid);
+
+    @Modifying
+    @Query("UPDATE CommPostEntity t SET t.viewCount = :viewCount WHERE t.ulid = :ulid AND t.viewCount < :viewCount")
+    int updateViewCount(@Param("ulid") String ulid, @Param("viewCount") Long viewCount);
+
+}

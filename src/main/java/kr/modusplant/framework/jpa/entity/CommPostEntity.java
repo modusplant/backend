@@ -79,7 +79,7 @@ public class CommPostEntity {
 
     @Version
     @Column(nullable = false)
-    private Long ver;
+    private long ver;
 
     public void updatePrimaryCategory(CommPrimaryCategoryEntity primaryCategory) {
         this.primaryCategory = primaryCategory;
@@ -120,6 +120,19 @@ public class CommPostEntity {
         }
         if (this.viewCount == null) {
             this.viewCount = 0L;
+        }
+        if (this.isPublished == null) {
+            this.isPublished = false;
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        if (this.viewCount == null) {
+            this.viewCount = 0L;
+        }
+        if (this.isPublished == null) {
+            this.isPublished = false;
         }
     }
 
