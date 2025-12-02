@@ -21,8 +21,6 @@ import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -308,6 +306,8 @@ public class PostRestController {
     )
     @GetMapping("/me")
     public ResponseEntity<DataResponse<OffsetPageResponse<PostSummaryResponse>>> getPostsByMember(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
             @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
             @RequestParam(defaultValue = "1")
             @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
@@ -318,6 +318,7 @@ public class PostRestController {
             @Range(min = 1, max = 50)
             Integer size
     ) {
+        UUID currentMemberUuid = userDetails.getActiveUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getByMemberUuid(currentMemberUuid, page-1, size)));
     }
 
@@ -327,6 +328,8 @@ public class PostRestController {
     )
     @GetMapping("/me/drafts")
     public ResponseEntity<DataResponse<OffsetPageResponse<DraftPostResponse>>> getDraftPostsByMember(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
             @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
             @RequestParam(defaultValue = "1")
             @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
@@ -337,6 +340,7 @@ public class PostRestController {
             @Range(min = 1, max = 50)
             Integer size
     ) {
+        UUID currentMemberUuid = userDetails.getActiveUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getDraftByMemberUuid(currentMemberUuid,page-1, size)));
     }
 
@@ -346,6 +350,8 @@ public class PostRestController {
     )
     @GetMapping("/me/likes")
     public ResponseEntity<DataResponse<OffsetPageResponse<PostSummaryResponse>>> getLikedPostsByMember(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
             @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
             @RequestParam(defaultValue = "1")
             @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
@@ -356,6 +362,7 @@ public class PostRestController {
             @Range(min = 1, max = 50)
             Integer size
     ) {
+        UUID currentMemberUuid = userDetails.getActiveUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getLikedByMemberUuid(currentMemberUuid, page-1, size)));
     }
 
@@ -365,6 +372,8 @@ public class PostRestController {
     )
     @GetMapping("/me/bookmarks")
     public ResponseEntity<DataResponse<OffsetPageResponse<PostSummaryResponse>>> getBookmarkedPostsByMember(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
             @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
             @RequestParam(defaultValue = "1")
             @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
@@ -375,6 +384,7 @@ public class PostRestController {
             @Range(min = 1, max = 50)
             Integer size
     ) {
+        UUID currentMemberUuid = userDetails.getActiveUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getBookmarkedByMemberUuid(currentMemberUuid, page-1, size)));
     }
 
