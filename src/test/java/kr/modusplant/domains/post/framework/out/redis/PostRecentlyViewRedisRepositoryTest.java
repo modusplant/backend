@@ -18,9 +18,9 @@ import java.util.concurrent.TimeUnit;
 
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.doubleThat;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,6 +55,17 @@ class PostRecentlyViewRedisRepositoryTest implements PostIdTestUtils {
                 doubleThat(score -> score >= beforeTime)
         );
         verify(stringRedisTemplate).expire(key,TTL_DAYS, TimeUnit.DAYS);
+    }
+
+    @Test
+    @DisplayName("회원 id가 null이면 기록하지 않는다.")
+    void testRecordViewPost_givenNullMemberIdAndPostId_willNotSaveRecord() {
+        // given & when
+        postRecentlyViewRedisRepository.recordViewPost(null,testPostId);
+
+        // then
+        verify(zSetOperations, never()).add(anyString(), anyString(), anyDouble());
+        verify(stringRedisTemplate,never()).expire(anyString(),anyLong(),any(TimeUnit.class));
     }
 
     @Test

@@ -21,6 +21,9 @@ public class PostRecentlyViewRedisRepository implements PostRecentlyViewReposito
 
     // 조회 기록 저장
     public void recordViewPost(UUID memberUuid, PostId postId) {
+        if (memberUuid == null) {
+            return;
+        }
         double score = System.currentTimeMillis() / 1000.0;
         String key = generatedKey(memberUuid);
 
