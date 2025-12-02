@@ -1,5 +1,6 @@
 package kr.modusplant.domains.identity.social.framework.in.web.rest;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.Duration;
 
 
+@Hidden
 @Tag(name = "소셜 로그인 API", description = "소셜 로그인을 다루는 API입니다.")
 @RestController
 @RequestMapping("/api/auth")
