@@ -1,6 +1,7 @@
 package kr.modusplant.domains.post.framework.out.jooq.repository;
 
 import kr.modusplant.domains.post.domain.vo.AuthorId;
+import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.framework.out.jooq.mapper.supers.PostJooqMapper;
 import kr.modusplant.domains.post.usecase.port.repository.PostQueryForMemberRepository;
 import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
@@ -13,8 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static kr.modusplant.jooq.Tables.*;
 import static org.jooq.impl.DSL.*;
@@ -107,6 +107,66 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                 .map(postJooqMapper::toDraftPostReadModel);
 
         return new PageImpl<>(posts, PageRequest.of(page, size), totalElements);
+    }
+
+    public List<PostSummaryReadModel> findByIds(List<PostId> postIds, UUID currentMemberUuid) {
+        if (postIds == null || postIds.isEmpty()) {
+            return List.of();
+        }
+
+        List<String> ulidList = postIds.stream()
+                .map(PostId::getValue)
+                .toList();
+
+        Map<String, Integer> ulidOrderMap = new LinkedHashMap<>();
+        for (int i=0; i<ulidList.size(); i++) {
+            ulidOrderMap.put(ulidList.get(i),i);
+        }
+
+        return dsl
+                .select(
+                        COMM_POST.ULID,
+                        COMM_PRI_CATE.CATEGORY.as("primaryCategory"),
+                        COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
+                        SITE_MEMBER.NICKNAME,
+                        COMM_POST.TITLE,
+                        COMM_POST.CONTENT.as("content"),
+                        COMM_POST.LIKE_COUNT,
+                        COMM_POST.PUBLISHED_AT,
+                        coalesce(field("cc.comment_count", Integer.class), 0).as("commentCount"),
+                        exists(
+                                selectOne()
+                                        .from(COMM_POST_LIKE)
+                                        .where(COMM_POST_LIKE.POST_ULID.eq(COMM_POST.ULID))
+                                        .and(COMM_POST_LIKE.MEMB_UUID.eq(currentMemberUuid))
+                        ).as("isLiked"),
+                        exists(
+                                selectOne()
+                                        .from(COMM_POST_BOOKMARK)
+                                        .where(COMM_POST_BOOKMARK.POST_ULID.eq(COMM_POST.ULID))
+                                        .and(COMM_POST_BOOKMARK.MEMB_UUID.eq(currentMemberUuid))
+                        ).as("isBookmarked")
+                )
+                .from(COMM_POST)
+                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_UUID.eq(COMM_PRI_CATE.UUID))
+                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_UUID.eq(COMM_SECO_CATE.UUID))
+                .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
+                .leftJoin(
+                        select(
+                                COMM_COMMENT.POST_ULID,
+                                count().as("comment_count")
+                        )
+                                .from(COMM_COMMENT)
+                                .where(COMM_COMMENT.IS_DELETED.isFalse())
+                                .groupBy(COMM_COMMENT.POST_ULID)
+                                .asTable("cc")
+                ).on(COMM_POST.ULID.eq(field("cc.post_ulid", String.class)))
+                .where(COMM_POST.ULID.in(ulidList))
+                .fetch()
+                .map(postJooqMapper::toPostSummaryReadModel)
+                .stream()
+                .sorted(Comparator.comparingInt(post -> ulidOrderMap.getOrDefault(post.ulid(),Integer.MAX_VALUE)))
+                .toList();
     }
 
     public Page<PostSummaryReadModel> findLikedByMemberWithOffset(UUID currentMemberUuid, int page, int size) {

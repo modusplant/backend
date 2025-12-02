@@ -105,7 +105,7 @@ public class PostRestController {
 
     @Operation(
             summary = "특정 컨텐츠 게시글 조회 API",
-            description = "게시글 식별자로 특정 컨텐츠 게시글을 조회합니다."
+            description = "게시글 식별자로 특정 컨텐츠 게시글을 조회합니다. 조회수 증가 및 최근 본 게시글에 추가됩니다."
     )
     @GetMapping("/{postId}")
     public ResponseEntity<DataResponse<?>> getPostByUlid(
@@ -342,6 +342,28 @@ public class PostRestController {
     ) {
         UUID currentMemberUuid = userDetails.getActiveUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getDraftByMemberUuid(currentMemberUuid,page-1, size)));
+    }
+
+    @Operation(
+            summary = "최근에 본 게시글 목록 조회 API (페이지 번호)",
+            description = "마이페이지에서 최근에 본 게시글 목록과 페이지 정보를 조회합니다."
+    )
+    @GetMapping("/me/history")
+    public ResponseEntity<DataResponse<OffsetPageResponse<PostSummaryResponse>>> getRecentViewPostsByMember(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
+            @RequestParam(defaultValue = "1")
+            @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
+            Integer page,
+
+            @Parameter(schema = @Schema(description = "페이지 크기", example = "10",minimum = "1",maximum = "50"))
+            @RequestParam
+            @Range(min = 1, max = 50)
+            Integer size
+    ) {
+        UUID currentMemberUuid = userDetails.getActiveUuid();
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getRecentlyViewByMemberUuid(currentMemberUuid, page-1,size)));
     }
 
     @Operation(
