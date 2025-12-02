@@ -6,6 +6,7 @@ import kr.modusplant.domains.post.domain.exception.ContentProcessingException;
 import kr.modusplant.domains.post.domain.exception.PostAccessDeniedException;
 import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
 import kr.modusplant.domains.post.domain.vo.*;
+import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
@@ -127,7 +128,7 @@ public class PostController {
     @Transactional
     public Long increaseViewCount(String ulid, UUID currentMemberUuid) {
         // 조회수 어뷰징 정책 - 사용자는 게시글 1개당 ttl에 1번 조회수 증가
-        if (!postViewLockRepository.lock(PostId.create(ulid), currentMemberUuid, ttlMinutes)) {
+        if (currentMemberUuid != null && !postViewLockRepository.lock(PostId.create(ulid), currentMemberUuid, ttlMinutes)) {
             return postViewCountRepository.read(PostId.create(ulid));
         }
         // 조회수 증가
@@ -137,29 +138,13 @@ public class PostController {
     public OffsetPageResponse<PostSummaryResponse> getByMemberUuid(UUID memberUuid, int page, int size) {
         return OffsetPageResponse.from(
                 postQueryForMemberRepository.findPublishedByAuthMemberWithOffset(AuthorId.fromUuid(memberUuid),page,size)
-                        .map(postModel -> {
-                            JsonNode contentPreview;
-                            try {
-                                contentPreview = multipartDataProcessorPort.convertToPreviewData(postModel.content());
-                            } catch (IOException e) {
-                                throw new ContentProcessingException();
-                            }
-                            return postMapper.toPostSummaryResponse(postModel,contentPreview);
-                        }));
+                        .map(postModel -> postMapper.toPostSummaryResponse(postModel,getJsonNodeContentPreview(postModel))));
     }
 
     public OffsetPageResponse<DraftPostResponse> getDraftByMemberUuid(UUID currentMemberUuid, int page, int size) {
         return OffsetPageResponse.from(
                 postQueryForMemberRepository.findDraftByAuthMemberWithOffset(AuthorId.fromUuid(currentMemberUuid),page,size)
-                        .map(postModel -> {
-                            JsonNode contentPreview;
-                            try {
-                                contentPreview = multipartDataProcessorPort.convertToPreviewData(postModel.content());
-                            } catch (IOException e) {
-                                throw new ContentProcessingException();
-                            }
-                            return postMapper.toDraftPostResponse(postModel, contentPreview);
-                        }));
+                        .map(postModel -> postMapper.toDraftPostResponse(postModel, getJsonNodeContentPreview(postModel))));
     }
 
     /*public OffsetPageResponse<PostSummaryResponse> getRecentViewedByMemberUuid(UUID currentMemberUuid, PageRequest pageRequest) {
@@ -169,30 +154,13 @@ public class PostController {
     public OffsetPageResponse<PostSummaryResponse> getLikedByMemberUuid(UUID currentMemberUuid, int page, int size) {
         return OffsetPageResponse.from(
                 postQueryForMemberRepository.findLikedByMemberWithOffset(currentMemberUuid,page,size)
-                        .map(postModel -> {
-                            JsonNode contentPreview;
-                            try {
-                                contentPreview = multipartDataProcessorPort.convertToPreviewData(postModel.content());
-                            } catch (IOException e) {
-                                throw new ContentProcessingException();
-                            }
-                            return postMapper.toPostSummaryResponse(postModel, contentPreview);
-                        })
-        );
+                        .map(postModel -> postMapper.toPostSummaryResponse(postModel, getJsonNodeContentPreview(postModel))));
     }
 
     public OffsetPageResponse<PostSummaryResponse> getBookmarkedByMemberUuid(UUID currentMemberUuid, int page, int size) {
         return OffsetPageResponse.from(
                 postQueryForMemberRepository.findBookmarkedByMemberWithOffset(currentMemberUuid,page,size)
-                        .map(postModel -> {
-                            JsonNode contentPreview;
-                            try {
-                                contentPreview = multipartDataProcessorPort.convertToPreviewData(postModel.content());
-                            } catch (IOException e) {
-                                throw new ContentProcessingException();
-                            }
-                            return postMapper.toPostSummaryResponse(postModel, contentPreview);
-                        })
+                        .map(postModel -> postMapper.toPostSummaryResponse(postModel, getJsonNodeContentPreview(postModel)))
         );
     }
 
@@ -201,7 +169,17 @@ public class PostController {
         try {
             contentPreview = multipartDataProcessorPort.convertToPreview(readModel.content());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ContentProcessingException();
+        }
+        return contentPreview;
+    }
+
+    private JsonNode getJsonNodeContentPreview(DraftPostReadModel readModel) {
+        JsonNode contentPreview;
+        try {
+            contentPreview = multipartDataProcessorPort.convertToPreview(readModel.content());
+        } catch (IOException e) {
+            throw new ContentProcessingException();
         }
         return contentPreview;
     }
@@ -211,7 +189,7 @@ public class PostController {
         try {
             content = multipartDataProcessorPort.convertFileSrcToFullFileSrc(readModel.content());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ContentProcessingException();
         }
         return content;
     }

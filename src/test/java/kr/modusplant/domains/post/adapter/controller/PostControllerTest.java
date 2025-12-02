@@ -348,7 +348,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         Page<PostSummaryReadModel> readModelPage = new PageImpl<>(List.of(TEST_POST_SUMMARY_READ_MODEL), PageRequest.of(page-1,size),totalElements);
 
         given(postQueryForMemberRepository.findPublishedByAuthMemberWithOffset(any(AuthorId.class), eq(page-1), eq(size))).willReturn(readModelPage);
-        given(multipartDataProcessorPort.convertToPreviewData(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
+        given(multipartDataProcessorPort.convertToPreview(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
 
         // when
         OffsetPageResponse<PostSummaryResponse> result = postController.getByMemberUuid(MEMBER_BASIC_USER_UUID, page-1, size);
@@ -363,7 +363,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         assertThat(result.hasNext()).isFalse();
         assertThat(result.hasPrevious()).isFalse();
         verify(postQueryForMemberRepository).findPublishedByAuthMemberWithOffset(any(AuthorId.class),eq(page-1),eq(size));
-        verify(multipartDataProcessorPort).convertToPreviewData(any(JsonNode.class));
+        verify(multipartDataProcessorPort).convertToPreview(any(JsonNode.class));
     }
 
     @Test
@@ -376,7 +376,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         Page<DraftPostReadModel> readModelPage = new PageImpl<>(List.of(TEST_DRAFT_POST_READ_MODEL), PageRequest.of(page-1,size),totalElements);
 
         given(postQueryForMemberRepository.findDraftByAuthMemberWithOffset(any(AuthorId.class), eq(page-1),eq(size))).willReturn(readModelPage);
-        given(multipartDataProcessorPort.convertToPreviewData(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
+        given(multipartDataProcessorPort.convertToPreview(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
 
         // when
         OffsetPageResponse<DraftPostResponse> result = postController.getDraftByMemberUuid(MEMBER_BASIC_USER_UUID,page-1,size);
@@ -392,7 +392,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         assertThat(result.hasPrevious()).isFalse();
 
         verify(postQueryForMemberRepository).findDraftByAuthMemberWithOffset(any(AuthorId.class), eq(page-1),eq(size));
-        verify(multipartDataProcessorPort).convertToPreviewData(any(JsonNode.class));
+        verify(multipartDataProcessorPort).convertToPreview(any(JsonNode.class));
     }
 
     @Test
@@ -405,7 +405,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         Page<PostSummaryReadModel> readModelPage = new PageImpl<>(List.of(TEST_POST_SUMMARY_READ_MODEL), PageRequest.of(page-1,size),totalElements);
 
         given(postQueryForMemberRepository.findLikedByMemberWithOffset(eq(MEMBER_BASIC_USER_UUID), eq(page-1), eq(size))).willReturn(readModelPage);
-        given(multipartDataProcessorPort.convertToPreviewData(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
+        given(multipartDataProcessorPort.convertToPreview(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
 
         // when
         OffsetPageResponse<PostSummaryResponse> result = postController.getLikedByMemberUuid(MEMBER_BASIC_USER_UUID,page-1,size);
@@ -420,7 +420,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         assertThat(result.hasNext()).isFalse();
         assertThat(result.hasPrevious()).isFalse();
         verify(postQueryForMemberRepository).findLikedByMemberWithOffset(eq(MEMBER_BASIC_USER_UUID),eq(page-1),eq(size));
-        verify(multipartDataProcessorPort).convertToPreviewData(any(JsonNode.class));
+        verify(multipartDataProcessorPort).convertToPreview(any(JsonNode.class));
     }
 
     @Test
@@ -433,7 +433,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         Page<PostSummaryReadModel> readModelPage = new PageImpl<>(List.of(TEST_POST_SUMMARY_READ_MODEL), PageRequest.of(page-1,size),totalElements);
 
         given(postQueryForMemberRepository.findBookmarkedByMemberWithOffset(eq(MEMBER_BASIC_USER_UUID), eq(page-1), eq(size))).willReturn(readModelPage);
-        given(multipartDataProcessorPort.convertToPreviewData(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
+        given(multipartDataProcessorPort.convertToPreview(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
 
         // when
         OffsetPageResponse<PostSummaryResponse> result = postController.getBookmarkedByMemberUuid(MEMBER_BASIC_USER_UUID,page-1,size);
@@ -448,7 +448,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         assertThat(result.hasNext()).isFalse();
         assertThat(result.hasPrevious()).isFalse();
         verify(postQueryForMemberRepository).findBookmarkedByMemberWithOffset(eq(MEMBER_BASIC_USER_UUID),eq(page-1),eq(size));
-        verify(multipartDataProcessorPort).convertToPreviewData(any(JsonNode.class));
+        verify(multipartDataProcessorPort).convertToPreview(any(JsonNode.class));
     }
 
 }
