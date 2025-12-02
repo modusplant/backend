@@ -9,13 +9,13 @@ import java.util.UUID;
 
 public interface NormalIdentityReadRepository {
 
-    String getMemberPassword(MemberId memberId, AuthProvider provider);
+    String getMemberPassword(MemberId memberId);
 
     UUID getMemberId(Email email, AuthProvider provider);
 
     boolean existsByMemberId(MemberId memberId);
 
-    boolean existsByEmailAndProvider(Email email, AuthProvider provider);
+    boolean existsByEmailAndProvider(Email email);
 
     boolean existsByNickname(Nickname nickname);
 }

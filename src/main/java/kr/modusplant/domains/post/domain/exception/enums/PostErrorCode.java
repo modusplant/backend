@@ -21,7 +21,9 @@ public enum PostErrorCode implements ResponseCode {
     EMPTY_CATEGORY_ID(HttpStatus.BAD_REQUEST, "empty_category_id", "카테고리 id가 비어 있습니다. "),
     INVALID_CATEGORY_ID(HttpStatus.BAD_REQUEST, "invalid_category_id", "카테고리 id가 유효하지 않습니다. "),
     POST_ACCESS_DENIED(HttpStatus.FORBIDDEN, "post_access_denied", "게시글에 대한 접근 권한이 없습니다."),
-    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "post_not_found", "게시글을 찾을 수 없습니다.");
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "post_not_found", "게시글을 찾을 수 없습니다."),
+    EMPTY_CATEGORY_NAME(HttpStatus.BAD_REQUEST,"empty_category_name","카테고리 이름이 비어 있습니다. "),
+    INVALID_CATEGORY_ORDER(HttpStatus.BAD_REQUEST,"invalid_category_order","카테고리 순서가 유효하지 않습니다. ");
 
     private final HttpStatus httpStatus;
     private final String code;
