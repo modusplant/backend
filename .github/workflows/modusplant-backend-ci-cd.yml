@@ -94,11 +94,6 @@ jobs:
 
           # ---- dummy ----
           KEYSTORE_PASSWORD: keystore_dummy_password
-          SPRINGDOC_API_DOCS_ENABLED: true
-          SPRINGDOC_SWAGGER_UI_ENABLED: true
-          LOGGING_LEVEL_ROOT: INFO
-          LOGGING_LEVEL_IO_LETTUCE: INFO
-          SECURITY_DEBUG_ENABLED: false
         run: |
           ./gradlew test \
             -PjdbcConnectionUrl="$JDBC_CONNECTION_URL" \
@@ -310,11 +305,6 @@ jobs:
           # === KEYSTORE_PASSWORD ===
           KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
           
-          SPRINGDOC_API_DOCS_ENABLED=true
-          SPRINGDOC_SWAGGER_UI_ENABLED=true
-          LOGGING_LEVEL_ROOT=INFO
-          LOGGING_LEVEL_IO_LETTUCE=INFO
-          SECURITY_DEBUG_ENABLED=false
           EOT
           
           echo "[EC2] Pull image: ${IMAGE}"
