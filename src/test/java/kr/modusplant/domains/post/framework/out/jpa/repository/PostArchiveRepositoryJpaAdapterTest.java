@@ -3,10 +3,10 @@ package kr.modusplant.domains.post.framework.out.jpa.repository;
 import kr.modusplant.domains.post.common.util.framework.out.jpa.entity.PostArchiveEntityTestUtils;
 import kr.modusplant.domains.post.common.util.framework.out.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostArchiveJpaMapper;
+import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostArchiveJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostJpaRepository;
 import kr.modusplant.framework.jpa.entity.CommPostArchiveEntity;
 import kr.modusplant.framework.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.jpa.repository.CommPostArchiveJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -16,10 +16,10 @@ import java.util.Optional;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-class CommPostArchiveRepositoryJpaAdapterTest implements PostEntityTestUtils, PostArchiveEntityTestUtils {
-    private final CommPostArchiveJpaRepository postArchiveJpaRepository = Mockito.mock(CommPostArchiveJpaRepository.class);
+class PostArchiveRepositoryJpaAdapterTest implements PostEntityTestUtils, PostArchiveEntityTestUtils {
+    private final PostArchiveJpaRepository postArchiveJpaRepository = Mockito.mock(PostArchiveJpaRepository.class);
     private final PostArchiveJpaMapper postArchiveJpaMapper = Mockito.mock(PostArchiveJpaMapper.class);
-    private final CommPostJpaRepository postJpaRepository = Mockito.mock(CommPostJpaRepository.class);
+    private final PostJpaRepository postJpaRepository = Mockito.mock(PostJpaRepository.class);
     private final PostArchiveRepositoryJpaAdapter postArchiveRepositoryJpaAdapter = new PostArchiveRepositoryJpaAdapter(
             postArchiveJpaRepository, postArchiveJpaMapper, postJpaRepository
     );

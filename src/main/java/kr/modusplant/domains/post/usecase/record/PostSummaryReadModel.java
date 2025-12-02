@@ -1,4 +1,4 @@
-package kr.modusplant.domains.post.usecase.model;
+package kr.modusplant.domains.post.usecase.record;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -11,6 +11,10 @@ public record PostSummaryReadModel(
         String nickname,
         String title,
         JsonNode content,
-        LocalDateTime publishedAt
+        Integer likeCount,
+        LocalDateTime publishedAt,
+        Integer commentCount,
+        Boolean isLiked,
+        Boolean isBookmarked
 ) {
 }

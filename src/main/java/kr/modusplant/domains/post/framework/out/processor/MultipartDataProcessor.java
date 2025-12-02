@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 
 
@@ -81,23 +80,22 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
         return directory + filename;
     }
 
-    public ArrayNode convertFileSrcToBinaryData(JsonNode content) throws IOException {
+    public ArrayNode convertFileSrcToFullFileSrc(JsonNode content) throws IOException {
         ArrayNode newArray = objectMapper.createArrayNode();
         for (JsonNode node : content) {
             ObjectNode objectNode = node.deepCopy();
             if (node.has(SRC)) {
-                String src = objectNode.get(SRC).asText();
-                byte[] fileBytes = s3FileService.downloadFile(src);
-                String base64Encoded = Base64.getEncoder().encodeToString(fileBytes);
-                objectNode.put(DATA, base64Encoded);
+                String fileKey = objectNode.get(SRC).asText();
                 objectNode.remove(SRC);
+                String src = s3FileService.generateS3SrcUrl(fileKey);
+                objectNode.put(SRC,src);
             }
             newArray.add(objectNode);
         }
         return newArray;
     }
 
-    public ArrayNode convertToPreviewData(JsonNode content) throws IOException {
+    public ArrayNode convertToPreview(JsonNode content) throws IOException {
         ArrayNode newArray = objectMapper.createArrayNode();
 
         JsonNode firstTextNode = null;
@@ -126,11 +124,10 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
         if (firstImageNode != null) {
             ObjectNode imageObjectNode = firstImageNode.deepCopy();
             if (imageObjectNode.has(SRC)) {
-                String src = imageObjectNode.get(SRC).asText();
-                byte[] fileBytes = s3FileService.downloadFile(src);
-                String base64Encoded = Base64.getEncoder().encodeToString(fileBytes);
-                imageObjectNode.put(DATA, base64Encoded);
+                String fileKey = imageObjectNode.get(SRC).asText();
                 imageObjectNode.remove(SRC);
+                String src = s3FileService.generateS3SrcUrl(fileKey);
+                imageObjectNode.put(SRC,src);
             }
             newArray.add(imageObjectNode);
         }

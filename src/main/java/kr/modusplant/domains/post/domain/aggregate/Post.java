@@ -49,7 +49,7 @@ public class Post {
         } else if (postContent == null) {
             throw new EmptyPostContentException();
         }
-        return new Post(PostId.generate(), authorId, authorId, primaryCategoryId, secondaryCategoryId, postContent, LikeCount.zero(), PostStatus.draft());
+        return new Post(null, authorId, authorId, primaryCategoryId, secondaryCategoryId, postContent, LikeCount.zero(), PostStatus.draft());
     }
 
     public static Post createPublished(AuthorId authorId, PrimaryCategoryId primaryCategoryId, SecondaryCategoryId secondaryCategoryId, PostContent postContent) {
@@ -62,7 +62,7 @@ public class Post {
         } else if (postContent == null) {
             throw new EmptyPostContentException();
         }
-        return new Post(PostId.generate(), authorId, authorId, primaryCategoryId, secondaryCategoryId, postContent, LikeCount.zero(), PostStatus.published());
+        return new Post(null, authorId, authorId, primaryCategoryId, secondaryCategoryId, postContent, LikeCount.zero(), PostStatus.published());
     }
 
     public void update(AuthorId authorId, PrimaryCategoryId primaryCategoryId, SecondaryCategoryId secondaryCategoryId, PostContent postContent, PostStatus postStatus) {
@@ -76,6 +76,9 @@ public class Post {
             throw new EmptyPostContentException();
         } else if (postStatus == null) {
             throw new EmptyPostStatusException();
+        }
+        if(this.status.isPublished() && postStatus.isDraft()) {
+            throw new InvalidPostStatusException();
         }
         this.authorId = authorId;
         this.primaryCategoryId = primaryCategoryId;

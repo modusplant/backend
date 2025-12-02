@@ -7,27 +7,18 @@ import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
 import kr.modusplant.domains.post.common.util.usecase.model.PostReadModelTestUtils;
 import kr.modusplant.domains.post.common.util.usecase.request.PostRequestTestUtils;
 import kr.modusplant.domains.post.domain.aggregate.Post;
-import kr.modusplant.domains.post.domain.vo.AuthorId;
+import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
 import kr.modusplant.domains.post.domain.vo.PostId;
-import kr.modusplant.domains.post.domain.vo.PrimaryCategoryId;
-import kr.modusplant.domains.post.usecase.model.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
-import kr.modusplant.domains.post.usecase.port.repository.PostArchiveRepository;
-import kr.modusplant.domains.post.usecase.port.repository.PostRepository;
-import kr.modusplant.domains.post.usecase.port.repository.PostViewCountRepository;
-import kr.modusplant.domains.post.usecase.port.repository.PostViewLockRepository;
-import kr.modusplant.domains.post.usecase.request.PostFilterRequest;
-import kr.modusplant.domains.post.usecase.response.PostDetailResponse;
-import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;
+import kr.modusplant.domains.post.usecase.port.repository.*;
+import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
+import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
+import kr.modusplant.domains.post.usecase.response.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
@@ -39,6 +30,7 @@ import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TE
 import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -48,11 +40,12 @@ import static org.mockito.Mockito.verify;
 class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostRequestTestUtils {
     private final PostMapper postMapper = new PostMapperImpl();
     private final PostRepository postRepository = Mockito.mock(PostRepository.class);
+    private final PostQueryRepository postQueryRepository = Mockito.mock(PostQueryRepository.class);
     private final MultipartDataProcessorPort multipartDataProcessorPort = Mockito.mock(MultipartDataProcessorPort.class);
     private final PostViewCountRepository postViewCountRepository = Mockito.mock(PostViewCountRepository.class);
     private final PostViewLockRepository postViewLockRepository = Mockito.mock(PostViewLockRepository.class);
     private final PostArchiveRepository postArchiveRepository = Mockito.mock(PostArchiveRepository.class);
-    private final PostController postController = new PostController(postMapper, postRepository, multipartDataProcessorPort, postViewCountRepository,postViewLockRepository,postArchiveRepository);
+    private final PostController postController = new PostController(postMapper, postRepository, postQueryRepository, multipartDataProcessorPort, postViewCountRepository,postViewLockRepository,postArchiveRepository);
 
     @BeforeEach
     void setUp() {
@@ -61,92 +54,56 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
 
     @Test
     @DisplayName("모든 발행된 게시글 조회")
-    void testGetAll_givenFilterAndPageable_willReturnPagedPostSummary() throws IOException {
+    void testGetAll_givenCategoryAndCursor_willReturnCursorPageResponse() throws IOException {
         // given
-        PostFilterRequest filterRequest = new PostFilterRequest(
-                testPrimaryCategoryId.getValue(),
-                List.of(testSecondaryCategoryId.getValue()),
-                "식물"
-        );
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<PostSummaryReadModel> readModelPage = new PageImpl<>(List.of(TEST_POST_SUMMARY_READ_MODEL));
+        PostCategoryRequest categoryRequest = new PostCategoryRequest(testPrimaryCategoryId.getValue(), List.of(testSecondaryCategoryId.getValue()));
+        UUID memberUuid = MEMBER_BASIC_USER_UUID;
+        String ulid = TEST_POST_ULID;
+        int size = 10;
+        List<PostSummaryReadModel> readModels = List.of(TEST_POST_SUMMARY_READ_MODEL);
 
-        given(postRepository.getPublishedPosts(
-                any(PrimaryCategoryId.class),
-                anyList(),
-                eq("식물"),
-                eq(pageable)
-        )).willReturn(readModelPage);
-        given(multipartDataProcessorPort.convertToPreviewData(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
+        given(postQueryRepository.findByCategoryWithCursor(testPrimaryCategoryId.getValue(), List.of(testSecondaryCategoryId.getValue()), memberUuid, ulid, size)).willReturn(readModels);
+        given(multipartDataProcessorPort.convertToPreview(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
 
         // when
-        Page<PostSummaryResponse> result = postController.getAll(filterRequest, pageable);
+        CursorPageResponse<PostSummaryResponse> result = postController.getAll(categoryRequest, memberUuid, ulid, size);
 
         // then
-        assertThat(result).hasSize(1);
-        assertThat(result.getContent().get(0).ulid()).isEqualTo(TEST_POST_SUMMARY_READ_MODEL.ulid());
-        verify(postRepository).getPublishedPosts(
-                any(PrimaryCategoryId.class),
-                anyList(),
-                eq("식물"),
-                eq(pageable)
-        );
-        verify(multipartDataProcessorPort).convertToPreviewData(any(JsonNode.class));
+        assertThat(result).isNotNull();
+        assertThat(result.posts()).hasSize(1);
+        assertThat(result.posts().get(0).ulid()).isEqualTo(TEST_POST_SUMMARY_READ_MODEL.ulid());
+        assertThat(result.nextUlid()).isNull();
+        assertThat(result.hasNext()).isFalse();
+
+        verify(postQueryRepository).findByCategoryWithCursor(testPrimaryCategoryId.getValue(), List.of(testSecondaryCategoryId.getValue()), memberUuid, ulid, size);
+        verify(multipartDataProcessorPort).convertToPreview(TEST_POST_SUMMARY_READ_MODEL.content());
     }
 
     @Test
-    @DisplayName("특정 회원의 발행된 게시글 조회")
-    void testGetByMemberUuid_givenMemberUuidAndFilter_willReturnPagedPostSummary() throws IOException {
+    @DisplayName("키워드로 발행된 게시글 조회")
+    void testGetByKeyword_givenKeywordAndCursor_willReturnCursorPageResponse() throws IOException {
         // given
-        PostFilterRequest filterRequest = new PostFilterRequest(
-                testPrimaryCategoryId.getValue(),
-                List.of(testSecondaryCategoryId.getValue()),
-                "식물"
-        );
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<PostSummaryReadModel> readModelPage = new PageImpl<>(List.of(TEST_POST_SUMMARY_READ_MODEL));
+        String keyword = "벌레";
+        UUID memberUuid = MEMBER_BASIC_USER_UUID;
+        String ulid = TEST_POST_ULID;
+        int size = 10;
+        List<PostSummaryReadModel> readModels = List.of(TEST_POST_SUMMARY_READ_MODEL);
 
-        given(postRepository.getPublishedPostsByAuthor(
-                any(AuthorId.class),
-                any(PrimaryCategoryId.class),
-                anyList(),
-                anyString(),
-                eq(pageable)
-        )).willReturn(readModelPage);
-        given(multipartDataProcessorPort.convertToPreviewData(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
+        given(postQueryRepository.findByKeywordWithCursor(keyword, memberUuid, ulid, size)).willReturn(readModels);
+        given(multipartDataProcessorPort.convertToPreview(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
 
         // when
-        Page<PostSummaryResponse> result = postController.getByMemberUuid(MEMBER_BASIC_USER_UUID, filterRequest, pageable);
+        CursorPageResponse<PostSummaryResponse> result = postController.getByKeyword(keyword, memberUuid, ulid, size);
 
         // then
-        assertThat(result).hasSize(1);
-        verify(postRepository).getPublishedPostsByAuthor(
-                any(AuthorId.class),
-                any(PrimaryCategoryId.class),
-                anyList(),
-                anyString(),
-                eq(pageable)
-        );
-        verify(multipartDataProcessorPort).convertToPreviewData(any(JsonNode.class));
-    }
+        assertThat(result).isNotNull();
+        assertThat(result.posts()).hasSize(1);
+        assertThat(result.posts().get(0).ulid()).isEqualTo(TEST_POST_SUMMARY_READ_MODEL.ulid());
+        assertThat(result.nextUlid()).isNull();
+        assertThat(result.hasNext()).isFalse();
 
-    @Test
-    @DisplayName("특정 회원의 임시저장 게시글 조회")
-    void testGetDraftByMemberUuid_givenMemberUuid_willReturnPagedDraftPosts() throws IOException {
-        // given
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<PostSummaryReadModel> readModelPage = new PageImpl<>(List.of(TEST_POST_SUMMARY_READ_MODEL));
-
-        given(postRepository.getDraftPostsByAuthor(any(AuthorId.class), eq(pageable))).willReturn(readModelPage);
-        given(multipartDataProcessorPort.convertToPreviewData(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
-
-        // when
-        Page<PostSummaryResponse> result = postController.getDraftByMemberUuid(MEMBER_BASIC_USER_UUID, pageable);
-
-        // then
-        assertThat(result).hasSize(1);
-        verify(postRepository).getDraftPostsByAuthor(any(AuthorId.class), eq(pageable));
-        verify(multipartDataProcessorPort).convertToPreviewData(any(JsonNode.class));
+        verify(postQueryRepository).findByKeywordWithCursor(keyword, memberUuid, ulid, size);
+        verify(multipartDataProcessorPort).convertToPreview(TEST_POST_SUMMARY_READ_MODEL.content());
     }
 
     @Test
@@ -155,18 +112,18 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         // given
         Long viewCount = 100L;
 
-        given(postRepository.getPostDetailByUlid(any(PostId.class))).willReturn(Optional.of(TEST_PUBLISHED_POST_DETAIL_READ_MODEL));
-        given(multipartDataProcessorPort.convertFileSrcToBinaryData(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
+        given(postQueryRepository.findPostDetailByPostId(any(PostId.class), eq(MEMBER_BASIC_USER_UUID))).willReturn(Optional.of(TEST_PUBLISHED_POST_DETAIL_READ_MODEL));
+        given(multipartDataProcessorPort.convertFileSrcToFullFileSrc(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
         given(postViewCountRepository.read(any(PostId.class))).willReturn(viewCount);
 
         // when
-        Optional<PostDetailResponse> result = postController.getByUlid(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
+        PostDetailResponse result = postController.getByUlid(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
 
         // then
-        assertThat(result).isPresent();
-        assertThat(result.get().ulid()).isEqualTo(TEST_POST_ULID);
-        verify(postRepository).getPostDetailByUlid(any(PostId.class));
-        verify(multipartDataProcessorPort).convertFileSrcToBinaryData(any(JsonNode.class));
+        assertThat(result).isNotNull();
+        assertThat(result.ulid()).isEqualTo(TEST_POST_ULID);
+        verify(postQueryRepository).findPostDetailByPostId(any(PostId.class), eq(MEMBER_BASIC_USER_UUID));
+        verify(multipartDataProcessorPort).convertFileSrcToFullFileSrc(any(JsonNode.class));
         verify(postViewCountRepository).read(any(PostId.class));
     }
 
@@ -174,41 +131,38 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     @DisplayName("작성자가 ULID로 임시저장 게시글 조회하기")
     void testGetByUlid_givenDraftPostAndAuthor_willReturnPostDetail() throws IOException {
         // given
-        given(postRepository.getPostDetailByUlid(any(PostId.class))).willReturn(Optional.of(TEST_DRAFT_POST_DETAIL_READ_MODEL));
-        given(multipartDataProcessorPort.convertFileSrcToBinaryData(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
+        given(postQueryRepository.findPostDetailByPostId(any(PostId.class), eq(MEMBER_BASIC_USER_UUID))).willReturn(Optional.of(TEST_DRAFT_POST_DETAIL_READ_MODEL));
+        given(multipartDataProcessorPort.convertFileSrcToFullFileSrc(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
 
         // when
-        Optional<PostDetailResponse> result = postController.getByUlid(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
+        PostDetailResponse result = postController.getByUlid(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
 
         // then
-        assertThat(result).isPresent();
-        verify(postRepository).getPostDetailByUlid(any(PostId.class));
-        verify(multipartDataProcessorPort).convertFileSrcToBinaryData(any(JsonNode.class));
+        assertThat(result).isNotNull();
+        verify(postQueryRepository).findPostDetailByPostId(any(PostId.class), eq(MEMBER_BASIC_USER_UUID));
+        verify(multipartDataProcessorPort).convertFileSrcToFullFileSrc(any(JsonNode.class));
         verify(postViewCountRepository, never()).read(any(PostId.class));
     }
 
     @Test
     @DisplayName("작성자가 아닐 때, ULID로 임시저장 게시글 조회 불가")
-    void testGetByUlid_givenDraftPostAndNonAuthor_willReturnEmpty() {
+    void testGetByUlid_givenDraftPostAndNonAuthor_willReturnEmpty() throws IOException {
         // given
         UUID otherMemberUuid = UUID.randomUUID();
 
-        given(postRepository.getPostDetailByUlid(any(PostId.class))).willReturn(Optional.of(TEST_DRAFT_POST_DETAIL_READ_MODEL));
+        given(postQueryRepository.findPostDetailByPostId(any(PostId.class), eq(otherMemberUuid))).willReturn(Optional.of(TEST_DRAFT_POST_DETAIL_READ_MODEL));
 
-        // when
-        Optional<PostDetailResponse> result = postController.getByUlid(TEST_POST_ULID, otherMemberUuid);
-
-        // then
-        assertThat(result).isEmpty();
-        verify(postRepository).getPostDetailByUlid(any(PostId.class));
+        // when & then
+        assertThatThrownBy(() -> postController.getByUlid(TEST_POST_ULID, otherMemberUuid))
+                .isInstanceOf(PostNotFoundException.class);
+        verify(postQueryRepository).findPostDetailByPostId(any(PostId.class), eq(otherMemberUuid));
+        verify(multipartDataProcessorPort, never()).convertFileSrcToFullFileSrc(any(JsonNode.class));
     }
-
     @Test
     @DisplayName("게시글 생성 및 발행")
     void testCreatePost_givenPublishedPostRequest_willCreatePost() throws IOException {
         // given
         given(multipartDataProcessorPort.saveFilesAndGenerateContentJson(anyList())).willReturn(TEST_POST_CONTENT_BINARY_DATA);
-        given(postRepository.save(any(Post.class))).willReturn(TEST_PUBLISHED_POST_DETAIL_READ_MODEL);
 
         // when
         postController.createPost(requestAllTypes, MEMBER_BASIC_USER_UUID);
@@ -226,7 +180,6 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     void testCreatePost_givenDraftPostRequest_willCreateDraftPost() throws IOException {
         // given
         given(multipartDataProcessorPort.saveFilesAndGenerateContentJson(anyList())).willReturn(TEST_POST_CONTENT_BINARY_DATA);
-        given(postRepository.save(any(Post.class))).willReturn(TEST_DRAFT_POST_DETAIL_READ_MODEL);
 
         // when
         postController.createPost(requestAllTypesDraft, MEMBER_BASIC_USER_UUID);
@@ -248,7 +201,6 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         given(postRepository.getPostByUlid(any(PostId.class))).willReturn(Optional.of(existingPost));
         willDoNothing().given(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
         given(multipartDataProcessorPort.saveFilesAndGenerateContentJson(anyList())).willReturn(TEST_POST_CONTENT_BINARY_DATA);
-        given(postRepository.save(any(Post.class))).willReturn(TEST_PUBLISHED_POST_DETAIL_READ_MODEL);
 
         // when
         postController.updatePost(updateRequestAllTypes, MEMBER_BASIC_USER_UUID);
@@ -257,7 +209,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         verify(postRepository).getPostByUlid(any(PostId.class));
         verify(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
         verify(multipartDataProcessorPort).saveFilesAndGenerateContentJson(anyList());
-        verify(postRepository).save(any(Post.class));
+        verify(postRepository).update(any(Post.class));
     }
 
     @Test
