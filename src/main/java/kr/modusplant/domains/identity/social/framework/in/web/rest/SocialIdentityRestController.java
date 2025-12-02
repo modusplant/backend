@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
 
-import static kr.modusplant.shared.persistence.constant.TableColumnName.REFRESH_TOKEN;
 
 @Tag(name = "소셜 로그인 API", description = "소셜 로그인을 다루는 API입니다.")
 @RestController
@@ -64,7 +63,7 @@ public class SocialIdentityRestController {
     }
 
     private String setRefreshTokenCookie(String refreshToken) {
-        ResponseCookie refreshCookie = ResponseCookie.from(REFRESH_TOKEN, refreshToken)
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
                 .httpOnly(true)
                 .secure(true)
                 .path("/")

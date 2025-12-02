@@ -34,7 +34,7 @@ public class TokenRestController {
             @ApiResponse(responseCode = "200", description = "Succeeded : JWT 발급 완료")
     })
     @PostMapping("/auth/token/refresh")
-    public ResponseEntity<DataResponse<?>> refreshToken(@CookieValue("Cookie") String refreshToken,
+    public ResponseEntity<DataResponse<?>> refreshToken(@CookieValue("refresh_token") String refreshToken,
                                                         @RequestHeader("Authorization") String rawAccessToken) {
 
         String accessToken = getTokenFromAuthorizationHeader(rawAccessToken);
