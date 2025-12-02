@@ -2,6 +2,7 @@ package kr.modusplant.domains.post.framework.out.jooq.repository;
 
 import kr.modusplant.domains.post.common.helper.PostTestDataHelper;
 import kr.modusplant.domains.post.domain.vo.AuthorId;
+import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.jooq.tables.records.CommPostRecord;
@@ -165,6 +166,56 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         assertThat(firstPage.getTotalElements()).isEqualTo(0);
         assertThat(firstPage.getTotalPages()).isEqualTo(0);
         assertThat(firstPage.getContent()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("게시글 id 목록으로 게시글 목록 오프셋 기반으로 조회")
+    void testFindByIds_givenIds_willReturnPosts() {
+        // given
+        List<PostId> postIds = List.of(
+                PostId.create(testPost4.getUlid()),
+                PostId.create(testPost1.getUlid()),
+                PostId.create(testPost2.getUlid())
+        );
+
+        // when
+        List<PostSummaryReadModel> results = postQueryForMemberJooqRepository.findByIds(postIds,testMember2.getUuid());
+
+        // then
+        PostSummaryReadModel post4 = results.get(0);
+        PostSummaryReadModel post1 = results.get(1);
+        PostSummaryReadModel post2 = results.get(2);
+
+        assertThat(results).hasSize(3);
+        assertThat(post4.ulid()).isEqualTo(testPost4.getUlid());
+        assertThat(post1.ulid()).isEqualTo(testPost1.getUlid());
+        assertThat(post2.ulid()).isEqualTo(testPost2.getUlid());
+
+        // 좋아요, 북마크, 댓글 수 확인
+        assertThat(post4.isLiked()).isTrue();
+        assertThat(post4.isBookmarked()).isFalse();
+        assertThat(post4.commentCount()).isEqualTo(0);
+        assertThat(post1.isLiked()).isTrue();
+        assertThat(post1.isBookmarked()).isTrue();
+        assertThat(post1.commentCount()).isEqualTo(2);
+        assertThat(post2.isLiked()).isFalse();
+        assertThat(post2.isBookmarked()).isTrue();
+        assertThat(post2.commentCount()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("빈 게시글 id 목록으로 게시글 목록 조회 시 empty list 반환")
+    void testFindByIds_givenEmptyIdList_willReturnEmptyPostList() {
+        // given
+        UUID currentMemberUuid = testMember1.getUuid();
+
+        // when
+        List<PostSummaryReadModel> result1 = postQueryForMemberJooqRepository.findByIds(List.of(),currentMemberUuid);
+        List<PostSummaryReadModel> result2 = postQueryForMemberJooqRepository.findByIds(null,currentMemberUuid);
+
+        // then
+        assertThat(result1).isEmpty();
+        assertThat(result2).isEmpty();
     }
 
     @Test
