@@ -2,7 +2,6 @@ package kr.modusplant.domains.identity.normal.adapter.controller;
 
 import kr.modusplant.domains.identity.normal.domain.exception.DataAlreadyExistsException;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
-import kr.modusplant.domains.identity.normal.domain.vo.Email;
 import kr.modusplant.domains.identity.normal.domain.vo.MemberId;
 import kr.modusplant.domains.identity.normal.domain.vo.Nickname;
 import kr.modusplant.domains.identity.normal.domain.vo.Password;
@@ -12,11 +11,11 @@ import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdent
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityUpdateRepository;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailModificationRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.NormalSignUpRequest;
-import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.domains.identity.normal.usecase.request.PasswordModificationRequest;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.InvalidDataException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

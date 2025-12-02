@@ -12,12 +12,12 @@ class SocialUserProfileTest implements SocialUserProfileTestUtils {
     @DisplayName("유효한 SocialCredentials, Email, Nickname으로 SocialUserProfile 생성")
     void testCreate_givenValidParameters_willReturnSocialUserProfile() {
         // when
-        SocialUserProfile profile = SocialUserProfile.create(testKakaoSocialCredentials, testSocialKakaoEmail, testSocialKakaoNickname);
+        SocialUserProfile profile = SocialUserProfile.create(testKakaoSocialCredentials, testKakaoUserEmail, testSocialKakaoNickname);
 
         // then
         assertNotNull(profile);
         assertEquals(testKakaoSocialCredentials, profile.getSocialCredentials());
-        assertEquals(testSocialKakaoEmail, profile.getEmail());
+        assertEquals(testKakaoUserEmail, profile.getEmail());
         assertEquals(testSocialKakaoNickname, profile.getNickname());
     }
 
@@ -30,7 +30,7 @@ class SocialUserProfileTest implements SocialUserProfileTestUtils {
     @Test
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
     void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
-        assertNotEquals(testSocialKakaoEmail,testKakaoSocialUserProfile);
+        assertNotEquals(testKakaoUserEmail,testKakaoSocialUserProfile);
     }
 
     @Test

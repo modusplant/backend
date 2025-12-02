@@ -2,7 +2,6 @@ package kr.modusplant.domains.identity.normal.adapter.controller;
 
 import kr.modusplant.domains.identity.normal.adapter.EmailAuthTokenHelper;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
-import kr.modusplant.domains.identity.normal.domain.vo.Email;
 import kr.modusplant.domains.identity.normal.domain.vo.Password;
 import kr.modusplant.domains.identity.normal.usecase.enums.EmailType;
 import kr.modusplant.domains.identity.normal.usecase.port.contract.CallEmailSendApiGateway;
@@ -13,9 +12,9 @@ import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequ
 import kr.modusplant.domains.identity.normal.usecase.request.InputValidationRequest;
 import kr.modusplant.framework.redis.RedisHelper;
 import kr.modusplant.framework.redis.RedisKeys;
-import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.InvalidDataException;
+import kr.modusplant.shared.kernel.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -59,7 +58,7 @@ public class EmailAuthController {
         UUID uuid = UUID.randomUUID();
         String stringUuid = String.valueOf(uuid);
         String redisKey = RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, stringUuid);
-        redisHelper.setString(redisKey, email, Duration.ofMinutes(3));
+        redisHelper.setString(redisKey, email, Duration.ofMinutes(5));
 
         apiGateway.execute(email, stringUuid, EmailType.RESET_PASSWORD_EMAIL);
         return tokenHelper.generateResetPasswordAccessToken(email, RESET_PASSWORD_EMAIL);

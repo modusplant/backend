@@ -15,6 +15,10 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
 @Slf4j
 @Service
 public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
@@ -41,9 +45,14 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
         // 요청 생성
         MailjetRequest request = new MailjetRequest(Emailv31.resource);
 
+        ZonedDateTime expiredTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).plusMinutes(5);
+
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
+
         switch (type) {
             case AUTHENTICATION_CODE_EMAIL: // 회원가입 인증 코드 메일 발송
-                templateId = 6747014;
+                templateId = 7541104;
                 subject = "[ModusPlant] 인증 코드를 포함하는 메일입니다.";
 
                 // 요청 생성
@@ -69,12 +78,13 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
                                                         .put(Emailv31.Message.SUBJECT, subject)
                                                         .put(Emailv31.Message.VARS, new JSONObject()
                                                                 .put("verifyCode", varValue)
+                                                                .put("expiredTime", expiredTime.format(formatter))
                                                         )
                                         )
                         );
                 break;
             case RESET_PASSWORD_EMAIL:
-                templateId = 7011045; // 비밀번호 재설정 메일 발송
+                templateId = 7541296; // 비밀번호 재설정 메일 발송
                 subject = "[ModusPlant] 비밀번호 재설정 전용 메일입니다.";
 
                 // 요청 생성
@@ -99,7 +109,9 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
                                                         .put("TemplateLanguage", true)
                                                         .put(Emailv31.Message.SUBJECT, subject)
                                                         .put(Emailv31.Message.VARS, new JSONObject()
+                                                                .put("emailAddress", email)
                                                                 .put("resetUrl", String.format("https://app.modusplant.kr/api/auth/reset-password-request/verify/email?uuid=%s", varValue))
+                                                                .put("expiredTime", expiredTime.format(formatter))
                                                         )
                                         )
                         );

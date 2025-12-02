@@ -1,0 +1,21 @@
+# Debugging & Logging
+logging:
+  level:
+    root: DEBUG
+    io:
+      lettuce: DEBUG
+security:
+  debug:
+    enabled: true
+
+# Scheduler
+scheduler:
+  sync-interval-ms : 300000           # 5분
+  token-cleanup-cron : "0 0 3 * * *"  # 새벽 3시
+
+# Swagger
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true

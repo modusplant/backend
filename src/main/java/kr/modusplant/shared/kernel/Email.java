@@ -1,8 +1,8 @@
-package kr.modusplant.domains.identity.social.domain.vo;
+package kr.modusplant.shared.kernel;
 
-import kr.modusplant.domains.identity.social.domain.exception.EmptyEmailException;
-import kr.modusplant.domains.identity.social.domain.exception.InvalidEmailException;
 import kr.modusplant.shared.constant.Regex;
+import kr.modusplant.shared.exception.EmptyEmailException;
+import kr.modusplant.shared.exception.InvalidEmailException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,9 +28,9 @@ public class Email {
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof Email email)) return false;
+        if (!(o instanceof Email)) return false;
 
-        return new EqualsBuilder().append(getEmail(), email.getEmail()).isEquals();
+        return new EqualsBuilder().append(getEmail(), ((Email) o).getEmail()).isEquals();
     }
 
     @Override
