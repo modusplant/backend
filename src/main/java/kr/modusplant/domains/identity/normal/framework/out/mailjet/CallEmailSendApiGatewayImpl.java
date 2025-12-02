@@ -45,7 +45,7 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
         // 요청 생성
         MailjetRequest request = new MailjetRequest(Emailv31.resource);
 
-        ZonedDateTime expiredTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).plusMinutes(3);
+        ZonedDateTime expiredTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).plusMinutes(5);
 
         DateTimeFormatter formatter =
                 DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
@@ -109,7 +109,7 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
                                                         .put("TemplateLanguage", true)
                                                         .put(Emailv31.Message.SUBJECT, subject)
                                                         .put(Emailv31.Message.VARS, new JSONObject()
-                                                                .put("emailAdress", email)
+                                                                .put("emailAddress", email)
                                                                 .put("resetUrl", String.format("https://app.modusplant.kr/api/auth/reset-password-request/verify/email?uuid=%s", varValue))
                                                                 .put("expiredTime", expiredTime.format(formatter))
                                                         )
