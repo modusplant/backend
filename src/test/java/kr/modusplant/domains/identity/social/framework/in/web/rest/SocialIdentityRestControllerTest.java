@@ -22,6 +22,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static kr.modusplant.infrastructure.jwt.constant.CookieName.REFRESH_TOKEN_COOKIE_NAME;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -75,7 +76,7 @@ class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, U
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.data.accessToken").value(TEST_ACCESS_TOKEN))
                 .andExpect(header().exists("Set-Cookie"))
-                .andExpect(cookie().exists("refresh_token"));
+                .andExpect(cookie().exists(REFRESH_TOKEN_COOKIE_NAME));
     }
 
     @Test
@@ -100,7 +101,7 @@ class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, U
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.data.accessToken").value(TEST_ACCESS_TOKEN))
                 .andExpect(header().exists("Set-Cookie"))
-                .andExpect(cookie().exists("refresh_token"));
+                .andExpect(cookie().exists(REFRESH_TOKEN_COOKIE_NAME));
     }
 
 
