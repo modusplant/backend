@@ -1,5 +1,6 @@
 package kr.modusplant.domains.post.framework.in.web.rest;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,7 +15,10 @@ import kr.modusplant.domains.post.usecase.request.FileOrder;
 import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
 import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
 import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
-import kr.modusplant.domains.post.usecase.response.*;
+import kr.modusplant.domains.post.usecase.response.CursorPageResponse;
+import kr.modusplant.domains.post.usecase.response.DraftPostResponse;
+import kr.modusplant.domains.post.usecase.response.OffsetPageResponse;
+import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -104,7 +108,7 @@ public class PostRestController {
 
     @Operation(
             summary = "특정 컨텐츠 게시글 조회 API",
-            description = "게시글 식별자로 특정 컨텐츠 게시글을 조회합니다."
+            description = "게시글 식별자로 특정 컨텐츠 게시글을 조회합니다. 조회수 증가 및 최근 본 게시글에 추가됩니다."
     )
     @GetMapping("/{postId}")
     public ResponseEntity<DataResponse<?>> getPostByUlid(
@@ -273,4 +277,140 @@ public class PostRestController {
         UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
         return ResponseEntity.ok().body(DataResponse.ok(postController.increaseViewCount(ulid, currentMemberUuid)));
     }
+
+    @Hidden
+    @Operation(
+            summary = "회원별 게시글 목록 조회 API (페이지 번호)",
+            description = "사이트 회원별 컨텐츠 게시글의 목록과 페이지 정보를 조회합니다."
+    )
+    @GetMapping("/member/{memberUuid}")
+    public ResponseEntity<DataResponse<OffsetPageResponse<PostSummaryResponse>>> getPostsByMember(
+            @Parameter(schema = @Schema(description = "회원의 식별자", example = "038ae842-3c93-484f-b526-7c4645a195a7"))
+            @PathVariable
+            @NotNull(message = "회원 식별자가 비어 있습니다.")
+            UUID memberUuid,
+
+            @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
+            @RequestParam(defaultValue = "1")
+            @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
+            Integer page,
+
+            @Parameter(schema = @Schema(description = "페이지 크기", example = "10",minimum = "1",maximum = "50"))
+            @RequestParam
+            @Range(min = 1, max = 50)
+            Integer size
+    ) {
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getByMemberUuid(memberUuid, page-1, size)));
+    }
+
+    @Operation(
+            summary = "내가 작성한 게시글 목록 조회 API (페이지 번호)",
+            description = "로그인한 회원의 컨텐츠 게시글의 목록과 페이지 정보를 조회합니다."
+    )
+    @GetMapping("/me")
+    public ResponseEntity<DataResponse<OffsetPageResponse<PostSummaryResponse>>> getPostsByMember(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
+            @RequestParam(defaultValue = "1")
+            @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
+            Integer page,
+
+            @Parameter(schema = @Schema(description = "페이지 크기", example = "10",minimum = "1",maximum = "50"))
+            @RequestParam
+            @Range(min = 1, max = 50)
+            Integer size
+    ) {
+        UUID currentMemberUuid = userDetails.getActiveUuid();
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getByMemberUuid(currentMemberUuid, page-1, size)));
+    }
+
+    @Operation(
+            summary = "임시저장한 게시글 목록 조회 API (페이지번호)",
+            description = "로그인한 회원의 임시저장된 게시글의 목록과 페이지 정보를 조회합니다."
+    )
+    @GetMapping("/me/drafts")
+    public ResponseEntity<DataResponse<OffsetPageResponse<DraftPostResponse>>> getDraftPostsByMember(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
+            @RequestParam(defaultValue = "1")
+            @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
+            Integer page,
+
+            @Parameter(schema = @Schema(description = "페이지 크기", example = "10",minimum = "1",maximum = "50"))
+            @RequestParam
+            @Range(min = 1, max = 50)
+            Integer size
+    ) {
+        UUID currentMemberUuid = userDetails.getActiveUuid();
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getDraftByMemberUuid(currentMemberUuid,page-1, size)));
+    }
+
+    @Operation(
+            summary = "최근에 본 게시글 목록 조회 API (페이지 번호)",
+            description = "마이페이지에서 최근에 본 게시글 목록과 페이지 정보를 조회합니다."
+    )
+    @GetMapping("/me/history")
+    public ResponseEntity<DataResponse<OffsetPageResponse<PostSummaryResponse>>> getRecentViewPostsByMember(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
+            @RequestParam(defaultValue = "1")
+            @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
+            Integer page,
+
+            @Parameter(schema = @Schema(description = "페이지 크기", example = "10",minimum = "1",maximum = "50"))
+            @RequestParam
+            @Range(min = 1, max = 50)
+            Integer size
+    ) {
+        UUID currentMemberUuid = userDetails.getActiveUuid();
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getRecentlyViewByMemberUuid(currentMemberUuid, page-1,size)));
+    }
+
+    @Operation(
+            summary = "내가 좋아요한 게시글 목록 조회 API (페이지 번호)",
+            description = "마이페이지에서 좋아요한 게시글 목록과 페이지 정보를 조회합니다."
+    )
+    @GetMapping("/me/likes")
+    public ResponseEntity<DataResponse<OffsetPageResponse<PostSummaryResponse>>> getLikedPostsByMember(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
+            @RequestParam(defaultValue = "1")
+            @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
+            Integer page,
+
+            @Parameter(schema = @Schema(description = "페이지 크기", example = "10",minimum = "1",maximum = "50"))
+            @RequestParam
+            @Range(min = 1, max = 50)
+            Integer size
+    ) {
+        UUID currentMemberUuid = userDetails.getActiveUuid();
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getLikedByMemberUuid(currentMemberUuid, page-1, size)));
+    }
+
+    @Operation(
+            summary = "내가 북마크한 게시글 목록 조회 API (페이지 번호)",
+            description = "마이페이지에서 북마크한 게시글 목록과 페이지 정보를 조회합니다."
+    )
+    @GetMapping("/me/bookmarks")
+    public ResponseEntity<DataResponse<OffsetPageResponse<PostSummaryResponse>>> getBookmarkedPostsByMember(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
+            @RequestParam(defaultValue = "1")
+            @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
+            Integer page,
+
+            @Parameter(schema = @Schema(description = "페이지 크기", example = "10",minimum = "1",maximum = "50"))
+            @RequestParam
+            @Range(min = 1, max = 50)
+            Integer size
+    ) {
+        UUID currentMemberUuid = userDetails.getActiveUuid();
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getBookmarkedByMemberUuid(currentMemberUuid, page-1, size)));
+    }
+
 }

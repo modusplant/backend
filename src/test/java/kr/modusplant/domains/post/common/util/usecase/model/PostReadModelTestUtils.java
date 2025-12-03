@@ -1,5 +1,6 @@
 package kr.modusplant.domains.post.common.util.usecase.model;
 
+import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT;
 import static kr.modusplant.domains.post.common.constant.PostStringConstant.TEST_POST_TITLE;
 import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
+import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID2;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_UUID;
 import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
@@ -67,5 +69,28 @@ public interface PostReadModelTestUtils {
             5,
             true,
             false
+    );
+
+    PostSummaryReadModel TEST_POST_SUMMARY_READ_MODEL2 = new PostSummaryReadModel(
+            TEST_POST_ULID2,
+            TEST_COMM_PRIMARY_CATEGORY_CATEGORY,
+            TEST_COMM_SECONDARY_CATEGORY_CATEGORY,
+            MEMBER_BASIC_USER_NICKNAME,
+            TEST_POST_TITLE,
+            TEST_POST_CONTENT,
+            likeCount,
+            testDate,
+            5,
+            true,
+            false
+    );
+
+    DraftPostReadModel TEST_DRAFT_POST_READ_MODEL = new DraftPostReadModel(
+            TEST_POST_ULID,
+            TEST_COMM_PRIMARY_CATEGORY_CATEGORY,
+            TEST_COMM_SECONDARY_CATEGORY_CATEGORY,
+            TEST_POST_TITLE,
+            TEST_POST_CONTENT,
+            testDate
     );
 }

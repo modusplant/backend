@@ -131,10 +131,11 @@ public class SecurityConfig {
                 .addFilterBefore(emailPasswordAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(http), EmailPasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/communication/posts/me/**").authenticated()
                         .requestMatchers(HttpMethod.POST,"/api/v1/communication/posts").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/communication/posts/*").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/communication/posts/*").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/communication/posts/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/communication/posts/**","/api/v1/communication/posts").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/communication/posts/*/views").permitAll()
                         .anyRequest().permitAll()
                 )
