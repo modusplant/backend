@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class PostRecentlyViewRedisRepository implements PostRecentlyViewRepository {
     private static final String KEY_FORMAT = "recentlyView:member:%s:posts";
-    private static final long TTL_DAYS = 7;          // TTL 30일
+    private static final long TTL_DAYS = 7;          // TTL 7일
 
     private final StringRedisTemplate stringRedisTemplate;
 
