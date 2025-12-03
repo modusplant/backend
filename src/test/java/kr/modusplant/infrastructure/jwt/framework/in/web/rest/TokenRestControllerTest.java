@@ -57,7 +57,7 @@ class TokenRestControllerTest {
         // when & then
         mockMvc.perform(post("/api/auth/token/refresh")
                         .header("Authorization", authorizationHeader)
-                        .cookie(new Cookie("Cookie", refreshToken))
+                        .cookie(new Cookie("refresh_token", refreshToken))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(header().exists("Set-Cookie"))
