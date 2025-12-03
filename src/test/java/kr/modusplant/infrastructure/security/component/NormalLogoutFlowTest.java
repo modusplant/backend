@@ -2,15 +2,8 @@ package kr.modusplant.infrastructure.security.component;
 
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.context.SecurityOnlyContext;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
-
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SecurityOnlyContext
 public class NormalLogoutFlowTest {

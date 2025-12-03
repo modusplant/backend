@@ -8,15 +8,7 @@ import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqRepository;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJpaAdapter;
-import kr.modusplant.domains.comment.usecase.response.CommentResponse;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         CommentReadModelTestUtils, MemberReadModelTestUtils, CommentResponseTestUtils {

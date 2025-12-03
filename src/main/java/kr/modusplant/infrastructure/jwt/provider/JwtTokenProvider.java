@@ -19,6 +19,7 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -78,8 +79,8 @@ public class JwtTokenProvider {
             KeyStore keyStore = KeyStore.getInstance(keyStoreType);
             char[] password = keyStorePassword.toCharArray();
             if (Files.exists(keyStorePath)) {
-                InputStream fis = Files.newInputStream(keyStorePath);
-                keyStore.load(fis, password);
+                InputStream inputStream = Files.newInputStream(keyStorePath);
+                keyStore.load(inputStream, password);
                 KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry)
                         keyStore.getEntry(keyAlias, new KeyStore.PasswordProtection(password));
                 privateKey = privateKeyEntry.getPrivateKey();
@@ -98,8 +99,8 @@ public class JwtTokenProvider {
                 keyStore.load(null, password);
                 keyStore.setKeyEntry(keyAlias, privateKey, password, certChain);
 
-                OutputStream fos = Files.newOutputStream(keyStorePath);
-                keyStore.store(fos, password);
+                OutputStream outputStream = Files.newOutputStream(keyStorePath);
+                keyStore.store(outputStream, password);
             }
         } catch (KeyStoreException e) {
             throw new TokenKeyStorageException();
@@ -139,6 +140,17 @@ public class JwtTokenProvider {
                 .expiration(exp)
                 .signWith(privateKey)
                 .compact();
+    }
+
+    public String generateRefreshTokenCookieAsString(String refreshToken) {
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(refreshDuration)
+                .sameSite("Lax")
+                .build();
+        return refreshCookie.toString();
     }
 
     // 토큰 검증하기
