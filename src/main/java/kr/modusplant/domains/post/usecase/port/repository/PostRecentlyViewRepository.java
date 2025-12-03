@@ -7,6 +7,8 @@ import java.util.UUID;
 
 public interface PostRecentlyViewRepository {
     void recordViewPost(UUID memberUuid, PostId postId);
+
     List<PostId> getRecentlyViewPostIds(UUID memberUuid, int page, int size);
+
     long getTotalRecentlyViewPosts(UUID memberUuid);
 }
