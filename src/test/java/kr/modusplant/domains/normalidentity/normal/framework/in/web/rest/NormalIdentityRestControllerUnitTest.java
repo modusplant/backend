@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -52,7 +53,7 @@ public class NormalIdentityRestControllerUnitTest implements
         // when
         ResponseEntity<DataResponse<Map<String, Object>>> response = restController.respondToNormalLoginSuccess(testAccessToken, testRefreshToken);
 
-        String refreshTokenCookie = response.getHeaders().get("Set-Cookie").getFirst();
+        String refreshTokenCookie = response.getHeaders().get(HttpHeaders.SET_COOKIE).getFirst();
         Map<String, String> cookieResult = new HashMap<>();
 
         for(String part: refreshTokenCookie.split(";")) {

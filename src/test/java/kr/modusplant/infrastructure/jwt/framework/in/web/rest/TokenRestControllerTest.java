@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -61,11 +62,11 @@ class TokenRestControllerTest {
                         .cookie(new Cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(header().exists("Set-Cookie"))
-                .andExpect(header().string("Set-Cookie", containsString(REFRESH_TOKEN_COOKIE_NAME)))
-                .andExpect(header().string("Set-Cookie", containsString("HttpOnly")))
-                .andExpect(header().string("Set-Cookie", containsString("Secure")))
-                .andExpect(header().string("Set-Cookie", containsString("SameSite=Lax")))
+                .andExpect(header().exists(HttpHeaders.SET_COOKIE))
+                .andExpect(header().string(HttpHeaders.SET_COOKIE, containsString(REFRESH_TOKEN_COOKIE_NAME)))
+                .andExpect(header().string(HttpHeaders.SET_COOKIE, containsString("HttpOnly")))
+                .andExpect(header().string(HttpHeaders.SET_COOKIE, containsString("Secure")))
+                .andExpect(header().string(HttpHeaders.SET_COOKIE, containsString("SameSite=Lax")))
                 .andExpect(header().string("Cache-Control", "no-store"))
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.data.accessToken").value("new_access_token"));
