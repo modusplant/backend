@@ -1,6 +1,5 @@
 package kr.modusplant.domains.identity.social.framework.out.jpa.repository;
 
-import kr.modusplant.domains.identity.social.common.util.domain.vo.EmailTestUtils;
 import kr.modusplant.domains.identity.social.common.util.domain.vo.SocialCredentialsTestUtils;
 import kr.modusplant.domains.identity.social.common.util.domain.vo.UserPayloadTestUtils;
 import kr.modusplant.domains.identity.social.domain.vo.MemberId;
@@ -16,6 +15,7 @@ import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
 import kr.modusplant.shared.persistence.constant.TableName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -152,7 +152,7 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
     @DisplayName("유효한 SocialUserProfile과 Role로 소셜 회원을 생성")
     void testCreateSocialMember_givenValidProfileAndRole_willCreateMemberAndReturnPayload() {
         // given
-        SocialUserProfile profile = SocialUserProfile.create(testKakaoSocialCredentials, testSocialKakaoEmail, testSocialKakaoNickname);
+        SocialUserProfile profile = SocialUserProfile.create(testKakaoSocialCredentials, testKakaoUserEmail, testSocialKakaoNickname);
         Role role = Role.USER;
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         SiteMemberAuthEntity memberAuthEntity = mock(SiteMemberAuthEntity.class);

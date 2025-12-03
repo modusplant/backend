@@ -6,6 +6,7 @@ import kr.modusplant.domains.identity.social.common.util.domain.vo.UserPayloadTe
 import kr.modusplant.domains.identity.social.common.util.usecase.request.SocialLoginRequestTestUtils;
 import kr.modusplant.domains.identity.social.usecase.request.SocialLoginRequest;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.shared.enums.AuthProvider;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,8 +15,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -34,6 +37,9 @@ class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, U
     @Mock
     private TokenService tokenService;
 
+    @Spy
+    private JwtTokenProvider jwtTokenProvider;
+
     @InjectMocks
     private SocialIdentityRestController socialIdentityRestController;
 
@@ -44,6 +50,7 @@ class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, U
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(socialIdentityRestController).build();
+        ReflectionTestUtils.setField(jwtTokenProvider, "refreshDuration", 604800000L);
     }
 
     @Test

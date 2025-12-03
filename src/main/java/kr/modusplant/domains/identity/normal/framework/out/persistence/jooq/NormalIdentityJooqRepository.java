@@ -1,6 +1,5 @@
 package kr.modusplant.domains.identity.normal.framework.out.persistence.jooq;
 
-import kr.modusplant.domains.identity.normal.domain.vo.Email;
 import kr.modusplant.domains.identity.normal.domain.vo.MemberId;
 import kr.modusplant.domains.identity.normal.domain.vo.Nickname;
 import kr.modusplant.domains.identity.normal.domain.vo.Password;
@@ -9,6 +8,7 @@ import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdent
 import kr.modusplant.jooq.tables.SiteMember;
 import kr.modusplant.jooq.tables.SiteMemberAuth;
 import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.kernel.Email;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.security.crypto.password.PasswordEncoder;

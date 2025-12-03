@@ -1,5 +1,6 @@
 package kr.modusplant.domains.identity.normal.domain.vo;
 
+import kr.modusplant.shared.kernel.Email;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +18,6 @@ public class Credentials {
     }
 
     public static Credentials createWithDomain(Email email, Password password) {
-        Email.validateSource(email.getEmail());
         Password.validateSource(password.getPassword());
         return new Credentials(email, password);
     }

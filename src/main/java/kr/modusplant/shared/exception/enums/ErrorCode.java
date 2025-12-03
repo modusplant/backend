@@ -28,6 +28,7 @@ public enum ErrorCode implements ResponseCode {
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "post_not_found", "게시글을 찾을 수 없습니다"),
 
     // empty or invalid value
+    EMAIL_EMPTY(HttpStatus.BAD_REQUEST, "empty_email","이메일이 비었습니다. "),
     FILE_NAME_EMPTY(HttpStatus.BAD_REQUEST, "file_name_empty", "컨텐츠의 파일명이 비었습니다"),
     CONTENT_TYPE_EMPTY(HttpStatus.BAD_REQUEST, "content_type_empty", "컨텐츠의 컨텐츠 타입이 비었습니다"),
 

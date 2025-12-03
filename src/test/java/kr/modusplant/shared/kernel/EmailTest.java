@@ -1,14 +1,13 @@
-package kr.modusplant.domains.identity.social.domain.vo;
+package kr.modusplant.shared.kernel;
 
-import kr.modusplant.domains.identity.social.common.util.domain.vo.EmailTestUtils;
-import kr.modusplant.domains.identity.social.domain.exception.EmptyEmailException;
-import kr.modusplant.domains.identity.social.domain.exception.InvalidEmailException;
-import kr.modusplant.domains.identity.social.domain.exception.enums.SocialIdentityErrorCode;
+import kr.modusplant.shared.exception.EmptyEmailException;
+import kr.modusplant.shared.exception.InvalidEmailException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.domains.identity.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_EMAIL_STRING;
-import static kr.modusplant.domains.identity.social.common.util.domain.vo.MemberIdTestUtils.testSocialKakaoMemberId;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_KAKAO_USER_EMAIL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,8 +16,8 @@ class EmailTest implements EmailTestUtils {
     @Test
     @DisplayName("Email 문자열로 Email 생성하기")
     void testCreate_givenValidEmailString_willReturnEmailVo() {
-        assertNotNull(testSocialKakaoEmail);
-        assertThat(testSocialKakaoEmail.getEmail()).isEqualTo(TEST_SOCIAL_KAKAO_EMAIL_STRING);
+        assertNotNull(testKakaoUserEmail);
+        assertThat(testKakaoUserEmail.getEmail()).isEqualTo(MEMBER_AUTH_KAKAO_USER_EMAIL);
     }
 
     @Test
@@ -28,9 +27,9 @@ class EmailTest implements EmailTestUtils {
         EmptyEmailException exception1 = assertThrows(EmptyEmailException.class, () -> Email.create(null));
         EmptyEmailException exception2 = assertThrows(EmptyEmailException.class, () -> Email.create(""));
         EmptyEmailException exception3 = assertThrows(EmptyEmailException.class, () -> Email.create("   "));
-        assertThat(exception1.getErrorCode()).isEqualTo(SocialIdentityErrorCode.EMPTY_EMAIL);
-        assertThat(exception2.getErrorCode()).isEqualTo(SocialIdentityErrorCode.EMPTY_EMAIL);
-        assertThat(exception3.getErrorCode()).isEqualTo(SocialIdentityErrorCode.EMPTY_EMAIL);
+        assertThat(exception1.getErrorCode()).isEqualTo(ErrorCode.EMAIL_EMPTY);
+        assertThat(exception2.getErrorCode()).isEqualTo(ErrorCode.EMAIL_EMPTY);
+        assertThat(exception3.getErrorCode()).isEqualTo(ErrorCode.EMAIL_EMPTY);
     }
 
     @Test
@@ -38,25 +37,25 @@ class EmailTest implements EmailTestUtils {
     void testCreate_givenInvalidEmailFormat_willThrowException() {
         InvalidEmailException exception1 = assertThrows(InvalidEmailException.class, () -> Email.create("invalid-email"));
         InvalidEmailException exception2 = assertThrows(InvalidEmailException.class, () -> Email.create("@example.com"));
-        assertThat(exception1.getErrorCode()).isEqualTo(SocialIdentityErrorCode.INVALID_EMAIL);
-        assertThat(exception2.getErrorCode()).isEqualTo(SocialIdentityErrorCode.INVALID_EMAIL);
+        assertThat(exception1.getErrorCode()).isEqualTo(ErrorCode.INVALID_EMAIL);
+        assertThat(exception2.getErrorCode()).isEqualTo(ErrorCode.INVALID_EMAIL);
     }
 
     @Test
     @DisplayName("같은 객체에 대한 equals 호출")
     void useEqual_givenSameObject_willReturnTrue() {
-        assertEquals(testSocialKakaoEmail,testSocialKakaoEmail);
+        assertEquals(testKakaoUserEmail, testKakaoUserEmail);
     }
 
     @Test
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
     void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
-        assertNotEquals(testSocialKakaoEmail,testSocialKakaoMemberId);
+        assertNotEquals(testKakaoUserEmail, "Different Class");
     }
 
     @Test
     @DisplayName("다른 프로퍼티를 가진 인스턴스에 대한 equals 호출")
     void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
-        assertNotEquals(testSocialKakaoEmail, testSocialGoogleEmail);
+        assertNotEquals(testKakaoUserEmail, testGoogleUserEmail);
     }
 }

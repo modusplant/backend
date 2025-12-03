@@ -1,5 +1,6 @@
 package kr.modusplant.domains.identity.social.domain.vo;
 
+import kr.modusplant.shared.kernel.Email;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
