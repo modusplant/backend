@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -75,7 +76,7 @@ class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, U
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.data.accessToken").value(TEST_ACCESS_TOKEN))
-                .andExpect(header().exists("Set-Cookie"))
+                .andExpect(header().exists(HttpHeaders.SET_COOKIE))
                 .andExpect(cookie().exists(REFRESH_TOKEN_COOKIE_NAME));
     }
 
@@ -100,7 +101,7 @@ class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, U
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.data.accessToken").value(TEST_ACCESS_TOKEN))
-                .andExpect(header().exists("Set-Cookie"))
+                .andExpect(header().exists(HttpHeaders.SET_COOKIE))
                 .andExpect(cookie().exists(REFRESH_TOKEN_COOKIE_NAME));
     }
 
