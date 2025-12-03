@@ -1,10 +1,10 @@
 package kr.modusplant.domains.post.adapter.mapper;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
 import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
-import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
 import kr.modusplant.domains.post.usecase.response.DraftPostResponse;
 import kr.modusplant.domains.post.usecase.response.PostDetailResponse;
 import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;

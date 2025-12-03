@@ -10,10 +10,12 @@ import kr.modusplant.framework.jpa.entity.CommPostEntity;
 import org.jooq.Record;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.jooq.Tables.*;
+import static kr.modusplant.jooq.Tables.COMM_POST;
+import static kr.modusplant.jooq.Tables.SITE_MEMBER;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_UUID;
 import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;

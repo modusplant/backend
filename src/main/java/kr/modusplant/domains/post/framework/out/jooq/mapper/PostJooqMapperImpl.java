@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-import static kr.modusplant.jooq.Tables.*;
 import static kr.modusplant.jooq.Tables.COMM_POST;
+import static kr.modusplant.jooq.Tables.SITE_MEMBER;
 
 @Component
 public class PostJooqMapperImpl implements PostJooqMapper {
