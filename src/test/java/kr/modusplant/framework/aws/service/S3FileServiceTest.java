@@ -1,6 +1,5 @@
 package kr.modusplant.framework.aws.service;
 
-import kr.modusplant.framework.aws.service.S3FileService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,12 +25,14 @@ class S3FileServiceTest {
     private S3Client s3Client;
     private S3FileService s3FileService;
 
+    private static final String ENDPOINT = "test-endpoint";
     private static final String BUCKET_NAME = "test-bucket";
 
     @BeforeEach
     void setUp() {
         s3Client = mock(S3Client.class);
         s3FileService = new S3FileService(s3Client);
+        ReflectionTestUtils.setField(s3FileService, "endpoint", ENDPOINT);
         ReflectionTestUtils.setField(s3FileService, "bucket", BUCKET_NAME);
     }
 
@@ -98,5 +99,16 @@ class S3FileServiceTest {
         DeleteObjectRequest actualRequest = requestCaptor.getValue();
         assertThat(actualRequest.bucket()).isEqualTo(BUCKET_NAME);
         assertThat(actualRequest.key()).isEqualTo(fileKey);
+    }
+
+    @Test
+    @DisplayName("파일 src url 변환")
+    void testGenerateS3SrcUrl_givenFileKey_willReturnS3Url() {
+        String fileKey = "test-file-key";
+        String expected = ENDPOINT + "/" + BUCKET_NAME + "/" +fileKey;
+
+        String result = s3FileService.generateS3SrcUrl(fileKey);
+
+        assertThat(result).isEqualTo(expected);
     }
 }

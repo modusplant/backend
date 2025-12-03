@@ -10,9 +10,9 @@ import java.util.List;
 public interface MultipartDataProcessorPort {
     JsonNode saveFilesAndGenerateContentJson(List<MultipartFile> parts) throws IOException;
 
-    ArrayNode convertFileSrcToBinaryData(JsonNode content) throws IOException;
+    ArrayNode convertFileSrcToFullFileSrc(JsonNode content) throws IOException;
 
-    ArrayNode convertToPreviewData(JsonNode content) throws IOException;
+    ArrayNode convertToPreview(JsonNode content) throws IOException;
 
     void deleteFiles(JsonNode content);
 }

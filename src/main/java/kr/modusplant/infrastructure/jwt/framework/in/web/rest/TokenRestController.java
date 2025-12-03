@@ -6,13 +6,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.response.TokenResponse;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,10 +23,8 @@ import static kr.modusplant.infrastructure.jwt.util.TokenUtils.getTokenFromAutho
 @RequestMapping("/api")
 public class TokenRestController {
 
-    @Value("${jwt.refresh_duration}")
-    private long refreshDuration;
-
     private final TokenService tokenService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Operation(summary = "JWT 토큰 갱신 API", description = "리프레시 토큰을 받아 처리합니다.")
     @ApiResponses(value = {
@@ -43,22 +40,11 @@ public class TokenRestController {
 
         TokenResponse tokenResponse = new TokenResponse(tokenPair.accessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(tokenResponse);
-        String refreshCookie = setRefreshTokenCookie(tokenPair.refreshToken());
+        String refreshCookie = jwtTokenProvider.generateRefreshTokenCookieAsString(tokenPair.refreshToken());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshCookie)
                 .cacheControl(CacheControl.noStore())
                 .body(response);
-    }
-
-    private String setRefreshTokenCookie(String refreshToken) {
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .maxAge(refreshDuration)
-                .sameSite("Lax")
-                .build();
-        return refreshCookie.toString();
     }
 }

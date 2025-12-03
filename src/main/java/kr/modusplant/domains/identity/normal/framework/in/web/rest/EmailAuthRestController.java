@@ -13,7 +13,6 @@ import kr.modusplant.domains.identity.normal.usecase.request.EmailAuthRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.InputValidationRequest;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -118,7 +117,7 @@ public class EmailAuthRestController {
         accessTokenCookie.setHttpOnly(true); // HTTP-Only 설정: JavaScript에서 접근 불가
         accessTokenCookie.setSecure(false);  // Secure 설정
         accessTokenCookie.setPath("/");    // 모든 경로에서 유효
-        accessTokenCookie.setMaxAge(3 * 60); // 유효 기간: 3분 (Access 토큰의 유효 기간과 동일)
+        accessTokenCookie.setMaxAge(5 * 60); // 유효 기간: 5분 (Access 토큰의 유효 기간과 동일)
         accessTokenCookie.setAttribute("SameSite", "Lax");
         httpResponse.addCookie(accessTokenCookie);
     }

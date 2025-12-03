@@ -28,18 +28,19 @@ jobs:
         uses: dkershner6/aws-ssm-getparameters-action@v2
         with:
           parameterPairs: |
-            /config/modusplant_dev/DB_CONNECTION_URL    = JDBC_CONNECTION_URL,
-            /config/modusplant_dev/DB_USERNAME          = JDBC_USERNAME,
-            /config/modusplant_dev/DB_PASSWORD          = JDBC_PASSWORD,
-            /config/modusplant_dev/REDIS_HOST           = REDIS_HOST,
-            /config/modusplant_dev/REDIS_PASSWORD       = REDIS_PASSWORD,
-            /config/modusplant_dev/REDIS_PORT           = REDIS_PORT,
-            /config/modusplant_dev/REDIS_SSL_ENABLED    = REDIS_SSL_ENABLED,
-            /config/modusplant_dev/WASABI_ENDPOINT      = WASABI_ENDPOINT,
-            /config/modusplant_dev/WASABI_REGION        = WASABI_REGION,
-            /config/modusplant_dev/WASABI_ACCESS_KEY    = WASABI_ACCESS_KEY,
-            /config/modusplant_dev/WASABI_SECRET_KEY    = WASABI_SECRET_KEY,
-            /config/modusplant_dev/WASABI_BUCKET        = WASABI_BUCKET
+            /config/modusplant_dev/DB_CONNECTION_URL      = JDBC_CONNECTION_URL,
+            /config/modusplant_dev/DB_USERNAME            = JDBC_USERNAME,
+            /config/modusplant_dev/DB_PASSWORD            = JDBC_PASSWORD,
+            /config/modusplant_dev/SPRING_ACTIVE_PROFILE  = SPRING_ACTIVE_PROFILE,
+            /config/modusplant_dev/REDIS_HOST             = REDIS_HOST,
+            /config/modusplant_dev/REDIS_PASSWORD         = REDIS_PASSWORD,
+            /config/modusplant_dev/REDIS_PORT             = REDIS_PORT,
+            /config/modusplant_dev/REDIS_SSL_ENABLED      = REDIS_SSL_ENABLED,
+            /config/modusplant_dev/WASABI_ENDPOINT        = WASABI_ENDPOINT,
+            /config/modusplant_dev/WASABI_REGION          = WASABI_REGION,
+            /config/modusplant_dev/WASABI_ACCESS_KEY      = WASABI_ACCESS_KEY,
+            /config/modusplant_dev/WASABI_SECRET_KEY      = WASABI_SECRET_KEY,
+            /config/modusplant_dev/WASABI_BUCKET          = WASABI_BUCKET
           withDecryption: "true"
 
       - name: Debug DB env
@@ -63,6 +64,8 @@ jobs:
           DB_CONNECTION_URL: ${{ env.JDBC_CONNECTION_URL }}
           DB_USERNAME: ${{ env.JDBC_USERNAME }}
           DB_PASSWORD: ${{ env.JDBC_PASSWORD }}
+
+          SPRING_ACTIVE_PROFILE: ${{ env.SPRING_ACTIVE_PROFILE }}
 
           REDIS_HOST: ${{ env.REDIS_HOST }}
           REDIS_PORT: ${{ env.REDIS_PORT }}
@@ -94,11 +97,6 @@ jobs:
 
           # ---- dummy ----
           KEYSTORE_PASSWORD: keystore_dummy_password
-          SPRINGDOC_API_DOCS_ENABLED: true
-          SPRINGDOC_SWAGGER_UI_ENABLED: true
-          LOGGING_LEVEL_ROOT: INFO
-          LOGGING_LEVEL_IO_LETTUCE: INFO
-          SECURITY_DEBUG_ENABLED: false
         run: |
           ./gradlew test \
             -PjdbcConnectionUrl="$JDBC_CONNECTION_URL" \
@@ -129,9 +127,9 @@ jobs:
         with:
           parameterPairs: |
             /config/modusplant/GHCR_PAT               = GHCR_PAT,
-            /config/modusplant_dev/DB_CONNECTION_URL = JDBC_CONNECTION_URL,
-            /config/modusplant_dev/DB_USERNAME = JDBC_USERNAME,
-            /config/modusplant_dev/DB_PASSWORD = JDBC_PASSWORD
+            /config/modusplant_dev/DB_CONNECTION_URL  = JDBC_CONNECTION_URL,
+            /config/modusplant_dev/DB_USERNAME        = JDBC_USERNAME,
+            /config/modusplant_dev/DB_PASSWORD        = JDBC_PASSWORD
           withDecryption: "true"
 
       - name: Set up Docker Buildx
@@ -243,6 +241,9 @@ jobs:
           DB_PASSWORD=$(aws ssm get-parameter       --name "/config/modusplant_prod/DB_PASSWORD"        --with-decryption --query "Parameter.Value" --output text)
           DB_SCHEMA=$(aws ssm get-parameter         --name "/config/modusplant_prod/DB_SCHEMA"          --with-decryption --query "Parameter.Value" --output text)
           
+          # === Spring (application.yml: SPRING_* ) ===
+          SPRING_ACTIVE_PROFILE=$(aws ssm get-parameter --name "/config/modusplant_prod/SPRING_ACTIVE_PROFILE"  --with-decryption --query "Parameter.Value" --output text)
+          
           # === Redis (application.yml: REDIS_* ) ===
           REDIS_HOST=$(aws ssm get-parameter        --name "/config/modusplant_prod/REDIS_HOST"         --with-decryption --query "Parameter.Value" --output text)
           REDIS_PORT=$(aws ssm get-parameter        --name "/config/modusplant_prod/REDIS_PORT"         --with-decryption --query "Parameter.Value" --output text)
@@ -260,12 +261,10 @@ jobs:
           KAKAO_API_KEY=$(aws ssm get-parameter      --name "/config/modusplant_prod/KAKAO_API_KEY"            --with-decryption --query "Parameter.Value" --output text)
           KAKAO_REDIRECT_URI=$(aws ssm get-parameter --name "/config/modusplant_prod/KAKAO_REDIRECT_URI"       --with-decryption --query "Parameter.Value" --output text)
 
-
           # === Google Login ===
           GOOGLE_API_KEY=$(aws ssm get-parameter      --name "/config/modusplant_prod/GOOGLE_API_KEY"           --with-decryption --query "Parameter.Value" --output text)
           GOOGLE_SECRET=$(aws ssm get-parameter       --name "/config/modusplant_prod/GOOGLE_SECRET"            --with-decryption --query "Parameter.Value" --output text)
           GOOGLE_REDIRECT_URI=$(aws ssm get-parameter --name "/config/modusplant_prod/GOOGLE_REDIRECT_URI"      --with-decryption --query "Parameter.Value" --output text)
-
 
           # === MailJet ===
           MAIL_API_KEY=$(aws ssm get-parameter            --name "/config/modusplant_prod/MAIL_API_KEY"            --with-decryption --query "Parameter.Value" --output text)
@@ -281,6 +280,8 @@ jobs:
           DB_USERNAME=${DB_USERNAME}
           DB_PASSWORD=${DB_PASSWORD}
           DB_SCHEMA=${DB_SCHEMA}
+
+          SPRING_ACTIVE_PROFILE=${SPRING_ACTIVE_PROFILE}
           
           REDIS_HOST=${REDIS_HOST}
           REDIS_PORT=${REDIS_PORT}
@@ -310,11 +311,6 @@ jobs:
           # === KEYSTORE_PASSWORD ===
           KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
           
-          SPRINGDOC_API_DOCS_ENABLED=true
-          SPRINGDOC_SWAGGER_UI_ENABLED=true
-          LOGGING_LEVEL_ROOT=INFO
-          LOGGING_LEVEL_IO_LETTUCE=INFO
-          SECURITY_DEBUG_ENABLED=false
           EOT
           
           echo "[EC2] Pull image: ${IMAGE}"

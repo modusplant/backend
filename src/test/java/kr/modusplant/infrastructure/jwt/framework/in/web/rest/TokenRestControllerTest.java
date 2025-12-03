@@ -2,6 +2,7 @@ package kr.modusplant.infrastructure.jwt.framework.in.web.rest;
 
 import jakarta.servlet.http.Cookie;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -28,13 +30,16 @@ class TokenRestControllerTest {
     @Mock
     private TokenService tokenService;
 
+    @Spy
+    private JwtTokenProvider jwtTokenProvider;
+
     @InjectMocks
     private TokenRestController tokenRestController;
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(tokenRestController).build();
-        ReflectionTestUtils.setField(tokenRestController, "refreshDuration", 604800L);
+        ReflectionTestUtils.setField(jwtTokenProvider, "refreshDuration", 604800000L);
     }
 
     @Test
@@ -47,7 +52,7 @@ class TokenRestControllerTest {
 
         TokenPair newTokenPair = new TokenPair("new_access_token","new_refresh_token");
 
-        given(tokenService.verifyAndReissueToken(accessToken,refreshToken)).willReturn(newTokenPair);
+        given(tokenService.verifyAndReissueToken(accessToken, refreshToken)).willReturn(newTokenPair);
 
         // when & then
         mockMvc.perform(post("/api/auth/token/refresh")

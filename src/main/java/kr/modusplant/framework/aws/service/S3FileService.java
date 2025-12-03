@@ -17,6 +17,9 @@ import java.io.IOException;
 public class S3FileService {
     private final S3Client s3Client;
 
+    @Value("${cloud.wasabi.s3.endpoint}")
+    private String endpoint;
+
     @Value("${cloud.wasabi.s3.bucket}")
     private String bucket;
 
@@ -48,5 +51,9 @@ public class S3FileService {
                 .build();
 
         s3Client.deleteObject(request);
+    }
+
+    public String generateS3SrcUrl(String fileKey) {
+        return String.format("%s/%s/%s",endpoint,bucket,fileKey);
     }
 }

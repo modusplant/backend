@@ -4,7 +4,6 @@ import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentContentTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentPathTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
-import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.domains.normalidentity.normal.common.util.domain.vo.NicknameTestUtils;
 import org.jooq.DSLContext;
 import org.jooq.Record6;
@@ -16,14 +15,9 @@ import org.jooq.tools.jdbc.MockDataProvider;
 import org.jooq.tools.jdbc.MockExecuteContext;
 import org.jooq.tools.jdbc.MockResult;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class CommentJooqRepositoryTest implements
         PostIdTestUtils, AuthorTestUtils, CommentPathTestUtils,

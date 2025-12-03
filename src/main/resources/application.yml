@@ -2,7 +2,8 @@ spring:
   application:
     name: modusplant
   profiles:
-    active: secrets
+    active: ${SPRING_ACTIVE_PROFILE:local}
+    include: secrets
   cache:
     type: redis
   data:
@@ -46,16 +47,11 @@ spring:
           batch_versioned_data: true
         order_inserts: true
         default_schema: ${DB_SCHEMA}
-
-# Debugging & Logging
-logging:
-  level:
-    root: ${LOGGING_LEVEL_ROOT}
-    io:
-      lettuce: ${LOGGING_LEVEL_IO_LETTUCE}
-security:
-  debug:
-    enabled: ${SECURITY_DEBUG_ENABLED}
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 300MB
 
 # KeyStore
 keystore:
@@ -63,11 +59,6 @@ keystore:
   key-store-type: PKCS12
   key-alias: modusplant-server
   key-store-filename: modusplant-server-keystore.12
-
-# Scheduler
-scheduler:
-  sync-interval-ms : 300000           # 5분
-  token-cleanup-cron : "0 0 3 * * *"  # 새벽 3시
 
 # JWT
 jwt:
@@ -80,13 +71,6 @@ jwt:
 redis:
   ttl:
     view_count: 10
-
-# Swagger
-springdoc:
-  api-docs:
-    enabled: ${SPRINGDOC_API_DOCS_ENABLED}
-  swagger-ui:
-    enabled: ${SPRINGDOC_SWAGGER_UI_ENABLED}
 
 # Wasabi
 cloud:

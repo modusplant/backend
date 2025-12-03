@@ -9,12 +9,12 @@ import kr.modusplant.domains.identity.social.domain.vo.UserPayload;
 import kr.modusplant.domains.identity.social.usecase.request.SocialLoginRequest;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.response.TokenResponse;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.shared.enums.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +35,7 @@ public class SocialIdentityRestController {
 
     private final SocialIdentityController socialIdentityController;
     private final TokenService tokenService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Operation(summary = "카카오 소셜 로그인 API", description = "카카오 인가 코드를 받아 로그인합니다.")
     @PostMapping("/kakao/social-login")
@@ -45,7 +46,7 @@ public class SocialIdentityRestController {
 
         TokenResponse token = new TokenResponse(tokenPair.accessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(token);
-        String refreshCookie = setRefreshTokenCookie(tokenPair.refreshToken());
+        String refreshCookie = jwtTokenProvider.generateRefreshTokenCookieAsString(tokenPair.refreshToken());
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie).body(response);
     }
@@ -59,19 +60,8 @@ public class SocialIdentityRestController {
 
         TokenResponse token = new TokenResponse(tokenPair.accessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(token);
-        String refreshCookie = setRefreshTokenCookie(tokenPair.refreshToken());
+        String refreshCookie = jwtTokenProvider.generateRefreshTokenCookieAsString(tokenPair.refreshToken());
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie).body(response);
-    }
-
-    private String setRefreshTokenCookie(String refreshToken) {
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .sameSite("Lax")
-                .maxAge(Duration.ofDays(7))
-                .build();
-        return refreshCookie.toString();
     }
 }
