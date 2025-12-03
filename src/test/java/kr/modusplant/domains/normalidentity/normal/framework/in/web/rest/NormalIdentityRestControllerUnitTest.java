@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import static kr.modusplant.infrastructure.jwt.constant.CookieName.REFRESH_TOKEN_COOKIE_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class NormalIdentityRestControllerUnitTest implements
@@ -68,7 +69,7 @@ public class NormalIdentityRestControllerUnitTest implements
         assertThat(Objects.requireNonNull(response.getBody()).getData().get("accessToken"))
                 .isEqualTo(testAccessToken);
         assertThat(refreshTokenCookie).isNotNull();
-        assertThat(cookieResult.get("refresh_token")).isEqualTo(testRefreshToken);
+        assertThat(cookieResult.get(REFRESH_TOKEN_COOKIE_NAME)).isEqualTo(testRefreshToken);
         assertThat(cookieResult.get("Path")).isEqualTo("/");
         assertThat(cookieResult.get("Secure")).isEqualTo("Secure");
         assertThat(cookieResult.get("HttpOnly")).isEqualTo("HttpOnly");
