@@ -45,15 +45,6 @@ public class NormalIdentityJooqRepository implements
     }
 
     @Override
-    public int updatePassword(Email email, Password pw) {
-        return dsl.update(memberAuth)
-                .set(memberAuth.PW, passwordEncoder.encode(pw.getPassword()))
-                .where(memberAuth.EMAIL.eq(email.getEmail()))
-                .and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
-                .execute();
-    }
-
-    @Override
     public String getMemberPassword(MemberId memberId) {
         return dsl.select(memberAuth.PW)
                 .from(memberAuth)

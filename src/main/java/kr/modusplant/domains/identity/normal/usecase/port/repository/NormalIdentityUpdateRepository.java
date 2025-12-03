@@ -10,5 +10,4 @@ public interface NormalIdentityUpdateRepository {
 
     int updatePassword(MemberId memberId, Password pw);
 
-    int updatePassword(Email email, Password pw);
 }
