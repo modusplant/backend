@@ -13,15 +13,12 @@ import kr.modusplant.domains.identity.normal.usecase.request.EmailModificationRe
 import kr.modusplant.domains.identity.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.PasswordModificationRequest;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.security.models.NormalLoginRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -36,9 +33,7 @@ import java.util.UUID;
 @Validated
 public class NormalIdentityRestController {
     private final NormalIdentityController controller;
-
-    @Value("${jwt.refresh_duration}")
-    private long refreshDuration;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Operation(
             summary = "일반 회원가입 API",
@@ -118,18 +113,12 @@ public class NormalIdentityRestController {
             @NotBlank(message = "리프레시 토큰이 비어 있습니다.")
             String refreshToken) {
 
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .maxAge(refreshDuration)
-                .sameSite("Lax")
-                .build();
+        String refreshTokenCookie = jwtTokenProvider.generateRefreshTokenCookieAsString(refreshToken);
 
         Map<String, Object> accessTokenData = Map.of("accessToken", accessToken);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie)
                 .cacheControl(CacheControl.noStore())
                 .body(DataResponse.ok(accessTokenData));
     }

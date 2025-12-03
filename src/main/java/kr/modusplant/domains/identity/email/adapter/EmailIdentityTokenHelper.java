@@ -38,9 +38,9 @@ public class EmailIdentityTokenHelper {
      *  이메일 인증 관련 JWT 토큰 메소드
      */
     public String generateAuthCodeAccessToken(String email, String verifyCode) {
-        // 만료 시간 설정 (3분 뒤)
+        // 만료 시간 설정 (5분 뒤)
         Date now = new Date();
-        Date expirationDate = new Date(now.getTime() + 3 * 60 * 1000);
+        Date expirationDate = new Date(now.getTime() + 5 * 60 * 1000);
 
         return Jwts.builder()
                 .header()
@@ -89,9 +89,9 @@ public class EmailIdentityTokenHelper {
     }
 
     public String generateResetPasswordAccessToken(String email, TokenScope scope) {
-        // 만료 시간 설정 (3분 뒤)
+        // 만료 시간 설정 (5분 뒤)
         Date now = new Date();
-        Date expirationDate = new Date(now.getTime() + 3 * 60 * 1000);
+        Date expirationDate = new Date(now.getTime() + 5 * 60 * 1000);
 
         return Jwts.builder()
                 .header()

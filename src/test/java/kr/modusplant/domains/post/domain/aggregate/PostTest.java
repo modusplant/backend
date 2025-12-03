@@ -78,7 +78,6 @@ class PostTest implements PostTestUtils {
 
             // then
             assertNotNull(post);
-            assertNotNull(post.getPostId()); // PostId.generate()로 생성됨
             assertEquals(testAuthorId, post.getAuthorId());
             assertEquals(testAuthorId, post.getCreateAuthorId());
             assertEquals(testPrimaryCategoryId, post.getPrimaryCategoryId());
@@ -116,7 +115,6 @@ class PostTest implements PostTestUtils {
 
             // then
             assertNotNull(post);
-            assertNotNull(post.getPostId()); // PostId.generate()로 생성됨
             assertEquals(testAuthorId, post.getAuthorId());
             assertEquals(testAuthorId, post.getCreateAuthorId());
             assertEquals(testPrimaryCategoryId, post.getPrimaryCategoryId());
@@ -187,6 +185,18 @@ class PostTest implements PostTestUtils {
 
             assertThrows(EmptyPostStatusException.class, () ->
                     post.update(testAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, postContent, null));
+        }
+
+        @Test
+        @DisplayName("Post의 파라미터가 null일 때 Exception을 발생시킨다.")
+        void testUpdate_givenPublishedPostToDraftPost_willThrowException() {
+            // given
+            Post post = createPublishedPost();
+            PostContent postContent = PostContent.create("title",TEST_POST_CONTENT);
+
+            // when & then
+            assertThrows(InvalidPostStatusException.class, () ->
+                    post.update(testAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, postContent, PostStatus.draft()));
         }
     }
 

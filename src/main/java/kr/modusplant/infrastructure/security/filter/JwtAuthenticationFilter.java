@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String rawAccessToken = request.getHeader("Authorization");
 
         if(rawAccessToken != null) {
-            if(!rawAccessToken.substring(7).equals("Bearer ")){
+            if(!rawAccessToken.startsWith("Bearer ")){
                 throw new BadCredentialException(SecurityErrorCode.AUTHENTICATION_FAILED);
             }
             String accessToken = rawAccessToken.substring(7);

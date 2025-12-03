@@ -11,7 +11,7 @@ import java.util.UUID;
 
 import static kr.modusplant.domains.identity.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_MEMBER_UUID_STRING;
 import static kr.modusplant.domains.identity.social.common.constant.SocialUuidConstant.TEST_SOCIAL_KAKAO_MEMBER_ID_UUID;
-import static kr.modusplant.domains.identity.social.common.util.domain.vo.EmailTestUtils.testSocialKakaoEmail;
+import static kr.modusplant.shared.kernel.common.util.EmailTestUtils.testKakaoUserEmail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -75,7 +75,7 @@ class MemberIdTest implements MemberIdTestUtils {
     @Test
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
     void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
-        assertNotEquals(testSocialKakaoEmail,testSocialKakaoMemberId);
+        assertNotEquals(testKakaoUserEmail,testSocialKakaoMemberId);
     }
 
     @Test

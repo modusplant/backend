@@ -1,10 +1,10 @@
 package kr.modusplant.domains.identity.email.framework.out.persistence.jooq;
 
-import kr.modusplant.domains.identity.email.domain.vo.Email;
 import kr.modusplant.domains.identity.email.domain.vo.Password;
 import kr.modusplant.domains.identity.email.usecase.port.repository.EmailIdentityRepository;
 import kr.modusplant.jooq.tables.SiteMemberAuth;
 import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.kernel.Email;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -13,8 +13,8 @@ public record FileOrder(
         String filename,
 
         @Schema(
-                description = "멀티파트 데이터에서 해당 파트의 순서(1부터 시작)",
-                minimum = "1",
+                description = "멀티파트 데이터에서 해당 파트의 순서(text부터 시작)",
+                minimum = "0",
                 maximum = "100",
                 example = "1"
         )

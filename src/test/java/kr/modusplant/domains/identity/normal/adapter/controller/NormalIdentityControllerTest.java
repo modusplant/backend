@@ -6,7 +6,6 @@ import kr.modusplant.domains.identity.normal.common.util.domain.vo.SignUpDataTes
 import kr.modusplant.domains.identity.normal.common.util.usecase.request.EmailModificationRequestTestUtils;
 import kr.modusplant.domains.identity.normal.common.util.usecase.request.NormalSignUpRequestTestUtils;
 import kr.modusplant.domains.identity.normal.common.util.usecase.request.PasswordModificationRequestTestUtils;
-import kr.modusplant.domains.identity.normal.domain.vo.Email;
 import kr.modusplant.domains.identity.normal.domain.vo.Password;
 import kr.modusplant.domains.identity.normal.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityCreateRepository;
@@ -14,6 +13,7 @@ import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdent
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityUpdateRepository;
 import kr.modusplant.domains.identity.normal.usecase.request.EmailModificationRequest;
 import kr.modusplant.domains.identity.normal.usecase.request.PasswordModificationRequest;
+import kr.modusplant.shared.kernel.Email;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

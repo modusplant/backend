@@ -1,9 +1,11 @@
 package kr.modusplant.domains.post.adapter.mapper;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import kr.modusplant.domains.post.usecase.model.PostDetailReadModel;
-import kr.modusplant.domains.post.usecase.model.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
+import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
+import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
+import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
+import kr.modusplant.domains.post.usecase.response.DraftPostResponse;
 import kr.modusplant.domains.post.usecase.response.PostDetailResponse;
 import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +30,10 @@ public class PostMapperImpl implements PostMapper {
                 postDetailReadModel.title(),
                 content,
                 postDetailReadModel.isPublished(),
-                postDetailReadModel.publishedAt()
+                postDetailReadModel.publishedAt(),
+                postDetailReadModel.updatedAt(),
+                postDetailReadModel.isLiked(),
+                postDetailReadModel.isBookmarked()
         );
     }
 
@@ -41,7 +46,23 @@ public class PostMapperImpl implements PostMapper {
                 postSummaryReadModel.nickname(),
                 postSummaryReadModel.title(),
                 content,
-                postSummaryReadModel.publishedAt()
+                postSummaryReadModel.likeCount(),
+                postSummaryReadModel.publishedAt(),
+                postSummaryReadModel.commentCount(),
+                postSummaryReadModel.isLiked(),
+                postSummaryReadModel.isBookmarked()
+        );
+    }
+
+    @Override
+    public DraftPostResponse toDraftPostResponse(DraftPostReadModel draftPostReadModel, JsonNode content) {
+        return new DraftPostResponse(
+                draftPostReadModel.ulid(),
+                draftPostReadModel.primaryCategory(),
+                draftPostReadModel.secondaryCategory(),
+                draftPostReadModel.title(),
+                content,
+                draftPostReadModel.updatedAt()
         );
     }
 }

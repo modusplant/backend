@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.identity.social.common.constant.SocialStringConstant.TEST_SOCIAL_GOOGLE_PROVIDER_ID_STRING;
 import static kr.modusplant.domains.identity.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_PROVIDER_ID_STRING;
-import static kr.modusplant.domains.identity.social.common.util.domain.vo.EmailTestUtils.testSocialKakaoEmail;
+import static kr.modusplant.shared.kernel.common.util.EmailTestUtils.testKakaoUserEmail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -118,7 +118,7 @@ class SocialCredentialsTest implements SocialCredentialsTestUtils {
     @Test
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
     void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
-        assertNotEquals(testSocialKakaoEmail,testGoogleSocialCredentials);
+        assertNotEquals(testKakaoUserEmail,testGoogleSocialCredentials);
     }
 
     @Test

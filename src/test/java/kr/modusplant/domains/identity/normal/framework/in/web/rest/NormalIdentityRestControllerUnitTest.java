@@ -6,10 +6,13 @@ import kr.modusplant.domains.identity.normal.common.util.usecase.request.NormalS
 import kr.modusplant.domains.identity.normal.common.util.usecase.request.PasswordModificationRequestTestUtils;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.jwt.common.util.entity.RefreshTokenEntityTestUtils;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +26,13 @@ public class NormalIdentityRestControllerUnitTest implements
         EmailModificationRequestTestUtils, PasswordModificationRequestTestUtils {
 
     private final NormalIdentityController controller = Mockito.mock(NormalIdentityController.class);
-    private final NormalIdentityRestController restController = new NormalIdentityRestController(controller);
+    private final JwtTokenProvider jwtTokenProvider = new JwtTokenProvider();
+    private final NormalIdentityRestController restController = new NormalIdentityRestController(controller, jwtTokenProvider);
+
+    @BeforeEach
+    public void beforeEach() {
+        ReflectionTestUtils.setField(jwtTokenProvider, "refreshDuration", 604800000L);
+    }
 
     @Test
     @DisplayName("유효한 요청을 받으면 일반 회원가입 후 성공 응답 반환")
@@ -67,7 +76,7 @@ public class NormalIdentityRestControllerUnitTest implements
         // when
         ResponseEntity<DataResponse<Map<String, Object>>> response = restController.respondToNormalLoginSuccess(testAccessToken, testRefreshToken);
 
-        String refreshTokenCookie = response.getHeaders().get("Set-Cookie").get(0);
+        String refreshTokenCookie = response.getHeaders().get("Set-Cookie").getFirst();
         Map<String, String> cookieResult = new HashMap<>();
 
         for(String part: refreshTokenCookie.split(";")) {
@@ -84,7 +93,7 @@ public class NormalIdentityRestControllerUnitTest implements
         assertThat(Objects.requireNonNull(response.getBody()).getData().get("accessToken"))
                 .isEqualTo(testAccessToken);
         assertThat(refreshTokenCookie).isNotNull();
-        assertThat(cookieResult.get("refreshToken")).isEqualTo(testRefreshToken);
+        assertThat(cookieResult.get("refresh_token")).isEqualTo(testRefreshToken);
         assertThat(cookieResult.get("Path")).isEqualTo("/");
         assertThat(cookieResult.get("Secure")).isEqualTo("Secure");
         assertThat(cookieResult.get("HttpOnly")).isEqualTo("HttpOnly");

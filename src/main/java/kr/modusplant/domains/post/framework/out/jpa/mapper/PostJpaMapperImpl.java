@@ -3,9 +3,8 @@ package kr.modusplant.domains.post.framework.out.jpa.mapper;
 import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.vo.*;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
-import kr.modusplant.domains.post.usecase.model.PostDetailReadModel;
-import kr.modusplant.domains.post.usecase.model.PostSummaryReadModel;
 import kr.modusplant.framework.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.jpa.entity.CommPostEntity.CommPostEntityBuilder;
 import kr.modusplant.framework.jpa.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.framework.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
@@ -19,8 +18,11 @@ public class PostJpaMapperImpl implements PostJpaMapper {
     @Override
     public CommPostEntity toPostEntity(Post post, SiteMemberEntity authorEntity, SiteMemberEntity createAuthorEntity, CommPrimaryCategoryEntity primaryCategoryEntity, CommSecondaryCategoryEntity secondaryCategoryEntity, Long viewCount) {
         LocalDateTime publishedAt = post.getStatus().isPublished() ? LocalDateTime.now() : null;
-        return CommPostEntity.builder()
-                .ulid(post.getPostId().getValue())
+        CommPostEntityBuilder postEntityBuilder = CommPostEntity.builder();
+        if (post.getPostId() != null) {
+            postEntityBuilder.ulid(post.getPostId().getValue());
+        }
+        return postEntityBuilder
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)
                 .authMember(authorEntity)
@@ -53,37 +55,6 @@ public class PostJpaMapperImpl implements PostJpaMapper {
                 ),
                 LikeCount.create(postEntity.getLikeCount()),
                 postStatus
-        );
-    }
-
-    @Override
-    public PostSummaryReadModel toPostSummaryReadModel(CommPostEntity postEntity) {
-        return new PostSummaryReadModel(
-                postEntity.getUlid(),
-                postEntity.getPrimaryCategory().getCategory(),
-                postEntity.getSecondaryCategory().getCategory(),
-                postEntity.getAuthMember().getNickname(),
-                postEntity.getTitle(),
-                postEntity.getContent(),
-                postEntity.getPublishedAt()
-        );
-    }
-
-    @Override
-    public PostDetailReadModel toPostDetailReadModel(CommPostEntity postEntity) {
-        return new PostDetailReadModel(
-                postEntity.getUlid(),
-                postEntity.getPrimaryCategory().getUuid(),
-                postEntity.getPrimaryCategory().getCategory(),
-                postEntity.getSecondaryCategory().getUuid(),
-                postEntity.getSecondaryCategory().getCategory(),
-                postEntity.getAuthMember().getUuid(),
-                postEntity.getAuthMember().getNickname(),
-                postEntity.getTitle(),
-                postEntity.getContent(),
-                postEntity.getLikeCount(),
-                postEntity.getIsPublished(),
-                postEntity.getPublishedAt()
         );
     }
 
