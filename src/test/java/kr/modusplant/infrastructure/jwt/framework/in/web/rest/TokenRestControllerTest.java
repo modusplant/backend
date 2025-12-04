@@ -12,11 +12,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static kr.modusplant.infrastructure.jwt.constant.CookieName.REFRESH_TOKEN_COOKIE_NAME;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -47,7 +49,7 @@ class TokenRestControllerTest {
     void testRefreshToken_givenRefreshTokenAndAccessToken_willReturnResponseEntity() throws Exception{
         // given
         String accessToken = "access_token";
-        String refreshToken = "refresh_token";
+        String refreshToken = REFRESH_TOKEN_COOKIE_NAME;
         String authorizationHeader = "Bearer " + accessToken;
 
         TokenPair newTokenPair = new TokenPair("new_access_token","new_refresh_token");
@@ -57,14 +59,14 @@ class TokenRestControllerTest {
         // when & then
         mockMvc.perform(post("/api/auth/token/refresh")
                         .header("Authorization", authorizationHeader)
-                        .cookie(new Cookie("Cookie", refreshToken))
+                        .cookie(new Cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(header().exists("Set-Cookie"))
-                .andExpect(header().string("Set-Cookie", containsString("refresh_token")))
-                .andExpect(header().string("Set-Cookie", containsString("HttpOnly")))
-                .andExpect(header().string("Set-Cookie", containsString("Secure")))
-                .andExpect(header().string("Set-Cookie", containsString("SameSite=Lax")))
+                .andExpect(header().exists(HttpHeaders.SET_COOKIE))
+                .andExpect(header().string(HttpHeaders.SET_COOKIE, containsString(REFRESH_TOKEN_COOKIE_NAME)))
+                .andExpect(header().string(HttpHeaders.SET_COOKIE, containsString("HttpOnly")))
+                .andExpect(header().string(HttpHeaders.SET_COOKIE, containsString("Secure")))
+                .andExpect(header().string(HttpHeaders.SET_COOKIE, containsString("SameSite=Lax")))
                 .andExpect(header().string("Cache-Control", "no-store"))
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.data.accessToken").value("new_access_token"));

@@ -35,6 +35,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
+import static kr.modusplant.infrastructure.jwt.constant.CookieName.REFRESH_TOKEN_COOKIE_NAME;
+
 /**
  * 순수 JWT 제어 Provider
  * <p>
@@ -143,7 +145,7 @@ public class JwtTokenProvider {
     }
 
     public String generateRefreshTokenCookieAsString(String refreshToken) {
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
+        ResponseCookie refreshCookie = ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)
                 .httpOnly(true)
                 .secure(true)
                 .path("/")

@@ -92,9 +92,6 @@ jobs:
           MAIL_API_SECRET_KEY: DUMMY_MAILJET_SECRET_ABC123
           MAIL_API_JWT_SECRET_KEY: DUMMY_JWT_SECRET_KEY_ABC1234567890
 
-          # ---- TEMP USER dummy ----
-          TEMP_USER_UUID: 00000000-0000-0000-0000-000000000000
-
           # ---- dummy ----
           KEYSTORE_PASSWORD: keystore_dummy_password
         run: |
@@ -304,9 +301,6 @@ jobs:
           MAIL_API_KEY=${MAIL_API_KEY}
           MAIL_API_SECRET_KEY=${MAIL_API_SECRET_KEY}
           MAIL_API_JWT_SECRET_KEY=${MAIL_API_JWT_SECRET_KEY}
-          
-          # === TEMP_USER_UUID ===
-          TEMP_USER_UUID=d6b716f1-60f7-4c79-aeaf-37037101f126
           
           # === KEYSTORE_PASSWORD ===
           KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
