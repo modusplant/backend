@@ -11,7 +11,6 @@ public record SecondaryCategoryResponse(
         UUID uuid,
 
         @Schema(description = "2차 항목이 포함된 1차 항목의 식별자", example = "2d9f462d-b50f-4394-928e-5c864f60b09a")
-        @JsonProperty("primaryCategoryId")
         UUID primaryCategoryId,
 
         @Schema(description = "2차 항목의 카테고리명", example = "물꽂이 + 잎꽂이")
