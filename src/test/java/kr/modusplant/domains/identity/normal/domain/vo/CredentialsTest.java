@@ -4,6 +4,9 @@ import kr.modusplant.domains.identity.normal.common.util.domain.vo.CredentialsTe
 import kr.modusplant.domains.identity.normal.domain.exception.EmptyValueException;
 import kr.modusplant.domains.identity.normal.domain.exception.InvalidValueException;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
+import kr.modusplant.shared.exception.EmptyEmailException;
+import kr.modusplant.shared.exception.InvalidEmailException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,24 +16,24 @@ public class CredentialsTest implements CredentialsTestUtils {
 
     @Test
     @DisplayName("null 값으로 자격 요소 생성")
-    public void testCreate_givenNullEmailAndPassword_willThrowEmptyValueException() {
+    public void testCreate_givenNullEmailAndPassword_willThrowEmptyEmailException() {
         // given
-        EmptyValueException result = assertThrows(EmptyValueException.class, () ->
+        EmptyEmailException result = assertThrows(EmptyEmailException.class, () ->
                 Credentials.createWithString(null, null));
 
         // when & then
-        assertEquals(NormalIdentityErrorCode.EMPTY_EMAIL, result.getErrorCode());
+        assertEquals(ErrorCode.EMAIL_EMPTY, result.getErrorCode());
     }
 
     @Test
     @DisplayName("형식에 맞지 않는 이메일로 자격 요소 생성")
-    public void testCreate_givenInvalidEmail_willThrowInvalidValueException() {
+    public void testCreate_givenInvalidEmail_willThrowInvalidEmailException() {
         // given
-        InvalidValueException result = assertThrows(InvalidValueException.class, () ->
+        InvalidEmailException result = assertThrows(InvalidEmailException.class, () ->
                 Credentials.createWithString("email", testCredentials.getPassword().getPassword()));
 
         // when & then
-        assertEquals(NormalIdentityErrorCode.INVALID_EMAIL, result.getErrorCode());
+        assertEquals(ErrorCode.INVALID_EMAIL, result.getErrorCode());
     }
 
     @Test
