@@ -37,7 +37,7 @@ public class NormalIdentityControllerTest implements
     @DisplayName("유효한 요청 데이터를 받았을 시 일반 회원가입 진행")
     public void testRegisterNormalMember_givenValidRequest_willProcessRequest() {
         // given
-        given(readRepository.existsByEmailAndProvider(testEmail)).willReturn(false);
+        given(readRepository.existsByEmail(testEmail)).willReturn(false);
         given(readRepository.existsByNickname(testNickname)).willReturn(false);
         given(mapper.toSignUpData(testNormalSignUpRequest)).willReturn(testSignUpData);
         doNothing().when(createRepository).save(testSignUpData);
@@ -46,7 +46,7 @@ public class NormalIdentityControllerTest implements
         controller.registerNormalMember(testNormalSignUpRequest);
 
         // then
-        verify(readRepository, times(1)).existsByEmailAndProvider(testEmail);
+        verify(readRepository, times(1)).existsByEmail(testEmail);
         verify(readRepository, times(1)).existsByNickname(testNickname);
         verify(mapper, times(1)).toSignUpData(testNormalSignUpRequest);
         verify(createRepository, times(1)).save(testSignUpData);
@@ -58,14 +58,14 @@ public class NormalIdentityControllerTest implements
         // given
         EmailModificationRequest request = testEmailModificationRequest;
 
-        given(readRepository.existsByEmailAndProvider(Email.create(request.currentEmail()))).willReturn(true);
+        given(readRepository.existsByEmail(Email.create(request.currentEmail()))).willReturn(true);
         given(updateRepository.updateEmail(testMemberId, Email.create(request.newEmail()))).willReturn(1);
 
         // when
         controller.modifyEmail(testMemberId.getValue(), testEmailModificationRequest);
 
         // then
-        verify(readRepository, times(1)).existsByEmailAndProvider(testEmail);
+        verify(readRepository, times(1)).existsByEmail(testEmail);
         verify(updateRepository, times(1)).updateEmail(testMemberId, Email.create(request.newEmail()));
     }
 

@@ -10,7 +10,7 @@ public interface NormalIdentityReadRepository {
 
     boolean existsByMemberId(MemberId memberId);
 
-    boolean existsByEmailAndProvider(Email email);
+    boolean existsByEmail(Email email);
 
     boolean existsByNickname(Nickname nickname);
 }

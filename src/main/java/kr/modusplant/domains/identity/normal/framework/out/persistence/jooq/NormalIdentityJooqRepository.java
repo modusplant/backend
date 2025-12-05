@@ -52,28 +52,28 @@ public class NormalIdentityJooqRepository implements
 
     @Override
     public boolean existsByMemberId(MemberId memberId) {
-        return dsl.selectOne()
-                .from(memberAuth)
-                .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
-                .fetch()
-                .isNotEmpty();
+        return dsl.fetchExists(
+                dsl.selectOne()
+                        .from(memberAuth)
+                        .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
+        );
     }
 
     @Override
-    public boolean existsByEmailAndProvider(Email email) {
-        return dsl.selectOne()
-                .from(memberAuth)
-                .where(memberAuth.EMAIL.eq(email.getEmail())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
-                .fetch()
-                .isNotEmpty();
+    public boolean existsByEmail(Email email) {
+        return dsl.fetchExists(
+                dsl.selectOne()
+                        .from(memberAuth)
+                        .where(memberAuth.EMAIL.eq(email.getEmail())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
+        );
     }
 
     @Override
     public boolean existsByNickname(Nickname nickname) {
-        return dsl.selectOne()
-                .from(member)
-                .where(member.NICKNAME.eq(nickname.getNickname()))
-                .fetch()
-                .isNotEmpty();
+        return dsl.fetchExists(
+                dsl.selectOne()
+                        .from(member)
+                        .where(member.NICKNAME.eq(nickname.getNickname()))
+        );
     }
 }

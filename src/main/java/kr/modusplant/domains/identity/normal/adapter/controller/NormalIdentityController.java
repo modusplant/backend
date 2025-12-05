@@ -35,7 +35,7 @@ public class NormalIdentityController {
     private final PasswordEncoder encoder;
 
     public void registerNormalMember(NormalSignUpRequest request) {
-        if(readRepository.existsByEmailAndProvider(Email.create(request.email()))) {
+        if(readRepository.existsByEmail(Email.create(request.email()))) {
             throw new DataAlreadyExistsException(NormalIdentityErrorCode.ALREADY_EXISTS_MEMBER);
         } else if(readRepository.existsByNickname(Nickname.create(request.nickname()))) {
             throw new DataAlreadyExistsException(NormalIdentityErrorCode.ALREADY_EXISTS_NICKNAME);
@@ -45,7 +45,7 @@ public class NormalIdentityController {
     }
 
     public void modifyEmail(UUID memberActiveUuid, EmailModificationRequest request) {
-        if(!readRepository.existsByEmailAndProvider(Email.create(request.currentEmail()))) {
+        if(!readRepository.existsByEmail(Email.create(request.currentEmail()))) {
             throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER_AUTH);
         } else {
             updateRepository.updateEmail(MemberId.create(memberActiveUuid), Email.create(request.newEmail()));
