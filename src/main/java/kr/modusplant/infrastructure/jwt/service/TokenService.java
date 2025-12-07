@@ -2,7 +2,7 @@ package kr.modusplant.infrastructure.jwt.service;
 
 
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
+import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
@@ -40,19 +40,20 @@ import java.util.UUID;
 public class TokenService {
     private final JwtTokenProvider jwtTokenProvider;
     private final SiteMemberJpaRepository siteMemberJpaRepository;
+    private final SiteMemberAuthJpaRepository siteMemberAuthJpaRepository;
     private final SiteMemberRoleJpaRepository siteMemberRoleJpaRepository;
     private final RefreshTokenJpaRepository refreshTokenJpaRepository;
     private final AccessTokenRedisRepository accessTokenRedisRepository;
 
     // 토큰 생성
-    public TokenPair issueToken(UUID memberUuid, String nickname, Role role) {
+    public TokenPair issueToken(UUID memberUuid, String nickname, String email, Role role) {
         // memberUuid 검증
         if (memberUuid == null || !siteMemberJpaRepository.existsByUuid(memberUuid)) {
             throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER);
         }
 
         // accessToken , refresh token 생성
-        Map<String,String> claims = createClaims(nickname,role);
+        Map<String,String> claims = createClaims(nickname,email, role);
         String accessToken = jwtTokenProvider.generateAccessToken(memberUuid, claims);
         String refreshToken = jwtTokenProvider.generateRefreshToken(memberUuid);
 
@@ -98,7 +99,8 @@ public class TokenService {
         UUID memberUuid = jwtTokenProvider.getMemberUuidFromToken(refreshToken);
 
         SiteMemberEntity memberEntity = siteMemberJpaRepository.findByUuid(memberUuid).orElseThrow(TokenNotFoundException::new);
-        SiteMemberRoleEntity memberRoleEntity = siteMemberRoleJpaRepository.findByUuid(memberUuid).orElseThrow(TokenNotFoundException::new);
+        String email = siteMemberAuthJpaRepository.findByActiveMember(memberEntity).getFirst().getEmail();      // TODO: 연동 구현 시 이메일 선택 수정 필요
+        Role role = siteMemberRoleJpaRepository.findByUuid(memberUuid).orElseThrow(TokenNotFoundException::new).getRole();
 
         // refresh token 재발급 (RTR기법)
         String reissuedRefreshToken = jwtTokenProvider.generateRefreshToken(memberUuid);
@@ -113,7 +115,7 @@ public class TokenService {
         );
 
         // access token 재발급
-        Map<String,String> claims = createClaims(memberEntity.getNickname(),memberRoleEntity.getRole());
+        Map<String,String> claims = createClaims(memberEntity.getNickname(), email, role);
         String accessToken = jwtTokenProvider.generateAccessToken(memberUuid,claims);
 
         return new TokenPair(accessToken,reissuedRefreshToken);
@@ -133,9 +135,10 @@ public class TokenService {
         accessTokenRedisRepository.removeFromBlacklist(accessToken);
     }
 
-    private Map<String,String> createClaims(String nickname, Role role) {
+    private Map<String,String> createClaims(String nickname, String email, Role role) {
         Map<String,String> claims = new HashMap<>();
         claims.put("nickname", nickname);
+        claims.put("email",email);
         claims.put("role", role.name());
         return claims;
     }
