@@ -154,31 +154,12 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberRoleEntit
     @DisplayName("토큰 검증 및 재발급 테스트")
     class testVerifyAndReissueToken {
         @Test
-        @DisplayName("유효한 access token과 refresh token으로 검증 시 토큰 그대로 반환")
-        void testVerifyAndReissueToken_givenValidAccessTokenAndRefreshToken_willReturnToken() {
-            // given
-            given(accessTokenRedisRepository.isBlacklisted(accessToken)).willReturn(false);
-            given(jwtTokenProvider.validateToken(refreshToken)).willReturn(true);
-            given(jwtTokenProvider.validateToken(accessToken)).willReturn(true);
-
-            // when
-            TokenPair result = tokenService.verifyAndReissueToken(accessToken, refreshToken);
-
-            // then
-            assertThat(result.accessToken()).isEqualTo(accessToken);
-            assertThat(result.refreshToken()).isEqualTo(refreshToken);
-        }
-
-        @Test
         @DisplayName("만료된 access token과 유효한 refresh token으로 검증 시 토큰 갱신")
         void testVerifyAndReissueToken_givenExpiredAccessTokenAndValidRefreshToken_willReissue() {
             // given
-            String expiredAccessToken = "expired_access_token";
             String newRefreshToken = "new_refresh_token";
             String newAccessToken = "new_access_token";
-            given(accessTokenRedisRepository.isBlacklisted(expiredAccessToken)).willReturn(false);
             given(jwtTokenProvider.validateToken(refreshToken)).willReturn(true);
-            given(jwtTokenProvider.validateToken(expiredAccessToken)).willReturn(false);
             given(refreshTokenJpaRepository.existsByRefreshToken(refreshToken)).willReturn(true);
             given(jwtTokenProvider.getMemberUuidFromToken(refreshToken)).willReturn(memberUuid);
             given(siteMemberJpaRepository.findByUuid(memberUuid)).willReturn(Optional.of(memberEntity));
@@ -188,12 +169,10 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberRoleEntit
             given(jwtTokenProvider.getIssuedAtFromToken(newRefreshToken)).willReturn(issuedAt);
             given(jwtTokenProvider.getExpirationFromToken(newRefreshToken)).willReturn(expiredAt);
             given(refreshTokenJpaRepository.save(any(RefreshTokenEntity.class))).willAnswer(invocation -> invocation.getArgument(0));
-            /*given(memberEntity.getNickname()).willReturn("testUser");
-            given(memberRoleEntity.getRole()).willReturn(Role.ROLE_USER);*/
             given(jwtTokenProvider.generateAccessToken(eq(memberUuid), any())).willReturn(newAccessToken);
 
             // when
-            TokenPair result = tokenService.verifyAndReissueToken(expiredAccessToken, refreshToken);
+            TokenPair result = tokenService.verifyAndReissueToken(refreshToken);
 
             // then
             assertThat(result.accessToken()).isEqualTo(newAccessToken);
@@ -201,30 +180,15 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberRoleEntit
         }
 
         @Test
-        @DisplayName("블랙리스트에 있는 access token으로 검증 시 예외 발생")
-        void testVerifyAndReissueToken_givenBlacklistedAccessToken_willThrowException() {
-            // given
-            given(accessTokenRedisRepository.isBlacklisted(accessToken)).willReturn(true);
-
-            // when & then
-            assertThrows(InvalidTokenException.class , () -> tokenService.verifyAndReissueToken(accessToken,refreshToken));
-            verify(accessTokenRedisRepository).isBlacklisted(accessToken);
-            verify(jwtTokenProvider,never()).validateToken(any());
-        }
-
-        @Test
         @DisplayName("유효하지 않은 refresh token으로 검증 시 예외 발생")
         void testVerifyAndReissueToken_givenInvalidRefreshToken_willThrowException() {
             // given
             String invalidRefreshToken = "invalid_refresh_token";
-            given(accessTokenRedisRepository.isBlacklisted(accessToken)).willReturn(false);
             given(jwtTokenProvider.validateToken(invalidRefreshToken)).willReturn(false);
 
             // when & then
-            assertThrows(InvalidTokenException.class , () -> tokenService.verifyAndReissueToken(accessToken,invalidRefreshToken));
-            verify(accessTokenRedisRepository).isBlacklisted(accessToken);
+            assertThrows(InvalidTokenException.class , () -> tokenService.verifyAndReissueToken(invalidRefreshToken));
             verify(jwtTokenProvider).validateToken(invalidRefreshToken);
-            verify(jwtTokenProvider,never()).validateToken(accessToken);
         }
     }
 
