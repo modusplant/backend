@@ -12,7 +12,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class PostContent {
-    private static final int MAX_TITLE_LENGTH = 60;        // TODO:따로 빼기
+    private static final int MAX_TITLE_LENGTH = 60;
 
     private final String title;
     private final JsonNode content;
@@ -21,7 +21,7 @@ public class PostContent {
         if (title == null || title.trim().isEmpty()) {
             throw new EmptyPostContentException("게시글 제목이 비어 있습니다. ");
         }
-        if (title.length() > 60) {
+        if (title.length() > MAX_TITLE_LENGTH) {
             throw new InvalidPostContentException("게시글 제목이 유효하지 않습니다. ");
         }
         if (content == null) {
