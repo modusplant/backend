@@ -85,39 +85,12 @@ public class TokenService {
     }
 
     // 토큰 검증 및 재발급
-    public TokenPair verifyAndReissueToken(String accessToken, String refreshToken) {
-        // 블랙리스트 확인
-        if (accessTokenRedisRepository.isBlacklisted(accessToken)) {
-            throw new InvalidTokenException();
-        }
+    public TokenPair verifyAndReissueToken(String refreshToken) {
         // refresh token 유효성 검증
         if (!jwtTokenProvider.validateToken(refreshToken)) {
             throw new InvalidTokenException();
         }
-        // access token 유효성 검증
-        if (jwtTokenProvider.validateToken(accessToken)) {
-            return new TokenPair(accessToken,refreshToken);
-        }
-        // access token 만료 시 토큰 갱신
-        return reissueTokenWithValidRefreshToken(refreshToken);
-    }
-
-    // access token 블랙리스트
-    public void blacklistAccessToken(String accessToken) {
-        if (jwtTokenProvider.validateToken(accessToken)) {
-            Instant expiration = jwtTokenProvider.getExpirationFromToken(accessToken).toInstant();
-            Long expirationSeconds = Duration.between(Instant.now(),expiration).getSeconds();
-            accessTokenRedisRepository.addToBlacklist(accessToken, expirationSeconds);
-        }
-    }
-
-    // 블랙리스트에서 access token 제거
-    public void removeAccessTokenFromBlacklist(String accessToken) {
-        accessTokenRedisRepository.removeFromBlacklist(accessToken);
-    }
-
-    // 토큰 갱신
-    private TokenPair reissueTokenWithValidRefreshToken(String refreshToken) {
+        // 토큰 갱신
         // refresh token 검증
         validateNotFoundRefreshToken(refreshToken);
 
@@ -144,6 +117,20 @@ public class TokenService {
         String accessToken = jwtTokenProvider.generateAccessToken(memberUuid,claims);
 
         return new TokenPair(accessToken,reissuedRefreshToken);
+    }
+
+    // access token 블랙리스트
+    public void blacklistAccessToken(String accessToken) {
+        if (jwtTokenProvider.validateToken(accessToken)) {
+            Instant expiration = jwtTokenProvider.getExpirationFromToken(accessToken).toInstant();
+            Long expirationSeconds = Duration.between(Instant.now(),expiration).getSeconds();
+            accessTokenRedisRepository.addToBlacklist(accessToken, expirationSeconds);
+        }
+    }
+
+    // 블랙리스트에서 access token 제거
+    public void removeAccessTokenFromBlacklist(String accessToken) {
+        accessTokenRedisRepository.removeFromBlacklist(accessToken);
     }
 
     private Map<String,String> createClaims(String nickname, Role role) {
