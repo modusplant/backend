@@ -9,6 +9,7 @@ import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
 import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.shared.kernel.Email;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -44,19 +45,21 @@ public class SocialIdentityJpaMapperImpl implements SocialIdentityJpaMapper {
     }
 
     @Override
-    public UserPayload toUserPayload(SiteMemberEntity memberEntity, SiteMemberRoleEntity memberRoleEntity) {
+    public UserPayload toUserPayload(SiteMemberEntity memberEntity, SiteMemberAuthEntity memberAuthEntity, SiteMemberRoleEntity memberRoleEntity) {
         return UserPayload.create(
                 MemberId.fromUuid(memberEntity.getUuid()),
                 Nickname.create(memberEntity.getNickname()),
+                Email.create(memberAuthEntity.getEmail()),
                 memberRoleEntity.getRole()
         );
     }
 
     @Override
-    public UserPayload toUserPayload(SiteMemberEntity memberEntity, Nickname nickname, Role role) {
+    public UserPayload toUserPayload(SiteMemberEntity memberEntity, Nickname nickname, Email email, Role role) {
         return UserPayload.create(
                 MemberId.fromUuid(memberEntity.getUuid()),
                 nickname,
+                email,
                 role
         );
     }
