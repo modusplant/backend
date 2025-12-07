@@ -84,7 +84,7 @@ public class EmailAuthTokenHelper {
         } catch (ExpiredJwtException e) {
             throw new TokenExpiredException();
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new InvalidTokenException();
         }
     }
 
