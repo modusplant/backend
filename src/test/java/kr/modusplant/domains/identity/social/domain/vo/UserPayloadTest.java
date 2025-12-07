@@ -10,15 +10,16 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserPayloadTest implements UserPayloadTestUtils {
 
     @Test
-    @DisplayName("유효한 MemberId, Nickname, Role로 UserPayload를 생성")
+    @DisplayName("유효한 MemberId, Nickname, Email Role로 UserPayload를 생성")
     void testCreate_givenValidParameters_willReturnUserPayload() {
         // when
-        UserPayload userPayload = UserPayload.create(testSocialKakaoMemberId, testSocialKakaoNickname, Role.USER);
+        UserPayload userPayload = UserPayload.create(testSocialKakaoMemberId, testSocialKakaoNickname, testKakaoUserEmail, Role.USER);
 
         // then
         assertNotNull(userPayload);
         assertEquals(testSocialKakaoMemberId, userPayload.getMemberId());
         assertEquals(testSocialKakaoNickname, userPayload.getNickname());
+        assertEquals(testKakaoUserEmail, userPayload.getEmail());
         assertEquals(Role.USER, userPayload.getRole());
     }
 
