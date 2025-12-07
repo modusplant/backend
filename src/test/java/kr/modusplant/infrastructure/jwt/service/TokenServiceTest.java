@@ -1,8 +1,11 @@
 package kr.modusplant.infrastructure.jwt.service;
 
+import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.common.util.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberRoleEntityTestUtils;
+import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
 import kr.modusplant.infrastructure.jwt.common.util.entity.RefreshTokenEntityTestUtils;
@@ -25,10 +28,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -38,13 +38,15 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberRoleEntityTestUtils, RefreshTokenEntityTestUtils {
+class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntityTestUtils, SiteMemberRoleEntityTestUtils, RefreshTokenEntityTestUtils {
     @InjectMocks
     private TokenService tokenService;
     @Mock
     private JwtTokenProvider jwtTokenProvider;
     @Mock
     private SiteMemberJpaRepository siteMemberJpaRepository;
+    @Mock
+    private SiteMemberAuthJpaRepository siteMemberAuthJpaRepository;
     @Mock
     private SiteMemberRoleJpaRepository siteMemberRoleJpaRepository;
     @Mock
@@ -56,6 +58,7 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberRoleEntit
     private RefreshTokenEntity refreshTokenEntity;
     private UUID memberUuid;
     private String nickname;
+    private String email;
     private Role role;
     private String accessToken;
     private String refreshToken;
@@ -72,11 +75,13 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberRoleEntit
                 .build();
         memberUuid = memberEntity.getUuid();
         nickname = memberEntity.getNickname();
+        email = "test@example.com";
         role = Role.USER;
         accessToken = "access-token";
         refreshToken = refreshTokenEntity.getRefreshToken();
         claims = Map.of(
                 "nickname", nickname,
+                "email",email,
                 "role", role.name()
         );
         issuedAt = Date.from(Instant.now());
@@ -87,7 +92,7 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberRoleEntit
     @DisplayName("토큰 생성 테스트")
     class testIssueToken {
         @Test
-        @DisplayName("회원 uuid, nickname, role로 TokenPair 생성하기")
+        @DisplayName("회원 uuid, nickname, email, role로 TokenPair 생성하기")
         void testIssueToken_givenMemberUuidAndNicknameAndRole_willReturnTokenPair() {
             // given
             given(siteMemberJpaRepository.existsByUuid(memberUuid)).willReturn(true);
@@ -99,7 +104,7 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberRoleEntit
             given(refreshTokenJpaRepository.save(any(RefreshTokenEntity.class))).willAnswer(invocation -> invocation.getArgument(0));
 
             // when
-            TokenPair result = tokenService.issueToken(memberUuid, nickname, role);
+            TokenPair result = tokenService.issueToken(memberUuid, nickname, email, role);
 
             // then
             assertThat(result.accessToken()).isEqualTo(accessToken);
@@ -113,7 +118,7 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberRoleEntit
             given(siteMemberJpaRepository.existsByUuid(memberUuid)).willReturn(false);
 
             // when & then
-            assertThrows(EntityNotFoundException.class, () -> tokenService.issueToken(memberUuid,nickname,Role.USER));
+            assertThrows(EntityNotFoundException.class, () -> tokenService.issueToken(memberUuid,nickname,email,Role.USER));
         }
     }
 
@@ -159,10 +164,13 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberRoleEntit
             // given
             String newRefreshToken = "new_refresh_token";
             String newAccessToken = "new_access_token";
+            SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityBuilder()
+                    .activeMember(memberEntity).originalMember(memberEntity).build();
             given(jwtTokenProvider.validateToken(refreshToken)).willReturn(true);
             given(refreshTokenJpaRepository.existsByRefreshToken(refreshToken)).willReturn(true);
             given(jwtTokenProvider.getMemberUuidFromToken(refreshToken)).willReturn(memberUuid);
             given(siteMemberJpaRepository.findByUuid(memberUuid)).willReturn(Optional.of(memberEntity));
+            given(siteMemberAuthJpaRepository.findByActiveMember(memberEntity)).willReturn(List.of(memberAuthEntity));
             given(siteMemberRoleJpaRepository.findByUuid(memberUuid)).willReturn(Optional.of(createMemberRoleUserEntityWithUuid()));
             given(jwtTokenProvider.generateRefreshToken(memberUuid)).willReturn(newRefreshToken);
             given(refreshTokenJpaRepository.findByRefreshToken(refreshToken)).willReturn(Optional.of(refreshTokenEntity));
