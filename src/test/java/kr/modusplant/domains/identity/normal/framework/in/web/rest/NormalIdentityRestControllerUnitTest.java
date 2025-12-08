@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import static kr.modusplant.infrastructure.jwt.constant.CookieName.REFRESH_TOKEN_COOKIE_NAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_ACTIVE_MEMBER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -76,7 +78,7 @@ public class NormalIdentityRestControllerUnitTest implements
         // when
         ResponseEntity<DataResponse<Map<String, Object>>> response = restController.respondToNormalLoginSuccess(testAccessToken, testRefreshToken);
 
-        String refreshTokenCookie = response.getHeaders().get("Set-Cookie").getFirst();
+        String refreshTokenCookie = response.getHeaders().get(HttpHeaders.SET_COOKIE).getFirst();
         Map<String, String> cookieResult = new HashMap<>();
 
         for(String part: refreshTokenCookie.split(";")) {
@@ -93,7 +95,7 @@ public class NormalIdentityRestControllerUnitTest implements
         assertThat(Objects.requireNonNull(response.getBody()).getData().get("accessToken"))
                 .isEqualTo(testAccessToken);
         assertThat(refreshTokenCookie).isNotNull();
-        assertThat(cookieResult.get("refresh_token")).isEqualTo(testRefreshToken);
+        assertThat(cookieResult.get(REFRESH_TOKEN_COOKIE_NAME)).isEqualTo(testRefreshToken);
         assertThat(cookieResult.get("Path")).isEqualTo("/");
         assertThat(cookieResult.get("Secure")).isEqualTo("Secure");
         assertThat(cookieResult.get("HttpOnly")).isEqualTo("HttpOnly");

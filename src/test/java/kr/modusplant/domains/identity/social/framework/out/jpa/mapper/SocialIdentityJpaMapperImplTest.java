@@ -72,18 +72,24 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialUs
     void testToUserPayload_givenMemberEntityAndMemberRoleEntity_willReturnUserPayload() {
         // given
         SiteMemberEntity memberEntity = createKakaoMemberEntityWithUuid();
+        SiteMemberAuthEntity memberAuthEntity = SiteMemberAuthEntity.builder()
+                .activeMember(memberEntity)
+                .originalMember(memberEntity)
+                .email(testKakaoUserEmail.getEmail())
+                .build();
         SiteMemberRoleEntity memberRoleEntity = SiteMemberRoleEntity.builder()
                 .member(memberEntity)
                 .role(Role.USER)
                 .build();
 
         // when
-        UserPayload result = socialIdentityJpaMapper.toUserPayload(memberEntity, memberRoleEntity);
+        UserPayload result = socialIdentityJpaMapper.toUserPayload(memberEntity, memberAuthEntity, memberRoleEntity);
 
         // then
         assertNotNull(result);
         assertEquals(memberEntity.getUuid(), result.getMemberId().getValue());
         assertEquals(memberEntity.getNickname(), result.getNickname().getNickname());
+        assertEquals(memberAuthEntity.getEmail(), result.getEmail().getEmail());
         assertEquals(Role.USER, result.getRole());
     }
 
@@ -95,12 +101,13 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialUs
         Role role = Role.USER;
 
         // when
-        UserPayload result = socialIdentityJpaMapper.toUserPayload(memberEntity, testSocialKakaoNickname, role);
+        UserPayload result = socialIdentityJpaMapper.toUserPayload(memberEntity, testSocialKakaoNickname, testKakaoUserEmail, role);
 
         // then
         assertNotNull(result);
         assertEquals(memberEntity.getUuid(), result.getMemberId().getValue());
         assertEquals(testSocialKakaoNickname.getNickname(), result.getNickname().getNickname());
+        assertEquals(testKakaoUserEmail.getEmail(), result.getEmail().getEmail());
         assertEquals(Role.USER, result.getRole());
     }
 

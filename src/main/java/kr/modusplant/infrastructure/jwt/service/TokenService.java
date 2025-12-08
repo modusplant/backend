@@ -2,7 +2,7 @@ package kr.modusplant.infrastructure.jwt.service;
 
 
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
+import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
@@ -40,19 +40,20 @@ import java.util.UUID;
 public class TokenService {
     private final JwtTokenProvider jwtTokenProvider;
     private final SiteMemberJpaRepository siteMemberJpaRepository;
+    private final SiteMemberAuthJpaRepository siteMemberAuthJpaRepository;
     private final SiteMemberRoleJpaRepository siteMemberRoleJpaRepository;
     private final RefreshTokenJpaRepository refreshTokenJpaRepository;
     private final AccessTokenRedisRepository accessTokenRedisRepository;
 
     // 토큰 생성
-    public TokenPair issueToken(UUID memberUuid, String nickname, Role role) {
+    public TokenPair issueToken(UUID memberUuid, String nickname, String email, Role role) {
         // memberUuid 검증
         if (memberUuid == null || !siteMemberJpaRepository.existsByUuid(memberUuid)) {
             throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER);
         }
 
         // accessToken , refresh token 생성
-        Map<String,String> claims = createClaims(nickname,role);
+        Map<String,String> claims = createClaims(nickname,email, role);
         String accessToken = jwtTokenProvider.generateAccessToken(memberUuid, claims);
         String refreshToken = jwtTokenProvider.generateRefreshToken(memberUuid);
 
@@ -85,21 +86,39 @@ public class TokenService {
     }
 
     // 토큰 검증 및 재발급
-    public TokenPair verifyAndReissueToken(String accessToken, String refreshToken) {
-        // 블랙리스트 확인
-        if (accessTokenRedisRepository.isBlacklisted(accessToken)) {
-            throw new InvalidTokenException();
-        }
+    public TokenPair verifyAndReissueToken(String refreshToken) {
         // refresh token 유효성 검증
         if (!jwtTokenProvider.validateToken(refreshToken)) {
             throw new InvalidTokenException();
         }
-        // access token 유효성 검증
-        if (jwtTokenProvider.validateToken(accessToken)) {
-            return new TokenPair(accessToken,refreshToken);
-        }
-        // access token 만료 시 토큰 갱신
-        return reissueTokenWithValidRefreshToken(refreshToken);
+        // 토큰 갱신
+        // refresh token 검증
+        validateNotFoundRefreshToken(refreshToken);
+
+        // token에서 사용자 정보 가져오기
+        UUID memberUuid = jwtTokenProvider.getMemberUuidFromToken(refreshToken);
+
+        SiteMemberEntity memberEntity = siteMemberJpaRepository.findByUuid(memberUuid).orElseThrow(TokenNotFoundException::new);
+        String email = siteMemberAuthJpaRepository.findByActiveMember(memberEntity).getFirst().getEmail();      // TODO: 연동 구현 시 이메일 선택 수정 필요
+        Role role = siteMemberRoleJpaRepository.findByUuid(memberUuid).orElseThrow(TokenNotFoundException::new).getRole();
+
+        // refresh token 재발급 (RTR기법)
+        String reissuedRefreshToken = jwtTokenProvider.generateRefreshToken(memberUuid);
+        refreshTokenJpaRepository.save(
+                RefreshTokenEntity.builder()
+                        .uuid(refreshTokenJpaRepository.findByRefreshToken(refreshToken).orElseThrow().getUuid())
+                        .member(memberEntity)
+                        .refreshToken(reissuedRefreshToken)
+                        .issuedAt(convertToLocalDateTime(jwtTokenProvider.getIssuedAtFromToken(reissuedRefreshToken)))
+                        .expiredAt(convertToLocalDateTime(jwtTokenProvider.getExpirationFromToken(reissuedRefreshToken)))
+                        .build()
+        );
+
+        // access token 재발급
+        Map<String,String> claims = createClaims(memberEntity.getNickname(), email, role);
+        String accessToken = jwtTokenProvider.generateAccessToken(memberUuid,claims);
+
+        return new TokenPair(accessToken,reissuedRefreshToken);
     }
 
     // access token 블랙리스트
@@ -116,39 +135,10 @@ public class TokenService {
         accessTokenRedisRepository.removeFromBlacklist(accessToken);
     }
 
-    // 토큰 갱신
-    private TokenPair reissueTokenWithValidRefreshToken(String refreshToken) {
-        // refresh token 검증
-        validateNotFoundRefreshToken(refreshToken);
-
-        // token에서 사용자 정보 가져오기
-        UUID memberUuid = jwtTokenProvider.getMemberUuidFromToken(refreshToken);
-
-        SiteMemberEntity memberEntity = siteMemberJpaRepository.findByUuid(memberUuid).orElseThrow(TokenNotFoundException::new);
-        SiteMemberRoleEntity memberRoleEntity = siteMemberRoleJpaRepository.findByUuid(memberUuid).orElseThrow(TokenNotFoundException::new);
-
-        // refresh token 재발급 (RTR기법)
-        String reissuedRefreshToken = jwtTokenProvider.generateRefreshToken(memberUuid);
-        refreshTokenJpaRepository.save(
-                RefreshTokenEntity.builder()
-                        .uuid(refreshTokenJpaRepository.findByRefreshToken(refreshToken).orElseThrow().getUuid())
-                        .member(memberEntity)
-                        .refreshToken(reissuedRefreshToken)
-                        .issuedAt(convertToLocalDateTime(jwtTokenProvider.getIssuedAtFromToken(reissuedRefreshToken)))
-                        .expiredAt(convertToLocalDateTime(jwtTokenProvider.getExpirationFromToken(reissuedRefreshToken)))
-                        .build()
-        );
-
-        // access token 재발급
-        Map<String,String> claims = createClaims(memberEntity.getNickname(),memberRoleEntity.getRole());
-        String accessToken = jwtTokenProvider.generateAccessToken(memberUuid,claims);
-
-        return new TokenPair(accessToken,reissuedRefreshToken);
-    }
-
-    private Map<String,String> createClaims(String nickname, Role role) {
+    private Map<String,String> createClaims(String nickname, String email, Role role) {
         Map<String,String> claims = new HashMap<>();
         claims.put("nickname", nickname);
+        claims.put("email",email);
         claims.put("role", role.name());
         return claims;
     }

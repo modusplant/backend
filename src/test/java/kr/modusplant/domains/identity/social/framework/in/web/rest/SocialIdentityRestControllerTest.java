@@ -17,11 +17,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static kr.modusplant.infrastructure.jwt.constant.CookieName.REFRESH_TOKEN_COOKIE_NAME;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -64,6 +66,7 @@ class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, U
         given(tokenService.issueToken(
                 eq(testSocialKakaoUserPayload.getMemberId().getValue()),
                 eq(testSocialKakaoUserPayload.getNickname().getNickname()),
+                eq(testSocialKakaoUserPayload.getEmail().getEmail()),
                 eq(testSocialKakaoUserPayload.getRole())
         )).willReturn(mockTokenPair);
 
@@ -74,8 +77,8 @@ class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, U
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.data.accessToken").value(TEST_ACCESS_TOKEN))
-                .andExpect(header().exists("Set-Cookie"))
-                .andExpect(cookie().exists("refresh_token"));
+                .andExpect(header().exists(HttpHeaders.SET_COOKIE))
+                .andExpect(cookie().exists(REFRESH_TOKEN_COOKIE_NAME));
     }
 
     @Test
@@ -89,6 +92,7 @@ class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, U
         given(tokenService.issueToken(
                 eq(testSocialGoogleUserPayload.getMemberId().getValue()),
                 eq(testSocialGoogleUserPayload.getNickname().getNickname()),
+                eq(testSocialGoogleUserPayload.getEmail().getEmail()),
                 eq(testSocialGoogleUserPayload.getRole())
         )).willReturn(mockTokenPair);
 
@@ -99,8 +103,8 @@ class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, U
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.data.accessToken").value(TEST_ACCESS_TOKEN))
-                .andExpect(header().exists("Set-Cookie"))
-                .andExpect(cookie().exists("refresh_token"));
+                .andExpect(header().exists(HttpHeaders.SET_COOKIE))
+                .andExpect(cookie().exists(REFRESH_TOKEN_COOKIE_NAME));
     }
 
 
