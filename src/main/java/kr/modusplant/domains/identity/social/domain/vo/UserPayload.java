@@ -1,6 +1,7 @@
 package kr.modusplant.domains.identity.social.domain.vo;
 
 import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.shared.kernel.Email;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,10 +13,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class UserPayload {
     private final MemberId memberId;
     private final Nickname nickname;
+    private final Email email;
     private final Role role;
 
-    public static UserPayload create(MemberId memberId, Nickname nickname, Role role) {
-        return new UserPayload(memberId, nickname, role);
+    public static UserPayload create(MemberId memberId, Nickname nickname, Email email, Role role) {
+        return new UserPayload(memberId, nickname, email, role);
     }
 
     @Override

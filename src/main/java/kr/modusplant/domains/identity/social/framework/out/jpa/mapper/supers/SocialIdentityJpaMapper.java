@@ -7,6 +7,7 @@ import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
 import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.shared.kernel.Email;
 
 public interface SocialIdentityJpaMapper {
 
@@ -16,7 +17,7 @@ public interface SocialIdentityJpaMapper {
 
     SiteMemberRoleEntity toMemberRoleEntity(SiteMemberEntity memberEntity, Role role);
 
-    UserPayload toUserPayload(SiteMemberEntity memberEntity, SiteMemberRoleEntity memberRoleEntity);
+    UserPayload toUserPayload(SiteMemberEntity memberEntity, SiteMemberAuthEntity memberAuthEntity, SiteMemberRoleEntity memberRoleEntity);
 
-    UserPayload toUserPayload(SiteMemberEntity memberEntity, Nickname nickname, Role role);
+    UserPayload toUserPayload(SiteMemberEntity memberEntity, Nickname nickname, Email email, Role role);
 }
