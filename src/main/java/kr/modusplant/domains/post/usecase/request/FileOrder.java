@@ -2,7 +2,7 @@ package kr.modusplant.domains.post.usecase.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import kr.modusplant.shared.validation.OneBasedOrder;
+import kr.modusplant.shared.validation.ZeroBasedOrder;
 
 public record FileOrder(
         @Schema(
@@ -18,6 +18,6 @@ public record FileOrder(
                 maximum = "100",
                 example = "1"
         )
-        @OneBasedOrder
+        @ZeroBasedOrder
         Integer order) {
 }
