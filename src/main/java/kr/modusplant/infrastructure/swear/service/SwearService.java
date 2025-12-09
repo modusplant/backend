@@ -1,8 +1,10 @@
 package kr.modusplant.infrastructure.swear.service;
 
+import jakarta.annotation.PostConstruct;
 import kr.modusplant.infrastructure.swear.persistence.jpa.entity.SwearEntity;
 import kr.modusplant.infrastructure.swear.persistence.jpa.repository.SwearJpaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -10,12 +12,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class SwearService {
 
-    private final List<String> swearWords;
+    private final SwearJpaRepository repository;
+    private List<String> swearWords;
 
-    @Autowired
-    public SwearService(SwearJpaRepository repository) {
+    @PostConstruct
+    public void init() {
         List<String> swears = repository.findAll()
                 .stream()
                 .map(SwearEntity::getWord)
@@ -57,7 +62,6 @@ public class SwearService {
         if(text == null || text.isBlank()) {
             return false;
         }
-
         return swearWords.stream().anyMatch(text::contains);
     }
 
