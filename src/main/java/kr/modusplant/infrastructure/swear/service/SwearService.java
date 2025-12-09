@@ -4,7 +4,6 @@ import jakarta.annotation.PostConstruct;
 import kr.modusplant.infrastructure.swear.persistence.jpa.entity.SwearEntity;
 import kr.modusplant.infrastructure.swear.persistence.jpa.repository.SwearJpaRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,7 +12,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class SwearService {
 
     private final SwearJpaRepository repository;
