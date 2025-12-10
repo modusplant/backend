@@ -56,7 +56,7 @@ public class SwearService {
         return text;
     }
 
-    public boolean containSwear(String text) {
+    public boolean isSwearContained(String text) {
         if(text == null || text.isBlank()) {
             return false;
         }
