@@ -1,9 +1,7 @@
 package kr.modusplant.infrastructure.swear.persistence.jpa.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import kr.modusplant.infrastructure.swear.persistence.jpa.entity.enums.SwearType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +13,7 @@ import java.time.LocalDateTime;
 import static kr.modusplant.shared.persistence.constant.TableColumnName.CREATED_AT;
 
 @Entity
-@Table(name = "swear_word")
+@Table(name = "swear")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SwearEntity {
@@ -28,35 +26,36 @@ public class SwearEntity {
     private String word;
 
     @Column(nullable = false)
-    private String category;
+    @Enumerated(EnumType.STRING)
+    private SwearType type;
 
     @Column(name = CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 
-    public SwearEntity(String word, String category) {
+    public SwearEntity(String word, SwearType type) {
         this.word = word;
-        this.category = category;
+        this.type = type;
     }
 
     public static SwearWordEntityBuilder builder() { return new SwearWordEntityBuilder(); }
 
     public static final class SwearWordEntityBuilder {
         private String word;
-        private String category;
+        private SwearType type;
 
         public SwearWordEntityBuilder word(final String word) {
             this.word = word;
             return this;
         }
 
-        public SwearWordEntityBuilder category(final String category) {
-            this.category = category;
+        public SwearWordEntityBuilder type(final SwearType type) {
+            this.type = type;
             return this;
         }
 
         public SwearEntity build() {
-            return new SwearEntity(this.word, this.category);
+            return new SwearEntity(this.word, this.type);
         }
     }
 
