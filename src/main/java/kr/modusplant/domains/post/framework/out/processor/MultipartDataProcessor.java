@@ -35,7 +35,7 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
     public JsonNode saveFilesAndGenerateContentJson(List<MultipartFile> parts) throws IOException {
         String fileUlid = generator.generate(null, null, null, EventType.INSERT);
         ArrayNode contentArray = objectMapper.createArrayNode();
-        int order = 1;
+        int order = 0;
         for (MultipartFile part:parts) {
             contentArray.add(convertSinglePartToJson(fileUlid, part, order++));
         }
