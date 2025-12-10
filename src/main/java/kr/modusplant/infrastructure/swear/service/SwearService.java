@@ -41,7 +41,7 @@ public class SwearService {
         return swears;
     }
 
-    public String filterText(String text) {
+    public String filterSwear(String text) {
         if(text == null || text.isBlank()) {
             return text;
         }
