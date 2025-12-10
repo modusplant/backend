@@ -9,6 +9,7 @@ import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.CREATED_AT;
 
@@ -20,9 +21,10 @@ public class SwearEntity {
 
     @Id
     @UuidGenerator
-    private Long id;
+    @Column(nullable = false, updatable = false)
+    private UUID uuid;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, length = 10, unique = true)
     private String word;
 
     @Column(nullable = false)
