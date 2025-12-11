@@ -37,7 +37,7 @@ public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessH
         updateMemberLoggedInAt(currentMember.getActiveUuid());
 
         TokenPair loginTokenPair = tokenService.issueToken(
-                currentMember.getActiveUuid(), currentMember.getNickname(), getMemberRole(currentMember));
+                currentMember.getActiveUuid(), currentMember.getNickname(), currentMember.getEmail(), getMemberRole(currentMember));
 
         request.setAttribute("accessToken", loginTokenPair.accessToken());
         request.setAttribute("refreshToken", loginTokenPair.refreshToken());

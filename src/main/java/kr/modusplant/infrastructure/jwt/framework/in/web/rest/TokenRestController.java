@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static kr.modusplant.infrastructure.jwt.constant.CookieName.REFRESH_TOKEN_COOKIE_NAME;
-import static kr.modusplant.infrastructure.jwt.util.TokenUtils.getTokenFromAuthorizationHeader;
 
 @Tag(name="Token API", description = "JWT API")
 @RestController
@@ -32,12 +31,8 @@ public class TokenRestController {
             @ApiResponse(responseCode = "200", description = "Succeeded : JWT 발급 완료")
     })
     @PostMapping("/auth/token/refresh")
-    public ResponseEntity<DataResponse<?>> refreshToken(@CookieValue(REFRESH_TOKEN_COOKIE_NAME) String refreshToken,
-                                                        @RequestHeader("Authorization") String rawAccessToken) {
-
-        String accessToken = getTokenFromAuthorizationHeader(rawAccessToken);
-
-        TokenPair tokenPair = tokenService.verifyAndReissueToken(accessToken, refreshToken);
+    public ResponseEntity<DataResponse<?>> refreshToken(@CookieValue(REFRESH_TOKEN_COOKIE_NAME) String refreshToken) {
+        TokenPair tokenPair = tokenService.verifyAndReissueToken(refreshToken);
 
         TokenResponse tokenResponse = new TokenResponse(tokenPair.accessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(tokenResponse);
