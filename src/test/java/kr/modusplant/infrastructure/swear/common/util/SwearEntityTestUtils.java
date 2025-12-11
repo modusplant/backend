@@ -1,7 +1,7 @@
 package kr.modusplant.infrastructure.swear.common.util;
 
 import kr.modusplant.infrastructure.swear.persistence.jpa.entity.SwearEntity;
-import kr.modusplant.infrastructure.swear.persistence.jpa.entity.enums.SwearType;
+import kr.modusplant.infrastructure.swear.enums.SwearType;
 
 import java.util.List;
 
