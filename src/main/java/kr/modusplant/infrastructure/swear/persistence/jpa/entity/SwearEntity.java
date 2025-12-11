@@ -12,9 +12,10 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.CREATED_AT;
+import static kr.modusplant.shared.persistence.constant.TableName.SWEAR;
 
 @Entity
-@Table(name = "swear")
+@Table(name = SWEAR)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SwearEntity {
