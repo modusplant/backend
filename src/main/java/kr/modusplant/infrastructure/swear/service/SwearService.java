@@ -49,7 +49,7 @@ public class SwearService {
         for (String swear : swearWords) {
             if(text.contains(swear)) {
                 String replacePart = "*".repeat(swear.length());
-                text = text.replaceAll(swear, replacePart);
+                text = text.replace(swear, replacePart);
             }
 
         }
