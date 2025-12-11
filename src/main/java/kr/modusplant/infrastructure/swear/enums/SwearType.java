@@ -1,4 +1,4 @@
-package kr.modusplant.infrastructure.swear.persistence.jpa.entity.enums;
+package kr.modusplant.infrastructure.swear.enums;
 
 import lombok.Getter;
 

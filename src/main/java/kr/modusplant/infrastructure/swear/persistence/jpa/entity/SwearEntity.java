@@ -1,7 +1,7 @@
 package kr.modusplant.infrastructure.swear.persistence.jpa.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.infrastructure.swear.persistence.jpa.entity.enums.SwearType;
+import kr.modusplant.infrastructure.swear.enums.SwearType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
