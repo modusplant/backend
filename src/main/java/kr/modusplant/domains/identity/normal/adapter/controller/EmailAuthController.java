@@ -1,6 +1,7 @@
 package kr.modusplant.domains.identity.normal.adapter.controller;
 
 import kr.modusplant.domains.identity.normal.adapter.EmailAuthTokenHelper;
+import kr.modusplant.domains.identity.normal.domain.exception.InvalidValueException;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
 import kr.modusplant.domains.identity.normal.domain.vo.Password;
 import kr.modusplant.domains.identity.normal.usecase.enums.EmailType;
@@ -13,7 +14,6 @@ import kr.modusplant.domains.identity.normal.usecase.request.InputValidationRequ
 import kr.modusplant.framework.redis.RedisHelper;
 import kr.modusplant.framework.redis.RedisKeys;
 import kr.modusplant.shared.exception.EntityNotFoundException;
-import kr.modusplant.shared.exception.InvalidDataException;
 import kr.modusplant.shared.kernel.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +22,9 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.UUID;
 
-import static kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode.INVALID_ID;
 import static kr.modusplant.framework.redis.RedisKeys.RESET_PASSWORD_PREFIX;
-import static kr.modusplant.infrastructure.jwt.enums.TokenScope.RESET_PASSWORD_EMAIL;
 import static kr.modusplant.infrastructure.jwt.enums.TokenScope.RESET_PASSWORD_INPUT;
+import static kr.modusplant.shared.exception.enums.ErrorCode.PASSWORD_RESET_EMAIL_VERIFY_FAIL;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -48,7 +47,7 @@ public class EmailAuthController {
         tokenHelper.validateAuthCodeAccessToken(request, accessToken);
     }
 
-    public String sendResetPasswordEmail(EmailAuthRequest request) {
+    public void sendResetPasswordEmail(EmailAuthRequest request) {
         String email = request.email();
 
         if (!readRepository.existsByEmailAndProvider(Email.create(email))) {
@@ -61,21 +60,27 @@ public class EmailAuthController {
         redisHelper.setString(redisKey, email, Duration.ofMinutes(5));
 
         apiGateway.execute(email, stringUuid, EmailType.RESET_PASSWORD_EMAIL);
-        return tokenHelper.generateResetPasswordAccessToken(email, RESET_PASSWORD_EMAIL);
     }
 
-    public String verifyResetPasswordEmail(UUID uuid, String accessToken) {
+    /**
+     * 비밀번호 재설정 토큰(UUID) 검증
+     * - 쿠키/JWT 의존성 없이 UUID 검증
+     * - 프론트엔드에서 호출하여 토큰 유효성 확인 후 비밀번호 재설정 진행
+     */
+    public String verifyResetPasswordEmail(UUID uuid) {
         String stringUuid = String.valueOf(uuid);
         String redisKey = RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, stringUuid);
-        String storedEmail = redisHelper.getString(redisKey).orElseThrow(() -> new InvalidDataException(INVALID_ID, "uuid"));
-        tokenHelper.validateResetPasswordEmailAccessToken(storedEmail, accessToken);
-        return tokenHelper.generateResetPasswordAccessToken(storedEmail, RESET_PASSWORD_INPUT);
+        String storedEmail = redisHelper.getString(redisKey)
+                .orElseThrow(() -> new InvalidValueException(PASSWORD_RESET_EMAIL_VERIFY_FAIL));
+        return tokenHelper.generateResetPasswordAccessToken(storedEmail, stringUuid, RESET_PASSWORD_INPUT);
     }
 
     public void verifyResetPasswordInput(InputValidationRequest request, String accessToken) {
         tokenHelper.validateResetPasswordInputAccessToken(accessToken);
         String email = tokenHelper.getClaims(accessToken).get("email", String.class);
+        String uuid = tokenHelper.getClaims(accessToken).get("uuid", String.class);
         String password = request.password();
         identityUpdateRepository.updatePassword(Email.create(email), Password.create(password));
+        redisHelper.delete(RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, uuid));
     }
 }
