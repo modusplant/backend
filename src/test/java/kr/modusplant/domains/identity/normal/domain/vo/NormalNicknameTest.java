@@ -1,6 +1,6 @@
 package kr.modusplant.domains.identity.normal.domain.vo;
 
-import kr.modusplant.domains.identity.normal.common.util.domain.vo.PasswordTestUtils;
+import kr.modusplant.domains.identity.normal.common.util.domain.vo.NicknameTestUtils;
 import kr.modusplant.domains.identity.normal.domain.exception.EmptyValueException;
 import kr.modusplant.domains.identity.normal.domain.exception.InvalidValueException;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
@@ -9,56 +9,53 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PasswordTest implements PasswordTestUtils {
+public class NormalNicknameTest implements NicknameTestUtils {
 
     @Test
-    @DisplayName("null로 비밀번호 생성")
-    public void testCreate_givenNull_willThrowEmptyValueException() {
+    @DisplayName("null 값으로 닉네임 생성")
+    public void testCreate_givenNullNickname_willThrowEmptyValueException() {
         // given
         EmptyValueException result = assertThrows(EmptyValueException.class, () ->
-                Password.create(null));
+                NormalNickname.create(null));
 
         // when & then
-        assertEquals(NormalIdentityErrorCode.EMPTY_PASSWORD, result.getErrorCode());
+        assertEquals(NormalIdentityErrorCode.EMPTY_NICKNAME, result.getErrorCode());
     }
 
     @Test
-    @DisplayName("형식에 맞지 않는 값으로 비밀번호 생성")
-    public void testCreate_givenInvalidFormat_willThrowInvalidValueException() {
+    @DisplayName("형식에 맞지 않는 값으로 닉네임 생성")
+    public void testCreate_givenInvalidEmail_willThrowInvalidValueException() {
         // given
         InvalidValueException result = assertThrows(InvalidValueException.class, () ->
-                Password.create("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
+                NormalNickname.create("nickname!!!!!"));
 
         // when & then
-        assertEquals(NormalIdentityErrorCode.INVALID_PASSWORD, result.getErrorCode());
+        assertEquals(NormalIdentityErrorCode.INVALID_NICKNAME, result.getErrorCode());
     }
 
     @Test
     @DisplayName("동일한 객체로 동등성 비교")
     void testEquals_givenSameObject_willReturnTrue() {
         // given
-        Password password = testPassword;
+        NormalNickname normalNickname = TEST_NORMAL_NICKNAME;
 
         // when & then
-        assertEquals(password, testPassword);
+        assertEquals(normalNickname, normalNickname);
     }
 
     @Test
     @DisplayName("다른 객체로 동등성 비교")
     void testEquals_givenDifferentObject_willReturnFalse() {
-        // given & when & then
         EmptyValueException different = new EmptyValueException(NormalIdentityErrorCode.EMPTY_NICKNAME);
-        assertNotEquals(testPassword, different);
+        assertNotEquals(TEST_NORMAL_NICKNAME, different);
     }
 
     @Test
     @DisplayName("동일하고 다른 프로퍼티를 지닌 객체로 동등성 비교")
     void testEquals_givenDifferentProperty_willReturnFalse() {
         // given
-        Password different = Password.create("plant12@example.com");
+        NormalNickname normalNickname = NormalNickname.create("nickname");
 
-        // when & then
-        assertNotEquals(testPassword, different);
+        assertNotEquals(TEST_NORMAL_NICKNAME, normalNickname);
     }
-
 }

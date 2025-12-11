@@ -12,7 +12,7 @@ import static kr.modusplant.shared.kernel.common.util.EmailTestUtils.testKakaoUs
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-class NicknameTest implements NicknameTestUtils {
+class NormalNicknameTest implements NicknameTestUtils {
 
     @Test
     @DisplayName("유효한 닉네임으로 Nickname을 생성")

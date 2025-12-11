@@ -15,7 +15,7 @@ import static kr.modusplant.shared.kernel.common.util.EmailTestUtils.testKakaoUs
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-class MemberIdTest implements MemberIdTestUtils {
+class NormalMemberIdTest implements MemberIdTestUtils {
 
     @Test
     @DisplayName("유효한 UUID로 MemberId를 생성한다")

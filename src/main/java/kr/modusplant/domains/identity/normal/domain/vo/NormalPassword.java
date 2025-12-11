@@ -12,18 +12,18 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class AgreedTermsOfVersion {
-    private final String version;
+public class NormalPassword {
+    private final String value;
 
-    public static AgreedTermsOfVersion create(String version) {
-        AgreedTermsOfVersion.validateSource(version);
-        return new AgreedTermsOfVersion(version);
+    public static NormalPassword create(String password) {
+        NormalPassword.validateSource(password);
+        return new NormalPassword(password);
     }
 
-    public static void validateSource(String input) {
-        if(input == null || input.isBlank()) { throw new EmptyValueException(NormalIdentityErrorCode.EMPTY_AGREED_TERMS_OF_VERSION); }
-        if(!input.matches(Regex.REGEX_VERSION)) {
-            throw new InvalidValueException(NormalIdentityErrorCode.INVALID_AGREED_TERMS_OF_VERSION);
+    public static void validateSource(String password) {
+        if (password == null || password.isBlank()) { throw new EmptyValueException(NormalIdentityErrorCode.EMPTY_PASSWORD); }
+        if (!password.matches(Regex.REGEX_PASSWORD)) {
+            throw new InvalidValueException(NormalIdentityErrorCode.INVALID_PASSWORD);
         }
     }
 
@@ -31,16 +31,16 @@ public class AgreedTermsOfVersion {
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof AgreedTermsOfVersion agreed)) return false;
+        if (!(o instanceof NormalPassword pw)) return false;
 
         return new EqualsBuilder()
-                .append(getVersion(), agreed.getVersion())
+                .append(getValue(), pw.getValue())
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(getVersion()).toHashCode();
+                .append(getValue()).toHashCode();
     }
 }

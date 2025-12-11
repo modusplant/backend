@@ -12,23 +12,23 @@ import java.util.UUID;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class MemberId {
+public class NormalMemberId {
     private final UUID value;
 
-    public static MemberId create(UUID uuid) {
+    public static NormalMemberId create(UUID uuid) {
         if (uuid == null) {
             throw new EmptyValueException(NormalIdentityErrorCode.EMPTY_MEMBER_ID);
         }
-        return new MemberId(uuid);
+        return new NormalMemberId(uuid);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof MemberId memberId)) return false;
+        if (!(o instanceof NormalMemberId normalMemberId)) return false;
 
-        return new EqualsBuilder().append(getValue(), memberId.getValue()).isEquals();
+        return new EqualsBuilder().append(getValue(), normalMemberId.getValue()).isEquals();
     }
 
     @Override

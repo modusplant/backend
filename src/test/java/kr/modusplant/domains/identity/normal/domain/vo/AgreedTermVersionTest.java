@@ -1,6 +1,6 @@
 package kr.modusplant.domains.identity.normal.domain.vo;
 
-import kr.modusplant.domains.identity.normal.common.util.domain.vo.NicknameTestUtils;
+import kr.modusplant.domains.identity.normal.common.util.domain.vo.AgreedTermsOfVersionTestUtils;
 import kr.modusplant.domains.identity.normal.domain.exception.EmptyValueException;
 import kr.modusplant.domains.identity.normal.domain.exception.InvalidValueException;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
@@ -9,53 +9,53 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class NicknameTest implements NicknameTestUtils {
+public class AgreedTermVersionTest implements AgreedTermsOfVersionTestUtils {
 
     @Test
-    @DisplayName("null 값으로 닉네임 생성")
-    public void testCreate_givenNullNickname_willThrowEmptyValueException() {
+    @DisplayName("null로 동의된 약관 버전 생성")
+    public void testCreate_givenNullVersion_willThrowEmptyValueException() {
         // given
         EmptyValueException result = assertThrows(EmptyValueException.class, () ->
-                Nickname.create(null));
+                AgreedTermVersion.create(null));
 
         // when & then
-        assertEquals(NormalIdentityErrorCode.EMPTY_NICKNAME, result.getErrorCode());
+        assertEquals(NormalIdentityErrorCode.EMPTY_AGREED_TERMS_OF_VERSION, result.getErrorCode());
     }
 
     @Test
-    @DisplayName("형식에 맞지 않는 값으로 닉네임 생성")
-    public void testCreate_givenInvalidEmail_willThrowInvalidValueException() {
+    @DisplayName("형식에 맞지 않는 값으로 동의된 약관 버전 생성")
+    public void testCreate_givenInvalidVersionFormat_willThrowInvalidValueException() {
         // given
         InvalidValueException result = assertThrows(InvalidValueException.class, () ->
-                Nickname.create("nickname!!!!!"));
+                AgreedTermVersion.create("va11223"));
 
         // when & then
-        assertEquals(NormalIdentityErrorCode.INVALID_NICKNAME, result.getErrorCode());
+        assertEquals(NormalIdentityErrorCode.INVALID_AGREED_TERMS_OF_VERSION, result.getErrorCode());
     }
 
     @Test
     @DisplayName("동일한 객체로 동등성 비교")
     void testEquals_givenSameObject_willReturnTrue() {
         // given
-        Nickname nickname = testNickname;
+        AgreedTermVersion version = testAgreedTermsOfUse;
 
         // when & then
-        assertEquals(nickname, nickname);
+        assertEquals(version, version);
     }
 
     @Test
     @DisplayName("다른 객체로 동등성 비교")
     void testEquals_givenDifferentObject_willReturnFalse() {
+        // given & when & then
         EmptyValueException different = new EmptyValueException(NormalIdentityErrorCode.EMPTY_NICKNAME);
-        assertNotEquals(testNickname, different);
+        assertNotEquals(testAgreedTermsOfUse, different);
     }
 
     @Test
     @DisplayName("동일하고 다른 프로퍼티를 지닌 객체로 동등성 비교")
     void testEquals_givenDifferentProperty_willReturnFalse() {
-        // given
-        Nickname nickname = Nickname.create("nickname");
-
-        assertNotEquals(testNickname, nickname);
+        // given & when & then
+        assertNotEquals(testAgreedTermsOfUse, testAgreedAdReceiving);
     }
+
 }

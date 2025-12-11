@@ -19,8 +19,6 @@ import org.junit.jupiter.api.BeforeEach;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class CommentJooqRepositoryTest implements
         PostIdTestUtils, AuthorTestUtils, CommentPathTestUtils,
         NicknameTestUtils, CommentContentTestUtils {
@@ -54,7 +52,7 @@ public class CommentJooqRepositoryTest implements
 
         testRecord.value1(testPostId.getId());
         testRecord.value2(testCommentPath.getPath());
-        testRecord.value3(testNickname.getNickname());
+        testRecord.value3(TEST_NORMAL_NICKNAME.getValue());
         testRecord.value4(testCommentContent.getContent());
         testRecord.value5(false);
         testRecord.value6(testDateTime);

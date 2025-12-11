@@ -2,7 +2,6 @@ package kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repo
 
 import kr.modusplant.domains.identity.normal.domain.vo.SignUpData;
 import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.*;
-import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.NormalIdentityRepositoryJpaAdapter;
 import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.repository.supers.*;
 import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
@@ -64,7 +63,7 @@ public class NormalIdentityRepositoryJpaAdapterTest implements SiteMemberEntityT
                 .originalMember(createMemberBasicUserEntityWithUuid())
                 .activeMember(createMemberBasicUserEntityWithUuid())
                 .email(sign.getCredentials().getEmail().getEmail())
-                .pw(sign.getCredentials().getPassword().getPassword())
+                .pw(sign.getCredentials().getPassword().getValue())
                 .provider(AuthProvider.BASIC).build();
 
         roleEntityToBeSaved = createMemberRoleUserEntityWithUuid();

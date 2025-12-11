@@ -1,8 +1,8 @@
 package kr.modusplant.domains.identity.normal.framework.out.persistence.jooq;
 
-import kr.modusplant.domains.identity.normal.domain.vo.MemberId;
-import kr.modusplant.domains.identity.normal.domain.vo.Nickname;
-import kr.modusplant.domains.identity.normal.domain.vo.Password;
+import kr.modusplant.domains.identity.normal.domain.vo.NormalMemberId;
+import kr.modusplant.domains.identity.normal.domain.vo.NormalNickname;
+import kr.modusplant.domains.identity.normal.domain.vo.NormalPassword;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityReadRepository;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityUpdateRepository;
 import kr.modusplant.jooq.tables.SiteMember;
@@ -25,37 +25,37 @@ public class NormalIdentityJooqRepository implements
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public int updateEmail(MemberId memberId, Email newEmail) {
+    public int updateEmail(NormalMemberId normalMemberId, Email newEmail) {
         return dsl.update(memberAuth)
                 .set(memberAuth.EMAIL, newEmail.getEmail())
-                .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue()))
+                .where(memberAuth.ACT_MEMB_UUID.eq(normalMemberId.getValue()))
                 .and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
                 .execute();
     }
 
     @Override
-    public int updatePassword(MemberId memberId, Password pw) {
+    public int updatePassword(NormalMemberId normalMemberId, NormalPassword pw) {
         return dsl.update(memberAuth)
-                .set(memberAuth.PW, passwordEncoder.encode(pw.getPassword()))
-                .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue()))
+                .set(memberAuth.PW, passwordEncoder.encode(pw.getValue()))
+                .where(memberAuth.ACT_MEMB_UUID.eq(normalMemberId.getValue()))
                 .and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
                 .execute();
     }
 
     @Override
-    public String getMemberPassword(MemberId memberId) {
+    public String getMemberPassword(NormalMemberId normalMemberId) {
         return dsl.select(memberAuth.PW)
                 .from(memberAuth)
-                .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
+                .where(memberAuth.ACT_MEMB_UUID.eq(normalMemberId.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
                 .fetchOne(memberAuth.PW);
     }
 
     @Override
-    public boolean existsByMemberId(MemberId memberId) {
+    public boolean existsByMemberId(NormalMemberId normalMemberId) {
         return dsl.fetchExists(
                 dsl.selectOne()
                         .from(memberAuth)
-                        .where(memberAuth.ACT_MEMB_UUID.eq(memberId.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
+                        .where(memberAuth.ACT_MEMB_UUID.eq(normalMemberId.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
         );
     }
 
@@ -69,11 +69,11 @@ public class NormalIdentityJooqRepository implements
     }
 
     @Override
-    public boolean existsByNickname(Nickname nickname) {
+    public boolean existsByNickname(NormalNickname normalNickname) {
         return dsl.fetchExists(
                 dsl.selectOne()
                         .from(member)
-                        .where(member.NICKNAME.eq(nickname.getNickname()))
+                        .where(member.NICKNAME.eq(normalNickname.getValue()))
         );
     }
 }

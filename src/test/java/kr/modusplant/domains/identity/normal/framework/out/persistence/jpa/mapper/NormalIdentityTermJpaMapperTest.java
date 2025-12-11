@@ -1,8 +1,6 @@
 package kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper;
 
 import kr.modusplant.domains.identity.normal.domain.vo.SignUpData;
-import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.NormalIdentityTermJpaMapper;
-import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.NormalIdentityTermJpaMapperImpl;
 import kr.modusplant.framework.jpa.entity.SiteMemberTermEntity;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
@@ -30,8 +28,8 @@ public class NormalIdentityTermJpaMapperTest implements SiteMemberEntityTestUtil
 
         // then
         assertThat(result.getMember()).isEqualTo(createMemberBasicUserEntityWithUuid());
-        assertThat(result.getAgreedPrivacyPolicyVersion()).isEqualTo(testSign.getAgreedPrivacyPolicyVersion().getVersion());
-        assertThat(result.getAgreedAdInfoReceivingVersion()).isEqualTo(testSign.getAgreedAdInfoReceivingVersion().getVersion());
-        assertThat(result.getAgreedTermsOfUseVersion()).isEqualTo(testSign.getAgreedTermsOfUseVersion().getVersion());
+        assertThat(result.getAgreedPrivacyPolicyVersion()).isEqualTo(testSign.getAgreedPrivacyPolicyVersion().getValue());
+        assertThat(result.getAgreedAdInfoReceivingVersion()).isEqualTo(testSign.getAgreedAdInfoReceivingVersion().getValue());
+        assertThat(result.getAgreedTermsOfUseVersion()).isEqualTo(testSign.getAgreedTermsOfUseVersion().getValue());
     }
 }

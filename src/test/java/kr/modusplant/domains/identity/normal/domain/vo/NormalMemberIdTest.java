@@ -9,14 +9,14 @@ import org.junit.jupiter.api.Test;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_ADMIN_UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class MemberIdTest implements MemberIdTestUtils {
+public class NormalMemberIdTest implements MemberIdTestUtils {
 
     @Test
     @DisplayName("null로 사용자 아이디 생성")
     public void testCreate_givenNullVersion_willThrowEmptyValueException() {
         // given
         EmptyValueException result = assertThrows(EmptyValueException.class, () ->
-                MemberId.create(null));
+                NormalMemberId.create(null));
 
         // when & then
         assertEquals(NormalIdentityErrorCode.EMPTY_MEMBER_ID, result.getErrorCode());
@@ -26,10 +26,10 @@ public class MemberIdTest implements MemberIdTestUtils {
     @DisplayName("동일한 객체로 동등성 비교")
     void testEquals_givenSameObject_willReturnTrue() {
         // given
-        MemberId id = testMemberId;
+        NormalMemberId id = TEST_NORMAL_MEMBER_ID;
 
         // when & then
-        assertEquals(id, testMemberId);
+        assertEquals(id, TEST_NORMAL_MEMBER_ID);
     }
 
     @Test
@@ -37,17 +37,17 @@ public class MemberIdTest implements MemberIdTestUtils {
     void testEquals_givenDifferentObject_willReturnFalse() {
         // given & when & then
         EmptyValueException different = new EmptyValueException(NormalIdentityErrorCode.EMPTY_NICKNAME);
-        assertNotEquals(testMemberId, different);
+        assertNotEquals(TEST_NORMAL_MEMBER_ID, different);
     }
 
     @Test
     @DisplayName("동일하고 다른 프로퍼티를 지닌 객체로 동등성 비교")
     void testEquals_givenDifferentProperty_willReturnFalse() {
         // given
-        MemberId different = MemberId.create(MEMBER_AUTH_BASIC_ADMIN_UUID);
+        NormalMemberId different = NormalMemberId.create(MEMBER_AUTH_BASIC_ADMIN_UUID);
 
         // when & then
-        assertNotEquals(testMemberId, different);
+        assertNotEquals(TEST_NORMAL_MEMBER_ID, different);
     }
 
 }

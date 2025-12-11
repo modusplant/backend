@@ -12,12 +12,12 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Nickname {
-    private final String nickname;
+public class NormalNickname {
+    private final String value;
 
-    public static Nickname create(String input) {
-        Nickname.validateSource(input);
-        return new Nickname(input);
+    public static NormalNickname create(String input) {
+        NormalNickname.validateSource(input);
+        return new NormalNickname(input);
     }
 
     public static void validateSource(String input) {
@@ -31,16 +31,16 @@ public class Nickname {
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof Nickname name)) return false;
+        if (!(o instanceof NormalNickname name)) return false;
 
         return new EqualsBuilder()
-                .append(getNickname(), name.getNickname())
+                .append(getValue(), name.getValue())
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(getNickname()).toHashCode();
+                .append(getValue()).toHashCode();
     }
 }

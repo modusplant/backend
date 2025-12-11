@@ -19,9 +19,9 @@ public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, Pass
     public void testCreate_givenNullEmail_willThrowEmptyEmailException() {
         // given
         EmptyEmailException result = assertThrows(EmptyEmailException.class, () ->
-                SignUpData.create(null, testPassword.getPassword(),
-                        testNickname.getNickname(), testAgreedTermsOfUse.getVersion(),
-                        testAgreedPrivacyPolicy.getVersion(), testAgreedAdReceiving.getVersion()));
+                SignUpData.create(null, TEST_NORMAL_PASSWORD.getValue(),
+                        TEST_NORMAL_NICKNAME.getValue(), testAgreedTermsOfUse.getValue(),
+                        testAgreedPrivacyPolicy.getValue(), testAgreedAdReceiving.getValue()));
 
         // when & then
         assertEquals(ErrorCode.EMAIL_EMPTY, result.getErrorCode());
@@ -32,9 +32,9 @@ public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, Pass
     public void testCreate_givenInvalidEmail_willThrowInvalidEmailException() {
         // given
         InvalidEmailException result = assertThrows(InvalidEmailException.class, () ->
-                SignUpData.create("testCredentials.getEmail()", testPassword.getPassword(),
-                        testNickname.getNickname(), testAgreedTermsOfUse.getVersion(),
-                        testAgreedPrivacyPolicy.getVersion(), testAgreedAdReceiving.getVersion()));
+                SignUpData.create("testCredentials.getEmail()", TEST_NORMAL_PASSWORD.getValue(),
+                        TEST_NORMAL_NICKNAME.getValue(), testAgreedTermsOfUse.getValue(),
+                        testAgreedPrivacyPolicy.getValue(), testAgreedAdReceiving.getValue()));
 
         // when & then
         assertEquals(ErrorCode.INVALID_EMAIL, result.getErrorCode());
@@ -44,7 +44,7 @@ public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, Pass
     @DisplayName("동일한 객체로 동등성 비교")
     void testEquals_givenSameObject_willReturnTrue() {
         // given
-        SignUpData sign = testSignUpData;
+        SignUpData sign = TEST_NORMAL_SIGN_UP_DATA;
 
         // when & then
         assertEquals(sign, sign);
@@ -54,17 +54,17 @@ public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, Pass
     @DisplayName("다른 객체로 동등성 비교")
     void testEquals_givenDifferentObject_willReturnFalse() {
         EmptyValueException different = new EmptyValueException(NormalIdentityErrorCode.EMPTY_NICKNAME);
-        assertNotEquals(testSignUpData, different);
+        assertNotEquals(TEST_NORMAL_SIGN_UP_DATA, different);
     }
 
     @Test
     @DisplayName("동일하고 다른 프로퍼티를 지닌 객체로 동등성 비교")
     void testEquals_givenDifferentProperty_willReturnFalse() {
         // given
-        SignUpData signUpData = SignUpData.create(testEmail.getEmail(), testPassword.getPassword(),
-                testNickname.getNickname(), testAgreedPrivacyPolicy.getVersion(),
-                testAgreedTermsOfUse.getVersion(), testAgreedAdReceiving.getVersion());
+        SignUpData signUpData = SignUpData.create(testEmail.getEmail(), TEST_NORMAL_PASSWORD.getValue(),
+                TEST_NORMAL_NICKNAME.getValue(), testAgreedPrivacyPolicy.getValue(),
+                testAgreedTermsOfUse.getValue(), testAgreedAdReceiving.getValue());
 
-        assertNotEquals(testNickname, signUpData);
+        assertNotEquals(TEST_NORMAL_NICKNAME, signUpData);
     }
 }

@@ -2,9 +2,9 @@ package kr.modusplant.domains.identity.normal.adapter.controller;
 
 import kr.modusplant.domains.identity.normal.domain.exception.DataAlreadyExistsException;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
-import kr.modusplant.domains.identity.normal.domain.vo.MemberId;
-import kr.modusplant.domains.identity.normal.domain.vo.Nickname;
-import kr.modusplant.domains.identity.normal.domain.vo.Password;
+import kr.modusplant.domains.identity.normal.domain.vo.NormalMemberId;
+import kr.modusplant.domains.identity.normal.domain.vo.NormalNickname;
+import kr.modusplant.domains.identity.normal.domain.vo.NormalPassword;
 import kr.modusplant.domains.identity.normal.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityCreateRepository;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityReadRepository;
@@ -37,7 +37,7 @@ public class NormalIdentityController {
     public void registerNormalMember(NormalSignUpRequest request) {
         if(readRepository.existsByEmail(Email.create(request.email()))) {
             throw new DataAlreadyExistsException(NormalIdentityErrorCode.ALREADY_EXISTS_MEMBER);
-        } else if(readRepository.existsByNickname(Nickname.create(request.nickname()))) {
+        } else if(readRepository.existsByNickname(NormalNickname.create(request.nickname()))) {
             throw new DataAlreadyExistsException(NormalIdentityErrorCode.ALREADY_EXISTS_NICKNAME);
         }  else {
             createRepository.save(mapper.toSignUpData(request));
@@ -48,23 +48,23 @@ public class NormalIdentityController {
         if(!readRepository.existsByEmail(Email.create(request.currentEmail()))) {
             throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER_AUTH);
         } else {
-            updateRepository.updateEmail(MemberId.create(memberActiveUuid), Email.create(request.newEmail()));
+            updateRepository.updateEmail(NormalMemberId.create(memberActiveUuid), Email.create(request.newEmail()));
         }
     }
 
     public void modifyPassword(UUID memberActiveUuid, PasswordModificationRequest request) {
-        if(!readRepository.existsByMemberId(MemberId.create(memberActiveUuid))) {
+        if(!readRepository.existsByMemberId(NormalMemberId.create(memberActiveUuid))) {
             throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER_AUTH);
-        } else if(!isPasswordsMatch(MemberId.create(memberActiveUuid), Password.create(request.currentPw()))) {
+        } else if(!isPasswordsMatch(NormalMemberId.create(memberActiveUuid), NormalPassword.create(request.currentPw()))) {
             throw new InvalidDataException(ErrorCode.INVALID_PASSWORD, request.currentPw());
         } else {
-            updateRepository.updatePassword(MemberId.create(memberActiveUuid), Password.create(request.newPw()));
+            updateRepository.updatePassword(NormalMemberId.create(memberActiveUuid), NormalPassword.create(request.newPw()));
         }
     }
 
-    private boolean isPasswordsMatch(MemberId memberActiveUuid, Password currentPassword) {
-        Password storedPw = Password.create(readRepository.getMemberPassword(memberActiveUuid));
+    private boolean isPasswordsMatch(NormalMemberId memberActiveUuid, NormalPassword currentNormalPassword) {
+        NormalPassword storedPw = NormalPassword.create(readRepository.getMemberPassword(memberActiveUuid));
 
-        return encoder.matches(currentPassword.getPassword(), storedPw.getPassword());
+        return encoder.matches(currentNormalPassword.getValue(), storedPw.getValue());
     }
 }

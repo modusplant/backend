@@ -1,10 +1,10 @@
 package kr.modusplant.domains.identity.normal.adapter.mapper;
 
-import kr.modusplant.domains.identity.normal.domain.vo.SignUpData;
-import kr.modusplant.domains.identity.normal.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.domains.identity.normal.common.util.domain.vo.CredentialsTestUtils;
 import kr.modusplant.domains.identity.normal.common.util.domain.vo.SignUpDataTestUtils;
 import kr.modusplant.domains.identity.normal.common.util.usecase.request.NormalSignUpRequestTestUtils;
+import kr.modusplant.domains.identity.normal.domain.vo.SignUpData;
+import kr.modusplant.domains.identity.normal.usecase.port.mapper.NormalIdentityMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,16 +26,16 @@ public class NormalIdentityMapperImplTest implements CredentialsTestUtils,
 
         // then
         assertThat(result.getCredentials().getEmail())
-                .isEqualTo(testSignUpData.getCredentials().getEmail());
-        assertThat(encoder.matches(testCredentials.getPassword().getPassword(),
-                result.getCredentials().getPassword().getPassword())).isTrue();
-        assertThat(result.getNickname().getNickname())
-                .isEqualTo(testSignUpData.getNickname().getNickname());
-        assertThat(result.getAgreedTermsOfUseVersion().getVersion())
-                .isEqualTo(testSignUpData.getAgreedTermsOfUseVersion().getVersion());
-        assertThat(result.getAgreedPrivacyPolicyVersion().getVersion())
-                .isEqualTo(testSignUpData.getAgreedPrivacyPolicyVersion().getVersion());
-        assertThat(result.getAgreedAdInfoReceivingVersion().getVersion())
-                .isEqualTo(testSignUpData.getAgreedAdInfoReceivingVersion().getVersion());
+                .isEqualTo(TEST_NORMAL_SIGN_UP_DATA.getCredentials().getEmail());
+        assertThat(encoder.matches(testCredentials.getPassword().getValue(),
+                result.getCredentials().getPassword().getValue())).isTrue();
+        assertThat(result.getNickname().getValue())
+                .isEqualTo(TEST_NORMAL_SIGN_UP_DATA.getNickname().getValue());
+        assertThat(result.getAgreedTermsOfUseVersion().getValue())
+                .isEqualTo(TEST_NORMAL_SIGN_UP_DATA.getAgreedTermsOfUseVersion().getValue());
+        assertThat(result.getAgreedPrivacyPolicyVersion().getValue())
+                .isEqualTo(TEST_NORMAL_SIGN_UP_DATA.getAgreedPrivacyPolicyVersion().getValue());
+        assertThat(result.getAgreedAdInfoReceivingVersion().getValue())
+                .isEqualTo(TEST_NORMAL_SIGN_UP_DATA.getAgreedAdInfoReceivingVersion().getValue());
     }
 }

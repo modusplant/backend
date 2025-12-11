@@ -30,7 +30,7 @@ public class CredentialsTest implements CredentialsTestUtils {
     public void testCreate_givenInvalidEmail_willThrowInvalidEmailException() {
         // given
         InvalidEmailException result = assertThrows(InvalidEmailException.class, () ->
-                Credentials.createWithString("email", testCredentials.getPassword().getPassword()));
+                Credentials.createWithString("email", testCredentials.getPassword().getValue()));
 
         // when & then
         assertEquals(ErrorCode.INVALID_EMAIL, result.getErrorCode());
