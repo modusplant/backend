@@ -46,6 +46,7 @@ public enum ErrorCode implements ResponseCode {
     // -- auth errors --
     CREDENTIAL_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "credential_not_authorized", "인증에 필요한 데이터가 없거나 유효하지 않습니다"),
     INTERNAL_AUTHENTICATION_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "internal_authentication_fail", "서버의 문제로 인증을 처리하지 못했습니다"),
+    PASSWORD_RESET_EMAIL_VERIFY_FAIL(HttpStatus.BAD_REQUEST, "password_reset_email_verify_fail","유효하지 않거나 만료된 링크입니다"),
 
     GOOGLE_LOGIN_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "google_login_fail", "구글 로그인 요청에 실패했습니다"),
     KAKAO_LOGIN_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "kakao_login_fail","카카오 로그인 요청에 실패했습니다");

@@ -127,7 +127,7 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
                 throw new NotSendableEmailException();
             }
         } catch (MailjetException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new NotSendableEmailException();
         }
         log.info("Mail Send Address : {}, Send Status : {} ", email, response.getStatus());
         return response;
