@@ -14,12 +14,10 @@ import kr.modusplant.domains.identity.normal.usecase.request.EmailValidationRequ
 import kr.modusplant.domains.identity.normal.usecase.request.InputValidationRequest;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -76,7 +74,7 @@ public class EmailAuthRestController {
     @PostMapping("/auth/reset-password-request/verify/email")
     public ResponseEntity<DataResponse<?>> verifyResetPasswordEmail(
             @Parameter(
-                    description = "비밀번호를 저장하려는 회원에 대해서 발송된 링크내 UUID",
+                    description = "비밀번호를 저장하려는 회원에 대해서 발송된 링크 안에 포함된 UUID",
                     schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
             @RequestParam @NotNull(message = "식별자가 비어 있습니다.") UUID uuid,
             HttpServletResponse httpResponse
