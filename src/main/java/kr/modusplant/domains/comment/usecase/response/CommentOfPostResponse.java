@@ -3,7 +3,7 @@ package kr.modusplant.domains.comment.usecase.response;
 import java.time.LocalDate;
 
 public record CommentOfPostResponse(
-        String profileImage,
+        String profileImagePath,
         String nickname,
         String path,
         String content,

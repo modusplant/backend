@@ -32,7 +32,7 @@ public class CommentJooqRepository implements CommentReadRepository {
     private final SiteMemberProf memberProf = SiteMemberProf.SITE_MEMBER_PROF;
 
     public List<CommentOfPostResponse> findByPost(PostId postId) {
-        return dsl.select(memberProf.IMAGE_PATH.as("profileImage"), siteMember.NICKNAME,
+        return dsl.select(memberProf.IMAGE_PATH.as("profileImagePath"), siteMember.NICKNAME,
                         commComment.PATH, commComment.CONTENT, commComment.LIKE_COUNT,
                         DSL.when(commentLike.MEMB_UUID.isNotNull(), true).as("isLiked"),
                         commComment.CREATED_AT, commComment.IS_DELETED)
