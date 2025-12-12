@@ -84,11 +84,11 @@ public class EmailIdentityTokenHelper {
         } catch (ExpiredJwtException e) {
             throw new TokenExpiredException();
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new InvalidTokenException();
         }
     }
 
-    public String generateResetPasswordAccessToken(String email, TokenScope scope) {
+    public String generateResetPasswordAccessToken(String email, String uuid, TokenScope scope) {
         // 만료 시간 설정 (5분 뒤)
         Date now = new Date();
         Date expirationDate = new Date(now.getTime() + 5 * 60 * 1000);
@@ -102,6 +102,7 @@ public class EmailIdentityTokenHelper {
                 .expiration(expirationDate)
                 .add(SCOPE, List.of(scope.getValue()))
                 .add("email", email)
+                .add("uuid", uuid)
                 .and()
                 .signWith(Keys.hmacShaKeyFor(MAIL_API_JWT_SECRET_KEY.getBytes()))
                 .compact();

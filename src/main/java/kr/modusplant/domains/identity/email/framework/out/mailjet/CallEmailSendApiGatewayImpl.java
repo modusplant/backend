@@ -52,7 +52,7 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
 
         switch (type) {
             case AUTHENTICATION_CODE_EMAIL: // 회원가입 인증 코드 메일 발송
-                templateId = 7541104;
+                templateId = 7559214;
                 subject = "[ModusPlant] 인증 코드를 포함하는 메일입니다.";
 
                 // 요청 생성
@@ -63,7 +63,7 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
                                                 new JSONObject()
                                                         .put(
                                                                 Emailv31.Message.FROM, new JSONObject()
-                                                                        .put("Email", "modusplant.master@gmail.com")
+                                                                        .put("Email", "support@modusplant.kr")
                                                                         .put("Name", "ModusPlant")
                                                         )
                                                         .put(
@@ -84,7 +84,7 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
                         );
                 break;
             case RESET_PASSWORD_EMAIL:
-                templateId = 7541296; // 비밀번호 재설정 메일 발송
+                templateId = 7559217; // 비밀번호 재설정 메일 발송
                 subject = "[ModusPlant] 비밀번호 재설정 전용 메일입니다.";
 
                 // 요청 생성
@@ -95,7 +95,7 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
                                                 new JSONObject()
                                                         .put(
                                                                 Emailv31.Message.FROM, new JSONObject()
-                                                                        .put("Email", "modusplant.master@gmail.com")
+                                                                        .put("Email", "support@modusplant.kr")
                                                                         .put("Name", "ModusPlant")
                                                         )
                                                         .put(
@@ -110,7 +110,7 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
                                                         .put(Emailv31.Message.SUBJECT, subject)
                                                         .put(Emailv31.Message.VARS, new JSONObject()
                                                                 .put("emailAddress", email)
-                                                                .put("resetUrl", String.format("https://app.modusplant.kr/api/auth/reset-password-request/verify/email?uuid=%s", varValue))
+                                                                .put("resetUrl", String.format("https://www.modusplant.kr/reset-password?uuid=%s", varValue))
                                                                 .put("expiredTime", expiredTime.format(formatter))
                                                         )
                                         )
@@ -127,7 +127,7 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
                 throw new NotSendableEmailException();
             }
         } catch (MailjetException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new NotSendableEmailException();
         }
         log.info("Mail Send Address : {}, Send Status : {} ", email, response.getStatus());
         return response;

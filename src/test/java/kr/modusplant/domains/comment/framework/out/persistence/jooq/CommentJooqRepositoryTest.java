@@ -21,7 +21,7 @@ import java.time.format.DateTimeFormatter;
 
 public class CommentJooqRepositoryTest implements
         PostIdTestUtils, AuthorTestUtils, CommentPathTestUtils,
-        NicknameTestUtils, CommentContentTestUtils {
+        CommentContentTestUtils {
 
     private Result<Record6<String, String, String, String, Boolean, LocalDateTime>> testResult;
 
@@ -52,7 +52,7 @@ public class CommentJooqRepositoryTest implements
 
         testRecord.value1(testPostId.getId());
         testRecord.value2(testCommentPath.getPath());
-        testRecord.value3(TEST_NORMAL_NICKNAME.getValue());
+//        testRecord.value3(testNickname.getNickname());
         testRecord.value4(testCommentContent.getContent());
         testRecord.value5(false);
         testRecord.value6(testDateTime);
