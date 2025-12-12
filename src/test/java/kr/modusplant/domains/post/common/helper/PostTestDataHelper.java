@@ -1,8 +1,8 @@
 package kr.modusplant.domains.post.common.helper;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
+import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.jooq.tables.records.*;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.generator.EventType;

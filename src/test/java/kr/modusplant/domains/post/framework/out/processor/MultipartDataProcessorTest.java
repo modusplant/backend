@@ -18,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.*;
@@ -62,31 +61,31 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
         assertThat(result.size()).isEqualTo(allMediaFiles.size());
 
         JsonNode textNode = result.get(0);
-        assertThat(textNode.get(ORDER).asInt()).isEqualTo(1);
+        assertThat(textNode.get(ORDER).asInt()).isEqualTo(0);
         assertThat(textNode.get(TYPE).asText()).isEqualTo(FileType.TEXT.getValue());
         assertThat(textNode.get(FILENAME).asText()).isEqualTo(textFile0.getOriginalFilename());
         assertThat(textNode.get(DATA).asText()).isEqualTo(new String(textFile0.getBytes(), StandardCharsets.UTF_8));
 
         JsonNode imageNode = result.get(1);
-        assertThat(imageNode.get(ORDER).asInt()).isEqualTo(2);
+        assertThat(imageNode.get(ORDER).asInt()).isEqualTo(1);
         assertThat(imageNode.get(TYPE).asText()).isEqualTo(FileType.IMAGE.getValue());
         assertThat(imageNode.get(FILENAME).asText()).isEqualTo(imageFile.getOriginalFilename());
         assertThat(imageNode.get(SRC).asText()).matches(regex+FileType.IMAGE.getValue()+"/.*");
 
         JsonNode videoNode = result.get(2);
-        assertThat(videoNode.get(ORDER).asInt()).isEqualTo(3);
+        assertThat(videoNode.get(ORDER).asInt()).isEqualTo(2);
         assertThat(videoNode.get(TYPE).asText()).isEqualTo(FileType.VIDEO.getValue());
         assertThat(videoNode.get(FILENAME).asText()).isEqualTo(videoFile.getOriginalFilename());
         assertThat(videoNode.get(SRC).asText()).matches(regex+FileType.VIDEO.getValue()+"/.*");
 
         JsonNode audioNode = result.get(3);
-        assertThat(audioNode.get(ORDER).asInt()).isEqualTo(4);
+        assertThat(audioNode.get(ORDER).asInt()).isEqualTo(3);
         assertThat(audioNode.get(TYPE).asText()).isEqualTo(FileType.AUDIO.getValue());
         assertThat(audioNode.get(FILENAME).asText()).isEqualTo(audioFile.getOriginalFilename());
         assertThat(audioNode.get(SRC).asText()).matches(regex+FileType.AUDIO.getValue()+"/.*");
 
         JsonNode fileNode = result.get(4);
-        assertThat(fileNode.get(ORDER).asInt()).isEqualTo(5);
+        assertThat(fileNode.get(ORDER).asInt()).isEqualTo(4);
         assertThat(fileNode.get(TYPE).asText()).isEqualTo(FileType.FILE.getValue());
         assertThat(fileNode.get(FILENAME).asText()).isEqualTo(applicationFile.getOriginalFilename());
         assertThat(fileNode.get(SRC).asText()).matches(regex+FileType.FILE.getValue()+"/.*");

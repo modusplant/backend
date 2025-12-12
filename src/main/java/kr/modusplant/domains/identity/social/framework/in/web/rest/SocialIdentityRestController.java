@@ -1,5 +1,6 @@
 package kr.modusplant.domains.identity.social.framework.in.web.rest;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
+@Hidden
 @Tag(name = "소셜 로그인 API", description = "소셜 로그인을 다루는 API입니다.")
 @RestController
 @RequestMapping("/api/auth")
@@ -37,7 +40,7 @@ public class SocialIdentityRestController {
     public ResponseEntity<DataResponse<?>> kakaoSocialLogin(@RequestBody @Valid SocialLoginRequest request) {
         UserPayload member = socialIdentityController.handleSocialLogin(AuthProvider.KAKAO, request.getCode());
 
-        TokenPair tokenPair = tokenService.issueToken(member.getMemberId().getValue(), member.getNickname().getNickname(), member.getRole());
+        TokenPair tokenPair = tokenService.issueToken(member.getMemberId().getValue(), member.getNickname().getNickname(), member.getEmail().getEmail(), member.getRole());
 
         TokenResponse token = new TokenResponse(tokenPair.accessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(token);
@@ -51,7 +54,7 @@ public class SocialIdentityRestController {
     public ResponseEntity<DataResponse<?>> googleSocialLogin(@RequestBody @Valid SocialLoginRequest request) {
         UserPayload member = socialIdentityController.handleSocialLogin(AuthProvider.GOOGLE, request.getCode());
 
-        TokenPair tokenPair = tokenService.issueToken(member.getMemberId().getValue(), member.getNickname().getNickname(), member.getRole());
+        TokenPair tokenPair = tokenService.issueToken(member.getMemberId().getValue(), member.getNickname().getNickname(), member.getEmail().getEmail(), member.getRole());
 
         TokenResponse token = new TokenResponse(tokenPair.accessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(token);
