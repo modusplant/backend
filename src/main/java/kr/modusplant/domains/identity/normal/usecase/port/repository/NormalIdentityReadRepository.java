@@ -1,21 +1,16 @@
 package kr.modusplant.domains.identity.normal.usecase.port.repository;
 
-import kr.modusplant.domains.identity.normal.domain.vo.MemberId;
-import kr.modusplant.domains.identity.normal.domain.vo.Nickname;
-import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.domains.identity.normal.domain.vo.NormalMemberId;
+import kr.modusplant.domains.identity.normal.domain.vo.NormalNickname;
 import kr.modusplant.shared.kernel.Email;
-
-import java.util.UUID;
 
 public interface NormalIdentityReadRepository {
 
-    String getMemberPassword(MemberId memberId);
+    String getMemberPassword(NormalMemberId normalMemberId);
 
-    UUID getMemberId(Email email, AuthProvider provider);
+    boolean existsByMemberId(NormalMemberId normalMemberId);
 
-    boolean existsByMemberId(MemberId memberId);
+    boolean existsByEmail(Email email);
 
-    boolean existsByEmailAndProvider(Email email);
-
-    boolean existsByNickname(Nickname nickname);
+    boolean existsByNickname(NormalNickname normalNickname);
 }

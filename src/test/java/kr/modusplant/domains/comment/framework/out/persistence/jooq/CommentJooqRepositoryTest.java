@@ -4,6 +4,7 @@ import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentContentTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentPathTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
+import kr.modusplant.domains.identity.normal.common.util.domain.vo.NicknameTestUtils;
 import org.jooq.DSLContext;
 import org.jooq.Record6;
 import org.jooq.Result;
