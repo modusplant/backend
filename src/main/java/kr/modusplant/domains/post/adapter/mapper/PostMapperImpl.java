@@ -2,6 +2,7 @@ package kr.modusplant.domains.post.adapter.mapper;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
+import kr.modusplant.domains.post.usecase.record.PostDetailDataReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
@@ -34,6 +35,28 @@ public class PostMapperImpl implements PostMapper {
                 postDetailReadModel.updatedAt(),
                 postDetailReadModel.isLiked(),
                 postDetailReadModel.isBookmarked()
+        );
+    }
+
+    @Override
+    public PostDetailResponse toPostDetailResponse(PostDetailDataReadModel postDetailDataReadModel, JsonNode content) {
+        return new PostDetailResponse(
+                postDetailDataReadModel.ulid(),
+                postDetailDataReadModel.primaryCategoryUuid(),
+                postDetailDataReadModel.primaryCategory(),
+                postDetailDataReadModel.secondaryCategoryUuid(),
+                postDetailDataReadModel.secondaryCategory(),
+                postDetailDataReadModel.authorUuid(),
+                postDetailDataReadModel.nickname(),
+                null,
+                null,
+                postDetailDataReadModel.title(),
+                postDetailDataReadModel.content(),
+                postDetailDataReadModel.isPublished(),
+                postDetailDataReadModel.publishedAt(),
+                postDetailDataReadModel.updatedAt(),
+                null,
+                null
         );
     }
 
