@@ -194,7 +194,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         if (keyword == null || keyword.trim().isEmpty()) {
             return noCondition();
         }
-        String searchKeyword = "%"+keyword+"%";
+        String searchKeyword = "%"+escapeWildcards(keyword)+"%";
         Condition titleCondition = COMM_POST.TITLE.likeIgnoreCase(searchKeyword);
         Name alias = name("c");
         Condition contentCondition = exists(
@@ -206,6 +206,13 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         )
         );
         return titleCondition.or(contentCondition);
+    }
+
+    private String escapeWildcards(String input) {
+        return input
+                .replace("\\", "\\\\")
+                .replace("%", "\\%")
+                .replace("_", "\\_");
     }
 
     private Condition buildCursorCondition(String cursorUlid) {
