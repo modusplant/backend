@@ -18,4 +18,6 @@ public interface CommPostBookmarkJpaRepository extends JpaRepository<CommPostBoo
     boolean existsByPostIdAndMemberId(String postId, UUID memberId);
 
     void deleteByPostIdAndMemberId(String postId, UUID memberId);
+
+    void deleteByPostId(String postId);
 }

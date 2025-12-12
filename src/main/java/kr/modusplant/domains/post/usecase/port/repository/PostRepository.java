@@ -19,4 +19,10 @@ public interface PostRepository {
 
     int updateViewCount(PostId postId, Long viewCount);
 
+    void deletePostLikeByPostId(PostId postId);
+
+    void deletePostBookmarkByPostId(PostId postId);
+
+    void deletePostRecentlyViewRecordByPostId(PostId postId);
+
 }

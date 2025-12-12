@@ -124,6 +124,9 @@ public class PostController {
         }
         if (post.getStatus().isPublished()) {
             postArchiveRepository.save(PostId.create(ulid));
+            postRepository.deletePostLikeByPostId(post.getPostId());
+            postRepository.deletePostBookmarkByPostId(post.getPostId());
+            postRepository.deletePostRecentlyViewRecordByPostId(post.getPostId());
         }
         multipartDataProcessorPort.deleteFiles(post.getPostContent().getContent());
         postRepository.delete(post);
