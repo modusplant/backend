@@ -40,7 +40,7 @@ public class SocialIdentityRestController {
     public ResponseEntity<DataResponse<?>> kakaoSocialLogin(@RequestBody @Valid SocialLoginRequest request) {
         UserPayload member = socialIdentityController.handleSocialLogin(AuthProvider.KAKAO, request.getCode());
 
-        TokenPair tokenPair = tokenService.issueToken(member.getMemberId().getValue(), member.getNickname().getNickname(), member.getEmail().getEmail(), member.getRole());
+        TokenPair tokenPair = tokenService.issueToken(member.getMemberId().getValue(), member.getNickname().getNickname(), member.getEmail().getValue(), member.getRole());
 
         TokenResponse token = new TokenResponse(tokenPair.accessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(token);
@@ -54,7 +54,7 @@ public class SocialIdentityRestController {
     public ResponseEntity<DataResponse<?>> googleSocialLogin(@RequestBody @Valid SocialLoginRequest request) {
         UserPayload member = socialIdentityController.handleSocialLogin(AuthProvider.GOOGLE, request.getCode());
 
-        TokenPair tokenPair = tokenService.issueToken(member.getMemberId().getValue(), member.getNickname().getNickname(), member.getEmail().getEmail(), member.getRole());
+        TokenPair tokenPair = tokenService.issueToken(member.getMemberId().getValue(), member.getNickname().getNickname(), member.getEmail().getValue(), member.getRole());
 
         TokenResponse token = new TokenResponse(tokenPair.accessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(token);

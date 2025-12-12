@@ -3,16 +3,17 @@ package kr.modusplant.domains.member.domain.aggregate;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberBirthDateException;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberIdException;
-import kr.modusplant.domains.member.domain.exception.EmptyMemberNicknameException;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberStatusException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.domain.vo.MemberId;
+import kr.modusplant.shared.exception.EmptyNicknameException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberBirthDateTestUtils.testMemberBirthDate;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
-import static kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils.testMemberNickname;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils.TEST_NICKNAME;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,28 +24,28 @@ class MemberTest implements MemberTestUtils {
     void testCreate_givenNullToOneOfFourParameters_willThrowException() {
         // MemberId가 null일 때
         // given
-        EmptyMemberIdException memberIdException = assertThrows(EmptyMemberIdException.class, () -> Member.create(null, testMemberActiveStatus, testMemberNickname, testMemberBirthDate));
+        EmptyMemberIdException memberIdException = assertThrows(EmptyMemberIdException.class, () -> Member.create(null, testMemberActiveStatus, TEST_NICKNAME, testMemberBirthDate));
 
         // when & then
         assertThat(memberIdException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_ID);
 
         // MemberStatus가 null일 때
         // given
-        EmptyMemberStatusException memberStatusException = assertThrows(EmptyMemberStatusException.class, () -> Member.create(testMemberId, null, testMemberNickname, testMemberBirthDate));
+        EmptyMemberStatusException memberStatusException = assertThrows(EmptyMemberStatusException.class, () -> Member.create(testMemberId, null, TEST_NICKNAME, testMemberBirthDate));
 
         // when & then
         assertThat(memberStatusException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_STATUS);
 
         // MemberNickname이 null일 때
         // given
-        EmptyMemberNicknameException memberNicknameException = assertThrows(EmptyMemberNicknameException.class, () -> Member.create(testMemberId, testMemberActiveStatus, null, testMemberBirthDate));
+        EmptyNicknameException nicknameException = assertThrows(EmptyNicknameException.class, () -> Member.create(testMemberId, testMemberActiveStatus, null, testMemberBirthDate));
 
         // when & then
-        assertThat(memberNicknameException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_NICKNAME);
+        assertThat(nicknameException.getErrorCode()).isEqualTo(ErrorCode.NICKNAME_EMPTY);
 
         // MemberBirthDate가 null일 때
         // given
-        EmptyMemberBirthDateException memberBirthDateException = assertThrows(EmptyMemberBirthDateException.class, () -> Member.create(testMemberId, testMemberActiveStatus, testMemberNickname, null));
+        EmptyMemberBirthDateException memberBirthDateException = assertThrows(EmptyMemberBirthDateException.class, () -> Member.create(testMemberId, testMemberActiveStatus, TEST_NICKNAME, null));
 
         // when & then
         assertThat(memberBirthDateException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_BIRTH_DATE);
@@ -72,6 +73,6 @@ class MemberTest implements MemberTestUtils {
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
     void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
         Member member = createMember();
-        assertNotEquals(member, Member.create(MemberId.generate(), testMemberActiveStatus, testMemberNickname, testMemberBirthDate));
+        assertNotEquals(member, Member.create(MemberId.generate(), testMemberActiveStatus, TEST_NICKNAME, testMemberBirthDate));
     }
 }

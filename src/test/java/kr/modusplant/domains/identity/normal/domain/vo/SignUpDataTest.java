@@ -61,7 +61,7 @@ public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, Pass
     @DisplayName("동일하고 다른 프로퍼티를 지닌 객체로 동등성 비교")
     void testEquals_givenDifferentProperty_willReturnFalse() {
         // given
-        SignUpData signUpData = SignUpData.create(testEmail.getEmail(), TEST_NORMAL_PASSWORD.getValue(),
+        SignUpData signUpData = SignUpData.create(testEmail.getValue(), TEST_NORMAL_PASSWORD.getValue(),
                 TEST_NORMAL_NICKNAME.getValue(), testAgreedPrivacyPolicy.getValue(),
                 testAgreedTermsOfUse.getValue(), testAgreedAdReceiving.getValue());
 

@@ -9,7 +9,7 @@ import kr.modusplant.domains.identity.normal.usecase.request.NormalSignUpRequest
 public interface NormalSignUpRequestTestUtils extends AgreedTermsOfVersionTestUtils, EmailTestUtils,
         PasswordTestUtils, NicknameTestUtils {
     NormalSignUpRequest testNormalSignUpRequest = new NormalSignUpRequest(
-            testEmail.getEmail(), TEST_NORMAL_PASSWORD.getValue(), TEST_NORMAL_NICKNAME.getValue(),
+            testEmail.getValue(), TEST_NORMAL_PASSWORD.getValue(), TEST_NORMAL_NICKNAME.getValue(),
             testAgreedTermsOfUse.getValue(), testAgreedPrivacyPolicy.getValue(), testAgreedAdReceiving.getValue()
     );
 }

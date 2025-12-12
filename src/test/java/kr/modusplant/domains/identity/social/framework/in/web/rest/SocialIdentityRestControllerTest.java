@@ -66,7 +66,7 @@ class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, U
         given(tokenService.issueToken(
                 eq(testSocialKakaoUserPayload.getMemberId().getValue()),
                 eq(testSocialKakaoUserPayload.getNickname().getNickname()),
-                eq(testSocialKakaoUserPayload.getEmail().getEmail()),
+                eq(testSocialKakaoUserPayload.getEmail().getValue()),
                 eq(testSocialKakaoUserPayload.getRole())
         )).willReturn(mockTokenPair);
 
@@ -92,7 +92,7 @@ class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, U
         given(tokenService.issueToken(
                 eq(testSocialGoogleUserPayload.getMemberId().getValue()),
                 eq(testSocialGoogleUserPayload.getNickname().getNickname()),
-                eq(testSocialGoogleUserPayload.getEmail().getEmail()),
+                eq(testSocialGoogleUserPayload.getEmail().getValue()),
                 eq(testSocialGoogleUserPayload.getRole())
         )).willReturn(mockTokenPair);
 

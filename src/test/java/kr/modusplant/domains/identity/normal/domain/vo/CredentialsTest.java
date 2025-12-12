@@ -41,7 +41,7 @@ public class CredentialsTest implements CredentialsTestUtils {
     public void testCreate_givenInvalidPassword_willThrowInvalidValueException() {
         // given
         InvalidValueException result = assertThrows(InvalidValueException.class, () ->
-                Credentials.createWithString(testCredentials.getEmail().getEmail(), "282933"));
+                Credentials.createWithString(testCredentials.getEmail().getValue(), "282933"));
 
         // when & then
         assertEquals(NormalIdentityErrorCode.INVALID_PASSWORD, result.getErrorCode());

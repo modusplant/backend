@@ -11,7 +11,7 @@ public interface CommentResponseTestUtils extends
         MemberNicknameTestUtils, CommentContentTestUtils, CommentReadModelTestUtils{
 
     CommentResponse testCommentResponse = new CommentResponse(
-            testPostId.getId(), testCommentPath.getPath(), testMemberNickname.getValue(),
+            testPostId.getId(), testCommentPath.getPath(), TEST_NICKNAME.getValue(),
             testCommentContent.getContent(), false, testCommentReadModel.createdAt()
     );
 }

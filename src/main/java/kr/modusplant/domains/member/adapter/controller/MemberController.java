@@ -23,6 +23,7 @@ import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.*;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
+import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -49,14 +50,14 @@ public class MemberController {
     private final EventBus eventBus;
 
     public MemberResponse register(MemberRegisterRequest request) {
-        MemberNickname memberNickname = MemberNickname.create(request.nickname());
-        validateBeforeRegister(memberNickname);
-        return memberMapper.toMemberResponse(memberRepository.save(memberNickname));
+        Nickname nickname = Nickname.create(request.nickname());
+        validateBeforeRegister(nickname);
+        return memberMapper.toMemberResponse(memberRepository.save(nickname));
     }
 
     public boolean checkExistedNickname(MemberNicknameCheckRecord record) {
-        MemberNickname memberNickname = MemberNickname.create(record.nickname());
-        return memberRepository.isNicknameExist(memberNickname);
+        Nickname nickname = Nickname.create(record.nickname());
+        return memberRepository.isNicknameExist(nickname);
     }
 
     public MemberProfileResponse getProfile(MemberProfileGetRecord record) throws IOException {
@@ -69,14 +70,14 @@ public class MemberController {
         if (optionalMemberProfile.isPresent()) {
             return memberProfileMapper.toMemberProfileResponse(optionalMemberProfile.orElseThrow());
         } else {
-            return new MemberProfileResponse(memberId.getValue(), null, null, optionalMember.orElseThrow().getMemberNickname().getValue());
+            return new MemberProfileResponse(memberId.getValue(), null, null, optionalMember.orElseThrow().getNickname().getValue());
         }
     }
 
     public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
-        MemberNickname memberNickname = MemberNickname.create(record.nickname());
-        validateBeforeOverrideProfile(memberId, memberNickname);
+        Nickname nickname = Nickname.create(record.nickname());
+        validateBeforeOverrideProfile(memberId, nickname);
         MemberProfile memberProfile;
         MemberProfileImage memberProfileImage;
         MemberProfileIntroduction memberProfileIntroduction;
@@ -106,7 +107,7 @@ public class MemberController {
         } else {
             memberProfileIntroduction = MemberEmptyProfileIntroduction.create();
         }
-        memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
+        memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, nickname);
         return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.addOrUpdate(memberProfile));
     }
 
@@ -164,19 +165,19 @@ public class MemberController {
         }
     }
 
-    private void validateBeforeRegister(MemberNickname memberNickname) {
-        if (memberRepository.isNicknameExist(memberNickname)) {
-            throw new EntityExistsException(ALREADY_EXISTED_NICKNAME, "memberNickname");
+    private void validateBeforeRegister(Nickname nickname) {
+        if (memberRepository.isNicknameExist(nickname)) {
+            throw new EntityExistsException(ALREADY_EXISTED_NICKNAME, "nickname");
         }
     }
 
-    private void validateBeforeOverrideProfile(MemberId memberId, MemberNickname memberNickname) {
+    private void validateBeforeOverrideProfile(MemberId memberId, Nickname nickname) {
         if (!memberRepository.isIdExist(memberId)) {
             throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
         }
-        Optional<Member> emptyOrMember = memberRepository.getByNickname(memberNickname);
+        Optional<Member> emptyOrMember = memberRepository.getByNickname(nickname);
         if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
-            throw new EntityExistsException(ALREADY_EXISTED_NICKNAME, "memberNickname");
+            throw new EntityExistsException(ALREADY_EXISTED_NICKNAME, "nickname");
         }
     }
 

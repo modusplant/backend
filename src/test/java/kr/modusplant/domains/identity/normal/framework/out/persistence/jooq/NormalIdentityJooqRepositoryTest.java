@@ -41,7 +41,7 @@ public class NormalIdentityJooqRepositoryTest implements
         MockDataProvider provider = ctx -> {
             Object[] bindings = ctx.bindings();
 
-            if (bindings[0].equals(testEmail.getEmail()) && bindings[1].equals(TEST_NORMAL_MEMBER_ID.getValue())) {
+            if (bindings[0].equals(testEmail.getValue()) && bindings[1].equals(TEST_NORMAL_MEMBER_ID.getValue())) {
                 return new MockResult[] {
                         new MockResult(1, null)
                 };
@@ -153,7 +153,7 @@ public class NormalIdentityJooqRepositoryTest implements
             Result<Record1<Integer>> result = dsl.newResult(DSL.inline(1));
             result.add(dsl.newRecord(DSL.inline(1)).values(1));
 
-            if (bindings[0].equals(testEmail.getEmail())) {
+            if (bindings[0].equals(testEmail.getValue())) {
                 return new MockResult[] {
                         new MockResult(0, result)
                 };

@@ -27,7 +27,7 @@ public class NormalIdentityJooqRepository implements
     @Override
     public int updateEmail(NormalMemberId normalMemberId, Email newEmail) {
         return dsl.update(memberAuth)
-                .set(memberAuth.EMAIL, newEmail.getEmail())
+                .set(memberAuth.EMAIL, newEmail.getValue())
                 .where(memberAuth.ACT_MEMB_UUID.eq(normalMemberId.getValue()))
                 .and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
                 .execute();
@@ -64,7 +64,7 @@ public class NormalIdentityJooqRepository implements
         return dsl.fetchExists(
                 dsl.selectOne()
                         .from(memberAuth)
-                        .where(memberAuth.EMAIL.eq(email.getEmail())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
+                        .where(memberAuth.EMAIL.eq(email.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
         );
     }
 

@@ -1,7 +1,5 @@
 package kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper;
 
-import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.NormalIdentityRoleJpaMapper;
-import kr.modusplant.domains.identity.normal.framework.out.persistence.jpa.mapper.NormalIdentityRoleJpaMapperImpl;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
 import kr.modusplant.infrastructure.security.enums.Role;

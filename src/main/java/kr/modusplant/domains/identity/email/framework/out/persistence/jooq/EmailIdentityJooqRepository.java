@@ -22,7 +22,7 @@ public class EmailIdentityJooqRepository implements EmailIdentityRepository {
     public boolean existsByEmailAndProvider(Email email) {
         return dsl.selectOne()
                 .from(memberAuth)
-                .where(memberAuth.EMAIL.eq(email.getEmail())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
+                .where(memberAuth.EMAIL.eq(email.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
                 .fetch()
                 .isNotEmpty();
     }
@@ -31,7 +31,7 @@ public class EmailIdentityJooqRepository implements EmailIdentityRepository {
     public int updatePassword(Email email, Password pw) {
         return dsl.update(memberAuth)
                 .set(memberAuth.PW, passwordEncoder.encode(pw.getPassword()))
-                .where(memberAuth.EMAIL.eq(email.getEmail()))
+                .where(memberAuth.EMAIL.eq(email.getValue()))
                 .and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
                 .execute();
     }

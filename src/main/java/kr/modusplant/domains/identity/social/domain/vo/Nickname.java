@@ -28,9 +28,9 @@ public class Nickname {
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof Nickname nickname)) return false;
+        if (!(o instanceof Nickname)) return false;
 
-        return new EqualsBuilder().append(getNickname(), nickname.getNickname()).isEquals();
+        return new EqualsBuilder().append(getNickname(), ((Nickname) o).getNickname()).isEquals();
     }
 
     @Override

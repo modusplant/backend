@@ -30,7 +30,7 @@ public class SocialIdentityJpaMapperImpl implements SocialIdentityJpaMapper {
         return SiteMemberAuthEntity.builder()
                 .activeMember(memberEntity)
                 .originalMember(memberEntity)
-                .email(profile.getEmail().getEmail())
+                .email(profile.getEmail().getValue())
                 .provider(profile.getSocialCredentials().getProvider())
                 .providerId(profile.getSocialCredentials().getProviderId())
                 .build();

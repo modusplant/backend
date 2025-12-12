@@ -1,6 +1,6 @@
-package kr.modusplant.domains.member.domain.vo;
+package kr.modusplant.shared.kernel;
 
-import kr.modusplant.domains.member.domain.exception.EmptyMemberNicknameException;
+import kr.modusplant.shared.exception.EmptyNicknameException;
 import kr.modusplant.shared.exception.InvalidDataException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.AccessLevel;
@@ -13,16 +13,16 @@ import static kr.modusplant.shared.constant.Regex.PATTERN_NICKNAME;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class MemberNickname {
+public class Nickname {
     private final String value;
 
-    public static MemberNickname create(String value) {
+    public static Nickname create(String value) {
         if (value == null || value.trim().isEmpty()) {
-            throw new EmptyMemberNicknameException();
+            throw new EmptyNicknameException();
         } else if (!PATTERN_NICKNAME.matcher(value).matches()) {
-            throw new InvalidDataException(ErrorCode.INVALID_INPUT, "memberNickname");
+            throw new InvalidDataException(ErrorCode.INVALID_INPUT, "nickname");
         }
-        return new MemberNickname(value);
+        return new Nickname(value);
     }
 
     public boolean isEmpty() {
@@ -33,9 +33,9 @@ public class MemberNickname {
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof MemberNickname memberNickname)) return false;
+        if (!(o instanceof Nickname nickname)) return false;
 
-        return new EqualsBuilder().append(getValue(), memberNickname.getValue()).isEquals();
+        return new EqualsBuilder().append(getValue(), nickname.getValue()).isEquals();
     }
 
     @Override

@@ -17,7 +17,7 @@ class EmailTest implements EmailTestUtils {
     @DisplayName("Email 문자열로 Email 생성하기")
     void testCreate_givenValidEmailString_willReturnEmailVo() {
         assertNotNull(testKakaoUserEmail);
-        assertThat(testKakaoUserEmail.getEmail()).isEqualTo(MEMBER_AUTH_KAKAO_USER_EMAIL);
+        assertThat(testKakaoUserEmail.getValue()).isEqualTo(MEMBER_AUTH_KAKAO_USER_EMAIL);
     }
 
     @Test

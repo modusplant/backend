@@ -37,7 +37,7 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialUs
         // given
         SiteMemberEntity memberEntity = createKakaoMemberEntityWithUuid();
         String providerId = testKakaoSocialUserProfile.getSocialCredentials().getProviderId();
-        String email = testKakaoSocialUserProfile.getEmail().getEmail();
+        String email = testKakaoSocialUserProfile.getEmail().getValue();
 
         // when
         SiteMemberAuthEntity result = socialIdentityJpaMapper.toMemberAuthEntity(memberEntity, testKakaoSocialUserProfile);
@@ -75,7 +75,7 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialUs
         SiteMemberAuthEntity memberAuthEntity = SiteMemberAuthEntity.builder()
                 .activeMember(memberEntity)
                 .originalMember(memberEntity)
-                .email(testKakaoUserEmail.getEmail())
+                .email(testKakaoUserEmail.getValue())
                 .build();
         SiteMemberRoleEntity memberRoleEntity = SiteMemberRoleEntity.builder()
                 .member(memberEntity)
@@ -89,7 +89,7 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialUs
         assertNotNull(result);
         assertEquals(memberEntity.getUuid(), result.getMemberId().getValue());
         assertEquals(memberEntity.getNickname(), result.getNickname().getNickname());
-        assertEquals(memberAuthEntity.getEmail(), result.getEmail().getEmail());
+        assertEquals(memberAuthEntity.getEmail(), result.getEmail().getValue());
         assertEquals(Role.USER, result.getRole());
     }
 
@@ -107,7 +107,7 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialUs
         assertNotNull(result);
         assertEquals(memberEntity.getUuid(), result.getMemberId().getValue());
         assertEquals(testSocialKakaoNickname.getNickname(), result.getNickname().getNickname());
-        assertEquals(testKakaoUserEmail.getEmail(), result.getEmail().getEmail());
+        assertEquals(testKakaoUserEmail.getValue(), result.getEmail().getValue());
         assertEquals(Role.USER, result.getRole());
     }
 

@@ -10,6 +10,6 @@ import org.mapstruct.Mapping;
 public interface NormalIdentityJpaMapper {
 
     @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "nickname", source = "memberNickname.value")
-    SiteMemberEntity toSiteMemberEntity(NormalNickname memberNickname);
+    @Mapping(target = "nickname", source = "nickname.value")
+    SiteMemberEntity toSiteMemberEntity(NormalNickname nickname);
 }

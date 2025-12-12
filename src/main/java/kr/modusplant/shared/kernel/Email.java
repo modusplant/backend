@@ -12,7 +12,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Email {
-    private final String email;
+    private final String value;
 
     public static Email create(String email) {
         if (email == null || email.isBlank()) {
@@ -30,11 +30,11 @@ public class Email {
 
         if (!(o instanceof Email)) return false;
 
-        return new EqualsBuilder().append(getEmail(), ((Email) o).getEmail()).isEquals();
+        return new EqualsBuilder().append(getValue(), ((Email) o).getValue()).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(getEmail()).toHashCode();
+        return new HashCodeBuilder(17, 37).append(getValue()).toHashCode();
     }
 }

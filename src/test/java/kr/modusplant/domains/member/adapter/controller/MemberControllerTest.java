@@ -40,7 +40,7 @@ import java.util.UUID;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberBirthDateTestUtils.testMemberBirthDate;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
-import static kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils.testMemberNickname;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils.TEST_NICKNAME;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils.testMemberProfileIntroduction;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD;
@@ -194,7 +194,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
                         testMemberId,
                         MemberEmptyProfileImage.create(),
                         testMemberProfileIntroduction,
-                        testMemberNickname))
+                        TEST_NICKNAME))
         );
         willDoNothing().given(s3FileService).deleteFiles(any());
         willDoNothing().given(s3FileService).uploadFile(any(), any());
@@ -214,7 +214,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     @DisplayName("존재하는 않는 데이터로 overrideProfile로 프로필 덮어쓰기")
     void testOverrideProfile_givenNotFoundData_willReturnResponse() throws IOException {
         // given
-        MemberProfile memberProfile = MemberProfile.create(testMemberId, MemberEmptyProfileImage.create(), MemberEmptyProfileIntroduction.create(), testMemberNickname);
+        MemberProfile memberProfile = MemberProfile.create(testMemberId, MemberEmptyProfileImage.create(), MemberEmptyProfileIntroduction.create(), TEST_NICKNAME);
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(memberProfileRepository.getById(any())).willReturn(Optional.empty());
@@ -248,7 +248,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     void testValidateBeforeOverrideProfile_givenAlreadyExistedNickname_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
-        given(memberRepository.getByNickname(any())).willReturn(Optional.of(Member.create(MemberId.generate(), testMemberActiveStatus, testMemberNickname, testMemberBirthDate)));
+        given(memberRepository.getByNickname(any())).willReturn(Optional.of(Member.create(MemberId.generate(), testMemberActiveStatus, TEST_NICKNAME, testMemberBirthDate)));
 
         // when & then
         EntityExistsException alreadyExistedNicknameException = assertThrows(
