@@ -7,6 +7,7 @@ import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
 import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostJpaRepository;
+import kr.modusplant.domains.post.framework.out.redis.PostRecentlyViewRedisRepository;
 import kr.modusplant.domains.post.framework.out.redis.PostViewCountRedisRepository;
 import kr.modusplant.framework.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.jpa.entity.CommPrimaryCategoryEntity;
@@ -15,9 +16,7 @@ import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.entity.common.util.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.jpa.repository.CommPrimaryCategoryJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommSecondaryCategoryJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -38,8 +37,11 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
     private final CommPrimaryCategoryJpaRepository primaryCategoryJpaRepository = Mockito.mock(CommPrimaryCategoryJpaRepository.class);
     private final CommSecondaryCategoryJpaRepository secondaryCategoryJpaRepository = Mockito.mock(CommSecondaryCategoryJpaRepository.class);
     private final PostViewCountRedisRepository postViewCountRedisRepository = Mockito.mock(PostViewCountRedisRepository.class);
+    private final CommPostLikeJpaRepository postLikeJpaRepository = Mockito.mock(CommPostLikeJpaRepository.class);
+    private final CommPostBookmarkJpaRepository postBookmarkJpaRepository = Mockito.mock(CommPostBookmarkJpaRepository.class);
+    private final PostRecentlyViewRedisRepository postRecentlyViewRedisRepository = Mockito.mock(PostRecentlyViewRedisRepository.class);
     private final PostRepositoryJpaAdapter postRepositoryJpaAdapter = new PostRepositoryJpaAdapter(
-            postJpaMapper, postJpaRepository, authorJpaRepository, primaryCategoryJpaRepository, secondaryCategoryJpaRepository, postViewCountRedisRepository
+            postJpaMapper, postJpaRepository, authorJpaRepository, primaryCategoryJpaRepository, secondaryCategoryJpaRepository, postViewCountRedisRepository,postLikeJpaRepository,postBookmarkJpaRepository,postRecentlyViewRedisRepository
     );
 
     @Test
@@ -164,6 +166,45 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
         // then
         assertThat(result).isEqualTo(expectedAffectedRows);
         verify(postJpaRepository).updateViewCount(testPostId.getValue(), newViewCount);
+    }
+
+    @Test
+    @DisplayName("게시글 id로 게시글 좋아요 삭제하기")
+    void testDeletePostLikeByPostId_givenPostId_willDeletePostLike() {
+        // given
+        Post post = createPublishedPost();
+
+        // when
+        postRepositoryJpaAdapter.deletePostLikeByPostId(post.getPostId());
+
+        // then
+        verify(postLikeJpaRepository).deleteByPostId(testPostId.getValue());
+    }
+
+    @Test
+    @DisplayName("게시글 id로 게시글 북마크 삭제하기")
+    void testDeletePostBookmarkByPostId_givenPostId_willDeletePostBookmark() {
+        // given
+        Post post = createPublishedPost();
+
+        // when
+        postRepositoryJpaAdapter.deletePostBookmarkByPostId(post.getPostId());
+
+        // then
+        verify(postBookmarkJpaRepository).deleteByPostId(testPostId.getValue());
+    }
+
+    @Test
+    @DisplayName("게시글 id로 최근 본 게시글 기록 삭제하기")
+    void testDeletePostRecentlyViewRecordByPostId_givenPostId_willDeleteRecentlyViewRecord() {
+        // given
+        Post post = createPublishedPost();
+
+        // when
+        postRepositoryJpaAdapter.deletePostRecentlyViewRecordByPostId(post.getPostId());
+
+        // then
+        verify(postRecentlyViewRedisRepository).removePostFromAllMembers(testPostId);
     }
 
 }

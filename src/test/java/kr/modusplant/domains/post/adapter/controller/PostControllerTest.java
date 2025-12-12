@@ -232,6 +232,9 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
 
         given(postRepository.getPostByUlid(any(PostId.class))).willReturn(Optional.of(existingPost));
         willDoNothing().given(postArchiveRepository).save(any(PostId.class));
+        willDoNothing().given(postRepository).deletePostLikeByPostId(any(PostId.class));
+        willDoNothing().given(postRepository).deletePostBookmarkByPostId(any(PostId.class));
+        willDoNothing().given(postRepository).deletePostRecentlyViewRecordByPostId(any(PostId.class));
         willDoNothing().given(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
         willDoNothing().given(postRepository).delete(any(Post.class));
 
@@ -241,6 +244,9 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         // then
         verify(postRepository).getPostByUlid(any(PostId.class));
         verify(postArchiveRepository).save(any(PostId.class));
+        verify(postRepository).deletePostLikeByPostId(any(PostId.class));
+        verify(postRepository).deletePostBookmarkByPostId(any(PostId.class));
+        verify(postRepository).deletePostRecentlyViewRecordByPostId(any(PostId.class));
         verify(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
         verify(postRepository).delete(any(Post.class));
     }
@@ -251,8 +257,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         // given
         Post existingPost = createDraftPost2();
 
-        given(postRepository.getPostByUlid(any(PostId.class)))
-                .willReturn(Optional.of(existingPost));
+        given(postRepository.getPostByUlid(any(PostId.class))).willReturn(Optional.of(existingPost));
         willDoNothing().given(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
         willDoNothing().given(postRepository).delete(any(Post.class));
 
@@ -262,6 +267,9 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         // then
         verify(postRepository).getPostByUlid(any(PostId.class));
         verify(postArchiveRepository, never()).save(any(PostId.class));
+        verify(postRepository, never()).deletePostLikeByPostId(any(PostId.class));
+        verify(postRepository, never()).deletePostBookmarkByPostId(any(PostId.class));
+        verify(postRepository, never()).deletePostRecentlyViewRecordByPostId(any(PostId.class));
         verify(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
         verify(postRepository).delete(any(Post.class));
     }

@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_GOOGLE_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -143,4 +144,23 @@ class PostRecentlyViewRedisRepositoryTest implements PostIdTestUtils {
         verify(zSetOperations).remove(key,testPostId.getValue());
     }
 
+    @Test
+    @DisplayName("게시글 id로 최근 본 게시글을 모두 삭제한다")
+    void testRemovePostFromAllMembers_givenPostId_willRemovePosts() {
+        // given
+        Set<String> keys = Set.of(
+                "recentlyView:member:"+MEMBER_BASIC_USER_UUID+":posts",
+                "recentlyView:member:"+MEMBER_GOOGLE_USER_UUID+":posts"
+        );
+        given(stringRedisTemplate.keys("recentlyView:member:*:posts")).willReturn(keys);
+        given(stringRedisTemplate.opsForZSet()).willReturn(zSetOperations);
+
+        // when
+        postRecentlyViewRedisRepository.removePostFromAllMembers(testPostId);
+
+        // then
+        for (String key : keys) {
+            verify(zSetOperations).remove(key,testPostId.getValue());
+        }
+    }
 }
