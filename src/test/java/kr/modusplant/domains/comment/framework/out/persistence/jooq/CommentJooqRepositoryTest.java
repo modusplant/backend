@@ -4,6 +4,7 @@ import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentContentTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentPathTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
+import kr.modusplant.domains.identity.normal.common.util.domain.vo.NicknameTestUtils;
 import org.jooq.DSLContext;
 import org.jooq.Record6;
 import org.jooq.Result;
@@ -51,6 +52,7 @@ public class CommentJooqRepositoryTest implements
 
         testRecord.value1(testPostId.getId());
         testRecord.value2(testCommentPath.getPath());
+        testRecord.value3("테스트 닉네임"); // TODO: 댓글용 테스트 닉네임을 만들거나 할 것.
 //        testRecord.value3(testNickname.getNickname());
         testRecord.value4(testCommentContent.getContent());
         testRecord.value5(false);

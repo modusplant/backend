@@ -2,7 +2,6 @@ package kr.modusplant.domains.comment.framework.in.web.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.comment.adapter.controller.CommentController;
-import kr.modusplant.domains.comment.common.util.adapter.CommentDeleteRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.adapter.CommentRegisterRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.adapter.CommentResponseTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
@@ -20,7 +19,7 @@ import static org.mockito.Mockito.doNothing;
 
 public class CommentRestControllerTest implements PostIdTestUtils,
         CommentResponseTestUtils, CommentRegisterRequestTestUtils,
-        CommentDeleteRequestTestUtils, MemberIdTestUtils {
+        MemberIdTestUtils {
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(new ObjectMapper());
     private final CommentController controller = Mockito.mock(CommentController.class);
     private final CommentRestController restController = new CommentRestController(controller);

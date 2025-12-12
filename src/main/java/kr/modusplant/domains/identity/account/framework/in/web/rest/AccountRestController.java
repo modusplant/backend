@@ -23,7 +23,7 @@ public class AccountRestController {
     private final AccountController controller;
 
     @Operation(
-            summary = "회원의 식별자로 회원의 이메일과 인증 제공자를 가져오는 API",
+            summary = "회원의 식별자로 회원의 이메일, 인증 제공자, 가입일을 가져오는 API",
             description = "회원의 식별자에 맞는 계정의 인증 정보를 제공합니다."
     )
     @GetMapping("/v1/members/{id}/auth-info")

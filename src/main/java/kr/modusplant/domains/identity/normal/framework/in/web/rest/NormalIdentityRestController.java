@@ -71,7 +71,7 @@ public class NormalIdentityRestController {
 
     @Operation(
             summary = "일반 회원의 비밀번호 수정 API",
-            description = "사용자의 식별자, 새로운 비밀번호로 사용자의 이메일을 갱신합니다."
+            description = "사용자의 식별자, 새로운 비밀번호로 사용자의 비밀번호를 갱신합니다."
     )
     @PostMapping("/api/v1/members/{id}/modify/password")
     public ResponseEntity<DataResponse<Void>> modifyPassword(

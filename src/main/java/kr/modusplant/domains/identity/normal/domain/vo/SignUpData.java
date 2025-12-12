@@ -10,17 +10,17 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SignUpData {
     private final Credentials credentials;
-    private final Nickname nickname;
-    private final AgreedTermsOfVersion agreedTermsOfUseVersion;
-    private final AgreedTermsOfVersion agreedPrivacyPolicyVersion;
-    private final AgreedTermsOfVersion agreedAdInfoReceivingVersion;
+    private final NormalNickname nickname;
+    private final AgreedTermVersion agreedTermsOfUseVersion;
+    private final AgreedTermVersion agreedPrivacyPolicyVersion;
+    private final AgreedTermVersion agreedAdInfoReceivingVersion;
 
     public static SignUpData create(String email, String password, String nickname,
                                     String termsOfUseVersion, String privacyPolicyVersion,
                                     String adInfoReceivingVersion) {
         return new SignUpData(Credentials.createWithString(email, password),
-                Nickname.create(nickname), AgreedTermsOfVersion.create(termsOfUseVersion),
-                AgreedTermsOfVersion.create(privacyPolicyVersion), AgreedTermsOfVersion.create(adInfoReceivingVersion));
+                NormalNickname.create(nickname), AgreedTermVersion.create(termsOfUseVersion),
+                AgreedTermVersion.create(privacyPolicyVersion), AgreedTermVersion.create(adInfoReceivingVersion));
     }
 
     @Override
