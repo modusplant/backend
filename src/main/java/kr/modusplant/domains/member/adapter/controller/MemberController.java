@@ -34,6 +34,7 @@ import java.util.Optional;
 
 import static kr.modusplant.domains.member.adapter.util.MemberProfileImageUtils.generateMemberProfileImagePath;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
+import static kr.modusplant.shared.exception.enums.ErrorCode.NICKNAME_EXISTS;
 
 @RequiredArgsConstructor
 @Service
@@ -167,7 +168,7 @@ public class MemberController {
 
     private void validateBeforeRegister(Nickname nickname) {
         if (memberRepository.isNicknameExist(nickname)) {
-            throw new EntityExistsException(ALREADY_EXISTED_NICKNAME, "nickname");
+            throw new EntityExistsException(NICKNAME_EXISTS, "nickname");
         }
     }
 
@@ -177,7 +178,7 @@ public class MemberController {
         }
         Optional<Member> emptyOrMember = memberRepository.getByNickname(nickname);
         if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
-            throw new EntityExistsException(ALREADY_EXISTED_NICKNAME, "nickname");
+            throw new EntityExistsException(NICKNAME_EXISTS, "nickname");
         }
     }
 

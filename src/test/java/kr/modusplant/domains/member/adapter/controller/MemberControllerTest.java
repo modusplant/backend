@@ -58,6 +58,7 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 import static kr.modusplant.shared.event.common.util.CommentLikeEventTestUtils.testCommentLikeEvent;
 import static kr.modusplant.shared.event.common.util.PostBookmarkEventTestUtils.testPostBookmarkEvent;
 import static kr.modusplant.shared.event.common.util.PostCancelPostBookmarkEventTestUtils.testPostBookmarkCancelEvent;
+import static kr.modusplant.shared.exception.enums.ErrorCode.NICKNAME_EXISTS;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
@@ -109,7 +110,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         // when & then
         EntityExistsException alreadyExistedNicknameException = assertThrows(
                 EntityExistsException.class, () -> memberController.register(testMemberRegisterRequest));
-        assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(ALREADY_EXISTED_NICKNAME.getMessage());
+        assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(NICKNAME_EXISTS.getMessage());
     }
 
     @Test
@@ -253,7 +254,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         // when & then
         EntityExistsException alreadyExistedNicknameException = assertThrows(
                 EntityExistsException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
-        assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(ALREADY_EXISTED_NICKNAME.getMessage());
+        assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(NICKNAME_EXISTS.getMessage());
     }
 
     @Test
