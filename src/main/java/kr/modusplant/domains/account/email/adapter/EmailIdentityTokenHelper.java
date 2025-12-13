@@ -79,7 +79,7 @@ public class EmailIdentityTokenHelper {
                 throw new InvalidDataException(ErrorCode.INVALID_EMAIL_VERIFY_CODE, "verifyCode");
             }
             if (!email.equals(claims.get("email", String.class))) {
-                throw new InvalidDataException(ErrorCode.INVALID_EMAIL, "email");
+                throw new InvalidDataException(ErrorCode.FORBIDDEN_EMAIL, "email");
             }
         } catch (ExpiredJwtException e) {
             throw new TokenExpiredException();
@@ -121,7 +121,7 @@ public class EmailIdentityTokenHelper {
 
             // 이메일 일치 검증
             if (!email.equals(claims.get("email", String.class))) {
-                throw new InvalidDataException(ErrorCode.INVALID_EMAIL, "email");
+                throw new InvalidDataException(ErrorCode.FORBIDDEN_EMAIL, "email");
             }
         } catch (ExpiredJwtException e) {
             throw new TokenExpiredException();
