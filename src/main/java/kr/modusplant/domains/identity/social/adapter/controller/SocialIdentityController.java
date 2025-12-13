@@ -1,8 +1,8 @@
 package kr.modusplant.domains.identity.social.adapter.controller;
 
-import kr.modusplant.domains.identity.social.domain.vo.MemberId;
-import kr.modusplant.domains.identity.social.domain.vo.SocialAccountProfile;
+import kr.modusplant.domains.identity.shared.kernel.AccountId;
 import kr.modusplant.domains.identity.social.domain.vo.SocialAccountPayload;
+import kr.modusplant.domains.identity.social.domain.vo.SocialAccountProfile;
 import kr.modusplant.domains.identity.social.usecase.port.client.SocialAuthClientFactory;
 import kr.modusplant.domains.identity.social.usecase.port.client.dto.SocialUserInfo;
 import kr.modusplant.domains.identity.social.usecase.port.mapper.SocialIdentityMapper;
@@ -34,7 +34,7 @@ public class SocialIdentityController {
 
     @Transactional
     public SocialAccountPayload findOrCreateMember(SocialAccountProfile profile) {
-        Optional<MemberId> existingMemberId = socialIdentityRepository.getMemberIdBySocialCredentials(profile.getSocialCredentials());
+        Optional<AccountId> existingMemberId = socialIdentityRepository.getMemberIdBySocialCredentials(profile.getSocialCredentials());
 
         if (existingMemberId.isPresent()) {
             return handleExistingMember(existingMemberId.get());
@@ -43,9 +43,9 @@ public class SocialIdentityController {
         }
     }
 
-    private SocialAccountPayload handleExistingMember(MemberId memberId) {
-        socialIdentityRepository.updateLoggedInAt(memberId);
-        return socialIdentityRepository.getUserPayloadByMemberId(memberId);
+    private SocialAccountPayload handleExistingMember(AccountId accountId) {
+        socialIdentityRepository.updateLoggedInAt(accountId);
+        return socialIdentityRepository.getUserPayloadByMemberId(accountId);
     }
 
     private SocialAccountPayload handleNewMember(SocialAccountProfile profile) {

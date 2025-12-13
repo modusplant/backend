@@ -1,9 +1,7 @@
 package kr.modusplant.domains.identity.normal.domain.vo;
 
-import kr.modusplant.domains.identity.normal.common.util.domain.vo.AgreedTermsOfVersionTestUtils;
+import kr.modusplant.domains.identity.normal.common.util.domain.vo.AgreedTermVersionTestUtils;
 import kr.modusplant.domains.identity.normal.common.util.domain.vo.SignUpDataTestUtils;
-import kr.modusplant.domains.identity.normal.domain.exception.EmptyValueException;
-import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
 import kr.modusplant.shared.exception.EmptyEmailException;
 import kr.modusplant.shared.exception.InvalidEmailException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
@@ -16,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, PasswordTestUtils,
-        NicknameTestUtils, AgreedTermsOfVersionTestUtils {
+        NicknameTestUtils, AgreedTermVersionTestUtils {
 
     @Test
     @DisplayName("null 값으로 회원가입 정보 생성")
@@ -57,7 +55,7 @@ public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, Pass
     @Test
     @DisplayName("다른 객체로 동등성 비교")
     void testEquals_givenDifferentObject_willReturnFalse() {
-        EmptyValueException different = new EmptyValueException(NormalIdentityErrorCode.EMPTY_NICKNAME);
+        RuntimeException different = new RuntimeException();
         assertNotEquals(TEST_NORMAL_SIGN_UP_DATA, different);
     }
 

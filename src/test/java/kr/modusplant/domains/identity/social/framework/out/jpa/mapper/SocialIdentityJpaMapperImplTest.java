@@ -1,7 +1,7 @@
 package kr.modusplant.domains.identity.social.framework.out.jpa.mapper;
 
-import kr.modusplant.domains.identity.social.common.util.domain.vo.SocialUserProfileTestUtils;
-import kr.modusplant.domains.identity.social.common.util.domain.vo.UserPayloadTestUtils;
+import kr.modusplant.domains.identity.social.common.util.domain.vo.SocialAccountPayloadTestUtils;
+import kr.modusplant.domains.identity.social.common.util.domain.vo.SocialAccountProfileTestUtils;
 import kr.modusplant.domains.identity.social.common.util.framework.out.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.identity.social.domain.vo.SocialAccountPayload;
 import kr.modusplant.domains.identity.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialUserProfileTestUtils, UserPayloadTestUtils {
+class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialAccountProfileTestUtils, SocialAccountPayloadTestUtils {
     private final SocialIdentityJpaMapper socialIdentityJpaMapper = new SocialIdentityJpaMapperImpl();
 
     @Test
@@ -87,7 +87,7 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialUs
 
         // then
         assertNotNull(result);
-        assertEquals(memberEntity.getUuid(), result.getMemberId().getValue());
+        assertEquals(memberEntity.getUuid(), result.getAccountId().getValue());
         assertEquals(memberEntity.getNickname(), result.getNickname().getValue());
         assertEquals(memberAuthEntity.getEmail(), result.getEmail().getValue());
         assertEquals(Role.USER, result.getRole());
@@ -105,7 +105,7 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialUs
 
         // then
         assertNotNull(result);
-        assertEquals(memberEntity.getUuid(), result.getMemberId().getValue());
+        assertEquals(memberEntity.getUuid(), result.getAccountId().getValue());
         assertEquals(testNormalUserNickname.getValue(), result.getNickname().getValue());
         assertEquals(testKakaoUserEmail.getValue(), result.getEmail().getValue());
         assertEquals(Role.USER, result.getRole());

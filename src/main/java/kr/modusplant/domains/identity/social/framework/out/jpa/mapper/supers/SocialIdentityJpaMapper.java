@@ -1,7 +1,7 @@
 package kr.modusplant.domains.identity.social.framework.out.jpa.mapper.supers;
 
-import kr.modusplant.domains.identity.social.domain.vo.SocialAccountProfile;
 import kr.modusplant.domains.identity.social.domain.vo.SocialAccountPayload;
+import kr.modusplant.domains.identity.social.domain.vo.SocialAccountProfile;
 import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;

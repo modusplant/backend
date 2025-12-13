@@ -1,8 +1,8 @@
 package kr.modusplant.domains.identity.normal.framework.out.persistence.jooq;
 
-import kr.modusplant.domains.identity.normal.domain.vo.NormalMemberId;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityReadRepository;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityUpdateRepository;
+import kr.modusplant.domains.identity.shared.kernel.AccountId;
 import kr.modusplant.jooq.tables.SiteMember;
 import kr.modusplant.jooq.tables.SiteMemberAuth;
 import kr.modusplant.shared.enums.AuthProvider;
@@ -25,37 +25,37 @@ public class NormalIdentityJooqRepository implements
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public int updateEmail(NormalMemberId normalMemberId, Email newEmail) {
+    public int updateEmail(AccountId accountId, Email newEmail) {
         return dsl.update(memberAuth)
                 .set(memberAuth.EMAIL, newEmail.getValue())
-                .where(memberAuth.ACT_MEMB_UUID.eq(normalMemberId.getValue()))
+                .where(memberAuth.ACT_MEMB_UUID.eq(accountId.getValue()))
                 .and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
                 .execute();
     }
 
     @Override
-    public int updatePassword(NormalMemberId normalMemberId, Password pw) {
+    public int updatePassword(AccountId accountId, Password pw) {
         return dsl.update(memberAuth)
                 .set(memberAuth.PW, passwordEncoder.encode(pw.getValue()))
-                .where(memberAuth.ACT_MEMB_UUID.eq(normalMemberId.getValue()))
+                .where(memberAuth.ACT_MEMB_UUID.eq(accountId.getValue()))
                 .and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
                 .execute();
     }
 
     @Override
-    public String getMemberPassword(NormalMemberId normalMemberId) {
+    public String getMemberPassword(AccountId accountId) {
         return dsl.select(memberAuth.PW)
                 .from(memberAuth)
-                .where(memberAuth.ACT_MEMB_UUID.eq(normalMemberId.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
+                .where(memberAuth.ACT_MEMB_UUID.eq(accountId.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
                 .fetchOne(memberAuth.PW);
     }
 
     @Override
-    public boolean existsByMemberId(NormalMemberId normalMemberId) {
+    public boolean existsByMemberId(AccountId accountId) {
         return dsl.fetchExists(
                 dsl.selectOne()
                         .from(memberAuth)
-                        .where(memberAuth.ACT_MEMB_UUID.eq(normalMemberId.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
+                        .where(memberAuth.ACT_MEMB_UUID.eq(accountId.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
         );
     }
 

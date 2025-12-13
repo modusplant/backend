@@ -1,12 +1,12 @@
 package kr.modusplant.domains.identity.social.domain.vo;
 
-import kr.modusplant.domains.identity.social.common.util.domain.vo.SocialUserProfileTestUtils;
+import kr.modusplant.domains.identity.social.common.util.domain.vo.SocialAccountProfileTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SocialAccountProfileTest implements SocialUserProfileTestUtils {
+class SocialAccountProfileTest implements SocialAccountProfileTestUtils {
 
     @Test
     @DisplayName("유효한 SocialCredentials, Email, Nickname으로 SocialUserProfile 생성")

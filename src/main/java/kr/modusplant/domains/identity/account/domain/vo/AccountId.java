@@ -1,7 +1,7 @@
 package kr.modusplant.domains.identity.account.domain.vo;
 
 import kr.modusplant.domains.identity.account.domain.exception.EmptyValueException;
-import kr.modusplant.domains.identity.account.domain.exception.enums.AccountErrorCode;
+import kr.modusplant.domains.identity.shared.exception.enums.AccountErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,23 +12,23 @@ import java.util.UUID;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class MemberId {
+public class AccountId {
     private final UUID value;
 
-    public static MemberId create(UUID uuid) {
+    public static AccountId create(UUID uuid) {
         if (uuid == null) {
-            throw new EmptyValueException(AccountErrorCode.EMPTY_MEMBER_ID);
+            throw new EmptyValueException(AccountErrorCode.EMPTY_ACCOUNT_ID);
         }
-        return new MemberId(uuid);
+        return new AccountId(uuid);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof MemberId memberId)) return false;
+        if (!(o instanceof AccountId accountId)) return false;
 
-        return new EqualsBuilder().append(getValue(), memberId.getValue()).isEquals();
+        return new EqualsBuilder().append(getValue(), accountId.getValue()).isEquals();
     }
 
     @Override

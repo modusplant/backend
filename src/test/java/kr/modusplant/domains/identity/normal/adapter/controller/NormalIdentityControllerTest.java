@@ -1,7 +1,6 @@
 package kr.modusplant.domains.identity.normal.adapter.controller;
 
 import kr.modusplant.domains.identity.normal.adapter.mapper.NormalIdentityMapperImpl;
-import kr.modusplant.domains.identity.normal.common.util.domain.vo.MemberIdTestUtils;
 import kr.modusplant.domains.identity.normal.common.util.domain.vo.SignUpDataTestUtils;
 import kr.modusplant.domains.identity.normal.common.util.usecase.request.EmailModificationRequestTestUtils;
 import kr.modusplant.domains.identity.normal.common.util.usecase.request.NormalSignUpRequestTestUtils;
@@ -20,11 +19,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import static kr.modusplant.domains.identity.shared.kernel.common.util.AccountIdTestUtils.testNormalMemberId;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 public class NormalIdentityControllerTest implements EmailTestUtils,
-        NormalSignUpRequestTestUtils, SignUpDataTestUtils, MemberIdTestUtils,
+        NormalSignUpRequestTestUtils, SignUpDataTestUtils,
         EmailModificationRequestTestUtils, PasswordModificationRequestTestUtils {
     private final NormalIdentityMapper mapper = Mockito.mock(NormalIdentityMapperImpl.class);
     private final NormalIdentityCreateRepository createRepository = Mockito.mock(NormalIdentityCreateRepository.class);
@@ -60,14 +60,14 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
         EmailModificationRequest request = testEmailModificationRequest;
 
         given(readRepository.existsByEmail(Email.create(request.currentEmail()))).willReturn(true);
-        given(updateRepository.updateEmail(TEST_NORMAL_MEMBER_ID, Email.create(request.newEmail()))).willReturn(1);
+        given(updateRepository.updateEmail(testNormalMemberId, Email.create(request.newEmail()))).willReturn(1);
 
         // when
-        controller.modifyEmail(TEST_NORMAL_MEMBER_ID.getValue(), testEmailModificationRequest);
+        controller.modifyEmail(testNormalMemberId.getValue(), testEmailModificationRequest);
 
         // then
         verify(readRepository, times(1)).existsByEmail(testNormalUserEmail);
-        verify(updateRepository, times(1)).updateEmail(TEST_NORMAL_MEMBER_ID, Email.create(request.newEmail()));
+        verify(updateRepository, times(1)).updateEmail(testNormalMemberId, Email.create(request.newEmail()));
     }
 
     @Test
@@ -76,19 +76,19 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
         // given
         PasswordModificationRequest request = testPasswordModificationRequest;
 
-        given(readRepository.existsByMemberId(TEST_NORMAL_MEMBER_ID)).willReturn(true);
-        given(readRepository.getMemberPassword(TEST_NORMAL_MEMBER_ID)).willReturn(request.currentPw());
+        given(readRepository.existsByMemberId(testNormalMemberId)).willReturn(true);
+        given(readRepository.getMemberPassword(testNormalMemberId)).willReturn(request.currentPw());
         given(encoder.matches(request.currentPw(), request.currentPw())).willReturn(true);
-        given(updateRepository.updatePassword(TEST_NORMAL_MEMBER_ID, Password.create(request.newPw())))
+        given(updateRepository.updatePassword(testNormalMemberId, Password.create(request.newPw())))
                 .willReturn(1);
 
         // when
-        controller.modifyPassword(TEST_NORMAL_MEMBER_ID.getValue(), testPasswordModificationRequest);
+        controller.modifyPassword(testNormalMemberId.getValue(), testPasswordModificationRequest);
 
         // then
-        verify(readRepository, times(1)).existsByMemberId(TEST_NORMAL_MEMBER_ID);
-        verify(readRepository, times(1)).getMemberPassword(TEST_NORMAL_MEMBER_ID);
+        verify(readRepository, times(1)).existsByMemberId(testNormalMemberId);
+        verify(readRepository, times(1)).getMemberPassword(testNormalMemberId);
         verify(encoder, times(1)).matches(request.currentPw(), request.currentPw());
-        verify(updateRepository, times(1)).updatePassword(TEST_NORMAL_MEMBER_ID, Password.create(request.newPw()));
+        verify(updateRepository, times(1)).updatePassword(testNormalMemberId, Password.create(request.newPw()));
     }
 }

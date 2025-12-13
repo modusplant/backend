@@ -1,8 +1,8 @@
 package kr.modusplant.domains.identity.social.framework.out.jpa.mapper;
 
-import kr.modusplant.domains.identity.social.domain.vo.MemberId;
-import kr.modusplant.domains.identity.social.domain.vo.SocialAccountProfile;
+import kr.modusplant.domains.identity.shared.kernel.AccountId;
 import kr.modusplant.domains.identity.social.domain.vo.SocialAccountPayload;
+import kr.modusplant.domains.identity.social.domain.vo.SocialAccountProfile;
 import kr.modusplant.domains.identity.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
 import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
@@ -47,7 +47,7 @@ public class SocialIdentityJpaMapperImpl implements SocialIdentityJpaMapper {
     @Override
     public SocialAccountPayload toUserPayload(SiteMemberEntity memberEntity, SiteMemberAuthEntity memberAuthEntity, SiteMemberRoleEntity memberRoleEntity) {
         return SocialAccountPayload.create(
-                MemberId.fromUuid(memberEntity.getUuid()),
+                AccountId.fromUuid(memberEntity.getUuid()),
                 Nickname.create(memberEntity.getNickname()),
                 Email.create(memberAuthEntity.getEmail()),
                 memberRoleEntity.getRole()
@@ -57,7 +57,7 @@ public class SocialIdentityJpaMapperImpl implements SocialIdentityJpaMapper {
     @Override
     public SocialAccountPayload toUserPayload(SiteMemberEntity memberEntity, Nickname nickname, Email email, Role role) {
         return SocialAccountPayload.create(
-                MemberId.fromUuid(memberEntity.getUuid()),
+                AccountId.fromUuid(memberEntity.getUuid()),
                 nickname,
                 email,
                 role

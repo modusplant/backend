@@ -1,6 +1,6 @@
 package kr.modusplant.domains.identity.normal.domain.vo;
 
-import kr.modusplant.domains.identity.normal.common.util.domain.vo.AgreedTermsOfVersionTestUtils;
+import kr.modusplant.domains.identity.normal.common.util.domain.vo.AgreedTermVersionTestUtils;
 import kr.modusplant.domains.identity.normal.domain.exception.EmptyValueException;
 import kr.modusplant.domains.identity.normal.domain.exception.InvalidValueException;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AgreedTermVersionTest implements AgreedTermsOfVersionTestUtils {
+public class AgreedTermVersionTest implements AgreedTermVersionTestUtils {
 
     @Test
     @DisplayName("null로 동의된 약관 버전 생성")
@@ -47,7 +47,7 @@ public class AgreedTermVersionTest implements AgreedTermsOfVersionTestUtils {
     @DisplayName("다른 객체로 동등성 비교")
     void testEquals_givenDifferentObject_willReturnFalse() {
         // given & when & then
-        EmptyValueException different = new EmptyValueException(NormalIdentityErrorCode.EMPTY_NICKNAME);
+        RuntimeException different = new RuntimeException();
         assertNotEquals(testAgreedTermsOfUse, different);
     }
 

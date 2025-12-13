@@ -2,7 +2,7 @@ package kr.modusplant.domains.identity.social.framework.in.web.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.identity.social.adapter.controller.SocialIdentityController;
-import kr.modusplant.domains.identity.social.common.util.domain.vo.UserPayloadTestUtils;
+import kr.modusplant.domains.identity.social.common.util.domain.vo.SocialAccountPayloadTestUtils;
 import kr.modusplant.domains.identity.social.common.util.usecase.request.SocialLoginRequestTestUtils;
 import kr.modusplant.domains.identity.social.usecase.request.SocialLoginRequest;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
-class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, UserPayloadTestUtils {
+class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, SocialAccountPayloadTestUtils {
     private MockMvc mockMvc;
 
     @Mock
@@ -64,7 +64,7 @@ class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, U
 
         given(socialIdentityController.handleSocialLogin(eq(AuthProvider.KAKAO), eq(socialLoginRequest.getCode()))).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD);
         given(tokenService.issueToken(
-                eq(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD.getMemberId().getValue()),
+                eq(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD.getAccountId().getValue()),
                 eq(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD.getNickname().getValue()),
                 eq(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD.getEmail().getValue()),
                 eq(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD.getRole())
@@ -90,7 +90,7 @@ class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, U
 
         given(socialIdentityController.handleSocialLogin(eq(AuthProvider.GOOGLE), eq(socialLoginRequest.getCode()))).willReturn(TEST_SOCIAL_GOOGLE_SOCIAL_ACCOUNT_PAYLOAD);
         given(tokenService.issueToken(
-                eq(TEST_SOCIAL_GOOGLE_SOCIAL_ACCOUNT_PAYLOAD.getMemberId().getValue()),
+                eq(TEST_SOCIAL_GOOGLE_SOCIAL_ACCOUNT_PAYLOAD.getAccountId().getValue()),
                 eq(TEST_SOCIAL_GOOGLE_SOCIAL_ACCOUNT_PAYLOAD.getNickname().getValue()),
                 eq(TEST_SOCIAL_GOOGLE_SOCIAL_ACCOUNT_PAYLOAD.getEmail().getValue()),
                 eq(TEST_SOCIAL_GOOGLE_SOCIAL_ACCOUNT_PAYLOAD.getRole())

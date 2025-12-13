@@ -1,6 +1,6 @@
 package kr.modusplant.domains.identity.normal.adapter.mapper;
 
-import kr.modusplant.domains.identity.normal.common.util.domain.vo.CredentialsTestUtils;
+import kr.modusplant.domains.identity.normal.common.util.domain.vo.NormalCredentialsTestUtils;
 import kr.modusplant.domains.identity.normal.common.util.domain.vo.SignUpDataTestUtils;
 import kr.modusplant.domains.identity.normal.common.util.usecase.request.NormalSignUpRequestTestUtils;
 import kr.modusplant.domains.identity.normal.domain.vo.SignUpData;
@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class NormalIdentityMapperImplTest implements CredentialsTestUtils,
+public class NormalIdentityMapperImplTest implements NormalCredentialsTestUtils,
         NormalSignUpRequestTestUtils, SignUpDataTestUtils {
 
     private final PasswordEncoder encoder = new BCryptPasswordEncoder();

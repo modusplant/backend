@@ -15,7 +15,7 @@ import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUti
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-class NormalMemberIdTest implements MemberTestUtils {
+class NormalAccountIdTest implements MemberTestUtils {
     @Test
     @DisplayName("generate으로 회원 ID 반환")
     void testGenerate_givenNoParameter_willReturnMemberId() {

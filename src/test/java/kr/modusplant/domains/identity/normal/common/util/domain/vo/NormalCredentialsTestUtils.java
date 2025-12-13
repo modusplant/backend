@@ -5,6 +5,6 @@ import kr.modusplant.shared.kernel.common.util.PasswordTestUtils;
 
 import static kr.modusplant.shared.kernel.common.util.EmailTestUtils.testNormalUserEmail;
 
-public interface CredentialsTestUtils extends PasswordTestUtils {
+public interface NormalCredentialsTestUtils extends PasswordTestUtils {
     NormalCredentials testNormalCredentials = NormalCredentials.createWithDomain(testNormalUserEmail, testNormalUserPassword);
 }

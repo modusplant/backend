@@ -1,8 +1,7 @@
 package kr.modusplant.domains.identity.social.adapter.controller;
 
-import kr.modusplant.domains.identity.social.common.util.domain.vo.MemberIdTestUtils;
-import kr.modusplant.domains.identity.social.common.util.domain.vo.SocialUserProfileTestUtils;
-import kr.modusplant.domains.identity.social.common.util.domain.vo.UserPayloadTestUtils;
+import kr.modusplant.domains.identity.social.common.util.domain.vo.SocialAccountPayloadTestUtils;
+import kr.modusplant.domains.identity.social.common.util.domain.vo.SocialAccountProfileTestUtils;
 import kr.modusplant.domains.identity.social.common.util.usecase.request.SocialLoginRequestTestUtils;
 import kr.modusplant.domains.identity.social.domain.vo.SocialAccountPayload;
 import kr.modusplant.domains.identity.social.usecase.port.client.SocialAuthClient;
@@ -17,12 +16,13 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
+import static kr.modusplant.domains.identity.shared.kernel.common.util.AccountIdTestUtils.testKakaoAccountId;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-class SocialIdentityControllerTest implements SocialLoginRequestTestUtils, MemberIdTestUtils, SocialUserProfileTestUtils, UserPayloadTestUtils {
+class SocialIdentityControllerTest implements SocialLoginRequestTestUtils, SocialAccountProfileTestUtils, SocialAccountPayloadTestUtils {
     private final SocialAuthClientFactory clientFactory = mock(SocialAuthClientFactory.class);
     private final SocialIdentityRepository socialIdentityRepository = mock(SocialIdentityRepository.class);
     private final SocialIdentityMapper socialIdentityMapper = mock(SocialIdentityMapper.class);
@@ -41,8 +41,8 @@ class SocialIdentityControllerTest implements SocialLoginRequestTestUtils, Membe
         given(authClient.getAccessToken(code)).willReturn(accessToken);
         given(authClient.getUserInfo(accessToken)).willReturn(userInfo);
         given(socialIdentityMapper.toSocialUserProfile(AuthProvider.KAKAO, userInfo)).willReturn(TEST_KAKAO_SOCIAL_ACCOUNT_PROFILE);
-        given(socialIdentityRepository.getMemberIdBySocialCredentials(testKakaoSocialCredentials)).willReturn(Optional.of(testSocialKakaoMemberId));
-        given(socialIdentityRepository.getUserPayloadByMemberId(testSocialKakaoMemberId)).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD);
+        given(socialIdentityRepository.getMemberIdBySocialCredentials(testKakaoSocialCredentials)).willReturn(Optional.of(testKakaoAccountId));
+        given(socialIdentityRepository.getUserPayloadByMemberId(testKakaoAccountId)).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD);
 
         // when
         SocialAccountPayload result = socialIdentityController.handleSocialLogin(AuthProvider.KAKAO, code);
@@ -54,15 +54,15 @@ class SocialIdentityControllerTest implements SocialLoginRequestTestUtils, Membe
         verify(authClient).getAccessToken(code);
         verify(authClient).getUserInfo(accessToken);
         verify(socialIdentityMapper).toSocialUserProfile(AuthProvider.KAKAO, userInfo);
-        verify(socialIdentityRepository).updateLoggedInAt(testSocialKakaoMemberId);
+        verify(socialIdentityRepository).updateLoggedInAt(testKakaoAccountId);
     }
 
     @Test
     @DisplayName("기존 회원이 존재하면 해당 회원의 UserPayload를 반환한다")
     void testFindOrCreateMember_givenExistingMember_willReturnUserPayload() {
         // given
-        given(socialIdentityRepository.getMemberIdBySocialCredentials(testKakaoSocialCredentials)).willReturn(Optional.of(testSocialKakaoMemberId));
-        given(socialIdentityRepository.getUserPayloadByMemberId(testSocialKakaoMemberId)).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD);
+        given(socialIdentityRepository.getMemberIdBySocialCredentials(testKakaoSocialCredentials)).willReturn(Optional.of(testKakaoAccountId));
+        given(socialIdentityRepository.getUserPayloadByMemberId(testKakaoAccountId)).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD);
 
         // when
         SocialAccountPayload result = socialIdentityController.findOrCreateMember(TEST_KAKAO_SOCIAL_ACCOUNT_PROFILE);
@@ -71,8 +71,8 @@ class SocialIdentityControllerTest implements SocialLoginRequestTestUtils, Membe
         assertNotNull(result);
         assertEquals(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD, result);
         verify(socialIdentityRepository).getMemberIdBySocialCredentials(testKakaoSocialCredentials);
-        verify(socialIdentityRepository).updateLoggedInAt(testSocialKakaoMemberId);
-        verify(socialIdentityRepository).getUserPayloadByMemberId(testSocialKakaoMemberId);
+        verify(socialIdentityRepository).updateLoggedInAt(testKakaoAccountId);
+        verify(socialIdentityRepository).getUserPayloadByMemberId(testKakaoAccountId);
         verify(socialIdentityRepository, never()).createSocialMember(any(), any());
     }
 

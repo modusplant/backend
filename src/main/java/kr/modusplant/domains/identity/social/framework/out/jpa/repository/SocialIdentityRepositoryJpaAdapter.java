@@ -1,9 +1,9 @@
 package kr.modusplant.domains.identity.social.framework.out.jpa.repository;
 
-import kr.modusplant.domains.identity.social.domain.vo.MemberId;
-import kr.modusplant.domains.identity.social.domain.vo.SocialCredentials;
-import kr.modusplant.domains.identity.social.domain.vo.SocialAccountProfile;
+import kr.modusplant.domains.identity.shared.kernel.AccountId;
 import kr.modusplant.domains.identity.social.domain.vo.SocialAccountPayload;
+import kr.modusplant.domains.identity.social.domain.vo.SocialAccountProfile;
+import kr.modusplant.domains.identity.social.domain.vo.SocialCredentials;
 import kr.modusplant.domains.identity.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
 import kr.modusplant.domains.identity.social.usecase.port.repository.SocialIdentityRepository;
 import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
@@ -31,14 +31,14 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
     private final SocialIdentityJpaMapper socialIdentityJpaMapper;
 
     @Override
-    public Optional<MemberId> getMemberIdBySocialCredentials(SocialCredentials socialCredentials) {
+    public Optional<AccountId> getMemberIdBySocialCredentials(SocialCredentials socialCredentials) {
         return memberAuthJpaRepository.findByProviderAndProviderId(socialCredentials.getProvider(), socialCredentials.getProviderId())
-                .map(memberAuthEntity -> MemberId.fromUuid(memberAuthEntity.getActiveMember().getUuid()));
+                .map(memberAuthEntity -> AccountId.fromUuid(memberAuthEntity.getActiveMember().getUuid()));
     }
 
     @Override
-    public SocialAccountPayload getUserPayloadByMemberId(MemberId memberId) {
-        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId.getValue())
+    public SocialAccountPayload getUserPayloadByMemberId(AccountId accountId) {
+        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(accountId.getValue())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER));
         SiteMemberAuthEntity memberAuthEntity = memberAuthJpaRepository.findByActiveMember(memberEntity).getFirst();
         SiteMemberRoleEntity memberRoleEntity = memberRoleJpaRepository.findByMember(memberEntity)
@@ -47,8 +47,8 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
     }
 
     @Override
-    public void updateLoggedInAt(MemberId memberId) {
-        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId.getValue())
+    public void updateLoggedInAt(AccountId accountId) {
+        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(accountId.getValue())
                 .orElseThrow();
         memberEntity.updateLoggedInAt(LocalDateTime.now());
         memberJpaRepository.save(memberEntity);

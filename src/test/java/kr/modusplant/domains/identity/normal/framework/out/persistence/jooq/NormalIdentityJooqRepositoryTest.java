@@ -1,6 +1,5 @@
 package kr.modusplant.domains.identity.normal.framework.out.persistence.jooq;
 
-import kr.modusplant.domains.identity.normal.common.util.domain.vo.MemberIdTestUtils;
 import kr.modusplant.jooq.tables.SiteMemberAuth;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
@@ -19,11 +18,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import static kr.modusplant.domains.identity.shared.kernel.common.util.AccountIdTestUtils.testNormalMemberId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 public class NormalIdentityJooqRepositoryTest implements
-        MemberIdTestUtils, EmailTestUtils, PasswordTestUtils, NicknameTestUtils {
+        EmailTestUtils, PasswordTestUtils, NicknameTestUtils {
 
     private final SiteMemberAuth memberAuth = SiteMemberAuth.SITE_MEMBER_AUTH;
     PasswordEncoder encoder = Mockito.mock(PasswordEncoder.class);
@@ -41,7 +41,7 @@ public class NormalIdentityJooqRepositoryTest implements
         MockDataProvider provider = ctx -> {
             Object[] bindings = ctx.bindings();
 
-            if (bindings[0].equals(testNormalUserEmail.getValue()) && bindings[1].equals(TEST_NORMAL_MEMBER_ID.getValue())) {
+            if (bindings[0].equals(testNormalUserEmail.getValue()) && bindings[1].equals(testNormalMemberId.getValue())) {
                 return new MockResult[] {
                         new MockResult(1, null)
                 };
@@ -51,7 +51,7 @@ public class NormalIdentityJooqRepositoryTest implements
         NormalIdentityJooqRepository repository = createRepository(provider);
 
         // when
-        int result = repository.updateEmail(TEST_NORMAL_MEMBER_ID, testNormalUserEmail);
+        int result = repository.updateEmail(testNormalMemberId, testNormalUserEmail);
 
         // then
         assertThat(result).isEqualTo(1);
@@ -65,7 +65,7 @@ public class NormalIdentityJooqRepositoryTest implements
             Object[] bindings = ctx.bindings();
 
             if (bindings[0].equals(testNormalUserPassword.getValue())
-                    && bindings[1].equals(TEST_NORMAL_MEMBER_ID.getValue())
+                    && bindings[1].equals(testNormalMemberId.getValue())
                     && bindings[2].equals(AuthProvider.BASIC.name())) {
                 return new MockResult[] {
                         new MockResult(1, null)
@@ -78,7 +78,7 @@ public class NormalIdentityJooqRepositoryTest implements
         given(encoder.encode(testNormalUserPassword.getValue())).willReturn(testNormalUserPassword.getValue());
 
         // when
-        int result = repository.updatePassword(TEST_NORMAL_MEMBER_ID, testNormalUserPassword);
+        int result = repository.updatePassword(testNormalMemberId, testNormalUserPassword);
 
         // then
         assertThat(result).isEqualTo(1);
@@ -97,7 +97,7 @@ public class NormalIdentityJooqRepositoryTest implements
                     dsl.newRecord(memberAuth.PW).value1(testNormalUserPassword.getValue())
             );
 
-            if (bindings[0].equals(TEST_NORMAL_MEMBER_ID.getValue()) && bindings[1].equals(AuthProvider.BASIC.name())) {
+            if (bindings[0].equals(testNormalMemberId.getValue()) && bindings[1].equals(AuthProvider.BASIC.name())) {
                 return new MockResult[] {
                         new MockResult(0, result)
                 };
@@ -108,7 +108,7 @@ public class NormalIdentityJooqRepositoryTest implements
         NormalIdentityJooqRepository repository = createRepository(provider);
 
         // when
-        String result = repository.getMemberPassword(TEST_NORMAL_MEMBER_ID);
+        String result = repository.getMemberPassword(testNormalMemberId);
 
         // then
         assertThat(result).isEqualTo(testNormalUserPassword.getValue());
@@ -125,7 +125,7 @@ public class NormalIdentityJooqRepositoryTest implements
             Result<Record1<Integer>> result = dsl.newResult(DSL.inline(1));
             result.add(dsl.newRecord(DSL.inline(1)).values(1));
 
-            if (bindings[0].equals(TEST_NORMAL_MEMBER_ID.getValue())) {
+            if (bindings[0].equals(testNormalMemberId.getValue())) {
                 return new MockResult[] {
                         new MockResult(0, result)
                 };
@@ -136,7 +136,7 @@ public class NormalIdentityJooqRepositoryTest implements
         NormalIdentityJooqRepository repository = createRepository(provider);
 
         // when
-        boolean result = repository.existsByMemberId(TEST_NORMAL_MEMBER_ID);
+        boolean result = repository.existsByMemberId(testNormalMemberId);
 
         // then
         assertThat(result).isEqualTo(true);

@@ -1,8 +1,6 @@
 package kr.modusplant.domains.identity.normal.domain.vo;
 
-import kr.modusplant.domains.identity.normal.common.util.domain.vo.CredentialsTestUtils;
-import kr.modusplant.domains.identity.normal.domain.exception.EmptyValueException;
-import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
+import kr.modusplant.domains.identity.normal.common.util.domain.vo.NormalCredentialsTestUtils;
 import kr.modusplant.shared.exception.EmptyEmailException;
 import kr.modusplant.shared.exception.InvalidEmailException;
 import kr.modusplant.shared.exception.InvalidPasswordException;
@@ -12,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class NormalCredentialsTest implements CredentialsTestUtils {
+public class NormalCredentialsTest implements NormalCredentialsTestUtils {
 
     @Test
     @DisplayName("null 값으로 자격 요소 생성")
@@ -60,7 +58,7 @@ public class NormalCredentialsTest implements CredentialsTestUtils {
     @Test
     @DisplayName("다른 객체로 동등성 비교")
     void testEquals_givenDifferentObject_willReturnFalse() {
-        EmptyValueException different = new EmptyValueException(NormalIdentityErrorCode.EMPTY_NICKNAME);
+        RuntimeException different = new RuntimeException();
         assertNotEquals(testNormalCredentials, different);
     }
 

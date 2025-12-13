@@ -12,18 +12,8 @@ public enum NormalIdentityErrorCode implements ResponseCode {
     // domain
     INVALID_CODE(HttpStatus.BAD_REQUEST, "invalid_code", "올바른 코드가 아닙니다"),
     INVALID_ROLE(HttpStatus.BAD_REQUEST, "invalid_role", "올바른 사용자의 역할이 아닙니다"),
-    INVALID_ID(HttpStatus.BAD_REQUEST, "invalid_id", "올바른 ID가 아닙니다"),
-    INVALID_NICKNAME(HttpStatus.BAD_REQUEST, "invalid_nickname", "올바른 닉네임 형식이 아닙니다"),
     INVALID_AGREED_TERMS_OF_VERSION(HttpStatus.BAD_REQUEST, "invalid_agreed_terms_of_version", "동의한 약관의 버전 값이 올바른 형식이 아닙니다"),
-
-    EMPTY_MEMBER_ID(HttpStatus.BAD_REQUEST, "empty_member_id", "사용자의 식별자 값이 비었습니다"),
-    EMPTY_PASSWORD(HttpStatus.BAD_REQUEST, "empty_password", "비밀번호가 비어 있습니다"),
-    EMPTY_NICKNAME(HttpStatus.BAD_REQUEST, "empty_nickname", "닉네임이 비어 있습니다"),
-    EMPTY_AGREED_TERMS_OF_VERSION(HttpStatus.BAD_REQUEST, "empty_agreed_terms_of_version", "동의한 약관의 버전 값이 비어 있습니다"),
-
-    ALREADY_EXISTS_NICKNAME(HttpStatus.BAD_REQUEST, "already_exists_nickname", "해당 닉네임이 이미 존재합니다"),
-    ALREADY_EXISTS_MEMBER(HttpStatus.BAD_REQUEST, "already_exists_member", "해당 사용자가 이미 존재합니다"),
-    MEMBER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "member_already_exists", "해당 사용자가 이미 존재합니다");
+    EMPTY_AGREED_TERMS_OF_VERSION(HttpStatus.BAD_REQUEST, "empty_agreed_terms_of_version", "동의한 약관의 버전 값이 비어 있습니다");
 
     private final HttpStatus httpStatus;
     private final String code;

@@ -1,6 +1,6 @@
 package kr.modusplant.domains.identity.account.framework.out.jooq;
 
-import kr.modusplant.domains.identity.account.domain.vo.MemberId;
+import kr.modusplant.domains.identity.account.domain.vo.AccountId;
 import kr.modusplant.domains.identity.account.usecase.port.repository.AccountRepository;
 import kr.modusplant.domains.identity.account.usecase.response.AccountAuthResponse;
 import kr.modusplant.jooq.tables.SiteMember;
@@ -19,7 +19,7 @@ public class AccountJooqRepository implements AccountRepository {
     private final SiteMember member = SiteMember.SITE_MEMBER;
 
     @Override
-    public AccountAuthResponse getAuthInfo(MemberId id) {
+    public AccountAuthResponse getAuthInfo(AccountId id) {
         return dsl.select(memberAuth.EMAIL, memberAuth.PROVIDER, member.CREATED_AT)
                 .from(memberAuth)
                 .join(member).on(memberAuth.ACT_MEMB_UUID.eq(member.UUID))
