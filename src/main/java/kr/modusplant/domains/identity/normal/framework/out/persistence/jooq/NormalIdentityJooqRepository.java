@@ -1,7 +1,6 @@
 package kr.modusplant.domains.identity.normal.framework.out.persistence.jooq;
 
 import kr.modusplant.domains.identity.normal.domain.vo.NormalMemberId;
-import kr.modusplant.domains.identity.normal.domain.vo.NormalNickname;
 import kr.modusplant.domains.identity.normal.domain.vo.NormalPassword;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityReadRepository;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityUpdateRepository;
@@ -9,6 +8,7 @@ import kr.modusplant.jooq.tables.SiteMember;
 import kr.modusplant.jooq.tables.SiteMemberAuth;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.kernel.Email;
+import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -69,11 +69,11 @@ public class NormalIdentityJooqRepository implements
     }
 
     @Override
-    public boolean existsByNickname(NormalNickname normalNickname) {
+    public boolean existsByNickname(Nickname nickname) {
         return dsl.fetchExists(
                 dsl.selectOne()
                         .from(member)
-                        .where(member.NICKNAME.eq(normalNickname.getValue()))
+                        .where(member.NICKNAME.eq(nickname.getValue()))
         );
     }
 }

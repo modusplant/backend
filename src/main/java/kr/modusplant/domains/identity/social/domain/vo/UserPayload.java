@@ -2,6 +2,7 @@ package kr.modusplant.domains.identity.social.domain.vo;
 
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.shared.kernel.Email;
+import kr.modusplant.shared.kernel.Nickname;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

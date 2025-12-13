@@ -34,7 +34,7 @@ class SocialIdentityMapperImplTest {
         assertEquals(AuthProvider.KAKAO, result.getSocialCredentials().getProvider());
         assertEquals(TEST_SOCIAL_KAKAO_PROVIDER_ID_STRING, result.getSocialCredentials().getProviderId());
         assertEquals(TEST_SOCIAL_KAKAO_EMAIL_STRING, result.getEmail().getValue());
-        assertEquals(TEST_SOCIAL_KAKAO_NICKNAME_STRING, result.getNickname().getNickname());
+        assertEquals(TEST_SOCIAL_KAKAO_NICKNAME_STRING, result.getNickname().getValue());
         assertTrue(result.getSocialCredentials().isKakao());
     }
 
@@ -55,7 +55,7 @@ class SocialIdentityMapperImplTest {
         assertEquals(AuthProvider.GOOGLE, result.getSocialCredentials().getProvider());
         assertEquals(TEST_SOCIAL_GOOGLE_PROVIDER_ID_STRING, result.getSocialCredentials().getProviderId());
         assertEquals(TEST_SOCIAL_GOOGLE_EMAIL_STRING, result.getEmail().getValue());
-        assertEquals(TEST_SOCIAL_GOOGLE_NICKNAME_STRING, result.getNickname().getNickname());
+        assertEquals(TEST_SOCIAL_GOOGLE_NICKNAME_STRING, result.getNickname().getValue());
         assertTrue(result.getSocialCredentials().isGoogle());
     }
 

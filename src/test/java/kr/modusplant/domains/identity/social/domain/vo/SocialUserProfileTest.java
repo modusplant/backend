@@ -12,13 +12,13 @@ class SocialUserProfileTest implements SocialUserProfileTestUtils {
     @DisplayName("유효한 SocialCredentials, Email, Nickname으로 SocialUserProfile 생성")
     void testCreate_givenValidParameters_willReturnSocialUserProfile() {
         // when
-        SocialUserProfile profile = SocialUserProfile.create(testKakaoSocialCredentials, testKakaoUserEmail, testSocialKakaoNickname);
+        SocialUserProfile profile = SocialUserProfile.create(testKakaoSocialCredentials, testKakaoUserEmail, testKakaoUserNickname);
 
         // then
         assertNotNull(profile);
         assertEquals(testKakaoSocialCredentials, profile.getSocialCredentials());
         assertEquals(testKakaoUserEmail, profile.getEmail());
-        assertEquals(testSocialKakaoNickname, profile.getNickname());
+        assertEquals(testKakaoUserNickname, profile.getNickname());
     }
 
     @Test

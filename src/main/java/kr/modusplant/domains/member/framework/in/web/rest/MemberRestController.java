@@ -17,7 +17,6 @@ import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
-import kr.modusplant.infrastructure.jwt.exception.InvalidTokenException;
 import kr.modusplant.infrastructure.jwt.exception.TokenExpiredException;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +31,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
+import static kr.modusplant.infrastructure.jwt.util.TokenUtils.getTokenFromAuthorizationHeader;
 import static kr.modusplant.shared.constant.Regex.*;
 
 @Tag(name = "회원 API", description = "회원의 생성과 갱신(상태 제외), 회원이 할 수 있는 단일한 기능을 관리하는 API 입니다.")
@@ -288,23 +288,8 @@ public class MemberRestController {
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
-//    private void validateTokenAndAccessToId(UUID id, String auth) {
-//        String accessToken = getTokenFromAuthorizationHeader(auth);
-//        if (!jwtTokenProvider.validateToken(accessToken)) {
-//            throw new TokenExpiredException();
-//        }
-//        if (!jwtTokenProvider.getMemberUuidFromToken(accessToken).equals(id)) {
-//            throw new IncorrectMemberIdException();
-//        }
-//    }
-
     private void validateTokenAndAccessToId(UUID id, String auth) {
-        String accessToken;
-        if (auth.startsWith("Bearer ")) {
-            accessToken = auth.substring(7);
-        } else {
-            throw new InvalidTokenException();
-        }
+        String accessToken = getTokenFromAuthorizationHeader(auth);
         if (!jwtTokenProvider.validateToken(accessToken)) {
             throw new TokenExpiredException();
         }

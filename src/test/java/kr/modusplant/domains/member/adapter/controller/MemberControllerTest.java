@@ -40,13 +40,12 @@ import java.util.UUID;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberBirthDateTestUtils.testMemberBirthDate;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
-import static kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils.TEST_NICKNAME;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils.testMemberProfileIntroduction;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD;
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberCheckNicknameRecordTestUtils.TEST_MEMBER_NICKNAME_CHECK_RECORD;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.testMemberPostBookmarkCancelRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.testMemberCommentLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.testMemberCommentUnlikeRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberNicknameCheckRecordTestUtils.TestMemberNicknameCheckRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostBookmarkRecordTestUtils.testMemberPostBookmarkRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostLikeRecordTestUtils.testMemberPostLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
@@ -59,6 +58,7 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 import static kr.modusplant.shared.event.common.util.CommentLikeEventTestUtils.testCommentLikeEvent;
 import static kr.modusplant.shared.event.common.util.PostBookmarkEventTestUtils.testPostBookmarkEvent;
 import static kr.modusplant.shared.event.common.util.PostCancelPostBookmarkEventTestUtils.testPostBookmarkCancelEvent;
+import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES;
@@ -119,7 +119,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(memberRepository.isNicknameExist(any())).willReturn(true);
 
         // when & then
-        assertThat(memberController.checkExistedNickname(TEST_MEMBER_NICKNAME_CHECK_RECORD)).isEqualTo(true);
+        assertThat(memberController.checkExistedNickname(TestMemberNicknameCheckRecord)).isEqualTo(true);
     }
 
     @Test
@@ -194,7 +194,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
                         testMemberId,
                         MemberEmptyProfileImage.create(),
                         testMemberProfileIntroduction,
-                        TEST_NICKNAME))
+                        testNormalUserNickname))
         );
         willDoNothing().given(s3FileService).deleteFiles(any());
         willDoNothing().given(s3FileService).uploadFile(any(), any());
@@ -214,7 +214,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     @DisplayName("존재하는 않는 데이터로 overrideProfile로 프로필 덮어쓰기")
     void testOverrideProfile_givenNotFoundData_willReturnResponse() throws IOException {
         // given
-        MemberProfile memberProfile = MemberProfile.create(testMemberId, MemberEmptyProfileImage.create(), MemberEmptyProfileIntroduction.create(), TEST_NICKNAME);
+        MemberProfile memberProfile = MemberProfile.create(testMemberId, MemberEmptyProfileImage.create(), MemberEmptyProfileIntroduction.create(), testNormalUserNickname);
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(memberProfileRepository.getById(any())).willReturn(Optional.empty());
@@ -248,7 +248,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     void testValidateBeforeOverrideProfile_givenAlreadyExistedNickname_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
-        given(memberRepository.getByNickname(any())).willReturn(Optional.of(Member.create(MemberId.generate(), testMemberActiveStatus, TEST_NICKNAME, testMemberBirthDate)));
+        given(memberRepository.getByNickname(any())).willReturn(Optional.of(Member.create(MemberId.generate(), testMemberActiveStatus, testNormalUserNickname, testMemberBirthDate)));
 
         // when & then
         EntityExistsException alreadyExistedNicknameException = assertThrows(
@@ -388,7 +388,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         willDoNothing().given(commPostBookmarkRepository).delete(postBookmarkEntity);
 
         // when
-        memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD);
+        memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord);
 
         // then
         verify(commPostBookmarkRepository, times(1)).delete(any());
@@ -404,7 +404,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(targetPostIdRepository.isBookmarked(any(), any())).willReturn(false);
 
         // when
-        memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD);
+        memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord);
 
         // then
         verify(commPostBookmarkRepository, times(0)).delete(any());
@@ -474,7 +474,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         EntityNotFoundException entityNotFoundExceptionForBookmark = assertThrows(EntityNotFoundException.class,
                 () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
         EntityNotFoundException entityNotFoundExceptionForCancelBookmark = assertThrows(EntityNotFoundException.class,
-                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
+                () -> memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord));
 
         // then
         assertThat(entityNotFoundExceptionForBookmark.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
@@ -492,7 +492,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         EntityNotFoundException entityNotFoundExceptionForBookmark = assertThrows(EntityNotFoundException.class,
                 () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
         EntityNotFoundException entityNotFoundExceptionForCancelBookmark = assertThrows(EntityNotFoundException.class,
-                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
+                () -> memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord));
 
         // then
         assertThat(entityNotFoundExceptionForBookmark.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
@@ -511,7 +511,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         NotAccessiblePostBookmarkException entityNotFoundExceptionForBookmark = assertThrows(NotAccessiblePostBookmarkException.class,
                 () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
         NotAccessiblePostBookmarkException entityNotFoundExceptionForCancelBookmark = assertThrows(NotAccessiblePostBookmarkException.class,
-                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
+                () -> memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord));
 
         // then
         assertThat(entityNotFoundExceptionForBookmark.getMessage()).isEqualTo(NOT_ACCESSIBLE_POST_BOOKMARK.getMessage());

@@ -38,7 +38,7 @@ public class NormalIdentityControllerTest implements
     public void testRegisterNormalMember_givenValidRequest_willProcessRequest() {
         // given
         given(readRepository.existsByEmail(testEmail)).willReturn(false);
-        given(readRepository.existsByNickname(TEST_NORMAL_NICKNAME)).willReturn(false);
+        given(readRepository.existsByNickname(testNormalUserNickname)).willReturn(false);
         given(mapper.toSignUpData(testNormalSignUpRequest)).willReturn(TEST_NORMAL_SIGN_UP_DATA);
         doNothing().when(createRepository).save(TEST_NORMAL_SIGN_UP_DATA);
 
@@ -47,7 +47,7 @@ public class NormalIdentityControllerTest implements
 
         // then
         verify(readRepository, times(1)).existsByEmail(testEmail);
-        verify(readRepository, times(1)).existsByNickname(TEST_NORMAL_NICKNAME);
+        verify(readRepository, times(1)).existsByNickname(testNormalUserNickname);
         verify(mapper, times(1)).toSignUpData(testNormalSignUpRequest);
         verify(createRepository, times(1)).save(TEST_NORMAL_SIGN_UP_DATA);
     }

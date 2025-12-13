@@ -159,19 +159,19 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
     @DisplayName("유효한 SocialUserProfile과 Role로 소셜 회원을 생성")
     void testCreateSocialMember_givenValidProfileAndRole_willCreateMemberAndReturnPayload() {
         // given
-        SocialUserProfile profile = SocialUserProfile.create(testKakaoSocialCredentials, testKakaoUserEmail, testSocialKakaoNickname);
+        SocialUserProfile profile = SocialUserProfile.create(testKakaoSocialCredentials, testKakaoUserEmail, testNormalUserNickname);
         Role role = Role.USER;
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         SiteMemberAuthEntity memberAuthEntity = mock(SiteMemberAuthEntity.class);
         SiteMemberRoleEntity memberRoleEntity = mock(SiteMemberRoleEntity.class);
 
-        given(socialIdentityJpaMapper.toMemberEntity(testSocialKakaoNickname)).willReturn(memberEntity);
+        given(socialIdentityJpaMapper.toMemberEntity(testNormalUserNickname)).willReturn(memberEntity);
         given(memberJpaRepository.save(memberEntity)).willReturn(memberEntity);
         given(socialIdentityJpaMapper.toMemberAuthEntity(memberEntity, profile)).willReturn(memberAuthEntity);
         given(memberAuthJpaRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
         given(socialIdentityJpaMapper.toMemberRoleEntity(memberEntity, role)).willReturn(memberRoleEntity);
         given(memberRoleJpaRepository.save(memberRoleEntity)).willReturn(memberRoleEntity);
-        given(socialIdentityJpaMapper.toUserPayload(memberEntity, testSocialKakaoNickname, testKakaoUserEmail, role)).willReturn(testSocialKakaoUserPayload);
+        given(socialIdentityJpaMapper.toUserPayload(memberEntity, testNormalUserNickname, testKakaoUserEmail, role)).willReturn(testSocialKakaoUserPayload);
 
         // when
         UserPayload result = socialIdentityRepositoryJpaAdapter.createSocialMember(profile, role);
@@ -179,13 +179,13 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
         // then
         assertNotNull(result);
         assertEquals(testSocialKakaoUserPayload, result);
-        verify(socialIdentityJpaMapper).toMemberEntity(testSocialKakaoNickname);
+        verify(socialIdentityJpaMapper).toMemberEntity(testNormalUserNickname);
         verify(memberJpaRepository).save(memberEntity);
         verify(socialIdentityJpaMapper).toMemberAuthEntity(memberEntity, profile);
         verify(memberAuthJpaRepository).save(memberAuthEntity);
         verify(socialIdentityJpaMapper).toMemberRoleEntity(memberEntity, role);
         verify(memberRoleJpaRepository).save(memberRoleEntity);
-        verify(socialIdentityJpaMapper).toUserPayload(memberEntity, testSocialKakaoNickname,testKakaoUserEmail, role);
+        verify(socialIdentityJpaMapper).toUserPayload(memberEntity, testNormalUserNickname, testKakaoUserEmail, role);
     }
 
 }

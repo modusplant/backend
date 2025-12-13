@@ -13,7 +13,7 @@ import org.mockito.Mockito;
 import java.util.Optional;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
-import static kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils.TEST_NICKNAME;
+import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -50,7 +50,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, SiteMemberEntit
         given(memberJpaRepository.findByNickname(any())).willReturn(Optional.of(createMemberBasicUserEntityWithUuid()));
 
         // when & then
-        assertThat(memberRepositoryJpaAdapter.getByNickname(TEST_NICKNAME)).isEqualTo(Optional.of(createMember()));
+        assertThat(memberRepositoryJpaAdapter.getByNickname(testNormalUserNickname)).isEqualTo(Optional.of(createMember()));
     }
 
     @Test
@@ -60,7 +60,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, SiteMemberEntit
         given(memberJpaRepository.findByNickname(any())).willReturn(Optional.empty());
 
         // when & then
-        assertThat(memberRepositoryJpaAdapter.getByNickname(TEST_NICKNAME)).isEqualTo(Optional.empty());
+        assertThat(memberRepositoryJpaAdapter.getByNickname(testNormalUserNickname)).isEqualTo(Optional.empty());
     }
 
     @Test
@@ -71,7 +71,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, SiteMemberEntit
         given(memberJpaRepository.save(any())).willReturn(memberEntity);
 
         // when & then
-        assertThat(memberRepositoryJpaAdapter.save(TEST_NICKNAME).getNickname()).isEqualTo(TEST_NICKNAME);
+        assertThat(memberRepositoryJpaAdapter.save(testNormalUserNickname).getNickname()).isEqualTo(testNormalUserNickname);
     }
 
     @Test
@@ -82,9 +82,9 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, SiteMemberEntit
         given(memberJpaRepository.save(any())).willReturn(memberEntity);
 
         // when & then
-        Member member = memberRepositoryJpaAdapter.save(testMemberId, TEST_NICKNAME);
+        Member member = memberRepositoryJpaAdapter.save(testMemberId, testNormalUserNickname);
         assertThat(member.getMemberId()).isEqualTo(testMemberId);
-        assertThat(member.getNickname()).isEqualTo(TEST_NICKNAME);
+        assertThat(member.getNickname()).isEqualTo(testNormalUserNickname);
     }
 
     @Test
@@ -111,19 +111,19 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, SiteMemberEntit
     @DisplayName("isNicknameExist로 true 반환")
     void testIsNicknameExist_givenNicknameThatExists_willReturnTrue() {
         // given & when
-        given(memberJpaRepository.existsByNickname(TEST_NICKNAME.getValue())).willReturn(true);
+        given(memberJpaRepository.existsByNickname(testNormalUserNickname.getValue())).willReturn(true);
 
         // when & then
-        assertThat(memberRepositoryJpaAdapter.isNicknameExist(TEST_NICKNAME)).isEqualTo(true);
+        assertThat(memberRepositoryJpaAdapter.isNicknameExist(testNormalUserNickname)).isEqualTo(true);
     }
 
     @Test
     @DisplayName("isNicknameExist로 false 반환")
     void testIsNicknameExist_givenNicknameThatIsNotExist_willReturnFalse() {
         // given & when
-        given(memberJpaRepository.existsByNickname(TEST_NICKNAME.getValue())).willReturn(false);
+        given(memberJpaRepository.existsByNickname(testNormalUserNickname.getValue())).willReturn(false);
 
         // when & then
-        assertThat(memberRepositoryJpaAdapter.isNicknameExist(TEST_NICKNAME)).isEqualTo(false);
+        assertThat(memberRepositoryJpaAdapter.isNicknameExist(testNormalUserNickname)).isEqualTo(false);
     }
 }
