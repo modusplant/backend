@@ -23,7 +23,7 @@ public class AuthorTest implements AuthorTestUtils {
 
     @Test
     @DisplayName("null인 작성자의 닉네임으로 작성자 생성")
-    public void testCreate_givenInvalidMemberNickname_willThrowEmptyValueException() {
+    public void testCreate_givenInvalidNickname_willThrowEmptyValueException() {
         // given
         EmptyValueException result = assertThrows(EmptyValueException.class, () -> Author.create(testAuthor.getMemberUuid(), null));
 
