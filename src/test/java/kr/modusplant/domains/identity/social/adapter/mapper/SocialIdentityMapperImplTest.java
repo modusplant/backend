@@ -1,6 +1,6 @@
 package kr.modusplant.domains.identity.social.adapter.mapper;
 
-import kr.modusplant.domains.identity.social.domain.vo.SocialUserProfile;
+import kr.modusplant.domains.identity.social.domain.vo.SocialAccountProfile;
 import kr.modusplant.domains.identity.social.framework.out.client.dto.GoogleUserInfo;
 import kr.modusplant.domains.identity.social.framework.out.client.dto.KakaoUserInfo;
 import kr.modusplant.domains.identity.social.usecase.port.client.dto.SocialUserInfo;
@@ -27,7 +27,7 @@ class SocialIdentityMapperImplTest {
         given(userInfo.getNickname()).willReturn(TEST_SOCIAL_KAKAO_NICKNAME_STRING);
 
         // when
-        SocialUserProfile result = socialIdentityMapper.toSocialUserProfile(AuthProvider.KAKAO,userInfo);
+        SocialAccountProfile result = socialIdentityMapper.toSocialUserProfile(AuthProvider.KAKAO,userInfo);
 
         // then
         assertNotNull(result);
@@ -48,7 +48,7 @@ class SocialIdentityMapperImplTest {
         given(userInfo.getNickname()).willReturn(TEST_SOCIAL_GOOGLE_NICKNAME_STRING);
 
         // when
-        SocialUserProfile result = socialIdentityMapper.toSocialUserProfile(AuthProvider.GOOGLE,userInfo);
+        SocialAccountProfile result = socialIdentityMapper.toSocialUserProfile(AuthProvider.GOOGLE,userInfo);
 
         // then
         assertNotNull(result);

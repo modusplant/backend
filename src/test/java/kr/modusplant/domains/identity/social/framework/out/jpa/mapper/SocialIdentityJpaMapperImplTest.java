@@ -3,7 +3,7 @@ package kr.modusplant.domains.identity.social.framework.out.jpa.mapper;
 import kr.modusplant.domains.identity.social.common.util.domain.vo.SocialUserProfileTestUtils;
 import kr.modusplant.domains.identity.social.common.util.domain.vo.UserPayloadTestUtils;
 import kr.modusplant.domains.identity.social.common.util.framework.out.jpa.entity.MemberEntityTestUtils;
-import kr.modusplant.domains.identity.social.domain.vo.UserPayload;
+import kr.modusplant.domains.identity.social.domain.vo.SocialAccountPayload;
 import kr.modusplant.domains.identity.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
 import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
@@ -36,11 +36,11 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialUs
     void testToMemberAuthEntity_givenMemberEntityAndProfile_willReturnMemberAuthEntity() {
         // given
         SiteMemberEntity memberEntity = createKakaoMemberEntityWithUuid();
-        String providerId = testKakaoSocialUserProfile.getSocialCredentials().getProviderId();
-        String email = testKakaoSocialUserProfile.getEmail().getValue();
+        String providerId = TEST_KAKAO_SOCIAL_ACCOUNT_PROFILE.getSocialCredentials().getProviderId();
+        String email = TEST_KAKAO_SOCIAL_ACCOUNT_PROFILE.getEmail().getValue();
 
         // when
-        SiteMemberAuthEntity result = socialIdentityJpaMapper.toMemberAuthEntity(memberEntity, testKakaoSocialUserProfile);
+        SiteMemberAuthEntity result = socialIdentityJpaMapper.toMemberAuthEntity(memberEntity, TEST_KAKAO_SOCIAL_ACCOUNT_PROFILE);
 
         // then
         assertNotNull(result);
@@ -83,7 +83,7 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialUs
                 .build();
 
         // when
-        UserPayload result = socialIdentityJpaMapper.toUserPayload(memberEntity, memberAuthEntity, memberRoleEntity);
+        SocialAccountPayload result = socialIdentityJpaMapper.toUserPayload(memberEntity, memberAuthEntity, memberRoleEntity);
 
         // then
         assertNotNull(result);
@@ -101,7 +101,7 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialUs
         Role role = Role.USER;
 
         // when
-        UserPayload result = socialIdentityJpaMapper.toUserPayload(memberEntity, testNormalUserNickname, testKakaoUserEmail, role);
+        SocialAccountPayload result = socialIdentityJpaMapper.toUserPayload(memberEntity, testNormalUserNickname, testKakaoUserEmail, role);
 
         // then
         assertNotNull(result);

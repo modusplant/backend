@@ -1,13 +1,13 @@
 package kr.modusplant.domains.identity.normal.domain.vo;
 
 import kr.modusplant.domains.identity.normal.common.util.domain.vo.AgreedTermsOfVersionTestUtils;
-import kr.modusplant.domains.identity.normal.common.util.domain.vo.EmailTestUtils;
 import kr.modusplant.domains.identity.normal.common.util.domain.vo.SignUpDataTestUtils;
 import kr.modusplant.domains.identity.normal.domain.exception.EmptyValueException;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
 import kr.modusplant.shared.exception.EmptyEmailException;
 import kr.modusplant.shared.exception.InvalidEmailException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
 import kr.modusplant.shared.kernel.common.util.NicknameTestUtils;
 import kr.modusplant.shared.kernel.common.util.PasswordTestUtils;
 import org.junit.jupiter.api.DisplayName;
@@ -65,7 +65,7 @@ public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, Pass
     @DisplayName("동일하고 다른 프로퍼티를 지닌 객체로 동등성 비교")
     void testEquals_givenDifferentProperty_willReturnFalse() {
         // given
-        SignUpData signUpData = SignUpData.create(testEmail.getValue(), testNormalUserPassword.getValue(),
+        SignUpData signUpData = SignUpData.create(testNormalUserEmail.getValue(), testNormalUserPassword.getValue(),
                 testNormalUserNickname.getValue(), testAgreedPrivacyPolicy.getValue(),
                 testAgreedTermsOfUse.getValue(), testAgreedAdReceiving.getValue());
 

@@ -10,23 +10,23 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class SocialUserProfile {
+public class SocialAccountProfile {
     private final SocialCredentials socialCredentials;
     private final Email email;
     private final Nickname nickname;
 
-    public static SocialUserProfile create(SocialCredentials socialCredentials, Email email, Nickname nickname) {
-        return new SocialUserProfile(socialCredentials, email, nickname);
+    public static SocialAccountProfile create(SocialCredentials socialCredentials, Email email, Nickname nickname) {
+        return new SocialAccountProfile(socialCredentials, email, nickname);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof SocialUserProfile socialUserProfile)) return false;
+        if (!(o instanceof SocialAccountProfile socialAccountProfile)) return false;
 
         return new EqualsBuilder()
-                .append(getSocialCredentials(), socialUserProfile.getSocialCredentials())
+                .append(getSocialCredentials(), socialAccountProfile.getSocialCredentials())
                 .isEquals();
     }
 

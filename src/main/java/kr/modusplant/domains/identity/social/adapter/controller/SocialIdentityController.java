@@ -1,8 +1,8 @@
 package kr.modusplant.domains.identity.social.adapter.controller;
 
 import kr.modusplant.domains.identity.social.domain.vo.MemberId;
-import kr.modusplant.domains.identity.social.domain.vo.SocialUserProfile;
-import kr.modusplant.domains.identity.social.domain.vo.UserPayload;
+import kr.modusplant.domains.identity.social.domain.vo.SocialAccountProfile;
+import kr.modusplant.domains.identity.social.domain.vo.SocialAccountPayload;
 import kr.modusplant.domains.identity.social.usecase.port.client.SocialAuthClientFactory;
 import kr.modusplant.domains.identity.social.usecase.port.client.dto.SocialUserInfo;
 import kr.modusplant.domains.identity.social.usecase.port.mapper.SocialIdentityMapper;
@@ -23,7 +23,7 @@ public class SocialIdentityController {
     private final SocialIdentityRepository socialIdentityRepository;
     private final SocialIdentityMapper socialIdentityMapper;
 
-    public UserPayload handleSocialLogin(AuthProvider provider, String code) {
+    public SocialAccountPayload handleSocialLogin(AuthProvider provider, String code) {
         // 소셜 토큰 발급
         String socialAccessToken = clientFactory.getClient(provider).getAccessToken(code);
         // 소셜 사용자 정보 가져오기
@@ -33,7 +33,7 @@ public class SocialIdentityController {
     }
 
     @Transactional
-    public UserPayload findOrCreateMember(SocialUserProfile profile) {
+    public SocialAccountPayload findOrCreateMember(SocialAccountProfile profile) {
         Optional<MemberId> existingMemberId = socialIdentityRepository.getMemberIdBySocialCredentials(profile.getSocialCredentials());
 
         if (existingMemberId.isPresent()) {
@@ -43,12 +43,12 @@ public class SocialIdentityController {
         }
     }
 
-    private UserPayload handleExistingMember(MemberId memberId) {
+    private SocialAccountPayload handleExistingMember(MemberId memberId) {
         socialIdentityRepository.updateLoggedInAt(memberId);
         return socialIdentityRepository.getUserPayloadByMemberId(memberId);
     }
 
-    private UserPayload handleNewMember(SocialUserProfile profile) {
+    private SocialAccountPayload handleNewMember(SocialAccountProfile profile) {
         return socialIdentityRepository.createSocialMember(profile, Role.USER);
     }
 

@@ -25,10 +25,10 @@ public class NormalIdentityMapperImplTest implements CredentialsTestUtils,
         SignUpData result = mapper.toSignUpData(testNormalSignUpRequest);
 
         // then
-        assertThat(result.getCredentials().getEmail())
-                .isEqualTo(TEST_NORMAL_SIGN_UP_DATA.getCredentials().getEmail());
-        assertThat(encoder.matches(testCredentials.getPassword().getValue(),
-                result.getCredentials().getPassword().getValue())).isTrue();
+        assertThat(result.getNormalCredentials().getEmail())
+                .isEqualTo(TEST_NORMAL_SIGN_UP_DATA.getNormalCredentials().getEmail());
+        assertThat(encoder.matches(testNormalCredentials.getPassword().getValue(),
+                result.getNormalCredentials().getPassword().getValue())).isTrue();
         assertThat(result.getNickname().getValue())
                 .isEqualTo(TEST_NORMAL_SIGN_UP_DATA.getNickname().getValue());
         assertThat(result.getAgreedTermsOfUseVersion().getValue())

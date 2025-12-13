@@ -10,27 +10,27 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Credentials {
+public class NormalCredentials {
     private final Email email;
     private final Password password;
 
-    public static Credentials createWithString(String email, String password) {
-        return new Credentials(Email.create(email), Password.create(password));
+    public static NormalCredentials createWithString(String email, String password) {
+        return new NormalCredentials(Email.create(email), Password.create(password));
     }
 
-    public static Credentials createWithDomain(Email email, Password password) {
-        return new Credentials(email, password);
+    public static NormalCredentials createWithDomain(Email email, Password password) {
+        return new NormalCredentials(email, password);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof Credentials credentials)) return false;
+        if (!(o instanceof NormalCredentials normalCredentials)) return false;
 
         return new EqualsBuilder()
-                .append(getEmail(), credentials.getEmail())
-                .append(getPassword(), credentials.getPassword())
+                .append(getEmail(), normalCredentials.getEmail())
+                .append(getPassword(), normalCredentials.getPassword())
                 .isEquals();
     }
 

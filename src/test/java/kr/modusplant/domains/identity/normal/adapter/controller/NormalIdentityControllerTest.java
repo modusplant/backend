@@ -14,6 +14,7 @@ import kr.modusplant.domains.identity.normal.usecase.request.EmailModificationRe
 import kr.modusplant.domains.identity.normal.usecase.request.PasswordModificationRequest;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Password;
+import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -22,7 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-public class NormalIdentityControllerTest implements
+public class NormalIdentityControllerTest implements EmailTestUtils,
         NormalSignUpRequestTestUtils, SignUpDataTestUtils, MemberIdTestUtils,
         EmailModificationRequestTestUtils, PasswordModificationRequestTestUtils {
     private final NormalIdentityMapper mapper = Mockito.mock(NormalIdentityMapperImpl.class);
@@ -37,7 +38,7 @@ public class NormalIdentityControllerTest implements
     @DisplayName("유효한 요청 데이터를 받았을 시 일반 회원가입 진행")
     public void testRegisterNormalMember_givenValidRequest_willProcessRequest() {
         // given
-        given(readRepository.existsByEmail(testEmail)).willReturn(false);
+        given(readRepository.existsByEmail(testNormalUserEmail)).willReturn(false);
         given(readRepository.existsByNickname(testNormalUserNickname)).willReturn(false);
         given(mapper.toSignUpData(testNormalSignUpRequest)).willReturn(TEST_NORMAL_SIGN_UP_DATA);
         doNothing().when(createRepository).save(TEST_NORMAL_SIGN_UP_DATA);
@@ -46,7 +47,7 @@ public class NormalIdentityControllerTest implements
         controller.registerNormalMember(testNormalSignUpRequest);
 
         // then
-        verify(readRepository, times(1)).existsByEmail(testEmail);
+        verify(readRepository, times(1)).existsByEmail(testNormalUserEmail);
         verify(readRepository, times(1)).existsByNickname(testNormalUserNickname);
         verify(mapper, times(1)).toSignUpData(testNormalSignUpRequest);
         verify(createRepository, times(1)).save(TEST_NORMAL_SIGN_UP_DATA);
@@ -65,7 +66,7 @@ public class NormalIdentityControllerTest implements
         controller.modifyEmail(TEST_NORMAL_MEMBER_ID.getValue(), testEmailModificationRequest);
 
         // then
-        verify(readRepository, times(1)).existsByEmail(testEmail);
+        verify(readRepository, times(1)).existsByEmail(testNormalUserEmail);
         verify(updateRepository, times(1)).updateEmail(TEST_NORMAL_MEMBER_ID, Email.create(request.newEmail()));
     }
 

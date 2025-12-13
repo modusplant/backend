@@ -62,12 +62,12 @@ class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, U
         SocialLoginRequest socialLoginRequest = createTestKakaoLoginRequest();
         TokenPair mockTokenPair = new TokenPair(TEST_ACCESS_TOKEN, TEST_REFRESH_TOKEN);
 
-        given(socialIdentityController.handleSocialLogin(eq(AuthProvider.KAKAO), eq(socialLoginRequest.getCode()))).willReturn(testSocialKakaoUserPayload);
+        given(socialIdentityController.handleSocialLogin(eq(AuthProvider.KAKAO), eq(socialLoginRequest.getCode()))).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD);
         given(tokenService.issueToken(
-                eq(testSocialKakaoUserPayload.getMemberId().getValue()),
-                eq(testSocialKakaoUserPayload.getNickname().getValue()),
-                eq(testSocialKakaoUserPayload.getEmail().getValue()),
-                eq(testSocialKakaoUserPayload.getRole())
+                eq(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD.getMemberId().getValue()),
+                eq(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD.getNickname().getValue()),
+                eq(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD.getEmail().getValue()),
+                eq(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD.getRole())
         )).willReturn(mockTokenPair);
 
         // when & then
@@ -88,12 +88,12 @@ class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, U
         SocialLoginRequest socialLoginRequest = createTestGoogleLoginRequest();
         TokenPair mockTokenPair = new TokenPair(TEST_ACCESS_TOKEN, TEST_REFRESH_TOKEN);
 
-        given(socialIdentityController.handleSocialLogin(eq(AuthProvider.GOOGLE), eq(socialLoginRequest.getCode()))).willReturn(testSocialGoogleUserPayload);
+        given(socialIdentityController.handleSocialLogin(eq(AuthProvider.GOOGLE), eq(socialLoginRequest.getCode()))).willReturn(TEST_SOCIAL_GOOGLE_SOCIAL_ACCOUNT_PAYLOAD);
         given(tokenService.issueToken(
-                eq(testSocialGoogleUserPayload.getMemberId().getValue()),
-                eq(testSocialGoogleUserPayload.getNickname().getValue()),
-                eq(testSocialGoogleUserPayload.getEmail().getValue()),
-                eq(testSocialGoogleUserPayload.getRole())
+                eq(TEST_SOCIAL_GOOGLE_SOCIAL_ACCOUNT_PAYLOAD.getMemberId().getValue()),
+                eq(TEST_SOCIAL_GOOGLE_SOCIAL_ACCOUNT_PAYLOAD.getNickname().getValue()),
+                eq(TEST_SOCIAL_GOOGLE_SOCIAL_ACCOUNT_PAYLOAD.getEmail().getValue()),
+                eq(TEST_SOCIAL_GOOGLE_SOCIAL_ACCOUNT_PAYLOAD.getRole())
         )).willReturn(mockTokenPair);
 
         // when & then

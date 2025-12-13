@@ -1,9 +1,9 @@
 package kr.modusplant.domains.identity.normal.framework.out.persistence.jooq;
 
-import kr.modusplant.domains.identity.normal.common.util.domain.vo.EmailTestUtils;
 import kr.modusplant.domains.identity.normal.common.util.domain.vo.MemberIdTestUtils;
 import kr.modusplant.jooq.tables.SiteMemberAuth;
 import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
 import kr.modusplant.shared.kernel.common.util.NicknameTestUtils;
 import kr.modusplant.shared.kernel.common.util.PasswordTestUtils;
 import org.jooq.DSLContext;
@@ -41,7 +41,7 @@ public class NormalIdentityJooqRepositoryTest implements
         MockDataProvider provider = ctx -> {
             Object[] bindings = ctx.bindings();
 
-            if (bindings[0].equals(testEmail.getValue()) && bindings[1].equals(TEST_NORMAL_MEMBER_ID.getValue())) {
+            if (bindings[0].equals(testNormalUserEmail.getValue()) && bindings[1].equals(TEST_NORMAL_MEMBER_ID.getValue())) {
                 return new MockResult[] {
                         new MockResult(1, null)
                 };
@@ -51,7 +51,7 @@ public class NormalIdentityJooqRepositoryTest implements
         NormalIdentityJooqRepository repository = createRepository(provider);
 
         // when
-        int result = repository.updateEmail(TEST_NORMAL_MEMBER_ID, testEmail);
+        int result = repository.updateEmail(TEST_NORMAL_MEMBER_ID, testNormalUserEmail);
 
         // then
         assertThat(result).isEqualTo(1);
@@ -153,7 +153,7 @@ public class NormalIdentityJooqRepositoryTest implements
             Result<Record1<Integer>> result = dsl.newResult(DSL.inline(1));
             result.add(dsl.newRecord(DSL.inline(1)).values(1));
 
-            if (bindings[0].equals(testEmail.getValue())) {
+            if (bindings[0].equals(testNormalUserEmail.getValue())) {
                 return new MockResult[] {
                         new MockResult(0, result)
                 };
@@ -164,7 +164,7 @@ public class NormalIdentityJooqRepositoryTest implements
         NormalIdentityJooqRepository repository = createRepository(provider);
 
         // when
-        boolean result = repository.existsByEmail(testEmail);
+        boolean result = repository.existsByEmail(testNormalUserEmail);
 
         // then
         assertThat(result).isEqualTo(true);

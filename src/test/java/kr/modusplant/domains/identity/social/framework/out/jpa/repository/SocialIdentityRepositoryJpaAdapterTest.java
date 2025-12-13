@@ -3,8 +3,8 @@ package kr.modusplant.domains.identity.social.framework.out.jpa.repository;
 import kr.modusplant.domains.identity.social.common.util.domain.vo.SocialCredentialsTestUtils;
 import kr.modusplant.domains.identity.social.common.util.domain.vo.UserPayloadTestUtils;
 import kr.modusplant.domains.identity.social.domain.vo.MemberId;
-import kr.modusplant.domains.identity.social.domain.vo.SocialUserProfile;
-import kr.modusplant.domains.identity.social.domain.vo.UserPayload;
+import kr.modusplant.domains.identity.social.domain.vo.SocialAccountProfile;
+import kr.modusplant.domains.identity.social.domain.vo.SocialAccountPayload;
 import kr.modusplant.domains.identity.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
 import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
@@ -91,15 +91,15 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
         given(memberJpaRepository.findByUuid(testSocialKakaoMemberId.getValue())).willReturn(Optional.of(memberEntity));
         given(memberAuthJpaRepository.findByActiveMember(memberEntity)).willReturn(List.of(memberAuthEntity));
         given(memberRoleJpaRepository.findByMember(memberEntity)).willReturn(Optional.of(memberRoleEntity));
-        given(socialIdentityJpaMapper.toUserPayload(memberEntity,memberAuthEntity, memberRoleEntity)).willReturn(testSocialKakaoUserPayload);
+        given(socialIdentityJpaMapper.toUserPayload(memberEntity,memberAuthEntity, memberRoleEntity)).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD);
 
 
         // when
-        UserPayload result = socialIdentityRepositoryJpaAdapter.getUserPayloadByMemberId(testSocialKakaoMemberId);
+        SocialAccountPayload result = socialIdentityRepositoryJpaAdapter.getUserPayloadByMemberId(testSocialKakaoMemberId);
 
         // then
         assertNotNull(result);
-        assertEquals(testSocialKakaoUserPayload, result);
+        assertEquals(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD, result);
         verify(memberJpaRepository).findByUuid(testSocialKakaoMemberId.getValue());
         verify(memberAuthJpaRepository).findByActiveMember(memberEntity);
         verify(memberRoleJpaRepository).findByMember(memberEntity);
@@ -159,7 +159,7 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
     @DisplayName("유효한 SocialUserProfile과 Role로 소셜 회원을 생성")
     void testCreateSocialMember_givenValidProfileAndRole_willCreateMemberAndReturnPayload() {
         // given
-        SocialUserProfile profile = SocialUserProfile.create(testKakaoSocialCredentials, testKakaoUserEmail, testNormalUserNickname);
+        SocialAccountProfile profile = SocialAccountProfile.create(testKakaoSocialCredentials, testKakaoUserEmail, testNormalUserNickname);
         Role role = Role.USER;
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         SiteMemberAuthEntity memberAuthEntity = mock(SiteMemberAuthEntity.class);
@@ -171,14 +171,14 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
         given(memberAuthJpaRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
         given(socialIdentityJpaMapper.toMemberRoleEntity(memberEntity, role)).willReturn(memberRoleEntity);
         given(memberRoleJpaRepository.save(memberRoleEntity)).willReturn(memberRoleEntity);
-        given(socialIdentityJpaMapper.toUserPayload(memberEntity, testNormalUserNickname, testKakaoUserEmail, role)).willReturn(testSocialKakaoUserPayload);
+        given(socialIdentityJpaMapper.toUserPayload(memberEntity, testNormalUserNickname, testKakaoUserEmail, role)).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD);
 
         // when
-        UserPayload result = socialIdentityRepositoryJpaAdapter.createSocialMember(profile, role);
+        SocialAccountPayload result = socialIdentityRepositoryJpaAdapter.createSocialMember(profile, role);
 
         // then
         assertNotNull(result);
-        assertEquals(testSocialKakaoUserPayload, result);
+        assertEquals(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD, result);
         verify(socialIdentityJpaMapper).toMemberEntity(testNormalUserNickname);
         verify(memberJpaRepository).save(memberEntity);
         verify(socialIdentityJpaMapper).toMemberAuthEntity(memberEntity, profile);

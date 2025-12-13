@@ -11,24 +11,24 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class UserPayload {
+public class SocialAccountPayload {
     private final MemberId memberId;
     private final Nickname nickname;
     private final Email email;
     private final Role role;
 
-    public static UserPayload create(MemberId memberId, Nickname nickname, Email email, Role role) {
-        return new UserPayload(memberId, nickname, email, role);
+    public static SocialAccountPayload create(MemberId memberId, Nickname nickname, Email email, Role role) {
+        return new SocialAccountPayload(memberId, nickname, email, role);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof UserPayload userPayload)) return false;
+        if (!(o instanceof SocialAccountPayload socialAccountPayload)) return false;
 
         return new EqualsBuilder()
-                .append(getMemberId(), userPayload.getMemberId())
+                .append(getMemberId(), socialAccountPayload.getMemberId())
                 .isEquals();
     }
 

@@ -12,14 +12,14 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CredentialsTest implements CredentialsTestUtils {
+public class NormalCredentialsTest implements CredentialsTestUtils {
 
     @Test
     @DisplayName("null 값으로 자격 요소 생성")
     public void testCreate_givenNullEmailAndPassword_willThrowEmptyEmailException() {
         // given
         EmptyEmailException result = assertThrows(EmptyEmailException.class, () ->
-                Credentials.createWithString(null, null));
+                NormalCredentials.createWithString(null, null));
 
         // when & then
         assertEquals(ErrorCode.EMAIL_EMPTY, result.getErrorCode());
@@ -30,7 +30,7 @@ public class CredentialsTest implements CredentialsTestUtils {
     public void testCreate_givenInvalidEmail_willThrowInvalidEmailException() {
         // given
         InvalidEmailException result = assertThrows(InvalidEmailException.class, () ->
-                Credentials.createWithString("email", testCredentials.getPassword().getValue()));
+                NormalCredentials.createWithString("email", testNormalCredentials.getPassword().getValue()));
 
         // when & then
         assertEquals(ErrorCode.INVALID_EMAIL, result.getErrorCode());
@@ -41,7 +41,7 @@ public class CredentialsTest implements CredentialsTestUtils {
     public void testCreate_givenInvalidPassword_willThrowInvalidValueException() {
         // given
         InvalidPasswordException result = assertThrows(InvalidPasswordException.class, () ->
-                Credentials.createWithString(testCredentials.getEmail().getValue(), "282933"));
+                NormalCredentials.createWithString(testNormalCredentials.getEmail().getValue(), "282933"));
 
         // when & then
         assertEquals(ErrorCode.INVALID_PASSWORD, result.getErrorCode());
@@ -51,25 +51,25 @@ public class CredentialsTest implements CredentialsTestUtils {
     @DisplayName("동일한 객체로 동등성 비교")
     void testEquals_givenSameObject_willReturnTrue() {
         // given
-        Credentials same = testCredentials;
+        NormalCredentials same = testNormalCredentials;
 
         // when & then
-        assertEquals(testCredentials, testCredentials);
+        assertEquals(testNormalCredentials, testNormalCredentials);
     }
 
     @Test
     @DisplayName("다른 객체로 동등성 비교")
     void testEquals_givenDifferentObject_willReturnFalse() {
         EmptyValueException different = new EmptyValueException(NormalIdentityErrorCode.EMPTY_NICKNAME);
-        assertNotEquals(testCredentials, different);
+        assertNotEquals(testNormalCredentials, different);
     }
 
     @Test
     @DisplayName("동일하고 다른 프로퍼티를 지닌 객체로 동등성 비교")
     void testEquals_givenDifferentProperty_willReturnFalse() {
         // given
-        Credentials credentials = Credentials.createWithString("jeho123@email.com", "myPassword123!");
+        NormalCredentials credentials = NormalCredentials.createWithString("jeho123@email.com", "myPassword123!");
 
-        assertNotEquals(testCredentials, credentials);
+        assertNotEquals(testNormalCredentials, credentials);
     }
 }

@@ -1,8 +1,8 @@
 package kr.modusplant.domains.identity.social.framework.out.jpa.mapper;
 
 import kr.modusplant.domains.identity.social.domain.vo.MemberId;
-import kr.modusplant.domains.identity.social.domain.vo.SocialUserProfile;
-import kr.modusplant.domains.identity.social.domain.vo.UserPayload;
+import kr.modusplant.domains.identity.social.domain.vo.SocialAccountProfile;
+import kr.modusplant.domains.identity.social.domain.vo.SocialAccountPayload;
 import kr.modusplant.domains.identity.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
 import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
@@ -26,7 +26,7 @@ public class SocialIdentityJpaMapperImpl implements SocialIdentityJpaMapper {
     }
 
     @Override
-    public SiteMemberAuthEntity toMemberAuthEntity(SiteMemberEntity memberEntity, SocialUserProfile profile) {
+    public SiteMemberAuthEntity toMemberAuthEntity(SiteMemberEntity memberEntity, SocialAccountProfile profile) {
         return SiteMemberAuthEntity.builder()
                 .activeMember(memberEntity)
                 .originalMember(memberEntity)
@@ -45,8 +45,8 @@ public class SocialIdentityJpaMapperImpl implements SocialIdentityJpaMapper {
     }
 
     @Override
-    public UserPayload toUserPayload(SiteMemberEntity memberEntity, SiteMemberAuthEntity memberAuthEntity, SiteMemberRoleEntity memberRoleEntity) {
-        return UserPayload.create(
+    public SocialAccountPayload toUserPayload(SiteMemberEntity memberEntity, SiteMemberAuthEntity memberAuthEntity, SiteMemberRoleEntity memberRoleEntity) {
+        return SocialAccountPayload.create(
                 MemberId.fromUuid(memberEntity.getUuid()),
                 Nickname.create(memberEntity.getNickname()),
                 Email.create(memberAuthEntity.getEmail()),
@@ -55,8 +55,8 @@ public class SocialIdentityJpaMapperImpl implements SocialIdentityJpaMapper {
     }
 
     @Override
-    public UserPayload toUserPayload(SiteMemberEntity memberEntity, Nickname nickname, Email email, Role role) {
-        return UserPayload.create(
+    public SocialAccountPayload toUserPayload(SiteMemberEntity memberEntity, Nickname nickname, Email email, Role role) {
+        return SocialAccountPayload.create(
                 MemberId.fromUuid(memberEntity.getUuid()),
                 nickname,
                 email,

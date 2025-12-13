@@ -10,8 +10,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SignUpData {
-    private final Credentials credentials;
-    private final kr.modusplant.shared.kernel.Nickname nickname;
+    private final NormalCredentials normalCredentials;
+    private final Nickname nickname;
     private final AgreedTermVersion agreedTermsOfUseVersion;
     private final AgreedTermVersion agreedPrivacyPolicyVersion;
     private final AgreedTermVersion agreedAdInfoReceivingVersion;
@@ -19,7 +19,7 @@ public class SignUpData {
     public static SignUpData create(String email, String password, String nickname,
                                     String termsOfUseVersion, String privacyPolicyVersion,
                                     String adInfoReceivingVersion) {
-        return new SignUpData(Credentials.createWithString(email, password),
+        return new SignUpData(NormalCredentials.createWithString(email, password),
                 Nickname.create(nickname), AgreedTermVersion.create(termsOfUseVersion),
                 AgreedTermVersion.create(privacyPolicyVersion), AgreedTermVersion.create(adInfoReceivingVersion));
     }
@@ -31,13 +31,13 @@ public class SignUpData {
         if (!(o instanceof SignUpData sign)) return false;
 
         return new EqualsBuilder()
-                .append(getCredentials(), sign.getCredentials())
+                .append(getNormalCredentials(), sign.getNormalCredentials())
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(getCredentials()).toHashCode();
+                .append(getNormalCredentials()).toHashCode();
     }
 }

@@ -2,8 +2,8 @@ package kr.modusplant.domains.identity.social.framework.out.jpa.repository;
 
 import kr.modusplant.domains.identity.social.domain.vo.MemberId;
 import kr.modusplant.domains.identity.social.domain.vo.SocialCredentials;
-import kr.modusplant.domains.identity.social.domain.vo.SocialUserProfile;
-import kr.modusplant.domains.identity.social.domain.vo.UserPayload;
+import kr.modusplant.domains.identity.social.domain.vo.SocialAccountProfile;
+import kr.modusplant.domains.identity.social.domain.vo.SocialAccountPayload;
 import kr.modusplant.domains.identity.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
 import kr.modusplant.domains.identity.social.usecase.port.repository.SocialIdentityRepository;
 import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
@@ -37,7 +37,7 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
     }
 
     @Override
-    public UserPayload getUserPayloadByMemberId(MemberId memberId) {
+    public SocialAccountPayload getUserPayloadByMemberId(MemberId memberId) {
         SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId.getValue())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER));
         SiteMemberAuthEntity memberAuthEntity = memberAuthJpaRepository.findByActiveMember(memberEntity).getFirst();
@@ -55,7 +55,7 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
     }
 
     @Override
-    public UserPayload createSocialMember(SocialUserProfile profile, Role role) {
+    public SocialAccountPayload createSocialMember(SocialAccountProfile profile, Role role) {
         SiteMemberEntity memberEntity = memberJpaRepository.save(socialIdentityJpaMapper.toMemberEntity(profile.getNickname()));
         memberAuthJpaRepository.save(socialIdentityJpaMapper.toMemberAuthEntity(memberEntity, profile));
         memberRoleJpaRepository.save(socialIdentityJpaMapper.toMemberRoleEntity(memberEntity,role));
