@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.member.common.util.domain.entity.MemberProfileImageTestUtils.testMemberProfileImage;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
-import static kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils.TEST_NICKNAME;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils.testMemberProfileIntroduction;
+import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,26 +24,26 @@ class MemberProfileTest implements MemberProfileTestUtils {
     void testCreate_givenNullToOneOfFourParameters_willThrowException() {
         // MemberId가 null일 때
         // given
-        EmptyMemberIdException memberIdException = assertThrows(EmptyMemberIdException.class, () -> MemberProfile.create(null, testMemberProfileImage, testMemberProfileIntroduction, TEST_NICKNAME));
+        EmptyMemberIdException memberIdException = assertThrows(EmptyMemberIdException.class, () -> MemberProfile.create(null, testMemberProfileImage, testMemberProfileIntroduction, testNormalUserNickname));
 
         // when & then
         assertThat(memberIdException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_ID);
 
         // MemberProfileImage가 null일 때
         // given
-        EmptyMemberProfileImageException emptyMemberProfileImageException = assertThrows(EmptyMemberProfileImageException.class, () -> MemberProfile.create(testMemberId, null, testMemberProfileIntroduction, TEST_NICKNAME));
+        EmptyMemberProfileImageException emptyMemberProfileImageException = assertThrows(EmptyMemberProfileImageException.class, () -> MemberProfile.create(testMemberId, null, testMemberProfileIntroduction, testNormalUserNickname));
 
         // when & then
         assertThat(emptyMemberProfileImageException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_PROFILE_IMAGE);
 
         // MemberProfileIntroduction이 null일 때
         // given
-        EmptyMemberProfileIntroductionException memberProfileIntroductionException = assertThrows(EmptyMemberProfileIntroductionException.class, () -> MemberProfile.create(testMemberId, testMemberProfileImage, null, TEST_NICKNAME));
+        EmptyMemberProfileIntroductionException memberProfileIntroductionException = assertThrows(EmptyMemberProfileIntroductionException.class, () -> MemberProfile.create(testMemberId, testMemberProfileImage, null, testNormalUserNickname));
 
         // when & then
         assertThat(memberProfileIntroductionException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_PROFILE_INTRODUCTION);
 
-        // MemberNickname이 null일 때
+        // Nickname이 null일 때
         // given
         EmptyNicknameException nicknameException = assertThrows(EmptyNicknameException.class, () -> MemberProfile.create(testMemberId, testMemberProfileImage, testMemberProfileIntroduction, null));
 
@@ -73,6 +73,6 @@ class MemberProfileTest implements MemberProfileTestUtils {
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
     void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
         MemberProfile memberProfile = createMemberProfile();
-        assertNotEquals(memberProfile, MemberProfile.create(MemberId.generate(), testMemberProfileImage, testMemberProfileIntroduction, TEST_NICKNAME));
+        assertNotEquals(memberProfile, MemberProfile.create(MemberId.generate(), testMemberProfileImage, testMemberProfileIntroduction, testNormalUserNickname));
     }
 }

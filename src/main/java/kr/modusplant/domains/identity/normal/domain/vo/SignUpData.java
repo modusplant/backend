@@ -1,5 +1,6 @@
 package kr.modusplant.domains.identity.normal.domain.vo;
 
+import kr.modusplant.shared.kernel.Nickname;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +11,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SignUpData {
     private final Credentials credentials;
-    private final NormalNickname nickname;
+    private final kr.modusplant.shared.kernel.Nickname nickname;
     private final AgreedTermVersion agreedTermsOfUseVersion;
     private final AgreedTermVersion agreedPrivacyPolicyVersion;
     private final AgreedTermVersion agreedAdInfoReceivingVersion;
@@ -19,7 +20,7 @@ public class SignUpData {
                                     String termsOfUseVersion, String privacyPolicyVersion,
                                     String adInfoReceivingVersion) {
         return new SignUpData(Credentials.createWithString(email, password),
-                NormalNickname.create(nickname), AgreedTermVersion.create(termsOfUseVersion),
+                Nickname.create(nickname), AgreedTermVersion.create(termsOfUseVersion),
                 AgreedTermVersion.create(privacyPolicyVersion), AgreedTermVersion.create(adInfoReceivingVersion));
     }
 

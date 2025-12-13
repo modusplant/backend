@@ -2,10 +2,10 @@ package kr.modusplant.domains.identity.normal.framework.out.persistence.jooq;
 
 import kr.modusplant.domains.identity.normal.common.util.domain.vo.EmailTestUtils;
 import kr.modusplant.domains.identity.normal.common.util.domain.vo.MemberIdTestUtils;
-import kr.modusplant.domains.identity.normal.common.util.domain.vo.NicknameTestUtils;
 import kr.modusplant.domains.identity.normal.common.util.domain.vo.PasswordTestUtils;
 import kr.modusplant.jooq.tables.SiteMemberAuth;
 import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.kernel.common.util.NicknameTestUtils;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Result;
@@ -181,7 +181,7 @@ public class NormalIdentityJooqRepositoryTest implements
             Result<Record1<Integer>> result = dsl.newResult(DSL.inline(1));
             result.add(dsl.newRecord(DSL.inline(1)).values(1));
 
-            if (bindings[0].equals(TEST_NORMAL_NICKNAME.getValue())) {
+            if (bindings[0].equals(testNormalUserNickname.getValue())) {
                 return new MockResult[] {
                         new MockResult(0, result)
                 };
@@ -192,7 +192,7 @@ public class NormalIdentityJooqRepositoryTest implements
         NormalIdentityJooqRepository repository = createRepository(provider);
 
         // when
-        boolean result = repository.existsByNickname(TEST_NORMAL_NICKNAME);
+        boolean result = repository.existsByNickname(testNormalUserNickname);
 
         // then
         assertThat(result).isEqualTo(true);

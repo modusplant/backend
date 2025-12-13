@@ -1,7 +1,6 @@
 package kr.modusplant.domains.identity.social.framework.out.jpa.mapper;
 
 import kr.modusplant.domains.identity.social.domain.vo.MemberId;
-import kr.modusplant.domains.identity.social.domain.vo.Nickname;
 import kr.modusplant.domains.identity.social.domain.vo.SocialUserProfile;
 import kr.modusplant.domains.identity.social.domain.vo.UserPayload;
 import kr.modusplant.domains.identity.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
@@ -10,6 +9,7 @@ import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.shared.kernel.Email;
+import kr.modusplant.shared.kernel.Nickname;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -20,7 +20,7 @@ public class SocialIdentityJpaMapperImpl implements SocialIdentityJpaMapper {
     @Override
     public SiteMemberEntity toMemberEntity(Nickname nickname) {
         return SiteMemberEntity.builder()
-                .nickname(nickname.getNickname())
+                .nickname(nickname.getValue())
                 .loggedInAt(LocalDateTime.now())
                 .build();
     }

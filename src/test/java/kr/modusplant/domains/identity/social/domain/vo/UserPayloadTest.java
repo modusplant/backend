@@ -13,12 +13,12 @@ class UserPayloadTest implements UserPayloadTestUtils {
     @DisplayName("유효한 MemberId, Nickname, Email Role로 UserPayload를 생성")
     void testCreate_givenValidParameters_willReturnUserPayload() {
         // when
-        UserPayload userPayload = UserPayload.create(testSocialKakaoMemberId, testSocialKakaoNickname, testKakaoUserEmail, Role.USER);
+        UserPayload userPayload = UserPayload.create(testSocialKakaoMemberId, testKakaoUserNickname, testKakaoUserEmail, Role.USER);
 
         // then
         assertNotNull(userPayload);
         assertEquals(testSocialKakaoMemberId, userPayload.getMemberId());
-        assertEquals(testSocialKakaoNickname, userPayload.getNickname());
+        assertEquals(testKakaoUserNickname, userPayload.getNickname());
         assertEquals(testKakaoUserEmail, userPayload.getEmail());
         assertEquals(Role.USER, userPayload.getRole());
     }

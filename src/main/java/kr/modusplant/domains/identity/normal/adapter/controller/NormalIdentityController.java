@@ -3,7 +3,6 @@ package kr.modusplant.domains.identity.normal.adapter.controller;
 import kr.modusplant.domains.identity.normal.domain.exception.DataAlreadyExistsException;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
 import kr.modusplant.domains.identity.normal.domain.vo.NormalMemberId;
-import kr.modusplant.domains.identity.normal.domain.vo.NormalNickname;
 import kr.modusplant.domains.identity.normal.domain.vo.NormalPassword;
 import kr.modusplant.domains.identity.normal.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityCreateRepository;
@@ -16,6 +15,7 @@ import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.InvalidDataException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.kernel.Email;
+import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,7 +37,7 @@ public class NormalIdentityController {
     public void registerNormalMember(NormalSignUpRequest request) {
         if(readRepository.existsByEmail(Email.create(request.email()))) {
             throw new DataAlreadyExistsException(NormalIdentityErrorCode.ALREADY_EXISTS_MEMBER);
-        } else if(readRepository.existsByNickname(NormalNickname.create(request.nickname()))) {
+        } else if(readRepository.existsByNickname(Nickname.create(request.nickname()))) {
             throw new DataAlreadyExistsException(NormalIdentityErrorCode.ALREADY_EXISTS_NICKNAME);
         }  else {
             createRepository.save(mapper.toSignUpData(request));

@@ -1,8 +1,8 @@
 package kr.modusplant.domains.identity.normal.usecase.port.repository;
 
 import kr.modusplant.domains.identity.normal.domain.vo.NormalMemberId;
-import kr.modusplant.domains.identity.normal.domain.vo.NormalNickname;
 import kr.modusplant.shared.kernel.Email;
+import kr.modusplant.shared.kernel.Nickname;
 
 public interface NormalIdentityReadRepository {
 
@@ -12,5 +12,5 @@ public interface NormalIdentityReadRepository {
 
     boolean existsByEmail(Email email);
 
-    boolean existsByNickname(NormalNickname normalNickname);
+    boolean existsByNickname(Nickname nickname);
 }
