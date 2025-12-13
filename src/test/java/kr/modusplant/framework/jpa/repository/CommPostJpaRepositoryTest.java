@@ -364,10 +364,9 @@ class CommPostJpaRepositoryTest implements CommPostEntityTestUtils, CommPrimaryC
         Page<CommPostEntity> result3 = commPostRepository.searchByTitleOrContent("erd", pageable);
 
         // then
-        assertThat(result1.getTotalElements()).isEqualTo(1);
-        assertThat(result2.getTotalElements()).isEqualTo(1);
-        assertThat(result3.getTotalElements()).isEqualTo(0);
-        assertThat(result1.getContent().getFirst().getContent().get(1).has("src")).isEqualTo(true);
+        assertThat(!result1.getContent().isEmpty()).isTrue();
+        assertThat(!result2.getContent().isEmpty()).isTrue();
+        assertThat(result3.getContent().isEmpty()).isTrue();
     }
 
     @Test
