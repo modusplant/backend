@@ -125,6 +125,24 @@ public class PostRestController {
     }
 
     @Operation(
+            summary = "특정 컨텐츠 게시글 데이터 조회 API (편집/관리 용도)",
+            description = "편집/관리를 위해 게시글 식별자로 특정 컨텐츠 게시글 데이터만 조회합니다. 조회수 증가 및 조회 기록은 남지 않습니다."
+    )
+    @GetMapping("/{postId}/data")
+    public ResponseEntity<DataResponse<?>> getPostDataByUlid(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "게시글의 식별자", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
+            @PathVariable(name = "postId")
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
+            String ulid
+    ) {
+        UUID currentMemberUuid = userDetails.getActiveUuid();
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getDataByUlid(ulid,currentMemberUuid)));
+    }
+
+    @Operation(
             summary = "컨텐츠 게시글 추가 API",
             description = "컨텐츠 게시글을 작성합니다."
     )

@@ -11,15 +11,15 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Credentials {
     private final Email email;
-    private final Password password;
+    private final NormalPassword password;
 
     public static Credentials createWithString(String email, String password) {
-        return new Credentials(Email.create(email), Password.create(password));
+        return new Credentials(Email.create(email), NormalPassword.create(password));
     }
 
-    public static Credentials createWithDomain(Email email, Password password) {
-        Password.validateSource(password.getPassword());
-        return new Credentials(email, password);
+    public static Credentials createWithDomain(Email email, NormalPassword normalPassword) {
+        NormalPassword.validateSource(normalPassword.getValue());
+        return new Credentials(email, normalPassword);
     }
 
     @Override

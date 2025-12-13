@@ -3,6 +3,7 @@ package kr.modusplant.domains.post.framework.out.jooq.repository;
 import kr.modusplant.domains.post.common.helper.PostTestDataHelper;
 import kr.modusplant.domains.post.domain.exception.EmptyCategoryIdException;
 import kr.modusplant.domains.post.domain.vo.PostId;
+import kr.modusplant.domains.post.usecase.record.PostDetailDataReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.jooq.tables.records.CommPostRecord;
@@ -219,6 +220,17 @@ class PostQueryJooqRepositoryIntegrationTest {
         Optional<PostDetailReadModel> result = postQueryJooqRepository.findPostDetailByPostId(
                 PostId.create(testPost1.getUlid()), testMember2.getUuid()
         );
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get().ulid()).isEqualTo(testPost1.getUlid());
+    }
+
+    @Test
+    @DisplayName("PostId로 특정 게시글 조회")
+    void testFindPostDetailDataByPostId_givenPostId_willReturnPost() {
+        // when
+        Optional<PostDetailDataReadModel> result = postQueryJooqRepository.findPostDetailDataByPostId(PostId.create(testPost1.getUlid()));
 
         // then
         assertThat(result).isPresent();
