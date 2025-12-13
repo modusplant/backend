@@ -2,10 +2,10 @@ package kr.modusplant.domains.identity.normal.domain.vo;
 
 import kr.modusplant.domains.identity.normal.common.util.domain.vo.CredentialsTestUtils;
 import kr.modusplant.domains.identity.normal.domain.exception.EmptyValueException;
-import kr.modusplant.domains.identity.normal.domain.exception.InvalidValueException;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
 import kr.modusplant.shared.exception.EmptyEmailException;
 import kr.modusplant.shared.exception.InvalidEmailException;
+import kr.modusplant.shared.exception.InvalidPasswordException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,11 +40,11 @@ public class CredentialsTest implements CredentialsTestUtils {
     @DisplayName("형식에 맞지 않는 비밀번호로 자격 요소 생성")
     public void testCreate_givenInvalidPassword_willThrowInvalidValueException() {
         // given
-        InvalidValueException result = assertThrows(InvalidValueException.class, () ->
+        InvalidPasswordException result = assertThrows(InvalidPasswordException.class, () ->
                 Credentials.createWithString(testCredentials.getEmail().getValue(), "282933"));
 
         // when & then
-        assertEquals(NormalIdentityErrorCode.INVALID_PASSWORD, result.getErrorCode());
+        assertEquals(ErrorCode.INVALID_PASSWORD, result.getErrorCode());
     }
 
     @Test

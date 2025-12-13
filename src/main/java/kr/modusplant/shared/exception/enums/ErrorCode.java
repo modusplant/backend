@@ -32,12 +32,13 @@ public enum ErrorCode implements ResponseCode {
     EMAIL_EMPTY(HttpStatus.BAD_REQUEST, "empty_email","이메일이 비었습니다"),
     FILE_NAME_EMPTY(HttpStatus.BAD_REQUEST, "file_name_empty", "파일명이 비었습니다"),
     NICKNAME_EMPTY(HttpStatus.BAD_REQUEST, "nickname_empty", "닉네임이 비어 있습니다"),
+    PASSWORD_EMPTY(HttpStatus.BAD_REQUEST, "password_empty", "비밀번호가 비어 있습니다"),
 
-    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "invalid_password", "비밀번호가 올바르지 않습니다"),
-    INVALID_PAGE_RANGE(HttpStatus.BAD_REQUEST, "invalid_page_range", "이용할 수 있는 페이지 범위가 아닙니다"),
     INVALID_EMAIL_VERIFY_CODE(HttpStatus.FORBIDDEN, "invalid_email_verify_code", "이메일의 검증 코드가 올바르지 않습니다"),
     INVALID_EMAIL(HttpStatus.FORBIDDEN, "invalid_email", "이메일이 올바르지 않습니다"),
     INVALID_NICKNAME(HttpStatus.BAD_REQUEST, "invalid_nickname", "닉네임이 올바르지 않습니다"),
+    INVALID_PAGE_RANGE(HttpStatus.BAD_REQUEST, "invalid_page_range", "이용할 수 있는 페이지 범위가 아닙니다"),
+    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "invalid_password", "비밀번호가 올바르지 않습니다"),
 
     // others
     UNSUPPORTED_FILE(HttpStatus.FORBIDDEN, "unsupported_file", "지원되지 않는 파일 타입입니다"),

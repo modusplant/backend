@@ -2,7 +2,6 @@ package kr.modusplant.domains.identity.email.adapter.controller;
 
 import kr.modusplant.domains.identity.email.adapter.EmailIdentityTokenHelper;
 import kr.modusplant.domains.identity.email.domain.exception.enums.EmailIdentityErrorCode;
-import kr.modusplant.domains.identity.email.domain.vo.Password;
 import kr.modusplant.domains.identity.email.usecase.enums.EmailType;
 import kr.modusplant.domains.identity.email.usecase.port.gateway.CallEmailSendApiGateway;
 import kr.modusplant.domains.identity.email.usecase.port.repository.EmailIdentityRepository;
@@ -14,6 +13,7 @@ import kr.modusplant.framework.redis.RedisHelper;
 import kr.modusplant.framework.redis.RedisKeys;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.kernel.Email;
+import kr.modusplant.shared.kernel.Password;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

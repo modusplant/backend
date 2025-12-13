@@ -1,6 +1,7 @@
 package kr.modusplant.domains.identity.normal.domain.vo;
 
 import kr.modusplant.shared.kernel.Email;
+import kr.modusplant.shared.kernel.Password;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,15 +12,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Credentials {
     private final Email email;
-    private final NormalPassword password;
+    private final Password password;
 
     public static Credentials createWithString(String email, String password) {
-        return new Credentials(Email.create(email), NormalPassword.create(password));
+        return new Credentials(Email.create(email), Password.create(password));
     }
 
-    public static Credentials createWithDomain(Email email, NormalPassword normalPassword) {
-        NormalPassword.validateSource(normalPassword.getValue());
-        return new Credentials(email, normalPassword);
+    public static Credentials createWithDomain(Email email, Password password) {
+        return new Credentials(email, password);
     }
 
     @Override

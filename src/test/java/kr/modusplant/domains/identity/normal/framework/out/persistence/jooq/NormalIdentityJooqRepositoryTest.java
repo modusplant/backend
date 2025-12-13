@@ -2,10 +2,10 @@ package kr.modusplant.domains.identity.normal.framework.out.persistence.jooq;
 
 import kr.modusplant.domains.identity.normal.common.util.domain.vo.EmailTestUtils;
 import kr.modusplant.domains.identity.normal.common.util.domain.vo.MemberIdTestUtils;
-import kr.modusplant.domains.identity.normal.common.util.domain.vo.PasswordTestUtils;
 import kr.modusplant.jooq.tables.SiteMemberAuth;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.kernel.common.util.NicknameTestUtils;
+import kr.modusplant.shared.kernel.common.util.PasswordTestUtils;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Result;
@@ -64,7 +64,7 @@ public class NormalIdentityJooqRepositoryTest implements
         MockDataProvider provider = ctx -> {
             Object[] bindings = ctx.bindings();
 
-            if (bindings[0].equals(TEST_NORMAL_PASSWORD.getValue())
+            if (bindings[0].equals(testNormalUserPassword.getValue())
                     && bindings[1].equals(TEST_NORMAL_MEMBER_ID.getValue())
                     && bindings[2].equals(AuthProvider.BASIC.name())) {
                 return new MockResult[] {
@@ -75,10 +75,10 @@ public class NormalIdentityJooqRepositoryTest implements
         };
         NormalIdentityJooqRepository repository = createRepository(provider);
 
-        given(encoder.encode(TEST_NORMAL_PASSWORD.getValue())).willReturn(TEST_NORMAL_PASSWORD.getValue());
+        given(encoder.encode(testNormalUserPassword.getValue())).willReturn(testNormalUserPassword.getValue());
 
         // when
-        int result = repository.updatePassword(TEST_NORMAL_MEMBER_ID, TEST_NORMAL_PASSWORD);
+        int result = repository.updatePassword(TEST_NORMAL_MEMBER_ID, testNormalUserPassword);
 
         // then
         assertThat(result).isEqualTo(1);
@@ -94,7 +94,7 @@ public class NormalIdentityJooqRepositoryTest implements
             DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
             Result<Record1<String>> result = dsl.newResult(memberAuth.PW);
             result.add(
-                    dsl.newRecord(memberAuth.PW).value1(TEST_NORMAL_PASSWORD.getValue())
+                    dsl.newRecord(memberAuth.PW).value1(testNormalUserPassword.getValue())
             );
 
             if (bindings[0].equals(TEST_NORMAL_MEMBER_ID.getValue()) && bindings[1].equals(AuthProvider.BASIC.name())) {
@@ -111,7 +111,7 @@ public class NormalIdentityJooqRepositoryTest implements
         String result = repository.getMemberPassword(TEST_NORMAL_MEMBER_ID);
 
         // then
-        assertThat(result).isEqualTo(TEST_NORMAL_PASSWORD.getValue());
+        assertThat(result).isEqualTo(testNormalUserPassword.getValue());
     }
 
     @Test

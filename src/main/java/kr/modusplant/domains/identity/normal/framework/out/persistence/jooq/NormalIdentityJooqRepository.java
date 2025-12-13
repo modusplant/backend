@@ -1,7 +1,6 @@
 package kr.modusplant.domains.identity.normal.framework.out.persistence.jooq;
 
 import kr.modusplant.domains.identity.normal.domain.vo.NormalMemberId;
-import kr.modusplant.domains.identity.normal.domain.vo.NormalPassword;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityReadRepository;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityUpdateRepository;
 import kr.modusplant.jooq.tables.SiteMember;
@@ -9,6 +8,7 @@ import kr.modusplant.jooq.tables.SiteMemberAuth;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
+import kr.modusplant.shared.kernel.Password;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,7 +34,7 @@ public class NormalIdentityJooqRepository implements
     }
 
     @Override
-    public int updatePassword(NormalMemberId normalMemberId, NormalPassword pw) {
+    public int updatePassword(NormalMemberId normalMemberId, Password pw) {
         return dsl.update(memberAuth)
                 .set(memberAuth.PW, passwordEncoder.encode(pw.getValue()))
                 .where(memberAuth.ACT_MEMB_UUID.eq(normalMemberId.getValue()))

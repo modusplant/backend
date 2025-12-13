@@ -3,7 +3,6 @@ package kr.modusplant.domains.identity.normal.adapter.controller;
 import kr.modusplant.domains.identity.normal.domain.exception.DataAlreadyExistsException;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
 import kr.modusplant.domains.identity.normal.domain.vo.NormalMemberId;
-import kr.modusplant.domains.identity.normal.domain.vo.NormalPassword;
 import kr.modusplant.domains.identity.normal.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityCreateRepository;
 import kr.modusplant.domains.identity.normal.usecase.port.repository.NormalIdentityReadRepository;
@@ -16,6 +15,7 @@ import kr.modusplant.shared.exception.InvalidDataException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
+import kr.modusplant.shared.kernel.Password;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -55,16 +55,16 @@ public class NormalIdentityController {
     public void modifyPassword(UUID memberActiveUuid, PasswordModificationRequest request) {
         if(!readRepository.existsByMemberId(NormalMemberId.create(memberActiveUuid))) {
             throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER_AUTH);
-        } else if(!isPasswordsMatch(NormalMemberId.create(memberActiveUuid), NormalPassword.create(request.currentPw()))) {
+        } else if(!isPasswordsMatch(NormalMemberId.create(memberActiveUuid), Password.create(request.currentPw()))) {
             throw new InvalidDataException(ErrorCode.INVALID_PASSWORD, request.currentPw());
         } else {
-            updateRepository.updatePassword(NormalMemberId.create(memberActiveUuid), NormalPassword.create(request.newPw()));
+            updateRepository.updatePassword(NormalMemberId.create(memberActiveUuid), Password.create(request.newPw()));
         }
     }
 
-    private boolean isPasswordsMatch(NormalMemberId memberActiveUuid, NormalPassword currentNormalPassword) {
-        NormalPassword storedPw = NormalPassword.create(readRepository.getMemberPassword(memberActiveUuid));
+    private boolean isPasswordsMatch(NormalMemberId memberActiveUuid, Password currentPassword) {
+        Password storedPw = Password.create(readRepository.getMemberPassword(memberActiveUuid));
 
-        return encoder.matches(currentNormalPassword.getValue(), storedPw.getValue());
+        return encoder.matches(currentPassword.getValue(), storedPw.getValue());
     }
 }

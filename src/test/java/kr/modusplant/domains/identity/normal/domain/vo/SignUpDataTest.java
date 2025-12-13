@@ -2,7 +2,6 @@ package kr.modusplant.domains.identity.normal.domain.vo;
 
 import kr.modusplant.domains.identity.normal.common.util.domain.vo.AgreedTermsOfVersionTestUtils;
 import kr.modusplant.domains.identity.normal.common.util.domain.vo.EmailTestUtils;
-import kr.modusplant.domains.identity.normal.common.util.domain.vo.PasswordTestUtils;
 import kr.modusplant.domains.identity.normal.common.util.domain.vo.SignUpDataTestUtils;
 import kr.modusplant.domains.identity.normal.domain.exception.EmptyValueException;
 import kr.modusplant.domains.identity.normal.domain.exception.enums.NormalIdentityErrorCode;
@@ -10,6 +9,7 @@ import kr.modusplant.shared.exception.EmptyEmailException;
 import kr.modusplant.shared.exception.InvalidEmailException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.kernel.common.util.NicknameTestUtils;
+import kr.modusplant.shared.kernel.common.util.PasswordTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, Pass
     public void testCreate_givenNullEmail_willThrowEmptyEmailException() {
         // given
         EmptyEmailException result = assertThrows(EmptyEmailException.class, () ->
-                SignUpData.create(null, TEST_NORMAL_PASSWORD.getValue(),
+                SignUpData.create(null, testNormalUserPassword.getValue(),
                         testNormalUserNickname.getValue(), testAgreedTermsOfUse.getValue(),
                         testAgreedPrivacyPolicy.getValue(), testAgreedAdReceiving.getValue()));
 
@@ -36,7 +36,7 @@ public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, Pass
     public void testCreate_givenInvalidEmail_willThrowInvalidEmailException() {
         // given
         InvalidEmailException result = assertThrows(InvalidEmailException.class, () ->
-                SignUpData.create("testCredentials.getEmail()", TEST_NORMAL_PASSWORD.getValue(),
+                SignUpData.create("testCredentials.getEmail()", testNormalUserPassword.getValue(),
                         testNormalUserNickname.getValue(), testAgreedTermsOfUse.getValue(),
                         testAgreedPrivacyPolicy.getValue(), testAgreedAdReceiving.getValue()));
 
@@ -65,7 +65,7 @@ public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, Pass
     @DisplayName("동일하고 다른 프로퍼티를 지닌 객체로 동등성 비교")
     void testEquals_givenDifferentProperty_willReturnFalse() {
         // given
-        SignUpData signUpData = SignUpData.create(testEmail.getValue(), TEST_NORMAL_PASSWORD.getValue(),
+        SignUpData signUpData = SignUpData.create(testEmail.getValue(), testNormalUserPassword.getValue(),
                 testNormalUserNickname.getValue(), testAgreedPrivacyPolicy.getValue(),
                 testAgreedTermsOfUse.getValue(), testAgreedAdReceiving.getValue());
 
