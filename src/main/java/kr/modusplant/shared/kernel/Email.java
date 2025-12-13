@@ -1,6 +1,5 @@
 package kr.modusplant.shared.kernel;
 
-import kr.modusplant.shared.constant.Regex;
 import kr.modusplant.shared.exception.EmptyEmailException;
 import kr.modusplant.shared.exception.InvalidEmailException;
 import lombok.AccessLevel;
@@ -8,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import static kr.modusplant.shared.constant.Regex.PATTERN_EMAIL;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -17,8 +18,7 @@ public class Email {
     public static Email create(String email) {
         if (email == null || email.isBlank()) {
             throw new EmptyEmailException();
-        }
-        if (!email.matches(Regex.REGEX_EMAIL)) {
+        } else if (!PATTERN_EMAIL.matcher(email).matches()) {
             throw new InvalidEmailException();
         }
         return new Email(email);
