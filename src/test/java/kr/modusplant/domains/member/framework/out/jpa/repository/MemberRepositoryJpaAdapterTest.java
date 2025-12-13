@@ -45,7 +45,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, SiteMemberEntit
 
     @Test
     @DisplayName("getByNickname으로 가용한 Member 반환(가용할 때)")
-    void testGetByNickname_givenValidMemberNickname_willReturnOptionalAvailableMember() {
+    void testGetByNickname_givenValidNickname_willReturnOptionalAvailableMember() {
         // given
         given(memberJpaRepository.findByNickname(any())).willReturn(Optional.of(createMemberBasicUserEntityWithUuid()));
 
@@ -55,7 +55,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, SiteMemberEntit
 
     @Test
     @DisplayName("getByNickname으로 가용한 Member 반환(가용하지 않을 때)")
-    void testGetByNickname_givenValidMemberNickname_willReturnOptionalEmptyMember() {
+    void testGetByNickname_givenValidNickname_willReturnOptionalEmptyMember() {
         // given
         given(memberJpaRepository.findByNickname(any())).willReturn(Optional.empty());
 
@@ -64,8 +64,8 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, SiteMemberEntit
     }
 
     @Test
-    @DisplayName("save(MemberNickname nickname)로 Member 반환")
-    void testSave_givenValidMemberNickname_willReturnMember() {
+    @DisplayName("save(Nickname nickname)로 Member 반환")
+    void testSave_givenValidNickname_willReturnMember() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         given(memberJpaRepository.save(any())).willReturn(memberEntity);
@@ -75,7 +75,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, SiteMemberEntit
     }
 
     @Test
-    @DisplayName("save(MemberId memberId, MemberNickname nickname)로 Member 반환")
+    @DisplayName("save(MemberId memberId, Nickname nickname)로 Member 반환")
     void testSave_givenValidMemberIdAndNickname_willReturnMember() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();

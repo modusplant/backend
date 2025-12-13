@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class NicknameTest {
     @Test
     @DisplayName("create으로 회원 닉네임 반환")
-    void testCreate_givenValidValue_willReturnMemberNickname() {
+    void testCreate_givenValidValue_willReturnNickname() {
         assertThat(Nickname.create(MEMBER_BASIC_USER_NICKNAME)).isEqualTo(Nickname.create(MEMBER_BASIC_USER_NICKNAME));
     }
 

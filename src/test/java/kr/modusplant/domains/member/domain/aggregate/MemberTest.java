@@ -36,7 +36,7 @@ class MemberTest implements MemberTestUtils {
         // when & then
         assertThat(memberStatusException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_STATUS);
 
-        // MemberNickname이 null일 때
+        // Nickname이 null일 때
         // given
         EmptyNicknameException nicknameException = assertThrows(EmptyNicknameException.class, () -> Member.create(testMemberId, testMemberActiveStatus, null, testMemberBirthDate));
 

@@ -43,7 +43,7 @@ class MemberProfileTest implements MemberProfileTestUtils {
         // when & then
         assertThat(memberProfileIntroductionException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_PROFILE_INTRODUCTION);
 
-        // MemberNickname이 null일 때
+        // Nickname이 null일 때
         // given
         EmptyNicknameException nicknameException = assertThrows(EmptyNicknameException.class, () -> MemberProfile.create(testMemberId, testMemberProfileImage, testMemberProfileIntroduction, null));
 
