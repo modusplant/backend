@@ -6,5 +6,5 @@ import static kr.modusplant.shared.persistence.common.util.constant.CommPostCons
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 
 public interface MemberCancelPostBookmarkRecordTestUtils {
-    MemberPostBookmarkCancelRecord TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD = new MemberPostBookmarkCancelRecord(MEMBER_BASIC_USER_UUID, TEST_COMM_POST_ULID);
+    MemberPostBookmarkCancelRecord testMemberPostBookmarkCancelRecord = new MemberPostBookmarkCancelRecord(MEMBER_BASIC_USER_UUID, TEST_COMM_POST_ULID);
 }

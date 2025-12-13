@@ -96,7 +96,7 @@ class MemberProfileRepositoryJpaAdapterTest implements MemberProfileTestUtils, S
         MemberProfile result = memberProfileRepositoryJpaAdapter.addOrUpdate(updatedMemberProfile);
 
         // then
-        assertThat(result.getMemberNickname().getValue()).isEqualTo("abcNickname");
+        assertThat(result.getNickname().getValue()).isEqualTo("abcNickname");
         assertThat(result.getMemberProfileIntroduction().getValue()).isEqualTo("abcIntroduction");
     }
 
@@ -118,7 +118,7 @@ class MemberProfileRepositoryJpaAdapterTest implements MemberProfileTestUtils, S
         MemberProfile result = memberProfileRepositoryJpaAdapter.addOrUpdate(updatedMemberProfile);
 
         // then
-        assertThat(result.getMemberNickname().getValue()).isEqualTo("abcNickname");
+        assertThat(result.getNickname().getValue()).isEqualTo("abcNickname");
         assertThat(result.getMemberProfileIntroduction().getValue()).isEqualTo("abcIntroduction");
     }
 
