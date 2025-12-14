@@ -17,7 +17,7 @@ class EmailTest implements EmailTestUtils {
     @DisplayName("Email 문자열로 Email 생성하기")
     void testCreate_givenValidEmailString_willReturnEmailVo() {
         assertNotNull(testKakaoUserEmail);
-        assertThat(testKakaoUserEmail.getEmail()).isEqualTo(MEMBER_AUTH_KAKAO_USER_EMAIL);
+        assertThat(testKakaoUserEmail.getValue()).isEqualTo(MEMBER_AUTH_KAKAO_USER_EMAIL);
     }
 
     @Test
@@ -44,12 +44,14 @@ class EmailTest implements EmailTestUtils {
     @Test
     @DisplayName("같은 객체에 대한 equals 호출")
     void useEqual_givenSameObject_willReturnTrue() {
+        //noinspection EqualsWithItself
         assertEquals(testKakaoUserEmail, testKakaoUserEmail);
     }
 
     @Test
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
     void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
+        //noinspection AssertBetweenInconvertibleTypes
         assertNotEquals(testKakaoUserEmail, "Different Class");
     }
 

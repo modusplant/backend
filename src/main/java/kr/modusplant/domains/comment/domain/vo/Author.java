@@ -16,18 +16,18 @@ import java.util.UUID;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Author {
     private final UUID memberUuid;
-    private final String memberNickname;
+    private final String nickname;
 
     public static Author create(UUID memberUuid) {
         if(memberUuid == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR); }
         return new Author(memberUuid, null);
     }
 
-    public static Author create(UUID memberUuid, String memberNickname) {
+    public static Author create(UUID memberUuid, String nickname) {
         if(memberUuid == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR); }
-        if(memberNickname == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_MEMBER_NICKNAME); }
-        if(!memberNickname.matches(Regex.REGEX_NICKNAME)) { throw new InvalidValueException(CommentErrorCode.INVALID_AUTHOR_NICKNAME); }
-        return new Author(memberUuid, memberNickname);
+        if(nickname == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_MEMBER_NICKNAME); }
+        if(!nickname.matches(Regex.REGEX_NICKNAME)) { throw new InvalidValueException(CommentErrorCode.INVALID_AUTHOR_NICKNAME); }
+        return new Author(memberUuid, nickname);
     }
 
     @Override

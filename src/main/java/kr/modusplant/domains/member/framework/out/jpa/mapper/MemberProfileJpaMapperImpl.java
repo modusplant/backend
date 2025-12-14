@@ -3,12 +3,16 @@ package kr.modusplant.domains.member.framework.out.jpa.mapper;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
-import kr.modusplant.domains.member.domain.vo.*;
+import kr.modusplant.domains.member.domain.vo.MemberId;
+import kr.modusplant.domains.member.domain.vo.MemberProfileImageBytes;
+import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
+import kr.modusplant.domains.member.domain.vo.MemberProfileIntroduction;
 import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.supers.MemberProfileJpaMapper;
 import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jpa.entity.SiteMemberProfileEntity;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -49,6 +53,6 @@ public class MemberProfileJpaMapperImpl implements MemberProfileJpaMapper {
                 MemberId.fromUuid(entity.getMember().getUuid()),
                 memberProfileImage,
                 memberProfileIntroduction,
-                MemberNickname.create(entity.getMember().getNickname()));
+                Nickname.create(entity.getMember().getNickname()));
         }
 }

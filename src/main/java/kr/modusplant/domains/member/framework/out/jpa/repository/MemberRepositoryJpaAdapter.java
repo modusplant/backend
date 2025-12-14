@@ -2,11 +2,11 @@ package kr.modusplant.domains.member.framework.out.jpa.repository;
 
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.vo.MemberId;
-import kr.modusplant.domains.member.domain.vo.MemberNickname;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberJpaMapperImpl;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -25,19 +25,19 @@ public class MemberRepositoryJpaAdapter implements MemberRepository {
     }
 
     @Override
-    public Optional<Member> getByNickname(MemberNickname nickname) {
+    public Optional<Member> getByNickname(Nickname nickname) {
         Optional<SiteMemberEntity> emptyOrMemberEntity = memberJpaRepository.findByNickname(nickname.getValue());
         return emptyOrMemberEntity.isEmpty() ? Optional.empty() : Optional.of(memberJpaMapper.toMember(emptyOrMemberEntity.orElseThrow()));
     }
 
     @Override
-    public Member save(MemberNickname memberNickname) {
-        return memberJpaMapper.toMember(memberJpaRepository.save(memberJpaMapper.toMemberEntity(memberNickname)));
+    public Member save(Nickname nickname) {
+        return memberJpaMapper.toMember(memberJpaRepository.save(memberJpaMapper.toMemberEntity(nickname)));
     }
 
     @Override
-    public Member save(MemberId memberId, MemberNickname memberNickname) {
-        return memberJpaMapper.toMember(memberJpaRepository.save(memberJpaMapper.toMemberEntity(memberId, memberNickname)));
+    public Member save(MemberId memberId, Nickname nickname) {
+        return memberJpaMapper.toMember(memberJpaRepository.save(memberJpaMapper.toMemberEntity(memberId, nickname)));
     }
 
     @Override
@@ -46,7 +46,7 @@ public class MemberRepositoryJpaAdapter implements MemberRepository {
     }
 
     @Override
-    public boolean isNicknameExist(MemberNickname nickname) {
+    public boolean isNicknameExist(Nickname nickname) {
         return memberJpaRepository.existsByNickname(nickname.getValue());
     }
 }

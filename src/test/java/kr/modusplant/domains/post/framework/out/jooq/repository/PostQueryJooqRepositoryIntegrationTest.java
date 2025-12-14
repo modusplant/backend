@@ -198,6 +198,10 @@ class PostQueryJooqRepositoryIntegrationTest {
         List<PostSummaryReadModel> firstPageByBlankKeyword = postQueryJooqRepository.findByKeywordWithCursor("",testMember2.getUuid(),null,size);
         List<PostSummaryReadModel> secondePageByBlankKeyword = postQueryJooqRepository.findByKeywordWithCursor("",testMember2.getUuid(),firstPageByBlankKeyword.get(size-1).ulid(),size);
 
+        List<PostSummaryReadModel> pageByBackslash = postQueryJooqRepository.findByKeywordWithCursor("\\",testMember2.getUuid(),null,size);
+        List<PostSummaryReadModel> pageByPercent = postQueryJooqRepository.findByKeywordWithCursor("%%",testMember2.getUuid(),null,size);
+        List<PostSummaryReadModel> pageByUnderscore = postQueryJooqRepository.findByKeywordWithCursor("_",testMember2.getUuid(),null,size);
+
         // then
         assertThat(firstPageByKeyword).hasSize(size+1);
         assertThat(firstPageByKeyword.getLast()).isEqualTo(secondPageByKeyword.getFirst());
@@ -211,6 +215,10 @@ class PostQueryJooqRepositoryIntegrationTest {
         assertThat(firstPageByBlankKeyword.get(1).ulid()).isEqualTo(testPost4.getUlid());
         assertThat(secondePageByBlankKeyword.get(0).ulid()).isEqualTo(testPost2.getUlid());
         assertThat(secondePageByBlankKeyword.get(1).ulid()).isEqualTo(testPost1.getUlid());
+
+        assertThat(pageByBackslash).hasSize(0);
+        assertThat(pageByPercent).hasSize(0);
+        assertThat(pageByUnderscore).hasSize(0);
     }
 
     @Test

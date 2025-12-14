@@ -2,12 +2,12 @@ package kr.modusplant.domains.member.domain.aggregate;
 
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberIdException;
-import kr.modusplant.domains.member.domain.exception.EmptyMemberNicknameException;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileImageException;
 import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileIntroductionException;
 import kr.modusplant.domains.member.domain.vo.MemberId;
-import kr.modusplant.domains.member.domain.vo.MemberNickname;
 import kr.modusplant.domains.member.domain.vo.MemberProfileIntroduction;
+import kr.modusplant.shared.exception.EmptyNicknameException;
+import kr.modusplant.shared.kernel.Nickname;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,9 +20,9 @@ public class MemberProfile {
     private final MemberId memberId;
     private MemberProfileImage memberProfileImage;
     private MemberProfileIntroduction memberProfileIntroduction;
-    private MemberNickname memberNickname;
+    private Nickname nickname;
 
-    public static MemberProfile create(MemberId id, MemberProfileImage profileImage, MemberProfileIntroduction profileIntroduction, MemberNickname nickname) {
+    public static MemberProfile create(MemberId id, MemberProfileImage profileImage, MemberProfileIntroduction profileIntroduction, Nickname nickname) {
         if (id == null) {
             throw new EmptyMemberIdException();
         } else if (profileImage == null) {
@@ -30,7 +30,7 @@ public class MemberProfile {
         } else if (profileIntroduction == null) {
             throw new EmptyMemberProfileIntroductionException();
         } else if (nickname == null) {
-            throw new EmptyMemberNicknameException();
+            throw new EmptyNicknameException();
         }
         return new MemberProfile(id, profileImage, profileIntroduction, nickname);
     }

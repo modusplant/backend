@@ -6,11 +6,11 @@ import kr.modusplant.domains.post.domain.exception.ContentProcessingException;
 import kr.modusplant.domains.post.domain.exception.PostAccessDeniedException;
 import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
 import kr.modusplant.domains.post.domain.vo.*;
-import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
-import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
 import kr.modusplant.domains.post.usecase.port.repository.*;
+import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
+import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
 import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
 import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
@@ -124,6 +124,9 @@ public class PostController {
         }
         if (post.getStatus().isPublished()) {
             postArchiveRepository.save(PostId.create(ulid));
+            postRepository.deletePostLikeByPostId(post.getPostId());
+            postRepository.deletePostBookmarkByPostId(post.getPostId());
+            postRepository.deletePostRecentlyViewRecordByPostId(post.getPostId());
         }
         multipartDataProcessorPort.deleteFiles(post.getPostContent().getContent());
         postRepository.delete(post);
