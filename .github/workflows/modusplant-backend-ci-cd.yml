@@ -329,6 +329,8 @@ jobs:
           --network nginx_proxy \
           --env-file "${ENV_FILE}" \
           -e SPRING_PROFILES_ACTIVE=prod \
+          -e LOG_TO_FILE=true \
+          -e LOG_DIR="${DOCKER_LOGPATH}" \
           -v "${BACKEND_LOGPATH}:${DOCKER_LOGPATH}" \
           "${IMAGE}"
           
