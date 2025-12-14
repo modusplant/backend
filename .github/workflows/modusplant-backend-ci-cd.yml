@@ -365,7 +365,9 @@ jobs:
           parameterPairs: |
             /config/modusplant/GHCR_PAT             = GHCR_PAT,
             /config/modusplant_dev/DEV_SERVER_IP    = DEV_SERVER_IP,
-            /config/modusplant_dev/DEV_SSH_KEY      = DEV_SSH_KEY
+            /config/modusplant_dev/DEV_SSH_KEY      = DEV_SSH_KEY,
+            /config/modusplant_dev/backend_logpath  = MODUSPLANT_BACKEND_LOGPATH,
+            /config/modusplant_dev/docker_logpath   = MODUSPLANT_DOCKER_LOGPATH
           withDecryption: "true"
 
       - name: Write SSH key from env
@@ -379,6 +381,8 @@ jobs:
         env:
           DEV_SERVER_IP: ${{ env.DEV_SERVER_IP }}
           GHCR_PAT: ${{ env.GHCR_PAT }}
+          BACKEND_LOGPATH: ${{ env.MODUSPLANT_BACKEND_LOGPATH }}
+          DOCKER_LOGPATH: ${{ env.MODUSPLANT_DOCKER_LOGPATH }}
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
           GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
         run: |
@@ -390,7 +394,7 @@ jobs:
 
           ssh -i "_ci_tmp_dev_ssh_key.pem" -p 2222 -o StrictHostKeyChecking=no \
             donghyeok@"${DEV_SERVER_IP}" \
-            "IMAGE=${IMAGE} GHCR_PAT=${GHCR_PAT} GITHUB_REPOSITORY_OWNER=${GITHUB_REPOSITORY_OWNER} bash -s" <<'EOF'
+            "IMAGE=${IMAGE} GHCR_PAT=${GHCR_PAT} BACKEND_LOGPATH=${BACKEND_LOGPATH} DOCKER_LOGPATH=${DOCKER_LOGPATH} GITHUB_REPOSITORY_OWNER=${GITHUB_REPOSITORY_OWNER} bash -s" <<'EOF'
           set -euo pipefail
 
           export PATH="/usr/local/bin:$PATH"
@@ -399,6 +403,8 @@ jobs:
 
           echo "[Dev Server] IMAGE=${IMAGE}"
           echo "[Dev Server] ENV_FILE=${ENV_FILE}"
+          echo "[Dev Server] BACKEND_LOGPATH=${BACKEND_LOGPATH:-<empty>}"
+          echo "[Dev Server] DOCKER_LOGPATH=${DOCKER_LOGPATH:-<empty>}"
 
           echo "[Dev Server] Docker login to GHCR..."
           echo "${GHCR_PAT}" | docker login ghcr.io -u "${GITHUB_REPOSITORY_OWNER}" --password-stdin
@@ -420,6 +426,9 @@ jobs:
           --network nginx_proxy \
           --env-file "${ENV_FILE}" \
           -e SPRING_PROFILES_ACTIVE=dev \
+          -e LOG_TO_FILE=true \
+          -e LOG_DIR="${DOCKER_LOGPATH}" \
+          -v "${BACKEND_LOGPATH}:${DOCKER_LOGPATH}" \
           "${IMAGE}"
 
           echo "[Dev Server] Check container status..."
