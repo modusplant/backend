@@ -8,14 +8,14 @@ COPY gradle/wrapper/gradle-wrapper.jar /builder/gradle/wrapper/
 COPY gradle/wrapper/gradle-wrapper.properties /builder/gradle/wrapper/
 
 ARG JDBC_CONNECTION_URL
-ARG JDBC_USER_NAME
+ARG JDBC_USERNAME
 ARG JDBC_PASSWORD
 
 # Gradle buildx
 RUN chmod +x gradlew
 RUN ./gradlew --no-daemon clean flywayMigrate jooqCodegen bootJar \
   -PjdbcConnectionUrl="${JDBC_CONNECTION_URL}" \
-  -PjdbcUsername="${JDBC_USER_NAME}" \
+  -PjdbcUsername="${JDBC_USERNAME}" \
   -PjdbcPassword="${JDBC_PASSWORD}"
 
 
