@@ -3,6 +3,7 @@ package kr.modusplant.domains.post.framework.out.jooq.repository;
 import kr.modusplant.domains.post.common.helper.PostTestDataHelper;
 import kr.modusplant.domains.post.domain.exception.EmptyCategoryIdException;
 import kr.modusplant.domains.post.domain.vo.PostId;
+import kr.modusplant.domains.post.usecase.record.PostDetailDataReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.jooq.tables.records.CommPostRecord;
@@ -197,6 +198,10 @@ class PostQueryJooqRepositoryIntegrationTest {
         List<PostSummaryReadModel> firstPageByBlankKeyword = postQueryJooqRepository.findByKeywordWithCursor("",testMember2.getUuid(),null,size);
         List<PostSummaryReadModel> secondePageByBlankKeyword = postQueryJooqRepository.findByKeywordWithCursor("",testMember2.getUuid(),firstPageByBlankKeyword.get(size-1).ulid(),size);
 
+        List<PostSummaryReadModel> pageByBackslash = postQueryJooqRepository.findByKeywordWithCursor("\\",testMember2.getUuid(),null,size);
+        List<PostSummaryReadModel> pageByPercent = postQueryJooqRepository.findByKeywordWithCursor("%%",testMember2.getUuid(),null,size);
+        List<PostSummaryReadModel> pageByUnderscore = postQueryJooqRepository.findByKeywordWithCursor("_",testMember2.getUuid(),null,size);
+
         // then
         assertThat(firstPageByKeyword).hasSize(size+1);
         assertThat(firstPageByKeyword.getLast()).isEqualTo(secondPageByKeyword.getFirst());
@@ -210,6 +215,10 @@ class PostQueryJooqRepositoryIntegrationTest {
         assertThat(firstPageByBlankKeyword.get(1).ulid()).isEqualTo(testPost4.getUlid());
         assertThat(secondePageByBlankKeyword.get(0).ulid()).isEqualTo(testPost2.getUlid());
         assertThat(secondePageByBlankKeyword.get(1).ulid()).isEqualTo(testPost1.getUlid());
+
+        assertThat(pageByBackslash).hasSize(0);
+        assertThat(pageByPercent).hasSize(0);
+        assertThat(pageByUnderscore).hasSize(0);
     }
 
     @Test
@@ -219,6 +228,17 @@ class PostQueryJooqRepositoryIntegrationTest {
         Optional<PostDetailReadModel> result = postQueryJooqRepository.findPostDetailByPostId(
                 PostId.create(testPost1.getUlid()), testMember2.getUuid()
         );
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get().ulid()).isEqualTo(testPost1.getUlid());
+    }
+
+    @Test
+    @DisplayName("PostId로 특정 게시글 조회")
+    void testFindPostDetailDataByPostId_givenPostId_willReturnPost() {
+        // when
+        Optional<PostDetailDataReadModel> result = postQueryJooqRepository.findPostDetailDataByPostId(PostId.create(testPost1.getUlid()));
 
         // then
         assertThat(result).isPresent();

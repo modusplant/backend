@@ -3,7 +3,10 @@ package kr.modusplant.domains.member.framework.out.jpa.repository;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
-import kr.modusplant.domains.member.domain.vo.*;
+import kr.modusplant.domains.member.domain.vo.MemberId;
+import kr.modusplant.domains.member.domain.vo.MemberProfileImageBytes;
+import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
+import kr.modusplant.domains.member.domain.vo.MemberProfileIntroduction;
 import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberProfileJpaMapperImpl;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
@@ -12,6 +15,7 @@ import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberProfileEntity;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberProfileJpaRepository;
+import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -48,7 +52,7 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
             return Optional.of(MemberProfile.create(memberId,
                     profileImage,
                     profileIntroduction,
-                    MemberNickname.create(profileEntity.getMember().getNickname())));
+                    Nickname.create(profileEntity.getMember().getNickname())));
         } else {
             return Optional.empty();
         }
@@ -68,7 +72,7 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
     public MemberProfile addOrUpdate(MemberProfile memberProfile) throws IOException {
         String imagePath = memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue();
         String introduction = memberProfile.getMemberProfileIntroduction().getValue();
-        String nickname = memberProfile.getMemberNickname().getValue();
+        String nickname = memberProfile.getNickname().getValue();
         Optional<SiteMemberProfileEntity> optionalMemberProfileEntity = profileJpaRepository.findByUuid(
                 memberProfile.getMemberId().getValue());
         SiteMemberProfileEntity memberProfileEntity;

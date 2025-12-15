@@ -20,10 +20,10 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD;
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberCheckNicknameRecordTestUtils.TEST_MEMBER_NICKNAME_CHECK_RECORD;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.testMemberPostBookmarkCancelRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.testMemberCommentLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.testMemberCommentUnlikeRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberNicknameCheckRecordTestUtils.testMemberNicknameCheckRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostBookmarkRecordTestUtils.testMemberPostBookmarkRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostLikeRecordTestUtils.testMemberPostLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
@@ -73,15 +73,15 @@ class MemberRestControllerTest implements MemberTestUtils {
     @DisplayName("checkExistedMemberNickname으로 응답 반환")
     void testCheckExistedMemberNickname_givenValidRequest_willReturnResponse() {
         // given
-        given(memberController.checkExistedNickname(TEST_MEMBER_NICKNAME_CHECK_RECORD)).willReturn(true);
+        given(memberController.checkExistedNickname(testMemberNicknameCheckRecord)).willReturn(true);
 
         // when
-        ResponseEntity<DataResponse<Map<String, Boolean>>> isExistedMemberNickname =
+        ResponseEntity<DataResponse<Map<String, Boolean>>> isExistedNickname =
                 memberRestController.checkExistedMemberNickname(MEMBER_BASIC_USER_NICKNAME);
 
         // then
-        assertThat(isExistedMemberNickname.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(isExistedMemberNickname.getBody().getData().toString()).isEqualTo(Map.of("isNicknameExisted", true).toString());
+        assertThat(isExistedNickname.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(isExistedNickname.getBody().getData().toString()).isEqualTo(Map.of("isNicknameExisted", true).toString());
     }
 
     @Test
@@ -170,7 +170,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         // given
         given(jwtTokenProvider.validateToken(accessToken)).willReturn(true);
         given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(MEMBER_BASIC_USER_UUID);
-        willDoNothing().given(memberController).cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD);
+        willDoNothing().given(memberController).cancelPostBookmark(testMemberPostBookmarkCancelRecord);
 
         // when
         ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.cancelCommunicationPostBookmark(MEMBER_BASIC_USER_UUID, TEST_COMM_POST_ULID, auth);

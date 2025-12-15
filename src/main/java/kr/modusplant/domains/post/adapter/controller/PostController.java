@@ -9,7 +9,6 @@ import kr.modusplant.domains.post.domain.vo.*;
 import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
 import kr.modusplant.domains.post.usecase.port.repository.*;
-import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
@@ -51,7 +50,7 @@ public class PostController {
         boolean hasNext = readModels.size() > size;
         List<PostSummaryResponse> responses = readModels.stream()
                 .limit(size)
-                .map(readModel -> postMapper.toPostSummaryResponse(readModel,getJsonNodeContentPreview(readModel))).toList();
+                .map(readModel -> postMapper.toPostSummaryResponse(readModel,getJsonNodeContentPreview(readModel.content()))).toList();
         String nextUlid = hasNext && !responses.isEmpty() ? responses.get(responses.size() - 1).ulid() : null;
         return CursorPageResponse.of(responses, nextUlid, hasNext);
     }
@@ -61,7 +60,7 @@ public class PostController {
         boolean hasNext = readModels.size() > size;
         List<PostSummaryResponse> responses = readModels.stream()
                 .limit(size)
-                .map(readModel -> postMapper.toPostSummaryResponse(readModel,getJsonNodeContentPreview(readModel))).toList();
+                .map(readModel -> postMapper.toPostSummaryResponse(readModel,getJsonNodeContentPreview(readModel.content()))).toList();
         String nextUlid = hasNext && !responses.isEmpty() ? responses.get(responses.size() - 1).ulid() : null;
         return CursorPageResponse.of(responses, nextUlid, hasNext);
     }
@@ -75,10 +74,18 @@ public class PostController {
                     postRecentlyViewRepository.recordViewPost(currentMemberUuid,postId);
                     return postMapper.toPostDetailResponse(
                             postDetail,
-                            getJsonNodeContent(postDetail),
+                            getJsonNodeContent(postDetail.content()),
                             readViewCount(ulid)
                     );
                 }).orElseThrow(() -> new PostNotFoundException());
+    }
+
+    public PostDetailResponse getDataByUlid(String ulid, UUID currentMemberUuid) {
+        return postQueryRepository.findPostDetailDataByPostId(PostId.create(ulid))
+                .filter(postDetailData -> postDetailData.isPublished() ||
+                        (!postDetailData.isPublished() && postDetailData.authorUuid().equals(currentMemberUuid)))
+                .map(postDetailData -> postMapper.toPostDetailResponse(postDetailData, getJsonNodeContent(postDetailData.content())))
+                .orElseThrow(() -> new PostNotFoundException());
     }
 
     @Transactional
@@ -117,6 +124,9 @@ public class PostController {
         }
         if (post.getStatus().isPublished()) {
             postArchiveRepository.save(PostId.create(ulid));
+            postRepository.deletePostLikeByPostId(post.getPostId());
+            postRepository.deletePostBookmarkByPostId(post.getPostId());
+            postRepository.deletePostRecentlyViewRecordByPostId(post.getPostId());
         }
         multipartDataProcessorPort.deleteFiles(post.getPostContent().getContent());
         postRepository.delete(post);
@@ -145,13 +155,13 @@ public class PostController {
     public OffsetPageResponse<PostSummaryResponse> getByMemberUuid(UUID memberUuid, int page, int size) {
         return OffsetPageResponse.from(
                 postQueryForMemberRepository.findPublishedByAuthMemberWithOffset(AuthorId.fromUuid(memberUuid),page,size)
-                        .map(postModel -> postMapper.toPostSummaryResponse(postModel,getJsonNodeContentPreview(postModel))));
+                        .map(postModel -> postMapper.toPostSummaryResponse(postModel,getJsonNodeContentPreview(postModel.content()))));
     }
 
     public OffsetPageResponse<DraftPostResponse> getDraftByMemberUuid(UUID currentMemberUuid, int page, int size) {
         return OffsetPageResponse.from(
                 postQueryForMemberRepository.findDraftByAuthMemberWithOffset(AuthorId.fromUuid(currentMemberUuid),page,size)
-                        .map(postModel -> postMapper.toDraftPostResponse(postModel, getJsonNodeContentPreview(postModel))));
+                        .map(postModel -> postMapper.toDraftPostResponse(postModel, getJsonNodeContentPreview(postModel.content()))));
     }
 
     public OffsetPageResponse<PostSummaryResponse> getRecentlyViewByMemberUuid(UUID currentMemberUuid, int page, int size) {
@@ -162,7 +172,7 @@ public class PostController {
         }
         List<PostSummaryResponse> postsPages = postQueryForMemberRepository.findByIds(postIds,currentMemberUuid)
                 .stream()
-                .map(postModel -> postMapper.toPostSummaryResponse(postModel, getJsonNodeContentPreview(postModel)))
+                .map(postModel -> postMapper.toPostSummaryResponse(postModel, getJsonNodeContentPreview(postModel.content())))
                 .toList();
         return OffsetPageResponse.from(new PageImpl<>(postsPages,PageRequest.of(page,size),totalElements));
     }
@@ -170,43 +180,33 @@ public class PostController {
     public OffsetPageResponse<PostSummaryResponse> getLikedByMemberUuid(UUID currentMemberUuid, int page, int size) {
         return OffsetPageResponse.from(
                 postQueryForMemberRepository.findLikedByMemberWithOffset(currentMemberUuid,page,size)
-                        .map(postModel -> postMapper.toPostSummaryResponse(postModel, getJsonNodeContentPreview(postModel))));
+                        .map(postModel -> postMapper.toPostSummaryResponse(postModel, getJsonNodeContentPreview(postModel.content()))));
     }
 
     public OffsetPageResponse<PostSummaryResponse> getBookmarkedByMemberUuid(UUID currentMemberUuid, int page, int size) {
         return OffsetPageResponse.from(
                 postQueryForMemberRepository.findBookmarkedByMemberWithOffset(currentMemberUuid,page,size)
-                        .map(postModel -> postMapper.toPostSummaryResponse(postModel, getJsonNodeContentPreview(postModel)))
+                        .map(postModel -> postMapper.toPostSummaryResponse(postModel, getJsonNodeContentPreview(postModel.content())))
         );
     }
 
-    private JsonNode getJsonNodeContentPreview(PostSummaryReadModel readModel) {
+    private JsonNode getJsonNodeContentPreview(JsonNode content) {
         JsonNode contentPreview;
         try {
-            contentPreview = multipartDataProcessorPort.convertToPreview(readModel.content());
+            contentPreview = multipartDataProcessorPort.convertToPreview(content);
         } catch (IOException e) {
             throw new ContentProcessingException();
         }
         return contentPreview;
     }
 
-    private JsonNode getJsonNodeContentPreview(DraftPostReadModel readModel) {
-        JsonNode contentPreview;
+    private JsonNode getJsonNodeContent(JsonNode content) {
+        JsonNode newContent;
         try {
-            contentPreview = multipartDataProcessorPort.convertToPreview(readModel.content());
+            newContent = multipartDataProcessorPort.convertFileSrcToFullFileSrc(content);
         } catch (IOException e) {
             throw new ContentProcessingException();
         }
-        return contentPreview;
-    }
-
-    private JsonNode getJsonNodeContent(PostDetailReadModel readModel) {
-        JsonNode content;
-        try {
-            content = multipartDataProcessorPort.convertFileSrcToFullFileSrc(readModel.content());
-        } catch (IOException e) {
-            throw new ContentProcessingException();
-        }
-        return content;
+        return newContent;
     }
 }

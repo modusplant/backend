@@ -1,6 +1,7 @@
 package kr.modusplant.domains.post.usecase.port.repository;
 
 import kr.modusplant.domains.post.domain.vo.PostId;
+import kr.modusplant.domains.post.usecase.record.PostDetailDataReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 
@@ -16,4 +17,5 @@ public interface PostQueryRepository {
 
     Optional<PostDetailReadModel> findPostDetailByPostId(PostId postId, UUID currentMemberUuid);
 
+    Optional<PostDetailDataReadModel> findPostDetailDataByPostId(PostId postId);
 }
