@@ -93,7 +93,7 @@ public class PostController {
         AuthorId authorId = AuthorId.fromUuid(currentMemberUuid);
         PrimaryCategoryId primaryCategoryId = PrimaryCategoryId.fromUuid(postInsertRequest.primaryCategoryUuid());
         SecondaryCategoryId secondaryCategoryId = SecondaryCategoryId.fromUuid(postInsertRequest.secondaryCategoryUuid());
-        PostContent postContent = PostContent.create(postInsertRequest.title(), multipartDataProcessorPort.saveFilesAndGenerateContentJson(postInsertRequest.content()));
+        PostContent postContent = PostContent.create(postInsertRequest.title(), multipartDataProcessorPort.saveFilesAndGenerateContentJson(postInsertRequest.content(), postInsertRequest.orderInfo()));
         Post post = postInsertRequest.isPublished()
                 ? Post.createPublished(authorId, primaryCategoryId, secondaryCategoryId, postContent)
                 : Post.createDraft(authorId, primaryCategoryId, secondaryCategoryId, postContent);
@@ -105,7 +105,7 @@ public class PostController {
         Post post = postRepository.getPostByUlid(PostId.create(postUpdateRequest.ulid()))
                 .filter(p -> p.getAuthorId().equals(AuthorId.fromUuid(currentMemberUuid))).orElseThrow();
         multipartDataProcessorPort.deleteFiles(post.getPostContent().getContent());
-        PostContent postContent = PostContent.create(postUpdateRequest.title(),multipartDataProcessorPort.saveFilesAndGenerateContentJson(postUpdateRequest.content()));
+        PostContent postContent = PostContent.create(postUpdateRequest.title(),multipartDataProcessorPort.saveFilesAndGenerateContentJson(postUpdateRequest.content(), postUpdateRequest.orderInfo()));
         post.update(
                 AuthorId.fromUuid(currentMemberUuid),
                 PrimaryCategoryId.fromUuid(postUpdateRequest.primaryCategoryUuid()),
