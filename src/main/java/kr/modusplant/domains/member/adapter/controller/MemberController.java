@@ -36,6 +36,7 @@ import static kr.modusplant.domains.member.adapter.util.MemberProfileImageUtils.
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 import static kr.modusplant.shared.exception.enums.ErrorCode.NICKNAME_EXISTS;
 
+@SuppressWarnings("LoggingSimilarMessage")
 @RequiredArgsConstructor
 @Service
 @Transactional
@@ -71,6 +72,7 @@ public class MemberController {
         if (optionalMemberProfile.isPresent()) {
             return memberProfileMapper.toMemberProfileResponse(optionalMemberProfile.orElseThrow());
         } else {
+            log.warn("Not found member profile, member uuid: {}. Please check it out. ", memberId.getValue());
             return new MemberProfileResponse(memberId.getValue(), null, null, optionalMember.orElseThrow().getNickname().getValue());
         }
     }
