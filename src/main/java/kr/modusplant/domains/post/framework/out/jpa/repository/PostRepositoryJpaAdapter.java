@@ -4,14 +4,13 @@ import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
 import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostJpaRepository;
+import kr.modusplant.domains.post.framework.out.redis.PostRecentlyViewRedisRepository;
 import kr.modusplant.domains.post.framework.out.redis.PostViewCountRedisRepository;
 import kr.modusplant.domains.post.usecase.port.repository.PostRepository;
 import kr.modusplant.framework.jpa.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.framework.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.repository.CommPrimaryCategoryJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommSecondaryCategoryJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -26,6 +25,9 @@ public class PostRepositoryJpaAdapter implements PostRepository {
     private final CommPrimaryCategoryJpaRepository primaryCategoryJpaRepository;
     private final CommSecondaryCategoryJpaRepository secondaryCategoryJpaRepository;
     private final PostViewCountRedisRepository postViewCountRedisRepository;
+    private final CommPostLikeJpaRepository postLikeJpaRepository;
+    private final CommPostBookmarkJpaRepository postBookmarkJpaRepository;
+    private final PostRecentlyViewRedisRepository postRecentlyViewRedisRepository;
 
     @Override
     public void save(Post post) {
@@ -67,6 +69,21 @@ public class PostRepositoryJpaAdapter implements PostRepository {
     @Override
     public int updateViewCount(PostId postId, Long viewCount) {
         return postJpaRepository.updateViewCount(postId.getValue(),viewCount);
+    }
+
+    @Override
+    public void deletePostLikeByPostId(PostId postId) {
+        postLikeJpaRepository.deleteByPostId(postId.getValue());
+    }
+
+    @Override
+    public void deletePostBookmarkByPostId(PostId postId) {
+        postBookmarkJpaRepository.deleteByPostId(postId.getValue());
+    }
+
+    @Override
+    public void deletePostRecentlyViewRecordByPostId(PostId postId) {
+        postRecentlyViewRedisRepository.removePostFromAllMembers(postId);
     }
 
 }

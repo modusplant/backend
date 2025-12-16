@@ -4,14 +4,14 @@ import kr.modusplant.domains.comment.common.util.domain.CommentContentTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentPathTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.usecase.response.CommentResponse;
-import kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils;
+import kr.modusplant.shared.kernel.common.util.NicknameTestUtils;
 
 public interface CommentResponseTestUtils extends
         PostIdTestUtils, CommentPathTestUtils,
-        MemberNicknameTestUtils, CommentContentTestUtils, CommentReadModelTestUtils{
+        NicknameTestUtils, CommentContentTestUtils, CommentReadModelTestUtils{
 
     CommentResponse testCommentResponse = new CommentResponse(
-            testPostId.getId(), testCommentPath.getPath(), testMemberNickname.getValue(),
+            testPostId.getId(), testCommentPath.getPath(), testNormalUserNickname.getValue(),
             testCommentContent.getContent(), false, testCommentReadModel.createdAt()
     );
 }

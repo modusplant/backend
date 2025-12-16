@@ -1,12 +1,13 @@
 package kr.modusplant.domains.post.framework.out.jooq.repository;
 
 import kr.modusplant.domains.post.domain.exception.EmptyCategoryIdException;
+import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.framework.out.jooq.mapper.supers.PostJooqMapper;
+import kr.modusplant.domains.post.usecase.port.repository.PostQueryRepository;
 import kr.modusplant.domains.post.usecase.record.PostDetailDataReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
-import kr.modusplant.domains.post.usecase.port.repository.PostQueryRepository;
 import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
 import lombok.RequiredArgsConstructor;
 import org.jooq.Condition;
@@ -193,7 +194,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         if (keyword == null || keyword.trim().isEmpty()) {
             return noCondition();
         }
-        String searchKeyword = "%"+keyword+"%";
+        String searchKeyword = "%"+escapeWildcards(keyword)+"%";
         Condition titleCondition = COMM_POST.TITLE.likeIgnoreCase(searchKeyword);
         Name alias = name("c");
         Condition contentCondition = exists(
@@ -207,6 +208,13 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         return titleCondition.or(contentCondition);
     }
 
+    private String escapeWildcards(String input) {
+        return input
+                .replace("\\", "\\\\")
+                .replace("%", "\\%")
+                .replace("_", "\\_");
+    }
+
     private Condition buildCursorCondition(String cursorUlid) {
         if (cursorUlid == null) {
             return noCondition();
@@ -217,7 +225,13 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                 .fetchOne(COMM_POST.PUBLISHED_AT);
 
         if (cursorPublishedAt == null) {
-            return noCondition();
+            cursorPublishedAt = dsl.select(COMM_POST_ARCHIVE.PUBLISHED_AT)
+                    .from(COMM_POST_ARCHIVE)
+                    .where(COMM_POST_ARCHIVE.ULID.eq(cursorUlid))
+                    .fetchOne(COMM_POST_ARCHIVE.PUBLISHED_AT);
+            if(cursorPublishedAt == null) {
+                throw new PostNotFoundException();
+            }
         }
         return row(COMM_POST.PUBLISHED_AT, COMM_POST.ULID).lessThan(cursorPublishedAt,cursorUlid);
     }

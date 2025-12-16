@@ -8,10 +8,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum MemberErrorCode implements ResponseCode {
-    ALREADY_EXISTED_NICKNAME(HttpStatus.BAD_REQUEST, "already_existed_nickname", "이미 동일한 닉네임이 존재합니다. "),
     EMPTY_MEMBER_BIRTH_DATE(HttpStatus.BAD_REQUEST, "empty_member_birth_date", "회원 생일이 비어 있습니다. "),
     EMPTY_MEMBER_ID(HttpStatus.BAD_REQUEST, "empty_member_id", "회원 아이디가 비어 있습니다. "),
-    EMPTY_MEMBER_NICKNAME(HttpStatus.BAD_REQUEST, "empty_member_nickname", "회원 닉네임이 비어 있습니다. "),
     EMPTY_MEMBER_STATUS(HttpStatus.BAD_REQUEST, "empty_member_status", "회원 상태가 비어 있습니다. "),
     EMPTY_MEMBER_PROFILE_IMAGE(HttpStatus.BAD_REQUEST, "empty_member_profile_image", "회원 프로필 이미지가 비어 있습니다. "),
     EMPTY_MEMBER_PROFILE_IMAGE_BYTES(HttpStatus.BAD_REQUEST, "empty_member_profile_image_bytes", "회원 프로필 이미지 바이트 값이 비어 있습니다. "),

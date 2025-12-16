@@ -12,7 +12,7 @@ public class MemberMapperImpl implements MemberMapper {
         return new MemberResponse(
                 member.getMemberId().getValue(),
                 member.getMemberStatus().getValue(),
-                member.getMemberNickname().getValue(),
+                member.getNickname().getValue(),
                 member.getMemberBirthDate().getValue());
     }
 }

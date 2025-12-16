@@ -13,6 +13,6 @@ public class MemberProfileMapperImpl implements MemberProfileMapper {
                 memberProfile.getMemberId().getValue(),
                 memberProfile.getMemberProfileImage().getMemberProfileImageBytes().getValue(),
                 memberProfile.getMemberProfileIntroduction().getValue(),
-                memberProfile.getMemberNickname().getValue());
+                memberProfile.getNickname().getValue());
     }
 }
