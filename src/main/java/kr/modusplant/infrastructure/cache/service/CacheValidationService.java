@@ -37,15 +37,16 @@ public class CacheValidationService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Map<String, Object> isCacheUsableForSiteMemberProfile(@Nullable String ifNoneMatch,
-                                                 @Nullable String ifModifiedSince,
-                                                 @Nonnull UUID id) {
+    public Map<String, Object> isCacheUsableForSiteMemberProfile(
+            @Nullable String ifNoneMatch,
+            @Nullable String ifModifiedSince,
+            @Nonnull UUID id) {
         Optional<SiteMemberProfileEntity> optionalMemberProfile = memberProfileJpaRepository.findByUuid(id);
         if (optionalMemberProfile.isEmpty()) {
             throw new EntityNotFoundException(MEMBER_PROFILE_NOT_FOUND, "memberProfile");
         }
         SiteMemberProfileEntity memberProfileEntity = optionalMemberProfile.orElseThrow();
-        Map<String, Object> returnedMap = new HashMap<>(){{
+        Map<String, Object> returnedMap = new HashMap<>() {{
             put(ENTITY_TAG, passwordEncoder.encode(memberProfileEntity.getETagSource()));
             put(LAST_MODIFIED_DATE_TIME, memberProfileEntity.getLastModifiedAtAsTruncatedToSeconds());
         }};
