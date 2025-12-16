@@ -23,7 +23,6 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_COMMENT;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @IdClass(CommCommentId.class)
 public class CommCommentEntity {
-
     @Id
     private String postUlid;
 

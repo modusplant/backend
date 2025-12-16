@@ -75,6 +75,10 @@ public class SiteMemberAuthEntity {
         this.lockoutUntil = lockoutUntil;
     }
 
+    public String getETagSource() {
+        return getUuid() + "-" + getVersionNumber();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

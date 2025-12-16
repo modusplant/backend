@@ -34,6 +34,7 @@ import java.util.Optional;
 
 import static kr.modusplant.domains.member.adapter.util.MemberProfileImageUtils.generateMemberProfileImagePath;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
+import static kr.modusplant.shared.exception.enums.ErrorCode.MEMBER_PROFILE_NOT_FOUND;
 import static kr.modusplant.shared.exception.enums.ErrorCode.NICKNAME_EXISTS;
 
 @SuppressWarnings("LoggingSimilarMessage")
@@ -72,8 +73,7 @@ public class MemberController {
         if (optionalMemberProfile.isPresent()) {
             return memberProfileMapper.toMemberProfileResponse(optionalMemberProfile.orElseThrow());
         } else {
-            log.warn("Not found member profile, member uuid: {}. Please check it out. ", memberId.getValue());
-            return new MemberProfileResponse(memberId.getValue(), null, null, optionalMember.orElseThrow().getNickname().getValue());
+            throw new EntityNotFoundException(MEMBER_PROFILE_NOT_FOUND, "memberProfile");
         }
     }
 
@@ -94,7 +94,7 @@ public class MemberController {
                 s3FileService.deleteFiles(imagePath);
             }
         } else {
-            log.warn("Not found member profile, member uuid: {}. Please check it out. ", memberId.getValue());
+            throw new EntityNotFoundException(MEMBER_PROFILE_NOT_FOUND, "memberProfile");
         }
         if (isImageExist) {
             String newImagePath = uploadImage(memberId, record);
