@@ -7,16 +7,26 @@ import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.infrastructure.cache.service.CacheValidationService;
 import kr.modusplant.infrastructure.jwt.exception.InvalidTokenException;
 import kr.modusplant.infrastructure.jwt.exception.TokenExpiredException;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -45,13 +55,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.*;
 
 class MemberRestControllerTest implements MemberTestUtils {
     @SuppressWarnings({"unused", "InstantiationOfUtilityClass"})
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
+    private final PasswordEncoder passwordEncoder = Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8();
     private final MemberController memberController = Mockito.mock(MemberController.class);
     private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
-    private final MemberRestController memberRestController = new MemberRestController(memberController, jwtTokenProvider);
+    private final CacheValidationService cacheValidationService = Mockito.mock(CacheValidationService.class);
+    private final MemberRestController memberRestController = new MemberRestController(memberController, jwtTokenProvider, cacheValidationService);
+
     private final String auth = "Bearer a.b.c";
     private final String accessToken = "a.b.c";
 
@@ -81,23 +95,76 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // then
         assertThat(isExistedNickname.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(isExistedNickname.getHeaders().getCacheControl()).isEqualTo(CacheControl.noStore().mustRevalidate().cachePrivate().getHeaderValue());
         assertThat(isExistedNickname.getBody().getData().toString()).isEqualTo(Map.of("isNicknameExisted", true).toString());
     }
 
     @Test
-    @DisplayName("getMemberProfile로 응답 반환")
-    void testGetMemberProfile_givenValidId_willReturnResponse() throws IOException {
+    @DisplayName("캐시를 그대로 사용할 수 있을 때 getMemberProfile로 응답 반환")
+    void testGetMemberProfile_givenValidIdAndUsableCache_willReturnResponse() throws IOException {
         // given
+        String entityTag = passwordEncoder.encode(UUID.randomUUID() + "-0");
+        LocalDateTime now = LocalDateTime.now();
+        String ifNoneMatch = String.format("\"%s\"", entityTag);
+        String ifModifiedSince = now.atZone(ZoneId.systemDefault()).format(DateTimeFormatter.RFC_1123_DATE_TIME);
+
         given(jwtTokenProvider.validateToken(accessToken)).willReturn(true);
         given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(MEMBER_BASIC_USER_UUID);
+        Map<String, Object> hashMap = new HashMap<>() {{
+            put("entityTag", entityTag);
+            put("lastModifiedDateTime", now);
+            put("result", true);
+        }};
+        given(cacheValidationService.isCacheUsableForSiteMemberProfile(
+                ifNoneMatch,
+                ifModifiedSince,
+                MEMBER_BASIC_USER_UUID
+        )).willReturn(hashMap);
+
+        // when
+        ResponseEntity<DataResponse<MemberProfileResponse>> memberResponseEntity = memberRestController.getMemberProfile(MEMBER_BASIC_USER_UUID, auth, ifNoneMatch, ifModifiedSince);
+
+        // then
+        assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_MODIFIED);
+        assertThat(memberResponseEntity.getHeaders().getCacheControl()).isEqualTo(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate().getHeaderValue());
+        assertThat(memberResponseEntity.getHeaders().getETag()).isEqualTo(String.format("\"%s\"", entityTag));
+        assertThat(memberResponseEntity.getHeaders().getLastModified()).isEqualTo(now.atZone(ZoneId.systemDefault()).toInstant().truncatedTo(ChronoUnit.SECONDS).toEpochMilli());
+        verify(memberController, never()).getProfile(testMemberProfileGetRecord);
+    }
+
+    @Test
+    @DisplayName("캐시를 그대로 사용할 수 없을 때 getMemberProfile로 응답 반환")
+    void testGetMemberProfile_givenValidIdAndNotUsableCache_willReturnResponse() throws IOException {
+        // given
+        String entityTag = passwordEncoder.encode(UUID.randomUUID() + "-0");
+        LocalDateTime now = LocalDateTime.now();
+        String ifNoneMatch = String.format("\"%s\"", entityTag);
+        String ifModifiedSince = now.atZone(ZoneId.systemDefault()).format(DateTimeFormatter.RFC_1123_DATE_TIME);
+
+        given(jwtTokenProvider.validateToken(accessToken)).willReturn(true);
+        given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(MEMBER_BASIC_USER_UUID);
+        Map<String, Object> hashMap = new HashMap<>() {{
+            put("entityTag", entityTag);
+            put("lastModifiedDateTime", now);
+            put("result", false);
+        }};
+        given(cacheValidationService.isCacheUsableForSiteMemberProfile(
+                ifNoneMatch,
+                ifModifiedSince,
+                MEMBER_BASIC_USER_UUID
+        )).willReturn(hashMap);
         given(memberController.getProfile(testMemberProfileGetRecord)).willReturn(testMemberProfileResponse);
 
         // when
-        ResponseEntity<DataResponse<MemberProfileResponse>> memberResponseEntity = memberRestController.getMemberProfile(MEMBER_BASIC_USER_UUID, auth);
+        ResponseEntity<DataResponse<MemberProfileResponse>> memberResponseEntity = memberRestController.getMemberProfile(MEMBER_BASIC_USER_UUID, auth, ifNoneMatch, ifModifiedSince);
 
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(memberResponseEntity.getHeaders().getCacheControl()).isEqualTo(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate().getHeaderValue());
+        assertThat(memberResponseEntity.getHeaders().getETag()).isEqualTo(String.format("\"%s\"", entityTag));
+        assertThat(memberResponseEntity.getHeaders().getLastModified()).isEqualTo(now.atZone(ZoneId.systemDefault()).toInstant().truncatedTo(ChronoUnit.SECONDS).toEpochMilli());
         assertThat(memberResponseEntity.getBody().toString()).isEqualTo(DataResponse.ok(testMemberProfileResponse).toString());
+        verify(memberController, only()).getProfile(testMemberProfileGetRecord);
     }
 
     @Test
@@ -113,6 +180,7 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(memberResponseEntity.getHeaders().getCacheControl()).isEqualTo(CacheControl.noStore().mustRevalidate().cachePrivate().getHeaderValue());
         assertThat(memberResponseEntity.getBody().toString()).isEqualTo(DataResponse.ok(testMemberProfileResponse).toString());
     }
 
@@ -216,7 +284,7 @@ class MemberRestControllerTest implements MemberTestUtils {
     @DisplayName("Bearer 표시가 없는 Authorization 사용으로 응답 반환 실패")
     void testValidateTokenAndAccessToId_givenInvalidToken_willThrowException() {
         // given & when
-        InvalidTokenException invalidTokenException = assertThrows(InvalidTokenException.class, () -> memberRestController.getMemberProfile(MEMBER_BASIC_USER_UUID, "a.b.c"));
+        InvalidTokenException invalidTokenException = assertThrows(InvalidTokenException.class, () -> memberRestController.getMemberProfile(MEMBER_BASIC_USER_UUID, "a.b.c", null, null));
 
         // then
         assertThat(invalidTokenException.getMessage()).isEqualTo(CREDENTIAL_NOT_AUTHORIZED.getMessage());
@@ -229,7 +297,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         given(jwtTokenProvider.validateToken(accessToken)).willReturn(false);
 
         // when
-        TokenExpiredException tokenExpiredException = assertThrows(TokenExpiredException.class, () -> memberRestController.getMemberProfile(MEMBER_BASIC_USER_UUID, auth));
+        TokenExpiredException tokenExpiredException = assertThrows(TokenExpiredException.class, () -> memberRestController.getMemberProfile(MEMBER_BASIC_USER_UUID, auth, null, null));
 
         // then
         assertThat(tokenExpiredException.getMessage()).isEqualTo(CREDENTIAL_NOT_AUTHORIZED.getMessage());
@@ -243,7 +311,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(UUID.randomUUID());
 
         // when
-        IncorrectMemberIdException incorrectMemberIdException = assertThrows(IncorrectMemberIdException.class, () -> memberRestController.getMemberProfile(MEMBER_BASIC_USER_UUID, auth));
+        IncorrectMemberIdException incorrectMemberIdException = assertThrows(IncorrectMemberIdException.class, () -> memberRestController.getMemberProfile(MEMBER_BASIC_USER_UUID, auth, null, null));
 
         // then
         assertThat(incorrectMemberIdException.getMessage()).isEqualTo(INCORRECT_MEMBER_ID.getMessage());

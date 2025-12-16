@@ -17,18 +17,21 @@ import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.infrastructure.cache.service.CacheValidationService;
 import kr.modusplant.infrastructure.jwt.exception.TokenExpiredException;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
 
@@ -40,17 +43,20 @@ import static kr.modusplant.shared.constant.Regex.*;
 @RequestMapping("/api/v1/members")
 @RequiredArgsConstructor
 @Validated
+@Slf4j
 public class MemberRestController {
     private final MemberController memberController;
     private final JwtTokenProvider jwtTokenProvider;
+    private final CacheValidationService cacheValidationService;
 
     @Hidden
     @Operation(summary = "회원 등록 API", description = "닉네임을 통해 회원을 등록합니다.")
     @PostMapping
     public ResponseEntity<DataResponse<MemberResponse>> registerMember(
             @RequestBody @Valid MemberRegisterRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                DataResponse.ok(memberController.register(request)));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(DataResponse.ok(memberController.register(request)));
     }
 
     @Operation(summary = "회원 닉네임 중복 확인 API", description = "이미 등록된 닉네임이 있는지 조회합니다.")
@@ -62,9 +68,17 @@ public class MemberRestController {
             @Pattern(regexp = REGEX_NICKNAME,
                     message = "회원 닉네임 서식이 올바르지 않습니다. ")
             String nickname) {
-        return ResponseEntity.status(HttpStatus.OK).body(DataResponse.ok(Map.of(
-                "isNicknameExisted", memberController.checkExistedNickname(new MemberNicknameCheckRecord(nickname))))
-        );
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
+                .body(
+                        DataResponse.ok(
+                                Map.of(
+                                        "isNicknameExisted",
+                                        memberController.checkExistedNickname(new MemberNicknameCheckRecord(nickname))
+                                )
+                        )
+                );
     }
 
     @Operation(
@@ -82,10 +96,37 @@ public class MemberRestController {
             @Parameter(hidden = true)
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String auth) throws IOException {
+            String auth,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.IF_NONE_MATCH, required = false)
+            String ifNoneMatch,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.IF_MODIFIED_SINCE, required = false)
+            String ifModifiedSince) throws IOException {
         validateTokenAndAccessToId(id, auth);
-        return ResponseEntity.status(HttpStatus.OK).body(
-                DataResponse.ok(memberController.getProfile(new MemberProfileGetRecord(id))));
+        Map<String, ?> cacheMap =
+                cacheValidationService.isCacheUsableForSiteMemberProfile(ifNoneMatch, ifModifiedSince, id);
+        if (cacheMap.get("result").equals(true)) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_MODIFIED)
+                    .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
+                    .eTag((String) cacheMap.get("entityTag"))
+                    .lastModified(
+                            ZonedDateTime.of(
+                                    ((LocalDateTime) cacheMap.get("lastModifiedDateTime")), ZoneId.systemDefault()))
+                    .build();
+        } else {
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
+                    .eTag((String) cacheMap.get("entityTag"))
+                    .lastModified(
+                            ZonedDateTime.of(
+                                    ((LocalDateTime) cacheMap.get("lastModifiedDateTime")), ZoneId.systemDefault()))
+                    .body(DataResponse.ok(memberController.getProfile(new MemberProfileGetRecord(id))));
+        }
     }
 
     @Operation(
@@ -119,8 +160,11 @@ public class MemberRestController {
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) throws IOException {
         validateTokenAndAccessToId(id, auth);
-        return ResponseEntity.status(HttpStatus.OK).body(
-                DataResponse.ok(memberController.overrideProfile(new MemberProfileOverrideRecord(id, introduction, image, nickname))));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
+                .body(DataResponse.ok(
+                        memberController.overrideProfile(new MemberProfileOverrideRecord(id, introduction, image, nickname))));
     }
 
     @Operation(

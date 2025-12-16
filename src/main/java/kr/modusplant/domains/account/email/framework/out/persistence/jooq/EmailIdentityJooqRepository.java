@@ -5,18 +5,22 @@ import kr.modusplant.jooq.tables.SiteMemberAuth;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Password;
-import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 @Repository
-@RequiredArgsConstructor
 public class EmailIdentityJooqRepository implements EmailIdentityRepository {
 
-    private final DSLContext dsl;
     private final SiteMemberAuth memberAuth = SiteMemberAuth.SITE_MEMBER_AUTH;
+    private final DSLContext dsl;
     private final PasswordEncoder passwordEncoder;
+
+    public EmailIdentityJooqRepository(DSLContext dsl, @Qualifier("bcryptPasswordEncoder") PasswordEncoder passwordEncoder) {
+        this.dsl = dsl;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public boolean existsByEmailAndProvider(Email email) {

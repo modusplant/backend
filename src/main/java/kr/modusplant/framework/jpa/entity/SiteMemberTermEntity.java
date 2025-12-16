@@ -59,6 +59,10 @@ public class SiteMemberTermEntity {
         this.agreedAdInfoReceivingVersion = agreedAdInfoReceivingVersion;
     }
 
+    public String getETagSource() {
+        return getUuid() + "-" + getVersionNumber();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -101,6 +101,10 @@ public class CommPostEntity {
         this.likeCount = Math.max(0, this.likeCount - 1);
     }
 
+    public String getETagSource() {
+        return getUlid() + "-" + getVer();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
