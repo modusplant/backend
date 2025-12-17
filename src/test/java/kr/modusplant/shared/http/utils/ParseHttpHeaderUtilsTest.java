@@ -41,7 +41,7 @@ class ParseHttpHeaderUtilsTest implements SiteMemberEntityTestUtils, SiteMemberP
     void testParseIfModifiedSince() {
         // given & when
         LocalDateTime now = LocalDateTime.now();
-        String ifModifiedSince = ZonedDateTime.of(now, ZoneId.systemDefault()).format(DateTimeFormatter.RFC_1123_DATE_TIME);
+        String ifModifiedSince = ZonedDateTime.of(now, ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.RFC_1123_DATE_TIME);
 
         // then
         assertThat(parseIfModifiedSince(ifModifiedSince)).isEqualTo(now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")));

@@ -132,7 +132,7 @@ class CacheValidationServiceTest implements SiteMemberEntityTestUtils, SiteMembe
         Map<String, ?> returnedMapEqual = cacheValidationService.isCacheUsableForSiteMemberProfile(
                 String.format("\"%s\"", passwordEncoder.encode(memberProfileEntity.getETagSource())),
                 ZonedDateTime.of(memberProfileEntity.getLastModifiedAtAsTruncatedToSeconds(),
-                        ZoneId.systemDefault()).format(DateTimeFormatter.RFC_1123_DATE_TIME),
+                        ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.RFC_1123_DATE_TIME),
                 id);
 
         // then
@@ -143,7 +143,7 @@ class CacheValidationServiceTest implements SiteMemberEntityTestUtils, SiteMembe
         Map<String, ?> returnedMapPast = cacheValidationService.isCacheUsableForSiteMemberProfile(
                 String.format("\"%s\"", passwordEncoder.encode(memberProfileEntity.getETagSource())),
                 ZonedDateTime.of(memberProfileEntity.getLastModifiedAtAsTruncatedToSeconds().plusMinutes(5),
-                        ZoneId.systemDefault()).format(DateTimeFormatter.RFC_1123_DATE_TIME),
+                        ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.RFC_1123_DATE_TIME),
                 id);
 
         // then
@@ -165,7 +165,7 @@ class CacheValidationServiceTest implements SiteMemberEntityTestUtils, SiteMembe
         Map<String, ?> returnedMapEqual = cacheValidationService.isCacheUsableForSiteMemberProfile(
                 String.format("\"%s\"", passwordEncoder.encode(memberProfileEntity.getETagSource())),
                 ZonedDateTime.of(memberProfileEntity.getLastModifiedAtAsTruncatedToSeconds().minusMinutes(5),
-                        ZoneId.systemDefault()).format(DateTimeFormatter.RFC_1123_DATE_TIME),
+                        ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.RFC_1123_DATE_TIME),
                 id);
 
         // then

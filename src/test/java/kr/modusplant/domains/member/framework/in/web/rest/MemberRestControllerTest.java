@@ -106,7 +106,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         String entityTag = passwordEncoder.encode(UUID.randomUUID() + "-0");
         LocalDateTime now = LocalDateTime.now();
         String ifNoneMatch = String.format("\"%s\"", entityTag);
-        String ifModifiedSince = now.atZone(ZoneId.systemDefault()).format(DateTimeFormatter.RFC_1123_DATE_TIME);
+        String ifModifiedSince = now.atZone(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.RFC_1123_DATE_TIME);
 
         given(jwtTokenProvider.validateToken(accessToken)).willReturn(true);
         given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(MEMBER_BASIC_USER_UUID);
@@ -128,7 +128,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_MODIFIED);
         assertThat(memberResponseEntity.getHeaders().getCacheControl()).isEqualTo(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate().getHeaderValue());
         assertThat(memberResponseEntity.getHeaders().getETag()).isEqualTo(String.format("\"%s\"", entityTag));
-        assertThat(memberResponseEntity.getHeaders().getLastModified()).isEqualTo(now.atZone(ZoneId.systemDefault()).toInstant().truncatedTo(ChronoUnit.SECONDS).toEpochMilli());
+        assertThat(memberResponseEntity.getHeaders().getLastModified()).isEqualTo(now.atZone(ZoneId.of("Asia/Seoul")).toInstant().truncatedTo(ChronoUnit.SECONDS).toEpochMilli());
         verify(memberController, never()).getProfile(testMemberProfileGetRecord);
     }
 
@@ -139,7 +139,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         String entityTag = passwordEncoder.encode(UUID.randomUUID() + "-0");
         LocalDateTime now = LocalDateTime.now();
         String ifNoneMatch = String.format("\"%s\"", entityTag);
-        String ifModifiedSince = now.atZone(ZoneId.systemDefault()).format(DateTimeFormatter.RFC_1123_DATE_TIME);
+        String ifModifiedSince = now.atZone(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.RFC_1123_DATE_TIME);
 
         given(jwtTokenProvider.validateToken(accessToken)).willReturn(true);
         given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(MEMBER_BASIC_USER_UUID);
@@ -162,7 +162,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(memberResponseEntity.getHeaders().getCacheControl()).isEqualTo(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate().getHeaderValue());
         assertThat(memberResponseEntity.getHeaders().getETag()).isEqualTo(String.format("\"%s\"", entityTag));
-        assertThat(memberResponseEntity.getHeaders().getLastModified()).isEqualTo(now.atZone(ZoneId.systemDefault()).toInstant().truncatedTo(ChronoUnit.SECONDS).toEpochMilli());
+        assertThat(memberResponseEntity.getHeaders().getLastModified()).isEqualTo(now.atZone(ZoneId.of("Asia/Seoul")).toInstant().truncatedTo(ChronoUnit.SECONDS).toEpochMilli());
         assertThat(memberResponseEntity.getBody().toString()).isEqualTo(DataResponse.ok(testMemberProfileResponse).toString());
         verify(memberController, only()).getProfile(testMemberProfileGetRecord);
     }
