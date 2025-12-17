@@ -50,7 +50,7 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
     private static final String FILE_KEY = "post/test-ulid/image/test-file.jpg";
 
     @Nested
-    @DisplayName("saveFilesAndGenerateContentJson 메서드")
+    @DisplayName("saveFilesAndGenerateContentJson 메서드 테스트")
     class testSaveFilesAndGenerateContentJson {
 
         @Test
@@ -191,7 +191,7 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
     }
 
     @Nested
-    @DisplayName("")
+    @DisplayName("convertToPreview 메서드 테스트")
     class testConvertToPreview {
         @Test
         @DisplayName("저장된 텍스트와 이미지 파일 경로로 텍스트 및 이미지 미리보기 읽기")
