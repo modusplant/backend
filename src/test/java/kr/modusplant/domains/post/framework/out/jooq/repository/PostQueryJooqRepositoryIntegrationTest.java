@@ -129,7 +129,7 @@ class PostQueryJooqRepositoryIntegrationTest {
         List<PostSummaryReadModel> firstPageByCategories = postQueryJooqRepository.findByCategoryWithCursor(
                 testPrimaryCategory1.getUuid(),List.of(testSecondaryCategory1.getUuid()),testMember2.getUuid(),null,size
         );
-        List<PostSummaryReadModel> secondePageByCategories = postQueryJooqRepository.findByCategoryWithCursor(
+        List<PostSummaryReadModel> secondPageByCategories = postQueryJooqRepository.findByCategoryWithCursor(
                 testPrimaryCategory1.getUuid(),List.of(testSecondaryCategory1.getUuid()),testMember2.getUuid(),firstPageByCategories.get(size-1).ulid(),size
         );
 
@@ -141,7 +141,7 @@ class PostQueryJooqRepositoryIntegrationTest {
         assertThat(secondPageByPrimaryCategory.get(0).ulid()).isEqualTo(testPost1.getUlid());
 
         assertThat(firstPageByCategories).hasSize(size);
-        assertThat(secondePageByCategories).isEmpty();
+        assertThat(secondPageByCategories).isEmpty();
         assertThat(firstPageByCategories.get(0).ulid()).isEqualTo(testPost5.getUlid());
         assertThat(firstPageByCategories.get(1).ulid()).isEqualTo(testPost1.getUlid());
 
