@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -46,17 +47,18 @@ public class CacheValidationService {
             throw new EntityNotFoundException(MEMBER_PROFILE_NOT_FOUND, "memberProfile");
         }
         SiteMemberProfileEntity memberProfileEntity = optionalMemberProfile.orElseThrow();
+        String entityTagSource = memberProfileEntity.getETagSource();
+        LocalDateTime lastModifiedAt = memberProfileEntity.getLastModifiedAtAsTruncatedToSeconds();
         Map<String, Object> returnedMap = new HashMap<>() {{
-            put(ENTITY_TAG, passwordEncoder.encode(memberProfileEntity.getETagSource()));
-            put(LAST_MODIFIED_DATE_TIME, memberProfileEntity.getLastModifiedAtAsTruncatedToSeconds());
+            put(ENTITY_TAG, passwordEncoder.encode(entityTagSource));
+            put(LAST_MODIFIED_DATE_TIME, lastModifiedAt);
         }};
         if (ifNoneMatch == null) {                  // ETag를 통한 검증 강제
             returnedMap.put(RESULT, false);
             return returnedMap;
         }
-        String comparedEntityTagSource = memberProfileEntity.getETagSource();
         Optional<String> foundEntityTag = parseIfNoneMatch(ifNoneMatch).stream()
-                .filter(element -> passwordEncoder.matches(comparedEntityTagSource, element))
+                .filter(element -> passwordEncoder.matches(entityTagSource, element))
                 .findFirst();
         if (foundEntityTag.isEmpty()) {
             returnedMap.put(RESULT, false);
@@ -65,7 +67,7 @@ public class CacheValidationService {
                 returnedMap.put(RESULT, true);
             } else {
                 returnedMap.put(RESULT,
-                        !memberProfileEntity.getLastModifiedAtAsTruncatedToSeconds().isAfter(parseIfModifiedSince(ifModifiedSince)));
+                        !lastModifiedAt.isAfter(parseIfModifiedSince(ifModifiedSince)));
             }
         }
         return returnedMap;

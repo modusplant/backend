@@ -115,7 +115,7 @@ public class MemberRestController {
                     .eTag((String) cacheMap.get("entityTag"))
                     .lastModified(
                             ZonedDateTime.of(
-                                    ((LocalDateTime) cacheMap.get("lastModifiedDateTime")), ZoneId.systemDefault()))
+                                    ((LocalDateTime) cacheMap.get("lastModifiedDateTime")), ZoneId.of("Asia/Seoul")))
                     .build();
         } else {
             return ResponseEntity
@@ -124,7 +124,7 @@ public class MemberRestController {
                     .eTag((String) cacheMap.get("entityTag"))
                     .lastModified(
                             ZonedDateTime.of(
-                                    ((LocalDateTime) cacheMap.get("lastModifiedDateTime")), ZoneId.systemDefault()))
+                                    ((LocalDateTime) cacheMap.get("lastModifiedDateTime")), ZoneId.of("Asia/Seoul")))
                     .body(DataResponse.ok(memberController.getProfile(new MemberProfileGetRecord(id))));
         }
     }
