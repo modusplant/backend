@@ -127,7 +127,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_MODIFIED);
         assertThat(memberResponseEntity.getHeaders().getCacheControl()).isEqualTo(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate().getHeaderValue());
-        assertThat(memberResponseEntity.getHeaders().getETag()).isEqualTo(String.format("\"%s\"", entityTag));
+        assertThat(memberResponseEntity.getHeaders().getETag()).isEqualTo(String.format("W/\"%s\"", entityTag));
         assertThat(memberResponseEntity.getHeaders().getLastModified()).isEqualTo(now.atZone(ZoneId.of("Asia/Seoul")).toInstant().truncatedTo(ChronoUnit.SECONDS).toEpochMilli());
         verify(memberController, never()).getProfile(testMemberProfileGetRecord);
     }
@@ -161,7 +161,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(memberResponseEntity.getHeaders().getCacheControl()).isEqualTo(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate().getHeaderValue());
-        assertThat(memberResponseEntity.getHeaders().getETag()).isEqualTo(String.format("\"%s\"", entityTag));
+        assertThat(memberResponseEntity.getHeaders().getETag()).isEqualTo(String.format("W/\"%s\"", entityTag));
         assertThat(memberResponseEntity.getHeaders().getLastModified()).isEqualTo(now.atZone(ZoneId.of("Asia/Seoul")).toInstant().truncatedTo(ChronoUnit.SECONDS).toEpochMilli());
         assertThat(memberResponseEntity.getBody().toString()).isEqualTo(DataResponse.ok(testMemberProfileResponse).toString());
         verify(memberController, only()).getProfile(testMemberProfileGetRecord);

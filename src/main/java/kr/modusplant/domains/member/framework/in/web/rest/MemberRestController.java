@@ -112,7 +112,7 @@ public class MemberRestController {
             return ResponseEntity
                     .status(HttpStatus.NOT_MODIFIED)
                     .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
-                    .eTag((String) cacheMap.get("entityTag"))
+                    .eTag("W/\"" + cacheMap.get("entityTag") + "\"")
                     .lastModified(
                             ZonedDateTime.of(
                                     ((LocalDateTime) cacheMap.get("lastModifiedDateTime")), ZoneId.of("Asia/Seoul")))
@@ -121,7 +121,7 @@ public class MemberRestController {
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
-                    .eTag((String) cacheMap.get("entityTag"))
+                    .eTag("W/\"" + cacheMap.get("entityTag") + "\"")
                     .lastModified(
                             ZonedDateTime.of(
                                     ((LocalDateTime) cacheMap.get("lastModifiedDateTime")), ZoneId.of("Asia/Seoul")))

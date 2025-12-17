@@ -12,6 +12,7 @@ public class MockPasswordEncoderInitializer implements ApplicationContextInitial
     @Override
     public void initialize(ConfigurableApplicationContext applicationContext) {
         PasswordEncoder encoder = mock(PasswordEncoder.class);
-        applicationContext.getBeanFactory().registerSingleton("passwordEncoder", encoder);
+        applicationContext.getBeanFactory().registerSingleton("bcryptPasswordEncoder", encoder);
+        applicationContext.getBeanFactory().registerSingleton("pbkdf2PasswordEncoder", encoder);
     }
 }
