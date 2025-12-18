@@ -9,15 +9,17 @@ import kr.modusplant.domains.comment.usecase.port.mapper.CommentMapper;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class CommentMapperImpl implements CommentMapper {
 
     @Override
-    public Comment toComment(CommentRegisterRequest request) {
+    public Comment toComment(CommentRegisterRequest request, UUID currentMemberUuid) {
         return Comment.create(
                 PostId.create(request.postId()),
                 CommentPath.create(request.path()),
-                Author.create(request.memberUuid()),
+                Author.create(currentMemberUuid),
                 CommentContent.create(request.content())
         );
     }
