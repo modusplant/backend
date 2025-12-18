@@ -46,13 +46,16 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
         validatePartsAndOrderInfo(parts,orderInfo);
         validateFileConstraints(parts);
         List<MultipartFile> orderedParts = reorderParts(parts, orderInfo);
+        List<FileOrder> sortedOrderInfo = orderInfo.stream()
+                .sorted(Comparator.comparing(FileOrder::order))
+                .collect(Collectors.toList());
 
         // 멀티파트 파일 저장 및 json 변환
         String fileUlid = generator.generate(null, null, null, EventType.INSERT);
         ArrayNode contentArray = objectMapper.createArrayNode();
         for (int i=0; i<orderedParts.size(); i++) {
             MultipartFile part = orderedParts.get(i);
-            int order = orderInfo.get(i).order();
+            int order = sortedOrderInfo.get(i).order();
             contentArray.add(convertSinglePartToJson(fileUlid,part,order));
         }
         return contentArray;
