@@ -13,10 +13,12 @@ import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -101,9 +103,12 @@ public class CommentRestController {
     )
     @PostMapping
     public ResponseEntity<DataResponse<Void>> register(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
             @RequestBody @Valid
             CommentRegisterRequest registerRequest) {
-        controller.register(registerRequest);
+        UUID currentMemberUuid = userDetails.getActiveUuid();
+        controller.register(registerRequest, currentMemberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

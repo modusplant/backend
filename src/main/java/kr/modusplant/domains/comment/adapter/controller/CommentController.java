@@ -39,8 +39,8 @@ public class CommentController {
                 result.hasNext(), result.hasPrevious());
     }
 
-    public void register(CommentRegisterRequest request) {
-        Comment comment = mapper.toComment(request);
+    public void register(CommentRegisterRequest request, UUID currentMemberUuid) {
+        Comment comment = mapper.toComment(request, currentMemberUuid);
         jpaAdapter.save(comment);
     }
 
