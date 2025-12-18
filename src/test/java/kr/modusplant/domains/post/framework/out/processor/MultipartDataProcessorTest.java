@@ -86,6 +86,43 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
         }
 
         @Test
+        @DisplayName("순서 정보가 섞여서 들어왔을때, 텍스트와 이미지 파일을 순서 정보의 순서대로 처리")
+        void testSaveFilesAndGenerateContentJson_givenMultipartFilesAndMixedOrderInfoList_willReturnJsonContentWithCorrectOrder() throws Exception {
+            // given
+            String regex = "post/[a-zA-Z0-9]{26}/";
+            doNothing().when(s3FileService).uploadFile(any(MultipartFile.class),anyString());
+            List<FileOrder> mixedBasicMediaFilesOrder = List.of(
+                    new FileOrder(imageFile.getOriginalFilename(),1),
+                    new FileOrder(textFile0.getOriginalFilename(),0),
+                    new FileOrder(videoFile.getOriginalFilename(),2)
+            );
+
+            // when
+            JsonNode result = multipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles,basicMediaFilesOrder);
+
+            // then
+            JsonNode textNode = result.get(0);
+            assertThat(textNode.get(ORDER).asInt()).isEqualTo(0);
+            assertThat(textNode.get(TYPE).asText()).isEqualTo(FileType.TEXT.getValue());
+            assertThat(textNode.get(FILENAME).asText()).isEqualTo(textFile0.getOriginalFilename());
+            assertThat(textNode.get(DATA).asText()).isEqualTo(new String(textFile0.getBytes(), StandardCharsets.UTF_8));
+
+            JsonNode imageNode = result.get(1);
+            assertThat(imageNode.get(ORDER).asInt()).isEqualTo(1);
+            assertThat(imageNode.get(TYPE).asText()).isEqualTo(FileType.IMAGE.getValue());
+            assertThat(imageNode.get(FILENAME).asText()).isEqualTo(imageFile.getOriginalFilename());
+            assertThat(imageNode.get(SRC).asText()).matches(regex+FileType.IMAGE.getValue()+"/.*");
+
+            JsonNode videoNode = result.get(2);
+            assertThat(videoNode.get(ORDER).asInt()).isEqualTo(2);
+            assertThat(videoNode.get(TYPE).asText()).isEqualTo(FileType.VIDEO.getValue());
+            assertThat(videoNode.get(FILENAME).asText()).isEqualTo(videoFile.getOriginalFilename());
+            assertThat(videoNode.get(SRC).asText()).matches(regex+FileType.VIDEO.getValue()+"/.*");
+        }
+
+
+
+            @Test
         @DisplayName("validatePartsAndOrderInfo - null, 크기 불일치, order 검증 실패시 예외가 발생")
         void testSaveFilesAndGenerateContentJson_givenInvalidMultipartFilesAndOrderInfoList_willThrowException() {
             // given
