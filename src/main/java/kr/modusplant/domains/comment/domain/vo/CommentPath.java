@@ -27,7 +27,10 @@ public class CommentPath {
             throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_PATH);
         }
         if (!source.matches("^\\d+(\\.\\d+)*$")) {
-            throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_PATH);
+            throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_PATH_FORMAT);
+        }
+        if (source.charAt(0) == '0' || source.contains(".0")) {
+            throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_PATH_INDEX);
         }
     }
 
