@@ -9,17 +9,17 @@ import kr.modusplant.jooq.tables.records.CommPostRecord;
 import kr.modusplant.jooq.tables.records.CommPriCateRecord;
 import kr.modusplant.jooq.tables.records.CommSecoCateRecord;
 import kr.modusplant.jooq.tables.records.SiteMemberRecord;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT;
@@ -29,6 +29,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @Transactional
 @Rollback
+@TestPropertySource(properties = {
+        "spring.jpa.properties.hibernate.jdbc.time_zone=Asia/Seoul"
+})
 class PostQueryForMemberJooqRepositoryIntegrationTest {
 
     @Autowired
@@ -42,8 +45,14 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
     private CommSecoCateRecord testSecondaryCategory1, testSecondaryCategory2, testSecondaryCategory3;
     private CommPostRecord testPost1, testPost2, testPost3, testPost4, testPost5;
 
+    @BeforeAll
+    static void setTimezone() {
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+    }
+
     @BeforeEach
     void setUp() {
+        LocalDateTime baseTime = LocalDateTime.now();
         testMember1 = testDataHelper.insertTestMember("TestMember1");
         testMember2 = testDataHelper.insertTestMember("TestMember2");
         testPrimaryCategory1 = testDataHelper.insertTestPrimaryCategory("testPrimaryCategory1",100);
@@ -51,11 +60,11 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         testSecondaryCategory1 = testDataHelper.insertTestSecondaryCategory(testPrimaryCategory1,"testSecondaryCategory1",100);
         testSecondaryCategory2 = testDataHelper.insertTestSecondaryCategory(testPrimaryCategory1,"testSecondaryCategory2",101);
         testSecondaryCategory3 = testDataHelper.insertTestSecondaryCategory(testPrimaryCategory2,"testSecondaryCategory3",102);
-        testPost1 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory1,testMember1,"title1",TEST_POST_CONTENT);
-        testPost2 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory2,testMember1,"title2",TEST_POST_CONTENT_TEXT_AND_IMAGE);
+        testPost1 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory1,testMember1,"title1",TEST_POST_CONTENT,baseTime.plusDays(1));
+        testPost2 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory2,testMember1,"title2",TEST_POST_CONTENT_TEXT_AND_IMAGE,baseTime.plusDays(2));
         testPost3 = testDataHelper.insertTestDraftPost(testPrimaryCategory1,testSecondaryCategory1,testMember1,"title3",TEST_POST_CONTENT);
-        testPost4 = testDataHelper.insertTestPublishedPost(testPrimaryCategory2,testSecondaryCategory3,testMember1,"title4",TEST_POST_CONTENT);
-        testPost5 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory1,testMember2,"title5",TEST_POST_CONTENT);
+        testPost4 = testDataHelper.insertTestPublishedPost(testPrimaryCategory2,testSecondaryCategory3,testMember1,"title4",TEST_POST_CONTENT,baseTime.plusDays(3));
+        testPost5 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory1,testMember2,"title5",TEST_POST_CONTENT,baseTime.plusDays(4));
         testDataHelper.insertTestComment(testPost1,"1",testMember2,"content1",false);
         testDataHelper.insertTestComment(testPost1,"1.1",testMember1,"content2",true);
         testDataHelper.insertTestComment(testPost1,"1.2",testMember2,"content3",false);

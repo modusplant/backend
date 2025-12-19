@@ -17,17 +17,21 @@ import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.infrastructure.cache.service.CacheValidationService;
 import kr.modusplant.infrastructure.jwt.exception.TokenExpiredException;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
 
@@ -39,17 +43,20 @@ import static kr.modusplant.shared.constant.Regex.*;
 @RequestMapping("/api/v1/members")
 @RequiredArgsConstructor
 @Validated
+@Slf4j
 public class MemberRestController {
     private final MemberController memberController;
     private final JwtTokenProvider jwtTokenProvider;
+    private final CacheValidationService cacheValidationService;
 
     @Hidden
     @Operation(summary = "회원 등록 API", description = "닉네임을 통해 회원을 등록합니다.")
     @PostMapping
     public ResponseEntity<DataResponse<MemberResponse>> registerMember(
             @RequestBody @Valid MemberRegisterRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                DataResponse.ok(memberController.register(request)));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(DataResponse.ok(memberController.register(request)));
     }
 
     @Operation(summary = "회원 닉네임 중복 확인 API", description = "이미 등록된 닉네임이 있는지 조회합니다.")
@@ -61,15 +68,23 @@ public class MemberRestController {
             @Pattern(regexp = REGEX_NICKNAME,
                     message = "회원 닉네임 서식이 올바르지 않습니다. ")
             String nickname) {
-        return ResponseEntity.status(HttpStatus.OK).body(DataResponse.ok(Map.of(
-                "isNicknameExisted", memberController.checkExistedNickname(new MemberNicknameCheckRecord(nickname))))
-        );
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
+                .body(
+                        DataResponse.ok(
+                                Map.of(
+                                        "isNicknameExisted",
+                                        memberController.checkExistedNickname(new MemberNicknameCheckRecord(nickname))
+                                )
+                        )
+                );
     }
 
     @Operation(
             summary = "회원 프로필 조회 API",
             description = "기존 회원 프로필을 조회합니다. ",
-            security = @SecurityRequirement(name = "Authorization")
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @GetMapping(value = "/{id}/profile")
     public ResponseEntity<DataResponse<MemberProfileResponse>> getMemberProfile(
@@ -79,18 +94,45 @@ public class MemberRestController {
             UUID id,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = "Authorization")
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String auth) throws IOException {
+            String auth,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.IF_NONE_MATCH, required = false)
+            String ifNoneMatch,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.IF_MODIFIED_SINCE, required = false)
+            String ifModifiedSince) throws IOException {
         validateTokenAndAccessToId(id, auth);
-        return ResponseEntity.status(HttpStatus.OK).body(
-                DataResponse.ok(memberController.getProfile(new MemberProfileGetRecord(id))));
+        Map<String, ?> cacheMap =
+                cacheValidationService.isCacheUsableForSiteMemberProfile(ifNoneMatch, ifModifiedSince, id);
+        if (cacheMap.get("result").equals(true)) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_MODIFIED)
+                    .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
+                    .eTag("W/\"" + cacheMap.get("entityTag") + "\"")
+                    .lastModified(
+                            ZonedDateTime.of(
+                                    ((LocalDateTime) cacheMap.get("lastModifiedDateTime")), ZoneId.of("Asia/Seoul")))
+                    .build();
+        } else {
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
+                    .eTag("W/\"" + cacheMap.get("entityTag") + "\"")
+                    .lastModified(
+                            ZonedDateTime.of(
+                                    ((LocalDateTime) cacheMap.get("lastModifiedDateTime")), ZoneId.of("Asia/Seoul")))
+                    .body(DataResponse.ok(memberController.getProfile(new MemberProfileGetRecord(id))));
+        }
     }
 
     @Operation(
             summary = "회원 프로필 덮어쓰기 API",
             description = "기존 회원 프로필을 덮어씁니다.",
-            security = @SecurityRequirement(name = "Authorization")
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PutMapping(value = "/{id}/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<MemberProfileResponse>> overrideMemberProfile(
@@ -114,18 +156,21 @@ public class MemberRestController {
             String nickname,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = "Authorization")
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) throws IOException {
         validateTokenAndAccessToId(id, auth);
-        return ResponseEntity.status(HttpStatus.OK).body(
-                DataResponse.ok(memberController.overrideProfile(new MemberProfileOverrideRecord(id, introduction, image, nickname))));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
+                .body(DataResponse.ok(
+                        memberController.overrideProfile(new MemberProfileOverrideRecord(id, introduction, image, nickname))));
     }
 
     @Operation(
             summary = "게시글 좋아요 API",
             description = "게시글에 좋아요를 누릅니다.",
-            security = @SecurityRequirement(name = "Authorization")
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PutMapping("/{id}/like/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationPost(
@@ -140,7 +185,7 @@ public class MemberRestController {
             String postUlid,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = "Authorization")
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
         validateTokenAndAccessToId(id, auth);
@@ -151,7 +196,7 @@ public class MemberRestController {
     @Operation(
             summary = "게시글 좋아요 취소 API",
             description = "게시글에 대한 좋아요를 취소합니다.",
-            security = @SecurityRequirement(name = "Authorization")
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @DeleteMapping("/{id}/like/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationPost(
@@ -166,7 +211,7 @@ public class MemberRestController {
             String postUlid,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = "Authorization")
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
         validateTokenAndAccessToId(id, auth);
@@ -177,7 +222,7 @@ public class MemberRestController {
     @Operation(
             summary = "게시글 북마크 API",
             description = "게시글에 북마크를 누릅니다.",
-            security = @SecurityRequirement(name = "Authorization")
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PutMapping("/{id}/bookmark/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> bookmarkCommunicationPost(
@@ -192,7 +237,7 @@ public class MemberRestController {
             String postUlid,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = "Authorization")
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
         validateTokenAndAccessToId(id, auth);
@@ -203,7 +248,7 @@ public class MemberRestController {
     @Operation(
             summary = "게시글 북마크 취소 API",
             description = "게시글에 대한 북마크를 취소합니다.",
-            security = @SecurityRequirement(name = "Authorization")
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @DeleteMapping("/{id}/bookmark/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> cancelCommunicationPostBookmark(
@@ -218,7 +263,7 @@ public class MemberRestController {
             String postUlid,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = "Authorization")
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
         validateTokenAndAccessToId(id, auth);
@@ -229,7 +274,7 @@ public class MemberRestController {
     @Operation(
             summary = "댓글 좋아요 API",
             description = "댓글에 좋아요를 누릅니다.",
-            security = @SecurityRequirement(name = "Authorization")
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PutMapping("/{id}/like/communication/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationComment(
@@ -249,7 +294,7 @@ public class MemberRestController {
             String path,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = "Authorization")
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
         validateTokenAndAccessToId(id, auth);
@@ -260,7 +305,7 @@ public class MemberRestController {
     @Operation(
             summary = "댓글 좋아요 취소 API",
             description = "댓글에 대한 좋아요를 취소합니다.",
-            security = @SecurityRequirement(name = "Authorization")
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @DeleteMapping("/{id}/like/communication/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationComment(
@@ -280,7 +325,7 @@ public class MemberRestController {
             String path,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = "Authorization")
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
         validateTokenAndAccessToId(id, auth);

@@ -16,6 +16,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
 import static kr.modusplant.shared.persistence.constant.TableName.COMM_POST;
@@ -99,6 +100,14 @@ public class CommPostEntity {
 
     public void decreaseLikeCount() {
         this.likeCount = Math.max(0, this.likeCount - 1);
+    }
+
+    public String getETagSource() {
+        return getUlid() + "-" + getVer();
+    }
+
+    public LocalDateTime getUpdatedAtAsTruncatedToSeconds() {
+        return getUpdatedAt().truncatedTo(ChronoUnit.SECONDS);
     }
 
     @Override
