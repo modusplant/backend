@@ -60,9 +60,9 @@ public class PostTestDataHelper {
 
     public CommPostRecord insertTestPublishedPost(
             CommPriCateRecord priCateRecord, CommSecoCateRecord secoCateRecord,
-            SiteMemberRecord memberRecord, String title, JsonNode content
+            SiteMemberRecord memberRecord, String title, JsonNode content, LocalDateTime dateTime
     ) {
-        LocalDateTime dateTime = LocalDateTime.now().minusMinutes(10);
+        dateTime = dateTime.minusSeconds(10);
         return dsl.insertInto(COMM_POST)
                 .set(COMM_POST.ULID,generator.generate(null,null,null, EventType.INSERT))
                 .set(COMM_POST.PRI_CATE_UUID,priCateRecord.getUuid())
@@ -86,7 +86,7 @@ public class PostTestDataHelper {
             CommPriCateRecord priCateRecord, CommSecoCateRecord secoCateRecord,
             SiteMemberRecord memberRecord, String title, JsonNode content
     ) {
-        LocalDateTime dateTime = LocalDateTime.now().minusMinutes(10);
+        LocalDateTime dateTime = LocalDateTime.now().minusSeconds(10);
         return dsl.insertInto(COMM_POST)
                 .set(COMM_POST.ULID,generator.generate(null,null,null, EventType.INSERT))
                 .set(COMM_POST.PRI_CATE_UUID,priCateRecord.getUuid())
