@@ -23,10 +23,14 @@ import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jpa.entity.*;
 import kr.modusplant.framework.jpa.entity.common.util.CommPostEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.common.util.SiteMemberProfileEntityTestUtils;
 import kr.modusplant.framework.jpa.repository.*;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.event.consumer.CommentEventConsumer;
 import kr.modusplant.infrastructure.event.consumer.PostEventConsumer;
+import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
+import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
+import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.common.util.PostLikeEventTestUtils;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
@@ -58,6 +62,7 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 import static kr.modusplant.shared.event.common.util.CommentLikeEventTestUtils.testCommentLikeEvent;
 import static kr.modusplant.shared.event.common.util.PostBookmarkEventTestUtils.testPostBookmarkEvent;
 import static kr.modusplant.shared.event.common.util.PostCancelPostBookmarkEventTestUtils.testPostBookmarkCancelEvent;
+import static kr.modusplant.shared.exception.enums.ErrorCode.MEMBER_PROFILE_NOT_FOUND;
 import static kr.modusplant.shared.exception.enums.ErrorCode.NICKNAME_EXISTS;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
@@ -72,8 +77,9 @@ import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, PostLikeEventTestUtils, CommPostEntityTestUtils {
+class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, PostLikeEventTestUtils, CommPostEntityTestUtils, SiteMemberProfileEntityTestUtils {
     private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
+    private final SwearService swearService = Mockito.mock(SwearService.class);
     private final MemberMapper memberMapper = new MemberMapperImpl();
     private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl();
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryJpaAdapter.class);
@@ -88,7 +94,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     private final EventBus eventBus = new EventBus();
     private final PostEventConsumer postEventConsumer = new PostEventConsumer(eventBus, commPostLikeRepository, commPostBookmarkRepository, commPostRepository);
     private final CommentEventConsumer commentEventConsumer = new CommentEventConsumer(eventBus, commCommentLikeRepository, commCommentRepository);
-    private final MemberController memberController = new MemberController(s3FileService, memberMapper, memberProfileMapper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
+    private final MemberController memberController = new MemberController(s3FileService, swearService, memberMapper, memberProfileMapper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
 
     @Test
     @DisplayName("register로 회원 등록")
@@ -135,19 +141,6 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     }
 
     @Test
-    @DisplayName("기존에 저장된 회원 프로필이 없을 때 getProfile로 회원 프로필 조회")
-    void testGetProfile_givenValidGetRecordAndNoStoredMemberProfile_willReturnResponse() throws IOException {
-        // given
-        given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
-        given(memberProfileRepository.getById(any())).willReturn(Optional.empty());
-
-        // when & then
-        assertThat(memberController.getProfile(testMemberProfileGetRecord)).isEqualTo(
-                new MemberProfileResponse(MEMBER_BASIC_USER_UUID, null, null, MEMBER_BASIC_USER_NICKNAME)
-        );
-    }
-
-    @Test
     @DisplayName("존재하지 않는 회원으로 인해 getProfile로 회원 프로필 조회 실패")
     void testGetProfile_givenNotFoundMemberId_willThrowException() {
         // given
@@ -162,6 +155,18 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     }
 
     @Test
+    @DisplayName("존재하지 않는 회원 프로필로 인해 getProfile로 회원 프로필 조회 실패")
+    void testGetProfile_givenNotFoundMemberProfile_willThrowException() throws IOException {
+        // given
+        given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
+        given(memberProfileRepository.getById(any())).willReturn(Optional.empty());
+
+        // when & then
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> memberController.getProfile(testMemberProfileGetRecord));
+        assertThat(exception.getMessage()).contains(MEMBER_PROFILE_NOT_FOUND.getMessage());
+    }
+
+    @Test
     @DisplayName("이미지 경로를 포함해서 존재하는 모든 데이터로 overrideProfile로 프로필 덮어쓰기")
     void testOverrideProfile_givenExistedData_willReturnResponse() throws IOException {
         // given
@@ -169,6 +174,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(memberProfileRepository.getById(any())).willReturn(Optional.of(memberProfile));
+        given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(s3FileService).deleteFiles(any());
         willDoNothing().given(s3FileService).uploadFile(any(), any());
         given(memberProfileRepository.addOrUpdate(any())).willReturn(memberProfile);
@@ -197,6 +203,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
                         testMemberProfileIntroduction,
                         testNormalUserNickname))
         );
+        given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(s3FileService).deleteFiles(any());
         willDoNothing().given(s3FileService).uploadFile(any(), any());
         given(memberProfileRepository.addOrUpdate(any())).willReturn(memberProfile);
@@ -218,8 +225,9 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         MemberProfile memberProfile = MemberProfile.create(testMemberId, MemberEmptyProfileImage.create(), MemberEmptyProfileIntroduction.create(), testNormalUserNickname);
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(memberProfileRepository.getById(any())).willReturn(Optional.empty());
+        given(memberProfileRepository.getById(any())).willReturn(Optional.of(memberProfile));
         given(memberProfileRepository.addOrUpdate(any())).willReturn(memberProfile);
+        willDoNothing().given(s3FileService).deleteFiles(any());
 
         // when
         MemberProfileResponse memberProfileResponse = memberController.overrideProfile(
@@ -234,7 +242,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     
     @Test
     @DisplayName("존재하지 않는 아이디로 인해 overrideProfile로 프로필 덮어쓰기 실패")
-    void testValidateBeforeOverrideProfile_givenNotFoundId_willThrowException() {
+    void testValidateMemberIdAndNicknameBeforeOverrideProfile_givenNotFoundId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(false);
 
@@ -245,8 +253,21 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     }
 
     @Test
+    @DisplayName("닉네임에 사용된 비속어로 인해 overrideProfile로 프로필 덮어쓰기 실패")
+    void testValidateThatHasSwear_willThrowException() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(swearService.isSwearContained(any())).willReturn(true);
+
+        // when & then
+        SwearContainedException swearContainedException = assertThrows(
+                SwearContainedException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
+        assertThat(swearContainedException.getMessage()).isEqualTo(SwearErrorCode.SWEAR_CONTAINED.getMessage());
+    }
+
+    @Test
     @DisplayName("이미 존재하는 닉네임으로 인해 overrideProfile로 프로필 덮어쓰기 실패")
-    void testValidateBeforeOverrideProfile_givenAlreadyExistedNickname_willThrowException() {
+    void testValidate_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(memberRepository.getByNickname(any())).willReturn(Optional.of(Member.create(MemberId.generate(), testMemberActiveStatus, testNormalUserNickname, testMemberBirthDate)));
@@ -255,6 +276,22 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         EntityExistsException alreadyExistedNicknameException = assertThrows(
                 EntityExistsException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
         assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(NICKNAME_EXISTS.getMessage());
+    }
+
+    @Test
+    @DisplayName("존재하는 않는 회원 프로필로 인해 overrideProfile로 프로필 덮어쓰기 실패")
+    void testOverrideProfile_givenNotFoundMemberProfile_willThrowException() throws IOException {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        given(memberProfileRepository.getById(any())).willReturn(Optional.empty());
+
+        // when
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> memberController.overrideProfile(
+                new MemberProfileOverrideRecord(MEMBER_BASIC_USER_UUID, null, null, MEMBER_BASIC_USER_NICKNAME)));
+
+        // then
+        assertThat(exception.getMessage()).contains(MEMBER_PROFILE_NOT_FOUND.getMessage());
     }
 
     @Test

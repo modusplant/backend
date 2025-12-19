@@ -16,13 +16,12 @@ import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.Password;
 import kr.modusplant.shared.persistence.constant.TableName;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-@RequiredArgsConstructor
 @Service
 public class NormalIdentityController {
 
@@ -32,6 +31,18 @@ public class NormalIdentityController {
     private final NormalIdentityReadRepository readRepository;
 
     private final PasswordEncoder encoder;
+
+    public NormalIdentityController(NormalIdentityMapper mapper,
+                                    NormalIdentityCreateRepository createRepository,
+                                    NormalIdentityUpdateRepository updateRepository,
+                                    NormalIdentityReadRepository readRepository,
+                                    @Qualifier("bcryptPasswordEncoder") PasswordEncoder encoder) {
+        this.mapper = mapper;
+        this.createRepository = createRepository;
+        this.updateRepository = updateRepository;
+        this.readRepository = readRepository;
+        this.encoder = encoder;
+    }
 
     public void registerNormalMember(NormalSignUpRequest request) {
         if(readRepository.existsByEmail(Email.create(request.email()))) {

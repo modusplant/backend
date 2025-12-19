@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.Type;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -49,9 +51,11 @@ public class CommPostArchiveEntity {
     private JsonNode content;
 
     @Column(name = CREATED_AT, nullable = false)
+    @CreatedDate
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
+    @LastModifiedDate
     private LocalDateTime updatedAt;
 
     @Column(name = "published_at")

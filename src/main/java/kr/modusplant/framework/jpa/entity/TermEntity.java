@@ -13,6 +13,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
@@ -56,6 +57,14 @@ public class TermEntity {
 
     public void updateVersion(String version) {
         this.version = version;
+    }
+
+    public String getETagSource() {
+        return getUuid() + "-" + getVersionNumber();
+    }
+
+    public LocalDateTime getLastModifiedAtAsTruncatedToSeconds() {
+        return getLastModifiedAt().truncatedTo(ChronoUnit.SECONDS);
     }
 
     @Override

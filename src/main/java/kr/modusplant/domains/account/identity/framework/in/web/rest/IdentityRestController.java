@@ -53,15 +53,11 @@ public class IdentityRestController {
     )
     @PostMapping("/auth/logout")
     public void processLogout(
-            @Parameter(schema = @Schema(
-                    description = "리프레시 토큰",
-                    example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIn0.sFzQWkpK8HG2xKcI1vNH3oW7nIO9QaX3ghTkfT2Yq3s"))
+            @Parameter(hidden = true)
             @CookieValue("Cookie")
             String refreshToken,
 
-            @Parameter(schema = @Schema(
-                    description = "접근 토큰",
-                    example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE1MTYyNDI2MjIsInJvbGUiOiJhZG1pbiJ9.4Adcj3UFYzPUVaVF43FmMab6RlaQD4u-Vd4GcSANrLo"))
+            @Parameter(hidden = true)
             @RequestHeader("Authorization")
             String accessToken
     ) {

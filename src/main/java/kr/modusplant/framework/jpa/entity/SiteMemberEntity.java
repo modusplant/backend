@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
@@ -93,6 +94,14 @@ public class SiteMemberEntity {
 
     public void updateLoggedInAt(LocalDateTime loggedInAt) {
         this.loggedInAt = loggedInAt;
+    }
+
+    public String getETagSource() {
+        return getUuid() + "-" + getVersionNumber();
+    }
+
+    public LocalDateTime getLastModifiedAtAsTruncatedToSeconds() {
+        return getLastModifiedAt().truncatedTo(ChronoUnit.SECONDS);
     }
 
     @Override
