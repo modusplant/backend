@@ -26,6 +26,7 @@ public enum ErrorCode implements ResponseCode {
     MEMBER_EXISTS(HttpStatus.CONFLICT, "member_exists", "사용자의 계정이 이미 존재합니다"),
 
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "member_not_found", "사용자의 계정이 존재하지 않습니다"),
+    MEMBER_PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND, "member_profile_not_found", "사용자의 프로필 정보가 존재하지 않습니다"),
     MEMBER_ROLE_NOT_FOUND(HttpStatus.NOT_FOUND, "member_role_not_found", "사용자의 역할 정보가 존재하지 않습니다"),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "comment_not_found", "댓글을 찾을 수 없습니다"),
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "post_not_found", "게시글을 찾을 수 없습니다"),
@@ -44,10 +45,13 @@ public enum ErrorCode implements ResponseCode {
     INVALID_NICKNAME(HttpStatus.BAD_REQUEST, "invalid_nickname", "닉네임이 올바르지 않습니다"),
     INVALID_PAGE_RANGE(HttpStatus.BAD_REQUEST, "invalid_page_range", "이용할 수 있는 페이지 범위가 아닙니다"),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "invalid_password", "비밀번호가 올바르지 않습니다"),
+    INVALID_FILE_INPUT(HttpStatus.BAD_REQUEST,"invalid_file_input","파일 입력이 올바르지 않습니다"),
 
     // others
     UNSUPPORTED_FILE(HttpStatus.FORBIDDEN, "unsupported_file", "지원되지 않는 파일 타입입니다"),
     UNSUPPORTED_SOCIAL_PROVIDER(HttpStatus.FORBIDDEN, "unsupported_social_provider", "지원되지 않는 소셜 로그인 방식입니다"),
+
+    FILE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST,"file_limit_exceeded","파일 개수 또는 크기 제한을 초과했습니다"),
 
     SPECIFIED_SORTING_METHOD(HttpStatus.BAD_REQUEST, "specified_sorting_method", "페이지 정렬 방식은 지정되지 않아야 합니다"),
 

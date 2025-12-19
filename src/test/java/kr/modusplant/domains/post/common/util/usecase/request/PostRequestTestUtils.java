@@ -72,21 +72,24 @@ public interface PostRequestTestUtils {
     /* List<MultipartFile>, List<FileOrder> Utils */
     List<MultipartFile> allMediaFiles = Arrays.asList(textFile0,imageFile,videoFile,audioFile,applicationFile);
     List<FileOrder> allMediaFilesOrder = Arrays.asList(
-            textFileOrder(0,1),
-            imageFileOrder(2),
-            videoFileOrder(3),
-            audioFileOrder(4),
-            applicationFileOrder(5)
+            textFileOrder(0,0),
+            imageFileOrder(1),
+            videoFileOrder(2),
+            audioFileOrder(3),
+            applicationFileOrder(4)
     );
 
     List<MultipartFile> textImageFiles = Arrays.asList(textFile0,imageFile);
-    List<FileOrder> textImageFilesOrder = Arrays.asList(textFileOrder(0,1), imageFileOrder(2));
-
-    List<MultipartFile> imageTextFiles = Arrays.asList(imageFile, textFile0);
-    List<FileOrder> imageTextFilesOrder = Arrays.asList(imageFileOrder(1),textFileOrder(0,2));
+    List<FileOrder> textImageFilesOrder = Arrays.asList(textFileOrder(0,0), imageFileOrder(1));
 
     List<MultipartFile> basicMediaFiles = Arrays.asList(textFile0,imageFile,videoFile);
-    List<FileOrder> basicMediaFilesOrder = Arrays.asList(textFileOrder(0,1), imageFileOrder(2), videoFileOrder(3));
+    List<FileOrder> basicMediaFilesOrder = Arrays.asList(textFileOrder(0,0), imageFileOrder(1), videoFileOrder(2));
+
+    List<MultipartFile> onlyMediaFiles = Arrays.asList(imageFile,videoFile);
+    List<FileOrder> onlyMediaFilesOrder = Arrays.asList(imageFileOrder(1), videoFileOrder(2));
+
+    List<MultipartFile> onlyImageFile = Arrays.asList(imageFile);
+    List<FileOrder> onlyImageFilesOrder = Arrays.asList(imageFileOrder(1));
 
     List<MultipartFile> duplicatedTextFiles = Arrays.asList(textFile0,imageFile,textFile1);
     List<FileOrder> duplicatedTextFilesOrder = Arrays.asList(textFileOrder(0,1),imageFileOrder(2),textFileOrder(1,3));

@@ -29,7 +29,7 @@ public class RefreshTokenEntity {
     @JoinColumn(nullable = false, name = MEMB_UUID, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity member;
 
-    @Column(name = REFRESH_TOKEN, nullable = false)
+    @Column(name = "refresh_token", nullable = false)
     private String refreshToken;
 
     @Column(name = "issued_at", nullable = false)
