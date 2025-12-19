@@ -58,9 +58,7 @@ public class CommentController {
         if(jooqRepository.existsByPostAndPath(PostId.create(request.postId()), CommentPath.create(request.path()))) {
             throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT);
         }
-        if (!checkPathCondition(request.postId(), request.path())) {
-            throw new InvalidValueException(CommentErrorCode.NOT_EXIST_PARENT_COMMENT);
-        }
+        checkPathCondition(request.postId(), request.path());
         Comment comment = mapper.toComment(request, currentMemberUuid);
         jpaAdapter.save(comment);
     }
@@ -72,12 +70,12 @@ public class CommentController {
                 .build());
     }
 
-    private boolean checkPathCondition(String postId, String path) {
+    private void checkPathCondition(String postId, String path) {
         PostId commentPost = PostId.create(postId);
 
         // 댓글 경로가 1인 경우 게시글에 댓글이 없어야 등록 가능
-        if(path.equals("1")) {
-            return jooqRepository.countPostComment(commentPost) == 0;
+        if(path.equals("1") && !(jooqRepository.countPostComment(commentPost) == 0)) {
+            throw new InvalidValueException(CommentErrorCode.EXIST_POST_COMMENT);
         }
 
         int lastDotIndex = path.lastIndexOf(".");
@@ -85,15 +83,17 @@ public class CommentController {
 
         // 댓글 경로가 1로 끝나는 경우, 마지막 . 이후의 값을 제거한 경로에 해당하는 댓글이 있어야 댓글 등록 가능
         // 예시: 경로가 1.2.1인 댓글을 등록하려면 경로가 1.2인 댓글이 있어야 함
-        if (lastNumOfPath.equals("1")) {
-            String parentCommentPath = path.substring(0, lastDotIndex);
-            return jooqRepository.existsByPostAndPath(commentPost, CommentPath.create(parentCommentPath));
-        } else {
-            // 그 외의 경우 경로의 마지막 숫자 -1을 한 경로의 댓글이 있어야 댓글 등록 가능
-            // 예시: 경로가 1.5.3인 댓글을 등록하려면 경로가 1.5.2인 댓글이 있어야 함
-            String parentPathLastNum = String.valueOf(Integer.parseInt(lastNumOfPath) - 1);
-            String parentCommentPath = path.substring(0, lastDotIndex + 1).concat(parentPathLastNum);
-            return jooqRepository.existsByPostAndPath(commentPost, CommentPath.create(parentCommentPath));
+        String parentCommentPath = path.substring(0, lastDotIndex);
+        if (lastNumOfPath.equals("1") && !jooqRepository.existsByPostAndPath(commentPost, CommentPath.create(parentCommentPath))) {
+            throw new InvalidValueException(CommentErrorCode.NOT_EXIST_PARENT_COMMENT);
+        }
+
+        // 그 외의 경우 경로의 마지막 숫자 -1을 한 경로의 댓글이 있어야 댓글 등록 가능
+        // 예시: 경로가 1.5.3인 댓글을 등록하려면 경로가 1.5.2인 댓글이 있어야 함
+        String siblingPathLastNum = String.valueOf(Integer.parseInt(lastNumOfPath) - 1);
+        String siblingCommentPath = path.substring(0, lastDotIndex + 1).concat(siblingPathLastNum);
+        if (1 < Integer.parseInt(lastNumOfPath) && !jooqRepository.existsByPostAndPath(commentPost, CommentPath.create(siblingCommentPath))) {
+            throw new InvalidValueException(CommentErrorCode.NOT_EXIST_SIBLING_COMMENT);
         }
     }
 
