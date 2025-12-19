@@ -2,7 +2,10 @@ package kr.modusplant.domains.comment.adapter.controller;
 
 import kr.modusplant.domains.comment.adapter.mapper.CommentMapperImpl;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
+import kr.modusplant.domains.comment.domain.exception.InvalidValueException;
+import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.Author;
+import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqRepository;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJpaAdapter;
@@ -40,6 +43,12 @@ public class CommentController {
     }
 
     public void register(CommentRegisterRequest request, UUID currentMemberUuid) {
+        if(jooqRepository.existsByPostAndPath(PostId.create(request.postId()), CommentPath.create(request.path()))) {
+            throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT);
+        }
+        if (!checkPathCondition(request.postId(), request.path())) {
+            throw new InvalidValueException(CommentErrorCode.NOT_EXIST_PARENT_COMMENT);
+        }
         Comment comment = mapper.toComment(request, currentMemberUuid);
         jpaAdapter.save(comment);
     }
@@ -49,6 +58,31 @@ public class CommentController {
                 .postUlid(postUlid)
                 .path(commentPath)
                 .build());
+    }
+
+    private boolean checkPathCondition(String postId, String path) {
+        PostId commentPost = PostId.create(postId);
+
+        // 댓글 경로가 1인 경우 게시글에 댓글이 없어야 등록 가능
+        if(path.equals("1")) {
+            return jooqRepository.countPostComment(commentPost) == 0;
+        }
+
+        int lastDotIndex = path.lastIndexOf(".");
+        String lastNumOfPath = path.substring(lastDotIndex + 1);
+
+        // 댓글 경로가 1로 끝나는 경우, 마지막 . 이후의 값을 제거한 경로에 해당하는 댓글이 있어야 댓글 등록 가능
+        // 예시: 경로가 1.2.1인 댓글을 등록하려면 경로가 1.2인 댓글이 있어야 함
+        if (lastNumOfPath.equals("1")) {
+            String parentCommentPath = path.substring(0, lastDotIndex);
+            return jooqRepository.existsByPostAndPath(commentPost, CommentPath.create(parentCommentPath));
+        } else {
+            // 그 외의 경우 경로의 마지막 숫자 -1을 한 경로의 댓글이 있어야 댓글 등록 가능
+            // 예시: 경로가 1.5.3인 댓글을 등록하려면 경로가 1.5.2인 댓글이 있어야 함
+            String parentPathLastNum = String.valueOf(Integer.parseInt(lastNumOfPath) - 1);
+            String parentCommentPath = path.substring(0, lastDotIndex + 1).concat(parentPathLastNum);
+            return jooqRepository.existsByPostAndPath(commentPost, CommentPath.create(parentCommentPath));
+        }
     }
 
 }

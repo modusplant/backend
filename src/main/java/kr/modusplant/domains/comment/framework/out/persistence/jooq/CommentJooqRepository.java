@@ -1,6 +1,7 @@
 package kr.modusplant.domains.comment.framework.out.persistence.jooq;
 
 import kr.modusplant.domains.comment.domain.vo.Author;
+import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentReadRepository;
@@ -30,6 +31,26 @@ public class CommentJooqRepository implements CommentReadRepository {
     private final SiteMember siteMember = SiteMember.SITE_MEMBER;
     private final CommCommentLike commentLike = CommCommentLike.COMM_COMMENT_LIKE;
     private final SiteMemberProf memberProf = SiteMemberProf.SITE_MEMBER_PROF;
+
+    @Override
+    public boolean existsByPostAndPath(PostId postId, CommentPath path) {
+        return dsl.fetchExists(
+                dsl.selectOne()
+                        .from(commComment)
+                        .where(commComment.POST_ULID.eq(postId.getId()))
+                        .and(commComment.PATH.eq(path.getPath()))
+        );
+    }
+
+    @Override
+    public int countPostComment(PostId postId) {
+        return dsl.selectCount()
+                .from(commComment)
+                .where(commComment.POST_ULID.eq(postId.getId()))
+                .fetchOptional()
+                .map(Record1::value1)
+                .orElse(0);
+    }
 
     public List<CommentOfPostResponse> findByPost(PostId postId) {
         return dsl.select(memberProf.IMAGE_PATH.as("profileImagePath"), siteMember.NICKNAME,
