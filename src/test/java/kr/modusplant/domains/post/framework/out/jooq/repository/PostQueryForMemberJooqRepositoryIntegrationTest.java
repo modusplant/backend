@@ -9,18 +9,17 @@ import kr.modusplant.jooq.tables.records.CommPostRecord;
 import kr.modusplant.jooq.tables.records.CommPriCateRecord;
 import kr.modusplant.jooq.tables.records.CommSecoCateRecord;
 import kr.modusplant.jooq.tables.records.SiteMemberRecord;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT;
@@ -30,6 +29,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @Transactional
 @Rollback
+@TestPropertySource(properties = {
+        "spring.jpa.properties.hibernate.jdbc.time_zone=Asia/Seoul"
+})
 class PostQueryForMemberJooqRepositoryIntegrationTest {
 
     @Autowired
@@ -42,6 +44,11 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
     private CommPriCateRecord testPrimaryCategory1, testPrimaryCategory2;
     private CommSecoCateRecord testSecondaryCategory1, testSecondaryCategory2, testSecondaryCategory3;
     private CommPostRecord testPost1, testPost2, testPost3, testPost4, testPost5;
+
+    @BeforeAll
+    static void setTimezone() {
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+    }
 
     @BeforeEach
     void setUp() {
