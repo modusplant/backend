@@ -24,9 +24,11 @@ public enum CommentErrorCode implements ResponseCode {
 
     NOT_EXIST_AUTHOR(HttpStatus.NOT_FOUND, "not_exist_author", "댓글 작성자의 데이터가 없습니다"),
     NOT_EXIST_POST(HttpStatus.NOT_FOUND, "not_exist_post", "댓글이 작성된 게시글의 데이터를 찾을 수 없습니다"),
-    NOT_EXIST_PARENT_COMMENT(HttpStatus.NOT_FOUND, "not_exist_parent_comment", "대댓글이 등록될 댓글의 데이터가 없습니다"),
+    NOT_EXIST_PARENT_COMMENT(HttpStatus.NOT_FOUND, "not_exist_parent_comment", "댓글의 부모 댓글의 데이터가 없습니다"),
+    NOT_EXIST_SIBLING_COMMENT(HttpStatus.NOT_FOUND, "not_exist_sibling_comment", "댓글의 형제 댓글의 데이터가 없습니다"),
 
-    EXIST_COMMENT(HttpStatus.CONFLICT, "exist_comment", "댓글이 이미 존재합니다");
+    EXIST_COMMENT(HttpStatus.CONFLICT, "exist_comment", "댓글이 이미 존재합니다"),
+    EXIST_POST_COMMENT(HttpStatus.CONFLICT, "exist_post_comment", "게시글에 하나 이상의 댓글이 존재합니다");
 
     private final HttpStatus httpStatus;
     private final String code;
