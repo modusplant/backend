@@ -100,6 +100,10 @@ dependencies {
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store'
 	implementation 'software.amazon.awssdk:s3'
 
+    // Flyway Runtime Dependencies
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-database-postgresql'
+
 	// Other Main Dependencies (Version required)
 	implementation 'com.github.f4b6a3:ulid-creator:5.2.3'
 	implementation 'com.mailjet:mailjet-client:5.2.5'
