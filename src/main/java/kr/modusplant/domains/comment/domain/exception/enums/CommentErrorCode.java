@@ -18,7 +18,8 @@ public enum CommentErrorCode implements ResponseCode {
 
     INVALID_POST_ID(HttpStatus.BAD_REQUEST, "invalid_post_id", "게시글 식별자의 형식이 올바르지 않습니다"),
     INVALID_COMMENT_CONTENT(HttpStatus.BAD_REQUEST, "invalid_comment_content", "댓글의 길이가 600자를 초과했습니다"),
-    INVALID_COMMENT_PATH(HttpStatus.BAD_REQUEST, "invalid_comment_path", "댓글 경로의 형식이 올바르지 않습니다"),
+    INVALID_COMMENT_PATH_FORMAT(HttpStatus.BAD_REQUEST, "invalid_comment_path_format", "댓글 경로의 형식이 올바르지 않습니다"),
+    INVALID_COMMENT_PATH_INDEX(HttpStatus.BAD_REQUEST, "invalid_comment_path_index", "댓글 경로가 1 기반 인덱스를 따르지 않습니다"),
     INVALID_COMMENT_STATUS(HttpStatus.BAD_REQUEST, "invalid_comment_status", "댓글의 상태가 올바르지 않습니다"),
     INVALID_AUTHOR_NICKNAME(HttpStatus.BAD_REQUEST, "invalid_author_nickname", "작성자의 닉네임 형식이 올바르지 않습니다"),
 
