@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,6 +47,7 @@ class PostQueryJooqRepositoryIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        LocalDateTime baseTime = LocalDateTime.now();
         testMember1 = testDataHelper.insertTestMember("TestMember1");
         testMember2 = testDataHelper.insertTestMember("TestMember2");
         testPrimaryCategory1 = testDataHelper.insertTestPrimaryCategory("testPrimaryCategory1",100);
@@ -53,11 +55,11 @@ class PostQueryJooqRepositoryIntegrationTest {
         testSecondaryCategory1 = testDataHelper.insertTestSecondaryCategory(testPrimaryCategory1,"testSecondaryCategory1",100);
         testSecondaryCategory2 = testDataHelper.insertTestSecondaryCategory(testPrimaryCategory1,"testSecondaryCategory2",101);
         testSecondaryCategory3 = testDataHelper.insertTestSecondaryCategory(testPrimaryCategory2,"testSecondaryCategory3",102);
-        testPost1 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory1,testMember1,"title1",TEST_POST_CONTENT);
-        testPost2 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory2,testMember1,"title2",TEST_POST_CONTENT_TEXT_AND_IMAGE);
+        testPost1 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory1,testMember1,"title1",TEST_POST_CONTENT,baseTime.minusSeconds(4));
+        testPost2 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory2,testMember1,"title2",TEST_POST_CONTENT_TEXT_AND_IMAGE,baseTime.minusSeconds(3));
         testPost3 = testDataHelper.insertTestDraftPost(testPrimaryCategory1,testSecondaryCategory1,testMember1,"title3",TEST_POST_CONTENT);
-        testPost4 = testDataHelper.insertTestPublishedPost(testPrimaryCategory2,testSecondaryCategory3,testMember1,"title4",TEST_POST_CONTENT);
-        testPost5 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory1,testMember2,"title5",TEST_POST_CONTENT);
+        testPost4 = testDataHelper.insertTestPublishedPost(testPrimaryCategory2,testSecondaryCategory3,testMember1,"title4",TEST_POST_CONTENT,baseTime.minusSeconds(1));
+        testPost5 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory1,testMember2,"title5",TEST_POST_CONTENT,baseTime);
         testDataHelper.insertTestComment(testPost1,"1",testMember2,"content1",false);
         testDataHelper.insertTestComment(testPost1,"1.1",testMember1,"content2",true);
         testDataHelper.insertTestComment(testPost1,"1.2",testMember2,"content3",false);
@@ -87,6 +89,12 @@ class PostQueryJooqRepositoryIntegrationTest {
         List<PostSummaryReadModel> pageWithAnonymousUser = postQueryJooqRepository.findByCategoryWithCursor(null,null,null,null,size);
 
         // then
+        System.out.println("=== First Page ===");
+        firstPage.forEach(post -> System.out.println("ULID: " + post.ulid() + ", Title: "+post.title() +" PublishedAt: " + post.publishedAt()));
+
+        System.out.println("=== Second Page ===");
+        secondPage.forEach(post -> System.out.println("ULID: " + post.ulid() + ", Title: "+post.title() +" PublishedAt: " + post.publishedAt()));
+
         assertThat(firstPage).hasSize(size+1);
         assertThat(firstPage.getLast()).isEqualTo(secondPage.getFirst());
         assertThat(firstPage.get(0).ulid()).isEqualTo(testPost5.getUlid());
