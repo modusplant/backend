@@ -20,7 +20,7 @@ public class Comment {
 
     public static Comment create(PostId postId, CommentPath path, Author author, CommentContent content) {
         if(postId == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID); }
-        if(path == null) { throw new EmptyValueException(CommentErrorCode.INVALID_COMMENT_PATH); }
+        if(path == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_PATH); }
         if(author == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR); }
         if(content == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_CONTENT); }
         return new Comment(postId, path, author, content, CommentStatus.setAsValid());
@@ -28,7 +28,7 @@ public class Comment {
 
     public static Comment create(PostId postId, CommentPath path, Author author, CommentContent content, CommentStatus status) {
         if(postId == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID); }
-        if(path == null) { throw new EmptyValueException(CommentErrorCode.INVALID_COMMENT_PATH); }
+        if(path == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_PATH); }
         if(author == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR); }
         if(content == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_CONTENT); }
         if (status == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_STATUS); }
