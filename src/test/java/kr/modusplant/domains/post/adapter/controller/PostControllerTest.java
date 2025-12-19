@@ -174,13 +174,13 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     @DisplayName("게시글 생성 및 발행")
     void testCreatePost_givenPublishedPostRequest_willCreatePost() throws IOException {
         // given
-        given(multipartDataProcessorPort.saveFilesAndGenerateContentJson(anyList())).willReturn(TEST_POST_CONTENT_BINARY_DATA);
+        given(multipartDataProcessorPort.saveFilesAndGenerateContentJson(anyList(),anyList())).willReturn(TEST_POST_CONTENT_BINARY_DATA);
 
         // when
         postController.createPost(requestAllTypes, MEMBER_BASIC_USER_UUID);
 
         // then
-        verify(multipartDataProcessorPort).saveFilesAndGenerateContentJson(anyList());
+        verify(multipartDataProcessorPort).saveFilesAndGenerateContentJson(anyList(),anyList());
         verify(postRepository).save(argThat(post ->
                 post.getAuthorId().getValue().equals(MEMBER_BASIC_USER_UUID) &&
                         post.getStatus().isPublished()
@@ -191,13 +191,13 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     @DisplayName("게시글 생성 및 임시저장")
     void testCreatePost_givenDraftPostRequest_willCreateDraftPost() throws IOException {
         // given
-        given(multipartDataProcessorPort.saveFilesAndGenerateContentJson(anyList())).willReturn(TEST_POST_CONTENT_BINARY_DATA);
+        given(multipartDataProcessorPort.saveFilesAndGenerateContentJson(anyList(),anyList())).willReturn(TEST_POST_CONTENT_BINARY_DATA);
 
         // when
         postController.createPost(requestAllTypesDraft, MEMBER_BASIC_USER_UUID);
 
         // then
-        verify(multipartDataProcessorPort).saveFilesAndGenerateContentJson(anyList());
+        verify(multipartDataProcessorPort).saveFilesAndGenerateContentJson(anyList(),anyList());
         verify(postRepository).save(argThat(post ->
                 post.getAuthorId().getValue().equals(MEMBER_BASIC_USER_UUID) &&
                         !post.getStatus().isPublished()
@@ -212,7 +212,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
 
         given(postRepository.getPostByUlid(any(PostId.class))).willReturn(Optional.of(existingPost));
         willDoNothing().given(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
-        given(multipartDataProcessorPort.saveFilesAndGenerateContentJson(anyList())).willReturn(TEST_POST_CONTENT_BINARY_DATA);
+        given(multipartDataProcessorPort.saveFilesAndGenerateContentJson(anyList(),anyList())).willReturn(TEST_POST_CONTENT_BINARY_DATA);
 
         // when
         postController.updatePost(updateRequestAllTypes, MEMBER_BASIC_USER_UUID);
@@ -220,7 +220,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         // then
         verify(postRepository).getPostByUlid(any(PostId.class));
         verify(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
-        verify(multipartDataProcessorPort).saveFilesAndGenerateContentJson(anyList());
+        verify(multipartDataProcessorPort).saveFilesAndGenerateContentJson(anyList(),anyList());
         verify(postRepository).update(any(Post.class));
     }
 
@@ -232,6 +232,9 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
 
         given(postRepository.getPostByUlid(any(PostId.class))).willReturn(Optional.of(existingPost));
         willDoNothing().given(postArchiveRepository).save(any(PostId.class));
+        willDoNothing().given(postRepository).deletePostLikeByPostId(any(PostId.class));
+        willDoNothing().given(postRepository).deletePostBookmarkByPostId(any(PostId.class));
+        willDoNothing().given(postRepository).deletePostRecentlyViewRecordByPostId(any(PostId.class));
         willDoNothing().given(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
         willDoNothing().given(postRepository).delete(any(Post.class));
 
@@ -241,6 +244,9 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         // then
         verify(postRepository).getPostByUlid(any(PostId.class));
         verify(postArchiveRepository).save(any(PostId.class));
+        verify(postRepository).deletePostLikeByPostId(any(PostId.class));
+        verify(postRepository).deletePostBookmarkByPostId(any(PostId.class));
+        verify(postRepository).deletePostRecentlyViewRecordByPostId(any(PostId.class));
         verify(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
         verify(postRepository).delete(any(Post.class));
     }
@@ -251,8 +257,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         // given
         Post existingPost = createDraftPost2();
 
-        given(postRepository.getPostByUlid(any(PostId.class)))
-                .willReturn(Optional.of(existingPost));
+        given(postRepository.getPostByUlid(any(PostId.class))).willReturn(Optional.of(existingPost));
         willDoNothing().given(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
         willDoNothing().given(postRepository).delete(any(Post.class));
 
@@ -262,6 +267,9 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         // then
         verify(postRepository).getPostByUlid(any(PostId.class));
         verify(postArchiveRepository, never()).save(any(PostId.class));
+        verify(postRepository, never()).deletePostLikeByPostId(any(PostId.class));
+        verify(postRepository, never()).deletePostBookmarkByPostId(any(PostId.class));
+        verify(postRepository, never()).deletePostRecentlyViewRecordByPostId(any(PostId.class));
         verify(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
         verify(postRepository).delete(any(Post.class));
     }

@@ -1,0 +1,66 @@
+package kr.modusplant.domains.account.identity.framework.in.web.rest;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
+import kr.modusplant.domains.account.identity.adapter.controller.IdentityController;
+import kr.modusplant.domains.account.identity.usecase.response.IdentityAuthResponse;
+import kr.modusplant.framework.jackson.http.response.DataResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
+@Tag(name = "계정 인증 정보 API", description = "일반과 소셜에 국한되지 않은 인증 정보를 다루는 API 입니다.")
+@RestController
+@RequestMapping("/api")
+@RequiredArgsConstructor
+public class IdentityRestController {
+
+    private final IdentityController controller;
+
+    @Operation(
+            summary = "회원의 식별자로 회원의 이메일, 인증 제공자, 가입일을 가져오는 API",
+            description = "회원의 식별자에 맞는 계정의 인증 정보를 제공합니다."
+    )
+    @GetMapping("/v1/members/{id}/auth-info")
+    public ResponseEntity<DataResponse<IdentityAuthResponse>> getAuthInfo(
+            @Parameter(schema = @Schema(
+                    description = "회원의 식별자",
+                    example = "038ae842-3c93-484f-b526-7c4645a195a7")
+            )
+            @PathVariable("id")
+            @NotNull(message = "사용자의 식별자 값이 비어 있습니다")
+            UUID memberActiveUuid
+    ) {
+        IdentityAuthResponse response = controller.getAuthInfo(memberActiveUuid);
+        return ResponseEntity.ok(DataResponse.ok(response));
+    }
+
+    /**
+     * Spring Security의 보안 필터 체인에 설정된 로그아웃 URL을
+     * Swagger UI에 등록하기 위해 만들어진 더미 메서드입니다.
+     * <p>"절대로" 호출되거나, 사용될 일이 없습니다.<p/>
+     * @param refreshToken 클라이언트가 쿠키로서 발송한 리프레시 토큰입니다.
+     * @param accessToken 로그인한 사용자의 접근 토큰입니다.
+     */
+    @Operation(
+            summary = "로그아웃 API",
+            description = "리프레시 토큰과 접근 토큰으로 로그아웃합니다."
+    )
+    @PostMapping("/auth/logout")
+    public void processLogout(
+            @Parameter(hidden = true)
+            @CookieValue("Cookie")
+            String refreshToken,
+
+            @Parameter(hidden = true)
+            @RequestHeader("Authorization")
+            String accessToken
+    ) {
+
+    }
+}

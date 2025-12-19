@@ -23,10 +23,14 @@ import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jpa.entity.*;
 import kr.modusplant.framework.jpa.entity.common.util.CommPostEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.common.util.SiteMemberProfileEntityTestUtils;
 import kr.modusplant.framework.jpa.repository.*;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.event.consumer.CommentEventConsumer;
 import kr.modusplant.infrastructure.event.consumer.PostEventConsumer;
+import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
+import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
+import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.common.util.PostLikeEventTestUtils;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
@@ -40,13 +44,12 @@ import java.util.UUID;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberBirthDateTestUtils.testMemberBirthDate;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
-import static kr.modusplant.domains.member.common.util.domain.vo.MemberNicknameTestUtils.testMemberNickname;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils.testMemberProfileIntroduction;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD;
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberCheckNicknameRecordTestUtils.TEST_MEMBER_NICKNAME_CHECK_RECORD;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.testMemberPostBookmarkCancelRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.testMemberCommentLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.testMemberCommentUnlikeRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberNicknameCheckRecordTestUtils.testMemberNicknameCheckRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostBookmarkRecordTestUtils.testMemberPostBookmarkRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostLikeRecordTestUtils.testMemberPostLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
@@ -59,6 +62,9 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 import static kr.modusplant.shared.event.common.util.CommentLikeEventTestUtils.testCommentLikeEvent;
 import static kr.modusplant.shared.event.common.util.PostBookmarkEventTestUtils.testPostBookmarkEvent;
 import static kr.modusplant.shared.event.common.util.PostCancelPostBookmarkEventTestUtils.testPostBookmarkCancelEvent;
+import static kr.modusplant.shared.exception.enums.ErrorCode.MEMBER_PROFILE_NOT_FOUND;
+import static kr.modusplant.shared.exception.enums.ErrorCode.NICKNAME_EXISTS;
+import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES;
@@ -71,8 +77,9 @@ import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, PostLikeEventTestUtils, CommPostEntityTestUtils {
+class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, PostLikeEventTestUtils, CommPostEntityTestUtils, SiteMemberProfileEntityTestUtils {
     private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
+    private final SwearService swearService = Mockito.mock(SwearService.class);
     private final MemberMapper memberMapper = new MemberMapperImpl();
     private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl();
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryJpaAdapter.class);
@@ -87,7 +94,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     private final EventBus eventBus = new EventBus();
     private final PostEventConsumer postEventConsumer = new PostEventConsumer(eventBus, commPostLikeRepository, commPostBookmarkRepository, commPostRepository);
     private final CommentEventConsumer commentEventConsumer = new CommentEventConsumer(eventBus, commCommentLikeRepository, commCommentRepository);
-    private final MemberController memberController = new MemberController(s3FileService, memberMapper, memberProfileMapper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
+    private final MemberController memberController = new MemberController(s3FileService, swearService, memberMapper, memberProfileMapper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
 
     @Test
     @DisplayName("register로 회원 등록")
@@ -109,7 +116,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         // when & then
         EntityExistsException alreadyExistedNicknameException = assertThrows(
                 EntityExistsException.class, () -> memberController.register(testMemberRegisterRequest));
-        assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(ALREADY_EXISTED_NICKNAME.getMessage());
+        assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(NICKNAME_EXISTS.getMessage());
     }
 
     @Test
@@ -119,7 +126,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(memberRepository.isNicknameExist(any())).willReturn(true);
 
         // when & then
-        assertThat(memberController.checkExistedNickname(TEST_MEMBER_NICKNAME_CHECK_RECORD)).isEqualTo(true);
+        assertThat(memberController.checkExistedNickname(testMemberNicknameCheckRecord)).isEqualTo(true);
     }
 
     @Test
@@ -131,19 +138,6 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
 
         // when & then
         assertThat(memberController.getProfile(testMemberProfileGetRecord)).isEqualTo(testMemberProfileResponse);
-    }
-
-    @Test
-    @DisplayName("기존에 저장된 회원 프로필이 없을 때 getProfile로 회원 프로필 조회")
-    void testGetProfile_givenValidGetRecordAndNoStoredMemberProfile_willReturnResponse() throws IOException {
-        // given
-        given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
-        given(memberProfileRepository.getById(any())).willReturn(Optional.empty());
-
-        // when & then
-        assertThat(memberController.getProfile(testMemberProfileGetRecord)).isEqualTo(
-                new MemberProfileResponse(MEMBER_BASIC_USER_UUID, null, null, MEMBER_BASIC_USER_NICKNAME)
-        );
     }
 
     @Test
@@ -161,6 +155,18 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     }
 
     @Test
+    @DisplayName("존재하지 않는 회원 프로필로 인해 getProfile로 회원 프로필 조회 실패")
+    void testGetProfile_givenNotFoundMemberProfile_willThrowException() throws IOException {
+        // given
+        given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
+        given(memberProfileRepository.getById(any())).willReturn(Optional.empty());
+
+        // when & then
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> memberController.getProfile(testMemberProfileGetRecord));
+        assertThat(exception.getMessage()).contains(MEMBER_PROFILE_NOT_FOUND.getMessage());
+    }
+
+    @Test
     @DisplayName("이미지 경로를 포함해서 존재하는 모든 데이터로 overrideProfile로 프로필 덮어쓰기")
     void testOverrideProfile_givenExistedData_willReturnResponse() throws IOException {
         // given
@@ -168,6 +174,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(memberProfileRepository.getById(any())).willReturn(Optional.of(memberProfile));
+        given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(s3FileService).deleteFiles(any());
         willDoNothing().given(s3FileService).uploadFile(any(), any());
         given(memberProfileRepository.addOrUpdate(any())).willReturn(memberProfile);
@@ -194,8 +201,9 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
                         testMemberId,
                         MemberEmptyProfileImage.create(),
                         testMemberProfileIntroduction,
-                        testMemberNickname))
+                        testNormalUserNickname))
         );
+        given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(s3FileService).deleteFiles(any());
         willDoNothing().given(s3FileService).uploadFile(any(), any());
         given(memberProfileRepository.addOrUpdate(any())).willReturn(memberProfile);
@@ -214,11 +222,12 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     @DisplayName("존재하는 않는 데이터로 overrideProfile로 프로필 덮어쓰기")
     void testOverrideProfile_givenNotFoundData_willReturnResponse() throws IOException {
         // given
-        MemberProfile memberProfile = MemberProfile.create(testMemberId, MemberEmptyProfileImage.create(), MemberEmptyProfileIntroduction.create(), testMemberNickname);
+        MemberProfile memberProfile = MemberProfile.create(testMemberId, MemberEmptyProfileImage.create(), MemberEmptyProfileIntroduction.create(), testNormalUserNickname);
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(memberProfileRepository.getById(any())).willReturn(Optional.empty());
+        given(memberProfileRepository.getById(any())).willReturn(Optional.of(memberProfile));
         given(memberProfileRepository.addOrUpdate(any())).willReturn(memberProfile);
+        willDoNothing().given(s3FileService).deleteFiles(any());
 
         // when
         MemberProfileResponse memberProfileResponse = memberController.overrideProfile(
@@ -233,7 +242,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     
     @Test
     @DisplayName("존재하지 않는 아이디로 인해 overrideProfile로 프로필 덮어쓰기 실패")
-    void testValidateBeforeOverrideProfile_givenNotFoundId_willThrowException() {
+    void testValidateMemberIdAndNicknameBeforeOverrideProfile_givenNotFoundId_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(false);
 
@@ -244,16 +253,45 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     }
 
     @Test
-    @DisplayName("이미 존재하는 닉네임으로 인해 overrideProfile로 프로필 덮어쓰기 실패")
-    void testValidateBeforeOverrideProfile_givenAlreadyExistedNickname_willThrowException() {
+    @DisplayName("닉네임에 사용된 비속어로 인해 overrideProfile로 프로필 덮어쓰기 실패")
+    void testValidateThatHasSwear_willThrowException() {
         // given
         given(memberRepository.isIdExist(any())).willReturn(true);
-        given(memberRepository.getByNickname(any())).willReturn(Optional.of(Member.create(MemberId.generate(), testMemberActiveStatus, testMemberNickname, testMemberBirthDate)));
+        given(swearService.isSwearContained(any())).willReturn(true);
+
+        // when & then
+        SwearContainedException swearContainedException = assertThrows(
+                SwearContainedException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
+        assertThat(swearContainedException.getMessage()).isEqualTo(SwearErrorCode.SWEAR_CONTAINED.getMessage());
+    }
+
+    @Test
+    @DisplayName("이미 존재하는 닉네임으로 인해 overrideProfile로 프로필 덮어쓰기 실패")
+    void testValidate_willThrowException() {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(memberRepository.getByNickname(any())).willReturn(Optional.of(Member.create(MemberId.generate(), testMemberActiveStatus, testNormalUserNickname, testMemberBirthDate)));
 
         // when & then
         EntityExistsException alreadyExistedNicknameException = assertThrows(
                 EntityExistsException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
-        assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(ALREADY_EXISTED_NICKNAME.getMessage());
+        assertThat(alreadyExistedNicknameException.getMessage()).isEqualTo(NICKNAME_EXISTS.getMessage());
+    }
+
+    @Test
+    @DisplayName("존재하는 않는 회원 프로필로 인해 overrideProfile로 프로필 덮어쓰기 실패")
+    void testOverrideProfile_givenNotFoundMemberProfile_willThrowException() throws IOException {
+        // given
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        given(memberProfileRepository.getById(any())).willReturn(Optional.empty());
+
+        // when
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> memberController.overrideProfile(
+                new MemberProfileOverrideRecord(MEMBER_BASIC_USER_UUID, null, null, MEMBER_BASIC_USER_NICKNAME)));
+
+        // then
+        assertThat(exception.getMessage()).contains(MEMBER_PROFILE_NOT_FOUND.getMessage());
     }
 
     @Test
@@ -388,7 +426,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         willDoNothing().given(commPostBookmarkRepository).delete(postBookmarkEntity);
 
         // when
-        memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD);
+        memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord);
 
         // then
         verify(commPostBookmarkRepository, times(1)).delete(any());
@@ -404,7 +442,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(targetPostIdRepository.isBookmarked(any(), any())).willReturn(false);
 
         // when
-        memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD);
+        memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord);
 
         // then
         verify(commPostBookmarkRepository, times(0)).delete(any());
@@ -474,7 +512,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         EntityNotFoundException entityNotFoundExceptionForBookmark = assertThrows(EntityNotFoundException.class,
                 () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
         EntityNotFoundException entityNotFoundExceptionForCancelBookmark = assertThrows(EntityNotFoundException.class,
-                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
+                () -> memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord));
 
         // then
         assertThat(entityNotFoundExceptionForBookmark.getMessage()).isEqualTo(NOT_FOUND_MEMBER_ID.getMessage());
@@ -492,7 +530,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         EntityNotFoundException entityNotFoundExceptionForBookmark = assertThrows(EntityNotFoundException.class,
                 () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
         EntityNotFoundException entityNotFoundExceptionForCancelBookmark = assertThrows(EntityNotFoundException.class,
-                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
+                () -> memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord));
 
         // then
         assertThat(entityNotFoundExceptionForBookmark.getMessage()).isEqualTo(NOT_FOUND_TARGET_POST_ID.getMessage());
@@ -511,7 +549,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         NotAccessiblePostBookmarkException entityNotFoundExceptionForBookmark = assertThrows(NotAccessiblePostBookmarkException.class,
                 () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
         NotAccessiblePostBookmarkException entityNotFoundExceptionForCancelBookmark = assertThrows(NotAccessiblePostBookmarkException.class,
-                () -> memberController.cancelPostBookmark(TEST_MEMBER_POST_BOOKMARK_CANCEL_RECORD));
+                () -> memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord));
 
         // then
         assertThat(entityNotFoundExceptionForBookmark.getMessage()).isEqualTo(NOT_ACCESSIBLE_POST_BOOKMARK.getMessage());

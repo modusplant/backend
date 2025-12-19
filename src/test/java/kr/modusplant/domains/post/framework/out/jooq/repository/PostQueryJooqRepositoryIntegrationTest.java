@@ -3,23 +3,24 @@ package kr.modusplant.domains.post.framework.out.jooq.repository;
 import kr.modusplant.domains.post.common.helper.PostTestDataHelper;
 import kr.modusplant.domains.post.domain.exception.EmptyCategoryIdException;
 import kr.modusplant.domains.post.domain.vo.PostId;
+import kr.modusplant.domains.post.usecase.record.PostDetailDataReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.jooq.tables.records.CommPostRecord;
 import kr.modusplant.jooq.tables.records.CommPriCateRecord;
 import kr.modusplant.jooq.tables.records.CommSecoCateRecord;
 import kr.modusplant.jooq.tables.records.SiteMemberRecord;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT;
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT_TEXT_AND_IMAGE;
@@ -29,6 +30,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest
 @Transactional
 @Rollback
+@TestPropertySource(properties = {
+        "spring.jpa.properties.hibernate.jdbc.time_zone=Asia/Seoul"
+})
 class PostQueryJooqRepositoryIntegrationTest {
 
     @Autowired
@@ -43,8 +47,14 @@ class PostQueryJooqRepositoryIntegrationTest {
     private CommSecoCateRecord testSecondaryCategory1, testSecondaryCategory2, testSecondaryCategory3;
     private CommPostRecord testPost1,testPost2,testPost3,testPost4,testPost5;
 
+    @BeforeAll
+    static void setTimezone() {
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+    }
+
     @BeforeEach
     void setUp() {
+        LocalDateTime baseTime = LocalDateTime.now();
         testMember1 = testDataHelper.insertTestMember("TestMember1");
         testMember2 = testDataHelper.insertTestMember("TestMember2");
         testPrimaryCategory1 = testDataHelper.insertTestPrimaryCategory("testPrimaryCategory1",100);
@@ -52,11 +62,11 @@ class PostQueryJooqRepositoryIntegrationTest {
         testSecondaryCategory1 = testDataHelper.insertTestSecondaryCategory(testPrimaryCategory1,"testSecondaryCategory1",100);
         testSecondaryCategory2 = testDataHelper.insertTestSecondaryCategory(testPrimaryCategory1,"testSecondaryCategory2",101);
         testSecondaryCategory3 = testDataHelper.insertTestSecondaryCategory(testPrimaryCategory2,"testSecondaryCategory3",102);
-        testPost1 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory1,testMember1,"title1",TEST_POST_CONTENT);
-        testPost2 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory2,testMember1,"title2",TEST_POST_CONTENT_TEXT_AND_IMAGE);
+        testPost1 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory1,testMember1,"title1",TEST_POST_CONTENT,baseTime.minusSeconds(4));
+        testPost2 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory2,testMember1,"title2",TEST_POST_CONTENT_TEXT_AND_IMAGE,baseTime.minusSeconds(3));
         testPost3 = testDataHelper.insertTestDraftPost(testPrimaryCategory1,testSecondaryCategory1,testMember1,"title3",TEST_POST_CONTENT);
-        testPost4 = testDataHelper.insertTestPublishedPost(testPrimaryCategory2,testSecondaryCategory3,testMember1,"title4",TEST_POST_CONTENT);
-        testPost5 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory1,testMember2,"title5",TEST_POST_CONTENT);
+        testPost4 = testDataHelper.insertTestPublishedPost(testPrimaryCategory2,testSecondaryCategory3,testMember1,"title4",TEST_POST_CONTENT,baseTime.minusSeconds(1));
+        testPost5 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory1,testMember2,"title5",TEST_POST_CONTENT,baseTime);
         testDataHelper.insertTestComment(testPost1,"1",testMember2,"content1",false);
         testDataHelper.insertTestComment(testPost1,"1.1",testMember1,"content2",true);
         testDataHelper.insertTestComment(testPost1,"1.2",testMember2,"content3",false);
@@ -88,7 +98,9 @@ class PostQueryJooqRepositoryIntegrationTest {
         // then
         assertThat(firstPage).hasSize(size+1);
         assertThat(firstPage.getLast()).isEqualTo(secondPage.getFirst());
-        assertThat(firstPage.get(0).ulid()).isEqualTo(testPost5.getUlid());
+        assertThat(firstPage.get(0).ulid())
+                .withFailMessage("ULID: " + firstPage.get(0).ulid() + ", Title: "+firstPage.get(0).title() +" PublishedAt: " + firstPage.get(0).publishedAt())
+                .isEqualTo(testPost5.getUlid());
         assertThat(firstPage.get(1).ulid()).isEqualTo(testPost4.getUlid());
         assertThat(secondPage.get(0).ulid()).isEqualTo(testPost2.getUlid());
         assertThat(secondPage.get(1).ulid()).isEqualTo(testPost1.getUlid());
@@ -128,7 +140,7 @@ class PostQueryJooqRepositoryIntegrationTest {
         List<PostSummaryReadModel> firstPageByCategories = postQueryJooqRepository.findByCategoryWithCursor(
                 testPrimaryCategory1.getUuid(),List.of(testSecondaryCategory1.getUuid()),testMember2.getUuid(),null,size
         );
-        List<PostSummaryReadModel> secondePageByCategories = postQueryJooqRepository.findByCategoryWithCursor(
+        List<PostSummaryReadModel> secondPageByCategories = postQueryJooqRepository.findByCategoryWithCursor(
                 testPrimaryCategory1.getUuid(),List.of(testSecondaryCategory1.getUuid()),testMember2.getUuid(),firstPageByCategories.get(size-1).ulid(),size
         );
 
@@ -140,7 +152,7 @@ class PostQueryJooqRepositoryIntegrationTest {
         assertThat(secondPageByPrimaryCategory.get(0).ulid()).isEqualTo(testPost1.getUlid());
 
         assertThat(firstPageByCategories).hasSize(size);
-        assertThat(secondePageByCategories).isEmpty();
+        assertThat(secondPageByCategories).isEmpty();
         assertThat(firstPageByCategories.get(0).ulid()).isEqualTo(testPost5.getUlid());
         assertThat(firstPageByCategories.get(1).ulid()).isEqualTo(testPost1.getUlid());
 
@@ -197,6 +209,10 @@ class PostQueryJooqRepositoryIntegrationTest {
         List<PostSummaryReadModel> firstPageByBlankKeyword = postQueryJooqRepository.findByKeywordWithCursor("",testMember2.getUuid(),null,size);
         List<PostSummaryReadModel> secondePageByBlankKeyword = postQueryJooqRepository.findByKeywordWithCursor("",testMember2.getUuid(),firstPageByBlankKeyword.get(size-1).ulid(),size);
 
+        List<PostSummaryReadModel> pageByBackslash = postQueryJooqRepository.findByKeywordWithCursor("\\",testMember2.getUuid(),null,size);
+        List<PostSummaryReadModel> pageByPercent = postQueryJooqRepository.findByKeywordWithCursor("%%",testMember2.getUuid(),null,size);
+        List<PostSummaryReadModel> pageByUnderscore = postQueryJooqRepository.findByKeywordWithCursor("_",testMember2.getUuid(),null,size);
+
         // then
         assertThat(firstPageByKeyword).hasSize(size+1);
         assertThat(firstPageByKeyword.getLast()).isEqualTo(secondPageByKeyword.getFirst());
@@ -210,6 +226,10 @@ class PostQueryJooqRepositoryIntegrationTest {
         assertThat(firstPageByBlankKeyword.get(1).ulid()).isEqualTo(testPost4.getUlid());
         assertThat(secondePageByBlankKeyword.get(0).ulid()).isEqualTo(testPost2.getUlid());
         assertThat(secondePageByBlankKeyword.get(1).ulid()).isEqualTo(testPost1.getUlid());
+
+        assertThat(pageByBackslash).hasSize(0);
+        assertThat(pageByPercent).hasSize(0);
+        assertThat(pageByUnderscore).hasSize(0);
     }
 
     @Test
@@ -219,6 +239,17 @@ class PostQueryJooqRepositoryIntegrationTest {
         Optional<PostDetailReadModel> result = postQueryJooqRepository.findPostDetailByPostId(
                 PostId.create(testPost1.getUlid()), testMember2.getUuid()
         );
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get().ulid()).isEqualTo(testPost1.getUlid());
+    }
+
+    @Test
+    @DisplayName("PostId로 특정 게시글 조회")
+    void testFindPostDetailDataByPostId_givenPostId_willReturnPost() {
+        // when
+        Optional<PostDetailDataReadModel> result = postQueryJooqRepository.findPostDetailDataByPostId(PostId.create(testPost1.getUlid()));
 
         // then
         assertThat(result).isPresent();

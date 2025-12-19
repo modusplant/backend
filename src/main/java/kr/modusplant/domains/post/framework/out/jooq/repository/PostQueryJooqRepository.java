@@ -1,9 +1,11 @@
 package kr.modusplant.domains.post.framework.out.jooq.repository;
 
 import kr.modusplant.domains.post.domain.exception.EmptyCategoryIdException;
+import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.framework.out.jooq.mapper.supers.PostJooqMapper;
 import kr.modusplant.domains.post.usecase.port.repository.PostQueryRepository;
+import kr.modusplant.domains.post.usecase.record.PostDetailDataReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
@@ -150,6 +152,30 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         ).map(postJooqMapper::toPostDetailReadModel);
     }
 
+    public Optional<PostDetailDataReadModel> findPostDetailDataByPostId(PostId postId) {
+        return Optional.ofNullable(dsl
+                .select(
+                        COMM_POST.ULID,
+                        COMM_PRI_CATE.UUID.as("primaryCategoryUuid"),
+                        COMM_PRI_CATE.CATEGORY.as("primaryCategory"),
+                        COMM_SECO_CATE.UUID.as("secondaryCategoryUuid"),
+                        COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
+                        SITE_MEMBER.UUID.as("authorUuid"),
+                        SITE_MEMBER.NICKNAME,
+                        COMM_POST.TITLE,
+                        COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.IS_PUBLISHED,
+                        COMM_POST.PUBLISHED_AT,
+                        COMM_POST.UPDATED_AT
+                ).from(COMM_POST)
+                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_UUID.eq(COMM_PRI_CATE.UUID))
+                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_UUID.eq(COMM_SECO_CATE.UUID))
+                .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
+                .where(COMM_POST.ULID.eq(postId.getValue()))
+                .fetchOne()
+        ).map(postJooqMapper::toPostDetailDataReadModel);
+    }
+
     private Condition buildCategoryConditions(UUID primaryCategoryUuid, List<UUID> secondaryCategoryUuids) {
         if (primaryCategoryUuid == null && secondaryCategoryUuids != null && !secondaryCategoryUuids.isEmpty()) {
             throw new EmptyCategoryIdException();
@@ -168,7 +194,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         if (keyword == null || keyword.trim().isEmpty()) {
             return noCondition();
         }
-        String searchKeyword = "%"+keyword+"%";
+        String searchKeyword = "%"+escapeWildcards(keyword)+"%";
         Condition titleCondition = COMM_POST.TITLE.likeIgnoreCase(searchKeyword);
         Name alias = name("c");
         Condition contentCondition = exists(
@@ -182,6 +208,13 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         return titleCondition.or(contentCondition);
     }
 
+    private String escapeWildcards(String input) {
+        return input
+                .replace("\\", "\\\\")
+                .replace("%", "\\%")
+                .replace("_", "\\_");
+    }
+
     private Condition buildCursorCondition(String cursorUlid) {
         if (cursorUlid == null) {
             return noCondition();
@@ -192,7 +225,13 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                 .fetchOne(COMM_POST.PUBLISHED_AT);
 
         if (cursorPublishedAt == null) {
-            return noCondition();
+            cursorPublishedAt = dsl.select(COMM_POST_ARCHIVE.PUBLISHED_AT)
+                    .from(COMM_POST_ARCHIVE)
+                    .where(COMM_POST_ARCHIVE.ULID.eq(cursorUlid))
+                    .fetchOne(COMM_POST_ARCHIVE.PUBLISHED_AT);
+            if(cursorPublishedAt == null) {
+                throw new PostNotFoundException();
+            }
         }
         return row(COMM_POST.PUBLISHED_AT, COMM_POST.ULID).lessThan(cursorPublishedAt,cursorUlid);
     }

@@ -4,17 +4,22 @@ import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import kr.modusplant.infrastructure.security.exception.*;
 import kr.modusplant.infrastructure.security.models.DefaultAuthToken;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@RequiredArgsConstructor
 public class DefaultAuthProvider implements AuthenticationProvider {
 
     private final DefaultUserDetailsService defaultUserDetailsService;
     private final PasswordEncoder passwordEncoder;
+
+    public DefaultAuthProvider(DefaultUserDetailsService defaultUserDetailsService,
+                               @Qualifier("bcryptPasswordEncoder") PasswordEncoder passwordEncoder) {
+        this.defaultUserDetailsService = defaultUserDetailsService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {

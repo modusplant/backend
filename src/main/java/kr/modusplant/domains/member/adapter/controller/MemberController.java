@@ -20,9 +20,12 @@ import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.infrastructure.event.bus.EventBus;
+import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
+import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.*;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
+import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,13 +36,17 @@ import java.util.Optional;
 
 import static kr.modusplant.domains.member.adapter.util.MemberProfileImageUtils.generateMemberProfileImagePath;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
+import static kr.modusplant.shared.exception.enums.ErrorCode.MEMBER_PROFILE_NOT_FOUND;
+import static kr.modusplant.shared.exception.enums.ErrorCode.NICKNAME_EXISTS;
 
+@SuppressWarnings("LoggingSimilarMessage")
 @RequiredArgsConstructor
 @Service
 @Transactional
 @Slf4j
 public class MemberController {
     private final S3FileService s3FileService;
+    private final SwearService swearService;
     private final MemberMapper memberMapper;
     private final MemberProfileMapper memberProfileMapper;
     private final MemberRepository memberRepository;
@@ -49,14 +56,14 @@ public class MemberController {
     private final EventBus eventBus;
 
     public MemberResponse register(MemberRegisterRequest request) {
-        MemberNickname memberNickname = MemberNickname.create(request.nickname());
-        validateBeforeRegister(memberNickname);
-        return memberMapper.toMemberResponse(memberRepository.save(memberNickname));
+        Nickname nickname = Nickname.create(request.nickname());
+        validateBeforeRegister(nickname);
+        return memberMapper.toMemberResponse(memberRepository.save(nickname));
     }
 
     public boolean checkExistedNickname(MemberNicknameCheckRecord record) {
-        MemberNickname memberNickname = MemberNickname.create(record.nickname());
-        return memberRepository.isNicknameExist(memberNickname);
+        Nickname nickname = Nickname.create(record.nickname());
+        return memberRepository.isNicknameExist(nickname);
     }
 
     public MemberProfileResponse getProfile(MemberProfileGetRecord record) throws IOException {
@@ -69,19 +76,21 @@ public class MemberController {
         if (optionalMemberProfile.isPresent()) {
             return memberProfileMapper.toMemberProfileResponse(optionalMemberProfile.orElseThrow());
         } else {
-            return new MemberProfileResponse(memberId.getValue(), null, null, optionalMember.orElseThrow().getMemberNickname().getValue());
+            throw new EntityNotFoundException(MEMBER_PROFILE_NOT_FOUND, "memberProfile");
         }
     }
 
     public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
-        MemberNickname memberNickname = MemberNickname.create(record.nickname());
-        validateBeforeOverrideProfile(memberId, memberNickname);
+        Nickname memberNickname = Nickname.create(record.nickname());
         MemberProfile memberProfile;
         MemberProfileImage memberProfileImage;
         MemberProfileIntroduction memberProfileIntroduction;
+        String introduction = record.introduction();
         boolean isImageExist = !(record.image() == null);
-        boolean isIntroductionExist = !(record.introduction() == null);
+        boolean isIntroductionExist = !(introduction == null);
+        validateBeforeOverrideProfile(memberId, memberNickname);
+
         Optional<MemberProfile> optionalMemberProfile = memberProfileRepository.getById(memberId);
         if (optionalMemberProfile.isPresent()) {
             memberProfile = optionalMemberProfile.orElseThrow();
@@ -90,8 +99,9 @@ public class MemberController {
                 s3FileService.deleteFiles(imagePath);
             }
         } else {
-            log.warn("Not found member profile, member uuid: {}. Please check it out. ", memberId.getValue());
+            throw new EntityNotFoundException(MEMBER_PROFILE_NOT_FOUND, "memberProfile");
         }
+
         if (isImageExist) {
             String newImagePath = uploadImage(memberId, record);
             memberProfileImage = MemberProfileImage.create(
@@ -102,7 +112,8 @@ public class MemberController {
             memberProfileImage = MemberEmptyProfileImage.create();
         }
         if (isIntroductionExist) {
-            memberProfileIntroduction = MemberProfileIntroduction.create(record.introduction());
+            introduction = swearService.filterSwear(introduction);
+            memberProfileIntroduction = MemberProfileIntroduction.create(introduction);
         } else {
             memberProfileIntroduction = MemberEmptyProfileIntroduction.create();
         }
@@ -164,19 +175,22 @@ public class MemberController {
         }
     }
 
-    private void validateBeforeRegister(MemberNickname memberNickname) {
-        if (memberRepository.isNicknameExist(memberNickname)) {
-            throw new EntityExistsException(ALREADY_EXISTED_NICKNAME, "memberNickname");
+    private void validateBeforeRegister(Nickname nickname) {
+        if (memberRepository.isNicknameExist(nickname)) {
+            throw new EntityExistsException(NICKNAME_EXISTS, "nickname");
         }
     }
 
-    private void validateBeforeOverrideProfile(MemberId memberId, MemberNickname memberNickname) {
+    private void validateBeforeOverrideProfile(MemberId memberId, Nickname memberNickname) {
         if (!memberRepository.isIdExist(memberId)) {
             throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
         }
+        if (swearService.isSwearContained(memberNickname.getValue())) {
+            throw new SwearContainedException();
+        }
         Optional<Member> emptyOrMember = memberRepository.getByNickname(memberNickname);
         if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
-            throw new EntityExistsException(ALREADY_EXISTED_NICKNAME, "memberNickname");
+            throw new EntityExistsException(NICKNAME_EXISTS, "memberNickname");
         }
     }
 

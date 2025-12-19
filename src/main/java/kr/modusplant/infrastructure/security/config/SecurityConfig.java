@@ -12,6 +12,7 @@ import kr.modusplant.infrastructure.security.filter.EmailPasswordAuthenticationF
 import kr.modusplant.infrastructure.security.filter.JwtAuthenticationFilter;
 import kr.modusplant.infrastructure.security.handler.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +27,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.validation.Validator;
@@ -60,8 +62,15 @@ public class SecurityConfig {
         return new DefaultAuthenticationEntryPoint(objectMapper); }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    @Qualifier("bcryptPasswordEncoder")
+    public PasswordEncoder bcryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    @Qualifier("pbkdf2PasswordEncoder")
+    public PasswordEncoder pbkdf2PasswordEncoder() {
+        return Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8();
     }
 
     @Bean
@@ -71,7 +80,7 @@ public class SecurityConfig {
 
     @Bean
     public DefaultAuthProvider siteMemberAuthProvider() {
-        return new DefaultAuthProvider(defaultUserDetailsService, passwordEncoder());
+        return new DefaultAuthProvider(defaultUserDetailsService, bcryptPasswordEncoder());
     }
 
     @Bean
@@ -132,6 +141,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter(http), EmailPasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/communication/posts/me/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/communication/posts/*/data").authenticated()
                         .requestMatchers(HttpMethod.POST,"/api/v1/communication/posts").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/communication/posts/*").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/communication/posts/*").authenticated()
