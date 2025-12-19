@@ -89,15 +89,11 @@ class PostQueryJooqRepositoryIntegrationTest {
         List<PostSummaryReadModel> pageWithAnonymousUser = postQueryJooqRepository.findByCategoryWithCursor(null,null,null,null,size);
 
         // then
-        System.out.println("=== First Page ===");
-        firstPage.forEach(post -> System.out.println("ULID: " + post.ulid() + ", Title: "+post.title() +" PublishedAt: " + post.publishedAt()));
-
-        System.out.println("=== Second Page ===");
-        secondPage.forEach(post -> System.out.println("ULID: " + post.ulid() + ", Title: "+post.title() +" PublishedAt: " + post.publishedAt()));
-
         assertThat(firstPage).hasSize(size+1);
         assertThat(firstPage.getLast()).isEqualTo(secondPage.getFirst());
-        assertThat(firstPage.get(0).ulid()).isEqualTo(testPost5.getUlid());
+        assertThat(firstPage.get(0).ulid())
+                .withFailMessage("ULID: " + firstPage.get(0).ulid() + ", Title: "+firstPage.get(0).title() +" PublishedAt: " + firstPage.get(0).publishedAt())
+                .isEqualTo(testPost5.getUlid());
         assertThat(firstPage.get(1).ulid()).isEqualTo(testPost4.getUlid());
         assertThat(secondPage.get(0).ulid()).isEqualTo(testPost2.getUlid());
         assertThat(secondPage.get(1).ulid()).isEqualTo(testPost1.getUlid());
