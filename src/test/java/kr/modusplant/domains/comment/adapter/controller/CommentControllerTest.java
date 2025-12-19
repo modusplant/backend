@@ -8,6 +8,8 @@ import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqRepository;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJpaAdapter;
+import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
+import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import org.mockito.Mockito;
 
 public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
@@ -15,7 +17,10 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     private final CommentMapperImpl mapper = Mockito.mock(CommentMapperImpl.class);
     private final CommentJooqRepository jooqAdapter = Mockito.mock(CommentJooqRepository.class);
     private final CommentRepositoryJpaAdapter jpaAdapter = Mockito.mock(CommentRepositoryJpaAdapter.class);
-    private final CommentController controller = new CommentController(mapper, jooqAdapter, jpaAdapter);
+    private final CommPostJpaRepository postJpaRepository = Mockito.mock(CommPostJpaRepository.class);
+    private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
+    private final CommentController controller = new CommentController(mapper, jooqAdapter,
+            jpaAdapter, postJpaRepository, memberJpaRepository);
 
 //    @Test
 //    @DisplayName("유효한 게시글 id로 댓글 읽기")
