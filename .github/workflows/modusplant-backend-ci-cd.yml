@@ -96,7 +96,7 @@ jobs:
           # ---- dummy ----
           KEYSTORE_PASSWORD: keystore_dummy_password
         run: |
-          ./gradlew test \
+          ./gradlew test --info --stacktrace \
             -PjdbcConnectionUrl="$JDBC_CONNECTION_URL" \
             -PjdbcUsername="$JDBC_USERNAME" \
             -PjdbcPassword="$JDBC_PASSWORD"
