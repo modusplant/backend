@@ -54,6 +54,6 @@ public class S3FileService {
     }
 
     public String generateS3SrcUrl(String fileKey) {
-        return String.format("%s/%s/%s",endpoint,bucket,fileKey);
+        return String.format("%s/%s/%s", endpoint, bucket, fileKey);
     }
 }

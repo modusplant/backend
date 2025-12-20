@@ -11,7 +11,7 @@ public interface MemberProfileRepository {
 
     MemberProfile add(MemberProfile memberProfile) throws IOException;
 
-    MemberProfile addOrUpdate(MemberProfile memberProfile) throws IOException;
+    MemberProfile update(MemberProfile memberProfile) throws IOException;
 
     boolean isIdExist(MemberId memberId);
 }
