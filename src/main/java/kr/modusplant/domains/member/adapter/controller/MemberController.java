@@ -118,7 +118,7 @@ public class MemberController {
             memberProfileIntroduction = MemberEmptyProfileIntroduction.create();
         }
         memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
-        return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.addOrUpdate(memberProfile));
+        return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile));
     }
 
     public void likePost(MemberPostLikeRecord record) {
