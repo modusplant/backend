@@ -15,8 +15,10 @@ import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -31,6 +33,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/communication/comments")
 @RequiredArgsConstructor
 @Validated
+@Slf4j
 public class CommentRestController {
 
     private final CommentController controller;
