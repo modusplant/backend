@@ -14,11 +14,19 @@ public class MemberProfileMapperImpl implements MemberProfileMapper {
 
     @Override
     public MemberProfileResponse toMemberProfileResponse(MemberProfile memberProfile) {
-        return new MemberProfileResponse(
-                memberProfile.getMemberId().getValue(),
-                s3FileService.generateS3SrcUrl(
-                        memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue()),
-                memberProfile.getMemberProfileIntroduction().getValue(),
-                memberProfile.getNickname().getValue());
+        String imagePath = memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue();
+        if (imagePath == null) {
+            return new MemberProfileResponse(
+                    memberProfile.getMemberId().getValue(),
+                    null,
+                    memberProfile.getMemberProfileIntroduction().getValue(),
+                    memberProfile.getNickname().getValue());
+        } else {
+            return new MemberProfileResponse(
+                    memberProfile.getMemberId().getValue(),
+                    s3FileService.generateS3SrcUrl(imagePath),
+                    memberProfile.getMemberProfileIntroduction().getValue(),
+                    memberProfile.getNickname().getValue());
+        }
     }
 }
