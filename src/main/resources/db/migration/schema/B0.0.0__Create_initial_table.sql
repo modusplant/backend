@@ -142,6 +142,13 @@ CREATE TABLE public.term (
     ver_num integer NOT NULL
 );
 
+CREATE TABLE public.swear (
+    uuid UUID NOT NULL,
+    type character varying(10) NOT NULL,
+    word character varying(10) NOT NULL,
+    created_at TIMESTAMP without time zone NOT NULL
+);
+
 ALTER TABLE ONLY public.comm_comment
     ADD CONSTRAINT "PK_COMM_COMMENT" PRIMARY KEY (post_ulid, "path");
 
@@ -184,6 +191,9 @@ ALTER TABLE ONLY public.site_member_term
 ALTER TABLE ONLY public.term
     ADD CONSTRAINT "PK_TERM" PRIMARY KEY (uuid);
 
+ALTER TABLE ONLY public.swear
+    ADD CONSTRAINT "PK_SWEAR" PRIMARY KEY (uuid);
+
 ALTER TABLE ONLY public.comm_post_archive
     ADD CONSTRAINT comm_post_archive_pkey PRIMARY KEY (ulid);
 
@@ -198,3 +208,6 @@ ALTER TABLE ONLY public.site_member
 
 ALTER TABLE ONLY public.comm_pri_cate
     ADD CONSTRAINT "UK_COMM_PRI_CATE" UNIQUE (category, "order");
+
+ALTER TABLE ONLY public.swear
+    ADD CONSTRAINT "UK_SWEAR" UNIQUE (word);
