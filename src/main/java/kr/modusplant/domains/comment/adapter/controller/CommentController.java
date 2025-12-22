@@ -49,9 +49,15 @@ public class CommentController {
         }
         PageImpl<CommentOfAuthorPageModel> result = jooqRepository.findByAuthor(Author.create(memberUuid), pageable);
 
-        return new CommentPageResponse<>(result.getContent(), result.getNumber() + 1,
+        CommentPageResponse<CommentOfAuthorPageModel> response =
+                new CommentPageResponse<>(result.getContent(), result.getNumber(),
                 result.getSize(), result.getTotalElements(), result.getTotalPages(),
                 result.hasNext(), result.hasPrevious());
+        
+        response.ApplyOneIndexBasedPage();
+
+        return response;
+
     }
 
     public void register(CommentRegisterRequest request, UUID currentMemberUuid) {
