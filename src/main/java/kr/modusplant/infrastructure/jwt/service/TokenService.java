@@ -18,6 +18,7 @@ import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -37,6 +38,7 @@ import java.util.UUID;
  */
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class TokenService {
     private final JwtTokenProvider jwtTokenProvider;
     private final SiteMemberJpaRepository siteMemberJpaRepository;

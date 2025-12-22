@@ -67,8 +67,7 @@ import static kr.modusplant.shared.exception.enums.ErrorCode.NICKNAME_EXISTS;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -81,7 +80,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
     private final SwearService swearService = Mockito.mock(SwearService.class);
     private final MemberMapper memberMapper = new MemberMapperImpl();
-    private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl();
+    private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl(s3FileService);
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryJpaAdapter.class);
     private final MemberProfileRepository memberProfileRepository = Mockito.mock(MemberProfileRepository.class);
     private final CommPostLikeJpaRepository commPostLikeRepository = Mockito.mock(CommPostLikeJpaRepository.class);
@@ -135,6 +134,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         // given
         given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
         given(memberProfileRepository.getById(any())).willReturn(Optional.of(createMemberProfile()));
+        given(s3FileService.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when & then
         assertThat(memberController.getProfile(testMemberProfileGetRecord)).isEqualTo(testMemberProfileResponse);
@@ -177,14 +177,15 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(s3FileService).deleteFiles(any());
         willDoNothing().given(s3FileService).uploadFile(any(), any());
-        given(memberProfileRepository.addOrUpdate(any())).willReturn(memberProfile);
+        given(memberProfileRepository.update(any())).willReturn(memberProfile);
+        given(s3FileService.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when
         MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecord);
 
         // then
         assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
-        assertThat(memberProfileResponse.image()).isEqualTo(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
+        assertThat(memberProfileResponse.imageUrl()).isEqualTo(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
         assertThat(memberProfileResponse.introduction()).isEqualTo(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
     }
@@ -206,14 +207,15 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(s3FileService).deleteFiles(any());
         willDoNothing().given(s3FileService).uploadFile(any(), any());
-        given(memberProfileRepository.addOrUpdate(any())).willReturn(memberProfile);
+        given(memberProfileRepository.update(any())).willReturn(memberProfile);
+        given(s3FileService.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when
         MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecord);
 
         // then
         assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
-        assertThat(memberProfileResponse.image()).isEqualTo(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
+        assertThat(memberProfileResponse.imageUrl()).isEqualTo(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
         assertThat(memberProfileResponse.introduction()).isEqualTo(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
     }
@@ -226,7 +228,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(memberProfileRepository.getById(any())).willReturn(Optional.of(memberProfile));
-        given(memberProfileRepository.addOrUpdate(any())).willReturn(memberProfile);
+        given(memberProfileRepository.update(any())).willReturn(memberProfile);
         willDoNothing().given(s3FileService).deleteFiles(any());
 
         // when
@@ -235,7 +237,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
 
         // then
         assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
-        assertThat(memberProfileResponse.image()).isEqualTo(null);
+        assertThat(memberProfileResponse.imageUrl()).isEqualTo(null);
         assertThat(memberProfileResponse.introduction()).isEqualTo(null);
         assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
     }

@@ -1,6 +1,7 @@
 package kr.modusplant.domains.member.domain.vo;
 
 import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileImagePathException;
+import kr.modusplant.domains.member.domain.exception.InvalidMemberProfileImagePathException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,15 +9,21 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.util.regex.Pattern;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class MemberProfileImagePath {
     private final String value;
+    private static final Pattern PATTERN_MEMBER_PROFILE_IMAGE_PATH = Pattern.compile(
+            "^member/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/profile/.+\\..+$");
 
     public static MemberProfileImagePath create(String value) {
         if (value == null || value.trim().isEmpty()) {
             throw new EmptyMemberProfileImagePathException();
+        } else if (!PATTERN_MEMBER_PROFILE_IMAGE_PATH.matcher(value).matches()) {
+            throw new InvalidMemberProfileImagePathException();
         }
         return new MemberProfileImagePath(value);
     }
