@@ -55,7 +55,7 @@ public class CommentJooqRepository implements CommentReadRepository {
 
     public List<CommentOfPostResponse> findByPost(PostId postId) {
 
-        Field<Boolean> isLiked = DSL.when(commentLike.MEMB_UUID.isNotNull(), true);
+        Field<Boolean> isLiked = DSL.when(commentLike.MEMB_UUID.isNotNull(), true).otherwise(false);
 
         return dsl.select(memberProf.IMAGE_PATH, siteMember.NICKNAME,
                         commComment.PATH, commComment.CONTENT, commComment.LIKE_COUNT,
@@ -87,7 +87,7 @@ public class CommentJooqRepository implements CommentReadRepository {
         if(totalComments.isPresent()) {
             int totalComment = totalComments.get().component1();
 
-            Field<Boolean> isLiked = DSL.when(commentLike.MEMB_UUID.isNotNull(), true);
+            Field<Boolean> isLiked = DSL.when(commentLike.MEMB_UUID.isNotNull(), true).otherwise(false);
 
             Field<Integer> totalCommentsOfPost = dsl.select(count())
                     .from(commComment)
