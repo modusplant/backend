@@ -42,6 +42,7 @@ jobs:
             /config/modusplant_dev/WASABI_ACCESS_KEY      = WASABI_ACCESS_KEY,
             /config/modusplant_dev/WASABI_SECRET_KEY      = WASABI_SECRET_KEY,
             /config/modusplant_dev/WASABI_BUCKET          = WASABI_BUCKET
+            /config/modusplant_dev/DEV_PUBLIC_ENDPOINT    = DEV_PUBLIC_ENDPOINT
           withDecryption: "true"
 
       - name: Debug DB env
@@ -78,6 +79,7 @@ jobs:
           WASABI_ACCESS_KEY: ${{ env.WASABI_ACCESS_KEY }}
           WASABI_SECRET_KEY: ${{ env.WASABI_SECRET_KEY }}
           WASABI_BUCKET: ${{ env.WASABI_BUCKET }}
+          DEV_PUBLIC_ENDPOINT: ${{ env.DEV_PUBLIC_ENDPOINT }}
 
           # ---- Kakao dummy ----
           KAKAO_API_KEY: DUMMY_KAKAO_KEY_1234567890
