@@ -10,10 +10,8 @@ public record MemberProfileResponse(
                 format = "uuid")
         UUID id,
 
-        @Schema(description = "회원 프로필 이미지",
-                type = "string",
-                format = "byte")
-        byte[] image,
+        @Schema(description = "회원 프로필 이미지 URL")
+        String imageUrl,
 
         @Schema(description = "회원 프로필 소개",
                 example = "프로필 소개글")
