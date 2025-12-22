@@ -54,10 +54,12 @@ public class CommentJooqRepository implements CommentReadRepository {
     }
 
     public List<CommentOfPostResponse> findByPost(PostId postId) {
-        return dsl.select(memberProf.IMAGE_PATH.as("profileImagePath"), siteMember.NICKNAME,
+
+        Field<Boolean> isLiked = DSL.when(commentLike.MEMB_UUID.isNotNull(), true);
+
+        return dsl.select(memberProf.IMAGE_PATH, siteMember.NICKNAME,
                         commComment.PATH, commComment.CONTENT, commComment.LIKE_COUNT,
-                        DSL.when(commentLike.MEMB_UUID.isNotNull(), true).as("isLiked"),
-                        commComment.CREATED_AT, commComment.IS_DELETED)
+                        isLiked, commComment.CREATED_AT, commComment.IS_DELETED)
                 .from(commComment)
                 .join(commPost).on(commComment.POST_ULID.eq(commPost.ULID))
                 .join(siteMember).on(commPost.AUTH_MEMB_UUID.eq(siteMember.UUID))
@@ -66,7 +68,12 @@ public class CommentJooqRepository implements CommentReadRepository {
                         .and(commComment.PATH.eq(commentLike.PATH)))
                 .where(commComment.POST_ULID.eq(postId.getId()))
                 .orderBy(commComment.CREATED_AT.desc())
-                .fetchInto(CommentOfPostResponse.class);
+                .fetch(record -> new CommentOfPostResponse(
+                        record.getValue(memberProf.IMAGE_PATH), record.getValue(siteMember.NICKNAME),
+                        record.getValue(commComment.PATH), record.getValue(commComment.CONTENT),
+                        record.getValue(commComment.LIKE_COUNT), record.getValue(isLiked),
+                        record.getValue(commComment.CREATED_AT).withNano(0), record.getValue(commComment.IS_DELETED)
+                ));
     }
 
     public PageImpl<CommentOfAuthorPageModel> findByAuthor(Author author, Pageable pageable) {
