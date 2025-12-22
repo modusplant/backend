@@ -9,6 +9,7 @@ import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.jooq.tables.*;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.impl.DSL;
 import org.springframework.data.domain.PageImpl;
@@ -79,16 +80,24 @@ public class CommentJooqRepository implements CommentReadRepository {
         if(totalComments.isPresent()) {
             int totalComment = totalComments.get().component1();
 
+            Field<Integer> totalCommentsOfPost = dsl.select(count())
+                    .from(commComment)
+                    .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
+                    .join(commPost).on(siteMember.UUID.eq(commPost.AUTH_MEMB_UUID))
+                    .where(commComment.IS_DELETED.eq(false))
+                    .asField();
+
             List<CommentOfAuthorPageModel> commentList = dsl.select(commComment.CONTENT,
                             commComment.CREATED_AT, commPost.TITLE, commPost.ULID.as("postId"),
                             DSL.when(commentLike.MEMB_UUID.isNotNull(), true),
-                            count(commComment.POST_ULID))
+                            totalCommentsOfPost)
                     .from(commComment)
                     .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
                     .join(commPost).on(commComment.POST_ULID.eq(commPost.ULID))
                     .leftJoin(commentLike).on(commComment.POST_ULID.eq(commentLike.POST_ULID)
                             .and(commComment.PATH.eq(commentLike.PATH)))
                     .where(commComment.AUTH_MEMB_UUID.eq(author.getMemberUuid()))
+                        .and(commComment.IS_DELETED.eq(false))
                     .groupBy(commComment.CONTENT, commComment.CREATED_AT,
                             commPost.TITLE, commPost.ULID, commentLike.MEMB_UUID)
                     .orderBy(commComment.CREATED_AT.desc())
