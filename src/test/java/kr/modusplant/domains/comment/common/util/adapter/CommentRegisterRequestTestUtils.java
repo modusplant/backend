@@ -11,6 +11,6 @@ import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUti
 public interface CommentRegisterRequestTestUtils extends PostIdTestUtils, CommentPathTestUtils,
         MemberTestUtils, CommentContentTestUtils {
     CommentRegisterRequest testCommentRegisterRequest = new CommentRegisterRequest(
-            testPostId.getId(), testCommentPath.getPath(), testMemberId.getValue(), testCommentContent.getContent()
+            testPostId.getId(), testCommentPath.getPath(), testCommentContent.getContent()
     );
 }
