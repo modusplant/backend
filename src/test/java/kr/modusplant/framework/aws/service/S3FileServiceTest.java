@@ -25,7 +25,7 @@ class S3FileServiceTest {
     private S3Client s3Client;
     private S3FileService s3FileService;
 
-    private static final String ENDPOINT = "test-endpoint";
+    private static final String ENDPOINT = System.getenv("DEV_PUBLIC_ENDPOINT") != null ? System.getenv("DEV_PUBLIC_ENDPOINT") : "test-endpoint";
     private static final String BUCKET_NAME = "test-bucket";
 
     @BeforeEach
