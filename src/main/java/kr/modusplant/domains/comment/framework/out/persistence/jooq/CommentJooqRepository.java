@@ -80,6 +80,8 @@ public class CommentJooqRepository implements CommentReadRepository {
         if(totalComments.isPresent()) {
             int totalComment = totalComments.get().component1();
 
+            Field<Boolean> isLiked = DSL.when(commentLike.MEMB_UUID.isNotNull(), true);
+
             Field<Integer> totalCommentsOfPost = dsl.select(count())
                     .from(commComment)
                     .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
@@ -88,9 +90,8 @@ public class CommentJooqRepository implements CommentReadRepository {
                     .asField();
 
             List<CommentOfAuthorPageModel> commentList = dsl.select(commComment.CONTENT,
-                            commComment.CREATED_AT, commPost.TITLE, commPost.ULID.as("postId"),
-                            DSL.when(commentLike.MEMB_UUID.isNotNull(), true),
-                            totalCommentsOfPost)
+                            commComment.CREATED_AT, commPost.TITLE, commPost.ULID,
+                            isLiked, totalCommentsOfPost)
                     .from(commComment)
                     .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
                     .join(commPost).on(commComment.POST_ULID.eq(commPost.ULID))
@@ -103,7 +104,11 @@ public class CommentJooqRepository implements CommentReadRepository {
                     .orderBy(commComment.CREATED_AT.desc())
                     .limit(pageable.getPageSize())
                     .offset(pageable.getOffset())
-                    .fetchInto(CommentOfAuthorPageModel.class);
+                    .fetch(record -> new CommentOfAuthorPageModel(
+                            record.getValue(commComment.CONTENT), record.getValue(commComment.CREATED_AT).withNano(0),
+                            record.getValue(commPost.TITLE), record.getValue(commPost.ULID),
+                            record.getValue(isLiked), record.getValue(totalCommentsOfPost)
+                    ));
 
             return new PageImpl<>(commentList, pageable, totalComment);
         } else {
