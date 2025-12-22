@@ -23,7 +23,7 @@ public class CommentPath {
      * @param source 의 형식은 반드시 숫자와 점(.)의 연속물이어야 합니다.
      */
     public static void validateSource(String source) {
-        if (source.isBlank()) {
+        if (source == null || source.isBlank()) {
             throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_PATH);
         }
         if (!source.matches("^\\d+(\\.\\d+)*$")) {
