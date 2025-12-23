@@ -35,13 +35,6 @@ public class MemberProfile {
         return new MemberProfile(id, profileImage, profileIntroduction, nickname);
     }
 
-    public void updateProfileImage(MemberProfileImage profileImage) {
-        if (profileImage == null) {
-            throw new EmptyMemberProfileImageException();
-        }
-        this.memberProfileImage = profileImage;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

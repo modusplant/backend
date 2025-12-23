@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -20,7 +21,7 @@ public class MemberProfileImagePath {
             "^member/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/profile/.+\\..+$");
 
     public static MemberProfileImagePath create(String value) {
-        if (value == null || value.trim().isEmpty()) {
+        if (StringUtils.isBlank(value)) {
             throw new EmptyMemberProfileImagePathException();
         } else if (!PATTERN_MEMBER_PROFILE_IMAGE_PATH.matcher(value).matches()) {
             throw new InvalidMemberProfileImagePathException();

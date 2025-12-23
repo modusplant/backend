@@ -112,19 +112,21 @@ public class MemberRestController {
             return ResponseEntity
                     .status(HttpStatus.NOT_MODIFIED)
                     .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
-                    .eTag("W/\"" + cacheMap.get("entityTag") + "\"")
+                    .eTag(String.format("W/\"%s\"", cacheMap.get("entityTag")))
                     .lastModified(
                             ZonedDateTime.of(
-                                    ((LocalDateTime) cacheMap.get("lastModifiedDateTime")), ZoneId.of("Asia/Seoul")))
+                                    ((LocalDateTime) cacheMap.get("lastModifiedDateTime")),
+                                    ZoneId.of("Asia/Seoul")))
                     .build();
         } else {
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
-                    .eTag("W/\"" + cacheMap.get("entityTag") + "\"")
+                    .eTag(String.format("W/\"%s\"", cacheMap.get("entityTag")))
                     .lastModified(
                             ZonedDateTime.of(
-                                    ((LocalDateTime) cacheMap.get("lastModifiedDateTime")), ZoneId.of("Asia/Seoul")))
+                                    ((LocalDateTime) cacheMap.get("lastModifiedDateTime")),
+                                    ZoneId.of("Asia/Seoul")))
                     .body(DataResponse.ok(memberController.getProfile(new MemberProfileGetRecord(id))));
         }
     }
@@ -164,7 +166,8 @@ public class MemberRestController {
                 .status(HttpStatus.OK)
                 .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
                 .body(DataResponse.ok(
-                        memberController.overrideProfile(new MemberProfileOverrideRecord(id, introduction, image, nickname))));
+                        memberController.overrideProfile(
+                                new MemberProfileOverrideRecord(id, introduction, image, nickname))));
     }
 
     @Operation(

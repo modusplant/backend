@@ -6,6 +6,7 @@ import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -17,7 +18,7 @@ public class TargetPostId {
     private final String value;
 
     public static TargetPostId create(String value) {
-        if (value == null || value.trim().isEmpty()) {
+        if (StringUtils.isBlank(value)) {
             throw new EmptyTargetPostIdException();
         } else if (!PATTERN_ULID.matcher(value).matches()) {
             throw new InvalidDataException(ErrorCode.INVALID_INPUT, "targetPostId");
