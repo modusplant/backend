@@ -31,7 +31,8 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
 
     @Override
     public Optional<MemberProfile> getById(MemberId memberId) throws IOException {
-        Optional<SiteMemberProfileEntity> profileEntityOrEmpty = siteMemberProfileJpaRepository.findByUuid(memberId.getValue());
+        Optional<SiteMemberProfileEntity> profileEntityOrEmpty =
+                siteMemberProfileJpaRepository.findByUuid(memberId.getValue());
         if (profileEntityOrEmpty.isPresent()) {
             SiteMemberProfileEntity profileEntity = profileEntityOrEmpty.orElseThrow();
             MemberProfileImage profileImage;
@@ -59,12 +60,15 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
 
     @Override
     public MemberProfile add(MemberProfile memberProfile) throws IOException {
-        return memberProfileJpaMapper.toMemberProfile(siteMemberProfileJpaRepository.save(
-                SiteMemberProfileEntity.builder()
-                        .member(siteMemberJpaRepository.findByUuid(memberProfile.getMemberId().getValue()).orElseThrow())
-                        .imagePath(memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue())
-                        .introduction(memberProfile.getMemberProfileIntroduction().getValue())
-                        .build()));
+        return memberProfileJpaMapper.toMemberProfile(
+                siteMemberProfileJpaRepository.save(
+                        SiteMemberProfileEntity.builder()
+                                .member(siteMemberJpaRepository
+                                        .findByUuid(memberProfile.getMemberId().getValue())
+                                        .orElseThrow())
+                                .imagePath(memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue())
+                                .introduction(memberProfile.getMemberProfileIntroduction().getValue())
+                                .build()));
     }
 
     @Override
@@ -72,8 +76,8 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
         String imagePath = memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue();
         String introduction = memberProfile.getMemberProfileIntroduction().getValue();
         String nickname = memberProfile.getNickname().getValue();
-        SiteMemberProfileEntity memberProfileEntity = siteMemberProfileJpaRepository.findByUuid(
-                memberProfile.getMemberId().getValue()).orElseThrow();
+        SiteMemberProfileEntity memberProfileEntity = siteMemberProfileJpaRepository
+                .findByUuid(memberProfile.getMemberId().getValue()).orElseThrow();
         memberProfileEntity.updateImagePath(imagePath);
         memberProfileEntity.updateIntroduction(introduction);
         memberProfileEntity.getMember().updateNickname(nickname);
