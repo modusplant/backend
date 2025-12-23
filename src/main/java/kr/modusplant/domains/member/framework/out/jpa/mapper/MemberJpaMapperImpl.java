@@ -37,6 +37,11 @@ public class MemberJpaMapperImpl implements MemberJpaMapper {
         } else {
             birthDate = MemberBirthDate.create(entity.getBirthDate());
         }
-        return Member.create(MemberId.fromUuid(entity.getUuid()), status, Nickname.create(entity.getNickname()), birthDate);
+        return Member.create(
+                MemberId.fromUuid(entity.getUuid()),
+                status,
+                Nickname.create(entity.getNickname()),
+                birthDate
+        );
     }
 }

@@ -21,13 +21,15 @@ public class MemberRepositoryJpaAdapter implements MemberRepository {
     @Override
     public Optional<Member> getById(MemberId memberId) {
         Optional<SiteMemberEntity> emptyOrMemberEntity = memberJpaRepository.findByUuid(memberId.getValue());
-        return emptyOrMemberEntity.isEmpty() ? Optional.empty() : Optional.of(memberJpaMapper.toMember(emptyOrMemberEntity.orElseThrow()));
+        return emptyOrMemberEntity.isEmpty() ?
+                Optional.empty() : Optional.of(memberJpaMapper.toMember(emptyOrMemberEntity.orElseThrow()));
     }
 
     @Override
     public Optional<Member> getByNickname(Nickname nickname) {
         Optional<SiteMemberEntity> emptyOrMemberEntity = memberJpaRepository.findByNickname(nickname.getValue());
-        return emptyOrMemberEntity.isEmpty() ? Optional.empty() : Optional.of(memberJpaMapper.toMember(emptyOrMemberEntity.orElseThrow()));
+        return emptyOrMemberEntity.isEmpty() ?
+                Optional.empty() : Optional.of(memberJpaMapper.toMember(emptyOrMemberEntity.orElseThrow()));
     }
 
     @Override

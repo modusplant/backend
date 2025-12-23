@@ -25,7 +25,7 @@ class S3FileServiceTest {
     private S3Client s3Client;
     private S3FileService s3FileService;
 
-    private static final String ENDPOINT = "test-endpoint";
+    private static final String ENDPOINT = System.getenv("DEV_PUBLIC_ENDPOINT") != null ? System.getenv("DEV_PUBLIC_ENDPOINT") : "test-endpoint";
     private static final String BUCKET_NAME = "test-bucket";
 
     @BeforeEach
@@ -34,6 +34,12 @@ class S3FileServiceTest {
         s3FileService = new S3FileService(s3Client);
         ReflectionTestUtils.setField(s3FileService, "endpoint", ENDPOINT);
         ReflectionTestUtils.setField(s3FileService, "bucket", BUCKET_NAME);
+        if(System.getenv("DEV_PUBLIC_ENDPOINT") != null){
+            ReflectionTestUtils.setField(s3FileService, "profile", "dev");
+            ReflectionTestUtils.setField(s3FileService, "devPublicEndpoint", ENDPOINT);
+        } else {
+            ReflectionTestUtils.setField(s3FileService, "profile", "prod");
+        }
     }
 
     @Test
