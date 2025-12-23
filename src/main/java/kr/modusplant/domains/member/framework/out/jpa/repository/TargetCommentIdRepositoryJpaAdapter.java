@@ -16,16 +16,21 @@ public class TargetCommentIdRepositoryJpaAdapter implements TargetCommentIdRepos
 
     @Override
     public boolean isIdExist(TargetCommentId targetPostId) {
-        return commPostJpaRepository.existsByPostUlidAndPath(targetPostId.getTargetPostId().getValue(), targetPostId.getTargetCommentPath().getValue());
+        return commPostJpaRepository.existsByPostUlidAndPath(
+                targetPostId.getTargetPostId().getValue(), targetPostId.getTargetCommentPath().getValue());
     }
 
     @Override
     public boolean isLiked(MemberId memberId, TargetCommentId targetPostId) {
-        return commPostLikeJpaRepository.existsByPostIdAndPathAndMemberId(targetPostId.getTargetPostId().getValue(), targetPostId.getTargetCommentPath().getValue(), memberId.getValue());
+        return commPostLikeJpaRepository.existsByPostIdAndPathAndMemberId(
+                targetPostId.getTargetPostId().getValue(),
+                targetPostId.getTargetCommentPath().getValue(), memberId.getValue());
     }
 
     @Override
     public boolean isUnliked(MemberId memberId, TargetCommentId targetPostId) {
-        return !commPostLikeJpaRepository.existsByPostIdAndPathAndMemberId(targetPostId.getTargetPostId().getValue(), targetPostId.getTargetCommentPath().getValue(), memberId.getValue());
+        return !commPostLikeJpaRepository.existsByPostIdAndPathAndMemberId(
+                targetPostId.getTargetPostId().getValue(),
+                targetPostId.getTargetCommentPath().getValue(), memberId.getValue());
     }
 }

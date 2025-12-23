@@ -53,6 +53,7 @@ public class MemberProfileJpaMapperImpl implements MemberProfileJpaMapper {
                 MemberId.fromUuid(entity.getMember().getUuid()),
                 memberProfileImage,
                 memberProfileIntroduction,
-                Nickname.create(entity.getMember().getNickname()));
-        }
+                Nickname.create(entity.getMember().getNickname())
+        );
+    }
 }
