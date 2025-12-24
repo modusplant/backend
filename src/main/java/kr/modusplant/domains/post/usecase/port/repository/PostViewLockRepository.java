@@ -6,4 +6,6 @@ import java.util.UUID;
 
 public interface PostViewLockRepository {
     boolean lock(PostId postId, UUID memberUuid, long ttlMinutes);
+
+    boolean lockAnonymous(PostId postId, UUID guestId, long ttlMinutes);
 }
