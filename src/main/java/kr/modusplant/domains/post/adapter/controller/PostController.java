@@ -65,12 +65,12 @@ public class PostController {
         return CursorPageResponse.of(responses, nextUlid, hasNext);
     }
 
-    public PostDetailResponse getByUlid(String ulid, UUID currentMemberUuid) {
+    public PostDetailResponse getByUlid(String ulid, UUID currentMemberUuid, UUID guestId) {
         PostId postId = PostId.create(ulid);
         return postQueryRepository.findPostDetailByPostId(postId,currentMemberUuid)
                 .filter(PostDetailReadModel::isPublished)
                 .map(postDetail -> {
-                    increaseViewCount(ulid,currentMemberUuid);
+                    increaseViewCount(ulid,currentMemberUuid,guestId);
                     postRecentlyViewRepository.recordViewPost(currentMemberUuid,postId);
                     return postMapper.toPostDetailResponse(
                             postDetail,
@@ -143,9 +143,15 @@ public class PostController {
     }
 
     @Transactional
-    public Long increaseViewCount(String ulid, UUID currentMemberUuid) {
+    public Long increaseViewCount(String ulid, UUID currentMemberUuid, UUID guestId) {
         // 조회수 어뷰징 정책 - 사용자는 게시글 1개당 ttl에 1번 조회수 증가
-        if (currentMemberUuid != null && !postViewLockRepository.lock(PostId.create(ulid), currentMemberUuid, ttlMinutes)) {
+        boolean isLocked = true;
+        if (currentMemberUuid != null) {
+            isLocked = !postViewLockRepository.lock(PostId.create(ulid), currentMemberUuid, ttlMinutes);
+        } else if (guestId != null) {
+            isLocked = !postViewLockRepository.lockAnonymous(PostId.create(ulid),guestId,ttlMinutes);
+        }
+        if (isLocked) {
             return postViewCountRepository.read(PostId.create(ulid));
         }
         // 조회수 증가
