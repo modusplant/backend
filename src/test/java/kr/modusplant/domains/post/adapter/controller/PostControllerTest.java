@@ -112,7 +112,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     }
 
     @Test
-    @DisplayName("ULID로 발행된 게시글 상세 조회")
+    @DisplayName("회원인 경우 ULID로 발행된 게시글 상세 조회")
     void testGetByUlid_givenUlidAndMemberUuid_willReturnPostDetail() throws IOException {
         // given
         Long viewCount = 100L;
@@ -125,7 +125,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         given(postViewCountRepository.read(any(PostId.class))).willReturn(viewCount);
 
         // when
-        PostDetailResponse result = postController.getByUlid(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
+        PostDetailResponse result = postController.getByUlid(TEST_POST_ULID, MEMBER_BASIC_USER_UUID,null);
 
         // then
         assertThat(result).isNotNull();
@@ -141,6 +141,34 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     /*@Test
     @DisplayName("작성자가 ULID로 임시저장 게시글 조회하기")
     void testGetByUlid_givenDraftPostAndAuthor_willReturnPostDetail() throws IOException {
+    @Test
+    @DisplayName("비회원인 경우 ULID로 발행된 게시글 상세 조회")
+    void testGetByUlid_givenUlidAndGuestId_willReturnPostDetail() throws IOException {
+        // given
+        Long viewCount = 100L;
+        UUID guestId = UUID.randomUUID();
+
+        given(postQueryRepository.findPostDetailByPostId(any(PostId.class), isNull())).willReturn(Optional.of(TEST_PUBLISHED_POST_DETAIL_READ_MODEL));
+        given(multipartDataProcessorPort.convertFileSrcToFullFileSrc(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_TEXT_AND_IMAGE);
+        given(postViewLockRepository.lockAnonymous(any(PostId.class), eq(guestId), anyLong())).willReturn(true);
+        given(postViewCountRepository.increase(any(PostId.class))).willReturn(viewCount);
+        doNothing().when(postRecentlyViewRepository).recordViewPost(isNull(), any(PostId.class));
+        given(postViewCountRepository.read(any(PostId.class))).willReturn(viewCount);
+
+        // when
+        PostDetailResponse result = postController.getByUlid(TEST_POST_ULID,null, guestId);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.ulid()).isEqualTo(TEST_POST_ULID);
+        verify(postQueryRepository).findPostDetailByPostId(any(PostId.class), isNull());
+        verify(multipartDataProcessorPort).convertFileSrcToFullFileSrc(any(JsonNode.class));
+        verify(postViewLockRepository).lockAnonymous(any(PostId.class), eq(guestId), anyLong());
+        verify(postViewCountRepository).increase(any(PostId.class));
+        verify(postRecentlyViewRepository).recordViewPost(isNull(), any(PostId.class));
+        verify(postViewCountRepository).read(any(PostId.class));
+    }
+
         // given
         given(postQueryRepository.findPostDetailByPostId(any(PostId.class), eq(MEMBER_BASIC_USER_UUID))).willReturn(Optional.of(TEST_DRAFT_POST_DETAIL_READ_MODEL));
         given(multipartDataProcessorPort.convertFileSrcToFullFileSrc(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_BINARY_DATA);
@@ -312,7 +340,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     }
 
     @Test
-    @DisplayName("락 획득 성공 시 조회수 증가")
+    @DisplayName("회원일 경우 락 획득 성공 시 조회수 증가")
     void testIncreaseViewCount_givenUlidAndMemberWithoutLock_willIncreasViewCount() {
         // given
         long ttl = 10L;
@@ -322,7 +350,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         given(postViewCountRepository.increase(any(PostId.class))).willReturn(increasedViewCount);
 
         // when
-        Long result = postController.increaseViewCount(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
+        Long result = postController.increaseViewCount(TEST_POST_ULID, MEMBER_BASIC_USER_UUID,null);
 
         // then
         assertThat(result).isEqualTo(increasedViewCount);
@@ -331,7 +359,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     }
 
     @Test
-    @DisplayName("락 획득 실패 시 기존 조회수 반환")
+    @DisplayName("회원일 경우 락 획득 실패 시 기존 조회수 반환")
     void testIncreaseViewCount_givenUlidAndMemberWithExistingLock_willReturnCurrentViewCount() {
         // given
         long ttl = 10L;
@@ -342,11 +370,71 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         given(postViewCountRepository.read(any(PostId.class))).willReturn(currentViewCount);
 
         // when
-        Long result = postController.increaseViewCount(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
+        Long result = postController.increaseViewCount(TEST_POST_ULID, MEMBER_BASIC_USER_UUID,null);
 
         // then
         assertThat(result).isEqualTo(currentViewCount);
         verify(postViewLockRepository).lock(any(PostId.class), eq(MEMBER_BASIC_USER_UUID), eq(ttl));
+        verify(postViewCountRepository).read(any(PostId.class));
+        verify(postViewCountRepository, never()).increase(any(PostId.class));
+    }
+
+    @Test
+    @DisplayName("비회원일 경우 락 획득 성공 시 조회수 증가")
+    void testIncreaseViewCount_givenUlidAndGuestIdWithoutLock_willIncreasViewCount() {
+        // given
+        long ttl = 10L;
+        Long increasedViewCount = 101L;
+        UUID guestId = UUID.randomUUID();
+
+        given(postViewLockRepository.lockAnonymous(any(PostId.class), eq(guestId), eq(ttl))).willReturn(true);
+        given(postViewCountRepository.increase(any(PostId.class))).willReturn(increasedViewCount);
+
+        // when
+        Long result = postController.increaseViewCount(TEST_POST_ULID,null, guestId);
+
+        // then
+        assertThat(result).isEqualTo(increasedViewCount);
+        verify(postViewLockRepository).lockAnonymous(any(PostId.class), eq(guestId), eq(ttl));
+        verify(postViewCountRepository).increase(any(PostId.class));
+    }
+
+    @Test
+    @DisplayName("비회원일 경우 락 획득 실패 시 기존 조회수 반환")
+    void testIncreaseViewCount_givenUlidAndGuestIdWithExistingLock_willReturnCurrentViewCount() {
+        // given
+        long ttl = 10L;
+        Long currentViewCount = 100L;
+        UUID guestId = UUID.randomUUID();
+
+        given(postViewLockRepository.lockAnonymous(any(PostId.class), eq(guestId), eq(ttl)))
+                .willReturn(false);
+        given(postViewCountRepository.read(any(PostId.class))).willReturn(currentViewCount);
+
+        // when
+        Long result = postController.increaseViewCount(TEST_POST_ULID,null, guestId);
+
+        // then
+        assertThat(result).isEqualTo(currentViewCount);
+        verify(postViewLockRepository).lockAnonymous(any(PostId.class), eq(guestId), eq(ttl));
+        verify(postViewCountRepository).read(any(PostId.class));
+        verify(postViewCountRepository, never()).increase(any(PostId.class));
+    }
+
+    @Test
+    @DisplayName("회원 ID와 게스트 ID 모두 주어지지 않았을 때 기존 조회수 반환")
+    void testIncreaseViewCount_givenUlid_willReturnCurrentViewCount() {
+        // given
+        long ttl = 10L;
+        Long currentViewCount = 100L;
+
+        given(postViewCountRepository.read(any(PostId.class))).willReturn(currentViewCount);
+
+        // when
+        Long result = postController.increaseViewCount(TEST_POST_ULID,null,null);
+
+        // then
+        assertThat(result).isEqualTo(currentViewCount);
         verify(postViewCountRepository).read(any(PostId.class));
         verify(postViewCountRepository, never()).increase(any(PostId.class));
     }
