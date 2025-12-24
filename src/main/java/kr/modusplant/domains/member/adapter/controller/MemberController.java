@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -86,9 +87,8 @@ public class MemberController {
         MemberProfile memberProfile;
         MemberProfileImage memberProfileImage;
         MemberProfileIntroduction memberProfileIntroduction;
+        MultipartFile image = record.image();
         String introduction = record.introduction();
-        boolean isImageExist = !(record.image() == null);
-        boolean isIntroductionExist = !(introduction == null);
         validateBeforeOverrideProfile(memberId, memberNickname);
 
         Optional<MemberProfile> optionalMemberProfile = memberProfileRepository.getById(memberId);
@@ -101,17 +101,16 @@ public class MemberController {
         } else {
             throw new EntityNotFoundException(MEMBER_PROFILE_NOT_FOUND, "memberProfile");
         }
-
-        if (isImageExist) {
+        if (!(image == null)) {
             String newImagePath = uploadImage(memberId, record);
             memberProfileImage = MemberProfileImage.create(
                     MemberProfileImagePath.create(newImagePath),
-                    MemberProfileImageBytes.create(record.image().getBytes())
+                    MemberProfileImageBytes.create(image.getBytes())
             );
         } else {
             memberProfileImage = MemberEmptyProfileImage.create();
         }
-        if (isIntroductionExist) {
+        if (!(introduction == null)) {
             introduction = swearService.filterSwear(introduction);
             memberProfileIntroduction = MemberProfileIntroduction.create(introduction);
         } else {

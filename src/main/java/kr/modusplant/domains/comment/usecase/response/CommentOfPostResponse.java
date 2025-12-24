@@ -1,6 +1,6 @@
 package kr.modusplant.domains.comment.usecase.response;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record CommentOfPostResponse(
         String profileImagePath,
@@ -9,7 +9,7 @@ public record CommentOfPostResponse(
         String content,
         int likeCount,
         boolean isLiked,
-        LocalDate createdAt,
+        LocalDateTime createdAt,
         boolean isDeleted
 ) {
 }
