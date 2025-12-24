@@ -3,11 +3,12 @@ package kr.modusplant.domains.member.framework.in.web.rest;
 import kr.modusplant.domains.member.adapter.controller.MemberController;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.exception.IncorrectMemberIdException;
+import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
+import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
-import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -107,16 +107,12 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         
         given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(MEMBER_BASIC_USER_UUID);
-        Map<String, Object> hashMap = new HashMap<>() {{
-            put("entityTag", entityTag);
-            put("lastModifiedDateTime", now);
-            put("result", true);
-        }};
-        given(memberCacheValidationService.isCacheUsableForSiteMemberProfile(
+        MemberCacheValidationResult cacheValidationResult = new MemberCacheValidationResult(entityTag, now, true);
+        given(memberCacheValidationService.isCacheable(
                 ifNoneMatch,
                 ifModifiedSince,
                 MEMBER_BASIC_USER_UUID
-        )).willReturn(hashMap);
+        )).willReturn(cacheValidationResult);
 
         // when
         ResponseEntity<DataResponse<MemberProfileResponse>> memberResponseEntity = memberRestController.getMemberProfile(MEMBER_BASIC_USER_UUID, auth, ifNoneMatch, ifModifiedSince);
@@ -139,16 +135,12 @@ class MemberRestControllerTest implements MemberTestUtils {
         String ifModifiedSince = now.atZone(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.RFC_1123_DATE_TIME);
 
         given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(MEMBER_BASIC_USER_UUID);
-        Map<String, Object> hashMap = new HashMap<>() {{
-            put("entityTag", entityTag);
-            put("lastModifiedDateTime", now);
-            put("result", false);
-        }};
-        given(memberCacheValidationService.isCacheUsableForSiteMemberProfile(
+        MemberCacheValidationResult cacheValidationResult = new MemberCacheValidationResult(entityTag, now, false);
+        given(memberCacheValidationService.isCacheable(
                 ifNoneMatch,
                 ifModifiedSince,
                 MEMBER_BASIC_USER_UUID
-        )).willReturn(hashMap);
+        )).willReturn(cacheValidationResult);
         given(memberController.getProfile(testMemberProfileGetRecord)).willReturn(testMemberProfileResponse);
 
         // when

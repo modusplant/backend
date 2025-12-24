@@ -2,6 +2,7 @@ package kr.modusplant.domains.member.framework.in.web.cache.service;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
 import kr.modusplant.framework.jpa.entity.SiteMemberProfileEntity;
 import kr.modusplant.framework.jpa.repository.SiteMemberProfileJpaRepository;
 import kr.modusplant.shared.exception.EntityNotFoundException;
@@ -12,8 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,17 +27,13 @@ public class MemberCacheValidationService {
     private final SiteMemberProfileJpaRepository memberProfileJpaRepository;
     private final PasswordEncoder passwordEncoder;
 
-    private final String ENTITY_TAG = "entityTag";
-    private final String LAST_MODIFIED_DATE_TIME = "lastModifiedDateTime";
-    private final String RESULT = "result";
-
     public MemberCacheValidationService(SiteMemberProfileJpaRepository memberProfileJpaRepository,
                                         @Qualifier("pbkdf2PasswordEncoder") PasswordEncoder passwordEncoder) {
         this.memberProfileJpaRepository = memberProfileJpaRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Map<String, Object> isCacheUsableForSiteMemberProfile(
+    public MemberCacheValidationResult isCacheable(
             @Nullable String ifNoneMatch,
             @Nullable String ifModifiedSince,
             @Nonnull UUID id) {
@@ -49,27 +44,36 @@ public class MemberCacheValidationService {
         SiteMemberProfileEntity memberProfileEntity = optionalMemberProfile.orElseThrow();
         String entityTagSource = memberProfileEntity.getETagSource();
         LocalDateTime lastModifiedAt = memberProfileEntity.getLastModifiedAtAsTruncatedToSeconds();
-        Map<String, Object> returnedMap = new HashMap<>() {{
-            put(ENTITY_TAG, passwordEncoder.encode(entityTagSource));
-            put(LAST_MODIFIED_DATE_TIME, lastModifiedAt);
-        }};
         if (ifNoneMatch == null) {                  // ETag를 통한 검증 강제
-            returnedMap.put(RESULT, false);
-            return returnedMap;
+            return new MemberCacheValidationResult(
+                    passwordEncoder.encode(entityTagSource),
+                    lastModifiedAt,
+                    false
+            );
         }
         Optional<String> foundEntityTag = parseIfNoneMatch(ifNoneMatch).stream()
                 .filter(element -> passwordEncoder.matches(entityTagSource, element))
                 .findFirst();
         if (foundEntityTag.isEmpty()) {
-            returnedMap.put(RESULT, false);
+            return new MemberCacheValidationResult(
+                    passwordEncoder.encode(entityTagSource),
+                    lastModifiedAt,
+                    false
+            );
         } else {
             if (ifModifiedSince == null) {
-                returnedMap.put(RESULT, true);
+                return new MemberCacheValidationResult(
+                        passwordEncoder.encode(entityTagSource),
+                        lastModifiedAt,
+                        true
+                );
             } else {
-                returnedMap.put(RESULT,
-                        !lastModifiedAt.isAfter(parseIfModifiedSince(ifModifiedSince)));
+                return new MemberCacheValidationResult(
+                        passwordEncoder.encode(entityTagSource),
+                        lastModifiedAt,
+                        !lastModifiedAt.isAfter(parseIfModifiedSince(ifModifiedSince))
+                );
             }
         }
-        return returnedMap;
     }
 }
