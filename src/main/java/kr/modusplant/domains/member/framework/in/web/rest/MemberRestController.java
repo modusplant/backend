@@ -17,7 +17,7 @@ import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
-import kr.modusplant.infrastructure.cache.service.CacheValidationService;
+import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +46,7 @@ import static kr.modusplant.shared.constant.Regex.*;
 public class MemberRestController {
     private final MemberController memberController;
     private final JwtTokenProvider jwtTokenProvider;
-    private final CacheValidationService cacheValidationService;
+    private final MemberCacheValidationService memberCacheValidationService;
 
     @Hidden
     @Operation(summary = "회원 등록 API", description = "닉네임을 통해 회원을 등록합니다.")
@@ -106,7 +106,7 @@ public class MemberRestController {
             String ifModifiedSince) throws IOException {
         validateMemberIdFromToken(id, auth);
         Map<String, ?> cacheMap =
-                cacheValidationService.isCacheUsableForSiteMemberProfile(ifNoneMatch, ifModifiedSince, id);
+                memberCacheValidationService.isCacheUsableForSiteMemberProfile(ifNoneMatch, ifModifiedSince, id);
         if (cacheMap.get("result").equals(true)) {
             return ResponseEntity
                     .status(HttpStatus.NOT_MODIFIED)

@@ -1,5 +1,6 @@
 package kr.modusplant.infrastructure.cache.service;
 
+import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.framework.jpa.entity.SiteMemberProfileEntity;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberProfileEntityTestUtils;
@@ -29,10 +30,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @Slf4j
-class CacheValidationServiceTest implements SiteMemberEntityTestUtils, SiteMemberProfileEntityTestUtils {
+class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, SiteMemberProfileEntityTestUtils {
     private final SiteMemberProfileJpaRepository memberProfileJpaRepository = Mockito.mock(SiteMemberProfileJpaRepository.class);
     private final PasswordEncoder passwordEncoder = Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8();
-    private final CacheValidationService cacheValidationService = new CacheValidationService(memberProfileJpaRepository, passwordEncoder);
+    private final MemberCacheValidationService memberCacheValidationService = new MemberCacheValidationService(memberProfileJpaRepository, passwordEncoder);
 
     private final UUID id = UUID.randomUUID();
     private final String RESULT = "result";
@@ -46,7 +47,7 @@ class CacheValidationServiceTest implements SiteMemberEntityTestUtils, SiteMembe
         // when
         EntityNotFoundException exception = assertThrows(
                 EntityNotFoundException.class,
-                () -> cacheValidationService.isCacheUsableForSiteMemberProfile(
+                () -> memberCacheValidationService.isCacheUsableForSiteMemberProfile(
                         String.format("\"%s\"", passwordEncoder.encode(UUID.randomUUID() + "-0")),
                         ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME),
                         id));
@@ -67,7 +68,7 @@ class CacheValidationServiceTest implements SiteMemberEntityTestUtils, SiteMembe
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(optionalMemberProfileEntity);
 
         // when
-        Map<String, ?> returnedMap = cacheValidationService.isCacheUsableForSiteMemberProfile(
+        Map<String, ?> returnedMap = memberCacheValidationService.isCacheUsableForSiteMemberProfile(
                 null, ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME), id);
 
         // then
@@ -86,7 +87,7 @@ class CacheValidationServiceTest implements SiteMemberEntityTestUtils, SiteMembe
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(optionalMemberProfileEntity);
 
         // when
-        Map<String, ?> returnedMap = cacheValidationService.isCacheUsableForSiteMemberProfile(
+        Map<String, ?> returnedMap = memberCacheValidationService.isCacheUsableForSiteMemberProfile(
                 String.format("\"%s\"", passwordEncoder.encode(memberProfileEntity.getUuid() + "-99")),
                 ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME),
                 id);
@@ -107,7 +108,7 @@ class CacheValidationServiceTest implements SiteMemberEntityTestUtils, SiteMembe
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(optionalMemberProfileEntity);
 
         // when
-        Map<String, ?> returnedMap = cacheValidationService.isCacheUsableForSiteMemberProfile(
+        Map<String, ?> returnedMap = memberCacheValidationService.isCacheUsableForSiteMemberProfile(
                 String.format("\"%s\"", passwordEncoder.encode(memberProfileEntity.getETagSource())),
                 null,
                 id);
@@ -129,7 +130,7 @@ class CacheValidationServiceTest implements SiteMemberEntityTestUtils, SiteMembe
 
         // 엔터티의 lastModifiedAt 값이 ifModifiedSince 값과 같을 때
         // when
-        Map<String, ?> returnedMapEqual = cacheValidationService.isCacheUsableForSiteMemberProfile(
+        Map<String, ?> returnedMapEqual = memberCacheValidationService.isCacheUsableForSiteMemberProfile(
                 String.format("\"%s\"", passwordEncoder.encode(memberProfileEntity.getETagSource())),
                 ZonedDateTime.of(memberProfileEntity.getLastModifiedAtAsTruncatedToSeconds(),
                         ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.RFC_1123_DATE_TIME),
@@ -140,7 +141,7 @@ class CacheValidationServiceTest implements SiteMemberEntityTestUtils, SiteMembe
 
         // 엔터티의 lastModifiedAt 값이 ifModifiedSince 값보다 과거일 때
         // when
-        Map<String, ?> returnedMapPast = cacheValidationService.isCacheUsableForSiteMemberProfile(
+        Map<String, ?> returnedMapPast = memberCacheValidationService.isCacheUsableForSiteMemberProfile(
                 String.format("\"%s\"", passwordEncoder.encode(memberProfileEntity.getETagSource())),
                 ZonedDateTime.of(memberProfileEntity.getLastModifiedAtAsTruncatedToSeconds().plusMinutes(5),
                         ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.RFC_1123_DATE_TIME),
@@ -162,7 +163,7 @@ class CacheValidationServiceTest implements SiteMemberEntityTestUtils, SiteMembe
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(optionalMemberProfileEntity);
 
         // when
-        Map<String, ?> returnedMapEqual = cacheValidationService.isCacheUsableForSiteMemberProfile(
+        Map<String, ?> returnedMapEqual = memberCacheValidationService.isCacheUsableForSiteMemberProfile(
                 String.format("\"%s\"", passwordEncoder.encode(memberProfileEntity.getETagSource())),
                 ZonedDateTime.of(memberProfileEntity.getLastModifiedAtAsTruncatedToSeconds().minusMinutes(5),
                         ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.RFC_1123_DATE_TIME),
