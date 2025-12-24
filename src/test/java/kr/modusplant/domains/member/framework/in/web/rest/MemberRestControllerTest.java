@@ -7,7 +7,7 @@ import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
-import kr.modusplant.infrastructure.cache.service.CacheValidationService;
+import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,8 +60,8 @@ class MemberRestControllerTest implements MemberTestUtils {
     private final PasswordEncoder passwordEncoder = Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8();
     private final MemberController memberController = Mockito.mock(MemberController.class);
     private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
-    private final CacheValidationService cacheValidationService = Mockito.mock(CacheValidationService.class);
-    private final MemberRestController memberRestController = new MemberRestController(memberController, jwtTokenProvider, cacheValidationService);
+    private final MemberCacheValidationService memberCacheValidationService = Mockito.mock(MemberCacheValidationService.class);
+    private final MemberRestController memberRestController = new MemberRestController(memberController, jwtTokenProvider, memberCacheValidationService);
 
     private final String auth = "Bearer a.b.c";
     private final String accessToken = "a.b.c";
@@ -112,7 +112,7 @@ class MemberRestControllerTest implements MemberTestUtils {
             put("lastModifiedDateTime", now);
             put("result", true);
         }};
-        given(cacheValidationService.isCacheUsableForSiteMemberProfile(
+        given(memberCacheValidationService.isCacheUsableForSiteMemberProfile(
                 ifNoneMatch,
                 ifModifiedSince,
                 MEMBER_BASIC_USER_UUID
@@ -144,7 +144,7 @@ class MemberRestControllerTest implements MemberTestUtils {
             put("lastModifiedDateTime", now);
             put("result", false);
         }};
-        given(cacheValidationService.isCacheUsableForSiteMemberProfile(
+        given(memberCacheValidationService.isCacheUsableForSiteMemberProfile(
                 ifNoneMatch,
                 ifModifiedSince,
                 MEMBER_BASIC_USER_UUID

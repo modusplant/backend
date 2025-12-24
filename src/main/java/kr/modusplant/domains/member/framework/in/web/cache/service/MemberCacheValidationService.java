@@ -1,4 +1,4 @@
-package kr.modusplant.infrastructure.cache.service;
+package kr.modusplant.domains.member.framework.in.web.cache.service;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -24,7 +24,7 @@ import static kr.modusplant.shared.http.utils.ParseHttpHeaderUtils.parseIfNoneMa
 @Service
 @Transactional
 @Slf4j
-public class CacheValidationService {
+public class MemberCacheValidationService {
     private final SiteMemberProfileJpaRepository memberProfileJpaRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -32,8 +32,8 @@ public class CacheValidationService {
     private final String LAST_MODIFIED_DATE_TIME = "lastModifiedDateTime";
     private final String RESULT = "result";
 
-    public CacheValidationService(SiteMemberProfileJpaRepository memberProfileJpaRepository,
-                                  @Qualifier("pbkdf2PasswordEncoder") PasswordEncoder passwordEncoder) {
+    public MemberCacheValidationService(SiteMemberProfileJpaRepository memberProfileJpaRepository,
+                                        @Qualifier("pbkdf2PasswordEncoder") PasswordEncoder passwordEncoder) {
         this.memberProfileJpaRepository = memberProfileJpaRepository;
         this.passwordEncoder = passwordEncoder;
     }
