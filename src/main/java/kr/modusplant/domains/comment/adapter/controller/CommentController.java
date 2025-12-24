@@ -5,6 +5,7 @@ import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.exception.InvalidValueException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.Author;
+import kr.modusplant.domains.comment.domain.vo.CommentContent;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqRepository;
@@ -15,6 +16,7 @@ import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
 import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.persistence.compositekey.CommCommentId;
@@ -35,6 +37,7 @@ public class CommentController {
     private final CommentRepositoryJpaAdapter jpaAdapter;
     private final CommPostJpaRepository postJpaRepository;
     private final SiteMemberJpaRepository memberJpaRepository;
+    private final SwearService swearService;
 
     public List<CommentOfPostResponse> gatherByPost(String postUlid) {
         if(!postJpaRepository.existsByUlid(postUlid)) {
@@ -65,7 +68,12 @@ public class CommentController {
             throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT);
         }
         checkPathCondition(request.postId(), request.path());
-        Comment comment = mapper.toComment(request, currentMemberUuid);
+
+        Comment comment = mapper.toComment(
+                PostId.create(request.postId()),
+                CommentPath.create(request.path()),
+                Author.create(currentMemberUuid),
+                CommentContent.create(swearService.filterSwear(request.content())));
         jpaAdapter.save(comment);
     }
 
