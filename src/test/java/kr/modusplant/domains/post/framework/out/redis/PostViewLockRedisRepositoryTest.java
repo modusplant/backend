@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
 import java.time.Duration;
+import java.util.UUID;
 
 import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
@@ -32,9 +33,10 @@ class PostViewLockRedisRepositoryTest implements PostIdTestUtils {
     private PostViewLockRedisRepository postViewLockRedisRepository;
 
     private static final String KEY_FORMAT = "viewCount:comm_post:%s:member:%s:lock";
+    private static final String KEY_FORMAT_ANONYMOUS = "viewCount:comm_post:%s:guest:%s:lock";
 
     @Test
-    @DisplayName("Redis에 TTL 동안 락이 존재하면 조회수 증가 없이 true를 반환한다")
+    @DisplayName("회원ID와 게시글ID가 주어졌을 때 Redis에 TTL 동안 락이 존재하면 조회수 증가 없이 true를 반환한다")
     void testLock_givenPostIdAndMemberUuidAndTtlWithExistingLock_willReturnTrue() {
         // given
         given(stringRedisTemplate.opsForValue()).willReturn(valueOperations);
@@ -50,7 +52,7 @@ class PostViewLockRedisRepositoryTest implements PostIdTestUtils {
     }
 
     @Test
-    @DisplayName("Redis에 TTL 동안 락이 존재하지 않으면 false를 반환한다")
+    @DisplayName("회원ID와 게시글ID가 주어졌을 때 Redis에 TTL 동안 락이 존재하지 않으면 false를 반환한다")
     void testLock_givenPostIdAndMemberUuidAndTtlWithoutExistingLock_willReturnFalse() {
         // given
         given(stringRedisTemplate.opsForValue()).willReturn(valueOperations);
@@ -58,6 +60,38 @@ class PostViewLockRedisRepositoryTest implements PostIdTestUtils {
 
         // when
         boolean result = postViewLockRedisRepository.lock(testPostId,MEMBER_BASIC_USER_UUID,10);
+
+        // then
+        assertThat(result).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("게스트ID와 게시글ID가 주어졌을 때 Redis에 TTL 동안 락이 존재하면 조회수 증가 없이 true를 반환한다")
+    void testLockAnonymous_givenPostIdAndGuestIdAndTtlWithExistingLock_willReturnTrue() {
+        // given
+        UUID guestId = UUID.randomUUID();
+        given(stringRedisTemplate.opsForValue()).willReturn(valueOperations);
+        given(valueOperations.setIfAbsent(anyString(), anyString(), any(Duration.class))).willReturn(true);
+
+        // when
+        boolean result = postViewLockRedisRepository.lockAnonymous(testPostId,guestId,10);
+
+        // then
+        assertThat(result).isEqualTo(true);
+        then(stringRedisTemplate).should().opsForValue();
+        then(valueOperations).should().setIfAbsent(String.format(KEY_FORMAT_ANONYMOUS, TEST_POST_ULID, guestId),"",Duration.ofMinutes(10));
+    }
+
+    @Test
+    @DisplayName("게스트ID와 게시글ID가 주어졌을 때 Redis에 TTL 동안 락이 존재하지 않으면 false를 반환한다")
+    void testLockAnonymous_givenPostIdAndGuestIdAndTtlWithoutExistingLock_willReturnFalse() {
+        // given
+        UUID guestId = UUID.randomUUID();
+        given(stringRedisTemplate.opsForValue()).willReturn(valueOperations);
+        given(valueOperations.setIfAbsent(anyString(), anyString(), any(Duration.class))).willReturn(false);
+
+        // when
+        boolean result = postViewLockRedisRepository.lockAnonymous(testPostId,guestId,10);
 
         // then
         assertThat(result).isEqualTo(false);

@@ -37,7 +37,7 @@ public class CommentTest implements
         );
 
         // when & then
-        assertThat(result.getErrorCode()).isEqualTo(CommentErrorCode.INVALID_COMMENT_PATH);
+        assertThat(result.getErrorCode()).isEqualTo(CommentErrorCode.EMPTY_COMMENT_PATH);
     }
 
     @Test

@@ -23,13 +23,6 @@ public record CommentRegisterRequest(
         String path,
 
         @Schema(
-                description = "댓글을 작성한 사용자의 식별자",
-                example = "038ae842-3c93-484f-b526-7c4645a195a7"
-        )
-        @NotNull(message = "댓글 작성자의 식별자가 비어 있습니다.")
-        UUID memberUuid,
-
-        @Schema(
                 description = "댓글의 내용",
                 example = "테스트 댓글 내용입니다"
         )

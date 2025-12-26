@@ -1,6 +1,7 @@
 package kr.modusplant.domains.post.common.util.usecase.model;
 
 import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
+import kr.modusplant.domains.post.usecase.record.PostDetailDataReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 
@@ -39,7 +40,7 @@ public interface PostReadModelTestUtils {
             false
     );
 
-    PostDetailReadModel TEST_DRAFT_POST_DETAIL_READ_MODEL = new PostDetailReadModel(
+    PostDetailDataReadModel TEST_PUBLISHED_POST_DETAIL_DATA_READ_MODEL = new PostDetailDataReadModel(
             TEST_POST_ULID,
             TEST_COMM_PRIMARY_CATEGORY_UUID,
             TEST_COMM_PRIMARY_CATEGORY_CATEGORY,
@@ -49,12 +50,24 @@ public interface PostReadModelTestUtils {
             MEMBER_BASIC_USER_NICKNAME,
             TEST_POST_TITLE,
             TEST_POST_CONTENT,
-            likeCount,
+            true,
+            testDate,
+            testDate
+    );
+
+    PostDetailDataReadModel TEST_DRAFT_POST_DETAIL_DATA_READ_MODEL = new PostDetailDataReadModel(
+            TEST_POST_ULID,
+            TEST_COMM_PRIMARY_CATEGORY_UUID,
+            TEST_COMM_PRIMARY_CATEGORY_CATEGORY,
+            TEST_COMM_SECONDARY_CATEGORY_UUID,
+            TEST_COMM_SECONDARY_CATEGORY_CATEGORY,
+            MEMBER_BASIC_USER_UUID,
+            MEMBER_BASIC_USER_NICKNAME,
+            TEST_POST_TITLE,
+            TEST_POST_CONTENT,
             false,
             null,
-            testDate,
-            false,
-            false
+            testDate
     );
 
     PostSummaryReadModel TEST_POST_SUMMARY_READ_MODEL = new PostSummaryReadModel(
@@ -93,4 +106,6 @@ public interface PostReadModelTestUtils {
             TEST_POST_CONTENT,
             testDate
     );
+
+
 }

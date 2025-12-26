@@ -23,6 +23,12 @@ public class S3FileService {
     @Value("${cloud.wasabi.s3.bucket}")
     private String bucket;
 
+    @Value("${spring.profiles.active:local}")
+    private String profile;
+
+    @Value("${minio.public-endpoint:#{null}}")
+    private String devPublicEndpoint;
+
     public void uploadFile(MultipartFile file, String fileKey) throws IOException {
         PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(bucket)
@@ -54,6 +60,9 @@ public class S3FileService {
     }
 
     public String generateS3SrcUrl(String fileKey) {
-        return String.format("%s/%s/%s",endpoint,bucket,fileKey);
+        if(profile.equals("dev")){
+            endpoint = devPublicEndpoint;
+        }
+        return String.format("%s/%s/%s", endpoint, bucket, fileKey);
     }
 }
