@@ -73,24 +73,10 @@ public class CommentRestController {
             ) {
         CommentCacheData cacheData = controller.getCacheData(postUlid, ifNoneMatch, ifModifiedSince);
         if (cacheData.isCacheable()) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_MODIFIED)
-                    .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
-                    .eTag(String.format("W/\"%s\"", cacheData.entityTag()))
-                    .lastModified(
-                            ZonedDateTime.of(
-                                    (cacheData.lastModifiedAt()),
-                                    ZoneId.of("Asia/Seoul")))
+            return buildFixedCacheResponsePart(cacheData)
                     .build();
         } else {
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
-                    .eTag(String.format("W/\"%s\"", cacheData.entityTag()))
-                    .lastModified(
-                            ZonedDateTime.of(
-                                    (cacheData.lastModifiedAt()),
-                                    ZoneId.of("Asia/Seoul")))
+            return buildFixedCacheResponsePart(cacheData)
                     .body(DataResponse.ok(controller.gatherByPost(postUlid)));
         }
     }
@@ -139,24 +125,10 @@ public class CommentRestController {
     ) {
         CommentCacheData cacheData = controller.getCacheData(memberUuid, ifNoneMatch, ifModifiedSince);
         if (cacheData.isCacheable()) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_MODIFIED)
-                    .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
-                    .eTag(String.format("W/\"%s\"", cacheData.entityTag()))
-                    .lastModified(
-                            ZonedDateTime.of(
-                                    (cacheData.lastModifiedAt()),
-                                    ZoneId.of("Asia/Seoul")))
+            return buildFixedCacheResponsePart(cacheData)
                     .build();
         } else {
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
-                    .eTag(String.format("W/\"%s\"", cacheData.entityTag()))
-                    .lastModified(
-                            ZonedDateTime.of(
-                                    (cacheData.lastModifiedAt()),
-                                    ZoneId.of("Asia/Seoul")))
+            return buildFixedCacheResponsePart(cacheData)
                     .body(DataResponse.ok(controller.gatherByAuthor(memberUuid, PageRequest.of(page, size))));
         }
     }
@@ -192,5 +164,16 @@ public class CommentRestController {
     ) {
         controller.delete(ulid, path);
         return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    private ResponseEntity.BodyBuilder buildFixedCacheResponsePart(CommentCacheData cacheData) {
+        return ResponseEntity
+                .status(cacheData.isCacheable() ? HttpStatus.NOT_MODIFIED : HttpStatus.OK)
+                .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
+                .eTag(String.format("W/\"%s\"", cacheData.entityTag()))
+                .lastModified(
+                        ZonedDateTime.of(
+                                (cacheData.lastModifiedAt()),
+                                ZoneId.of("Asia/Seoul")));
     }
 }
