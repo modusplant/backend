@@ -72,7 +72,7 @@ public class CommentRestController {
             String ifModifiedSince
             ) {
         CommentCacheData cacheData = controller.getCacheData(postUlid, ifNoneMatch, ifModifiedSince);
-        if (cacheData.result()) {
+        if (cacheData.isCacheable()) {
             return ResponseEntity
                     .status(HttpStatus.NOT_MODIFIED)
                     .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
@@ -127,11 +127,38 @@ public class CommentRestController {
                     example = "8"
             )
             @RequestParam(value = "size", defaultValue = "8")
-            int size
+            int size,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.IF_NONE_MATCH, required = false)
+            String ifNoneMatch,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.IF_MODIFIED_SINCE, required = false)
+            String ifModifiedSince
     ) {
-        CommentPageResponse<CommentOfAuthorPageModel> commentResponses =
-                controller.gatherByAuthor(memberUuid, PageRequest.of(page, size));
-        return ResponseEntity.ok().body(DataResponse.ok(commentResponses));
+        CommentCacheData cacheData = controller.getCacheData(memberUuid, ifNoneMatch, ifModifiedSince);
+        if (cacheData.isCacheable()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_MODIFIED)
+                    .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
+                    .eTag(String.format("W/\"%s\"", cacheData.entityTag()))
+                    .lastModified(
+                            ZonedDateTime.of(
+                                    (cacheData.lastModifiedAt()),
+                                    ZoneId.of("Asia/Seoul")))
+                    .build();
+        } else {
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
+                    .eTag(String.format("W/\"%s\"", cacheData.entityTag()))
+                    .lastModified(
+                            ZonedDateTime.of(
+                                    (cacheData.lastModifiedAt()),
+                                    ZoneId.of("Asia/Seoul")))
+                    .body(DataResponse.ok(controller.gatherByAuthor(memberUuid, PageRequest.of(page, size))));
+        }
     }
 
     @Operation(

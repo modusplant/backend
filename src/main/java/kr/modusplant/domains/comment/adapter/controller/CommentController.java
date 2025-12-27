@@ -16,6 +16,7 @@ import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
+import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.swear.service.SwearService;
@@ -45,6 +46,11 @@ public class CommentController {
 
     public CommentCacheData getCacheData(String postUlid, String ifNoneMatch, String ifModifiedSince) {
         return cacheService.getCacheData(ifNoneMatch, ifModifiedSince, PostId.create(postUlid));
+
+    }
+
+    public CommentCacheData getCacheData(UUID memberUuid, String ifNoneMatch, String ifModifiedSince) {
+        return cacheService.getCacheData(ifNoneMatch, ifModifiedSince, MemberId.fromUuid(memberUuid));
 
     }
 
