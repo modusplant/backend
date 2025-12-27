@@ -8,6 +8,8 @@ import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.CommentContent;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.PostId;
+import kr.modusplant.domains.comment.framework.in.web.cache.CommentCacheService;
+import kr.modusplant.domains.comment.framework.in.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqRepository;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJpaAdapter;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
@@ -39,10 +41,18 @@ public class CommentController {
     private final SiteMemberJpaRepository memberJpaRepository;
     private final SwearService swearService;
 
+    private final CommentCacheService cacheService;
+
+    public CommentCacheData getCacheData(String postUlid, String ifNoneMatch, String ifModifiedSince) {
+        return cacheService.getCacheData(ifNoneMatch, ifModifiedSince, PostId.create(postUlid));
+
+    }
+
     public List<CommentOfPostResponse> gatherByPost(String postUlid) {
         if(!postJpaRepository.existsByUlid(postUlid)) {
             throw new EntityNotFoundException(ErrorCode.POST_NOT_FOUND, "post");
         }
+
         return jooqRepository.findByPost(PostId.create(postUlid));
     }
 
