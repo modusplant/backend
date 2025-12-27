@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import kr.modusplant.domains.post.adapter.controller.PostController;
@@ -24,7 +25,9 @@ import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -118,10 +121,15 @@ public class PostRestController {
             @PathVariable(name = "postId")
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
-            String ulid
+            String ulid,
+
+            @CookieValue(value = "guestId", required = false)
+            String guestIdStr,
+            HttpServletResponse response
     ) {
         UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
-        return ResponseEntity.ok().body(DataResponse.ok(postController.getByUlid(ulid,currentMemberUuid)));
+        UUID guestId = (currentMemberUuid==null) ? getOrCreateGuestId(guestIdStr,response) : null;
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getByUlid(ulid,currentMemberUuid,guestId)));
     }
 
     @Operation(
@@ -290,10 +298,15 @@ public class PostRestController {
             @PathVariable(name = "postId")
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
-            String ulid
+            String ulid,
+
+            @CookieValue(value = "guestId", required = false)
+            String guestIdStr,
+            HttpServletResponse response
     ) {
         UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
-        return ResponseEntity.ok().body(DataResponse.ok(postController.increaseViewCount(ulid, currentMemberUuid)));
+        UUID guestId = (currentMemberUuid==null) ? getOrCreateGuestId(guestIdStr,response) : null;
+        return ResponseEntity.ok().body(DataResponse.ok(postController.increaseViewCount(ulid, currentMemberUuid,guestId)));
     }
 
     @Hidden
@@ -429,6 +442,34 @@ public class PostRestController {
     ) {
         UUID currentMemberUuid = userDetails.getActiveUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getBookmarkedByMemberUuid(currentMemberUuid, page-1, size)));
+    }
+
+    private UUID getOrCreateGuestId(String guestIdStr, HttpServletResponse response) {
+        UUID guestId;
+        boolean needsNewCookie = false;
+        if (guestIdStr == null) {
+            guestId = UUID.randomUUID();
+            needsNewCookie = true;
+        } else {
+            try {
+                guestId = UUID.fromString(guestIdStr);
+            } catch (IllegalArgumentException e) {
+                guestId = UUID.randomUUID();
+                needsNewCookie = true;
+            }
+        }
+        // 쿠키 설정
+        if (needsNewCookie) {
+            ResponseCookie cookie = ResponseCookie.from("guestId",guestId.toString())
+                    .maxAge(365 * 24 * 60 * 60)
+                    .path("/")
+                    .httpOnly(true)
+                    .secure(true)
+                    .sameSite("Lax")
+                    .build();
+            response.addHeader(HttpHeaders.SET_COOKIE,cookie.toString());
+        }
+        return guestId;
     }
 
 }

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 public enum SecurityErrorCode implements ResponseCode {
 
     BAD_PASSWORD(HttpStatus.UNAUTHORIZED, "bad_password", "비밀번호가 틀렸습니다"),
+    BAD_CREDENTIALS(HttpStatus.UNAUTHORIZED, "bad_credentials", "인증에 필요한 요건이 없거나 부족합니다"),
     BANNED(HttpStatus.UNAUTHORIZED, "banned", "밴 처리 된 계정입니다"),
     DELETED(HttpStatus.UNAUTHORIZED, "deleted", "삭제된 계정입니다"),
     DISABLED_BY_LINKING(HttpStatus.UNAUTHORIZED, "disabled_by_linking", "계정 연동으로 인해 비활성화된 계정입니다"),

@@ -12,13 +12,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import kr.modusplant.domains.member.adapter.controller.MemberController;
 import kr.modusplant.domains.member.domain.exception.IncorrectMemberIdException;
+import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
+import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
-import kr.modusplant.infrastructure.cache.service.CacheValidationService;
-import kr.modusplant.infrastructure.jwt.exception.TokenExpiredException;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -47,7 +46,7 @@ import static kr.modusplant.shared.constant.Regex.*;
 public class MemberRestController {
     private final MemberController memberController;
     private final JwtTokenProvider jwtTokenProvider;
-    private final CacheValidationService cacheValidationService;
+    private final MemberCacheValidationService memberCacheValidationService;
 
     @Hidden
     @Operation(summary = "회원 등록 API", description = "닉네임을 통해 회원을 등록합니다.")
@@ -105,27 +104,27 @@ public class MemberRestController {
             @Parameter(hidden = true)
             @RequestHeader(name = HttpHeaders.IF_MODIFIED_SINCE, required = false)
             String ifModifiedSince) throws IOException {
-        validateTokenAndAccessToId(id, auth);
-        Map<String, ?> cacheMap =
-                cacheValidationService.isCacheUsableForSiteMemberProfile(ifNoneMatch, ifModifiedSince, id);
-        if (cacheMap.get("result").equals(true)) {
+        validateMemberIdFromToken(id, auth);
+        MemberCacheValidationResult cacheValidationResult =
+                memberCacheValidationService.isCacheable(ifNoneMatch, ifModifiedSince, id);
+        if (cacheValidationResult.isCacheable()) {
             return ResponseEntity
                     .status(HttpStatus.NOT_MODIFIED)
                     .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
-                    .eTag(String.format("W/\"%s\"", cacheMap.get("entityTag")))
+                    .eTag(String.format("W/\"%s\"", cacheValidationResult.entityTag()))
                     .lastModified(
                             ZonedDateTime.of(
-                                    ((LocalDateTime) cacheMap.get("lastModifiedDateTime")),
+                                    cacheValidationResult.lastModifiedDateTime(),
                                     ZoneId.of("Asia/Seoul")))
                     .build();
         } else {
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
-                    .eTag(String.format("W/\"%s\"", cacheMap.get("entityTag")))
+                    .eTag(String.format("W/\"%s\"", cacheValidationResult.entityTag()))
                     .lastModified(
                             ZonedDateTime.of(
-                                    ((LocalDateTime) cacheMap.get("lastModifiedDateTime")),
+                                    cacheValidationResult.lastModifiedDateTime(),
                                     ZoneId.of("Asia/Seoul")))
                     .body(DataResponse.ok(memberController.getProfile(new MemberProfileGetRecord(id))));
         }
@@ -161,7 +160,7 @@ public class MemberRestController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) throws IOException {
-        validateTokenAndAccessToId(id, auth);
+        validateMemberIdFromToken(id, auth);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
@@ -191,7 +190,7 @@ public class MemberRestController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
-        validateTokenAndAccessToId(id, auth);
+        validateMemberIdFromToken(id, auth);
         memberController.likePost(new MemberPostLikeRecord(id, postUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -217,7 +216,7 @@ public class MemberRestController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
-        validateTokenAndAccessToId(id, auth);
+        validateMemberIdFromToken(id, auth);
         memberController.unlikePost(new MemberPostUnlikeRecord(id, postUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -243,7 +242,7 @@ public class MemberRestController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
-        validateTokenAndAccessToId(id, auth);
+        validateMemberIdFromToken(id, auth);
         memberController.bookmarkPost(new MemberPostBookmarkRecord(id, postUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -269,7 +268,7 @@ public class MemberRestController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
-        validateTokenAndAccessToId(id, auth);
+        validateMemberIdFromToken(id, auth);
         memberController.cancelPostBookmark(new MemberPostBookmarkCancelRecord(id, postUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -300,7 +299,7 @@ public class MemberRestController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
-        validateTokenAndAccessToId(id, auth);
+        validateMemberIdFromToken(id, auth);
         memberController.likeComment(new MemberCommentLikeRecord(id, postUlid, path));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -331,16 +330,13 @@ public class MemberRestController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
-        validateTokenAndAccessToId(id, auth);
+        validateMemberIdFromToken(id, auth);
         memberController.unlikeComment(new MemberCommentUnlikeRecord(id, postUlid, path));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
-    private void validateTokenAndAccessToId(UUID id, String auth) {
+    private void validateMemberIdFromToken(UUID id, String auth) {
         String accessToken = getTokenFromAuthorizationHeader(auth);
-        if (!jwtTokenProvider.validateToken(accessToken)) {
-            throw new TokenExpiredException();
-        }
         if (!jwtTokenProvider.getMemberUuidFromToken(accessToken).equals(id)) {
             throw new IncorrectMemberIdException();
         }
