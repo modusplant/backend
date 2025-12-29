@@ -4,6 +4,8 @@ import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.exception.enums.supers.ResponseCode;
 import lombok.Getter;
 
+import java.time.Instant;
+
 /**
  * {@code BusinessException}은 모든 커스텀 예외의 상위 클래스입니다.
  *
@@ -17,14 +19,29 @@ import lombok.Getter;
 public class BusinessException extends RuntimeException {
 
     private final ResponseCode errorCode;
+    private final Instant causedAt;
 
     public BusinessException(ResponseCode errorCode) {
-        super(errorCode.getMessage());
+        super();
         this.errorCode = errorCode;
+        this.causedAt = Instant.now();
     }
 
     public BusinessException(ResponseCode errorCode, String message) {
         super(message);
         this.errorCode = errorCode;
+        this.causedAt = Instant.now();
+    }
+
+    public BusinessException(ResponseCode errorCode, String message, Throwable cause) {
+        super(message, cause);
+        this.errorCode = errorCode;
+        this.causedAt = Instant.now();
+    }
+
+    public BusinessException(ResponseCode errorCode, Throwable cause) {
+        super(cause);
+        this.errorCode = errorCode;
+        this.causedAt = Instant.now();
     }
 }
