@@ -108,7 +108,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         
         given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(MEMBER_BASIC_USER_UUID);
         MemberCacheValidationResult cacheValidationResult = new MemberCacheValidationResult(entityTag, now, true);
-        given(memberCacheValidationService.isCacheable(
+        given(memberCacheValidationService.getMemberCacheValidationResult(
                 ifNoneMatch,
                 ifModifiedSince,
                 MEMBER_BASIC_USER_UUID
@@ -136,7 +136,7 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(MEMBER_BASIC_USER_UUID);
         MemberCacheValidationResult cacheValidationResult = new MemberCacheValidationResult(entityTag, now, false);
-        given(memberCacheValidationService.isCacheable(
+        given(memberCacheValidationService.getMemberCacheValidationResult(
                 ifNoneMatch,
                 ifModifiedSince,
                 MEMBER_BASIC_USER_UUID
