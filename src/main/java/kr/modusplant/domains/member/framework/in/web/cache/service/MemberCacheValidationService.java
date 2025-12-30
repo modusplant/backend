@@ -33,7 +33,7 @@ public class MemberCacheValidationService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public MemberCacheValidationResult isCacheable(
+    public MemberCacheValidationResult getMemberCacheValidationResult(
             @Nullable String ifNoneMatch,
             @Nullable String ifModifiedSince,
             @Nonnull UUID id) {
