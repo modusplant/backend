@@ -12,9 +12,9 @@ public interface CommSecondaryCategoryEntityTestUtils extends CommPrimaryCategor
                 .order(TEST_COMM_SECONDARY_CATEGORY_ORDER);
     }
 
-    default CommSecondaryCategoryEntityBuilder createCommSecondaryCategoryEntityBuilderWithUuid() {
+    default CommSecondaryCategoryEntityBuilder createCommSecondaryCategoryEntityBuilderWithId() {
         return CommSecondaryCategoryEntity.builder()
-                .uuid(TEST_COMM_SECONDARY_CATEGORY_UUID)
+                .id(TEST_COMM_SECONDARY_CATEGORY_ID)
                 .category(TEST_COMM_SECONDARY_CATEGORY_CATEGORY)
                 .order(TEST_COMM_SECONDARY_CATEGORY_ORDER);
     }
