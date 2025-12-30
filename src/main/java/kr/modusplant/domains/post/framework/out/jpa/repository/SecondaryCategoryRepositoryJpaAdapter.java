@@ -21,7 +21,7 @@ public class SecondaryCategoryRepositoryJpaAdapter implements SecondaryCategoryR
     @Override
     public List<SecondaryCategory> getSecondaryCategoriesByPrimaryCategory(PrimaryCategoryId primaryCategoryId) {
         return secondaryCategoryJpaRepository.findByPrimaryCategoryEntityOrderByOrderAsc(
-                primaryCategoryJpaRepository.findByUuid(primaryCategoryId.getValue()).orElseThrow()
+                primaryCategoryJpaRepository.findById(primaryCategoryId.getValue()).orElseThrow()
         ).stream().map(secondaryCategoryJpaMapper::toSecondaryCategory).toList();
     }
 }

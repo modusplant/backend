@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.UUID;
 
 @Tag(name = "게시글 항목 API", description = "게시글 항목을 다루는 API입니다.")
 @RestController
@@ -44,11 +43,11 @@ public class CategoryRestController {
     )
     @GetMapping("/primary-categories/{primaryCategoryId}/secondary-categories")
     public ResponseEntity<DataResponse<List<SecondaryCategoryResponse>>> getSecondaryCategoriesByPrimaryCategory(
-            @Parameter(schema = @Schema(description = "1차 항목의 식별자", example = "038ae842-3c93-484f-b526-7c4645a195a7"))
+            @Parameter(schema = @Schema(description = "1차 항목의 식별자", example = "1"))
             @PathVariable(name = "primaryCategoryId")
             @NotNull(message = "1차 항목 식별자가 비어 있습니다.")
-            UUID primaryCategoryUuid
+            Integer primaryCategoryId
     ) {
-        return ResponseEntity.ok().body(DataResponse.ok(categoryController.getSecondaryCategoriesByPrimaryCategory(primaryCategoryUuid)));
+        return ResponseEntity.ok().body(DataResponse.ok(categoryController.getSecondaryCategoriesByPrimaryCategory(primaryCategoryId)));
     }
 }
