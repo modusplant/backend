@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum SuccessCode implements ResponseCode {
+public enum GeneralSuccessCode implements ResponseCode {
 
     GENERIC_SUCCESS(HttpStatus.OK, "generic_success", "");
 

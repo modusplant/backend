@@ -2,7 +2,7 @@ package kr.modusplant.framework.jackson.http.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
-import kr.modusplant.shared.exception.enums.SuccessCode;
+import kr.modusplant.shared.exception.enums.GeneralSuccessCode;
 import kr.modusplant.shared.exception.enums.supers.ResponseCode;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -39,17 +39,17 @@ public class DataResponse<T> {
 
     public static DataResponse<Void> ok() {
         DataResponse<Void> response = new DataResponse<>();
-        response.status = SuccessCode.GENERIC_SUCCESS.getHttpStatus().getValue();
-        response.code = SuccessCode.GENERIC_SUCCESS.getCode();
-        response.message = SuccessCode.GENERIC_SUCCESS.getMessage();
+        response.status = GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus().getValue();
+        response.code = GeneralSuccessCode.GENERIC_SUCCESS.getCode();
+        response.message = GeneralSuccessCode.GENERIC_SUCCESS.getMessage();
         return response;
     }
 
     public static <T> DataResponse<T> ok(T data) {
         DataResponse<T> response = new DataResponse<>();
-        response.status = SuccessCode.GENERIC_SUCCESS.getHttpStatus().getValue();
-        response.code = SuccessCode.GENERIC_SUCCESS.getCode();
-        response.message = SuccessCode.GENERIC_SUCCESS.getMessage();
+        response.status = GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus().getValue();
+        response.code = GeneralSuccessCode.GENERIC_SUCCESS.getCode();
+        response.message = GeneralSuccessCode.GENERIC_SUCCESS.getMessage();
         response.data = data;
         return response;
     }
