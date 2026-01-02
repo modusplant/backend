@@ -9,9 +9,9 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum GeneralSuccessCode implements ResponseCode {
 
-    GENERIC_SUCCESS(HttpStatus.OK, "generic_success", "");
+    GENERIC_SUCCESS(HttpStatus.OK.value(), "generic_success", "");
 
-    private final HttpStatus httpStatus;
+    private final int httpStatus;
     private final String code;
     private final String message;
 

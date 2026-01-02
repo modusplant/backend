@@ -22,7 +22,7 @@ public class DataResponse<T> {
 
     public static <T> DataResponse<T> of(ResponseCode responseCode, T data) {
         DataResponse<T> response = new DataResponse<>();
-        response.status = responseCode.getHttpStatus().getValue();
+        response.status = responseCode.getHttpStatus();
         response.code = responseCode.getCode();
         response.message = responseCode.getMessage();
         response.data = data;
@@ -31,7 +31,7 @@ public class DataResponse<T> {
 
     public static DataResponse<Void> of(ResponseCode responseCode) {
         DataResponse<Void> response = new DataResponse<>();
-        response.status = responseCode.getHttpStatus().getValue();
+        response.status = responseCode.getHttpStatus();
         response.code = responseCode.getCode();
         response.message = responseCode.getMessage();
         return response;
@@ -39,7 +39,7 @@ public class DataResponse<T> {
 
     public static DataResponse<Void> ok() {
         DataResponse<Void> response = new DataResponse<>();
-        response.status = GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus().value();
+        response.status = GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus();
         response.code = GeneralSuccessCode.GENERIC_SUCCESS.getCode();
         response.message = GeneralSuccessCode.GENERIC_SUCCESS.getMessage();
         return response;
@@ -47,7 +47,7 @@ public class DataResponse<T> {
 
     public static <T> DataResponse<T> ok(T data) {
         DataResponse<T> response = new DataResponse<>();
-        response.status = GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus().value();
+        response.status = GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus();
         response.code = GeneralSuccessCode.GENERIC_SUCCESS.getCode();
         response.message = GeneralSuccessCode.GENERIC_SUCCESS.getMessage();
         response.data = data;

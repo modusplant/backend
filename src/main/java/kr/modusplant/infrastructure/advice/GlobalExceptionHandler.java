@@ -30,14 +30,14 @@ public class GlobalExceptionHandler {
     // 메서드의 인자가 유효하지 않은 값일 경우
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<DataResponse<Void>> handleIllegalArgumentException() {
-        return ResponseEntity.status(HttpStatus.valueOf(GeneralErrorCode.INVALID_INPUT.getHttpStatus().getValue()))
+        return ResponseEntity.status(GeneralErrorCode.INVALID_INPUT.getHttpStatus())
                 .body(DataResponse.of(GeneralErrorCode.INVALID_INPUT));
     }
 
     // 호출된 메서드가 정상적으로 작동할 수 없는 경우
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<DataResponse<Void>> handleIllegalStateException() {
-        return ResponseEntity.status(HttpStatus.valueOf(GeneralErrorCode.INVALID_STATE.getHttpStatus().getValue()))
+        return ResponseEntity.status(GeneralErrorCode.INVALID_STATE.getHttpStatus())
                 .body(DataResponse.of(GeneralErrorCode.INVALID_STATE));
     }
 
@@ -49,10 +49,10 @@ public class GlobalExceptionHandler {
         log.error("FieldError of MethodArgumentNotValidException: {}", fieldError);
 
         if(fieldError != null) {
-            return ResponseEntity.status(HttpStatus.valueOf(GeneralErrorCode.INVALID_INPUT.getHttpStatus().getValue()))
+            return ResponseEntity.status(GeneralErrorCode.INVALID_INPUT.getHttpStatus())
                     .body(DataResponse.of(GeneralErrorCode.INVALID_INPUT));
         } else {
-            return ResponseEntity.status(HttpStatus.valueOf(GeneralErrorCode.INVALID_INPUT.getHttpStatus().getValue()))
+            return ResponseEntity.status(GeneralErrorCode.INVALID_INPUT.getHttpStatus())
                     .body(DataResponse.of(GeneralErrorCode.INVALID_INPUT));
         }
     }
@@ -66,7 +66,7 @@ public class GlobalExceptionHandler {
             log.error("FieldError of MethodArgumentTypeMismatchException: {}", ex.getName());
         }
 
-        return ResponseEntity.status(HttpStatus.valueOf(GeneralErrorCode.MISMATCH_INPUT_TYPE.getHttpStatus().getValue()))
+        return ResponseEntity.status(GeneralErrorCode.MISMATCH_INPUT_TYPE.getHttpStatus())
                 .body(DataResponse.of(GeneralErrorCode.MISMATCH_INPUT_TYPE));
     }
 
@@ -83,7 +83,7 @@ public class GlobalExceptionHandler {
             log.error("invalidPropertyNames of MethodArgumentTypeMismatchException: {}", invalidPropertyNames);
 
         }
-        return ResponseEntity.status(HttpStatus.valueOf(GeneralErrorCode.CONSTRAINT_VIOLATION.getHttpStatus().getValue()))
+        return ResponseEntity.status(GeneralErrorCode.CONSTRAINT_VIOLATION.getHttpStatus())
                 .body(DataResponse.of(GeneralErrorCode.CONSTRAINT_VIOLATION));
     }
 
@@ -108,28 +108,28 @@ public class GlobalExceptionHandler {
     // 응답 처리 간 예외가 발생한 경우
     @ExceptionHandler(HttpMessageNotWritableException.class)
     public ResponseEntity<DataResponse<Void>> handleHttpMessageNotWritableException() {
-        return ResponseEntity.status(HttpStatus.valueOf(GeneralErrorCode.GENERIC_ERROR.getHttpStatus().getValue()))
+        return ResponseEntity.status(GeneralErrorCode.GENERIC_ERROR.getHttpStatus())
                 .body(DataResponse.of(GeneralErrorCode.GENERIC_ERROR));
     }
 
     // BusinessException
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<DataResponse<Void>> handleBusinessException(BusinessException ex) {
-        return ResponseEntity.status(HttpStatus.valueOf(ex.getErrorCode().getHttpStatus().getValue()))
+        return ResponseEntity.status(HttpStatus.valueOf(ex.getErrorCode().getHttpStatus()))
                 .body(DataResponse.of(ex.getErrorCode()));
     }
 
     // RuntimeException
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<DataResponse<Void>> handleRuntimeException(HttpServletRequest ignoredRequest, RuntimeException ignoredEx) {
-        return ResponseEntity.status(HttpStatus.valueOf(GeneralErrorCode.GENERIC_ERROR.getHttpStatus().getValue()))
+        return ResponseEntity.status(GeneralErrorCode.GENERIC_ERROR.getHttpStatus())
                 .body(DataResponse.of(GeneralErrorCode.GENERIC_ERROR));
     }
 
     // Exception
     @ExceptionHandler(Exception.class)
     public ResponseEntity<DataResponse<Void>> handleGenericException(HttpServletRequest ignoredRequest, Exception ignoredEx) {
-        return ResponseEntity.status(HttpStatus.valueOf(GeneralErrorCode.GENERIC_ERROR.getHttpStatus().getValue()))
+        return ResponseEntity.status(GeneralErrorCode.GENERIC_ERROR.getHttpStatus())
                 .body(DataResponse.of(GeneralErrorCode.GENERIC_ERROR));
     }
 }
