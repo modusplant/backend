@@ -39,7 +39,7 @@ public class DataResponse<T> {
 
     public static DataResponse<Void> ok() {
         DataResponse<Void> response = new DataResponse<>();
-        response.status = GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus().getValue();
+        response.status = GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus().value();
         response.code = GeneralSuccessCode.GENERIC_SUCCESS.getCode();
         response.message = GeneralSuccessCode.GENERIC_SUCCESS.getMessage();
         return response;
@@ -47,7 +47,7 @@ public class DataResponse<T> {
 
     public static <T> DataResponse<T> ok(T data) {
         DataResponse<T> response = new DataResponse<>();
-        response.status = GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus().getValue();
+        response.status = GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus().value();
         response.code = GeneralSuccessCode.GENERIC_SUCCESS.getCode();
         response.message = GeneralSuccessCode.GENERIC_SUCCESS.getMessage();
         response.data = data;
