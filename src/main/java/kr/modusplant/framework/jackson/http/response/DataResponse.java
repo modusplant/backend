@@ -9,9 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.stream.Collectors;
 
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -36,22 +34,6 @@ public class DataResponse<T> {
         response.status = responseCode.getHttpStatus().getValue();
         response.code = responseCode.getCode();
         response.message = responseCode.getMessage();
-        return response;
-    }
-
-    public static DataResponse<Void> ofErrorFieldName(ResponseCode responseCode, String errorFieldName) {
-        DataResponse<Void> response = new DataResponse<>();
-        response.status = responseCode.getHttpStatus().getValue();
-        response.code = responseCode.getCode();
-        response.message = responseCode.getMessage() + ". 원인: " + errorFieldName;
-        return response;
-    }
-
-    public static DataResponse<Void> ofErrorFieldNames(ResponseCode responseCode, Collection<?> errorFieldNames) {
-        DataResponse<Void> response = new DataResponse<>();
-        response.status = responseCode.getHttpStatus().getValue();
-        response.code = responseCode.getCode();
-        response.message = responseCode.getMessage() + ". 원인: " + generateErrorDetail(errorFieldNames);
         return response;
     }
 
@@ -88,10 +70,4 @@ public class DataResponse<T> {
         return ObjectMapperHolder.getObjectMapper().writeValueAsString(map);
     }
 
-    private static String generateErrorDetail(Collection<?> errorFieldNames) {
-        String arrangedNames = errorFieldNames.stream()
-                .map(fieldName -> fieldName + ", ")
-                .collect(Collectors.joining());
-        return arrangedNames.substring(0, arrangedNames.length() - 2);
-    }
 }
