@@ -223,6 +223,9 @@ jobs:
           echo "[CI] GITHUB_REPOSITORY_OWNER=${GITHUB_REPOSITORY_OWNER}"
           
           ssh -i "_ci_tmp_ssh_key.pem" -o StrictHostKeyChecking=no \
+            -o ServerAliveInterval=10 \
+            -o ServerAliveCountMax=20 \
+            -o ConnectTimeout=60 \
             ec2-user@"${EC2_INSTANCE_IP}" \
             "IMAGE=${IMAGE} GHCR_PAT=${GHCR_PAT} BACKEND_LOGPATH=${BACKEND_LOGPATH} DOCKER_LOGPATH=${DOCKER_LOGPATH} GITHUB_REPOSITORY_OWNER=${GITHUB_REPOSITORY_OWNER} bash -s" <<'EOF'
           set -euo pipefail
@@ -397,6 +400,9 @@ jobs:
           echo "[CI] GITHUB_REPOSITORY_OWNER=${GITHUB_REPOSITORY_OWNER}"
 
           ssh -i "_ci_tmp_dev_ssh_key.pem" -p 2222 -o StrictHostKeyChecking=no \
+            -o ServerAliveInterval=10 \
+            -o ServerAliveCountMax=20 \
+            -o ConnectTimeout=60 \
             donghyeok@"${DEV_SERVER_IP}" \
             "IMAGE=${IMAGE} GHCR_PAT=${GHCR_PAT} BACKEND_LOGPATH=${BACKEND_LOGPATH} DOCKER_LOGPATH=${DOCKER_LOGPATH} GITHUB_REPOSITORY_OWNER=${GITHUB_REPOSITORY_OWNER} bash -s" <<'EOF'
           set -euo pipefail
