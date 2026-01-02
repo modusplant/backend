@@ -8,10 +8,13 @@ security:
   debug:
     enabled: true
 
-# Scheduler
-scheduler:
-  sync-interval-ms : 300000           # 5분
-  token-cleanup-cron : "0 0 3 * * *"  # 새벽 3시
+# Hikari
+spring:
+  datasource:
+    hikari:
+      pool-name: DevHikariPool
+      maximum-pool-size: 10
+      minimum-idle: 3
 
 # Spring
 spring:
@@ -23,6 +26,11 @@ spring:
 # MinIO
 minio:
   public-endpoint: ${DEV_PUBLIC_ENDPOINT}
+
+# Scheduler
+scheduler:
+  sync-interval-ms : 300000           # 5분
+  token-cleanup-cron : "0 0 3 * * *"  # 새벽 3시
 
 # Swagger
 springdoc:
