@@ -1,5 +1,6 @@
 package kr.modusplant.framework.aws.service;
 
+import kr.modusplant.framework.aws.exception.NotFoundFileKeyOnS3Exception;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
@@ -46,7 +48,11 @@ public class S3FileService {
                 .key(fileKey)
                 .build();
 
-        return s3Client.getObject(request).readAllBytes();
+        try {
+            return s3Client.getObject(request).readAllBytes();
+        } catch (NoSuchKeyException e) {
+            throw new NotFoundFileKeyOnS3Exception();
+        }
     }
 
 
