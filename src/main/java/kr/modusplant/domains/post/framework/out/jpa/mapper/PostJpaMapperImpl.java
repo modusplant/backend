@@ -47,8 +47,8 @@ public class PostJpaMapperImpl implements PostJpaMapper {
         return Post.create(
                 PostId.create(postEntity.getUlid()),
                 AuthorId.fromUuid(postEntity.getAuthMember().getUuid()),
-                PrimaryCategoryId.fromUuid(postEntity.getPrimaryCategory().getUuid()),
-                SecondaryCategoryId.fromUuid(postEntity.getSecondaryCategory().getUuid()),
+                PrimaryCategoryId.create(postEntity.getPrimaryCategory().getId()),
+                SecondaryCategoryId.create(postEntity.getSecondaryCategory().getId()),
                 PostContent.create(
                         postEntity.getTitle(),
                         postEntity.getContent()

@@ -13,8 +13,8 @@ public class SecondaryCategoryJpaMapperImpl implements SecondaryCategoryJpaMappe
     @Override
     public SecondaryCategory toSecondaryCategory(CommSecondaryCategoryEntity secondaryCategoryEntity) {
         return SecondaryCategory.create(
-                SecondaryCategoryId.fromUuid(secondaryCategoryEntity.getUuid()),
-                PrimaryCategoryId.fromUuid(secondaryCategoryEntity.getPrimaryCategoryEntity().getUuid()),
+                SecondaryCategoryId.create(secondaryCategoryEntity.getId()),
+                PrimaryCategoryId.create(secondaryCategoryEntity.getPrimaryCategoryEntity().getId()),
                 secondaryCategoryEntity.getCategory(),
                 secondaryCategoryEntity.getOrder()
         );

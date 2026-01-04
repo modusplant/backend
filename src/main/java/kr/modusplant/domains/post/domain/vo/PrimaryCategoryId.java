@@ -1,38 +1,23 @@
 package kr.modusplant.domains.post.domain.vo;
 
 import kr.modusplant.domains.post.domain.exception.EmptyCategoryIdException;
-import kr.modusplant.domains.post.domain.exception.InvalidCategoryIdException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.UUID;
-
-import static kr.modusplant.shared.constant.Regex.PATTERN_UUID;
-
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PrimaryCategoryId {
 
-    private final UUID value;
+    private final Integer value;
 
-    public static PrimaryCategoryId fromUuid(UUID uuid) {
-        if (uuid == null) {
+    public static PrimaryCategoryId create(Integer id) {
+        if (id == null) {
             throw new EmptyCategoryIdException();
         }
-        return new PrimaryCategoryId(uuid);
-    }
-
-    public static PrimaryCategoryId fromString(String value) {
-        if (value == null || value.trim().isEmpty()) {
-            throw new EmptyCategoryIdException();
-        }
-        if (!PATTERN_UUID.matcher(value).matches()) {
-            throw new InvalidCategoryIdException();
-        }
-        return new PrimaryCategoryId(UUID.fromString(value));
+        return new PrimaryCategoryId(id);
     }
 
     @Override

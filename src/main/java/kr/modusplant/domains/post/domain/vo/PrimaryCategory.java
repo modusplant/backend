@@ -33,12 +33,20 @@ public class PrimaryCategory {
 
         if (!(o instanceof PrimaryCategory primaryCategory)) return false;
 
-        return new EqualsBuilder().append(getId(), primaryCategory.getId()).isEquals();
+        return new EqualsBuilder()
+                .append(getId(), primaryCategory.getId())
+                .append(getCategoryName(), primaryCategory.getCategoryName())
+                .append(getCategoryOrder(), primaryCategory.getCategoryOrder())
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(getId()).toHashCode();
+        return new HashCodeBuilder(17, 37)
+                .append(getId())
+                .append(getCategoryName())
+                .append(getCategoryOrder())
+                .toHashCode();
     }
 
 }

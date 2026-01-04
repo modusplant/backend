@@ -26,8 +26,8 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
         // given
         Post post = createPublishedPost();
         SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(testAuthorId.getValue()).build();
-        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().uuid(testPrimaryCategoryId.getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().uuid(testSecondaryCategoryId.getValue()).build();
+        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().id(testPrimaryCategoryId.getValue()).build();
+        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().id(testSecondaryCategoryId.getValue()).build();
         long viewCount = 5L;
 
         // when
@@ -58,8 +58,8 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
     void testToPost_givenPostEntity_willReturnPost() {
         // given
         SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(testAuthorId.getValue()).build();
-        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().uuid(testPrimaryCategoryId.getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().uuid(testSecondaryCategoryId.getValue()).build();
+        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().id(testPrimaryCategoryId.getValue()).build();
+        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().id(testSecondaryCategoryId.getValue()).build();
         CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid()
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)

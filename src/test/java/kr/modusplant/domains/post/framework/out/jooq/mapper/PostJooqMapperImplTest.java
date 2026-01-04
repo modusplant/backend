@@ -17,9 +17,9 @@ import java.util.UUID;
 import static kr.modusplant.jooq.Tables.COMM_POST;
 import static kr.modusplant.jooq.Tables.SITE_MEMBER;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
 import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -123,9 +123,9 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
     void testToPostDetailReadModel_givenRecord_willReturnPostDetailReadModel() {
         // given
         Record record = mock(Record.class);
-        UUID primaryCategoryUuid = TEST_COMM_PRIMARY_CATEGORY_UUID;
+        Integer primaryCategoryId = TEST_COMM_PRIMARY_CATEGORY_ID;
         String primaryCategory = TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
-        UUID secondaryCategoryUuid = TEST_COMM_SECONDARY_CATEGORY_UUID;
+        Integer secondaryCategoryId = TEST_COMM_SECONDARY_CATEGORY_ID;
         String secondaryCategory = TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
         UUID authorUuid = MEMBER_BASIC_USER_UUID;
         String nickname = MEMBER_BASIC_USER_NICKNAME;
@@ -137,9 +137,9 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
 
         // when
         given(record.get(COMM_POST.ULID)).willReturn(postEntity.getUlid());
-        given(record.get("primaryCategoryUuid", UUID.class)).willReturn(primaryCategoryUuid);
+        given(record.get("primaryCategoryId", Integer.class)).willReturn(primaryCategoryId);
         given(record.get("primaryCategory", String.class)).willReturn(primaryCategory);
-        given(record.get("secondaryCategoryUuid", UUID.class)).willReturn(secondaryCategoryUuid);
+        given(record.get("secondaryCategoryId", Integer.class)).willReturn(secondaryCategoryId);
         given(record.get("secondaryCategory", String.class)).willReturn(secondaryCategory);
         given(record.get("authorUuid", UUID.class)).willReturn(authorUuid);
         given(record.get(SITE_MEMBER.NICKNAME)).willReturn(nickname);
@@ -158,9 +158,9 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         assertThat(result)
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("ulid", postEntity.getUlid())
-                .hasFieldOrPropertyWithValue("primaryCategoryUuid", primaryCategoryUuid)
+                .hasFieldOrPropertyWithValue("primaryCategoryId", primaryCategoryId)
                 .hasFieldOrPropertyWithValue("primaryCategory", primaryCategory)
-                .hasFieldOrPropertyWithValue("secondaryCategoryUuid", secondaryCategoryUuid)
+                .hasFieldOrPropertyWithValue("secondaryCategoryId", secondaryCategoryId)
                 .hasFieldOrPropertyWithValue("secondaryCategory", secondaryCategory)
                 .hasFieldOrPropertyWithValue("authorUuid", authorUuid)
                 .hasFieldOrPropertyWithValue("nickname", nickname)
@@ -179,9 +179,9 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
     void testToPostDetailReadModel_givenRecordWithNullPublishedAt_willReturnPostDetailReadModel() {
         // given
         Record record = mock(Record.class);
-        UUID primaryCategoryUuid = TEST_COMM_PRIMARY_CATEGORY_UUID;
+        Integer primaryCategoryId = TEST_COMM_PRIMARY_CATEGORY_ID;
         String primaryCategory = TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
-        UUID secondaryCategoryUuid = TEST_COMM_SECONDARY_CATEGORY_UUID;
+        Integer secondaryCategoryId = TEST_COMM_SECONDARY_CATEGORY_ID;
         String secondaryCategory = TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
         UUID authorUuid = MEMBER_BASIC_USER_UUID;
         String nickname = MEMBER_BASIC_USER_NICKNAME;
@@ -192,9 +192,9 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
 
         // when
         given(record.get(COMM_POST.ULID)).willReturn(postEntity.getUlid());
-        given(record.get("primaryCategoryUuid", UUID.class)).willReturn(primaryCategoryUuid);
+        given(record.get("primaryCategoryId", Integer.class)).willReturn(primaryCategoryId);
         given(record.get("primaryCategory", String.class)).willReturn(primaryCategory);
-        given(record.get("secondaryCategoryUuid", UUID.class)).willReturn(secondaryCategoryUuid);
+        given(record.get("secondaryCategoryId", Integer.class)).willReturn(secondaryCategoryId);
         given(record.get("secondaryCategory", String.class)).willReturn(secondaryCategory);
         given(record.get("authorUuid", UUID.class)).willReturn(authorUuid);
         given(record.get(SITE_MEMBER.NICKNAME)).willReturn(nickname);
@@ -213,9 +213,9 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         assertThat(result)
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("ulid", postEntity.getUlid())
-                .hasFieldOrPropertyWithValue("primaryCategoryUuid", primaryCategoryUuid)
+                .hasFieldOrPropertyWithValue("primaryCategoryId", primaryCategoryId)
                 .hasFieldOrPropertyWithValue("primaryCategory", primaryCategory)
-                .hasFieldOrPropertyWithValue("secondaryCategoryUuid", secondaryCategoryUuid)
+                .hasFieldOrPropertyWithValue("secondaryCategoryId", secondaryCategoryId)
                 .hasFieldOrPropertyWithValue("secondaryCategory", secondaryCategory)
                 .hasFieldOrPropertyWithValue("authorUuid", authorUuid)
                 .hasFieldOrPropertyWithValue("nickname", nickname)

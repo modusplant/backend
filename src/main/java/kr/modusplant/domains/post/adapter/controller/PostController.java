@@ -45,7 +45,7 @@ public class PostController {
 
     public CursorPageResponse<PostSummaryResponse> getAll(PostCategoryRequest postCategoryRequest, UUID currentMemberUuid, String lastUlid, int size) {
         List<PostSummaryReadModel> readModels = postQueryRepository.findByCategoryWithCursor(
-                postCategoryRequest.primaryCategoryUuid(), postCategoryRequest.secondaryCategoryUuids(), currentMemberUuid, lastUlid, size
+                postCategoryRequest.primaryCategoryId(), postCategoryRequest.secondaryCategoryIds(), currentMemberUuid, lastUlid, size
         );
         boolean hasNext = readModels.size() > size;
         List<PostSummaryResponse> responses = readModels.stream()
@@ -91,8 +91,8 @@ public class PostController {
     @Transactional
     public void createPost(PostInsertRequest postInsertRequest, UUID currentMemberUuid) throws IOException {
         AuthorId authorId = AuthorId.fromUuid(currentMemberUuid);
-        PrimaryCategoryId primaryCategoryId = PrimaryCategoryId.fromUuid(postInsertRequest.primaryCategoryUuid());
-        SecondaryCategoryId secondaryCategoryId = SecondaryCategoryId.fromUuid(postInsertRequest.secondaryCategoryUuid());
+        PrimaryCategoryId primaryCategoryId = PrimaryCategoryId.create(postInsertRequest.primaryCategoryId());
+        SecondaryCategoryId secondaryCategoryId = SecondaryCategoryId.create(postInsertRequest.secondaryCategoryId());
         PostContent postContent = PostContent.create(postInsertRequest.title(), multipartDataProcessorPort.saveFilesAndGenerateContentJson(postInsertRequest.content(), postInsertRequest.orderInfo()));
         Post post = postInsertRequest.isPublished()
                 ? Post.createPublished(authorId, primaryCategoryId, secondaryCategoryId, postContent)
@@ -108,8 +108,8 @@ public class PostController {
         PostContent postContent = PostContent.create(postUpdateRequest.title(),multipartDataProcessorPort.saveFilesAndGenerateContentJson(postUpdateRequest.content(), postUpdateRequest.orderInfo()));
         post.update(
                 AuthorId.fromUuid(currentMemberUuid),
-                PrimaryCategoryId.fromUuid(postUpdateRequest.primaryCategoryUuid()),
-                SecondaryCategoryId.fromUuid(postUpdateRequest.secondaryCategoryUuid()),
+                PrimaryCategoryId.create(postUpdateRequest.primaryCategoryId()),
+                SecondaryCategoryId.create(postUpdateRequest.secondaryCategoryId()),
                 postContent,
                 postUpdateRequest.isPublished() ? PostStatus.published() : PostStatus.draft()
         );

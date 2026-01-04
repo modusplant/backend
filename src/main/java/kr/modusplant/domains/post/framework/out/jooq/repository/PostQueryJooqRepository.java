@@ -31,7 +31,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
     private final PostJooqMapper postJooqMapper;
     private static final JsonbJsonNodeConverter JSON_CONVERTER = new JsonbJsonNodeConverter();
 
-    public List<PostSummaryReadModel> findByCategoryWithCursor(UUID primaryCategoryUuid, List<UUID> secondaryCategoryUuids, UUID currentMemberUuid, String cursorUlid, int size) {
+    public List<PostSummaryReadModel> findByCategoryWithCursor(Integer primaryCategoryId, List<Integer> secondaryCategoryIds, UUID currentMemberUuid, String cursorUlid, int size) {
         return dsl
                 .select(
                         COMM_POST.ULID,
@@ -55,8 +55,8 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         ).as("isBookmarked")
                 )
                 .from(COMM_POST)
-                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_UUID.eq(COMM_PRI_CATE.UUID))
-                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_UUID.eq(COMM_SECO_CATE.UUID))
+                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
+                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
                 .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .leftJoin(
                         select(COMM_COMMENT.POST_ULID, count().as("comment_count"))
@@ -66,7 +66,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                                 .asTable("cc")
                 ).on(COMM_POST.ULID.eq(field("cc.post_ulid",String.class)))
                 .where(COMM_POST.IS_PUBLISHED.isTrue())
-                .and(buildCategoryConditions(primaryCategoryUuid, secondaryCategoryUuids))
+                .and(buildCategoryConditions(primaryCategoryId, secondaryCategoryIds))
                 .and(buildCursorCondition(cursorUlid))
                 .orderBy(COMM_POST.PUBLISHED_AT.desc(), COMM_POST.ULID.desc())
                 .limit(size+1)
@@ -98,8 +98,8 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         ).as("isBookmarked")
                 )
                 .from(COMM_POST)
-                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_UUID.eq(COMM_PRI_CATE.UUID))
-                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_UUID.eq(COMM_SECO_CATE.UUID))
+                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
+                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
                 .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .leftJoin(
                         select(COMM_COMMENT.POST_ULID, count().as("comment_count"))
@@ -121,9 +121,9 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         return Optional.ofNullable(dsl
                 .select(
                         COMM_POST.ULID,
-                        COMM_PRI_CATE.UUID.as("primaryCategoryUuid"),
+                        COMM_PRI_CATE.ID.as("primaryCategoryId"),
                         COMM_PRI_CATE.CATEGORY.as("primaryCategory"),
-                        COMM_SECO_CATE.UUID.as("secondaryCategoryUuid"),
+                        COMM_SECO_CATE.ID.as("secondaryCategoryId"),
                         COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
                         SITE_MEMBER.UUID.as("authorUuid"),
                         SITE_MEMBER.NICKNAME,
@@ -144,8 +144,8 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                                         .and(COMM_POST_BOOKMARK.MEMB_UUID.eq(currentMemberUuid))
                         ).as("isBookmarked")
                 ).from(COMM_POST)
-                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_UUID.eq(COMM_PRI_CATE.UUID))
-                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_UUID.eq(COMM_SECO_CATE.UUID))
+                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
+                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
                 .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .where(COMM_POST.ULID.eq(postId.getValue()))
                 .fetchOne()
@@ -156,9 +156,9 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         return Optional.ofNullable(dsl
                 .select(
                         COMM_POST.ULID,
-                        COMM_PRI_CATE.UUID.as("primaryCategoryUuid"),
+                        COMM_PRI_CATE.ID.as("primaryCategoryId"),
                         COMM_PRI_CATE.CATEGORY.as("primaryCategory"),
-                        COMM_SECO_CATE.UUID.as("secondaryCategoryUuid"),
+                        COMM_SECO_CATE.ID.as("secondaryCategoryId"),
                         COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
                         SITE_MEMBER.UUID.as("authorUuid"),
                         SITE_MEMBER.NICKNAME,
@@ -168,24 +168,24 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         COMM_POST.PUBLISHED_AT,
                         COMM_POST.UPDATED_AT
                 ).from(COMM_POST)
-                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_UUID.eq(COMM_PRI_CATE.UUID))
-                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_UUID.eq(COMM_SECO_CATE.UUID))
+                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
+                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
                 .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .where(COMM_POST.ULID.eq(postId.getValue()))
                 .fetchOne()
         ).map(postJooqMapper::toPostDetailDataReadModel);
     }
 
-    private Condition buildCategoryConditions(UUID primaryCategoryUuid, List<UUID> secondaryCategoryUuids) {
-        if (primaryCategoryUuid == null && secondaryCategoryUuids != null && !secondaryCategoryUuids.isEmpty()) {
+    private Condition buildCategoryConditions(Integer primaryCategoryId, List<Integer> secondaryCategoryIds) {
+        if (primaryCategoryId == null && secondaryCategoryIds != null && !secondaryCategoryIds.isEmpty()) {
             throw new EmptyCategoryIdException();
         }
         Condition condition = noCondition();
-        if(primaryCategoryUuid != null) {
-            condition = condition.and(COMM_POST.PRI_CATE_UUID.eq(primaryCategoryUuid));
+        if(primaryCategoryId != null) {
+            condition = condition.and(COMM_POST.PRI_CATE_ID.eq(primaryCategoryId));
         }
-        if (primaryCategoryUuid != null && secondaryCategoryUuids != null && !secondaryCategoryUuids.isEmpty()) {
-            condition = condition.and(COMM_POST.SECO_CATE_UUID.in(secondaryCategoryUuids));
+        if (primaryCategoryId != null && secondaryCategoryIds != null && !secondaryCategoryIds.isEmpty()) {
+            condition = condition.and(COMM_POST.SECO_CATE_ID.in(secondaryCategoryIds));
         }
         return condition;
     }

@@ -131,17 +131,17 @@ class PostQueryJooqRepositoryIntegrationTest {
         // when
         int size = 2;
         List<PostSummaryReadModel> firstPageByPrimaryCategory = postQueryJooqRepository.findByCategoryWithCursor(
-                testPrimaryCategory1.getUuid(), null,testMember2.getUuid(),null,size
+                testPrimaryCategory1.getId(), null,testMember2.getUuid(),null,size
         );
         List<PostSummaryReadModel> secondPageByPrimaryCategory = postQueryJooqRepository.findByCategoryWithCursor(
-                testPrimaryCategory1.getUuid(), null,testMember2.getUuid(),firstPageByPrimaryCategory.get(size-1).ulid(),size
+                testPrimaryCategory1.getId(), null,testMember2.getUuid(),firstPageByPrimaryCategory.get(size-1).ulid(),size
         );
 
         List<PostSummaryReadModel> firstPageByCategories = postQueryJooqRepository.findByCategoryWithCursor(
-                testPrimaryCategory1.getUuid(),List.of(testSecondaryCategory1.getUuid()),testMember2.getUuid(),null,size
+                testPrimaryCategory1.getId(),List.of(testSecondaryCategory1.getId()),testMember2.getUuid(),null,size
         );
         List<PostSummaryReadModel> secondPageByCategories = postQueryJooqRepository.findByCategoryWithCursor(
-                testPrimaryCategory1.getUuid(),List.of(testSecondaryCategory1.getUuid()),testMember2.getUuid(),firstPageByCategories.get(size-1).ulid(),size
+                testPrimaryCategory1.getId(),List.of(testSecondaryCategory1.getId()),testMember2.getUuid(),firstPageByCategories.get(size-1).ulid(),size
         );
 
         // then
@@ -159,7 +159,7 @@ class PostQueryJooqRepositoryIntegrationTest {
         // when & then
         assertThatThrownBy(() ->
                 postQueryJooqRepository.findByCategoryWithCursor(
-                        null, List.of(testSecondaryCategory1.getUuid()), testMember2.getUuid(), null, size
+                        null, List.of(testSecondaryCategory1.getId()), testMember2.getUuid(), null, size
                 )
         ).isInstanceOf(EmptyCategoryIdException.class);
     }

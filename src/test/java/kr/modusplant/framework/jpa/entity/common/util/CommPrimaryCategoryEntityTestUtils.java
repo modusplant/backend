@@ -12,9 +12,9 @@ public interface CommPrimaryCategoryEntityTestUtils {
                 .build();
     }
 
-    default CommPrimaryCategoryEntity createCommPrimaryCategoryEntityWithUuid() {
+    default CommPrimaryCategoryEntity createCommPrimaryCategoryEntityWithId() {
         return CommPrimaryCategoryEntity.builder()
-                .uuid(TEST_COMM_PRIMARY_CATEGORY_UUID)
+                .id(TEST_COMM_PRIMARY_CATEGORY_ID)
                 .category(TEST_COMM_PRIMARY_CATEGORY_CATEGORY)
                 .order(TEST_COMM_PRIMARY_CATEGORY_ORDER)
                 .build();

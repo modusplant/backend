@@ -10,8 +10,8 @@ public interface PostArchiveEntityTestUtils extends PostTestUtils {
         LocalDateTime time = LocalDateTime.now();
         return CommPostArchiveEntity.builder()
                 .ulid(testPostId.getValue())
-                .primaryCategoryUuid(testPrimaryCategoryId.getValue())
-                .secondaryCategoryUuid(testSecondaryCategoryId.getValue())
+                .primaryCategoryId(testPrimaryCategoryId.getValue())
+                .secondaryCategoryId(testSecondaryCategoryId.getValue())
                 .authMemberUuid(testAuthorId.getValue())
                 .createMemberUuid(testAuthorId.getValue())
                 .title(testPostContent.getTitle())

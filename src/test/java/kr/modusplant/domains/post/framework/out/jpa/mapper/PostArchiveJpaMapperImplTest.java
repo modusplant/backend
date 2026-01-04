@@ -22,8 +22,8 @@ class PostArchiveJpaMapperImplTest implements PostEntityTestUtils, PostArchiveEn
     void testToPostArchiveEntity_givenPostEntity_willReturnPostArchiveEntity() {
         // given
         SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(testAuthorId.getValue()).build();
-        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().uuid(testPrimaryCategoryId.getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().uuid(testSecondaryCategoryId.getValue()).build();
+        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().id(testPrimaryCategoryId.getValue()).build();
+        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().id(testSecondaryCategoryId.getValue()).build();
         CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid()
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)
@@ -37,8 +37,8 @@ class PostArchiveJpaMapperImplTest implements PostEntityTestUtils, PostArchiveEn
 
         // then
         assertThat(result.getUlid()).isEqualTo(postEntity.getUlid());
-        assertThat(result.getPrimaryCategoryUuid()).isEqualTo(primaryCategoryEntity.getUuid());
-        assertThat(result.getSecondaryCategoryUuid()).isEqualTo(secondaryCategoryEntity.getUuid());
+        assertThat(result.getPrimaryCategoryId()).isEqualTo(primaryCategoryEntity.getId());
+        assertThat(result.getSecondaryCategoryId()).isEqualTo(secondaryCategoryEntity.getId());
         assertThat(result.getAuthMemberUuid()).isEqualTo(memberEntity.getUuid());
         assertThat(result.getCreateMemberUuid()).isEqualTo(memberEntity.getUuid());
         assertThat(result.getTitle()).isEqualTo(postEntity.getTitle());

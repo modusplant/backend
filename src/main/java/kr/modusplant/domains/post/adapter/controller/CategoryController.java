@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
@@ -27,8 +26,8 @@ public class CategoryController {
                 .toList();
     }
 
-    public List<SecondaryCategoryResponse> getSecondaryCategoriesByPrimaryCategory(UUID primaryCategoryUuid) {
-        return secondaryCategoryRepository.getSecondaryCategoriesByPrimaryCategory(PrimaryCategoryId.fromUuid(primaryCategoryUuid)).stream()
+    public List<SecondaryCategoryResponse> getSecondaryCategoriesByPrimaryCategory(Integer primarycategoryId) {
+        return secondaryCategoryRepository.getSecondaryCategoriesByPrimaryCategory(PrimaryCategoryId.create(primarycategoryId)).stream()
                 .map(categoryMapper::toSecondaryCategoryResponse)
                 .toList();
     }

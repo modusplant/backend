@@ -34,12 +34,22 @@ public class SecondaryCategory {
 
         if (!(o instanceof SecondaryCategory secondaryCategory)) return false;
 
-        return new EqualsBuilder().append(getId(), secondaryCategory.getId()).isEquals();
+        return new EqualsBuilder()
+                .append(getId(), secondaryCategory.getId())
+                .append(getPrimaryCategoryId(), secondaryCategory.getPrimaryCategoryId())
+                .append(getCategoryName(),secondaryCategory.getCategoryName())
+                .append(getCategoryOrder(),secondaryCategory.getCategoryOrder())
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(getId()).toHashCode();
+        return new HashCodeBuilder(17, 37)
+                .append(getId())
+                .append(getPrimaryCategoryId())
+                .append(getCategoryName())
+                .append(getCategoryOrder())
+                .toHashCode();
     }
 
 }

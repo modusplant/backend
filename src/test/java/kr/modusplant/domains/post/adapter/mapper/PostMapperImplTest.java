@@ -25,9 +25,9 @@ class PostMapperImplTest implements PostReadModelTestUtils {
 
         // then
         assertEquals(result.ulid(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.ulid());
-        assertEquals(result.primaryCategoryUuid(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.primaryCategoryUuid());
+        assertEquals(result.primaryCategoryId(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.primaryCategoryId());
         assertEquals(result.primaryCategory(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.primaryCategory());
-        assertEquals(result.secondaryCategoryUuid(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.secondaryCategoryUuid());
+        assertEquals(result.secondaryCategoryId(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.secondaryCategoryId());
         assertEquals(result.secondaryCategory(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.secondaryCategory());
         assertEquals(result.authorUuid(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.authorUuid());
         assertEquals(result.nickname(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.nickname());

@@ -15,15 +15,13 @@ public record PostDetailResponse(
         String ulid,
 
         @Schema(description = "게시글이 포함된 1차 항목의 식별자", example = "2d9f462d-b50f-4394-928e-5c864f60b09a")
-        @JsonProperty("primaryCategoryId")
-        UUID primaryCategoryUuid,
+        Integer primaryCategoryId,
 
         @Schema(description = "게시글이 속한 1차 항목", example = "팁")
         String primaryCategory,
 
         @Schema(description = "게시글이 포함된 2차 항목의 식별자", example = "12d0d32d-f907-4605-a9d0-00b5669ea18a")
-        @JsonProperty("secondaryCategoryId")
-        UUID secondaryCategoryUuid,
+        Integer secondaryCategoryId,
 
         @Schema(description = "게시글이 속한 2차 항목", example = "물꽂이 + 잎꽂이")
         String secondaryCategory,

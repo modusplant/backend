@@ -31,11 +31,11 @@ public class CommPostArchiveEntity {
     @Column(nullable = false, updatable = false)
     private String ulid;
 
-    @Column(name = PRI_CATE_UUID, nullable = false)
-    private UUID primaryCategoryUuid;
+    @Column(name = PRI_CATE_ID, nullable = false)
+    private Integer primaryCategoryId;
 
-    @Column(name = "seco_cate_uuid", nullable = false)
-    private UUID secondaryCategoryUuid;
+    @Column(name = SECO_CATE_ID, nullable = false)
+    private Integer secondaryCategoryId;
 
     @Column(name = AUTH_MEMB_UUID, nullable = false)
     private UUID authMemberUuid;
@@ -73,10 +73,10 @@ public class CommPostArchiveEntity {
         return new HashCodeBuilder(17,37).append(getUlid()).toHashCode();
     }
 
-    private CommPostArchiveEntity(String ulid, UUID primaryCategoryUuid, UUID secondaryCategoryUuid, UUID authMemberUuid, UUID createMemberUuid, String title, JsonNode content, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime publishedAt) {
+    private CommPostArchiveEntity(String ulid, Integer primaryCategoryId, Integer secondaryCategoryId, UUID authMemberUuid, UUID createMemberUuid, String title, JsonNode content, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime publishedAt) {
         this.ulid = ulid;
-        this.primaryCategoryUuid = primaryCategoryUuid;
-        this.secondaryCategoryUuid = secondaryCategoryUuid;
+        this.primaryCategoryId = primaryCategoryId;
+        this.secondaryCategoryId = secondaryCategoryId;
         this.authMemberUuid = authMemberUuid;
         this.createMemberUuid = createMemberUuid;
         this.title = title;
@@ -92,8 +92,8 @@ public class CommPostArchiveEntity {
 
     public static final class CommPostArchiveEntityBuilder {
         private String ulid;
-        private UUID primaryCategoryUuid;
-        private UUID secondaryCategoryUuid;
+        private Integer primaryCategoryId;
+        private Integer secondaryCategoryId;
         private UUID authMemberUuid;
         private UUID createMemberUuid;
         private String title;
@@ -107,13 +107,13 @@ public class CommPostArchiveEntity {
             return this;
         }
 
-        public CommPostArchiveEntityBuilder primaryCategoryUuid(UUID primaryCategoryUuid) {
-            this.primaryCategoryUuid = primaryCategoryUuid;
+        public CommPostArchiveEntityBuilder primaryCategoryId(Integer primaryCategoryId) {
+            this.primaryCategoryId = primaryCategoryId;
             return this;
         }
 
-        public CommPostArchiveEntityBuilder secondaryCategoryUuid(UUID secondaryCategoryUuid) {
-            this.secondaryCategoryUuid = secondaryCategoryUuid;
+        public CommPostArchiveEntityBuilder secondaryCategoryId(Integer secondaryCategoryId) {
+            this.secondaryCategoryId = secondaryCategoryId;
             return this;
         }
 
@@ -154,8 +154,8 @@ public class CommPostArchiveEntity {
 
         public CommPostArchiveEntityBuilder commPost(final CommPostArchiveEntity postEntity) {
             this.ulid = postEntity.ulid;
-            this.primaryCategoryUuid = postEntity.primaryCategoryUuid;
-            this.secondaryCategoryUuid = postEntity.secondaryCategoryUuid;
+            this.primaryCategoryId = postEntity.primaryCategoryId;
+            this.secondaryCategoryId = postEntity.secondaryCategoryId;
             this.authMemberUuid = postEntity.authMemberUuid;
             this.createMemberUuid = postEntity.createMemberUuid;
             this.title = postEntity.title;
@@ -167,7 +167,7 @@ public class CommPostArchiveEntity {
         }
 
         public CommPostArchiveEntity build() {
-            return new CommPostArchiveEntity(this.ulid, this.primaryCategoryUuid, this.secondaryCategoryUuid, this.authMemberUuid, this.createMemberUuid, this.title, this.content, this.createdAt, this.updatedAt, this.publishedAt);
+            return new CommPostArchiveEntity(this.ulid, this.primaryCategoryId, this.secondaryCategoryId, this.authMemberUuid, this.createMemberUuid, this.title, this.content, this.createdAt, this.updatedAt, this.publishedAt);
         }
 
     }

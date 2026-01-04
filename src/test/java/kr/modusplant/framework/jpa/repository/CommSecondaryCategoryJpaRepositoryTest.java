@@ -7,8 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryOnlyContext
@@ -21,14 +19,14 @@ class CommSecondaryCategoryJpaRepositoryTest implements CommSecondaryCategoryEnt
         this.commCategoryRepository = commCategoryRepository;
     }
 
-    @DisplayName("UUID로 컨텐츠 항목 찾기")
+    @DisplayName("카테고리 id로 컨텐츠 항목 찾기")
     @Test
     void findByUuidTest() {
         // given & when
         CommSecondaryCategoryEntity entity = commCategoryRepository.save(createCommSecondaryCategoryEntityBuilder().primaryCategory(createCommPrimaryCategoryEntity()).build());
 
         // then
-        assertThat(commCategoryRepository.findByUuid(entity.getUuid()).orElseThrow()).isEqualTo(entity);
+        assertThat(commCategoryRepository.findById(entity.getId()).orElseThrow()).isEqualTo(entity);
     }
 
     @DisplayName("category로 컨텐츠 항목 찾기")
@@ -61,20 +59,6 @@ class CommSecondaryCategoryJpaRepositoryTest implements CommSecondaryCategoryEnt
         assertThat(commCategoryRepository.findByCreatedAt(entity.getCreatedAt()).getFirst()).isEqualTo(entity);
     }
 
-    @DisplayName("UUID로 컨텐츠 항목 삭제")
-    @Test
-    void deleteByUuidTest() {
-        // given
-        CommSecondaryCategoryEntity entity = commCategoryRepository.save(createCommSecondaryCategoryEntityBuilder().primaryCategory(createCommPrimaryCategoryEntity()).build());
-        UUID uuid = entity.getUuid();
-
-        // when
-        commCategoryRepository.deleteByUuid(uuid);
-
-        // then
-        assertThat(commCategoryRepository.findByUuid(uuid)).isEmpty();
-    }
-
     @DisplayName("UUID로 컨텐츠 항목 확인")
     @Test
     void existsByUuidTest() {
@@ -82,6 +66,6 @@ class CommSecondaryCategoryJpaRepositoryTest implements CommSecondaryCategoryEnt
         CommSecondaryCategoryEntity entity = commCategoryRepository.save(createCommSecondaryCategoryEntityBuilder().primaryCategory(createCommPrimaryCategoryEntity()).build());
 
         // then
-        assertThat(commCategoryRepository.existsByUuid(entity.getUuid())).isEqualTo(true);
+        assertThat(commCategoryRepository.existsById(entity.getId())).isEqualTo(true);
     }
 }
