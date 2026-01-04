@@ -61,7 +61,11 @@ public class MemberRestController {
     @Operation(summary = "회원 닉네임 중복 확인 API", description = "이미 등록된 닉네임이 있는지 조회합니다.")
     @GetMapping(value = "/check/nickname/{nickname}")
     public ResponseEntity<DataResponse<Map<String, Boolean>>> checkExistedMemberNickname(
-            @Parameter(description = "중복을 확인하려는 회원의 닉네임", example = "IsThisNickname", schema = @Schema(type = "string", pattern = REGEX_NICKNAME))
+            @Parameter(
+                    description = "중복을 확인하려는 회원의 닉네임",
+                    example = "IsThisNickname",
+                    schema = @Schema(type = "string", pattern = REGEX_NICKNAME)
+            )
             @PathVariable(required = false)
             @NotBlank(message = "회원 닉네임이 비어 있습니다. ")
             @Pattern(regexp = REGEX_NICKNAME,
@@ -87,7 +91,10 @@ public class MemberRestController {
     )
     @GetMapping(value = "/{id}/profile")
     public ResponseEntity<DataResponse<MemberProfileResponse>> getMemberProfile(
-            @Parameter(description = "기존에 저장된 회원의 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
+            @Parameter(
+                    description = "기존에 저장된 회원의 아이디",
+                    schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID)
+            )
             @PathVariable(required = false)
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
             UUID id,
@@ -106,7 +113,7 @@ public class MemberRestController {
             String ifModifiedSince) throws IOException {
         validateMemberIdFromToken(id, auth);
         MemberCacheValidationResult cacheValidationResult =
-                memberCacheValidationService.isCacheable(ifNoneMatch, ifModifiedSince, id);
+                memberCacheValidationService.getMemberCacheValidationResult(ifNoneMatch, ifModifiedSince, id);
         if (cacheValidationResult.isCacheable()) {
             return ResponseEntity
                     .status(HttpStatus.NOT_MODIFIED)
@@ -137,12 +144,18 @@ public class MemberRestController {
     )
     @PutMapping(value = "/{id}/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<MemberProfileResponse>> overrideMemberProfile(
-            @Parameter(description = "기존에 저장된 회원의 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
+            @Parameter(
+                    description = "기존에 저장된 회원의 아이디",
+                    schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID)
+            )
             @PathVariable(required = false)
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
             UUID id,
 
-            @Parameter(description = "갱신할 회원의 프로필 이미지", schema = @Schema(type = "string", format = "binary"))
+            @Parameter(
+                    description = "갱신할 회원의 프로필 이미지",
+                    schema = @Schema(type = "string", format = "binary")
+            )
             @RequestPart(name = "image", required = false)
             MultipartFile image,
 
@@ -150,7 +163,11 @@ public class MemberRestController {
             @RequestPart(name = "introduction", required = false)
             String introduction,
 
-            @Parameter(description = "갱신할 회원의 닉네임", example = "NewPlayer", schema = @Schema(type = "string", pattern = REGEX_NICKNAME))
+            @Parameter(
+                    description = "갱신할 회원의 닉네임",
+                    example = "NewPlayer",
+                    schema = @Schema(type = "string", pattern = REGEX_NICKNAME)
+            )
             @RequestPart(name = "nickname")
             @NotBlank(message = "회원 닉네임이 비어 있습니다. ")
             @Pattern(regexp = REGEX_NICKNAME, message = "회원 닉네임 서식이 올바르지 않습니다. ")
@@ -176,12 +193,18 @@ public class MemberRestController {
     )
     @PutMapping("/{id}/like/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationPost(
-            @Parameter(description = "회원의 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
+            @Parameter(
+                    description = "회원의 아이디",
+                    schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID)
+            )
             @PathVariable(required = false)
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
             UUID id,
 
-            @Parameter(description = "좋아요를 누를 게시글의 식별자", schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID))
+            @Parameter(
+                    description = "좋아요를 누를 게시글의 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
             @PathVariable(required = false)
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid,
@@ -202,12 +225,18 @@ public class MemberRestController {
     )
     @DeleteMapping("/{id}/like/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationPost(
-            @Parameter(description = "회원의 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
+            @Parameter(
+                    description = "회원의 아이디",
+                    schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID)
+            )
             @PathVariable(required = false)
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
             UUID id,
 
-            @Parameter(description = "좋아요를 취소할 게시글의 식별자", schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID))
+            @Parameter(
+                    description = "좋아요를 취소할 게시글의 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
             @PathVariable(required = false)
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid,
@@ -228,12 +257,18 @@ public class MemberRestController {
     )
     @PutMapping("/{id}/bookmark/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> bookmarkCommunicationPost(
-            @Parameter(description = "회원의 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
+            @Parameter(
+                    description = "회원의 아이디",
+                    schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID)
+            )
             @PathVariable(required = false)
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
             UUID id,
 
-            @Parameter(description = "북마크를 누를 게시글의 식별자", schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID))
+            @Parameter(
+                    description = "북마크를 누를 게시글의 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
             @PathVariable(required = false)
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid,
@@ -254,12 +289,18 @@ public class MemberRestController {
     )
     @DeleteMapping("/{id}/bookmark/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> cancelCommunicationPostBookmark(
-            @Parameter(description = "회원의 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
+            @Parameter(
+                    description = "회원의 아이디",
+                    schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID)
+            )
             @PathVariable(required = false)
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
             UUID id,
 
-            @Parameter(description = "북마크를 취소할 게시글의 식별자", schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID))
+            @Parameter(
+                    description = "북마크를 취소할 게시글의 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
             @PathVariable(required = false)
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid,
@@ -280,17 +321,27 @@ public class MemberRestController {
     )
     @PutMapping("/{id}/like/communication/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationComment(
-            @Parameter(description = "회원의 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
+            @Parameter(
+                    description = "회원의 아이디",
+                    schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID)
+            )
             @PathVariable(required = false)
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
             UUID id,
 
-            @Parameter(description = "좋아요를 누를 댓글의 게시글 식별자", schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID))
+            @Parameter(
+                    description = "좋아요를 누를 댓글의 게시글 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
             @PathVariable(required = false)
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid,
 
-            @Parameter(description = "좋아요를 누를 댓글의 경로", example = "1.0.4", schema = @Schema(type = "string", pattern = REGEX_MATERIALIZED_PATH))
+            @Parameter(
+                    description = "좋아요를 누를 댓글의 경로",
+                    example = "1.0.4",
+                    schema = @Schema(type = "string", pattern = REGEX_MATERIALIZED_PATH)
+            )
             @PathVariable(required = false)
             @NotBlank(message = "댓글 경로가 비어 있습니다.")
             String path,
@@ -311,17 +362,27 @@ public class MemberRestController {
     )
     @DeleteMapping("/{id}/like/communication/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationComment(
-            @Parameter(description = "회원의 아이디", schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID))
+            @Parameter(
+                    description = "회원의 아이디",
+                    schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID)
+            )
             @PathVariable(required = false)
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
             UUID id,
 
-            @Parameter(description = "좋아요를 취소할 댓글의 게시글 식별자", schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID))
+            @Parameter(
+                    description = "좋아요를 취소할 댓글의 게시글 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
             @PathVariable(required = false)
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid,
 
-            @Parameter(description = "좋아요를 취소할 댓글의 경로", example = "1.0.4", schema = @Schema(type = "string", pattern = REGEX_MATERIALIZED_PATH))
+            @Parameter(
+                    description = "좋아요를 취소할 댓글의 경로",
+                    example = "1.0.4",
+                    schema = @Schema(type = "string", pattern = REGEX_MATERIALIZED_PATH)
+            )
             @PathVariable(required = false)
             @NotBlank(message = "댓글 경로가 비어 있습니다.")
             String path,
