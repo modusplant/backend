@@ -1,15 +1,16 @@
 BEGIN;
 
-WITH daily_id AS (
-	SELECT id FROM comm_pri_cate WHERE category = '일상'
+WITH daily_uuid AS (
+	SELECT uuid FROM comm_pri_cate WHERE category = '일상'
 )
-INSERT INTO comm_seco_cate(pri_cate_id, category, "order", created_at)
+INSERT INTO comm_seco_cate("uuid", pri_cate_uuid, category, "order", created_at)
 SELECT
-    daily_id.id,
+	uuid_generate_v4(),
+	daily_uuid.uuid,
 	v.category,
 	v."order",
 	CURRENT_TIMESTAMP
-FROM daily_id, (VALUES
+FROM daily_uuid, (VALUES
     ('관엽/야생화', 0),
     ('제라늄', 1),
     ('베고니아', 2),
@@ -22,16 +23,17 @@ FROM daily_id, (VALUES
     ('기타', 9)
 ) AS v(category, "order");
 
-WITH qna_id AS (
-	SELECT id FROM comm_pri_cate WHERE category = 'Q&A'
+WITH qna_uuid AS (
+	SELECT uuid FROM comm_pri_cate WHERE category = 'Q&A'
 )
-INSERT INTO comm_seco_cate(pri_cate_id, category, "order", created_at)
+INSERT INTO comm_seco_cate("uuid", pri_cate_uuid, category, "order", created_at)
 SELECT
-    qna_id.id,
+    public.uuid_generate_v4(),
+    qna_uuid.uuid,
     v.category,
     v."order",
     CURRENT_TIMESTAMP
-FROM qna_id, (VALUES
+FROM qna_uuid, (VALUES
     ('물주기/흙', 0),
     ('잎상태/성장/병충해', 1),
     ('물꽂이/잎꽂이', 2),
@@ -42,16 +44,17 @@ FROM qna_id, (VALUES
     ('기타', 7)
 ) AS v(category, "order");
 
-WITH tip_id AS (
-	SELECT id FROM comm_pri_cate WHERE category = '팁'
+WITH tip_uuid AS (
+	SELECT uuid FROM comm_pri_cate WHERE category = '팁'
 )
-INSERT INTO comm_seco_cate(pri_cate_id, category, "order", created_at)
+INSERT INTO comm_seco_cate("uuid", pri_cate_uuid, category, "order", created_at)
 SELECT
-    tip_id.id,
+    public.uuid_generate_v4(),
+    tip_uuid.uuid,
     v.category,
     v."order",
     CURRENT_TIMESTAMP
-FROM tip_id, (VALUES
+FROM tip_uuid, (VALUES
     ('물주기/흙', 0),
     ('잎상태/성장/병충해', 1),
     ('물꽂이/잎꽂이', 2),

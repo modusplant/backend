@@ -20,8 +20,8 @@ CREATE TABLE public.comm_comment_like (
 
 CREATE TABLE public.comm_post (
     ulid character varying(26) NOT NULL,
-    pri_cate_id integer NOT NULL,
-    seco_cate_id integer NOT NULL,
+    pri_cate_uuid uuid NOT NULL,
+    seco_cate_uuid uuid NOT NULL,
     auth_memb_uuid uuid NOT NULL,
     crea_memb_uuid uuid NOT NULL,
     like_count integer NOT NULL,
@@ -37,8 +37,8 @@ CREATE TABLE public.comm_post (
 
 CREATE TABLE public.comm_post_archive (
     ulid character varying(26) NOT NULL,
-    pri_cate_id integer NOT NULL,
-    seco_cate_id integer NOT NULL,
+    pri_cate_uuid uuid NOT NULL,
+    seco_cate_uuid uuid NOT NULL,
     auth_memb_uuid uuid NOT NULL,
     crea_memb_uuid uuid NOT NULL,
     title character varying(60) NOT NULL,
@@ -61,15 +61,15 @@ CREATE TABLE public.comm_post_like (
 );
 
 CREATE TABLE public.comm_pri_cate (
-    id serial NOT NULL,
+    uuid uuid NOT NULL,
     category character varying(40) NOT NULL,
     "order" integer NOT NULL,
     created_at timestamp without time zone NOT NULL
 );
 
 CREATE TABLE public.comm_seco_cate (
-    id serial NOT NULL,
-    pri_cate_id integer NOT NULL,
+    uuid uuid NOT NULL,
+    pri_cate_uuid uuid NOT NULL,
     category character varying(40) NOT NULL,
     "order" integer NOT NULL,
     created_at timestamp without time zone NOT NULL
@@ -165,10 +165,10 @@ ALTER TABLE ONLY public.comm_post_like
     ADD CONSTRAINT "PK_COMM_POST_LIKE" PRIMARY KEY (post_ulid, memb_uuid);
 
 ALTER TABLE ONLY public.comm_pri_cate
-    ADD CONSTRAINT "PK_COMM_PRI_CATE" PRIMARY KEY (id);
+    ADD CONSTRAINT "PK_COMM_PRI_CATE" PRIMARY KEY (uuid);
 
 ALTER TABLE ONLY public.comm_seco_cate
-    ADD CONSTRAINT "PK_COMM_SECO_CATE" PRIMARY KEY (id);
+    ADD CONSTRAINT "PK_COMM_SECO_CATE" PRIMARY KEY (uuid);
 
 ALTER TABLE ONLY public.refresh_token
     ADD CONSTRAINT "PK_REFRESH_TOKEN" PRIMARY KEY (uuid);
