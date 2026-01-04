@@ -11,7 +11,7 @@ public class PrimaryCategoryJpaMapperImpl implements PrimaryCategoryJpaMapper {
     @Override
     public PrimaryCategory toPrimaryCategory(CommPrimaryCategoryEntity primaryCategoryEntity) {
         return PrimaryCategory.create(
-                PrimaryCategoryId.fromUuid(primaryCategoryEntity.getUuid()),
+                PrimaryCategoryId.create(primaryCategoryEntity.getId()),
                 primaryCategoryEntity.getCategory(),
                 primaryCategoryEntity.getOrder()
         );

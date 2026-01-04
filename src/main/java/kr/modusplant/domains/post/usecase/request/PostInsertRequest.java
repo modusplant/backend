@@ -6,14 +6,13 @@ import org.hibernate.validator.constraints.Length;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.UUID;
 
 public record PostInsertRequest(
         @NotNull(message = "1차 항목 식별자가 비어 있습니다.")
-        UUID primaryCategoryUuid,
+        Integer primaryCategoryId,
 
         @NotNull(message = "2차 항목 식별자가 비어 있습니다.")
-        UUID secondaryCategoryUuid,
+        Integer secondaryCategoryId,
 
         @NotBlank(message = "게시글 제목이 비어 있습니다.")
         @Length(max = 60, message = "게시글 제목은 최대 60글자까지 작성할 수 있습니다.")

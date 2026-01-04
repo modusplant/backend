@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface PostQueryRepository {
 
-    List<PostSummaryReadModel> findByCategoryWithCursor(UUID primaryCategoryUuid, List<UUID> secondaryCategoryUuids, UUID currentMemberUuid, String cursorUlid, int size);
+    List<PostSummaryReadModel> findByCategoryWithCursor(Integer primaryCategoryId, List<Integer> secondaryCategoryIds, UUID currentMemberUuid, String cursorUlid, int size);
 
     List<PostSummaryReadModel> findByKeywordWithCursor(String keyword, UUID currentMemberUuid, String cursorUlid, int size);
 
