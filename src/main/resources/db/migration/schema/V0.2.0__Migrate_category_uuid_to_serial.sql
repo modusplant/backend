@@ -27,7 +27,7 @@ CREATE TEMP TABLE seco_cate_mapping AS
 ALTER TABLE comm_pri_cate ADD COLUMN id SERIAL;
 UPDATE comm_pri_cate c SET id = m.new_id FROM pri_cate_mapping m WHERE c.uuid = m.old_uuid;
 
-ALTER TABLE comm_pri_cate DROP CONSTRAINT comm_pri_cate_pkey;
+ALTER TABLE comm_pri_cate DROP CONSTRAINT PK_COMM_PRI_CATE;
 ALTER TABLE comm_pri_cate ADD PRIMARY KEY (id);
 ALTER TABLE comm_pri_cate ALTER COLUMN id SET NOT NULL;
 
@@ -37,7 +37,7 @@ ALTER TABLE comm_seco_cate ADD COLUMN pri_cate_id INTEGER;
 UPDATE comm_seco_cate s SET id = m.new_id FROM seco_cate_mapping m WHERE s.uuid = m.old_uuid;
 UPDATE comm_seco_cate s SET pri_cate_id = m.new_id FROM pri_cate_mapping m WHERE s.pri_cate_uuid = m.old_uuid;
 
-ALTER TABLE comm_seco_cate DROP CONSTRAINT comm_seco_cate_pkey;
+ALTER TABLE comm_seco_cate DROP CONSTRAINT PK_COMM_SECO_CATE;
 ALTER TABLE comm_seco_cate ADD PRIMARY KEY (id);
 ALTER TABLE comm_seco_cate ALTER COLUMN id SET NOT NULL;
 ALTER TABLE comm_seco_cate ALTER COLUMN pri_cate_id SET NOT NULL;
