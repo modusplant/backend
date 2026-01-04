@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.comment.adapter.controller.CommentController;
+import kr.modusplant.domains.comment.framework.in.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
@@ -18,12 +19,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,10 +61,24 @@ public class CommentRestController {
             )
             @PathVariable(required = false, value = "ulid")
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
-            String postUlid) {
-        List<CommentOfPostResponse> commentResponses = controller.gatherByPost(postUlid);
-        return ResponseEntity.ok().body(
-                DataResponse.ok(commentResponses));
+            String postUlid,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.IF_NONE_MATCH, required = false)
+            String ifNoneMatch,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.IF_MODIFIED_SINCE, required = false)
+            String ifModifiedSince
+            ) {
+        CommentCacheData cacheData = controller.getCacheData(postUlid, ifNoneMatch, ifModifiedSince);
+        if (cacheData.isCacheable()) {
+            return buildFixedCacheResponsePart(cacheData)
+                    .build();
+        } else {
+            return buildFixedCacheResponsePart(cacheData)
+                    .body(DataResponse.ok(controller.gatherByPost(postUlid)));
+        }
     }
 
     /**
@@ -93,11 +113,24 @@ public class CommentRestController {
                     example = "8"
             )
             @RequestParam(value = "size", defaultValue = "8")
-            int size
+            int size,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.IF_NONE_MATCH, required = false)
+            String ifNoneMatch,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.IF_MODIFIED_SINCE, required = false)
+            String ifModifiedSince
     ) {
-        CommentPageResponse<CommentOfAuthorPageModel> commentResponses =
-                controller.gatherByAuthor(memberUuid, PageRequest.of(page, size));
-        return ResponseEntity.ok().body(DataResponse.ok(commentResponses));
+        CommentCacheData cacheData = controller.getCacheData(memberUuid, ifNoneMatch, ifModifiedSince);
+        if (cacheData.isCacheable()) {
+            return buildFixedCacheResponsePart(cacheData)
+                    .build();
+        } else {
+            return buildFixedCacheResponsePart(cacheData)
+                    .body(DataResponse.ok(controller.gatherByAuthor(memberUuid, PageRequest.of(page, size))));
+        }
     }
 
     @Operation(
@@ -131,5 +164,16 @@ public class CommentRestController {
     ) {
         controller.delete(ulid, path);
         return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    private ResponseEntity.BodyBuilder buildFixedCacheResponsePart(CommentCacheData cacheData) {
+        return ResponseEntity
+                .status(cacheData.isCacheable() ? HttpStatus.NOT_MODIFIED : HttpStatus.OK)
+                .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
+                .eTag(String.format("W/\"%s\"", cacheData.entityTag()))
+                .lastModified(
+                        ZonedDateTime.of(
+                                (cacheData.lastModifiedAt()),
+                                ZoneId.of("Asia/Seoul")));
     }
 }
