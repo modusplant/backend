@@ -39,7 +39,6 @@ public class PostTestDataHelper {
 
     public CommPriCateRecord insertTestPrimaryCategory(String category, int order) {
         return dsl.insertInto(COMM_PRI_CATE)
-                .set(COMM_PRI_CATE.UUID,UUID.randomUUID())
                 .set(COMM_PRI_CATE.CATEGORY,category)
                 .set(COMM_PRI_CATE.ORDER,order)
                 .set(COMM_PRI_CATE.CREATED_AT,LocalDateTime.now().minusYears(3))
@@ -49,11 +48,10 @@ public class PostTestDataHelper {
 
     public CommSecoCateRecord insertTestSecondaryCategory(CommPriCateRecord priCateRecord, String category, int order) {
         return dsl.insertInto(COMM_SECO_CATE)
-                .set(COMM_SECO_CATE.UUID,UUID.randomUUID())
                 .set(COMM_SECO_CATE.CATEGORY,category)
                 .set(COMM_SECO_CATE.ORDER,order)
                 .set(COMM_SECO_CATE.CREATED_AT,LocalDateTime.now().minusYears(3))
-                .set(COMM_SECO_CATE.PRI_CATE_UUID,priCateRecord.getUuid())
+                .set(COMM_SECO_CATE.PRI_CATE_ID,priCateRecord.getId())
                 .returning()
                 .fetchOneInto(CommSecoCateRecord.class);
     }
@@ -64,8 +62,8 @@ public class PostTestDataHelper {
     ) {
         return dsl.insertInto(COMM_POST)
                 .set(COMM_POST.ULID,generator.generate(null,null,null, EventType.INSERT))
-                .set(COMM_POST.PRI_CATE_UUID,priCateRecord.getUuid())
-                .set(COMM_POST.SECO_CATE_UUID,secoCateRecord.getUuid())
+                .set(COMM_POST.PRI_CATE_ID,priCateRecord.getId())
+                .set(COMM_POST.SECO_CATE_ID,secoCateRecord.getId())
                 .set(COMM_POST.AUTH_MEMB_UUID,memberRecord.getUuid())
                 .set(COMM_POST.CREA_MEMB_UUID,memberRecord.getUuid())
                 .set(COMM_POST.LIKE_COUNT,30)
@@ -88,8 +86,8 @@ public class PostTestDataHelper {
         LocalDateTime dateTime = LocalDateTime.now().plusDays(1);
         return dsl.insertInto(COMM_POST)
                 .set(COMM_POST.ULID,generator.generate(null,null,null, EventType.INSERT))
-                .set(COMM_POST.PRI_CATE_UUID,priCateRecord.getUuid())
-                .set(COMM_POST.SECO_CATE_UUID,secoCateRecord.getUuid())
+                .set(COMM_POST.PRI_CATE_ID,priCateRecord.getId())
+                .set(COMM_POST.SECO_CATE_ID,secoCateRecord.getId())
                 .set(COMM_POST.AUTH_MEMB_UUID,memberRecord.getUuid())
                 .set(COMM_POST.CREA_MEMB_UUID,memberRecord.getUuid())
                 .set(COMM_POST.LIKE_COUNT,0)
@@ -163,18 +161,18 @@ public class PostTestDataHelper {
     }
 
     public void deleteTestCategory(CommPriCateRecord... primaryCategories) {
-        UUID[] uuids = Arrays.stream(primaryCategories)
-                .map(CommPriCateRecord::getUuid)
-                .toArray(UUID[]::new);
+        Integer[] ids = Arrays.stream(primaryCategories)
+                .map(CommPriCateRecord::getId)
+                .toArray(Integer[]::new);
 
         // 2차 카테고리 삭제
         dsl.deleteFrom(COMM_SECO_CATE)
-                .where(COMM_SECO_CATE.PRI_CATE_UUID.in(uuids))
+                .where(COMM_SECO_CATE.PRI_CATE_ID.in(ids))
                 .execute();
 
         // 1차 카테고리 삭제
         dsl.deleteFrom(COMM_PRI_CATE)
-                .where(COMM_PRI_CATE.UUID.in(uuids))
+                .where(COMM_PRI_CATE.ID.in(ids))
                 .execute();
     }
 

@@ -6,12 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
 import static kr.modusplant.shared.persistence.constant.TableName.COMM_SECO_CATE;
@@ -23,12 +21,13 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_SECO_CATE
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CommSecondaryCategoryEntity {
     @Id
-    @UuidGenerator
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "comm_seco_cate_seq")
+    @SequenceGenerator(name = "comm_seco_cate_seq", sequenceName = "comm_seco_cate_id_seq", allocationSize = 1)
     @Column(nullable = false, updatable = false)
-    private UUID uuid;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = PRI_CATE_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = PRI_CATE_ID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private CommPrimaryCategoryEntity primaryCategoryEntity;
 
     @Column(nullable = false, updatable = false)
@@ -57,8 +56,8 @@ public class CommSecondaryCategoryEntity {
         return new HashCodeBuilder(17, 37).append(getOrder()).toHashCode();
     }
 
-    private CommSecondaryCategoryEntity(UUID uuid, CommPrimaryCategoryEntity primaryCategoryEntity, String category, Integer order) {
-        this.uuid = uuid;
+    private CommSecondaryCategoryEntity(Integer id, CommPrimaryCategoryEntity primaryCategoryEntity, String category, Integer order) {
+        this.id = id;
         this.primaryCategoryEntity = primaryCategoryEntity;
         this.category = category;
         this.order = order;
@@ -69,13 +68,13 @@ public class CommSecondaryCategoryEntity {
     }
 
     public static final class CommSecondaryCategoryEntityBuilder {
-        private UUID uuid;
+        private Integer id;
         private CommPrimaryCategoryEntity primaryCategoryEntity;
         private String category;
         private Integer order;
 
-        public CommSecondaryCategoryEntityBuilder uuid(final UUID uuid) {
-            this.uuid = uuid;
+        public CommSecondaryCategoryEntityBuilder id(final Integer id) {
+            this.id = id;
             return this;
         }
 
@@ -95,7 +94,7 @@ public class CommSecondaryCategoryEntity {
         }
 
         public CommSecondaryCategoryEntityBuilder commSecondaryCategory(final CommSecondaryCategoryEntity commCategory) {
-            this.uuid = commCategory.getUuid();
+            this.id = commCategory.getId();
             this.primaryCategoryEntity = commCategory.getPrimaryCategoryEntity();
             this.category = commCategory.getCategory();
             this.order = commCategory.getOrder();
@@ -103,7 +102,7 @@ public class CommSecondaryCategoryEntity {
         }
 
         public CommSecondaryCategoryEntity build() {
-            return new CommSecondaryCategoryEntity(this.uuid, this.primaryCategoryEntity, this.category, this.order);
+            return new CommSecondaryCategoryEntity(this.id, this.primaryCategoryEntity, this.category, this.order);
         }
     }
 }

@@ -38,9 +38,9 @@ public class PostJooqMapperImpl implements PostJooqMapper {
     public PostDetailReadModel toPostDetailReadModel(Record record) {
         return new PostDetailReadModel(
                 record.get(COMM_POST.ULID),
-                record.get("primaryCategoryUuid", UUID.class),
+                record.get("primaryCategoryId", Integer.class),
                 record.get("primaryCategory", String.class),
-                record.get("secondaryCategoryUuid", UUID.class),
+                record.get("secondaryCategoryId", Integer.class),
                 record.get("secondaryCategory", String.class),
                 record.get("authorUuid", UUID.class),
                 record.get(SITE_MEMBER.NICKNAME),
@@ -59,9 +59,9 @@ public class PostJooqMapperImpl implements PostJooqMapper {
     public PostDetailDataReadModel toPostDetailDataReadModel(Record record) {
         return new PostDetailDataReadModel(
                 record.get(COMM_POST.ULID),
-                record.get("primaryCategoryUuid", UUID.class),
+                record.get("primaryCategoryId", Integer.class),
                 record.get("primaryCategory", String.class),
-                record.get("secondaryCategoryUuid", UUID.class),
+                record.get("secondaryCategoryId", Integer.class),
                 record.get("secondaryCategory", String.class),
                 record.get("authorUuid", UUID.class),
                 record.get(SITE_MEMBER.NICKNAME),

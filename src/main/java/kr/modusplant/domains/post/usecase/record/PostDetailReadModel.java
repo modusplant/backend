@@ -7,9 +7,9 @@ import java.util.UUID;
 
 public record PostDetailReadModel(
         String ulid,
-        UUID primaryCategoryUuid,
+        Integer primaryCategoryId,
         String primaryCategory,
-        UUID secondaryCategoryUuid,
+        Integer secondaryCategoryId,
         String secondaryCategory,
         UUID authorUuid,
         String nickname,

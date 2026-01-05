@@ -11,8 +11,8 @@ public class PostArchiveJpaMapperImpl implements PostArchiveJpaMapper {
     public CommPostArchiveEntity toPostArchiveEntity(CommPostEntity postEntity) {
         return CommPostArchiveEntity.builder()
                 .ulid(postEntity.getUlid())
-                .primaryCategoryUuid(postEntity.getPrimaryCategory().getUuid())
-                .secondaryCategoryUuid(postEntity.getSecondaryCategory().getUuid())
+                .primaryCategoryId(postEntity.getPrimaryCategory().getId())
+                .secondaryCategoryId(postEntity.getSecondaryCategory().getId())
                 .authMemberUuid(postEntity.getAuthMember().getUuid())
                 .createMemberUuid(postEntity.getCreateMember().getUuid())
                 .title(postEntity.getTitle())
