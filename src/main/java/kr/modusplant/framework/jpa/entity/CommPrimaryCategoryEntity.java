@@ -6,12 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.CREATED_AT;
 import static kr.modusplant.shared.persistence.constant.TableColumnName.ORDER;
@@ -24,9 +22,10 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_PRI_CATE;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CommPrimaryCategoryEntity {
     @Id
-    @UuidGenerator
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "comm_pri_cate_seq")
+    @SequenceGenerator(name = "comm_pri_cate_seq", sequenceName = "comm_pri_cate_id_seq", allocationSize = 1)
     @Column(nullable = false, updatable = false)
-    private UUID uuid;
+    private Integer id;
 
     @Column(nullable = false, updatable = false, unique = true)
     private String category;
@@ -54,8 +53,8 @@ public class CommPrimaryCategoryEntity {
         return new HashCodeBuilder(17, 37).append(getOrder()).toHashCode();
     }
 
-    private CommPrimaryCategoryEntity(UUID uuid, String category, Integer order) {
-        this.uuid = uuid;
+    private CommPrimaryCategoryEntity(Integer id, String category, Integer order) {
+        this.id = id;
         this.category = category;
         this.order = order;
     }
@@ -65,12 +64,12 @@ public class CommPrimaryCategoryEntity {
     }
 
     public static final class CommCategoryEntityBuilder {
-        private UUID uuid;
+        private Integer id;
         private String category;
         private Integer order;
 
-        public CommCategoryEntityBuilder uuid(final UUID uuid) {
-            this.uuid = uuid;
+        public CommCategoryEntityBuilder id(final Integer id) {
+            this.id = id;
             return this;
         }
 
@@ -85,14 +84,14 @@ public class CommPrimaryCategoryEntity {
         }
 
         public CommCategoryEntityBuilder commPrimaryCategory(final CommPrimaryCategoryEntity commCategory) {
-            this.uuid = commCategory.getUuid();
+            this.id = commCategory.getId();
             this.category = commCategory.getCategory();
             this.order = commCategory.getOrder();
             return this;
         }
 
         public CommPrimaryCategoryEntity build() {
-            return new CommPrimaryCategoryEntity(this.uuid, this.category, this.order);
+            return new CommPrimaryCategoryEntity(this.id, this.category, this.order);
         }
     }
 }
