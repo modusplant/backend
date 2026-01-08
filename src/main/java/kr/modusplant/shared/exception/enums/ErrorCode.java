@@ -65,9 +65,4 @@ public enum ErrorCode implements kr.modusplant.shared.exception.enums.supers.Err
     private final int httpStatus;
     private final String code;
     private final String message;
-
-    @Override
-    public boolean isSuccess() {
-        return false;
-    }
 }

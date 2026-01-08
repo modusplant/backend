@@ -22,9 +22,4 @@ public enum SecurityErrorCode implements ErrorCode {
     private final String code;
     private final String message;
 
-    @Override
-    public boolean isSuccess() {
-        return false;
-    }
-
 }

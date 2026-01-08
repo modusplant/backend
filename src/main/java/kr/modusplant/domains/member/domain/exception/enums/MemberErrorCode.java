@@ -29,9 +29,4 @@ public enum MemberErrorCode implements ErrorCode {
     private final int httpStatus;
     private final String code;
     private final String message;
-
-    @Override
-    public boolean isSuccess() {
-        return false;
-    }
 }
