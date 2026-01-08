@@ -57,8 +57,8 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                                 .and(COMM_POST_BOOKMARK.MEMB_UUID.eq(authorId.getValue()))
                 ).as("isBookmarked")
         ).from(COMM_POST)
-                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_UUID.eq(COMM_PRI_CATE.UUID))
-                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_UUID.eq(COMM_SECO_CATE.UUID))
+                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
+                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
                 .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .leftJoin(
                         select(COMM_COMMENT.POST_ULID, count().as("comment_count"))
@@ -96,8 +96,8 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                         COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
                         COMM_POST.UPDATED_AT
                 ).from(COMM_POST)
-                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_UUID.eq(COMM_PRI_CATE.UUID))
-                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_UUID.eq(COMM_SECO_CATE.UUID))
+                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
+                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
                 .where(COMM_POST.IS_PUBLISHED.isFalse())
                 .and(COMM_POST.AUTH_MEMB_UUID.eq(authorId.getValue()))
                 .orderBy(COMM_POST.UPDATED_AT.desc(), COMM_POST.ULID.desc())
@@ -148,8 +148,8 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                         ).as("isBookmarked")
                 )
                 .from(COMM_POST)
-                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_UUID.eq(COMM_PRI_CATE.UUID))
-                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_UUID.eq(COMM_SECO_CATE.UUID))
+                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
+                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
                 .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .leftJoin(
                         select(
@@ -199,8 +199,8 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                 )
                 .from(COMM_POST_LIKE)
                 .join(COMM_POST).on(COMM_POST_LIKE.POST_ULID.eq(COMM_POST.ULID))
-                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_UUID.eq(COMM_PRI_CATE.UUID))
-                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_UUID.eq(COMM_SECO_CATE.UUID))
+                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
+                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
                 .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .leftJoin(
                         select(COMM_COMMENT.POST_ULID, count().as("comment_count"))
@@ -250,8 +250,8 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                 )
                 .from(COMM_POST_BOOKMARK)
                 .join(COMM_POST).on(COMM_POST_BOOKMARK.POST_ULID.eq(COMM_POST.ULID))
-                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_UUID.eq(COMM_PRI_CATE.UUID))
-                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_UUID.eq(COMM_SECO_CATE.UUID))
+                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
+                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
                 .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .leftJoin(
                         select(COMM_COMMENT.POST_ULID, count().as("comment_count"))

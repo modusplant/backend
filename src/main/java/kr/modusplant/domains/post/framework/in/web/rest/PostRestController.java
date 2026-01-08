@@ -68,19 +68,19 @@ public class PostRestController {
             @Range(min = 1, max = 50)
             Integer size,
 
-            @Parameter(schema = @Schema(description = "1차 항목 식별자", example = "2d9f462d-b50f-4394-928e-5c864f60b09a"))
-            @RequestParam(name = "primaryCategoryId", required = false)
-            UUID primaryCategoryUuid,
+            @Parameter(schema = @Schema(description = "1차 항목 식별자", example = "1"))
+            @RequestParam(required = false)
+            Integer primaryCategoryId,
 
-            @Parameter(schema = @Schema(description = "2차 항목 식별자 (복수 선택 가능)", example = "4803f4e8-c982-4631-ba82-234d4fa6e824"))
-            @RequestParam(name = "secondaryCategoryId", required = false)
-            List<UUID> secondaryCategoryUuids
+            @Parameter(schema = @Schema(description = "2차 항목 식별자 (복수 선택 가능)", example = "1"))
+            @RequestParam(required = false)
+            List<Integer> secondaryCategoryIds
     ) {
         UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
-        if(primaryCategoryUuid == null && secondaryCategoryUuids != null && !secondaryCategoryUuids.isEmpty()) {
+        if(primaryCategoryId == null && secondaryCategoryIds != null && !secondaryCategoryIds.isEmpty()) {
             throw new EmptyCategoryIdException();
         }
-        return ResponseEntity.ok().body(DataResponse.ok(postController.getAll(new PostCategoryRequest(primaryCategoryUuid, secondaryCategoryUuids), currentMemberUuid, lastUlid,size)));
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getAll(new PostCategoryRequest(primaryCategoryId, secondaryCategoryIds), currentMemberUuid, lastUlid,size)));
     }
 
     @Operation(
@@ -158,15 +158,15 @@ public class PostRestController {
     public ResponseEntity<DataResponse<Void>> insertPost(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 
-            @Parameter(schema = @Schema(description = "게시글이 포함된 1차 항목의 식별자", example = "148d6e33-102d-4df4-a4d0-5ff233665548"))
-            @RequestParam(name = "primaryCategoryId")
+            @Parameter(schema = @Schema(description = "게시글이 포함된 1차 항목의 식별자", example = "1"))
+            @RequestParam
             @NotNull(message = "1차 항목 식별자가 비어 있습니다.")
-            UUID primaryCategoryUuid,
+            Integer primaryCategoryId,
 
-            @Parameter(schema = @Schema(description = "게시글이 포함된 2차 항목의 식별자", example = "148d6e33-102d-4df4-a4d0-5ff233665548"))
-            @RequestParam(name = "secondaryCategoryId")
+            @Parameter(schema = @Schema(description = "게시글이 포함된 2차 항목의 식별자", example = "1"))
+            @RequestParam
             @NotNull(message = "2차 항목 식별자가 비어 있습니다.")
-            UUID secondaryCategoryUuid,
+            Integer secondaryCategoryId,
 
             @Parameter(schema = @Schema(description = "게시글의 제목", maximum = "60", example = "이거 과습인가요?"))
             @RequestParam
@@ -194,7 +194,7 @@ public class PostRestController {
             Boolean isPublished
     ) throws IOException {
         UUID currentMemberUuid = userDetails.getActiveUuid();
-        postController.createPost(new PostInsertRequest(primaryCategoryUuid, secondaryCategoryUuid, title, content, orderInfo, isPublished), currentMemberUuid);
+        postController.createPost(new PostInsertRequest(primaryCategoryId, secondaryCategoryId, title, content, orderInfo, isPublished), currentMemberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
@@ -212,15 +212,15 @@ public class PostRestController {
             @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
             String ulid,
 
-            @Parameter(schema = @Schema(description = "게시글이 포함된 1차 항목의 식별자", example = "148d6e33-102d-4df4-a4d0-5ff233665548"))
-            @RequestParam(name = "primaryCategoryId")
+            @Parameter(schema = @Schema(description = "게시글이 포함된 1차 항목의 식별자", example = "1"))
+            @RequestParam
             @NotNull(message = "1차 항목 식별자가 비어 있습니다.")
-            UUID primaryCategoryUuid,
+            Integer primaryCategoryId,
 
-            @Parameter(schema = @Schema(description = "게시글이 포함된 2차 항목의 식별자", example = "148d6e33-102d-4df4-a4d0-5ff233665548"))
-            @RequestParam(name = "secondaryCategoryId")
+            @Parameter(schema = @Schema(description = "게시글이 포함된 2차 항목의 식별자", example = "1"))
+            @RequestParam
             @NotNull(message = "2차 항목 식별자가 비어 있습니다.")
-            UUID secondaryCategoryUuid,
+            Integer secondaryCategoryId,
 
             @Parameter(schema = @Schema(description = "게시글의 제목", maximum = "60", example = "이거 과습인가요?"))
             @RequestParam
@@ -248,7 +248,7 @@ public class PostRestController {
             Boolean isPublished
     ) throws IOException {
         UUID currentMemberUuid = userDetails.getActiveUuid();
-        postController.updatePost(new PostUpdateRequest(ulid, primaryCategoryUuid, secondaryCategoryUuid, title, content, orderInfo, isPublished), currentMemberUuid);
+        postController.updatePost(new PostUpdateRequest(ulid, primaryCategoryId, secondaryCategoryId, title, content, orderInfo, isPublished), currentMemberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

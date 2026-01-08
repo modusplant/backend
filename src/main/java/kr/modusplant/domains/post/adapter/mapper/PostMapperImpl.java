@@ -20,9 +20,9 @@ public class PostMapperImpl implements PostMapper {
     public PostDetailResponse toPostDetailResponse(PostDetailReadModel postDetailReadModel, JsonNode content, Long viewCount) {
         return new PostDetailResponse(
                 postDetailReadModel.ulid(),
-                postDetailReadModel.primaryCategoryUuid(),
+                postDetailReadModel.primaryCategoryId(),
                 postDetailReadModel.primaryCategory(),
-                postDetailReadModel.secondaryCategoryUuid(),
+                postDetailReadModel.secondaryCategoryId(),
                 postDetailReadModel.secondaryCategory(),
                 postDetailReadModel.authorUuid(),
                 postDetailReadModel.nickname(),
@@ -42,9 +42,9 @@ public class PostMapperImpl implements PostMapper {
     public PostDetailResponse toPostDetailResponse(PostDetailDataReadModel postDetailDataReadModel, JsonNode content) {
         return new PostDetailResponse(
                 postDetailDataReadModel.ulid(),
-                postDetailDataReadModel.primaryCategoryUuid(),
+                postDetailDataReadModel.primaryCategoryId(),
                 postDetailDataReadModel.primaryCategory(),
-                postDetailDataReadModel.secondaryCategoryUuid(),
+                postDetailDataReadModel.secondaryCategoryId(),
                 postDetailDataReadModel.secondaryCategory(),
                 postDetailDataReadModel.authorUuid(),
                 postDetailDataReadModel.nickname(),
