@@ -1,5 +1,7 @@
 package kr.modusplant.framework.aws.service;
 
+import kr.modusplant.framework.aws.exception.NotFoundFileKeyOnS3Exception;
+import kr.modusplant.framework.aws.exception.enums.AWSErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,15 +11,13 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -87,6 +87,23 @@ class S3FileServiceTest {
         // then
         assertThat(result).isEqualTo(fileContent);
         verify(s3Client, times(1)).getObject(any(GetObjectRequest.class));
+    }
+
+    @Test
+    @DisplayName("파일 다운로드 시 해당하는 파일 키가 없어 오류 발생")
+    void downloadFile_givenNotFoundFileKey_willThrowException() {
+        // given
+        String fileKey = "test-file-key";
+
+        given(s3Client.getObject(any(GetObjectRequest.class))).willThrow(NoSuchKeyException.class);
+
+        // when
+        NotFoundFileKeyOnS3Exception exception = assertThrows(NotFoundFileKeyOnS3Exception.class, () -> {
+            byte[] result = s3FileService.downloadFile(fileKey);
+        });
+
+        // then
+        assertThat(exception.getMessage()).isEqualTo(AWSErrorCode.NOT_FOUND_FILE_KEY_ON_S3.getMessage());
     }
 
     @Test

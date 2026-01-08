@@ -11,10 +11,8 @@ import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TE
 import static kr.modusplant.domains.post.common.constant.PostStringConstant.TEST_POST_TITLE;
 import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
 import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID2;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.*;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 
@@ -24,9 +22,9 @@ public interface PostReadModelTestUtils {
 
     PostDetailReadModel TEST_PUBLISHED_POST_DETAIL_READ_MODEL = new PostDetailReadModel(
             TEST_POST_ULID,
-            TEST_COMM_PRIMARY_CATEGORY_UUID,
+            TEST_COMM_PRIMARY_CATEGORY_ID,
             TEST_COMM_PRIMARY_CATEGORY_CATEGORY,
-            TEST_COMM_SECONDARY_CATEGORY_UUID,
+            TEST_COMM_SECONDARY_CATEGORY_ID,
             TEST_COMM_SECONDARY_CATEGORY_CATEGORY,
             MEMBER_BASIC_USER_UUID,
             MEMBER_BASIC_USER_NICKNAME,
@@ -42,9 +40,9 @@ public interface PostReadModelTestUtils {
 
     PostDetailDataReadModel TEST_PUBLISHED_POST_DETAIL_DATA_READ_MODEL = new PostDetailDataReadModel(
             TEST_POST_ULID,
-            TEST_COMM_PRIMARY_CATEGORY_UUID,
+            TEST_COMM_PRIMARY_CATEGORY_ID,
             TEST_COMM_PRIMARY_CATEGORY_CATEGORY,
-            TEST_COMM_SECONDARY_CATEGORY_UUID,
+            TEST_COMM_SECONDARY_CATEGORY_ID,
             TEST_COMM_SECONDARY_CATEGORY_CATEGORY,
             MEMBER_BASIC_USER_UUID,
             MEMBER_BASIC_USER_NICKNAME,
@@ -57,9 +55,9 @@ public interface PostReadModelTestUtils {
 
     PostDetailDataReadModel TEST_DRAFT_POST_DETAIL_DATA_READ_MODEL = new PostDetailDataReadModel(
             TEST_POST_ULID,
-            TEST_COMM_PRIMARY_CATEGORY_UUID,
+            TEST_COMM_PRIMARY_CATEGORY_ID,
             TEST_COMM_PRIMARY_CATEGORY_CATEGORY,
-            TEST_COMM_SECONDARY_CATEGORY_UUID,
+            TEST_COMM_SECONDARY_CATEGORY_ID,
             TEST_COMM_SECONDARY_CATEGORY_CATEGORY,
             MEMBER_BASIC_USER_UUID,
             MEMBER_BASIC_USER_NICKNAME,
