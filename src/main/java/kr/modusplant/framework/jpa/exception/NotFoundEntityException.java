@@ -1,23 +1,23 @@
 package kr.modusplant.framework.jpa.exception;
 
-import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.exception.BusinessException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 
 public class NotFoundEntityException extends BusinessException {
 
-    public NotFoundEntityException(EntityErrorCode errorCode, String message, Throwable cause) {
+    public NotFoundEntityException(ErrorCode errorCode, String message, Throwable cause) {
         super(errorCode, message, cause);
     }
 
-    public NotFoundEntityException(EntityErrorCode errorCode, Throwable cause) {
+    public NotFoundEntityException(ErrorCode errorCode, Throwable cause) {
         super(errorCode, cause);
     }
 
-    public NotFoundEntityException(EntityErrorCode errorCode, String message) {
+    public NotFoundEntityException(ErrorCode errorCode, String message) {
         super(errorCode, message);
     }
 
-    public NotFoundEntityException(EntityErrorCode errorCode) {
+    public NotFoundEntityException(ErrorCode errorCode) {
         super(errorCode);
     }
 }
