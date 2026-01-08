@@ -3,7 +3,7 @@ package kr.modusplant.framework.jackson.http.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.exception.enums.GeneralSuccessCode;
-import kr.modusplant.shared.exception.enums.supers.ResponseCode;
+import kr.modusplant.shared.exception.enums.supers.ErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,20 +20,20 @@ public class DataResponse<T> {
     private String message;
     private T data;
 
-    public static <T> DataResponse<T> of(ResponseCode responseCode, T data) {
+    public static <T> DataResponse<T> of(ErrorCode errorCode, T data) {
         DataResponse<T> response = new DataResponse<>();
-        response.status = responseCode.getHttpStatus();
-        response.code = responseCode.getCode();
-        response.message = responseCode.getMessage();
+        response.status = errorCode.getHttpStatus();
+        response.code = errorCode.getCode();
+        response.message = errorCode.getMessage();
         response.data = data;
         return response;
     }
 
-    public static DataResponse<Void> of(ResponseCode responseCode) {
+    public static DataResponse<Void> of(ErrorCode errorCode) {
         DataResponse<Void> response = new DataResponse<>();
-        response.status = responseCode.getHttpStatus();
-        response.code = responseCode.getCode();
-        response.message = responseCode.getMessage();
+        response.status = errorCode.getHttpStatus();
+        response.code = errorCode.getCode();
+        response.message = errorCode.getMessage();
         return response;
     }
 

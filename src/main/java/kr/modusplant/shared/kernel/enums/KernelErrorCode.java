@@ -1,13 +1,13 @@
 package kr.modusplant.shared.kernel.enums;
 
-import kr.modusplant.shared.exception.enums.supers.ResponseCode;
+import kr.modusplant.shared.exception.enums.supers.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum KernelErrorCode implements ResponseCode {
+public enum KernelErrorCode implements ErrorCode {
 
     // Empty
     EMPTY_EMAIL(HttpStatus.BAD_REQUEST.value(), "empty_email","이메일 값이 비었습니다"),

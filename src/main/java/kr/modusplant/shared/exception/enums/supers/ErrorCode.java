@@ -1,6 +1,6 @@
 package kr.modusplant.shared.exception.enums.supers;
 
-public interface ResponseCode {
+public interface ErrorCode {
     int getHttpStatus();
     String getCode();
     String getMessage();

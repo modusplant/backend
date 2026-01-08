@@ -1,13 +1,13 @@
 package kr.modusplant.framework.jpa.exception.enums;
 
-import kr.modusplant.shared.exception.enums.supers.ResponseCode;
+import kr.modusplant.shared.exception.enums.supers.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum EntityErrorCode implements ResponseCode {
+public enum EntityErrorCode implements ErrorCode {
 
     // Not Found
     NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND.value(), "not_found_comment", "댓글이 존재하지 않습니다"),

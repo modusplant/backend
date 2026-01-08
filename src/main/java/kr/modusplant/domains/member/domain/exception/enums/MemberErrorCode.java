@@ -1,13 +1,13 @@
 package kr.modusplant.domains.member.domain.exception.enums;
 
-import kr.modusplant.shared.exception.enums.supers.ResponseCode;
+import kr.modusplant.shared.exception.enums.supers.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum MemberErrorCode implements ResponseCode {
+public enum MemberErrorCode implements ErrorCode {
     EMPTY_MEMBER_BIRTH_DATE(HttpStatus.BAD_REQUEST.value(), "empty_member_birth_date", "회원 생일이 비어 있습니다. "),
     EMPTY_MEMBER_ID(HttpStatus.BAD_REQUEST.value(), "empty_member_id", "회원 아이디가 비어 있습니다. "),
     EMPTY_MEMBER_STATUS(HttpStatus.BAD_REQUEST.value(), "empty_member_status", "회원 상태가 비어 있습니다. "),

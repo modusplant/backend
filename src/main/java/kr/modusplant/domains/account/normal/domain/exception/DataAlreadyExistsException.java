@@ -1,15 +1,15 @@
 package kr.modusplant.domains.account.normal.domain.exception;
 
 import kr.modusplant.shared.exception.BusinessException;
-import kr.modusplant.shared.exception.enums.supers.ResponseCode;
+import kr.modusplant.shared.exception.enums.supers.ErrorCode;
 
 public class DataAlreadyExistsException extends BusinessException {
 
-    public DataAlreadyExistsException(ResponseCode errorCode) {
+    public DataAlreadyExistsException(ErrorCode errorCode) {
         super(errorCode);
     }
 
-    public DataAlreadyExistsException(ResponseCode errorCode, String message) {
+    public DataAlreadyExistsException(ErrorCode errorCode, String message) {
         super(errorCode, message);
     }
 }

@@ -1,13 +1,13 @@
 package kr.modusplant.domains.post.domain.exception.enums;
 
-import kr.modusplant.shared.exception.enums.supers.ResponseCode;
+import kr.modusplant.shared.exception.enums.supers.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum PostErrorCode implements ResponseCode {
+public enum PostErrorCode implements ErrorCode {
     EMPTY_POST_ID(HttpStatus.BAD_REQUEST.value(), "empty_post_id", "게시글 id가 비어 있습니다. "),
     INVALID_POST_ID(HttpStatus.BAD_REQUEST.value(), "invalid_post_id", "게시글 id가 유효하지 않습니다. "),
     EMPTY_AUTHOR_ID(HttpStatus.BAD_REQUEST.value(), "empty_author_id", "작성자 id가 비어 있습니다. "),

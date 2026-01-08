@@ -1,13 +1,13 @@
 package kr.modusplant.domains.comment.domain.exception.enums;
 
-import kr.modusplant.shared.exception.enums.supers.ResponseCode;
+import kr.modusplant.shared.exception.enums.supers.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum CommentErrorCode implements ResponseCode {
+public enum CommentErrorCode implements ErrorCode {
 
     EMPTY_POST_ID(HttpStatus.BAD_REQUEST.value(), "empty_post_id", "게시글의 식별자 값이 비었습니다"),
     EMPTY_COMMENT_PATH(HttpStatus.BAD_REQUEST.value(), "empty_comment_path", "댓글의 경로 값이 비었습니다"),

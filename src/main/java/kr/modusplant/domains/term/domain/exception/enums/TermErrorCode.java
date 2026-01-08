@@ -1,13 +1,13 @@
 package kr.modusplant.domains.term.domain.exception.enums;
 
-import kr.modusplant.shared.exception.enums.supers.ResponseCode;
+import kr.modusplant.shared.exception.enums.supers.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum TermErrorCode implements ResponseCode {
+public enum TermErrorCode implements ErrorCode {
     EMPTY_TERM_ID(HttpStatus.BAD_REQUEST.value(), "empty_term_id", "약관 아이디가 비어 있습니다. "),
     EMPTY_TERM_NAME(HttpStatus.BAD_REQUEST.value(), "empty_term_name", "약관명이 비어 있습니다. "),
     EMPTY_TERM_CONTENT(HttpStatus.BAD_REQUEST.value(), "empty_term_content", "약관내용이 비어 있습니다. "),

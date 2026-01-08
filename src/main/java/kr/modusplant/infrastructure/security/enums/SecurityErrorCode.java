@@ -1,13 +1,13 @@
 package kr.modusplant.infrastructure.security.enums;
 
-import kr.modusplant.shared.exception.enums.supers.ResponseCode;
+import kr.modusplant.shared.exception.enums.supers.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum SecurityErrorCode implements ResponseCode {
+public enum SecurityErrorCode implements ErrorCode {
 
     BAD_PASSWORD(HttpStatus.UNAUTHORIZED.value(), "bad_password", "비밀번호가 틀렸습니다"),
     BAD_CREDENTIALS(HttpStatus.UNAUTHORIZED.value(), "bad_credentials", "인증에 필요한 요건이 없거나 부족합니다"),

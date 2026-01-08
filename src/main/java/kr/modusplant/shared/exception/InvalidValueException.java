@@ -1,28 +1,28 @@
 package kr.modusplant.shared.exception;
 
-import kr.modusplant.shared.exception.enums.supers.ResponseCode;
+import kr.modusplant.shared.exception.enums.supers.ErrorCode;
 
 public class InvalidValueException extends BusinessException {
 
     private final String valueName;
 
-    public InvalidValueException(ResponseCode errorCode, String valueName) {
+    public InvalidValueException(ErrorCode errorCode, String valueName) {
         super(errorCode);
         this.valueName = valueName;
     }
 
-    public InvalidValueException(ResponseCode errorCode, String valueName, String message) {
+    public InvalidValueException(ErrorCode errorCode, String valueName, String message) {
         super(errorCode, message);
         this.valueName = valueName;
 
     }
 
-    public InvalidValueException(ResponseCode errorCode, String valueName, String message, Throwable cause) {
+    public InvalidValueException(ErrorCode errorCode, String valueName, String message, Throwable cause) {
         super(errorCode, message, cause);
         this.valueName = valueName;
     }
 
-    public InvalidValueException(ResponseCode errorCode, String valueName, Throwable cause) {
+    public InvalidValueException(ErrorCode errorCode, String valueName, Throwable cause) {
         super(errorCode, cause);
         this.valueName = valueName;
     }

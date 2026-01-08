@@ -1,13 +1,13 @@
 package kr.modusplant.domains.account.normal.domain.exception.enums;
 
-import kr.modusplant.shared.exception.enums.supers.ResponseCode;
+import kr.modusplant.shared.exception.enums.supers.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum NormalIdentityErrorCode implements ResponseCode {
+public enum NormalIdentityErrorCode implements ErrorCode {
 
     // domain
     INVALID_CODE(HttpStatus.BAD_REQUEST.value(), "invalid_code", "올바른 코드가 아닙니다"),

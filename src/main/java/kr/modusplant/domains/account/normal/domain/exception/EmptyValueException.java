@@ -1,15 +1,15 @@
 package kr.modusplant.domains.account.normal.domain.exception;
 
 import kr.modusplant.shared.exception.BusinessException;
-import kr.modusplant.shared.exception.enums.supers.ResponseCode;
+import kr.modusplant.shared.exception.enums.supers.ErrorCode;
 
 public class EmptyValueException extends BusinessException {
 
-    public EmptyValueException(ResponseCode errorCode) {
+    public EmptyValueException(ErrorCode errorCode) {
         super(errorCode);
     }
 
-    public EmptyValueException(ResponseCode errorCode, String message) {
+    public EmptyValueException(ErrorCode errorCode, String message) {
         super(errorCode, message);
     }
 }

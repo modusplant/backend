@@ -1,13 +1,13 @@
 package kr.modusplant.shared.exception.enums;
 
-import kr.modusplant.shared.exception.enums.supers.ResponseCode;
+import kr.modusplant.shared.exception.enums.supers.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum GeneralErrorCode implements ResponseCode {
+public enum GeneralErrorCode implements ErrorCode {
 
     GENERIC_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "internal_server_error", "서버에 문제가 발생했습니다"),
     MISMATCH_INPUT_TYPE(HttpStatus.BAD_REQUEST.value(), "mismatch_input_type", "입력값의 타입이 올바르지 않습니다"),
