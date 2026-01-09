@@ -103,7 +103,7 @@ class S3FileServiceTest {
         });
 
         // then
-        assertThat(exception.getMessage()).isEqualTo(AWSErrorCode.NOT_FOUND_FILE_KEY_ON_S3.getMessage());
+        assertThat(exception.getErrorCode()).isEqualTo(AWSErrorCode.NOT_FOUND_FILE_KEY_ON_S3);
     }
 
     @Test
