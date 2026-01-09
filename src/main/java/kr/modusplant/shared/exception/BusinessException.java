@@ -43,4 +43,9 @@ public class BusinessException extends RuntimeException {
         this.errorCode = errorCode;
         this.causedAt = Instant.now();
     }
+
+    @Override
+    public String getMessage() {
+        return String.format("%s [errorCode: %s, causedAt: %s]", super.getMessage(), errorCode, causedAt);
+    }
 }
