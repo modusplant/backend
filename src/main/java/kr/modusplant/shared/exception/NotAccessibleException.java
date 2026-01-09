@@ -17,7 +17,6 @@ public class NotAccessibleException extends BusinessException {
         super(errorCode, message);
         this.target = target;
         this.targetId = targetId;
-
     }
 
     public NotAccessibleException(ErrorCode errorCode, String target, String targetId, String message, Throwable cause) {
