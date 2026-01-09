@@ -11,7 +11,7 @@ public enum ErrorCode implements kr.modusplant.shared.exception.enums.supers.Err
     // -- common errors --
     GENERIC_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "internal_server_error", "서버에 문제가 발생했습니다"),
 
-    INPUT_TYPE_MISMATCH(HttpStatus.BAD_REQUEST.value(), "input_type_mismatch", "입력값의 서식이 올바르지 않습니다"),
+    INPUT_TYPE_MISMATCH(HttpStatus.BAD_REQUEST.value(), "mismatch_input_type", "입력값의 서식이 올바르지 않습니다"),
     INVALID_INPUT(HttpStatus.BAD_REQUEST.value(), "invalid_input", "입력값이 유효하지 않습니다"),
     CONSTRAINT_VIOLATION(HttpStatus.BAD_REQUEST.value(), "constraint_violation", "데이터에 설정된 조건을 위배했습니다"),
     MALFORMED_INPUT(HttpStatus.BAD_REQUEST.value(), "malformed_input", "입력값의 형식이 올바르지 않습니다"),
