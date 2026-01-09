@@ -48,13 +48,8 @@ public class GlobalExceptionHandler {
 
         log.error("FieldError of MethodArgumentNotValidException: {}", fieldError);
 
-        if(fieldError != null) {
-            return ResponseEntity.status(GeneralErrorCode.INVALID_INPUT.getHttpStatus())
-                    .body(DataResponse.of(GeneralErrorCode.INVALID_INPUT));
-        } else {
-            return ResponseEntity.status(GeneralErrorCode.INVALID_INPUT.getHttpStatus())
-                    .body(DataResponse.of(GeneralErrorCode.INVALID_INPUT));
-        }
+        return ResponseEntity.status(GeneralErrorCode.INVALID_INPUT.getHttpStatus())
+                .body(DataResponse.of(GeneralErrorCode.INVALID_INPUT));
     }
 
     // 메소드의 타입과 요청 값의 타입이 불일치하는 경우
