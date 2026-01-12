@@ -26,14 +26,14 @@ public class WriteResponseLoginFailureHandler implements AuthenticationFailureHa
         response.setCharacterEncoding("UTF-8");
 
         if(exception instanceof BusinessAuthenticationException ex) {
-            response.setStatus(ex.getErrorCode().getHttpStatus().getValue());
+            response.setStatus(ex.getErrorCode().getHttpStatus());
             response.getWriter().write(
                     objectMapper.writeValueAsString(DataResponse
                             .of(ex.getErrorCode())
                     )
             );
         } else {
-            response.setStatus(SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus().getValue());
+            response.setStatus(SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus());
             response.getWriter().write(
                     objectMapper.writeValueAsString(DataResponse
                             .of(SecurityErrorCode.AUTHENTICATION_FAILED)
