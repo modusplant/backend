@@ -128,6 +128,7 @@ public class CommentRestController {
             return buildFixedCacheResponsePart(cacheData)
                     .build();
         } else {
+            // 클라이언트가 page에 1 기반 인덱스를 사용하므로, 로직을 처리하기 전에 page에서 1을 뺌
             return buildFixedCacheResponsePart(cacheData)
                     .body(DataResponse.ok(controller.gatherByAuthor(memberUuid, PageRequest.of(page - 1, size))));
         }
