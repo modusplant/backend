@@ -1,6 +1,7 @@
 package kr.modusplant.infrastructure.jwt.provider;
 
 import kr.modusplant.infrastructure.jwt.exception.TokenKeyCreationException;
+import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,7 +57,8 @@ class JwtTokenProviderTest {
 
             assertThatThrownBy(tokenProvider::init)
                     .isInstanceOf(TokenKeyCreationException.class)
-                    .hasMessage("서버의 문제로 인증을 처리하지 못했습니다");
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.INTERNAL_AUTHENTICATION_FAIL);
         }
     }
 }

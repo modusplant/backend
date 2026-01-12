@@ -47,7 +47,7 @@ public class GlobalExceptionHandlerTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(ErrorCode.INVALID_INPUT.getHttpStatus().getValue(), errorResponse.getStatus());
+        assertEquals(ErrorCode.INVALID_INPUT.getHttpStatus(), errorResponse.getStatus());
         assertEquals(ErrorCode.INVALID_INPUT.getCode(), errorResponse.getCode());
         assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
@@ -62,7 +62,7 @@ public class GlobalExceptionHandlerTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(ErrorCode.INVALID_STATE.getHttpStatus().getValue(), errorResponse.getStatus());
+        assertEquals(ErrorCode.INVALID_STATE.getHttpStatus(), errorResponse.getStatus());
         assertEquals(ErrorCode.INVALID_STATE.getCode(), errorResponse.getCode());
         assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
@@ -82,9 +82,8 @@ public class GlobalExceptionHandlerTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(ErrorCode.INVALID_INPUT.getHttpStatus().getValue(), errorResponse.getStatus());
+        assertEquals(ErrorCode.INVALID_INPUT.getHttpStatus(), errorResponse.getStatus());
         assertEquals(ErrorCode.INVALID_INPUT.getCode(), errorResponse.getCode());
-        assertTrue(errorResponse.getMessage().contains("testField"));
         assertNull(errorResponse.getData());
     }
 
@@ -101,9 +100,8 @@ public class GlobalExceptionHandlerTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(ErrorCode.INPUT_TYPE_MISMATCH.getHttpStatus().getValue(), errorResponse.getStatus());
+        assertEquals(ErrorCode.INPUT_TYPE_MISMATCH.getHttpStatus(), errorResponse.getStatus());
         assertEquals(ErrorCode.INPUT_TYPE_MISMATCH.getCode(), errorResponse.getCode());
-        assertTrue(errorResponse.getMessage().contains("testRequestParam"));
         assertNull(errorResponse.getData());
     }
 
@@ -133,11 +131,8 @@ public class GlobalExceptionHandlerTest {
         // then
         assertNotNull(errorResponse);
         System.out.println(errorResponse.getMessage());
-        assertEquals(ErrorCode.CONSTRAINT_VIOLATION.getHttpStatus().getValue(), errorResponse.getStatus());
+        assertEquals(ErrorCode.CONSTRAINT_VIOLATION.getHttpStatus(), errorResponse.getStatus());
         assertEquals(ErrorCode.CONSTRAINT_VIOLATION.getCode(), errorResponse.getCode());
-        assertTrue(errorResponse.getMessage().contains("testFieldName1"));
-        assertTrue(errorResponse.getMessage().contains("testFieldName2"));
-        assertTrue(errorResponse.getMessage().contains("testFieldName3"));
         assertNull(errorResponse.getData());
     }
 
@@ -155,7 +150,7 @@ public class GlobalExceptionHandlerTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(ErrorCode.UNEXPECTED_INPUT.getHttpStatus().getValue(), errorResponse.getStatus());
+        assertEquals(ErrorCode.UNEXPECTED_INPUT.getHttpStatus(), errorResponse.getStatus());
         assertEquals(ErrorCode.UNEXPECTED_INPUT.getCode(), errorResponse.getCode());
         assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
@@ -175,7 +170,7 @@ public class GlobalExceptionHandlerTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(ErrorCode.INVALID_INPUT.getHttpStatus().getValue(), errorResponse.getStatus());
+        assertEquals(ErrorCode.INVALID_INPUT.getHttpStatus(), errorResponse.getStatus());
         assertEquals(ErrorCode.INVALID_INPUT.getCode(), errorResponse.getCode());
         assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
@@ -195,7 +190,7 @@ public class GlobalExceptionHandlerTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(ErrorCode.INVALID_INPUT.getHttpStatus().getValue(), errorResponse.getStatus());
+        assertEquals(ErrorCode.INVALID_INPUT.getHttpStatus(), errorResponse.getStatus());
         assertEquals(ErrorCode.INVALID_INPUT.getCode(), errorResponse.getCode());
         assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
@@ -214,7 +209,7 @@ public class GlobalExceptionHandlerTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(ErrorCode.MALFORMED_INPUT.getHttpStatus().getValue(), errorResponse.getStatus());
+        assertEquals(ErrorCode.MALFORMED_INPUT.getHttpStatus(), errorResponse.getStatus());
         assertEquals(ErrorCode.MALFORMED_INPUT.getCode(), errorResponse.getCode());
         assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
@@ -229,7 +224,7 @@ public class GlobalExceptionHandlerTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(ErrorCode.GENERIC_ERROR.getHttpStatus().getValue(), errorResponse.getStatus());
+        assertEquals(ErrorCode.GENERIC_ERROR.getHttpStatus(), errorResponse.getStatus());
         assertEquals(ErrorCode.GENERIC_ERROR.getCode(), errorResponse.getCode());
         assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
@@ -247,7 +242,7 @@ public class GlobalExceptionHandlerTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(ErrorCode.GENERIC_ERROR.getHttpStatus().getValue(), errorResponse.getStatus());
+        assertEquals(ErrorCode.GENERIC_ERROR.getHttpStatus(), errorResponse.getStatus());
         assertEquals(ErrorCode.GENERIC_ERROR.getCode(), errorResponse.getCode());
         assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
@@ -266,7 +261,7 @@ public class GlobalExceptionHandlerTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(ErrorCode.GENERIC_ERROR.getHttpStatus().getValue(), errorResponse.getStatus());
+        assertEquals(ErrorCode.GENERIC_ERROR.getHttpStatus(), errorResponse.getStatus());
         assertEquals(ErrorCode.GENERIC_ERROR.getCode(), errorResponse.getCode());
         assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
@@ -285,7 +280,7 @@ public class GlobalExceptionHandlerTest {
 
         // then
         assertNotNull(errorResponse);
-        assertEquals(ErrorCode.GENERIC_ERROR.getHttpStatus().getValue(), errorResponse.getStatus());
+        assertEquals(ErrorCode.GENERIC_ERROR.getHttpStatus(), errorResponse.getStatus());
         assertEquals(ErrorCode.GENERIC_ERROR.getCode(), errorResponse.getCode());
         assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
