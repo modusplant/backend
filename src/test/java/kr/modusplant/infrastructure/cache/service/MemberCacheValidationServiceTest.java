@@ -52,7 +52,7 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
                         id));
 
         // then
-        assertThat(exception.getMessage()).contains(MEMBER_PROFILE_NOT_FOUND.getMessage());
+        assertThat(exception.getErrorCode()).isEqualTo(MEMBER_PROFILE_NOT_FOUND);
     }
 
     @Test

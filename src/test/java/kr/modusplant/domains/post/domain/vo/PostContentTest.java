@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
 import kr.modusplant.domains.post.domain.exception.EmptyPostContentException;
 import kr.modusplant.domains.post.domain.exception.InvalidPostContentException;
+import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -74,15 +75,15 @@ class PostContentTest implements PostTestUtils {
             // when & then
             EmptyPostContentException exception1 = assertThrows(EmptyPostContentException.class,
                     () -> PostContent.create(null, TEST_POST_CONTENT));
-            assertEquals("게시글 제목이 비어 있습니다. ", exception1.getMessage());
+            assertEquals(exception1.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
 
             EmptyPostContentException exception2 = assertThrows(EmptyPostContentException.class,
                     () -> PostContent.create("", TEST_POST_CONTENT));
-            assertEquals("게시글 제목이 비어 있습니다. ", exception2.getMessage());
+            assertEquals(exception2.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
 
             EmptyPostContentException exception3 = assertThrows(EmptyPostContentException.class,
                     () -> PostContent.create("   ", TEST_POST_CONTENT));
-            assertEquals("게시글 제목이 비어 있습니다. ", exception3.getMessage());
+            assertEquals(exception3.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
         }
 
         @Test
@@ -91,7 +92,7 @@ class PostContentTest implements PostTestUtils {
             // when & then
             InvalidPostContentException exception = assertThrows(InvalidPostContentException.class,
                     () -> PostContent.create(OVER_MAX_LENGTH_TITLE, TEST_POST_CONTENT));
-            assertEquals("게시글 제목이 유효하지 않습니다. ", exception.getMessage());
+            assertEquals(exception.getErrorCode(), PostErrorCode.INVALID_POST_CONTENT);
         }
 
         @Test
@@ -100,7 +101,7 @@ class PostContentTest implements PostTestUtils {
             // when & then
             EmptyPostContentException exception = assertThrows(EmptyPostContentException.class,
                     () -> PostContent.create(TEST_POST_TITLE, null));
-            assertEquals("게시글 내용이 비어 있습니다. ", exception.getMessage());
+            assertEquals(exception.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
         }
     }
 

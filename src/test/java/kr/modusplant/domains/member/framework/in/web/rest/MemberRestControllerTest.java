@@ -273,6 +273,6 @@ class MemberRestControllerTest implements MemberTestUtils {
         IncorrectMemberIdException incorrectMemberIdException = assertThrows(IncorrectMemberIdException.class, () -> memberRestController.getMemberProfile(MEMBER_BASIC_USER_UUID, auth, null, null));
 
         // then
-        assertThat(incorrectMemberIdException.getMessage()).isEqualTo(INCORRECT_MEMBER_ID.getMessage());
+        assertThat(incorrectMemberIdException.getErrorCode()).isEqualTo(INCORRECT_MEMBER_ID);
     }
 }
