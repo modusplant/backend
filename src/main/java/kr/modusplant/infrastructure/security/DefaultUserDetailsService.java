@@ -7,6 +7,8 @@ import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
 import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
+import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
+import kr.modusplant.infrastructure.security.exception.AccountStateException;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import kr.modusplant.shared.enums.AuthProvider;
 import lombok.RequiredArgsConstructor;
@@ -30,11 +32,13 @@ public class DefaultUserDetailsService implements UserDetailsService {
     public DefaultUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         SiteMemberAuthEntity auth = memberAuthRepository
-                .findByEmailAndProvider(email, AuthProvider.BASIC).orElseThrow();
+                .findByEmailAndProvider(email, AuthProvider.BASIC).orElseThrow(
+                        () -> new AccountStateException(SecurityErrorCode.MEMBER_STATE_NOT_FOUND));
         SiteMemberEntity member = memberRepository
-                .findByUuid(auth.getActiveMember().getUuid()).orElseThrow();
-        SiteMemberRoleEntity role = memberRoleRepository.findByMember(auth.getActiveMember())
-                .orElseThrow();
+                .findByUuid(auth.getActiveMember().getUuid()).orElseThrow(
+                        () -> new AccountStateException(SecurityErrorCode.MEMBER_AUTH_STATE_NOT_FOUND));
+        SiteMemberRoleEntity role = memberRoleRepository.findByMember(auth.getActiveMember()).orElseThrow(
+                () -> new AccountStateException(SecurityErrorCode.MEMBER_ROLE_STATE_NOT_FOUND));
 
         return DefaultUserDetails.builder()
                 .email(auth.getEmail())
