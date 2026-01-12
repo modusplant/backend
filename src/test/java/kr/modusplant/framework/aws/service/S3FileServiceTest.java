@@ -39,7 +39,7 @@ class S3FileServiceTest {
         s3Presigner = mock(S3Presigner.class);
         s3FileService = new S3FileService(s3Client,s3Presigner);
         ReflectionTestUtils.setField(s3FileService, "bucket", BUCKET_NAME);
-        if(System.getenv("DEV_PUBLIC_ENDPOINT") != null){
+        if (System.getenv("DEV_PUBLIC_ENDPOINT") != null) {
             ReflectionTestUtils.setField(s3FileService, "profile", "dev");
             ReflectionTestUtils.setField(s3FileService, "devPublicEndpoint", ENDPOINT);
         } else {

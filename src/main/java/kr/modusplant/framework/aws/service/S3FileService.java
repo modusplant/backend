@@ -68,6 +68,7 @@ public class S3FileService {
     }
 
     public String generateS3SrcUrl(String fileKey) {
+        return String.format("%s/%s/%s", endpoint, bucket, fileKey);
         if(profile.equals("dev")){
             return String.format("%s/%s/%s", devPublicEndpoint, bucket, fileKey);
         }
