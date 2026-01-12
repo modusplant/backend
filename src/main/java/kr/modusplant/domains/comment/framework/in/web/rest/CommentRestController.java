@@ -103,7 +103,7 @@ public class CommentRestController {
 
             @Parameter(
                     description = "현재 페이지의 숫자",
-                    example = "0"
+                    example = "1"
             )
             @RequestParam(value = "page", defaultValue = "0")
             int page,
@@ -129,7 +129,7 @@ public class CommentRestController {
                     .build();
         } else {
             return buildFixedCacheResponsePart(cacheData)
-                    .body(DataResponse.ok(controller.gatherByAuthor(memberUuid, PageRequest.of(page, size))));
+                    .body(DataResponse.ok(controller.gatherByAuthor(memberUuid, PageRequest.of(page - 1, size))));
         }
     }
 
