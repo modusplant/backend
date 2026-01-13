@@ -7,8 +7,6 @@ import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
-import kr.modusplant.domains.member.domain.exception.NotAccessiblePostBookmarkException;
-import kr.modusplant.domains.member.domain.exception.NotAccessiblePostLikeException;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
 import kr.modusplant.domains.member.framework.out.jpa.repository.MemberRepositoryJpaAdapter;
@@ -34,6 +32,7 @@ import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.common.util.PostLikeEventTestUtils;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
+import kr.modusplant.shared.exception.NotAccessibleException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -67,7 +66,8 @@ import static kr.modusplant.shared.exception.enums.ErrorCode.NICKNAME_EXISTS;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_URL;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -494,9 +494,9 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(targetPostIdRepository.isPublished(any())).willReturn(false);
 
         // when
-        NotAccessiblePostLikeException entityNotFoundExceptionForLike = assertThrows(NotAccessiblePostLikeException.class,
+        NotAccessibleException entityNotFoundExceptionForLike = assertThrows(NotAccessibleException.class,
                 () -> memberController.likePost(testMemberPostLikeRecord));
-        NotAccessiblePostLikeException entityNotFoundExceptionForUnlike = assertThrows(NotAccessiblePostLikeException.class,
+        NotAccessibleException entityNotFoundExceptionForUnlike = assertThrows(NotAccessibleException.class,
                 () -> memberController.unlikePost(testMemberPostUnlikeRecord));
 
         // then
@@ -548,9 +548,9 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(targetPostIdRepository.isPublished(any())).willReturn(false);
 
         // when
-        NotAccessiblePostBookmarkException entityNotFoundExceptionForBookmark = assertThrows(NotAccessiblePostBookmarkException.class,
+        NotAccessibleException entityNotFoundExceptionForBookmark = assertThrows(NotAccessibleException.class,
                 () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
-        NotAccessiblePostBookmarkException entityNotFoundExceptionForCancelBookmark = assertThrows(NotAccessiblePostBookmarkException.class,
+        NotAccessibleException entityNotFoundExceptionForCancelBookmark = assertThrows(NotAccessibleException.class,
                 () -> memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord));
 
         // then

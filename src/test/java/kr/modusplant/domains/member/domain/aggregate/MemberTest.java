@@ -1,12 +1,10 @@
 package kr.modusplant.domains.member.domain.aggregate;
 
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
-import kr.modusplant.domains.member.domain.exception.EmptyMemberBirthDateException;
-import kr.modusplant.domains.member.domain.exception.EmptyMemberIdException;
-import kr.modusplant.domains.member.domain.exception.EmptyMemberStatusException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.shared.exception.EmptyNicknameException;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,14 +22,14 @@ class MemberTest implements MemberTestUtils {
     void testCreate_givenNullToOneOfFourParameters_willThrowException() {
         // MemberId가 null일 때
         // given
-        EmptyMemberIdException memberIdException = assertThrows(EmptyMemberIdException.class, () -> Member.create(null, testMemberActiveStatus, testNormalUserNickname, testMemberBirthDate));
+        EmptyValueException memberIdException = assertThrows(EmptyValueException.class, () -> Member.create(null, testMemberActiveStatus, testNormalUserNickname, testMemberBirthDate));
 
         // when & then
         assertThat(memberIdException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_ID);
 
         // MemberStatus가 null일 때
         // given
-        EmptyMemberStatusException memberStatusException = assertThrows(EmptyMemberStatusException.class, () -> Member.create(testMemberId, null, testNormalUserNickname, testMemberBirthDate));
+        EmptyValueException memberStatusException = assertThrows(EmptyValueException.class, () -> Member.create(testMemberId, null, testNormalUserNickname, testMemberBirthDate));
 
         // when & then
         assertThat(memberStatusException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_STATUS);
@@ -45,7 +43,7 @@ class MemberTest implements MemberTestUtils {
 
         // MemberBirthDate가 null일 때
         // given
-        EmptyMemberBirthDateException memberBirthDateException = assertThrows(EmptyMemberBirthDateException.class, () -> Member.create(testMemberId, testMemberActiveStatus, testNormalUserNickname, null));
+        EmptyValueException memberBirthDateException = assertThrows(EmptyValueException.class, () -> Member.create(testMemberId, testMemberActiveStatus, testNormalUserNickname, null));
 
         // when & then
         assertThat(memberBirthDateException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_BIRTH_DATE);
