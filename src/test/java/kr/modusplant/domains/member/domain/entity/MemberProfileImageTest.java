@@ -1,10 +1,9 @@
 package kr.modusplant.domains.member.domain.entity;
 
 import kr.modusplant.domains.member.common.util.domain.entity.MemberProfileImageTestUtils;
-import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileImageBytesException;
-import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileImagePathException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
+import kr.modusplant.shared.exception.EmptyValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -21,14 +20,14 @@ class MemberProfileImageTest implements MemberProfileImageTestUtils {
     void testCreate_givenNullToOneOfTwoParameters_willThrowException() {
         // MemberProfileImagePath가 null일 때
         // given
-        EmptyMemberProfileImagePathException emptyMemberProfileImagePathException = assertThrows(EmptyMemberProfileImagePathException.class, () -> MemberProfileImage.create(null, testMemberProfileImageBytes));
+        EmptyValueException emptyMemberProfileImagePathException = assertThrows(EmptyValueException.class, () -> MemberProfileImage.create(null, testMemberProfileImageBytes));
 
         // when & then
         assertThat(emptyMemberProfileImagePathException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_PROFILE_IMAGE_PATH);
 
         // MemberProfileImageBytes가 null일 때
         // given
-        EmptyMemberProfileImageBytesException emptyMemberProfileImageBytesException = assertThrows(EmptyMemberProfileImageBytesException.class, () -> MemberProfileImage.create(testMemberProfileImagePath, null));
+        EmptyValueException emptyMemberProfileImageBytesException = assertThrows(EmptyValueException.class, () -> MemberProfileImage.create(testMemberProfileImagePath, null));
 
         // when & then
         assertThat(emptyMemberProfileImageBytesException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_PROFILE_IMAGE_BYTES);

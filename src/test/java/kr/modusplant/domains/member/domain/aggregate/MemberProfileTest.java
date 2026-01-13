@@ -1,12 +1,10 @@
 package kr.modusplant.domains.member.domain.aggregate;
 
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberProfileTestUtils;
-import kr.modusplant.domains.member.domain.exception.EmptyMemberIdException;
-import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileImageException;
-import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileIntroductionException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.shared.exception.EmptyNicknameException;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,21 +22,21 @@ class MemberProfileTest implements MemberProfileTestUtils {
     void testCreate_givenNullToOneOfFourParameters_willThrowException() {
         // MemberId가 null일 때
         // given
-        EmptyMemberIdException memberIdException = assertThrows(EmptyMemberIdException.class, () -> MemberProfile.create(null, testMemberProfileImage, testMemberProfileIntroduction, testNormalUserNickname));
+        EmptyValueException memberIdException = assertThrows(EmptyValueException.class, () -> MemberProfile.create(null, testMemberProfileImage, testMemberProfileIntroduction, testNormalUserNickname));
 
         // when & then
         assertThat(memberIdException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_ID);
 
         // MemberProfileImage가 null일 때
         // given
-        EmptyMemberProfileImageException emptyMemberProfileImageException = assertThrows(EmptyMemberProfileImageException.class, () -> MemberProfile.create(testMemberId, null, testMemberProfileIntroduction, testNormalUserNickname));
+        EmptyValueException emptyMemberProfileImageException = assertThrows(EmptyValueException.class, () -> MemberProfile.create(testMemberId, null, testMemberProfileIntroduction, testNormalUserNickname));
 
         // when & then
         assertThat(emptyMemberProfileImageException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_PROFILE_IMAGE);
 
         // MemberProfileIntroduction이 null일 때
         // given
-        EmptyMemberProfileIntroductionException memberProfileIntroductionException = assertThrows(EmptyMemberProfileIntroductionException.class, () -> MemberProfile.create(testMemberId, testMemberProfileImage, null, testNormalUserNickname));
+        EmptyValueException memberProfileIntroductionException = assertThrows(EmptyValueException.class, () -> MemberProfile.create(testMemberId, testMemberProfileImage, null, testNormalUserNickname));
 
         // when & then
         assertThat(memberProfileIntroductionException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_PROFILE_INTRODUCTION);

@@ -1,11 +1,13 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.domain.exception.EmptyMemberStatusException;
+import kr.modusplant.shared.exception.EmptyValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EMPTY_MEMBER_STATUS;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -22,7 +24,7 @@ public class MemberStatus {
 
     public static MemberStatus fromBoolean(Boolean isActive) {
         if (isActive == null) {
-            throw new EmptyMemberStatusException();
+            throw new EmptyValueException(EMPTY_MEMBER_STATUS, "memberStatus");
         }
         if (isActive.equals(true)) {
             return MemberStatus.active();
