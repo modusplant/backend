@@ -1,8 +1,8 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileIntroductionException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.shared.exception.DataLengthException;
+import kr.modusplant.shared.exception.EmptyValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -24,14 +24,14 @@ class MemberProfileIntroductionTest {
     @Test
     @DisplayName("null로 create을 호출하여 오류 발생")
     void testCreate_givenNull_willThrowException() {
-        EmptyMemberProfileIntroductionException exception = assertThrows(EmptyMemberProfileIntroductionException.class, () -> MemberProfileIntroduction.create(null));
+        EmptyValueException exception = assertThrows(EmptyValueException.class, () -> MemberProfileIntroduction.create(null));
         assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_PROFILE_INTRODUCTION);
     }
 
     @Test
     @DisplayName("빈 문자열로 create을 호출하여 오류 발생")
     void testCreate_givenEmptyString_willThrowException() {
-        EmptyMemberProfileIntroductionException exception = assertThrows(EmptyMemberProfileIntroductionException.class, () -> MemberProfileIntroduction.create("   "));
+        EmptyValueException exception = assertThrows(EmptyValueException.class, () -> MemberProfileIntroduction.create("   "));
         assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_PROFILE_INTRODUCTION);
     }
 

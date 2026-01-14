@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileIntroductionException;
 import kr.modusplant.shared.exception.DataLengthException;
+import kr.modusplant.shared.exception.EmptyValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EMPTY_MEMBER_PROFILE_INTRODUCTION;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.MEMBER_PROFILE_INTRODUCTION_OVER_LENGTH;
 
 @Getter
@@ -20,7 +21,7 @@ public class MemberProfileIntroduction {
 
     public static MemberProfileIntroduction create(String value) {
         if (StringUtils.isBlank(value)) {
-            throw new EmptyMemberProfileIntroductionException();
+            throw new EmptyValueException(EMPTY_MEMBER_PROFILE_INTRODUCTION, "memberProfileIntroduction");
         } else if (value.length() > 60) {
             throw new DataLengthException(MEMBER_PROFILE_INTRODUCTION_OVER_LENGTH);
         }

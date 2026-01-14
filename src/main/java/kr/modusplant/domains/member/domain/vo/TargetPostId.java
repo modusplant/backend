@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.domain.exception.EmptyTargetPostIdException;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidDataException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.AccessLevel;
@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EMPTY_TARGET_POST_ID;
 import static kr.modusplant.shared.constant.Regex.PATTERN_ULID;
 
 @Getter
@@ -19,7 +20,7 @@ public class TargetPostId {
 
     public static TargetPostId create(String value) {
         if (StringUtils.isBlank(value)) {
-            throw new EmptyTargetPostIdException();
+            throw new EmptyValueException(EMPTY_TARGET_POST_ID, "targetPostId");
         } else if (!PATTERN_ULID.matcher(value).matches()) {
             throw new InvalidDataException(ErrorCode.INVALID_INPUT, "targetPostId");
         }

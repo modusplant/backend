@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.domain.exception.EmptyMemberBirthDateException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
+import kr.modusplant.shared.exception.EmptyValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ class MemberBirthDateTest {
     @Test
     @DisplayName("null로 create를 호출하여 오류 발생")
     void testCreate_givenNull_willThrowException() {
-        EmptyMemberBirthDateException exception = assertThrows(EmptyMemberBirthDateException.class, () -> MemberBirthDate.create(null));
+        EmptyValueException exception = assertThrows(EmptyValueException.class, () -> MemberBirthDate.create(null));
         assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_BIRTH_DATE);
     }
 

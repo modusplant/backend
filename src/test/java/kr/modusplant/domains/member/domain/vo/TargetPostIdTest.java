@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.domain.exception.EmptyTargetPostIdException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidDataException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
@@ -23,14 +23,14 @@ class TargetPostIdTest {
     @Test
     @DisplayName("null로 create을 호출하여 오류 발생")
     void testCreate_givenNull_willThrowException() {
-        EmptyTargetPostIdException exception = assertThrows(EmptyTargetPostIdException.class, () -> TargetPostId.create(null));
+        EmptyValueException exception = assertThrows(EmptyValueException.class, () -> TargetPostId.create(null));
         assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_TARGET_POST_ID);
     }
 
     @Test
     @DisplayName("빈 문자열로 create을 호출하여 오류 발생")
     void testCreate_willThrowException() {
-        EmptyTargetPostIdException exception = assertThrows(EmptyTargetPostIdException.class, () -> TargetPostId.create("   "));
+        EmptyValueException exception = assertThrows(EmptyValueException.class, () -> TargetPostId.create("   "));
         assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_TARGET_POST_ID);
     }
 
