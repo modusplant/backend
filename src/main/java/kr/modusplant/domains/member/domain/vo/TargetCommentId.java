@@ -1,12 +1,14 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.domain.exception.EmptyTargetCommentPathException;
-import kr.modusplant.domains.member.domain.exception.EmptyTargetPostIdException;
+import kr.modusplant.shared.exception.EmptyValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EMPTY_TARGET_COMMENT_PATH;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EMPTY_TARGET_POST_ID;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -16,9 +18,9 @@ public class TargetCommentId {
 
     public static TargetCommentId create(TargetPostId targetPostId, TargetCommentPath targetCommentPath) {
         if (targetPostId == null) {
-            throw new EmptyTargetPostIdException();
+            throw new EmptyValueException(EMPTY_TARGET_POST_ID, "targetPostId");
         } else if (targetCommentPath == null) {
-            throw new EmptyTargetCommentPathException();
+            throw new EmptyValueException(EMPTY_TARGET_COMMENT_PATH, "targetCommentPath");
         }
         return new TargetCommentId(targetPostId, targetCommentPath);
     }

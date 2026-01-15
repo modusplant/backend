@@ -4,8 +4,6 @@ import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
-import kr.modusplant.domains.member.domain.exception.NotAccessiblePostBookmarkException;
-import kr.modusplant.domains.member.domain.exception.NotAccessiblePostLikeException;
 import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
@@ -25,6 +23,7 @@ import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.*;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
+import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -201,7 +200,7 @@ public class MemberController {
             throw new EntityNotFoundException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
         }
         if (!targetPostIdRepository.isPublished(targetPostId)) {
-            throw new NotAccessiblePostLikeException();
+            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_LIKE, "postLike", targetPostId.getValue());
         }
     }
 
@@ -213,7 +212,7 @@ public class MemberController {
             throw new EntityNotFoundException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
         }
         if (!targetPostIdRepository.isPublished(targetPostId)) {
-            throw new NotAccessiblePostBookmarkException();
+            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_BOOKMARK, "postBookmark", targetPostId.getValue());
         }
     }
 

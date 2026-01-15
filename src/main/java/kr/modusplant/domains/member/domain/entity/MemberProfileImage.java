@@ -1,14 +1,16 @@
 package kr.modusplant.domains.member.domain.entity;
 
-import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileImageBytesException;
-import kr.modusplant.domains.member.domain.exception.EmptyMemberProfileImagePathException;
 import kr.modusplant.domains.member.domain.vo.MemberProfileImageBytes;
 import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
+import kr.modusplant.shared.exception.EmptyValueException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EMPTY_MEMBER_PROFILE_IMAGE_BYTES;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EMPTY_MEMBER_PROFILE_IMAGE_PATH;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -18,9 +20,9 @@ public class MemberProfileImage {
 
     public static MemberProfileImage create(MemberProfileImagePath profileImagePath, MemberProfileImageBytes profileImageBytes) {
         if (profileImagePath == null) {
-            throw new EmptyMemberProfileImagePathException();
+            throw new EmptyValueException(EMPTY_MEMBER_PROFILE_IMAGE_PATH, "memberProfileImagePath");
         } else if (profileImageBytes == null) {
-            throw new EmptyMemberProfileImageBytesException();
+            throw new EmptyValueException(EMPTY_MEMBER_PROFILE_IMAGE_BYTES, "memberProfileImageBytes");
         }
         return new MemberProfileImage(profileImagePath, profileImageBytes);
     }
