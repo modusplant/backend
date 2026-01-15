@@ -13,8 +13,8 @@ spring:
   datasource:
     hikari:
       pool-name: ProdHikariPool
-      maximum-pool-size: 10
-      minimum-idle: 3
+      maximum-pool-size: 70
+      minimum-idle: 16
 
 # Scheduler
 scheduler:
