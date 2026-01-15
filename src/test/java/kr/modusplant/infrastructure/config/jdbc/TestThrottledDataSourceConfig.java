@@ -2,13 +2,13 @@ package kr.modusplant.infrastructure.config.jdbc;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
 
-@Configuration
-public class DataSourceConfig {
+@TestConfiguration
+public class TestThrottledDataSourceConfig {
 
     @Value("${spring.datasource.driver-class-name}")
     private String driverClassName;
