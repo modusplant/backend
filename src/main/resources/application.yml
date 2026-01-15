@@ -23,7 +23,7 @@ spring:
       max-lifetime: 1800000           # 30분
       connection-timeout: 30000       # 30초
       auto-commit: true
-      validation-timeout: 5000
+      validation-timeout: 10000       # 10초
   flyway:
     enabled: true
     validate-on-migrate: true
