@@ -1,8 +1,7 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.domain.exception.EmptyTargetCommentPathException;
-import kr.modusplant.domains.member.domain.exception.EmptyTargetPostIdException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
+import kr.modusplant.shared.exception.EmptyValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -19,14 +18,14 @@ class TargetCommentIdTest {
     void testCreate_givenNullToOneOfTwoParameters_willThrowException() {
         // TargetPostId가 null일 때
         // given
-        EmptyTargetPostIdException emptyTargetPostIdException = assertThrows(EmptyTargetPostIdException.class, () -> TargetCommentId.create(null, testTargetCommentPath));
+        EmptyValueException EmptyValueException = assertThrows(EmptyValueException.class, () -> TargetCommentId.create(null, testTargetCommentPath));
 
         // when & then
-        assertThat(emptyTargetPostIdException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_TARGET_POST_ID);
+        assertThat(EmptyValueException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_TARGET_POST_ID);
 
         // TargetCommentPath가 null일 때
         // given
-        EmptyTargetCommentPathException emptyTargetCommentPathException = assertThrows(EmptyTargetCommentPathException.class, () -> TargetCommentId.create(testTargetPostId, null));
+        EmptyValueException emptyTargetCommentPathException = assertThrows(EmptyValueException.class, () -> TargetCommentId.create(testTargetPostId, null));
 
         // when & then
         assertThat(emptyTargetCommentPathException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_TARGET_COMMENT_PATH);
