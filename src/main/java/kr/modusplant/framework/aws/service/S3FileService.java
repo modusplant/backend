@@ -1,5 +1,6 @@
 package kr.modusplant.framework.aws.service;
 
+import jakarta.annotation.PostConstruct;
 import kr.modusplant.framework.aws.exception.NotFoundFileKeyOnS3Exception;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +33,13 @@ public class S3FileService {
 
     @Value("${minio.public-endpoint:#{null}}")
     private String devPublicEndpoint;
+
+    @PostConstruct
+    public void postConstruct() {
+        if (profile.equals("dev")) {
+            endpoint = devPublicEndpoint;
+        }
+    }
 
     public void uploadFile(MultipartFile file, String fileKey) throws IOException {
         PutObjectRequest request = PutObjectRequest.builder()
