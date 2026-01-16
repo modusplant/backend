@@ -11,16 +11,18 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.io.IOException;
+import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
 public class S3FileService {
     private final S3Client s3Client;
-
-    @Value("${cloud.wasabi.s3.endpoint}")
-    private String endpoint;
+    private final S3Presigner s3Presigner;
 
     @Value("${cloud.wasabi.s3.bucket}")
     private String bucket;
@@ -67,8 +69,21 @@ public class S3FileService {
 
     public String generateS3SrcUrl(String fileKey) {
         if(profile.equals("dev")){
-            endpoint = devPublicEndpoint;
+            return String.format("%s/%s/%s", devPublicEndpoint, bucket, fileKey);
         }
-        return String.format("%s/%s/%s", endpoint, bucket, fileKey);
+        return getPresignedUrl(fileKey);
+    }
+
+    private String getPresignedUrl(String fileKey) {
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofHours(12))
+                .getObjectRequest(req -> req
+                        .bucket(bucket)
+                        .key(fileKey))
+                .build();
+
+        PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
+
+        return presignedRequest.url().toString();
     }
 }

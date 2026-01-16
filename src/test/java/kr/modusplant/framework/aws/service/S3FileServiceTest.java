@@ -12,9 +12,13 @@ import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URI;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -23,18 +27,19 @@ import static org.mockito.Mockito.*;
 
 class S3FileServiceTest {
     private S3Client s3Client;
+    private S3Presigner s3Presigner;
     private S3FileService s3FileService;
 
-    private static final String ENDPOINT = System.getenv("DEV_PUBLIC_ENDPOINT") != null ? System.getenv("DEV_PUBLIC_ENDPOINT") : "test-endpoint";
+    private static final String ENDPOINT = System.getenv("DEV_PUBLIC_ENDPOINT") != null ? System.getenv("DEV_PUBLIC_ENDPOINT") : "https://test-endpoint";
     private static final String BUCKET_NAME = "test-bucket";
 
     @BeforeEach
     void setUp() {
         s3Client = mock(S3Client.class);
-        s3FileService = new S3FileService(s3Client);
-        ReflectionTestUtils.setField(s3FileService, "endpoint", ENDPOINT);
+        s3Presigner = mock(S3Presigner.class);
+        s3FileService = new S3FileService(s3Client,s3Presigner);
         ReflectionTestUtils.setField(s3FileService, "bucket", BUCKET_NAME);
-        if(System.getenv("DEV_PUBLIC_ENDPOINT") != null){
+        if (System.getenv("DEV_PUBLIC_ENDPOINT") != null) {
             ReflectionTestUtils.setField(s3FileService, "profile", "dev");
             ReflectionTestUtils.setField(s3FileService, "devPublicEndpoint", ENDPOINT);
         } else {
@@ -126,12 +131,16 @@ class S3FileServiceTest {
 
     @Test
     @DisplayName("파일 src url 변환")
-    void testGenerateS3SrcUrl_givenFileKey_willReturnS3Url() {
+    void testGenerateS3SrcUrl_givenFileKey_willReturnS3Url() throws Exception {
         String fileKey = "test-file-key";
         String expected = ENDPOINT + "/" + BUCKET_NAME + "/" +fileKey;
+        PresignedGetObjectRequest mockPresignedRequest = mock(PresignedGetObjectRequest.class);
+        given(mockPresignedRequest.url()).willReturn(URI.create(expected).toURL());
+        given(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class))).willReturn(mockPresignedRequest);
 
         String result = s3FileService.generateS3SrcUrl(fileKey);
 
         assertThat(result).isEqualTo(expected);
+        verify(s3Presigner, times(1)).presignGetObject(any(GetObjectPresignRequest.class));
     }
 }
