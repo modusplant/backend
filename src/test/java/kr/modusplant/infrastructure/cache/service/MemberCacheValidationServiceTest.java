@@ -71,7 +71,7 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
                 null, ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME), id);
 
         // then
-        assertThat(returnedMap.isCacheable()).isEqualTo(false);
+        assertThat(returnedMap.isCacheUsable()).isEqualTo(false);
     }
 
     @Test
@@ -92,7 +92,7 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
                 id);
 
         // then
-        assertThat(returnedMap.isCacheable()).isEqualTo(false);
+        assertThat(returnedMap.isCacheUsable()).isEqualTo(false);
     }
 
     @Test
@@ -113,7 +113,7 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
                 id);
 
         // then
-        assertThat(returnedMap.isCacheable()).isEqualTo(true);
+        assertThat(returnedMap.isCacheUsable()).isEqualTo(true);
     }
 
     @Test
@@ -136,7 +136,7 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
                 id);
 
         // then
-        assertThat(returnedMapEqual.isCacheable()).isEqualTo(true);
+        assertThat(returnedMapEqual.isCacheUsable()).isEqualTo(true);
 
         // 엔터티의 lastModifiedAt 값이 ifModifiedSince 값보다 과거일 때
         // when
@@ -147,7 +147,7 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
                 id);
 
         // then
-        assertThat(returnedMapPast.isCacheable()).isEqualTo(true);
+        assertThat(returnedMapPast.isCacheUsable()).isEqualTo(true);
     }
 
     @Test
@@ -169,6 +169,6 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
                 id);
 
         // then
-        assertThat(returnedMapEqual.isCacheable()).isEqualTo(false);
+        assertThat(returnedMapEqual.isCacheUsable()).isEqualTo(false);
     }
 }

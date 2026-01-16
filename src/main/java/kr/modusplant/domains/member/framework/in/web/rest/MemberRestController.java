@@ -114,7 +114,7 @@ public class MemberRestController {
         validateMemberIdFromToken(id, auth);
         MemberCacheValidationResult cacheValidationResult =
                 memberCacheValidationService.getMemberCacheValidationResult(ifNoneMatch, ifModifiedSince, id);
-        if (cacheValidationResult.isCacheable()) {
+        if (cacheValidationResult.isCacheUsable()) {
             return ResponseEntity
                     .status(HttpStatus.NOT_MODIFIED)
                     .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())
