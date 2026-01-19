@@ -89,13 +89,6 @@ public class CommentJooqRepository implements CommentReadRepository {
 
             Field<Boolean> isLiked = DSL.when(commentLike.MEMB_UUID.isNotNull(), true).otherwise(false);
 
-//            Field<Integer> totalCommentsOfPost = dsl.select(count())
-//                    .from(commComment)
-//                    .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
-//                    .join(commPost).on(siteMember.UUID.eq(commPost.AUTH_MEMB_UUID))
-//                    .where(commComment.IS_DELETED.eq(false))
-//                    .asField();
-
             Field<Integer> totalCommentsOfPost = dsl.select(count())
                     .from(commComment)
                     .where(commComment.POST_ULID.eq(commPost.ULID)
