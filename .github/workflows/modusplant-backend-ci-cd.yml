@@ -25,10 +25,9 @@ jobs:
           # cache: gradle
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v2
         with:
           cache-read-only: false
-          gradle-home-cache-cleanup: true
 
       - name: Configure AWS credentials (for SSM)
         uses: aws-actions/configure-aws-credentials@v4
