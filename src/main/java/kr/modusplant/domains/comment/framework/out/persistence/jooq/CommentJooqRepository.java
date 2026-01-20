@@ -91,9 +91,8 @@ public class CommentJooqRepository implements CommentReadRepository {
 
             Field<Integer> totalCommentsOfPost = dsl.select(count())
                     .from(commComment)
-                    .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
-                    .join(commPost).on(siteMember.UUID.eq(commPost.AUTH_MEMB_UUID))
-                    .where(commComment.IS_DELETED.eq(false))
+                    .where(commComment.POST_ULID.eq(commPost.ULID)
+                            .and(commComment.IS_DELETED.eq(false)))
                     .asField();
 
             List<CommentOfAuthorPageModel> commentList = dsl.select(commComment.CONTENT,
