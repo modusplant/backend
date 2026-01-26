@@ -22,16 +22,17 @@ class ThrottledDataSource implements DataSource {
     public Connection getConnection() throws SQLException {
         try {
             semaphore.acquire();
-            boolean isSuccessful = false;
+            int successCode = 1;        // 0: Failure(SQLException), 1: Failure(Other Throwable), 2: Success
             try {
                 Connection connection = delegatedDataSource.getConnection();
-                isSuccessful = true;
+                successCode = 2;
                 return new ThrottledConnection(connection, semaphore);
             } catch (SQLException e) {
                 semaphore.release();
+                successCode = 0;
                 throw e;
             } finally {
-                if (!isSuccessful) {
+                if (successCode == 1) {
                     semaphore.release();
                 }
             }
@@ -45,16 +46,17 @@ class ThrottledDataSource implements DataSource {
     public Connection getConnection(String username, String password) throws SQLException {
         try {
             semaphore.acquire();
-            boolean isSuccessful = false;
+            int successCode = 1;        // 0: Failure(SQLException), 1: Failure(Other Throwable), 2: Success
             try {
                 Connection connection = delegatedDataSource.getConnection(username, password);
-                isSuccessful = true;
+                successCode = 2;
                 return new ThrottledConnection(connection, semaphore);
             } catch (SQLException e) {
                 semaphore.release();
+                successCode = 0;
                 throw e;
             } finally {
-                if (!isSuccessful) {
+                if (successCode == 1) {
                     semaphore.release();
                 }
             }
