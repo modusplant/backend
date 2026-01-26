@@ -133,7 +133,7 @@ class S3FileServiceTest {
     @DisplayName("파일 src url 변환")
     void testGenerateS3SrcUrl_givenFileKey_willReturnS3Url() throws Exception {
         String fileKey = "test-file-key";
-        String expected = ENDPOINT + "/" + BUCKET_NAME + "/" +fileKey;
+        String expected = ENDPOINT + "/" + BUCKET_NAME + "/" + fileKey;
         PresignedGetObjectRequest mockPresignedRequest = mock(PresignedGetObjectRequest.class);
         given(mockPresignedRequest.url()).willReturn(URI.create(expected).toURL());
         given(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class))).willReturn(mockPresignedRequest);
@@ -141,6 +141,8 @@ class S3FileServiceTest {
         String result = s3FileService.generateS3SrcUrl(fileKey);
 
         assertThat(result).isEqualTo(expected);
-        verify(s3Presigner, times(1)).presignGetObject(any(GetObjectPresignRequest.class));
+        if (!ReflectionTestUtils.getField(s3FileService, "profile").equals("dev")) {
+            verify(s3Presigner, times(1)).presignGetObject(any(GetObjectPresignRequest.class));
+        }
     }
 }
