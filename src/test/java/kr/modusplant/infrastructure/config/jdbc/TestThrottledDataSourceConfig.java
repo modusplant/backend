@@ -14,7 +14,7 @@ public class TestThrottledDataSourceConfig {
     @Value("${app.semaphore.datasource.allowed-connection-size}")
     private Integer allowedConnectionSize;
 
-    @Value("${spring.datasource.driver-class-name}")
+    @Value("${spring.datasource.driverClassName}")
     private String driverClassName;
 
     @Value("${spring.datasource.url}")
