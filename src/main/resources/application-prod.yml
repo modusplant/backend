@@ -14,14 +14,6 @@ security:
   debug:
     enabled: false
 
-# Hikari
-spring:
-  datasource:
-    hikari:
-      pool-name: ProdHikariPool
-      maximum-pool-size: 70
-      minimum-idle: 16
-
 # Scheduler
 scheduler:
   sync-interval-ms : 300000           # 5분
@@ -29,6 +21,11 @@ scheduler:
 
 # Spring
 spring:
+  datasource:
+    hikari:
+      pool-name: ProdHikariPool
+      maximum-pool-size: 70
+      minimum-idle: 16
   jpa:
     properties:
       hibernate:
