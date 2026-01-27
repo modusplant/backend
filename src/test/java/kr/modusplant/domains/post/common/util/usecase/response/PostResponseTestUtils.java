@@ -15,6 +15,7 @@ import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryC
 import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.*;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_URL;
 
 public interface PostResponseTestUtils {
     LocalDateTime testDate = LocalDateTime.of(2025, 6, 1, 0, 0);
@@ -27,6 +28,7 @@ public interface PostResponseTestUtils {
             TEST_COMM_SECONDARY_CATEGORY_CATEGORY,
             MEMBER_BASIC_USER_UUID,
             MEMBER_BASIC_USER_NICKNAME,
+            MEMBER_PROFILE_BASIC_USER_IMAGE_URL,
             5,
             50L,
             TEST_POST_TITLE,
