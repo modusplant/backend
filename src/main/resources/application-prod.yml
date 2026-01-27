@@ -27,6 +27,13 @@ scheduler:
   sync-interval-ms : 300000           # 5분
   token-cleanup-cron : "0 0 3 * * *"  # 새벽 3시
 
+# Spring
+spring:
+  jpa:
+    properties:
+      hibernate:
+        show_sql: false
+
 # Swagger
 springdoc:
   api-docs:
