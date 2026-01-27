@@ -73,7 +73,7 @@ public class PostRestController {
             Integer primaryCategoryId,
 
             @Parameter(schema = @Schema(description = "2차 항목 식별자 (복수 선택 가능)", example = "1"))
-            @RequestParam(required = false)
+            @RequestParam(name = "secondaryCategoryId", required = false)
             List<Integer> secondaryCategoryIds
     ) {
         UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;

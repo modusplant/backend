@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.domain.exception.EmptyMemberStatusException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
+import kr.modusplant.shared.exception.EmptyValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +36,7 @@ class MemberStatusTest {
     @Test
     @DisplayName("null로 fromBoolean을 호출하여 오류 발생")
     void testFromBoolean_givenNull_willThrowException() {
-        EmptyMemberStatusException exception = assertThrows(EmptyMemberStatusException.class, () -> MemberStatus.fromBoolean(null));
+        EmptyValueException exception = assertThrows(EmptyValueException.class, () -> MemberStatus.fromBoolean(null));
         assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_STATUS);
     }
 
