@@ -8,7 +8,7 @@ import java.util.concurrent.Future;
 public abstract class VirtualThreadUtils {
     private static final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
 
-    public static Future<?> submit(Callable<?> callable) {
+    public static <T> Future<T> submit(Callable<T> callable) {
         return executorService.submit(callable);
     }
 }
