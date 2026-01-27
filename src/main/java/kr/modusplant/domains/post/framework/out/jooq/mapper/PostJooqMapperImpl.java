@@ -11,8 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-import static kr.modusplant.jooq.Tables.COMM_POST;
-import static kr.modusplant.jooq.Tables.SITE_MEMBER;
+import static kr.modusplant.jooq.Tables.*;
 
 @Component
 public class PostJooqMapperImpl implements PostJooqMapper {
@@ -44,6 +43,7 @@ public class PostJooqMapperImpl implements PostJooqMapper {
                 record.get("secondaryCategory", String.class),
                 record.get("authorUuid", UUID.class),
                 record.get(SITE_MEMBER.NICKNAME),
+                record.get(SITE_MEMBER_PROF.IMAGE_PATH),
                 record.get(COMM_POST.TITLE),
                 record.get("content", JsonNode.class),
                 record.get(COMM_POST.LIKE_COUNT),
