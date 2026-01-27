@@ -33,6 +33,9 @@ public record PostDetailResponse(
         @Schema(description = "게시글을 작성한 회원의 닉네임", example = "제트드랍")
         String nickname,
 
+        @Schema(description = "회원 프로필 이미지 URL")
+        String authorImageUrl,
+
         @Schema(description = "게시글의 조회수", example = "231")
         Integer likeCount,
 
