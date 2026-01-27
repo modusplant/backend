@@ -28,4 +28,22 @@ class VirtualThreadUtilsTest implements MemberTestUtils {
         // then
         assertThat(memberResult.get()).isEqualTo(createMember());
     }
+
+    @Test
+    @DisplayName("submitAndGet으로 제네릭 타입 값 반환")
+    void testSubmitAndGet_givenCallable_willReturnGeneric() {
+        // 래퍼 클래스 타입
+        // given & when
+        Integer wrapperResult = VirtualThreadUtils.submitAndGet(() -> 1);
+
+        // then
+        assertThat(wrapperResult).isEqualTo(1);
+
+        // 사용자 지정 제네릭 타입
+        // given & when
+        Member memberResult = VirtualThreadUtils.submitAndGet(this::createMember);
+
+        // then
+        assertThat(memberResult).isEqualTo(createMember());
+    }
 }
