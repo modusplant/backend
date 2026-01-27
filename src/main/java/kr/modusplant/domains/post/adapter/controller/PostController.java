@@ -76,7 +76,7 @@ public class PostController {
                     postRecentlyViewRepository.recordViewPost(currentMemberUuid,postId);
                     return postMapper.toPostDetailResponse(
                             postDetail,
-                            s3FileService.generateS3SrcUrl(postDetail.imagePath()),
+                            (postDetail.imagePath() != null && !postDetail.imagePath().isBlank()) ? s3FileService.generateS3SrcUrl(postDetail.imagePath()) : null,
                             getJsonNodeContent(postDetail.content()),
                             readViewCount(ulid)
                     );
