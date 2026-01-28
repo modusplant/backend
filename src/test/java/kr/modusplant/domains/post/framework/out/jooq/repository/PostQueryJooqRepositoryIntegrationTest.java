@@ -207,11 +207,11 @@ class PostQueryJooqRepositoryIntegrationTest {
         List<PostSummaryReadModel> secondPageByKeyword = postQueryJooqRepository.findByKeywordWithCursor(keyword,testMember2.getUuid(),firstPageByKeyword.get(size-1).ulid(),size);
 
         List<PostSummaryReadModel> firstPageByBlankKeyword = postQueryJooqRepository.findByKeywordWithCursor("",testMember2.getUuid(),null,size);
-        List<PostSummaryReadModel> secondePageByBlankKeyword = postQueryJooqRepository.findByKeywordWithCursor("",testMember2.getUuid(),firstPageByBlankKeyword.get(size-1).ulid(),size);
+        List<PostSummaryReadModel> secondPageByBlankKeyword = postQueryJooqRepository.findByKeywordWithCursor("",testMember2.getUuid(),firstPageByBlankKeyword.get(size-1).ulid(),size);
 
-        List<PostSummaryReadModel> pageByBackslash = postQueryJooqRepository.findByKeywordWithCursor("\\",testMember2.getUuid(),null,size);
-        List<PostSummaryReadModel> pageByPercent = postQueryJooqRepository.findByKeywordWithCursor("%%",testMember2.getUuid(),null,size);
-        List<PostSummaryReadModel> pageByUnderscore = postQueryJooqRepository.findByKeywordWithCursor("_",testMember2.getUuid(),null,size);
+        List<PostSummaryReadModel> pageByBackslash = postQueryJooqRepository.findByKeywordWithCursor("\\".repeat(10),testMember2.getUuid(),null,size);
+        List<PostSummaryReadModel> pageByPercent = postQueryJooqRepository.findByKeywordWithCursor("%%".repeat(10),testMember2.getUuid(),null,size);
+        List<PostSummaryReadModel> pageByUnderscore = postQueryJooqRepository.findByKeywordWithCursor("_".repeat(10),testMember2.getUuid(),null,size);
 
         // then
         assertThat(firstPageByKeyword).hasSize(size+1);
@@ -221,11 +221,11 @@ class PostQueryJooqRepositoryIntegrationTest {
         assertThat(secondPageByKeyword.get(0).ulid()).isEqualTo(testPost1.getUlid());
 
         assertThat(firstPageByBlankKeyword).hasSize(size+1);
-        assertThat(firstPageByBlankKeyword.getLast()).isEqualTo(secondePageByBlankKeyword.getFirst());
+        assertThat(firstPageByBlankKeyword.getLast()).isEqualTo(secondPageByBlankKeyword.getFirst());
         assertThat(firstPageByBlankKeyword.get(0).ulid()).isEqualTo(testPost5.getUlid());
         assertThat(firstPageByBlankKeyword.get(1).ulid()).isEqualTo(testPost4.getUlid());
-        assertThat(secondePageByBlankKeyword.get(0).ulid()).isEqualTo(testPost2.getUlid());
-        assertThat(secondePageByBlankKeyword.get(1).ulid()).isEqualTo(testPost1.getUlid());
+        assertThat(secondPageByBlankKeyword.get(0).ulid()).isEqualTo(testPost2.getUlid());
+        assertThat(secondPageByBlankKeyword.get(1).ulid()).isEqualTo(testPost1.getUlid());
 
         assertThat(pageByBackslash).hasSize(0);
         assertThat(pageByPercent).hasSize(0);
