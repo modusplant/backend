@@ -53,7 +53,7 @@ public class PostMapperImpl implements PostMapper {
                 null,
                 null,
                 postDetailDataReadModel.title(),
-                postDetailDataReadModel.content(),
+                content,
                 postDetailDataReadModel.isPublished(),
                 postDetailDataReadModel.publishedAt(),
                 postDetailDataReadModel.updatedAt(),

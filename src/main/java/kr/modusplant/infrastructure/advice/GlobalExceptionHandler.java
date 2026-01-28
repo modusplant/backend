@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -105,6 +106,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<DataResponse<Void>> handleHttpMessageNotWritableException() {
         return ResponseEntity.status(GeneralErrorCode.GENERIC_ERROR.getHttpStatus())
                 .body(DataResponse.of(GeneralErrorCode.GENERIC_ERROR));
+    }
+
+    // 동시성 문제가 발생한 경우
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<DataResponse<Void>> handleObjectOptimisticLockingFailureException() {
+        return ResponseEntity.status(GeneralErrorCode.FAILURE_OPTIMISTIC_LOCKING.getHttpStatus())
+                .body(DataResponse.of(GeneralErrorCode.FAILURE_OPTIMISTIC_LOCKING));
     }
 
     // BusinessException
