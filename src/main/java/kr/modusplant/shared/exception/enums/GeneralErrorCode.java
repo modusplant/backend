@@ -16,7 +16,7 @@ public enum GeneralErrorCode implements ErrorCode {
     MALFORMED_INPUT(HttpStatus.BAD_REQUEST.value(), "malformed_input", "입력값의 형식이 올바르지 않습니다"),
     UNEXPECTED_INPUT(HttpStatus.BAD_REQUEST.value(), "unexpected_input", "서버가 알 수 없는 입력값이 발견되었습니다"),
     INVALID_STATE(HttpStatus.CONFLICT.value(), "invalid_state", "리소스의 상태가 유효하지 않습니다"),
-
+    FAILURE_OPTIMISTIC_LOCKING(HttpStatus.CONFLICT.value(), "failure_optimistic_locking", "요청을 처리하는 도중에 문제가 발생했습니다")
     ;
 
     private final int httpStatus;
