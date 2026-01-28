@@ -15,6 +15,7 @@ import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
 import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
 import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
 import kr.modusplant.domains.post.usecase.response.*;
+import kr.modusplant.framework.aws.service.S3FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageImpl;
@@ -39,6 +40,7 @@ public class PostController {
     private final PostViewLockRepository postViewLockRepository;
     private final PostArchiveRepository postArchiveRepository;
     private final PostRecentlyViewRepository postRecentlyViewRepository;
+    private final S3FileService s3FileService;
 
     @Value("${redis.ttl.view_count}")
     private long ttlMinutes;
@@ -74,6 +76,7 @@ public class PostController {
                     postRecentlyViewRepository.recordViewPost(currentMemberUuid,postId);
                     return postMapper.toPostDetailResponse(
                             postDetail,
+                            (postDetail.imagePath() != null && !postDetail.imagePath().isBlank()) ? s3FileService.generateS3SrcUrl(postDetail.imagePath()) : null,
                             getJsonNodeContent(postDetail.content()),
                             readViewCount(ulid)
                     );

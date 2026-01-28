@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class PostMapperImpl implements PostMapper {
 
     @Override
-    public PostDetailResponse toPostDetailResponse(PostDetailReadModel postDetailReadModel, JsonNode content, Long viewCount) {
+    public PostDetailResponse toPostDetailResponse(PostDetailReadModel postDetailReadModel, String profileImageUrl, JsonNode content, Long viewCount) {
         return new PostDetailResponse(
                 postDetailReadModel.ulid(),
                 postDetailReadModel.primaryCategoryId(),
@@ -26,6 +26,7 @@ public class PostMapperImpl implements PostMapper {
                 postDetailReadModel.secondaryCategory(),
                 postDetailReadModel.authorUuid(),
                 postDetailReadModel.nickname(),
+                profileImageUrl,
                 postDetailReadModel.likeCount(),
                 viewCount==null ? 0 : viewCount,
                 postDetailReadModel.title(),
@@ -48,6 +49,7 @@ public class PostMapperImpl implements PostMapper {
                 postDetailDataReadModel.secondaryCategory(),
                 postDetailDataReadModel.authorUuid(),
                 postDetailDataReadModel.nickname(),
+                null,
                 null,
                 null,
                 postDetailDataReadModel.title(),

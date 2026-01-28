@@ -18,6 +18,7 @@ import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
 import kr.modusplant.domains.post.usecase.response.*;
+import kr.modusplant.framework.aws.service.S3FileService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,8 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     private final PostViewLockRepository postViewLockRepository = Mockito.mock(PostViewLockRepository.class);
     private final PostArchiveRepository postArchiveRepository = Mockito.mock(PostArchiveRepository.class);
     private final PostRecentlyViewRepository postRecentlyViewRepository = Mockito.mock(PostRecentlyViewRepository.class);
-    private final PostController postController = new PostController(postMapper, postRepository, postQueryRepository, postQueryForMemberRepository, multipartDataProcessorPort, postViewCountRepository,postViewLockRepository,postArchiveRepository, postRecentlyViewRepository);
+    private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
+    private final PostController postController = new PostController(postMapper, postRepository, postQueryRepository, postQueryForMemberRepository, multipartDataProcessorPort, postViewCountRepository,postViewLockRepository,postArchiveRepository, postRecentlyViewRepository,s3FileService);
 
     @BeforeEach
     void setUp() {
