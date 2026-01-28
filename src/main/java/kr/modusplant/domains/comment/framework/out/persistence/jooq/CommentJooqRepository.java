@@ -6,6 +6,7 @@ import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentReadRepository;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
+import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.jooq.tables.*;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
@@ -32,6 +33,7 @@ public class CommentJooqRepository implements CommentReadRepository {
     private final SiteMember siteMember = SiteMember.SITE_MEMBER;
     private final CommCommentLike commentLike = CommCommentLike.COMM_COMMENT_LIKE;
     private final SiteMemberProf memberProf = SiteMemberProf.SITE_MEMBER_PROF;
+    private final S3FileService fileService;
 
     @Override
     public boolean existsByPostAndPath(PostId postId, CommentPath path) {
@@ -69,7 +71,7 @@ public class CommentJooqRepository implements CommentReadRepository {
                 .where(commComment.POST_ULID.eq(postId.getId()))
                 .orderBy(commComment.CREATED_AT.desc())
                 .fetch(record -> new CommentOfPostResponse(
-                        record.getValue(memberProf.IMAGE_PATH), record.getValue(siteMember.NICKNAME),
+                        fileService.generateS3SrcUrl(record.getValue(memberProf.IMAGE_PATH)), record.getValue(siteMember.NICKNAME),
                         record.getValue(commComment.PATH), record.getValue(commComment.CONTENT),
                         record.getValue(commComment.LIKE_COUNT), record.getValue(isLiked),
                         record.getValue(commComment.CREATED_AT).withNano(0), record.getValue(commComment.IS_DELETED)
