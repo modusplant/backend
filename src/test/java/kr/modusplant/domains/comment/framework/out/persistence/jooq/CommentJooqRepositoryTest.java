@@ -4,6 +4,7 @@ import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentContentTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentPathTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
+import kr.modusplant.framework.aws.service.S3FileService;
 import org.jooq.DSLContext;
 import org.jooq.Record6;
 import org.jooq.Result;
@@ -14,6 +15,7 @@ import org.jooq.tools.jdbc.MockDataProvider;
 import org.jooq.tools.jdbc.MockExecuteContext;
 import org.jooq.tools.jdbc.MockResult;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -34,8 +36,9 @@ public class CommentJooqRepositoryTest implements
     };
 
     private final MockConnection connection = new MockConnection(provider);
+    private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
     private final DSLContext dsl = DSL.using(connection, SQLDialect.POSTGRES);
-    private final CommentJooqRepository repository = new CommentJooqRepository(dsl);
+    private final CommentJooqRepository repository = new CommentJooqRepository(dsl, s3FileService);
     private final LocalDateTime testDateTime = LocalDateTime.parse("2025-10-16 14:30:45", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
     @BeforeEach
