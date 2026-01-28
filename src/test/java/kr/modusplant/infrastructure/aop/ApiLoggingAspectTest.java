@@ -1,5 +1,6 @@
 package kr.modusplant.infrastructure.aop;
 
+import kr.modusplant.infrastructure.aop.logging.ApiLoggingAspect;
 import nl.altindag.log.LogCaptor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
