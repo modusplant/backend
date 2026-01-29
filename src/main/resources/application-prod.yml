@@ -8,8 +8,9 @@ app:
 logging:
   level:
     root: INFO
-    io:
-      lettuce: INFO
+    io.lettuce: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql: WARN
 security:
   debug:
     enabled: false
