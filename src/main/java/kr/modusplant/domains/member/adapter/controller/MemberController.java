@@ -20,6 +20,7 @@ import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.service.SwearService;
+import kr.modusplant.shared.concurrency.annotation.RunOnVirtualThread;
 import kr.modusplant.shared.event.*;
 import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
@@ -43,6 +44,7 @@ import static kr.modusplant.shared.exception.enums.ErrorCode.NICKNAME_EXISTS;
 @RequiredArgsConstructor
 @Service
 @Transactional
+@RunOnVirtualThread
 @Slf4j
 public class MemberController {
     private final S3FileService s3FileService;

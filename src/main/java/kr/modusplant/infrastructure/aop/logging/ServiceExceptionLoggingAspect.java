@@ -1,4 +1,4 @@
-package kr.modusplant.infrastructure.aop;
+package kr.modusplant.infrastructure.aop.logging;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
