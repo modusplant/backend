@@ -1,3 +1,11 @@
+# Apache Tomcat
+server:
+  tomcat:
+    threads:
+      max: 80
+    max-connections: 500
+    accept-count: 100
+
 # Application
 app:
   semaphore:
