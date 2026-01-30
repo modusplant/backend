@@ -1,12 +1,31 @@
+# Apache Tomcat
+server:
+  tomcat:
+    threads:
+      max: 15
+    max-connections: 100
+    accept-count: 20
+
+# Application
+app:
+  semaphore:
+    datasource:
+      allowed-connection-size: 12
+
 # Debugging & Logging
 logging:
   level:
     root: DEBUG
-    io:
-      lettuce: DEBUG
+    io.lettuce: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: DEBUG
 security:
   debug:
     enabled: true
+
+# MinIO
+minio:
+  public-endpoint: ${DEV_PUBLIC_ENDPOINT}
 
 # Scheduler
 scheduler:
@@ -15,14 +34,15 @@ scheduler:
 
 # Spring
 spring:
+  datasource:
+    hikari:
+      pool-name: DevHikariPool
+      maximum-pool-size: 15
+      minimum-idle: 5
   jpa:
     properties:
       hibernate:
         show_sql: true
-
-# MinIO
-minio:
-  public-endpoint: ${DEV_PUBLIC_ENDPOINT}
 
 # Swagger
 springdoc:

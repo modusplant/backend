@@ -1,9 +1,24 @@
+# Apache Tomcat
+server:
+  tomcat:
+    threads:
+      max: 80
+    max-connections: 500
+    accept-count: 100
+
+# Application
+app:
+  semaphore:
+    datasource:
+      allowed-connection-size: 60
+
 # Debugging & Logging
 logging:
   level:
     root: INFO
-    io:
-      lettuce: INFO
+    io.lettuce: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql: WARN
 security:
   debug:
     enabled: false
@@ -15,6 +30,11 @@ scheduler:
 
 # Spring
 spring:
+  datasource:
+    hikari:
+      pool-name: ProdHikariPool
+      maximum-pool-size: 70
+      minimum-idle: 16
   jpa:
     properties:
       hibernate:

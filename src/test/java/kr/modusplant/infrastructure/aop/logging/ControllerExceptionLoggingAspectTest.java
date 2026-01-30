@@ -1,4 +1,4 @@
-package kr.modusplant.infrastructure.aop;
+package kr.modusplant.infrastructure.aop.logging;
 
 import nl.altindag.log.LogCaptor;
 import org.junit.jupiter.api.DisplayName;
