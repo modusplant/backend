@@ -9,6 +9,7 @@ import kr.modusplant.domains.post.framework.out.jpa.repository.supers.SecondaryC
 import kr.modusplant.domains.post.framework.out.redis.PostRecentlyViewRedisRepository;
 import kr.modusplant.domains.post.framework.out.redis.PostViewCountRedisRepository;
 import kr.modusplant.domains.post.usecase.port.repository.PostRepository;
+import kr.modusplant.framework.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.jpa.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.framework.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
@@ -16,6 +17,7 @@ import kr.modusplant.framework.jpa.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Repository
@@ -44,13 +46,17 @@ public class PostRepositoryJpaAdapter implements PostRepository {
 
     @Override
     public void update(Post post) {
-        SiteMemberEntity authorEntity = authorJpaRepository.findByUuid(post.getAuthorId().getValue()).orElseThrow();
-        SiteMemberEntity createMember = authorJpaRepository.findByUuid(post.getCreateAuthorId().getValue()).orElseThrow();
         CommPrimaryCategoryEntity primaryCategoryEntity = primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue()).orElseThrow();
         CommSecondaryCategoryEntity secondaryCategoryEntity = secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue()).orElseThrow();
-        postJpaRepository.save(
-                postJpaMapper.toPostEntity(post, authorEntity,createMember,primaryCategoryEntity,secondaryCategoryEntity,postViewCountRedisRepository.read(post.getPostId()))
-        );
+        CommPostEntity postEntity = postJpaRepository.findByUlid(post.getPostId().getValue()).orElseThrow();
+        postEntity.updatePrimaryCategory(primaryCategoryEntity);
+        postEntity.updateSecondaryCategory(secondaryCategoryEntity);
+        postEntity.updateViewCount(postViewCountRedisRepository.read(post.getPostId()));
+        postEntity.updateTitle(post.getPostContent().getTitle());
+        postEntity.updateContent(post.getPostContent().getContent());
+        postEntity.updateIsPublished(post.getStatus().isPublished());
+        postEntity.updatePublishedAt(post.getStatus().isPublished() ? LocalDateTime.now() : null);
+        postJpaRepository.save(postEntity);
     }
 
     @Override
