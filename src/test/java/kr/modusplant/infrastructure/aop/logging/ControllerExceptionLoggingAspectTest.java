@@ -1,6 +1,5 @@
-package kr.modusplant.infrastructure.aop;
+package kr.modusplant.infrastructure.aop.logging;
 
-import kr.modusplant.infrastructure.aop.logging.ControllerExceptionLoggingAspect;
 import nl.altindag.log.LogCaptor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
