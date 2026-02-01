@@ -1,6 +1,6 @@
 package kr.modusplant.shared.exception;
 
-import kr.modusplant.shared.exception.enums.supers.ErrorCode;
+import kr.modusplant.shared.exception.supers.ErrorCode;
 
 /**
  * 클라이언트가 조회하려는 데이터가 존재하지 않는 경우에 발생하는 예외입니다.

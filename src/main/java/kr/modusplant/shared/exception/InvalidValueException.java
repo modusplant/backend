@@ -1,6 +1,6 @@
 package kr.modusplant.shared.exception;
 
-import kr.modusplant.shared.exception.enums.supers.ErrorCode;
+import kr.modusplant.shared.exception.supers.ErrorCode;
 
 /**
  * 클라이언트 요청 필드의 값이 해당 값의 형식과 맞지 않는 경우에 발생하는 예외입니다.

@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum ErrorCode implements kr.modusplant.shared.exception.enums.supers.ErrorCode {
+public enum ErrorCode implements kr.modusplant.shared.exception.supers.ErrorCode {
 
     // -- common errors --
     GENERIC_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "internal_server_error", "서버에 문제가 발생했습니다"),
