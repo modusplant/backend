@@ -1,7 +1,7 @@
 package kr.modusplant.domains.comment.domain.exception;
 
 import kr.modusplant.shared.exception.BusinessException;
-import kr.modusplant.shared.exception.enums.supers.ErrorCode;
+import kr.modusplant.shared.exception.supers.ErrorCode;
 
 public class InvalidValueException extends BusinessException {
   public InvalidValueException(ErrorCode errorCode) {
