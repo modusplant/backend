@@ -90,6 +90,14 @@ public class CommPostEntity {
         this.secondaryCategory = secondaryCategory;
     }
 
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    public void updateContent(JsonNode content) {
+        this.content = content;
+    }
+
     public void updateIsPublished(Boolean isPublished) {
         this.isPublished = isPublished;
     }
@@ -100,6 +108,14 @@ public class CommPostEntity {
 
     public void decreaseLikeCount() {
         this.likeCount = Math.max(0, this.likeCount - 1);
+    }
+
+    public void updateViewCount(Long viewCount) {
+        this.viewCount = viewCount;
+    }
+
+    public void updatePublishedAt(LocalDateTime publishedAt) {
+        this.publishedAt = publishedAt;
     }
 
     public String getETagSource() {

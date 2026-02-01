@@ -19,13 +19,11 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     hikari:
-      pool-name: DevHikariPool
-      maximum-pool-size: 10
-      minimum-idle: 3
       idle-timeout: 60000             # 10분
       max-lifetime: 1800000           # 30분
-      connection-timeout: 30000       # 30초
+      connection-timeout: 10000       # 10초
       auto-commit: true
+      validation-timeout: 10000       # 10초
   flyway:
     enabled: true
     validate-on-migrate: true

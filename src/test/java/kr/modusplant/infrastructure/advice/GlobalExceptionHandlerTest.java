@@ -9,6 +9,7 @@ import jakarta.validation.ConstraintViolationException;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.shared.exception.BusinessException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -229,6 +230,21 @@ public class GlobalExceptionHandlerTest {
         assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
+
+//    @Test
+//    @DisplayName("ObjectOptimisticLockingFailureException으로 전역 예외 핸들러 호출")
+//    public void testHandleObjectOptimisticLockingFailureException_givenValidGlobalExceptionHandler_returnResponse() {
+//        // given & when
+//        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleHttpMessageNotWritableException();
+//        DataResponse<Void> errorResponse = response.getBody();
+//
+//        // then
+//        assertNotNull(errorResponse);
+//        assertEquals(GeneralErrorCode.FAILURE_OPTIMISTIC_LOCKING.getHttpStatus(), errorResponse.getStatus());
+//        assertEquals(GeneralErrorCode.FAILURE_OPTIMISTIC_LOCKING.getCode(), errorResponse.getCode());
+//        assertNotNull(errorResponse.getMessage());
+//        assertNull(errorResponse.getData());
+//    }
 
     @Test
     @DisplayName("BusinessException으로 전역 예외 핸들러 호출")
