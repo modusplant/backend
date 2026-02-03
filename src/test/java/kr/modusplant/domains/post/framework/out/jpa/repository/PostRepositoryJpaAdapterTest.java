@@ -54,7 +54,10 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
         CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
         SiteMemberEntity memberEntity = createMemberBasicUserEntity().builder().uuid(post.getAuthorId().getValue()).build();
         CommPrimaryCategoryEntity primaryCategoryEntity = createCommPrimaryCategoryEntity().builder().id(post.getPrimaryCategoryId().getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().id(post.getSecondaryCategoryId().getValue()).build();
+        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder()
+                .id(post.getSecondaryCategoryId().getValue())
+                .primaryCategory(primaryCategoryEntity)
+                .build();
         long viewCount = 0L;
 
         given(authorJpaRepository.findByUuid(post.getAuthorId().getValue())).willReturn(Optional.of(memberEntity));
@@ -82,7 +85,10 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
         Post post = createPublishedPost();
         CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
         CommPrimaryCategoryEntity primaryCategoryEntity = createCommPrimaryCategoryEntity().builder().id(post.getPrimaryCategoryId().getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().id(post.getSecondaryCategoryId().getValue()).build();
+        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder()
+                .id(post.getSecondaryCategoryId().getValue())
+                .primaryCategory(primaryCategoryEntity)
+                .build();
         long viewCount = 0L;
 
         given(primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue())).willReturn(Optional.of(primaryCategoryEntity));
