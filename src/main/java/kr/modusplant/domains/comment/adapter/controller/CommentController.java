@@ -61,7 +61,9 @@ public class CommentController {
             throw new EntityNotFoundException(ErrorCode.POST_NOT_FOUND, "post");
         }
 
-        return jooqRepository.findByPost(PostId.create(postUlid));
+        return jooqRepository.findByPost(PostId.create(postUlid))
+                .stream().map(mapper::toCommentOfPostResponse)
+                .toList();
     }
 
     public CommentPageResponse<CommentOfAuthorPageModel> gatherByAuthor(UUID memberUuid, Pageable pageable) {

@@ -38,7 +38,7 @@ public class CommentJooqRepositoryTest implements
     private final MockConnection connection = new MockConnection(provider);
     private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
     private final DSLContext dsl = DSL.using(connection, SQLDialect.POSTGRES);
-    private final CommentJooqRepository repository = new CommentJooqRepository(dsl, s3FileService);
+    private final CommentJooqRepository repository = new CommentJooqRepository(dsl);
     private final LocalDateTime testDateTime = LocalDateTime.parse("2025-10-16 14:30:45", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
     @BeforeEach
