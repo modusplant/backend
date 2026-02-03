@@ -9,6 +9,7 @@ import jakarta.validation.ConstraintViolationException;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.shared.exception.BusinessException;
 import kr.modusplant.shared.exception.enums.GeneralErrorCode;
+import kr.modusplant.shared.exception.model.DynamicErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,8 +50,21 @@ public class GlobalExceptionHandler {
 
         log.error("FieldError of MethodArgumentNotValidException: {}", fieldError);
 
-        return ResponseEntity.status(GeneralErrorCode.INVALID_INPUT.getHttpStatus())
-                .body(DataResponse.of(GeneralErrorCode.INVALID_INPUT));
+        String message = ex
+                .getBindingResult()
+                .getAllErrors()
+                .getFirst()
+                .getDefaultMessage();
+
+        if (message == null || message.isBlank()) {
+            return ResponseEntity.status(GeneralErrorCode.INVALID_INPUT.getHttpStatus())
+                    .body(DataResponse.of(GeneralErrorCode.INVALID_INPUT));
+        } else {
+            DynamicErrorCode dynamicErrorCode = DynamicErrorCode.create(GeneralErrorCode.INVALID_INPUT, message);
+            return ResponseEntity.status(dynamicErrorCode.getHttpStatus())
+                    .body(DataResponse.of(dynamicErrorCode));
+        }
+
     }
 
     // 메소드의 타입과 요청 값의 타입이 불일치하는 경우

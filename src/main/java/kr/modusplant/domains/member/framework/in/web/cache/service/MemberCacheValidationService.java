@@ -21,7 +21,7 @@ import static kr.modusplant.shared.http.utils.ParseHttpHeaderUtils.parseIfModifi
 import static kr.modusplant.shared.http.utils.ParseHttpHeaderUtils.parseIfNoneMatch;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @Slf4j
 public class MemberCacheValidationService {
     private final SiteMemberProfileJpaRepository memberProfileJpaRepository;

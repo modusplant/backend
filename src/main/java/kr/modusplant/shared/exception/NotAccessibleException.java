@@ -1,6 +1,6 @@
 package kr.modusplant.shared.exception;
 
-import kr.modusplant.shared.exception.enums.supers.ErrorCode;
+import kr.modusplant.shared.exception.supers.ErrorCode;
 
 /**
  * 클라이언트가 특정 리소스에 접근할 수 없는 경우에 발생하는 예외입니다.
