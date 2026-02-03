@@ -2,7 +2,7 @@ package kr.modusplant.framework.jpa.exception;
 
 import kr.modusplant.framework.jpa.exception.enums.EntityName;
 import kr.modusplant.shared.exception.BusinessException;
-import kr.modusplant.shared.exception.enums.supers.ErrorCode;
+import kr.modusplant.shared.exception.supers.ErrorCode;
 
 public class ExistedEntityException extends BusinessException {
 
