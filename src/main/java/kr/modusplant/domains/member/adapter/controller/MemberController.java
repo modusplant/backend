@@ -61,11 +61,13 @@ public class MemberController {
         return memberMapper.toMemberResponse(memberRepository.save(nickname));
     }
 
+    @Transactional(readOnly = true)
     public boolean checkExistedNickname(MemberNicknameCheckRecord record) {
         Nickname nickname = Nickname.create(record.nickname());
         return memberRepository.isNicknameExist(nickname);
     }
 
+    @Transactional(readOnly = true)
     public MemberProfileResponse getProfile(MemberProfileGetRecord record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Optional<Member> optionalMember = memberRepository.getById(memberId);
