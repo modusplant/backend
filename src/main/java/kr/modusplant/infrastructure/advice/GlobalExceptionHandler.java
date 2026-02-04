@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @RestControllerAdvice
@@ -81,6 +82,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<DataResponse<Void>> handleConstraintViolationException(ConstraintViolationException ex) {
         Set<ConstraintViolation<?>> constraintViolations = ex.getConstraintViolations();
+        Optional<String> firstMessage = ex.getConstraintViolations().stream()
+                .map(ConstraintViolation::getMessage)
+                .findFirst();
 
         if(constraintViolations != null) {
             List<String> invalidPropertyNames = constraintViolations.stream()
@@ -88,10 +92,16 @@ public class GlobalExceptionHandler {
                     .toList();
 
             log.error("invalidPropertyNames of MethodArgumentTypeMismatchException: {}", invalidPropertyNames);
-
         }
-        return ResponseEntity.status(GeneralErrorCode.CONSTRAINT_VIOLATION.getHttpStatus())
-                .body(DataResponse.of(GeneralErrorCode.CONSTRAINT_VIOLATION));
+
+        if(firstMessage.isPresent()) {
+            DynamicErrorCode dynamicErrorCode = DynamicErrorCode.create(GeneralErrorCode.CONSTRAINT_VIOLATION, firstMessage.get());
+            return ResponseEntity.status(dynamicErrorCode.getHttpStatus())
+                    .body(DataResponse.of(dynamicErrorCode));
+        } else {
+            return ResponseEntity.status(GeneralErrorCode.CONSTRAINT_VIOLATION.getHttpStatus())
+                    .body(DataResponse.of(GeneralErrorCode.CONSTRAINT_VIOLATION));
+        }
     }
 
     // 요청 처리 간 예외가 발생한 경우
