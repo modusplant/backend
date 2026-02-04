@@ -1,4 +1,4 @@
-package kr.modusplant.shared.exception.enums.supers;
+package kr.modusplant.shared.exception.supers;
 
 public interface SuccessCode {
     int getHttpStatus();
