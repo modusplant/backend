@@ -50,11 +50,8 @@ public class GlobalExceptionHandler {
 
         log.error("FieldError of MethodArgumentNotValidException: {}", fieldError);
 
-        String message = ex
-                .getBindingResult()
-                .getAllErrors()
-                .getFirst()
-                .getDefaultMessage();
+        String message = ex.getBindingResult().getAllErrors()
+                .getFirst().getDefaultMessage();
 
         if (message == null || message.isBlank()) {
             return ResponseEntity.status(GeneralErrorCode.INVALID_INPUT.getHttpStatus())
