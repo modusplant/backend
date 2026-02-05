@@ -122,7 +122,7 @@ public class GlobalExceptionHandlerTest {
         given(violation1.getPropertyPath()).willReturn(PathImpl.createPathFromString("testFieldName1"));
         given(violation2.getPropertyPath()).willReturn(PathImpl.createPathFromString("testFieldName2"));
         given(violation3.getPropertyPath()).willReturn(PathImpl.createPathFromString("testFieldName3"));
-
+        given(violation1.getMessage()).willReturn("Test message 1");
 
         // when
         ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleConstraintViolationException(ex);
