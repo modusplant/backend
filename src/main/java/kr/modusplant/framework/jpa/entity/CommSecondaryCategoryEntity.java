@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.CreatedDate;
@@ -19,6 +20,7 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_SECO_CATE
 @Table(name = COMM_SECO_CATE)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class CommSecondaryCategoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "comm_seco_cate_seq")
@@ -28,6 +30,7 @@ public class CommSecondaryCategoryEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = PRI_CATE_ID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @ToString.Exclude
     private CommPrimaryCategoryEntity primaryCategoryEntity;
 
     @Column(nullable = false, updatable = false)

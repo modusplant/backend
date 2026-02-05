@@ -9,6 +9,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.Type;
@@ -26,6 +27,7 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_POST_ARCH
 @Table(name = COMM_POST_ARCHIVE)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class CommPostArchiveEntity {
     @Id
     @Column(nullable = false, updatable = false)
@@ -48,6 +50,7 @@ public class CommPostArchiveEntity {
 
     @Type(JsonBinaryType.class)
     @Column(nullable = false, columnDefinition = "jsonb")
+    @ToString.Exclude
     private JsonNode content;
 
     @Column(name = CREATED_AT, nullable = false)

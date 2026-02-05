@@ -5,6 +5,7 @@ import kr.modusplant.shared.enums.AuthProvider;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -23,8 +24,10 @@ import static kr.modusplant.shared.persistence.constant.TableName.SITE_MEMBER_AU
 @Table(name = SITE_MEMBER_AUTH)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString(onlyExplicitlyIncluded = true)
 public class SiteMemberAuthEntity {
     @Id
+    @ToString.Include
     private UUID uuid;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
@@ -44,6 +47,7 @@ public class SiteMemberAuthEntity {
 
     @Column(nullable = false, updatable = false)
     @Enumerated(EnumType.STRING)
+    @ToString.Include
     private AuthProvider provider;
 
     @Column(unique = true, updatable = false, name = "provider_id")
@@ -54,6 +58,7 @@ public class SiteMemberAuthEntity {
 
     @Column(name = LAST_MODIFIED_AT, nullable = false)
     @LastModifiedDate
+    @ToString.Include
     private LocalDateTime lastModifiedAt;
 
     @Version

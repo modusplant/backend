@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -22,6 +23,7 @@ import static kr.modusplant.shared.persistence.constant.TableName.SITE_MEMBER_PR
 @Table(name = SITE_MEMBER_PROF)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class SiteMemberProfileEntity {
     @Id
     private UUID uuid;
@@ -29,6 +31,7 @@ public class SiteMemberProfileEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @MapsId
     @JoinColumn(name = "uuid", nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @ToString.Exclude
     private SiteMemberEntity member;
 
     @Column(name = "image_path")
@@ -43,6 +46,7 @@ public class SiteMemberProfileEntity {
 
     @Version
     @Column(name = VER_NUM, nullable = false)
+    @ToString.Exclude
     private Long versionNumber;
 
     public void updateImagePath(String imagePath) {

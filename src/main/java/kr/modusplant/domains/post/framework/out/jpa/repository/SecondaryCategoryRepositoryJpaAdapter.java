@@ -1,5 +1,7 @@
 package kr.modusplant.domains.post.framework.out.jpa.repository;
 
+import kr.modusplant.domains.post.domain.exception.InvalidValueException;
+import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.domains.post.domain.vo.PrimaryCategoryId;
 import kr.modusplant.domains.post.domain.vo.SecondaryCategory;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.SecondaryCategoryJpaMapper;
@@ -21,7 +23,7 @@ public class SecondaryCategoryRepositoryJpaAdapter implements SecondaryCategoryR
     @Override
     public List<SecondaryCategory> getSecondaryCategoriesByPrimaryCategory(PrimaryCategoryId primaryCategoryId) {
         return secondaryCategoryJpaRepository.findByPrimaryCategoryEntityOrderByOrderAsc(
-                primaryCategoryJpaRepository.findById(primaryCategoryId.getValue()).orElseThrow()
+                primaryCategoryJpaRepository.findById(primaryCategoryId.getValue()).orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID))
         ).stream().map(secondaryCategoryJpaMapper::toSecondaryCategory).toList();
     }
 }
