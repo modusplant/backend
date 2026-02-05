@@ -1,8 +1,9 @@
 package kr.modusplant.shared.kernel;
 
-import kr.modusplant.shared.exception.EmptyNicknameException;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidNicknameException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -22,15 +23,15 @@ class NicknameTest {
     @Test
     @DisplayName("null로 create을 호출하여 오류 발생")
     void testCreate_givenNull_willThrowException() {
-        EmptyNicknameException exception = assertThrows(EmptyNicknameException.class, () -> Nickname.create(null));
+        EmptyValueException exception = assertThrows(EmptyValueException.class, () -> Nickname.create(null));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NICKNAME_EMPTY);
     }
 
     @Test
     @DisplayName("빈 문자열로 create을 호출하여 오류 발생")
     void testCreate_givenEmptyString_willThrowException() {
-        EmptyNicknameException exception = assertThrows(EmptyNicknameException.class, () -> Nickname.create("   "));
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NICKNAME_EMPTY);
+        EmptyValueException exception = assertThrows(EmptyValueException.class, () -> Nickname.create("   "));
+        assertThat(exception.getErrorCode()).isEqualTo(KernelErrorCode.EMPTY_NICKNAME);
     }
 
     @Test

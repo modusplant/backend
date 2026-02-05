@@ -3,9 +3,10 @@ package kr.modusplant.domains.member.domain.aggregate;
 import kr.modusplant.domains.member.domain.vo.MemberBirthDate;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberStatus;
-import kr.modusplant.shared.exception.EmptyNicknameException;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.kernel.Nickname;
+import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,7 +29,7 @@ public class Member {
         } else if (status == null) {
             throw new EmptyValueException(EMPTY_MEMBER_STATUS, "memberStatus");
         } else if (nickname == null) {
-            throw new EmptyNicknameException();
+            throw new EmptyValueException(KernelErrorCode.EMPTY_NICKNAME, "nickname");
         } else if (birthDate == null) {
             throw new EmptyValueException(EMPTY_MEMBER_BIRTH_DATE, "memberBirthDate");
         }
