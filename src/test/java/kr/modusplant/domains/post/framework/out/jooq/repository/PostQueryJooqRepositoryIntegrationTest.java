@@ -1,7 +1,7 @@
 package kr.modusplant.domains.post.framework.out.jooq.repository;
 
 import kr.modusplant.domains.post.common.helper.PostTestDataHelper;
-import kr.modusplant.domains.post.domain.exception.EmptyCategoryIdException;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.usecase.record.PostDetailDataReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
@@ -161,7 +161,7 @@ class PostQueryJooqRepositoryIntegrationTest {
                 postQueryJooqRepository.findByCategoryWithCursor(
                         null, List.of(testSecondaryCategory1.getId()), testMember2.getUuid(), null, size
                 )
-        ).isInstanceOf(EmptyCategoryIdException.class);
+        ).isInstanceOf(EmptyValueException.class);
     }
 
     @Test
