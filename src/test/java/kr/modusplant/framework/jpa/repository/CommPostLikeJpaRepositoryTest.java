@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @RepositoryOnlyContext
 public class CommPostLikeJpaRepositoryTest implements CommPostLikeEntityTestUtils {
@@ -73,6 +74,16 @@ public class CommPostLikeJpaRepositoryTest implements CommPostLikeEntityTestUtil
 
             // then
             assertThat(commPostLikeRepository.existsByPostIdAndMemberId(postId, memberId)).isFalse();
+        }
+
+        @Test
+        @DisplayName("게시글 좋아요 엔터티 toString 호출 시 순환 오류 발생 여부 확인")
+        void testToString_givenCommPostLikeEntity_willReturnRepresentative() {
+            // given & when
+            CommPostLikeEntity entity = commPostLikeRepository.save(CommPostLikeEntity.of(postId, memberId));
+
+            // then
+            assertDoesNotThrow(entity::toString);
         }
     }
 
