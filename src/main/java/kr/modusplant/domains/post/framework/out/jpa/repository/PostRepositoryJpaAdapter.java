@@ -79,7 +79,7 @@ public class PostRepositoryJpaAdapter implements PostRepository {
 
     @Override
     public Long getViewCountByUlid(PostId postId) {
-        return postJpaRepository.findByUlid(postId.getValue()).orElseThrow().getViewCount();
+        return postJpaRepository.findByUlid(postId.getValue()).orElseThrow(() -> new PostNotFoundException()).getViewCount();
     }
 
     @Override
