@@ -1,7 +1,8 @@
 package kr.modusplant.domains.post.framework.out.jooq.repository;
 
-import kr.modusplant.domains.post.domain.exception.EmptyCategoryIdException;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
+import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.framework.out.jooq.mapper.supers.PostJooqMapper;
 import kr.modusplant.domains.post.usecase.port.repository.PostQueryRepository;
@@ -180,7 +181,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
 
     private Condition buildCategoryConditions(Integer primaryCategoryId, List<Integer> secondaryCategoryIds) {
         if (primaryCategoryId == null && secondaryCategoryIds != null && !secondaryCategoryIds.isEmpty()) {
-            throw new EmptyCategoryIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
         }
         Condition condition = noCondition();
         if(primaryCategoryId != null) {

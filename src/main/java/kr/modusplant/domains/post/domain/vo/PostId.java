@@ -1,7 +1,8 @@
 package kr.modusplant.domains.post.domain.vo;
 
-import kr.modusplant.domains.post.domain.exception.EmptyPostIdException;
-import kr.modusplant.domains.post.domain.exception.InvalidPostIdException;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
+import kr.modusplant.domains.post.domain.exception.InvalidValueException;
+import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -26,10 +27,10 @@ public class PostId {
 
     public static PostId create(String ulid) {
         if (ulid == null || ulid.trim().isEmpty()) {
-            throw new EmptyPostIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_POST_ID);
         }
         if (!isValidUlid(ulid)) {
-            throw new InvalidPostIdException();
+            throw new InvalidValueException(PostErrorCode.INVALID_POST_ID);
         }
         return new PostId(ulid);
     }

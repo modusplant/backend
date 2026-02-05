@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @RepositoryOnlyContext
 class CommPrimaryCategoryJpaRepositoryTest implements CommPrimaryCategoryEntityTestUtils {
@@ -67,5 +68,15 @@ class CommPrimaryCategoryJpaRepositoryTest implements CommPrimaryCategoryEntityT
 
         // then
         assertThat(commCategoryRepository.existsById(entity.getId())).isEqualTo(true);
+    }
+
+    @DisplayName("1차 항목 엔터티 toString 호출 시 순환 오류 발생 여부 확인")
+    @Test
+    void testToString_givenCommPrimaryCategoryEntity_willReturnRepresentative() {
+        // given & when
+        CommPrimaryCategoryEntity entity = commCategoryRepository.save(createCommPrimaryCategoryEntity());
+
+        // then
+        assertDoesNotThrow(entity::toString);
     }
 }

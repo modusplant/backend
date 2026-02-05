@@ -1,8 +1,8 @@
 package kr.modusplant.domains.post.domain.vo;
 
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
-import kr.modusplant.domains.post.domain.exception.EmptyPostIdException;
-import kr.modusplant.domains.post.domain.exception.InvalidPostIdException;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
+import kr.modusplant.domains.post.domain.exception.InvalidValueException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,7 +27,6 @@ class PostIdTest implements PostTestUtils {
             assertNotNull(postId);
             assertNotNull(postId.getValue());
             assertEquals(26, postId.getValue().length());
-            System.out.println(postId.getValue());
             assertTrue(postId.getValue().matches("^[0-9A-HJKMNP-TV-Z]{26}$"));
         }
     }
@@ -40,8 +39,6 @@ class PostIdTest implements PostTestUtils {
         @DisplayName("유효한 ULID 문자열로 PostId를 생성한다")
         void testCreate_givenUlid_willReturnPostId() {
             // then
-            System.out.println(TEST_POST_ULID);
-            System.out.println(PostId.create(TEST_POST_ULID).getValue());
             assertFalse(StringUtils.isBlank(testPostId.getValue()));
             assertFalse(testPostId.getValue().length() != 26);
             assertTrue(testPostId.getValue().matches("^[0-9A-HJKMNP-TV-Z]{26}$"));
@@ -53,17 +50,17 @@ class PostIdTest implements PostTestUtils {
         @DisplayName("null이나 빈 문자열 ULID로 PostId 생성 시 EmptyPostIdException을 발생시킨다")
         void testCreate_givenNullOrEmptyPostId_willThrowException() {
             // when & then
-            assertThrows(EmptyPostIdException.class, () -> PostId.create(null));
-            assertThrows(EmptyPostIdException.class, () -> PostId.create(""));
-            assertThrows(EmptyPostIdException.class, () -> PostId.create("   "));
+            assertThrows(EmptyValueException.class, () -> PostId.create(null));
+            assertThrows(EmptyValueException.class, () -> PostId.create(""));
+            assertThrows(EmptyValueException.class, () -> PostId.create("   "));
         }
 
         @Test
         @DisplayName("유효하지 않은 ULID로 PostId 생성 시 InvalidPostIdException을 발생시킨다")
         void shouldThrowInvalidPostIdExceptionWhenUlidLengthIsNot26() {
             // when & then
-            assertThrows(InvalidPostIdException.class, () -> PostId.create(TEST_INVALID_POST_ULID)); // 25자
-            assertThrows(InvalidPostIdException.class, () -> PostId.create(TEST_INVALID_POST_ULID2)); // 유효하지 않은 문자 @포함
+            assertThrows(InvalidValueException.class, () -> PostId.create(TEST_INVALID_POST_ULID)); // 25자
+            assertThrows(InvalidValueException.class, () -> PostId.create(TEST_INVALID_POST_ULID2)); // 유효하지 않은 문자 @포함
         }
 
     }

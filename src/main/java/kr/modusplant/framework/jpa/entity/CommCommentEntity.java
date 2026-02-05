@@ -6,6 +6,7 @@ import kr.modusplant.shared.persistence.compositekey.CommCommentId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.CreatedDate;
@@ -22,6 +23,7 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_COMMENT;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @IdClass(CommCommentId.class)
+@ToString
 public class CommCommentEntity {
     @Id
     private String postUlid;
@@ -29,6 +31,7 @@ public class CommCommentEntity {
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @MapsId("postUlid")
     @JoinColumn(name = POST_ULID, nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @ToString.Exclude
     private CommPostEntity postEntity;
 
     @Id
@@ -37,10 +40,12 @@ public class CommCommentEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @ToString.Exclude
     private SiteMemberEntity authMember;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @ToString.Exclude
     private SiteMemberEntity createMember;
 
     @Column(name = "like_count", nullable = false)
@@ -48,6 +53,7 @@ public class CommCommentEntity {
     private Integer likeCount;
 
     @Column(name = "content", nullable = false, length = 900)
+    @ToString.Exclude
     private String content;
 
     @Column(name = "is_deleted", nullable = false)

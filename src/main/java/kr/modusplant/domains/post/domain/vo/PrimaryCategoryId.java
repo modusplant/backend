@@ -1,6 +1,7 @@
 package kr.modusplant.domains.post.domain.vo;
 
-import kr.modusplant.domains.post.domain.exception.EmptyCategoryIdException;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
+import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +16,7 @@ public class PrimaryCategoryId {
 
     public static PrimaryCategoryId create(Integer id) {
         if (id == null) {
-            throw new EmptyCategoryIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
         }
         return new PrimaryCategoryId(id);
     }
