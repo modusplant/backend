@@ -27,7 +27,6 @@ class PostIdTest implements PostTestUtils {
             assertNotNull(postId);
             assertNotNull(postId.getValue());
             assertEquals(26, postId.getValue().length());
-            System.out.println(postId.getValue());
             assertTrue(postId.getValue().matches("^[0-9A-HJKMNP-TV-Z]{26}$"));
         }
     }
@@ -40,8 +39,6 @@ class PostIdTest implements PostTestUtils {
         @DisplayName("유효한 ULID 문자열로 PostId를 생성한다")
         void testCreate_givenUlid_willReturnPostId() {
             // then
-            System.out.println(TEST_POST_ULID);
-            System.out.println(PostId.create(TEST_POST_ULID).getValue());
             assertFalse(StringUtils.isBlank(testPostId.getValue()));
             assertFalse(testPostId.getValue().length() != 26);
             assertTrue(testPostId.getValue().matches("^[0-9A-HJKMNP-TV-Z]{26}$"));
