@@ -6,8 +6,6 @@ import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 
-import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
-
 public interface CommentRegisterRequestTestUtils extends PostIdTestUtils, CommentPathTestUtils,
         MemberTestUtils, CommentContentTestUtils {
     CommentRegisterRequest testCommentRegisterRequest = new CommentRegisterRequest(

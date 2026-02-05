@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @RepositoryOnlyContext
 class SiteMemberRoleJpaRepositoryTest implements SiteMemberRoleEntityTestUtils {
@@ -85,5 +86,18 @@ class SiteMemberRoleJpaRepositoryTest implements SiteMemberRoleEntityTestUtils {
 
         // then
         assertThat(memberRoleRepository.existsByUuid(memberRole.getUuid())).isEqualTo(true);
+    }
+
+    @DisplayName("회원 역할 엔터티 toString 호출 시 순환 오류 발생 여부 확인")
+    @Test
+    void testToString_givenSiteMemberRoleEntity_willReturnRepresentative() {
+        // given
+        SiteMemberRoleEntity memberRole = createMemberRoleUserEntity();
+
+        // when
+        SiteMemberRoleEntity memberRoleEntity = memberRoleRepository.save(memberRole);
+
+        // then
+        assertDoesNotThrow(memberRoleEntity::toString);
     }
 }

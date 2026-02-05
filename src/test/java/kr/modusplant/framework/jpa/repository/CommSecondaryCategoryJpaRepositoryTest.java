@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @RepositoryOnlyContext
 class CommSecondaryCategoryJpaRepositoryTest implements CommSecondaryCategoryEntityTestUtils {
@@ -67,5 +68,15 @@ class CommSecondaryCategoryJpaRepositoryTest implements CommSecondaryCategoryEnt
 
         // then
         assertThat(commCategoryRepository.existsById(entity.getId())).isEqualTo(true);
+    }
+
+    @DisplayName("2차 항목 엔터티 toString 호출 시 순환 오류 발생 여부 확인")
+    @Test
+    void testToString_givenCommSecondaryCategoryEntity_willReturnRepresentative() {
+        // given & when
+        CommSecondaryCategoryEntity entity = commCategoryRepository.save(createCommSecondaryCategoryEntityBuilder().primaryCategory(createCommPrimaryCategoryEntity()).build());
+
+        // then
+        assertDoesNotThrow(entity::toString);
     }
 }

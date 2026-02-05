@@ -11,7 +11,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import kr.modusplant.domains.post.adapter.controller.PostController;
-import kr.modusplant.domains.post.domain.exception.EmptyCategoryIdException;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
+import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.domains.post.usecase.request.FileOrder;
 import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
 import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
@@ -78,7 +79,7 @@ public class PostRestController {
     ) {
         UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
         if(primaryCategoryId == null && secondaryCategoryIds != null && !secondaryCategoryIds.isEmpty()) {
-            throw new EmptyCategoryIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
         }
         return ResponseEntity.ok().body(DataResponse.ok(postController.getAll(new PostCategoryRequest(primaryCategoryId, secondaryCategoryIds), currentMemberUuid, lastUlid,size)));
     }
