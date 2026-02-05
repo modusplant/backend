@@ -1,7 +1,7 @@
 package kr.modusplant.domains.post.domain.vo;
 
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
-import kr.modusplant.domains.post.domain.exception.EmptyCategoryIdException;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,10 +20,10 @@ class PrimaryCategoryIdTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("null UUID로 PrimaryCategoryId 생성 시 EmptyCategoryIdException을 발생시킨다")
+        @DisplayName("null UUID로 PrimaryCategoryId 생성 시 EmptyValueException을 발생시킨다")
         void testCreate_givenNullParameter_willThrowException() {
             // when & then
-            assertThrows(EmptyCategoryIdException.class, () -> PrimaryCategoryId.create(null));
+            assertThrows(EmptyValueException.class, () -> PrimaryCategoryId.create(null));
         }
     }
 
