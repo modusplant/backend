@@ -17,7 +17,9 @@ import kr.modusplant.framework.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.jpa.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.framework.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.repository.*;
+import kr.modusplant.framework.jpa.repository.CommPostBookmarkJpaRepository;
+import kr.modusplant.framework.jpa.repository.CommPostLikeJpaRepository;
+import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

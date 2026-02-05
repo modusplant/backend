@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @RepositoryOnlyContext
 public class CommCommentJpaRepositoryTest implements
@@ -150,4 +151,21 @@ public class CommCommentJpaRepositoryTest implements
 //        assertThat(List.of(savedCommCommentEntity)).isEqualTo(result);
 //    }
 
+    @Test
+    @DisplayName("댓글 엔터티 toString 호출 시 순환 오류 발생 여부 확인")
+    void testToString_givenCommCommentEntity_willReturnRepresentative() {
+        // given
+        CommCommentEntity commentEntity = createCommCommentEntityBuilder()
+                .postEntity(savedPostEntity)
+                .authMember(savedMemberEntity)
+                .createMember(savedMemberEntity)
+                .isDeleted(true)
+                .build();
+
+        // when
+        CommCommentEntity savedCommCommentEntity = commentRepository.save(commentEntity);
+
+        // then
+        assertDoesNotThrow(savedCommCommentEntity::toString);
+    }
 }

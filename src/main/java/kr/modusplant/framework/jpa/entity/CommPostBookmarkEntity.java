@@ -5,6 +5,7 @@ import kr.modusplant.shared.persistence.compositekey.CommPostBookmarkId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -20,6 +21,7 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_POST_BOOK
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
+@ToString
 public class CommPostBookmarkEntity {
     @Id
     @Column(name = POST_ULID, nullable = false)
