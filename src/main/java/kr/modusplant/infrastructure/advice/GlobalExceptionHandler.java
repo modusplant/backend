@@ -82,17 +82,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<DataResponse<Void>> handleConstraintViolationException(ConstraintViolationException ex) {
         Set<ConstraintViolation<?>> constraintViolations = ex.getConstraintViolations();
-        Optional<String> firstMessage = ex.getConstraintViolations().stream()
+        Optional<String> firstMessage = constraintViolations.stream()
                 .map(ConstraintViolation::getMessage)
                 .findFirst();
 
-        if(constraintViolations != null) {
-            List<String> invalidPropertyNames = constraintViolations.stream()
-                    .map(violation -> violation.getPropertyPath().toString())
-                    .toList();
+        List<String> invalidPropertyNames = constraintViolations.stream()
+                .map(violation -> violation.getPropertyPath().toString())
+                .toList();
 
-            log.error("invalidPropertyNames of MethodArgumentTypeMismatchException: {}", invalidPropertyNames);
-        }
+        log.error("invalidPropertyNames of MethodArgumentTypeMismatchException: {}", invalidPropertyNames);
 
         if(firstMessage.isPresent()) {
             DynamicErrorCode dynamicErrorCode = DynamicErrorCode.create(GeneralErrorCode.CONSTRAINT_VIOLATION, firstMessage.get());
