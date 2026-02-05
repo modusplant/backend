@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @RepositoryOnlyContext
@@ -168,5 +169,18 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
 
         // then
         assertThat(memberAuthRepository.existsByUuid(memberAuth.getUuid())).isEqualTo(true);
+    }
+
+    @DisplayName("회원 인증 엔터티 toString 호출 시 순환 오류 발생 여부 확인")
+    @Test
+    void testToString_givenSiteMemberAuthEntity_willReturnRepresentative() {
+        // given
+        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
+
+        // when
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
+
+        // then
+        assertDoesNotThrow(memberAuth::toString);
     }
 }

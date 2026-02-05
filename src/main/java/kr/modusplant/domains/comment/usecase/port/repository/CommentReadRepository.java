@@ -5,7 +5,6 @@ import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
-import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
