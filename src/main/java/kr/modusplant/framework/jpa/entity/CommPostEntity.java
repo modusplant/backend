@@ -8,6 +8,7 @@ import kr.modusplant.shared.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.Type;
@@ -26,6 +27,7 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_POST;
 @Table(name = COMM_POST)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class CommPostEntity {
     @Id
     @UlidGenerator
@@ -34,18 +36,22 @@ public class CommPostEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = PRI_CATE_ID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @ToString.Exclude
     private CommPrimaryCategoryEntity primaryCategory;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = SECO_CATE_ID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @ToString.Exclude
     private CommSecondaryCategoryEntity secondaryCategory;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @ToString.Exclude
     private SiteMemberEntity authMember;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @ToString.Exclude
     private SiteMemberEntity createMember;
 
     @Column(name = "like_count", nullable = false)
@@ -61,6 +67,7 @@ public class CommPostEntity {
 
     @Type(JsonBinaryType.class)
     @Column(nullable = false, columnDefinition = "jsonb")
+    @ToString.Exclude
     private JsonNode content;
 
     @Column(name = "is_published", nullable = false)
@@ -80,6 +87,7 @@ public class CommPostEntity {
 
     @Version
     @Column(nullable = false)
+    @ToString.Exclude
     private long ver;
 
     public void updatePrimaryCategory(CommPrimaryCategoryEntity primaryCategory) {

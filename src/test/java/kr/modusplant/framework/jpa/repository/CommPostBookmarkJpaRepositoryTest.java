@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @RepositoryOnlyContext
 public class CommPostBookmarkJpaRepositoryTest implements CommPostBookmarkEntityTestUtils {
@@ -51,7 +52,7 @@ public class CommPostBookmarkJpaRepositoryTest implements CommPostBookmarkEntity
 
         @Test
         @DisplayName("특정 사용자 게시글 북마크 여부 확인")
-        void isBookmarkdByMember_willReturnTrue() {
+        void isBookmarkedByMember_willReturnTrue() {
             // given
             commPostBookmarkRepository.save(CommPostBookmarkEntity.of(postId, memberId));
 
@@ -73,6 +74,16 @@ public class CommPostBookmarkJpaRepositoryTest implements CommPostBookmarkEntity
 
             // then
             assertThat(commPostBookmarkRepository.existsByPostIdAndMemberId(postId, memberId)).isFalse();
+        }
+
+        @Test
+        @DisplayName("게시글 북마크 엔터티 toString 호출 시 순환 오류 발생 여부 확인")
+        void testToString_givenCommPostBookmarkEntity_willReturnRepresentative() {
+            // given & when
+            CommPostBookmarkEntity entity = commPostBookmarkRepository.save(CommPostBookmarkEntity.of(postId, memberId));
+
+            // then
+            assertDoesNotThrow(entity::toString);
         }
     }
 
