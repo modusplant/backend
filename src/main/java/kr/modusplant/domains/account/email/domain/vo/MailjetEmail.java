@@ -1,7 +1,8 @@
 package kr.modusplant.domains.account.email.domain.vo;
 
-import kr.modusplant.shared.exception.EmptyEmailException;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidEmailException;
+import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +18,7 @@ public class MailjetEmail {
 
     public static MailjetEmail create(String email) {
         if (email == null || email.isBlank()) {
-            throw new EmptyEmailException();
+            throw new EmptyValueException(KernelErrorCode.EMPTY_EMAIL, "email");
         } else if (!PATTERN_EMAIL.matcher(email).matches()) {
             throw new InvalidEmailException();
         }

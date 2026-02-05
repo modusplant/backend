@@ -1,10 +1,11 @@
 package kr.modusplant.domains.account.normal.domain.vo;
 
 import kr.modusplant.domains.account.normal.common.util.domain.vo.NormalCredentialsTestUtils;
-import kr.modusplant.shared.exception.EmptyEmailException;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidEmailException;
 import kr.modusplant.shared.exception.InvalidPasswordException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -14,13 +15,13 @@ public class NormalCredentialsTest implements NormalCredentialsTestUtils {
 
     @Test
     @DisplayName("null 값으로 자격 요소 생성")
-    public void testCreate_givenNullEmailAndPassword_willThrowEmptyEmailException() {
+    public void testCreate_givenNullEmailAndPassword_willThrowEmptyValueException() {
         // given
-        EmptyEmailException result = assertThrows(EmptyEmailException.class, () ->
+        EmptyValueException result = assertThrows(EmptyValueException.class, () ->
                 NormalCredentials.createWithString(null, null));
 
         // when & then
-        assertEquals(ErrorCode.EMAIL_EMPTY, result.getErrorCode());
+        assertEquals(KernelErrorCode.EMPTY_EMAIL, result.getErrorCode());
     }
 
     @Test

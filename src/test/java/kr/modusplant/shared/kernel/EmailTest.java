@@ -1,9 +1,10 @@
 package kr.modusplant.shared.kernel;
 
-import kr.modusplant.shared.exception.EmptyEmailException;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidEmailException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
+import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -24,12 +25,12 @@ class EmailTest implements EmailTestUtils {
     @DisplayName("null이나 빈 문자열으로 이메일 생성시 예외 발생")
     void testCreate_givenEmptyEmail_willThrowException() {
         // when & then
-        EmptyEmailException exception1 = assertThrows(EmptyEmailException.class, () -> Email.create(null));
-        EmptyEmailException exception2 = assertThrows(EmptyEmailException.class, () -> Email.create(""));
-        EmptyEmailException exception3 = assertThrows(EmptyEmailException.class, () -> Email.create("   "));
-        assertThat(exception1.getErrorCode()).isEqualTo(ErrorCode.EMAIL_EMPTY);
-        assertThat(exception2.getErrorCode()).isEqualTo(ErrorCode.EMAIL_EMPTY);
-        assertThat(exception3.getErrorCode()).isEqualTo(ErrorCode.EMAIL_EMPTY);
+        EmptyValueException exception1 = assertThrows(EmptyValueException.class, () -> Email.create(null));
+        EmptyValueException exception2 = assertThrows(EmptyValueException.class, () -> Email.create(""));
+        EmptyValueException exception3 = assertThrows(EmptyValueException.class, () -> Email.create("   "));
+        assertThat(exception1.getErrorCode()).isEqualTo(KernelErrorCode.EMPTY_EMAIL);
+        assertThat(exception2.getErrorCode()).isEqualTo(KernelErrorCode.EMPTY_EMAIL);
+        assertThat(exception3.getErrorCode()).isEqualTo(KernelErrorCode.EMPTY_EMAIL);
     }
 
     @Test

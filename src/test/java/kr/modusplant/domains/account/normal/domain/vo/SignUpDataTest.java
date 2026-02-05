@@ -2,12 +2,13 @@ package kr.modusplant.domains.account.normal.domain.vo;
 
 import kr.modusplant.domains.account.normal.common.util.domain.vo.AgreedTermVersionTestUtils;
 import kr.modusplant.domains.account.normal.common.util.domain.vo.SignUpDataTestUtils;
-import kr.modusplant.shared.exception.EmptyEmailException;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidEmailException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
 import kr.modusplant.shared.kernel.common.util.NicknameTestUtils;
 import kr.modusplant.shared.kernel.common.util.PasswordTestUtils;
+import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -18,15 +19,15 @@ public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, Pass
 
     @Test
     @DisplayName("null 값으로 회원가입 정보 생성")
-    public void testCreate_givenNullEmail_willThrowEmptyEmailException() {
+    public void testCreate_givenNullEmail_willThrowEmptyValueException() {
         // given
-        EmptyEmailException result = assertThrows(EmptyEmailException.class, () ->
+        EmptyValueException result = assertThrows(EmptyValueException.class, () ->
                 SignUpData.create(null, testNormalUserPassword.getValue(),
                         testNormalUserNickname.getValue(), testAgreedTermsOfUse.getValue(),
                         testAgreedPrivacyPolicy.getValue(), testAgreedAdReceiving.getValue()));
 
         // when & then
-        assertEquals(ErrorCode.EMAIL_EMPTY, result.getErrorCode());
+        assertEquals(KernelErrorCode.EMPTY_EMAIL, result.getErrorCode());
     }
 
     @Test
