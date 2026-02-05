@@ -23,7 +23,7 @@ public class MemberProfileIntroduction {
         if (StringUtils.isBlank(value)) {
             throw new EmptyValueException(EMPTY_MEMBER_PROFILE_INTRODUCTION, "memberProfileIntroduction");
         } else if (value.length() > 60) {
-            throw new DataLengthException(MEMBER_PROFILE_INTRODUCTION_OVER_LENGTH);
+            throw new DataLengthException(MEMBER_PROFILE_INTRODUCTION_OVER_LENGTH, "memberProfileIntroduction");
         }
         return new MemberProfileIntroduction(value);
     }
