@@ -54,8 +54,10 @@ public class PostRepositoryJpaAdapter implements PostRepository {
         postEntity.updateViewCount(postViewCountRedisRepository.read(post.getPostId()));
         postEntity.updateTitle(post.getPostContent().getTitle());
         postEntity.updateContent(post.getPostContent().getContent());
-        postEntity.updateIsPublished(post.getStatus().isPublished());
-        postEntity.updatePublishedAt(post.getStatus().isPublished() ? LocalDateTime.now() : null);
+        if (!postEntity.getIsPublished()) {
+            postEntity.updatePublishedAt(post.getStatus().isPublished() ? LocalDateTime.now() : null);
+            postEntity.updateIsPublished(post.getStatus().isPublished());
+        }
         postJpaRepository.save(postEntity);
     }
 
