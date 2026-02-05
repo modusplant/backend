@@ -9,7 +9,6 @@ import jakarta.validation.ConstraintViolationException;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.shared.exception.BusinessException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
-import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -131,7 +130,6 @@ public class GlobalExceptionHandlerTest {
 
         // then
         assertNotNull(errorResponse);
-        System.out.println(errorResponse.getMessage());
         assertEquals(ErrorCode.CONSTRAINT_VIOLATION.getHttpStatus(), errorResponse.getStatus());
         assertEquals(ErrorCode.CONSTRAINT_VIOLATION.getCode(), errorResponse.getCode());
         assertNull(errorResponse.getData());
