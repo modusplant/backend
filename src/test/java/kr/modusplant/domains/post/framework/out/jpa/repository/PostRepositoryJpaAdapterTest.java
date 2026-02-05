@@ -23,6 +23,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -80,7 +81,7 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
     void testUpdate_givenPost_willReturnPostDetailReadModel() {
         // given
         Post post = createPublishedPost();
-        CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
+        CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid().publishedAt(LocalDateTime.now()).build();
         CommPrimaryCategoryEntity primaryCategoryEntity = createCommPrimaryCategoryEntity().builder().id(post.getPrimaryCategoryId().getValue()).build();
         CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().id(post.getSecondaryCategoryId().getValue()).build();
         long viewCount = 0L;
