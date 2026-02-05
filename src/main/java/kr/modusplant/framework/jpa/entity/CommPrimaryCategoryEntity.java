@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.CreatedDate;
@@ -20,6 +21,7 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_PRI_CATE;
 @Table(name = COMM_PRI_CATE)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class CommPrimaryCategoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "comm_pri_cate_seq")

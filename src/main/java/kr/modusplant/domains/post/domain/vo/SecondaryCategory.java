@@ -1,8 +1,8 @@
 package kr.modusplant.domains.post.domain.vo;
 
-import kr.modusplant.domains.post.domain.exception.EmptyCategoryIdException;
-import kr.modusplant.domains.post.domain.exception.EmptyCategoryNameException;
-import kr.modusplant.domains.post.domain.exception.InvalidCategoryOrderException;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
+import kr.modusplant.domains.post.domain.exception.InvalidValueException;
+import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,11 +19,11 @@ public class SecondaryCategory {
 
     public static SecondaryCategory create(SecondaryCategoryId id, PrimaryCategoryId primaryCategoryId, String categoryName, int categoryOrder) {
         if (id == null || primaryCategoryId == null) {
-            throw new EmptyCategoryIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
         }  else if (categoryName == null || categoryName.trim().isEmpty()) {
-            throw new EmptyCategoryNameException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_NAME);
         } else if (categoryOrder < 0) {
-            throw new InvalidCategoryOrderException();
+            throw new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ORDER);
         }
         return new SecondaryCategory(id, primaryCategoryId, categoryName, categoryOrder);
     }

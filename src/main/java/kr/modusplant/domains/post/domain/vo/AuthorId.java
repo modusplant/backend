@@ -1,7 +1,8 @@
 package kr.modusplant.domains.post.domain.vo;
 
-import kr.modusplant.domains.post.domain.exception.EmptyAuthorIdException;
-import kr.modusplant.domains.post.domain.exception.InvalidAuthorIdException;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
+import kr.modusplant.domains.post.domain.exception.InvalidValueException;
+import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,17 +20,17 @@ public class AuthorId {
 
     public static AuthorId fromUuid(UUID uuid) {
         if (uuid == null) {
-            throw new EmptyAuthorIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_AUTHOR_ID);
         }
         return new AuthorId(uuid);
     }
 
     public static AuthorId fromString(String value) {
         if (value == null || value.trim().isEmpty()) {
-            throw new EmptyAuthorIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_AUTHOR_ID);
         }
         if (!PATTERN_UUID.matcher(value).matches()) {
-            throw new InvalidAuthorIdException();
+            throw new InvalidValueException(PostErrorCode.INVALID_AUTHOR_ID);
         }
         return new AuthorId(UUID.fromString(value));
     }
