@@ -5,8 +5,8 @@ import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheVa
 import kr.modusplant.framework.jpa.entity.SiteMemberProfileEntity;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberProfileEntityTestUtils;
+import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.repository.SiteMemberProfileJpaRepository;
-import kr.modusplant.shared.exception.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,8 +44,8 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.empty());
 
         // when
-        EntityNotFoundException exception = assertThrows(
-                EntityNotFoundException.class,
+        NotFoundEntityException exception = assertThrows(
+                NotFoundEntityException.class,
                 () -> memberCacheValidationService.getMemberCacheValidationResult(
                         String.format("\"%s\"", passwordEncoder.encode(UUID.randomUUID() + "-0")),
                         ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME),

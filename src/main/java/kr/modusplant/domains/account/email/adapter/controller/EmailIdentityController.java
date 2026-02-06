@@ -9,9 +9,9 @@ import kr.modusplant.domains.account.email.usecase.request.EmailIdentityRequest;
 import kr.modusplant.domains.account.email.usecase.request.EmailValidationRequest;
 import kr.modusplant.domains.account.email.usecase.request.InputValidationRequest;
 import kr.modusplant.domains.account.normal.domain.exception.InvalidValueException;
+import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.redis.RedisHelper;
 import kr.modusplant.framework.redis.RedisKeys;
-import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Password;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +49,7 @@ public class EmailIdentityController {
         String email = request.email();
 
         if (!repository.existsByEmailAndProvider(Email.create(email))) {
-            throw new EntityNotFoundException(EmailIdentityErrorCode.MEMBER_NOT_FOUND_WITH_EMAIL, "email");
+            throw new NotFoundEntityException(EmailIdentityErrorCode.MEMBER_NOT_FOUND_WITH_EMAIL, "email");
         }
 
         UUID uuid = UUID.randomUUID();

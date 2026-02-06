@@ -18,11 +18,11 @@ import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jpa.exception.ExistsEntityException;
+import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.*;
-import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
@@ -72,13 +72,13 @@ public class MemberController {
         MemberId memberId = MemberId.fromUuid(record.id());
         Optional<Member> optionalMember = memberRepository.getById(memberId);
         if (optionalMember.isEmpty()) {
-            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         }
         Optional<MemberProfile> optionalMemberProfile = memberProfileRepository.getById(memberId);
         if (optionalMemberProfile.isPresent()) {
             return memberProfileMapper.toMemberProfileResponse(optionalMemberProfile.orElseThrow());
         } else {
-            throw new EntityNotFoundException(MEMBER_PROFILE_NOT_FOUND, "memberProfile");
+            throw new NotFoundEntityException(MEMBER_PROFILE_NOT_FOUND, "memberProfile");
         }
     }
 
@@ -100,7 +100,7 @@ public class MemberController {
                 s3FileService.deleteFiles(imagePath);
             }
         } else {
-            throw new EntityNotFoundException(MEMBER_PROFILE_NOT_FOUND, "memberProfile");
+            throw new NotFoundEntityException(MEMBER_PROFILE_NOT_FOUND, "memberProfile");
         }
         if (!(image == null)) {
             String newImagePath = uploadImage(memberId, record);
@@ -183,7 +183,7 @@ public class MemberController {
 
     private void validateBeforeOverrideProfile(MemberId memberId, Nickname memberNickname) {
         if (!memberRepository.isIdExist(memberId)) {
-            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         }
         if (swearService.isSwearContained(memberNickname.getValue())) {
             throw new SwearContainedException();
@@ -196,10 +196,10 @@ public class MemberController {
 
     private void validateBeforeLikeOrUnlikePost(MemberId memberId, TargetPostId targetPostId) {
         if (!memberRepository.isIdExist(memberId)) {
-            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         }
         if (!targetPostIdRepository.isIdExist(targetPostId)) {
-            throw new EntityNotFoundException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
+            throw new NotFoundEntityException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
         }
         if (!targetPostIdRepository.isPublished(targetPostId)) {
             throw new NotAccessibleException(NOT_ACCESSIBLE_POST_LIKE, "postLike", targetPostId.getValue());
@@ -208,10 +208,10 @@ public class MemberController {
 
     private void validateBeforeBookmarkOrCancelBookmark(MemberId memberId, TargetPostId targetPostId) {
         if (!memberRepository.isIdExist(memberId)) {
-            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         }
         if (!targetPostIdRepository.isIdExist(targetPostId)) {
-            throw new EntityNotFoundException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
+            throw new NotFoundEntityException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
         }
         if (!targetPostIdRepository.isPublished(targetPostId)) {
             throw new NotAccessibleException(NOT_ACCESSIBLE_POST_BOOKMARK, "postBookmark", targetPostId.getValue());
@@ -220,10 +220,10 @@ public class MemberController {
 
     private void validateBeforeLikeOrUnlikeComment(MemberId memberId, TargetCommentId targetCommentId) {
         if (!memberRepository.isIdExist(memberId)) {
-            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         }
         if (!targetCommentIdRepository.isIdExist(targetCommentId)) {
-            throw new EntityNotFoundException(NOT_FOUND_TARGET_COMMENT_ID, "targetCommentId");
+            throw new NotFoundEntityException(NOT_FOUND_TARGET_COMMENT_ID, "targetCommentId");
         }
     }
 

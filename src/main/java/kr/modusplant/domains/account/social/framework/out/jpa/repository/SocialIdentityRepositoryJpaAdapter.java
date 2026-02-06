@@ -9,11 +9,11 @@ import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdenti
 import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
+import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
 import kr.modusplant.infrastructure.security.enums.Role;
-import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
@@ -39,10 +39,10 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
     @Override
     public SocialAccountPayload getUserPayloadByMemberId(AccountId accountId) {
         SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(accountId.getValue())
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER));
+                .orElseThrow(() -> new NotFoundEntityException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER));
         SiteMemberAuthEntity memberAuthEntity = memberAuthJpaRepository.findByActiveMember(memberEntity).getFirst();
         SiteMemberRoleEntity memberRoleEntity = memberRoleJpaRepository.findByMember(memberEntity)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_ROLE_NOT_FOUND, TableName.SITE_MEMBER_ROLE));
+                .orElseThrow(() -> new NotFoundEntityException(ErrorCode.MEMBER_ROLE_NOT_FOUND, TableName.SITE_MEMBER_ROLE));
         return socialIdentityJpaMapper.toUserPayload(memberEntity,memberAuthEntity,memberRoleEntity);
     }
 

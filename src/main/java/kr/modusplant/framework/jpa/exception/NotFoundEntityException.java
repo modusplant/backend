@@ -2,7 +2,9 @@ package kr.modusplant.framework.jpa.exception;
 
 import kr.modusplant.shared.exception.BusinessException;
 import kr.modusplant.shared.exception.supers.ErrorCode;
+import lombok.Getter;
 
+@Getter
 public class NotFoundEntityException extends BusinessException {
 
     private final String entityName;

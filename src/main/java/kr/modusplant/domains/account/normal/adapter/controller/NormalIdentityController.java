@@ -9,7 +9,7 @@ import kr.modusplant.domains.account.normal.usecase.request.EmailModificationReq
 import kr.modusplant.domains.account.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.domains.account.normal.usecase.request.PasswordModificationRequest;
 import kr.modusplant.domains.account.shared.kernel.AccountId;
-import kr.modusplant.shared.exception.EntityNotFoundException;
+import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.exception.InvalidDataException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.kernel.Email;
@@ -56,7 +56,7 @@ public class NormalIdentityController {
 
     public void modifyEmail(UUID memberActiveUuid, EmailModificationRequest request) {
         if(!readRepository.existsByEmail(Email.create(request.currentEmail()))) {
-            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER_AUTH);
+            throw new NotFoundEntityException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER_AUTH);
         } else {
             updateRepository.updateEmail(AccountId.create(memberActiveUuid), Email.create(request.newEmail()));
         }
@@ -64,7 +64,7 @@ public class NormalIdentityController {
 
     public void modifyPassword(UUID memberActiveUuid, PasswordModificationRequest request) {
         if(!readRepository.existsByMemberId(AccountId.create(memberActiveUuid))) {
-            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER_AUTH);
+            throw new NotFoundEntityException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER_AUTH);
         } else if(!isPasswordsMatch(AccountId.create(memberActiveUuid), Password.create(request.currentPw()))) {
             throw new InvalidDataException(ErrorCode.INVALID_PASSWORD, request.currentPw());
         } else {

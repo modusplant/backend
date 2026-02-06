@@ -4,8 +4,8 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
 import kr.modusplant.framework.jpa.entity.SiteMemberProfileEntity;
+import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.repository.SiteMemberProfileJpaRepository;
-import kr.modusplant.shared.exception.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,7 +39,7 @@ public class MemberCacheValidationService {
             @Nonnull UUID id) {
         Optional<SiteMemberProfileEntity> optionalMemberProfile = memberProfileJpaRepository.findByUuid(id);
         if (optionalMemberProfile.isEmpty()) {
-            throw new EntityNotFoundException(MEMBER_PROFILE_NOT_FOUND, "memberProfile");
+            throw new NotFoundEntityException(MEMBER_PROFILE_NOT_FOUND, "memberProfile");
         }
         SiteMemberProfileEntity memberProfileEntity = optionalMemberProfile.orElseThrow();
         String entityTagSource = memberProfileEntity.getETagSource();
