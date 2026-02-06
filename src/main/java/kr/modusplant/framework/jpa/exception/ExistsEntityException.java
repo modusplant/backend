@@ -1,29 +1,28 @@
 package kr.modusplant.framework.jpa.exception;
 
-import kr.modusplant.framework.jpa.exception.enums.EntityName;
 import kr.modusplant.shared.exception.BusinessException;
 import kr.modusplant.shared.exception.supers.ErrorCode;
 
 public class ExistsEntityException extends BusinessException {
 
-    private final EntityName entityName;
+    private final String entityName;
 
-    public ExistsEntityException(ErrorCode errorCode, EntityName entityName) {
+    public ExistsEntityException(ErrorCode errorCode, String entityName) {
         super(errorCode);
         this.entityName = entityName;
     }
 
-    public ExistsEntityException(ErrorCode errorCode, EntityName entityName, String message) {
+    public ExistsEntityException(ErrorCode errorCode, String entityName, String message) {
         super(errorCode, message);
         this.entityName = entityName;
     }
 
-    public ExistsEntityException(ErrorCode errorCode, EntityName entityName, String message, Throwable cause) {
+    public ExistsEntityException(ErrorCode errorCode, String entityName, String message, Throwable cause) {
         super(errorCode, message, cause);
         this.entityName = entityName;
     }
 
-    public ExistsEntityException(ErrorCode errorCode, EntityName entityName, Throwable cause) {
+    public ExistsEntityException(ErrorCode errorCode, String entityName, Throwable cause) {
         super(errorCode, cause);
         this.entityName = entityName;
     }
