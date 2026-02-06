@@ -22,6 +22,7 @@ import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jpa.entity.*;
 import kr.modusplant.framework.jpa.entity.common.util.CommPostEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberProfileEntityTestUtils;
+import kr.modusplant.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.framework.jpa.repository.*;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.event.consumer.CommentEventConsumer;
@@ -30,7 +31,6 @@ import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.common.util.PostLikeEventTestUtils;
-import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import org.junit.jupiter.api.DisplayName;
@@ -113,8 +113,8 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(memberRepository.isNicknameExist(any())).willReturn(true);
 
         // when & then
-        EntityExistsException alreadyExistedNicknameException = assertThrows(
-                EntityExistsException.class, () -> memberController.register(testMemberRegisterRequest));
+        ExistsEntityException alreadyExistedNicknameException = assertThrows(
+                ExistsEntityException.class, () -> memberController.register(testMemberRegisterRequest));
         assertThat(alreadyExistedNicknameException.getErrorCode()).isEqualTo(NICKNAME_EXISTS);
     }
 
@@ -275,8 +275,8 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(memberRepository.getByNickname(any())).willReturn(Optional.of(Member.create(MemberId.generate(), testMemberActiveStatus, testNormalUserNickname, testMemberBirthDate)));
 
         // when & then
-        EntityExistsException alreadyExistedNicknameException = assertThrows(
-                EntityExistsException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
+        ExistsEntityException alreadyExistedNicknameException = assertThrows(
+                ExistsEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
         assertThat(alreadyExistedNicknameException.getErrorCode()).isEqualTo(NICKNAME_EXISTS);
     }
 

@@ -17,11 +17,11 @@ import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.*;
-import kr.modusplant.shared.exception.EntityExistsException;
 import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.kernel.Nickname;
@@ -177,7 +177,7 @@ public class MemberController {
 
     private void validateBeforeRegister(Nickname nickname) {
         if (memberRepository.isNicknameExist(nickname)) {
-            throw new EntityExistsException(NICKNAME_EXISTS, "nickname");
+            throw new ExistsEntityException(NICKNAME_EXISTS, "nickname");
         }
     }
 
@@ -190,7 +190,7 @@ public class MemberController {
         }
         Optional<Member> emptyOrMember = memberRepository.getByNickname(memberNickname);
         if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
-            throw new EntityExistsException(NICKNAME_EXISTS, "memberNickname");
+            throw new ExistsEntityException(NICKNAME_EXISTS, "memberNickname");
         }
     }
 
