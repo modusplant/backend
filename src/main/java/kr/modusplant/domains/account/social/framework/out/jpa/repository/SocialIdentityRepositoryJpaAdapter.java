@@ -15,7 +15,6 @@ import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
 import kr.modusplant.infrastructure.security.enums.Role;
-import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -43,7 +42,7 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER));
         SiteMemberAuthEntity memberAuthEntity = memberAuthJpaRepository.findByActiveMember(memberEntity).getFirst();
         SiteMemberRoleEntity memberRoleEntity = memberRoleJpaRepository.findByMember(memberEntity)
-                .orElseThrow(() -> new NotFoundEntityException(ErrorCode.MEMBER_ROLE_NOT_FOUND, TableName.SITE_MEMBER_ROLE));
+                .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_ROLE, TableName.SITE_MEMBER_ROLE));
         return socialIdentityJpaMapper.toUserPayload(memberEntity,memberAuthEntity,memberRoleEntity);
     }
 

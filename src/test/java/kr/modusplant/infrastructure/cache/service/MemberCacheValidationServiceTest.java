@@ -6,6 +6,7 @@ import kr.modusplant.framework.jpa.entity.SiteMemberProfileEntity;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberProfileEntityTestUtils;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.SiteMemberProfileJpaRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -23,7 +24,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.shared.exception.enums.ErrorCode.MEMBER_PROFILE_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -52,7 +52,7 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
                         id));
 
         // then
-        assertThat(exception.getErrorCode()).isEqualTo(MEMBER_PROFILE_NOT_FOUND);
+        assertThat(exception.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE);
     }
 
     @Test

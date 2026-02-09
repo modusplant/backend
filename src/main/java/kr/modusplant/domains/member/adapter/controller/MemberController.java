@@ -19,6 +19,7 @@ import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.service.SwearService;
@@ -37,7 +38,6 @@ import java.util.Optional;
 
 import static kr.modusplant.domains.member.adapter.util.MemberProfileImageUtils.generateMemberProfileImagePath;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
-import static kr.modusplant.shared.exception.enums.ErrorCode.MEMBER_PROFILE_NOT_FOUND;
 
 @SuppressWarnings("LoggingSimilarMessage")
 @RequiredArgsConstructor
@@ -78,7 +78,7 @@ public class MemberController {
         if (optionalMemberProfile.isPresent()) {
             return memberProfileMapper.toMemberProfileResponse(optionalMemberProfile.orElseThrow());
         } else {
-            throw new NotFoundEntityException(MEMBER_PROFILE_NOT_FOUND, "memberProfile");
+            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE, "memberProfile");
         }
     }
 
@@ -100,7 +100,7 @@ public class MemberController {
                 s3FileService.deleteFiles(imagePath);
             }
         } else {
-            throw new NotFoundEntityException(MEMBER_PROFILE_NOT_FOUND, "memberProfile");
+            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE, "memberProfile");
         }
         if (!(image == null)) {
             String newImagePath = uploadImage(memberId, record);

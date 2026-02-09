@@ -11,7 +11,6 @@ import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
-import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,7 +46,7 @@ public class CommentCacheService {
             @Nonnull PostId postUlid
     ) {
         CommPostEntity postEntity = postJpaRepository.findByUlid(postUlid.getId())
-                .orElseThrow( () -> new NotFoundEntityException(ErrorCode.POST_NOT_FOUND, "post"));
+                .orElseThrow( () -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post"));
 
         String ETagSource = postEntity.getETagSource();
         LocalDateTime lastModifiedAt = postEntity.getUpdatedAtAsTruncatedToSeconds();

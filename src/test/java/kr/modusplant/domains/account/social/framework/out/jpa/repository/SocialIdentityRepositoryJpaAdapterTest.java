@@ -15,7 +15,6 @@ import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
 import kr.modusplant.infrastructure.security.enums.Role;
-import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
 import kr.modusplant.shared.persistence.constant.TableName;
 import org.junit.jupiter.api.DisplayName;
@@ -134,7 +133,7 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
 
         // when & then
         NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> socialIdentityRepositoryJpaAdapter.getUserPayloadByMemberId(testKakaoAccountId));
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.MEMBER_ROLE_NOT_FOUND);
+        assertThat(exception.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_MEMBER_ROLE);
         assertThat(exception.getEntityName()).isEqualTo(TableName.SITE_MEMBER_ROLE);
         verify(memberAuthJpaRepository).findByActiveMember(memberEntity);
         verify(memberRoleJpaRepository).findByMember(memberEntity);

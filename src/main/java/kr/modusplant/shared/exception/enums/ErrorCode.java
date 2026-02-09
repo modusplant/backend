@@ -13,11 +13,6 @@ public enum ErrorCode implements kr.modusplant.shared.exception.supers.ErrorCode
     // -- business errors --
     // exists and not found
 
-    MEMBER_PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "member_profile_not_found", "사용자의 프로필 정보가 존재하지 않습니다"),
-    MEMBER_ROLE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "member_role_not_found", "사용자의 역할 정보가 존재하지 않습니다"),
-    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "comment_not_found", "댓글을 찾을 수 없습니다"),
-    POST_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "post_not_found", "게시글을 찾을 수 없습니다"),
-
     // empty or invalid value
     NICKNAME_EMPTY(HttpStatus.BAD_REQUEST.value(), "nickname_empty", "닉네임이 비어 있습니다"),
 

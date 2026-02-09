@@ -24,6 +24,7 @@ import kr.modusplant.framework.jpa.entity.common.util.CommPostEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberProfileEntityTestUtils;
 import kr.modusplant.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.*;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.event.consumer.CommentEventConsumer;
@@ -62,7 +63,6 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 import static kr.modusplant.shared.event.common.util.CommentLikeEventTestUtils.testCommentLikeEvent;
 import static kr.modusplant.shared.event.common.util.PostBookmarkEventTestUtils.testPostBookmarkEvent;
 import static kr.modusplant.shared.event.common.util.PostCancelPostBookmarkEventTestUtils.testPostBookmarkCancelEvent;
-import static kr.modusplant.shared.exception.enums.ErrorCode.MEMBER_PROFILE_NOT_FOUND;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
@@ -163,7 +163,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
 
         // when & then
         NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> memberController.getProfile(testMemberProfileGetRecord));
-        assertThat(exception.getErrorCode()).isEqualTo(MEMBER_PROFILE_NOT_FOUND);
+        assertThat(exception.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE);
     }
 
     @Test
@@ -293,7 +293,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
                 new MemberProfileOverrideRecord(MEMBER_BASIC_USER_UUID, null, null, MEMBER_BASIC_USER_NICKNAME)));
 
         // then
-        assertThat(exception.getErrorCode()).isEqualTo(MEMBER_PROFILE_NOT_FOUND);
+        assertThat(exception.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE);
     }
 
     @Test
