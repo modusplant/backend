@@ -33,6 +33,7 @@ import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.common.util.PostLikeEventTestUtils;
 import kr.modusplant.shared.exception.NotAccessibleException;
+import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -62,7 +63,6 @@ import static kr.modusplant.shared.event.common.util.CommentLikeEventTestUtils.t
 import static kr.modusplant.shared.event.common.util.PostBookmarkEventTestUtils.testPostBookmarkEvent;
 import static kr.modusplant.shared.event.common.util.PostCancelPostBookmarkEventTestUtils.testPostBookmarkCancelEvent;
 import static kr.modusplant.shared.exception.enums.ErrorCode.MEMBER_PROFILE_NOT_FOUND;
-import static kr.modusplant.shared.exception.enums.ErrorCode.NICKNAME_EXISTS;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
@@ -115,7 +115,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         // when & then
         ExistsEntityException alreadyExistedNicknameException = assertThrows(
                 ExistsEntityException.class, () -> memberController.register(testMemberRegisterRequest));
-        assertThat(alreadyExistedNicknameException.getErrorCode()).isEqualTo(NICKNAME_EXISTS);
+        assertThat(alreadyExistedNicknameException.getErrorCode()).isEqualTo(KernelErrorCode.EXISTS_NICKNAME);
     }
 
     @Test
@@ -277,7 +277,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         // when & then
         ExistsEntityException alreadyExistedNicknameException = assertThrows(
                 ExistsEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
-        assertThat(alreadyExistedNicknameException.getErrorCode()).isEqualTo(NICKNAME_EXISTS);
+        assertThat(alreadyExistedNicknameException.getErrorCode()).isEqualTo(KernelErrorCode.EXISTS_NICKNAME);
     }
 
     @Test

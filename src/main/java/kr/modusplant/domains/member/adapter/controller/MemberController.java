@@ -25,6 +25,7 @@ import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.*;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.kernel.Nickname;
+import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,6 @@ import java.util.Optional;
 import static kr.modusplant.domains.member.adapter.util.MemberProfileImageUtils.generateMemberProfileImagePath;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 import static kr.modusplant.shared.exception.enums.ErrorCode.MEMBER_PROFILE_NOT_FOUND;
-import static kr.modusplant.shared.exception.enums.ErrorCode.NICKNAME_EXISTS;
 
 @SuppressWarnings("LoggingSimilarMessage")
 @RequiredArgsConstructor
@@ -177,7 +177,7 @@ public class MemberController {
 
     private void validateBeforeRegister(Nickname nickname) {
         if (memberRepository.isNicknameExist(nickname)) {
-            throw new ExistsEntityException(NICKNAME_EXISTS, "nickname");
+            throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "nickname");
         }
     }
 
@@ -190,7 +190,7 @@ public class MemberController {
         }
         Optional<Member> emptyOrMember = memberRepository.getByNickname(memberNickname);
         if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
-            throw new ExistsEntityException(NICKNAME_EXISTS, "memberNickname");
+            throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "memberNickname");
         }
     }
 

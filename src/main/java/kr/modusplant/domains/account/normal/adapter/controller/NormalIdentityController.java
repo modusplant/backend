@@ -10,17 +10,21 @@ import kr.modusplant.domains.account.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.domains.account.normal.usecase.request.PasswordModificationRequest;
 import kr.modusplant.domains.account.shared.kernel.AccountId;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.Password;
+import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import kr.modusplant.shared.persistence.constant.TableName;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+
+import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.EXISTS_MEMBER;
 
 @Service
 public class NormalIdentityController {
@@ -46,9 +50,9 @@ public class NormalIdentityController {
 
     public void registerNormalMember(NormalSignUpRequest request) {
         if(readRepository.existsByEmail(Email.create(request.email()))) {
-            throw new DataAlreadyExistsException(ErrorCode.MEMBER_EXISTS);
+            throw new DataAlreadyExistsException(EXISTS_MEMBER);
         } else if(readRepository.existsByNickname(Nickname.create(request.nickname()))) {
-            throw new DataAlreadyExistsException(ErrorCode.NICKNAME_EXISTS);
+            throw new DataAlreadyExistsException(KernelErrorCode.EXISTS_NICKNAME);
         }  else {
             createRepository.save(mapper.toSignUpData(request));
         }
@@ -56,7 +60,7 @@ public class NormalIdentityController {
 
     public void modifyEmail(UUID memberActiveUuid, EmailModificationRequest request) {
         if(!readRepository.existsByEmail(Email.create(request.currentEmail()))) {
-            throw new NotFoundEntityException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER_AUTH);
+            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER_AUTH);
         } else {
             updateRepository.updateEmail(AccountId.create(memberActiveUuid), Email.create(request.newEmail()));
         }
@@ -64,7 +68,7 @@ public class NormalIdentityController {
 
     public void modifyPassword(UUID memberActiveUuid, PasswordModificationRequest request) {
         if(!readRepository.existsByMemberId(AccountId.create(memberActiveUuid))) {
-            throw new NotFoundEntityException(ErrorCode.MEMBER_NOT_FOUND, TableName.SITE_MEMBER_AUTH);
+            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER_AUTH);
         } else if(!isPasswordsMatch(AccountId.create(memberActiveUuid), Password.create(request.currentPw()))) {
             throw new InvalidValueException(ErrorCode.INVALID_PASSWORD, request.currentPw());
         } else {

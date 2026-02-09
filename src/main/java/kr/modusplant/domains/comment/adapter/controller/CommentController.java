@@ -18,6 +18,7 @@ import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.swear.service.SwearService;
@@ -68,7 +69,7 @@ public class CommentController {
 
     public CommentPageResponse<CommentOfAuthorPageModel> gatherByAuthor(UUID memberUuid, Pageable pageable) {
         if(!memberJpaRepository.existsById(memberUuid)) {
-            throw new NotFoundEntityException(ErrorCode.MEMBER_NOT_FOUND, "member");
+            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, "member");
         }
         PageImpl<CommentOfAuthorPageModel> result = jooqRepository.findByAuthor(Author.create(memberUuid), pageable);
 

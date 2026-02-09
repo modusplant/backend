@@ -10,6 +10,7 @@ import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
@@ -115,7 +116,7 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
 
         // when & then
         NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> socialIdentityRepositoryJpaAdapter.getUserPayloadByMemberId(testKakaoAccountId));
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.MEMBER_NOT_FOUND);
+        assertThat(exception.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_MEMBER);
         assertThat(exception.getEntityName()).isEqualTo(TableName.SITE_MEMBER);
         verify(memberJpaRepository).findByUuid(testKakaoAccountId.getValue());
     }
