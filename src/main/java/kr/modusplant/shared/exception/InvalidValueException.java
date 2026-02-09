@@ -20,7 +20,6 @@ public class InvalidValueException extends BusinessException {
     public InvalidValueException(ErrorCode errorCode, String valueName, String message) {
         super(errorCode, message);
         this.valueName = valueName;
-
     }
 
     public InvalidValueException(ErrorCode errorCode, String valueName, String message, Throwable cause) {
