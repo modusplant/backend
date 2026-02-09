@@ -1,7 +1,7 @@
 package kr.modusplant.shared.kernel;
 
 import kr.modusplant.shared.exception.EmptyValueException;
-import kr.modusplant.shared.exception.InvalidEmailException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
@@ -36,10 +36,10 @@ class EmailTest implements EmailTestUtils {
     @Test
     @DisplayName("유효하지 않은 문자열로 이메일 생성 시 예외 발생")
     void testCreate_givenInvalidEmailFormat_willThrowException() {
-        InvalidEmailException exception1 = assertThrows(InvalidEmailException.class, () -> Email.create("invalid-email"));
-        InvalidEmailException exception2 = assertThrows(InvalidEmailException.class, () -> Email.create("@example.com"));
-        assertThat(exception1.getErrorCode()).isEqualTo(ErrorCode.INVALID_EMAIL);
-        assertThat(exception2.getErrorCode()).isEqualTo(ErrorCode.INVALID_EMAIL);
+        InvalidValueException exception1 = assertThrows(InvalidValueException.class, () -> Email.create("invalid-email"));
+        InvalidValueException exception2 = assertThrows(InvalidValueException.class, () -> Email.create("@example.com"));
+        assertThat(exception1.getErrorCode()).isEqualTo(KernelErrorCode.INVALID_EMAIL_FORMAT);
+        assertThat(exception2.getErrorCode()).isEqualTo(KernelErrorCode.INVALID_EMAIL_FORMAT);
     }
 
     @Test

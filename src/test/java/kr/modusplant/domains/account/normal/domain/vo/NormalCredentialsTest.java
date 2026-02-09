@@ -2,8 +2,8 @@ package kr.modusplant.domains.account.normal.domain.vo;
 
 import kr.modusplant.domains.account.normal.common.util.domain.vo.NormalCredentialsTestUtils;
 import kr.modusplant.shared.exception.EmptyValueException;
-import kr.modusplant.shared.exception.InvalidEmailException;
 import kr.modusplant.shared.exception.InvalidPasswordException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
@@ -26,13 +26,13 @@ public class NormalCredentialsTest implements NormalCredentialsTestUtils {
 
     @Test
     @DisplayName("형식에 맞지 않는 이메일로 자격 요소 생성")
-    public void testCreate_givenInvalidEmail_willThrowInvalidEmailException() {
+    public void testCreate_givenInvalidEmail_willThrowInvalidValueException() {
         // given
-        InvalidEmailException result = assertThrows(InvalidEmailException.class, () ->
+        InvalidValueException result = assertThrows(InvalidValueException.class, () ->
                 NormalCredentials.createWithString("email", testNormalCredentials.getPassword().getValue()));
 
         // when & then
-        assertEquals(ErrorCode.INVALID_EMAIL, result.getErrorCode());
+        assertEquals(KernelErrorCode.INVALID_EMAIL_FORMAT, result.getErrorCode());
     }
 
     @Test
