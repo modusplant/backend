@@ -11,6 +11,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EMPTY_TARGET_POST_ID;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.INVALID_TARGET_POST_ID;
 import static kr.modusplant.shared.constant.Regex.PATTERN_ULID;
 
 @Getter
@@ -22,7 +23,7 @@ public class TargetPostId {
         if (StringUtils.isBlank(value)) {
             throw new EmptyValueException(EMPTY_TARGET_POST_ID, "targetPostId");
         } else if (!PATTERN_ULID.matcher(value).matches()) {
-            throw new InvalidValueException(ErrorCode.INVALID_INPUT, "targetPostId");
+            throw new InvalidValueException(INVALID_TARGET_POST_ID, "targetPostId");
         }
         return new TargetPostId(value);
     }

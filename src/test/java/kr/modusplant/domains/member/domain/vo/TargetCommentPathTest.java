@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberBirthDateTestUtils.testMemberBirthDate;
 import static kr.modusplant.domains.member.common.util.domain.vo.TargetCommentPathTestUtils.testTargetCommentPath;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.INVALID_TARGET_COMMENT_PATH;
 import static kr.modusplant.shared.persistence.common.util.constant.CommCommentConstant.TEST_COMM_COMMENT_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,7 +39,7 @@ class TargetCommentPathTest {
     @DisplayName("정규 표현식에 매칭되지 않는 값으로 create을 호출하여 오류 발생")
     void testCreate_givenInvalidId_willThrowException() {
         InvalidValueException exception = assertThrows(InvalidValueException.class, () -> TargetCommentPath.create("!유효하지않음!"));
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_INPUT);
+        assertThat(exception.getErrorCode()).isEqualTo(INVALID_TARGET_COMMENT_PATH);
         assertThat(exception.getValueName()).isEqualTo("targetCommentPath");
     }
 

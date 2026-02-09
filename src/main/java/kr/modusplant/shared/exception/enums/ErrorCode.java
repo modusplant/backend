@@ -9,10 +9,6 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode implements kr.modusplant.shared.exception.supers.ErrorCode {
 
     // -- common errors --
-    GENERIC_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "internal_server_error", "서버에 문제가 발생했습니다"),
-
-    INPUT_TYPE_MISMATCH(HttpStatus.BAD_REQUEST.value(), "mismatch_input_type", "입력값의 서식이 올바르지 않습니다"),
-    INVALID_INPUT(HttpStatus.BAD_REQUEST.value(), "invalid_input", "입력값이 유효하지 않습니다"),
     CONSTRAINT_VIOLATION(HttpStatus.BAD_REQUEST.value(), "constraint_violation", "데이터에 설정된 조건을 위배했습니다"),
     MALFORMED_INPUT(HttpStatus.BAD_REQUEST.value(), "malformed_input", "입력값의 형식이 올바르지 않습니다"),
     UNEXPECTED_INPUT(HttpStatus.BAD_REQUEST.value(), "unexpected_input", "서버가 알 수 없는 입력값이 발견되었습니다"),
@@ -31,18 +27,11 @@ public enum ErrorCode implements kr.modusplant.shared.exception.supers.ErrorCode
     POST_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "post_not_found", "게시글을 찾을 수 없습니다"),
 
     // empty or invalid value
-    CONTENT_TYPE_EMPTY(HttpStatus.BAD_REQUEST.value(), "content_type_empty", "컨텐츠 타입이 비었습니다"),
-    EMAIL_EMPTY(HttpStatus.BAD_REQUEST.value(), "empty_email","이메일이 비었습니다"),
-    FILE_NAME_EMPTY(HttpStatus.BAD_REQUEST.value(), "file_name_empty", "파일명이 비었습니다"),
     NICKNAME_EMPTY(HttpStatus.BAD_REQUEST.value(), "nickname_empty", "닉네임이 비어 있습니다"),
-    PASSWORD_EMPTY(HttpStatus.BAD_REQUEST.value(), "password_empty", "비밀번호가 비어 있습니다"),
 
     FORBIDDEN_EMAIL(HttpStatus.FORBIDDEN.value(), "forbidden_email", "해당 이메일에 접근할 수 없습니다"),
     INVALID_EMAIL_VERIFY_CODE(HttpStatus.FORBIDDEN.value(), "invalid_email_verify_code", "이메일의 검증 코드가 올바르지 않습니다"),
 
-    INVALID_EMAIL(HttpStatus.BAD_REQUEST.value(), "invalid_email", "이메일이 올바르지 않습니다"),
-    INVALID_NICKNAME(HttpStatus.BAD_REQUEST.value(), "invalid_nickname", "닉네임이 올바르지 않습니다"),
-    INVALID_PAGE_RANGE(HttpStatus.BAD_REQUEST.value(), "invalid_page_range", "이용할 수 있는 페이지 범위가 아닙니다"),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST.value(), "invalid_password", "비밀번호가 올바르지 않습니다"),
     INVALID_FILE_INPUT(HttpStatus.BAD_REQUEST.value(),"invalid_file_input","파일 입력이 올바르지 않습니다"),
 
@@ -52,7 +41,6 @@ public enum ErrorCode implements kr.modusplant.shared.exception.supers.ErrorCode
 
     FILE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST.value(),"file_limit_exceeded","파일 개수 또는 크기 제한을 초과했습니다"),
 
-    SPECIFIED_SORTING_METHOD(HttpStatus.BAD_REQUEST.value(), "specified_sorting_method", "페이지 정렬 방식은 지정되지 않아야 합니다"),
 
     // -- auth errors --
     CREDENTIAL_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED.value(), "credential_not_authorized", "인증에 필요한 데이터가 없거나 유효하지 않습니다"),
