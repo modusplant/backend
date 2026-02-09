@@ -2,7 +2,7 @@ package kr.modusplant.domains.member.domain.vo;
 
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.shared.exception.EmptyValueException;
-import kr.modusplant.shared.exception.InvalidDataException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,9 +37,9 @@ class TargetPostIdTest {
     @Test
     @DisplayName("정규 표현식에 매칭되지 않는 값으로 create을 호출하여 오류 발생")
     void testCreate_givenInvalidId_willThrowException() {
-        InvalidDataException exception = assertThrows(InvalidDataException.class, () -> TargetPostId.create("!유효하지않음!"));
+        InvalidValueException exception = assertThrows(InvalidValueException.class, () -> TargetPostId.create("!유효하지않음!"));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_INPUT);
-        assertThat(exception.getDataName()).isEqualTo("targetPostId");
+        assertThat(exception.getValueName()).isEqualTo("targetPostId");
     }
 
     @Test

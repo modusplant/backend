@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.domain.vo;
 
 import kr.modusplant.shared.exception.EmptyValueException;
-import kr.modusplant.shared.exception.InvalidDataException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,7 +22,7 @@ public class TargetCommentPath {
         if (StringUtils.isBlank(value)) {
             throw new EmptyValueException(EMPTY_TARGET_COMMENT_PATH, "targetCommentPath");
         } else if (!PATTERN_MATERIALIZED_PATH.matcher(value).matches()) {
-            throw new InvalidDataException(ErrorCode.INVALID_INPUT, "targetCommentPath");
+            throw new InvalidValueException(ErrorCode.INVALID_INPUT, "targetCommentPath");
         }
         return new TargetCommentPath(value);
     }

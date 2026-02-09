@@ -1,6 +1,6 @@
 package kr.modusplant.shared.event;
 
-import kr.modusplant.shared.exception.InvalidDataException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,9 +16,9 @@ public class PostBookmarkEvent {
 
     public static PostBookmarkEvent create(UUID memberId, String postId) {
         if (memberId == null) {
-            throw new InvalidDataException(ErrorCode.MEMBER_NOT_FOUND, "memberId");
+            throw new InvalidValueException(ErrorCode.MEMBER_NOT_FOUND, "memberId");
         } else if (postId.isEmpty()) {
-            throw new InvalidDataException(ErrorCode.POST_NOT_FOUND, "postId");
+            throw new InvalidValueException(ErrorCode.POST_NOT_FOUND, "postId");
         } else {
             return new PostBookmarkEvent(memberId, postId);
         }

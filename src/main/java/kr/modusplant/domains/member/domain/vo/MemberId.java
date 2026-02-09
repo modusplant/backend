@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.domain.vo;
 
 import kr.modusplant.shared.exception.EmptyValueException;
-import kr.modusplant.shared.exception.InvalidDataException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -35,7 +35,7 @@ public class MemberId {
         if (StringUtils.isBlank(value)) {
             throw new EmptyValueException(EMPTY_MEMBER_ID, "memberId");
         } else if (!PATTERN_UUID.matcher(value).matches()) {
-            throw new InvalidDataException(ErrorCode.INVALID_INPUT, "memberId");
+            throw new InvalidValueException(ErrorCode.INVALID_INPUT, "memberId");
         }
         return new MemberId(UUID.fromString(value));
     }
