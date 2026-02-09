@@ -1,7 +1,7 @@
 package kr.modusplant.shared.kernel;
 
 import kr.modusplant.shared.exception.EmptyValueException;
-import kr.modusplant.shared.exception.InvalidNicknameException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
@@ -37,8 +37,8 @@ class NicknameTest {
     @Test
     @DisplayName("정규 표현식에 매칭되지 않는 값으로 create을 호출하여 오류 발생")
     void testCreate_givenInvalidNickname_willThrowException() {
-        InvalidNicknameException exception = assertThrows(InvalidNicknameException.class, () -> Nickname.create("!유효하지않음!"));
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_NICKNAME);
+        InvalidValueException exception = assertThrows(InvalidValueException.class, () -> Nickname.create("!유효하지않음!"));
+        assertThat(exception.getErrorCode()).isEqualTo(KernelErrorCode.INVALID_NICKNAME_FORMAT);
     }
 
     @Test
