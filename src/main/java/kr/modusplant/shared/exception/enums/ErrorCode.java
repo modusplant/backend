@@ -9,11 +9,6 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode implements kr.modusplant.shared.exception.supers.ErrorCode {
 
     // -- common errors --
-    CONSTRAINT_VIOLATION(HttpStatus.BAD_REQUEST.value(), "constraint_violation", "데이터에 설정된 조건을 위배했습니다"),
-    MALFORMED_INPUT(HttpStatus.BAD_REQUEST.value(), "malformed_input", "입력값의 형식이 올바르지 않습니다"),
-    UNEXPECTED_INPUT(HttpStatus.BAD_REQUEST.value(), "unexpected_input", "서버가 알 수 없는 입력값이 발견되었습니다"),
-
-    INVALID_STATE(HttpStatus.CONFLICT.value(), "invalid_state", "리소스의 상태가 유효하지 않습니다"),
 
     // -- business errors --
     // exists and not found
