@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.shared.exception.DataLengthException;
 import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +23,7 @@ public class MemberProfileIntroduction {
         if (StringUtils.isBlank(value)) {
             throw new EmptyValueException(EMPTY_MEMBER_PROFILE_INTRODUCTION, "memberProfileIntroduction");
         } else if (value.length() > 60) {
-            throw new DataLengthException(MEMBER_PROFILE_INTRODUCTION_OVER_LENGTH, "memberProfileIntroduction");
+            throw new InvalidValueException(MEMBER_PROFILE_INTRODUCTION_OVER_LENGTH, "memberProfileIntroduction");
         }
         return new MemberProfileIntroduction(value);
     }
