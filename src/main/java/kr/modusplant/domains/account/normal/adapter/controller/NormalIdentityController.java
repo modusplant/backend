@@ -12,7 +12,6 @@ import kr.modusplant.domains.account.shared.kernel.AccountId;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.Password;
@@ -70,7 +69,7 @@ public class NormalIdentityController {
         if(!readRepository.existsByMemberId(AccountId.create(memberActiveUuid))) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER_AUTH);
         } else if(!isPasswordsMatch(AccountId.create(memberActiveUuid), Password.create(request.currentPw()))) {
-            throw new InvalidValueException(ErrorCode.INVALID_PASSWORD, request.currentPw());
+            throw new InvalidValueException(KernelErrorCode.INVALID_PASSWORD_FORMAT, request.currentPw());
         } else {
             updateRepository.updatePassword(AccountId.create(memberActiveUuid), Password.create(request.newPw()));
         }

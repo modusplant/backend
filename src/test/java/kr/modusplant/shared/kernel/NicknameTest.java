@@ -24,7 +24,7 @@ class NicknameTest {
     @DisplayName("null로 create을 호출하여 오류 발생")
     void testCreate_givenNull_willThrowException() {
         EmptyValueException exception = assertThrows(EmptyValueException.class, () -> Nickname.create(null));
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NICKNAME_EMPTY);
+        assertThat(exception.getErrorCode()).isEqualTo(KernelErrorCode.EMPTY_NICKNAME);
     }
 
     @Test
