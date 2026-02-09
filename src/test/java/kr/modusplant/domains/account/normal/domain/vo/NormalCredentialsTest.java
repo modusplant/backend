@@ -3,8 +3,6 @@ package kr.modusplant.domains.account.normal.domain.vo;
 import kr.modusplant.domains.account.normal.common.util.domain.vo.NormalCredentialsTestUtils;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -2,7 +2,6 @@ package kr.modusplant.domains.member.domain.vo;
 
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

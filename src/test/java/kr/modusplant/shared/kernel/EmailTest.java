@@ -2,7 +2,6 @@ package kr.modusplant.shared.kernel;
 
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;

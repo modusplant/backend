@@ -23,7 +23,6 @@ import java.util.UUID;
 
 import static kr.modusplant.framework.redis.RedisKeys.RESET_PASSWORD_PREFIX;
 import static kr.modusplant.infrastructure.jwt.enums.TokenScope.RESET_PASSWORD_INPUT;
-import static kr.modusplant.shared.exception.enums.ErrorCode.PASSWORD_RESET_EMAIL_VERIFY_FAIL;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -69,7 +68,7 @@ public class EmailIdentityController {
         String stringUuid = String.valueOf(uuid);
         String redisKey = RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, stringUuid);
         String storedEmail = redisHelper.getString(redisKey)
-                .orElseThrow(() -> new InvalidValueException(PASSWORD_RESET_EMAIL_VERIFY_FAIL));
+                .orElseThrow(() -> new InvalidValueException(EmailIdentityErrorCode.INVALID_EMAIL_VERIFY_LINK));
         return tokenHelper.generateResetPasswordAccessToken(storedEmail, stringUuid, RESET_PASSWORD_INPUT);
     }
 
