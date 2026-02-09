@@ -11,7 +11,8 @@ public enum SocialIdentityErrorCode implements ErrorCode {
     EMPTY_PROVIDER(HttpStatus.BAD_REQUEST.value(), "empty_provider", "제공자가 비어 있습니다. "),
     INVALID_PROVIDER(HttpStatus.BAD_REQUEST.value(), "invalid_provider", "제공자가 유효하지 않습니다. "),
     EMPTY_PROVIDER_ID(HttpStatus.BAD_REQUEST.value(), "empty_provider_id", "제공자 id가 비어 있습니다. "),
-    INVALID_PROVIDER_ID(HttpStatus.BAD_REQUEST.value(), "invalid_provider_id", "제공자 id가 유효하지 않습니다. ");
+    INVALID_PROVIDER_ID(HttpStatus.BAD_REQUEST.value(), "invalid_provider_id", "제공자 id가 유효하지 않습니다. "),
+    UNSUPPORTED_SOCIAL_PROVIDER(HttpStatus.FORBIDDEN.value(), "unsupported_social_provider", "지원되지 않는 소셜 로그인 방식입니다");
 
     private final int httpStatus;
     private final String code;
