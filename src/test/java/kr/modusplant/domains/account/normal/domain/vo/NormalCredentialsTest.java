@@ -2,7 +2,7 @@ package kr.modusplant.domains.account.normal.domain.vo;
 
 import kr.modusplant.domains.account.normal.common.util.domain.vo.NormalCredentialsTestUtils;
 import kr.modusplant.shared.exception.EmptyValueException;
-import kr.modusplant.shared.exception.InvalidPasswordException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
@@ -39,11 +39,11 @@ public class NormalCredentialsTest implements NormalCredentialsTestUtils {
     @DisplayName("형식에 맞지 않는 비밀번호로 자격 요소 생성")
     public void testCreate_givenInvalidPassword_willThrowInvalidValueException() {
         // given
-        InvalidPasswordException result = assertThrows(InvalidPasswordException.class, () ->
+        InvalidValueException result = assertThrows(InvalidValueException.class, () ->
                 NormalCredentials.createWithString(testNormalCredentials.getEmail().getValue(), "282933"));
 
         // when & then
-        assertEquals(ErrorCode.INVALID_PASSWORD, result.getErrorCode());
+        assertEquals(KernelErrorCode.INVALID_PASSWORD_FORMAT, result.getErrorCode());
     }
 
     @Test

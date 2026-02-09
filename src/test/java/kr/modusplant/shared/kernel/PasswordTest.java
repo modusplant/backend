@@ -1,8 +1,7 @@
 package kr.modusplant.shared.kernel;
 
 import kr.modusplant.shared.exception.EmptyValueException;
-import kr.modusplant.shared.exception.InvalidPasswordException;
-import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.kernel.common.util.PasswordTestUtils;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
@@ -27,11 +26,11 @@ public class PasswordTest implements PasswordTestUtils {
     @DisplayName("형식에 맞지 않는 값으로 비밀번호 생성")
     public void testCreate_givenInvalidFormat_willThrowInvalidValueException() {
         // given
-        InvalidPasswordException result = assertThrows(InvalidPasswordException.class,
+        InvalidValueException result = assertThrows(InvalidValueException.class,
                 () -> Password.create("a".repeat(7)));
 
         // when & then
-        assertEquals(ErrorCode.INVALID_PASSWORD, result.getErrorCode());
+        assertEquals(KernelErrorCode.INVALID_PASSWORD_FORMAT, result.getErrorCode());
     }
 
     @Test

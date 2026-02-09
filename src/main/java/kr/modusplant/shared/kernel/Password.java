@@ -1,7 +1,7 @@
 package kr.modusplant.shared.kernel;
 
 import kr.modusplant.shared.exception.EmptyValueException;
-import kr.modusplant.shared.exception.InvalidPasswordException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,7 +20,7 @@ public class Password {
         if (password == null || password.isBlank()) {
             throw new EmptyValueException(KernelErrorCode.EMPTY_PASSWORD, "password");
         } else if (!PATTERN_PASSWORD.matcher(password).matches()) {
-            throw new InvalidPasswordException();
+            throw new InvalidValueException(KernelErrorCode.INVALID_PASSWORD_FORMAT, "password");
         }
         return new Password(password);
     }
