@@ -28,7 +28,6 @@ class PostArchiveJpaMapperImplTest implements PostEntityTestUtils, PostArchiveEn
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)
                 .authMember(memberEntity)
-                .createMember(memberEntity)
                 .publishedAt(LocalDateTime.now())
                 .build();
 
@@ -40,7 +39,6 @@ class PostArchiveJpaMapperImplTest implements PostEntityTestUtils, PostArchiveEn
         assertThat(result.getPrimaryCategoryId()).isEqualTo(primaryCategoryEntity.getId());
         assertThat(result.getSecondaryCategoryId()).isEqualTo(secondaryCategoryEntity.getId());
         assertThat(result.getAuthMemberUuid()).isEqualTo(memberEntity.getUuid());
-        assertThat(result.getCreateMemberUuid()).isEqualTo(memberEntity.getUuid());
         assertThat(result.getTitle()).isEqualTo(postEntity.getTitle());
         assertThat(result.getContent()).isEqualTo(postEntity.getContent());
         assertThat(result.getCreatedAt()).isEqualTo(postEntity.getCreatedAt());

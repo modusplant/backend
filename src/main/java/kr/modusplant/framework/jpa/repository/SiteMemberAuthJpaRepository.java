@@ -16,8 +16,6 @@ import java.util.UUID;
 @Repository
 @Primary
 public interface SiteMemberAuthJpaRepository extends LastModifiedAtRepository<SiteMemberAuthEntity>, UuidPrimaryKeyRepository<SiteMemberAuthEntity>, JpaRepository<SiteMemberAuthEntity, UUID> {
-    List<SiteMemberAuthEntity> findByActiveMember(SiteMemberEntity activeMember);
-
     List<SiteMemberAuthEntity> findByEmail(String email);
 
     List<SiteMemberAuthEntity> findByProvider(AuthProvider provider);

@@ -44,7 +44,6 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialAc
 
         // then
         assertNotNull(result);
-        assertEquals(memberEntity, result.getActiveMember());
         assertEquals(memberEntity, result.getOriginalMember());
         assertEquals(email, result.getEmail());
         assertEquals(AuthProvider.KAKAO, result.getProvider());
@@ -73,7 +72,6 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialAc
         // given
         SiteMemberEntity memberEntity = createKakaoMemberEntityWithUuid();
         SiteMemberAuthEntity memberAuthEntity = SiteMemberAuthEntity.builder()
-                .activeMember(memberEntity)
                 .originalMember(memberEntity)
                 .email(testKakaoUserEmail.getValue())
                 .build();

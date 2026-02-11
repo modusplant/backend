@@ -35,7 +35,6 @@ public class CommCommentEntityTest implements CommCommentEntityTestUtils,
                 .primaryCategory(primaryCategory)
                 .secondaryCategory(secondaryCategory)
                 .authMember(member)
-                .createMember(member)
                 .likeCount(1)
                 .viewCount(1L)
                 .isPublished(true)
@@ -44,7 +43,6 @@ public class CommCommentEntityTest implements CommCommentEntityTestUtils,
         CommCommentEntity commentEntity = createCommCommentEntityBuilder()
                 .postEntity(postEntity)
                 .authMember(member)
-                .createMember(member)
                 .isDeleted(true)
                 .build();
 
