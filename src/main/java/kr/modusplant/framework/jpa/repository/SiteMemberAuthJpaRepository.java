@@ -22,7 +22,7 @@ public interface SiteMemberAuthJpaRepository extends LastModifiedAtRepository<Si
 
     List<SiteMemberAuthEntity> findByProviderId(String providerId);
 
-    Optional<SiteMemberAuthEntity> findByOriginalMember(SiteMemberEntity originalMember);
+    Optional<SiteMemberAuthEntity> findByMember(SiteMemberEntity member);
 
     Optional<SiteMemberAuthEntity> findByEmailAndProvider(String email, AuthProvider provider);
 
@@ -30,5 +30,5 @@ public interface SiteMemberAuthJpaRepository extends LastModifiedAtRepository<Si
 
     boolean existsByEmail(String email);
 
-    boolean existsByOriginalMember(SiteMemberEntity originalMember);
+    boolean existsByMember(SiteMemberEntity member);
 }

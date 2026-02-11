@@ -44,7 +44,7 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialAc
 
         // then
         assertNotNull(result);
-        assertEquals(memberEntity, result.getOriginalMember());
+        assertEquals(memberEntity, result.getMember());
         assertEquals(email, result.getEmail());
         assertEquals(AuthProvider.KAKAO, result.getProvider());
         assertEquals(providerId, result.getProviderId());
@@ -72,7 +72,7 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialAc
         // given
         SiteMemberEntity memberEntity = createKakaoMemberEntityWithUuid();
         SiteMemberAuthEntity memberAuthEntity = SiteMemberAuthEntity.builder()
-                .originalMember(memberEntity)
+                .member(memberEntity)
                 .email(testKakaoUserEmail.getValue())
                 .build();
         SiteMemberRoleEntity memberRoleEntity = SiteMemberRoleEntity.builder()

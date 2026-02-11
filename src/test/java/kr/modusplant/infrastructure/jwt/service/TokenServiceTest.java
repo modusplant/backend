@@ -167,12 +167,12 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntit
             // given
             String newRefreshToken = "new_refresh_token";
             String newAccessToken = "new_access_token";
-            SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityBuilder().originalMember(memberEntity).build();
+            SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityBuilder().member(memberEntity).build();
             given(jwtTokenProvider.validateToken(refreshToken)).willReturn(true);
             given(refreshTokenJpaRepository.existsByRefreshToken(refreshToken)).willReturn(true);
             given(jwtTokenProvider.getMemberUuidFromToken(refreshToken)).willReturn(memberUuid);
             given(siteMemberJpaRepository.findByUuid(memberUuid)).willReturn(Optional.of(memberEntity));
-            given(siteMemberAuthJpaRepository.findByOriginalMember(memberEntity)).willReturn(Optional.of(memberAuthEntity));
+            given(siteMemberAuthJpaRepository.findByMember(memberEntity)).willReturn(Optional.of(memberAuthEntity));
             given(siteMemberRoleJpaRepository.findByUuid(memberUuid)).willReturn(Optional.of(createMemberRoleUserEntityWithUuid()));
             given(jwtTokenProvider.generateRefreshToken(memberUuid)).willReturn(newRefreshToken);
             given(refreshTokenJpaRepository.findByRefreshToken(refreshToken)).willReturn(Optional.of(refreshTokenEntity));

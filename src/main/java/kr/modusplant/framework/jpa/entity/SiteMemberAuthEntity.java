@@ -33,7 +33,7 @@ public class SiteMemberAuthEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @MapsId
     @JoinColumn(nullable = false, name = "uuid", updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private SiteMemberEntity originalMember;
+    private SiteMemberEntity member;
 
     @Column(nullable = false, length = 80)
     private String email;
@@ -81,16 +81,16 @@ public class SiteMemberAuthEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SiteMemberAuthEntity that)) return false;
-        return new EqualsBuilder().append(getOriginalMember(), that.getOriginalMember()).isEquals();
+        return new EqualsBuilder().append(getMember(), that.getMember()).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(getOriginalMember()).toHashCode();
+        return new HashCodeBuilder(17, 37).append(getMember()).toHashCode();
     }
 
-    private SiteMemberAuthEntity(SiteMemberEntity originalMember, String email, String pw, AuthProvider provider, String providerId, LocalDateTime lockoutUntil) {
-        this.originalMember = originalMember;
+    private SiteMemberAuthEntity(SiteMemberEntity member, String email, String pw, AuthProvider provider, String providerId, LocalDateTime lockoutUntil) {
+        this.member = member;
         this.email = email;
         this.pw = pw;
         this.provider = provider;
@@ -103,15 +103,15 @@ public class SiteMemberAuthEntity {
     }
 
     public static final class SiteMemberAuthEntityBuilder {
-        private SiteMemberEntity originalMember;
+        private SiteMemberEntity member;
         private String email;
         private String pw;
         private AuthProvider provider;
         private String providerId;
         private LocalDateTime lockoutUntil;
 
-        public SiteMemberAuthEntityBuilder originalMember(final SiteMemberEntity originalMember) {
-            this.originalMember = originalMember;
+        public SiteMemberAuthEntityBuilder member(final SiteMemberEntity member) {
+            this.member = member;
             return this;
         }
 
@@ -141,7 +141,7 @@ public class SiteMemberAuthEntity {
         }
 
         public SiteMemberAuthEntityBuilder memberAuth(final SiteMemberAuthEntity memberAuth) {
-            this.originalMember = memberAuth.getOriginalMember();
+            this.member = memberAuth.getMember();
             this.email = memberAuth.getEmail();
             this.pw = memberAuth.getPw();
             this.provider = memberAuth.getProvider();
@@ -151,7 +151,7 @@ public class SiteMemberAuthEntity {
         }
 
         public SiteMemberAuthEntity build() {
-            return new SiteMemberAuthEntity(this.originalMember, this.email, this.pw, this.provider, this.providerId, this.lockoutUntil);
+            return new SiteMemberAuthEntity(this.member, this.email, this.pw, this.provider, this.providerId, this.lockoutUntil);
         }
     }
 }

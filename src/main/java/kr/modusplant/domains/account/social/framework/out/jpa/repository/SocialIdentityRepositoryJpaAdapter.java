@@ -33,14 +33,14 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
     @Override
     public Optional<AccountId> getMemberIdBySocialCredentials(SocialCredentials socialCredentials) {
         return memberAuthJpaRepository.findByProviderAndProviderId(socialCredentials.getProvider(), socialCredentials.getProviderId())
-                .map(memberAuthEntity -> AccountId.fromUuid(memberAuthEntity.getOriginalMember().getUuid()));
+                .map(memberAuthEntity -> AccountId.fromUuid(memberAuthEntity.getMember().getUuid()));
     }
 
     @Override
     public SocialAccountPayload getUserPayloadByMemberId(AccountId accountId) {
         SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(accountId.getValue())
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER));
-        SiteMemberAuthEntity memberAuthEntity = memberAuthJpaRepository.findByOriginalMember(memberEntity)
+        SiteMemberAuthEntity memberAuthEntity = memberAuthJpaRepository.findByMember(memberEntity)
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH, TableName.SITE_MEMBER_AUTH));
         SiteMemberRoleEntity memberRoleEntity = memberRoleJpaRepository.findByMember(memberEntity)
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_ROLE, TableName.SITE_MEMBER_ROLE));
