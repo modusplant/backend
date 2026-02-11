@@ -35,10 +35,6 @@ public class SiteMemberAuthEntity {
     @JoinColumn(nullable = false, name = "uuid", updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity originalMember;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(nullable = false, name = "act_memb_uuid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private SiteMemberEntity activeMember;
-
     @Column(nullable = false, length = 80)
     private String email;
 
@@ -65,20 +61,12 @@ public class SiteMemberAuthEntity {
     @Column(name = VER_NUM, nullable = false)
     private Long versionNumber;
 
-    public void updateActiveMember(SiteMemberEntity activeMember) {
-        this.activeMember = activeMember;
-    }
-
     public void updateEmail(String email) {
         this.email = email;
     }
 
     public void updatePw(String pw) {
         this.pw = pw;
-    }
-
-    public void updateLockoutUntil(LocalDateTime lockoutUntil) {
-        this.lockoutUntil = lockoutUntil;
     }
 
     public String getETagSource() {
@@ -101,9 +89,8 @@ public class SiteMemberAuthEntity {
         return new HashCodeBuilder(17, 37).append(getOriginalMember()).toHashCode();
     }
 
-    private SiteMemberAuthEntity(SiteMemberEntity originalMember, SiteMemberEntity activeMember, String email, String pw, AuthProvider provider, String providerId, LocalDateTime lockoutUntil) {
+    private SiteMemberAuthEntity(SiteMemberEntity originalMember, String email, String pw, AuthProvider provider, String providerId, LocalDateTime lockoutUntil) {
         this.originalMember = originalMember;
-        this.activeMember = activeMember;
         this.email = email;
         this.pw = pw;
         this.provider = provider;
@@ -117,7 +104,6 @@ public class SiteMemberAuthEntity {
 
     public static final class SiteMemberAuthEntityBuilder {
         private SiteMemberEntity originalMember;
-        private SiteMemberEntity activeMember;
         private String email;
         private String pw;
         private AuthProvider provider;
@@ -126,11 +112,6 @@ public class SiteMemberAuthEntity {
 
         public SiteMemberAuthEntityBuilder originalMember(final SiteMemberEntity originalMember) {
             this.originalMember = originalMember;
-            return this;
-        }
-
-        public SiteMemberAuthEntityBuilder activeMember(final SiteMemberEntity activeMember) {
-            this.activeMember = activeMember;
             return this;
         }
 
@@ -161,7 +142,6 @@ public class SiteMemberAuthEntity {
 
         public SiteMemberAuthEntityBuilder memberAuth(final SiteMemberAuthEntity memberAuth) {
             this.originalMember = memberAuth.getOriginalMember();
-            this.activeMember = memberAuth.getActiveMember();
             this.email = memberAuth.getEmail();
             this.pw = memberAuth.getPw();
             this.provider = memberAuth.getProvider();
@@ -171,7 +151,7 @@ public class SiteMemberAuthEntity {
         }
 
         public SiteMemberAuthEntity build() {
-            return new SiteMemberAuthEntity(this.originalMember, this.activeMember, this.email, this.pw, this.provider, this.providerId, this.lockoutUntil);
+            return new SiteMemberAuthEntity(this.originalMember, this.email, this.pw, this.provider, this.providerId, this.lockoutUntil);
         }
     }
 }

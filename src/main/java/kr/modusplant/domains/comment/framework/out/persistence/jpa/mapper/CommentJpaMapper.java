@@ -18,7 +18,6 @@ public interface CommentJpaMapper {
     @Mapping(source = "comment.path.path", target = "path")
     @Mapping(source = "commentPost", target = "postEntity")
     @Mapping(source = "commentAuthor", target = "authMember")
-    @Mapping(source = "commentAuthor", target = "createMember")
     @Mapping(source = "comment.content.content", target = "content")
     @Mapping(source = "comment.status", target = "isDeleted", qualifiedByName = "mapIsDeleted")
     CommCommentEntity toCommCommentEntity(Comment comment, SiteMemberEntity commentAuthor, CommPostEntity commentPost);

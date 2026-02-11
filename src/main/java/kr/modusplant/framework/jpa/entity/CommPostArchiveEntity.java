@@ -42,9 +42,6 @@ public class CommPostArchiveEntity {
     @Column(name = AUTH_MEMB_UUID, nullable = false)
     private UUID authMemberUuid;
 
-    @Column(name = CREA_MEMB_UUID, nullable = false)
-    private UUID createMemberUuid;
-
     @Column(nullable = false, length = 60)
     private String title;
 
@@ -76,12 +73,11 @@ public class CommPostArchiveEntity {
         return new HashCodeBuilder(17,37).append(getUlid()).toHashCode();
     }
 
-    private CommPostArchiveEntity(String ulid, Integer primaryCategoryId, Integer secondaryCategoryId, UUID authMemberUuid, UUID createMemberUuid, String title, JsonNode content, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime publishedAt) {
+    private CommPostArchiveEntity(String ulid, Integer primaryCategoryId, Integer secondaryCategoryId, UUID authMemberUuid, String title, JsonNode content, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime publishedAt) {
         this.ulid = ulid;
         this.primaryCategoryId = primaryCategoryId;
         this.secondaryCategoryId = secondaryCategoryId;
         this.authMemberUuid = authMemberUuid;
-        this.createMemberUuid = createMemberUuid;
         this.title = title;
         this.content = content;
         this.createdAt = createdAt;
@@ -98,7 +94,6 @@ public class CommPostArchiveEntity {
         private Integer primaryCategoryId;
         private Integer secondaryCategoryId;
         private UUID authMemberUuid;
-        private UUID createMemberUuid;
         private String title;
         private JsonNode content;
         private LocalDateTime createdAt;
@@ -122,11 +117,6 @@ public class CommPostArchiveEntity {
 
         public CommPostArchiveEntityBuilder authMemberUuid(UUID authMemberUuid) {
             this.authMemberUuid = authMemberUuid;
-            return this;
-        }
-
-        public CommPostArchiveEntityBuilder createMemberUuid(UUID createMemberUuid) {
-            this.createMemberUuid = createMemberUuid;
             return this;
         }
 
@@ -160,7 +150,6 @@ public class CommPostArchiveEntity {
             this.primaryCategoryId = postEntity.primaryCategoryId;
             this.secondaryCategoryId = postEntity.secondaryCategoryId;
             this.authMemberUuid = postEntity.authMemberUuid;
-            this.createMemberUuid = postEntity.createMemberUuid;
             this.title = postEntity.title;
             this.content = postEntity.content;
             this.createdAt = postEntity.createdAt;
@@ -170,7 +159,7 @@ public class CommPostArchiveEntity {
         }
 
         public CommPostArchiveEntity build() {
-            return new CommPostArchiveEntity(this.ulid, this.primaryCategoryId, this.secondaryCategoryId, this.authMemberUuid, this.createMemberUuid, this.title, this.content, this.createdAt, this.updatedAt, this.publishedAt);
+            return new CommPostArchiveEntity(this.ulid, this.primaryCategoryId, this.secondaryCategoryId, this.authMemberUuid, this.title, this.content, this.createdAt, this.updatedAt, this.publishedAt);
         }
 
     }

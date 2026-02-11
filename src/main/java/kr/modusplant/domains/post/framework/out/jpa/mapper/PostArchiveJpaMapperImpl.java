@@ -14,7 +14,6 @@ public class PostArchiveJpaMapperImpl implements PostArchiveJpaMapper {
                 .primaryCategoryId(postEntity.getPrimaryCategory().getId())
                 .secondaryCategoryId(postEntity.getSecondaryCategory().getId())
                 .authMemberUuid(postEntity.getAuthMember().getUuid())
-                .createMemberUuid(postEntity.getCreateMember().getUuid())
                 .title(postEntity.getTitle())
                 .content(postEntity.getContent())
                 .createdAt(postEntity.getCreatedAt())

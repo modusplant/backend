@@ -18,8 +18,6 @@ public interface CommCommentJpaRepository extends JpaRepository<CommCommentEntit
 
     List<CommCommentEntity> findByAuthMember(SiteMemberEntity authMember);
 
-    List<CommCommentEntity> findByCreateMember(SiteMemberEntity createMember);
-
     List<CommCommentEntity> findByContent(String content);
 
     void deleteByPostUlidAndPath(String postUlid, String path);
