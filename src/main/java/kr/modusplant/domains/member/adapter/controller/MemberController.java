@@ -17,14 +17,16 @@ import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.framework.jpa.exception.ExistsEntityException;
+import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.*;
-import kr.modusplant.shared.exception.EntityExistsException;
-import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.kernel.Nickname;
+import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,8 +38,6 @@ import java.util.Optional;
 
 import static kr.modusplant.domains.member.adapter.util.MemberProfileImageUtils.generateMemberProfileImagePath;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
-import static kr.modusplant.shared.exception.enums.ErrorCode.MEMBER_PROFILE_NOT_FOUND;
-import static kr.modusplant.shared.exception.enums.ErrorCode.NICKNAME_EXISTS;
 
 @SuppressWarnings("LoggingSimilarMessage")
 @RequiredArgsConstructor
@@ -72,13 +72,13 @@ public class MemberController {
         MemberId memberId = MemberId.fromUuid(record.id());
         Optional<Member> optionalMember = memberRepository.getById(memberId);
         if (optionalMember.isEmpty()) {
-            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         }
         Optional<MemberProfile> optionalMemberProfile = memberProfileRepository.getById(memberId);
         if (optionalMemberProfile.isPresent()) {
             return memberProfileMapper.toMemberProfileResponse(optionalMemberProfile.orElseThrow());
         } else {
-            throw new EntityNotFoundException(MEMBER_PROFILE_NOT_FOUND, "memberProfile");
+            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE, "memberProfile");
         }
     }
 
@@ -100,7 +100,7 @@ public class MemberController {
                 s3FileService.deleteFiles(imagePath);
             }
         } else {
-            throw new EntityNotFoundException(MEMBER_PROFILE_NOT_FOUND, "memberProfile");
+            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE, "memberProfile");
         }
         if (!(image == null)) {
             String newImagePath = uploadImage(memberId, record);
@@ -177,29 +177,29 @@ public class MemberController {
 
     private void validateBeforeRegister(Nickname nickname) {
         if (memberRepository.isNicknameExist(nickname)) {
-            throw new EntityExistsException(NICKNAME_EXISTS, "nickname");
+            throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "nickname");
         }
     }
 
     private void validateBeforeOverrideProfile(MemberId memberId, Nickname memberNickname) {
         if (!memberRepository.isIdExist(memberId)) {
-            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         }
         if (swearService.isSwearContained(memberNickname.getValue())) {
             throw new SwearContainedException();
         }
         Optional<Member> emptyOrMember = memberRepository.getByNickname(memberNickname);
         if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
-            throw new EntityExistsException(NICKNAME_EXISTS, "memberNickname");
+            throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "memberNickname");
         }
     }
 
     private void validateBeforeLikeOrUnlikePost(MemberId memberId, TargetPostId targetPostId) {
         if (!memberRepository.isIdExist(memberId)) {
-            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         }
         if (!targetPostIdRepository.isIdExist(targetPostId)) {
-            throw new EntityNotFoundException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
+            throw new NotFoundEntityException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
         }
         if (!targetPostIdRepository.isPublished(targetPostId)) {
             throw new NotAccessibleException(NOT_ACCESSIBLE_POST_LIKE, "postLike", targetPostId.getValue());
@@ -208,10 +208,10 @@ public class MemberController {
 
     private void validateBeforeBookmarkOrCancelBookmark(MemberId memberId, TargetPostId targetPostId) {
         if (!memberRepository.isIdExist(memberId)) {
-            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         }
         if (!targetPostIdRepository.isIdExist(targetPostId)) {
-            throw new EntityNotFoundException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
+            throw new NotFoundEntityException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
         }
         if (!targetPostIdRepository.isPublished(targetPostId)) {
             throw new NotAccessibleException(NOT_ACCESSIBLE_POST_BOOKMARK, "postBookmark", targetPostId.getValue());
@@ -220,10 +220,10 @@ public class MemberController {
 
     private void validateBeforeLikeOrUnlikeComment(MemberId memberId, TargetCommentId targetCommentId) {
         if (!memberRepository.isIdExist(memberId)) {
-            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         }
         if (!targetCommentIdRepository.isIdExist(targetCommentId)) {
-            throw new EntityNotFoundException(NOT_FOUND_TARGET_COMMENT_ID, "targetCommentId");
+            throw new NotFoundEntityException(NOT_FOUND_TARGET_COMMENT_ID, "targetCommentId");
         }
     }
 

@@ -5,6 +5,7 @@ import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberRoleEntityTestUtils;
+import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
@@ -17,7 +18,6 @@ import kr.modusplant.infrastructure.jwt.framework.out.jpa.repository.RefreshToke
 import kr.modusplant.infrastructure.jwt.framework.out.redis.AccessTokenRedisRepository;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.security.enums.Role;
-import kr.modusplant.shared.exception.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -118,7 +118,7 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntit
             given(siteMemberJpaRepository.existsByUuid(memberUuid)).willReturn(false);
 
             // when & then
-            assertThrows(EntityNotFoundException.class, () -> tokenService.issueToken(memberUuid,nickname,email,Role.USER));
+            assertThrows(NotFoundEntityException.class, () -> tokenService.issueToken(memberUuid,nickname,email,Role.USER));
         }
     }
 

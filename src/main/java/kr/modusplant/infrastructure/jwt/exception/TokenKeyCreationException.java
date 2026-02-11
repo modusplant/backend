@@ -1,9 +1,9 @@
 package kr.modusplant.infrastructure.jwt.exception;
 
-import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.infrastructure.jwt.exception.enums.AuthTokenErrorCode;
 
 public class TokenKeyCreationException extends AuthTokenException {
     public TokenKeyCreationException() {
-        super(ErrorCode.INTERNAL_AUTHENTICATION_FAIL);
+        super(AuthTokenErrorCode.INTERNAL_AUTHENTICATION_FAIL);
     }
 }

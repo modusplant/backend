@@ -1,7 +1,7 @@
 package kr.modusplant.shared.event;
 
-import kr.modusplant.shared.exception.InvalidDataException;
-import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
+import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +17,11 @@ public class CommentUnlikeEvent {
 
     public static CommentUnlikeEvent create(UUID memberId, String postId, String path) {
         if (memberId == null) {
-            throw new InvalidDataException(ErrorCode.MEMBER_NOT_FOUND, "memberId");
+            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_MEMBER, "memberId");
         } else if (postId.isEmpty()) {
-            throw new InvalidDataException(ErrorCode.POST_NOT_FOUND, "postId");
+            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_POST, "postId");
         } else if (path.isEmpty()) {
-            throw new InvalidDataException(ErrorCode.COMMENT_NOT_FOUND, "path");
+            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_COMMENT, "path");
         } else {
             return new CommentUnlikeEvent(memberId, postId, path);
         }

@@ -3,8 +3,7 @@ package kr.modusplant.domains.member.domain.vo;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.shared.exception.EmptyValueException;
-import kr.modusplant.shared.exception.InvalidDataException;
-import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -12,6 +11,7 @@ import java.util.UUID;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberBirthDateTestUtils.testMemberBirthDate;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.INVALID_MEMBER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -58,9 +58,9 @@ class MemberIdTest implements MemberTestUtils {
     @Test
     @DisplayName("정규 표현식에 매칭되지 않는 값으로 fromString을 호출하여 오류 발생")
     void testFromString_givenInvalidId_willThrowException() {
-        InvalidDataException exception = assertThrows(InvalidDataException.class, () -> MemberId.fromString("!유효하지않음!"));
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_INPUT);
-        assertThat(exception.getDataName()).isEqualTo("memberId");
+        InvalidValueException exception = assertThrows(InvalidValueException.class, () -> MemberId.fromString("!유효하지않음!"));
+        assertThat(exception.getErrorCode()).isEqualTo(INVALID_MEMBER_ID);
+        assertThat(exception.getValueName()).isEqualTo("memberId");
     }
 
     @Test

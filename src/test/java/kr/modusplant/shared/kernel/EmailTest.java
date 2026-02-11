@@ -1,9 +1,9 @@
 package kr.modusplant.shared.kernel;
 
-import kr.modusplant.shared.exception.EmptyEmailException;
-import kr.modusplant.shared.exception.InvalidEmailException;
-import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
+import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -24,21 +24,21 @@ class EmailTest implements EmailTestUtils {
     @DisplayName("null이나 빈 문자열으로 이메일 생성시 예외 발생")
     void testCreate_givenEmptyEmail_willThrowException() {
         // when & then
-        EmptyEmailException exception1 = assertThrows(EmptyEmailException.class, () -> Email.create(null));
-        EmptyEmailException exception2 = assertThrows(EmptyEmailException.class, () -> Email.create(""));
-        EmptyEmailException exception3 = assertThrows(EmptyEmailException.class, () -> Email.create("   "));
-        assertThat(exception1.getErrorCode()).isEqualTo(ErrorCode.EMAIL_EMPTY);
-        assertThat(exception2.getErrorCode()).isEqualTo(ErrorCode.EMAIL_EMPTY);
-        assertThat(exception3.getErrorCode()).isEqualTo(ErrorCode.EMAIL_EMPTY);
+        EmptyValueException exception1 = assertThrows(EmptyValueException.class, () -> Email.create(null));
+        EmptyValueException exception2 = assertThrows(EmptyValueException.class, () -> Email.create(""));
+        EmptyValueException exception3 = assertThrows(EmptyValueException.class, () -> Email.create("   "));
+        assertThat(exception1.getErrorCode()).isEqualTo(KernelErrorCode.EMPTY_EMAIL);
+        assertThat(exception2.getErrorCode()).isEqualTo(KernelErrorCode.EMPTY_EMAIL);
+        assertThat(exception3.getErrorCode()).isEqualTo(KernelErrorCode.EMPTY_EMAIL);
     }
 
     @Test
     @DisplayName("유효하지 않은 문자열로 이메일 생성 시 예외 발생")
     void testCreate_givenInvalidEmailFormat_willThrowException() {
-        InvalidEmailException exception1 = assertThrows(InvalidEmailException.class, () -> Email.create("invalid-email"));
-        InvalidEmailException exception2 = assertThrows(InvalidEmailException.class, () -> Email.create("@example.com"));
-        assertThat(exception1.getErrorCode()).isEqualTo(ErrorCode.INVALID_EMAIL);
-        assertThat(exception2.getErrorCode()).isEqualTo(ErrorCode.INVALID_EMAIL);
+        InvalidValueException exception1 = assertThrows(InvalidValueException.class, () -> Email.create("invalid-email"));
+        InvalidValueException exception2 = assertThrows(InvalidValueException.class, () -> Email.create("@example.com"));
+        assertThat(exception1.getErrorCode()).isEqualTo(KernelErrorCode.INVALID_EMAIL_FORMAT);
+        assertThat(exception2.getErrorCode()).isEqualTo(KernelErrorCode.INVALID_EMAIL_FORMAT);
     }
 
     @Test

@@ -3,9 +3,10 @@ package kr.modusplant.domains.member.domain.aggregate;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberProfileIntroduction;
-import kr.modusplant.shared.exception.EmptyNicknameException;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.kernel.Nickname;
+import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,7 +31,7 @@ public class MemberProfile {
         } else if (profileIntroduction == null) {
             throw new EmptyValueException(EMPTY_MEMBER_PROFILE_INTRODUCTION, "memberProfileIntroduction");
         } else if (nickname == null) {
-            throw new EmptyNicknameException();
+            throw new EmptyValueException(KernelErrorCode.EMPTY_NICKNAME, "nickname");
         }
         return new MemberProfile(id, profileImage, profileIntroduction, nickname);
     }
