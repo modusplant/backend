@@ -27,7 +27,6 @@ public class PostTestDataHelper {
                 .set(SITE_MEMBER.UUID, UUID.randomUUID())
                 .set(SITE_MEMBER.NICKNAME, nickname)
                 .set(SITE_MEMBER.IS_ACTIVE, true)
-                .set(SITE_MEMBER.IS_DISABLED_BY_LINKING, true)
                 .set(SITE_MEMBER.IS_BANNED, true)
                 .set(SITE_MEMBER.IS_DELETED, true)
                 .set(SITE_MEMBER.CREATED_AT, dateTime)
