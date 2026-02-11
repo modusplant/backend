@@ -28,7 +28,7 @@ public class SocialIdentityJpaMapperImpl implements SocialIdentityJpaMapper {
     @Override
     public SiteMemberAuthEntity toMemberAuthEntity(SiteMemberEntity memberEntity, SocialAccountProfile profile) {
         return SiteMemberAuthEntity.builder()
-                .originalMember(memberEntity)
+                .member(memberEntity)
                 .email(profile.getEmail().getValue())
                 .provider(profile.getSocialCredentials().getProvider())
                 .providerId(profile.getSocialCredentials().getProviderId())

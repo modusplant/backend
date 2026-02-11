@@ -101,7 +101,7 @@ public class TokenService {
         UUID memberUuid = jwtTokenProvider.getMemberUuidFromToken(refreshToken);
 
         SiteMemberEntity memberEntity = siteMemberJpaRepository.findByUuid(memberUuid).orElseThrow(TokenNotFoundException::new);
-        String email = siteMemberAuthJpaRepository.findByOriginalMember(memberEntity).orElseThrow(TokenNotFoundException::new).getEmail();      // TODO: 연동 구현 시 이메일 선택 수정 필요
+        String email = siteMemberAuthJpaRepository.findByMember(memberEntity).orElseThrow(TokenNotFoundException::new).getEmail();      // TODO: 연동 구현 시 이메일 선택 수정 필요
         Role role = siteMemberRoleJpaRepository.findByUuid(memberUuid).orElseThrow(TokenNotFoundException::new).getRole();
 
         // refresh token 재발급 (RTR기법)

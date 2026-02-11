@@ -35,15 +35,15 @@ public class DefaultUserDetailsService implements UserDetailsService {
                 .findByEmailAndProvider(email, AuthProvider.BASIC).orElseThrow(
                         () -> new AccountStateException(SecurityErrorCode.MEMBER_STATE_NOT_FOUND));
         SiteMemberEntity member = memberRepository
-                .findByUuid(auth.getOriginalMember().getUuid()).orElseThrow(
+                .findByUuid(auth.getMember().getUuid()).orElseThrow(
                         () -> new AccountStateException(SecurityErrorCode.MEMBER_AUTH_STATE_NOT_FOUND));
-        SiteMemberRoleEntity role = memberRoleRepository.findByMember(auth.getOriginalMember()).orElseThrow(
+        SiteMemberRoleEntity role = memberRoleRepository.findByMember(auth.getMember()).orElseThrow(
                 () -> new AccountStateException(SecurityErrorCode.MEMBER_ROLE_STATE_NOT_FOUND));
 
         return DefaultUserDetails.builder()
                 .email(auth.getEmail())
                 .password(auth.getPw())
-                .activeUuid(auth.getOriginalMember().getUuid())
+                .activeUuid(auth.getMember().getUuid())
                 .nickname(member.getNickname())
                 .provider(auth.getProvider())
                 .isActive(member.getIsActive())
