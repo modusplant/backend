@@ -4,7 +4,6 @@ import kr.modusplant.domains.member.domain.vo.MemberBirthDate;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberStatus;
 import kr.modusplant.shared.exception.EmptyValueException;
-import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.AccessLevel;

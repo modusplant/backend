@@ -47,7 +47,6 @@ public class DefaultUserDetailsService implements UserDetailsService {
                 .nickname(member.getNickname())
                 .provider(auth.getProvider())
                 .isActive(member.getIsActive())
-                .isDisabledByLinking(member.getIsDisabledByLinking())
                 .isBanned(member.getIsBanned())
                 .isDeleted(member.getIsDeleted())
                 .authorities(List.of(new SimpleGrantedAuthority(role.getRole().getValue())))

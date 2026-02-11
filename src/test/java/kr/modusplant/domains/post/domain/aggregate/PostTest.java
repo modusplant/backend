@@ -1,7 +1,8 @@
 package kr.modusplant.domains.post.domain.aggregate;
 
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
-import kr.modusplant.domains.post.domain.exception.*;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
+import kr.modusplant.domains.post.domain.exception.InvalidValueException;
 import kr.modusplant.domains.post.domain.vo.LikeCount;
 import kr.modusplant.domains.post.domain.vo.PostContent;
 import kr.modusplant.domains.post.domain.vo.PostId;

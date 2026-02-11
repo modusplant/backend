@@ -1,7 +1,10 @@
 package kr.modusplant.infrastructure.security;
 
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
-import kr.modusplant.infrastructure.security.exception.*;
+import kr.modusplant.infrastructure.security.exception.BadCredentialException;
+import kr.modusplant.infrastructure.security.exception.BannedException;
+import kr.modusplant.infrastructure.security.exception.DeletedException;
+import kr.modusplant.infrastructure.security.exception.InactiveException;
 import kr.modusplant.infrastructure.security.models.DefaultAuthToken;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,8 +46,6 @@ public class DefaultAuthProvider implements AuthenticationProvider {
     private boolean validateDefaultUserDetails(DefaultUserDetails userDetails, String password) {
         if(!passwordEncoder.matches(password, userDetails.getPassword())) {
             throw new BadCredentialException(SecurityErrorCode.BAD_PASSWORD); }
-        if (userDetails.isDisabledByLinking()) {
-            throw new DisabledByLinkingException(); }
         if (userDetails.isBanned()) {
             throw new BannedException(); }
         if (userDetails.isDeleted()) {

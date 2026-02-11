@@ -1,7 +1,8 @@
 package kr.modusplant.domains.account.social.domain.vo;
 
 import kr.modusplant.domains.account.social.common.util.domain.vo.SocialCredentialsTestUtils;
-import kr.modusplant.domains.account.social.domain.exception.*;
+import kr.modusplant.domains.account.social.domain.exception.EmptyValueException;
+import kr.modusplant.domains.account.social.domain.exception.InvalidValueException;
 import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
 import kr.modusplant.shared.enums.AuthProvider;
 import org.junit.jupiter.api.DisplayName;
