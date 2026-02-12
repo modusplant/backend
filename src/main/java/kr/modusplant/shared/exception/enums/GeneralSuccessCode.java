@@ -1,6 +1,6 @@
 package kr.modusplant.shared.exception.enums;
 
-import kr.modusplant.shared.exception.enums.supers.SuccessCode;
+import kr.modusplant.shared.exception.supers.SuccessCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

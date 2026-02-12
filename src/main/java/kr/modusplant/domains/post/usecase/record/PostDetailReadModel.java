@@ -13,6 +13,7 @@ public record PostDetailReadModel(
         String secondaryCategory,
         UUID authorUuid,
         String nickname,
+        String imagePath,
         String title,
         JsonNode content,
         int likeCount,

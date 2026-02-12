@@ -1,6 +1,6 @@
 package kr.modusplant.shared.exception;
 
-import kr.modusplant.shared.exception.enums.supers.ErrorCode;
+import kr.modusplant.shared.exception.supers.ErrorCode;
 
 /**
  * 클라이언트 요청의 필드 값이 비었기 때문에 요청을 처리할 수 없는 경우에 사용합니다.

@@ -1,10 +1,7 @@
 package kr.modusplant.domains.account.social.domain.vo;
 
 import kr.modusplant.domains.account.social.common.util.domain.vo.SocialCredentialsTestUtils;
-import kr.modusplant.domains.account.social.domain.exception.EmptyProviderException;
-import kr.modusplant.domains.account.social.domain.exception.EmptyProviderIdException;
-import kr.modusplant.domains.account.social.domain.exception.InvalidProviderException;
-import kr.modusplant.domains.account.social.domain.exception.InvalidProviderIdException;
+import kr.modusplant.domains.account.social.domain.exception.*;
 import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
 import kr.modusplant.shared.enums.AuthProvider;
 import org.junit.jupiter.api.DisplayName;
@@ -38,10 +35,10 @@ class SocialCredentialsTest implements SocialCredentialsTestUtils {
     @DisplayName("빈 provider와 providerId로 생성 시 예외 발생")
     void testCreate_givenNullProviderOrProviderId_willThrowException() {
         // when & then
-        EmptyProviderException providerException = assertThrows(EmptyProviderException.class, () -> SocialCredentials.create(null, TEST_SOCIAL_KAKAO_PROVIDER_ID_STRING));
-        EmptyProviderIdException providerIdException1 = assertThrows(EmptyProviderIdException.class, () -> SocialCredentials.create(AuthProvider.KAKAO, null));
-        EmptyProviderIdException providerIdException2 = assertThrows(EmptyProviderIdException.class, () -> SocialCredentials.create(AuthProvider.KAKAO, ""));
-        EmptyProviderIdException providerIdException3 = assertThrows(EmptyProviderIdException.class, () -> SocialCredentials.create(AuthProvider.KAKAO, "   "));
+        EmptyValueException providerException = assertThrows(EmptyValueException.class, () -> SocialCredentials.create(null, TEST_SOCIAL_KAKAO_PROVIDER_ID_STRING));
+        EmptyValueException providerIdException1 = assertThrows(EmptyValueException.class, () -> SocialCredentials.create(AuthProvider.KAKAO, null));
+        EmptyValueException providerIdException2 = assertThrows(EmptyValueException.class, () -> SocialCredentials.create(AuthProvider.KAKAO, ""));
+        EmptyValueException providerIdException3 = assertThrows(EmptyValueException.class, () -> SocialCredentials.create(AuthProvider.KAKAO, "   "));
 
         assertThat(providerException.getErrorCode()).isEqualTo(SocialIdentityErrorCode.EMPTY_PROVIDER);
         assertThat(providerIdException1.getErrorCode()).isEqualTo(SocialIdentityErrorCode.EMPTY_PROVIDER_ID);
@@ -53,7 +50,7 @@ class SocialCredentialsTest implements SocialCredentialsTestUtils {
     @DisplayName("BASIC provider로 생성 시 예외 발생")
     void testCreate_givenBasicProvider_willThrowException() {
         // when & then
-        InvalidProviderException exception = assertThrows(InvalidProviderException.class, () -> SocialCredentials.create(AuthProvider.BASIC, "12345"));
+        InvalidValueException exception = assertThrows(InvalidValueException.class, () -> SocialCredentials.create(AuthProvider.BASIC, "12345"));
         assertThat(exception.getErrorCode()).isEqualTo(SocialIdentityErrorCode.INVALID_PROVIDER);
     }
 
@@ -61,8 +58,8 @@ class SocialCredentialsTest implements SocialCredentialsTestUtils {
     @DisplayName("유효하지 않은 길이의 providerId로 생성 시 예외 발생")
     void testCreate_givenInvalidProviderIdLength_willThrowException() {
         // when & then
-        InvalidProviderIdException kakaoException = assertThrows(InvalidProviderIdException.class, () -> SocialCredentials.create(AuthProvider.KAKAO, "123456789"));
-        InvalidProviderIdException googleException = assertThrows(InvalidProviderIdException.class, () -> SocialCredentials.create(AuthProvider.GOOGLE, "12345678901234567890"));
+        InvalidValueException kakaoException = assertThrows(InvalidValueException.class, () -> SocialCredentials.create(AuthProvider.KAKAO, "123456789"));
+        InvalidValueException googleException = assertThrows(InvalidValueException.class, () -> SocialCredentials.create(AuthProvider.GOOGLE, "12345678901234567890"));
         assertThat(kakaoException.getErrorCode()).isEqualTo(SocialIdentityErrorCode.INVALID_PROVIDER_ID);
         assertThat(googleException.getErrorCode()).isEqualTo(SocialIdentityErrorCode.INVALID_PROVIDER_ID);
     }

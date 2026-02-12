@@ -69,7 +69,7 @@ public class MemberRestController {
             @PathVariable(required = false)
             @NotBlank(message = "회원 닉네임이 비어 있습니다. ")
             @Pattern(regexp = REGEX_NICKNAME,
-                    message = "회원 닉네임 서식이 올바르지 않습니다. ")
+                    message = "닉네임은 2 ~ 10자까지 가능하며, 특수문자는 사용할 수 없습니다.")
             String nickname) {
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -114,7 +114,7 @@ public class MemberRestController {
         validateMemberIdFromToken(id, auth);
         MemberCacheValidationResult cacheValidationResult =
                 memberCacheValidationService.getMemberCacheValidationResult(ifNoneMatch, ifModifiedSince, id);
-        if (cacheValidationResult.isCacheable()) {
+        if (cacheValidationResult.isCacheUsable()) {
             return ResponseEntity
                     .status(HttpStatus.NOT_MODIFIED)
                     .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate())

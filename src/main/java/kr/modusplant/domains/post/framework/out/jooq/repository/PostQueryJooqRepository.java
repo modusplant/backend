@@ -1,7 +1,8 @@
 package kr.modusplant.domains.post.framework.out.jooq.repository;
 
-import kr.modusplant.domains.post.domain.exception.EmptyCategoryIdException;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
+import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.framework.out.jooq.mapper.supers.PostJooqMapper;
 import kr.modusplant.domains.post.usecase.port.repository.PostQueryRepository;
@@ -127,6 +128,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
                         SITE_MEMBER.UUID.as("authorUuid"),
                         SITE_MEMBER.NICKNAME,
+                        SITE_MEMBER_PROF.IMAGE_PATH,
                         COMM_POST.TITLE,
                         COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
                         COMM_POST.LIKE_COUNT,
@@ -147,6 +149,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                 .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
                 .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
                 .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
+                .leftJoin(SITE_MEMBER_PROF).on(SITE_MEMBER.UUID.eq(SITE_MEMBER_PROF.UUID))
                 .where(COMM_POST.ULID.eq(postId.getValue()))
                 .fetchOne()
         ).map(postJooqMapper::toPostDetailReadModel);
@@ -178,7 +181,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
 
     private Condition buildCategoryConditions(Integer primaryCategoryId, List<Integer> secondaryCategoryIds) {
         if (primaryCategoryId == null && secondaryCategoryIds != null && !secondaryCategoryIds.isEmpty()) {
-            throw new EmptyCategoryIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
         }
         Condition condition = noCondition();
         if(primaryCategoryId != null) {

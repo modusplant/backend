@@ -24,7 +24,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -111,18 +111,13 @@ public class GlobalExceptionHandlerTest {
         // given
         ConstraintViolationException ex = mock(ConstraintViolationException.class);
 
-        ConstraintViolation<?> violation1 = mock(ConstraintViolation.class);
-        ConstraintViolation<?> violation2 = mock(ConstraintViolation.class);
-        ConstraintViolation<?> violation3 = mock(ConstraintViolation.class);
+        ConstraintViolation<?> violation = mock(ConstraintViolation.class);
 
-        Set<ConstraintViolation<?>> testViolations =
-                new HashSet<>(Arrays.asList(violation1, violation2, violation3));
+        Set<ConstraintViolation<?>> testViolations = new HashSet<>(Collections.singletonList(violation));
 
         given(ex.getConstraintViolations()).willReturn(testViolations);
-        given(violation1.getPropertyPath()).willReturn(PathImpl.createPathFromString("testFieldName1"));
-        given(violation2.getPropertyPath()).willReturn(PathImpl.createPathFromString("testFieldName2"));
-        given(violation3.getPropertyPath()).willReturn(PathImpl.createPathFromString("testFieldName3"));
-
+        given(violation.getPropertyPath()).willReturn(PathImpl.createPathFromString("testFieldName"));
+        given(violation.getMessage()).willReturn("Test message");
 
         // when
         ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleConstraintViolationException(ex);
@@ -130,7 +125,6 @@ public class GlobalExceptionHandlerTest {
 
         // then
         assertNotNull(errorResponse);
-        System.out.println(errorResponse.getMessage());
         assertEquals(ErrorCode.CONSTRAINT_VIOLATION.getHttpStatus(), errorResponse.getStatus());
         assertEquals(ErrorCode.CONSTRAINT_VIOLATION.getCode(), errorResponse.getCode());
         assertNull(errorResponse.getData());
@@ -229,6 +223,21 @@ public class GlobalExceptionHandlerTest {
         assertNotNull(errorResponse.getMessage());
         assertNull(errorResponse.getData());
     }
+
+//    @Test
+//    @DisplayName("ObjectOptimisticLockingFailureException으로 전역 예외 핸들러 호출")
+//    public void testHandleObjectOptimisticLockingFailureException_givenValidGlobalExceptionHandler_returnResponse() {
+//        // given & when
+//        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleHttpMessageNotWritableException();
+//        DataResponse<Void> errorResponse = response.getBody();
+//
+//        // then
+//        assertNotNull(errorResponse);
+//        assertEquals(GeneralErrorCode.FAILURE_OPTIMISTIC_LOCKING.getHttpStatus(), errorResponse.getStatus());
+//        assertEquals(GeneralErrorCode.FAILURE_OPTIMISTIC_LOCKING.getCode(), errorResponse.getCode());
+//        assertNotNull(errorResponse.getMessage());
+//        assertNull(errorResponse.getData());
+//    }
 
     @Test
     @DisplayName("BusinessException으로 전역 예외 핸들러 호출")

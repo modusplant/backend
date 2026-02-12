@@ -1,6 +1,7 @@
 package kr.modusplant.domains.post.domain.vo;
 
-import kr.modusplant.domains.post.domain.exception.InvalidLikeCountException;
+import kr.modusplant.domains.post.domain.exception.InvalidValueException;
+import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ public class LikeCount {
 
     public static LikeCount create(int value) {
         if (value < 0) {
-            throw new InvalidLikeCountException();
+            throw new InvalidValueException(PostErrorCode.INVALID_LIKE_COUNT);
         }
         return new LikeCount(value);
     }
