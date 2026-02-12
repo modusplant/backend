@@ -20,8 +20,6 @@ public interface SiteMemberJpaRepository extends CreatedAtAndLastModifiedAtRepos
 
     List<SiteMemberEntity> findByIsActive(Boolean isActive);
 
-    List<SiteMemberEntity> findByIsDisabledByLinking(Boolean isDisabledByLinking);
-
     List<SiteMemberEntity> findByIsBanned(Boolean isBanned);
 
     List<SiteMemberEntity> findByIsDeleted(Boolean isDeleted);

@@ -10,7 +10,6 @@ import kr.modusplant.infrastructure.jwt.enums.TokenScope;
 import kr.modusplant.infrastructure.jwt.exception.InvalidTokenException;
 import kr.modusplant.infrastructure.jwt.exception.TokenExpiredException;
 import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

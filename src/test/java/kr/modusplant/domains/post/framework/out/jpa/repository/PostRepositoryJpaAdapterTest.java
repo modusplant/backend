@@ -64,20 +64,19 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
         long viewCount = 0L;
 
         given(authorJpaRepository.findByUuid(post.getAuthorId().getValue())).willReturn(Optional.of(memberEntity));
-        given(authorJpaRepository.findByUuid(post.getCreateAuthorId().getValue())).willReturn(Optional.of(memberEntity));
         given(primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue())).willReturn(Optional.of(primaryCategoryEntity));
         given(secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue())).willReturn(Optional.of(secondaryCategoryEntity));
-        given(postJpaMapper.toPostEntity(post, memberEntity, memberEntity, primaryCategoryEntity, secondaryCategoryEntity, viewCount)).willReturn(postEntity);
+        given(postJpaMapper.toPostEntity(post, memberEntity, primaryCategoryEntity, secondaryCategoryEntity, viewCount)).willReturn(postEntity);
         given(postJpaRepository.save(postEntity)).willReturn(postEntity);
 
         // when
         postRepositoryJpaAdapter.save(post);
 
         // then
-        verify(authorJpaRepository, times(2)).findByUuid(any(UUID.class));
+        verify(authorJpaRepository, times(1)).findByUuid(any(UUID.class));
         verify(primaryCategoryJpaRepository).findById(post.getPrimaryCategoryId().getValue());
         verify(secondaryCategoryJpaRepository).findById(post.getSecondaryCategoryId().getValue());
-        verify(postJpaMapper).toPostEntity(post, memberEntity, memberEntity, primaryCategoryEntity, secondaryCategoryEntity, viewCount);
+        verify(postJpaMapper).toPostEntity(post, memberEntity, primaryCategoryEntity, secondaryCategoryEntity, viewCount);
         verify(postJpaRepository).save(postEntity);
     }
 
