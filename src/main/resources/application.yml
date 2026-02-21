@@ -91,3 +91,9 @@ management:
     web:
       exposure:
         include: "health,info,prometheus"
+
+# Profiling
+pyroscope:
+  enabled: true
+  server-address: ${PYROSCOPE_SERSVER_URL}
+  application-name: ${PYROSCOPE_APP_NAME}
