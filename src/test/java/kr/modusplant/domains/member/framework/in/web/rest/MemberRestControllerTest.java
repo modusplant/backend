@@ -70,7 +70,7 @@ class MemberRestControllerTest implements MemberTestUtils {
     @DisplayName("register로 응답 반환")
     void testRegister_givenValidRequest_willReturnResponse() {
         // given
-        given(memberController.register(testMemberRegisterRequest)).willReturn(testMemberResponse);
+        given(memberController.registerMember(testMemberRegisterRequest)).willReturn(testMemberResponse);
 
         // when
         ResponseEntity<DataResponse<MemberResponse>> memberResponseEntity = memberRestController.registerMember(testMemberRegisterRequest);

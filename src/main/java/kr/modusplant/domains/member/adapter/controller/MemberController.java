@@ -5,6 +5,7 @@ import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
 import kr.modusplant.domains.member.domain.vo.*;
+import kr.modusplant.domains.member.domain.vo.nullobject.EmptyReportImagePath;
 import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
@@ -37,6 +38,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static kr.modusplant.domains.member.adapter.util.MemberProfileImageUtils.generateMemberProfileImagePath;
+import static kr.modusplant.domains.member.adapter.util.MemberProfileImageUtils.generateReportImagePath;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 
 @SuppressWarnings("LoggingSimilarMessage")
@@ -55,10 +57,10 @@ public class MemberController {
     private final TargetCommentIdRepository targetCommentIdRepository;
     private final EventBus eventBus;
 
-    public MemberResponse register(MemberRegisterRequest request) {
+    public MemberResponse registerMember(MemberRegisterRequest request) {
         Nickname nickname = Nickname.create(request.nickname());
         validateBeforeRegister(nickname);
-        return memberMapper.toMemberResponse(memberRepository.save(nickname));
+        return memberMapper.toMemberResponse(memberRepository.add(nickname));
     }
 
     @Transactional(readOnly = true)
@@ -175,6 +177,24 @@ public class MemberController {
         }
     }
 
+    public void reportProposalOrBug(ProposalOrBugReportRecord record) throws IOException {
+        MemberId memberId = MemberId.fromUuid(record.memberId());
+        ReportTitle reportTitle = ReportTitle.create(record.title());
+        ReportContent reportContent = ReportContent.create(record.content());
+        ReportImagePath reportImagePath;
+        MultipartFile image = record.image();
+        Optional<Member> optionalMember = memberRepository.getById(memberId);
+        if (optionalMember.isEmpty()) {
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
+        };
+        if (!(image == null)) {
+            reportImagePath = ReportImagePath.create(uploadImage(memberId, record));
+        } else {
+            reportImagePath = EmptyReportImagePath.create();
+        }
+        eventBus.publish(ProposalOrBugReportEvent.create(memberId.getValue(), reportTitle.getValue(), reportContent.getValue(), reportImagePath.getValue()));
+    }
+
     private void validateBeforeRegister(Nickname nickname) {
         if (memberRepository.isNicknameExist(nickname)) {
             throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "nickname");
@@ -229,6 +249,12 @@ public class MemberController {
 
     private String uploadImage(MemberId memberId, MemberProfileOverrideRecord record) throws IOException {
         String newImagePath = generateMemberProfileImagePath(memberId.getValue(), record.image().getOriginalFilename());
+        s3FileService.uploadFile(record.image(), newImagePath);
+        return newImagePath;
+    }
+
+    private String uploadImage(MemberId memberId, ProposalOrBugReportRecord record) throws IOException {
+        String newImagePath = generateReportImagePath(memberId.getValue(), record.image().getOriginalFilename());
         s3FileService.uploadFile(record.image(), newImagePath);
         return newImagePath;
     }

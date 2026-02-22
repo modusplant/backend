@@ -97,24 +97,24 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
 
     @Test
     @DisplayName("register로 회원 등록")
-    void testRegister_givenValidRegisterRequest_willReturnResponse() {
+    void testRegister_givenValidRegisterMemberRequest_willReturnResponse() {
         // given
         given(memberRepository.isNicknameExist(any())).willReturn(false);
-        given(memberRepository.save(any())).willReturn(createMember());
+        given(memberRepository.add(any())).willReturn(createMember());
 
         // when & then
-        assertThat(memberController.register(testMemberRegisterRequest)).isEqualTo(testMemberResponse);
+        assertThat(memberController.registerMember(testMemberRegisterRequest)).isEqualTo(testMemberResponse);
     }
 
     @Test
     @DisplayName("중복된 닉네임으로 인해 register로 회원 등록 실패")
-    void testValidateBeforeRegister_givenAlreadyExistedNickname_willThrowException() {
+    void testValidateBeforeRegister_Member_givenAlreadyExistedNickname_willThrowException() {
         // given
         given(memberRepository.isNicknameExist(any())).willReturn(true);
 
         // when & then
         ExistsEntityException alreadyExistedNicknameException = assertThrows(
-                ExistsEntityException.class, () -> memberController.register(testMemberRegisterRequest));
+                ExistsEntityException.class, () -> memberController.registerMember(testMemberRegisterRequest));
         assertThat(alreadyExistedNicknameException.getErrorCode()).isEqualTo(KernelErrorCode.EXISTS_NICKNAME);
     }
 
