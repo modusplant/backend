@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 public final class TableColumnName {
     public static final String AUTH_MEMB_UUID = "auth_memb_uuid";
     public static final String CREATED_AT = "created_at";
-    public static final String CREA_MEMB_UUID = "crea_memb_uuid";
     public static final String LAST_MODIFIED_AT = "last_modified_at";
     public static final String MEMB_UUID = "memb_uuid";
     public static final String ORDER = "\"order\"";
