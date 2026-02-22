@@ -7,15 +7,16 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
-import static kr.modusplant.shared.persistence.constant.TableColumnName.VER_NUM;
 import static kr.modusplant.shared.persistence.constant.TableName.PROP_BUG_REP;
 
 @Entity
@@ -26,8 +27,9 @@ import static kr.modusplant.shared.persistence.constant.TableName.PROP_BUG_REP;
 @ToString
 public class PropBugRepEntity {
     @Id
+    @UuidGenerator
     @Column(name = "uuid", nullable = false)
-    private String uuid;
+    private UUID uuid;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @MapsId
@@ -85,7 +87,7 @@ public class PropBugRepEntity {
         return new HashCodeBuilder(17, 37).append(getUuid()).toHashCode();
     }
 
-    private PropBugRepEntity(String uuid, SiteMemberEntity member, String title, String content, String imagePath, LocalDateTime checkedAt, LocalDateTime handledAt) {
+    private PropBugRepEntity(UUID uuid, SiteMemberEntity member, String title, String content, String imagePath, LocalDateTime checkedAt, LocalDateTime handledAt) {
         this.uuid = uuid;
         this.member = member;
         this.title = title;
@@ -100,7 +102,7 @@ public class PropBugRepEntity {
     }
 
     public static final class PropBugRepEntityBuilder {
-        private String uuid;
+        private UUID uuid;
         private SiteMemberEntity member;
         private String title;
         private String content;
@@ -108,7 +110,7 @@ public class PropBugRepEntity {
         private LocalDateTime checkedAt;
         private LocalDateTime handledAt;
 
-        public PropBugRepEntityBuilder uuid(final String uuid) {
+        public PropBugRepEntityBuilder uuid(final UUID uuid) {
             this.uuid = uuid;
             return this;
         }

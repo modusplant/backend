@@ -55,7 +55,7 @@ public class MemberRestController {
             @RequestBody @Valid MemberRegisterRequest request) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(DataResponse.ok(memberController.register(request)));
+                .body(DataResponse.ok(memberController.registerMember(request)));
     }
 
     @Operation(summary = "회원 닉네임 중복 확인 API", description = "이미 등록된 닉네임이 있는지 조회합니다.")
@@ -393,6 +393,45 @@ public class MemberRestController {
             String auth) {
         validateMemberIdFromToken(id, auth);
         memberController.unlikeComment(new MemberCommentUnlikeRecord(id, postUlid, path));
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Operation(
+            summary = "건의 및 버그 제보 API",
+            description = "건의 사항 또는 버그를 제보합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PostMapping(value = "/{id}/report/proposal-or-bug", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<DataResponse<Void>> reportProposalOrBug(
+            @Parameter(
+                    description = "기존에 저장된 회원의 아이디",
+                    schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID)
+            )
+            @PathVariable(required = false)
+            @NotNull(message = "회원 아이디가 비어 있습니다. ")
+            UUID id,
+
+            @Parameter(description = "제보 문서 제목", example = "제보합니다!")
+            @RequestPart(name = "title")
+            String title,
+
+            @Parameter(description = "제보 문서 내용", example = "이런 건의 사항을 드립니다.")
+            @RequestPart(name = "content")
+            String content,
+
+            @Parameter(
+                    description = "제보 관련 이미지",
+                    schema = @Schema(type = "string", format = "binary")
+            )
+            @RequestPart(name = "image", required = false)
+            MultipartFile image,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
+            @NotNull(message = "접근 토큰이 비어 있습니다. ")
+            String auth) throws IOException {
+        validateMemberIdFromToken(id, auth);
+        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(id, title, content, image));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

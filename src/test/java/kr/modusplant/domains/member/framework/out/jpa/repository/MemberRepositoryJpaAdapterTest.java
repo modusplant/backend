@@ -64,25 +64,25 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, SiteMemberEntit
     }
 
     @Test
-    @DisplayName("save(Nickname nickname)로 Member 반환")
-    void testSave_givenValidNickname_willReturnMember() {
+    @DisplayName("add(Nickname nickname)로 Member 반환")
+    void testAdd_givenValidNickname_willReturnMember() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         given(memberJpaRepository.save(any())).willReturn(memberEntity);
 
         // when & then
-        assertThat(memberRepositoryJpaAdapter.save(testNormalUserNickname).getNickname()).isEqualTo(testNormalUserNickname);
+        assertThat(memberRepositoryJpaAdapter.add(testNormalUserNickname).getNickname()).isEqualTo(testNormalUserNickname);
     }
 
     @Test
-    @DisplayName("save(MemberId memberId, Nickname nickname)로 Member 반환")
-    void testSave_givenValidMemberIdAndNickname_willReturnMember() {
+    @DisplayName("add(MemberId memberId, Nickname nickname)로 Member 반환")
+    void testAdd_givenValidMemberIdAndNickname_willReturnMember() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         given(memberJpaRepository.save(any())).willReturn(memberEntity);
 
         // when & then
-        Member member = memberRepositoryJpaAdapter.save(testMemberId, testNormalUserNickname);
+        Member member = memberRepositoryJpaAdapter.add(testMemberId, testNormalUserNickname);
         assertThat(member.getMemberId()).isEqualTo(testMemberId);
         assertThat(member.getNickname()).isEqualTo(testNormalUserNickname);
     }
