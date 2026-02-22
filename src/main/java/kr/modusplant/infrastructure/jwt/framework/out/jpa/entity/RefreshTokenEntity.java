@@ -26,7 +26,7 @@ public class RefreshTokenEntity {
     private UUID uuid;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(nullable = false, name = MEMB_UUID, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = MEMB_UUID, nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity member;
 
     @Column(name = "refresh_token", nullable = false)
