@@ -695,7 +695,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         PropBugRepEntity propBugRepEntity = createPropBugRepEntityBuilderWithUuid().member(memberEntity).build();
 
-        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
         given(memberImageIOHelper.uploadImage(any(MemberId.class), any(ProposalOrBugReportRecord.class))).willReturn(REPORT_IMAGE_PATH);
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
         given(propBugRepJpaRepository.save(propBugRepEntity)).willReturn(propBugRepEntity);
@@ -715,7 +715,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         PropBugRepEntity propBugRepEntity = createPropBugRepEntityBuilderWithUuid().member(memberEntity).imagePath(null).build();
 
-        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
         given(propBugRepJpaRepository.save(propBugRepEntity)).willReturn(propBugRepEntity);
 
@@ -731,7 +731,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     @DisplayName("존재하지 않는 회원으로 인해 reportProposalOrBug로 건의 및 버그 제보 실패")
     void testReportProposalOrBug_givenNotFoundMemberId_willThrowException() {
         // given
-        given(memberRepository.isIdExist(any())).willReturn(false);
+        given(memberRepository.getById(any())).willReturn(Optional.empty());
 
         // when
         NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
