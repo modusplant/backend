@@ -3,10 +3,10 @@ package kr.modusplant.domains.member.adapter.controller;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
-import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
+import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileImage;
 import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyReportImagePath;
-import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
+import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
@@ -111,13 +111,13 @@ public class MemberController {
                     MemberProfileImageBytes.create(image.getBytes())
             );
         } else {
-            memberProfileImage = MemberEmptyProfileImage.create();
+            memberProfileImage = EmptyMemberProfileImage.create();
         }
         if (!(introduction == null)) {
             introduction = swearService.filterSwear(introduction);
             memberProfileIntroduction = MemberProfileIntroduction.create(introduction);
         } else {
-            memberProfileIntroduction = MemberEmptyProfileIntroduction.create();
+            memberProfileIntroduction = EmptyMemberProfileIntroduction.create();
         }
         memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
         return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile));

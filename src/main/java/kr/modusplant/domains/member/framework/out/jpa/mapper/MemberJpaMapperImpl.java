@@ -4,7 +4,7 @@ import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.vo.MemberBirthDate;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberStatus;
-import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyBirthDate;
+import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberBirthDate;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.supers.MemberJpaMapper;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.shared.kernel.Nickname;
@@ -33,7 +33,7 @@ public class MemberJpaMapperImpl implements MemberJpaMapper {
         }
         MemberBirthDate birthDate;
         if (entity.getBirthDate() == null) {
-            birthDate = MemberEmptyBirthDate.create();
+            birthDate = EmptyMemberBirthDate.create();
         } else {
             birthDate = MemberBirthDate.create(entity.getBirthDate());
         }

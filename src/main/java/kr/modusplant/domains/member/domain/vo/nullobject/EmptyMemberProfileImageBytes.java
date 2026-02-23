@@ -9,10 +9,10 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class MemberEmptyProfileImageBytes extends MemberProfileImageBytes {
+public class EmptyMemberProfileImageBytes extends MemberProfileImageBytes {
 
-    public static MemberEmptyProfileImageBytes create() {
-        return new MemberEmptyProfileImageBytes();
+    public static EmptyMemberProfileImageBytes create() {
+        return new EmptyMemberProfileImageBytes();
     }
 
     @Override

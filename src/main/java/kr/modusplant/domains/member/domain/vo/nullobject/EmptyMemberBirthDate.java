@@ -9,10 +9,10 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.time.LocalDate;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class MemberEmptyBirthDate extends MemberBirthDate {
+public class EmptyMemberBirthDate extends MemberBirthDate {
 
-    public static MemberEmptyBirthDate create() {
-        return new MemberEmptyBirthDate();
+    public static EmptyMemberBirthDate create() {
+        return new EmptyMemberBirthDate();
     }
 
     @Override

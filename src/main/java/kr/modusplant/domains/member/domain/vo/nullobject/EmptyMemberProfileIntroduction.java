@@ -7,10 +7,10 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class MemberEmptyProfileIntroduction extends MemberProfileIntroduction {
+public class EmptyMemberProfileIntroduction extends MemberProfileIntroduction {
 
-    public static MemberEmptyProfileIntroduction create() {
-        return new MemberEmptyProfileIntroduction();
+    public static EmptyMemberProfileIntroduction create() {
+        return new EmptyMemberProfileIntroduction();
     }
 
     @Override
