@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT_BINARY_DATA;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_URL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PostMapperImplTest implements PostReadModelTestUtils {
@@ -21,7 +22,7 @@ class PostMapperImplTest implements PostReadModelTestUtils {
         long viewCount = 1L;
 
         // when
-        PostDetailResponse result = postMapper.toPostDetailResponse(TEST_PUBLISHED_POST_DETAIL_READ_MODEL,TEST_POST_CONTENT_BINARY_DATA,viewCount);
+        PostDetailResponse result = postMapper.toPostDetailResponse(TEST_PUBLISHED_POST_DETAIL_READ_MODEL, MEMBER_PROFILE_BASIC_USER_IMAGE_URL ,TEST_POST_CONTENT_BINARY_DATA,viewCount);
 
         // then
         assertEquals(result.ulid(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.ulid());
@@ -31,6 +32,7 @@ class PostMapperImplTest implements PostReadModelTestUtils {
         assertEquals(result.secondaryCategory(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.secondaryCategory());
         assertEquals(result.authorUuid(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.authorUuid());
         assertEquals(result.nickname(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.nickname());
+        assertEquals(result.authorImageUrl(), MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
         assertEquals(result.likeCount(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.likeCount());
         assertEquals(result.viewCount(),viewCount);
         assertEquals(result.title(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.title());

@@ -4,12 +4,12 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import kr.modusplant.domains.account.email.domain.exception.enums.EmailIdentityErrorCode;
 import kr.modusplant.domains.account.email.usecase.request.EmailValidationRequest;
 import kr.modusplant.infrastructure.jwt.enums.TokenScope;
 import kr.modusplant.infrastructure.jwt.exception.InvalidTokenException;
 import kr.modusplant.infrastructure.jwt.exception.TokenExpiredException;
-import kr.modusplant.shared.exception.InvalidDataException;
-import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -76,10 +76,10 @@ public class EmailIdentityTokenHelper {
 
             // 인증코드, 이메일 일치 검증
             if (!verifyCode.equals(payloadVerifyCode)) {
-                throw new InvalidDataException(ErrorCode.INVALID_EMAIL_VERIFY_CODE, "verifyCode");
+                throw new InvalidValueException(EmailIdentityErrorCode.INVALID_EMAIL_VERIFY_CODE, "verifyCode");
             }
             if (!email.equals(claims.get("email", String.class))) {
-                throw new InvalidDataException(ErrorCode.FORBIDDEN_EMAIL, "email");
+                throw new InvalidValueException(EmailIdentityErrorCode.FORBIDDEN_EMAIL, "email");
             }
         } catch (ExpiredJwtException e) {
             throw new TokenExpiredException();
@@ -121,7 +121,7 @@ public class EmailIdentityTokenHelper {
 
             // 이메일 일치 검증
             if (!email.equals(claims.get("email", String.class))) {
-                throw new InvalidDataException(ErrorCode.FORBIDDEN_EMAIL, "email");
+                throw new InvalidValueException(EmailIdentityErrorCode.FORBIDDEN_EMAIL, "email");
             }
         } catch (ExpiredJwtException e) {
             throw new TokenExpiredException();

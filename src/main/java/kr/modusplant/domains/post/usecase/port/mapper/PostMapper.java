@@ -10,7 +10,7 @@ import kr.modusplant.domains.post.usecase.response.PostDetailResponse;
 import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;
 
 public interface PostMapper {
-    PostDetailResponse toPostDetailResponse(PostDetailReadModel postDetailReadModel, JsonNode content, Long viewCount);
+    PostDetailResponse toPostDetailResponse(PostDetailReadModel postDetailReadModel, String profileImageUrl, JsonNode content, Long viewCount);
 
     PostDetailResponse toPostDetailResponse(PostDetailDataReadModel postDetailDataReadModel, JsonNode content);
 

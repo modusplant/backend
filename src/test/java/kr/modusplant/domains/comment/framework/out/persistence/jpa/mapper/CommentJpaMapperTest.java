@@ -15,8 +15,7 @@ public class CommentJpaMapperTest implements CommentTestUtils, CommCommentEntity
 //        CommCommentEntity compare = createCommCommentEntityBuilder()
 //                .postEntity(createCommPostEntityBuilder().ulid(TEST_COMM_POST_ULID).build())
 //                .path(TEST_COMM_COMMENT_PATH)
-//                .authMember(createMemberBasicUserEntity())
-//                .createMember(createMemberBasicUserEntity()).build();
+//                .authMember(createMemberBasicUserEntity()).build();
 //
 //        // when
 //        CommCommentEntity result = mapper.toCommCommentEntity(testValidComment);

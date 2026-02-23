@@ -22,12 +22,11 @@ public class PostTestDataHelper {
     private final DSLContext dsl;
 
     public SiteMemberRecord insertTestMember(String nickname) {
-        LocalDateTime dateTime = LocalDateTime.now().minusMonths(3);
+        LocalDateTime dateTime = LocalDateTime.now().plusDays(7);
         return dsl.insertInto(SITE_MEMBER)
                 .set(SITE_MEMBER.UUID, UUID.randomUUID())
                 .set(SITE_MEMBER.NICKNAME, nickname)
                 .set(SITE_MEMBER.IS_ACTIVE, true)
-                .set(SITE_MEMBER.IS_DISABLED_BY_LINKING, true)
                 .set(SITE_MEMBER.IS_BANNED, true)
                 .set(SITE_MEMBER.IS_DELETED, true)
                 .set(SITE_MEMBER.CREATED_AT, dateTime)
@@ -35,6 +34,17 @@ public class PostTestDataHelper {
                 .set(SITE_MEMBER.VER_NUM, 1)
                 .returning()
                 .fetchOneInto(SiteMemberRecord.class);
+    }
+
+    public SiteMemberProfRecord insertTestMemberProfile(SiteMemberRecord memberRecord) {
+        LocalDateTime dateTime = LocalDateTime.now().plusDays(30);
+        return dsl.insertInto(SITE_MEMBER_PROF)
+                .set(SITE_MEMBER_PROF.UUID,memberRecord.getUuid())
+                .set(SITE_MEMBER_PROF.IMAGE_PATH, "member/"+memberRecord.getUuid()+"/profile/profile.png")
+                .set(SITE_MEMBER_PROF.LAST_MODIFIED_AT,dateTime)
+                .set(SITE_MEMBER_PROF.VER_NUM, 0)
+                .returning()
+                .fetchOneInto(SiteMemberProfRecord.class);
     }
 
     public CommPriCateRecord insertTestPrimaryCategory(String category, int order) {
@@ -65,7 +75,6 @@ public class PostTestDataHelper {
                 .set(COMM_POST.PRI_CATE_ID,priCateRecord.getId())
                 .set(COMM_POST.SECO_CATE_ID,secoCateRecord.getId())
                 .set(COMM_POST.AUTH_MEMB_UUID,memberRecord.getUuid())
-                .set(COMM_POST.CREA_MEMB_UUID,memberRecord.getUuid())
                 .set(COMM_POST.LIKE_COUNT,30)
                 .set(COMM_POST.VIEW_COUNT,251)
                 .set(COMM_POST.TITLE,title)
@@ -89,7 +98,6 @@ public class PostTestDataHelper {
                 .set(COMM_POST.PRI_CATE_ID,priCateRecord.getId())
                 .set(COMM_POST.SECO_CATE_ID,secoCateRecord.getId())
                 .set(COMM_POST.AUTH_MEMB_UUID,memberRecord.getUuid())
-                .set(COMM_POST.CREA_MEMB_UUID,memberRecord.getUuid())
                 .set(COMM_POST.LIKE_COUNT,0)
                 .set(COMM_POST.VIEW_COUNT,0)
                 .set(COMM_POST.TITLE,title)
@@ -107,7 +115,6 @@ public class PostTestDataHelper {
                 .set(COMM_COMMENT.POST_ULID,postRecord.getUlid())
                 .set(COMM_COMMENT.PATH,path)
                 .set(COMM_COMMENT.AUTH_MEMB_UUID,memberRecord.getUuid())
-                .set(COMM_COMMENT.CREA_MEMB_UUID,memberRecord.getUuid())
                 .set(COMM_COMMENT.CONTENT,content)
                 .set(COMM_COMMENT.LIKE_COUNT,2)
                 .set(COMM_COMMENT.IS_DELETED,isDeleted)
@@ -181,6 +188,12 @@ public class PostTestDataHelper {
                 .map(SiteMemberRecord::getUuid)
                 .toArray(UUID[]::new);
 
+        // 회원 프로필 정보 삭제
+        dsl.deleteFrom(SITE_MEMBER_PROF)
+                .where(SITE_MEMBER_PROF.UUID.in(uuids))
+                .execute();
+
+        // 회원 삭제
         dsl.deleteFrom(SITE_MEMBER)
                 .where(SITE_MEMBER.UUID.in(uuids))
                 .execute();

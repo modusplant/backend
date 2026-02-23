@@ -9,9 +9,9 @@ import kr.modusplant.domains.account.email.usecase.request.EmailIdentityRequest;
 import kr.modusplant.domains.account.email.usecase.request.EmailValidationRequest;
 import kr.modusplant.domains.account.email.usecase.request.InputValidationRequest;
 import kr.modusplant.domains.account.normal.domain.exception.InvalidValueException;
+import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.redis.RedisHelper;
 import kr.modusplant.framework.redis.RedisKeys;
-import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Password;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,6 @@ import java.util.UUID;
 
 import static kr.modusplant.framework.redis.RedisKeys.RESET_PASSWORD_PREFIX;
 import static kr.modusplant.infrastructure.jwt.enums.TokenScope.RESET_PASSWORD_INPUT;
-import static kr.modusplant.shared.exception.enums.ErrorCode.PASSWORD_RESET_EMAIL_VERIFY_FAIL;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -49,7 +48,7 @@ public class EmailIdentityController {
         String email = request.email();
 
         if (!repository.existsByEmailAndProvider(Email.create(email))) {
-            throw new EntityNotFoundException(EmailIdentityErrorCode.MEMBER_NOT_FOUND_WITH_EMAIL, "email");
+            throw new NotFoundEntityException(EmailIdentityErrorCode.MEMBER_NOT_FOUND_WITH_EMAIL, "email");
         }
 
         UUID uuid = UUID.randomUUID();
@@ -69,7 +68,7 @@ public class EmailIdentityController {
         String stringUuid = String.valueOf(uuid);
         String redisKey = RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, stringUuid);
         String storedEmail = redisHelper.getString(redisKey)
-                .orElseThrow(() -> new InvalidValueException(PASSWORD_RESET_EMAIL_VERIFY_FAIL));
+                .orElseThrow(() -> new InvalidValueException(EmailIdentityErrorCode.INVALID_EMAIL_VERIFY_LINK));
         return tokenHelper.generateResetPasswordAccessToken(storedEmail, stringUuid, RESET_PASSWORD_INPUT);
     }
 

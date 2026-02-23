@@ -5,8 +5,9 @@ import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheVa
 import kr.modusplant.framework.jpa.entity.SiteMemberProfileEntity;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberProfileEntityTestUtils;
+import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.SiteMemberProfileJpaRepository;
-import kr.modusplant.shared.exception.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.shared.exception.enums.ErrorCode.MEMBER_PROFILE_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,15 +44,15 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.empty());
 
         // when
-        EntityNotFoundException exception = assertThrows(
-                EntityNotFoundException.class,
+        NotFoundEntityException exception = assertThrows(
+                NotFoundEntityException.class,
                 () -> memberCacheValidationService.getMemberCacheValidationResult(
                         String.format("\"%s\"", passwordEncoder.encode(UUID.randomUUID() + "-0")),
                         ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME),
                         id));
 
         // then
-        assertThat(exception.getErrorCode()).isEqualTo(MEMBER_PROFILE_NOT_FOUND);
+        assertThat(exception.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE);
     }
 
     @Test
@@ -71,7 +71,7 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
                 null, ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME), id);
 
         // then
-        assertThat(returnedMap.isCacheable()).isEqualTo(false);
+        assertThat(returnedMap.isCacheUsable()).isEqualTo(false);
     }
 
     @Test
@@ -92,7 +92,7 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
                 id);
 
         // then
-        assertThat(returnedMap.isCacheable()).isEqualTo(false);
+        assertThat(returnedMap.isCacheUsable()).isEqualTo(false);
     }
 
     @Test
@@ -113,7 +113,7 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
                 id);
 
         // then
-        assertThat(returnedMap.isCacheable()).isEqualTo(true);
+        assertThat(returnedMap.isCacheUsable()).isEqualTo(true);
     }
 
     @Test
@@ -136,7 +136,7 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
                 id);
 
         // then
-        assertThat(returnedMapEqual.isCacheable()).isEqualTo(true);
+        assertThat(returnedMapEqual.isCacheUsable()).isEqualTo(true);
 
         // 엔터티의 lastModifiedAt 값이 ifModifiedSince 값보다 과거일 때
         // when
@@ -147,7 +147,7 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
                 id);
 
         // then
-        assertThat(returnedMapPast.isCacheable()).isEqualTo(true);
+        assertThat(returnedMapPast.isCacheUsable()).isEqualTo(true);
     }
 
     @Test
@@ -169,6 +169,6 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
                 id);
 
         // then
-        assertThat(returnedMapEqual.isCacheable()).isEqualTo(false);
+        assertThat(returnedMapEqual.isCacheUsable()).isEqualTo(false);
     }
 }

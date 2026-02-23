@@ -13,7 +13,6 @@ public interface PostArchiveEntityTestUtils extends PostTestUtils {
                 .primaryCategoryId(testPrimaryCategoryId.getValue())
                 .secondaryCategoryId(testSecondaryCategoryId.getValue())
                 .authMemberUuid(testAuthorId.getValue())
-                .createMemberUuid(testAuthorId.getValue())
                 .title(testPostContent.getTitle())
                 .content(testPostContent.getContent())
                 .createdAt(time)

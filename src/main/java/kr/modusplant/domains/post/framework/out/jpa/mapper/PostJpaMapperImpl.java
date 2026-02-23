@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class PostJpaMapperImpl implements PostJpaMapper {
 
     @Override
-    public CommPostEntity toPostEntity(Post post, SiteMemberEntity authorEntity, SiteMemberEntity createAuthorEntity, CommPrimaryCategoryEntity primaryCategoryEntity, CommSecondaryCategoryEntity secondaryCategoryEntity, Long viewCount) {
+    public CommPostEntity toPostEntity(Post post, SiteMemberEntity authorEntity, CommPrimaryCategoryEntity primaryCategoryEntity, CommSecondaryCategoryEntity secondaryCategoryEntity, Long viewCount) {
         LocalDateTime publishedAt = post.getStatus().isPublished() ? LocalDateTime.now() : null;
         CommPostEntityBuilder postEntityBuilder = CommPostEntity.builder();
         if (post.getPostId() != null) {
@@ -26,7 +26,6 @@ public class PostJpaMapperImpl implements PostJpaMapper {
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)
                 .authMember(authorEntity)
-                .createMember(createAuthorEntity)
                 .likeCount(post.getLikeCount().getValue())
                 .viewCount(viewCount)
                 .title(post.getPostContent().getTitle())

@@ -1,6 +1,10 @@
 package kr.modusplant.domains.post.framework.out.jpa.repository;
 
 import kr.modusplant.domains.post.domain.aggregate.Post;
+import kr.modusplant.domains.post.domain.exception.AuthorNotFoundException;
+import kr.modusplant.domains.post.domain.exception.InvalidValueException;
+import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
+import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
 import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostJpaRepository;
@@ -9,13 +13,17 @@ import kr.modusplant.domains.post.framework.out.jpa.repository.supers.SecondaryC
 import kr.modusplant.domains.post.framework.out.redis.PostRecentlyViewRedisRepository;
 import kr.modusplant.domains.post.framework.out.redis.PostViewCountRedisRepository;
 import kr.modusplant.domains.post.usecase.port.repository.PostRepository;
+import kr.modusplant.framework.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.jpa.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.framework.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.repository.*;
+import kr.modusplant.framework.jpa.repository.CommPostBookmarkJpaRepository;
+import kr.modusplant.framework.jpa.repository.CommPostLikeJpaRepository;
+import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Repository
@@ -33,24 +41,33 @@ public class PostRepositoryJpaAdapter implements PostRepository {
 
     @Override
     public void save(Post post) {
-        SiteMemberEntity authorEntity = authorJpaRepository.findByUuid(post.getAuthorId().getValue()).orElseThrow();
-        SiteMemberEntity createMember = authorJpaRepository.findByUuid(post.getCreateAuthorId().getValue()).orElseThrow();
-        CommPrimaryCategoryEntity primaryCategoryEntity = primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue()).orElseThrow();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue()).orElseThrow();
+        SiteMemberEntity authorEntity = authorJpaRepository.findByUuid(post.getAuthorId().getValue()).orElseThrow(() -> new AuthorNotFoundException());
+        CommPrimaryCategoryEntity primaryCategoryEntity = primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue()).orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID));
+        CommSecondaryCategoryEntity secondaryCategoryEntity = secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue())
+                .filter(secondaryCategory -> secondaryCategory.getPrimaryCategoryEntity().equals(primaryCategoryEntity))
+                .orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID));
         postJpaRepository.save(
-                postJpaMapper.toPostEntity(post, authorEntity,createMember,primaryCategoryEntity,secondaryCategoryEntity,0L)
+                postJpaMapper.toPostEntity(post, authorEntity, primaryCategoryEntity,secondaryCategoryEntity,0L)
         );
     }
 
     @Override
     public void update(Post post) {
-        SiteMemberEntity authorEntity = authorJpaRepository.findByUuid(post.getAuthorId().getValue()).orElseThrow();
-        SiteMemberEntity createMember = authorJpaRepository.findByUuid(post.getCreateAuthorId().getValue()).orElseThrow();
-        CommPrimaryCategoryEntity primaryCategoryEntity = primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue()).orElseThrow();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue()).orElseThrow();
-        postJpaRepository.save(
-                postJpaMapper.toPostEntity(post, authorEntity,createMember,primaryCategoryEntity,secondaryCategoryEntity,postViewCountRedisRepository.read(post.getPostId()))
-        );
+        CommPrimaryCategoryEntity primaryCategoryEntity = primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue()).orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID));
+        CommSecondaryCategoryEntity secondaryCategoryEntity = secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue())
+                .filter(secondaryCategory -> secondaryCategory.getPrimaryCategoryEntity().equals(primaryCategoryEntity))
+                .orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID));
+        CommPostEntity postEntity = postJpaRepository.findByUlid(post.getPostId().getValue()).orElseThrow(() -> new PostNotFoundException());
+        postEntity.updatePrimaryCategory(primaryCategoryEntity);
+        postEntity.updateSecondaryCategory(secondaryCategoryEntity);
+        postEntity.updateViewCount(postViewCountRedisRepository.read(post.getPostId()));
+        postEntity.updateTitle(post.getPostContent().getTitle());
+        postEntity.updateContent(post.getPostContent().getContent());
+        if (!postEntity.getIsPublished()) {
+            postEntity.updatePublishedAt(post.getStatus().isPublished() ? LocalDateTime.now() : null);
+            postEntity.updateIsPublished(post.getStatus().isPublished());
+        }
+        postJpaRepository.save(postEntity);
     }
 
     @Override
@@ -65,7 +82,7 @@ public class PostRepositoryJpaAdapter implements PostRepository {
 
     @Override
     public Long getViewCountByUlid(PostId postId) {
-        return postJpaRepository.findByUlid(postId.getValue()).orElseThrow().getViewCount();
+        return postJpaRepository.findByUlid(postId.getValue()).orElseThrow(() -> new PostNotFoundException()).getViewCount();
     }
 
     @Override

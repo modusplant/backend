@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @RepositoryOnlyContext
@@ -32,33 +33,20 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().member(member).build());
 
         // then
         assertThat(memberAuthRepository.findByUuid(memberAuth.getUuid()).orElseThrow()).isEqualTo(memberAuth);
     }
 
-    @DisplayName("activeMember로 회원 인증 찾기")
+    @DisplayName("member로 회원 인증 찾기")
     @Test
-    void findByActiveMemberTest() {
+    void findByMemberTest() {
         // given
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
-
-        // then
-        assertThat(memberAuthRepository.findByActiveMember(memberAuth.getActiveMember()).getFirst()).isEqualTo(memberAuth);
-    }
-
-    @DisplayName("originalMember로 회원 인증 찾기")
-    @Test
-    void findByOriginalMemberTest() {
-        // given
-        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
-
-        // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().member(member).build());
 
         // then
         assertThat(memberAuthRepository.findByUuid(memberAuth.getUuid()).orElseThrow()).isEqualTo(memberAuth);
@@ -71,7 +59,7 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().member(member).build());
 
         // then
         assertThat(memberAuthRepository.findByEmail(memberAuth.getEmail()).getFirst()).isEqualTo(memberAuth);
@@ -84,10 +72,10 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().member(member).build());
 
         // then
-        assertTrue(memberAuthRepository.findByProvider(memberAuth.getProvider()).stream().anyMatch(element -> element.getOriginalMember().getUuid().equals(member.getUuid())));
+        assertTrue(memberAuthRepository.findByProvider(memberAuth.getProvider()).stream().anyMatch(element -> element.getMember().getUuid().equals(member.getUuid())));
     }
 
     @DisplayName("providerId로 회원 인증 찾기")
@@ -97,7 +85,7 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().member(member).build());
 
         // then
         assertThat(memberAuthRepository.findByProviderId(memberAuth.getProviderId()).stream().map(element -> element.getUuid().equals(member.getUuid())).findFirst()).isPresent();
@@ -110,7 +98,7 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().member(member).build());
 
         // then
         assertThat(memberAuthRepository.findByEmailAndProvider(memberAuth.getEmail(), memberAuth.getProvider()).orElseThrow()).isEqualTo(memberAuth);
@@ -123,7 +111,7 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberEntity member = memberRepository.save(createMemberGoogleUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthGoogleUserEntityBuilder().originalMember(member).activeMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthGoogleUserEntityBuilder().member(member).build());
 
         // then
         assertThat(memberAuthRepository.findByProviderAndProviderId(memberAuth.getProvider(), memberAuth.getProviderId()).orElseThrow()).isEqualTo(memberAuth);
@@ -136,7 +124,7 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().member(member).build());
 
         // then
         assertThat(memberAuthRepository.findByLastModifiedAt(memberAuth.getLastModifiedAt()).getFirst()).isEqualTo(memberAuth);
@@ -147,7 +135,7 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
     void deleteByUuidTest() {
         // given
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().member(member).build());
         UUID uuid = memberAuth.getUuid();
 
         // when
@@ -164,9 +152,22 @@ class SiteMemberAuthJpaRepositoryTest implements SiteMemberAuthEntityTestUtils {
         SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
 
         // when
-        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().originalMember(member).activeMember(member).build());
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().member(member).build());
 
         // then
         assertThat(memberAuthRepository.existsByUuid(memberAuth.getUuid())).isEqualTo(true);
+    }
+
+    @DisplayName("회원 인증 엔터티 toString 호출 시 순환 오류 발생 여부 확인")
+    @Test
+    void testToString_givenSiteMemberAuthEntity_willReturnRepresentative() {
+        // given
+        SiteMemberEntity member = memberRepository.save(createMemberBasicUserEntity());
+
+        // when
+        SiteMemberAuthEntity memberAuth = memberAuthRepository.save(createMemberAuthBasicUserEntityBuilder().member(member).build());
+
+        // then
+        assertDoesNotThrow(memberAuth::toString);
     }
 }

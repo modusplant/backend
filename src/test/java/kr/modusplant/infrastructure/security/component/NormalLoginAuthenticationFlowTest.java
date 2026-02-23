@@ -60,7 +60,6 @@
 //
 //        DefaultUserDetails validDefaultUserDetails = testDefaultMemberUserDetailsBuilder
 //                .isActive(true)
-//                .isDisabledByLinking(false)
 //                .isBanned(false)
 //                .isDeleted(false)
 //                .build();
@@ -96,7 +95,6 @@
 //
 //        DefaultUserDetails invalidDefaultUserDetails = testDefaultMemberUserDetailsBuilder
 //                .isActive(false)
-//                .isDisabledByLinking(false)
 //                .isBanned(false)
 //                .isDeleted(false)
 //                .build();

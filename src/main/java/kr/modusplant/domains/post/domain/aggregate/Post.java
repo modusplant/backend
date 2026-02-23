@@ -1,6 +1,8 @@
 package kr.modusplant.domains.post.domain.aggregate;
 
-import kr.modusplant.domains.post.domain.exception.*;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
+import kr.modusplant.domains.post.domain.exception.InvalidValueException;
+import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.domains.post.domain.vo.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -13,7 +15,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class Post {
     private final PostId postId;
     private AuthorId authorId;
-    private AuthorId createAuthorId;
     private PrimaryCategoryId primaryCategoryId;
     private SecondaryCategoryId secondaryCategoryId;
     private PostContent postContent;
@@ -22,63 +23,63 @@ public class Post {
 
     public static Post create(PostId postId, AuthorId authorId, PrimaryCategoryId primaryCategoryId, SecondaryCategoryId secondaryCategoryId, PostContent postContent, LikeCount likeCount, PostStatus postStatus) {
         if(postId == null) {
-            throw new EmptyPostIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_POST_ID);
         } else if (authorId == null) {
-            throw new EmptyAuthorIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_AUTHOR_ID);
         } else if (primaryCategoryId == null) {
-            throw new EmptyCategoryIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
         } else if (secondaryCategoryId == null) {
-            throw new EmptyCategoryIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
         } else if (postContent == null) {
-            throw new EmptyPostContentException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_POST_CONTENT);
         } else if (likeCount == null) {
-            throw new EmptyLikeCountException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_LIKE_COUNT);
         } else if (postStatus == null) {
-            throw new EmptyPostStatusException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_POST_STATUS);
         }
-        return new Post(postId, authorId, authorId, primaryCategoryId, secondaryCategoryId, postContent, likeCount, postStatus);
+        return new Post(postId, authorId, primaryCategoryId, secondaryCategoryId, postContent, likeCount, postStatus);
     }
 
     public static Post createDraft(AuthorId authorId, PrimaryCategoryId primaryCategoryId, SecondaryCategoryId secondaryCategoryId, PostContent postContent) {
         if (authorId == null) {
-            throw new EmptyAuthorIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_AUTHOR_ID);
         } else if (primaryCategoryId == null) {
-            throw new EmptyCategoryIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
         } else if (secondaryCategoryId == null) {
-            throw new EmptyCategoryIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
         } else if (postContent == null) {
-            throw new EmptyPostContentException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_POST_CONTENT);
         }
-        return new Post(null, authorId, authorId, primaryCategoryId, secondaryCategoryId, postContent, LikeCount.zero(), PostStatus.draft());
+        return new Post(null, authorId, primaryCategoryId, secondaryCategoryId, postContent, LikeCount.zero(), PostStatus.draft());
     }
 
     public static Post createPublished(AuthorId authorId, PrimaryCategoryId primaryCategoryId, SecondaryCategoryId secondaryCategoryId, PostContent postContent) {
         if (authorId == null) {
-            throw new EmptyAuthorIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_AUTHOR_ID);
         } else if (primaryCategoryId == null) {
-            throw new EmptyCategoryIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
         } else if (secondaryCategoryId == null) {
-            throw new EmptyCategoryIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
         } else if (postContent == null) {
-            throw new EmptyPostContentException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_POST_CONTENT);
         }
-        return new Post(null, authorId, authorId, primaryCategoryId, secondaryCategoryId, postContent, LikeCount.zero(), PostStatus.published());
+        return new Post(null, authorId, primaryCategoryId, secondaryCategoryId, postContent, LikeCount.zero(), PostStatus.published());
     }
 
     public void update(AuthorId authorId, PrimaryCategoryId primaryCategoryId, SecondaryCategoryId secondaryCategoryId, PostContent postContent, PostStatus postStatus) {
         if (authorId == null) {
-            throw new EmptyAuthorIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_AUTHOR_ID);
         } else if (primaryCategoryId == null) {
-            throw new EmptyCategoryIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
         } else if (secondaryCategoryId == null) {
-            throw new EmptyCategoryIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
         } else if (postContent == null) {
-            throw new EmptyPostContentException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_POST_CONTENT);
         } else if (postStatus == null) {
-            throw new EmptyPostStatusException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_POST_STATUS);
         }
         if(this.status.isPublished() && postStatus.isDraft()) {
-            throw new InvalidPostStatusException();
+            throw new InvalidValueException(PostErrorCode.INVALID_POST_STATUS);
         }
         this.authorId = authorId;
         this.primaryCategoryId = primaryCategoryId;
@@ -89,7 +90,7 @@ public class Post {
 
     public void updateAuthorId(AuthorId newAuthorId) {
         if (newAuthorId == null) {
-            throw new EmptyAuthorIdException();
+            throw new EmptyValueException(PostErrorCode.EMPTY_AUTHOR_ID);
         }
         this.authorId = newAuthorId;
     }
@@ -100,21 +101,21 @@ public class Post {
 
     public void publish() {
         if (this.status.isPublished()) {
-            throw new InvalidPostStatusException();
+            throw new InvalidValueException(PostErrorCode.INVALID_POST_STATUS);
         }
         this.status = PostStatus.published();
     }
 
     public void like() {
         if (this.status.isDraft()) {
-            throw new InvalidPostStatusException();
+            throw new InvalidValueException(PostErrorCode.INVALID_POST_STATUS);
         }
         this.likeCount = this.likeCount.increment();
     }
 
     public void unlike() {
         if (this.status.isDraft()) {
-            throw new InvalidPostStatusException();
+            throw new InvalidValueException(PostErrorCode.INVALID_POST_STATUS);
         }
         this.likeCount = likeCount.decrement();
     }

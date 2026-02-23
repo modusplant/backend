@@ -1,9 +1,9 @@
 package kr.modusplant.infrastructure.jwt.exception;
 
-import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.infrastructure.jwt.exception.enums.AuthTokenErrorCode;
 
 public class TokenExpiredException extends AuthTokenException {
     public TokenExpiredException() {
-        super(ErrorCode.CREDENTIAL_NOT_AUTHORIZED);
+        super(AuthTokenErrorCode.CREDENTIAL_NOT_AUTHORIZED);
     }
 }

@@ -1,7 +1,7 @@
 package kr.modusplant.domains.post.domain.vo;
 
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
-import kr.modusplant.domains.post.domain.exception.InvalidLikeCountException;
+import kr.modusplant.domains.post.domain.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -49,8 +49,8 @@ class LikeCountTest implements PostTestUtils {
         @DisplayName("음수 값으로 LikeCount 생성 시 InvalidLikeCountException을 발생시킨다")
         void testCreate_givenMinusValue_willThrowException() {
             // when & then
-            assertThrows(InvalidLikeCountException.class, () -> LikeCount.create(-1));
-            assertThrows(InvalidLikeCountException.class, () -> LikeCount.create(Integer.MIN_VALUE));
+            assertThrows(InvalidValueException.class, () -> LikeCount.create(-1));
+            assertThrows(InvalidValueException.class, () -> LikeCount.create(Integer.MIN_VALUE));
         }
 
     }

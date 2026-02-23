@@ -1,8 +1,7 @@
 package kr.modusplant.domains.member.domain.vo;
 
 import kr.modusplant.shared.exception.EmptyValueException;
-import kr.modusplant.shared.exception.InvalidDataException;
-import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +12,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.UUID;
 
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EMPTY_MEMBER_ID;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.INVALID_MEMBER_ID;
 import static kr.modusplant.shared.constant.Regex.PATTERN_UUID;
 
 @Getter
@@ -35,7 +35,7 @@ public class MemberId {
         if (StringUtils.isBlank(value)) {
             throw new EmptyValueException(EMPTY_MEMBER_ID, "memberId");
         } else if (!PATTERN_UUID.matcher(value).matches()) {
-            throw new InvalidDataException(ErrorCode.INVALID_INPUT, "memberId");
+            throw new InvalidValueException(INVALID_MEMBER_ID, "memberId");
         }
         return new MemberId(UUID.fromString(value));
     }

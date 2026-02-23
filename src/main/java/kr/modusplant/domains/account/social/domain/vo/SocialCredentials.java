@@ -1,9 +1,8 @@
 package kr.modusplant.domains.account.social.domain.vo;
 
-import kr.modusplant.domains.account.social.domain.exception.EmptyProviderException;
-import kr.modusplant.domains.account.social.domain.exception.EmptyProviderIdException;
-import kr.modusplant.domains.account.social.domain.exception.InvalidProviderException;
-import kr.modusplant.domains.account.social.domain.exception.InvalidProviderIdException;
+import kr.modusplant.domains.account.social.domain.exception.EmptyValueException;
+import kr.modusplant.domains.account.social.domain.exception.InvalidValueException;
+import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
 import kr.modusplant.shared.enums.AuthProvider;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -37,19 +36,19 @@ public class SocialCredentials {
 
     private static void validateSocialProvider(AuthProvider provider, String providerId) {
         if (provider == null) {
-            throw new EmptyProviderException();
+            throw new EmptyValueException(SocialIdentityErrorCode.EMPTY_PROVIDER);
         }
         if (providerId == null || providerId.isBlank()) {
-            throw new EmptyProviderIdException();
+            throw new EmptyValueException(SocialIdentityErrorCode.EMPTY_PROVIDER_ID);
         }
         if (provider == AuthProvider.BASIC) {
-            throw new InvalidProviderException();
+            throw new InvalidValueException(SocialIdentityErrorCode.INVALID_PROVIDER);
         }
         if (provider == AuthProvider.KAKAO && providerId.length() != KAKAO_PROVIDER_ID_LENGTH) {
-            throw new InvalidProviderIdException();
+            throw new InvalidValueException(SocialIdentityErrorCode.INVALID_PROVIDER_ID);
         }
         if (provider == AuthProvider.GOOGLE && providerId.length() != GOOGLE_PROVIDER_ID_LENGTH) {
-            throw new InvalidProviderIdException();
+            throw new InvalidValueException(SocialIdentityErrorCode.INVALID_PROVIDER_ID);
         }
     }
 

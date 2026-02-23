@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @RepositoryOnlyContext
 class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
@@ -124,5 +125,18 @@ class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
 
         // then
         assertThat(memberTermRepository.existsByUuid(memberTerm.getUuid())).isEqualTo(true);
+    }
+
+    @DisplayName("회원 약관 엔터티 toString 호출 시 순환 오류 발생 여부 확인")
+    @Test
+    void testToString_givenSiteMemberTermEntity_willReturnRepresentative() {
+        // given
+        SiteMemberTermEntity memberTerm = createMemberTermUserEntity();
+
+        // when
+        memberTerm = memberTermRepository.save(memberTerm);
+
+        // then
+        assertDoesNotThrow(memberTerm::toString);
     }
 }

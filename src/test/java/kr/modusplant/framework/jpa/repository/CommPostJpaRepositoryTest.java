@@ -64,7 +64,6 @@
 //                .primaryCategory(testCommPrimaryCategory)
 //                .secondaryCategory(testCommSecondaryCategory)
 //                .authMember(testSiteMember)
-//                .createMember(testSiteMember)
 //                .build();
 //
 //        // when
@@ -84,7 +83,6 @@
 //                        .primaryCategory(testCommPrimaryCategory)
 //                        .secondaryCategory(testCommSecondaryCategory)
 //                        .authMember(testSiteMember)
-//                        .createMember(testSiteMember)
 //                        .build()
 //                ).collect(Collectors.toList());
 //        commPostRepository.saveAll(commPosts);
@@ -116,7 +114,6 @@
 //                        .primaryCategory(testCommPrimaryCategory)
 //                        .secondaryCategory(testCommSecondaryCategory)
 //                        .authMember(testSiteMember)
-//                        .createMember(testSiteMember)
 //                        .build()
 //                ).collect(Collectors.toList());
 //        commPosts.getFirst().updateIsPublished(false);
@@ -150,7 +147,6 @@
 //                        .primaryCategory(i % 2 == 0 ? testCommPrimaryCategory : testOtherGroup)
 //                        .secondaryCategory(testCommSecondaryCategory)
 //                        .authMember(testSiteMember)
-//                        .createMember(testSiteMember)
 //                        .build()
 //                ).collect(Collectors.toList());
 //        commPosts.getFirst().updateIsPublished(false);
@@ -184,7 +180,6 @@
 //                        .primaryCategory(testCommPrimaryCategory)
 //                        .secondaryCategory(i % 2 == 0 ? testCommSecondaryCategory : testOtherGroup)
 //                        .authMember(testSiteMember)
-//                        .createMember(testSiteMember)
 //                        .build()
 //                ).collect(Collectors.toList());
 //        commPosts.getFirst().updateIsPublished(false);
@@ -217,7 +212,6 @@
 //                        .primaryCategory(testCommPrimaryCategory)
 //                        .secondaryCategory(testCommSecondaryCategory)
 //                        .authMember(i % 2 == 0 ? testSiteMember : testSiteMember2)
-//                        .createMember(i % 2 == 0 ? testSiteMember : testSiteMember2)
 //                        .build()
 //                ).collect(Collectors.toList());
 //        commPosts.getFirst().updateIsPublished(false);
@@ -250,7 +244,6 @@
 //                        .primaryCategory(testCommPrimaryCategory)
 //                        .secondaryCategory(testCommSecondaryCategory)
 //                        .authMember(testSiteMember)
-//                        .createMember(testSiteMember)
 //                        .build()
 //        );
 //
@@ -267,7 +260,6 @@
 //                        .primaryCategory(testCommPrimaryCategory)
 //                        .secondaryCategory(testCommSecondaryCategory)
 //                        .authMember(testSiteMember)
-//                        .createMember(testSiteMember)
 //                        .build()
 //        );
 //
@@ -284,7 +276,6 @@
 //                        .primaryCategory(testCommPrimaryCategory)
 //                        .secondaryCategory(testCommSecondaryCategory)
 //                        .authMember(testSiteMember)
-//                        .createMember(testSiteMember)
 //                        .build()
 //        );
 //        String ulid = commPostEntity.getUlid();
@@ -305,7 +296,6 @@
 //                        .primaryCategory(testCommPrimaryCategory)
 //                        .secondaryCategory(testCommSecondaryCategory)
 //                        .authMember(testSiteMember)
-//                        .createMember(testSiteMember)
 //                        .build()
 //        );
 //
@@ -322,7 +312,6 @@
 //                        .primaryCategory(testCommPrimaryCategory)
 //                        .secondaryCategory(testCommSecondaryCategory)
 //                        .authMember(testSiteMember)
-//                        .createMember(testSiteMember)
 //                        .build()
 //        );
 //        CommPostEntity commPostEntity2 = commPostRepository.save(
@@ -330,7 +319,6 @@
 //                        .primaryCategory(testCommPrimaryCategory)
 //                        .secondaryCategory(testCommSecondaryCategory)
 //                        .authMember(testSiteMember)
-//                        .createMember(testSiteMember)
 //                        .isPublished(false)
 //                        .build()
 //        );
@@ -354,7 +342,6 @@
 //                        .primaryCategory(testCommPrimaryCategory)
 //                        .secondaryCategory(testCommSecondaryCategory)
 //                        .authMember(testSiteMember)
-//                        .createMember(testSiteMember)
 //                        .build());
 //        Pageable pageable = PageRequest.of(0, 10);
 //
@@ -378,7 +365,6 @@
 //                        .primaryCategory(testCommPrimaryCategory)
 //                        .secondaryCategory(testCommSecondaryCategory)
 //                        .authMember(testSiteMember)
-//                        .createMember(testSiteMember)
 //                        .viewCount(10L)
 //                        .build()
 //        );
@@ -402,7 +388,6 @@
 //                        .primaryCategory(testCommPrimaryCategory)
 //                        .secondaryCategory(testCommSecondaryCategory)
 //                        .authMember(testSiteMember)
-//                        .createMember(testSiteMember)
 //                        .viewCount(10L)
 //                        .build()
 //        );

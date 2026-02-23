@@ -1,9 +1,9 @@
 package kr.modusplant.shared.kernel;
 
-import kr.modusplant.shared.exception.EmptyPasswordException;
-import kr.modusplant.shared.exception.InvalidPasswordException;
-import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.kernel.common.util.PasswordTestUtils;
+import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -16,21 +16,21 @@ public class PasswordTest implements PasswordTestUtils {
     @DisplayName("null로 비밀번호 생성")
     public void testCreate_givenNull_willThrowEmptyValueException() {
         // given
-        EmptyPasswordException result = assertThrows(EmptyPasswordException.class, () -> Password.create(null));
+        EmptyValueException result = assertThrows(EmptyValueException.class, () -> Password.create(null));
 
         // when & then
-        assertEquals(ErrorCode.PASSWORD_EMPTY, result.getErrorCode());
+        assertEquals(KernelErrorCode.EMPTY_PASSWORD, result.getErrorCode());
     }
 
     @Test
     @DisplayName("형식에 맞지 않는 값으로 비밀번호 생성")
     public void testCreate_givenInvalidFormat_willThrowInvalidValueException() {
         // given
-        InvalidPasswordException result = assertThrows(InvalidPasswordException.class,
+        InvalidValueException result = assertThrows(InvalidValueException.class,
                 () -> Password.create("a".repeat(7)));
 
         // when & then
-        assertEquals(ErrorCode.INVALID_PASSWORD, result.getErrorCode());
+        assertEquals(KernelErrorCode.INVALID_PASSWORD_FORMAT, result.getErrorCode());
     }
 
     @Test
@@ -43,7 +43,7 @@ public class PasswordTest implements PasswordTestUtils {
     @Test
     @DisplayName("다른 객체로 동등성 비교")
     void testEquals_givenDifferentObject_willReturnFalse() {
-        EmptyPasswordException different = new EmptyPasswordException();
+        EmptyValueException different = new EmptyValueException(KernelErrorCode.EMPTY_PASSWORD, "password");
         //noinspection AssertBetweenInconvertibleTypes
         assertNotEquals(testNormalUserPassword, different);
     }

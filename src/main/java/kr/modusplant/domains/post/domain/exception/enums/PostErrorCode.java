@@ -1,6 +1,6 @@
 package kr.modusplant.domains.post.domain.exception.enums;
 
-import kr.modusplant.shared.exception.enums.supers.ErrorCode;
+import kr.modusplant.shared.exception.supers.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,9 +22,13 @@ public enum PostErrorCode implements ErrorCode {
     INVALID_CATEGORY_ID(HttpStatus.BAD_REQUEST.value(), "invalid_category_id", "카테고리 id가 유효하지 않습니다. "),
     POST_ACCESS_DENIED(HttpStatus.FORBIDDEN.value(), "post_access_denied", "게시글에 대한 접근 권한이 없습니다."),
     POST_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "post_not_found", "게시글을 찾을 수 없습니다."),
+    AUTHOR_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "author_not_found", "작성자를 찾을 수 없습니다."),
     CONTENT_PROCESSING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR.value(),"content_processing_failed","콘텐츠를 처리하는 중 오류가 발생했습니다."),
     EMPTY_CATEGORY_NAME(HttpStatus.BAD_REQUEST.value(),"empty_category_name","카테고리 이름이 비어 있습니다. "),
-    INVALID_CATEGORY_ORDER(HttpStatus.BAD_REQUEST.value(),"invalid_category_order","카테고리 순서가 유효하지 않습니다. ");
+    INVALID_CATEGORY_ORDER(HttpStatus.BAD_REQUEST.value(),"invalid_category_order","카테고리 순서가 유효하지 않습니다. "),
+    INVALID_FILE_INPUT(HttpStatus.BAD_REQUEST.value(),"invalid_file_input","파일 입력이 올바르지 않습니다"),
+    UNSUPPORTED_FILE(HttpStatus.FORBIDDEN.value(), "unsupported_file", "지원되지 않는 파일 타입입니다"),
+    FILE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST.value(),"file_limit_exceeded","파일 개수 또는 크기 제한을 초과했습니다");
 
     private final int httpStatus;
     private final String code;
