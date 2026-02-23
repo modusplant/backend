@@ -183,8 +183,7 @@ public class MemberController {
         ReportContent reportContent = ReportContent.create(record.content());
         ReportImagePath reportImagePath;
         MultipartFile image = record.image();
-        Optional<Member> optionalMember = memberRepository.getById(memberId);
-        if (optionalMember.isEmpty()) {
+        if (!memberRepository.isIdExist(memberId)) {
             throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         };
         if (!(image == null)) {
