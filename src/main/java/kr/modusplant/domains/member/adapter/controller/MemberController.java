@@ -1,12 +1,13 @@
 package kr.modusplant.domains.member.adapter.controller;
 
+import kr.modusplant.domains.member.adapter.helper.MemberImageIOHelper;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileImage;
 import kr.modusplant.domains.member.domain.vo.*;
-import kr.modusplant.domains.member.domain.vo.nullobject.EmptyReportImagePath;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
+import kr.modusplant.domains.member.domain.vo.nullobject.EmptyReportImagePath;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
@@ -37,8 +38,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Optional;
 
-import static kr.modusplant.domains.member.adapter.util.MemberProfileImageUtils.generateMemberProfileImagePath;
-import static kr.modusplant.domains.member.adapter.util.MemberProfileImageUtils.generateReportImagePath;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 
 @SuppressWarnings("LoggingSimilarMessage")
@@ -51,6 +50,7 @@ public class MemberController {
     private final SwearService swearService;
     private final MemberMapper memberMapper;
     private final MemberProfileMapper memberProfileMapper;
+    private final MemberImageIOHelper memberImageIOHelper;
     private final MemberRepository memberRepository;
     private final MemberProfileRepository memberProfileRepository;
     private final TargetPostIdRepository targetPostIdRepository;
@@ -105,7 +105,7 @@ public class MemberController {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE, "memberProfile");
         }
         if (!(image == null)) {
-            String newImagePath = uploadImage(memberId, record);
+            String newImagePath = memberImageIOHelper.uploadImage(memberId, record);
             memberProfileImage = MemberProfileImage.create(
                     MemberProfileImagePath.create(newImagePath),
                     MemberProfileImageBytes.create(image.getBytes())
@@ -185,9 +185,9 @@ public class MemberController {
         MultipartFile image = record.image();
         if (!memberRepository.isIdExist(memberId)) {
             throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
-        };
+        }
         if (!(image == null)) {
-            reportImagePath = ReportImagePath.create(uploadImage(memberId, record));
+            reportImagePath = ReportImagePath.create(memberImageIOHelper.uploadImage(memberId, record));
         } else {
             reportImagePath = EmptyReportImagePath.create();
         }
@@ -244,17 +244,5 @@ public class MemberController {
         if (!targetCommentIdRepository.isIdExist(targetCommentId)) {
             throw new NotFoundEntityException(NOT_FOUND_TARGET_COMMENT_ID, "targetCommentId");
         }
-    }
-
-    private String uploadImage(MemberId memberId, MemberProfileOverrideRecord record) throws IOException {
-        String newImagePath = generateMemberProfileImagePath(memberId.getValue(), record.image().getOriginalFilename());
-        s3FileService.uploadFile(record.image(), newImagePath);
-        return newImagePath;
-    }
-
-    private String uploadImage(MemberId memberId, ProposalOrBugReportRecord record) throws IOException {
-        String newImagePath = generateReportImagePath(memberId.getValue(), record.image().getOriginalFilename());
-        s3FileService.uploadFile(record.image(), newImagePath);
-        return newImagePath;
     }
 }
