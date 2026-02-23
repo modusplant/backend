@@ -72,10 +72,7 @@ public class MemberController {
     @Transactional(readOnly = true)
     public MemberProfileResponse getProfile(MemberProfileGetRecord record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
-        Optional<Member> optionalMember = memberRepository.getById(memberId);
-        if (optionalMember.isEmpty()) {
-            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
-        }
+        validateIfMemberExists(memberId);
         Optional<MemberProfile> optionalMemberProfile = memberProfileRepository.getById(memberId);
         if (optionalMemberProfile.isPresent()) {
             return memberProfileMapper.toMemberProfileResponse(optionalMemberProfile.orElseThrow());
@@ -183,15 +180,20 @@ public class MemberController {
         ReportContent reportContent = ReportContent.create(record.content());
         ReportImagePath reportImagePath;
         MultipartFile image = record.image();
-        if (!memberRepository.isIdExist(memberId)) {
-            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
-        }
+        validateIfMemberExists(memberId);
         if (!(image == null)) {
             reportImagePath = ReportImagePath.create(memberImageIOHelper.uploadImage(memberId, record));
         } else {
             reportImagePath = EmptyReportImagePath.create();
         }
         eventBus.publish(ProposalOrBugReportEvent.create(memberId.getValue(), reportTitle.getValue(), reportContent.getValue(), reportImagePath.getValue()));
+    }
+
+    private void validateIfMemberExists(MemberId memberId) {
+        Optional<Member> optionalMember = memberRepository.getById(memberId);   // 영속성 컨텍스트에 회원 캐싱
+        if (optionalMember.isEmpty()) {
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
+        }
     }
 
     private void validateBeforeRegister(Nickname nickname) {
