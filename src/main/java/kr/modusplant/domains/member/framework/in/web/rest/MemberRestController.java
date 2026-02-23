@@ -411,11 +411,11 @@ public class MemberRestController {
             @NotNull(message = "회원 아이디가 비어 있습니다. ")
             UUID id,
 
-            @Parameter(description = "제보 문서 제목", example = "제보합니다!")
+            @Parameter(description = "보고서 제목", example = "제보합니다!")
             @RequestPart(name = "title")
             String title,
 
-            @Parameter(description = "제보 문서 내용", example = "이런 건의 사항을 드립니다.")
+            @Parameter(description = "보고서 내용", example = "이런 건의 사항을 드립니다.")
             @RequestPart(name = "content")
             String content,
 
