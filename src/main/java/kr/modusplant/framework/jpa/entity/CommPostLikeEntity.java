@@ -16,11 +16,11 @@ import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
 import static kr.modusplant.shared.persistence.constant.TableName.COMM_POST_LIKE;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = COMM_POST_LIKE)
 @IdClass(CommPostLikeId.class)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
+@Getter
 @ToString
 public class CommPostLikeEntity {
     @Id

@@ -20,9 +20,9 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_COMMENT;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = COMM_COMMENT)
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @IdClass(CommCommentId.class)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @ToString
 public class CommCommentEntity {
     @Id

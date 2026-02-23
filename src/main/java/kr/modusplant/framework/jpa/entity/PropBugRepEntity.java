@@ -20,10 +20,10 @@ import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
 import static kr.modusplant.shared.persistence.constant.TableName.PROP_BUG_REP;
 
 @Entity
-@Table(name = PROP_BUG_REP)
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
+@Table(name = PROP_BUG_REP)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @ToString
 public class PropBugRepEntity {
     @Id
