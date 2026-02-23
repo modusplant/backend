@@ -25,8 +25,8 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_POST;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = COMM_POST)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @ToString
 public class CommPostEntity {
     @Id

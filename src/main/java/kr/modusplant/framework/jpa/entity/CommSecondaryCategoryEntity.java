@@ -18,8 +18,8 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_SECO_CATE
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = COMM_SECO_CATE)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @ToString
 public class CommSecondaryCategoryEntity {
     @Id
