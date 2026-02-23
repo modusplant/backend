@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import static kr.modusplant.domains.member.adapter.util.MemberProfileImageUtils.generateReportImagePath;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportImagePathTestUtils.testReportImagePath;
 import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.REPORT_IMAGE_PATH;
@@ -60,6 +59,7 @@ class ReportImagePathTest {
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
     void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
-        assertNotEquals(testReportImagePath, ReportImagePath.create(generateReportImagePath(UUID.randomUUID(), "image.png")));
+        UUID id = UUID.randomUUID();
+        assertNotEquals(testReportImagePath, ReportImagePath.create(String.format("member/%s/report/%s", id, "image.png")));
     }
 }
