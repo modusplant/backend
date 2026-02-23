@@ -20,7 +20,7 @@ public class ReportContent {
     public static ReportContent create(String value) {
         if (StringUtils.isBlank(value)) {
             throw new EmptyValueException(EMPTY_REPORT_CONTENT, "reportContent");
-        } else if (value.length() > 60) {
+        } else if (value.length() > 600) {
             throw new InvalidValueException(REPORT_CONTENT_OVER_LENGTH, "reportContent");
         }
         return new ReportContent(value);

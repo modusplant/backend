@@ -28,11 +28,10 @@ import static kr.modusplant.shared.persistence.constant.TableName.PROP_BUG_REP;
 public class PropBugRepEntity {
     @Id
     @UuidGenerator
-    @Column(name = "uuid", nullable = false)
+    @Column(nullable = false, updatable = false)
     private UUID uuid;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @MapsId
     @JoinColumn(name = MEMB_UUID, nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ToString.Exclude
     private SiteMemberEntity member;
