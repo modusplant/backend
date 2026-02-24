@@ -7,8 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -32,7 +30,7 @@ class PropBugRepJpaRepositoryTest implements PropBugRepEntityTestUtils {
         proposalOrBugReportRepository.save(proposalOrBugReport);
 
         // then
-        assertThat(proposalOrBugReportRepository.findByUuid(proposalOrBugReport.getUuid()).orElseThrow()).isEqualTo(proposalOrBugReport);
+        assertThat(proposalOrBugReportRepository.findByUlid(proposalOrBugReport.getUlid()).orElseThrow()).isEqualTo(proposalOrBugReport);
     }
 
     @DisplayName("createdAt으로 보고서 찾기")
@@ -66,13 +64,13 @@ class PropBugRepJpaRepositoryTest implements PropBugRepEntityTestUtils {
     void deleteByUuidTest() {
         // given
         PropBugRepEntity proposalOrBugReport = proposalOrBugReportRepository.save(createPropBugRepEntityBuilder().member(createMemberBasicUserEntity()).build());
-        UUID uuid = proposalOrBugReport.getUuid();
+        String ulid = proposalOrBugReport.getUlid();
 
         // when
-        proposalOrBugReportRepository.deleteByUuid(uuid);
+        proposalOrBugReportRepository.deleteByUlid(ulid);
 
         // then
-        assertThat(proposalOrBugReportRepository.findByUuid(uuid)).isEmpty();
+        assertThat(proposalOrBugReportRepository.findByUlid(ulid)).isEmpty();
     }
 
     @DisplayName("uuid로 보고서 확인")
@@ -85,7 +83,7 @@ class PropBugRepJpaRepositoryTest implements PropBugRepEntityTestUtils {
         proposalOrBugReportRepository.save(proposalOrBugReport);
 
         // then
-        assertThat(proposalOrBugReportRepository.existsByUuid(proposalOrBugReport.getUuid())).isEqualTo(true);
+        assertThat(proposalOrBugReportRepository.existsByUlid(proposalOrBugReport.getUlid())).isEqualTo(true);
     }
 
     @DisplayName("보고서 엔터티 toString 호출 시 순환 오류 발생 여부 확인")

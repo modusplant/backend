@@ -5,13 +5,11 @@ import lombok.NoArgsConstructor;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.UUID;
-
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReportConstant {
-    public static final UUID REPORT_UUID = UUID.fromString("8af73f20-ce87-45cf-9924-48c91ea18e0b");
+    public static final String REPORT_ULID = "01KJ862TB91KP6BK301RZM17K7";
     public static final String REPORT_TITLE = "보고서 제목";
     public static final String REPORT_CONTENT = "보고서 컨텐츠";
     public static final byte[] REPORT_IMAGE_BYTES = "Image for report".getBytes();

@@ -14,7 +14,7 @@ public interface PropBugRepEntityTestUtils extends SiteMemberEntityTestUtils {
 
     default PropBugRepEntity.PropBugRepEntityBuilder createPropBugRepEntityBuilderWithUuid() {
         return PropBugRepEntity.builder()
-                .uuid(REPORT_UUID)
+                .ulid(REPORT_ULID)
                 .title(REPORT_TITLE)
                 .content(REPORT_CONTENT)
                 .imagePath(REPORT_IMAGE_PATH);
