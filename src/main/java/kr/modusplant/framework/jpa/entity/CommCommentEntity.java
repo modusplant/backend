@@ -20,9 +20,9 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_COMMENT;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = COMM_COMMENT)
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @IdClass(CommCommentId.class)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @ToString
 public class CommCommentEntity {
     @Id
@@ -42,11 +42,6 @@ public class CommCommentEntity {
     @JoinColumn(name = AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ToString.Exclude
     private SiteMemberEntity authMember;
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    @ToString.Exclude
-    private SiteMemberEntity createMember;
 
     @Column(name = "like_count", nullable = false)
     @DefaultValue
@@ -107,13 +102,12 @@ public class CommCommentEntity {
 
     private CommCommentEntity(
             CommPostEntity postEntity, String path,
-            SiteMemberEntity authMember, SiteMemberEntity createMember,
-            Integer likeCount, String content, Boolean isDeleted
+            SiteMemberEntity authMember, Integer likeCount,
+            String content, Boolean isDeleted
     ) {
         this.postEntity = postEntity;
         this.path = path;
         this.authMember = authMember;
-        this.createMember = createMember;
         this.likeCount = likeCount;
         this.content = content;
         this.isDeleted = isDeleted;
@@ -127,7 +121,6 @@ public class CommCommentEntity {
         private CommPostEntity postEntity;
         private String path;
         private SiteMemberEntity authMember;
-        private SiteMemberEntity createMember;
         private Integer likeCount;
         private String content;
         private Boolean isDeleted;
@@ -144,11 +137,6 @@ public class CommCommentEntity {
 
         public CommCommentEntityBuilder authMember(final SiteMemberEntity authMember) {
             this.authMember = authMember;
-            return this;
-        }
-
-        public CommCommentEntityBuilder createMember(final SiteMemberEntity createMember) {
-            this.createMember = createMember;
             return this;
         }
 
@@ -171,7 +159,6 @@ public class CommCommentEntity {
             this.postEntity = commCommentEntity.getPostEntity();
             this.path = commCommentEntity.getPath();
             this.authMember = commCommentEntity.getAuthMember();
-            this.createMember = commCommentEntity.getCreateMember();
             this.likeCount = commCommentEntity.getLikeCount();
             this.content = commCommentEntity.getContent();
             this.isDeleted = commCommentEntity.getIsDeleted();
@@ -179,7 +166,7 @@ public class CommCommentEntity {
         }
 
         public CommCommentEntity build() {
-            return new CommCommentEntity(this.postEntity, this.path, this.authMember, this.createMember, this.likeCount, this.content, this.isDeleted
+            return new CommCommentEntity(this.postEntity, this.path, this.authMember, this.likeCount, this.content, this.isDeleted
             );
         }
     }

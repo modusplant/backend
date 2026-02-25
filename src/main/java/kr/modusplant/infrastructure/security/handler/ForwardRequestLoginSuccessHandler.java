@@ -4,12 +4,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
-import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -19,8 +20,6 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-import static kr.modusplant.shared.exception.enums.ErrorCode.MEMBER_NOT_FOUND;
 
 @RequiredArgsConstructor
 public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessHandler {
@@ -62,7 +61,7 @@ public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessH
             return;
         }
         if (!memberRepository.existsByUuid(currentMemberUuid)) {
-            throw new EntityNotFoundException(MEMBER_NOT_FOUND, TableName.SITE_MEMBER);
+            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER);
         }
         SiteMemberEntity memberEntity = memberRepository.findByUuid(currentMemberUuid).orElseThrow();
         memberEntity.updateLoggedInAt(LocalDateTime.now());

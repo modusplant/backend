@@ -2,12 +2,12 @@ package kr.modusplant.domains.member.framework.out.jpa.repository;
 
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
-import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
+import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileImage;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberProfileImageBytes;
 import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
 import kr.modusplant.domains.member.domain.vo.MemberProfileIntroduction;
-import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
+import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberProfileJpaMapperImpl;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
 import kr.modusplant.framework.aws.service.S3FileService;
@@ -38,14 +38,14 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
             MemberProfileImage profileImage;
             MemberProfileIntroduction profileIntroduction;
             if (profileEntity.getImagePath() == null) {
-                profileImage = MemberEmptyProfileImage.create();
+                profileImage = EmptyMemberProfileImage.create();
             } else {
                 profileImage = MemberProfileImage.create(
                         MemberProfileImagePath.create(profileEntity.getImagePath()),
                         MemberProfileImageBytes.create(s3FileService.downloadFile(profileEntity.getImagePath())));
             }
             if (profileEntity.getIntroduction() == null) {
-                profileIntroduction = MemberEmptyProfileIntroduction.create();
+                profileIntroduction = EmptyMemberProfileIntroduction.create();
             } else {
                 profileIntroduction = MemberProfileIntroduction.create(profileEntity.getIntroduction());
             }

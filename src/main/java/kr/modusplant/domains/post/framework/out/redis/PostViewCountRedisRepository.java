@@ -2,7 +2,8 @@ package kr.modusplant.domains.post.framework.out.redis;
 
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.usecase.port.repository.PostViewCountRepository;
-import kr.modusplant.shared.exception.InvalidFormatException;
+import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -53,6 +54,6 @@ public class PostViewCountRedisRepository implements PostViewCountRepository {
         if (parts.length == 4) {
             return parts[2];
         }
-        throw new InvalidFormatException("redisKey");
+        throw new InvalidValueException(GeneralErrorCode.MALFORMED_INPUT, "redisKey");
     }
 }

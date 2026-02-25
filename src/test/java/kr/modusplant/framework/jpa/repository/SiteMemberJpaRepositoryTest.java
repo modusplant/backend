@@ -74,19 +74,6 @@ class SiteMemberJpaRepositoryTest implements SiteMemberEntityTestUtils {
         assertThat(member.getUuid()).isIn(memberRepository.findByIsActive(member.getIsActive()).stream().map(SiteMemberEntity::getUuid).toList());
     }
 
-    @DisplayName("isDisabledByLinking으로 회원 찾기")
-    @Test
-    void findByIsDisabledByLinkingTest() {
-        // given
-        SiteMemberEntity member = createMemberBasicUserEntity();
-
-        // when
-        memberRepository.save(member);
-
-        // then
-        assertThat(member.getUuid()).isIn(memberRepository.findByIsDisabledByLinking(member.getIsDisabledByLinking()).stream().map(SiteMemberEntity::getUuid).toList());
-    }
-
     @DisplayName("isBanned으로 회원 찾기")
     @Test
     void findByIsBannedTest() {

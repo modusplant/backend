@@ -42,13 +42,12 @@ public class PostRepositoryJpaAdapter implements PostRepository {
     @Override
     public void save(Post post) {
         SiteMemberEntity authorEntity = authorJpaRepository.findByUuid(post.getAuthorId().getValue()).orElseThrow(() -> new AuthorNotFoundException());
-        SiteMemberEntity createMember = authorJpaRepository.findByUuid(post.getCreateAuthorId().getValue()).orElseThrow(() -> new AuthorNotFoundException());
         CommPrimaryCategoryEntity primaryCategoryEntity = primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue()).orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID));
         CommSecondaryCategoryEntity secondaryCategoryEntity = secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue())
                 .filter(secondaryCategory -> secondaryCategory.getPrimaryCategoryEntity().equals(primaryCategoryEntity))
                 .orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID));
         postJpaRepository.save(
-                postJpaMapper.toPostEntity(post, authorEntity,createMember,primaryCategoryEntity,secondaryCategoryEntity,0L)
+                postJpaMapper.toPostEntity(post, authorEntity, primaryCategoryEntity,secondaryCategoryEntity,0L)
         );
     }
 

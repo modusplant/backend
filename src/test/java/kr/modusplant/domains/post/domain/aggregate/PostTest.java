@@ -1,7 +1,8 @@
 package kr.modusplant.domains.post.domain.aggregate;
 
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
-import kr.modusplant.domains.post.domain.exception.*;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
+import kr.modusplant.domains.post.domain.exception.InvalidValueException;
 import kr.modusplant.domains.post.domain.vo.LikeCount;
 import kr.modusplant.domains.post.domain.vo.PostContent;
 import kr.modusplant.domains.post.domain.vo.PostId;
@@ -25,7 +26,6 @@ class PostTest implements PostTestUtils {
             assertNotNull(createPublishedPost());
             assertEquals(testPostId, createPublishedPost().getPostId());
             assertEquals(testAuthorId, createPublishedPost().getAuthorId());
-            assertEquals(testAuthorId, createPublishedPost().getCreateAuthorId()); // authorId와 동일해야 함
             assertEquals(testPrimaryCategoryId, createPublishedPost().getPrimaryCategoryId());
             assertEquals(testSecondaryCategoryId, createPublishedPost().getSecondaryCategoryId());
             assertEquals(testPostContent, createPublishedPost().getPostContent());
@@ -79,7 +79,6 @@ class PostTest implements PostTestUtils {
             // then
             assertNotNull(post);
             assertEquals(testAuthorId, post.getAuthorId());
-            assertEquals(testAuthorId, post.getCreateAuthorId());
             assertEquals(testPrimaryCategoryId, post.getPrimaryCategoryId());
             assertEquals(testSecondaryCategoryId, post.getSecondaryCategoryId());
             assertEquals(testPostContent, post.getPostContent());
@@ -116,7 +115,6 @@ class PostTest implements PostTestUtils {
             // then
             assertNotNull(post);
             assertEquals(testAuthorId, post.getAuthorId());
-            assertEquals(testAuthorId, post.getCreateAuthorId());
             assertEquals(testPrimaryCategoryId, post.getPrimaryCategoryId());
             assertEquals(testSecondaryCategoryId, post.getSecondaryCategoryId());
             assertEquals(testPostContent, post.getPostContent());
@@ -160,7 +158,6 @@ class PostTest implements PostTestUtils {
             assertEquals(testSecondaryCategoryId2, post.getSecondaryCategoryId());
             assertEquals(postContent, post.getPostContent());
             assertEquals(PostStatus.published(), post.getStatus());
-            assertEquals(testAuthorId, post.getCreateAuthorId());
         }
 
         @Test
@@ -215,7 +212,6 @@ class PostTest implements PostTestUtils {
 
             // then
             assertEquals(testAuthorId2, post.getAuthorId());
-            assertEquals(testAuthorId, post.getCreateAuthorId());
         }
 
         @Test

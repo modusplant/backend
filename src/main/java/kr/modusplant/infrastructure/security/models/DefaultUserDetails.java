@@ -20,7 +20,6 @@ public class DefaultUserDetails implements UserDetails {
     private final String nickname;
     private final AuthProvider provider;
     private final boolean isActive;
-    private final boolean isDisabledByLinking;
     private final boolean isBanned;
     private final boolean isDeleted;
     private final List<GrantedAuthority> authorities;
@@ -58,8 +57,6 @@ public class DefaultUserDetails implements UserDetails {
 
     public boolean isActive() { return isActive; }
 
-    public boolean isDisabledByLinking() { return isDisabledByLinking; }
-
     public boolean isBanned() { return isBanned; }
 
     public boolean isDeleted() { return isDeleted; }
@@ -73,7 +70,6 @@ public class DefaultUserDetails implements UserDetails {
         private String nickname;
         private AuthProvider provider;
         private boolean isActive;
-        private boolean isDisabledByLinking;
         private boolean isBanned;
         private boolean isDeleted;
         private List<GrantedAuthority> authorities;
@@ -108,11 +104,6 @@ public class DefaultUserDetails implements UserDetails {
             return this;
         }
 
-        public DefaultUserDetailsBuilder isDisabledByLinking(boolean isDisabledByLinking) {
-            this.isDisabledByLinking = isDisabledByLinking;
-            return this;
-        }
-
         public DefaultUserDetailsBuilder isBanned(boolean isBanned) {
             this.isBanned = isBanned;
             return this;
@@ -129,7 +120,7 @@ public class DefaultUserDetails implements UserDetails {
         }
 
         public DefaultUserDetails build() {
-            return new DefaultUserDetails(this.email, this.password, this.activeUuid, this.nickname, this.provider, this.isActive, this.isDisabledByLinking, this.isBanned, this.isDeleted, this.authorities);
+            return new DefaultUserDetails(this.email, this.password, this.activeUuid, this.nickname, this.provider, this.isActive, this.isBanned, this.isDeleted, this.authorities);
         }
     }
 }

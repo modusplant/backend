@@ -1,9 +1,9 @@
 package kr.modusplant.domains.account.social.framework.out.client;
 
+import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
 import kr.modusplant.domains.account.social.framework.out.exception.UnsupportedSocialProviderException;
 import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClient;
 import kr.modusplant.shared.enums.AuthProvider;
-import kr.modusplant.shared.exception.enums.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,7 +53,7 @@ class SocialAuthClientFactoryImplTest {
     void testGetClient_givenBasicProvider_willThrowException() {
         // when & then
         UnsupportedSocialProviderException exception = assertThrows(UnsupportedSocialProviderException.class, () -> socialAuthClientFactory.getClient(AuthProvider.BASIC));
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.UNSUPPORTED_SOCIAL_PROVIDER);
+        assertThat(exception.getErrorCode()).isEqualTo(SocialIdentityErrorCode.UNSUPPORTED_SOCIAL_PROVIDER);
     }
 
 
