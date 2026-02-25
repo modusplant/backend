@@ -3,9 +3,8 @@ package kr.modusplant.domains.member.domain.aggregate;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberProfileTestUtils;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.domain.vo.MemberId;
-import kr.modusplant.shared.exception.EmptyNicknameException;
 import kr.modusplant.shared.exception.EmptyValueException;
-import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -43,10 +42,10 @@ class MemberProfileTest implements MemberProfileTestUtils {
 
         // Nickname이 null일 때
         // given
-        EmptyNicknameException nicknameException = assertThrows(EmptyNicknameException.class, () -> MemberProfile.create(testMemberId, testMemberProfileImage, testMemberProfileIntroduction, null));
+        EmptyValueException nicknameException = assertThrows(EmptyValueException.class, () -> MemberProfile.create(testMemberId, testMemberProfileImage, testMemberProfileIntroduction, null));
 
         // when & then
-        assertThat(nicknameException.getErrorCode()).isEqualTo(ErrorCode.NICKNAME_EMPTY);
+        assertThat(nicknameException.getErrorCode()).isEqualTo(KernelErrorCode.EMPTY_NICKNAME);
     }
 
     @Test

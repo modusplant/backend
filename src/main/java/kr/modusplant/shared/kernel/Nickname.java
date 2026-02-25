@@ -1,7 +1,8 @@
 package kr.modusplant.shared.kernel;
 
-import kr.modusplant.shared.exception.EmptyNicknameException;
-import kr.modusplant.shared.exception.InvalidNicknameException;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +18,9 @@ public class Nickname {
 
     public static Nickname create(String value) {
         if (value == null || value.isBlank()) {
-            throw new EmptyNicknameException();
+            throw new EmptyValueException(KernelErrorCode.EMPTY_NICKNAME, "nickname");
         } else if (!PATTERN_NICKNAME.matcher(value).matches()) {
-            throw new InvalidNicknameException();
+            throw new InvalidValueException(KernelErrorCode.INVALID_NICKNAME_FORMAT, "nickname");
         }
         return new Nickname(value);
     }

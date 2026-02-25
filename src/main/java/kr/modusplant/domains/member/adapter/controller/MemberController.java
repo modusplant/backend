@@ -1,11 +1,13 @@
 package kr.modusplant.domains.member.adapter.controller;
 
+import kr.modusplant.domains.member.adapter.helper.MemberImageIOHelper;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
-import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
+import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileImage;
 import kr.modusplant.domains.member.domain.vo.*;
-import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
+import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
+import kr.modusplant.domains.member.domain.vo.nullobject.EmptyReportImagePath;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
@@ -17,14 +19,16 @@ import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.framework.jpa.exception.ExistsEntityException;
+import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.*;
-import kr.modusplant.shared.exception.EntityExistsException;
-import kr.modusplant.shared.exception.EntityNotFoundException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.kernel.Nickname;
+import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,10 +38,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Optional;
 
-import static kr.modusplant.domains.member.adapter.util.MemberProfileImageUtils.generateMemberProfileImagePath;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
-import static kr.modusplant.shared.exception.enums.ErrorCode.MEMBER_PROFILE_NOT_FOUND;
-import static kr.modusplant.shared.exception.enums.ErrorCode.NICKNAME_EXISTS;
 
 @SuppressWarnings("LoggingSimilarMessage")
 @RequiredArgsConstructor
@@ -49,16 +50,17 @@ public class MemberController {
     private final SwearService swearService;
     private final MemberMapper memberMapper;
     private final MemberProfileMapper memberProfileMapper;
+    private final MemberImageIOHelper memberImageIOHelper;
     private final MemberRepository memberRepository;
     private final MemberProfileRepository memberProfileRepository;
     private final TargetPostIdRepository targetPostIdRepository;
     private final TargetCommentIdRepository targetCommentIdRepository;
     private final EventBus eventBus;
 
-    public MemberResponse register(MemberRegisterRequest request) {
+    public MemberResponse registerMember(MemberRegisterRequest request) {
         Nickname nickname = Nickname.create(request.nickname());
         validateBeforeRegister(nickname);
-        return memberMapper.toMemberResponse(memberRepository.save(nickname));
+        return memberMapper.toMemberResponse(memberRepository.add(nickname));
     }
 
     @Transactional(readOnly = true)
@@ -70,15 +72,12 @@ public class MemberController {
     @Transactional(readOnly = true)
     public MemberProfileResponse getProfile(MemberProfileGetRecord record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
-        Optional<Member> optionalMember = memberRepository.getById(memberId);
-        if (optionalMember.isEmpty()) {
-            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
-        }
+        validateIfMemberExists(memberId);
         Optional<MemberProfile> optionalMemberProfile = memberProfileRepository.getById(memberId);
         if (optionalMemberProfile.isPresent()) {
             return memberProfileMapper.toMemberProfileResponse(optionalMemberProfile.orElseThrow());
         } else {
-            throw new EntityNotFoundException(MEMBER_PROFILE_NOT_FOUND, "memberProfile");
+            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE, "memberProfile");
         }
     }
 
@@ -100,22 +99,22 @@ public class MemberController {
                 s3FileService.deleteFiles(imagePath);
             }
         } else {
-            throw new EntityNotFoundException(MEMBER_PROFILE_NOT_FOUND, "memberProfile");
+            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE, "memberProfile");
         }
         if (!(image == null)) {
-            String newImagePath = uploadImage(memberId, record);
+            String newImagePath = memberImageIOHelper.uploadImage(memberId, record);
             memberProfileImage = MemberProfileImage.create(
                     MemberProfileImagePath.create(newImagePath),
                     MemberProfileImageBytes.create(image.getBytes())
             );
         } else {
-            memberProfileImage = MemberEmptyProfileImage.create();
+            memberProfileImage = EmptyMemberProfileImage.create();
         }
         if (!(introduction == null)) {
             introduction = swearService.filterSwear(introduction);
             memberProfileIntroduction = MemberProfileIntroduction.create(introduction);
         } else {
-            memberProfileIntroduction = MemberEmptyProfileIntroduction.create();
+            memberProfileIntroduction = EmptyMemberProfileIntroduction.create();
         }
         memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
         return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile));
@@ -175,31 +174,53 @@ public class MemberController {
         }
     }
 
+    public void reportProposalOrBug(ProposalOrBugReportRecord record) throws IOException {
+        MemberId memberId = MemberId.fromUuid(record.memberId());
+        ReportTitle reportTitle = ReportTitle.create(record.title());
+        ReportContent reportContent = ReportContent.create(record.content());
+        ReportImagePath reportImagePath;
+        MultipartFile image = record.image();
+        validateIfMemberExists(memberId);
+        if (!(image == null)) {
+            reportImagePath = ReportImagePath.create(memberImageIOHelper.uploadImage(memberId, record));
+        } else {
+            reportImagePath = EmptyReportImagePath.create();
+        }
+        eventBus.publish(ProposalOrBugReportEvent.create(memberId.getValue(), reportTitle.getValue(), reportContent.getValue(), reportImagePath.getValue()));
+    }
+
+    private void validateIfMemberExists(MemberId memberId) {
+        Optional<Member> optionalMember = memberRepository.getById(memberId);   // 영속성 컨텍스트에 회원 캐싱
+        if (optionalMember.isEmpty()) {
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
+        }
+    }
+
     private void validateBeforeRegister(Nickname nickname) {
         if (memberRepository.isNicknameExist(nickname)) {
-            throw new EntityExistsException(NICKNAME_EXISTS, "nickname");
+            throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "nickname");
         }
     }
 
     private void validateBeforeOverrideProfile(MemberId memberId, Nickname memberNickname) {
         if (!memberRepository.isIdExist(memberId)) {
-            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         }
         if (swearService.isSwearContained(memberNickname.getValue())) {
             throw new SwearContainedException();
         }
         Optional<Member> emptyOrMember = memberRepository.getByNickname(memberNickname);
         if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
-            throw new EntityExistsException(NICKNAME_EXISTS, "memberNickname");
+            throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "memberNickname");
         }
     }
 
     private void validateBeforeLikeOrUnlikePost(MemberId memberId, TargetPostId targetPostId) {
         if (!memberRepository.isIdExist(memberId)) {
-            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         }
         if (!targetPostIdRepository.isIdExist(targetPostId)) {
-            throw new EntityNotFoundException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
+            throw new NotFoundEntityException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
         }
         if (!targetPostIdRepository.isPublished(targetPostId)) {
             throw new NotAccessibleException(NOT_ACCESSIBLE_POST_LIKE, "postLike", targetPostId.getValue());
@@ -208,10 +229,10 @@ public class MemberController {
 
     private void validateBeforeBookmarkOrCancelBookmark(MemberId memberId, TargetPostId targetPostId) {
         if (!memberRepository.isIdExist(memberId)) {
-            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         }
         if (!targetPostIdRepository.isIdExist(targetPostId)) {
-            throw new EntityNotFoundException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
+            throw new NotFoundEntityException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
         }
         if (!targetPostIdRepository.isPublished(targetPostId)) {
             throw new NotAccessibleException(NOT_ACCESSIBLE_POST_BOOKMARK, "postBookmark", targetPostId.getValue());
@@ -220,16 +241,10 @@ public class MemberController {
 
     private void validateBeforeLikeOrUnlikeComment(MemberId memberId, TargetCommentId targetCommentId) {
         if (!memberRepository.isIdExist(memberId)) {
-            throw new EntityNotFoundException(NOT_FOUND_MEMBER_ID, "memberId");
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         }
         if (!targetCommentIdRepository.isIdExist(targetCommentId)) {
-            throw new EntityNotFoundException(NOT_FOUND_TARGET_COMMENT_ID, "targetCommentId");
+            throw new NotFoundEntityException(NOT_FOUND_TARGET_COMMENT_ID, "targetCommentId");
         }
-    }
-
-    private String uploadImage(MemberId memberId, MemberProfileOverrideRecord record) throws IOException {
-        String newImagePath = generateMemberProfileImagePath(memberId.getValue(), record.image().getOriginalFilename());
-        s3FileService.uploadFile(record.image(), newImagePath);
-        return newImagePath;
     }
 }

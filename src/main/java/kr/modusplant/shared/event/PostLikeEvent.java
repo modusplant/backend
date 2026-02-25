@@ -1,7 +1,7 @@
 package kr.modusplant.shared.event;
 
-import kr.modusplant.shared.exception.InvalidDataException;
-import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
+import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +16,9 @@ public class PostLikeEvent {
 
     public static PostLikeEvent create(UUID memberId, String postId) {
         if (memberId == null) {
-            throw new InvalidDataException(ErrorCode.MEMBER_NOT_FOUND, "memberId");
+            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_MEMBER, "memberId");
         } else if (postId.isEmpty()) {
-            throw new InvalidDataException(ErrorCode.POST_NOT_FOUND, "postId");
+            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_POST, "postId");
         } else {
             return new PostLikeEvent(memberId, postId);
         }

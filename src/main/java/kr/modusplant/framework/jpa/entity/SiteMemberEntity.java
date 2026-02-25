@@ -24,8 +24,8 @@ import static kr.modusplant.shared.persistence.constant.TableName.SITE_MEMBER;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = SITE_MEMBER)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @ToString
 public class SiteMemberEntity {
     @Id
@@ -42,10 +42,6 @@ public class SiteMemberEntity {
     @Column(name = "is_active", nullable = false)
     @DefaultValue
     private Boolean isActive;
-
-    @Column(name = "is_disabled_by_linking", nullable = false)
-    @DefaultValue
-    private Boolean isDisabledByLinking;
 
     @Column(name = "is_banned", nullable = false)
     @DefaultValue
@@ -81,10 +77,6 @@ public class SiteMemberEntity {
 
     public void updateIsActive(Boolean isActive) {
         this.isActive = isActive;
-    }
-
-    public void updateIsDisabledByLinking(Boolean isDisabledByLinking) {
-        this.isDisabledByLinking = isDisabledByLinking;
     }
 
     public void updateIsBanned(Boolean isBanned) {
@@ -124,9 +116,6 @@ public class SiteMemberEntity {
         if (this.isActive == null) {
             this.isActive = true;
         }
-        if (this.isDisabledByLinking == null) {
-            this.isDisabledByLinking = false;
-        }
         if (this.isBanned == null) {
             this.isBanned = false;
         }
@@ -135,12 +124,11 @@ public class SiteMemberEntity {
         }
     }
 
-    private SiteMemberEntity(UUID uuid, String nickname, LocalDate birthDate, Boolean isActive, Boolean isDisabledByLinking, Boolean isBanned, Boolean isDeleted, LocalDateTime loggedInAt) {
+    private SiteMemberEntity(UUID uuid, String nickname, LocalDate birthDate, Boolean isActive, Boolean isBanned, Boolean isDeleted, LocalDateTime loggedInAt) {
         this.uuid = uuid;
         this.nickname = nickname;
         this.birthDate = birthDate;
         this.isActive = isActive;
-        this.isDisabledByLinking = isDisabledByLinking;
         this.isBanned = isBanned;
         this.isDeleted = isDeleted;
         this.loggedInAt = loggedInAt;
@@ -155,7 +143,6 @@ public class SiteMemberEntity {
         private String nickname;
         private LocalDate birthDate;
         private Boolean isActive;
-        private Boolean isDisabledByLinking;
         private Boolean isBanned;
         private Boolean isDeleted;
         private LocalDateTime loggedInAt;
@@ -180,11 +167,6 @@ public class SiteMemberEntity {
             return this;
         }
 
-        public SiteMemberEntityBuilder isDisabledByLinking(final Boolean isDisabledByLinking) {
-            this.isDisabledByLinking = isDisabledByLinking;
-            return this;
-        }
-
         public SiteMemberEntityBuilder isBanned(final Boolean isBanned) {
             this.isBanned = isBanned;
             return this;
@@ -205,7 +187,6 @@ public class SiteMemberEntity {
             this.nickname = member.getNickname();
             this.birthDate = member.getBirthDate();
             this.isActive = member.getIsActive();
-            this.isDisabledByLinking = member.getIsDisabledByLinking();
             this.isBanned = member.getIsBanned();
             this.isDeleted = member.getIsDeleted();
             this.loggedInAt = member.getLoggedInAt();
@@ -213,7 +194,7 @@ public class SiteMemberEntity {
         }
 
         public SiteMemberEntity build() {
-            return new SiteMemberEntity(this.uuid, this.nickname, this.birthDate, this.isActive, this.isDisabledByLinking, this.isBanned, this.isDeleted, this.loggedInAt);
+            return new SiteMemberEntity(this.uuid, this.nickname, this.birthDate, this.isActive, this.isBanned, this.isDeleted, this.loggedInAt);
         }
     }
 }
