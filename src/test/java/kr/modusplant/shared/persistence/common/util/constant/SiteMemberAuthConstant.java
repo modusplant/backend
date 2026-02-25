@@ -14,6 +14,7 @@ public final class SiteMemberAuthConstant {
     public static final String MEMBER_AUTH_BASIC_ADMIN_PW = new BCryptPasswordEncoder().encode("testPw12@");
     public static final AuthProvider MEMBER_AUTH_BASIC_ADMIN_PROVIDER = AuthProvider.BASIC;
     public static final String MEMBER_AUTH_BASIC_ADMIN_ACCESS_TOKEN = "member_auth_basic_admin.access.token";
+    public static final String MEMBER_AUTH_BASIC_ADMIN_AUTHORIZATION = "Bearer " + MEMBER_AUTH_BASIC_ADMIN_ACCESS_TOKEN;
 
     public static final UUID MEMBER_AUTH_BASIC_USER_ACTIVE_MEMBER_UUID = UUID.fromString("d6b716f1-60f7-4c79-aeaf-37037101f126");
     public static final UUID MEMBER_AUTH_BASIC_USER_ORIGINAL_MEMBER_UUID = MEMBER_AUTH_BASIC_USER_ACTIVE_MEMBER_UUID;
@@ -22,6 +23,7 @@ public final class SiteMemberAuthConstant {
     public static final AuthProvider MEMBER_AUTH_BASIC_USER_PROVIDER = AuthProvider.BASIC;
     public static final String MEMBER_AUTH_BASIC_USER_PROVIDER_ID = "";
     public static final String MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN = "member_auth_basic_user.access.token";
+    public static final String MEMBER_AUTH_BASIC_USER_AUTHORIZATION = "Bearer " + MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN;
 
     public static final UUID MEMBER_AUTH_GOOGLE_USER_ACTIVE_MEMBER_UUID = UUID.fromString("6ba6176c-bbc5-4767-9a25-598631918365");
     public static final UUID MEMBER_AUTH_GOOGLE_USER_ORIGINAL_MEMBER_UUID = MEMBER_AUTH_GOOGLE_USER_ACTIVE_MEMBER_UUID;
