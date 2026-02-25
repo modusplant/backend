@@ -693,7 +693,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     void testReportProposalOrBug_givenExistedData_willReportProposalOrBug() throws IOException {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        PropBugRepEntity propBugRepEntity = createPropBugRepEntityBuilderWithUuid().member(memberEntity).build();
+        PropBugRepEntity propBugRepEntity = createPropBugRepEntityBuilderWithUlid().member(memberEntity).build();
 
         given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
         given(memberImageIOHelper.uploadImage(any(MemberId.class), any(ProposalOrBugReportRecord.class))).willReturn(REPORT_IMAGE_PATH);
@@ -713,7 +713,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     void testReportProposalOrBug_givenExistedDataExceptOfImagePath_willReportProposalOrBug() throws IOException {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        PropBugRepEntity propBugRepEntity = createPropBugRepEntityBuilderWithUuid().member(memberEntity).imagePath(null).build();
+        PropBugRepEntity propBugRepEntity = createPropBugRepEntityBuilderWithUlid().member(memberEntity).imagePath(null).build();
 
         given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
