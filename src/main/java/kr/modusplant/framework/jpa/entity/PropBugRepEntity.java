@@ -1,20 +1,19 @@
 package kr.modusplant.framework.jpa.entity;
 
 import jakarta.persistence.*;
+import kr.modusplant.framework.jpa.generator.UlidGenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.UUID;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
 import static kr.modusplant.shared.persistence.constant.TableName.PROP_BUG_REP;
@@ -27,9 +26,9 @@ import static kr.modusplant.shared.persistence.constant.TableName.PROP_BUG_REP;
 @ToString
 public class PropBugRepEntity {
     @Id
-    @UuidGenerator
+    @UlidGenerator
     @Column(nullable = false, updatable = false)
-    private UUID uuid;
+    private String ulid;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = MEMB_UUID, nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
@@ -65,7 +64,7 @@ public class PropBugRepEntity {
     private Long versionNumber;
 
     public String getETagSource() {
-        return getUuid() + "-" + getVersionNumber();
+        return getUlid() + "-" + getVersionNumber();
     }
 
     public LocalDateTime getLastModifiedAtAsTruncatedToSeconds() {
@@ -78,16 +77,16 @@ public class PropBugRepEntity {
 
         if (!(object instanceof PropBugRepEntity that)) return false;
 
-        return new EqualsBuilder().append(getUuid(), that.getUuid()).isEquals();
+        return new EqualsBuilder().append(getUlid(), that.getUlid()).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(getUuid()).toHashCode();
+        return new HashCodeBuilder(17, 37).append(getUlid()).toHashCode();
     }
 
-    private PropBugRepEntity(UUID uuid, SiteMemberEntity member, String title, String content, String imagePath, LocalDateTime checkedAt, LocalDateTime handledAt) {
-        this.uuid = uuid;
+    private PropBugRepEntity(String ulid, SiteMemberEntity member, String title, String content, String imagePath, LocalDateTime checkedAt, LocalDateTime handledAt) {
+        this.ulid = ulid;
         this.member = member;
         this.title = title;
         this.content = content;
@@ -101,7 +100,7 @@ public class PropBugRepEntity {
     }
 
     public static final class PropBugRepEntityBuilder {
-        private UUID uuid;
+        private String ulid;
         private SiteMemberEntity member;
         private String title;
         private String content;
@@ -109,8 +108,8 @@ public class PropBugRepEntity {
         private LocalDateTime checkedAt;
         private LocalDateTime handledAt;
 
-        public PropBugRepEntityBuilder uuid(final UUID uuid) {
-            this.uuid = uuid;
+        public PropBugRepEntityBuilder ulid(final String ulid) {
+            this.ulid = ulid;
             return this;
         }
 
@@ -145,7 +144,7 @@ public class PropBugRepEntity {
         }
 
         public PropBugRepEntityBuilder propBugRep(final PropBugRepEntity propBugRep) {
-            this.uuid = propBugRep.getUuid();
+            this.ulid = propBugRep.getUlid();
             this.member = propBugRep.getMember();
             this.title = propBugRep.getTitle();
             this.content = propBugRep.getContent();
@@ -156,7 +155,7 @@ public class PropBugRepEntity {
         }
 
         public PropBugRepEntity build() {
-            return new PropBugRepEntity(this.uuid, this.member, this.title, this.content, this.imagePath, this.checkedAt, this.handledAt);
+            return new PropBugRepEntity(this.ulid, this.member, this.title, this.content, this.imagePath, this.checkedAt, this.handledAt);
         }
     }
 }
