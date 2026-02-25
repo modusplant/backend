@@ -1,5 +1,6 @@
 package kr.modusplant.domains.account.social.framework.out.client.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import kr.modusplant.domains.account.social.usecase.port.client.dto.SocialUserInfo;
 import lombok.Getter;
 
@@ -7,6 +8,7 @@ import lombok.Getter;
 public class KakaoUserInfo implements SocialUserInfo {
     private Long id;
 
+    @JsonProperty("kakao_account")
     private KakaoAccount kakaoAccount;
 
     @Getter
