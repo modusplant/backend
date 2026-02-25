@@ -34,7 +34,6 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
         CommPostEntity result = postJpaMapper.toPostEntity(
                 post,
                 memberEntity,
-                memberEntity,
                 primaryCategoryEntity,
                 secondaryCategoryEntity,
                 viewCount
@@ -43,7 +42,6 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
         // then
         assertThat(result.getUlid()).isEqualTo(post.getPostId().getValue());
         assertThat(result.getAuthMember()).isEqualTo(memberEntity);
-        assertThat(result.getCreateMember()).isEqualTo(memberEntity);
         assertThat(result.getPrimaryCategory()).isEqualTo(primaryCategoryEntity);
         assertThat(result.getSecondaryCategory()).isEqualTo(secondaryCategoryEntity);
         assertThat(result.getTitle()).isEqualTo(post.getPostContent().getTitle());
@@ -64,7 +62,6 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)
                 .authMember(memberEntity)
-                .createMember(memberEntity)
                 .publishedAt(LocalDateTime.now())
                 .build();
 

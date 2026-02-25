@@ -33,12 +33,12 @@ public class MemberRepositoryJpaAdapter implements MemberRepository {
     }
 
     @Override
-    public Member save(Nickname nickname) {
+    public Member add(Nickname nickname) {
         return memberJpaMapper.toMember(memberJpaRepository.save(memberJpaMapper.toMemberEntity(nickname)));
     }
 
     @Override
-    public Member save(MemberId memberId, Nickname nickname) {
+    public Member add(MemberId memberId, Nickname nickname) {
         return memberJpaMapper.toMember(memberJpaRepository.save(memberJpaMapper.toMemberEntity(memberId, nickname)));
     }
 

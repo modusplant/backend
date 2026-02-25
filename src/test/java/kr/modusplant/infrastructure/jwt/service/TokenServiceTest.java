@@ -5,6 +5,7 @@ import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberRoleEntityTestUtils;
+import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
@@ -17,7 +18,6 @@ import kr.modusplant.infrastructure.jwt.framework.out.jpa.repository.RefreshToke
 import kr.modusplant.infrastructure.jwt.framework.out.redis.AccessTokenRedisRepository;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.security.enums.Role;
-import kr.modusplant.shared.exception.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,7 +28,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -118,7 +121,7 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntit
             given(siteMemberJpaRepository.existsByUuid(memberUuid)).willReturn(false);
 
             // when & then
-            assertThrows(EntityNotFoundException.class, () -> tokenService.issueToken(memberUuid,nickname,email,Role.USER));
+            assertThrows(NotFoundEntityException.class, () -> tokenService.issueToken(memberUuid,nickname,email,Role.USER));
         }
     }
 
@@ -164,13 +167,12 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntit
             // given
             String newRefreshToken = "new_refresh_token";
             String newAccessToken = "new_access_token";
-            SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityBuilder()
-                    .activeMember(memberEntity).originalMember(memberEntity).build();
+            SiteMemberAuthEntity memberAuthEntity = createMemberAuthBasicUserEntityBuilder().member(memberEntity).build();
             given(jwtTokenProvider.validateToken(refreshToken)).willReturn(true);
             given(refreshTokenJpaRepository.existsByRefreshToken(refreshToken)).willReturn(true);
             given(jwtTokenProvider.getMemberUuidFromToken(refreshToken)).willReturn(memberUuid);
             given(siteMemberJpaRepository.findByUuid(memberUuid)).willReturn(Optional.of(memberEntity));
-            given(siteMemberAuthJpaRepository.findByActiveMember(memberEntity)).willReturn(List.of(memberAuthEntity));
+            given(siteMemberAuthJpaRepository.findByMember(memberEntity)).willReturn(Optional.of(memberAuthEntity));
             given(siteMemberRoleJpaRepository.findByUuid(memberUuid)).willReturn(Optional.of(createMemberRoleUserEntityWithUuid()));
             given(jwtTokenProvider.generateRefreshToken(memberUuid)).willReturn(newRefreshToken);
             given(refreshTokenJpaRepository.findByRefreshToken(refreshToken)).willReturn(Optional.of(refreshTokenEntity));

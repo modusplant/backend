@@ -22,8 +22,8 @@ public class IdentityJooqRepository implements IdentityRepository {
     public IdentityAuthResponse getAuthInfo(AccountId id) {
         return dsl.select(memberAuth.EMAIL, memberAuth.PROVIDER, member.CREATED_AT)
                 .from(memberAuth)
-                .join(member).on(memberAuth.ACT_MEMB_UUID.eq(member.UUID))
-                .where(memberAuth.ACT_MEMB_UUID.eq(id.getValue()))
+                .join(member).on(memberAuth.UUID.eq(member.UUID))
+                .where(memberAuth.UUID.eq(id.getValue()))
                 .fetchOne(record -> new IdentityAuthResponse(
                         record.get(memberAuth.EMAIL),
                         AuthProvider.valueOf(record.get(memberAuth.PROVIDER)),

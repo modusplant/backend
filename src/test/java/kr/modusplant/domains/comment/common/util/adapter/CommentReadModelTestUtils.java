@@ -11,7 +11,7 @@ import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUti
 public interface CommentReadModelTestUtils extends PostIdTestUtils, CommentPathTestUtils,
         MemberTestUtils, CommentContentTestUtils {
     CommentReadModel testCommentReadModel = new CommentReadModel(
-            testPostId.getId(), testCommentPath.getPath(), testMemberId.getValue().toString(), testMemberId.getValue().toString(),
+            testPostId.getId(), testCommentPath.getPath(), testMemberId.getValue().toString(),
             testCommentContent.getContent(), false, "2024-11-29T14:30:00+01:00"
     );
 }

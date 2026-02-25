@@ -45,7 +45,6 @@ public class CommCommentJpaRepositoryTest implements
                 .primaryCategory(primaryCategory)
                 .secondaryCategory(secondaryCategory)
                 .authMember(member)
-                .createMember(member)
                 .likeCount(1)
                 .viewCount(1L)
                 .isPublished(true)
@@ -62,7 +61,6 @@ public class CommCommentJpaRepositoryTest implements
         CommCommentEntity commentEntity = createCommCommentEntityBuilder()
                 .postEntity(savedPostEntity)
                 .authMember(savedMemberEntity)
-                .createMember(savedMemberEntity)
                 .isDeleted(true)
                 .build();
 
@@ -82,7 +80,6 @@ public class CommCommentJpaRepositoryTest implements
         CommCommentEntity commentEntity = createCommCommentEntityBuilder()
                 .postEntity(savedPostEntity)
                 .authMember(savedMemberEntity)
-                .createMember(savedMemberEntity)
                 .isDeleted(true)
                 .build();
 
@@ -101,7 +98,6 @@ public class CommCommentJpaRepositoryTest implements
         CommCommentEntity commentEntity = createCommCommentEntityBuilder()
                 .postEntity(savedPostEntity)
                 .authMember(savedMemberEntity)
-                .createMember(savedMemberEntity)
                 .isDeleted(true)
                 .build();
 
@@ -120,7 +116,6 @@ public class CommCommentJpaRepositoryTest implements
         CommCommentEntity commentEntity = createCommCommentEntityBuilder()
                 .postEntity(savedPostEntity)
                 .authMember(savedMemberEntity)
-                .createMember(savedMemberEntity)
                 .isDeleted(true)
                 .build();
 
@@ -139,7 +134,6 @@ public class CommCommentJpaRepositoryTest implements
 //        CommCommentEntity commentEntity = createCommCommentEntityBuilder()
 //                .postEntity(savedPostEntity)
 //                .authMember(savedMemberEntity)
-//                .createMember(savedMemberEntity)
 //                .isDeleted(true)
 //                .build();
 //
@@ -158,7 +152,6 @@ public class CommCommentJpaRepositoryTest implements
         CommCommentEntity commentEntity = createCommCommentEntityBuilder()
                 .postEntity(savedPostEntity)
                 .authMember(savedMemberEntity)
-                .createMember(savedMemberEntity)
                 .isDeleted(true)
                 .build();
 

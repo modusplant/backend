@@ -60,8 +60,7 @@ public class NormalIdentityRepositoryJpaAdapterTest implements SiteMemberEntityT
         savedMember = createMemberBasicUserEntityWithUuid();
 
         authEntityToBeSaved = createMemberAuthBasicUserEntityBuilder()
-                .originalMember(createMemberBasicUserEntityWithUuid())
-                .activeMember(createMemberBasicUserEntityWithUuid())
+                .member(createMemberBasicUserEntityWithUuid())
                 .email(sign.getNormalCredentials().getEmail().getValue())
                 .pw(sign.getNormalCredentials().getPassword().getValue())
                 .provider(AuthProvider.BASIC).build();

@@ -7,10 +7,10 @@ import kr.modusplant.domains.comment.framework.in.web.cache.model.CommentCacheDa
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.framework.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
-import kr.modusplant.shared.exception.EntityNotFoundException;
-import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,7 +46,7 @@ public class CommentCacheService {
             @Nonnull PostId postUlid
     ) {
         CommPostEntity postEntity = postJpaRepository.findByUlid(postUlid.getId())
-                .orElseThrow( () -> new EntityNotFoundException(ErrorCode.POST_NOT_FOUND, "post"));
+                .orElseThrow( () -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post"));
 
         String ETagSource = postEntity.getETagSource();
         LocalDateTime lastModifiedAt = postEntity.getUpdatedAtAsTruncatedToSeconds();
@@ -60,7 +60,7 @@ public class CommentCacheService {
             @Nonnull MemberId memberId
     ) {
         SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId.getValue())
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, "member"));
+                .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, "member"));
 
         String ETagSource = memberEntity.getETagSource();
         LocalDateTime lastModifiedAt = memberEntity.getLastModifiedAtAsTruncatedToSeconds();

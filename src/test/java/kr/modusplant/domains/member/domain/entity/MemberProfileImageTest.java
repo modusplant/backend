@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import static kr.modusplant.domains.member.adapter.util.MemberProfileImageUtils.generateMemberProfileImagePath;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -50,6 +49,7 @@ class MemberProfileImageTest implements MemberProfileImageTestUtils {
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
     void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
-        assertNotEquals(testMemberProfileImage, MemberProfileImage.create(MemberProfileImagePath.create(generateMemberProfileImagePath(UUID.randomUUID(), "image.png")), testMemberProfileImageBytes));
+        UUID id = UUID.randomUUID();
+        assertNotEquals(testMemberProfileImage, MemberProfileImage.create(MemberProfileImagePath.create(String.format("member/%s/profile/%s", id, "image.png")), testMemberProfileImageBytes));
     }
 }
