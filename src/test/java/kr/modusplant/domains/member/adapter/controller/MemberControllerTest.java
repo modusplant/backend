@@ -36,6 +36,7 @@ import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.event.consumer.CommentEventConsumer;
 import kr.modusplant.infrastructure.event.consumer.PostEventConsumer;
 import kr.modusplant.infrastructure.event.consumer.ReportEventConsumer;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
 import kr.modusplant.infrastructure.swear.service.SwearService;
@@ -73,6 +74,7 @@ import static kr.modusplant.shared.event.common.util.PostBookmarkEventTestUtils.
 import static kr.modusplant.shared.event.common.util.PostCancelPostBookmarkEventTestUtils.testPostBookmarkCancelEvent;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.*;
@@ -87,6 +89,7 @@ import static org.mockito.Mockito.verify;
 class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, PostLikeEventTestUtils, CommPostEntityTestUtils, SiteMemberProfileEntityTestUtils, PropBugRepEntityTestUtils {
     private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
     private final SwearService swearService = Mockito.mock(SwearService.class);
+    private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
     private final MemberImageIOHelper memberImageIOHelper = Mockito.mock(MemberImageIOHelper.class);
     private final MemberMapper memberMapper = new MemberMapperImpl();
     private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl(s3FileService);
@@ -108,7 +111,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     private final PostEventConsumer postEventConsumer = new PostEventConsumer(eventBus, commPostLikeRepository, commPostBookmarkRepository, commPostRepository);
     private final CommentEventConsumer commentEventConsumer = new CommentEventConsumer(eventBus, commCommentLikeRepository, commCommentRepository);
     private final ReportEventConsumer reportEventConsumer = new ReportEventConsumer(eventBus, memberJpaRepository, propBugRepJpaRepository);
-    private final MemberController memberController = new MemberController(s3FileService, swearService, memberMapper, memberProfileMapper, memberImageIOHelper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
+    private final MemberController memberController = new MemberController(s3FileService, swearService, jwtTokenProvider, memberMapper, memberProfileMapper, memberImageIOHelper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
 
     @Test
     @DisplayName("register로 회원 등록")
@@ -695,6 +698,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         PropBugRepEntity propBugRepEntity = createPropBugRepEntityBuilderWithUlid().member(memberEntity).build();
 
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
         given(memberImageIOHelper.uploadImage(any(MemberId.class), any(ProposalOrBugReportRecord.class))).willReturn(REPORT_IMAGE_PATH);
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
@@ -715,12 +719,13 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         PropBugRepEntity propBugRepEntity = createPropBugRepEntityBuilderWithUlid().member(memberEntity).imagePath(null).build();
 
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
         given(propBugRepJpaRepository.save(propBugRepEntity)).willReturn(propBugRepEntity);
 
         // when
-        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(MEMBER_BASIC_USER_UUID, REPORT_TITLE, REPORT_CONTENT, null));
+        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN, REPORT_TITLE, REPORT_CONTENT, null));
 
         // then
         verify(memberJpaRepository, times(1)).findByUuid(any());
@@ -731,6 +736,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     @DisplayName("존재하지 않는 회원으로 인해 reportProposalOrBug로 건의 및 버그 제보 실패")
     void testReportProposalOrBug_givenNotFoundMemberId_willThrowException() {
         // given
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         given(memberRepository.getById(any())).willReturn(Optional.empty());
 
         // when

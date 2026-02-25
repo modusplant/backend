@@ -46,6 +46,7 @@ import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.obje
 import static kr.modusplant.shared.persistence.common.util.constant.CommCommentConstant.TEST_COMM_COMMENT_PATH;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
 import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE;
@@ -65,8 +66,7 @@ class MemberRestControllerTest implements MemberTestUtils {
     private final MemberCacheValidationService memberCacheValidationService = Mockito.mock(MemberCacheValidationService.class);
     private final MemberRestController memberRestController = new MemberRestController(memberController, jwtTokenProvider, memberCacheValidationService);
 
-    private final String auth = "Bearer a.b.c";
-    private final String accessToken = "a.b.c";
+    private final String auth = "Bearer " + MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN;
 
     @Test
     @DisplayName("register로 응답 반환")
@@ -108,7 +108,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         String ifModifiedSince = now.atZone(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.RFC_1123_DATE_TIME);
 
         
-        given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(MEMBER_BASIC_USER_UUID);
+        given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
         MemberCacheValidationResult cacheValidationResult = new MemberCacheValidationResult(entityTag, now, true);
         given(memberCacheValidationService.getMemberCacheValidationResult(
                 ifNoneMatch,
@@ -136,7 +136,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         String ifNoneMatch = String.format("\"%s\"", entityTag);
         String ifModifiedSince = now.atZone(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.RFC_1123_DATE_TIME);
 
-        given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(MEMBER_BASIC_USER_UUID);
+        given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
         MemberCacheValidationResult cacheValidationResult = new MemberCacheValidationResult(entityTag, now, false);
         given(memberCacheValidationService.getMemberCacheValidationResult(
                 ifNoneMatch,
@@ -162,7 +162,7 @@ class MemberRestControllerTest implements MemberTestUtils {
     void testOverrideMemberProfile_givenValidParameters_willReturnResponse() throws IOException {
         // given
         
-        given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(MEMBER_BASIC_USER_UUID);
+        given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
         given(memberController.overrideProfile(testMemberProfileOverrideRecord)).willReturn(testMemberProfileResponse);
 
         // when
@@ -179,7 +179,7 @@ class MemberRestControllerTest implements MemberTestUtils {
     void testLikeCommunicationPost_givenValidRequest_willReturnResponse() {
         // given
         
-        given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(MEMBER_BASIC_USER_UUID);
+        given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberController).likePost(testMemberPostLikeRecord);
 
         // when
@@ -194,7 +194,7 @@ class MemberRestControllerTest implements MemberTestUtils {
     @DisplayName("unlikeCommunicationPost로 응답 반환")
     void testUnlikeCommunicationPost_givenValidRequest_willReturnResponse() {
         // given
-        given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(MEMBER_BASIC_USER_UUID);
+        given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberController).unlikePost(testMemberPostUnlikeRecord);
 
         // when
@@ -209,7 +209,7 @@ class MemberRestControllerTest implements MemberTestUtils {
     @DisplayName("bookmarkCommunicationPost로 응답 반환")
     void testBookmarkCommunicationPost_givenValidRequest_willReturnResponse() {
         // given
-        given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(MEMBER_BASIC_USER_UUID);
+        given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberController).bookmarkPost(testMemberPostBookmarkRecord);
 
         // when
@@ -224,7 +224,7 @@ class MemberRestControllerTest implements MemberTestUtils {
     @DisplayName("cancelCommunicationPostBookmark로 응답 반환")
     void testCancelCommunicationPostBookmark_givenValidRequest_willReturnResponse() {
         // given
-        given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(MEMBER_BASIC_USER_UUID);
+        given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberController).cancelPostBookmark(testMemberPostBookmarkCancelRecord);
 
         // when
@@ -239,7 +239,7 @@ class MemberRestControllerTest implements MemberTestUtils {
     @DisplayName("likeCommunicationComment로 응답 반환")
     void testLikeCommunicationComment_givenValidRequest_willReturnResponse() {
         // given
-        given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(MEMBER_BASIC_USER_UUID);
+        given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberController).likeComment(testMemberCommentLikeRecord);
 
         // when
@@ -254,7 +254,7 @@ class MemberRestControllerTest implements MemberTestUtils {
     @DisplayName("unlikeCommunicationComment로 응답 반환")
     void testUnlikeCommunicationComment_givenValidRequest_willReturnResponse() {
         // given
-        given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(MEMBER_BASIC_USER_UUID);
+        given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberController).unlikeComment(testMemberCommentUnlikeRecord);
 
         // when
@@ -269,11 +269,11 @@ class MemberRestControllerTest implements MemberTestUtils {
     @DisplayName("reportProposalOrBug로 응답 반환")
     void testReportProposalOrBug_givenValidRequest_willReturnResponse() throws IOException {
         // given
-        given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(MEMBER_BASIC_USER_UUID);
+        given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberController).reportProposalOrBug(testProposalOrBugReportRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportProposalOrBug(MEMBER_BASIC_USER_UUID, REPORT_TITLE, REPORT_CONTENT, REPORT_IMAGE, auth);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportProposalOrBug(REPORT_TITLE, REPORT_CONTENT, REPORT_IMAGE, auth);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -284,7 +284,7 @@ class MemberRestControllerTest implements MemberTestUtils {
     @DisplayName("자신과 다른 UUID가 저장된 Authorization 사용으로 응답 반환 실패")
     void testValidateTokenAndAccessToId_givenTokenWithoutMyUuid_willThrowExceptionFromToken() {
         // given
-        given(jwtTokenProvider.getMemberUuidFromToken(accessToken)).willReturn(UUID.randomUUID());
+        given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(UUID.randomUUID());
 
         // when
         IncorrectMemberIdException incorrectMemberIdException = assertThrows(IncorrectMemberIdException.class, () -> memberRestController.getMemberProfile(MEMBER_BASIC_USER_UUID, auth, null, null));
