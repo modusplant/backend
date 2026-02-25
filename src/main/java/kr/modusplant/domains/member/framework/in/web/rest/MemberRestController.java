@@ -401,16 +401,8 @@ public class MemberRestController {
             description = "건의 사항 또는 버그를 제보합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping(value = "/{id}/report/proposal-or-bug", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/proposal-or-bug", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> reportProposalOrBug(
-            @Parameter(
-                    description = "기존에 저장된 회원의 아이디",
-                    schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID)
-            )
-            @PathVariable(required = false)
-            @NotNull(message = "회원 아이디가 비어 있습니다. ")
-            UUID id,
-
             @Parameter(description = "보고서 제목", example = "제보합니다!")
             @RequestPart(name = "title")
             String title,
@@ -429,9 +421,8 @@ public class MemberRestController {
             @Parameter(hidden = true)
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String auth) throws IOException {
-        validateMemberIdFromToken(id, auth);
-        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(id, title, content, image));
+            String accessToken) throws IOException {
+        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(accessToken, title, content, image));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

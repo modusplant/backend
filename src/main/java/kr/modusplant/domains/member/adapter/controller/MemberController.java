@@ -23,6 +23,7 @@ import kr.modusplant.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.infrastructure.event.bus.EventBus;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.*;
@@ -48,6 +49,7 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 public class MemberController {
     private final S3FileService s3FileService;
     private final SwearService swearService;
+    private final JwtTokenProvider jwtTokenProvider;
     private final MemberMapper memberMapper;
     private final MemberProfileMapper memberProfileMapper;
     private final MemberImageIOHelper memberImageIOHelper;
@@ -175,7 +177,7 @@ public class MemberController {
     }
 
     public void reportProposalOrBug(ProposalOrBugReportRecord record) throws IOException {
-        MemberId memberId = MemberId.fromUuid(record.memberId());
+        MemberId memberId = MemberId.fromUuid(jwtTokenProvider.getMemberUuidFromToken(record.accessToken()));
         ReportTitle reportTitle = ReportTitle.create(record.title());
         ReportContent reportContent = ReportContent.create(record.content());
         ReportImagePath reportImagePath;
