@@ -421,8 +421,10 @@ public class MemberRestController {
             @Parameter(hidden = true)
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String accessToken) throws IOException {
-        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(accessToken, title, content, image));
+            String auth) throws IOException {
+        memberController.reportProposalOrBug(
+                new ProposalOrBugReportRecord(
+                        getTokenFromAuthorizationHeader(auth), title, content, image));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
