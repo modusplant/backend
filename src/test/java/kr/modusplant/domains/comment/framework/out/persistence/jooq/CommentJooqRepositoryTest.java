@@ -5,20 +5,20 @@ import kr.modusplant.domains.comment.common.util.domain.CommentContentTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentPathTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
 import kr.modusplant.framework.aws.service.S3FileService;
-import org.jooq.DSLContext;
-import org.jooq.Record6;
-import org.jooq.Result;
-import org.jooq.SQLDialect;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.tools.jdbc.MockConnection;
 import org.jooq.tools.jdbc.MockDataProvider;
 import org.jooq.tools.jdbc.MockExecuteContext;
 import org.jooq.tools.jdbc.MockResult;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CommentJooqRepositoryTest implements
         PostIdTestUtils, AuthorTestUtils, CommentPathTestUtils,
@@ -37,32 +37,40 @@ public class CommentJooqRepositoryTest implements
 
     private final MockConnection connection = new MockConnection(provider);
     private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
-    private final DSLContext dsl = DSL.using(connection, SQLDialect.POSTGRES);
-    private final CommentJooqRepository repository = new CommentJooqRepository(dsl);
+//    private final DSLContext dsl = DSL.using(connection, SQLDialect.POSTGRES);
+//    private final CommentJooqRepository repository = new CommentJooqRepository(dsl);
     private final LocalDateTime testDateTime = LocalDateTime.parse("2025-10-16 14:30:45", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-    @BeforeEach
-    void setUp() {
-        Record6<String, String, String, String, Boolean, LocalDateTime> testRecord = dsl.newRecord(
-                DSL.field("ulid", String.class),
-                DSL.field("path", String.class),
-                DSL.field("nickname", String.class),
-                DSL.field("content", String.class),
-                DSL.field("is_deleted", Boolean.class),
-                DSL.field("created_at", LocalDateTime.class)
-        );
+    private CommentJooqRepository createRepository(MockDataProvider provider) {
+        MockConnection connection = new MockConnection(provider);
+        DSLContext dsl = DSL.using(connection, SQLDialect.POSTGRES);
+        return new CommentJooqRepository(dsl);
+    }
 
-        testRecord.value1(testPostId.getId());
-        testRecord.value2(testCommentPath.getPath());
-        testRecord.value3("테스트 닉네임"); // TODO: 댓글용 테스트 닉네임을 만들거나 할 것.
-//        testRecord.value3(testNickname.getNickname());
-        testRecord.value4(testCommentContent.getContent());
-        testRecord.value5(false);
-        testRecord.value6(testDateTime);
+    @Test
+    @DisplayName("게시글의 식별자와 댓글 경로로 댓글 엔티티가 존재하는지 확인")
+    void testExistsByPostAndPath_givenValidPostUlidAndCommentPath_willReturnTrue() {
+        // given
+        MockDataProvider provider = ctx -> {
+            Object[] bindings = ctx.bindings();
 
-        testResult = dsl.newResult(testRecord.field1(), testRecord.field2(), testRecord.field3(),
-                        testRecord.field4(), testRecord.field5(), testRecord.field6());
-        testResult.add(testRecord);
+            if (bindings[0].equals(testPostId.getId()) && bindings[1].equals(testCommentPath.getPath())) {
+                DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+                Field<Boolean> existsField = DSL.field("exists", Boolean.class);
+                Result<Record1<Boolean>> result = dsl.newResult(existsField);
+                result.add(dsl.newRecord(existsField).values(true));
+
+                return new MockResult[] { new MockResult(0, result)};
+            }
+            return new MockResult[] { new MockResult(0, null) };
+        };
+        CommentJooqRepository repository = createRepository(provider);
+
+        // when
+        boolean result = repository.existsByPostAndPath(testPostId, testCommentPath);
+
+        // then
+        assertThat(result).isEqualTo(true);
     }
 
 //    @Test
