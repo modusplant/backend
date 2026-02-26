@@ -21,8 +21,8 @@ import static kr.modusplant.shared.persistence.constant.TableName.SITE_MEMBER_TE
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = SITE_MEMBER_TERM)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @ToString
 public class SiteMemberTermEntity {
     @Id

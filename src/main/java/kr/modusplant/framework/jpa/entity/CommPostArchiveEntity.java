@@ -22,11 +22,10 @@ import java.util.UUID;
 import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
 import static kr.modusplant.shared.persistence.constant.TableName.COMM_POST_ARCHIVE;
 
-
 @Entity
 @Table(name = COMM_POST_ARCHIVE)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @ToString
 public class CommPostArchiveEntity {
     @Id

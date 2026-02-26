@@ -1,15 +1,19 @@
 package kr.modusplant.domains.member.adapter.controller;
 
+import kr.modusplant.domains.member.adapter.helper.MemberImageIOHelper;
 import kr.modusplant.domains.member.adapter.mapper.MemberMapperImpl;
 import kr.modusplant.domains.member.adapter.mapper.MemberProfileMapperImpl;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberProfileTestUtils;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
-import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
+import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileImage;
 import kr.modusplant.domains.member.domain.vo.MemberId;
-import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
+import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberProfileRepositoryJpaAdapter;
 import kr.modusplant.domains.member.framework.out.jpa.repository.MemberRepositoryJpaAdapter;
+import kr.modusplant.domains.member.framework.out.jpa.repository.TargetCommentIdRepositoryJpaAdapter;
+import kr.modusplant.domains.member.framework.out.jpa.repository.TargetPostIdRepositoryJpaAdapter;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
@@ -17,10 +21,12 @@ import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
 import kr.modusplant.domains.member.usecase.port.repository.TargetCommentIdRepository;
 import kr.modusplant.domains.member.usecase.port.repository.TargetPostIdRepository;
 import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord;
+import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jpa.entity.*;
 import kr.modusplant.framework.jpa.entity.common.util.CommPostEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.common.util.PropBugRepEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberProfileEntityTestUtils;
 import kr.modusplant.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
@@ -29,6 +35,8 @@ import kr.modusplant.framework.jpa.repository.*;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.event.consumer.CommentEventConsumer;
 import kr.modusplant.infrastructure.event.consumer.PostEventConsumer;
+import kr.modusplant.infrastructure.event.consumer.ReportEventConsumer;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
 import kr.modusplant.infrastructure.swear.service.SwearService;
@@ -56,6 +64,7 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberPost
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileGetRecordTestUtils.testMemberProfileGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.request.MemberRegisterRequestTestUtils.testMemberRegisterRequest;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberResponseTestUtils.testMemberResponse;
@@ -64,10 +73,11 @@ import static kr.modusplant.shared.event.common.util.CommentLikeEventTestUtils.t
 import static kr.modusplant.shared.event.common.util.PostBookmarkEventTestUtils.testPostBookmarkEvent;
 import static kr.modusplant.shared.event.common.util.PostCancelPostBookmarkEventTestUtils.testPostBookmarkCancelEvent;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
+import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_URL;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -76,45 +86,54 @@ import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, PostLikeEventTestUtils, CommPostEntityTestUtils, SiteMemberProfileEntityTestUtils {
+class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, PostLikeEventTestUtils, CommPostEntityTestUtils, SiteMemberProfileEntityTestUtils, PropBugRepEntityTestUtils {
     private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
     private final SwearService swearService = Mockito.mock(SwearService.class);
+    private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
+    private final MemberImageIOHelper memberImageIOHelper = Mockito.mock(MemberImageIOHelper.class);
     private final MemberMapper memberMapper = new MemberMapperImpl();
     private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl(s3FileService);
+
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryJpaAdapter.class);
-    private final MemberProfileRepository memberProfileRepository = Mockito.mock(MemberProfileRepository.class);
-    private final CommPostLikeJpaRepository commPostLikeRepository = Mockito.mock(CommPostLikeJpaRepository.class);
-    private final CommPostBookmarkJpaRepository commPostBookmarkRepository = Mockito.mock(CommPostBookmarkJpaRepository.class);
-    private final CommPostJpaRepository commPostRepository = Mockito.mock(CommPostJpaRepository.class);
-    private final CommCommentLikeJpaRepository commCommentLikeRepository = Mockito.mock(CommCommentLikeJpaRepository.class);
-    private final CommCommentJpaRepository commCommentRepository = Mockito.mock(CommCommentJpaRepository.class);
-    private final TargetPostIdRepository targetPostIdRepository = Mockito.mock(TargetPostIdRepository.class);
-    private final TargetCommentIdRepository targetCommentIdRepository = Mockito.mock(TargetCommentIdRepository.class);
+    private final MemberProfileRepository memberProfileRepository = Mockito.mock(MemberProfileRepositoryJpaAdapter.class);
+    private final TargetPostIdRepository targetPostIdRepository = Mockito.mock(TargetPostIdRepositoryJpaAdapter.class);
+    private final TargetCommentIdRepository targetCommentIdRepository = Mockito.mock(TargetCommentIdRepositoryJpaAdapter.class);
+
+    private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
+    private final CommPostJpaRepository postJpaRepository = Mockito.mock(CommPostJpaRepository.class);
+    private final CommPostLikeJpaRepository postLikeJpaRepository = Mockito.mock(CommPostLikeJpaRepository.class);
+    private final CommPostBookmarkJpaRepository postBookmarkJpaRepository = Mockito.mock(CommPostBookmarkJpaRepository.class);
+    private final CommCommentJpaRepository commentJpaRepository = Mockito.mock(CommCommentJpaRepository.class);
+    private final CommCommentLikeJpaRepository commentLikeJpaRepository = Mockito.mock(CommCommentLikeJpaRepository.class);
+    private final PropBugRepJpaRepository propBugRepJpaRepository = Mockito.mock(PropBugRepJpaRepository.class);
+    private final CommPostAbuRepJpaRepository postAbuRepJpaRepository = Mockito.mock(CommPostAbuRepJpaRepository.class);
+
     private final EventBus eventBus = new EventBus();
-    private final PostEventConsumer postEventConsumer = new PostEventConsumer(eventBus, commPostLikeRepository, commPostBookmarkRepository, commPostRepository);
-    private final CommentEventConsumer commentEventConsumer = new CommentEventConsumer(eventBus, commCommentLikeRepository, commCommentRepository);
-    private final MemberController memberController = new MemberController(s3FileService, swearService, memberMapper, memberProfileMapper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
+    private final PostEventConsumer postEventConsumer = new PostEventConsumer(eventBus, postLikeJpaRepository, postBookmarkJpaRepository, postJpaRepository);
+    private final CommentEventConsumer commentEventConsumer = new CommentEventConsumer(eventBus, commentLikeJpaRepository, commentJpaRepository);
+    private final ReportEventConsumer reportEventConsumer = new ReportEventConsumer(eventBus, memberJpaRepository, postJpaRepository, propBugRepJpaRepository, postAbuRepJpaRepository);
+    private final MemberController memberController = new MemberController(s3FileService, swearService, jwtTokenProvider, memberMapper, memberProfileMapper, memberImageIOHelper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
 
     @Test
     @DisplayName("register로 회원 등록")
-    void testRegister_givenValidRegisterRequest_willReturnResponse() {
+    void testRegister_givenValidRegisterMemberRequest_willReturnResponse() {
         // given
         given(memberRepository.isNicknameExist(any())).willReturn(false);
-        given(memberRepository.save(any())).willReturn(createMember());
+        given(memberRepository.add(any())).willReturn(createMember());
 
         // when & then
-        assertThat(memberController.register(testMemberRegisterRequest)).isEqualTo(testMemberResponse);
+        assertThat(memberController.registerMember(testMemberRegisterRequest)).isEqualTo(testMemberResponse);
     }
 
     @Test
     @DisplayName("중복된 닉네임으로 인해 register로 회원 등록 실패")
-    void testValidateBeforeRegister_givenAlreadyExistedNickname_willThrowException() {
+    void testValidateBeforeRegister_Member_givenAlreadyExistedNickname_willThrowException() {
         // given
         given(memberRepository.isNicknameExist(any())).willReturn(true);
 
         // when & then
         ExistsEntityException alreadyExistedNicknameException = assertThrows(
-                ExistsEntityException.class, () -> memberController.register(testMemberRegisterRequest));
+                ExistsEntityException.class, () -> memberController.registerMember(testMemberRegisterRequest));
         assertThat(alreadyExistedNicknameException.getErrorCode()).isEqualTo(KernelErrorCode.EXISTS_NICKNAME);
     }
 
@@ -147,11 +166,11 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(memberRepository.getById(any())).willReturn(Optional.empty());
 
         // when
-        NotFoundEntityException NotFoundEntityException = assertThrows(NotFoundEntityException.class,
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
                 () -> memberController.getProfile(testMemberProfileGetRecord));
 
         // then
-        assertThat(NotFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
     @Test
@@ -175,8 +194,8 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(memberProfileRepository.getById(any())).willReturn(Optional.of(memberProfile));
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
+        given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
         willDoNothing().given(s3FileService).deleteFiles(any());
-        willDoNothing().given(s3FileService).uploadFile(any(), any());
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
         given(s3FileService.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
@@ -200,13 +219,13 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(memberProfileRepository.getById(any())).willReturn(Optional.of(
                 MemberProfile.create(
                         testMemberId,
-                        MemberEmptyProfileImage.create(),
+                        EmptyMemberProfileImage.create(),
                         testMemberProfileIntroduction,
                         testNormalUserNickname))
         );
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(s3FileService).deleteFiles(any());
-        willDoNothing().given(s3FileService).uploadFile(any(), any());
+        given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
         given(s3FileService.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
@@ -224,7 +243,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     @DisplayName("존재하는 않는 데이터로 overrideProfile로 프로필 덮어쓰기")
     void testOverrideProfile_givenNotFoundData_willReturnResponse() throws IOException {
         // given
-        MemberProfile memberProfile = MemberProfile.create(testMemberId, MemberEmptyProfileImage.create(), MemberEmptyProfileIntroduction.create(), testNormalUserNickname);
+        MemberProfile memberProfile = MemberProfile.create(testMemberId, EmptyMemberProfileImage.create(), EmptyMemberProfileIntroduction.create(), testNormalUserNickname);
         given(memberRepository.isIdExist(any())).willReturn(true);
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(memberProfileRepository.getById(any())).willReturn(Optional.of(memberProfile));
@@ -241,7 +260,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         assertThat(memberProfileResponse.introduction()).isEqualTo(null);
         assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
     }
-    
+
     @Test
     @DisplayName("존재하지 않는 아이디로 인해 overrideProfile로 프로필 덮어쓰기 실패")
     void testValidateMemberIdAndNicknameBeforeOverrideProfile_givenNotFoundId_willThrowException() {
@@ -307,16 +326,16 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(targetPostIdRepository.isPublished(any())).willReturn(true);
         given(targetPostIdRepository.isUnliked(any(), any())).willReturn(true);
         CommPostLikeEntity postLikeEntity = CommPostLikeEntity.of(postId, memberId);
-        given(commPostLikeRepository.save(postLikeEntity)).willReturn(postLikeEntity);
+        given(postLikeJpaRepository.save(postLikeEntity)).willReturn(postLikeEntity);
         Optional<CommPostEntity> postEntity = Optional.of(CommPostEntity.builder().ulid(postId).likeCount(1).build());
-        given(commPostRepository.findByUlid(postId)).willReturn(postEntity);
+        given(postJpaRepository.findByUlid(postId)).willReturn(postEntity);
 
         // when
         memberController.likePost(testMemberPostLikeRecord);
 
         // then
-        verify(commPostLikeRepository, times(1)).save(any());
-        verify(commPostRepository, times(1)).findByUlid(any());
+        verify(postLikeJpaRepository, times(1)).save(any());
+        verify(postJpaRepository, times(1)).findByUlid(any());
         assertThat(postEntity.orElseThrow().getLikeCount()).isEqualTo(2);
     }
 
@@ -333,8 +352,8 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         memberController.likePost(testMemberPostLikeRecord);
 
         // then
-        verify(commPostLikeRepository, times(0)).save(any());
-        verify(commPostRepository, times(0)).findByUlid(any());
+        verify(postLikeJpaRepository, times(0)).save(any());
+        verify(postJpaRepository, times(0)).findByUlid(any());
     }
 
     @Test
@@ -348,16 +367,16 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(targetPostIdRepository.isPublished(any())).willReturn(true);
         given(targetPostIdRepository.isLiked(any(), any())).willReturn(true);
         CommPostLikeEntity postLikeEntity = CommPostLikeEntity.of(postId, memberId);
-        willDoNothing().given(commPostLikeRepository).delete(postLikeEntity);
+        willDoNothing().given(postLikeJpaRepository).delete(postLikeEntity);
         Optional<CommPostEntity> postEntity = Optional.of(CommPostEntity.builder().ulid(postId).likeCount(1).build());
-        given(commPostRepository.findByUlid(postId)).willReturn(postEntity);
+        given(postJpaRepository.findByUlid(postId)).willReturn(postEntity);
 
         // when
         memberController.unlikePost(testMemberPostUnlikeRecord);
 
         // then
-        verify(commPostLikeRepository, times(1)).delete(any());
-        verify(commPostRepository, times(1)).findByUlid(any());
+        verify(postLikeJpaRepository, times(1)).delete(any());
+        verify(postJpaRepository, times(1)).findByUlid(any());
         assertThat(postEntity.orElseThrow().getLikeCount()).isEqualTo(0);
     }
 
@@ -374,8 +393,8 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         memberController.unlikePost(testMemberPostUnlikeRecord);
 
         // then
-        verify(commPostLikeRepository, times(0)).delete(any());
-        verify(commPostRepository, times(0)).findByUlid(any());
+        verify(postLikeJpaRepository, times(0)).delete(any());
+        verify(postJpaRepository, times(0)).findByUlid(any());
     }
 
     @Test
@@ -389,13 +408,13 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(targetPostIdRepository.isPublished(any())).willReturn(true);
         given(targetPostIdRepository.isNotBookmarked(any(), any())).willReturn(true);
         CommPostBookmarkEntity postBookmarkEntity = CommPostBookmarkEntity.of(postId, memberId);
-        given(commPostBookmarkRepository.save(postBookmarkEntity)).willReturn(postBookmarkEntity);
+        given(postBookmarkJpaRepository.save(postBookmarkEntity)).willReturn(postBookmarkEntity);
 
         // when
         memberController.bookmarkPost(testMemberPostBookmarkRecord);
 
         // then
-        verify(commPostBookmarkRepository, times(1)).save(any());
+        verify(postBookmarkJpaRepository, times(1)).save(any());
     }
 
     @Test
@@ -411,7 +430,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         memberController.bookmarkPost(testMemberPostBookmarkRecord);
 
         // then
-        verify(commPostBookmarkRepository, times(0)).save(any());
+        verify(postBookmarkJpaRepository, times(0)).save(any());
     }
 
     @Test
@@ -425,13 +444,13 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(targetPostIdRepository.isPublished(any())).willReturn(true);
         given(targetPostIdRepository.isBookmarked(any(), any())).willReturn(true);
         CommPostBookmarkEntity postBookmarkEntity = CommPostBookmarkEntity.of(postId, memberId);
-        willDoNothing().given(commPostBookmarkRepository).delete(postBookmarkEntity);
+        willDoNothing().given(postBookmarkJpaRepository).delete(postBookmarkEntity);
 
         // when
         memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord);
 
         // then
-        verify(commPostBookmarkRepository, times(1)).delete(any());
+        verify(postBookmarkJpaRepository, times(1)).delete(any());
     }
 
     @Test
@@ -447,7 +466,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord);
 
         // then
-        verify(commPostBookmarkRepository, times(0)).delete(any());
+        verify(postBookmarkJpaRepository, times(0)).delete(any());
     }
 
     @Test
@@ -569,16 +588,16 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(targetCommentIdRepository.isIdExist(any())).willReturn(true);
         given(targetCommentIdRepository.isUnliked(any(), any())).willReturn(true);
         CommCommentLikeEntity commentLikeEntity = CommCommentLikeEntity.of(postId, path, memberId);
-        given(commCommentLikeRepository.save(commentLikeEntity)).willReturn(commentLikeEntity);
+        given(commentLikeJpaRepository.save(commentLikeEntity)).willReturn(commentLikeEntity);
         Optional<CommCommentEntity> commentEntity = Optional.of(CommCommentEntity.builder().postEntity(createCommPostEntityBuilder().ulid(postId).build()).path(path).likeCount(1).build());
-        given(commCommentRepository.findByPostUlidAndPath(postId, path)).willReturn(commentEntity);
+        given(commentJpaRepository.findByPostUlidAndPath(postId, path)).willReturn(commentEntity);
 
         // when
         memberController.likeComment(testMemberCommentLikeRecord);
 
         // then
-        verify(commCommentLikeRepository, times(1)).save(any());
-        verify(commCommentRepository, times(1)).findByPostUlidAndPath(any(), any());
+        verify(commentLikeJpaRepository, times(1)).save(any());
+        verify(commentJpaRepository, times(1)).findByPostUlidAndPath(any(), any());
         assertThat(commentEntity.orElseThrow().getLikeCount()).isEqualTo(2);
     }
 
@@ -594,8 +613,8 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         memberController.likeComment(testMemberCommentLikeRecord);
 
         // then
-        verify(commCommentLikeRepository, times(0)).save(any());
-        verify(commCommentRepository, times(0)).findByPostUlidAndPath(any(), any());
+        verify(commentLikeJpaRepository, times(0)).save(any());
+        verify(commentJpaRepository, times(0)).findByPostUlidAndPath(any(), any());
     }
 
     @Test
@@ -609,16 +628,16 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(targetCommentIdRepository.isIdExist(any())).willReturn(true);
         given(targetCommentIdRepository.isLiked(any(), any())).willReturn(true);
         CommCommentLikeEntity commentLikeEntity = CommCommentLikeEntity.of(postId, path, memberId);
-        given(commCommentLikeRepository.save(commentLikeEntity)).willReturn(commentLikeEntity);
+        given(commentLikeJpaRepository.save(commentLikeEntity)).willReturn(commentLikeEntity);
         Optional<CommCommentEntity> commentEntity = Optional.of(CommCommentEntity.builder().postEntity(createCommPostEntityBuilder().ulid(postId).build()).path(path).likeCount(1).build());
-        given(commCommentRepository.findByPostUlidAndPath(postId, path)).willReturn(commentEntity);
+        given(commentJpaRepository.findByPostUlidAndPath(postId, path)).willReturn(commentEntity);
 
         // when
         memberController.unlikeComment(testMemberCommentUnlikeRecord);
 
         // then
-        verify(commCommentLikeRepository, times(1)).delete(any());
-        verify(commCommentRepository, times(1)).findByPostUlidAndPath(any(), any());
+        verify(commentLikeJpaRepository, times(1)).delete(any());
+        verify(commentJpaRepository, times(1)).findByPostUlidAndPath(any(), any());
         assertThat(commentEntity.orElseThrow().getLikeCount()).isEqualTo(0);
     }
 
@@ -634,8 +653,8 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         memberController.unlikeComment(testMemberCommentUnlikeRecord);
 
         // then
-        verify(commCommentLikeRepository, times(0)).delete(any());
-        verify(commCommentRepository, times(0)).findByPostUlidAndPath(any(), any());
+        verify(commentLikeJpaRepository, times(0)).delete(any());
+        verify(commentJpaRepository, times(0)).findByPostUlidAndPath(any(), any());
     }
 
     @Test
@@ -671,5 +690,61 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         // then
         assertThat(NotFoundEntityExceptionForLike.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID);
         assertThat(NotFoundEntityExceptionForUnlike.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID);
+    }
+
+    @Test
+    @DisplayName("이미지 경로를 포함해서 존재하는 모든 데이터로 reportProposalOrBug로 건의 및 버그 제보")
+    void testReportProposalOrBug_givenExistedData_willReportProposalOrBug() throws IOException {
+        // given
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        PropBugRepEntity propBugRepEntity = createPropBugRepEntityBuilderWithUlid().member(memberEntity).build();
+
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
+        given(memberImageIOHelper.uploadImage(any(MemberId.class), any(ProposalOrBugReportRecord.class))).willReturn(REPORT_IMAGE_PATH);
+        given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
+        given(propBugRepJpaRepository.save(propBugRepEntity)).willReturn(propBugRepEntity);
+
+        // when
+        memberController.reportProposalOrBug(testProposalOrBugReportRecord);
+
+        // then
+        verify(memberJpaRepository, times(1)).findByUuid(any());
+        verify(propBugRepJpaRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("이미지 경로를 제외한 존재하는 모든 데이터로 reportProposalOrBug로 건의 및 버그 제보")
+    void testReportProposalOrBug_givenExistedDataExceptOfImagePath_willReportProposalOrBug() throws IOException {
+        // given
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        PropBugRepEntity propBugRepEntity = createPropBugRepEntityBuilderWithUlid().member(memberEntity).imagePath(null).build();
+
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
+        given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
+        given(propBugRepJpaRepository.save(propBugRepEntity)).willReturn(propBugRepEntity);
+
+        // when
+        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN, REPORT_TITLE, REPORT_CONTENT, null));
+
+        // then
+        verify(memberJpaRepository, times(1)).findByUuid(any());
+        verify(propBugRepJpaRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원으로 인해 reportProposalOrBug로 건의 및 버그 제보 실패")
+    void testReportProposalOrBug_givenNotFoundMemberId_willThrowException() {
+        // given
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        given(memberRepository.getById(any())).willReturn(Optional.empty());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
+                () -> memberController.reportProposalOrBug(testProposalOrBugReportRecord));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 }

@@ -19,8 +19,8 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_PRI_CATE;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = COMM_PRI_CATE)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @ToString
 public class CommPrimaryCategoryEntity {
     @Id

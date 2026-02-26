@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.domain.vo.nullobject;
 
-import kr.modusplant.domains.member.domain.vo.MemberProfileImageBytes;
+import kr.modusplant.domains.member.domain.vo.ReportImagePath;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,14 +9,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class MemberEmptyProfileImageBytes extends MemberProfileImageBytes {
+public class EmptyReportImagePath extends ReportImagePath {
 
-    public static MemberEmptyProfileImageBytes create() {
-        return new MemberEmptyProfileImageBytes();
+    public static EmptyReportImagePath create() {
+        return new EmptyReportImagePath();
     }
 
     @Override
-    public byte[] getValue() {
+    public String getValue() {
         return null;
     }
 
@@ -24,9 +24,9 @@ public class MemberEmptyProfileImageBytes extends MemberProfileImageBytes {
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof MemberProfileImageBytes memberProfileImageBytes)) return false;
+        if (!(o instanceof ReportImagePath reportImagePath)) return false;
 
-        return new EqualsBuilder().append(getValue(), memberProfileImageBytes.getValue()).isEquals();
+        return new EqualsBuilder().append(getValue(), reportImagePath.getValue()).isEquals();
     }
 
     @Override

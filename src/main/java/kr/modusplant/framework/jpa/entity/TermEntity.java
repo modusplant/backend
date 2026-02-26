@@ -24,8 +24,8 @@ import static kr.modusplant.shared.util.VersionUtils.createVersion;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = TERM)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @ToString
 public class TermEntity {
     @Id

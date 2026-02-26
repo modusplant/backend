@@ -1,11 +1,13 @@
 package kr.modusplant.domains.member.adapter.controller;
 
+import kr.modusplant.domains.member.adapter.helper.MemberImageIOHelper;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
-import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
+import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileImage;
 import kr.modusplant.domains.member.domain.vo.*;
-import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
+import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
+import kr.modusplant.domains.member.domain.vo.nullobject.EmptyReportImagePath;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
@@ -21,6 +23,7 @@ import kr.modusplant.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.infrastructure.event.bus.EventBus;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.*;
@@ -36,7 +39,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Optional;
 
-import static kr.modusplant.domains.member.adapter.util.MemberProfileImageUtils.generateMemberProfileImagePath;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 
 @SuppressWarnings("LoggingSimilarMessage")
@@ -47,18 +49,20 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 public class MemberController {
     private final S3FileService s3FileService;
     private final SwearService swearService;
+    private final JwtTokenProvider jwtTokenProvider;
     private final MemberMapper memberMapper;
     private final MemberProfileMapper memberProfileMapper;
+    private final MemberImageIOHelper memberImageIOHelper;
     private final MemberRepository memberRepository;
     private final MemberProfileRepository memberProfileRepository;
     private final TargetPostIdRepository targetPostIdRepository;
     private final TargetCommentIdRepository targetCommentIdRepository;
     private final EventBus eventBus;
 
-    public MemberResponse register(MemberRegisterRequest request) {
+    public MemberResponse registerMember(MemberRegisterRequest request) {
         Nickname nickname = Nickname.create(request.nickname());
         validateBeforeRegister(nickname);
-        return memberMapper.toMemberResponse(memberRepository.save(nickname));
+        return memberMapper.toMemberResponse(memberRepository.add(nickname));
     }
 
     @Transactional(readOnly = true)
@@ -70,10 +74,7 @@ public class MemberController {
     @Transactional(readOnly = true)
     public MemberProfileResponse getProfile(MemberProfileGetRecord record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
-        Optional<Member> optionalMember = memberRepository.getById(memberId);
-        if (optionalMember.isEmpty()) {
-            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
-        }
+        validateIfMemberExists(memberId);
         Optional<MemberProfile> optionalMemberProfile = memberProfileRepository.getById(memberId);
         if (optionalMemberProfile.isPresent()) {
             return memberProfileMapper.toMemberProfileResponse(optionalMemberProfile.orElseThrow());
@@ -103,19 +104,19 @@ public class MemberController {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE, "memberProfile");
         }
         if (!(image == null)) {
-            String newImagePath = uploadImage(memberId, record);
+            String newImagePath = memberImageIOHelper.uploadImage(memberId, record);
             memberProfileImage = MemberProfileImage.create(
                     MemberProfileImagePath.create(newImagePath),
                     MemberProfileImageBytes.create(image.getBytes())
             );
         } else {
-            memberProfileImage = MemberEmptyProfileImage.create();
+            memberProfileImage = EmptyMemberProfileImage.create();
         }
         if (!(introduction == null)) {
             introduction = swearService.filterSwear(introduction);
             memberProfileIntroduction = MemberProfileIntroduction.create(introduction);
         } else {
-            memberProfileIntroduction = MemberEmptyProfileIntroduction.create();
+            memberProfileIntroduction = EmptyMemberProfileIntroduction.create();
         }
         memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
         return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile));
@@ -175,6 +176,34 @@ public class MemberController {
         }
     }
 
+    public void reportProposalOrBug(ProposalOrBugReportRecord record) throws IOException {
+        MemberId memberId = MemberId.fromUuid(jwtTokenProvider.getMemberUuidFromToken(record.accessToken()));
+        ReportTitle reportTitle = ReportTitle.create(record.title());
+        ReportContent reportContent = ReportContent.create(record.content());
+        ReportImagePath reportImagePath;
+        MultipartFile image = record.image();
+        validateIfMemberExists(memberId);
+        if (!(image == null)) {
+            reportImagePath = ReportImagePath.create(memberImageIOHelper.uploadImage(memberId, record));
+        } else {
+            reportImagePath = EmptyReportImagePath.create();
+        }
+        eventBus.publish(ProposalOrBugReportEvent.create(memberId.getValue(), reportTitle.getValue(), reportContent.getValue(), reportImagePath.getValue()));
+    }
+
+    public void reportPostAbuse(PostAbuseReportRecord record) throws IOException {
+        MemberId memberId = MemberId.fromUuid(jwtTokenProvider.getMemberUuidFromToken(record.accessToken()));
+        validateIfMemberExists(memberId);
+        eventBus.publish(PostAbuseReportEvent.create(memberId.getValue(), record.postUlid()));
+    }
+
+    private void validateIfMemberExists(MemberId memberId) {
+        Optional<Member> optionalMember = memberRepository.getById(memberId);   // 영속성 컨텍스트에 회원 캐싱
+        if (optionalMember.isEmpty()) {
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
+        }
+    }
+
     private void validateBeforeRegister(Nickname nickname) {
         if (memberRepository.isNicknameExist(nickname)) {
             throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "nickname");
@@ -225,11 +254,5 @@ public class MemberController {
         if (!targetCommentIdRepository.isIdExist(targetCommentId)) {
             throw new NotFoundEntityException(NOT_FOUND_TARGET_COMMENT_ID, "targetCommentId");
         }
-    }
-
-    private String uploadImage(MemberId memberId, MemberProfileOverrideRecord record) throws IOException {
-        String newImagePath = generateMemberProfileImagePath(memberId.getValue(), record.image().getOriginalFilename());
-        s3FileService.uploadFile(record.image(), newImagePath);
-        return newImagePath;
     }
 }

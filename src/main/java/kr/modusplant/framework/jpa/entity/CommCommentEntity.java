@@ -20,9 +20,9 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_COMMENT;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = COMM_COMMENT)
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @IdClass(CommCommentId.class)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @ToString
 public class CommCommentEntity {
     @Id
@@ -35,7 +35,7 @@ public class CommCommentEntity {
     private CommPostEntity postEntity;
 
     @Id
-    @Column(name = "path", nullable = false, updatable = false)
+    @Column(name = PATH, nullable = false, updatable = false)
     private String path;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
