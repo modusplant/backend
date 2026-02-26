@@ -71,6 +71,8 @@ public class CommCommentEntity {
         this.isDeleted = true;
     }
 
+    public void updateContent(String content) { this.content = content; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

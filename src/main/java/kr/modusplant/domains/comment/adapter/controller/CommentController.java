@@ -14,6 +14,7 @@ import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqR
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJpaAdapter;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
+import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
 import kr.modusplant.domains.member.domain.vo.MemberId;
@@ -97,6 +98,19 @@ public class CommentController {
         jpaAdapter.save(comment);
     }
 
+    public void update(CommentUpdateRequest request) {
+        if(jooqRepository.existsByPostAndPath(PostId.create(request.postId()), CommentPath.create(request.path()))) {
+            throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT);
+        }
+
+        CommCommentId id = CommCommentId.builder()
+                .postUlid(request.postId())
+                .path(request.path())
+                .build();
+
+        jpaAdapter.update(id, CommentContent.create(request.content()));
+    }
+
     public void delete(String postUlid, String commentPath) {
         jpaAdapter.setCommentAsDeleted(CommCommentId.builder()
                 .postUlid(postUlid)
@@ -133,7 +147,7 @@ public class CommentController {
                     throw new InvalidValueException(CommentErrorCode.EXIST_POST_COMMENT);
                 }
             } else {
-                // 댓글 경로게 .가 없고 1이 아닌 경우, 형제 댓글이 있어야 등록 가능
+                // 댓글 경로에 .가 없고 1이 아닌 경우, 형제 댓글이 있어야 등록 가능
                 String siblingCommentPath = String.valueOf(Integer.parseInt(path) - 1);
                 if (!(jooqRepository.existsByPostAndPath(commentPost, CommentPath.create(siblingCommentPath)))) {
                     throw new InvalidValueException(CommentErrorCode.NOT_EXIST_SIBLING_COMMENT);
