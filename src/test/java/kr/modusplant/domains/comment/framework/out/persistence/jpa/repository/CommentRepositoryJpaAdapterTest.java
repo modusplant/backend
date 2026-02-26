@@ -1,6 +1,6 @@
 package kr.modusplant.domains.comment.framework.out.persistence.jpa.repository;
 
-import kr.modusplant.domains.comment.common.util.adapter.CommentResponseTestUtils;
+import kr.modusplant.domains.comment.common.util.usecase.CommentResponseTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;

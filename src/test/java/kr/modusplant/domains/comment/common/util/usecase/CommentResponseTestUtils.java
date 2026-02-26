@@ -1,4 +1,4 @@
-package kr.modusplant.domains.comment.common.util.adapter;
+package kr.modusplant.domains.comment.common.util.usecase;
 
 import kr.modusplant.domains.comment.common.util.domain.CommentContentTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentPathTestUtils;

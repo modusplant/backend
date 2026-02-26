@@ -1,9 +1,9 @@
 package kr.modusplant.domains.comment.adapter.controller;
 
 import kr.modusplant.domains.comment.adapter.mapper.CommentMapperImpl;
-import kr.modusplant.domains.comment.common.util.adapter.CommentReadModelTestUtils;
-import kr.modusplant.domains.comment.common.util.adapter.CommentResponseTestUtils;
-import kr.modusplant.domains.comment.common.util.adapter.MemberReadModelTestUtils;
+import kr.modusplant.domains.comment.common.util.usecase.CommentReadModelTestUtils;
+import kr.modusplant.domains.comment.common.util.usecase.CommentResponseTestUtils;
+import kr.modusplant.domains.comment.common.util.usecase.MemberReadModelTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.framework.in.web.cache.CommentCacheService;
