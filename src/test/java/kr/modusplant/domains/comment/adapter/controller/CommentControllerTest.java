@@ -5,6 +5,7 @@ import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.CommentReadModelTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.CommentResponseTestUtils;
+import kr.modusplant.domains.comment.common.util.usecase.CommentUpdateRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.MemberReadModelTestUtils;
 import kr.modusplant.domains.comment.framework.in.web.cache.CommentCacheService;
 import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqRepository;
@@ -12,21 +13,26 @@ import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.Co
 import kr.modusplant.framework.jpa.entity.common.util.CommCommentEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.CommCommentIdTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.CommPostEntityTestUtils;
+import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.swear.service.SwearService;
+import kr.modusplant.shared.persistence.constant.TableName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static kr.modusplant.domains.comment.common.util.usecase.CommentUpdateRequestTestUtils.testCommentUpdateRequest;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         CommentReadModelTestUtils, MemberReadModelTestUtils, CommentResponseTestUtils,
-        CommPostEntityTestUtils, CommCommentEntityTestUtils, CommCommentIdTestUtils {
+        CommPostEntityTestUtils, CommCommentEntityTestUtils, CommCommentIdTestUtils,
+        CommentUpdateRequestTestUtils {
     private final CommentMapperImpl mapper = Mockito.mock(CommentMapperImpl.class);
     private final CommentJooqRepository jooqAdapter = Mockito.mock(CommentJooqRepository.class);
     private final CommentRepositoryJpaAdapter jpaAdapter = Mockito.mock(CommentRepositoryJpaAdapter.class);
@@ -52,7 +58,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
 
     @Test
     @DisplayName("유효한 댓글 갱신 요청 객체로 댓글 갱신하기")
-    public void testUpdate_givenValidCommentUpdateRequest_WillReturnResponseEntity() {
+    public void testUpdate_givenValidCommentUpdateRequest_willReturnResponseEntity() {
         // given
         given(jooqAdapter.existsByPostAndPath(testPostId, testCommentPath)).willReturn(true);
         doNothing().when(jpaAdapter).update(testCommCommentId, testCommentContent);
@@ -63,6 +69,22 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         // then
         verify(jooqAdapter, times(1)).existsByPostAndPath(any(), any());
         verify(jpaAdapter, times(1)).update(any(), any());
+    }
+
+    @Test
+    @DisplayName("무효한 댓글 갱신 요청 객체일 시 예외 발생")
+    public void testUpdate_givenInvalidCommentUpdateRequest_willThrowNotFoundEntityException() {
+        // given
+        given(jooqAdapter.existsByPostAndPath(testPostId, testCommentPath)).willReturn(false);
+        doNothing().when(jpaAdapter).update(testCommCommentId, testCommentContent);
+
+        // when
+        NotFoundEntityException ex = assertThrows(
+                NotFoundEntityException.class, () -> controller.update(testCommentUpdateRequest));
+
+        // then
+        assertThat(ex.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_COMMENT);
+        assertThat(ex.getEntityName()).isEqualTo(TableName.COMM_COMMENT);
     }
 
 //    @Test
