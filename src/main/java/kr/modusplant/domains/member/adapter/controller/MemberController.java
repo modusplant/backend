@@ -191,6 +191,12 @@ public class MemberController {
         eventBus.publish(ProposalOrBugReportEvent.create(memberId.getValue(), reportTitle.getValue(), reportContent.getValue(), reportImagePath.getValue()));
     }
 
+    public void reportPostAbuse(PostAbuseReportRecord record) throws IOException {
+        MemberId memberId = MemberId.fromUuid(jwtTokenProvider.getMemberUuidFromToken(record.accessToken()));
+        validateIfMemberExists(memberId);
+        eventBus.publish(PostAbuseReportEvent.create(memberId.getValue(), record.postUlid()));
+    }
+
     private void validateIfMemberExists(MemberId memberId) {
         Optional<Member> optionalMember = memberRepository.getById(memberId);   // 영속성 컨텍스트에 회원 캐싱
         if (optionalMember.isEmpty()) {
