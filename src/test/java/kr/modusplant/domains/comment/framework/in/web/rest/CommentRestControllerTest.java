@@ -69,7 +69,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
 
     @Test
     @DisplayName("유효한 댓글 갱신 요청 객체로 댓글 갱신하기")
-    public void testUpdate_givenValidCommentUpdateRequest_WillReturnResponseEntity() {
+    public void testUpdate_givenValidCommentUpdateRequest_willReturnResponseEntity() {
         // given
         doNothing().when(controller).update(testCommentUpdateRequest);
 
