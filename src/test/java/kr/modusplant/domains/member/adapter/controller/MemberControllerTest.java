@@ -25,6 +25,7 @@ import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jpa.entity.*;
+import kr.modusplant.framework.jpa.entity.common.util.CommPostAbuRepEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.CommPostEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.PropBugRepEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberProfileEntityTestUtils;
@@ -64,6 +65,7 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberPost
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileGetRecordTestUtils.testMemberProfileGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.request.MemberRegisterRequestTestUtils.testMemberRegisterRequest;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
@@ -86,7 +88,7 @@ import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, PostLikeEventTestUtils, CommPostEntityTestUtils, SiteMemberProfileEntityTestUtils, PropBugRepEntityTestUtils {
+class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, PostLikeEventTestUtils, CommPostEntityTestUtils, SiteMemberProfileEntityTestUtils, PropBugRepEntityTestUtils, CommPostAbuRepEntityTestUtils {
     private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
     private final SwearService swearService = Mockito.mock(SwearService.class);
     private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
@@ -736,6 +738,44 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     @Test
     @DisplayName("존재하지 않는 회원으로 인해 reportProposalOrBug로 건의 및 버그 제보 실패")
     void testReportProposalOrBug_givenNotFoundMemberId_willThrowException() {
+        // given
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        given(memberRepository.getById(any())).willReturn(Optional.empty());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
+                () -> memberController.reportProposalOrBug(testProposalOrBugReportRecord));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+    }
+
+    @Test
+    @DisplayName("reportPostAbuse로 게시글 신고")
+    void testReportPostAbuse_givenAlreadyLikedValue_willDoNothing() {
+        // given
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        CommPostEntity postEntity = createCommPostEntityBuilder().authMember(memberEntity).build();
+        CommPostAbuRepEntity postAbuRepEntity = createCommPostAbuRepEntityBuilder().member(memberEntity).post(postEntity).build();
+
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
+        given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
+        given(postJpaRepository.findByUlid(any())).willReturn(Optional.of(postEntity));
+        given(postAbuRepJpaRepository.save(any())).willReturn(postAbuRepEntity);
+
+        // when
+        memberController.reportPostAbuse(testPostAbuseReportRecord);
+
+        // then
+        verify(memberJpaRepository, times(1)).findByUuid(any());
+        verify(postJpaRepository, times(1)).findByUlid(any());
+        verify(postAbuRepJpaRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원으로 인해 reportPostAbuse로 게시글 신고 실패")
+    void testReportPostAbuse_givenNotFoundMemberId_willThrowException() {
         // given
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         given(memberRepository.getById(any())).willReturn(Optional.empty());
