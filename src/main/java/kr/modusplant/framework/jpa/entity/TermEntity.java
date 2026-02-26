@@ -5,6 +5,7 @@ import kr.modusplant.shared.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.UuidGenerator;
@@ -23,8 +24,9 @@ import static kr.modusplant.shared.util.VersionUtils.createVersion;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = TERM)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+@ToString
 public class TermEntity {
     @Id
     @UuidGenerator
@@ -35,6 +37,7 @@ public class TermEntity {
     private String name;
 
     @Column(nullable = false, length = 60000)
+    @ToString.Exclude
     private String content;
 
     @Column(name = "ver", nullable = false, length = 10)
@@ -51,6 +54,7 @@ public class TermEntity {
 
     @Version
     @Column(name = VER_NUM, nullable = false)
+    @ToString.Exclude
     private Long versionNumber;
 
     public void updateContent(String content) { this.content = content; }

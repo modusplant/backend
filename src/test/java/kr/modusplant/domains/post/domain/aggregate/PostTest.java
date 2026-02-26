@@ -1,7 +1,8 @@
 package kr.modusplant.domains.post.domain.aggregate;
 
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
-import kr.modusplant.domains.post.domain.exception.*;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
+import kr.modusplant.domains.post.domain.exception.InvalidValueException;
 import kr.modusplant.domains.post.domain.vo.LikeCount;
 import kr.modusplant.domains.post.domain.vo.PostContent;
 import kr.modusplant.domains.post.domain.vo.PostId;
@@ -25,7 +26,6 @@ class PostTest implements PostTestUtils {
             assertNotNull(createPublishedPost());
             assertEquals(testPostId, createPublishedPost().getPostId());
             assertEquals(testAuthorId, createPublishedPost().getAuthorId());
-            assertEquals(testAuthorId, createPublishedPost().getCreateAuthorId()); // authorId와 동일해야 함
             assertEquals(testPrimaryCategoryId, createPublishedPost().getPrimaryCategoryId());
             assertEquals(testSecondaryCategoryId, createPublishedPost().getSecondaryCategoryId());
             assertEquals(testPostContent, createPublishedPost().getPostContent());
@@ -36,31 +36,31 @@ class PostTest implements PostTestUtils {
         @Test
         @DisplayName("Post의 파라미터가 null일 때 Exception을 발생시킨다.")
         void testCreate_givenNullParameter_willThrowException() {
-            assertThrows(EmptyPostIdException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     Post.create(null, testAuthorId, testPrimaryCategoryId,
                             testSecondaryCategoryId, testPostContent, testLikeCount, PostStatus.published()));
 
-            assertThrows(EmptyAuthorIdException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     Post.create(testPostId, null, testPrimaryCategoryId,
                             testSecondaryCategoryId, testPostContent, testLikeCount, PostStatus.published()));
 
-            assertThrows(EmptyCategoryIdException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     Post.create(testPostId, testAuthorId, null,
                             testSecondaryCategoryId, testPostContent, testLikeCount, PostStatus.published()));
 
-            assertThrows(EmptyCategoryIdException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     Post.create(testPostId, testAuthorId, testPrimaryCategoryId,
                             null, testPostContent, testLikeCount, PostStatus.published()));
 
-            assertThrows(EmptyPostContentException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     Post.create(testPostId, testAuthorId, testPrimaryCategoryId,
                             testSecondaryCategoryId, null, testLikeCount, PostStatus.published()));
 
-            assertThrows(EmptyLikeCountException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     Post.create(testPostId, testAuthorId, testPrimaryCategoryId,
                             testSecondaryCategoryId, testPostContent, null, PostStatus.published()));
 
-            assertThrows(EmptyPostStatusException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     Post.create(testPostId, testAuthorId, testPrimaryCategoryId,
                             testSecondaryCategoryId, testPostContent, testLikeCount, null));
 
@@ -79,7 +79,6 @@ class PostTest implements PostTestUtils {
             // then
             assertNotNull(post);
             assertEquals(testAuthorId, post.getAuthorId());
-            assertEquals(testAuthorId, post.getCreateAuthorId());
             assertEquals(testPrimaryCategoryId, post.getPrimaryCategoryId());
             assertEquals(testSecondaryCategoryId, post.getSecondaryCategoryId());
             assertEquals(testPostContent, post.getPostContent());
@@ -90,16 +89,16 @@ class PostTest implements PostTestUtils {
         @Test
         @DisplayName("Post의 파라미터가 null일 때 Exception을 발생시킨다.")
         void testCreateDraft_givenNullParameter_willThrowException() {
-            assertThrows(EmptyAuthorIdException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     Post.createDraft( null, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent));
 
-            assertThrows(EmptyCategoryIdException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     Post.createDraft( testAuthorId, null, testSecondaryCategoryId, testPostContent));
 
-            assertThrows(EmptyCategoryIdException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     Post.createDraft( testAuthorId, testPrimaryCategoryId, null, testPostContent));
 
-            assertThrows(EmptyPostContentException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     Post.createDraft( testAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, null));
         }
     }
@@ -116,7 +115,6 @@ class PostTest implements PostTestUtils {
             // then
             assertNotNull(post);
             assertEquals(testAuthorId, post.getAuthorId());
-            assertEquals(testAuthorId, post.getCreateAuthorId());
             assertEquals(testPrimaryCategoryId, post.getPrimaryCategoryId());
             assertEquals(testSecondaryCategoryId, post.getSecondaryCategoryId());
             assertEquals(testPostContent, post.getPostContent());
@@ -127,16 +125,16 @@ class PostTest implements PostTestUtils {
         @Test
         @DisplayName("Post의 파라미터가 null일 때 Exception을 발생시킨다.")
         void testCreatePublished_givenNullParameter_willThrowException() {
-            assertThrows(EmptyAuthorIdException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     Post.createPublished( null, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent));
 
-            assertThrows(EmptyCategoryIdException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     Post.createPublished( testAuthorId, null, testSecondaryCategoryId, testPostContent));
 
-            assertThrows(EmptyCategoryIdException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     Post.createPublished( testAuthorId, testPrimaryCategoryId, null, testPostContent));
 
-            assertThrows(EmptyPostContentException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     Post.createPublished( testAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, null));
         }
     }
@@ -160,7 +158,6 @@ class PostTest implements PostTestUtils {
             assertEquals(testSecondaryCategoryId2, post.getSecondaryCategoryId());
             assertEquals(postContent, post.getPostContent());
             assertEquals(PostStatus.published(), post.getStatus());
-            assertEquals(testAuthorId, post.getCreateAuthorId());
         }
 
         @Test
@@ -171,19 +168,19 @@ class PostTest implements PostTestUtils {
             PostContent postContent = PostContent.create("title",TEST_POST_CONTENT);
 
             // when & then
-            assertThrows(EmptyAuthorIdException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     post.update(null, testPrimaryCategoryId2, testSecondaryCategoryId2, postContent, PostStatus.published()));
 
-            assertThrows(EmptyCategoryIdException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     post.update(testAuthorId2, null, testSecondaryCategoryId2, postContent, PostStatus.published()));
 
-            assertThrows(EmptyCategoryIdException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     post.update(testAuthorId2, testPrimaryCategoryId2, null, postContent, PostStatus.published()));
 
-            assertThrows(EmptyPostContentException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     post.update(testAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, null, PostStatus.published()));
 
-            assertThrows(EmptyPostStatusException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     post.update(testAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, postContent, null));
         }
 
@@ -195,7 +192,7 @@ class PostTest implements PostTestUtils {
             PostContent postContent = PostContent.create("title",TEST_POST_CONTENT);
 
             // when & then
-            assertThrows(InvalidPostStatusException.class, () ->
+            assertThrows(InvalidValueException.class, () ->
                     post.update(testAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, postContent, PostStatus.draft()));
         }
     }
@@ -215,17 +212,16 @@ class PostTest implements PostTestUtils {
 
             // then
             assertEquals(testAuthorId2, post.getAuthorId());
-            assertEquals(testAuthorId, post.getCreateAuthorId());
         }
 
         @Test
-        @DisplayName("AuthorId가 null일 때 EmptyAuthorIdException을 발생시킨다")
+        @DisplayName("AuthorId가 null일 때 EmptyValueException을 발생시킨다")
         void testUpdateAuthorId_givenNullParameter_willThrowException() {
             // given
             Post post = createPublishedPost();
 
             // when & then
-            assertThrows(EmptyAuthorIdException.class, () ->
+            assertThrows(EmptyValueException.class, () ->
                     post.updateAuthorId(null));
         }
     }
@@ -267,13 +263,13 @@ class PostTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("이미 발행된 Post를 발행하려 할 때 InvalidPostStatusException을 발생시킨다")
+        @DisplayName("이미 발행된 Post를 발행하려 할 때 InvalidValueException을 발생시킨다")
         void testPublish_givenPublishedPost_willChangeStatus() {
             // given
             Post post = createPublishedPost();
 
             // when & then
-            assertThrows(InvalidPostStatusException.class, post::publish);
+            assertThrows(InvalidValueException.class, post::publish);
         }
     }
 
@@ -296,13 +292,13 @@ class PostTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("Draft 상태의 Post에 Like를 추가하려 할 때 InvalidPostStatusException을 발생시킨다")
+        @DisplayName("Draft 상태의 Post에 Like를 추가하려 할 때 InvalidValueException을 발생시킨다")
         void testLike_givenDraftPost_willThrowException() {
             // given
             Post post = createDraftPost();
 
             // when & then
-            assertThrows(InvalidPostStatusException.class, post::like);
+            assertThrows(InvalidValueException.class, post::like);
         }
     }
 
@@ -326,13 +322,13 @@ class PostTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("Draft 상태의 Post에서 Like를 제거하려 할 때 InvalidPostStatusException을 발생시킨다")
+        @DisplayName("Draft 상태의 Post에서 Like를 제거하려 할 때 InvalidValueException을 발생시킨다")
         void testunlike_givenDraftPost_willThrowException() {
             // given
             Post post = createDraftPost();
 
             // when & then
-            assertThrows(InvalidPostStatusException.class, post::unlike);
+            assertThrows(InvalidValueException.class, post::unlike);
         }
     }
 

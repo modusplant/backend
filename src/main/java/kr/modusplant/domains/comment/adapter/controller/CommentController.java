@@ -17,11 +17,11 @@ import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
 import kr.modusplant.domains.member.domain.vo.MemberId;
+import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.swear.service.SwearService;
-import kr.modusplant.shared.exception.EntityNotFoundException;
-import kr.modusplant.shared.exception.enums.ErrorCode;
 import kr.modusplant.shared.persistence.compositekey.CommCommentId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,15 +58,17 @@ public class CommentController {
 
     public List<CommentOfPostResponse> gatherByPost(String postUlid) {
         if(!postJpaRepository.existsByUlid(postUlid)) {
-            throw new EntityNotFoundException(ErrorCode.POST_NOT_FOUND, "post");
+            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post");
         }
 
-        return jooqRepository.findByPost(PostId.create(postUlid));
+        return jooqRepository.findByPost(PostId.create(postUlid))
+                .stream().map(mapper::toCommentOfPostResponse)
+                .toList();
     }
 
     public CommentPageResponse<CommentOfAuthorPageModel> gatherByAuthor(UUID memberUuid, Pageable pageable) {
         if(!memberJpaRepository.existsById(memberUuid)) {
-            throw new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND, "member");
+            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, "member");
         }
         PageImpl<CommentOfAuthorPageModel> result = jooqRepository.findByAuthor(Author.create(memberUuid), pageable);
 

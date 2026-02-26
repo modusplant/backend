@@ -30,7 +30,6 @@ class CommPostEntityTest implements CommPostEntityTestUtils {
                 .primaryCategory(commPrimaryCategoryEntity)
                 .secondaryCategory(commSecondaryCategoryEntity)
                 .authMember(member)
-                .createMember(member)
                 .likeCount(1)
                 .viewCount(1L)
                 .isPublished(true)

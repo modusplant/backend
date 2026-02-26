@@ -1,8 +1,9 @@
 package kr.modusplant.domains.post.domain.vo;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import kr.modusplant.domains.post.domain.exception.EmptyPostContentException;
-import kr.modusplant.domains.post.domain.exception.InvalidPostContentException;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
+import kr.modusplant.domains.post.domain.exception.InvalidValueException;
+import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +20,13 @@ public class PostContent {
 
     public static PostContent create(String title, JsonNode content) {
         if (title == null || title.trim().isEmpty()) {
-            throw new EmptyPostContentException("게시글 제목이 비어 있습니다. ");
+            throw new EmptyValueException(PostErrorCode.EMPTY_POST_CONTENT,"게시글 제목이 비어 있습니다. ");
         }
         if (title.length() > MAX_TITLE_LENGTH) {
-            throw new InvalidPostContentException("게시글 제목이 유효하지 않습니다. ");
+            throw new InvalidValueException(PostErrorCode.INVALID_POST_CONTENT,"게시글 제목이 유효하지 않습니다. ");
         }
         if (content == null) {
-            throw new EmptyPostContentException("게시글 내용이 비어 있습니다. ");
+            throw new EmptyValueException(PostErrorCode.EMPTY_POST_CONTENT,"게시글 내용이 비어 있습니다. ");
         }
         return new PostContent(title, content);
     }

@@ -1,8 +1,8 @@
 package kr.modusplant.domains.member.domain.vo;
 
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
-import kr.modusplant.shared.exception.DataLengthException;
 import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +38,7 @@ class MemberProfileIntroductionTest {
     @Test
     @DisplayName("60자를 초과하는 문자열로 create을 호출하여 오류 발생")
     void testCreate_givenStringExceeding60Chars_willThrowException() {
-        DataLengthException exception = assertThrows(DataLengthException.class, () -> MemberProfileIntroduction.create("a".repeat(61)));
+        InvalidValueException exception = assertThrows(InvalidValueException.class, () -> MemberProfileIntroduction.create("a".repeat(61)));
         assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.MEMBER_PROFILE_INTRODUCTION_OVER_LENGTH);
     }
 

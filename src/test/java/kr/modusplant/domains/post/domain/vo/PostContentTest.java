@@ -3,8 +3,8 @@ package kr.modusplant.domains.post.domain.vo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
-import kr.modusplant.domains.post.domain.exception.EmptyPostContentException;
-import kr.modusplant.domains.post.domain.exception.InvalidPostContentException;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
+import kr.modusplant.domains.post.domain.exception.InvalidValueException;
 import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -73,15 +73,15 @@ class PostContentTest implements PostTestUtils {
         @DisplayName("null 이나 빈 문자열 제목으로 PostContent 생성 시 EmptyPostContentException을 발생시킨다")
         void testCreate_givenNullOrEmptyTitle_willThrowException() {
             // when & then
-            EmptyPostContentException exception1 = assertThrows(EmptyPostContentException.class,
+            EmptyValueException exception1 = assertThrows(EmptyValueException.class,
                     () -> PostContent.create(null, TEST_POST_CONTENT));
             assertEquals(exception1.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
 
-            EmptyPostContentException exception2 = assertThrows(EmptyPostContentException.class,
+            EmptyValueException exception2 = assertThrows(EmptyValueException.class,
                     () -> PostContent.create("", TEST_POST_CONTENT));
             assertEquals(exception2.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
 
-            EmptyPostContentException exception3 = assertThrows(EmptyPostContentException.class,
+            EmptyValueException exception3 = assertThrows(EmptyValueException.class,
                     () -> PostContent.create("   ", TEST_POST_CONTENT));
             assertEquals(exception3.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
         }
@@ -90,16 +90,16 @@ class PostContentTest implements PostTestUtils {
         @DisplayName("제목 길이가 60자를 초과할 때 InvalidPostContentException을 발생시킨다")
         void testCreate_givenOverMaxLengthTitle_willThrowException() {
             // when & then
-            InvalidPostContentException exception = assertThrows(InvalidPostContentException.class,
+            InvalidValueException exception = assertThrows(InvalidValueException.class,
                     () -> PostContent.create(OVER_MAX_LENGTH_TITLE, TEST_POST_CONTENT));
             assertEquals(exception.getErrorCode(), PostErrorCode.INVALID_POST_CONTENT);
         }
 
         @Test
-        @DisplayName("null 내용으로 PostContent 생성 시 EmptyPostContentException을 발생시킨다")
+        @DisplayName("null 내용으로 PostContent 생성 시 EmptyValueException을 발생시킨다")
         void testCreate_givenNullContent_willThrowException() {
             // when & then
-            EmptyPostContentException exception = assertThrows(EmptyPostContentException.class,
+            EmptyValueException exception = assertThrows(EmptyValueException.class,
                     () -> PostContent.create(TEST_POST_TITLE, null));
             assertEquals(exception.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
         }

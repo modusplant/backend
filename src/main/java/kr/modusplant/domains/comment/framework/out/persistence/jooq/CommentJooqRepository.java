@@ -4,9 +4,8 @@ import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
+import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentReadRepository;
-import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
-import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.jooq.tables.*;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
@@ -33,7 +32,6 @@ public class CommentJooqRepository implements CommentReadRepository {
     private final SiteMember siteMember = SiteMember.SITE_MEMBER;
     private final CommCommentLike commentLike = CommCommentLike.COMM_COMMENT_LIKE;
     private final SiteMemberProf memberProf = SiteMemberProf.SITE_MEMBER_PROF;
-    private final S3FileService fileService;
 
     @Override
     public boolean existsByPostAndPath(PostId postId, CommentPath path) {
@@ -55,7 +53,7 @@ public class CommentJooqRepository implements CommentReadRepository {
                 .orElse(0);
     }
 
-    public List<CommentOfPostResponse> findByPost(PostId postId) {
+    public List<CommentOfPostReadModel> findByPost(PostId postId) {
 
         Field<Boolean> isLiked = DSL.when(commentLike.MEMB_UUID.isNotNull(), true).otherwise(false);
 
@@ -64,14 +62,14 @@ public class CommentJooqRepository implements CommentReadRepository {
                         isLiked, commComment.CREATED_AT, commComment.IS_DELETED)
                 .from(commComment)
                 .join(commPost).on(commComment.POST_ULID.eq(commPost.ULID))
-                .join(siteMember).on(commPost.AUTH_MEMB_UUID.eq(siteMember.UUID))
+                .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
                 .join(memberProf).on(siteMember.UUID.eq(memberProf.UUID))
                 .leftJoin(commentLike).on(commComment.POST_ULID.eq(commentLike.POST_ULID)
                         .and(commComment.PATH.eq(commentLike.PATH)))
                 .where(commComment.POST_ULID.eq(postId.getId()))
-                .orderBy(commComment.CREATED_AT.desc())
-                .fetch(record -> new CommentOfPostResponse(
-                        fileService.generateS3SrcUrl(record.getValue(memberProf.IMAGE_PATH)), record.getValue(siteMember.NICKNAME),
+                .orderBy(commComment.CREATED_AT.asc())
+                .fetch(record -> new CommentOfPostReadModel(
+                        record.getValue(memberProf.IMAGE_PATH), record.getValue(siteMember.NICKNAME),
                         record.getValue(commComment.PATH), record.getValue(commComment.CONTENT),
                         record.getValue(commComment.LIKE_COUNT), record.getValue(isLiked),
                         record.getValue(commComment.CREATED_AT).withNano(0), record.getValue(commComment.IS_DELETED)

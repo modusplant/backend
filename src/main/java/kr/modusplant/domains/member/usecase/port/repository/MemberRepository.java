@@ -11,9 +11,9 @@ public interface MemberRepository {
 
     Optional<Member> getByNickname(Nickname nickname);
 
-    Member save(Nickname nickname);
+    Member add(Nickname nickname);
 
-    Member save(MemberId memberId, Nickname nickname);
+    Member add(MemberId memberId, Nickname nickname);
 
     boolean isIdExist(MemberId memberId);
 

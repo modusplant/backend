@@ -1,0 +1,1 @@
+ALTER TABLE public.site_member DROP COLUMN is_disabled_by_linking;

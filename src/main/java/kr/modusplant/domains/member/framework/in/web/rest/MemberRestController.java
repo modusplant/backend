@@ -39,7 +39,7 @@ import static kr.modusplant.shared.constant.Regex.*;
 
 @Tag(name = "회원 API", description = "회원의 생성과 갱신(상태 제외), 회원이 할 수 있는 단일한 기능을 관리하는 API 입니다.")
 @RestController
-@RequestMapping("/api/v1/members")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Validated
 @Slf4j
@@ -50,16 +50,16 @@ public class MemberRestController {
 
     @Hidden
     @Operation(summary = "회원 등록 API", description = "닉네임을 통해 회원을 등록합니다.")
-    @PostMapping
+    @PostMapping(value = "/members")
     public ResponseEntity<DataResponse<MemberResponse>> registerMember(
             @RequestBody @Valid MemberRegisterRequest request) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(DataResponse.ok(memberController.register(request)));
+                .body(DataResponse.ok(memberController.registerMember(request)));
     }
 
     @Operation(summary = "회원 닉네임 중복 확인 API", description = "이미 등록된 닉네임이 있는지 조회합니다.")
-    @GetMapping(value = "/check/nickname/{nickname}")
+    @GetMapping(value = "/members/check/nickname/{nickname}")
     public ResponseEntity<DataResponse<Map<String, Boolean>>> checkExistedMemberNickname(
             @Parameter(
                     description = "중복을 확인하려는 회원의 닉네임",
@@ -69,7 +69,7 @@ public class MemberRestController {
             @PathVariable(required = false)
             @NotBlank(message = "회원 닉네임이 비어 있습니다. ")
             @Pattern(regexp = REGEX_NICKNAME,
-                    message = "회원 닉네임 서식이 올바르지 않습니다. ")
+                    message = "닉네임은 2 ~ 10자까지 가능하며, 특수문자는 사용할 수 없습니다.")
             String nickname) {
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -89,7 +89,7 @@ public class MemberRestController {
             description = "기존 회원 프로필을 조회합니다. ",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @GetMapping(value = "/{id}/profile")
+    @GetMapping(value = "/members/{id}/profile")
     public ResponseEntity<DataResponse<MemberProfileResponse>> getMemberProfile(
             @Parameter(
                     description = "기존에 저장된 회원의 아이디",
@@ -142,7 +142,7 @@ public class MemberRestController {
             description = "기존 회원 프로필을 덮어씁니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PutMapping(value = "/{id}/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/members/{id}/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<MemberProfileResponse>> overrideMemberProfile(
             @Parameter(
                     description = "기존에 저장된 회원의 아이디",
@@ -191,7 +191,7 @@ public class MemberRestController {
             description = "게시글에 좋아요를 누릅니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PutMapping("/{id}/like/communication/post/{postUlid}")
+    @PutMapping("/members/{id}/like/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationPost(
             @Parameter(
                     description = "회원의 아이디",
@@ -223,7 +223,7 @@ public class MemberRestController {
             description = "게시글에 대한 좋아요를 취소합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping("/{id}/like/communication/post/{postUlid}")
+    @DeleteMapping("/members/{id}/like/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationPost(
             @Parameter(
                     description = "회원의 아이디",
@@ -255,7 +255,7 @@ public class MemberRestController {
             description = "게시글에 북마크를 누릅니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PutMapping("/{id}/bookmark/communication/post/{postUlid}")
+    @PutMapping("/members/{id}/bookmark/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> bookmarkCommunicationPost(
             @Parameter(
                     description = "회원의 아이디",
@@ -287,7 +287,7 @@ public class MemberRestController {
             description = "게시글에 대한 북마크를 취소합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping("/{id}/bookmark/communication/post/{postUlid}")
+    @DeleteMapping("/members/{id}/bookmark/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> cancelCommunicationPostBookmark(
             @Parameter(
                     description = "회원의 아이디",
@@ -319,7 +319,7 @@ public class MemberRestController {
             description = "댓글에 좋아요를 누릅니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PutMapping("/{id}/like/communication/post/{postUlid}/path/{path}")
+    @PutMapping("/members/{id}/like/communication/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationComment(
             @Parameter(
                     description = "회원의 아이디",
@@ -360,7 +360,7 @@ public class MemberRestController {
             description = "댓글에 대한 좋아요를 취소합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping("/{id}/like/communication/post/{postUlid}/path/{path}")
+    @DeleteMapping("/members/{id}/like/communication/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationComment(
             @Parameter(
                     description = "회원의 아이디",
@@ -393,6 +393,63 @@ public class MemberRestController {
             String auth) {
         validateMemberIdFromToken(id, auth);
         memberController.unlikeComment(new MemberCommentUnlikeRecord(id, postUlid, path));
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Operation(
+            summary = "건의 및 버그 제보 API",
+            description = "건의 사항 또는 버그를 제보합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PostMapping(value = "/report/proposal-or-bug", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<DataResponse<Void>> reportProposalOrBug(
+            @Parameter(description = "보고서 제목", example = "제보합니다!")
+            @RequestPart(name = "title")
+            String title,
+
+            @Parameter(description = "보고서 내용", example = "이런 건의 사항을 드립니다.")
+            @RequestPart(name = "content")
+            String content,
+
+            @Parameter(
+                    description = "제보 관련 이미지",
+                    schema = @Schema(type = "string", format = "binary")
+            )
+            @RequestPart(name = "image", required = false)
+            MultipartFile image,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
+            @NotNull(message = "접근 토큰이 비어 있습니다. ")
+            String auth) throws IOException {
+        memberController.reportProposalOrBug(
+                new ProposalOrBugReportRecord(
+                        getTokenFromAuthorizationHeader(auth), title, content, image));
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Operation(
+            summary = "게시글 신고 API",
+            description = "게시글을 신고합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PostMapping(value = "/report/abuse/post/{postUlid}")
+    public ResponseEntity<DataResponse<Void>> reportPostAbuse(
+            @Parameter(
+                    description = "신고할 게시글의 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
+            @PathVariable(required = false)
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String postUlid,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
+            @NotNull(message = "접근 토큰이 비어 있습니다. ")
+            String auth) throws IOException {
+        memberController.reportPostAbuse(
+                new PostAbuseReportRecord(
+                        getTokenFromAuthorizationHeader(auth), postUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

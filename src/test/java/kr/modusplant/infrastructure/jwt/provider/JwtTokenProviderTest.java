@@ -1,7 +1,7 @@
 package kr.modusplant.infrastructure.jwt.provider;
 
 import kr.modusplant.infrastructure.jwt.exception.TokenKeyCreationException;
-import kr.modusplant.shared.exception.enums.ErrorCode;
+import kr.modusplant.infrastructure.jwt.exception.enums.AuthTokenErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,7 +58,7 @@ class JwtTokenProviderTest {
             assertThatThrownBy(tokenProvider::init)
                     .isInstanceOf(TokenKeyCreationException.class)
                     .extracting("errorCode")
-                    .isEqualTo(ErrorCode.INTERNAL_AUTHENTICATION_FAIL);
+                    .isEqualTo(AuthTokenErrorCode.INTERNAL_AUTHENTICATION_FAIL);
         }
     }
 }

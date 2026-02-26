@@ -1,9 +1,9 @@
 package kr.modusplant.domains.account.social.framework.out.client;
 
+import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
 import kr.modusplant.domains.account.social.framework.out.client.dto.GoogleUserInfo;
 import kr.modusplant.domains.account.social.framework.out.exception.OAuthRequestFailException;
 import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClient;
-import kr.modusplant.shared.exception.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -50,7 +50,7 @@ public class GoogleAuthClient implements SocialAuthClient {
                 .body(formData)
                 .retrieve()
                 .onStatus(this::isErrorStatus, (request, response) -> {
-                    throw new OAuthRequestFailException(ErrorCode.GOOGLE_LOGIN_FAIL, "google");
+                    throw new OAuthRequestFailException(SocialIdentityErrorCode.GOOGLE_LOGIN_FAIL, "google");
                 })
                 .body(Map.class)
                 .get("access_token").toString();
@@ -67,7 +67,7 @@ public class GoogleAuthClient implements SocialAuthClient {
                 .uri("/userinfo/v2/me")
                 .retrieve()
                 .onStatus(this::isErrorStatus, (request, response) -> {
-                    throw new OAuthRequestFailException(ErrorCode.GOOGLE_LOGIN_FAIL, "google");
+                    throw new OAuthRequestFailException(SocialIdentityErrorCode.GOOGLE_LOGIN_FAIL, "google");
                 })
                 .body(GoogleUserInfo.class);
     }

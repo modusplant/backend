@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @RepositoryOnlyContext
 class SiteMemberJpaRepositoryTest implements SiteMemberEntityTestUtils {
@@ -71,19 +72,6 @@ class SiteMemberJpaRepositoryTest implements SiteMemberEntityTestUtils {
 
         // then
         assertThat(member.getUuid()).isIn(memberRepository.findByIsActive(member.getIsActive()).stream().map(SiteMemberEntity::getUuid).toList());
-    }
-
-    @DisplayName("isDisabledByLinking으로 회원 찾기")
-    @Test
-    void findByIsDisabledByLinkingTest() {
-        // given
-        SiteMemberEntity member = createMemberBasicUserEntity();
-
-        // when
-        memberRepository.save(member);
-
-        // then
-        assertThat(member.getUuid()).isIn(memberRepository.findByIsDisabledByLinking(member.getIsDisabledByLinking()).stream().map(SiteMemberEntity::getUuid).toList());
     }
 
     @DisplayName("isBanned으로 회원 찾기")
@@ -176,5 +164,18 @@ class SiteMemberJpaRepositoryTest implements SiteMemberEntityTestUtils {
 
         // then
         assertThat(memberRepository.existsByUuid(member.getUuid())).isEqualTo(true);
+    }
+
+    @DisplayName("회원 엔터티 toString 호출 시 순환 오류 발생 여부 확인")
+    @Test
+    void testToString_givenSiteMemberEntity_willReturnRepresentative() {
+        // given
+        SiteMemberEntity member = createMemberBasicUserEntity();
+
+        // when
+        SiteMemberEntity memberEntity = memberRepository.save(member);
+
+        // then
+        assertDoesNotThrow(memberEntity::toString);
     }
 }

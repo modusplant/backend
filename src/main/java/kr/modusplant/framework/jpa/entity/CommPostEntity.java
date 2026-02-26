@@ -8,6 +8,7 @@ import kr.modusplant.shared.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.Type;
@@ -24,8 +25,9 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_POST;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = COMM_POST)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+@ToString
 public class CommPostEntity {
     @Id
     @UlidGenerator
@@ -34,19 +36,18 @@ public class CommPostEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = PRI_CATE_ID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @ToString.Exclude
     private CommPrimaryCategoryEntity primaryCategory;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = SECO_CATE_ID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @ToString.Exclude
     private CommSecondaryCategoryEntity secondaryCategory;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @ToString.Exclude
     private SiteMemberEntity authMember;
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = CREA_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private SiteMemberEntity createMember;
 
     @Column(name = "like_count", nullable = false)
     @DefaultValue
@@ -61,6 +62,7 @@ public class CommPostEntity {
 
     @Type(JsonBinaryType.class)
     @Column(nullable = false, columnDefinition = "jsonb")
+    @ToString.Exclude
     private JsonNode content;
 
     @Column(name = "is_published", nullable = false)
@@ -80,7 +82,8 @@ public class CommPostEntity {
 
     @Version
     @Column(nullable = false)
-    private long ver;
+    @ToString.Exclude
+    private Long ver;
 
     public void updatePrimaryCategory(CommPrimaryCategoryEntity primaryCategory) {
         this.primaryCategory = primaryCategory;
@@ -161,12 +164,11 @@ public class CommPostEntity {
         }
     }
 
-    private CommPostEntity(String ulid, CommPrimaryCategoryEntity primaryCategory, CommSecondaryCategoryEntity secondaryCategory, SiteMemberEntity authMember, SiteMemberEntity createMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isPublished, LocalDateTime publishedAt) {
+    private CommPostEntity(String ulid, CommPrimaryCategoryEntity primaryCategory, CommSecondaryCategoryEntity secondaryCategory, SiteMemberEntity authMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isPublished, LocalDateTime publishedAt) {
         this.ulid = ulid;
         this.primaryCategory = primaryCategory;
         this.secondaryCategory = secondaryCategory;
         this.authMember = authMember;
-        this.createMember = createMember;
         this.likeCount = likeCount;
         this.viewCount = viewCount;
         this.title = title;
@@ -184,7 +186,6 @@ public class CommPostEntity {
         private CommPrimaryCategoryEntity primaryCategory;
         private CommSecondaryCategoryEntity secondaryCategory;
         private SiteMemberEntity authMember;
-        private SiteMemberEntity createMember;
         private Integer likeCount;
         private Long viewCount;
         private String title;
@@ -209,11 +210,6 @@ public class CommPostEntity {
 
         public CommPostEntityBuilder authMember(final SiteMemberEntity authMember) {
             this.authMember = authMember;
-            return this;
-        }
-
-        public CommPostEntityBuilder createMember(final SiteMemberEntity createMember) {
-            this.createMember = createMember;
             return this;
         }
 
@@ -252,7 +248,6 @@ public class CommPostEntity {
             this.primaryCategory = postEntity.primaryCategory;
             this.secondaryCategory = postEntity.secondaryCategory;
             this.authMember = postEntity.authMember;
-            this.createMember = postEntity.createMember;
             this.likeCount = postEntity.likeCount;
             this.viewCount = postEntity.viewCount;
             this.title = postEntity.title;
@@ -263,7 +258,7 @@ public class CommPostEntity {
         }
 
         public CommPostEntity build() {
-            return new CommPostEntity(this.ulid, this.primaryCategory, this.secondaryCategory, this.authMember, this.createMember, this.likeCount, this.viewCount, this.title, this.content, this.isPublished, this.publishedAt);
+            return new CommPostEntity(this.ulid, this.primaryCategory, this.secondaryCategory, this.authMember, this.likeCount, this.viewCount, this.title, this.content, this.isPublished, this.publishedAt);
         }
 
     }

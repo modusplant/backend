@@ -18,11 +18,14 @@ import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.entity.common.util.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.jpa.repository.*;
+import kr.modusplant.framework.jpa.repository.CommPostBookmarkJpaRepository;
+import kr.modusplant.framework.jpa.repository.CommPostLikeJpaRepository;
+import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -54,24 +57,26 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
         CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
         SiteMemberEntity memberEntity = createMemberBasicUserEntity().builder().uuid(post.getAuthorId().getValue()).build();
         CommPrimaryCategoryEntity primaryCategoryEntity = createCommPrimaryCategoryEntity().builder().id(post.getPrimaryCategoryId().getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().id(post.getSecondaryCategoryId().getValue()).build();
+        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder()
+                .id(post.getSecondaryCategoryId().getValue())
+                .primaryCategory(primaryCategoryEntity)
+                .build();
         long viewCount = 0L;
 
         given(authorJpaRepository.findByUuid(post.getAuthorId().getValue())).willReturn(Optional.of(memberEntity));
-        given(authorJpaRepository.findByUuid(post.getCreateAuthorId().getValue())).willReturn(Optional.of(memberEntity));
         given(primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue())).willReturn(Optional.of(primaryCategoryEntity));
         given(secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue())).willReturn(Optional.of(secondaryCategoryEntity));
-        given(postJpaMapper.toPostEntity(post, memberEntity, memberEntity, primaryCategoryEntity, secondaryCategoryEntity, viewCount)).willReturn(postEntity);
+        given(postJpaMapper.toPostEntity(post, memberEntity, primaryCategoryEntity, secondaryCategoryEntity, viewCount)).willReturn(postEntity);
         given(postJpaRepository.save(postEntity)).willReturn(postEntity);
 
         // when
         postRepositoryJpaAdapter.save(post);
 
         // then
-        verify(authorJpaRepository, times(2)).findByUuid(any(UUID.class));
+        verify(authorJpaRepository, times(1)).findByUuid(any(UUID.class));
         verify(primaryCategoryJpaRepository).findById(post.getPrimaryCategoryId().getValue());
         verify(secondaryCategoryJpaRepository).findById(post.getSecondaryCategoryId().getValue());
-        verify(postJpaMapper).toPostEntity(post, memberEntity, memberEntity, primaryCategoryEntity, secondaryCategoryEntity, viewCount);
+        verify(postJpaMapper).toPostEntity(post, memberEntity, primaryCategoryEntity, secondaryCategoryEntity, viewCount);
         verify(postJpaRepository).save(postEntity);
     }
 
@@ -80,9 +85,12 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
     void testUpdate_givenPost_willReturnPostDetailReadModel() {
         // given
         Post post = createPublishedPost();
-        CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
+        CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid().publishedAt(LocalDateTime.now()).build();
         CommPrimaryCategoryEntity primaryCategoryEntity = createCommPrimaryCategoryEntity().builder().id(post.getPrimaryCategoryId().getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().id(post.getSecondaryCategoryId().getValue()).build();
+        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder()
+                .id(post.getSecondaryCategoryId().getValue())
+                .primaryCategory(primaryCategoryEntity)
+                .build();
         long viewCount = 0L;
 
         given(primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue())).willReturn(Optional.of(primaryCategoryEntity));

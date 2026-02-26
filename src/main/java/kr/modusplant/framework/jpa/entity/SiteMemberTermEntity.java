@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -20,8 +21,9 @@ import static kr.modusplant.shared.persistence.constant.TableName.SITE_MEMBER_TE
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = SITE_MEMBER_TERM)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+@ToString
 public class SiteMemberTermEntity {
     @Id
     private UUID uuid;
@@ -29,6 +31,7 @@ public class SiteMemberTermEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @MapsId
     @JoinColumn(name = "uuid", nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @ToString.Exclude
     private SiteMemberEntity member;
 
     @Column(name = "agreed_tou_ver", nullable = false, length = 10)
@@ -46,6 +49,7 @@ public class SiteMemberTermEntity {
 
     @Version
     @Column(name = VER_NUM, nullable = false)
+    @ToString.Exclude
     private Long versionNumber;
 
     public void updateAgreedTermsOfUseVersion(String agreedTermsOfUseVersion) {

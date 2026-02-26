@@ -5,6 +5,7 @@ import kr.modusplant.shared.enums.AuthProvider;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -21,20 +22,18 @@ import static kr.modusplant.shared.persistence.constant.TableName.SITE_MEMBER_AU
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = SITE_MEMBER_AUTH)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+@ToString(onlyExplicitlyIncluded = true)
 public class SiteMemberAuthEntity {
     @Id
+    @ToString.Include
     private UUID uuid;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @MapsId
     @JoinColumn(nullable = false, name = "uuid", updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private SiteMemberEntity originalMember;
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(nullable = false, name = "act_memb_uuid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private SiteMemberEntity activeMember;
+    private SiteMemberEntity member;
 
     @Column(nullable = false, length = 80)
     private String email;
@@ -44,6 +43,7 @@ public class SiteMemberAuthEntity {
 
     @Column(nullable = false, updatable = false)
     @Enumerated(EnumType.STRING)
+    @ToString.Include
     private AuthProvider provider;
 
     @Column(unique = true, updatable = false, name = "provider_id")
@@ -54,15 +54,12 @@ public class SiteMemberAuthEntity {
 
     @Column(name = LAST_MODIFIED_AT, nullable = false)
     @LastModifiedDate
+    @ToString.Include
     private LocalDateTime lastModifiedAt;
 
     @Version
     @Column(name = VER_NUM, nullable = false)
     private Long versionNumber;
-
-    public void updateActiveMember(SiteMemberEntity activeMember) {
-        this.activeMember = activeMember;
-    }
 
     public void updateEmail(String email) {
         this.email = email;
@@ -70,10 +67,6 @@ public class SiteMemberAuthEntity {
 
     public void updatePw(String pw) {
         this.pw = pw;
-    }
-
-    public void updateLockoutUntil(LocalDateTime lockoutUntil) {
-        this.lockoutUntil = lockoutUntil;
     }
 
     public String getETagSource() {
@@ -88,17 +81,16 @@ public class SiteMemberAuthEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SiteMemberAuthEntity that)) return false;
-        return new EqualsBuilder().append(getOriginalMember(), that.getOriginalMember()).isEquals();
+        return new EqualsBuilder().append(getMember(), that.getMember()).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(getOriginalMember()).toHashCode();
+        return new HashCodeBuilder(17, 37).append(getMember()).toHashCode();
     }
 
-    private SiteMemberAuthEntity(SiteMemberEntity originalMember, SiteMemberEntity activeMember, String email, String pw, AuthProvider provider, String providerId, LocalDateTime lockoutUntil) {
-        this.originalMember = originalMember;
-        this.activeMember = activeMember;
+    private SiteMemberAuthEntity(SiteMemberEntity member, String email, String pw, AuthProvider provider, String providerId, LocalDateTime lockoutUntil) {
+        this.member = member;
         this.email = email;
         this.pw = pw;
         this.provider = provider;
@@ -111,21 +103,15 @@ public class SiteMemberAuthEntity {
     }
 
     public static final class SiteMemberAuthEntityBuilder {
-        private SiteMemberEntity originalMember;
-        private SiteMemberEntity activeMember;
+        private SiteMemberEntity member;
         private String email;
         private String pw;
         private AuthProvider provider;
         private String providerId;
         private LocalDateTime lockoutUntil;
 
-        public SiteMemberAuthEntityBuilder originalMember(final SiteMemberEntity originalMember) {
-            this.originalMember = originalMember;
-            return this;
-        }
-
-        public SiteMemberAuthEntityBuilder activeMember(final SiteMemberEntity activeMember) {
-            this.activeMember = activeMember;
+        public SiteMemberAuthEntityBuilder member(final SiteMemberEntity member) {
+            this.member = member;
             return this;
         }
 
@@ -155,8 +141,7 @@ public class SiteMemberAuthEntity {
         }
 
         public SiteMemberAuthEntityBuilder memberAuth(final SiteMemberAuthEntity memberAuth) {
-            this.originalMember = memberAuth.getOriginalMember();
-            this.activeMember = memberAuth.getActiveMember();
+            this.member = memberAuth.getMember();
             this.email = memberAuth.getEmail();
             this.pw = memberAuth.getPw();
             this.provider = memberAuth.getProvider();
@@ -166,7 +151,7 @@ public class SiteMemberAuthEntity {
         }
 
         public SiteMemberAuthEntity build() {
-            return new SiteMemberAuthEntity(this.originalMember, this.activeMember, this.email, this.pw, this.provider, this.providerId, this.lockoutUntil);
+            return new SiteMemberAuthEntity(this.member, this.email, this.pw, this.provider, this.providerId, this.lockoutUntil);
         }
     }
 }
