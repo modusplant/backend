@@ -439,14 +439,14 @@ public class MemberRestController {
                     description = "신고할 게시글의 식별자",
                     schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
             )
-            @PathVariable(required = false)
+            @PathVariable
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid,
 
             @Parameter(hidden = true)
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String auth) throws IOException {
+            String auth) {
         memberController.reportPostAbuse(
                 new PostAbuseReportRecord(
                         getTokenFromAuthorizationHeader(auth), postUlid));

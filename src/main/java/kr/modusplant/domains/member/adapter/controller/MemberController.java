@@ -191,7 +191,7 @@ public class MemberController {
         eventBus.publish(ProposalOrBugReportEvent.create(memberId.getValue(), reportTitle.getValue(), reportContent.getValue(), reportImagePath.getValue()));
     }
 
-    public void reportPostAbuse(PostAbuseReportRecord record) throws IOException {
+    public void reportPostAbuse(PostAbuseReportRecord record) {
         MemberId memberId = MemberId.fromUuid(jwtTokenProvider.getMemberUuidFromToken(record.accessToken()));
         validateIfMemberExists(memberId);
         eventBus.publish(PostAbuseReportEvent.create(memberId.getValue(), record.postUlid()));

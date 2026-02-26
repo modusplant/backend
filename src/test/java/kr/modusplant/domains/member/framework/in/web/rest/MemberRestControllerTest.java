@@ -37,6 +37,7 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberPost
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileGetRecordTestUtils.testMemberProfileGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.request.MemberRegisterRequestTestUtils.testMemberRegisterRequest;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
@@ -268,11 +269,24 @@ class MemberRestControllerTest implements MemberTestUtils {
     @DisplayName("reportProposalOrBug로 응답 반환")
     void testReportProposalOrBug_givenValidRequest_willReturnResponse() throws IOException {
         // given
-        given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberController).reportProposalOrBug(testProposalOrBugReportRecord);
 
         // when
         ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportProposalOrBug(REPORT_TITLE, REPORT_CONTENT, REPORT_IMAGE, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok().toString());
+    }
+
+    @Test
+    @DisplayName("reportPostAbuse로 응답 반환")
+    void testReportPostAbuse_givenValidRequest_willReturnResponse() throws IOException {
+        // given
+        willDoNothing().given(memberController).reportPostAbuse(testPostAbuseReportRecord);
+
+        // when
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportPostAbuse(TEST_COMM_POST_ULID, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
