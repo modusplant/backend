@@ -24,6 +24,7 @@ import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.persistence.compositekey.CommCommentId;
+import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageImpl;
@@ -99,8 +100,8 @@ public class CommentController {
     }
 
     public void update(CommentUpdateRequest request) {
-        if(jooqRepository.existsByPostAndPath(PostId.create(request.postId()), CommentPath.create(request.path()))) {
-            throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT);
+        if(!jooqRepository.existsByPostAndPath(PostId.create(request.postId()), CommentPath.create(request.path()))) {
+            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_COMMENT, TableName.COMM_COMMENT);
         }
 
         CommCommentId id = CommCommentId.builder()
