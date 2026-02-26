@@ -401,7 +401,7 @@ public class MemberRestController {
             description = "건의 사항 또는 버그를 제보합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping(value = "/proposal-or-bug", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/report/proposal-or-bug", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> reportProposalOrBug(
             @Parameter(description = "보고서 제목", example = "제보합니다!")
             @RequestPart(name = "title")
