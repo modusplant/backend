@@ -12,7 +12,7 @@ public interface PropBugRepEntityTestUtils extends SiteMemberEntityTestUtils {
                 .imagePath(REPORT_IMAGE_PATH);
     }
 
-    default PropBugRepEntity.PropBugRepEntityBuilder createPropBugRepEntityBuilderWithUuid() {
+    default PropBugRepEntity.PropBugRepEntityBuilder createPropBugRepEntityBuilderWithUlid() {
         return PropBugRepEntity.builder()
                 .ulid(REPORT_ULID)
                 .title(REPORT_TITLE)

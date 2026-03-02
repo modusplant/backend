@@ -28,7 +28,7 @@ public class CommCommentLikeEntity {
     private String postId;
 
     @Id
-    @Column(name = "path", nullable = false)
+    @Column(name = PATH, nullable = false)
     private String path;
 
     @Id
