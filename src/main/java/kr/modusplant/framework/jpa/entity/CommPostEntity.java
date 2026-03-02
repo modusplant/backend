@@ -83,7 +83,7 @@ public class CommPostEntity {
     @Version
     @Column(nullable = false)
     @ToString.Exclude
-    private long ver;
+    private Long ver;
 
     public void updatePrimaryCategory(CommPrimaryCategoryEntity primaryCategory) {
         this.primaryCategory = primaryCategory;

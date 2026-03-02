@@ -20,9 +20,9 @@ class PropBugRepJpaRepositoryTest implements PropBugRepEntityTestUtils {
         this.proposalOrBugReportRepository = proposalOrBugReportRepository;
     }
 
-    @DisplayName("uuid로 보고서 찾기")
+    @DisplayName("ulid로 보고서 찾기")
     @Test
-    void findByUuidTest() {
+    void findByUlidTest() {
         // given
         PropBugRepEntity proposalOrBugReport = createPropBugRepEntityBuilder().member(createMemberBasicUserEntity()).build();
 
@@ -59,9 +59,9 @@ class PropBugRepJpaRepositoryTest implements PropBugRepEntityTestUtils {
         assertThat(proposalOrBugReportRepository.findByLastModifiedAt(proposalOrBugReport.getLastModifiedAt()).getFirst()).isEqualTo(proposalOrBugReport);
     }
 
-    @DisplayName("uuid로 보고서 삭제")
+    @DisplayName("ulid로 보고서 삭제")
     @Test
-    void deleteByUuidTest() {
+    void deleteByUlidTest() {
         // given
         PropBugRepEntity proposalOrBugReport = proposalOrBugReportRepository.save(createPropBugRepEntityBuilder().member(createMemberBasicUserEntity()).build());
         String ulid = proposalOrBugReport.getUlid();
@@ -73,9 +73,9 @@ class PropBugRepJpaRepositoryTest implements PropBugRepEntityTestUtils {
         assertThat(proposalOrBugReportRepository.findByUlid(ulid)).isEmpty();
     }
 
-    @DisplayName("uuid로 보고서 확인")
+    @DisplayName("ulid로 보고서 확인")
     @Test
-    void existsByUuidTest() {
+    void existsByUlidTest() {
         // given
         PropBugRepEntity proposalOrBugReport = createPropBugRepEntityBuilder().member(createMemberBasicUserEntity()).build();
 
