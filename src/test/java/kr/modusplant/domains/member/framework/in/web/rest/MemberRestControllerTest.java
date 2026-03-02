@@ -3,6 +3,7 @@ package kr.modusplant.domains.member.framework.in.web.rest;
 import kr.modusplant.domains.member.adapter.controller.MemberController;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.exception.IncorrectMemberIdException;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
 import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
@@ -280,8 +281,19 @@ class MemberRestControllerTest implements MemberTestUtils {
     }
 
     @Test
-    @DisplayName("reportPostAbuse로 응답 반환")
-    void testReportPostAbuse_givenValidRequest_willReturnResponse() throws IOException {
+    @DisplayName("게시글 ID를 포함하지 않는 요청으로 reportPostAbuse로 응답 반환")
+    void testReportPostAbuse_givenValidRequestWithoutPostId_willReturnResponse() {
+        // given & when
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportPostAbuse(MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_POST_ID).toString());
+    }
+
+    @Test
+    @DisplayName("게시글 ID를 포함하는 요청으로 reportPostAbuse로 응답 반환")
+    void testReportPostAbuse_givenValidRequestWithPostId_willReturnResponse() {
         // given
         willDoNothing().given(memberController).reportPostAbuse(testPostAbuseReportRecord);
 
