@@ -95,7 +95,7 @@ class KakaoAuthClientTest {
         String nickname = "kakao-nickname";
         String responseJson = "{" +
                 "\"id\": " + id + "," +
-                "\"kakaoAccount\": {" +
+                "\"kakao_account\": {" +
                 "  \"email\": \""+email+"\"," +
                 "  \"isEmailVerified\": true," +
                 "  \"profile\": {" +

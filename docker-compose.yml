@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
       args:
         JDBC_CONNECTION_URL: ${JDBC_CONNECTION_URL}
-        JDBC_USER_NAME: ${JDBC_USERNAME}
+        JDBC_USERNAME: ${JDBC_USERNAME}
         JDBC_PASSWORD: ${JDBC_PASSWORD}
 
     image: ghcr.io/modusplant/backend

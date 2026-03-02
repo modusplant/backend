@@ -35,7 +35,7 @@ public class CommCommentEntity {
     private CommPostEntity postEntity;
 
     @Id
-    @Column(name = "path", nullable = false, updatable = false)
+    @Column(name = PATH, nullable = false, updatable = false)
     private String path;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)

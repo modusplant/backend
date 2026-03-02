@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
-@Hidden
 @Tag(name = "소셜 로그인 API", description = "소셜 로그인을 다루는 API입니다.")
 @RestController
 @RequestMapping("/api/auth")
@@ -35,7 +34,7 @@ public class SocialIdentityRestController {
     private final TokenService tokenService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    @Operation(summary = "카카오 소셜 로그인 API", description = "카카오 인가 코드를 받아 로그인합니다.")
+    @Operation(summary = "카카오 소셜 로그인 API (테스트용)", description = "카카오 인가 코드를 받아 로그인합니다.")
     @PostMapping("/kakao/social-login")
     public ResponseEntity<DataResponse<?>> kakaoSocialLogin(@RequestBody @Valid SocialLoginRequest request) {
         SocialAccountPayload member = socialIdentityController.handleSocialLogin(AuthProvider.KAKAO, request.getCode());
@@ -49,7 +48,7 @@ public class SocialIdentityRestController {
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie).body(response);
     }
 
-    @Operation(summary = "구글 소셜 로그인 API", description = "구글 인가 코드를 받아 로그인합니다.<br>구글 인가 코드를 URL에서 추출할 경우 '%2F'는 '/'로 대체해야 합니다.")
+    @Operation(summary = "구글 소셜 로그인 API (테스트용)", description = "구글 인가 코드를 받아 로그인합니다.<br>구글 인가 코드를 URL에서 추출할 경우 '%2F'는 '/'로 대체해야 합니다.")
     @PostMapping("/google/social-login")
     public ResponseEntity<DataResponse<?>> googleSocialLogin(@RequestBody @Valid SocialLoginRequest request) {
         SocialAccountPayload member = socialIdentityController.handleSocialLogin(AuthProvider.GOOGLE, request.getCode());
