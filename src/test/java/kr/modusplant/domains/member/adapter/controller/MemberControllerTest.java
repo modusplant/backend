@@ -153,7 +153,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     @DisplayName("기존에 저장된 회원 프로필이 있을 때 getProfile로 회원 프로필 조회")
     void testGetProfile_givenValidGetRecordAndStoredMemberProfile_willReturnResponse() throws IOException {
         // given
-        given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
+        given(memberRepository.isIdExist(any())).willReturn(true);
         given(memberProfileRepository.getById(any())).willReturn(Optional.of(createMemberProfile()));
         given(s3FileService.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
@@ -165,7 +165,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     @DisplayName("존재하지 않는 회원으로 인해 getProfile로 회원 프로필 조회 실패")
     void testGetProfile_givenNotFoundMemberId_willThrowException() {
         // given
-        given(memberRepository.getById(any())).willReturn(Optional.empty());
+        given(memberRepository.isIdExist(any())).willReturn(false);
 
         // when
         NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
@@ -179,7 +179,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     @DisplayName("존재하지 않는 회원 프로필로 인해 getProfile로 회원 프로필 조회 실패")
     void testGetProfile_givenNotFoundMemberProfile_willThrowException() throws IOException {
         // given
-        given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
+        given(memberRepository.isIdExist(any())).willReturn(true);
         given(memberProfileRepository.getById(any())).willReturn(Optional.empty());
 
         // when & then
@@ -478,14 +478,14 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(memberRepository.isIdExist(any())).willReturn(false);
 
         // when
-        NotFoundEntityException NotFoundEntityExceptionForLike = assertThrows(NotFoundEntityException.class,
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
                 () -> memberController.likePost(testMemberPostLikeRecord));
-        NotFoundEntityException NotFoundEntityExceptionForUnlike = assertThrows(NotFoundEntityException.class,
+        NotFoundEntityException notFoundEntityExceptionForUnlike = assertThrows(NotFoundEntityException.class,
                 () -> memberController.unlikePost(testMemberPostUnlikeRecord));
 
         // then
-        assertThat(NotFoundEntityExceptionForLike.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
-        assertThat(NotFoundEntityExceptionForUnlike.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+        assertThat(notFoundEntityExceptionForUnlike.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
     @Test
@@ -496,14 +496,14 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(targetPostIdRepository.isIdExist(any())).willReturn(false);
 
         // when
-        NotFoundEntityException NotFoundEntityExceptionForLike = assertThrows(NotFoundEntityException.class,
+        NotFoundEntityException notFoundEntityExceptionForLike = assertThrows(NotFoundEntityException.class,
                 () -> memberController.likePost(testMemberPostLikeRecord));
-        NotFoundEntityException NotFoundEntityExceptionForUnlike = assertThrows(NotFoundEntityException.class,
+        NotFoundEntityException notFoundEntityExceptionForUnlike = assertThrows(NotFoundEntityException.class,
                 () -> memberController.unlikePost(testMemberPostUnlikeRecord));
 
         // then
-        assertThat(NotFoundEntityExceptionForLike.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_POST_ID);
-        assertThat(NotFoundEntityExceptionForUnlike.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_POST_ID);
+        assertThat(notFoundEntityExceptionForLike.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_POST_ID);
+        assertThat(notFoundEntityExceptionForUnlike.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_POST_ID);
     }
 
     @Test
@@ -515,14 +515,14 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(targetPostIdRepository.isPublished(any())).willReturn(false);
 
         // when
-        NotAccessibleException NotFoundEntityExceptionForLike = assertThrows(NotAccessibleException.class,
+        NotAccessibleException notFoundEntityExceptionForLike = assertThrows(NotAccessibleException.class,
                 () -> memberController.likePost(testMemberPostLikeRecord));
-        NotAccessibleException NotFoundEntityExceptionForUnlike = assertThrows(NotAccessibleException.class,
+        NotAccessibleException notFoundEntityExceptionForUnlike = assertThrows(NotAccessibleException.class,
                 () -> memberController.unlikePost(testMemberPostUnlikeRecord));
 
         // then
-        assertThat(NotFoundEntityExceptionForLike.getErrorCode()).isEqualTo(NOT_ACCESSIBLE_POST_LIKE);
-        assertThat(NotFoundEntityExceptionForUnlike.getErrorCode()).isEqualTo(NOT_ACCESSIBLE_POST_LIKE);
+        assertThat(notFoundEntityExceptionForLike.getErrorCode()).isEqualTo(NOT_ACCESSIBLE_POST_LIKE);
+        assertThat(notFoundEntityExceptionForUnlike.getErrorCode()).isEqualTo(NOT_ACCESSIBLE_POST_LIKE);
     }
 
     @Test
@@ -532,14 +532,14 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(memberRepository.isIdExist(any())).willReturn(false);
 
         // when
-        NotFoundEntityException NotFoundEntityExceptionForBookmark = assertThrows(NotFoundEntityException.class,
+        NotFoundEntityException notFoundEntityExceptionForBookmark = assertThrows(NotFoundEntityException.class,
                 () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
-        NotFoundEntityException NotFoundEntityExceptionForCancelBookmark = assertThrows(NotFoundEntityException.class,
+        NotFoundEntityException notFoundEntityExceptionForCancelBookmark = assertThrows(NotFoundEntityException.class,
                 () -> memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord));
 
         // then
-        assertThat(NotFoundEntityExceptionForBookmark.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
-        assertThat(NotFoundEntityExceptionForCancelBookmark.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+        assertThat(notFoundEntityExceptionForBookmark.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+        assertThat(notFoundEntityExceptionForCancelBookmark.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
     @Test
@@ -550,14 +550,14 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(targetPostIdRepository.isIdExist(any())).willReturn(false);
 
         // when
-        NotFoundEntityException NotFoundEntityExceptionForBookmark = assertThrows(NotFoundEntityException.class,
+        NotFoundEntityException notFoundEntityExceptionForBookmark = assertThrows(NotFoundEntityException.class,
                 () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
-        NotFoundEntityException NotFoundEntityExceptionForCancelBookmark = assertThrows(NotFoundEntityException.class,
+        NotFoundEntityException notFoundEntityExceptionForCancelBookmark = assertThrows(NotFoundEntityException.class,
                 () -> memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord));
 
         // then
-        assertThat(NotFoundEntityExceptionForBookmark.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_POST_ID);
-        assertThat(NotFoundEntityExceptionForCancelBookmark.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_POST_ID);
+        assertThat(notFoundEntityExceptionForBookmark.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_POST_ID);
+        assertThat(notFoundEntityExceptionForCancelBookmark.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_POST_ID);
     }
 
     @Test
@@ -569,14 +569,14 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(targetPostIdRepository.isPublished(any())).willReturn(false);
 
         // when
-        NotAccessibleException NotFoundEntityExceptionForBookmark = assertThrows(NotAccessibleException.class,
+        NotAccessibleException notFoundEntityExceptionForBookmark = assertThrows(NotAccessibleException.class,
                 () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
-        NotAccessibleException NotFoundEntityExceptionForCancelBookmark = assertThrows(NotAccessibleException.class,
+        NotAccessibleException notFoundEntityExceptionForCancelBookmark = assertThrows(NotAccessibleException.class,
                 () -> memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord));
 
         // then
-        assertThat(NotFoundEntityExceptionForBookmark.getErrorCode()).isEqualTo(NOT_ACCESSIBLE_POST_BOOKMARK);
-        assertThat(NotFoundEntityExceptionForCancelBookmark.getErrorCode()).isEqualTo(NOT_ACCESSIBLE_POST_BOOKMARK);
+        assertThat(notFoundEntityExceptionForBookmark.getErrorCode()).isEqualTo(NOT_ACCESSIBLE_POST_BOOKMARK);
+        assertThat(notFoundEntityExceptionForCancelBookmark.getErrorCode()).isEqualTo(NOT_ACCESSIBLE_POST_BOOKMARK);
     }
 
     @Test
@@ -666,14 +666,14 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(memberRepository.isIdExist(any())).willReturn(false);
 
         // when
-        NotFoundEntityException NotFoundEntityExceptionForLike = assertThrows(NotFoundEntityException.class,
+        NotFoundEntityException notFoundEntityExceptionForLike = assertThrows(NotFoundEntityException.class,
                 () -> memberController.likeComment(testMemberCommentLikeRecord));
-        NotFoundEntityException NotFoundEntityExceptionForUnlike = assertThrows(NotFoundEntityException.class,
+        NotFoundEntityException notFoundEntityExceptionForUnlike = assertThrows(NotFoundEntityException.class,
                 () -> memberController.unlikeComment(testMemberCommentUnlikeRecord));
 
         // then
-        assertThat(NotFoundEntityExceptionForLike.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
-        assertThat(NotFoundEntityExceptionForUnlike.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+        assertThat(notFoundEntityExceptionForLike.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+        assertThat(notFoundEntityExceptionForUnlike.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
     @Test
@@ -684,14 +684,14 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         given(targetCommentIdRepository.isIdExist(any())).willReturn(false);
 
         // when
-        NotFoundEntityException NotFoundEntityExceptionForLike = assertThrows(NotFoundEntityException.class,
+        NotFoundEntityException notFoundEntityExceptionForLike = assertThrows(NotFoundEntityException.class,
                 () -> memberController.likeComment(testMemberCommentLikeRecord));
-        NotFoundEntityException NotFoundEntityExceptionForUnlike = assertThrows(NotFoundEntityException.class,
+        NotFoundEntityException notFoundEntityExceptionForUnlike = assertThrows(NotFoundEntityException.class,
                 () -> memberController.unlikeComment(testMemberCommentUnlikeRecord));
 
         // then
-        assertThat(NotFoundEntityExceptionForLike.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID);
-        assertThat(NotFoundEntityExceptionForUnlike.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID);
+        assertThat(notFoundEntityExceptionForLike.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID);
+        assertThat(notFoundEntityExceptionForUnlike.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID);
     }
 
     @Test
@@ -702,7 +702,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         PropBugRepEntity propBugRepEntity = createPropBugRepEntityBuilderWithUlid().member(memberEntity).build();
 
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
-        given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
+        given(memberRepository.isIdExist(any())).willReturn(true);
         given(memberImageIOHelper.uploadImage(any(MemberId.class), any(ProposalOrBugReportRecord.class))).willReturn(REPORT_IMAGE_PATH);
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
         given(propBugRepJpaRepository.save(propBugRepEntity)).willReturn(propBugRepEntity);
@@ -723,7 +723,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         PropBugRepEntity propBugRepEntity = createPropBugRepEntityBuilderWithUlid().member(memberEntity).imagePath(null).build();
 
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
-        given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
+        given(memberRepository.isIdExist(any())).willReturn(true);
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
         given(propBugRepJpaRepository.save(propBugRepEntity)).willReturn(propBugRepEntity);
 
@@ -740,7 +740,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     void testReportProposalOrBug_givenNotFoundMemberId_willThrowException() {
         // given
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
-        given(memberRepository.getById(any())).willReturn(Optional.empty());
+        given(memberRepository.isIdExist(any())).willReturn(false);
 
         // when
         NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
@@ -759,7 +759,9 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
         CommPostAbuRepEntity postAbuRepEntity = createCommPostAbuRepEntityBuilder().member(memberEntity).post(postEntity).build();
 
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
-        given(memberRepository.getById(any())).willReturn(Optional.of(createMember()));
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(true);
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
         given(postJpaRepository.findByUlid(any())).willReturn(Optional.of(postEntity));
         given(postAbuRepJpaRepository.save(any())).willReturn(postAbuRepEntity);
@@ -778,13 +780,46 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     void testReportPostAbuse_givenNotFoundMemberId_willThrowException() {
         // given
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
-        given(memberRepository.getById(any())).willReturn(Optional.empty());
+        given(memberRepository.isIdExist(any())).willReturn(false);
 
         // when
         NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
-                () -> memberController.reportProposalOrBug(testProposalOrBugReportRecord));
+                () -> memberController.reportPostAbuse(testPostAbuseReportRecord));
 
         // then
         assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 대상 게시글 아이디로 인해 reportPostAbuse로 게시글 신고 실패")
+    void testReportPostAbuse_givenNotFoundTargetPostId_willThrowException() {
+        // given
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetCommentIdRepository.isIdExist(any())).willReturn(false);
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
+                () -> memberController.reportPostAbuse(testPostAbuseReportRecord));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_POST_ID);
+    }
+
+    @Test
+    @DisplayName("발행되지 않은 대상 게시글로 인해 reportPostAbuse로 게시글 신고 실패")
+    void testReportPostAbuse_givenNotPublishedTargetPost_willThrowException() {
+        // given
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        given(memberRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isIdExist(any())).willReturn(true);
+        given(targetPostIdRepository.isPublished(any())).willReturn(false);
+
+        // when
+        NotAccessibleException notFoundEntityException = assertThrows(NotAccessibleException.class,
+                () -> memberController.reportPostAbuse(testPostAbuseReportRecord));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE);
     }
 }

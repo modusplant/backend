@@ -193,13 +193,13 @@ public class MemberController {
 
     public void reportPostAbuse(PostAbuseReportRecord record) {
         MemberId memberId = MemberId.fromUuid(jwtTokenProvider.getMemberUuidFromToken(record.accessToken()));
-        validateIfMemberExists(memberId);
+        TargetPostId targetPostId = TargetPostId.create(record.postUlid());
+        validateBeforeReportPostAbuse(memberId, targetPostId);
         eventBus.publish(PostAbuseReportEvent.create(memberId.getValue(), record.postUlid()));
     }
 
     private void validateIfMemberExists(MemberId memberId) {
-        Optional<Member> optionalMember = memberRepository.getById(memberId);   // 영속성 컨텍스트에 회원 캐싱
-        if (optionalMember.isEmpty()) {
+        if (!memberRepository.isIdExist(memberId)) {
             throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         }
     }
@@ -253,6 +253,18 @@ public class MemberController {
         }
         if (!targetCommentIdRepository.isIdExist(targetCommentId)) {
             throw new NotFoundEntityException(NOT_FOUND_TARGET_COMMENT_ID, "targetCommentId");
+        }
+    }
+
+    private void validateBeforeReportPostAbuse(MemberId memberId, TargetPostId targetPostId) {
+        if (!memberRepository.isIdExist(memberId)) {
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
+        }
+        if (!targetPostIdRepository.isIdExist(targetPostId)) {
+            throw new NotFoundEntityException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
+        }
+        if (!targetPostIdRepository.isPublished(targetPostId)) {
+            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE, "postReportForAbuse", targetPostId.getValue());
         }
     }
 }

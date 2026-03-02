@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import kr.modusplant.domains.member.adapter.controller.MemberController;
 import kr.modusplant.domains.member.domain.exception.IncorrectMemberIdException;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
 import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.domains.member.usecase.record.*;
@@ -426,6 +427,21 @@ public class MemberRestController {
                 new ProposalOrBugReportRecord(
                         getTokenFromAuthorizationHeader(auth), title, content, image));
         return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Hidden
+    @Operation(
+            summary = "게시글 신고 API",
+            description = "게시글을 신고합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PostMapping(value = "/report/abuse/post/")
+    public ResponseEntity<DataResponse<Void>> reportPostAbuse(
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
+            @NotNull(message = "접근 토큰이 비어 있습니다. ")
+            String auth) {
+        return ResponseEntity.badRequest().body(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_POST_ID));
     }
 
     @Operation(
