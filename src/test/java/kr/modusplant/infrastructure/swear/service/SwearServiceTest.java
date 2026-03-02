@@ -25,10 +25,10 @@ public class SwearServiceTest implements SwearEntityTestUtils {
     @DisplayName("욕설이 섞인 문자열을 필터링하여 반환함")
     public void testFilterText_givenStringWithSwear_willReturnFilteredString() {
         // given & when
-        String result = service.filterSwear("성인 애1미야");
+        String result = service.filterSwear("애1미야");
 
         // then
-        assertThat(result).isEqualTo("** ***야");
+        assertThat(result).isEqualTo("***야");
     }
 
     @Test

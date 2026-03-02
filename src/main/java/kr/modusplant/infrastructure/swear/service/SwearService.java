@@ -6,8 +6,9 @@ import kr.modusplant.infrastructure.swear.persistence.jpa.repository.SwearJpaRep
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -15,25 +16,25 @@ import java.util.stream.Collectors;
 public class SwearService {
 
     private final SwearJpaRepository repository;
-    private List<String> swearWords;
+    private Set<String> swearWords;
 
     @PostConstruct
     public void init() {
-        List<String> swears = repository.findAll()
+        Set<String> swears = repository.findAll()
                 .stream()
                 .map(SwearEntity::getWord)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
         this.swearWords = addModifiedSwears(swears);
     }
 
-    private List<String> addModifiedSwears(List<String> swears) {
+    private Set<String> addModifiedSwears(Set<String> swears) {
 
-        List<String> swearsWithWhiteSpaceAndNumber = new ArrayList<>();
+        Set<String> swearsWithWhiteSpaceAndNumber = new HashSet<>();
 
         for (String version : List.of(" ", "1", "2")) {
-            List<String> modifiedSwears = swears.stream()
+            Set<String> modifiedSwears = swears.stream()
                     .map(swear -> String.join(version, swear.split("")))
-                    .toList();
+                    .collect(Collectors.toSet());
             swearsWithWhiteSpaceAndNumber.addAll(modifiedSwears);
         }
         swears.addAll(swearsWithWhiteSpaceAndNumber);
