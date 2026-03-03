@@ -94,6 +94,9 @@ management:
   metrics:
     enable:
       tomcat: true
+    distribution:
+      percentiles:
+        http.server.requests: [ 0.95, 0.99 ]
 
 server:
   tomcat:
