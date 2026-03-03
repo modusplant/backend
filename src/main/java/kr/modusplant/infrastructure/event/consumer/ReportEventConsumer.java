@@ -20,7 +20,13 @@ public class ReportEventConsumer {
     private final CommPostAbuRepJpaRepository postAbuRepJpaRepository;
     private final CommCommentAbuRepJpaRepository commentAbuRepJpaRepository;
 
-    public ReportEventConsumer(EventBus eventBus, SiteMemberJpaRepository memberJpaRepository, CommPostJpaRepository postJpaRepository, CommCommentJpaRepository commentJpaRepository, PropBugRepJpaRepository propBugRepJpaRepository, CommPostAbuRepJpaRepository postAbuRepJpaRepository, CommCommentAbuRepJpaRepository commentAbuRepJpaRepository) {
+    public ReportEventConsumer(EventBus eventBus,
+                               SiteMemberJpaRepository memberJpaRepository,
+                               CommPostJpaRepository postJpaRepository,
+                               CommCommentJpaRepository commentJpaRepository,
+                               PropBugRepJpaRepository propBugRepJpaRepository,
+                               CommPostAbuRepJpaRepository postAbuRepJpaRepository,
+                               CommCommentAbuRepJpaRepository commentAbuRepJpaRepository) {
         eventBus.subscribe(event -> {
             if (event instanceof ProposalOrBugReportEvent proposalOrBugReportEvent) {
                 addProposalOrBugReport(proposalOrBugReportEvent.getMemberId(), proposalOrBugReportEvent.getTitle(), proposalOrBugReportEvent.getContent(), proposalOrBugReportEvent.getImagePath());
@@ -42,7 +48,13 @@ public class ReportEventConsumer {
 
     private void addProposalOrBugReport(UUID memberId, String title, String content, String imagePath) {
         SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
-        propBugRepJpaRepository.save(PropBugRepEntity.builder().member(memberEntity).title(title).content(content).imagePath(imagePath).build());
+        propBugRepJpaRepository.save(
+                PropBugRepEntity.builder()
+                        .member(memberEntity)
+                        .title(title)
+                        .content(content)
+                        .imagePath(imagePath)
+                        .build());
     }
 
     private void addPostAbuseReport(UUID memberId, String postUlid) {
@@ -53,7 +65,9 @@ public class ReportEventConsumer {
 
     private void addCommentAbuseReport(UUID memberId, String postUlid, String path) {
         SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
-        CommCommentEntity commentEntity = commentJpaRepository.findById(CommCommentId.builder().postUlid(postUlid).path(path).build()).orElseThrow();
-        commentAbuRepJpaRepository.save(CommCommentAbuRepEntity.builder().member(memberEntity).comment(commentEntity).build());
+        CommCommentEntity commentEntity = commentJpaRepository.findById(
+                CommCommentId.builder().postUlid(postUlid).path(path).build()).orElseThrow();
+        commentAbuRepJpaRepository.save(
+                CommCommentAbuRepEntity.builder().member(memberEntity).comment(commentEntity).build());
     }
 }

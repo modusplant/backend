@@ -9,5 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @Primary
-public interface CommCommentAbuRepJpaRepository extends CreatedAtAndLastModifiedAtRepository<CommCommentAbuRepEntity>, JpaRepository<CommCommentAbuRepEntity, CommCommentId> {
+public interface CommCommentAbuRepJpaRepository extends
+        CreatedAtAndLastModifiedAtRepository<CommCommentAbuRepEntity>,
+        JpaRepository<CommCommentAbuRepEntity, CommCommentId> {
 }

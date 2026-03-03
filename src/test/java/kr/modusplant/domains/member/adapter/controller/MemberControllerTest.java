@@ -39,7 +39,6 @@ import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
 import kr.modusplant.infrastructure.swear.service.SwearService;
-import kr.modusplant.shared.event.common.util.PostLikeEventTestUtils;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
@@ -74,6 +73,7 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 import static kr.modusplant.shared.event.common.util.CommentLikeEventTestUtils.testCommentLikeEvent;
 import static kr.modusplant.shared.event.common.util.PostBookmarkEventTestUtils.testPostBookmarkEvent;
 import static kr.modusplant.shared.event.common.util.PostCancelPostBookmarkEventTestUtils.testPostBookmarkCancelEvent;
+import static kr.modusplant.shared.event.common.util.PostLikeEventTestUtils.testPostLikeEvent;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.*;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN;
@@ -87,7 +87,10 @@ import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, PostLikeEventTestUtils, CommPostEntityTestUtils, SiteMemberProfileEntityTestUtils, PropBugRepEntityTestUtils, CommPostAbuRepEntityTestUtils, CommCommentEntityTestUtils, CommCommentAbuRepEntityTestUtils {
+class MemberControllerTest implements
+        MemberTestUtils, MemberProfileTestUtils,
+        SiteMemberProfileEntityTestUtils, CommPostEntityTestUtils, CommCommentEntityTestUtils,
+        PropBugRepEntityTestUtils, CommPostAbuRepEntityTestUtils, CommCommentAbuRepEntityTestUtils {
     private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
     private final SwearService swearService = Mockito.mock(SwearService.class);
     private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);

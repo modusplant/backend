@@ -10,7 +10,8 @@ import java.util.Optional;
 
 @Repository
 @Primary
-public interface CommPrimaryCategoryJpaRepository extends CreatedAtRepository<CommPrimaryCategoryEntity>, JpaRepository<CommPrimaryCategoryEntity, Integer> {
+public interface CommPrimaryCategoryJpaRepository extends
+        CreatedAtRepository<CommPrimaryCategoryEntity>, JpaRepository<CommPrimaryCategoryEntity, Integer> {
     Optional<CommPrimaryCategoryEntity> findById(Integer id);
 
     Optional<CommPrimaryCategoryEntity> findByOrder(Integer order);
