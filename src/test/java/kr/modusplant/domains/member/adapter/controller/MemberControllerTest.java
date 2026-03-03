@@ -26,10 +26,7 @@ import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jpa.entity.*;
-import kr.modusplant.framework.jpa.entity.common.util.CommPostAbuRepEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.CommPostEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.PropBugRepEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberProfileEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.common.util.*;
 import kr.modusplant.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
@@ -58,6 +55,7 @@ import static kr.modusplant.domains.member.common.util.domain.vo.MemberBirthDate
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils.testMemberProfileIntroduction;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
+import static kr.modusplant.domains.member.common.util.usecase.record.CommentAbuseReportRecordTestUtils.testCommentAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.testMemberPostBookmarkCancelRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.testMemberCommentLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.testMemberCommentUnlikeRecord;
@@ -89,7 +87,7 @@ import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, PostLikeEventTestUtils, CommPostEntityTestUtils, SiteMemberProfileEntityTestUtils, PropBugRepEntityTestUtils, CommPostAbuRepEntityTestUtils {
+class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, PostLikeEventTestUtils, CommPostEntityTestUtils, SiteMemberProfileEntityTestUtils, PropBugRepEntityTestUtils, CommPostAbuRepEntityTestUtils, CommCommentEntityTestUtils, CommCommentAbuRepEntityTestUtils {
     private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
     private final SwearService swearService = Mockito.mock(SwearService.class);
     private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
@@ -111,11 +109,12 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
     private final CommCommentLikeJpaRepository commentLikeJpaRepository = Mockito.mock(CommCommentLikeJpaRepository.class);
     private final PropBugRepJpaRepository propBugRepJpaRepository = Mockito.mock(PropBugRepJpaRepository.class);
     private final CommPostAbuRepJpaRepository postAbuRepJpaRepository = Mockito.mock(CommPostAbuRepJpaRepository.class);
+    private final CommCommentAbuRepJpaRepository commentAbuRepJpaRepository = Mockito.mock(CommCommentAbuRepJpaRepository.class);
 
     private final EventBus eventBus = new EventBus();
     private final PostEventConsumer postEventConsumer = new PostEventConsumer(eventBus, postLikeJpaRepository, postBookmarkJpaRepository, postJpaRepository);
     private final CommentEventConsumer commentEventConsumer = new CommentEventConsumer(eventBus, commentLikeJpaRepository, commentJpaRepository);
-    private final ReportEventConsumer reportEventConsumer = new ReportEventConsumer(eventBus, memberJpaRepository, postJpaRepository, propBugRepJpaRepository, postAbuRepJpaRepository);
+    private final ReportEventConsumer reportEventConsumer = new ReportEventConsumer(eventBus, memberJpaRepository, postJpaRepository, commentJpaRepository, propBugRepJpaRepository, postAbuRepJpaRepository, commentAbuRepJpaRepository);
     private final MemberController memberController = new MemberController(s3FileService, swearService, jwtTokenProvider, memberMapper, memberProfileMapper, memberImageIOHelper, memberValidationHelper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
 
     private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
@@ -870,7 +869,7 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
 
     @Test
     @DisplayName("reportPostAbuse로 게시글 신고")
-    void testReportPostAbuse_givenAlreadyLikedValue_willDoNothing() {
+    void testReportPostAbuse_givenValidPostAbuseReportRecord_willDoNothing() {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         CommPostEntity postEntity = createCommPostEntityBuilder().authMember(memberEntity).build();
@@ -939,5 +938,61 @@ class MemberControllerTest implements MemberTestUtils, MemberProfileTestUtils, P
 
         // then
         assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE);
+    }
+
+    @Test
+    @DisplayName("reportCommentAbuse로 댓글 신고")
+    void testReportCommentAbuse_givenValidCommentAbuseReportRecord_willDoNothing() {
+        // given
+        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        CommPostEntity postEntity = createCommPostEntityBuilder().authMember(memberEntity).build();
+        CommCommentEntity commentEntity = createCommCommentEntityBuilder().authMember(memberEntity).postEntity(postEntity).build();
+        CommCommentAbuRepEntity commentAbuRepEntity = createCommCommentAbuRepEntityBuilder().member(memberEntity).comment(commentEntity).build();
+
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        willDoNothing().given(memberValidationHelper).validateIfTargetCommentExists(any());
+        given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
+        given(commentJpaRepository.findById(any())).willReturn(Optional.of(commentEntity));
+        given(commentAbuRepJpaRepository.save(any())).willReturn(commentAbuRepEntity);
+
+        // when
+        memberController.reportCommentAbuse(testCommentAbuseReportRecord);
+
+        // then
+        verify(memberJpaRepository, times(1)).findByUuid(any());
+        verify(commentJpaRepository, times(1)).findById(any());
+        verify(commentAbuRepJpaRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원으로 인해 reportCommentAbuse로 댓글 신고 실패")
+    void testReportCommentAbuse_givenNotFoundMemberId_willThrowException() {
+        // given
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        willThrow(notFoundEntityExceptionForMember).given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
+                () -> memberController.reportCommentAbuse(testCommentAbuseReportRecord));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 대상 댓글 아이디로 인해 reportCommentAbuse로 댓글 신고 실패")
+    void testReportCommentAbuse_givenNotFoundTargetCommentId_willThrowException() {
+        // given
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        willThrow(notFoundEntityExceptionForTargetComment).given(memberValidationHelper).validateIfTargetCommentExists(any());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
+                () -> memberController.reportCommentAbuse(testCommentAbuseReportRecord));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID);
     }
 }

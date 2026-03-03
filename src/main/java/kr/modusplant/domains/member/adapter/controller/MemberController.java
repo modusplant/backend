@@ -178,21 +178,31 @@ public class MemberController {
 
     public void likeComment(MemberCommentLikeRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
-        TargetCommentId targetCommentId = TargetCommentId.create(TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
+        TargetCommentId targetCommentId = TargetCommentId.create(
+                TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
         if (targetCommentIdRepository.isUnliked(memberId, targetCommentId)) {
-            eventBus.publish(CommentLikeEvent.create(memberId.getValue(), targetCommentId.getTargetPostId().getValue(), targetCommentId.getTargetCommentPath().getValue()));
+            eventBus.publish(
+                    CommentLikeEvent.create(
+                            memberId.getValue(),
+                            targetCommentId.getTargetPostId().getValue(),
+                            targetCommentId.getTargetCommentPath().getValue()));
         }
     }
 
     public void unlikeComment(MemberCommentUnlikeRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
-        TargetCommentId targetCommentId = TargetCommentId.create(TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
+        TargetCommentId targetCommentId = TargetCommentId.create(
+                TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
         if (targetCommentIdRepository.isLiked(memberId, targetCommentId)) {
-            eventBus.publish(CommentUnlikeEvent.create(memberId.getValue(), targetCommentId.getTargetPostId().getValue(), targetCommentId.getTargetCommentPath().getValue()));
+            eventBus.publish(
+                    CommentUnlikeEvent.create(
+                            memberId.getValue(),
+                            targetCommentId.getTargetPostId().getValue(),
+                            targetCommentId.getTargetCommentPath().getValue()));
         }
     }
 
@@ -208,7 +218,12 @@ public class MemberController {
         } else {
             reportImagePath = EmptyReportImagePath.create();
         }
-        eventBus.publish(ProposalOrBugReportEvent.create(memberId.getValue(), reportTitle.getValue(), reportContent.getValue(), reportImagePath.getValue()));
+        eventBus.publish(
+                ProposalOrBugReportEvent.create(
+                        memberId.getValue(),
+                        reportTitle.getValue(),
+                        reportContent.getValue(),
+                        reportImagePath.getValue()));
     }
 
     public void reportPostAbuse(PostAbuseReportRecord record) {
@@ -217,9 +232,19 @@ public class MemberController {
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfTargetPostExists(targetPostId);
         if (!targetPostIdRepository.isPublished(targetPostId)) {
-            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE, "postReportForAbuse", targetPostId.getValue());
+            throw new NotAccessibleException(
+                    NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE, "postReportForAbuse", targetPostId.getValue());
         }
         eventBus.publish(PostAbuseReportEvent.create(memberId.getValue(), record.postUlid()));
+    }
+
+    public void reportCommentAbuse(CommentAbuseReportRecord record) {
+        MemberId memberId = MemberId.fromUuid(jwtTokenProvider.getMemberUuidFromToken(record.accessToken()));
+        TargetCommentId targetCommentId = TargetCommentId.create(
+                TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
+        memberValidationHelper.validateIfMemberExists(memberId);
+        memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
+        eventBus.publish(CommentAbuseReportEvent.create(memberId.getValue(), record.postUlid(), record.path()));
     }
 
     private void validateBeforeOverrideProfile(MemberId memberId, Nickname memberNickname) {
