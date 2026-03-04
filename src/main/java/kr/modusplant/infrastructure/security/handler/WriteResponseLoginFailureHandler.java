@@ -22,7 +22,7 @@ public class WriteResponseLoginFailureHandler implements AuthenticationFailureHa
                                         HttpServletResponse response,
                                         AuthenticationException exception) throws IOException {
 
-        response.setContentType("application/json;charset=UTF-8");
+        response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
         if(exception instanceof BusinessAuthenticationException ex) {
