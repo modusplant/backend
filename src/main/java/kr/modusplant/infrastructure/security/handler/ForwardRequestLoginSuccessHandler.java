@@ -45,15 +45,21 @@ public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessH
         TokenPair loginTokenPair = tokenService.issueToken(
                 currentMember.getActiveUuid(), currentMember.getNickname(), currentMember.getEmail(), getMemberRole(currentMember));
 
-        String refreshTokenCookie = tokenProvider.generateRefreshTokenCookieAsString(loginTokenPair.refreshToken());
-        Map<String, Object> accessTokenData = Map.of("accessToken", loginTokenPair.accessToken());
-
         response.setStatus(GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus());
-        response.setHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie);
-        response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store");
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(objectMapper.writeValueAsString(DataResponse.ok(accessTokenData)));
+
+        response.setHeader(HttpHeaders.SET_COOKIE,
+                tokenProvider.generateRefreshTokenCookieAsString(loginTokenPair.refreshToken())
+        );
+        response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store");
+
+        response.getWriter().write(
+                objectMapper.writeValueAsString(
+                        DataResponse.ok(
+                                Map.of("accessToken", loginTokenPair.accessToken())
+                        ))
+        );
 
     }
 
