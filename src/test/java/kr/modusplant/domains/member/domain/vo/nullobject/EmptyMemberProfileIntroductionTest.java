@@ -1,16 +1,16 @@
 package kr.modusplant.domains.member.domain.vo.nullobject;
 
-import kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyMemberProfileIntroductionTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils.testMemberProfileIntroduction;
+import static kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyMemberProfileIntroductionTestUtils.TEST_EMPTY_MEMBER_PROFILE_INTRODUCTION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class EmptyMemberProfileIntroductionTest implements EmptyMemberProfileIntroductionTestUtils {
+class EmptyMemberProfileIntroductionTest {
     @Test
     @DisplayName("create로 비어 있는 회원 프로필 소개 반환")
     void testCreate_givenNothing_willReturnEmptyMemberProfileIntroduction() {

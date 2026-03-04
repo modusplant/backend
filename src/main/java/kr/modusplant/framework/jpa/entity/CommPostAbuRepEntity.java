@@ -16,15 +16,15 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
-import static kr.modusplant.shared.persistence.constant.TableName.PROP_BUG_REP;
+import static kr.modusplant.shared.persistence.constant.TableName.COMM_POST_ABU_REP;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = PROP_BUG_REP)
+@Table(name = COMM_POST_ABU_REP)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
-public class PropBugRepEntity {
+public class CommPostAbuRepEntity {
     @Id
     @UlidGenerator
     @Column(nullable = false, updatable = false)
@@ -35,14 +35,10 @@ public class PropBugRepEntity {
     @ToString.Exclude
     private SiteMemberEntity member;
 
-    @Column(nullable = false, updatable = false, length = 60)
-    private String title;
-
-    @Column(nullable = false, updatable = false, length = 600)
-    private String content;
-
-    @Column(name = "image_path", updatable = false)
-    private String imagePath;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
+    @JoinColumn(name = POST_ULID, nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @ToString.Exclude
+    private CommPostEntity post;
 
     @Column(name = CHECKED_AT)
     private LocalDateTime checkedAt;
@@ -75,7 +71,7 @@ public class PropBugRepEntity {
     public boolean equals(Object object) {
         if (this == object) return true;
 
-        if (!(object instanceof PropBugRepEntity that)) return false;
+        if (!(object instanceof CommPostAbuRepEntity that)) return false;
 
         return new EqualsBuilder().append(getUlid(), that.getUlid()).isEquals();
     }
@@ -85,77 +81,61 @@ public class PropBugRepEntity {
         return new HashCodeBuilder(17, 37).append(getUlid()).toHashCode();
     }
 
-    private PropBugRepEntity(String ulid, SiteMemberEntity member, String title, String content, String imagePath, LocalDateTime checkedAt, LocalDateTime handledAt) {
+    private CommPostAbuRepEntity(String ulid, SiteMemberEntity member, CommPostEntity post, LocalDateTime checkedAt, LocalDateTime handledAt) {
         this.ulid = ulid;
         this.member = member;
-        this.title = title;
-        this.content = content;
-        this.imagePath = imagePath;
+        this.post = post;
         this.checkedAt = checkedAt;
         this.handledAt = handledAt;
     }
 
-    public static PropBugRepEntityBuilder builder() {
-        return new PropBugRepEntityBuilder();
+    public static CommPostAbuRepEntityBuilder builder() {
+        return new CommPostAbuRepEntityBuilder();
     }
 
-    public static final class PropBugRepEntityBuilder {
+    public static final class CommPostAbuRepEntityBuilder {
         private String ulid;
         private SiteMemberEntity member;
-        private String title;
-        private String content;
-        private String imagePath;
+        private CommPostEntity post;
         private LocalDateTime checkedAt;
         private LocalDateTime handledAt;
 
-        public PropBugRepEntityBuilder ulid(final String ulid) {
+        public CommPostAbuRepEntityBuilder ulid(final String ulid) {
             this.ulid = ulid;
             return this;
         }
 
-        public PropBugRepEntityBuilder member(final SiteMemberEntity member) {
+        public CommPostAbuRepEntityBuilder member(final SiteMemberEntity member) {
             this.member = member;
             return this;
         }
 
-        public PropBugRepEntityBuilder title(final String title) {
-            this.title = title;
+        public CommPostAbuRepEntityBuilder post(final CommPostEntity post) {
+            this.post = post;
             return this;
         }
 
-        public PropBugRepEntityBuilder content(final String content) {
-            this.content = content;
-            return this;
-        }
-
-        public PropBugRepEntityBuilder imagePath(final String imagePath) {
-            this.imagePath = imagePath;
-            return this;
-        }
-
-        public PropBugRepEntityBuilder checkedAt(final LocalDateTime checkedAt) {
+        public CommPostAbuRepEntityBuilder checkedAt(final LocalDateTime checkedAt) {
             this.checkedAt = checkedAt;
             return this;
         }
 
-        public PropBugRepEntityBuilder handledAt(final LocalDateTime handledAt) {
+        public CommPostAbuRepEntityBuilder handledAt(final LocalDateTime handledAt) {
             this.handledAt = handledAt;
             return this;
         }
 
-        public PropBugRepEntityBuilder propBugRep(final PropBugRepEntity propBugRep) {
-            this.ulid = propBugRep.getUlid();
-            this.member = propBugRep.getMember();
-            this.title = propBugRep.getTitle();
-            this.content = propBugRep.getContent();
-            this.imagePath = propBugRep.getImagePath();
-            this.checkedAt = propBugRep.getCheckedAt();
-            this.handledAt = propBugRep.getHandledAt();
+        public CommPostAbuRepEntityBuilder commPostAbuRep(final CommPostAbuRepEntity postAbuRep) {
+            this.ulid = postAbuRep.getUlid();
+            this.member = postAbuRep.getMember();
+            this.post = postAbuRep.getPost();
+            this.checkedAt = postAbuRep.getCheckedAt();
+            this.handledAt = postAbuRep.getHandledAt();
             return this;
         }
 
-        public PropBugRepEntity build() {
-            return new PropBugRepEntity(this.ulid, this.member, this.title, this.content, this.imagePath, this.checkedAt, this.handledAt);
+        public CommPostAbuRepEntity build() {
+            return new CommPostAbuRepEntity(this.ulid, this.member, this.post, this.checkedAt, this.handledAt);
         }
     }
 }

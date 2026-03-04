@@ -12,7 +12,10 @@ import java.util.UUID;
 
 @Repository
 @Primary
-public interface SiteMemberTermJpaRepository extends LastModifiedAtRepository<SiteMemberTermEntity>, SiteMemberUuidPrimaryKeyJpaRepository<SiteMemberTermEntity>, JpaRepository<SiteMemberTermEntity, UUID> {
+public interface SiteMemberTermJpaRepository extends
+        LastModifiedAtRepository<SiteMemberTermEntity>,
+        SiteMemberUuidPrimaryKeyJpaRepository<SiteMemberTermEntity>,
+        JpaRepository<SiteMemberTermEntity, UUID> {
     List<SiteMemberTermEntity> findByAgreedTermsOfUseVersion(String agreedTermsOfUseVersion);
 
     List<SiteMemberTermEntity> findByAgreedPrivacyPolicyVersion(String agreedPrivacyPolicyVersion);

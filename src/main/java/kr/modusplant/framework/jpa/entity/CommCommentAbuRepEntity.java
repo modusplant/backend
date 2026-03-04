@@ -16,15 +16,15 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
-import static kr.modusplant.shared.persistence.constant.TableName.PROP_BUG_REP;
+import static kr.modusplant.shared.persistence.constant.TableName.COMM_COMMENT_ABU_REP;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = PROP_BUG_REP)
+@Table(name = COMM_COMMENT_ABU_REP)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
-public class PropBugRepEntity {
+public class CommCommentAbuRepEntity {
     @Id
     @UlidGenerator
     @Column(nullable = false, updatable = false)
@@ -35,14 +35,13 @@ public class PropBugRepEntity {
     @ToString.Exclude
     private SiteMemberEntity member;
 
-    @Column(nullable = false, updatable = false, length = 60)
-    private String title;
-
-    @Column(nullable = false, updatable = false, length = 600)
-    private String content;
-
-    @Column(name = "image_path", updatable = false)
-    private String imagePath;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
+    @JoinColumns({
+            @JoinColumn(name = POST_ULID, referencedColumnName = POST_ULID, nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT)),
+            @JoinColumn(name = PATH, referencedColumnName = PATH, nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    })
+    @ToString.Exclude
+    private CommCommentEntity comment;
 
     @Column(name = CHECKED_AT)
     private LocalDateTime checkedAt;
@@ -75,7 +74,7 @@ public class PropBugRepEntity {
     public boolean equals(Object object) {
         if (this == object) return true;
 
-        if (!(object instanceof PropBugRepEntity that)) return false;
+        if (!(object instanceof CommCommentAbuRepEntity that)) return false;
 
         return new EqualsBuilder().append(getUlid(), that.getUlid()).isEquals();
     }
@@ -85,77 +84,61 @@ public class PropBugRepEntity {
         return new HashCodeBuilder(17, 37).append(getUlid()).toHashCode();
     }
 
-    private PropBugRepEntity(String ulid, SiteMemberEntity member, String title, String content, String imagePath, LocalDateTime checkedAt, LocalDateTime handledAt) {
+    private CommCommentAbuRepEntity(String ulid, SiteMemberEntity member, CommCommentEntity comment, LocalDateTime checkedAt, LocalDateTime handledAt) {
         this.ulid = ulid;
         this.member = member;
-        this.title = title;
-        this.content = content;
-        this.imagePath = imagePath;
+        this.comment = comment;
         this.checkedAt = checkedAt;
         this.handledAt = handledAt;
     }
 
-    public static PropBugRepEntityBuilder builder() {
-        return new PropBugRepEntityBuilder();
+    public static CommCommentAbuRepEntityBuilder builder() {
+        return new CommCommentAbuRepEntityBuilder();
     }
 
-    public static final class PropBugRepEntityBuilder {
+    public static final class CommCommentAbuRepEntityBuilder {
         private String ulid;
         private SiteMemberEntity member;
-        private String title;
-        private String content;
-        private String imagePath;
+        private CommCommentEntity comment;
         private LocalDateTime checkedAt;
         private LocalDateTime handledAt;
 
-        public PropBugRepEntityBuilder ulid(final String ulid) {
+        public CommCommentAbuRepEntityBuilder ulid(final String ulid) {
             this.ulid = ulid;
             return this;
         }
 
-        public PropBugRepEntityBuilder member(final SiteMemberEntity member) {
+        public CommCommentAbuRepEntityBuilder member(final SiteMemberEntity member) {
             this.member = member;
             return this;
         }
 
-        public PropBugRepEntityBuilder title(final String title) {
-            this.title = title;
+        public CommCommentAbuRepEntityBuilder comment(final CommCommentEntity comment) {
+            this.comment = comment;
             return this;
         }
 
-        public PropBugRepEntityBuilder content(final String content) {
-            this.content = content;
-            return this;
-        }
-
-        public PropBugRepEntityBuilder imagePath(final String imagePath) {
-            this.imagePath = imagePath;
-            return this;
-        }
-
-        public PropBugRepEntityBuilder checkedAt(final LocalDateTime checkedAt) {
+        public CommCommentAbuRepEntityBuilder checkedAt(final LocalDateTime checkedAt) {
             this.checkedAt = checkedAt;
             return this;
         }
 
-        public PropBugRepEntityBuilder handledAt(final LocalDateTime handledAt) {
+        public CommCommentAbuRepEntityBuilder handledAt(final LocalDateTime handledAt) {
             this.handledAt = handledAt;
             return this;
         }
 
-        public PropBugRepEntityBuilder propBugRep(final PropBugRepEntity propBugRep) {
-            this.ulid = propBugRep.getUlid();
-            this.member = propBugRep.getMember();
-            this.title = propBugRep.getTitle();
-            this.content = propBugRep.getContent();
-            this.imagePath = propBugRep.getImagePath();
-            this.checkedAt = propBugRep.getCheckedAt();
-            this.handledAt = propBugRep.getHandledAt();
+        public CommCommentAbuRepEntityBuilder commCommentAbuRep(final CommCommentAbuRepEntity commentAbuRep) {
+            this.ulid = commentAbuRep.getUlid();
+            this.member = commentAbuRep.getMember();
+            this.comment = commentAbuRep.getComment();
+            this.checkedAt = commentAbuRep.getCheckedAt();
+            this.handledAt = commentAbuRep.getHandledAt();
             return this;
         }
 
-        public PropBugRepEntity build() {
-            return new PropBugRepEntity(this.ulid, this.member, this.title, this.content, this.imagePath, this.checkedAt, this.handledAt);
+        public CommCommentAbuRepEntity build() {
+            return new CommCommentAbuRepEntity(this.ulid, this.member, this.comment, this.checkedAt, this.handledAt);
         }
     }
 }

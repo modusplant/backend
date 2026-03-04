@@ -1,6 +1,5 @@
 package kr.modusplant.domains.member.domain.vo.nullobject;
 
-import kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyMemberBirthDateTestUtils;
 import kr.modusplant.domains.member.domain.vo.MemberBirthDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,11 +7,12 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyMemberBirthDateTestUtils.TEST_EMPTY_MEMBER_BIRTH_DATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class EmptyMemberBirthDateTest implements EmptyMemberBirthDateTestUtils {
+class EmptyMemberBirthDateTest {
     @Test
     @DisplayName("create로 비어 있는 회원 생일 반환")
     void testCreate_givenNothing_willReturnEmptyMemberBirthDate() {

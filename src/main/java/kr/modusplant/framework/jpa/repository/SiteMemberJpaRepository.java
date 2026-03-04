@@ -15,7 +15,10 @@ import java.util.UUID;
 
 @Repository
 @Primary
-public interface SiteMemberJpaRepository extends CreatedAtAndLastModifiedAtRepository<SiteMemberEntity>, UuidPrimaryKeyRepository<SiteMemberEntity>, JpaRepository<SiteMemberEntity, UUID> {
+public interface SiteMemberJpaRepository extends
+        CreatedAtAndLastModifiedAtRepository<SiteMemberEntity>,
+        UuidPrimaryKeyRepository<SiteMemberEntity>,
+        JpaRepository<SiteMemberEntity, UUID> {
     List<SiteMemberEntity> findByBirthDate(LocalDate birthDate);
 
     List<SiteMemberEntity> findByIsActive(Boolean isActive);

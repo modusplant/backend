@@ -3,6 +3,7 @@ package kr.modusplant.domains.member.framework.in.web.rest;
 import kr.modusplant.domains.member.adapter.controller.MemberController;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.exception.IncorrectMemberIdException;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
 import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
@@ -28,6 +29,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.UUID;
 
+import static kr.modusplant.domains.member.common.util.usecase.record.CommentAbuseReportRecordTestUtils.testCommentAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.testMemberPostBookmarkCancelRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.testMemberCommentLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.testMemberCommentUnlikeRecord;
@@ -37,6 +39,7 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberPost
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileGetRecordTestUtils.testMemberProfileGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.request.MemberRegisterRequestTestUtils.testMemberRegisterRequest;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
@@ -268,10 +271,60 @@ class MemberRestControllerTest implements MemberTestUtils {
     @DisplayName("reportProposalOrBug로 응답 반환")
     void testReportProposalOrBug_givenValidRequest_willReturnResponse() throws IOException {
         // given
-        given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberController).reportProposalOrBug(testProposalOrBugReportRecord);
 
         // when
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportProposalOrBug(REPORT_TITLE, REPORT_CONTENT, REPORT_IMAGE, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok().toString());
+    }
+
+    @Test
+    @DisplayName("게시글 ID를 포함하지 않는 요청으로 reportPostAbuse로 응답 반환")
+    void testReportPostAbuse_givenValidRequestWithoutPostId_willReturnResponse() {
+        // given & when
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportPostAbuse(MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_POST_ID).toString());
+    }
+
+    @Test
+    @DisplayName("게시글 ID를 포함하는 요청으로 reportPostAbuse로 응답 반환")
+    void testReportPostAbuse_givenValidRequestWithPostId_willReturnResponse() {
+        // given
+        willDoNothing().given(memberController).reportPostAbuse(testPostAbuseReportRecord);
+
+        // when
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportPostAbuse(TEST_COMM_POST_ULID, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok().toString());
+    }
+
+    @Test
+    @DisplayName("댓글 ID를 포함하지 않는 요청으로 reportCommentAbuse로 응답 반환")
+    void testReportCommentAbuse_givenValidRequestWithoutCommentId_willReturnResponse() {
+        // given & when
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportCommentAbuse(TEST_COMM_COMMENT_PATH, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_COMMENT_ID).toString());
+    }
+
+    @Test
+    @DisplayName("댓글 ID를 포함하는 요청으로 reportCommentAbuse로 응답 반환")
+    void testReportCommentAbuse_givenValidRequestWithCommentId_willReturnResponse() {
+        // given
+        willDoNothing().given(memberController).reportCommentAbuse(testCommentAbuseReportRecord);
+
+        // when
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportCommentAbuse(TEST_COMM_POST_ULID, TEST_COMM_COMMENT_PATH, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
         ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportProposalOrBug(REPORT_TITLE, REPORT_CONTENT, REPORT_IMAGE, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
 
         // then

@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import kr.modusplant.domains.member.adapter.controller.MemberController;
 import kr.modusplant.domains.member.domain.exception.IncorrectMemberIdException;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
 import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.domains.member.usecase.record.*;
@@ -39,7 +40,7 @@ import static kr.modusplant.shared.constant.Regex.*;
 
 @Tag(name = "회원 API", description = "회원의 생성과 갱신(상태 제외), 회원이 할 수 있는 단일한 기능을 관리하는 API 입니다.")
 @RestController
-@RequestMapping("/api/v1/members")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Validated
 @Slf4j
@@ -50,7 +51,7 @@ public class MemberRestController {
 
     @Hidden
     @Operation(summary = "회원 등록 API", description = "닉네임을 통해 회원을 등록합니다.")
-    @PostMapping
+    @PostMapping(value = "/members")
     public ResponseEntity<DataResponse<MemberResponse>> registerMember(
             @RequestBody @Valid MemberRegisterRequest request) {
         return ResponseEntity
@@ -59,7 +60,7 @@ public class MemberRestController {
     }
 
     @Operation(summary = "회원 닉네임 중복 확인 API", description = "이미 등록된 닉네임이 있는지 조회합니다.")
-    @GetMapping(value = "/check/nickname/{nickname}")
+    @GetMapping(value = "/members/check/nickname/{nickname}")
     public ResponseEntity<DataResponse<Map<String, Boolean>>> checkExistedMemberNickname(
             @Parameter(
                     description = "중복을 확인하려는 회원의 닉네임",
@@ -89,7 +90,7 @@ public class MemberRestController {
             description = "기존 회원 프로필을 조회합니다. ",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @GetMapping(value = "/{id}/profile")
+    @GetMapping(value = "/members/{id}/profile")
     public ResponseEntity<DataResponse<MemberProfileResponse>> getMemberProfile(
             @Parameter(
                     description = "기존에 저장된 회원의 아이디",
@@ -142,7 +143,7 @@ public class MemberRestController {
             description = "기존 회원 프로필을 덮어씁니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PutMapping(value = "/{id}/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/members/{id}/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<MemberProfileResponse>> overrideMemberProfile(
             @Parameter(
                     description = "기존에 저장된 회원의 아이디",
@@ -191,7 +192,7 @@ public class MemberRestController {
             description = "게시글에 좋아요를 누릅니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PutMapping("/{id}/like/communication/post/{postUlid}")
+    @PutMapping("/members/{id}/like/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationPost(
             @Parameter(
                     description = "회원의 아이디",
@@ -223,7 +224,7 @@ public class MemberRestController {
             description = "게시글에 대한 좋아요를 취소합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping("/{id}/like/communication/post/{postUlid}")
+    @DeleteMapping("/members/{id}/like/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationPost(
             @Parameter(
                     description = "회원의 아이디",
@@ -255,7 +256,7 @@ public class MemberRestController {
             description = "게시글에 북마크를 누릅니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PutMapping("/{id}/bookmark/communication/post/{postUlid}")
+    @PutMapping("/members/{id}/bookmark/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> bookmarkCommunicationPost(
             @Parameter(
                     description = "회원의 아이디",
@@ -287,7 +288,7 @@ public class MemberRestController {
             description = "게시글에 대한 북마크를 취소합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping("/{id}/bookmark/communication/post/{postUlid}")
+    @DeleteMapping("/members/{id}/bookmark/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> cancelCommunicationPostBookmark(
             @Parameter(
                     description = "회원의 아이디",
@@ -319,7 +320,7 @@ public class MemberRestController {
             description = "댓글에 좋아요를 누릅니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PutMapping("/{id}/like/communication/post/{postUlid}/path/{path}")
+    @PutMapping("/members/{id}/like/communication/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationComment(
             @Parameter(
                     description = "회원의 아이디",
@@ -360,7 +361,7 @@ public class MemberRestController {
             description = "댓글에 대한 좋아요를 취소합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping("/{id}/like/communication/post/{postUlid}/path/{path}")
+    @DeleteMapping("/members/{id}/like/communication/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationComment(
             @Parameter(
                     description = "회원의 아이디",
@@ -401,7 +402,7 @@ public class MemberRestController {
             description = "건의 사항 또는 버그를 제보합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping(value = "/proposal-or-bug", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/report/proposal-or-bug", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> reportProposalOrBug(
             @Parameter(description = "보고서 제목", example = "제보합니다!")
             @RequestPart(name = "title")
@@ -421,6 +422,108 @@ public class MemberRestController {
             @Parameter(hidden = true)
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
+            String auth) throws IOException {
+        memberController.reportProposalOrBug(
+                new ProposalOrBugReportRecord(
+                        getTokenFromAuthorizationHeader(auth), title, content, image));
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Hidden
+    @Operation(
+            summary = "게시글 신고 API",
+            description = "게시글을 신고합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PostMapping(value = "/report/abuse/post/")
+    public ResponseEntity<DataResponse<Void>> reportPostAbuse(
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
+            @NotNull(message = "접근 토큰이 비어 있습니다. ")
+            String auth) {
+        return ResponseEntity.badRequest().body(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_POST_ID));
+    }
+
+    @Operation(
+            summary = "게시글 신고 API",
+            description = "게시글을 신고합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PostMapping(value = "/report/abuse/post/{postUlid}")
+    public ResponseEntity<DataResponse<Void>> reportPostAbuse(
+            @Parameter(
+                    description = "신고할 게시글의 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
+            @PathVariable
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String postUlid,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
+            @NotNull(message = "접근 토큰이 비어 있습니다. ")
+            String auth) {
+        memberController.reportPostAbuse(
+                new PostAbuseReportRecord(
+                        getTokenFromAuthorizationHeader(auth), postUlid));
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Hidden
+    @Operation(
+            summary = "댓글 신고 API",
+            description = "댓글을 신고합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PostMapping(value = "/report/abuse/post//path/{path}")
+    public ResponseEntity<DataResponse<Void>> reportCommentAbuse(
+            @Parameter(
+                    description = "신고할 댓글의 경로",
+                    example = "1.0.4",
+                    schema = @Schema(type = "string", pattern = REGEX_MATERIALIZED_PATH)
+            )
+            @PathVariable(required = false)
+            @NotBlank(message = "댓글 경로가 비어 있습니다.")
+            String path,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
+            @NotNull(message = "접근 토큰이 비어 있습니다. ")
+            String auth) {
+        return ResponseEntity.badRequest().body(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_COMMENT_ID));
+    }
+
+    @Operation(
+            summary = "댓글 신고 API",
+            description = "댓글을 신고합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PostMapping(value = "/report/abuse/post/{postUlid}/path/{path}")
+    public ResponseEntity<DataResponse<Void>> reportCommentAbuse(
+            @Parameter(
+                    description = "신고할 댓글이 달린 게시글의 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
+            @PathVariable
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String postUlid,
+
+            @Parameter(
+                    description = "신고할 댓글의 경로",
+                    example = "1.0.4",
+                    schema = @Schema(type = "string", pattern = REGEX_MATERIALIZED_PATH)
+            )
+            @PathVariable(required = false)
+            @NotBlank(message = "댓글 경로가 비어 있습니다.")
+            String path,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
+            @NotNull(message = "접근 토큰이 비어 있습니다. ")
+            String auth) {
+        memberController.reportCommentAbuse(
+                new CommentAbuseReportRecord(
+                        getTokenFromAuthorizationHeader(auth), postUlid, path));
             String auth) throws IOException {
         memberController.reportProposalOrBug(
                 new ProposalOrBugReportRecord(
