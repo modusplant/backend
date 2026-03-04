@@ -85,7 +85,7 @@ public class SecurityConfig {
 
     @Bean
     public ForwardRequestLoginSuccessHandler forwardRequestLoginSuccessHandler() {
-        return new ForwardRequestLoginSuccessHandler(memberRepository, tokenService);
+        return new ForwardRequestLoginSuccessHandler(memberRepository, tokenService, tokenProvider, objectMapper);
     }
 
     @Bean

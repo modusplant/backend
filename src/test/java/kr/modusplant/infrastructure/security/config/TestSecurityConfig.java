@@ -2,6 +2,7 @@ package kr.modusplant.infrastructure.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.DefaultAuthProvider;
 import kr.modusplant.infrastructure.security.DefaultAuthenticationEntryPoint;
@@ -41,6 +42,7 @@ public class TestSecurityConfig {
     private final AuthenticationConfiguration authConfiguration;
     private final DefaultUserDetailsService defaultUserDetailsService;
     private final TokenService tokenService;
+    private final JwtTokenProvider tokenProvider;
     private final SiteMemberJpaRepository memberRepository;
     private final ObjectMapper objectMapper;
     private final Validator validator;
@@ -67,7 +69,7 @@ public class TestSecurityConfig {
 
     @Bean
     public ForwardRequestLoginSuccessHandler normalLoginSuccessHandler() {
-        return new ForwardRequestLoginSuccessHandler(memberRepository, tokenService);
+        return new ForwardRequestLoginSuccessHandler(memberRepository, tokenService, tokenProvider, objectMapper);
     }
 
     @Bean

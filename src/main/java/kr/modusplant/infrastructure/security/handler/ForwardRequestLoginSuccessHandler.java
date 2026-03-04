@@ -1,24 +1,30 @@
 package kr.modusplant.infrastructure.security.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
+import kr.modusplant.shared.exception.enums.GeneralSuccessCode;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -26,6 +32,8 @@ public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessH
 
     private final SiteMemberJpaRepository memberRepository;
     private final TokenService tokenService;
+    private final JwtTokenProvider tokenProvider;
+    private final ObjectMapper objectMapper;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -38,10 +46,16 @@ public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessH
         TokenPair loginTokenPair = tokenService.issueToken(
                 currentMember.getActiveUuid(), currentMember.getNickname(), currentMember.getEmail(), getMemberRole(currentMember));
 
-        request.setAttribute("accessToken", loginTokenPair.accessToken());
-        request.setAttribute("refreshToken", loginTokenPair.refreshToken());
+        String refreshTokenCookie = tokenProvider.generateRefreshTokenCookieAsString(loginTokenPair.refreshToken());
+        Map<String, Object> accessTokenData = Map.of("accessToken", loginTokenPair.accessToken());
 
-        request.getRequestDispatcher("/api/auth/login-success").forward(request, response);
+        response.setStatus(GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus());
+        response.setHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie);
+        response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store");
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(objectMapper.writeValueAsString(DataResponse.ok(accessTokenData)));
+
     }
 
     private Role getMemberRole(DefaultUserDetails currentUserDetails) {
