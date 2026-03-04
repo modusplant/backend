@@ -98,8 +98,8 @@ public class SecurityConfig {
         return new JwtClearingLogoutHandler(tokenService); }
 
     @Bean
-    public ForwardRequestLogoutSuccessHandler normalLogoutSuccessHandler() {
-        return new ForwardRequestLogoutSuccessHandler(objectMapper); }
+    public WriteResponseLogoutSuccessHandler normalLogoutSuccessHandler() {
+        return new WriteResponseLogoutSuccessHandler(objectMapper); }
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(HttpSecurity http) {
