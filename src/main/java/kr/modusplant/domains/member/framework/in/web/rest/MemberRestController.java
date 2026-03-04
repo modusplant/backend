@@ -524,10 +524,6 @@ public class MemberRestController {
         memberController.reportCommentAbuse(
                 new CommentAbuseReportRecord(
                         getTokenFromAuthorizationHeader(auth), postUlid, path));
-            String auth) throws IOException {
-        memberController.reportProposalOrBug(
-                new ProposalOrBugReportRecord(
-                        getTokenFromAuthorizationHeader(auth), title, content, image));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

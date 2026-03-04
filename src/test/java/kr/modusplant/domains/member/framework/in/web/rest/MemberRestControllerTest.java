@@ -325,7 +325,6 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // when
         ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportCommentAbuse(TEST_COMM_POST_ULID, TEST_COMM_COMMENT_PATH, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportProposalOrBug(REPORT_TITLE, REPORT_CONTENT, REPORT_IMAGE, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
