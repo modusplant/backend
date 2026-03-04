@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessHandler {
+public class WriteResponseLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final SiteMemberJpaRepository memberRepository;
     private final TokenService tokenService;

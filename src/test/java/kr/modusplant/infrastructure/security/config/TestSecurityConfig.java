@@ -68,8 +68,8 @@ public class TestSecurityConfig {
     }
 
     @Bean
-    public ForwardRequestLoginSuccessHandler normalLoginSuccessHandler() {
-        return new ForwardRequestLoginSuccessHandler(memberRepository, tokenService, tokenProvider, objectMapper);
+    public WriteResponseLoginSuccessHandler normalLoginSuccessHandler() {
+        return new WriteResponseLoginSuccessHandler(memberRepository, tokenService, tokenProvider, objectMapper);
     }
 
     @Bean
