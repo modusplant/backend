@@ -1,62 +1,56 @@
-//package kr.modusplant.infrastructure.security.component;
-//
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
-//import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
-//import kr.modusplant.infrastructure.jwt.dto.TokenPair;
-//import kr.modusplant.infrastructure.jwt.service.TokenService;
-//import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
-//import kr.modusplant.infrastructure.security.common.util.NormalLoginRequestTestUtils;
-//import kr.modusplant.infrastructure.security.common.util.SiteMemberUserDetailsTestUtils;
-//import kr.modusplant.infrastructure.security.context.SecurityOnlyContext;
-//import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.http.MediaType;
-//import org.springframework.security.crypto.password.PasswordEncoder;
-//import org.springframework.security.web.FilterChainProxy;
-//import org.springframework.test.web.servlet.MockMvc;
-//
-//import java.util.Optional;
-//
-//import static org.hamcrest.Matchers.notNullValue;
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.ArgumentMatchers.anyString;
-//import static org.mockito.BDDMockito.given;
-//import static org.mockito.Mockito.when;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-//
-//@SecurityOnlyContext
-//public class NormalLoginAuthenticationFlowTest implements
-//        SiteMemberUserDetailsTestUtils, NormalLoginRequestTestUtils, SiteMemberEntityTestUtils {
-//
-//    private final MockMvc mockMvc;
-//    private final ObjectMapper objectMapper;
-//    private final FilterChainProxy filterChainProxy;
-//    private final DefaultUserDetailsService defaultUserDetailsService;
-//    private final TokenService tokenService;
-//    private final SiteMemberJpaRepository memberRepository;
-//    private final PasswordEncoder bCryptPasswordEncoder;
-//
-//    @Autowired
-//    public NormalLoginAuthenticationFlowTest(MockMvc mockMvc, ObjectMapper objectMapper, FilterChainProxy filterChainProxy, DefaultUserDetailsService defaultUserDetailsService, TokenService tokenService, SiteMemberJpaRepository memberRepository, PasswordEncoder bCryptPasswordEncoder) {
-//        this.mockMvc = mockMvc;
-//        this.objectMapper = objectMapper;
-//        this.filterChainProxy = filterChainProxy;
-//        this.defaultUserDetailsService = defaultUserDetailsService;
-//        this.tokenService = tokenService;
-//        this.memberRepository = memberRepository;
-//        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-//    }
-//
-//    @Test
-//    public void givenValidSiteMemberUserDetails_willCallSuccessHandler() throws Exception {
+package kr.modusplant.infrastructure.security.component;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.infrastructure.jwt.service.TokenService;
+import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
+import kr.modusplant.infrastructure.security.common.util.NormalLoginRequestTestUtils;
+import kr.modusplant.infrastructure.security.common.util.SiteMemberUserDetailsTestUtils;
+import kr.modusplant.infrastructure.security.context.SecurityOnlyContext;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.FilterChainProxy;
+import org.springframework.test.web.servlet.MockMvc;
+
+@SecurityOnlyContext
+public class NormalLoginAuthenticationFlowTest implements
+        SiteMemberUserDetailsTestUtils, NormalLoginRequestTestUtils, SiteMemberEntityTestUtils {
+
+    private final MockMvc mockMvc;
+    private final ObjectMapper objectMapper;
+    private final FilterChainProxy filterChainProxy;
+    private final DefaultUserDetailsService defaultUserDetailsService;
+    private final TokenService tokenService;
+    private final SiteMemberJpaRepository memberRepository;
+    private final PasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    public NormalLoginAuthenticationFlowTest(MockMvc mockMvc, ObjectMapper objectMapper, FilterChainProxy filterChainProxy, DefaultUserDetailsService defaultUserDetailsService, TokenService tokenService, SiteMemberJpaRepository memberRepository, @Qualifier("bcryptPasswordEncoder") PasswordEncoder bCryptPasswordEncoder) {
+        this.mockMvc = mockMvc;
+        this.objectMapper = objectMapper;
+        this.filterChainProxy = filterChainProxy;
+        this.defaultUserDetailsService = defaultUserDetailsService;
+        this.tokenService = tokenService;
+        this.memberRepository = memberRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
+
+    @Test
+    public void verifyFilterChain() {
+        filterChainProxy.getFilterChains()
+                .forEach(filter -> System.out.println("Filter being chained: " + filter));
+    }
+
+    @Test
+    public void givenValidSiteMemberUserDetails_willCallSuccessHandler() throws Exception {
 //        // given
-//        when(bCryptPasswordEncoder.encode("userPw2!"))
-//                .thenReturn(testDefaultMemberUserDetailsBuilder.build().getPassword());
-//        when(bCryptPasswordEncoder.matches(anyString(), anyString()))
-//                .thenReturn(true);
+//        given(bCryptPasswordEncoder.encode("userPw2!"))
+//                .willReturn(testDefaultMemberUserDetailsBuilder.build().getPassword());
+//        given(bCryptPasswordEncoder.matches(anyString(), anyString()))
+//                .willReturn(true);
 //
 //        DefaultUserDetails validDefaultUserDetails = testDefaultMemberUserDetailsBuilder
 //                .isActive(true)
@@ -83,10 +77,10 @@
 //                .andExpect(forwardedUrl("/api/auth/login-success"))
 //                .andExpect(request().attribute("accessToken", notNullValue()))
 //                .andExpect(request().attribute("refreshToken", notNullValue()));
-//    }
-//
-//    @Test
-//    public void givenInvalidSiteMemberUserDetails_thenCallFailureHandler() throws Exception {
+    }
+
+    @Test
+    public void givenInvalidSiteMemberUserDetails_thenCallFailureHandler() throws Exception {
 //        // given
 //        when(bCryptPasswordEncoder.encode("userPw2!"))
 //                .thenReturn(testDefaultMemberUserDetailsBuilder.build().getPassword());
@@ -110,11 +104,6 @@
 //                // then
 //                .andExpect(status().isUnauthorized())
 //                .andExpect(jsonPath("$.status").value(401));
-//    }
-//
-//    @Test
-//    public void verifyFilterChain() {
-//        filterChainProxy.getFilterChains()
-//                .forEach(filter -> System.out.println("Filter being chained: " + filter));
-//    }
-//}
+    }
+
+}
