@@ -10,6 +10,7 @@ import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
 import kr.modusplant.infrastructure.security.filter.EmailPasswordAuthenticationFilter;
 import kr.modusplant.infrastructure.security.handler.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +24,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -56,6 +58,12 @@ public class TestSecurityConfig {
     @Bean
     public DefaultAuthenticationEntryPoint defaultAuthenticationEntryPoint() {
         return new DefaultAuthenticationEntryPoint(objectMapper); }
+
+    @Bean
+    @Qualifier("bcryptPasswordEncoder")
+    public PasswordEncoder bcryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
