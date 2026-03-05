@@ -28,7 +28,6 @@ public enum SecurityErrorCode implements ErrorCode {
 
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED.value(), "expired_token", "인증 요건이 만료되었습니다"),
     BLACKLISTED_TOKEN(HttpStatus.UNAUTHORIZED.value(), "blacklisted_token", "인증 요건이 사용될 수 있는 상태가 아닙니다"),
-    EMPTY_TOKEN(HttpStatus.UNAUTHORIZED.value(), "empty_token", "인증 요건이 비었습니다"),
     INVALID_TOKEN_FORMAT(HttpStatus.UNAUTHORIZED.value(), "invalid_token_format", "유효한 인증 요건의 형식이 아닙니다"),
 
     ;

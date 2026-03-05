@@ -35,34 +35,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String rawAccessToken = request.getHeader("Authorization");
 
-        if (evaluateAccessToken(rawAccessToken)) {
-            String accessToken = rawAccessToken.substring(7);
+        if (rawAccessToken != null) {
+            if (evaluateAccessToken(rawAccessToken)) {
+                String accessToken = rawAccessToken.substring(7);
 
-            DefaultUserDetails defaultUserDetails = constructUserDetails(accessToken);
-            DefaultAuthToken authenticatedToken =
-                    new DefaultAuthToken(defaultUserDetails, defaultUserDetails.getAuthorities());
+                DefaultUserDetails defaultUserDetails = constructUserDetails(accessToken);
+                DefaultAuthToken authenticatedToken =
+                        new DefaultAuthToken(defaultUserDetails, defaultUserDetails.getAuthorities());
 
-            SecurityContextHolder.getContext().setAuthentication(authenticatedToken);
+                SecurityContextHolder.getContext().setAuthentication(authenticatedToken);
 
-            filterChain.doFilter(request, response);
+                filterChain.doFilter(request, response);
+            }
         } else {
-            SecurityContextHolder.clearContext();
+            filterChain.doFilter(request, response);
         }
     }
 
     private boolean evaluateAccessToken(String rawAccessToken) {
-        if (rawAccessToken == null) {
-            throw new BadCredentialException(SecurityErrorCode.EMPTY_TOKEN);
-        }
         if (!rawAccessToken.startsWith("Bearer ")) {
+            SecurityContextHolder.clearContext();
             throw new BadCredentialException(SecurityErrorCode.INVALID_TOKEN_FORMAT);
         }
 
         String accessToken = rawAccessToken.substring(7);
         if (!tokenProvider.validateToken(accessToken)) {
+            SecurityContextHolder.clearContext();
             throw new BadCredentialException(SecurityErrorCode.EXPIRED_TOKEN);
         }
         if (tokenRedisRepository.isBlacklisted(accessToken)) {
+            SecurityContextHolder.clearContext();
             throw new BadCredentialException(SecurityErrorCode.BLACKLISTED_TOKEN);
         }
         return true;
