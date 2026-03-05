@@ -61,7 +61,7 @@ public class WriteResponseLoginSuccessHandler implements AuthenticationSuccessHa
     private Role getMemberRole(DefaultUserDetails currentUserDetails) {
         GrantedAuthority memberRole = currentUserDetails.getAuthorities().stream()
                 .filter(auth -> auth.getAuthority().startsWith("ROLE_"))
-                .findFirst().orElseThrow(() -> new AccountStateException(SecurityErrorCode.MEMBER_ROLE_STATE_NOT_FOUND));
+                .findFirst().orElseThrow(() -> new AccountStateException(SecurityErrorCode.NOT_FOUND_MEMBER_ROLE_STATE));
 
         String rawRole = memberRole.getAuthority();
 
