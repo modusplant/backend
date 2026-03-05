@@ -13,6 +13,7 @@ import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
+import kr.modusplant.infrastructure.security.util.ResponseWritingHelper;
 import kr.modusplant.shared.exception.enums.GeneralSuccessCode;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
@@ -45,22 +46,14 @@ public class WriteResponseLoginSuccessHandler implements AuthenticationSuccessHa
         TokenPair loginTokenPair = tokenService.issueToken(
                 currentMember.getActiveUuid(), currentMember.getNickname(), currentMember.getEmail(), getMemberRole(currentMember));
 
-        response.setStatus(GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus());
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
+        ResponseWritingHelper.writeResponse(
+                response, GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus(),
+                objectMapper.writeValueAsString(DataResponse
+                        .ok(Map.of("accessToken", loginTokenPair.accessToken())))
+        );
         response.setHeader(HttpHeaders.SET_COOKIE,
-                tokenProvider.generateRefreshTokenCookieAsString(loginTokenPair.refreshToken())
-        );
+                tokenProvider.generateRefreshTokenCookieAsString(loginTokenPair.refreshToken()));
         response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store");
-
-        response.getWriter().write(
-                objectMapper.writeValueAsString(
-                        DataResponse.ok(
-                                Map.of("accessToken", loginTokenPair.accessToken())
-                        ))
-        );
-
     }
 
     private Role getMemberRole(DefaultUserDetails currentUserDetails) {

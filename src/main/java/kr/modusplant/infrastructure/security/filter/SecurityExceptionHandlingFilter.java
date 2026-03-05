@@ -7,11 +7,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.DefaultAuthenticationEntryPoint;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
+import kr.modusplant.infrastructure.security.util.ResponseWritingHelper;
 import kr.modusplant.shared.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -49,28 +49,19 @@ public class SecurityExceptionHandlingFilter extends OncePerRequestFilter {
     }
 
     private void writeBusinessErrorResponse(HttpServletResponse response, BusinessException businessEx) throws IOException {
-        response.setStatus(businessEx.getErrorCode().getHttpStatus());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
-
-        response.getWriter().write(
+        ResponseWritingHelper.writeResponse(
+                response, businessEx.getErrorCode().getHttpStatus(),
                 objectMapper.writeValueAsString(DataResponse
-                        .of(businessEx.getErrorCode())
-                )
-        );
+                        .of(businessEx.getErrorCode()))
+                );
     }
 
     private void writeGeneralErrorResponse(HttpServletResponse response, Exception ex) throws IOException {
-        log.error("[Security Error] exceptionName={} | message={}", ex.getClass(), ex.getMessage());
-
-        response.setStatus(SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
-
-        response.getWriter().write(
+        ResponseWritingHelper.logUnknownException(ex);
+        ResponseWritingHelper.writeResponse(
+                response, SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus(),
                 objectMapper.writeValueAsString(DataResponse
-                        .of(SecurityErrorCode.AUTHENTICATION_FAILED)
-                )
+                        .of(SecurityErrorCode.AUTHENTICATION_FAILED))
         );
     }
 }
