@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
+import kr.modusplant.infrastructure.security.exception.BusinessAuthenticationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,18 +24,30 @@ public class DefaultAuthenticationEntryPoint implements AuthenticationEntryPoint
     @Override
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
-                         AuthenticationException authException) throws IOException {
+                         AuthenticationException authEx) throws IOException {
 
-        log.error("[Security Error] exceptionName={} | message={}", authException.getClass(), authException.getMessage());
-        response.setStatus(SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
+        if (authEx instanceof BusinessAuthenticationException businessAuthEx) {
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding("UTF-8");
 
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.getWriter().write(
-                objectMapper.writeValueAsString(DataResponse
-                        .of(SecurityErrorCode.AUTHENTICATION_FAILED)
-                )
-        );
+            response.setStatus(businessAuthEx.getErrorCode().getHttpStatus());
+            response.getWriter().write(
+                    objectMapper.writeValueAsString(DataResponse
+                            .of(businessAuthEx.getErrorCode())
+                    )
+            );
+        } else {
+            log.error("[Security Error] exceptionName={} | message={}", authEx.getClass(), authEx.getMessage());
+            response.setStatus(SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus());
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding("UTF-8");
+
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write(
+                    objectMapper.writeValueAsString(DataResponse
+                            .of(SecurityErrorCode.AUTHENTICATION_FAILED)
+                    )
+            );
+        }
     }
 }
