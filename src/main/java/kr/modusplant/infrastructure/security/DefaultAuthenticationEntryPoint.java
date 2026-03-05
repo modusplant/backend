@@ -6,13 +6,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 import java.io.IOException;
 
 @RequiredArgsConstructor
+@Slf4j
 public class DefaultAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;
@@ -21,6 +24,11 @@ public class DefaultAuthenticationEntryPoint implements AuthenticationEntryPoint
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
+
+        log.error("[Security Error] exceptionName={} | message={}", authException.getClass(), authException.getMessage());
+        response.setStatus(SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.getWriter().write(
