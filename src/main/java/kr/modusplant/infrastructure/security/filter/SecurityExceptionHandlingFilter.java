@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.DefaultAuthenticationEntryPoint;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
-import kr.modusplant.infrastructure.security.util.ResponseWritingHelper;
+import kr.modusplant.infrastructure.security.util.SecurityResponseHelper;
 import kr.modusplant.shared.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +49,7 @@ public class SecurityExceptionHandlingFilter extends OncePerRequestFilter {
     }
 
     private void writeBusinessErrorResponse(HttpServletResponse response, BusinessException businessEx) throws IOException {
-        ResponseWritingHelper.writeResponse(
+        SecurityResponseHelper.writeResponse(
                 response, businessEx.getErrorCode().getHttpStatus(),
                 objectMapper.writeValueAsString(DataResponse
                         .of(businessEx.getErrorCode()))
@@ -57,8 +57,8 @@ public class SecurityExceptionHandlingFilter extends OncePerRequestFilter {
     }
 
     private void writeGeneralErrorResponse(HttpServletResponse response, Exception ex) throws IOException {
-        ResponseWritingHelper.logUnknownException(ex);
-        ResponseWritingHelper.writeResponse(
+        SecurityResponseHelper.logUnknownException(ex);
+        SecurityResponseHelper.writeResponse(
                 response, SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus(),
                 objectMapper.writeValueAsString(DataResponse
                         .of(SecurityErrorCode.AUTHENTICATION_FAILED))

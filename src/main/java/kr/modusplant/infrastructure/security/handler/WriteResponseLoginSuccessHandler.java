@@ -12,8 +12,10 @@ import kr.modusplant.infrastructure.jwt.dto.TokenPair;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
+import kr.modusplant.infrastructure.security.exception.AccountStateException;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
-import kr.modusplant.infrastructure.security.util.ResponseWritingHelper;
+import kr.modusplant.infrastructure.security.util.SecurityResponseHelper;
 import kr.modusplant.shared.exception.enums.GeneralSuccessCode;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +48,7 @@ public class WriteResponseLoginSuccessHandler implements AuthenticationSuccessHa
         TokenPair loginTokenPair = tokenService.issueToken(
                 currentMember.getActiveUuid(), currentMember.getNickname(), currentMember.getEmail(), getMemberRole(currentMember));
 
-        ResponseWritingHelper.writeResponse(
+        SecurityResponseHelper.writeResponse(
                 response, GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus(),
                 objectMapper.writeValueAsString(DataResponse
                         .ok(Map.of("accessToken", loginTokenPair.accessToken())))
@@ -59,7 +61,7 @@ public class WriteResponseLoginSuccessHandler implements AuthenticationSuccessHa
     private Role getMemberRole(DefaultUserDetails currentUserDetails) {
         GrantedAuthority memberRole = currentUserDetails.getAuthorities().stream()
                 .filter(auth -> auth.getAuthority().startsWith("ROLE_"))
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("인증된 유저에게 할당된 역할이 없습니다."));
+                .findFirst().orElseThrow(() -> new AccountStateException(SecurityErrorCode.MEMBER_ROLE_STATE_NOT_FOUND));
 
         String rawRole = memberRole.getAuthority();
 

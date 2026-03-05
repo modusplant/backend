@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
-import kr.modusplant.infrastructure.security.util.ResponseWritingHelper;
+import kr.modusplant.infrastructure.security.util.SecurityResponseHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -22,7 +22,7 @@ public class DefaultAccessDeniedHandler implements AccessDeniedHandler {
                        HttpServletResponse response,
                        AccessDeniedException accessDeniedException) throws IOException {
 
-        ResponseWritingHelper.writeResponse(
+        SecurityResponseHelper.writeResponse(
                 response, SecurityErrorCode.ACCESS_DENIED.getHttpStatus(),
                 objectMapper.writeValueAsString(DataResponse
                         .of(SecurityErrorCode.ACCESS_DENIED))

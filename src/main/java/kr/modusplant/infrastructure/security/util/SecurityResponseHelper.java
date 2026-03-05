@@ -10,7 +10,7 @@ import java.io.IOException;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
-public final class ResponseWritingHelper {
+public final class SecurityResponseHelper {
 
     public static void writeResponse(HttpServletResponse response, int status, String body) throws IOException {
         response.setStatus(status);

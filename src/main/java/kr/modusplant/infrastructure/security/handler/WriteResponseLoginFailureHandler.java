@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import kr.modusplant.infrastructure.security.exception.BusinessAuthenticationException;
-import kr.modusplant.infrastructure.security.util.ResponseWritingHelper;
+import kr.modusplant.infrastructure.security.util.SecurityResponseHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -23,18 +23,15 @@ public class WriteResponseLoginFailureHandler implements AuthenticationFailureHa
                                         HttpServletResponse response,
                                         AuthenticationException exception) throws IOException {
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
         if(exception instanceof BusinessAuthenticationException ex) {
-            ResponseWritingHelper.writeResponse(
+            SecurityResponseHelper.writeResponse(
                     response, ex.getErrorCode().getHttpStatus(),
                     objectMapper.writeValueAsString(DataResponse
                             .of(ex.getErrorCode()))
             );
         } else {
-            ResponseWritingHelper.logUnknownException(exception);
-            ResponseWritingHelper.writeResponse(
+            SecurityResponseHelper.logUnknownException(exception);
+            SecurityResponseHelper.writeResponse(
                     response, SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus(),
                     objectMapper.writeValueAsString(DataResponse
                             .of(SecurityErrorCode.AUTHENTICATION_FAILED))
