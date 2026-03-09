@@ -50,7 +50,7 @@ public class ServiceExceptionLoggingAspect {
             log.error("[BIZ ERROR] traceId={} | method={} | params={} | exception={} | message={} | location={}\n" +
                             "[BIZ ERROR - HTTP_REQUEST_INFO] httpMethod={} | uri={} | clientIp={}",
                     traceId, methodName, Arrays.toString(args), ex.getClass().getSimpleName(), ex.getMessage(), errorLocation,
-                    uri, method, clientIp);
+                    method, uri, clientIp);
         }
         MDC.put("isLogged", Boolean.TRUE.toString());
     }
