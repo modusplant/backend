@@ -1,16 +1,16 @@
 package kr.modusplant.domains.member.domain.vo.nullobject;
 
-import kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyMemberProfileImagePathTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileImagePathTestUtils.testMemberProfileImagePath;
+import static kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyMemberProfileImagePathTestUtils.TEST_EMPTY_MEMBER_PROFILE_IMAGE_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class EmptyMemberProfileImagePathTest implements EmptyMemberProfileImagePathTestUtils {
+class EmptyMemberProfileImagePathTest {
     @Test
     @DisplayName("create로 비어 있는 회원 프로필 이미지 경로 반환")
     void testCreate_givenNothing_willReturnEmptyMemberProfileImagePath() {

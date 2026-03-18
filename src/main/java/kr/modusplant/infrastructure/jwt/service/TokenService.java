@@ -64,7 +64,6 @@ public class TokenService {
                 RefreshTokenEntity.builder()
                         .member(siteMemberJpaRepository.findByUuid(memberUuid).orElseThrow())                   // memberUuid로 member 가져오기
                         .refreshToken(refreshToken)
-                        .issuedAt(convertToLocalDateTime(jwtTokenProvider.getIssuedAtFromToken(refreshToken)))
                         .expiredAt(convertToLocalDateTime(jwtTokenProvider.getExpirationFromToken(refreshToken)))
                         .build()
         );
@@ -111,7 +110,6 @@ public class TokenService {
                         .uuid(refreshTokenJpaRepository.findByRefreshToken(refreshToken).orElseThrow().getUuid())
                         .member(memberEntity)
                         .refreshToken(reissuedRefreshToken)
-                        .issuedAt(convertToLocalDateTime(jwtTokenProvider.getIssuedAtFromToken(reissuedRefreshToken)))
                         .expiredAt(convertToLocalDateTime(jwtTokenProvider.getExpirationFromToken(reissuedRefreshToken)))
                         .build()
         );

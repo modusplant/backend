@@ -11,5 +11,8 @@ import java.util.UUID;
 
 @Repository
 @Primary
-public interface CommPostAbuRepJpaRepository extends CreatedAtAndLastModifiedAtRepository<CommPostAbuRepEntity>, UlidPrimaryRepository<CommPostAbuRepEntity>, JpaRepository<CommPostAbuRepEntity, UUID> {
+public interface CommPostAbuRepJpaRepository extends
+        CreatedAtAndLastModifiedAtRepository<CommPostAbuRepEntity>,
+        UlidPrimaryRepository<CommPostAbuRepEntity>,
+        JpaRepository<CommPostAbuRepEntity, UUID> {
 }

@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import kr.modusplant.domains.member.adapter.controller.MemberController;
 import kr.modusplant.domains.member.domain.exception.IncorrectMemberIdException;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
 import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.domains.member.usecase.record.*;
@@ -428,6 +429,21 @@ public class MemberRestController {
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
+    @Hidden
+    @Operation(
+            summary = "게시글 신고 API",
+            description = "게시글을 신고합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PostMapping(value = "/report/abuse/post/")
+    public ResponseEntity<DataResponse<Void>> reportPostAbuse(
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
+            @NotNull(message = "접근 토큰이 비어 있습니다. ")
+            String auth) {
+        return ResponseEntity.badRequest().body(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_POST_ID));
+    }
+
     @Operation(
             summary = "게시글 신고 API",
             description = "게시글을 신고합니다.",
@@ -439,17 +455,75 @@ public class MemberRestController {
                     description = "신고할 게시글의 식별자",
                     schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
             )
-            @PathVariable(required = false)
+            @PathVariable
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String postUlid,
 
             @Parameter(hidden = true)
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String auth) throws IOException {
+            String auth) {
         memberController.reportPostAbuse(
                 new PostAbuseReportRecord(
                         getTokenFromAuthorizationHeader(auth), postUlid));
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Hidden
+    @Operation(
+            summary = "댓글 신고 API",
+            description = "댓글을 신고합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PostMapping(value = "/report/abuse/post//path/{path}")
+    public ResponseEntity<DataResponse<Void>> reportCommentAbuse(
+            @Parameter(
+                    description = "신고할 댓글의 경로",
+                    example = "1.0.4",
+                    schema = @Schema(type = "string", pattern = REGEX_MATERIALIZED_PATH)
+            )
+            @PathVariable(required = false)
+            @NotBlank(message = "댓글 경로가 비어 있습니다.")
+            String path,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
+            @NotNull(message = "접근 토큰이 비어 있습니다. ")
+            String auth) {
+        return ResponseEntity.badRequest().body(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_COMMENT_ID));
+    }
+
+    @Operation(
+            summary = "댓글 신고 API",
+            description = "댓글을 신고합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PostMapping(value = "/report/abuse/post/{postUlid}/path/{path}")
+    public ResponseEntity<DataResponse<Void>> reportCommentAbuse(
+            @Parameter(
+                    description = "신고할 댓글이 달린 게시글의 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
+            @PathVariable
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String postUlid,
+
+            @Parameter(
+                    description = "신고할 댓글의 경로",
+                    example = "1.0.4",
+                    schema = @Schema(type = "string", pattern = REGEX_MATERIALIZED_PATH)
+            )
+            @PathVariable(required = false)
+            @NotBlank(message = "댓글 경로가 비어 있습니다.")
+            String path,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
+            @NotNull(message = "접근 토큰이 비어 있습니다. ")
+            String auth) {
+        memberController.reportCommentAbuse(
+                new CommentAbuseReportRecord(
+                        getTokenFromAuthorizationHeader(auth), postUlid, path));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

@@ -66,7 +66,6 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntit
     private String accessToken;
     private String refreshToken;
     private Map<String,String> claims;
-    private Date issuedAt;
     private Date expiredAt;
 
     @BeforeEach
@@ -87,7 +86,6 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntit
                 "email",email,
                 "role", role.name()
         );
-        issuedAt = Date.from(Instant.now());
         expiredAt = Date.from(Instant.now().plusSeconds(3600));
     }
 
@@ -101,7 +99,6 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntit
             given(siteMemberJpaRepository.existsByUuid(memberUuid)).willReturn(true);
             given(jwtTokenProvider.generateAccessToken(memberUuid, claims)).willReturn(accessToken);
             given(jwtTokenProvider.generateRefreshToken(memberUuid)).willReturn(refreshToken);
-            given(jwtTokenProvider.getIssuedAtFromToken(refreshToken)).willReturn(issuedAt);
             given(jwtTokenProvider.getExpirationFromToken(refreshToken)).willReturn(expiredAt);
             given(siteMemberJpaRepository.findByUuid(memberUuid)).willReturn(Optional.of(memberEntity));
             given(refreshTokenJpaRepository.save(any(RefreshTokenEntity.class))).willAnswer(invocation -> invocation.getArgument(0));
@@ -176,7 +173,6 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntit
             given(siteMemberRoleJpaRepository.findByUuid(memberUuid)).willReturn(Optional.of(createMemberRoleUserEntityWithUuid()));
             given(jwtTokenProvider.generateRefreshToken(memberUuid)).willReturn(newRefreshToken);
             given(refreshTokenJpaRepository.findByRefreshToken(refreshToken)).willReturn(Optional.of(refreshTokenEntity));
-            given(jwtTokenProvider.getIssuedAtFromToken(newRefreshToken)).willReturn(issuedAt);
             given(jwtTokenProvider.getExpirationFromToken(newRefreshToken)).willReturn(expiredAt);
             given(refreshTokenJpaRepository.save(any(RefreshTokenEntity.class))).willAnswer(invocation -> invocation.getArgument(0));
             given(jwtTokenProvider.generateAccessToken(eq(memberUuid), any())).willReturn(newAccessToken);

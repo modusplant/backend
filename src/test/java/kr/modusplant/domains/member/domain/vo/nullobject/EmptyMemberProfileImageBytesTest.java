@@ -1,16 +1,16 @@
 package kr.modusplant.domains.member.domain.vo.nullobject;
 
-import kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyMemberProfileImageBytesTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileImageBytesTestUtils.testMemberProfileImageBytes;
+import static kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyMemberProfileImageBytesTestUtils.TEST_EMPTY_MEMBER_PROFILE_IMAGE_BYTES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class EmptyMemberProfileImageBytesTest implements EmptyMemberProfileImageBytesTestUtils {
+class EmptyMemberProfileImageBytesTest {
     @Test
     @DisplayName("create로 비어 있는 회원 프로필 이미지 바이트 반환")
     void testCreate_givenNothing_willReturnEmptyMemberProfileImageBytes() {
