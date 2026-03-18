@@ -3,7 +3,6 @@ package kr.modusplant.infrastructure.security;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import kr.modusplant.infrastructure.security.exception.BadCredentialException;
 import kr.modusplant.infrastructure.security.exception.BannedException;
-import kr.modusplant.infrastructure.security.exception.DeletedException;
 import kr.modusplant.infrastructure.security.exception.InactiveException;
 import kr.modusplant.infrastructure.security.models.DefaultAuthToken;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
@@ -48,8 +47,6 @@ public class DefaultAuthProvider implements AuthenticationProvider {
             throw new BadCredentialException(SecurityErrorCode.BAD_PASSWORD); }
         if (userDetails.isBanned()) {
             throw new BannedException(); }
-        if (userDetails.isDeleted()) {
-            throw new DeletedException(); }
         if (!userDetails.isActive()) {
             throw new InactiveException(); }
 

@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import static kr.modusplant.domains.member.common.util.domain.vo.MemberBirthDateTestUtils.testMemberBirthDate;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.INVALID_MEMBER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -74,7 +74,7 @@ class MemberIdTest implements MemberTestUtils {
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
     void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
-        assertNotEquals(testMemberId, testMemberBirthDate);
+        assertNotEquals(testMemberId, testMemberActiveStatus);
     }
 
     @Test

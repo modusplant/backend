@@ -32,9 +32,6 @@ public class RefreshTokenEntity {
     @Column(name = "refresh_token", nullable = false)
     private String refreshToken;
 
-    @Column(name = "issued_at", nullable = false)
-    private LocalDateTime issuedAt;
-
     @Column(name = "expired_at", nullable = false)
     private LocalDateTime expiredAt;
 
@@ -50,11 +47,10 @@ public class RefreshTokenEntity {
         return new HashCodeBuilder(17, 37).append(getMember()).toHashCode();
     }
 
-    private RefreshTokenEntity(UUID uuid, SiteMemberEntity member, String refreshToken, LocalDateTime issuedAt, LocalDateTime expiredAt) {
+    private RefreshTokenEntity(UUID uuid, SiteMemberEntity member, String refreshToken, LocalDateTime expiredAt) {
         this.uuid = uuid;
         this.member = member;
         this.refreshToken = refreshToken;
-        this.issuedAt = issuedAt;
         this.expiredAt = expiredAt;
     }
 
@@ -66,7 +62,6 @@ public class RefreshTokenEntity {
         private UUID uuid;
         private SiteMemberEntity member;
         private String refreshToken;
-        private LocalDateTime issuedAt;
         private LocalDateTime expiredAt;
 
         public RefreshTokenEntityBuilder uuid(final UUID uuid) {
@@ -84,11 +79,6 @@ public class RefreshTokenEntity {
             return this;
         }
 
-        public RefreshTokenEntityBuilder issuedAt(final LocalDateTime issuedAt) {
-            this.issuedAt = issuedAt;
-            return this;
-        }
-
         public RefreshTokenEntityBuilder expiredAt(final LocalDateTime expiredAt) {
             this.expiredAt = expiredAt;
             return this;
@@ -98,13 +88,12 @@ public class RefreshTokenEntity {
             this.uuid = token.getUuid();
             this.member = token.getMember();
             this.refreshToken = token.getRefreshToken();
-            this.issuedAt = token.getIssuedAt();
             this.expiredAt = token.getExpiredAt();
             return this;
         }
 
         public RefreshTokenEntity build() {
-            return new RefreshTokenEntity(this.uuid, this.member, this.refreshToken, this.issuedAt, this.expiredAt);
+            return new RefreshTokenEntity(this.uuid, this.member, this.refreshToken, this.expiredAt);
         }
     }
 }
