@@ -12,6 +12,7 @@ import java.io.IOException;
 @Slf4j
 public final class SecurityResponseHelper {
 
+    // SecurityResponseUtils
     public static void writeResponse(HttpServletResponse response, int status, String body) throws IOException {
         response.setStatus(status);
         response.setCharacterEncoding("UTF-8");
@@ -19,6 +20,7 @@ public final class SecurityResponseHelper {
         response.getWriter().write(body);
     }
 
+    // SecurityLogger
     public static void logUnknownException(Exception exception) {
         log.error("[Security Error] exceptionName={} | message={}", exception.getClass(), exception.getMessage());
     }
