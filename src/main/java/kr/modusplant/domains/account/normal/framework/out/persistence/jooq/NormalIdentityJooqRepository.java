@@ -55,12 +55,6 @@ public class NormalIdentityJooqRepository implements
                 .fetchOne(memberAuth.PW);
     }
 
-    @Override // 해당 메서드는 전역 framework > jOOQ > repository로 만든다.
-    public AuthProvider getMemberAuthProvider(Email email) {
-        return null;
-    }
-
-
     @Override
     public boolean existsByMemberId(AccountId accountId) {
         return dsl.fetchExists(

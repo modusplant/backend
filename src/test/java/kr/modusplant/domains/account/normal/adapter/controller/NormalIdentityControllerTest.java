@@ -11,7 +11,6 @@ import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdenti
 import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdentityUpdateRepository;
 import kr.modusplant.domains.account.normal.usecase.request.EmailModificationRequest;
 import kr.modusplant.domains.account.normal.usecase.request.PasswordModificationRequest;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Password;
 import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
@@ -32,9 +31,8 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
     private final NormalIdentityUpdateRepository updateRepository = Mockito.mock(NormalIdentityUpdateRepository.class);
     private final NormalIdentityReadRepository readRepository = Mockito.mock(NormalIdentityReadRepository.class);
     private final PasswordEncoder encoder = Mockito.mock(PasswordEncoder.class);
-    private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
     private final NormalIdentityController controller = new NormalIdentityController(
-            mapper, createRepository, updateRepository, readRepository, encoder, memberJpaRepository);
+            mapper, createRepository, updateRepository, readRepository, encoder);
 
     @Test
     @DisplayName("유효한 요청 데이터를 받았을 시 일반 회원가입 진행")
