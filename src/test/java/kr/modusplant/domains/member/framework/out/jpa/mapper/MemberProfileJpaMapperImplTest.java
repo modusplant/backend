@@ -26,7 +26,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-class MemberProfileJpaMapperImplTest implements MemberTestUtils, MemberProfileTestUtils, SiteMemberEntityTestUtils, SiteMemberProfileEntityTestUtils {
+class MemberProfileJpaMapperImplTest implements
+        MemberTestUtils, MemberProfileTestUtils,
+        SiteMemberEntityTestUtils, SiteMemberProfileEntityTestUtils {
     private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
     private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
     private final MemberProfileJpaMapper memberProfileJpaMapper = new MemberProfileJpaMapperImpl(memberJpaRepository, s3FileService);

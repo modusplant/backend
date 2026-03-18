@@ -28,7 +28,6 @@ public class PostTestDataHelper {
                 .set(SITE_MEMBER.NICKNAME, nickname)
                 .set(SITE_MEMBER.IS_ACTIVE, true)
                 .set(SITE_MEMBER.IS_BANNED, true)
-                .set(SITE_MEMBER.IS_DELETED, true)
                 .set(SITE_MEMBER.CREATED_AT, dateTime)
                 .set(SITE_MEMBER.LAST_MODIFIED_AT, dateTime)
                 .set(SITE_MEMBER.VER_NUM, 1)

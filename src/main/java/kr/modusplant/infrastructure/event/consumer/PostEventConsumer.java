@@ -20,7 +20,10 @@ public class PostEventConsumer {
     private final CommPostBookmarkJpaRepository commPostBookmarkRepository;
     private final CommPostJpaRepository commPostRepository;
 
-    public PostEventConsumer(EventBus eventBus, CommPostLikeJpaRepository commPostLikeRepository, CommPostBookmarkJpaRepository commPostBookmarkRepository, CommPostJpaRepository commPostRepository) {
+    public PostEventConsumer(EventBus eventBus,
+                             CommPostLikeJpaRepository commPostLikeRepository,
+                             CommPostBookmarkJpaRepository commPostBookmarkRepository,
+                             CommPostJpaRepository commPostRepository) {
         eventBus.subscribe(event -> {
             if (event instanceof PostLikeEvent likeEvent) {
                 putCommPostLike(likeEvent.getMemberId(), likeEvent.getPostId());

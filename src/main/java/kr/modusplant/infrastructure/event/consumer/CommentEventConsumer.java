@@ -15,15 +15,19 @@ public class CommentEventConsumer {
     private final CommCommentLikeJpaRepository commCommentLikeRepository;
     private final CommCommentJpaRepository commCommentRepository;
 
-    public CommentEventConsumer(EventBus eventBus, CommCommentLikeJpaRepository commCommentLikeRepository, CommCommentJpaRepository commCommentRepository) {
+    public CommentEventConsumer(EventBus eventBus,
+                                CommCommentLikeJpaRepository commCommentLikeRepository,
+                                CommCommentJpaRepository commCommentRepository) {
         eventBus.subscribe(event -> {
             if (event instanceof CommentLikeEvent commentLikeEvent) {
-                putCommCommentLike(commentLikeEvent.getMemberId(), commentLikeEvent.getPostId(), commentLikeEvent.getPath());
+                putCommCommentLike(
+                        commentLikeEvent.getMemberId(), commentLikeEvent.getPostId(), commentLikeEvent.getPath());
             }
         });
         eventBus.subscribe(event -> {
             if (event instanceof CommentUnlikeEvent commentUnlikeEvent) {
-                deleteCommCommentLike(commentUnlikeEvent.getMemberId(), commentUnlikeEvent.getPostId(), commentUnlikeEvent.getPath());
+                deleteCommCommentLike(
+                        commentUnlikeEvent.getMemberId(), commentUnlikeEvent.getPostId(), commentUnlikeEvent.getPath());
             }
         });
         this.commCommentLikeRepository = commCommentLikeRepository;
