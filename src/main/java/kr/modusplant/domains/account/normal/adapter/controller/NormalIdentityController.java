@@ -9,8 +9,11 @@ import kr.modusplant.domains.account.normal.usecase.request.EmailModificationReq
 import kr.modusplant.domains.account.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.domains.account.normal.usecase.request.PasswordModificationRequest;
 import kr.modusplant.domains.account.shared.kernel.AccountId;
+import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
+import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
@@ -21,6 +24,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.EXISTS_MEMBER;
@@ -34,20 +38,36 @@ public class NormalIdentityController {
     private final NormalIdentityReadRepository readRepository;
 
     private final PasswordEncoder encoder;
+    private final SiteMemberJpaRepository memberJpaRepository;
 
     public NormalIdentityController(NormalIdentityMapper mapper,
                                     NormalIdentityCreateRepository createRepository,
                                     NormalIdentityUpdateRepository updateRepository,
                                     NormalIdentityReadRepository readRepository,
-                                    @Qualifier("bcryptPasswordEncoder") PasswordEncoder encoder) {
+                                    @Qualifier("bcryptPasswordEncoder") PasswordEncoder encoder,
+                                    SiteMemberJpaRepository memberJpaRepository) {
         this.mapper = mapper;
         this.createRepository = createRepository;
         this.updateRepository = updateRepository;
         this.readRepository = readRepository;
         this.encoder = encoder;
+        this.memberJpaRepository = memberJpaRepository;
     }
 
     public void registerNormalMember(NormalSignUpRequest request) {
+
+        // 1. 일반 회원이 이미 있는가? -> 있다면 "일반 회원 정보가 이미 있음"고 알림. 없다면 추가 검증
+        // 2. 해당 이메일의 소셜 회원이 있는가? -> 있다면 "00 플랫폼의 계정이 있습니다"고 알림.
+        // 3. 일반과 소셜 둘 다 계정이 없다 -> 회원가입 진행
+        // AuthProvider에 "BASIC_KAKAO", "BASIC_GOOGLE" 추가? 지속 가능한가?
+        // 1. 계정이 있는가? -> 있다면, AuthProvider가 뭔가?
+
+//        if(readRepository.existsByEmail(Email.create(request.email()))) {
+//            readRepository.getMemberAuthProvider(Email.create(request.email()));
+//        }
+
+
+
         if(readRepository.existsByEmail(Email.create(request.email()))) {
             throw new DataAlreadyExistsException(EXISTS_MEMBER);
         } else if(readRepository.existsByNickname(Nickname.create(request.nickname()))) {
