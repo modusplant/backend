@@ -107,6 +107,7 @@ public class AuthorizationFlowTest implements CommentRegisterRequestTestUtils, C
     }
 
     @Test
+    @DisplayName("사용자의 역할이 무효한 경우 에러 발생")
     public void testMonitorApiWithRole_givenMismatchingRole_willReturnErrorResponse() throws Exception {
 //        // given
 //        given(tokenRedisRepository.isBlacklisted(rawAccessToken.substring(7))).willReturn(false);
