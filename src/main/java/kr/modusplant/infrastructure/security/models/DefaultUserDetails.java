@@ -21,7 +21,6 @@ public class DefaultUserDetails implements UserDetails {
     private final AuthProvider provider;
     private final boolean isActive;
     private final boolean isBanned;
-    private final boolean isDeleted;
     private final List<GrantedAuthority> authorities;
 
     @Override
@@ -59,8 +58,6 @@ public class DefaultUserDetails implements UserDetails {
 
     public boolean isBanned() { return isBanned; }
 
-    public boolean isDeleted() { return isDeleted; }
-
     public static DefaultUserDetailsBuilder builder() { return new DefaultUserDetailsBuilder(); }
 
     public static class DefaultUserDetailsBuilder {
@@ -71,7 +68,6 @@ public class DefaultUserDetails implements UserDetails {
         private AuthProvider provider;
         private boolean isActive;
         private boolean isBanned;
-        private boolean isDeleted;
         private List<GrantedAuthority> authorities;
 
         public DefaultUserDetailsBuilder email(String email) {
@@ -109,18 +105,13 @@ public class DefaultUserDetails implements UserDetails {
             return this;
         }
 
-        public DefaultUserDetailsBuilder email(boolean isDeleted) {
-            this.isDeleted = isDeleted;
-            return this;
-        }
-
         public DefaultUserDetailsBuilder email(List<GrantedAuthority> authorities) {
             this.authorities = authorities;
             return this;
         }
 
         public DefaultUserDetails build() {
-            return new DefaultUserDetails(this.email, this.password, this.activeUuid, this.nickname, this.provider, this.isActive, this.isBanned, this.isDeleted, this.authorities);
+            return new DefaultUserDetails(this.email, this.password, this.activeUuid, this.nickname, this.provider, this.isActive, this.isBanned, this.authorities);
         }
     }
 }

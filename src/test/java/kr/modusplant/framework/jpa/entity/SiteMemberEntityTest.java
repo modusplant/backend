@@ -23,7 +23,7 @@ class SiteMemberEntityTest implements SiteMemberEntityTestUtils {
     @Test
     void prePersist() {
         // given
-        SiteMemberEntity member = SiteMemberEntity.builder().member(createMemberBasicUserEntity()).isActive(null).isBanned(null).isDeleted(null).build();
+        SiteMemberEntity member = SiteMemberEntity.builder().member(createMemberBasicUserEntity()).isActive(null).isBanned(null).build();
 
         // when
         entityManager.persist(member);
@@ -32,6 +32,5 @@ class SiteMemberEntityTest implements SiteMemberEntityTestUtils {
         // then
         assertThat(member.getIsActive()).isEqualTo(true);
         assertThat(member.getIsBanned()).isEqualTo(false);
-        assertThat(member.getIsDeleted()).isEqualTo(false);
     }
 }
