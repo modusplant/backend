@@ -50,7 +50,6 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.domains.member.common.util.domain.vo.MemberBirthDateTestUtils.testMemberBirthDate;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils.testMemberProfileIntroduction;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
@@ -317,7 +316,7 @@ class MemberControllerTest implements
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(swearService.isSwearContained(any())).willReturn(false);
-        given(memberRepository.getByNickname(any())).willReturn(Optional.of(Member.create(MemberId.generate(), testMemberActiveStatus, testNormalUserNickname, testMemberBirthDate)));
+        given(memberRepository.getByNickname(any())).willReturn(Optional.of(Member.create(MemberId.generate(), testMemberActiveStatus, testNormalUserNickname)));
 
         // when & then
         ExistsEntityException alreadyExistedNicknameException = assertThrows(

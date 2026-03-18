@@ -13,7 +13,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
@@ -36,9 +35,6 @@ public class SiteMemberEntity {
     @Column(nullable = false, length = 40, unique = true)
     private String nickname;
 
-    @Column(name = "birth_date")
-    private LocalDate birthDate;
-
     @Column(name = "is_active", nullable = false)
     @DefaultValue
     private Boolean isActive;
@@ -46,10 +42,6 @@ public class SiteMemberEntity {
     @Column(name = "is_banned", nullable = false)
     @DefaultValue
     private Boolean isBanned;
-
-    @Column(name = "is_deleted", nullable = false)
-    @DefaultValue
-    private Boolean isDeleted;
 
     @Column(name = "logged_in_at")
     private LocalDateTime loggedInAt;
@@ -71,20 +63,12 @@ public class SiteMemberEntity {
         this.nickname = nickname;
     }
 
-    public void updateBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
-    }
-
     public void updateIsActive(Boolean isActive) {
         this.isActive = isActive;
     }
 
     public void updateIsBanned(Boolean isBanned) {
         this.isBanned = isBanned;
-    }
-
-    public void updateIsDeleted(Boolean isDeleted) {
-        this.isDeleted = isDeleted;
     }
 
     public void updateLoggedInAt(LocalDateTime loggedInAt) {
@@ -119,18 +103,13 @@ public class SiteMemberEntity {
         if (this.isBanned == null) {
             this.isBanned = false;
         }
-        if (this.isDeleted == null) {
-            this.isDeleted = false;
-        }
     }
 
-    private SiteMemberEntity(UUID uuid, String nickname, LocalDate birthDate, Boolean isActive, Boolean isBanned, Boolean isDeleted, LocalDateTime loggedInAt) {
+    private SiteMemberEntity(UUID uuid, String nickname, Boolean isActive, Boolean isBanned, LocalDateTime loggedInAt) {
         this.uuid = uuid;
         this.nickname = nickname;
-        this.birthDate = birthDate;
         this.isActive = isActive;
         this.isBanned = isBanned;
-        this.isDeleted = isDeleted;
         this.loggedInAt = loggedInAt;
     }
 
@@ -141,10 +120,8 @@ public class SiteMemberEntity {
     public static final class SiteMemberEntityBuilder {
         private UUID uuid;
         private String nickname;
-        private LocalDate birthDate;
         private Boolean isActive;
         private Boolean isBanned;
-        private Boolean isDeleted;
         private LocalDateTime loggedInAt;
 
         public SiteMemberEntityBuilder uuid(final UUID uuid) {
@@ -154,11 +131,6 @@ public class SiteMemberEntity {
 
         public SiteMemberEntityBuilder nickname(final String nickname) {
             this.nickname = nickname;
-            return this;
-        }
-
-        public SiteMemberEntityBuilder birthDate(final LocalDate birthDate) {
-            this.birthDate = birthDate;
             return this;
         }
 
@@ -172,11 +144,6 @@ public class SiteMemberEntity {
             return this;
         }
 
-        public SiteMemberEntityBuilder isDeleted(final Boolean isDeleted) {
-            this.isDeleted = isDeleted;
-            return this;
-        }
-
         public SiteMemberEntityBuilder loggedInAt(final LocalDateTime loggedInAt) {
             this.loggedInAt = loggedInAt;
             return this;
@@ -185,16 +152,14 @@ public class SiteMemberEntity {
         public SiteMemberEntityBuilder member(final SiteMemberEntity member) {
             this.uuid = member.getUuid();
             this.nickname = member.getNickname();
-            this.birthDate = member.getBirthDate();
             this.isActive = member.getIsActive();
             this.isBanned = member.getIsBanned();
-            this.isDeleted = member.getIsDeleted();
             this.loggedInAt = member.getLoggedInAt();
             return this;
         }
 
         public SiteMemberEntity build() {
-            return new SiteMemberEntity(this.uuid, this.nickname, this.birthDate, this.isActive, this.isBanned, this.isDeleted, this.loggedInAt);
+            return new SiteMemberEntity(this.uuid, this.nickname, this.isActive, this.isBanned, this.loggedInAt);
         }
     }
 }

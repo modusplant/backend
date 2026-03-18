@@ -1,6 +1,5 @@
 package kr.modusplant.domains.member.domain.aggregate;
 
-import kr.modusplant.domains.member.domain.vo.MemberBirthDate;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberStatus;
 import kr.modusplant.shared.exception.EmptyValueException;
@@ -12,7 +11,8 @@ import lombok.Getter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EMPTY_MEMBER_ID;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EMPTY_MEMBER_STATUS;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -20,19 +20,16 @@ public class Member {
     private final MemberId memberId;
     private MemberStatus memberStatus;
     private Nickname nickname;
-    private MemberBirthDate memberBirthDate;
 
-    public static Member create(MemberId id, MemberStatus status, Nickname nickname, MemberBirthDate birthDate) {
+    public static Member create(MemberId id, MemberStatus status, Nickname nickname) {
         if (id == null) {
             throw new EmptyValueException(EMPTY_MEMBER_ID, "memberId");
         } else if (status == null) {
             throw new EmptyValueException(EMPTY_MEMBER_STATUS, "memberStatus");
         } else if (nickname == null) {
             throw new EmptyValueException(KernelErrorCode.EMPTY_NICKNAME, "nickname");
-        } else if (birthDate == null) {
-            throw new EmptyValueException(EMPTY_MEMBER_BIRTH_DATE, "memberBirthDate");
         }
-        return new Member(id, status, nickname, birthDate);
+        return new Member(id, status, nickname);
     }
 
     @Override
