@@ -12,7 +12,6 @@ import kr.modusplant.infrastructure.jwt.dto.TokenPair;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.enums.Role;
-import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import kr.modusplant.infrastructure.security.exception.AccountStateException;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import kr.modusplant.infrastructure.security.util.SecurityResponseHelper;
@@ -61,7 +60,7 @@ public class WriteResponseLoginSuccessHandler implements AuthenticationSuccessHa
     private Role getMemberRole(DefaultUserDetails currentUserDetails) {
         GrantedAuthority memberRole = currentUserDetails.getAuthorities().stream()
                 .filter(auth -> auth.getAuthority().startsWith("ROLE_"))
-                .findFirst().orElseThrow(() -> new AccountStateException(SecurityErrorCode.NOT_FOUND_MEMBER_ROLE_STATE));
+                .findFirst().orElseThrow(() -> new AccountStateException(EntityErrorCode.NOT_FOUND_MEMBER_ROLE));
 
         String rawRole = memberRole.getAuthority();
 

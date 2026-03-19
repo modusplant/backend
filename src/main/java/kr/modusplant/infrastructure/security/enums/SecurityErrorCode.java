@@ -16,10 +16,6 @@ public enum SecurityErrorCode implements ErrorCode {
     BAD_EMAIL_FORMAT(HttpStatus.UNAUTHORIZED.value(), "bad_email_format", "이메일의 값이 형식에 어긋납니다"),
     BAD_CREDENTIALS(HttpStatus.UNAUTHORIZED.value(), "bad_credentials", "인증에 필요한 요건이 없거나 부족합니다"),
 
-    NOT_FOUND_MEMBER_STATE(HttpStatus.NOT_FOUND.value(), "not_found_member_state", "사용자의 계정 정보를 찾을 수 없습니다"),
-    NOT_FOUND_MEMBER_AUTH_STATE(HttpStatus.NOT_FOUND.value(), "not_found_member_auth_state", "사용자의 인증 정보를 찾을 수 없습니다"),
-    NOT_FOUND_MEMBER_ROLE_STATE(HttpStatus.NOT_FOUND.value(), "not_found_member_role_state", "사용자의 역할 정보를 찾을 수 없습니다"),
-
     BANNED(HttpStatus.UNAUTHORIZED.value(), "banned", "밴 처리 된 계정입니다"),
     DELETED(HttpStatus.UNAUTHORIZED.value(), "deleted", "삭제된 계정입니다"),
     DISABLED_BY_LINKING(HttpStatus.UNAUTHORIZED.value(), "disabled_by_linking", "계정 연동으로 인해 비활성화된 계정입니다"),
