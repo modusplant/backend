@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
-import kr.modusplant.infrastructure.security.util.SecurityResponseHelper;
+import kr.modusplant.infrastructure.security.util.SecurityResponseUtils;
 import kr.modusplant.shared.exception.enums.GeneralSuccessCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -21,7 +21,7 @@ public class WriteResponseLogoutSuccessHandler implements LogoutSuccessHandler {
     public void onLogoutSuccess(HttpServletRequest request,
                                 HttpServletResponse response,
                                 Authentication authentication) throws IOException {
-        SecurityResponseHelper.writeResponse(
+        SecurityResponseUtils.writeResponse(
                 response, GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus(),
                 objectMapper.writeValueAsString(DataResponse.ok())
         );

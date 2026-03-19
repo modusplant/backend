@@ -6,7 +6,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import kr.modusplant.infrastructure.security.exception.BusinessAuthenticationException;
-import kr.modusplant.infrastructure.security.util.SecurityResponseHelper;
+import kr.modusplant.infrastructure.security.util.SecurityLogger;
+import kr.modusplant.infrastructure.security.util.SecurityResponseUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -24,14 +25,14 @@ public class DefaultAuthenticationEntryPoint implements AuthenticationEntryPoint
                          AuthenticationException authEx) throws IOException {
 
         if (authEx instanceof BusinessAuthenticationException businessAuthEx) {
-            SecurityResponseHelper.writeResponse(
+            SecurityResponseUtils.writeResponse(
                     response, businessAuthEx.getErrorCode().getHttpStatus(),
                     objectMapper.writeValueAsString(DataResponse
                             .of(businessAuthEx.getErrorCode()))
             );
         } else {
-            SecurityResponseHelper.logUnknownException(authEx);
-            SecurityResponseHelper.writeResponse(
+            SecurityLogger.logUnknownException(authEx);
+            SecurityResponseUtils.writeResponse(
                     response, SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus(),
                     objectMapper.writeValueAsString(DataResponse
                             .of(SecurityErrorCode.AUTHENTICATION_FAILED))

@@ -14,7 +14,7 @@ import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.infrastructure.security.exception.AccountStateException;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
-import kr.modusplant.infrastructure.security.util.SecurityResponseHelper;
+import kr.modusplant.infrastructure.security.util.SecurityResponseUtils;
 import kr.modusplant.shared.exception.enums.GeneralSuccessCode;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +47,7 @@ public class WriteResponseLoginSuccessHandler implements AuthenticationSuccessHa
         TokenPair loginTokenPair = tokenService.issueToken(
                 currentMember.getActiveUuid(), currentMember.getNickname(), currentMember.getEmail(), getMemberRole(currentMember));
 
-        SecurityResponseHelper.writeResponse(
+        SecurityResponseUtils.writeResponse(
                 response, GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus(),
                 objectMapper.writeValueAsString(DataResponse
                         .ok(Map.of("accessToken", loginTokenPair.accessToken())))
