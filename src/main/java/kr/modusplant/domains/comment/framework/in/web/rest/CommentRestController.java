@@ -154,6 +154,7 @@ public class CommentRestController {
             summary = "컨텐츠 댓글 수정 API",
             description = "게시글 식별자, 댓글 경로, 댓글 내용으로 댓글을 갱신합니다."
     )
+    @PutMapping("/update")
     public ResponseEntity<DataResponse<Void>> update(
             @RequestBody @Valid
             CommentUpdateRequest updateRequest) {
