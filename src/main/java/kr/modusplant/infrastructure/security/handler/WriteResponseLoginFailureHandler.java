@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import kr.modusplant.infrastructure.security.exception.BusinessAuthenticationException;
+import kr.modusplant.infrastructure.security.util.SecurityLogger;
+import kr.modusplant.infrastructure.security.util.SecurityResponseUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -22,22 +24,18 @@ public class WriteResponseLoginFailureHandler implements AuthenticationFailureHa
                                         HttpServletResponse response,
                                         AuthenticationException exception) throws IOException {
 
-        response.setContentType("application/json;charset=UTF-8");
-        response.setCharacterEncoding("UTF-8");
-
         if(exception instanceof BusinessAuthenticationException ex) {
-            response.setStatus(ex.getErrorCode().getHttpStatus());
-            response.getWriter().write(
+            SecurityResponseUtils.writeResponse(
+                    response, ex.getErrorCode().getHttpStatus(),
                     objectMapper.writeValueAsString(DataResponse
-                            .of(ex.getErrorCode())
-                    )
+                            .of(ex.getErrorCode()))
             );
         } else {
-            response.setStatus(SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus());
-            response.getWriter().write(
+            SecurityLogger.logUnknownException(exception);
+            SecurityResponseUtils.writeResponse(
+                    response, SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus(),
                     objectMapper.writeValueAsString(DataResponse
-                            .of(SecurityErrorCode.AUTHENTICATION_FAILED)
-                    )
+                            .of(SecurityErrorCode.AUTHENTICATION_FAILED))
             );
         }
     }

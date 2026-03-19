@@ -10,6 +10,7 @@ import kr.modusplant.infrastructure.security.DefaultAuthenticationEntryPoint;
 import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
 import kr.modusplant.infrastructure.security.filter.EmailPasswordAuthenticationFilter;
 import kr.modusplant.infrastructure.security.filter.JwtAuthenticationFilter;
+import kr.modusplant.infrastructure.security.filter.SecurityExceptionHandlingFilter;
 import kr.modusplant.infrastructure.security.handler.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,6 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.validation.Validator;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -84,8 +86,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public ForwardRequestLoginSuccessHandler forwardRequestLoginSuccessHandler() {
-        return new ForwardRequestLoginSuccessHandler(memberRepository, tokenService);
+    public WriteResponseLoginSuccessHandler forwardRequestLoginSuccessHandler() {
+        return new WriteResponseLoginSuccessHandler(memberRepository, tokenService, tokenProvider, objectMapper);
     }
 
     @Bean
@@ -98,13 +100,13 @@ public class SecurityConfig {
         return new JwtClearingLogoutHandler(tokenService); }
 
     @Bean
-    public ForwardRequestLogoutSuccessHandler normalLogoutSuccessHandler() {
-        return new ForwardRequestLogoutSuccessHandler(objectMapper); }
+    public WriteResponseLogoutSuccessHandler normalLogoutSuccessHandler() {
+        return new WriteResponseLogoutSuccessHandler(objectMapper); }
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(HttpSecurity http) {
         try {
-            return new JwtAuthenticationFilter(tokenProvider, defaultAuthenticationEntryPoint(), tokenRedisRepository);
+            return new JwtAuthenticationFilter(tokenProvider, tokenRedisRepository);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -132,11 +134,17 @@ public class SecurityConfig {
     }
 
     @Bean
+    public SecurityExceptionHandlingFilter securityExceptionHandlingFilter() {
+        return new SecurityExceptionHandlingFilter(objectMapper, defaultAuthenticationEntryPoint());
+    }
+
+    @Bean
     public SecurityFilterChain defaultChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/api/**")
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
+                .addFilterBefore(securityExceptionHandlingFilter(), LogoutFilter.class)
                 .addFilterBefore(emailPasswordAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(http), EmailPasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth

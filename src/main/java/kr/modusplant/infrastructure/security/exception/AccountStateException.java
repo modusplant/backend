@@ -1,14 +1,14 @@
 package kr.modusplant.infrastructure.security.exception;
 
-import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
+import kr.modusplant.shared.exception.supers.ErrorCode;
 
 public class AccountStateException extends BusinessAuthenticationException {
 
-  public AccountStateException(SecurityErrorCode errorCode) {
+  public AccountStateException(ErrorCode errorCode) {
     super(errorCode);
   }
 
-  public AccountStateException(SecurityErrorCode errorCode, String message) {
+  public AccountStateException(ErrorCode errorCode, String message) {
     super(errorCode, message);
   }
 }

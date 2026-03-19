@@ -1,36 +1,45 @@
 package kr.modusplant.infrastructure.security.handler;
 
-import jakarta.servlet.ServletException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.infrastructure.security.exception.AccountStateException;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
+import kr.modusplant.infrastructure.security.util.SecurityResponseUtils;
+import kr.modusplant.shared.exception.enums.GeneralSuccessCode;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessHandler {
+public class WriteResponseLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final SiteMemberJpaRepository memberRepository;
     private final TokenService tokenService;
+    private final JwtTokenProvider tokenProvider;
+    private final ObjectMapper objectMapper;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
-                                        Authentication authentication) throws IOException, ServletException {
+                                        Authentication authentication) throws IOException {
         DefaultUserDetails currentMember = (DefaultUserDetails) authentication.getPrincipal();
 
         updateMemberLoggedInAt(currentMember.getActiveUuid());
@@ -38,16 +47,20 @@ public class ForwardRequestLoginSuccessHandler implements AuthenticationSuccessH
         TokenPair loginTokenPair = tokenService.issueToken(
                 currentMember.getActiveUuid(), currentMember.getNickname(), currentMember.getEmail(), getMemberRole(currentMember));
 
-        request.setAttribute("accessToken", loginTokenPair.accessToken());
-        request.setAttribute("refreshToken", loginTokenPair.refreshToken());
-
-        request.getRequestDispatcher("/api/auth/login-success").forward(request, response);
+        SecurityResponseUtils.writeResponse(
+                response, GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus(),
+                objectMapper.writeValueAsString(DataResponse
+                        .ok(Map.of("accessToken", loginTokenPair.accessToken())))
+        );
+        response.setHeader(HttpHeaders.SET_COOKIE,
+                tokenProvider.generateRefreshTokenCookieAsString(loginTokenPair.refreshToken()));
+        response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store");
     }
 
     private Role getMemberRole(DefaultUserDetails currentUserDetails) {
         GrantedAuthority memberRole = currentUserDetails.getAuthorities().stream()
                 .filter(auth -> auth.getAuthority().startsWith("ROLE_"))
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("인증된 유저에게 할당된 역할이 없습니다."));
+                .findFirst().orElseThrow(() -> new AccountStateException(EntityErrorCode.NOT_FOUND_MEMBER_ROLE));
 
         String rawRole = memberRole.getAuthority();
 

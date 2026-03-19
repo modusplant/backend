@@ -48,6 +48,19 @@ public class NormalIdentityController {
     }
 
     public void registerNormalMember(NormalSignUpRequest request) {
+
+        // 1. 일반 회원이 이미 있는가? -> 있다면 "일반 회원 정보가 이미 있음"고 알림. 없다면 추가 검증
+        // 2. 해당 이메일의 소셜 회원이 있는가? -> 있다면 "00 플랫폼의 계정이 있습니다"고 알림.
+        // 3. 일반과 소셜 둘 다 계정이 없다 -> 회원가입 진행
+        // AuthProvider에 "BASIC_KAKAO", "BASIC_GOOGLE" 추가? 지속 가능한가?
+        // 1. 계정이 있는가? -> 있다면, AuthProvider가 뭔가?
+
+//        if(readRepository.existsByEmail(Email.create(request.email()))) {
+//            readRepository.getMemberAuthProvider(Email.create(request.email()));
+//        }
+
+
+
         if(readRepository.existsByEmail(Email.create(request.email()))) {
             throw new DataAlreadyExistsException(EXISTS_MEMBER);
         } else if(readRepository.existsByNickname(Nickname.create(request.nickname()))) {
