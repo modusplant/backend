@@ -1,5 +1,6 @@
 package kr.modusplant.domains.comment.adapter.controller;
 
+import jakarta.transaction.Transactional;
 import kr.modusplant.domains.comment.adapter.mapper.CommentMapperImpl;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.exception.InvalidValueException;
@@ -48,16 +49,17 @@ public class CommentController {
 
     private final CommentCacheService cacheService;
 
+    @Transactional
     public CommentCacheData getCacheData(String postUlid, String ifNoneMatch, String ifModifiedSince) {
         return cacheService.getCacheData(ifNoneMatch, ifModifiedSince, PostId.create(postUlid));
-
     }
 
+    @Transactional
     public CommentCacheData getCacheData(UUID memberUuid, String ifNoneMatch, String ifModifiedSince) {
         return cacheService.getCacheData(ifNoneMatch, ifModifiedSince, MemberId.fromUuid(memberUuid));
-
     }
 
+    @Transactional
     public List<CommentOfPostResponse> gatherByPost(String postUlid) {
         if(!postJpaRepository.existsByUlid(postUlid)) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post");
@@ -68,6 +70,7 @@ public class CommentController {
                 .toList();
     }
 
+    @Transactional
     public CommentPageResponse<CommentOfAuthorPageModel> gatherByAuthor(UUID memberUuid, Pageable pageable) {
         if(!memberJpaRepository.existsById(memberUuid)) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, "member");
@@ -82,9 +85,9 @@ public class CommentController {
         response.ApplyOneIndexBasedPage();
 
         return response;
-
     }
 
+    @Transactional
     public void register(CommentRegisterRequest request, UUID currentMemberUuid) {
         if(jooqRepository.existsByPostAndPath(PostId.create(request.postId()), CommentPath.create(request.path()))) {
             throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT);
@@ -99,6 +102,7 @@ public class CommentController {
         jpaAdapter.save(comment);
     }
 
+    @Transactional
     public void update(CommentUpdateRequest request) {
         if(!jooqRepository.existsByPostAndPath(PostId.create(request.postId()), CommentPath.create(request.path()))) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_COMMENT, TableName.COMM_COMMENT);
@@ -112,6 +116,7 @@ public class CommentController {
         jpaAdapter.update(id, CommentContent.create(request.content()));
     }
 
+    @Transactional
     public void delete(String postUlid, String commentPath) {
         jpaAdapter.setCommentAsDeleted(CommCommentId.builder()
                 .postUlid(postUlid)
