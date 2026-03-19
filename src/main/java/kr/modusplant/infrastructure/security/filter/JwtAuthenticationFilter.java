@@ -36,23 +36,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String rawAccessToken = request.getHeader("Authorization");
 
         if (rawAccessToken != null) {
-            if (evaluateAccessToken(rawAccessToken)) {
-                String accessToken = rawAccessToken.substring(7);
+            evaluateAccessToken(rawAccessToken);
 
-                DefaultUserDetails defaultUserDetails = constructUserDetails(accessToken);
-                DefaultAuthToken authenticatedToken =
-                        new DefaultAuthToken(defaultUserDetails, defaultUserDetails.getAuthorities());
+            String accessToken = rawAccessToken.substring(7);
 
-                SecurityContextHolder.getContext().setAuthentication(authenticatedToken);
+            DefaultUserDetails defaultUserDetails = constructUserDetails(accessToken);
+            DefaultAuthToken authenticatedToken =
+                    new DefaultAuthToken(defaultUserDetails, defaultUserDetails.getAuthorities());
 
-                filterChain.doFilter(request, response);
-            }
-        } else {
-            filterChain.doFilter(request, response);
+            SecurityContextHolder.getContext().setAuthentication(authenticatedToken);
         }
+
+        filterChain.doFilter(request, response);
     }
 
-    private boolean evaluateAccessToken(String rawAccessToken) {
+    private void evaluateAccessToken(String rawAccessToken) {
         if (!rawAccessToken.startsWith("Bearer ")) {
             SecurityContextHolder.clearContext();
             throw new BadCredentialException(SecurityErrorCode.INVALID_TOKEN_FORMAT);
@@ -67,7 +65,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.clearContext();
             throw new BadCredentialException(SecurityErrorCode.BLACKLISTED_TOKEN);
         }
-        return true;
     }
 
     private DefaultUserDetails constructUserDetails(String accessToken) {
