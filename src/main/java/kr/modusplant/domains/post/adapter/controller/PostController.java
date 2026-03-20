@@ -94,12 +94,20 @@ public class PostController {
     @Transactional
     public void createPost(PostInsertRequest postInsertRequest, UUID currentMemberUuid) throws IOException {
         AuthorId authorId = AuthorId.fromUuid(currentMemberUuid);
-        PrimaryCategoryId primaryCategoryId = PrimaryCategoryId.create(postInsertRequest.primaryCategoryId());
-        SecondaryCategoryId secondaryCategoryId = SecondaryCategoryId.create(postInsertRequest.secondaryCategoryId());
-        PostContent postContent = PostContent.create(postInsertRequest.title(), multipartDataProcessorPort.saveFilesAndGenerateContentJson(postInsertRequest.content(), postInsertRequest.orderInfo()));
-        Post post = postInsertRequest.isPublished()
-                ? Post.createPublished(authorId, primaryCategoryId, secondaryCategoryId, postContent)
-                : Post.createDraft(authorId, primaryCategoryId, secondaryCategoryId, postContent);
+        Post post;
+        if (postInsertRequest.isPublished()) {
+            PrimaryCategoryId primaryCategoryId = PrimaryCategoryId.create(postInsertRequest.primaryCategoryId());
+            SecondaryCategoryId secondaryCategoryId = SecondaryCategoryId.create(postInsertRequest.secondaryCategoryId());
+            JsonNode content = multipartDataProcessorPort.saveFilesAndGenerateContentJson(postInsertRequest.content(), postInsertRequest.orderInfo());
+            post = Post.createPublished(authorId, primaryCategoryId, secondaryCategoryId,  PostContent.create(postInsertRequest.title(), content));
+        } else {
+            PrimaryCategoryId primaryCategoryId = postInsertRequest.primaryCategoryId() != null ? PrimaryCategoryId.create(postInsertRequest.primaryCategoryId()) : null;
+            SecondaryCategoryId secondaryCategoryId = postInsertRequest.secondaryCategoryId() != null ? SecondaryCategoryId.create(postInsertRequest.secondaryCategoryId()) : null;
+            JsonNode content = postInsertRequest.content() != null && postInsertRequest.orderInfo() != null
+                    ? multipartDataProcessorPort.saveFilesAndGenerateContentJson(postInsertRequest.content(), postInsertRequest.orderInfo())
+                    : null;
+            post = Post.createDraft(authorId, primaryCategoryId, secondaryCategoryId, PostContent.createDraft(postInsertRequest.title(), content));
+        }
         postRepository.save(post);
     }
 
@@ -107,15 +115,28 @@ public class PostController {
     public void updatePost(PostUpdateRequest postUpdateRequest, UUID currentMemberUuid) throws IOException {
         Post post = postRepository.getPostByUlid(PostId.create(postUpdateRequest.ulid()))
                 .filter(p -> p.getAuthorId().equals(AuthorId.fromUuid(currentMemberUuid))).orElseThrow();
+        // 게시글 검증 수행
         multipartDataProcessorPort.deleteFiles(post.getPostContent().getContent());
-        PostContent postContent = PostContent.create(postUpdateRequest.title(),multipartDataProcessorPort.saveFilesAndGenerateContentJson(postUpdateRequest.content(), postUpdateRequest.orderInfo()));
-        post.update(
-                AuthorId.fromUuid(currentMemberUuid),
-                PrimaryCategoryId.create(postUpdateRequest.primaryCategoryId()),
-                SecondaryCategoryId.create(postUpdateRequest.secondaryCategoryId()),
-                postContent,
-                postUpdateRequest.isPublished() ? PostStatus.published() : PostStatus.draft()
-        );
+        if (postUpdateRequest.isPublished()) {
+            PostContent postContent = PostContent.create(postUpdateRequest.title(),multipartDataProcessorPort.saveFilesAndGenerateContentJson(postUpdateRequest.content(), postUpdateRequest.orderInfo()));
+            post.update(
+                    AuthorId.fromUuid(currentMemberUuid),
+                    PrimaryCategoryId.create(postUpdateRequest.primaryCategoryId()),
+                    SecondaryCategoryId.create(postUpdateRequest.secondaryCategoryId()),
+                    postContent,
+                    PostStatus.published()
+            );
+        } else {
+            JsonNode content = postUpdateRequest.content() != null && postUpdateRequest.orderInfo() != null
+                    ? multipartDataProcessorPort.saveFilesAndGenerateContentJson(postUpdateRequest.content(), postUpdateRequest.orderInfo())
+                    : null;
+            post.updateDraft(
+                    AuthorId.fromUuid(currentMemberUuid),
+                    postUpdateRequest.primaryCategoryId() != null ? PrimaryCategoryId.create(postUpdateRequest.primaryCategoryId()) : null,
+                    postUpdateRequest.secondaryCategoryId() != null ? SecondaryCategoryId.create(postUpdateRequest.secondaryCategoryId()) : null,
+                    PostContent.createDraft(postUpdateRequest.title(),content)
+            );
+        }
         postRepository.update(post);
     }
 
@@ -200,6 +221,7 @@ public class PostController {
     }
 
     private JsonNode getJsonNodeContentPreview(JsonNode content) {
+        if (content == null) return null;
         JsonNode contentPreview;
         try {
             contentPreview = multipartDataProcessorPort.convertToPreview(content);
@@ -210,6 +232,7 @@ public class PostController {
     }
 
     private JsonNode getJsonNodeContent(JsonNode content) {
+        if (content == null) return null;
         JsonNode newContent;
         try {
             newContent = multipartDataProcessorPort.convertFileSrcToFullFileSrc(content);

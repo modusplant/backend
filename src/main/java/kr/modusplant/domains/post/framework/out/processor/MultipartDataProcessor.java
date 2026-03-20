@@ -117,6 +117,9 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
     }
 
     public void deleteFiles(JsonNode content) {
+        if (content == null || !content.isArray())
+            return ;
+        // null 일때도 돌아가는지 확인
         for (JsonNode node : content) {
             if (node.has(SRC)) {
                 String src = node.get(SRC).asText();
