@@ -41,6 +41,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         SITE_MEMBER.NICKNAME,
                         COMM_POST.TITLE,
                         COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.THUMBNAIL_PATH,
                         COMM_POST.LIKE_COUNT,
                         COMM_POST.PUBLISHED_AT,
                         coalesce(field("cc.comment_count",Integer.class), 0).as("commentCount"),
@@ -84,6 +85,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         SITE_MEMBER.NICKNAME,
                         COMM_POST.TITLE,
                         COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.THUMBNAIL_PATH,
                         COMM_POST.LIKE_COUNT,
                         COMM_POST.PUBLISHED_AT,
                         coalesce(field("cc.comment_count",Integer.class), 0).as("commentCount"),
@@ -168,6 +170,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         SITE_MEMBER.NICKNAME,
                         COMM_POST.TITLE,
                         COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.THUMBNAIL_PATH,
                         COMM_POST.IS_PUBLISHED,
                         COMM_POST.PUBLISHED_AT,
                         COMM_POST.UPDATED_AT

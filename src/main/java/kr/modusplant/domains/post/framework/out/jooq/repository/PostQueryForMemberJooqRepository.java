@@ -43,6 +43,7 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                 SITE_MEMBER.NICKNAME,
                 COMM_POST.TITLE,
                 COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                COMM_POST.THUMBNAIL_PATH,
                 COMM_POST.LIKE_COUNT,
                 COMM_POST.PUBLISHED_AT,
                 coalesce(field("cc.comment_count",Integer.class), 0).as("commentCount"),
@@ -94,6 +95,7 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                         COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
                         COMM_POST.TITLE,
                         COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.THUMBNAIL_PATH,
                         COMM_POST.UPDATED_AT
                 ).from(COMM_POST)
                 .leftOuterJoin(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
@@ -131,6 +133,7 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                         SITE_MEMBER.NICKNAME,
                         COMM_POST.TITLE,
                         COMM_POST.CONTENT.as("content"),
+                        COMM_POST.THUMBNAIL_PATH,
                         COMM_POST.LIKE_COUNT,
                         COMM_POST.PUBLISHED_AT,
                         coalesce(field("cc.comment_count", Integer.class), 0).as("commentCount"),
@@ -186,6 +189,7 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                         SITE_MEMBER.NICKNAME,
                         COMM_POST.TITLE,
                         COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.THUMBNAIL_PATH,
                         COMM_POST.LIKE_COUNT,
                         COMM_POST.PUBLISHED_AT,
                         coalesce(field("cc.comment_count",Integer.class), 0).as("commentCount"),
@@ -237,6 +241,7 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                         SITE_MEMBER.NICKNAME,
                         COMM_POST.TITLE,
                         COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.THUMBNAIL_PATH,
                         COMM_POST.LIKE_COUNT,
                         COMM_POST.PUBLISHED_AT,
                         coalesce(field("cc.comment_count",Integer.class), 0).as("commentCount"),
