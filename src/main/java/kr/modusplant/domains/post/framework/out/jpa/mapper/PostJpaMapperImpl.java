@@ -30,6 +30,7 @@ public class PostJpaMapperImpl implements PostJpaMapper {
                 .viewCount(viewCount)
                 .title(post.getPostContent().getTitle())
                 .content(post.getPostContent().getContent())
+                .thumbnailPath(post.getPostContent().getThumbnailPath())
                 .isPublished(post.getStatus().isPublished())
                 .publishedAt(publishedAt)
                 .build();
@@ -41,10 +42,10 @@ public class PostJpaMapperImpl implements PostJpaMapper {
         PostContent content;
         if (postEntity.getIsPublished()) {
             postStatus = PostStatus.published();
-            content = PostContent.create(postEntity.getTitle(), postEntity.getContent());
+            content = PostContent.create(postEntity.getTitle(), postEntity.getContent(), postEntity.getThumbnailPath());
         } else {
             postStatus = PostStatus.draft();
-            content = PostContent.createDraft(postEntity.getTitle(), postEntity.getContent());
+            content = PostContent.createDraft(postEntity.getTitle(), postEntity.getContent(), postEntity.getThumbnailPath());
         }
         return Post.create(
                 PostId.create(postEntity.getUlid()),
