@@ -5,10 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import kr.modusplant.domains.post.framework.out.processor.enums.FileType;
-import kr.modusplant.domains.post.framework.out.processor.exception.FileLimitExceededException;
-import kr.modusplant.domains.post.framework.out.processor.exception.InvalidFileInputException;
-import kr.modusplant.domains.post.framework.out.processor.exception.UnsupportedFileException;
+import kr.modusplant.domains.post.framework.out.processor.exception.*;
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
+import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
 import kr.modusplant.domains.post.usecase.request.FileOrder;
 import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
@@ -41,9 +40,9 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
     public static final String SRC = "src";
     public static final String TYPE = "type";
 
-    public JsonNode saveFilesAndGenerateContentJson(List<MultipartFile> parts, List<FileOrder> orderInfo) throws IOException {
+    public ContentProcessRecord saveFilesAndGenerateContentJson(List<MultipartFile> parts, List<FileOrder> orderInfo, String thumbnailFilename) throws IOException {
         // 멀티파트 파일 및 순서 정보 검증
-        validatePartsAndOrderInfo(parts,orderInfo);
+        validatePartsAndOrderInfo(parts,orderInfo,thumbnailFilename);
         validateFileConstraints(parts);
         List<MultipartFile> orderedParts = reorderParts(parts, orderInfo);
         List<FileOrder> sortedOrderInfo = orderInfo.stream()
@@ -53,12 +52,21 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
         // 멀티파트 파일 저장 및 json 변환
         String fileUlid = generator.generate(null, null, null, EventType.INSERT);
         ArrayNode contentArray = objectMapper.createArrayNode();
+        String thumbnailPath = null;
         for (int i=0; i<orderedParts.size(); i++) {
             MultipartFile part = orderedParts.get(i);
             int order = sortedOrderInfo.get(i).order();
-            contentArray.add(convertSinglePartToJson(fileUlid,part,order));
+            ObjectNode node = convertSinglePartToJson(fileUlid,part,order);
+            contentArray.add(node);
+
+            String filename = part.getOriginalFilename();
+            if (thumbnailFilename != null && thumbnailFilename.equals(filename)) {
+                if (node.has(SRC) && FileType.IMAGE.getValue().equals(node.get(TYPE).asText())) {
+                    thumbnailPath = node.get(SRC).asText();
+                }
+            }
         }
-        return contentArray;
+        return new ContentProcessRecord(contentArray,thumbnailPath);
     }
 
     public ArrayNode convertFileSrcToFullFileSrc(JsonNode content) {
@@ -76,41 +84,24 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
         return newArray;
     }
 
-    public ArrayNode convertToPreview(JsonNode content) {
+    public ArrayNode convertToPreview(JsonNode content, String thumbnailPath) {
         ArrayNode newArray = objectMapper.createArrayNode();
 
-        JsonNode firstTextNode = null;
-        JsonNode firstImageNode = null;
-
         for (JsonNode node : content) {
-            if (node.has(TYPE)) {
-                String type = node.get(TYPE).asText();
-                if (type.equals(FileType.TEXT.getValue()) && firstTextNode == null) {
-                    firstTextNode = node;
-                } else if (type.equals(FileType.IMAGE.getValue()) && firstImageNode == null) {
-                    firstImageNode = node;
-                }
-
-                if (firstTextNode != null && firstImageNode != null) {
-                    break;
-                }
+            if (node.has(TYPE) && FileType.TEXT.getValue().equals(node.get(TYPE).asText())) {
+                ObjectNode textNode = objectMapper.createObjectNode();
+                textNode.put(TYPE,node.get(TYPE).asText());
+                textNode.put(DATA,node.get(DATA).asText());
+                newArray.add(textNode);
+                break;
             }
         }
 
-        if (firstTextNode != null) {
-            ObjectNode textObjectNode = firstTextNode.deepCopy();
-            newArray.add(textObjectNode);
-        }
-
-        if (firstImageNode != null) {
-            ObjectNode imageObjectNode = firstImageNode.deepCopy();
-            if (imageObjectNode.has(SRC)) {
-                String fileKey = imageObjectNode.get(SRC).asText();
-                imageObjectNode.remove(SRC);
-                String src = s3FileService.generateS3SrcUrl(fileKey);
-                imageObjectNode.put(SRC,src);
-            }
-            newArray.add(imageObjectNode);
+        if (thumbnailPath != null && !thumbnailPath.isBlank()) {
+            ObjectNode thumbnailNode = objectMapper.createObjectNode();
+            thumbnailNode.put(TYPE, FileType.IMAGE.getValue());
+            thumbnailNode.put(SRC, s3FileService.generateS3SrcUrl(thumbnailPath));
+            newArray.add(thumbnailNode);
         }
 
         return newArray;
@@ -128,14 +119,14 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
         }
     }
 
-    private void validatePartsAndOrderInfo(List<MultipartFile> parts, List<FileOrder> orderInfo) {
+    private void validatePartsAndOrderInfo(List<MultipartFile> parts, List<FileOrder> orderInfo, String thumbnailFilename) {
         // parts와 orderInfo 크기 검증
         if (parts == null || orderInfo == null || parts.size() != orderInfo.size()) {
             throw new InvalidFileInputException();
         }
 
         Map<String, MultipartFile> partMap = parts.stream()
-                .collect(Collectors.toMap(MultipartFile::getOriginalFilename, part -> part));
+                .collect(Collectors.toMap(MultipartFile::getOriginalFilename, part -> part, (a, b) -> { throw new InvalidFileInputException();}));  // 같은 filename 업로드 시 예외 발생
 
         // 파일명 매칭 검증
         Set<String> orderFilenames = orderInfo.stream()
@@ -169,6 +160,22 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
                 expectedOrder++;
             }
         }
+
+        // thumbnailFilename가 실제로 존재하는 이미지 파일명인지 검증
+        boolean hasImage = parts.stream().anyMatch(part -> FileType.from(part.getContentType()) == FileType.IMAGE);
+        if (hasImage) {
+            if (thumbnailFilename == null) {
+                throw new EmptyThumbnailException();
+            }
+            MultipartFile thumbnailPart = partMap.get(thumbnailFilename);
+            if (thumbnailPart == null || FileType.from(thumbnailPart.getContentType()) != FileType.IMAGE) {
+                throw new InvalidThumbnailException();
+            }
+        } else {    // 이미지 파일이 존재하지 않을때 대표 사진 지정 시 예외 처리
+            if (thumbnailFilename != null) {
+                throw new ThumbnailNotAllowedException();
+            }
+        }
     }
 
     private void validateFileConstraints(List<MultipartFile> parts) {
@@ -178,6 +185,9 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
 
         for(MultipartFile part : parts) {
             String contentType = part.getContentType();
+            if (contentType == null) {
+                throw new UnsupportedFileException();
+            }
             String originalFilename = part.getOriginalFilename();
             long fileSize = part.getSize();
             // text이면 제외
@@ -258,6 +268,10 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
     }
 
     private String generateFileKey(String fileUlid, FileType fileType, String originalFilename, int order) {
+        if (originalFilename == null) {
+            throw new UnsupportedFileException();
+        }
+
         // post/{RAMDOM UlID}/{fileType}/{fileName}
         String directory = "post/" + fileUlid + "/" + fileType.getValue() + "/";
 
@@ -269,5 +283,23 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
                 + "_" + order + ext;
 
         return directory + filename;
+    }
+
+    public String extractOriginalFilenameFromFileKey(String fileKey) {
+        if (fileKey == null)
+            return null;
+
+        // fileKey 끝부분 가져오기
+        String filenameWithOrder = fileKey.substring(fileKey.lastIndexOf("/") + 1);
+
+        // 확장자 분리
+        int dotIndex = filenameWithOrder.lastIndexOf('.');
+        String ext = dotIndex > 0 ? filenameWithOrder.substring(dotIndex) : "";
+        String name = dotIndex > 0 ? filenameWithOrder.substring(0, dotIndex) : filenameWithOrder;
+
+        // 마지막 _order 제거
+        name = name.replaceAll("_(\\d+)$", "");  // 마지막 _숫자만 제거
+
+        return name + ext;
     }
 }
