@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT;
+import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT_THUMBNAIL_KEY;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PostTest implements PostTestUtils {
@@ -138,7 +139,7 @@ class PostTest implements PostTestUtils {
         void testUpdate_givenValidParameter_willReturnPost() {
             // given
             Post post = createDraftPost();
-            PostContent postContent = PostContent.create("title",TEST_POST_CONTENT);
+            PostContent postContent = PostContent.create("title",TEST_POST_CONTENT,TEST_POST_CONTENT_THUMBNAIL_KEY);
 
             // when
             post.update(testAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, postContent, PostStatus.published());
@@ -156,7 +157,7 @@ class PostTest implements PostTestUtils {
         void testUpdate_givenNullParameter_willThrowException() {
             // given
             Post post = createDraftPost();
-            PostContent postContent = PostContent.create("title",TEST_POST_CONTENT);
+            PostContent postContent = PostContent.create("title",TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY);
 
             // when & then
             assertThrows(EmptyValueException.class, () ->
@@ -180,7 +181,7 @@ class PostTest implements PostTestUtils {
         void testUpdate_givenPublishedPostToDraftPost_willThrowException() {
             // given
             Post post = createPublishedPost();
-            PostContent postContent = PostContent.create("title",TEST_POST_CONTENT);
+            PostContent postContent = PostContent.create("title",TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY);
 
             // when & then
             assertThrows(InvalidValueException.class, () ->
@@ -279,7 +280,7 @@ class PostTest implements PostTestUtils {
         void testUpdateContent_givenValidParameter_willReturnPost() {
             // given
             Post post = createDraftPost();
-            PostContent postContent = PostContent.create("title",TEST_POST_CONTENT);
+            PostContent postContent = PostContent.create("title",TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY);
 
             // when
             post.updateContent(postContent);

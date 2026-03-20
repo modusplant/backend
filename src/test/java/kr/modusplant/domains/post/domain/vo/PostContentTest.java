@@ -1,6 +1,5 @@
 package kr.modusplant.domains.post.domain.vo;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
 import kr.modusplant.domains.post.domain.exception.EmptyValueException;
@@ -11,6 +10,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT;
+import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT_THUMBNAIL_KEY;
 import static kr.modusplant.domains.post.common.constant.PostStringConstant.TEST_POST_TITLE;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,7 +29,7 @@ class PostContentTest implements PostTestUtils {
         @DisplayName("유효한 제목과 내용으로 PostContent를 생성한다")
         void testCreate_givenTitleAndContent_willReturnPostContent() {
             // when
-            PostContent postContent = PostContent.create(MAX_LENGTH_TITLE, TEST_POST_CONTENT);
+            PostContent postContent = PostContent.create(MAX_LENGTH_TITLE, TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY);
 
             // then
             assertNotNull(testPostContent);
@@ -47,7 +47,7 @@ class PostContentTest implements PostTestUtils {
             String titleWithSpaces = "  게시글 제목  ";
 
             // when
-            PostContent postContent = PostContent.create(titleWithSpaces, TEST_POST_CONTENT);
+            PostContent postContent = PostContent.create(titleWithSpaces, TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY);
 
             // then
             assertNotNull(postContent);
@@ -55,34 +55,19 @@ class PostContentTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("빈 JsonNode 객체로 PostContent를 생성한다")
-        void testCreate_givenEmptyJsonNode_willReturnPostContent() {
-            // given
-            JsonNode emptyContent = objectMapper.createObjectNode();
-
-            // when
-            PostContent postContent = PostContent.create(TEST_POST_TITLE, emptyContent);
-
-            // then
-            assertNotNull(postContent);
-            assertEquals(TEST_POST_TITLE, postContent.getTitle());
-            assertEquals(emptyContent, postContent.getContent());
-        }
-
-        @Test
         @DisplayName("null 이나 빈 문자열 제목으로 PostContent 생성 시 EmptyPostContentException을 발생시킨다")
         void testCreate_givenNullOrEmptyTitle_willThrowException() {
             // when & then
             EmptyValueException exception1 = assertThrows(EmptyValueException.class,
-                    () -> PostContent.create(null, TEST_POST_CONTENT));
+                    () -> PostContent.create(null, TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY));
             assertEquals(exception1.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
 
             EmptyValueException exception2 = assertThrows(EmptyValueException.class,
-                    () -> PostContent.create("", TEST_POST_CONTENT));
+                    () -> PostContent.create("", TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY));
             assertEquals(exception2.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
 
             EmptyValueException exception3 = assertThrows(EmptyValueException.class,
-                    () -> PostContent.create("   ", TEST_POST_CONTENT));
+                    () -> PostContent.create("   ", TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY));
             assertEquals(exception3.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
         }
 
@@ -91,7 +76,7 @@ class PostContentTest implements PostTestUtils {
         void testCreate_givenOverMaxLengthTitle_willThrowException() {
             // when & then
             InvalidValueException exception = assertThrows(InvalidValueException.class,
-                    () -> PostContent.create(OVER_MAX_LENGTH_TITLE, TEST_POST_CONTENT));
+                    () -> PostContent.create(OVER_MAX_LENGTH_TITLE, TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY));
             assertEquals(exception.getErrorCode(), PostErrorCode.INVALID_POST_CONTENT);
         }
 
@@ -100,7 +85,7 @@ class PostContentTest implements PostTestUtils {
         void testCreate_givenNullContent_willThrowException() {
             // when & then
             EmptyValueException exception = assertThrows(EmptyValueException.class,
-                    () -> PostContent.create(TEST_POST_TITLE, null));
+                    () -> PostContent.create(TEST_POST_TITLE, null,null));
             assertEquals(exception.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
         }
     }
@@ -113,7 +98,7 @@ class PostContentTest implements PostTestUtils {
         @DisplayName("유효한 제목과 내용으로 PostContent를 생성한다")
         void testCreateDraft_givenTitleAndContent_willReturnPostContent() {
             // when
-            PostContent postContent = PostContent.createDraft(MAX_LENGTH_TITLE, null);
+            PostContent postContent = PostContent.createDraft(MAX_LENGTH_TITLE, null,null);
 
             // then
             assertNotNull(postContent);
@@ -127,15 +112,15 @@ class PostContentTest implements PostTestUtils {
         void testCreateDraft_givenNullOrEmptyTitle_willThrowException() {
             // when & then
             EmptyValueException exception1 = assertThrows(EmptyValueException.class,
-                    () -> PostContent.createDraft(null, null));
+                    () -> PostContent.createDraft(null, null,null));
             assertEquals(exception1.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
 
             EmptyValueException exception2 = assertThrows(EmptyValueException.class,
-                    () -> PostContent.createDraft("", null));
+                    () -> PostContent.createDraft("", null,null));
             assertEquals(exception2.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
 
             EmptyValueException exception3 = assertThrows(EmptyValueException.class,
-                    () -> PostContent.createDraft("   ", null));
+                    () -> PostContent.createDraft("   ", null, null));
             assertEquals(exception3.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
         }
 
@@ -144,7 +129,7 @@ class PostContentTest implements PostTestUtils {
         void testCreateDraft_givenOverMaxLengthTitle_willThrowException() {
             // when & then
             InvalidValueException exception = assertThrows(InvalidValueException.class,
-                    () -> PostContent.createDraft(OVER_MAX_LENGTH_TITLE, TEST_POST_CONTENT));
+                    () -> PostContent.createDraft(OVER_MAX_LENGTH_TITLE, TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY));
             assertEquals(exception.getErrorCode(), PostErrorCode.INVALID_POST_CONTENT);
         }
     }
@@ -173,7 +158,7 @@ class PostContentTest implements PostTestUtils {
         @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
         void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
             // when & then
-            assertNotEquals(testPostContent, PostContent.create("title",TEST_POST_CONTENT));
+            assertNotEquals(testPostContent, PostContent.create("title",TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY));
         }
 
     }
