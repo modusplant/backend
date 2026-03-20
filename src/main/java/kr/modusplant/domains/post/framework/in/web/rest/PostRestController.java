@@ -183,13 +183,17 @@ public class PostRestController {
             @RequestPart(required = false)
             List<@Valid FileOrder> orderInfo,
 
+            @Parameter(schema = @Schema(description = "게시글 컨텐츠 대표 사진의 파일명", example = "1"))
+            @RequestParam(required = false)
+            String thumbnailFilename,
+
             @Parameter(schema = @Schema(description = "게시글 발행 유무"))
             @RequestParam
             @NotNull(message = "게시글 발행 유무가 비어 있습니다.")
             Boolean isPublished
     ) throws IOException {
         UUID currentMemberUuid = userDetails.getActiveUuid();
-        postController.createPost(new PostInsertRequest(primaryCategoryId, secondaryCategoryId, title, content, orderInfo, isPublished), currentMemberUuid);
+        postController.createPost(new PostInsertRequest(primaryCategoryId, secondaryCategoryId, title, content, orderInfo, thumbnailFilename, isPublished), currentMemberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
@@ -231,13 +235,17 @@ public class PostRestController {
             @RequestPart(required = false)
             List<@Valid FileOrder> orderInfo,
 
+            @Parameter(schema = @Schema(description = "게시글 컨텐츠 대표 사진의 파일명", example = "1"))
+            @RequestParam(required = false)
+            String thumbnailFilename,
+
             @Parameter(schema = @Schema(description = "게시글 발행 유무", example = "true"))
             @RequestParam
             @NotNull(message = "게시글 발행 유무가 비어 있습니다.")
             Boolean isPublished
     ) throws IOException {
         UUID currentMemberUuid = userDetails.getActiveUuid();
-        postController.updatePost(new PostUpdateRequest(ulid, primaryCategoryId, secondaryCategoryId, title, content, orderInfo, isPublished), currentMemberUuid);
+        postController.updatePost(new PostUpdateRequest(ulid, primaryCategoryId, secondaryCategoryId, title, content, orderInfo, thumbnailFilename, isPublished), currentMemberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

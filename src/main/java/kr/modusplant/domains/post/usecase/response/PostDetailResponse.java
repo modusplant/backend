@@ -48,6 +48,9 @@ public record PostDetailResponse(
         @Schema(description = "게시글 컨텐츠")
         JsonNode content,
 
+        @Schema(description = "대표 사진 파일명")
+        String thumbnailFilename,
+
         @Schema(description = "게시글의 게시 유무")
         Boolean isPublished,
 

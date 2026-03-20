@@ -16,6 +16,8 @@ public record PostInsertRequest(
 
         List<FileOrder> orderInfo,
 
+        String thumbnailFilename,
+
         @NotNull(message = "게시글 발행 유무가 비어 있습니다.")
         Boolean isPublished
 ) {
