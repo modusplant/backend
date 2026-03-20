@@ -38,20 +38,20 @@ public class PostJpaMapperImpl implements PostJpaMapper {
     @Override
     public Post toPost(CommPostEntity postEntity) {
         PostStatus postStatus;
+        PostContent content;
         if (postEntity.getIsPublished()) {
             postStatus = PostStatus.published();
+            content = PostContent.create(postEntity.getTitle(), postEntity.getContent());
         } else {
             postStatus = PostStatus.draft();
+            content = PostContent.createDraft(postEntity.getTitle(), postEntity.getContent());
         }
         return Post.create(
                 PostId.create(postEntity.getUlid()),
                 AuthorId.fromUuid(postEntity.getAuthMember().getUuid()),
-                PrimaryCategoryId.create(postEntity.getPrimaryCategory().getId()),
-                SecondaryCategoryId.create(postEntity.getSecondaryCategory().getId()),
-                PostContent.create(
-                        postEntity.getTitle(),
-                        postEntity.getContent()
-                ),
+                postEntity.getPrimaryCategory() != null ? PrimaryCategoryId.create(postEntity.getPrimaryCategory().getId()) : null,
+                postEntity.getSecondaryCategory() != null ? SecondaryCategoryId.create(postEntity.getSecondaryCategory().getId()) : null,
+                content,
                 LikeCount.create(postEntity.getLikeCount()),
                 postStatus
         );
