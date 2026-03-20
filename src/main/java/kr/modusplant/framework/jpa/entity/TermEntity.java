@@ -59,10 +59,6 @@ public class TermEntity {
 
     public void updateContent(String content) { this.content = content; }
 
-    public void updateVersion(String version) {
-        this.version = version;
-    }
-
     public String getETagSource() {
         return getUuid() + "-" + getVersionNumber();
     }

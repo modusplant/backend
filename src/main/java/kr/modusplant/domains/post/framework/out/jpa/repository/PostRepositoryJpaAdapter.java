@@ -44,7 +44,7 @@ public class PostRepositoryJpaAdapter implements PostRepository {
         SiteMemberEntity authorEntity = authorJpaRepository.findByUuid(post.getAuthorId().getValue()).orElseThrow(() -> new AuthorNotFoundException());
         CommPrimaryCategoryEntity primaryCategoryEntity = primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue()).orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID));
         CommSecondaryCategoryEntity secondaryCategoryEntity = secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue())
-                .filter(secondaryCategory -> secondaryCategory.getPrimaryCategoryEntity().equals(primaryCategoryEntity))
+                .filter(secondaryCategory -> secondaryCategory.getPrimaryCategory().equals(primaryCategoryEntity))
                 .orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID));
         postJpaRepository.save(
                 postJpaMapper.toPostEntity(post, authorEntity, primaryCategoryEntity,secondaryCategoryEntity,0L)
@@ -55,7 +55,7 @@ public class PostRepositoryJpaAdapter implements PostRepository {
     public void update(Post post) {
         CommPrimaryCategoryEntity primaryCategoryEntity = primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue()).orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID));
         CommSecondaryCategoryEntity secondaryCategoryEntity = secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue())
-                .filter(secondaryCategory -> secondaryCategory.getPrimaryCategoryEntity().equals(primaryCategoryEntity))
+                .filter(secondaryCategory -> secondaryCategory.getPrimaryCategory().equals(primaryCategoryEntity))
                 .orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID));
         CommPostEntity postEntity = postJpaRepository.findByUlid(post.getPostId().getValue()).orElseThrow(() -> new PostNotFoundException());
         postEntity.updatePrimaryCategory(primaryCategoryEntity);

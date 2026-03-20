@@ -3,6 +3,7 @@ package kr.modusplant.framework.jooq.converter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
 import org.jooq.Converter;
 import org.jooq.JSONB;
 import org.jooq.exception.DataAccessException;
@@ -33,11 +34,13 @@ public class JsonbJsonNodeConverter implements Converter<JSONB, JsonNode> {
         }
     }
 
+    @NotNull
     @Override
     public Class<JSONB> fromType() {
         return JSONB.class;
     }
 
+    @NotNull
     @Override
     public Class<JsonNode> toType() {
         return JsonNode.class;

@@ -14,7 +14,7 @@ public class SecondaryCategoryJpaMapperImpl implements SecondaryCategoryJpaMappe
     public SecondaryCategory toSecondaryCategory(CommSecondaryCategoryEntity secondaryCategoryEntity) {
         return SecondaryCategory.create(
                 SecondaryCategoryId.create(secondaryCategoryEntity.getId()),
-                PrimaryCategoryId.create(secondaryCategoryEntity.getPrimaryCategoryEntity().getId()),
+                PrimaryCategoryId.create(secondaryCategoryEntity.getPrimaryCategory().getId()),
                 secondaryCategoryEntity.getCategory(),
                 secondaryCategoryEntity.getOrder()
         );

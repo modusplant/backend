@@ -37,10 +37,6 @@ public class SiteMemberRoleEntity {
     @DefaultValue
     private Role role;
 
-    public void updateRole(Role role) {
-        this.role = role;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

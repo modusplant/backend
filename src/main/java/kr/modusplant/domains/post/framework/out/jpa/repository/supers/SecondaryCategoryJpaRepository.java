@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface SecondaryCategoryJpaRepository extends JpaRepository<CommSecondaryCategoryEntity, Integer> {
-    List<CommSecondaryCategoryEntity> findByPrimaryCategoryEntityOrderByOrderAsc(CommPrimaryCategoryEntity primaryCategoryEntity);
+    List<CommSecondaryCategoryEntity> findByPrimaryCategoryOrderByOrderAsc(CommPrimaryCategoryEntity primaryCategory);
 
     Optional<CommSecondaryCategoryEntity> findById(Integer id);
 }

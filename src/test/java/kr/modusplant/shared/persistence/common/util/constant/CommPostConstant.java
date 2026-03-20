@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_UUID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -18,8 +16,6 @@ public final class CommPostConstant {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static final String TEST_COMM_POST_ULID = "01K6DH4YCJMS3NJ4JCY8TPXP4T";
-    public static final UUID TEST_COMM_POST_PRIMARY_CATEGORY_UUID = TEST_COMM_PRIMARY_CATEGORY_UUID;
-    public static final UUID TEST_COMM_POST_SECONDARY_CATEGORY_UUID = TEST_COMM_SECONDARY_CATEGORY_UUID;
     public static final UUID TEST_COMM_POST_AUTH_MEMBER_UUID = MEMBER_BASIC_USER_UUID;
     public static final UUID TEST_COMM_POST_CREATE_MEMBER_UUID = MEMBER_BASIC_USER_UUID;
     public static final Integer TEST_COMM_POST_LIKE_COUNT = 0;

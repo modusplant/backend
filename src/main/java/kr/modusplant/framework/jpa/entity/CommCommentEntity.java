@@ -32,7 +32,7 @@ public class CommCommentEntity {
     @MapsId("postUlid")
     @JoinColumn(name = POST_ULID, nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ToString.Exclude
-    private CommPostEntity postEntity;
+    private CommPostEntity post;
 
     @Id
     @Column(name = PATH, nullable = false, updatable = false)
@@ -103,11 +103,11 @@ public class CommCommentEntity {
     }
 
     private CommCommentEntity(
-            CommPostEntity postEntity, String path,
+            CommPostEntity post, String path,
             SiteMemberEntity authMember, Integer likeCount,
             String content, Boolean isDeleted
     ) {
-        this.postEntity = postEntity;
+        this.post = post;
         this.path = path;
         this.authMember = authMember;
         this.likeCount = likeCount;
@@ -120,15 +120,15 @@ public class CommCommentEntity {
     }
 
     public static final class CommCommentEntityBuilder {
-        private CommPostEntity postEntity;
+        private CommPostEntity post;
         private String path;
         private SiteMemberEntity authMember;
         private Integer likeCount;
         private String content;
         private Boolean isDeleted;
 
-        public CommCommentEntityBuilder postEntity(final CommPostEntity postEntity) {
-            this.postEntity = postEntity;
+        public CommCommentEntityBuilder post(final CommPostEntity post) {
+            this.post = post;
             return this;
         }
 
@@ -158,7 +158,7 @@ public class CommCommentEntity {
         }
 
         public CommCommentEntityBuilder commComment(final CommCommentEntity commCommentEntity) {
-            this.postEntity = commCommentEntity.getPostEntity();
+            this.post = commCommentEntity.getPost();
             this.path = commCommentEntity.getPath();
             this.authMember = commCommentEntity.getAuthMember();
             this.likeCount = commCommentEntity.getLikeCount();
@@ -168,7 +168,7 @@ public class CommCommentEntity {
         }
 
         public CommCommentEntity build() {
-            return new CommCommentEntity(this.postEntity, this.path, this.authMember, this.likeCount, this.content, this.isDeleted
+            return new CommCommentEntity(this.post, this.path, this.authMember, this.likeCount, this.content, this.isDeleted
             );
         }
     }

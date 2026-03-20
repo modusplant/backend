@@ -154,16 +154,6 @@ public class CommPostEntity {
         }
     }
 
-    @PreUpdate
-    public void preUpdate() {
-        if (this.viewCount == null) {
-            this.viewCount = 0L;
-        }
-        if (this.isPublished == null) {
-            this.isPublished = false;
-        }
-    }
-
     private CommPostEntity(String ulid, CommPrimaryCategoryEntity primaryCategory, CommSecondaryCategoryEntity secondaryCategory, SiteMemberEntity authMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isPublished, LocalDateTime publishedAt) {
         this.ulid = ulid;
         this.primaryCategory = primaryCategory;

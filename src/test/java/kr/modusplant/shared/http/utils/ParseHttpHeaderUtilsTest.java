@@ -23,7 +23,7 @@ class ParseHttpHeaderUtilsTest implements SiteMemberEntityTestUtils, SiteMemberP
 
     @Test
     @DisplayName("parseIfNoneMatch 테스트")
-    void testParseIfNoneMatch() {
+    void parseIfNoneMatchTest() {
         // given
         String firstEntityTag = passwordEncoder.encode(MEMBER_BASIC_USER_UUID + "-null");
         String secondEntityTag = passwordEncoder.encode(MEMBER_BASIC_USER_UUID + "-0");
@@ -37,11 +37,22 @@ class ParseHttpHeaderUtilsTest implements SiteMemberEntityTestUtils, SiteMemberP
     }
 
     @Test
-    @DisplayName("parseIfModifiedSince 테스트")
-    void testParseIfModifiedSince() {
+    @DisplayName("RFC 1123 형식으로 parseIfModifiedSince를 통해 서울 기준의 날짜 및 시간 반환")
+    void testParseIfModifiedSince_givenRFC1123_willReturnLocalDateTime() {
         // given & when
         LocalDateTime now = LocalDateTime.now();
         String ifModifiedSince = ZonedDateTime.of(now, ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.RFC_1123_DATE_TIME);
+
+        // then
+        assertThat(parseIfModifiedSince(ifModifiedSince)).isEqualTo(now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")));
+    }
+
+    @Test
+    @DisplayName("RFC 1123이 아닌 형식으로 parseIfModifiedSince를 통해 서울 기준의 날짜 및 시간 반환")
+    void testParseIfModifiedSince_givenNoRFC1123_willReturnLocalDateTime() {
+        // given & when
+        LocalDateTime now = LocalDateTime.now();
+        String ifModifiedSince = ZonedDateTime.of(now, ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("EEE,dd MMM yyyy HH:mm:ss z"));
 
         // then
         assertThat(parseIfModifiedSince(ifModifiedSince)).isEqualTo(now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")));

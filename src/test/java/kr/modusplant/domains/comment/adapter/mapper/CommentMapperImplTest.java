@@ -1,7 +1,7 @@
 package kr.modusplant.domains.comment.adapter.mapper;
 
-import kr.modusplant.domains.comment.common.util.usecase.CommentRegisterRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentTestUtils;
+import kr.modusplant.domains.comment.common.util.usecase.CommentRegisterRequestTestUtils;
 import kr.modusplant.framework.aws.service.S3FileService;
 import org.mockito.Mockito;
 

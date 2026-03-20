@@ -11,6 +11,7 @@ import kr.modusplant.shared.exception.BusinessException;
 import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import kr.modusplant.shared.exception.model.DynamicErrorCode;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -54,7 +55,7 @@ public class GlobalExceptionHandler {
         String message = ex.getBindingResult().getAllErrors()
                 .getFirst().getDefaultMessage();
 
-        if (message == null || message.isBlank()) {
+        if (StringUtils.isBlank(message)) {
             return ResponseEntity.status(GeneralErrorCode.INVALID_INPUT.getHttpStatus())
                     .body(DataResponse.of(GeneralErrorCode.INVALID_INPUT));
         } else {

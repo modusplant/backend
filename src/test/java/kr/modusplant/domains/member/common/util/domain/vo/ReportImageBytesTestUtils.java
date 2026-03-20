@@ -2,8 +2,8 @@ package kr.modusplant.domains.member.common.util.domain.vo;
 
 import kr.modusplant.domains.member.domain.vo.ReportImageBytes;
 
-import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.REPORT_IMAGE_BYTES;
+import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.TEST_REPORT_IMAGE_BYTES;
 
 public interface ReportImageBytesTestUtils {
-    ReportImageBytes testReportImageBytes = ReportImageBytes.create(REPORT_IMAGE_BYTES);
+    ReportImageBytes testReportImageBytes = ReportImageBytes.create(TEST_REPORT_IMAGE_BYTES);
 }
