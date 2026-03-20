@@ -15,8 +15,10 @@ import static kr.modusplant.shared.persistence.common.util.constant.CommSecondar
 
 public interface PostRequestTestUtils {
     /* MultipartFile, FileOrder Utils */
-    MultipartFile textFile0 = new MockMultipartFile("content", "text_0.txt", "text/plain", "This is text for test".getBytes());
-    MultipartFile textFile1 = new MockMultipartFile("content", "text_1.txt", "text/plain", "This is text for test".getBytes());
+    String textFilename1 = "text_0.txt";
+    String textFilename2 = "text_1.txt";
+    MultipartFile textFile0 = new MockMultipartFile("content", textFilename1, "text/plain", "This is text for test".getBytes());
+    MultipartFile textFile1 = new MockMultipartFile("content", textFilename2, "text/plain", "This is text for test".getBytes());
     static FileOrder textFileOrder(int num, int order) {
         return new FileOrder("text_"+num+".txt",order);
     }
@@ -27,9 +29,10 @@ public interface PostRequestTestUtils {
             0x01, 0x01, 0x00, 0x48, 0x00, 0x48, 0x00, 0x00,
             (byte) 0xFF, (byte) 0xD9  // JPEG 종료
     };
-    MultipartFile imageFile = new MockMultipartFile("content", "image_0.jpeg", "image/jpeg", jpegData);
+    String imageFilename = "image_0.jpeg";
+    MultipartFile imageFile = new MockMultipartFile("content", imageFilename, "image/jpeg", jpegData);
     static FileOrder imageFileOrder(int order) {
-        return new FileOrder("image_0.jpeg",order);
+        return new FileOrder(imageFilename,order);
     }
 
     byte[] mp4Data = {
@@ -39,9 +42,10 @@ public interface PostRequestTestUtils {
             0x61, 0x76, 0x63, 0x31, 0x6D, 0x70, 0x34, 0x31,
             0x00, 0x01, 0x02, 0x03, 0x04, 0x05  // 임의 데이터
     };
-    MultipartFile videoFile = new MockMultipartFile("content", "video_0.mp4", "video/mp4", mp4Data);
+    String videoFilename = "video_0.mp4";
+    MultipartFile videoFile = new MockMultipartFile("content", videoFilename, "video/mp4", mp4Data);
     static FileOrder videoFileOrder(int order) {
-        return new FileOrder("video_0.mp4",order);
+        return new FileOrder(videoFilename,order);
     }
 
     byte[] wavData = {
@@ -54,9 +58,10 @@ public interface PostRequestTestUtils {
             0x44, (byte) 0xAC, 0x00, 0x00,  // sample rate
             0x00, 0x01, 0x02, 0x03   // 임의 데이터
     };
-    MultipartFile audioFile = new MockMultipartFile("content", "audio_0.wav", "audio/wav", wavData);
+    String audioFilename = "audio_0.wav";
+    MultipartFile audioFile = new MockMultipartFile("content", audioFilename, "audio/wav", wavData);
     static FileOrder audioFileOrder(int order) {
-        return new FileOrder("audio_0.wav",order);
+        return new FileOrder(audioFilename,order);
     }
 
     byte[] pdfData = {
@@ -64,9 +69,10 @@ public interface PostRequestTestUtils {
             0x0A, 0x25, (byte) 0xE2, (byte) 0xE3, (byte) 0xCF, (byte) 0xD3, 0x0A,
             0x00, 0x01, 0x02, 0x03, 0x04, 0x05
     };
-    MultipartFile applicationFile = new MockMultipartFile("content","file_0.pdf", "application/pdf", pdfData);
+    String applicationFilename = "file_0.pdf";
+    MultipartFile applicationFile = new MockMultipartFile("content",applicationFilename, "application/pdf", pdfData);
     static FileOrder applicationFileOrder(int order) {
-        return new FileOrder("file_0.pdf",order);
+        return new FileOrder(applicationFilename,order);
     }
 
     /* List<MultipartFile>, List<FileOrder> Utils */
@@ -85,6 +91,9 @@ public interface PostRequestTestUtils {
     List<MultipartFile> basicMediaFiles = Arrays.asList(textFile0,imageFile,videoFile);
     List<FileOrder> basicMediaFilesOrder = Arrays.asList(textFileOrder(0,0), imageFileOrder(1), videoFileOrder(2));
 
+    List<MultipartFile> onlyTextFiles = Arrays.asList(textFile0);
+    List<FileOrder> onlyTextFilesOrder = Arrays.asList(textFileOrder(0,0));
+
     List<MultipartFile> onlyMediaFiles = Arrays.asList(imageFile,videoFile);
     List<FileOrder> onlyMediaFilesOrder = Arrays.asList(imageFileOrder(1), videoFileOrder(2));
 
@@ -102,6 +111,7 @@ public interface PostRequestTestUtils {
             "유용한 컨텐츠 모음",
             allMediaFiles,
             allMediaFilesOrder,
+            imageFilename,
             true
     );
 
@@ -111,6 +121,7 @@ public interface PostRequestTestUtils {
             "유용한 컨텐츠 모음",
             allMediaFiles,
             allMediaFilesOrder,
+            imageFilename,
             false
     );
 
@@ -118,6 +129,7 @@ public interface PostRequestTestUtils {
             TEST_COMM_PRIMARY_CATEGORY_ID,
             null,
             "유용한 컨텐츠 모음",
+            null,
             null,
             null,
             false
@@ -129,6 +141,7 @@ public interface PostRequestTestUtils {
             "유용한 식물 기르기 컨텐츠",
             basicMediaFiles,
             basicMediaFilesOrder,
+            imageFilename,
             true
     );
 
@@ -140,6 +153,7 @@ public interface PostRequestTestUtils {
             "유용한 컨텐츠 모음",
             allMediaFiles,
             allMediaFilesOrder,
+            imageFilename,
             true
     );
 
@@ -150,6 +164,7 @@ public interface PostRequestTestUtils {
             "유용한 컨텐츠 모음",
             allMediaFiles,
             allMediaFilesOrder,
+            imageFilename,
             false
     );
 
@@ -158,6 +173,7 @@ public interface PostRequestTestUtils {
             TEST_COMM_PRIMARY_CATEGORY_ID,
             null,
             "유용한 컨텐츠 모음",
+            null,
             null,
             null,
             false

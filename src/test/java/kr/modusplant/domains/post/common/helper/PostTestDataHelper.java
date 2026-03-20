@@ -67,7 +67,7 @@ public class PostTestDataHelper {
 
     public CommPostRecord insertTestPublishedPost(
             CommPriCateRecord priCateRecord, CommSecoCateRecord secoCateRecord,
-            SiteMemberRecord memberRecord, String title, JsonNode content, LocalDateTime dateTime
+            SiteMemberRecord memberRecord, String title, JsonNode content, String thumbnailPath, LocalDateTime dateTime
     ) {
         return dsl.insertInto(COMM_POST)
                 .set(COMM_POST.ULID,generator.generate(null,null,null, EventType.INSERT))
@@ -78,6 +78,7 @@ public class PostTestDataHelper {
                 .set(COMM_POST.VIEW_COUNT,251)
                 .set(COMM_POST.TITLE,title)
                 .set(COMM_POST.CONTENT,new JsonbJsonNodeConverter().to(content))
+                .set(COMM_POST.THUMBNAIL_PATH, thumbnailPath)
                 .set(COMM_POST.IS_PUBLISHED,true)
                 .set(COMM_POST.PUBLISHED_AT,dateTime)
                 .set(COMM_POST.CREATED_AT,dateTime)
@@ -89,9 +90,8 @@ public class PostTestDataHelper {
 
     public CommPostRecord insertTestDraftPost(
             CommPriCateRecord priCateRecord, CommSecoCateRecord secoCateRecord,
-            SiteMemberRecord memberRecord, String title, JsonNode content
+            SiteMemberRecord memberRecord, String title, JsonNode content, String thumbnailPath, LocalDateTime dateTime
     ) {
-        LocalDateTime dateTime = LocalDateTime.now().plusDays(1);
         return dsl.insertInto(COMM_POST)
                 .set(COMM_POST.ULID,generator.generate(null,null,null, EventType.INSERT))
                 .set(COMM_POST.PRI_CATE_ID,priCateRecord!=null ? priCateRecord.getId() : null)
@@ -101,6 +101,7 @@ public class PostTestDataHelper {
                 .set(COMM_POST.VIEW_COUNT,0)
                 .set(COMM_POST.TITLE,title)
                 .set(COMM_POST.CONTENT,content!=null ? new JsonbJsonNodeConverter().to(content) : null)
+                .set(COMM_POST.THUMBNAIL_PATH, thumbnailPath)
                 .set(COMM_POST.IS_PUBLISHED,false)
                 .set(COMM_POST.CREATED_AT,dateTime)
                 .set(COMM_POST.UPDATED_AT,dateTime)

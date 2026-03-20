@@ -11,6 +11,7 @@ public interface PostEntityTestUtils extends PostTestUtils {
                 .viewCount(5L)
                 .title(testPostContent.getTitle())
                 .content(testPostContent.getContent())
+                .thumbnailPath(testPostContent.getThumbnailPath())
                 .isPublished(true);
     }
 
@@ -21,32 +22,35 @@ public interface PostEntityTestUtils extends PostTestUtils {
                 .viewCount(5L)
                 .title(testPostContent.getTitle())
                 .content(testPostContent.getContent())
+                .thumbnailPath(testPostContent.getThumbnailPath())
                 .isPublished(true);
     }
 
     default CommPostEntityBuilder createDraftPostEntityBuilder() {
         return CommPostEntity.builder()
-                .likeCount(testLikeCount.getValue())
-                .viewCount(5L)
+                .likeCount(0)
+                .viewCount(0L)
                 .title(testPostContent.getTitle())
                 .content(testPostContent.getContent())
+                .thumbnailPath(testPostContent.getThumbnailPath())
                 .isPublished(false);
     }
 
     default CommPostEntityBuilder createDraftPostEntityBuilderWithUuid() {
         return CommPostEntity.builder()
                 .ulid(testPostId.getValue())
-                .likeCount(testLikeCount.getValue())
-                .viewCount(5L)
+                .likeCount(0)
+                .viewCount(0L)
                 .title(testPostContent.getTitle())
                 .content(testPostContent.getContent())
+                .thumbnailPath(testPostContent.getThumbnailPath())
                 .isPublished(false);
     }
 
     default CommPostEntityBuilder createDraftPostEntityBuilderWithoutContent() {
         return CommPostEntity.builder()
-                .likeCount(testLikeCount.getValue())
-                .viewCount(5L)
+                .likeCount(0)
+                .viewCount(0L)
                 .title(testPostContent.getTitle())
                 .isPublished(false);
     }
@@ -54,8 +58,8 @@ public interface PostEntityTestUtils extends PostTestUtils {
     default CommPostEntityBuilder createDraftPostEntityBuilderWithoutContentWithUuid() {
         return CommPostEntity.builder()
                 .ulid(testPostId.getValue())
-                .likeCount(testLikeCount.getValue())
-                .viewCount(5L)
+                .likeCount(0)
+                .viewCount(0L)
                 .title(testPostContent.getTitle())
                 .isPublished(false);
     }

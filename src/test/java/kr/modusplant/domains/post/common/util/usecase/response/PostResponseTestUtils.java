@@ -35,6 +35,7 @@ public interface PostResponseTestUtils {
             50L,
             TEST_POST_TITLE,
             TEST_POST_CONTENT,
+            null,
             true,
             testDate,
             testDate,
