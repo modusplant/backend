@@ -151,6 +151,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                 .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .leftJoin(SITE_MEMBER_PROF).on(SITE_MEMBER.UUID.eq(SITE_MEMBER_PROF.UUID))
                 .where(COMM_POST.ULID.eq(postId.getValue()))
+                .and(COMM_POST.IS_PUBLISHED.isTrue())
                 .fetchOne()
         ).map(postJooqMapper::toPostDetailReadModel);
     }
@@ -171,8 +172,8 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         COMM_POST.PUBLISHED_AT,
                         COMM_POST.UPDATED_AT
                 ).from(COMM_POST)
-                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
-                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
+                .leftJoin(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
+                .leftJoin(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
                 .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .where(COMM_POST.ULID.eq(postId.getValue()))
                 .fetchOne()
