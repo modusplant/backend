@@ -458,6 +458,53 @@ public class PostRestController {
         return ResponseEntity.ok().body(DataResponse.ok(postController.getBookmarkedByMemberUuid(currentMemberUuid, page-1, size)));
     }
 
+    @Operation(
+            summary = "검색 기록 목록 조회 API",
+            description = "검색어로 게시글 목록 조회 시 입력한 검색어 기록 목록을 조회합니다. "
+    )
+    @GetMapping("/search-history")
+    public ResponseEntity<DataResponse<List<String>>> getSearchHistory(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "검색 기록 개수", example = "10", minimum = "1", maximum = "20"))
+            @RequestParam
+            int size
+    ) {
+        UUID currentMemberUuid = userDetails.getActiveUuid();
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getSearchHistory(currentMemberUuid,size)));
+    }
+
+    @Operation(
+            summary = "검색 기록 단건 삭제 API",
+            description = "검색 기록에서 검색어를 단건 삭제합니다."
+    )
+    @DeleteMapping("/search-history/{keyword}")
+    public ResponseEntity<DataResponse<Void>> removeSearchKeyword(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "검색어", example = "벌레"))
+            @PathVariable
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String keyword
+    ) {
+        UUID currentMemberUuid = userDetails.getActiveUuid();
+        postController.deleteSearchKeyword(currentMemberUuid,keyword);
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Operation(
+            summary = "검색 기록 전체 삭제 API",
+            description = "검색 기록에서 모든 검색어를 삭제합니다."
+    )
+    @DeleteMapping("/search-history")
+    public ResponseEntity<DataResponse<Void>> removeAllSearchHistory(
+            @AuthenticationPrincipal DefaultUserDetails userDetails
+    ) {
+        UUID currentMemberUuid = userDetails.getActiveUuid();
+        postController.deleteAllSearchHistory(currentMemberUuid);
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
     private UUID getOrCreateGuestId(String guestIdStr, HttpServletResponse response) {
         UUID guestId;
         boolean needsNewCookie = false;
