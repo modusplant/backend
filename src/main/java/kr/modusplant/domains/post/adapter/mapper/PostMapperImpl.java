@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class PostMapperImpl implements PostMapper {
 
     @Override
-    public PostDetailResponse toPostDetailResponse(PostDetailReadModel postDetailReadModel, String profileImageUrl, JsonNode content, Long viewCount) {
+    public PostDetailResponse postDetailReadModelToPostDetailResponse(PostDetailReadModel postDetailReadModel, String profileImageUrl, JsonNode content, Long viewCount) {
         return new PostDetailResponse(
                 postDetailReadModel.ulid(),
                 postDetailReadModel.primaryCategoryId(),
@@ -31,6 +31,7 @@ public class PostMapperImpl implements PostMapper {
                 viewCount==null ? 0 : viewCount,
                 postDetailReadModel.title(),
                 content,
+                null,
                 postDetailReadModel.isPublished(),
                 postDetailReadModel.publishedAt(),
                 postDetailReadModel.updatedAt(),
@@ -40,7 +41,7 @@ public class PostMapperImpl implements PostMapper {
     }
 
     @Override
-    public PostDetailResponse toPostDetailResponse(PostDetailDataReadModel postDetailDataReadModel, JsonNode content) {
+    public PostDetailResponse postDetailDataReadModelToPostDetailResponse(PostDetailDataReadModel postDetailDataReadModel, JsonNode content, String thumbnailFilename) {
         return new PostDetailResponse(
                 postDetailDataReadModel.ulid(),
                 postDetailDataReadModel.primaryCategoryId(),
@@ -54,6 +55,7 @@ public class PostMapperImpl implements PostMapper {
                 null,
                 postDetailDataReadModel.title(),
                 content,
+                thumbnailFilename,
                 postDetailDataReadModel.isPublished(),
                 postDetailDataReadModel.publishedAt(),
                 postDetailDataReadModel.updatedAt(),

@@ -15,6 +15,7 @@ public record PostDetailDataReadModel(
         String nickname,
         String title,
         JsonNode content,
+        String thumbnailPath,
         boolean isPublished,
         LocalDateTime publishedAt,
         LocalDateTime updatedAt
