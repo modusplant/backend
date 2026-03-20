@@ -17,8 +17,9 @@ public class PostContent {
 
     private final String title;
     private final JsonNode content;
+    private final String thumbnailPath;
 
-    public static PostContent create(String title, JsonNode content) {
+    public static PostContent create(String title, JsonNode content, String thumbnailPath) {
         if (title == null || title.trim().isEmpty()) {
             throw new EmptyValueException(PostErrorCode.EMPTY_POST_CONTENT,"게시글 제목이 비어 있습니다. ");
         }
@@ -28,10 +29,10 @@ public class PostContent {
         if (content == null) {
             throw new EmptyValueException(PostErrorCode.EMPTY_POST_CONTENT,"게시글 내용이 비어 있습니다. ");
         }
-        return new PostContent(title, content);
+        return new PostContent(title, content, thumbnailPath);
     }
 
-    public static PostContent createDraft(String title, JsonNode content) {
+    public static PostContent createDraft(String title, JsonNode content, String thumbnailPath) {
         boolean hasTitle = title != null && !title.isBlank() && !title.trim().isEmpty();
         boolean hasContent = content != null;
         if (!hasTitle && !hasContent) {
@@ -40,7 +41,7 @@ public class PostContent {
         if (hasTitle && title.length() > MAX_TITLE_LENGTH) {
             throw new InvalidValueException(PostErrorCode.INVALID_POST_CONTENT,"게시글 제목이 유효하지 않습니다. ");
         }
-        return new PostContent(title, content);
+        return new PostContent(title, content,thumbnailPath);
     }
 
     @Override
@@ -52,12 +53,13 @@ public class PostContent {
         return new EqualsBuilder()
                 .append(getTitle(),postContent.getTitle())
                 .append(getContent(),postContent.getContent())
+                .append(getThumbnailPath(),postContent.getThumbnailPath())
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(getTitle()).append(getContent()).toHashCode();
+        return new HashCodeBuilder(17, 37).append(getTitle()).append(getContent()).append(getThumbnailPath()).toHashCode();
     }
 
 }
