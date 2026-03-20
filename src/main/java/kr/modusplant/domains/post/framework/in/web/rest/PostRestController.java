@@ -13,10 +13,9 @@ import jakarta.validation.constraints.*;
 import kr.modusplant.domains.post.adapter.controller.PostController;
 import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
-import kr.modusplant.domains.post.usecase.request.FileOrder;
-import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
-import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
-import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
+import kr.modusplant.domains.post.usecase.enums.SearchOption;
+import kr.modusplant.domains.post.usecase.enums.SearchSort;
+import kr.modusplant.domains.post.usecase.request.*;
 import kr.modusplant.domains.post.usecase.response.CursorPageResponse;
 import kr.modusplant.domains.post.usecase.response.DraftPostResponse;
 import kr.modusplant.domains.post.usecase.response.OffsetPageResponse;
@@ -24,7 +23,6 @@ import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -102,12 +100,31 @@ public class PostRestController {
             @Range(min = 1, max = 50)
             Integer size,
 
+            @Parameter(schema = @Schema(description = "검색 옵션 필터", example = "title_content"))
+            @RequestParam
+            SearchOption option,
+
             @Parameter(schema = @Schema(description = "{제목+본문} 검색어 키워드", example = "벌레"))
+            @RequestParam
+            @NotBlank
+            String keyword,
+
+            @Parameter(schema = @Schema(description = "정렬 조건", example = "latest"))
+            @RequestParam
+            SearchSort sort,
+
+            @Parameter(schema = @Schema(description = "1차 항목 식별자", example = "1"))
             @RequestParam(required = false)
-            String keyword
+            Integer primaryCategoryId,
+
+            @Parameter(schema = @Schema(description = "2차 항목 식별자 (복수 선택 가능)", example = "1"))
+            @RequestParam(name = "secondaryCategoryId", required = false)
+            List<Integer> secondaryCategoryIds
     ) {
         UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
-        return ResponseEntity.ok().body(DataResponse.ok(postController.getByKeyword(keyword, currentMemberUuid, lastUlid, size)));
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getByKeyword(
+                new PostSearchRequest(option,keyword,sort,new PostCategoryRequest(primaryCategoryId,secondaryCategoryIds)),
+                currentMemberUuid, lastUlid, size)));
     }
 
     @Operation(
