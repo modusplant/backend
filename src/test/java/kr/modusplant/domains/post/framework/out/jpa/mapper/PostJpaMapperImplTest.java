@@ -46,6 +46,7 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
         assertThat(result.getSecondaryCategory()).isEqualTo(secondaryCategoryEntity);
         assertThat(result.getTitle()).isEqualTo(post.getPostContent().getTitle());
         assertThat(result.getContent()).isEqualTo(post.getPostContent().getContent());
+        assertThat(result.getThumbnailPath()).isEqualTo(post.getPostContent().getThumbnailPath());
         assertThat(result.getLikeCount()).isEqualTo(post.getLikeCount().getValue());
         assertThat(result.getViewCount()).isEqualTo(viewCount);
         assertThat(result.getIsPublished()).isTrue();
@@ -77,13 +78,14 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
         assertThat(result.getSecondaryCategory()).isEqualTo(secondaryCategoryEntity);
         assertThat(result.getTitle()).isEqualTo(post.getPostContent().getTitle());
         assertThat(result.getContent()).isEqualTo(post.getPostContent().getContent());
+        assertThat(result.getThumbnailPath()).isEqualTo(post.getPostContent().getThumbnailPath());
         assertThat(result.getLikeCount()).isEqualTo(post.getLikeCount().getValue());
         assertThat(result.getViewCount()).isEqualTo(viewCount);
         assertThat(result.getIsPublished()).isFalse();
     }
 
     @Test
-    @DisplayName("toPost로 aggregate 반환하기")
+    @DisplayName("toPost로 발행된 게시글 aggregate 반환하기")
     void testToPost_givenPostEntity_willReturnPost() {
         // given
         SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(testAuthorId.getValue()).build();
@@ -106,18 +108,48 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
         assertThat(result.getSecondaryCategoryId().getValue()).isEqualTo(testSecondaryCategoryId.getValue());
         assertThat(result.getPostContent().getTitle()).isEqualTo(postEntity.getTitle());
         assertThat(result.getPostContent().getContent()).isEqualTo(postEntity.getContent());
+        assertThat(result.getPostContent().getThumbnailPath()).isEqualTo(postEntity.getThumbnailPath());
         assertThat(result.getLikeCount().getValue()).isEqualTo(postEntity.getLikeCount());
         assertThat(result.getStatus().isPublished()).isTrue();
     }
 
     @Test
-    @DisplayName("toPost로 빈값이 포함된 임시저장된 entity를 aggregate로 매핑하기")
+    @DisplayName("toPost로 임시저장된 entity를 aggregate로 매핑하기")
     void testToPost_givenDraftPostEntity_willReturnPost() {
         // given
         SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(testAuthorId.getValue()).build();
         CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().id(testPrimaryCategoryId.getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = null;
+        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().id(testSecondaryCategoryId.getValue()).build();;
         CommPostEntity postEntity = createDraftPostEntityBuilderWithUuid()
+                .primaryCategory(primaryCategoryEntity)
+                .secondaryCategory(secondaryCategoryEntity)
+                .authMember(memberEntity)
+                .build();
+
+        // when
+        Post result = postJpaMapper.toPost(postEntity);
+
+        // then
+        assertThat(result.getPostId().getValue()).isEqualTo(postEntity.getUlid());
+        assertThat(result.getAuthorId().getValue()).isEqualTo(testAuthorId.getValue());
+        assertThat(result.getPrimaryCategoryId().getValue()).isEqualTo(primaryCategoryEntity.getId());
+        assertThat(result.getSecondaryCategoryId().getValue()).isEqualTo(secondaryCategoryEntity.getId());
+        assertThat(result.getPostContent().getTitle()).isEqualTo(postEntity.getTitle());
+        assertThat(result.getPostContent().getContent()).isEqualTo(postEntity.getContent());
+        assertThat(result.getPostContent().getThumbnailPath()).isEqualTo(postEntity.getThumbnailPath());
+        assertThat(result.getLikeCount().getValue()).isEqualTo(postEntity.getLikeCount());
+        assertThat(result.getStatus().isPublished()).isFalse();
+    }
+
+
+    @Test
+    @DisplayName("toPost로 빈값이 포함된 임시저장된 entity를 aggregate로 매핑하기")
+    void testToPost_givenDraftPostEntityWillNullValue_willReturnPost() {
+        // given
+        SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(testAuthorId.getValue()).build();
+        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().id(testPrimaryCategoryId.getValue()).build();
+        CommSecondaryCategoryEntity secondaryCategoryEntity = null;
+        CommPostEntity postEntity = createDraftPostEntityBuilderWithoutContentWithUuid()
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)
                 .authMember(memberEntity)
@@ -132,7 +164,8 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
         assertThat(result.getPrimaryCategoryId().getValue()).isEqualTo(primaryCategoryEntity.getId());
         assertThat(result.getSecondaryCategoryId()).isEqualTo(null);
         assertThat(result.getPostContent().getTitle()).isEqualTo(postEntity.getTitle());
-        assertThat(result.getPostContent().getContent()).isEqualTo(postEntity.getContent());
+        assertThat(result.getPostContent().getContent()).isEqualTo(null);
+        assertThat(result.getPostContent().getThumbnailPath()).isEqualTo(null);
         assertThat(result.getLikeCount().getValue()).isEqualTo(postEntity.getLikeCount());
         assertThat(result.getStatus().isPublished()).isFalse();
     }

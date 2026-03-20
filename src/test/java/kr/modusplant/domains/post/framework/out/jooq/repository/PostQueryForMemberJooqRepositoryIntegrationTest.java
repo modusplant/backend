@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
 
-import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT;
-import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT_TEXT_AND_IMAGE;
+import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -60,12 +59,12 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         testSecondaryCategory1 = testDataHelper.insertTestSecondaryCategory(testPrimaryCategory1,"testSecondaryCategory1",100);
         testSecondaryCategory2 = testDataHelper.insertTestSecondaryCategory(testPrimaryCategory1,"testSecondaryCategory2",101);
         testSecondaryCategory3 = testDataHelper.insertTestSecondaryCategory(testPrimaryCategory2,"testSecondaryCategory3",102);
-        testPost1 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory1,testMember1,"title1",TEST_POST_CONTENT,baseTime.plusDays(31));
-        testPost2 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory2,testMember1,"title2",TEST_POST_CONTENT_TEXT_AND_IMAGE,baseTime.plusDays(32));
-        testPost3 = testDataHelper.insertTestDraftPost(testPrimaryCategory1,testSecondaryCategory1,testMember1,"title3",TEST_POST_CONTENT);
-        testPost4 = testDataHelper.insertTestPublishedPost(testPrimaryCategory2,testSecondaryCategory3,testMember1,"title4",TEST_POST_CONTENT,baseTime.plusDays(33));
-        testPost5 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory1,testMember2,"title5",TEST_POST_CONTENT,baseTime.plusDays(34));
-        testDraftPost = testDataHelper.insertTestDraftPost(testPrimaryCategory1,null,testMember1,"drafttest",null);
+        testPost1 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory1,testMember1,"title1",TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY,baseTime.plusDays(31));
+        testPost2 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory2,testMember1,"title2",TEST_POST_CONTENT_TEXT_AND_IMAGE, TEST_POST_CONTENT_TEXT_AND_IMAGE_THUMBNAIL_KEY,baseTime.plusDays(32));
+        testPost3 = testDataHelper.insertTestDraftPost(testPrimaryCategory1,testSecondaryCategory1,testMember1,"title3",TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY,baseTime.plusDays(31));
+        testPost4 = testDataHelper.insertTestPublishedPost(testPrimaryCategory2,testSecondaryCategory3,testMember1,"title4",TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY,baseTime.plusDays(33));
+        testPost5 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory1,testMember2,"title5",TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY,baseTime.plusDays(34));
+        testDraftPost = testDataHelper.insertTestDraftPost(testPrimaryCategory1,null,testMember1,"drafttest",null,null,baseTime.plusDays(32));
         testDataHelper.insertTestComment(testPost1,"1",testMember2,"content1",false);
         testDataHelper.insertTestComment(testPost1,"1.1",testMember1,"content2",true);
         testDataHelper.insertTestComment(testPost1,"1.2",testMember2,"content3",false);
