@@ -43,7 +43,7 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
     private SiteMemberRecord testMember1, testMember2;
     private CommPriCateRecord testPrimaryCategory1, testPrimaryCategory2;
     private CommSecoCateRecord testSecondaryCategory1, testSecondaryCategory2, testSecondaryCategory3;
-    private CommPostRecord testPost1, testPost2, testPost3, testPost4, testPost5;
+    private CommPostRecord testPost1, testPost2, testPost3, testPost4, testPost5, testDraftPost;
 
     @BeforeAll
     static void setTimezone() {
@@ -65,21 +65,22 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         testPost3 = testDataHelper.insertTestDraftPost(testPrimaryCategory1,testSecondaryCategory1,testMember1,"title3",TEST_POST_CONTENT);
         testPost4 = testDataHelper.insertTestPublishedPost(testPrimaryCategory2,testSecondaryCategory3,testMember1,"title4",TEST_POST_CONTENT,baseTime.plusDays(33));
         testPost5 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory1,testMember2,"title5",TEST_POST_CONTENT,baseTime.plusDays(34));
+        testDraftPost = testDataHelper.insertTestDraftPost(testPrimaryCategory1,null,testMember1,"drafttest",null);
         testDataHelper.insertTestComment(testPost1,"1",testMember2,"content1",false);
         testDataHelper.insertTestComment(testPost1,"1.1",testMember1,"content2",true);
         testDataHelper.insertTestComment(testPost1,"1.2",testMember2,"content3",false);
         testDataHelper.insertTestComment(testPost2,"1",testMember2,"content1",false);
-        testDataHelper.insertTestPostLike(testPost1,testMember2);
-        testDataHelper.insertTestPostLike(testPost4,testMember2);
-        testDataHelper.insertTestPostLike(testPost5,testMember1);
-        testDataHelper.insertTestPostBookmark(testPost1,testMember2);
-        testDataHelper.insertTestPostBookmark(testPost2,testMember2);
-        testDataHelper.insertTestPostBookmark(testPost5,testMember1);
+        testDataHelper.insertTestPostLike(testPost1,testMember2, baseTime.plusDays(35));
+        testDataHelper.insertTestPostLike(testPost4,testMember2, baseTime.plusDays(36));
+        testDataHelper.insertTestPostLike(testPost5,testMember1, baseTime.plusDays(37));
+        testDataHelper.insertTestPostBookmark(testPost1,testMember2, baseTime.plusDays(35));
+        testDataHelper.insertTestPostBookmark(testPost2,testMember2, baseTime.plusDays(36));
+        testDataHelper.insertTestPostBookmark(testPost5,testMember1, baseTime.plusDays(37));
     }
 
     @AfterEach
     void tearDown() {
-        testDataHelper.deleteTestPostWithRelations(testPost1, testPost2, testPost3, testPost4, testPost5);
+        testDataHelper.deleteTestPostWithRelations(testPost1, testPost2, testPost3, testPost4, testPost5, testDraftPost);
         testDataHelper.deleteTestCategory(testPrimaryCategory1, testPrimaryCategory2);
         testDataHelper.deleteTestMember(testMember1, testMember2);
     }
@@ -154,10 +155,13 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         Page<DraftPostReadModel> firstPage = postQueryForMemberJooqRepository.findDraftByAuthMemberWithOffset(authorId, page, size);
 
         // then
-        assertThat(firstPage.getTotalElements()).isEqualTo(1);
+        assertThat(firstPage.getTotalElements()).isEqualTo(2);
         assertThat(firstPage.getTotalPages()).isEqualTo(1);
-        assertThat(firstPage.getContent()).hasSize(1);
-        assertThat(firstPage.getContent().get(0).ulid()).isEqualTo(testPost3.getUlid());
+        assertThat(firstPage.getContent()).hasSize(2);
+        assertThat(firstPage.getContent().get(1).ulid()).isEqualTo(testPost3.getUlid());
+        assertThat(firstPage.getContent().get(0).ulid()).isEqualTo(testDraftPost.getUlid());
+        assertThat(firstPage.getContent().get(0).secondaryCategory()).isEqualTo(testDraftPost.getSecoCateId());
+        assertThat(firstPage.getContent().get(0).content()).isEqualTo(testDraftPost.getContent());
     }
 
     @Test
@@ -290,6 +294,9 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
 
         // when
         Page<PostSummaryReadModel> firstPage = postQueryForMemberJooqRepository.findBookmarkedByMemberWithOffset(currentMemberUuid, page, size);
+
+        System.out.println(firstPage.getContent().get(0).ulid());
+        System.out.println(firstPage.getContent().get(1).ulid());
 
         // then
         assertThat(firstPage.getTotalElements()).isEqualTo(2);
