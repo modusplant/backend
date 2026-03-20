@@ -3,6 +3,7 @@ package kr.modusplant.domains.post.common.util.domain.aggregate;
 import kr.modusplant.domains.post.common.util.domain.vo.*;
 import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.vo.AuthorId;
+import kr.modusplant.domains.post.domain.vo.LikeCount;
 import kr.modusplant.domains.post.domain.vo.PostStatus;
 
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
@@ -22,5 +23,13 @@ public interface PostTestUtils extends PostIdTestUtils, AuthorIdTestUtils, Prima
 
     default Post createPublishedPost2() {
         return Post.create(testPostId, AuthorId.fromUuid(MEMBER_BASIC_USER_UUID), testPrimaryCategoryId, testSecondaryCategoryId, testPostContent,testLikeCount, PostStatus.published());
+    }
+
+    default Post createDraftPostWithEmptyValue() {
+        return Post.create(testPostId, testAuthorId, testPrimaryCategoryId, null, testDraftPostContent1, LikeCount.create(0), PostStatus.draft());
+    }
+
+    default Post createDraftPostWithEmptyValue2() {
+        return Post.create(testPostId, AuthorId.fromUuid(MEMBER_BASIC_USER_UUID), testPrimaryCategoryId, null, testDraftPostContent1, LikeCount.create(0), PostStatus.draft());
     }
 }

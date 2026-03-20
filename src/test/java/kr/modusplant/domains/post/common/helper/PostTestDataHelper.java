@@ -94,13 +94,13 @@ public class PostTestDataHelper {
         LocalDateTime dateTime = LocalDateTime.now().plusDays(1);
         return dsl.insertInto(COMM_POST)
                 .set(COMM_POST.ULID,generator.generate(null,null,null, EventType.INSERT))
-                .set(COMM_POST.PRI_CATE_ID,priCateRecord.getId())
-                .set(COMM_POST.SECO_CATE_ID,secoCateRecord.getId())
+                .set(COMM_POST.PRI_CATE_ID,priCateRecord!=null ? priCateRecord.getId() : null)
+                .set(COMM_POST.SECO_CATE_ID,secoCateRecord!=null ? secoCateRecord.getId() : null)
                 .set(COMM_POST.AUTH_MEMB_UUID,memberRecord.getUuid())
                 .set(COMM_POST.LIKE_COUNT,0)
                 .set(COMM_POST.VIEW_COUNT,0)
                 .set(COMM_POST.TITLE,title)
-                .set(COMM_POST.CONTENT,new JsonbJsonNodeConverter().to(content))
+                .set(COMM_POST.CONTENT,content!=null ? new JsonbJsonNodeConverter().to(content) : null)
                 .set(COMM_POST.IS_PUBLISHED,false)
                 .set(COMM_POST.CREATED_AT,dateTime)
                 .set(COMM_POST.UPDATED_AT,dateTime)
@@ -117,25 +117,25 @@ public class PostTestDataHelper {
                 .set(COMM_COMMENT.CONTENT,content)
                 .set(COMM_COMMENT.LIKE_COUNT,2)
                 .set(COMM_COMMENT.IS_DELETED,isDeleted)
-                .set(COMM_COMMENT.CREATED_AT,LocalDateTime.now().minusMinutes(1))
+                .set(COMM_COMMENT.CREATED_AT,LocalDateTime.now().plusDays(1))
                 .returning()
                 .fetchOneInto(CommCommentRecord.class);
     }
 
-    public CommPostLikeRecord insertTestPostLike(CommPostRecord postRecord, SiteMemberRecord memberRecord) {
+    public CommPostLikeRecord insertTestPostLike(CommPostRecord postRecord, SiteMemberRecord memberRecord, LocalDateTime dateTime) {
         return dsl.insertInto(COMM_POST_LIKE)
                 .set(COMM_POST_LIKE.POST_ULID,postRecord.getUlid())
                 .set(COMM_POST_LIKE.MEMB_UUID,memberRecord.getUuid())
-                .set(COMM_POST_LIKE.CREATED_AT,LocalDateTime.now())
+                .set(COMM_POST_LIKE.CREATED_AT,dateTime)
                 .returning()
                 .fetchOneInto(CommPostLikeRecord.class);
     }
 
-    public CommPostBookmarkRecord insertTestPostBookmark(CommPostRecord postRecord, SiteMemberRecord memberRecord) {
+    public CommPostBookmarkRecord insertTestPostBookmark(CommPostRecord postRecord, SiteMemberRecord memberRecord, LocalDateTime dateTime) {
         return dsl.insertInto(COMM_POST_BOOKMARK)
                 .set(COMM_POST_BOOKMARK.POST_ULID,postRecord.getUlid())
                 .set(COMM_POST_BOOKMARK.MEMB_UUID,memberRecord.getUuid())
-                .set(COMM_POST_BOOKMARK.CREATED_AT,LocalDateTime.now())
+                .set(COMM_POST_BOOKMARK.CREATED_AT,dateTime)
                 .returning()
                 .fetchOneInto(CommPostBookmarkRecord.class);
     }
