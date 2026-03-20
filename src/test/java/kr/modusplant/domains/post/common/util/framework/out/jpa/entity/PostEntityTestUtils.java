@@ -42,4 +42,22 @@ public interface PostEntityTestUtils extends PostTestUtils {
                 .content(testPostContent.getContent())
                 .isPublished(false);
     }
+
+    default CommPostEntityBuilder createDraftPostEntityBuilderWithoutContent() {
+        return CommPostEntity.builder()
+                .likeCount(testLikeCount.getValue())
+                .viewCount(5L)
+                .title(testPostContent.getTitle())
+                .isPublished(false);
+    }
+
+    default CommPostEntityBuilder createDraftPostEntityBuilderWithoutContentWithUuid() {
+        return CommPostEntity.builder()
+                .ulid(testPostId.getValue())
+                .likeCount(testLikeCount.getValue())
+                .viewCount(5L)
+                .title(testPostContent.getTitle())
+                .isPublished(false);
+    }
+
 }

@@ -7,4 +7,6 @@ import static kr.modusplant.domains.post.common.constant.PostStringConstant.TEST
 
 public interface PostContentTestUtils {
     PostContent testPostContent = PostContent.create(TEST_POST_TITLE, TEST_POST_CONTENT);
+    PostContent testDraftPostContent1 = PostContent.createDraft(TEST_POST_TITLE,null);
+    PostContent testDraftPostContent2 = PostContent.createDraft(null, TEST_POST_CONTENT);
 }
