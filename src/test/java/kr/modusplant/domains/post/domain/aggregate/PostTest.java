@@ -50,10 +50,6 @@ class PostTest implements PostTestUtils {
 
             assertThrows(EmptyValueException.class, () ->
                     Post.create(testPostId, testAuthorId, testPrimaryCategoryId,
-                            null, testPostContent, testLikeCount, PostStatus.published()));
-
-            assertThrows(EmptyValueException.class, () ->
-                    Post.create(testPostId, testAuthorId, testPrimaryCategoryId,
                             testSecondaryCategoryId, null, testLikeCount, PostStatus.published()));
 
             assertThrows(EmptyValueException.class, () ->
@@ -91,13 +87,8 @@ class PostTest implements PostTestUtils {
         void testCreateDraft_givenNullParameter_willThrowException() {
             assertThrows(EmptyValueException.class, () ->
                     Post.createDraft( null, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent));
-
             assertThrows(EmptyValueException.class, () ->
-                    Post.createDraft( testAuthorId, null, testSecondaryCategoryId, testPostContent));
-
-            assertThrows(EmptyValueException.class, () ->
-                    Post.createDraft( testAuthorId, testPrimaryCategoryId, null, testPostContent));
-
+                    Post.createDraft(testAuthorId, null, testSecondaryCategoryId, testPostContent));
             assertThrows(EmptyValueException.class, () ->
                     Post.createDraft( testAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, null));
         }
@@ -193,9 +184,62 @@ class PostTest implements PostTestUtils {
 
             // when & then
             assertThrows(InvalidValueException.class, () ->
-                    post.update(testAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, postContent, PostStatus.draft()));
+                    post.updateDraft(testAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, postContent));
         }
     }
+
+    @Nested
+    @DisplayName("Post 임시저장 업데이트 테스트")
+    class UpdateDraftTests {
+        @Test
+        @DisplayName("유효한 파라미터로 Post를 성공적으로 업데이트한다")
+        void testUpdateDraft_givenValidParameter_willReturnPost() {
+            // given
+            Post post = createDraftPost();
+            PostContent postContent = testPostContent;
+
+            // when
+            post.updateDraft(testAuthorId2, testPrimaryCategoryId2, null, postContent);
+
+            // then
+            assertEquals(testAuthorId2, post.getAuthorId());
+            assertEquals(testPrimaryCategoryId2, post.getPrimaryCategoryId());
+            assertNull(post.getSecondaryCategoryId());
+            assertEquals(postContent, post.getPostContent());
+            assertEquals(PostStatus.draft(), post.getStatus());
+        }
+
+        @Test
+        @DisplayName("Post의 파라미터가 null일 때 Exception을 발생시킨다.")
+        void testUpdateDraft_givenNullParameter_willThrowException() {
+            // given
+            Post post = createDraftPost();
+            PostContent postContent = testPostContent;
+
+            // when & then
+            assertThrows(EmptyValueException.class, () ->
+                    post.updateDraft(null, testPrimaryCategoryId2, testSecondaryCategoryId2, postContent));
+
+            assertThrows(EmptyValueException.class, () ->
+                    post.updateDraft(testAuthorId2, null, testSecondaryCategoryId2, postContent));
+
+            assertThrows(EmptyValueException.class, () ->
+                    post.updateDraft(testAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, null));
+        }
+
+        @Test
+        @DisplayName("발행된 게시글을 임시저장할 때 Exception을 발생시킨다.")
+        void testUpdateDraft_givenInvalidStatus_willThrowException() {
+            // given
+            Post post = createPublishedPost();
+            PostContent postContent = testPostContent;
+
+            // when & then
+            assertThrows(InvalidValueException.class, () ->
+                    post.updateDraft(testAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, postContent));
+        }
+    }
+
 
     @Nested
     @DisplayName("AuthorId 업데이트 테스트")
@@ -263,8 +307,18 @@ class PostTest implements PostTestUtils {
         }
 
         @Test
+        @DisplayName("유효하지 않은 Draft 상태의 Post를 발행하려 할 때 EmptyValueException을 발생시킨다")
+        void testPublish_givenInvalidPost_willThrowException() {
+            // given
+            Post post = createDraftPostWithEmptyValue();
+
+            // when & then
+            assertThrows(EmptyValueException.class, post::publish);
+        }
+
+        @Test
         @DisplayName("이미 발행된 Post를 발행하려 할 때 InvalidValueException을 발생시킨다")
-        void testPublish_givenPublishedPost_willChangeStatus() {
+        void testPublish_givenPublishedPost_willThrowException() {
             // given
             Post post = createPublishedPost();
 
