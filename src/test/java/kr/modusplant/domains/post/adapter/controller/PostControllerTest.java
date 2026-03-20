@@ -8,15 +8,19 @@ import kr.modusplant.domains.post.common.util.usecase.model.PostReadModelTestUti
 import kr.modusplant.domains.post.common.util.usecase.request.PostRequestTestUtils;
 import kr.modusplant.domains.post.common.util.usecase.response.PostResponseTestUtils;
 import kr.modusplant.domains.post.domain.aggregate.Post;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
 import kr.modusplant.domains.post.domain.vo.AuthorId;
 import kr.modusplant.domains.post.domain.vo.PostId;
+import kr.modusplant.domains.post.domain.vo.PostStatus;
 import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
 import kr.modusplant.domains.post.usecase.port.repository.*;
 import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
+import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
+import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
 import kr.modusplant.domains.post.usecase.response.*;
 import kr.modusplant.framework.aws.service.S3FileService;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,9 +39,11 @@ import java.util.UUID;
 
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.*;
 import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
+import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -218,6 +224,21 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     }
 
     @Test
+    @DisplayName("작성자가 ULID로 빈 값을 가진 임시저장 게시글 데이터 조회하기")
+    void testGetDataByUlid_givenDraftPostAndAuthorWithEmptyValue_willReturnPostDetail() throws IOException {
+        // given
+        given(postQueryRepository.findPostDetailDataByPostId(any(PostId.class))).willReturn(Optional.of(TEST_DRAFT_POST_DETAIL_DATA_READ_MODEL_WITH_EMPTY_VALUE));
+
+        // when
+        PostDetailResponse result = postController.getDataByUlid(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
+
+        // then
+        assertThat(result).isNotNull();
+        verify(postQueryRepository).findPostDetailDataByPostId(any(PostId.class));
+        verify(multipartDataProcessorPort,never()).convertFileSrcToFullFileSrc(any(JsonNode.class));
+    }
+
+    @Test
     @DisplayName("게시글 생성 및 발행")
     void testCreatePost_givenPublishedPostRequest_willCreatePost() throws IOException {
         // given
@@ -235,7 +256,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     }
 
     @Test
-    @DisplayName("게시글 생성 및 임시저장")
+    @DisplayName("게시글 임시저장")
     void testCreatePost_givenDraftPostRequest_willCreateDraftPost() throws IOException {
         // given
         given(multipartDataProcessorPort.saveFilesAndGenerateContentJson(anyList(),anyList())).willReturn(TEST_POST_CONTENT_TEXT_AND_IMAGE);
@@ -252,8 +273,33 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     }
 
     @Test
-    @DisplayName("게시글 수정")
-    void testUpdatePost_givenUpdateRequest_willUpdatePost() throws IOException {
+    @DisplayName("빈 값을 포함하여 게시글 임시저장")
+    void testCreatePost_givenDraftPostRequestWithEmptyValue_willCreateDraftPost() throws IOException {
+        // when
+        postController.createPost(requestWithEmptyValueDraft, MEMBER_BASIC_USER_UUID);
+
+        // then
+        verify(multipartDataProcessorPort,never()).saveFilesAndGenerateContentJson(anyList(),anyList());
+        verify(postRepository).save(argThat(post ->
+                post.getAuthorId().getValue().equals(MEMBER_BASIC_USER_UUID) &&
+                        !post.getStatus().isPublished()
+        ));
+    }
+
+    @Test
+    @DisplayName("게시글 제목과 내용 모두 포함하지 않고 게시글 임시저장 시 예외 발생")
+    void testCreatePost_givenDraftPostRequestWithEmptyTitleAndContent_willThrowException() throws IOException {
+        // given
+        PostInsertRequest invalidInsertRequest = new PostInsertRequest(TEST_COMM_PRIMARY_CATEGORY_ID, null, null, null, null, false);
+
+        // when & then
+        assertThrows(EmptyValueException.class, () -> postController.createPost(invalidInsertRequest, MEMBER_BASIC_USER_UUID));
+        verify(multipartDataProcessorPort,never()).saveFilesAndGenerateContentJson(anyList(),anyList());
+    }
+
+    @Test
+    @DisplayName("발행된 게시글 수정")
+    void testUpdatePost_givenPublishedUpdateRequest_willUpdatePublishedPost() throws IOException {
         // given
         Post existingPost = createPublishedPost2();
 
@@ -269,6 +315,79 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         verify(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
         verify(multipartDataProcessorPort).saveFilesAndGenerateContentJson(anyList(),anyList());
         verify(postRepository).update(any(Post.class));
+    }
+
+    @Test
+    @DisplayName("임시저장된 게시글 수정하여 발행")
+    void testUpdatePost_givenDraftUpdateRequest_willUpdatePublishedPost() throws IOException {
+        // given
+        Post existingPost = createDraftPost2();
+
+        given(postRepository.getPostByUlid(any(PostId.class))).willReturn(Optional.of(existingPost));
+        willDoNothing().given(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
+        given(multipartDataProcessorPort.saveFilesAndGenerateContentJson(anyList(),anyList())).willReturn(TEST_POST_CONTENT_TEXT_AND_IMAGE);
+
+        // when
+        postController.updatePost(updateRequestAllTypes, MEMBER_BASIC_USER_UUID);
+
+        // then
+        verify(postRepository).getPostByUlid(any(PostId.class));
+        verify(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
+        verify(multipartDataProcessorPort).saveFilesAndGenerateContentJson(anyList(),anyList());
+        verify(postRepository).update(any(Post.class));
+    }
+
+    @Test
+    @DisplayName("임시저장된 게시글 수정하여 임시저장")
+    void testUpdatePost_givenDraftUpdateRequest_willUpdateDraftPost() throws IOException {
+        // given
+        Post existingPost = createDraftPost2();
+
+        given(postRepository.getPostByUlid(any(PostId.class))).willReturn(Optional.of(existingPost));
+        willDoNothing().given(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
+        given(multipartDataProcessorPort.saveFilesAndGenerateContentJson(anyList(),anyList())).willReturn(TEST_POST_CONTENT_TEXT_AND_IMAGE);
+
+        // when
+        postController.updatePost(updateRequestAllTypesDraft, MEMBER_BASIC_USER_UUID);
+
+        // then
+        verify(postRepository).getPostByUlid(any(PostId.class));
+        verify(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
+        verify(multipartDataProcessorPort).saveFilesAndGenerateContentJson(anyList(),anyList());
+        verify(postRepository).update(any(Post.class));
+    }
+
+    @Test
+    @DisplayName("임시저장된 게시글 수정하여 빈값으로 수정하여 임시저장")
+    void testUpdatePost_givenDraftUpdateRequestWithEmptyValue_willUpdateDraftPost() throws IOException {
+        // given
+        Post existingPost = createDraftPost2();
+
+        given(postRepository.getPostByUlid(any(PostId.class))).willReturn(Optional.of(existingPost));
+        willDoNothing().given(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
+
+        // when
+        postController.updatePost(updateRequestWithEmptyValueDraft, MEMBER_BASIC_USER_UUID);
+
+        // then
+        verify(postRepository).getPostByUlid(any(PostId.class));
+        verify(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
+        verify(multipartDataProcessorPort,never()).saveFilesAndGenerateContentJson(anyList(),anyList());
+        verify(postRepository).update(any(Post.class));
+    }
+
+    @Test
+    @DisplayName("게시글 제목과 내용 모두 포함하지 않고 게시글 임시저장 시 예외 발생")
+    void testUpdatePost_givenDraftPostRequestWithEmptyTitleAndContent_willThrowException() throws IOException {
+        // given
+        Post existingPost = createDraftPost2();
+        PostUpdateRequest invalidUpdateRequest = new PostUpdateRequest(TEST_POST_ULID, TEST_COMM_PRIMARY_CATEGORY_ID, null, null, null, null, false);
+        given(postRepository.getPostByUlid(any(PostId.class))).willReturn(Optional.of(existingPost));
+        willDoNothing().given(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
+
+        // when & then
+        assertThrows(EmptyValueException.class, () -> postController.updatePost(invalidUpdateRequest, MEMBER_BASIC_USER_UUID));
+        verify(multipartDataProcessorPort,never()).saveFilesAndGenerateContentJson(anyList(),anyList());
     }
 
     @Test
@@ -318,6 +437,29 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         verify(postRepository, never()).deletePostBookmarkByPostId(any(PostId.class));
         verify(postRepository, never()).deletePostRecentlyViewRecordByPostId(any(PostId.class));
         verify(multipartDataProcessorPort).deleteFiles(any(JsonNode.class));
+        verify(postRepository).delete(any(Post.class));
+    }
+
+    @Test
+    @DisplayName("빈 값이 포함된 임시저장 게시글은 아카이브 없이 삭제")
+    void testDeletePost_givenDraftPostWithEmptyValue_willDeleteWithoutArchive() {
+        // given
+        Post existingPost = createDraftPostWithEmptyValue2();
+
+        given(postRepository.getPostByUlid(any(PostId.class))).willReturn(Optional.of(existingPost));
+        willDoNothing().given(multipartDataProcessorPort).deleteFiles(null);
+        willDoNothing().given(postRepository).delete(any(Post.class));
+
+        // when
+        postController.deletePost(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
+
+        // then
+        verify(postRepository).getPostByUlid(any(PostId.class));
+        verify(postArchiveRepository, never()).save(any(PostId.class));
+        verify(postRepository, never()).deletePostLikeByPostId(any(PostId.class));
+        verify(postRepository, never()).deletePostBookmarkByPostId(any(PostId.class));
+        verify(postRepository, never()).deletePostRecentlyViewRecordByPostId(any(PostId.class));
+        verify(multipartDataProcessorPort).deleteFiles(null);
         verify(postRepository).delete(any(Post.class));
     }
 
