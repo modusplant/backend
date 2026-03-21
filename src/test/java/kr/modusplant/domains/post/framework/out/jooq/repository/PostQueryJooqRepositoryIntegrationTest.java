@@ -71,12 +71,12 @@ class PostQueryJooqRepositoryIntegrationTest {
         testDataHelper.insertTestComment(testPost1,"1.1",testMember1,"content2",true);
         testDataHelper.insertTestComment(testPost1,"1.2",testMember2,"content3",false);
         testDataHelper.insertTestComment(testPost2,"1",testMember2,"content1",false);
-        testDataHelper.insertTestPostLike(testPost1,testMember2);
-        testDataHelper.insertTestPostLike(testPost4,testMember2);
-        testDataHelper.insertTestPostLike(testPost5,testMember1);
-        testDataHelper.insertTestPostBookmark(testPost1,testMember2);
-        testDataHelper.insertTestPostBookmark(testPost2,testMember2);
-        testDataHelper.insertTestPostBookmark(testPost5,testMember1);
+        testDataHelper.insertTestPostLike(testPost1,testMember2, baseTime.plusDays(35));
+        testDataHelper.insertTestPostLike(testPost4,testMember2, baseTime.plusDays(36));
+        testDataHelper.insertTestPostLike(testPost5,testMember1, baseTime.plusDays(37));
+        testDataHelper.insertTestPostBookmark(testPost1,testMember2, baseTime.plusDays(35));
+        testDataHelper.insertTestPostBookmark(testPost2,testMember2, baseTime.plusDays(36));
+        testDataHelper.insertTestPostBookmark(testPost5,testMember1, baseTime.plusDays(37));
     }
 
     @AfterEach

@@ -26,9 +26,7 @@ public class Post {
             throw new EmptyValueException(PostErrorCode.EMPTY_POST_ID);
         } else if (authorId == null) {
             throw new EmptyValueException(PostErrorCode.EMPTY_AUTHOR_ID);
-        } else if (primaryCategoryId == null) {
-            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
-        } else if (secondaryCategoryId == null) {
+        } else if(primaryCategoryId == null && secondaryCategoryId != null) {
             throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
         } else if (postContent == null) {
             throw new EmptyValueException(PostErrorCode.EMPTY_POST_CONTENT);
@@ -43,9 +41,7 @@ public class Post {
     public static Post createDraft(AuthorId authorId, PrimaryCategoryId primaryCategoryId, SecondaryCategoryId secondaryCategoryId, PostContent postContent) {
         if (authorId == null) {
             throw new EmptyValueException(PostErrorCode.EMPTY_AUTHOR_ID);
-        } else if (primaryCategoryId == null) {
-            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
-        } else if (secondaryCategoryId == null) {
+        } else if (primaryCategoryId == null && secondaryCategoryId != null) {
             throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
         } else if (postContent == null) {
             throw new EmptyValueException(PostErrorCode.EMPTY_POST_CONTENT);
@@ -88,6 +84,23 @@ public class Post {
         this.status = postStatus;
     }
 
+    public void updateDraft(AuthorId authorId, PrimaryCategoryId primaryCategoryId, SecondaryCategoryId secondaryCategoryId, PostContent postContent) {
+        if (authorId == null) {
+            throw new EmptyValueException(PostErrorCode.EMPTY_AUTHOR_ID);
+        } else if(primaryCategoryId == null && secondaryCategoryId != null) {
+            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
+        } else if (postContent == null) {
+            throw new EmptyValueException(PostErrorCode.EMPTY_POST_CONTENT);
+        } else if (this.status.isPublished()) {
+            throw new InvalidValueException(PostErrorCode.INVALID_POST_STATUS);
+        }
+        this.authorId = authorId;
+        this.primaryCategoryId = primaryCategoryId;
+        this.secondaryCategoryId = secondaryCategoryId;
+        this.postContent = postContent;
+        this.status = PostStatus.draft();
+    }
+
     public void updateAuthorId(AuthorId newAuthorId) {
         if (newAuthorId == null) {
             throw new EmptyValueException(PostErrorCode.EMPTY_AUTHOR_ID);
@@ -99,9 +112,16 @@ public class Post {
         this.postContent = newContent;
     }
 
+    /* 상태 전이 */
     public void publish() {
         if (this.status.isPublished()) {
             throw new InvalidValueException(PostErrorCode.INVALID_POST_STATUS);
+        }
+        if (this.primaryCategoryId == null || this.secondaryCategoryId == null) {
+            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
+        }
+        if (this.postContent == null) {
+            throw new EmptyValueException(PostErrorCode.EMPTY_POST_CONTENT);
         }
         this.status = PostStatus.published();
     }

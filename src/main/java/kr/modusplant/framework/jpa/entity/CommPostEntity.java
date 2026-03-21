@@ -34,13 +34,13 @@ public class CommPostEntity {
     @Column(nullable = false, updatable = false)
     private String ulid;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = PRI_CATE_ID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = PRI_CATE_ID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ToString.Exclude
     private CommPrimaryCategoryEntity primaryCategory;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = SECO_CATE_ID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = SECO_CATE_ID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ToString.Exclude
     private CommSecondaryCategoryEntity secondaryCategory;
 
@@ -57,11 +57,11 @@ public class CommPostEntity {
     @DefaultValue
     private Long viewCount;
 
-    @Column(nullable = false, length = 60)
+    @Column(length = 60)
     private String title;
 
     @Type(JsonBinaryType.class)
-    @Column(nullable = false, columnDefinition = "jsonb")
+    @Column(columnDefinition = "jsonb")
     @ToString.Exclude
     private JsonNode content;
 

@@ -114,6 +114,15 @@ public interface PostRequestTestUtils {
             false
     );
 
+    PostInsertRequest requestWithEmptyValueDraft = new PostInsertRequest(
+            TEST_COMM_PRIMARY_CATEGORY_ID,
+            null,
+            "유용한 컨텐츠 모음",
+            null,
+            null,
+            false
+    );
+
     PostInsertRequest requestBasicTypes = new PostInsertRequest(
             TEST_COMM_PRIMARY_CATEGORY_ID,
             TEST_COMM_SECONDARY_CATEGORY_ID,
@@ -132,5 +141,25 @@ public interface PostRequestTestUtils {
             allMediaFiles,
             allMediaFilesOrder,
             true
+    );
+
+    PostUpdateRequest updateRequestAllTypesDraft = new PostUpdateRequest(
+            TEST_POST_ULID,
+            TEST_COMM_PRIMARY_CATEGORY_ID,
+            TEST_COMM_SECONDARY_CATEGORY_ID,
+            "유용한 컨텐츠 모음",
+            allMediaFiles,
+            allMediaFilesOrder,
+            false
+    );
+
+    PostUpdateRequest updateRequestWithEmptyValueDraft = new PostUpdateRequest(
+            TEST_POST_ULID,
+            TEST_COMM_PRIMARY_CATEGORY_ID,
+            null,
+            "유용한 컨텐츠 모음",
+            null,
+            null,
+            false
     );
 }

@@ -96,8 +96,8 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                         COMM_POST.CONTENT.convert(jsonConverter).as("content"),
                         COMM_POST.UPDATED_AT
                 ).from(COMM_POST)
-                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
-                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
+                .leftOuterJoin(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
+                .leftOuterJoin(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
                 .where(COMM_POST.IS_PUBLISHED.isFalse())
                 .and(COMM_POST.AUTH_MEMB_UUID.eq(authorId.getValue()))
                 .orderBy(COMM_POST.UPDATED_AT.desc(), COMM_POST.ULID.desc())

@@ -106,6 +106,51 @@ class PostContentTest implements PostTestUtils {
     }
 
     @Nested
+    @DisplayName("PostContent Draft 생성 테스트")
+    class CreateDraftTests {
+
+        @Test
+        @DisplayName("유효한 제목과 내용으로 PostContent를 생성한다")
+        void testCreateDraft_givenTitleAndContent_willReturnPostContent() {
+            // when
+            PostContent postContent = PostContent.createDraft(MAX_LENGTH_TITLE, null);
+
+            // then
+            assertNotNull(postContent);
+            assertEquals(MAX_LENGTH_TITLE, postContent.getTitle());
+            assertEquals(60, postContent.getTitle().length());
+            assertNull(postContent.getContent());
+        }
+
+        @Test
+        @DisplayName("null 이나 빈 문자열 제목과 빈 content로 PostContent 생성 시 EmptyPostContentException을 발생시킨다")
+        void testCreateDraft_givenNullOrEmptyTitle_willThrowException() {
+            // when & then
+            EmptyValueException exception1 = assertThrows(EmptyValueException.class,
+                    () -> PostContent.createDraft(null, null));
+            assertEquals(exception1.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
+
+            EmptyValueException exception2 = assertThrows(EmptyValueException.class,
+                    () -> PostContent.createDraft("", null));
+            assertEquals(exception2.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
+
+            EmptyValueException exception3 = assertThrows(EmptyValueException.class,
+                    () -> PostContent.createDraft("   ", null));
+            assertEquals(exception3.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
+        }
+
+        @Test
+        @DisplayName("제목 길이가 60자를 초과할 때 InvalidPostContentException을 발생시킨다")
+        void testCreateDraft_givenOverMaxLengthTitle_willThrowException() {
+            // when & then
+            InvalidValueException exception = assertThrows(InvalidValueException.class,
+                    () -> PostContent.createDraft(OVER_MAX_LENGTH_TITLE, TEST_POST_CONTENT));
+            assertEquals(exception.getErrorCode(), PostErrorCode.INVALID_POST_CONTENT);
+        }
+    }
+
+
+    @Nested
     @DisplayName("Equals와 HashCode 테스트")
     class EqualsAndHashCodeTests {
 

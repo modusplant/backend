@@ -160,33 +160,27 @@ public class PostRestController {
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 
             @Parameter(schema = @Schema(description = "게시글이 포함된 1차 항목의 식별자", example = "1"))
-            @RequestParam
-            @NotNull(message = "1차 항목 식별자가 비어 있습니다.")
+            @RequestParam(required = false)
             Integer primaryCategoryId,
 
             @Parameter(schema = @Schema(description = "게시글이 포함된 2차 항목의 식별자", example = "1"))
-            @RequestParam
-            @NotNull(message = "2차 항목 식별자가 비어 있습니다.")
+            @RequestParam(required = false)
             Integer secondaryCategoryId,
 
             @Parameter(schema = @Schema(description = "게시글의 제목", maximum = "60", example = "이거 과습인가요?"))
-            @RequestParam
-            @NotBlank(message = "게시글 제목이 비어 있습니다.")
-            @Length(max = 60, message = "게시글 제목은 최대 60글자까지 작성할 수 있습니다.")
+            @RequestParam(required = false)
             String title,
 
             @Parameter(
                     schema = @Schema(description = "게시글 컨텐츠", type = "string", format = "binary"),
                     content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
-            @RequestPart
-            @NotEmpty(message = "게시글이 비어 있습니다.")
+            @RequestPart(required = false)
             List<MultipartFile> content,
 
             @Parameter(
                     schema = @Schema(description = "게시글에 속한 파트들의 순서에 대한 정보"),
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
-            @RequestPart
-            @NotEmpty(message = "순서 정보가 비어 있습니다.")
+            @RequestPart(required = false)
             List<@Valid FileOrder> orderInfo,
 
             @Parameter(schema = @Schema(description = "게시글 발행 유무"))
@@ -214,33 +208,27 @@ public class PostRestController {
             String ulid,
 
             @Parameter(schema = @Schema(description = "게시글이 포함된 1차 항목의 식별자", example = "1"))
-            @RequestParam
-            @NotNull(message = "1차 항목 식별자가 비어 있습니다.")
+            @RequestParam(required = false)
             Integer primaryCategoryId,
 
             @Parameter(schema = @Schema(description = "게시글이 포함된 2차 항목의 식별자", example = "1"))
-            @RequestParam
-            @NotNull(message = "2차 항목 식별자가 비어 있습니다.")
+            @RequestParam(required = false)
             Integer secondaryCategoryId,
 
             @Parameter(schema = @Schema(description = "게시글의 제목", maximum = "60", example = "이거 과습인가요?"))
-            @RequestParam
-            @NotBlank(message = "게시글 제목이 비어 있습니다.")
-            @Length(max = 60, message = "게시글 제목은 최대 60글자까지 작성할 수 있습니다.")
+            @RequestParam(required = false)
             String title,
 
             @Parameter(
                     schema = @Schema(description = "게시글 컨텐츠", type = "string", format = "binary"),
                     content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
-            @RequestPart
-            @NotEmpty(message = "게시글이 비어 있습니다.")
+            @RequestPart(required = false)
             List<MultipartFile> content,
 
             @Parameter(
                     schema = @Schema(description = "게시글에 속한 파트들의 순서에 대한 정보"),
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
-            @RequestPart
-            @NotEmpty(message = "순서 정보가 비어 있습니다.")
+            @RequestPart(required = false)
             List<@Valid FileOrder> orderInfo,
 
             @Parameter(schema = @Schema(description = "게시글 발행 유무", example = "true"))
