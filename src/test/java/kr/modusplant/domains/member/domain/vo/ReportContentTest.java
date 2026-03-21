@@ -10,7 +10,7 @@ import java.util.UUID;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportContentTestUtils.testReportContent;
-import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.REPORT_CONTENT;
+import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.TEST_REPORT_CONTENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,7 +18,7 @@ class ReportContentTest {
     @Test
     @DisplayName("create으로 보고서 내용 반환")
     void testCreate_givenValidValue_willReturnReportContent() {
-        assertThat(ReportContent.create(REPORT_CONTENT)).isEqualTo(ReportContent.create(REPORT_CONTENT));
+        assertThat(ReportContent.create(TEST_REPORT_CONTENT)).isEqualTo(ReportContent.create(TEST_REPORT_CONTENT));
     }
 
     @Test
@@ -44,21 +44,27 @@ class ReportContentTest {
 
     @Test
     @DisplayName("같은 객체에 대한 equals 호출")
-    void useEqual_givenSameObject_willReturnTrue() {
+    void testEquals_givenSameObject_willReturnTrue() {
         //noinspection EqualsWithItself
         assertEquals(testReportContent, testReportContent);
     }
 
     @Test
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
-    void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
+    void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
         assertNotEquals(testReportContent, testMemberId);
     }
 
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
-    void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
+    void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
         assertNotEquals(testReportContent, ReportContent.create(String.valueOf(UUID.randomUUID())));
+    }
+
+    @Test
+    @DisplayName("같은 객체에 대한 hashcode 동일성 보장")
+    void testHashCode_givenSameObject_willReturnSameHashCode() {
+        assertEquals(testReportContent.hashCode(), testReportContent.hashCode());
     }
 }

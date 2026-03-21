@@ -57,4 +57,10 @@ public class PasswordTest implements PasswordTestUtils {
         // when & then
         assertNotEquals(testNormalUserPassword, different);
     }
+
+    @Test
+    @DisplayName("같은 객체에 대한 hashcode 동일성 보장")
+    void testHashCode_givenSameObject_willReturnSameHashCode() {
+        assertEquals(testNormalUserPassword.hashCode(), testNormalUserPassword.hashCode());
+    }
 }

@@ -24,7 +24,7 @@ import static org.jooq.impl.DSL.*;
 public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepository {
     private final DSLContext dsl;
     private final PostJooqMapper postJooqMapper;
-    private static final JsonbJsonNodeConverter JSON_CONVERTER = new JsonbJsonNodeConverter();
+    private final JsonbJsonNodeConverter jsonConverter = new JsonbJsonNodeConverter();
 
     public Page<PostSummaryReadModel> findPublishedByAuthMemberWithOffset(AuthorId authorId, int page, int size) {
         long offset = (long) page * size;
@@ -42,7 +42,7 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                 COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
                 SITE_MEMBER.NICKNAME,
                 COMM_POST.TITLE,
-                COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                COMM_POST.CONTENT.convert(jsonConverter).as("content"),
                 COMM_POST.THUMBNAIL_PATH,
                 COMM_POST.LIKE_COUNT,
                 COMM_POST.PUBLISHED_AT,
@@ -94,7 +94,7 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                         COMM_PRI_CATE.CATEGORY.as("primaryCategory"),
                         COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
                         COMM_POST.TITLE,
-                        COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.CONTENT.convert(jsonConverter).as("content"),
                         COMM_POST.THUMBNAIL_PATH,
                         COMM_POST.UPDATED_AT
                 ).from(COMM_POST)
@@ -188,7 +188,7 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                         COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
                         SITE_MEMBER.NICKNAME,
                         COMM_POST.TITLE,
-                        COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.CONTENT.convert(jsonConverter).as("content"),
                         COMM_POST.THUMBNAIL_PATH,
                         COMM_POST.LIKE_COUNT,
                         COMM_POST.PUBLISHED_AT,
@@ -240,7 +240,7 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                         COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
                         SITE_MEMBER.NICKNAME,
                         COMM_POST.TITLE,
-                        COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.CONTENT.convert(jsonConverter).as("content"),
                         COMM_POST.THUMBNAIL_PATH,
                         COMM_POST.LIKE_COUNT,
                         COMM_POST.PUBLISHED_AT,

@@ -13,4 +13,14 @@ public interface CommPostEntityTestUtils extends SiteMemberEntityTestUtils, Comm
                 .content(TEST_COMM_POST_CONTENT)
                 .isPublished(TEST_COMM_POST_IS_PUBLISHED);
     }
+
+    default CommPostEntity.CommPostEntityBuilder createCommPostEntityBuilderWithUlid() {
+        return CommPostEntity.builder()
+                .ulid(TEST_COMM_POST_ULID)
+                .likeCount(TEST_COMM_POST_LIKE_COUNT)
+                .viewCount(TEST_COMM_POST_VIEW_COUNT)
+                .title(TEST_COMM_POST_TITLE)
+                .content(TEST_COMM_POST_CONTENT)
+                .isPublished(TEST_COMM_POST_IS_PUBLISHED);
+    }
 }

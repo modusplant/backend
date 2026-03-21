@@ -59,4 +59,10 @@ class NicknameTest {
     void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
         assertNotEquals(testNormalUserNickname, Nickname.create(MEMBER_BASIC_USER_NICKNAME + "1"));
     }
+
+    @Test
+    @DisplayName("같은 객체에 대한 hashcode 동일성 보장")
+    void testHashCode_givenSameObject_willReturnSameHashCode() {
+        assertEquals(testNormalUserNickname.hashCode(), testNormalUserNickname.hashCode());
+    }
 }

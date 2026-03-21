@@ -687,7 +687,7 @@ class MemberControllerTest implements
         given(targetCommentIdRepository.isUnliked(any(), any())).willReturn(true);
         CommCommentLikeEntity commentLikeEntity = CommCommentLikeEntity.of(postId, path, memberId);
         given(commentLikeJpaRepository.save(commentLikeEntity)).willReturn(commentLikeEntity);
-        Optional<CommCommentEntity> commentEntity = Optional.of(CommCommentEntity.builder().postEntity(createCommPostEntityBuilder().ulid(postId).build()).path(path).likeCount(1).build());
+        Optional<CommCommentEntity> commentEntity = Optional.of(CommCommentEntity.builder().post(createCommPostEntityBuilder().ulid(postId).build()).path(path).likeCount(1).build());
         given(commentJpaRepository.findByPostUlidAndPath(postId, path)).willReturn(commentEntity);
 
         // when
@@ -756,7 +756,7 @@ class MemberControllerTest implements
         given(targetCommentIdRepository.isLiked(any(), any())).willReturn(true);
         CommCommentLikeEntity commentLikeEntity = CommCommentLikeEntity.of(postId, path, memberId);
         given(commentLikeJpaRepository.save(commentLikeEntity)).willReturn(commentLikeEntity);
-        Optional<CommCommentEntity> commentEntity = Optional.of(CommCommentEntity.builder().postEntity(createCommPostEntityBuilder().ulid(postId).build()).path(path).likeCount(1).build());
+        Optional<CommCommentEntity> commentEntity = Optional.of(CommCommentEntity.builder().post(createCommPostEntityBuilder().ulid(postId).build()).path(path).likeCount(1).build());
         given(commentJpaRepository.findByPostUlidAndPath(postId, path)).willReturn(commentEntity);
 
         // when
@@ -822,7 +822,7 @@ class MemberControllerTest implements
 
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        given(memberImageIOHelper.uploadImage(any(MemberId.class), any(ProposalOrBugReportRecord.class))).willReturn(REPORT_IMAGE_PATH);
+        given(memberImageIOHelper.uploadImage(any(MemberId.class), any(ProposalOrBugReportRecord.class))).willReturn(TEST_REPORT_IMAGE_PATH);
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
         given(propBugRepJpaRepository.save(propBugRepEntity)).willReturn(propBugRepEntity);
 
@@ -847,7 +847,7 @@ class MemberControllerTest implements
         given(propBugRepJpaRepository.save(propBugRepEntity)).willReturn(propBugRepEntity);
 
         // when
-        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN, REPORT_TITLE, REPORT_CONTENT, null));
+        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN, TEST_REPORT_TITLE, TEST_REPORT_CONTENT, null));
 
         // then
         verify(memberJpaRepository, times(1)).findByUuid(any());
@@ -948,7 +948,7 @@ class MemberControllerTest implements
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         CommPostEntity postEntity = createCommPostEntityBuilder().authMember(memberEntity).build();
-        CommCommentEntity commentEntity = createCommCommentEntityBuilder().authMember(memberEntity).postEntity(postEntity).build();
+        CommCommentEntity commentEntity = createCommCommentEntityBuilder().authMember(memberEntity).post(postEntity).build();
         CommCommentAbuRepEntity commentAbuRepEntity = createCommCommentAbuRepEntityBuilder().member(memberEntity).comment(commentEntity).build();
 
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
