@@ -44,18 +44,6 @@ public class PostContent {
         return new PostContent(title, content,thumbnailPath);
     }
 
-    public static PostContent createDraft(String title, JsonNode content) {
-        boolean hasTitle = title != null && !title.isBlank() && !title.trim().isEmpty();
-        boolean hasContent = content != null;
-        if (!hasTitle && !hasContent) {
-            throw new EmptyValueException(PostErrorCode.EMPTY_POST_CONTENT, "게시글 제목과 내용이 모두 비어 있습니다. ");
-        }
-        if (hasTitle && title.length() > MAX_TITLE_LENGTH) {
-            throw new InvalidValueException(PostErrorCode.INVALID_POST_CONTENT,"게시글 제목이 유효하지 않습니다. ");
-        }
-        return new PostContent(title, content);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
