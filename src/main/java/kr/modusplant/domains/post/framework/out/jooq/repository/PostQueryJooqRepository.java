@@ -30,7 +30,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
 
     private final DSLContext dsl;
     private final PostJooqMapper postJooqMapper;
-    private static final JsonbJsonNodeConverter JSON_CONVERTER = new JsonbJsonNodeConverter();
+    private final JsonbJsonNodeConverter jsonConverter = new JsonbJsonNodeConverter();
 
     public List<PostSummaryReadModel> findByCategoryWithCursor(Integer primaryCategoryId, List<Integer> secondaryCategoryIds, UUID currentMemberUuid, String cursorUlid, int size) {
         return dsl
@@ -40,7 +40,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
                         SITE_MEMBER.NICKNAME,
                         COMM_POST.TITLE,
-                        COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.CONTENT.convert(jsonConverter).as("content"),
                         COMM_POST.LIKE_COUNT,
                         COMM_POST.PUBLISHED_AT,
                         coalesce(field("cc.comment_count",Integer.class), 0).as("commentCount"),
@@ -83,7 +83,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
                         SITE_MEMBER.NICKNAME,
                         COMM_POST.TITLE,
-                        COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.CONTENT.convert(jsonConverter).as("content"),
                         COMM_POST.LIKE_COUNT,
                         COMM_POST.PUBLISHED_AT,
                         coalesce(field("cc.comment_count",Integer.class), 0).as("commentCount"),
@@ -130,7 +130,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         SITE_MEMBER.NICKNAME,
                         SITE_MEMBER_PROF.IMAGE_PATH,
                         COMM_POST.TITLE,
-                        COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.CONTENT.convert(jsonConverter).as("content"),
                         COMM_POST.LIKE_COUNT,
                         COMM_POST.IS_PUBLISHED,
                         COMM_POST.PUBLISHED_AT,
@@ -166,7 +166,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         SITE_MEMBER.UUID.as("authorUuid"),
                         SITE_MEMBER.NICKNAME,
                         COMM_POST.TITLE,
-                        COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.CONTENT.convert(jsonConverter).as("content"),
                         COMM_POST.IS_PUBLISHED,
                         COMM_POST.PUBLISHED_AT,
                         COMM_POST.UPDATED_AT

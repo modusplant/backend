@@ -11,8 +11,8 @@ import kr.modusplant.domains.post.framework.out.processor.exception.UnsupportedF
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
 import kr.modusplant.domains.post.usecase.request.FileOrder;
 import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
-import lombok.RequiredArgsConstructor;
 import org.hibernate.generator.EventType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,19 +27,21 @@ import java.util.stream.Collectors;
 
 import static kr.modusplant.domains.post.framework.out.processor.constant.FileConstraints.*;
 
-
 @Service
-@RequiredArgsConstructor
 public class MultipartDataProcessor implements MultipartDataProcessorPort {
     private final S3FileService s3FileService;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
     private static final UlidIdGenerator generator = new UlidIdGenerator();
     public static final String DATA = "data";
     public static final String FILENAME = "filename";
     public static final String ORDER = "order";
     public static final String SRC = "src";
     public static final String TYPE = "type";
+    private final ObjectMapper objectMapper;
+
+    public MultipartDataProcessor(S3FileService s3FileService, ObjectMapperHolder objectMapperHolder) {
+        this.s3FileService = s3FileService;
+        this.objectMapper = objectMapperHolder.getObjectMapper();
+    }
 
     public JsonNode saveFilesAndGenerateContentJson(List<MultipartFile> parts, List<FileOrder> orderInfo) throws IOException {
         // 멀티파트 파일 및 순서 정보 검증

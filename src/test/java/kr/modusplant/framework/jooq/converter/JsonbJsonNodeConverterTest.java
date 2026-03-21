@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class JsonbJsonNodeConverterTest {
-    private final JsonbJsonNodeConverter jsonbJsonNodeConverter = new JsonbJsonNodeConverter();
     private final ObjectMapper objectMapper = JacksonConfig.objectMapper();
+    private final JsonbJsonNodeConverter jsonbJsonNodeConverter = new JsonbJsonNodeConverter();
     private final String string = """
             {"test": "test"}
             """;

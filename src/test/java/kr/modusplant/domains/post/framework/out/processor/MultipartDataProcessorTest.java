@@ -9,13 +9,12 @@ import kr.modusplant.domains.post.framework.out.processor.exception.InvalidFileI
 import kr.modusplant.domains.post.framework.out.processor.exception.UnsupportedFileException;
 import kr.modusplant.domains.post.usecase.request.FileOrder;
 import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
+import kr.modusplant.infrastructure.config.jackson.JacksonConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.Mockito;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,13 +32,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class MultipartDataProcessorTest implements PostRequestTestUtils {
-    @Mock
-    private S3FileService s3FileService;
-
-    @InjectMocks
-    private MultipartDataProcessor multipartDataProcessor;
+    private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
+    private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(JacksonConfig.objectMapper());
+    private final MultipartDataProcessor multipartDataProcessor = new MultipartDataProcessor(s3FileService, objectMapperHolder);
 
     private static final String DATA = "data";
     private static final String FILENAME = "filename";

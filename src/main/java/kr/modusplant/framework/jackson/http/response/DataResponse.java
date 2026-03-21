@@ -63,7 +63,6 @@ public class DataResponse<T> {
         if (data != null) {
             map.put("data", data);
         }
-        return ObjectMapperHolder.getObjectMapper().writeValueAsString(map);
+        return ObjectMapperHolder.getStaticObjectMapper().writeValueAsString(map);
     }
-
 }

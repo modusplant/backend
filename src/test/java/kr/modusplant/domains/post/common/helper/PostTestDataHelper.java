@@ -20,6 +20,7 @@ import static kr.modusplant.jooq.Tables.*;
 public class PostTestDataHelper {
     private static final UlidIdGenerator generator = new UlidIdGenerator();
     private final DSLContext dsl;
+    private final JsonbJsonNodeConverter jsonConverter = new JsonbJsonNodeConverter();
 
     public SiteMemberRecord insertTestMember(String nickname) {
         LocalDateTime dateTime = LocalDateTime.now().plusDays(7);
@@ -77,7 +78,7 @@ public class PostTestDataHelper {
                 .set(COMM_POST.LIKE_COUNT,30)
                 .set(COMM_POST.VIEW_COUNT,251)
                 .set(COMM_POST.TITLE,title)
-                .set(COMM_POST.CONTENT,new JsonbJsonNodeConverter().to(content))
+                .set(COMM_POST.CONTENT, jsonConverter.to(content))
                 .set(COMM_POST.IS_PUBLISHED,true)
                 .set(COMM_POST.PUBLISHED_AT,dateTime)
                 .set(COMM_POST.CREATED_AT,dateTime)
@@ -100,7 +101,7 @@ public class PostTestDataHelper {
                 .set(COMM_POST.LIKE_COUNT,0)
                 .set(COMM_POST.VIEW_COUNT,0)
                 .set(COMM_POST.TITLE,title)
-                .set(COMM_POST.CONTENT,new JsonbJsonNodeConverter().to(content))
+                .set(COMM_POST.CONTENT, jsonConverter.to(content))
                 .set(COMM_POST.IS_PUBLISHED,false)
                 .set(COMM_POST.CREATED_AT,dateTime)
                 .set(COMM_POST.UPDATED_AT,dateTime)
