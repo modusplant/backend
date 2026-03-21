@@ -13,13 +13,11 @@ import java.io.IOException;
 
 
 public class JsonbJsonNodeConverter implements Converter<JSONB, JsonNode> {
-    private final ObjectMapper objectMapper = ObjectMapperHolder.getStaticObjectMapper();
-
     @Override
     public JsonNode from(JSONB db) {
         if (db == null) return null;
         try {
-            return objectMapper.readTree(db.data());
+            return getObjectMapper().readTree(db.data());
         } catch (IOException e) {
             throw new DataAccessException("Failed to parse JSONB", e);
         }
@@ -29,7 +27,7 @@ public class JsonbJsonNodeConverter implements Converter<JSONB, JsonNode> {
     public JSONB to(JsonNode obj) {
         if (obj == null) return null;
         try {
-            return JSONB.valueOf(objectMapper.writeValueAsString(obj));
+            return JSONB.valueOf(getObjectMapper().writeValueAsString(obj));
         } catch (JsonProcessingException e) {
             throw new DataAccessException("Failed to serialize JsonNode", e);
         }
@@ -45,5 +43,9 @@ public class JsonbJsonNodeConverter implements Converter<JSONB, JsonNode> {
     @Override
     public Class<JsonNode> toType() {
         return JsonNode.class;
+    }
+
+    private ObjectMapper getObjectMapper() {
+        return ObjectMapperHolder.getStaticObjectMapper();
     }
 }
