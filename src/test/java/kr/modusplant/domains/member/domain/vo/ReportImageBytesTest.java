@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportImageBytesTestUtils.testReportImageBytes;
-import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.REPORT_IMAGE_BYTES;
+import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.TEST_REPORT_IMAGE_BYTES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,7 +17,7 @@ class ReportImageBytesTest {
     @Test
     @DisplayName("create으로 회원 프로필 이미지 바이트 반환")
     void testCreate_givenValidValue_willReturnReportImageBytes() {
-        assertThat(ReportImageBytes.create(REPORT_IMAGE_BYTES)).isEqualTo(ReportImageBytes.create(REPORT_IMAGE_BYTES));
+        assertThat(ReportImageBytes.create(TEST_REPORT_IMAGE_BYTES)).isEqualTo(ReportImageBytes.create(TEST_REPORT_IMAGE_BYTES));
     }
 
     @Test
@@ -29,21 +29,27 @@ class ReportImageBytesTest {
 
     @Test
     @DisplayName("같은 객체에 대한 equals 호출")
-    void useEqual_givenSameObject_willReturnTrue() {
+    void testEquals_givenSameObject_willReturnTrue() {
         //noinspection EqualsWithItself
         assertEquals(testReportImageBytes, testReportImageBytes);
     }
 
     @Test
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
-    void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
+    void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
         assertNotEquals(testReportImageBytes, testMemberId);
     }
 
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
-    void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
-        assertNotEquals(testReportImageBytes, ReportImageBytes.create((Arrays.toString(REPORT_IMAGE_BYTES) + "Test").getBytes()));
+    void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
+        assertNotEquals(testReportImageBytes, ReportImageBytes.create((Arrays.toString(TEST_REPORT_IMAGE_BYTES) + "Test").getBytes()));
+    }
+
+    @Test
+    @DisplayName("같은 객체에 대한 hashcode 동일성 보장")
+    void testHashCode_givenSameObject_willReturnSameHashCode() {
+        assertEquals(testReportImageBytes.hashCode(), testReportImageBytes.hashCode());
     }
 }

@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface CommCommentJpaRepository extends JpaRepository<CommCommentEntity, CommCommentId> {
     Optional<CommCommentEntity> findByPostUlidAndPath(String postUlid, String path);
 
-    List<CommCommentEntity> findByPostEntity(CommPostEntity postEntity);
+    List<CommCommentEntity> findByPost(CommPostEntity post);
 
     List<CommCommentEntity> findByAuthMember(SiteMemberEntity authMember);
 

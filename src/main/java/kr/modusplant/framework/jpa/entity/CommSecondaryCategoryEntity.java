@@ -31,7 +31,7 @@ public class CommSecondaryCategoryEntity {
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = PRI_CATE_ID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ToString.Exclude
-    private CommPrimaryCategoryEntity primaryCategoryEntity;
+    private CommPrimaryCategoryEntity primaryCategory;
 
     @Column(nullable = false, updatable = false)
     private String category;
@@ -42,10 +42,6 @@ public class CommSecondaryCategoryEntity {
     @Column(name = CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
-
-    public void updateCategory(String category) {
-        this.category = category;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -59,9 +55,9 @@ public class CommSecondaryCategoryEntity {
         return new HashCodeBuilder(17, 37).append(getOrder()).toHashCode();
     }
 
-    private CommSecondaryCategoryEntity(Integer id, CommPrimaryCategoryEntity primaryCategoryEntity, String category, Integer order) {
+    private CommSecondaryCategoryEntity(Integer id, CommPrimaryCategoryEntity primaryCategory, String category, Integer order) {
         this.id = id;
-        this.primaryCategoryEntity = primaryCategoryEntity;
+        this.primaryCategory = primaryCategory;
         this.category = category;
         this.order = order;
     }
@@ -72,7 +68,7 @@ public class CommSecondaryCategoryEntity {
 
     public static final class CommSecondaryCategoryEntityBuilder {
         private Integer id;
-        private CommPrimaryCategoryEntity primaryCategoryEntity;
+        private CommPrimaryCategoryEntity primaryCategory;
         private String category;
         private Integer order;
 
@@ -81,8 +77,8 @@ public class CommSecondaryCategoryEntity {
             return this;
         }
 
-        public CommSecondaryCategoryEntityBuilder primaryCategory(CommPrimaryCategoryEntity primaryCategoryEntity) {
-            this.primaryCategoryEntity = primaryCategoryEntity;
+        public CommSecondaryCategoryEntityBuilder primaryCategory(CommPrimaryCategoryEntity primaryCategory) {
+            this.primaryCategory = primaryCategory;
             return this;
         }
 
@@ -96,16 +92,16 @@ public class CommSecondaryCategoryEntity {
             return this;
         }
 
-        public CommSecondaryCategoryEntityBuilder commSecondaryCategory(final CommSecondaryCategoryEntity commCategory) {
-            this.id = commCategory.getId();
-            this.primaryCategoryEntity = commCategory.getPrimaryCategoryEntity();
-            this.category = commCategory.getCategory();
-            this.order = commCategory.getOrder();
+        public CommSecondaryCategoryEntityBuilder commSecondaryCategory(final CommSecondaryCategoryEntity secondaryCategory) {
+            this.id = secondaryCategory.getId();
+            this.primaryCategory = secondaryCategory.getPrimaryCategory();
+            this.category = secondaryCategory.getCategory();
+            this.order = secondaryCategory.getOrder();
             return this;
         }
 
         public CommSecondaryCategoryEntity build() {
-            return new CommSecondaryCategoryEntity(this.id, this.primaryCategoryEntity, this.category, this.order);
+            return new CommSecondaryCategoryEntity(this.id, this.primaryCategory, this.category, this.order);
         }
     }
 }

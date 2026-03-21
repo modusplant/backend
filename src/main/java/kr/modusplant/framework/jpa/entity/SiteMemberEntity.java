@@ -63,14 +63,6 @@ public class SiteMemberEntity {
         this.nickname = nickname;
     }
 
-    public void updateIsActive(Boolean isActive) {
-        this.isActive = isActive;
-    }
-
-    public void updateIsBanned(Boolean isBanned) {
-        this.isBanned = isBanned;
-    }
-
     public void updateLoggedInAt(LocalDateTime loggedInAt) {
         this.loggedInAt = loggedInAt;
     }

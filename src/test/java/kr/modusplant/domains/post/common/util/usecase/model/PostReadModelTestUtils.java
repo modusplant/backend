@@ -91,6 +91,21 @@ public interface PostReadModelTestUtils {
             testDate
     );
 
+    PostDetailDataReadModel TEST_DRAFT_POST_DETAIL_DATA_READ_MODEL_WITH_EMPTY_VALUE = new PostDetailDataReadModel(
+            TEST_POST_ULID,
+            TEST_COMM_PRIMARY_CATEGORY_ID,
+            TEST_COMM_PRIMARY_CATEGORY_CATEGORY,
+            null,
+            null,
+            MEMBER_BASIC_USER_UUID,
+            MEMBER_BASIC_USER_NICKNAME,
+            TEST_POST_TITLE,
+            null,
+            false,
+            null,
+            testDate
+    );
+
     PostSummaryReadModel TEST_POST_SUMMARY_READ_MODEL = new PostSummaryReadModel(
             TEST_POST_ULID,
             TEST_COMM_PRIMARY_CATEGORY_CATEGORY,

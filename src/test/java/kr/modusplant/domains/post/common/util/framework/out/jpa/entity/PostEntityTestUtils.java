@@ -63,5 +63,4 @@ public interface PostEntityTestUtils extends PostTestUtils {
                 .title(testPostContent.getTitle())
                 .isPublished(false);
     }
-
 }
