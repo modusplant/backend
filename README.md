@@ -1,6 +1,10 @@
 # 🪴ModusPlant
 **DDD + Clean Architecture 기반으로 외부 환경 변화에 유연하게 대응하는 반려식물 플랫폼 서버**
-* 진행 기간: 2024.12 - 현재
+
+### 핵심 가치
+* **관심사 분리:** 계층별 엄격한 역할 분리로 인프라 및 프레임워크 변환 시 안정적 비즈니스 로직 유지
+* **비용 최적화:** 비즈니스 요구사항에 최적화된 API와 기능 구현으로 개발 및 운영 효율 극대화
+* **데이터 무결성:** Bean Validation과 도메인 검증, 엄격한 테스트를 통한 데이터 정합성 확보
 
 | 팀원  | 역할 |
 | ------------- |:-------------:|
@@ -9,26 +13,22 @@
 | 송유정 | content |
 | 고동혁 | content |
 
-### 핵심 가치
-* **관심사 분리:** 계층별 엄격한 역할 분리로 인프라 및 프레임워크 변환 시 안정적 비즈니스 로직 유지
-* **비용 최적화:** 비즈니스 요구사항에 최적화된 API와 기능 구현으로 개발 및 운영 효율 극대화
-* **데이터 무결성:** Bean Validation과 도메인 검증, 엄격한 테스트를 통한 데이터 정합성 확보
 
 <br>
 
 # 📝주요 기능
-### 인증 및 보안
+### 1. 인증 및 보안
 * **사용자 인증 관리:** Spring Security 기반 로그인/회원가입 및 메일 기능(Mailjet) 연동을 통한 이메일 인증 구조
 * **권한 인가 체계:** JWT의 Access/Refresh Token 기반 stateless 인증 시스템
 * **소셜 로그인 연동:** OAuth 2.0을 통한 Google, Kakao 소셜 계정 기능
 * **보안 및 정책 관리:** 회원 약관 동의 프로세스 및 사용자 프로필 관리 API
 
-### 컨텐츠 및 커뮤니티
+### 2. 컨텐츠 및 커뮤니티
 * **게시 서비스:** 게시글 및 댓글의 CRUD 및 1차/2차 카테고리 분류 체계를 통한 구조적 데이터 관리
 * **이미지 기반 소통:** 멀티파트 데이터 처리 및 Wasabi 스토리지 운용
 * **사용자 활동:** 게시글/댓글 좋아요, 북마크를 통한 사용자 참여 기능
 
-### 고객 소통 및 운영
+### 3. 고객 소통 및 운영
 * **신고 시스템:** 서비스 가이드라인 준수를 위한 게시글 및 댓글 신고 API
 * **피드백 루프:** 서비스 개선을 위한 건의사항 및 버그제보 창구 운영
 
@@ -37,9 +37,9 @@
 # 🛠기술 스택 & 도입 이유
 ### 1. 백엔드 & 영속성
 * **Spring Boot 3.x & Java 21:** 알림 기능의 신속한 처리를 위한 가상 스레드 도입
-* **PostgreSQL 17:** 게시글 업로드용 이미지를 위한 JSONB, 전문 검색 및 GIN INDEX를 통한 빠른 텍스트 검색
+* **PostgreSQL 17:** 게시글 업로드용 이미지를 위한 JSONB, GIN INDEX를 통한 빠른 텍스트 검색
 * **Hybrid DB 접근 방식**
-    * JPA/Hibernate: 단순 DML 작업, 영속성 맥락을 통한 dirty checking, SQL 생성 메서드로 편리한 쿼리 개발
+    * JPA/Hibernate: 단순 DML, 영속성 맥락으로 dirty checking, SQL 생성 메서드로 편리한 쿼리 생성
     * jOOQ: 대규모 READ 및 영속성이 불필요한 정확한 데이터 조회
 * **Flyway:** DB 변경의 히스토리 유지 및 팀원의 로컬 DB 동기화 자동화
 
@@ -60,21 +60,119 @@
 <br>
 
 # 🗺️아키텍처 설계
-(아키텍처 구조도 필요)
-(Erd 필요)
+
+<details>
+<summary><b>1. 프로덕션 환경 아키텍처 </b></summary>
+<br />
+<img width="5887" height="5210" alt="프로덕션 아키텍처" src="https://github.com/user-attachments/assets/43603f19-95bf-48e7-8c97-7c6ef3ad6eef" />
+</details>
+
+<details>
+<summary><b>2. 소스 코드 아키텍처 </b></summary>
+<br />
+<img width="2648" height="1490" alt="소스 코드 아키텍처" src="https://github.com/user-attachments/assets/732455f1-39a1-40d6-b563-f0b613205395" />
+</details>
+
+<details>
+<summary><b>3. ERD Cloud </b></summary>
+<br />
+
+<a href="https://www.erdcloud.com/d/uP5rbBmZJTdo7xNmG">🔗 ERD Cloud 전체</a>
+
+<img width="696" height="661" alt="게시글, 댓글 테이블" src="https://github.com/user-attachments/assets/145c5e4b-5dea-474d-962b-0daf54ead687" />
+</details>
 
 <br>
 
-# 기술적 의사결정 및 트러블슈팅
+# 💡기술적 의사결정 및 트러블슈팅
+
+### 기술적 의사결정
+
+<details>
+<summary> DDD + Clean Architecture를 통한 비즈니스와 인프라/프레임워크 분리 </summary>
+
+- **문제**: 기능이 확장됨에 따라 클래스 간 의존성 파악을 위한 불필요한 소통 발생, 불명확한 구조로 유지보수 어려움
+- **의사 결정**: 비즈니스 로직 + 인프라/프레임워크 + 그 사이를 매개하는 계층형 아키텍처로 리팩토링
+- **성과**: 도메인들 간 명확한 경계 설정, Jira 백로그 기준 신규 기능 개발 기간 약 30% 단축
+
+</details>
+
+<details>
+<summary> Flyway로 DB 형상 관리 </summary>
+
+- **문제**: Slack을 통한 수동 DDL 공유로 팀원의 로컬 환경 간 스키마 불일치 및 히스토리 관리의 부재
+- **의사 결정**: Flyway 도입으로 애플리케이션 실행 시 스키마 자동 동기화
+- **성과**: DB 변경 히스토리를 통해 롤백 포인트 확보 및 배포 환경 간 정합성 문제 원천 차단
+
+</details>
+
+### 트러블슈팅
+
+<details>
+<summary> JPA의 N+1 문제 근절 및 대량 데이터 조회 최적화 </summary>
+
+- **문제**: 여러 테이블이 JOIN되는 대량의 데이터 조회 시 JPA의 N+1 발생, 성능 저하
+- **해결**
+    - 단순 CRUD는 JPA/Hibernate로 데이터 무결성 확보
+    - 복잡한 통계와 Read 작업은 jOOQ로 Type-Safe하게 수행 및 성능 최적화
+- **성과**: JPA의 N+1문제 근절 및 컴파일 타임 에러 확인 가능
+
+</details>
 
 <br>
 
 # API 명세서
-[모두의식물 API 명세서](https://www.notion.so/API-2bceed37f9c5809eace3fc0520c9285c)
+### 링크
+[모두의식물 API 명세서](https://resonant-tortellini-b95.notion.site/API-f0f2e2fc4ece8308bc998140c1335d60)
+
+### API 명세 구조
+
+| 기능 | 우선순위 | MVP | URI | Method | 진행 상태 | 담당자 | 페이지(다중선택) |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| 댓글 추가 | 높음 | `1차` | /api/v1/communication/comments | `POST` | 로컬 환경 테스트 완료 | 준희 박 | 소통 컨텐츠 상세 페이지 |
+
+### 요청 및 응답 형식
+
+<details>
+<summary> 요청 구조 </summary>
+
+```json
+{
+  "postId": "string", // ulid
+  "path": "string", // 숫자.숫자.숫자...
+  "content": "string" // 댓글 내용
+}
+```
+
+</details>
+
+<details>
+<summary> 응답 구조 </summary>
+
+```json
+{
+  "status": 200,
+  "code": "generic_success",
+  "message": ""
+}
+```
+
+```json
+{
+  "status": 400,
+  "code": "empty_post_id",
+  "message": "게시글의 식별자 값이 비었습니다"
+}
+```
+
+</details>
 
 <br>
 
 # 프로젝트 실행 방법
+* docker를 통한 실행 방법 추가.
+* docker-compose.yml 파일을 만들고, "Docker가 있다면 docker-compose up" 한 줄로 환경 구성이 끝난다"고 명시할 것.
+* 직접 설치가 어려울 시 최소한 어떤 버전의 도구들이 필요한 지 목록 기재.
 
 <br>
 
