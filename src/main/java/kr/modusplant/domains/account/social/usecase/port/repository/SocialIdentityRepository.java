@@ -5,7 +5,7 @@ import kr.modusplant.domains.account.shared.kernel.AccountId;
 import kr.modusplant.domains.account.social.domain.vo.SocialAccountPayload;
 import kr.modusplant.domains.account.social.domain.vo.SocialAccountProfile;
 import kr.modusplant.domains.account.social.domain.vo.SocialCredentials;
-import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.shared.enums.Role;
 
 import java.util.Optional;
 

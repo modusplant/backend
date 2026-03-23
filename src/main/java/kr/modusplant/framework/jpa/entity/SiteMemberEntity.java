@@ -1,6 +1,7 @@
 package kr.modusplant.framework.jpa.entity;
 
 import jakarta.persistence.*;
+import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -34,6 +35,11 @@ public class SiteMemberEntity {
 
     @Column(nullable = false, length = 40, unique = true)
     private String nickname;
+
+    @Column(nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    @DefaultValue
+    private Role role;
 
     @Column(name = "is_active", nullable = false)
     @DefaultValue
@@ -94,6 +100,9 @@ public class SiteMemberEntity {
         }
         if (this.isBanned == null) {
             this.isBanned = false;
+        }
+        if (this.role == null) {
+            this.role = Role.USER;
         }
     }
 

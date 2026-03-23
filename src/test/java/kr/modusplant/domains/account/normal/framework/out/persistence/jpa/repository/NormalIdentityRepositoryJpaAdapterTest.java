@@ -1,15 +1,19 @@
 package kr.modusplant.domains.account.normal.framework.out.persistence.jpa.repository;
 
 import kr.modusplant.domains.account.normal.domain.vo.SignUpData;
-import kr.modusplant.domains.account.normal.framework.out.persistence.jpa.mapper.*;
-import kr.modusplant.domains.account.normal.framework.out.persistence.jpa.repository.supers.*;
+import kr.modusplant.domains.account.normal.framework.out.persistence.jpa.mapper.NormalIdentityAuthJpaMapper;
+import kr.modusplant.domains.account.normal.framework.out.persistence.jpa.mapper.NormalIdentityJpaMapper;
+import kr.modusplant.domains.account.normal.framework.out.persistence.jpa.mapper.NormalIdentityProfileJpaMapper;
+import kr.modusplant.domains.account.normal.framework.out.persistence.jpa.mapper.NormalIdentityTermJpaMapper;
+import kr.modusplant.domains.account.normal.framework.out.persistence.jpa.repository.supers.NormalIdentityAuthJpaRepository;
+import kr.modusplant.domains.account.normal.framework.out.persistence.jpa.repository.supers.NormalIdentityJpaRepository;
+import kr.modusplant.domains.account.normal.framework.out.persistence.jpa.repository.supers.NormalIdentityProfileJpaRepository;
+import kr.modusplant.domains.account.normal.framework.out.persistence.jpa.repository.supers.NormalIdentityTermJpaRepository;
 import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberTermEntity;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberRoleEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberTermEntityTestUtils;
 import kr.modusplant.shared.enums.AuthProvider;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,26 +29,23 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 
 public class NormalIdentityRepositoryJpaAdapterTest implements SiteMemberEntityTestUtils,
-        SiteMemberAuthEntityTestUtils, SiteMemberRoleEntityTestUtils, SiteMemberTermEntityTestUtils {
+        SiteMemberAuthEntityTestUtils, SiteMemberTermEntityTestUtils {
     private final NormalIdentityJpaRepository identityRepository = Mockito.mock(NormalIdentityJpaRepository.class);
     private final NormalIdentityAuthJpaRepository authRepository = Mockito.mock(NormalIdentityAuthJpaRepository.class);
-    private final NormalIdentityRoleJpaRepository roleRepository = Mockito.mock(NormalIdentityRoleJpaRepository.class);
     private final NormalIdentityTermJpaRepository termRepository = Mockito.mock(NormalIdentityTermJpaRepository.class);
     private final NormalIdentityProfileJpaRepository profileRepository = Mockito.mock(NormalIdentityProfileJpaRepository.class);
 
     private final NormalIdentityJpaMapper identityMapper = Mockito.mock(NormalIdentityJpaMapper.class);
     private final NormalIdentityAuthJpaMapper authMapper = Mockito.mock(NormalIdentityAuthJpaMapper.class);
-    private final NormalIdentityRoleJpaMapper roleMapper = Mockito.mock(NormalIdentityRoleJpaMapper.class);
     private final NormalIdentityTermJpaMapper termMapper = Mockito.mock(NormalIdentityTermJpaMapper.class);
     private final NormalIdentityProfileJpaMapper profileMapper = Mockito.mock(NormalIdentityProfileJpaMapper.class);
     private final NormalIdentityRepositoryJpaAdapter adapter = new NormalIdentityRepositoryJpaAdapter(
-            identityRepository, authRepository, roleRepository, termRepository, profileRepository,
-            identityMapper, authMapper, roleMapper, termMapper, profileMapper);
+            identityRepository, authRepository, termRepository, profileRepository,
+            identityMapper, authMapper, termMapper, profileMapper);
 
     private SiteMemberEntity memberToBeSaved;
     private SiteMemberEntity savedMember;
     private SiteMemberAuthEntity authEntityToBeSaved;
-    private SiteMemberRoleEntity roleEntityToBeSaved;
     private SiteMemberTermEntity termEntityToBeSaved;
     private SignUpData sign;
 
@@ -65,8 +66,6 @@ public class NormalIdentityRepositoryJpaAdapterTest implements SiteMemberEntityT
                 .pw(sign.getNormalCredentials().getPassword().getValue())
                 .provider(AuthProvider.BASIC).build();
 
-        roleEntityToBeSaved = createMemberRoleUserEntityWithUuid();
-
         termEntityToBeSaved = createMemberTermUserEntityWithUuid();
     }
 
@@ -80,9 +79,6 @@ public class NormalIdentityRepositoryJpaAdapterTest implements SiteMemberEntityT
         given(authMapper.toSiteMemberAuthEntity(savedMember, sign)).willReturn(authEntityToBeSaved);
         given(authRepository.save(authEntityToBeSaved)).willReturn(null);
 
-        given(roleMapper.toSiteMemberRoleEntity(savedMember)).willReturn(roleEntityToBeSaved);
-        given(roleRepository.save(roleEntityToBeSaved)).willReturn(null);
-
         given(termMapper.toSiteMemberTermEntity(savedMember, sign)).willReturn(termEntityToBeSaved);
         given(termRepository.save(termEntityToBeSaved)).willReturn(null);
 
@@ -95,9 +91,6 @@ public class NormalIdentityRepositoryJpaAdapterTest implements SiteMemberEntityT
 
         Mockito.verify(authMapper, times(1)).toSiteMemberAuthEntity(savedMember, sign);
         Mockito.verify(authRepository, times(1)).save(authEntityToBeSaved);
-
-        Mockito.verify(roleMapper, times(1)).toSiteMemberRoleEntity(savedMember);
-        Mockito.verify(roleRepository, times(1)).save(roleEntityToBeSaved);
 
         Mockito.verify(termMapper, times(1)).toSiteMemberTermEntity(savedMember, sign);
         Mockito.verify(termRepository, times(1)).save(termEntityToBeSaved);

@@ -11,7 +11,7 @@ import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
-import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.shared.enums.Role;
 import kr.modusplant.infrastructure.security.exception.AccountStateException;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import kr.modusplant.infrastructure.security.util.SecurityResponseUtils;
@@ -45,7 +45,7 @@ public class WriteResponseLoginSuccessHandler implements AuthenticationSuccessHa
         updateMemberLoggedInAt(currentMember.getActiveUuid());
 
         TokenPair loginTokenPair = tokenService.issueToken(
-                currentMember.getActiveUuid(), currentMember.getNickname(), currentMember.getEmail(), getMemberRole(currentMember));
+                currentMember.getActiveUuid(), currentMember.getNickname(), currentMember.getEmail(), getRole(currentMember));
 
         SecurityResponseUtils.writeResponse(
                 response, GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus(),
@@ -57,12 +57,12 @@ public class WriteResponseLoginSuccessHandler implements AuthenticationSuccessHa
         response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store");
     }
 
-    private Role getMemberRole(DefaultUserDetails currentUserDetails) {
-        GrantedAuthority memberRole = currentUserDetails.getAuthorities().stream()
+    private Role getRole(DefaultUserDetails currentUserDetails) {
+        GrantedAuthority role = currentUserDetails.getAuthorities().stream()
                 .filter(auth -> auth.getAuthority().startsWith("ROLE_"))
                 .findFirst().orElseThrow(() -> new AccountStateException(EntityErrorCode.NOT_FOUND_MEMBER_ROLE));
 
-        String rawRole = memberRole.getAuthority();
+        String rawRole = role.getAuthority();
 
         return Role.valueOf(rawRole
                 .substring(rawRole.indexOf("_") + 1)

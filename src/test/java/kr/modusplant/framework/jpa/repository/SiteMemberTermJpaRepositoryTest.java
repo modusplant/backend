@@ -39,13 +39,13 @@ class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
     @Test
     void findByMemberTest() {
         // given
-        SiteMemberTermEntity memberRole = createMemberTermUserEntity();
+        SiteMemberTermEntity memberTerm = createMemberTermUserEntity();
 
         // when
-        memberTermRepository.save(memberRole);
+        memberTermRepository.save(memberTerm);
 
         // then
-        assertThat(memberTermRepository.findByMember(memberRole.getMember()).orElseThrow()).isEqualTo(memberRole);
+        assertThat(memberTermRepository.findByMember(memberTerm.getMember()).orElseThrow()).isEqualTo(memberTerm);
     }
 
     @DisplayName("agreedTermsOfUseVersion으로 회원 약관 찾기")

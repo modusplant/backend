@@ -1,4 +1,4 @@
-package kr.modusplant.infrastructure.security.enums;
+package kr.modusplant.shared.enums;
 
 import lombok.Getter;
 
