@@ -96,7 +96,6 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                         COMM_POST.TITLE,
                         COMM_POST.CONTENT.convert(jsonConverter).as("content"),
                         COMM_POST.THUMBNAIL_PATH,
-                        COMM_POST.CONTENT.convert(jsonConverter).as("content"),
                         COMM_POST.UPDATED_AT
                 ).from(COMM_POST)
                 .leftOuterJoin(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
