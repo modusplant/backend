@@ -113,13 +113,13 @@ public class PostTestDataHelper {
 
     public CommCommentRecord insertTestComment(CommPostRecord postRecord, String path, SiteMemberRecord memberRecord, String content, boolean isDeleted) {
         return dsl.insertInto(COMM_COMMENT)
-                .set(COMM_COMMENT.POST_ULID, postRecord.getUlid())
-                .set(COMM_COMMENT.PATH, path)
-                .set(COMM_COMMENT.AUTH_MEMB_UUID, memberRecord.getUuid())
-                .set(COMM_COMMENT.CONTENT, content)
-                .set(COMM_COMMENT.LIKE_COUNT, 2)
-                .set(COMM_COMMENT.IS_DELETED, isDeleted)
-                .set(COMM_COMMENT.CREATED_AT, LocalDateTime.now().plusDays(1))
+                .set(COMM_COMMENT.POST_ULID,postRecord.getUlid())
+                .set(COMM_COMMENT.PATH,path)
+                .set(COMM_COMMENT.AUTH_MEMB_UUID,memberRecord.getUuid())
+                .set(COMM_COMMENT.CONTENT,content)
+                .set(COMM_COMMENT.LIKE_COUNT,2)
+                .set(COMM_COMMENT.IS_DELETED,isDeleted)
+                .set(COMM_COMMENT.CREATED_AT,LocalDateTime.now().plusDays(1))
                 .returning()
                 .fetchOneInto(CommCommentRecord.class);
     }
