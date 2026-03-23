@@ -8,10 +8,10 @@
 
 | 팀원  | 역할 |
 | ------------- |:-------------:|
-| 박준희 | 회원가입(email/password) + 댓글 REST API, Spring Security 인증 인가, 전역적 예외 핸들링, 비속어 필터 |
-| 박준혁 | content |
-| 송유정 | content |
-| 고동혁 | content |
+| 박준희 | 일반 회원가입 + 댓글 Rest API, Spring Security 인증/인가, 전역적 예외 핸들링, 비속어 필터링 |
+| 박준혁 | 회원 프로필 + 좋아요 + 신고 + 북마크 + 건의 및 버그 제보 Rest API, AWS 및 Vercel 배포/관리  |
+| 송유정 | 소셜 로그인(OAuth 2.0), 게시글 + 게시글 1차/2차 카테고리 + 알림함 Rest API, JWT, 비동기 푸시알림, 클라우드 스토리지 관리 |
+| 고동혁 | 회원 약관 Rest API, 타사 이메일 서비스 연계, 로깅, 모니터링, 개발 및 프로덕션 환경 운영 |
 
 
 <br>
@@ -61,25 +61,69 @@
 
 # 🗺️아키텍처 설계
 
+### 설계 도면(Diagram)
+
 <details>
-<summary><b>1. 프로덕션 환경 아키텍처 </b></summary>
+<summary>1. 프로덕션 환경 아키텍처 </summary>
 <br />
 <img width="5887" height="5210" alt="프로덕션 아키텍처" src="https://github.com/user-attachments/assets/43603f19-95bf-48e7-8c97-7c6ef3ad6eef" />
 </details>
 
 <details>
-<summary><b>2. 소스 코드 아키텍처 </b></summary>
+<summary>2. 소스 코드 아키텍처 </summary>
 <br />
 <img width="2648" height="1490" alt="소스 코드 아키텍처" src="https://github.com/user-attachments/assets/732455f1-39a1-40d6-b563-f0b613205395" />
 </details>
 
 <details>
-<summary><b>3. ERD Cloud </b></summary>
+<summary>3. 데이터 모델링 </summary>
+<br />
+<img width="520" height="328" alt="게시글 테이블" src="https://github.com/user-attachments/assets/1c6a6d43-9662-44c3-a6c9-68fa268d1a87" />
+<img width="517" height="175" alt="댓글 테이블" src="https://github.com/user-attachments/assets/44bee886-0dfa-401f-bc97-c630c1eb68c0" />
+</details>
+
+### 패키지 레이아웃(Code Block)
+
+<details>
+<summary>1. 전체 프로젝트 패키지 구조 </summary>
 <br />
 
-<a href="https://www.erdcloud.com/d/uP5rbBmZJTdo7xNmG">🔗 ERD Cloud 전체</a>
+```
+📂 modusplant
+  │ 📜 ModusplantApplication.java
+  ├─📂 domains          # 📋 핵심 비즈니스 로직 및 도메인 모델
+  │  ├─📂 account       # 계정 (Email, Social, Normal)
+  │  ├─📂 post          # 게시글
+  │  └─ 📂 ...          # member, comment, term
+  ├─📂 framework        # ✈️ 외부 기술 스택 연동 (JPA, jOOQ, Redis 등)
+  ├─📂 infrastructure   # 🔨 애플리케이션 공통 기반 (Security, AOP, Config 등)
+  └─📂 shared           # 🧺 전역 공통 모듈 및 유틸리티 (Kernel, Exception 등)
+```
 
-<img width="696" height="661" alt="게시글, 댓글 테이블" src="https://github.com/user-attachments/assets/145c5e4b-5dea-474d-962b-0daf54ead687" />
+</details>
+
+<details>
+<summary>2. 도메인 내부 구조 </summary>
+<br />
+
+```
+📂 [domain_name]
+ ├─📂 adapter    # Interface Adapter: 외부 시스템 연결, 데이터 매핑 및 오케스트레이션
+ ├─📂 domain     # Enterprise Business Rules: 핵심 비즈니스 로직 (Aggregate, Entity, VO)
+ ├─📂 framework  # Frameworks & Drivers: 기술 구현체 (Service, RestController, Persistence)
+ └─📂 usecase    # Application Business Rules: 앱 사양 정의 (Port, DTO, Model)
+```
+
+</details>
+
+<details>
+<summary>3. 설계 원칙 및 의도 </summary>
+<br />
+
+- **가벼운 도메인 객체:** 도메인 객체는 상태(State)와 자기 검증에 집중하며, 비즈니스 행위 및 오케스트레이션을 adapter 계층에 위임하여 모델의 순수성을 유지
+- **실용적인 UseCase 계층:** 프로젝트의 낮은 복잡도를 고려하여 모든 로직을 클래스로 강제하지 않음. 대신 시스템 사양(Port)과 데이터 규격(DTO/Model)을 정의하는 인터페이스의 역할에 집중
+- **프레임워크 격리:** 특정 기술 스택(Spring, Redis 등)에 의존하는 기능은 framework 계층으로 격리하여 외부 기술의 변화가 비즈니스에 미치는 영향 최소화
+
 </details>
 
 <br>
@@ -121,7 +165,7 @@
 
 <br>
 
-# API 명세서
+# 📕API 명세서
 ### 링크
 [모두의식물 API 명세서](https://resonant-tortellini-b95.notion.site/API-f0f2e2fc4ece8308bc998140c1335d60)
 
@@ -169,14 +213,7 @@
 
 <br>
 
-# 프로젝트 실행 방법
-* docker를 통한 실행 방법 추가.
-* docker-compose.yml 파일을 만들고, "Docker가 있다면 docker-compose up" 한 줄로 환경 구성이 끝난다"고 명시할 것.
-* 직접 설치가 어려울 시 최소한 어떤 버전의 도구들이 필요한 지 목록 기재.
-
-<br>
-
-# 협업 방식
+# 🖊️협업 방식
 ### 깃모지
 | 이모티콘 | 커밋 유형 | 의미 |
 | --- | --- | --- |
