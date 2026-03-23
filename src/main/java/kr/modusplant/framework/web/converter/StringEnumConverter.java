@@ -12,10 +12,6 @@ public class StringEnumConverter<T extends Enum<T>> implements Converter<String,
 
     @Override
     public T convert(String source) {
-        try {
-            return Enum.valueOf(enumClass, source.toUpperCase());
-        } catch (Exception e) {
-            throw new RuntimeException(enumClass.getSimpleName() + " is not a valid enum value");
-        }
+        return Enum.valueOf(enumClass, source.toUpperCase());
     }
 }
