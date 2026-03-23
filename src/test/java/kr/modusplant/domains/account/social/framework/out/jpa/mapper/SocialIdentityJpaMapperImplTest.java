@@ -7,8 +7,7 @@ import kr.modusplant.domains.account.social.domain.vo.SocialAccountPayload;
 import kr.modusplant.domains.account.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
 import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
-import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.enums.AuthProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,37 +50,17 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialAc
     }
 
     @Test
-    @DisplayName("MemberEntity와 Role로 MemberRoleEntity를 생성")
-    void testToMemberRoleEntity_givenMemberEntityAndRole_willReturnMemberRoleEntity() {
-        // given
-        SiteMemberEntity memberEntity = createKakaoMemberEntityWithUuid();
-        Role role = Role.USER;
-
-        // when
-        SiteMemberRoleEntity result = socialIdentityJpaMapper.toMemberRoleEntity(memberEntity, role);
-
-        // then
-        assertNotNull(result);
-        assertEquals(memberEntity, result.getMember());
-        assertEquals(Role.USER, result.getRole());
-    }
-
-    @Test
-    @DisplayName("MemberEntity와 MemberRoleEntity로 UserPayload를 생성")
-    void testToUserPayload_givenMemberEntityAndMemberRoleEntity_willReturnUserPayload() {
+    @DisplayName("MemberEntity로 UserPayload를 생성")
+    void testToUserPayload_givenMemberEntity_willReturnUserPayload() {
         // given
         SiteMemberEntity memberEntity = createKakaoMemberEntityWithUuid();
         SiteMemberAuthEntity memberAuthEntity = SiteMemberAuthEntity.builder()
                 .member(memberEntity)
                 .email(testKakaoUserEmail.getValue())
                 .build();
-        SiteMemberRoleEntity memberRoleEntity = SiteMemberRoleEntity.builder()
-                .member(memberEntity)
-                .role(Role.USER)
-                .build();
 
         // when
-        SocialAccountPayload result = socialIdentityJpaMapper.toUserPayload(memberEntity, memberAuthEntity, memberRoleEntity);
+        SocialAccountPayload result = socialIdentityJpaMapper.toUserPayload(memberEntity, memberAuthEntity);
 
         // then
         assertNotNull(result);

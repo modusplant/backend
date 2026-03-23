@@ -1,7 +1,7 @@
 package kr.modusplant.domains.account.social.domain.vo;
 
 import kr.modusplant.domains.account.shared.kernel.AccountId;
-import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
 import lombok.AccessLevel;

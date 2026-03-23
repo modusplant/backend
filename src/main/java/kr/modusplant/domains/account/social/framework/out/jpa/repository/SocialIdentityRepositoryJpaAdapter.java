@@ -8,13 +8,11 @@ import kr.modusplant.domains.account.social.framework.out.jpa.mapper.supers.Soci
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
 import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
-import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -27,7 +25,6 @@ import java.util.Optional;
 public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityRepository {
     private final SiteMemberJpaRepository memberJpaRepository;
     private final SiteMemberAuthJpaRepository memberAuthJpaRepository;
-    private final SiteMemberRoleJpaRepository memberRoleJpaRepository;
     private final SocialIdentityJpaMapper socialIdentityJpaMapper;
 
     @Override
@@ -42,9 +39,7 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER));
         SiteMemberAuthEntity memberAuthEntity = memberAuthJpaRepository.findByMember(memberEntity)
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH, TableName.SITE_MEMBER_AUTH));
-        SiteMemberRoleEntity memberRoleEntity = memberRoleJpaRepository.findByMember(memberEntity)
-                .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_ROLE, TableName.SITE_MEMBER_ROLE));
-        return socialIdentityJpaMapper.toUserPayload(memberEntity,memberAuthEntity,memberRoleEntity);
+        return socialIdentityJpaMapper.toUserPayload(memberEntity, memberAuthEntity);
     }
 
     @Override
@@ -59,7 +54,6 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
     public SocialAccountPayload createSocialMember(SocialAccountProfile profile, Role role) {
         SiteMemberEntity memberEntity = memberJpaRepository.save(socialIdentityJpaMapper.toMemberEntity(profile.getNickname()));
         memberAuthJpaRepository.save(socialIdentityJpaMapper.toMemberAuthEntity(memberEntity, profile));
-        memberRoleJpaRepository.save(socialIdentityJpaMapper.toMemberRoleEntity(memberEntity,role));
         return socialIdentityJpaMapper.toUserPayload(memberEntity, profile.getNickname(), profile.getEmail(), role);
     }
 

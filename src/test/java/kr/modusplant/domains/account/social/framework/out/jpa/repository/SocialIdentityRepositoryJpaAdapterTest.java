@@ -8,13 +8,11 @@ import kr.modusplant.domains.account.social.domain.vo.SocialAccountProfile;
 import kr.modusplant.domains.account.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
 import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
-import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
 import kr.modusplant.shared.persistence.constant.TableName;
 import org.junit.jupiter.api.DisplayName;
@@ -35,10 +33,9 @@ import static org.mockito.Mockito.verify;
 class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUtils, SocialAccountPayloadTestUtils, EmailTestUtils {
     private final SiteMemberJpaRepository memberJpaRepository = mock(SiteMemberJpaRepository.class);
     private final SiteMemberAuthJpaRepository memberAuthJpaRepository = mock(SiteMemberAuthJpaRepository.class);
-    private final SiteMemberRoleJpaRepository memberRoleJpaRepository = mock(SiteMemberRoleJpaRepository.class);
     private final SocialIdentityJpaMapper socialIdentityJpaMapper = mock(SocialIdentityJpaMapper.class);
     private final SocialIdentityRepositoryJpaAdapter socialIdentityRepositoryJpaAdapter = new SocialIdentityRepositoryJpaAdapter(
-            memberJpaRepository,memberAuthJpaRepository,memberRoleJpaRepository,socialIdentityJpaMapper
+            memberJpaRepository, memberAuthJpaRepository, socialIdentityJpaMapper
     );
 
     @Test
@@ -86,12 +83,10 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
         // given
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         SiteMemberAuthEntity memberAuthEntity = mock(SiteMemberAuthEntity.class);
-        SiteMemberRoleEntity memberRoleEntity = mock(SiteMemberRoleEntity.class);
 
         given(memberJpaRepository.findByUuid(testKakaoAccountId.getValue())).willReturn(Optional.of(memberEntity));
         given(memberAuthJpaRepository.findByMember(memberEntity)).willReturn(Optional.of(memberAuthEntity));
-        given(memberRoleJpaRepository.findByMember(memberEntity)).willReturn(Optional.of(memberRoleEntity));
-        given(socialIdentityJpaMapper.toUserPayload(memberEntity,memberAuthEntity, memberRoleEntity)).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD);
+        given(socialIdentityJpaMapper.toUserPayload(memberEntity, memberAuthEntity)).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD);
 
 
         // when
@@ -102,8 +97,7 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
         assertEquals(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD, result);
         verify(memberJpaRepository).findByUuid(testKakaoAccountId.getValue());
         verify(memberAuthJpaRepository).findByMember(memberEntity);
-        verify(memberRoleJpaRepository).findByMember(memberEntity);
-        verify(socialIdentityJpaMapper).toUserPayload(memberEntity, memberAuthEntity,memberRoleEntity);
+        verify(socialIdentityJpaMapper).toUserPayload(memberEntity, memberAuthEntity);
     }
 
     @Test
@@ -117,25 +111,6 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
         assertThat(exception.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_MEMBER);
         assertThat(exception.getEntityName()).isEqualTo(TableName.SITE_MEMBER);
         verify(memberJpaRepository).findByUuid(testKakaoAccountId.getValue());
-    }
-
-    @Test
-    @DisplayName("MemberRole이 존재하지 않을 때 예외 발생")
-    void testGetUserPayloadByMemberId_givenMemberWithoutRole_willThrowException() {
-        // given
-        SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
-        SiteMemberAuthEntity memberAuthEntity = mock(SiteMemberAuthEntity.class);
-
-        given(memberJpaRepository.findByUuid(testKakaoAccountId.getValue())).willReturn(Optional.of(memberEntity));
-        given(memberAuthJpaRepository.findByMember(memberEntity)).willReturn(Optional.of(memberAuthEntity));
-        given(memberRoleJpaRepository.findByMember(memberEntity)).willReturn(Optional.empty());
-
-        // when & then
-        NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> socialIdentityRepositoryJpaAdapter.getUserPayloadByMemberId(testKakaoAccountId));
-        assertThat(exception.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_MEMBER_ROLE);
-        assertThat(exception.getEntityName()).isEqualTo(TableName.SITE_MEMBER_ROLE);
-        verify(memberAuthJpaRepository).findByMember(memberEntity);
-        verify(memberRoleJpaRepository).findByMember(memberEntity);
     }
 
     @Test
@@ -163,14 +138,11 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
         Role role = Role.USER;
         SiteMemberEntity memberEntity = mock(SiteMemberEntity.class);
         SiteMemberAuthEntity memberAuthEntity = mock(SiteMemberAuthEntity.class);
-        SiteMemberRoleEntity memberRoleEntity = mock(SiteMemberRoleEntity.class);
 
         given(socialIdentityJpaMapper.toMemberEntity(testNormalUserNickname)).willReturn(memberEntity);
         given(memberJpaRepository.save(memberEntity)).willReturn(memberEntity);
         given(socialIdentityJpaMapper.toMemberAuthEntity(memberEntity, profile)).willReturn(memberAuthEntity);
         given(memberAuthJpaRepository.save(memberAuthEntity)).willReturn(memberAuthEntity);
-        given(socialIdentityJpaMapper.toMemberRoleEntity(memberEntity, role)).willReturn(memberRoleEntity);
-        given(memberRoleJpaRepository.save(memberRoleEntity)).willReturn(memberRoleEntity);
         given(socialIdentityJpaMapper.toUserPayload(memberEntity, testNormalUserNickname, testKakaoUserEmail, role)).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCOUNT_PAYLOAD);
 
         // when
@@ -183,8 +155,6 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialCredentialsTestUti
         verify(memberJpaRepository).save(memberEntity);
         verify(socialIdentityJpaMapper).toMemberAuthEntity(memberEntity, profile);
         verify(memberAuthJpaRepository).save(memberAuthEntity);
-        verify(socialIdentityJpaMapper).toMemberRoleEntity(memberEntity, role);
-        verify(memberRoleJpaRepository).save(memberRoleEntity);
         verify(socialIdentityJpaMapper).toUserPayload(memberEntity, testNormalUserNickname, testKakaoUserEmail, role);
     }
 
