@@ -148,7 +148,7 @@ public class SecurityConfig {
                 .addFilterBefore(emailPasswordAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(http), EmailPasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/communication/posts/me/**").authenticated()
+                        .requestMatchers("/api/v1/communication/posts/me/**","/api/v1/communication/posts/search-history/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/communication/posts/*/data").authenticated()
                         .requestMatchers(HttpMethod.POST,"/api/v1/communication/posts").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/communication/posts/*").authenticated()
