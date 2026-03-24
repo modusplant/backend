@@ -45,7 +45,7 @@ public class CommPostEntity {
     private CommSecondaryCategoryEntity secondaryCategory;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = AUTH_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ToString.Exclude
     private SiteMemberEntity authMember;
 

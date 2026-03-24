@@ -38,7 +38,7 @@ public class CommPostArchiveEntity {
     @Column(name = SECO_CATE_ID, nullable = false)
     private Integer secondaryCategoryId;
 
-    @Column(name = AUTH_MEMB_UUID, nullable = false)
+    @Column(name = AUTH_MEMB_UUID)
     private UUID authMemberUuid;
 
     @Column(nullable = false, length = 60)
