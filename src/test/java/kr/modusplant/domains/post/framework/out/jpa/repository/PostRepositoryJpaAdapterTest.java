@@ -4,7 +4,6 @@ import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
 import kr.modusplant.domains.post.common.util.framework.out.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.domains.post.common.util.usecase.model.PostReadModelTestUtils;
 import kr.modusplant.domains.post.domain.aggregate.Post;
-import kr.modusplant.domains.post.domain.vo.PostContent;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
 import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostJpaRepository;

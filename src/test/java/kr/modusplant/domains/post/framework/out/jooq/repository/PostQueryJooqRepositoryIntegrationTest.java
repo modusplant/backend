@@ -23,7 +23,6 @@ import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.*;
 import static kr.modusplant.domains.post.usecase.enums.SearchOption.*;
 import static kr.modusplant.domains.post.usecase.enums.SearchSort.LATEST;
 import static kr.modusplant.domains.post.usecase.enums.SearchSort.RELEVANCE;
-import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

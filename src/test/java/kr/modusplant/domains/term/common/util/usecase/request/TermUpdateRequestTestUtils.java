@@ -2,7 +2,8 @@ package kr.modusplant.domains.term.common.util.usecase.request;
 
 import kr.modusplant.domains.term.usecase.request.TermUpdateRequest;
 
-import static kr.modusplant.shared.persistence.common.util.constant.TermConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.TermConstant.TEST_TERMS_OF_USE_CONTENT;
+import static kr.modusplant.shared.persistence.common.util.constant.TermConstant.TEST_TERMS_OF_USE_UUID;
 
 public interface TermUpdateRequestTestUtils {
     TermUpdateRequest testTermUpdateRequest = new TermUpdateRequest(

@@ -14,7 +14,6 @@ import org.mockito.Mockito;
 
 import java.util.Optional;
 
-import static kr.modusplant.domains.term.common.util.domain.vo.SiteMemberTermIdTestUtils.testSiteMemberTermId;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberTermConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
