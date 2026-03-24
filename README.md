@@ -37,14 +37,14 @@
 # 🛠기술 스택 & 도입 이유
 ### 1. 백엔드 & 영속성
 * **Spring Boot 3.x & Java 21:** 알림 기능의 신속한 처리를 위한 가상 스레드 도입
-* **PostgreSQL 17:** 게시글 업로드용 이미지를 위한 JSONB, GIN INDEX를 통한 빠른 텍스트 검색
+* **PostgreSQL 17:** 게시글 업로드 이미지용 JSONB, GIN INDEX를 통한 빠른 텍스트 검색
 * **Hybrid DB 접근 방식**
-    * JPA/Hibernate: 단순 DML, 영속성 맥락으로 dirty checking, SQL 생성 메서드로 편리한 쿼리 생성
-    * jOOQ: 대규모 READ 및 영속성이 불필요한 정확한 데이터 조회
-* **Flyway:** DB 변경의 히스토리 유지 및 팀원의 로컬 DB 동기화 자동화
+    * JPA/Hibernate: 단순 DML, dirty checking, SQL 생성 메서드로 편리한 쿼리 생성
+    * jOOQ: 대규모 READ, 영속성이 불필요한 정확한 데이터 조회
+* **Flyway:** DB 변경 히스토리 유지, 운영 환경 간 DB 동기화 자동화
 
 ### 2. 인프라 & 모니터링
-* **Redis:** 반복적인 게시글 및 댓글 조회 성능 향상, JWT 접근 토큰 blacklisting으로 보안 강화
+* **Redis:** 빈번하게 조회되는 게시글 및 댓글 caching, Access Token blacklisting으로 보안 강화
 * **LGTM Stack (Grafana, Loki, Prometheus, Tempo):** 소규모 환경이므로 로컬 파일 시스템을 사용하는 구조 채택
 * **Spring AOP & Logback:** 비즈니스 로직과 전역적 로깅 로직 분리, 느슨한 결합 유지
 
@@ -54,8 +54,8 @@
 * **MapStruct:** DTO와 Domain 간 매핑 로직을 자동 생성하여 boilerplate 코드 제거
 
 ### 4. 외부 서비스
-* **Mailjet:** 회원가입 및 비밀번호 변경 시 이메일의 신뢰성 확보를 위해 도입
-* **OAuth 2.0 (Google/Kakao):** 신규 사용자의 로그인 편의성 위해 제공
+* **Mailjet:** 이메일 전송 + 인증 코드 구조로 이메일 정보의 신뢰성 확보
+* **OAuth 2.0 (Google/Kakao):** 신규 사용자의 로그인 편의성 제공
 
 <br>
 
