@@ -16,10 +16,9 @@ import jakarta.validation.constraints.Pattern;
 import kr.modusplant.domains.post.adapter.controller.PostController;
 import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
-import kr.modusplant.domains.post.usecase.request.FileOrder;
-import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
-import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
-import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
+import kr.modusplant.domains.post.usecase.enums.SearchOption;
+import kr.modusplant.domains.post.usecase.enums.SearchSort;
+import kr.modusplant.domains.post.usecase.request.*;
 import kr.modusplant.domains.post.usecase.response.CursorPageResponse;
 import kr.modusplant.domains.post.usecase.response.DraftPostResponse;
 import kr.modusplant.domains.post.usecase.response.OffsetPageResponse;
@@ -104,12 +103,31 @@ public class PostRestController {
             @Range(min = 1, max = 50)
             Integer size,
 
+            @Parameter(schema = @Schema(description = "검색 옵션 필터", example = "title_content"))
+            @RequestParam
+            SearchOption option,
+
             @Parameter(schema = @Schema(description = "{제목+본문} 검색어 키워드", example = "벌레"))
+            @RequestParam
+            @NotBlank
+            String keyword,
+
+            @Parameter(schema = @Schema(description = "정렬 조건", example = "latest"))
+            @RequestParam
+            SearchSort sort,
+
+            @Parameter(schema = @Schema(description = "1차 항목 식별자", example = "1"))
             @RequestParam(required = false)
-            String keyword
+            Integer primaryCategoryId,
+
+            @Parameter(schema = @Schema(description = "2차 항목 식별자 (복수 선택 가능)", example = "1"))
+            @RequestParam(name = "secondaryCategoryId", required = false)
+            List<Integer> secondaryCategoryIds
     ) {
         UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
-        return ResponseEntity.ok().body(DataResponse.ok(postController.getByKeyword(keyword, currentMemberUuid, lastUlid, size)));
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getByKeyword(
+                new PostSearchRequest(option,keyword,sort,new PostCategoryRequest(primaryCategoryId,secondaryCategoryIds)),
+                currentMemberUuid, lastUlid, size)));
     }
 
     @Operation(
@@ -441,6 +459,53 @@ public class PostRestController {
     ) {
         UUID currentMemberUuid = userDetails.getActiveUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getBookmarkedByMemberUuid(currentMemberUuid, page-1, size)));
+    }
+
+    @Operation(
+            summary = "검색 기록 목록 조회 API",
+            description = "검색어로 게시글 목록 조회 시 입력한 검색어 기록 목록을 조회합니다. "
+    )
+    @GetMapping("/search-history")
+    public ResponseEntity<DataResponse<List<String>>> getSearchHistory(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "검색 기록 개수", example = "10", minimum = "1", maximum = "20"))
+            @RequestParam
+            int size
+    ) {
+        UUID currentMemberUuid = userDetails.getActiveUuid();
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getSearchHistory(currentMemberUuid,size)));
+    }
+
+    @Operation(
+            summary = "검색 기록 단건 삭제 API",
+            description = "검색 기록에서 검색어를 단건 삭제합니다."
+    )
+    @DeleteMapping("/search-history/{keyword}")
+    public ResponseEntity<DataResponse<Void>> removeSearchKeyword(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "검색어", example = "벌레"))
+            @PathVariable
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String keyword
+    ) {
+        UUID currentMemberUuid = userDetails.getActiveUuid();
+        postController.deleteSearchKeyword(currentMemberUuid,keyword);
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Operation(
+            summary = "검색 기록 전체 삭제 API",
+            description = "검색 기록에서 모든 검색어를 삭제합니다."
+    )
+    @DeleteMapping("/search-history")
+    public ResponseEntity<DataResponse<Void>> removeAllSearchHistory(
+            @AuthenticationPrincipal DefaultUserDetails userDetails
+    ) {
+        UUID currentMemberUuid = userDetails.getActiveUuid();
+        postController.deleteAllSearchHistory(currentMemberUuid);
+        return ResponseEntity.ok().body(DataResponse.ok());
     }
 
     private UUID getOrCreateGuestId(String guestIdStr, HttpServletResponse response) {

@@ -12,6 +12,8 @@ import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
 import kr.modusplant.domains.post.domain.vo.AuthorId;
 import kr.modusplant.domains.post.domain.vo.PostId;
+import kr.modusplant.domains.post.usecase.enums.SearchOption;
+import kr.modusplant.domains.post.usecase.enums.SearchSort;
 import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
 import kr.modusplant.domains.post.usecase.port.repository.*;
@@ -20,6 +22,7 @@ import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
 import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
+import kr.modusplant.domains.post.usecase.request.PostSearchRequest;
 import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
 import kr.modusplant.domains.post.usecase.response.*;
 import kr.modusplant.framework.aws.service.S3FileService;
@@ -59,8 +62,9 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     private final PostViewLockRepository postViewLockRepository = Mockito.mock(PostViewLockRepository.class);
     private final PostArchiveRepository postArchiveRepository = Mockito.mock(PostArchiveRepository.class);
     private final PostRecentlyViewRepository postRecentlyViewRepository = Mockito.mock(PostRecentlyViewRepository.class);
+    private final PostSearchHistoryRepository postSearchHistoryRepository = Mockito.mock(PostSearchHistoryRepository.class);
     private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
-    private final PostController postController = new PostController(postMapper, postRepository, postQueryRepository, postQueryForMemberRepository, multipartDataProcessorPort, postViewCountRepository,postViewLockRepository,postArchiveRepository, postRecentlyViewRepository,s3FileService);
+    private final PostController postController = new PostController(postMapper, postRepository, postQueryRepository, postQueryForMemberRepository, multipartDataProcessorPort, postViewCountRepository,postViewLockRepository,postArchiveRepository, postRecentlyViewRepository,postSearchHistoryRepository,s3FileService);
 
     @BeforeEach
     void setUp() {
@@ -103,12 +107,14 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         String ulid = TEST_POST_ULID;
         int size = 10;
         List<PostSummaryReadModel> readModels = List.of(TEST_POST_SUMMARY_READ_MODEL);
+        PostSearchRequest searchRequest = new PostSearchRequest(SearchOption.TITLE_CONTENT,keyword,SearchSort.LATEST, new PostCategoryRequest(null,null));
 
-        given(postQueryRepository.findByKeywordWithCursor(keyword, memberUuid, ulid, size)).willReturn(readModels);
+        given(postQueryRepository.findByKeywordWithCursor(SearchOption.TITLE_CONTENT, keyword, SearchSort.LATEST, null,null, memberUuid, ulid, size)).willReturn(readModels);
         given(multipartDataProcessorPort.convertToPreview(any(JsonNode.class),any(String.class))).willReturn((ArrayNode) TEST_POST_CONTENT_TEXT_AND_IMAGE);
+        doNothing().when(postSearchHistoryRepository).saveSearchKeyword(any(UUID.class),any(String.class));
 
         // when
-        CursorPageResponse<PostSummaryResponse> result = postController.getByKeyword(keyword, memberUuid, ulid, size);
+        CursorPageResponse<PostSummaryResponse> result = postController.getByKeyword(searchRequest, memberUuid, ulid, size);
 
         // then
         assertThat(result).isNotNull();
@@ -117,7 +123,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         assertThat(result.nextUlid()).isNull();
         assertThat(result.hasNext()).isFalse();
 
-        verify(postQueryRepository).findByKeywordWithCursor(keyword, memberUuid, ulid, size);
+        verify(postQueryRepository).findByKeywordWithCursor(SearchOption.TITLE_CONTENT, keyword, SearchSort.LATEST, null,null, memberUuid, ulid, size);
         verify(multipartDataProcessorPort).convertToPreview(TEST_POST_SUMMARY_READ_MODEL.content(),TEST_POST_SUMMARY_READ_MODEL.thumbnailPath());
     }
 

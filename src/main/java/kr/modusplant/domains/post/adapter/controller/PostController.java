@@ -16,6 +16,7 @@ import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
 import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
+import kr.modusplant.domains.post.usecase.request.PostSearchRequest;
 import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
 import kr.modusplant.domains.post.usecase.response.*;
 import kr.modusplant.framework.aws.service.S3FileService;
@@ -43,6 +44,7 @@ public class PostController {
     private final PostViewLockRepository postViewLockRepository;
     private final PostArchiveRepository postArchiveRepository;
     private final PostRecentlyViewRepository postRecentlyViewRepository;
+    private final PostSearchHistoryRepository postSearchHistoryRepository;
     private final S3FileService s3FileService;
 
     @Value("${redis.ttl.view_count}")
@@ -60,13 +62,15 @@ public class PostController {
         return CursorPageResponse.of(responses, nextUlid, hasNext);
     }
 
-    public CursorPageResponse<PostSummaryResponse> getByKeyword(String keyword, UUID currentMemberUuid, String lastUlid, int size) {
-        List<PostSummaryReadModel> readModels = postQueryRepository.findByKeywordWithCursor(keyword,currentMemberUuid, lastUlid, size);
+    @Transactional
+    public CursorPageResponse<PostSummaryResponse> getByKeyword(PostSearchRequest postSearchRequest, UUID currentMemberUuid, String lastUlid, int size) {
+        List<PostSummaryReadModel> readModels = postQueryRepository.findByKeywordWithCursor(postSearchRequest.option(), postSearchRequest.keyword(), postSearchRequest.sort(),postSearchRequest.category().primaryCategoryId(), postSearchRequest.category().secondaryCategoryIds(), currentMemberUuid, lastUlid, size);
         boolean hasNext = readModels.size() > size;
         List<PostSummaryResponse> responses = readModels.stream()
                 .limit(size)
                 .map(readModel -> postMapper.toPostSummaryResponse(readModel,getJsonNodeContentPreview(readModel.content(),readModel.thumbnailPath()))).toList();
         String nextUlid = hasNext && !responses.isEmpty() ? responses.get(responses.size() - 1).ulid() : null;
+        postSearchHistoryRepository.saveSearchKeyword(currentMemberUuid, postSearchRequest.keyword());
         return CursorPageResponse.of(responses, nextUlid, hasNext);
     }
 
@@ -234,6 +238,18 @@ public class PostController {
                 postQueryForMemberRepository.findBookmarkedByMemberWithOffset(currentMemberUuid,page,size)
                         .map(postModel -> postMapper.toPostSummaryResponse(postModel, getJsonNodeContentPreview(postModel.content(),postModel.thumbnailPath())))
         );
+    }
+
+    public List<String> getSearchHistory(UUID currentMemberUuid, int size) {
+        return postSearchHistoryRepository.getSearchHistory(currentMemberUuid, size);
+    }
+
+    public void deleteSearchKeyword(UUID currentMemberUuid, String keyword) {
+        postSearchHistoryRepository.removeSearchKeyword(currentMemberUuid,keyword);
+    }
+
+    public void deleteAllSearchHistory(UUID currentMemberUuid) {
+        postSearchHistoryRepository.removeAllSearchHistory(currentMemberUuid);
     }
 
     private JsonNode getJsonNodeContentPreview(JsonNode content, String thumbnailPath) {
