@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
 import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.jooq.tables.records.*;
+import kr.modusplant.shared.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.generator.EventType;
 import org.jooq.DSLContext;
@@ -27,6 +28,7 @@ public class PostTestDataHelper {
         return dsl.insertInto(SITE_MEMBER)
                 .set(SITE_MEMBER.UUID, UUID.randomUUID())
                 .set(SITE_MEMBER.NICKNAME, nickname)
+                .set(SITE_MEMBER.ROLE, Role.USER.getValue())
                 .set(SITE_MEMBER.IS_ACTIVE, true)
                 .set(SITE_MEMBER.IS_BANNED, true)
                 .set(SITE_MEMBER.CREATED_AT, dateTime)

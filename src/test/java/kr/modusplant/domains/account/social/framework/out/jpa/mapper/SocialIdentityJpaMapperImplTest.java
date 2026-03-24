@@ -2,20 +2,20 @@ package kr.modusplant.domains.account.social.framework.out.jpa.mapper;
 
 import kr.modusplant.domains.account.social.common.util.domain.vo.SocialAccountPayloadTestUtils;
 import kr.modusplant.domains.account.social.common.util.domain.vo.SocialAccountProfileTestUtils;
-import kr.modusplant.domains.account.social.common.util.framework.out.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.account.social.domain.vo.SocialAccountPayload;
 import kr.modusplant.domains.account.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
 import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.shared.enums.Role;
+import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialAccountProfileTestUtils, SocialAccountPayloadTestUtils {
+class SocialIdentityJpaMapperImplTest implements SiteMemberEntityTestUtils, SocialAccountProfileTestUtils, SocialAccountPayloadTestUtils {
     private final SocialIdentityJpaMapper socialIdentityJpaMapper = new SocialIdentityJpaMapperImpl();
 
     @Test
@@ -34,7 +34,7 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialAc
     @DisplayName("MemberEntity와 SocialUserProfile로 MemberAuthEntity를 생성")
     void testToMemberAuthEntity_givenMemberEntityAndProfile_willReturnMemberAuthEntity() {
         // given
-        SiteMemberEntity memberEntity = createKakaoMemberEntityWithUuid();
+        SiteMemberEntity memberEntity = createMemberKakaoUserEntityWithUuid();
         String providerId = TEST_KAKAO_SOCIAL_ACCOUNT_PROFILE.getSocialCredentials().getProviderId();
         String email = TEST_KAKAO_SOCIAL_ACCOUNT_PROFILE.getEmail().getValue();
 
@@ -53,7 +53,7 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialAc
     @DisplayName("MemberEntity로 UserPayload를 생성")
     void testToUserPayload_givenMemberEntity_willReturnUserPayload() {
         // given
-        SiteMemberEntity memberEntity = createKakaoMemberEntityWithUuid();
+        SiteMemberEntity memberEntity = createMemberKakaoUserEntityWithUuid();
         SiteMemberAuthEntity memberAuthEntity = SiteMemberAuthEntity.builder()
                 .member(memberEntity)
                 .email(testKakaoUserEmail.getValue())
@@ -74,7 +74,7 @@ class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialAc
     @DisplayName("MemberEntity, Nickname, Role로 UserPayload를 생성")
     void testToUserPayload_givenMemberEntityNicknameAndRole_willReturnUserPayload() {
         // given
-        SiteMemberEntity memberEntity = createKakaoMemberEntityWithUuid();
+        SiteMemberEntity memberEntity = createMemberKakaoUserEntityWithUuid();
         Role role = Role.USER;
 
         // when

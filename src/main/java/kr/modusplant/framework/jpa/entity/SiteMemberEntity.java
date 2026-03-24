@@ -106,9 +106,10 @@ public class SiteMemberEntity {
         }
     }
 
-    private SiteMemberEntity(UUID uuid, String nickname, Boolean isActive, Boolean isBanned, LocalDateTime loggedInAt) {
+    private SiteMemberEntity(UUID uuid, String nickname, Role role, Boolean isActive, Boolean isBanned, LocalDateTime loggedInAt) {
         this.uuid = uuid;
         this.nickname = nickname;
+        this.role = role;
         this.isActive = isActive;
         this.isBanned = isBanned;
         this.loggedInAt = loggedInAt;
@@ -121,6 +122,7 @@ public class SiteMemberEntity {
     public static final class SiteMemberEntityBuilder {
         private UUID uuid;
         private String nickname;
+        private Role role;
         private Boolean isActive;
         private Boolean isBanned;
         private LocalDateTime loggedInAt;
@@ -132,6 +134,11 @@ public class SiteMemberEntity {
 
         public SiteMemberEntityBuilder nickname(final String nickname) {
             this.nickname = nickname;
+            return this;
+        }
+
+        public SiteMemberEntityBuilder role(final Role role) {
+            this.role = role;
             return this;
         }
 
@@ -160,7 +167,7 @@ public class SiteMemberEntity {
         }
 
         public SiteMemberEntity build() {
-            return new SiteMemberEntity(this.uuid, this.nickname, this.isActive, this.isBanned, this.loggedInAt);
+            return new SiteMemberEntity(this.uuid, this.nickname, this.role, this.isActive, this.isBanned, this.loggedInAt);
         }
     }
 }

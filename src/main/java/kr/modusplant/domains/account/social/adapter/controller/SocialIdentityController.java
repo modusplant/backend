@@ -7,8 +7,8 @@ import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClient
 import kr.modusplant.domains.account.social.usecase.port.client.dto.SocialUserInfo;
 import kr.modusplant.domains.account.social.usecase.port.mapper.SocialIdentityMapper;
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
-import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
