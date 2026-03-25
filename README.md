@@ -1,93 +1,89 @@
 # 🪴ModusPlant
-**DDD + Clean Architecture 기반으로 외부 환경 변화에 유연하게 대응하는 반려식물 플랫폼 서버**
+**DDD + Clean Architecture 기반으로 외부 환경 변화에 유연하게 대응하는 반려식물 관리 및 커뮤니티 플랫폼 서버**
 ### 진행 기간
 * 2024.12 ~ 현재
 ### 핵심 가치
-* **관심사 분리:** 계층별 엄격한 역할 분리로 인프라 및 프레임워크 변환 시 안정적 비즈니스 로직 유지
-* **비용 최적화:** 비즈니스 요구사항에 최적화된 API와 기능 구현으로 개발 및 운영 효율 극대화
-* **데이터 무결성:** Bean Validation과 도메인 검증, 엄격한 테스트를 통한 데이터 정합성 확보
+* **관심사 분리:** DDD + Clean Architecture 적용 후 인프라 변경(JPA -> JPA + jOOQ)에도 도메인 로직 수정 없음
+* **비용 최적화:** 커뮤니티의 규모에 맞게 AWS가 아닌 Wasabi를 채택하는 등 요구사항과 환경에 맞는 기능 개발
+* **데이터 무결성:** Bean Validation + 도메인 검증 로직 + 테스트 코드로 데이터 정합성 확보
 
 | 팀원  | 역할 |
 | ------------- |:-------------:|
-| 박준희 | 일반 회원가입 + 댓글 Rest API, Spring Security 인증/인가, 전역적 예외 핸들링, 비속어 필터링 |
-| 박준혁 | 회원 프로필 + 좋아요 + 신고 + 북마크 + 건의 및 버그 제보 Rest API, AWS 및 Vercel 배포/관리  |
-| 송유정 | 소셜 로그인(OAuth 2.0), 게시글 + 게시글 1차/2차 카테고리 + 알림함 Rest API, JWT, 비동기 푸시알림, 클라우드 스토리지 관리 |
-| 고동혁 | 회원 약관 Rest API, 타사 이메일 서비스 연계, 로깅, 모니터링, 개발 및 프로덕션 환경 운영 |
-
+| 박준희 | • Spring Security 인증/인가, 전역적 예외 핸들링<br>• 비속어 필터링, 일반 회원가입/댓글 Rest API |
+| 박준혁 | • AWS 및 Vercel 배포/관리<br>• 회원 프로필/좋아요/신고/북마크/건의 및 버그 제보 Rest API |
+| 송유정 | • 소셜 로그인(OAuth 2.0), JWT 생성 및 관리<br>• 비동기 푸시알림, 클라우드 스토리지 관리<br>• 게시글/게시글 1차+2차 카테고리/알림함 Rest API |
+| 고동혁 | • 이메일 서비스 연동, 로깅, 모니터링<br>• 개발 및 프로덕션 환경 운영, 회원 약관 REST API |
 
 <br>
 
 # 📝주요 기능
-### 1. 인증 및 보안
-* **사용자 인증 관리:** Spring Security 기반 로그인/회원가입 및 메일 기능(Mailjet) 연동을 통한 이메일 인증 구조
-* **권한 인가 체계:** JWT의 Access/Refresh Token 기반 stateless 인증 시스템
-* **소셜 로그인 연동:** OAuth 2.0을 통한 Google, Kakao 소셜 계정 기능
-* **보안 및 정책 관리:** 회원 약관 동의 프로세스 및 사용자 프로필 관리 API
+### 1. 인증 및 사용자 관리
+* 회원가입(email/password), 소셜 로그인, 이메일 인증
+* 사용자 프로필 관리, 비밀번호 재설정
 
-### 2. 컨텐츠 및 커뮤니티
-* **게시 서비스:** 게시글 및 댓글의 CRUD 및 1차/2차 카테고리 분류 체계를 통한 구조적 데이터 관리
-* **이미지 기반 소통:** 멀티파트 데이터 처리 및 Wasabi 스토리지 운용
-* **사용자 활동:** 게시글/댓글 좋아요, 북마크를 통한 사용자 참여 기능
+### 2. 커뮤니티 기능
+* 게시글 및 댓글 작성/조회/수정/삭제
+* 게시글 검색 및 대표사진 지정, 게시글 이미지 업로드
+* 카테고리/최신순/좋아요/북마크에 따른 게시글 조회
+* 게시글/작성자에 따른 댓글 조회
+* 좋아요 및 북마크
 
-### 3. 고객 소통 및 운영
-* **신고 시스템:** 서비스 가이드라인 준수를 위한 게시글 및 댓글 신고 API
-* **피드백 루프:** 서비스 개선을 위한 건의사항 및 버그제보 창구 운영
+### 3. 운영 및 피드백
+* 게시글 및 댓글 신고
+* 건의사항 및 버그 제보
 
 <br>
 
 # 🛠기술 스택 & 도입 이유
 ### 1. 백엔드 & 영속성
 * **Spring Boot 3.x & Java 21:** 알림 기능의 신속한 처리를 위한 가상 스레드 도입
-* **PostgreSQL 17:** 게시글 업로드 이미지용 JSONB, GIN INDEX를 통한 빠른 텍스트 검색
+* **PostgreSQL 17:** JSONB, GIN INDEX로 비정형 데이터 검색 성능 개선
 * **Hybrid DB 접근 방식**
-    * JPA/Hibernate: 단순 DML, dirty checking, SQL 생성 메서드로 편리한 쿼리 생성
-    * jOOQ: 대규모 READ, 영속성이 불필요한 정확한 데이터 조회
-* **Flyway:** DB 변경 히스토리 유지, 운영 환경 간 DB 동기화 자동화
+    * JPA/Hibernate: 영속성 맥락 기반 단순 DML 작업, dirty checking으로 데이터 무결성 확보
+    * jOOQ: 영속성이 불필요한 대규모 READ, 복잡한 집계 쿼리 최적화
+* **Flyway:** DB 스키마 변경 히스토리 관리 및 환경 간 스키마 동기화 자동화
 
 ### 2. 인프라 & 모니터링
-* **Redis:** 빈번하게 조회되는 게시글 및 댓글 caching, Access Token blacklisting으로 보안 강화
-* **LGTM Stack (Grafana, Loki, Prometheus, Tempo):** 소규모 환경이므로 로컬 파일 시스템을 사용하는 구조 채택
-* **Spring AOP & Logback:** 비즈니스 로직과 전역적 로깅 로직 분리, 느슨한 결합 유지
+* **Redis:** 캐싱을 통한 조회 성능 개선 및 토큰 blacklist 관리로 보안 강화
+* **LGTM Stack (Grafana, Loki, Prometheus, Tempo):** 소규모에 적합한 로그, 매트릭, 트레이싱 통합 관찰 환경 구축
+* **Spring AOP & Logback:** 로깅을 비즈니스와 분리하여 로직의 순수성 유지
 
-### 3. 보안 & 최적화
-* **Spring Security & JJWT:** 인증/인가 매커니즘 단일화, 확장성 및 DB 조회 비용 절감 이점이 있는 stateless 구조 채택
-* **JaCoCo:** 테스트 커버리지를 시각화하여 지속적인 코드 품질 유지
-* **MapStruct:** DTO와 Domain 간 매핑 로직을 자동 생성하여 boilerplate 코드 제거
+### 3. 보안 & 품질
+* **Spring Security & JWT:** Stateless 인증 구조로 서버 확장성 확보 및 DB 조회 비용 절감
+* **JaCoCo:** 테스트 커버리지 기반 코드 품질 관리
+* **MapStruct:** boilerplate 매핑 로직 제거, 매핑 과정 단순화
 
 ### 4. 외부 서비스
-* **Mailjet:** 이메일 전송 + 인증 코드 구조로 이메일 정보의 신뢰성 확보
-* **OAuth 2.0 (Google/Kakao):** 신규 사용자의 로그인 편의성 제공
+* **Mailjet:** 인증 코드로 사용자 이메일 정보의 신뢰성 확보
+* **OAuth 2.0 (Google/Kakao):** 사용자 로그인 편의성 제공 및 가입 장벽 감소
 
 <br>
 
 # 🗺️아키텍처 설계
 
-### 설계 도면(Diagram)
+### 1. 설계 원칙
+* **경량의 도메인 객체:** 도메인 객체는 상태와 검증 로직만 지니며, 외부 시스템 호출 및 비즈니스 흐름 제어는 adapter 계층에서 처리
+* **UseCase 계층 단순화:** 프로젝트 복잡도 고려 후 UseCase 시스템 사양(인터페이스) 중심으로 설계하고, 불필요한 클래스 생성을 지양
+* **프레임워크 격리:** Spring, Redis 등 외부 기술 의존 코드를 framework 계층으로 분리하여 도메인 계층의 순수성 유지  
+
+### 3. 설계 도면(Diagram)
+
+<img width="2648" height="1490" alt="소스 코드 아키텍처" src="https://github.com/user-attachments/assets/732455f1-39a1-40d6-b563-f0b613205395">
 
 <details>
-<summary>1. 프로덕션 환경 아키텍처 </summary>
+<summary> 프로덕션 환경 아키텍처 </summary>
 <br />
 <img width="5887" height="5210" alt="프로덕션 아키텍처" src="https://github.com/user-attachments/assets/43603f19-95bf-48e7-8c97-7c6ef3ad6eef" />
 </details>
 
 <details>
-<summary>2. 소스 코드 아키텍처 </summary>
-<br />
-<img width="2648" height="1490" alt="소스 코드 아키텍처" src="https://github.com/user-attachments/assets/732455f1-39a1-40d6-b563-f0b613205395" />
-</details>
-
-<details>
-<summary>3. 데이터 모델링 </summary>
+<summary> 데이터 모델링 </summary>
 <br />
 <img width="520" height="328" alt="게시글 테이블" src="https://github.com/user-attachments/assets/1c6a6d43-9662-44c3-a6c9-68fa268d1a87" />
 <img width="517" height="175" alt="댓글 테이블" src="https://github.com/user-attachments/assets/44bee886-0dfa-401f-bc97-c630c1eb68c0" />
 </details>
 
-### 패키지 레이아웃(Code Block)
-
-<details>
-<summary>1. 전체 프로젝트 패키지 구조 </summary>
-<br />
+### 4. 패키지 레이아웃(Code Block)
 
 ```
 📂 modusplant
@@ -101,11 +97,14 @@
   └─📂 shared           # 🧺 전역 공통 모듈 및 유틸리티 (Kernel, Exception 등)
 ```
 
-</details>
-
 <details>
-<summary>2. 도메인 내부 구조 </summary>
+<summary> 도메인 내부 구조 </summary>
 <br />
+
+- domain -> 외부 계층 의존 ❌  
+- Use Case -> domain 의존 ⭕  
+- adapter -> Use Case 의존 ⭕  
+- framework -> adapter 의존 ⭕
 
 ```
 📂 [domain_name]
@@ -117,41 +116,23 @@
 
 </details>
 
-<details>
-<summary>3. 설계 원칙 및 의도 </summary>
-<br />
-
-- **가벼운 도메인 객체:** 도메인 객체는 상태(State)와 자기 검증에 집중하며, 비즈니스 행위 및 오케스트레이션을 adapter 계층에 위임하여 모델의 순수성을 유지
-- **실용적인 UseCase 계층:** 프로젝트의 낮은 복잡도를 고려하여 모든 로직을 클래스로 강제하지 않음. 대신 시스템 사양(Port)과 데이터 규격(DTO/Model)을 정의하는 인터페이스의 역할에 집중
-- **프레임워크 격리:** 특정 기술 스택(Spring, Redis 등)에 의존하는 기능은 framework 계층으로 격리하여 외부 기술의 변화가 비즈니스에 미치는 영향 최소화
-
-</details>
-
 <br>
 
 # 💡기술적 의사결정 및 트러블슈팅
 
-### 기술적 의사결정
-
-<details>
-<summary> DDD + Clean Architecture를 통한 비즈니스와 인프라/프레임워크 분리 </summary>
-
-- **문제**: 기능이 확장됨에 따라 클래스 간 의존성 파악을 위한 불필요한 소통 발생, 불명확한 구조로 유지보수 어려움
-- **의사 결정**: 비즈니스 로직 + 인프라/프레임워크 + 그 사이를 매개하는 계층형 아키텍처로 리팩토링
-- **성과**: 도메인들 간 명확한 경계 설정, Jira 백로그 기준 신규 기능 개발 기간 약 30% 단축
-
-</details>
+### ⭐ DDD + Clean Architecture를 통한 비즈니스와 인프라/프레임워크 분리
+* **문제**: 기능이 확장됨에 따라 클래스 간 의존성 파악을 위한 불필요한 소통 발생, 불명확한 구조로 유지보수 어려움
+* **의사 결정**: 비즈니스 로직 + 인프라/프레임워크 + 그 사이를 매개하는 계층형 아키텍처로 리팩토링
+* **성과**: 도메인들 간 명확한 경계 설정, Jira 백로그 기준 신규 기능 개발 기간 약 30% 단축
 
 <details>
 <summary> Flyway로 DB 형상 관리 </summary>
 
-- **문제**: Slack을 통한 수동 DDL 공유로 팀원의 로컬 환경 간 스키마 불일치 및 히스토리 관리의 부재
-- **의사 결정**: Flyway 도입으로 애플리케이션 실행 시 스키마 자동 동기화
-- **성과**: DB 변경 히스토리를 통해 롤백 포인트 확보 및 배포 환경 간 정합성 문제 원천 차단
+- **문제**: 수동 DDL 공유로 환경 간 스키마 불일치 발생, 변경 히스토리 추적 어려움
+- **의사 결정**: Flyway 도입으로 실행 시 스키마 자동 마이그레이션
+- **성과**: 스키마 정합성 문제 제거 및 롤백 가능 구조 확보
 
 </details>
-
-### 트러블슈팅
 
 <details>
 <summary> JPA의 N+1 문제 근절 및 대량 데이터 조회 최적화 </summary>
@@ -167,32 +148,40 @@
 <br>
 
 # 📕API 명세서
-### 링크
+
+### 설계 원칙
+* 일관된 응답 구조: status, code, data
+* 에러 코드 기반 클라이언트 처리 가능 구조
+* 버전 관리 가능한 REST URI (/api/v1/...)
+
+### API 명세서
 [모두의식물 API 명세서](https://resonant-tortellini-b95.notion.site/API-f0f2e2fc4ece8308bc998140c1335d60)
 
-### API 명세 구조
-
-| 기능 | 우선순위 | MVP | URI | Method | 진행 상태 | 담당자 | 페이지(다중선택) |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| 댓글 추가 | 높음 | `1차` | /api/v1/communication/comments | `POST` | 로컬 환경 테스트 완료 | 준희 박 | 소통 컨텐츠 상세 페이지 |
-
-### 요청 및 응답 형식
+### 댓글 추가 API 예시
 
 <details>
-<summary> 요청 구조 </summary>
+<summary> 요청 </summary>
+
+- postId: 댓글이 속한 게시글 식별자 (ULID)
+- path: 계층형 댓글 구조를 표현하는 경로 값 (숫자.숫자.숫자...)
+- content: 댓글 내용
 
 ```json
 {
-  "postId": "string", // ulid
-  "path": "string", // 숫자.숫자.숫자...
-  "content": "string" // 댓글 내용
+  "postId": "string"
+  "path": "string"
+  "content": "string"
 }
 ```
 
 </details>
 
 <details>
-<summary> 응답 구조 </summary>
+<summary> 응답 </summary>
+
+- status: HTTP 상태 코드
+- code: 클라이언트 분기 처리를 위한 응답 코드
+- message: 사용자 또는 디버깅을 위한 메시지
 
 ```json
 {
@@ -215,7 +204,21 @@
 <br>
 
 # 🖊️협업 방식
-### 깃모지
+
+### 협업 구조 & 효과
+* Jira 기반 이슈 및 브랜치 관리 + Confluence 기반 문서 아카이브
+* Gitmoji 기반 커밋 메시지 형식 통일 -> 코드 변경 이력 파악 시간 감소
+* PR 기반 코드리뷰로 품질 관리 -> 코드 품질 향상
+
+### 브랜치 전략
+* Jira 이슈 단위로 브랜치 생성 (ex. MP-123)
+* 작업 완료 후 PR -> 코드 리뷰 -> develop 병합
+
+### 커밋 컨벤션
+
+<details>
+<summary>Gitmoji 목록</summary>
+
 | 이모티콘 | 커밋 유형 | 의미 |
 | --- | --- | --- |
 | ✨ `:sparkles:` | `Feat` | 새로운 기능 추가 |
@@ -237,16 +240,11 @@
 | 🔧 `:wrench:` | `Chore` | 잡다한 과업 |
 | 🎉 `:tada:` | `Begin` | 프로젝트 시작 |
 
-### Commit 형식
- ```
-<Jira 브랜치 식별자> <깃모지> <제목>
-
-내용
-내용 ...
-```
+</details>
 
 ```
-MP-89 :sparkles: Feat: SecurityResponseUtils 추가
+MP-289 :bug: Fix: 게시글 여러 번 수정 시 발생하는 낙관적 락 에러 해결
 
-- filter chain 내에서 일관된 응답 charset을 유지하기 위해 추가함
+- 낙관적 락 충돌 문제를 방지하기 위해 전체 매핑 후 저장 방식을 제거하고 개별 필드 업데이트로 변경
+- 엔티티 업데이트 메서드 추가
 ```
