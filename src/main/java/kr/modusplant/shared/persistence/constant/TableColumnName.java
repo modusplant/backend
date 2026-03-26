@@ -18,4 +18,9 @@ public final class TableColumnName {
     public static final String SECO_CATE_ID = "seco_cate_id";
     public static final String REFRESH_TOKEN = "refresh_token";
     public static final String VER_NUM = "ver_num";
+    public static final String RECIPIENT_ID = "recipient_id";
+    public static final String ACTOR_ID = "actor_id";
+    public static final String ACTOR_NICKNAME = "actor_nickname";
+    public static final String COMMENT_PATH = "comment_path";
+    public static final String CONTENT_PREVIEW = "content_preview";
 }
