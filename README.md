@@ -16,7 +16,18 @@
 
 <br>
 
-# 📝주요 기능
+## 📌 목차
+- [주요 기능](#features)
+- [아키텍처 설계](#architecture)
+- [기술 스택](#tech-stack)
+- [트러블슈팅](#troubleshooting)
+- [API 명세서](#api)
+- [협업 방식](#collaboration)
+
+<br>
+
+<a id="features"></a>
+# 📝 주요 기능
 ### 1. 인증 및 사용자 관리
 * 회원가입(email/password), 소셜 로그인, 이메일 인증
 * 사용자 프로필 관리, 비밀번호 재설정
@@ -34,7 +45,68 @@
 
 <br>
 
-# 🛠기술 스택 & 도입 이유
+<a id="architecture"></a>
+# 🗺️ 아키텍처 설계
+
+### 1. 설계 원칙
+* **경량의 도메인 객체:** 도메인 객체는 상태와 검증 로직만 지니며, 외부 시스템 호출 및 비즈니스 흐름 제어는 adapter 계층에서 처리
+* **UseCase 계층 단순화:** 프로젝트 복잡도 고려 후 UseCase 시스템 사양(인터페이스) 중심으로 설계하고, 불필요한 클래스 생성을 지양
+* **프레임워크 격리:** Spring, Redis 등 외부 기술 의존 코드를 framework 계층으로 분리하여 도메인 계층의 순수성 유지  
+
+### 3. 설계 도면(Diagram)
+
+<img width="2648" height="1490" alt="소스 코드 아키텍처" src="https://github.com/user-attachments/assets/732455f1-39a1-40d6-b563-f0b613205395">
+
+<details>
+<summary> <strong>프로덕션 환경 아키텍처</strong> </summary>
+<br />
+<img width="5887" height="5210" alt="프로덕션 아키텍처" src="https://github.com/user-attachments/assets/43603f19-95bf-48e7-8c97-7c6ef3ad6eef" />
+</details>
+
+<details>
+<summary> <strong>데이터 모델링</strong> </summary>
+<br />
+<img width="520" height="328" alt="게시글 테이블" src="https://github.com/user-attachments/assets/1c6a6d43-9662-44c3-a6c9-68fa268d1a87" />
+<img width="517" height="175" alt="댓글 테이블" src="https://github.com/user-attachments/assets/44bee886-0dfa-401f-bc97-c630c1eb68c0" />
+</details>
+
+### 4. 패키지 레이아웃(Code Block)
+
+```
+📂 modusplant
+  │ 📜 ModusplantApplication.java
+  ├─📂 domains          # 📋 핵심 비즈니스 로직 및 도메인 모델
+  │  ├─📂 account       # 계정 (Email, Social, Normal)
+  │  ├─📂 post          # 게시글
+  │  └─ 📂 ...          # member, comment, term
+  ├─📂 framework        # ✈️ 외부 기술 스택 연동 (JPA, jOOQ, Redis 등)
+  ├─📂 infrastructure   # 🔨 애플리케이션 공통 기반 (Security, AOP, Config 등)
+  └─📂 shared           # 🧺 전역 공통 모듈 및 유틸리티 (Kernel, Exception 등)
+```
+
+<details>
+<summary> <strong>도메인 내부 구조</strong> </summary>
+<br />
+
+- domain -> 외부 계층 의존 ❌  
+- Use Case -> domain 의존 ⭕  
+- adapter -> Use Case 의존 ⭕  
+- framework -> adapter 의존 ⭕
+
+```
+📂 [domain_name]
+ ├─📂 adapter    # Interface Adapter: 외부 시스템 연결, 데이터 매핑 및 오케스트레이션
+ ├─📂 domain     # Enterprise Business Rules: 핵심 비즈니스 로직 (Aggregate, Entity, VO)
+ ├─📂 framework  # Frameworks & Drivers: 기술 구현체 (Service, RestController, Persistence)
+ └─📂 usecase    # Application Business Rules: 앱 사양 정의 (Port, DTO, Model)
+```
+
+</details>
+
+<br>
+
+<a id="tech-stack"></a>
+# 🛠 기술 스택
 ### 1. 백엔드 & 영속성
 * **Spring Boot 3.x & Java 21:** 알림 기능의 신속한 처리를 위한 가상 스레드 도입
 * **PostgreSQL 17:** JSONB, GIN INDEX로 비정형 데이터 검색 성능 개선
@@ -59,66 +131,8 @@
 
 <br>
 
-# 🗺️아키텍처 설계
-
-### 1. 설계 원칙
-* **경량의 도메인 객체:** 도메인 객체는 상태와 검증 로직만 지니며, 외부 시스템 호출 및 비즈니스 흐름 제어는 adapter 계층에서 처리
-* **UseCase 계층 단순화:** 프로젝트 복잡도 고려 후 UseCase 시스템 사양(인터페이스) 중심으로 설계하고, 불필요한 클래스 생성을 지양
-* **프레임워크 격리:** Spring, Redis 등 외부 기술 의존 코드를 framework 계층으로 분리하여 도메인 계층의 순수성 유지  
-
-### 3. 설계 도면(Diagram)
-
-<img width="2648" height="1490" alt="소스 코드 아키텍처" src="https://github.com/user-attachments/assets/732455f1-39a1-40d6-b563-f0b613205395">
-
-<details>
-<summary> 프로덕션 환경 아키텍처 </summary>
-<br />
-<img width="5887" height="5210" alt="프로덕션 아키텍처" src="https://github.com/user-attachments/assets/43603f19-95bf-48e7-8c97-7c6ef3ad6eef" />
-</details>
-
-<details>
-<summary> 데이터 모델링 </summary>
-<br />
-<img width="520" height="328" alt="게시글 테이블" src="https://github.com/user-attachments/assets/1c6a6d43-9662-44c3-a6c9-68fa268d1a87" />
-<img width="517" height="175" alt="댓글 테이블" src="https://github.com/user-attachments/assets/44bee886-0dfa-401f-bc97-c630c1eb68c0" />
-</details>
-
-### 4. 패키지 레이아웃(Code Block)
-
-```
-📂 modusplant
-  │ 📜 ModusplantApplication.java
-  ├─📂 domains          # 📋 핵심 비즈니스 로직 및 도메인 모델
-  │  ├─📂 account       # 계정 (Email, Social, Normal)
-  │  ├─📂 post          # 게시글
-  │  └─ 📂 ...          # member, comment, term
-  ├─📂 framework        # ✈️ 외부 기술 스택 연동 (JPA, jOOQ, Redis 등)
-  ├─📂 infrastructure   # 🔨 애플리케이션 공통 기반 (Security, AOP, Config 등)
-  └─📂 shared           # 🧺 전역 공통 모듈 및 유틸리티 (Kernel, Exception 등)
-```
-
-<details>
-<summary> 도메인 내부 구조 </summary>
-<br />
-
-- domain -> 외부 계층 의존 ❌  
-- Use Case -> domain 의존 ⭕  
-- adapter -> Use Case 의존 ⭕  
-- framework -> adapter 의존 ⭕
-
-```
-📂 [domain_name]
- ├─📂 adapter    # Interface Adapter: 외부 시스템 연결, 데이터 매핑 및 오케스트레이션
- ├─📂 domain     # Enterprise Business Rules: 핵심 비즈니스 로직 (Aggregate, Entity, VO)
- ├─📂 framework  # Frameworks & Drivers: 기술 구현체 (Service, RestController, Persistence)
- └─📂 usecase    # Application Business Rules: 앱 사양 정의 (Port, DTO, Model)
-```
-
-</details>
-
-<br>
-
-# 💡기술적 의사결정 및 트러블슈팅
+<a id="troubleshooting"></a>
+# 💡 트러블슈팅
 
 ### ⭐ DDD + Clean Architecture를 통한 비즈니스와 인프라/프레임워크 분리
 * **문제**: 기능이 확장됨에 따라 클래스 간 의존성 파악을 위한 불필요한 소통 발생, 불명확한 구조로 유지보수 어려움
@@ -126,7 +140,7 @@
 * **성과**: 도메인들 간 명확한 경계 설정, Jira 백로그 기준 신규 기능 개발 기간 약 30% 단축
 
 <details>
-<summary> Flyway로 DB 형상 관리 </summary>
+<summary> <strong>Flyway로 DB 형상 관리</strong> </summary>
 
 - **문제**: 수동 DDL 공유로 환경 간 스키마 불일치 발생, 변경 히스토리 추적 어려움
 - **의사 결정**: Flyway 도입으로 실행 시 스키마 자동 마이그레이션
@@ -135,7 +149,7 @@
 </details>
 
 <details>
-<summary> JPA의 N+1 문제 근절 및 대량 데이터 조회 최적화 </summary>
+<summary> <strong>JPA의 N+1 문제 근절 및 대량 데이터 조회 최적화</strong> </summary>
 
 - **문제**: 여러 테이블이 JOIN되는 대량의 데이터 조회 시 JPA의 N+1 발생, 성능 저하
 - **해결**
@@ -147,7 +161,8 @@
 
 <br>
 
-# 📕API 명세서
+<a id="api"></a>
+# 📕 API 명세서
 
 ### 설계 원칙
 * 일관된 응답 구조: status, code, data
@@ -203,7 +218,8 @@
 
 <br>
 
-# 🖊️협업 방식
+<a id="collaboration"></a>
+# 🖊️ 협업 방식
 
 ### 협업 구조 & 효과
 * Jira 기반 이슈 및 브랜치 관리 + Confluence 기반 문서 아카이브
