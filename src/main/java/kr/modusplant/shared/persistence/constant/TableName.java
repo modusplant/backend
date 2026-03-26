@@ -23,4 +23,5 @@ public final class TableName {
     public static final String SITE_MEMBER_TERM = "site_member_term";
     public static final String SWEAR = "swear";
     public static final String TERM = "term";
+    public static final String COMM_NOTIFICATION = "comm_notification";
 }
