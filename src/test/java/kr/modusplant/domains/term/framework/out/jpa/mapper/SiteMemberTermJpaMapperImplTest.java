@@ -36,7 +36,7 @@ class SiteMemberTermJpaMapperImplTest implements SiteMemberTermTestUtils, SiteMe
         // then
         assertThat(entity.getAgreedTermsOfUseVersion()).isEqualTo(MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION);
         assertThat(entity.getAgreedPrivacyPolicyVersion()).isEqualTo(MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION);
-        assertThat(entity.getAgreedAdInfoReceivingVersion()).isEqualTo(MEMBER_TERM_USER_AGREED_AD_INFO_RECEIVING_VERSION);
+        assertThat(entity.getAgreedCommunityPolicyVersion()).isEqualTo(MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION);
     }
 
     @Test
@@ -61,7 +61,7 @@ class SiteMemberTermJpaMapperImplTest implements SiteMemberTermTestUtils, SiteMe
         given(entity.getUuid()).willReturn(MEMBER_TERM_USER_UUID);
         given(entity.getAgreedTermsOfUseVersion()).willReturn(MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION);
         given(entity.getAgreedPrivacyPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION);
-        given(entity.getAgreedAdInfoReceivingVersion()).willReturn(MEMBER_TERM_USER_AGREED_AD_INFO_RECEIVING_VERSION);
+        given(entity.getAgreedCommunityPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION);
 
         // when & then
         assertThat(siteMemberTermJpaMapper.toSiteMemberTerm(entity)).isEqualTo(createSiteMemberTerm());

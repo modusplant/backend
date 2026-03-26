@@ -20,5 +20,5 @@ public interface SiteMemberTermJpaRepository extends
 
     List<SiteMemberTermEntity> findByAgreedPrivacyPolicyVersion(String agreedPrivacyPolicyVersion);
 
-    List<SiteMemberTermEntity> findByAgreedAdInfoReceivingVersion(String agreedAdInfoReceivingVersion);
+    List<SiteMemberTermEntity> findByAgreedCommunityPolicyVersion(String agreedCommunityPolicyVersion);
 }

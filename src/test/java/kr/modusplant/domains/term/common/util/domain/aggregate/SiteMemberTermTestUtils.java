@@ -11,7 +11,7 @@ public interface SiteMemberTermTestUtils {
                 testSiteMemberTermId,
                 MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION,
                 MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION,
-                MEMBER_TERM_USER_AGREED_AD_INFO_RECEIVING_VERSION
+                MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION
         );
     }
 }
