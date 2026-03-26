@@ -24,4 +24,7 @@ public interface NotificationJpaRepository extends UlidPrimaryRepository<CommNot
     long countByRecipientAndStatus(SiteMemberEntity recipient, NotificationStatusType status);
 
     void deleteByCreatedAtBefore(LocalDateTime cutoff);
+
+    // TODO: 알림 생성 로직 개발 완료 후 삭제
+    void deleteByRecipient(SiteMemberEntity recipient);
 }
