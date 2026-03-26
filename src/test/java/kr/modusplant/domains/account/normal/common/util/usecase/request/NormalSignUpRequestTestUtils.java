@@ -10,6 +10,6 @@ public interface NormalSignUpRequestTestUtils extends AgreedTermVersionTestUtils
         PasswordTestUtils, NicknameTestUtils {
     NormalSignUpRequest testNormalSignUpRequest = new NormalSignUpRequest(
             testNormalUserEmail.getValue(), testNormalUserPassword.getValue(), testNormalUserNickname.getValue(),
-            testAgreedTermsOfUse.getValue(), testAgreedPrivacyPolicy.getValue(), testAgreedAdReceiving.getValue()
+            testAgreedTermsOfUse.getValue(), testAgreedPrivacyPolicy.getValue(), testAgreedCommunityPolicy.getValue()
     );
 }

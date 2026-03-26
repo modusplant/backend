@@ -40,7 +40,7 @@ class SiteMemberTermRepositoryJpaAdapterTest implements SiteMemberTermTestUtils,
         given(savedEntity.getUuid()).willReturn(MEMBER_TERM_USER_UUID);
         given(savedEntity.getAgreedTermsOfUseVersion()).willReturn(MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION);
         given(savedEntity.getAgreedPrivacyPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION);
-        given(savedEntity.getAgreedAdInfoReceivingVersion()).willReturn(MEMBER_TERM_USER_AGREED_AD_INFO_RECEIVING_VERSION);
+        given(savedEntity.getAgreedCommunityPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION);
         given(siteMemberTermJpaRepository.save(any())).willReturn(savedEntity);
 
         // when & then
@@ -57,7 +57,7 @@ class SiteMemberTermRepositoryJpaAdapterTest implements SiteMemberTermTestUtils,
         given(existingEntity.getUuid()).willReturn(MEMBER_TERM_USER_UUID);
         given(existingEntity.getAgreedTermsOfUseVersion()).willReturn(MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION);
         given(existingEntity.getAgreedPrivacyPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION);
-        given(existingEntity.getAgreedAdInfoReceivingVersion()).willReturn(MEMBER_TERM_USER_AGREED_AD_INFO_RECEIVING_VERSION);
+        given(existingEntity.getAgreedCommunityPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION);
         given(siteMemberTermJpaRepository.getReferenceById(MEMBER_TERM_USER_UUID)).willReturn(existingEntity);
 
         // when
@@ -75,7 +75,7 @@ class SiteMemberTermRepositoryJpaAdapterTest implements SiteMemberTermTestUtils,
         given(entity.getUuid()).willReturn(MEMBER_TERM_USER_UUID);
         given(entity.getAgreedTermsOfUseVersion()).willReturn(MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION);
         given(entity.getAgreedPrivacyPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION);
-        given(entity.getAgreedAdInfoReceivingVersion()).willReturn(MEMBER_TERM_USER_AGREED_AD_INFO_RECEIVING_VERSION);
+        given(entity.getAgreedCommunityPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION);
         given(siteMemberTermJpaRepository.findById(MEMBER_TERM_USER_UUID)).willReturn(Optional.of(entity));
 
         // when & then
@@ -100,7 +100,7 @@ class SiteMemberTermRepositoryJpaAdapterTest implements SiteMemberTermTestUtils,
         given(entity.getUuid()).willReturn(MEMBER_TERM_USER_UUID);
         given(entity.getAgreedTermsOfUseVersion()).willReturn(MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION);
         given(entity.getAgreedPrivacyPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION);
-        given(entity.getAgreedAdInfoReceivingVersion()).willReturn(MEMBER_TERM_USER_AGREED_AD_INFO_RECEIVING_VERSION);
+        given(entity.getAgreedCommunityPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION);
         given(siteMemberTermJpaRepository.findAll()).willReturn(List.of(entity));
 
         // when & then

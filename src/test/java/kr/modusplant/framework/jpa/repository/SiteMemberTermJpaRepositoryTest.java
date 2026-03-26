@@ -74,9 +74,9 @@ class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
         assertThat(memberTermRepository.findByAgreedPrivacyPolicyVersion(memberTerm.getAgreedPrivacyPolicyVersion()).getFirst()).isEqualTo(memberTerm);
     }
 
-    @DisplayName("agreedAdInfoReceivingVersion으로 회원 약관 찾기")
+    @DisplayName("agreedCommunityPolicyVersion으로 회원 약관 찾기")
     @Test
-    void findByAgreedAdInfoReceivingVersionTest() {
+    void findByAgreedCommunityPolicyVersionTest() {
         // given
         SiteMemberTermEntity memberTerm = createMemberTermUserEntity();
 
@@ -84,7 +84,7 @@ class SiteMemberTermJpaRepositoryTest implements SiteMemberTermEntityTestUtils {
         memberTerm = memberTermRepository.save(memberTerm);
 
         // then
-        assertThat(memberTermRepository.findByAgreedAdInfoReceivingVersion(memberTerm.getAgreedAdInfoReceivingVersion()).getFirst()).isEqualTo(memberTerm);
+        assertThat(memberTermRepository.findByAgreedCommunityPolicyVersion(memberTerm.getAgreedCommunityPolicyVersion()).getFirst()).isEqualTo(memberTerm);
     }
 
     @DisplayName("lastModifiedAt으로 회원 약관 찾기")

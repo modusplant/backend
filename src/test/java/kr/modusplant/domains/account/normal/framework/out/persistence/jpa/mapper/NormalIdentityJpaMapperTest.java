@@ -22,7 +22,7 @@ public class NormalIdentityJpaMapperTest {
                 .nickname(MEMBER_BASIC_USER_NICKNAME).build();
         SignUpData testSign = SignUpData.create(MEMBER_AUTH_BASIC_USER_EMAIL,
                 MEMBER_AUTH_BASIC_USER_PW, MEMBER_BASIC_USER_NICKNAME, MEMBER_TERM_ADMIN_AGREED_TERMS_OF_USE_VERSION,
-                MEMBER_TERM_ADMIN_AGREED_PRIVACY_POLICY_VERSION, MEMBER_TERM_ADMIN_AGREED_AD_INFO_RECEIVING_VERSION);
+                MEMBER_TERM_ADMIN_AGREED_PRIVACY_POLICY_VERSION, MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION);
 
         // when
         SiteMemberEntity result = mapper.toSiteMemberEntity(testSign.getNickname());

@@ -25,7 +25,7 @@ public class SiteMemberTermJpaMapperImpl implements SiteMemberTermJpaMapper {
                 .member(entity)
                 .agreedTermsOfUseVersion(siteMemberTerm.getAgreedTermsOfUseVersion())
                 .agreedPrivacyPolicyVersion(siteMemberTerm.getAgreedPrivacyPolicyVersion())
-                .agreedAdInfoReceivingVersion(siteMemberTerm.getAgreedAdInfoReceivingVersion())
+                .agreedCommunityPolicyVersion(siteMemberTerm.getAgreedCommunityPolicyVersion())
                 .build();
     }
 
@@ -35,7 +35,7 @@ public class SiteMemberTermJpaMapperImpl implements SiteMemberTermJpaMapper {
                 SiteMemberTermId.fromUuid(entity.getUuid()),
                 entity.getAgreedTermsOfUseVersion(),
                 entity.getAgreedPrivacyPolicyVersion(),
-                entity.getAgreedAdInfoReceivingVersion()
+                entity.getAgreedCommunityPolicyVersion()
         );
     }
 }
