@@ -20,6 +20,6 @@ public class NormalIdentityMapperImpl implements NormalIdentityMapper {
     public SignUpData toSignUpData(NormalSignUpRequest request) {
         return SignUpData.create(request.email(), encoder.encode(request.password()), request.nickname(),
                 request.agreedTermsOfUseVersion(), request.agreedPrivacyPolicyVersion(),
-                request.agreedAdInfoReceivingVersion());
+                request.agreedCommunityPolicyVersion());
     }
 }

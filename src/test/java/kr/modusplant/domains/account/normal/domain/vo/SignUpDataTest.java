@@ -23,7 +23,7 @@ public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, Pass
         EmptyValueException result = assertThrows(EmptyValueException.class, () ->
                 SignUpData.create(null, testNormalUserPassword.getValue(),
                         testNormalUserNickname.getValue(), testAgreedTermsOfUse.getValue(),
-                        testAgreedPrivacyPolicy.getValue(), testAgreedAdReceiving.getValue()));
+                        testAgreedPrivacyPolicy.getValue(), testAgreedCommunityPolicy.getValue()));
 
         // when & then
         assertEquals(KernelErrorCode.EMPTY_EMAIL, result.getErrorCode());
@@ -36,7 +36,7 @@ public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, Pass
         InvalidValueException result = assertThrows(InvalidValueException.class, () ->
                 SignUpData.create("testCredentials.getEmail()", testNormalUserPassword.getValue(),
                         testNormalUserNickname.getValue(), testAgreedTermsOfUse.getValue(),
-                        testAgreedPrivacyPolicy.getValue(), testAgreedAdReceiving.getValue()));
+                        testAgreedPrivacyPolicy.getValue(), testAgreedCommunityPolicy.getValue()));
 
         // when & then
         assertEquals(KernelErrorCode.INVALID_EMAIL_FORMAT, result.getErrorCode());
@@ -65,7 +65,7 @@ public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, Pass
         // given
         SignUpData signUpData = SignUpData.create(testNormalUserEmail.getValue(), testNormalUserPassword.getValue(),
                 testNormalUserNickname.getValue(), testAgreedPrivacyPolicy.getValue(),
-                testAgreedTermsOfUse.getValue(), testAgreedAdReceiving.getValue());
+                testAgreedTermsOfUse.getValue(), testAgreedCommunityPolicy.getValue());
 
         assertNotEquals(testNormalUserNickname, signUpData);
     }
