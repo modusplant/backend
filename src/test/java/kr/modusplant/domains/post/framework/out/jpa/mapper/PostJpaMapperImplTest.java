@@ -2,6 +2,7 @@ package kr.modusplant.domains.post.framework.out.jpa.mapper;
 
 import kr.modusplant.domains.post.common.util.framework.out.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.domains.post.domain.aggregate.Post;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
 import kr.modusplant.framework.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.jpa.entity.CommPrimaryCategoryEntity;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils {
     private final PostJpaMapper postJpaMapper = new PostJpaMapperImpl();
@@ -169,5 +171,4 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
         assertThat(result.getLikeCount().getValue()).isEqualTo(postEntity.getLikeCount());
         assertThat(result.getStatus().isPublished()).isFalse();
     }
-
 }

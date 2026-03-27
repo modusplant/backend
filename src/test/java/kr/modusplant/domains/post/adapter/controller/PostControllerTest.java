@@ -191,7 +191,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         given(multipartDataProcessorPort.extractOriginalFilenameFromFileKey(anyString())).willReturn(TEST_POST_CONTENT_THUMBNAIL_FILENAME);
 
         // when
-        PostDetailResponse result = postController.getDataByUlid(TEST_POST_ULID,MEMBER_BASIC_USER_UUID);
+        PostDetailDataResponse result = postController.getDataByUlid(TEST_POST_ULID,MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(result).isNotNull();
@@ -209,7 +209,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         given(multipartDataProcessorPort.extractOriginalFilenameFromFileKey(anyString())).willReturn(TEST_POST_CONTENT_THUMBNAIL_FILENAME);
 
         // when
-        PostDetailResponse result = postController.getDataByUlid(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
+        PostDetailDataResponse result = postController.getDataByUlid(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(result).isNotNull();
@@ -242,7 +242,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         given(multipartDataProcessorPort.extractOriginalFilenameFromFileKey(null)).willReturn(null);
 
         // when
-        PostDetailResponse result = postController.getDataByUlid(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
+        PostDetailDataResponse result = postController.getDataByUlid(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(result).isNotNull();
