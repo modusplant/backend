@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static kr.modusplant.jooq.Tables.*;
+import static kr.modusplant.jooq.Tables.COMM_NOTIFICATION;
 import static org.jooq.impl.DSL.noCondition;
 import static org.jooq.impl.DSL.row;
 

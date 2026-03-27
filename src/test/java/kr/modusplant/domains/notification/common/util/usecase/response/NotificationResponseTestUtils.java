@@ -8,9 +8,6 @@ import kr.modusplant.shared.enums.NotificationStatusType;
 import java.time.LocalDateTime;
 
 import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.*;
-import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.TEST_NOTIFICATION_ACTOR_NICKNAME;
-import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.TEST_NOTIFICATION_POST_PREVIEW;
-import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.TEST_NOTIFICATION_POST_ULID;
 
 public interface NotificationResponseTestUtils {
     LocalDateTime testDate = LocalDateTime.of(2026, 3, 20, 0, 0);

@@ -56,8 +56,8 @@ class NotificationQueryJooqRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        testMember1 = postTestDataHelper.insertTestMember("NotificationMember1");
-        testMember2 = postTestDataHelper.insertTestMember("NotificationMember2");
+        testMember1 = postTestDataHelper.insertTestMember("Member1");
+        testMember2 = postTestDataHelper.insertTestMember("Member2");
 
         LocalDateTime baseTime = LocalDateTime.now();
 

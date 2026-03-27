@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.TEST_NOTIFICATION_RECIPIENT_ID;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RecipientIdTest implements NotificationTestUtils {
