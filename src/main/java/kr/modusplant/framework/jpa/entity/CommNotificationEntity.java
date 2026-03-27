@@ -2,8 +2,8 @@ package kr.modusplant.framework.jpa.entity;
 
 import jakarta.persistence.*;
 import kr.modusplant.framework.jpa.generator.UlidGenerator;
-import kr.modusplant.shared.enums.NotificationStatusType;
 import kr.modusplant.shared.enums.NotificationActionType;
+import kr.modusplant.shared.enums.NotificationStatusType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,7 +40,7 @@ public class CommNotificationEntity {
     @Column(name = ACTOR_ID, nullable = false)
     private UUID actorId;
 
-    @Column(name = ACTOR_NICKNAME, length = 40, nullable = false)
+    @Column(name = ACTOR_NICKNAME, length = 16, nullable = false)
     private String actorNickname;
 
     @Enumerated(EnumType.STRING)

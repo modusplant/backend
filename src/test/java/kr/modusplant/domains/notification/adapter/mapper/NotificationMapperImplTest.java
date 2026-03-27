@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class NotificationMapperImplTest {
     private final NotificationMapper notificationMapper = new NotificationMapperImpl();
