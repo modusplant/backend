@@ -1,6 +1,8 @@
 package kr.modusplant.domains.post.framework.out.jpa.mapper;
 
 import kr.modusplant.domains.post.domain.aggregate.Post;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
+import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.domains.post.domain.vo.*;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
 import kr.modusplant.framework.jpa.entity.CommPostEntity;
@@ -38,6 +40,9 @@ public class PostJpaMapperImpl implements PostJpaMapper {
 
     @Override
     public Post toPost(CommPostEntity postEntity) {
+        if (postEntity.getAuthMember() == null) {
+            throw new EmptyValueException(PostErrorCode.EMPTY_AUTHOR_ID);
+        }
         PostStatus postStatus;
         PostContent content;
         if (postEntity.getIsPublished()) {
