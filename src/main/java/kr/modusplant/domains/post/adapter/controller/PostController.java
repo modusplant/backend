@@ -81,7 +81,7 @@ public class PostController {
                 .map(postDetail -> {
                     increaseViewCount(ulid,currentMemberUuid,guestId);
                     postRecentlyViewRepository.recordViewPost(currentMemberUuid,postId);
-                    return postMapper.postDetailReadModelToPostDetailResponse(
+                    return postMapper.toPostDetailResponse(
                             postDetail,
                             (postDetail.imagePath() != null && !postDetail.imagePath().isBlank()) ? s3FileService.generateS3SrcUrl(postDetail.imagePath()) : null,
                             getJsonNodeContent(postDetail.content()),
@@ -90,11 +90,11 @@ public class PostController {
                 }).orElseThrow(() -> new PostNotFoundException());
     }
 
-    public PostDetailResponse getDataByUlid(String ulid, UUID currentMemberUuid) {
+    public PostDetailDataResponse getDataByUlid(String ulid, UUID currentMemberUuid) {
         return postQueryRepository.findPostDetailDataByPostId(PostId.create(ulid))
                 .filter(postDetailData -> postDetailData.isPublished() ||
                         (!postDetailData.isPublished() && postDetailData.authorUuid().equals(currentMemberUuid)))
-                .map(postDetailData -> postMapper.postDetailDataReadModelToPostDetailResponse(
+                .map(postDetailData -> postMapper.toPostDetailDataResponse(
                         postDetailData,
                         getJsonNodeContent(postDetailData.content()),
                         multipartDataProcessorPort.extractOriginalFilenameFromFileKey(postDetailData.thumbnailPath())))
