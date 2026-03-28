@@ -151,8 +151,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/v1/communication/posts/me/**",
                                 "/api/v1/communication/posts/search-history/**",
-                                "/api/v1/communication/notifications",
-                                "/api/v1/communication/notifications/**").authenticated()
+                                "/api/v1/notifications",
+                                "/api/v1/notifications/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/communication/posts/*/data").authenticated()
                         .requestMatchers(HttpMethod.POST,"/api/v1/communication/posts").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/communication/posts/*").authenticated()

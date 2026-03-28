@@ -21,7 +21,7 @@ import java.util.UUID;
 // TODO: 알림 생성 로직 완성 후 삭제
 @Tag(name = "알림함 API", description = "알림함을 다루는 API입니다.")
 @RestController
-@RequestMapping("/api/v1/communication/notifications/mock")
+@RequestMapping("/api/v1/notifications/mock")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Authorization")
 @Profile({"local", "dev"})

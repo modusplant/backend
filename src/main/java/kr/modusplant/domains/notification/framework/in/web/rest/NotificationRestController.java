@@ -26,7 +26,7 @@ import static kr.modusplant.shared.constant.Regex.REGEX_ULID;
 
 @Tag(name = "알림함 API", description = "알림함을 다루는 API입니다.")
 @RestController
-@RequestMapping("/api/v1/communication/notifications")
+@RequestMapping("/api/v1/notifications")
 @RequiredArgsConstructor
 @Validated
 @SecurityRequirement(name = "Authorization")
