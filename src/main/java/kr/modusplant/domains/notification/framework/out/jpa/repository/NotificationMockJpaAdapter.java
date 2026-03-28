@@ -8,6 +8,7 @@ import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.repository.CommCommentJpaRepository;
 import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.shared.enums.NotificationActionType;
 import kr.modusplant.shared.enums.NotificationStatusType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -24,7 +25,8 @@ public class NotificationMockJpaAdapter implements NotificationMockRepository {
     @Override
     public void saveMockNotification(RecipientId recipientId, NotificationAction action, PostId postId, CommentPath commentPath, ContentPreview contentPreview) {
         SiteMemberEntity member = siteMemberJpaRepository.findByUuid(recipientId.getValue()).orElseThrow();
-        if (!commPostJpaRepository.existsByUlid(postId.getValue()) || (commentPath != null && !commCommentJpaRepository.existsByPostUlidAndPath(postId.getValue(), commentPath.getPath()))){
+        if (!commPostJpaRepository.existsByUlid(postId.getValue()) ||
+                (commentPath != null && action.getAction() == NotificationActionType.COMMENT_LIKED && !commCommentJpaRepository.existsByPostUlidAndPath(postId.getValue(), commentPath.getPath()))){
             throw new IllegalArgumentException("Invalid post or comment path");
         }
         CommNotificationEntity commNotificationEntity = CommNotificationEntity.builder()
