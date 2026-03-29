@@ -46,6 +46,28 @@ class PostArchiveJpaMapperImplTest implements PostEntityTestUtils, PostArchiveEn
         assertThat(result.getPublishedAt()).isEqualTo(postEntity.getPublishedAt());
     }
 
+    @Test
+    @DisplayName("toPostArchiveEntity로 탈퇴한 회원을 가진 엔티티 반환하기")
+    void testToPostArchiveEntity_givenPostEntityWithNullMember_willReturnPostArchiveEntity() {
+        // given
+        SiteMemberEntity memberEntity = null;
+        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().id(testPrimaryCategoryId.getValue()).build();
+        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().id(testSecondaryCategoryId.getValue()).build();
+        CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid()
+                .primaryCategory(primaryCategoryEntity)
+                .secondaryCategory(secondaryCategoryEntity)
+                .authMember(memberEntity)
+                .publishedAt(LocalDateTime.now())
+                .build();
+
+        // when
+        CommPostArchiveEntity result = postArchiveJpaMapper.toPostArchiveEntity(postEntity);
+
+        // then
+
+        assertThat(result.getAuthMemberUuid()).isNull();
+    }
+
 
 
 }

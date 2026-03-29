@@ -24,7 +24,7 @@ import static org.jooq.impl.DSL.*;
 public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepository {
     private final DSLContext dsl;
     private final PostJooqMapper postJooqMapper;
-    private static final JsonbJsonNodeConverter JSON_CONVERTER = new JsonbJsonNodeConverter();
+    private final JsonbJsonNodeConverter jsonConverter = new JsonbJsonNodeConverter();
 
     public Page<PostSummaryReadModel> findPublishedByAuthMemberWithOffset(AuthorId authorId, int page, int size) {
         long offset = (long) page * size;
@@ -42,7 +42,8 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                 COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
                 SITE_MEMBER.NICKNAME,
                 COMM_POST.TITLE,
-                COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                COMM_POST.CONTENT.convert(jsonConverter).as("content"),
+                COMM_POST.THUMBNAIL_PATH,
                 COMM_POST.LIKE_COUNT,
                 COMM_POST.PUBLISHED_AT,
                 coalesce(field("cc.comment_count",Integer.class), 0).as("commentCount"),
@@ -93,11 +94,12 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                         COMM_PRI_CATE.CATEGORY.as("primaryCategory"),
                         COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
                         COMM_POST.TITLE,
-                        COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.CONTENT.convert(jsonConverter).as("content"),
+                        COMM_POST.THUMBNAIL_PATH,
                         COMM_POST.UPDATED_AT
                 ).from(COMM_POST)
-                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
-                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
+                .leftOuterJoin(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
+                .leftOuterJoin(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
                 .where(COMM_POST.IS_PUBLISHED.isFalse())
                 .and(COMM_POST.AUTH_MEMB_UUID.eq(authorId.getValue()))
                 .orderBy(COMM_POST.UPDATED_AT.desc(), COMM_POST.ULID.desc())
@@ -131,6 +133,7 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                         SITE_MEMBER.NICKNAME,
                         COMM_POST.TITLE,
                         COMM_POST.CONTENT.as("content"),
+                        COMM_POST.THUMBNAIL_PATH,
                         COMM_POST.LIKE_COUNT,
                         COMM_POST.PUBLISHED_AT,
                         coalesce(field("cc.comment_count", Integer.class), 0).as("commentCount"),
@@ -150,7 +153,7 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                 .from(COMM_POST)
                 .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
                 .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
-                .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
+                .leftJoin(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .leftJoin(
                         select(
                                 COMM_COMMENT.POST_ULID,
@@ -185,7 +188,8 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                         COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
                         SITE_MEMBER.NICKNAME,
                         COMM_POST.TITLE,
-                        COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.CONTENT.convert(jsonConverter).as("content"),
+                        COMM_POST.THUMBNAIL_PATH,
                         COMM_POST.LIKE_COUNT,
                         COMM_POST.PUBLISHED_AT,
                         coalesce(field("cc.comment_count",Integer.class), 0).as("commentCount"),
@@ -201,7 +205,7 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                 .join(COMM_POST).on(COMM_POST_LIKE.POST_ULID.eq(COMM_POST.ULID))
                 .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
                 .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
-                .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
+                .leftJoin(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .leftJoin(
                         select(COMM_COMMENT.POST_ULID, count().as("comment_count"))
                                 .from(COMM_COMMENT)
@@ -236,7 +240,8 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                         COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
                         SITE_MEMBER.NICKNAME,
                         COMM_POST.TITLE,
-                        COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.CONTENT.convert(jsonConverter).as("content"),
+                        COMM_POST.THUMBNAIL_PATH,
                         COMM_POST.LIKE_COUNT,
                         COMM_POST.PUBLISHED_AT,
                         coalesce(field("cc.comment_count",Integer.class), 0).as("commentCount"),
@@ -252,7 +257,7 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                 .join(COMM_POST).on(COMM_POST_BOOKMARK.POST_ULID.eq(COMM_POST.ULID))
                 .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
                 .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
-                .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
+                .leftJoin(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .leftJoin(
                         select(COMM_COMMENT.POST_ULID, count().as("comment_count"))
                                 .from(COMM_COMMENT)

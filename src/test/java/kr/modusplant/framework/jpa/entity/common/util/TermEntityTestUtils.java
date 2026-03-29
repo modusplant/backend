@@ -7,18 +7,18 @@ import static kr.modusplant.shared.persistence.common.util.constant.TermConstant
 public interface TermEntityTestUtils {
     default TermEntity createTermsOfUseEntity() {
         return TermEntity.builder()
-                .name(TERMS_OF_USE_NAME)
-                .content(TERMS_OF_USE_CONTENT)
-                .version(TERMS_OF_USE_VERSION)
+                .name(TEST_TERMS_OF_USE_NAME)
+                .content(TEST_TERMS_OF_USE_CONTENT)
+                .version(TEST_TERMS_OF_USE_VERSION)
                 .build();
     }
 
     default TermEntity createTermsOfUseEntityWithUuid() {
         return TermEntity.builder()
-                .uuid(TERMS_OF_USE_UUID)
-                .name(TERMS_OF_USE_NAME)
-                .content(TERMS_OF_USE_CONTENT)
-                .version(TERMS_OF_USE_VERSION)
+                .uuid(TEST_TERMS_OF_USE_UUID)
+                .name(TEST_TERMS_OF_USE_NAME)
+                .content(TEST_TERMS_OF_USE_CONTENT)
+                .version(TEST_TERMS_OF_USE_VERSION)
                 .build();
     }
 }

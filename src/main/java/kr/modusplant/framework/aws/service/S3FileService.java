@@ -76,7 +76,7 @@ public class S3FileService {
 
     private String getPresignedUrl(String fileKey) {
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofHours(12))
+                .signatureDuration(Duration.ofHours(168))
                 .getObjectRequest(req -> req
                         .bucket(bucket)
                         .key(fileKey))

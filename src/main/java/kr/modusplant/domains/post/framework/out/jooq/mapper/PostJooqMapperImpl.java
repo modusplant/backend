@@ -25,6 +25,7 @@ public class PostJooqMapperImpl implements PostJooqMapper {
                 record.get(SITE_MEMBER.NICKNAME),
                 record.get(COMM_POST.TITLE),
                 record.get("content", JsonNode.class),
+                record.get(COMM_POST.THUMBNAIL_PATH),
                 record.get(COMM_POST.LIKE_COUNT),
                 record.get(COMM_POST.PUBLISHED_AT),
                 record.get("commentCount", Integer.class),
@@ -67,6 +68,7 @@ public class PostJooqMapperImpl implements PostJooqMapper {
                 record.get(SITE_MEMBER.NICKNAME),
                 record.get(COMM_POST.TITLE),
                 record.get("content", JsonNode.class),
+                record.get(COMM_POST.THUMBNAIL_PATH),
                 record.get(COMM_POST.IS_PUBLISHED),
                 record.get(COMM_POST.PUBLISHED_AT),
                 record.get(COMM_POST.UPDATED_AT)
@@ -81,6 +83,7 @@ public class PostJooqMapperImpl implements PostJooqMapper {
                 record.get("secondaryCategory", String.class),
                 record.get(COMM_POST.TITLE),
                 record.get("content", JsonNode.class),
+                record.get(COMM_POST.THUMBNAIL_PATH),
                 record.get(COMM_POST.UPDATED_AT)
         );
     }

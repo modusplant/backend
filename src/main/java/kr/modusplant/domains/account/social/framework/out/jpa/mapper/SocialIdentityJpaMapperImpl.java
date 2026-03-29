@@ -6,8 +6,7 @@ import kr.modusplant.domains.account.social.domain.vo.SocialAccountProfile;
 import kr.modusplant.domains.account.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
 import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
-import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
 import org.springframework.stereotype.Component;
@@ -36,20 +35,12 @@ public class SocialIdentityJpaMapperImpl implements SocialIdentityJpaMapper {
     }
 
     @Override
-    public SiteMemberRoleEntity toMemberRoleEntity(SiteMemberEntity memberEntity, Role role) {
-        return SiteMemberRoleEntity.builder()
-                .member(memberEntity)
-                .role(role)
-                .build();
-    }
-
-    @Override
-    public SocialAccountPayload toUserPayload(SiteMemberEntity memberEntity, SiteMemberAuthEntity memberAuthEntity, SiteMemberRoleEntity memberRoleEntity) {
+    public SocialAccountPayload toUserPayload(SiteMemberEntity memberEntity, SiteMemberAuthEntity memberAuthEntity) {
         return SocialAccountPayload.create(
                 AccountId.fromUuid(memberEntity.getUuid()),
                 Nickname.create(memberEntity.getNickname()),
                 Email.create(memberAuthEntity.getEmail()),
-                memberRoleEntity.getRole()
+                memberEntity.getRole()
         );
     }
 

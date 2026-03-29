@@ -14,7 +14,7 @@ public interface NormalIdentityTermJpaMapper {
     @Mapping(target = "member", source = "savedMember")
     @Mapping(target = "agreedTermsOfUseVersion", source = "sign.agreedTermsOfUseVersion.value")
     @Mapping(target = "agreedPrivacyPolicyVersion", source = "sign.agreedPrivacyPolicyVersion.value")
-    @Mapping(target = "agreedAdInfoReceivingVersion", source = "sign.agreedAdInfoReceivingVersion.value")
+    @Mapping(target = "agreedCommunityPolicyVersion", source = "sign.agreedCommunityPolicyVersion.value")
     SiteMemberTermEntity toSiteMemberTermEntity(SiteMemberEntity savedMember, SignUpData sign);
 
 }

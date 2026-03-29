@@ -1,7 +1,7 @@
 package kr.modusplant.domains.account.social.common.util.domain.vo;
 
 import kr.modusplant.domains.account.social.domain.vo.SocialAccountPayload;
-import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
 import kr.modusplant.shared.kernel.common.util.NicknameTestUtils;
 

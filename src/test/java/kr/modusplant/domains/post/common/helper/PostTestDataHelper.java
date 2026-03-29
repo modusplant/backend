@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
 import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.jooq.tables.records.*;
+import kr.modusplant.shared.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.generator.EventType;
 import org.jooq.DSLContext;
@@ -20,12 +21,14 @@ import static kr.modusplant.jooq.Tables.*;
 public class PostTestDataHelper {
     private static final UlidIdGenerator generator = new UlidIdGenerator();
     private final DSLContext dsl;
+    private final JsonbJsonNodeConverter jsonConverter = new JsonbJsonNodeConverter();
 
     public SiteMemberRecord insertTestMember(String nickname) {
         LocalDateTime dateTime = LocalDateTime.now().plusDays(7);
         return dsl.insertInto(SITE_MEMBER)
                 .set(SITE_MEMBER.UUID, UUID.randomUUID())
                 .set(SITE_MEMBER.NICKNAME, nickname)
+                .set(SITE_MEMBER.ROLE, Role.USER.getValue())
                 .set(SITE_MEMBER.IS_ACTIVE, true)
                 .set(SITE_MEMBER.IS_BANNED, true)
                 .set(SITE_MEMBER.CREATED_AT, dateTime)
@@ -38,9 +41,9 @@ public class PostTestDataHelper {
     public SiteMemberProfRecord insertTestMemberProfile(SiteMemberRecord memberRecord) {
         LocalDateTime dateTime = LocalDateTime.now().plusDays(30);
         return dsl.insertInto(SITE_MEMBER_PROF)
-                .set(SITE_MEMBER_PROF.UUID,memberRecord.getUuid())
-                .set(SITE_MEMBER_PROF.IMAGE_PATH, "member/"+memberRecord.getUuid()+"/profile/profile.png")
-                .set(SITE_MEMBER_PROF.LAST_MODIFIED_AT,dateTime)
+                .set(SITE_MEMBER_PROF.UUID, memberRecord.getUuid())
+                .set(SITE_MEMBER_PROF.IMAGE_PATH, "member/" + memberRecord.getUuid() + "/profile/profile.png")
+                .set(SITE_MEMBER_PROF.LAST_MODIFIED_AT, dateTime)
                 .set(SITE_MEMBER_PROF.VER_NUM, 0)
                 .returning()
                 .fetchOneInto(SiteMemberProfRecord.class);
@@ -48,59 +51,60 @@ public class PostTestDataHelper {
 
     public CommPriCateRecord insertTestPrimaryCategory(String category, int order) {
         return dsl.insertInto(COMM_PRI_CATE)
-                .set(COMM_PRI_CATE.CATEGORY,category)
-                .set(COMM_PRI_CATE.ORDER,order)
-                .set(COMM_PRI_CATE.CREATED_AT,LocalDateTime.now().minusYears(3))
+                .set(COMM_PRI_CATE.CATEGORY, category)
+                .set(COMM_PRI_CATE.ORDER, order)
+                .set(COMM_PRI_CATE.CREATED_AT, LocalDateTime.now().minusYears(3))
                 .returning()
                 .fetchOneInto(CommPriCateRecord.class);
     }
 
     public CommSecoCateRecord insertTestSecondaryCategory(CommPriCateRecord priCateRecord, String category, int order) {
         return dsl.insertInto(COMM_SECO_CATE)
-                .set(COMM_SECO_CATE.CATEGORY,category)
-                .set(COMM_SECO_CATE.ORDER,order)
-                .set(COMM_SECO_CATE.CREATED_AT,LocalDateTime.now().minusYears(3))
-                .set(COMM_SECO_CATE.PRI_CATE_ID,priCateRecord.getId())
+                .set(COMM_SECO_CATE.CATEGORY, category)
+                .set(COMM_SECO_CATE.ORDER, order)
+                .set(COMM_SECO_CATE.CREATED_AT, LocalDateTime.now().minusYears(3))
+                .set(COMM_SECO_CATE.PRI_CATE_ID, priCateRecord.getId())
                 .returning()
                 .fetchOneInto(CommSecoCateRecord.class);
     }
 
     public CommPostRecord insertTestPublishedPost(
             CommPriCateRecord priCateRecord, CommSecoCateRecord secoCateRecord,
-            SiteMemberRecord memberRecord, String title, JsonNode content, LocalDateTime dateTime
+            SiteMemberRecord memberRecord, String title, JsonNode content, String thumbnailPath, LocalDateTime dateTime
     ) {
         return dsl.insertInto(COMM_POST)
-                .set(COMM_POST.ULID,generator.generate(null,null,null, EventType.INSERT))
-                .set(COMM_POST.PRI_CATE_ID,priCateRecord.getId())
-                .set(COMM_POST.SECO_CATE_ID,secoCateRecord.getId())
-                .set(COMM_POST.AUTH_MEMB_UUID,memberRecord.getUuid())
-                .set(COMM_POST.LIKE_COUNT,30)
-                .set(COMM_POST.VIEW_COUNT,251)
-                .set(COMM_POST.TITLE,title)
-                .set(COMM_POST.CONTENT,new JsonbJsonNodeConverter().to(content))
-                .set(COMM_POST.IS_PUBLISHED,true)
-                .set(COMM_POST.PUBLISHED_AT,dateTime)
-                .set(COMM_POST.CREATED_AT,dateTime)
-                .set(COMM_POST.UPDATED_AT,dateTime)
-                .set(COMM_POST.VER,1)
+                .set(COMM_POST.ULID, generator.generate(null, null, null, EventType.INSERT))
+                .set(COMM_POST.PRI_CATE_ID, priCateRecord.getId())
+                .set(COMM_POST.SECO_CATE_ID, secoCateRecord.getId())
+                .set(COMM_POST.AUTH_MEMB_UUID, memberRecord.getUuid())
+                .set(COMM_POST.LIKE_COUNT, 30)
+                .set(COMM_POST.VIEW_COUNT, 251)
+                .set(COMM_POST.TITLE, title)
+                .set(COMM_POST.CONTENT, jsonConverter.to(content))
+                .set(COMM_POST.THUMBNAIL_PATH, thumbnailPath)
+                .set(COMM_POST.IS_PUBLISHED, true)
+                .set(COMM_POST.PUBLISHED_AT, dateTime)
+                .set(COMM_POST.CREATED_AT, dateTime)
+                .set(COMM_POST.UPDATED_AT, dateTime)
+                .set(COMM_POST.VER, 1)
                 .returning()
                 .fetchOneInto(CommPostRecord.class);
     }
 
     public CommPostRecord insertTestDraftPost(
             CommPriCateRecord priCateRecord, CommSecoCateRecord secoCateRecord,
-            SiteMemberRecord memberRecord, String title, JsonNode content
+            SiteMemberRecord memberRecord, String title, JsonNode content, String thumbnailPath, LocalDateTime dateTime
     ) {
-        LocalDateTime dateTime = LocalDateTime.now().plusDays(1);
         return dsl.insertInto(COMM_POST)
                 .set(COMM_POST.ULID,generator.generate(null,null,null, EventType.INSERT))
-                .set(COMM_POST.PRI_CATE_ID,priCateRecord.getId())
-                .set(COMM_POST.SECO_CATE_ID,secoCateRecord.getId())
+                .set(COMM_POST.PRI_CATE_ID,priCateRecord!=null ? priCateRecord.getId() : null)
+                .set(COMM_POST.SECO_CATE_ID,secoCateRecord!=null ? secoCateRecord.getId() : null)
                 .set(COMM_POST.AUTH_MEMB_UUID,memberRecord.getUuid())
                 .set(COMM_POST.LIKE_COUNT,0)
                 .set(COMM_POST.VIEW_COUNT,0)
                 .set(COMM_POST.TITLE,title)
-                .set(COMM_POST.CONTENT,new JsonbJsonNodeConverter().to(content))
+                .set(COMM_POST.CONTENT,content!=null ? jsonConverter.to(content) : null)
+                .set(COMM_POST.THUMBNAIL_PATH, thumbnailPath)
                 .set(COMM_POST.IS_PUBLISHED,false)
                 .set(COMM_POST.CREATED_AT,dateTime)
                 .set(COMM_POST.UPDATED_AT,dateTime)
@@ -117,25 +121,25 @@ public class PostTestDataHelper {
                 .set(COMM_COMMENT.CONTENT,content)
                 .set(COMM_COMMENT.LIKE_COUNT,2)
                 .set(COMM_COMMENT.IS_DELETED,isDeleted)
-                .set(COMM_COMMENT.CREATED_AT,LocalDateTime.now().minusMinutes(1))
+                .set(COMM_COMMENT.CREATED_AT,LocalDateTime.now().plusDays(1))
                 .returning()
                 .fetchOneInto(CommCommentRecord.class);
     }
 
-    public CommPostLikeRecord insertTestPostLike(CommPostRecord postRecord, SiteMemberRecord memberRecord) {
+    public CommPostLikeRecord insertTestPostLike(CommPostRecord postRecord, SiteMemberRecord memberRecord, LocalDateTime dateTime) {
         return dsl.insertInto(COMM_POST_LIKE)
-                .set(COMM_POST_LIKE.POST_ULID,postRecord.getUlid())
-                .set(COMM_POST_LIKE.MEMB_UUID,memberRecord.getUuid())
-                .set(COMM_POST_LIKE.CREATED_AT,LocalDateTime.now())
+                .set(COMM_POST_LIKE.POST_ULID, postRecord.getUlid())
+                .set(COMM_POST_LIKE.MEMB_UUID, memberRecord.getUuid())
+                .set(COMM_POST_LIKE.CREATED_AT, dateTime)
                 .returning()
                 .fetchOneInto(CommPostLikeRecord.class);
     }
 
-    public CommPostBookmarkRecord insertTestPostBookmark(CommPostRecord postRecord, SiteMemberRecord memberRecord) {
+    public CommPostBookmarkRecord insertTestPostBookmark(CommPostRecord postRecord, SiteMemberRecord memberRecord, LocalDateTime dateTime) {
         return dsl.insertInto(COMM_POST_BOOKMARK)
-                .set(COMM_POST_BOOKMARK.POST_ULID,postRecord.getUlid())
-                .set(COMM_POST_BOOKMARK.MEMB_UUID,memberRecord.getUuid())
-                .set(COMM_POST_BOOKMARK.CREATED_AT,LocalDateTime.now())
+                .set(COMM_POST_BOOKMARK.POST_ULID, postRecord.getUlid())
+                .set(COMM_POST_BOOKMARK.MEMB_UUID, memberRecord.getUuid())
+                .set(COMM_POST_BOOKMARK.CREATED_AT, dateTime)
                 .returning()
                 .fetchOneInto(CommPostBookmarkRecord.class);
     }

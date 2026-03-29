@@ -11,6 +11,7 @@ public record PostSummaryReadModel(
         String nickname,
         String title,
         JsonNode content,
+        String thumbnailPath,
         Integer likeCount,
         LocalDateTime publishedAt,
         Integer commentCount,

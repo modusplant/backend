@@ -31,9 +31,9 @@ public class TargetPostId {
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof TargetPostId memberId)) return false;
+        if (!(o instanceof TargetPostId targetPostId)) return false;
 
-        return new EqualsBuilder().append(getValue(), memberId.getValue()).isEquals();
+        return new EqualsBuilder().append(getValue(), targetPostId.getValue()).isEquals();
     }
 
     @Override

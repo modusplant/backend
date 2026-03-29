@@ -1,6 +1,7 @@
 package kr.modusplant.framework.jpa.entity;
 
 import jakarta.persistence.*;
+import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -35,6 +36,11 @@ public class SiteMemberEntity {
     @Column(nullable = false, length = 40, unique = true)
     private String nickname;
 
+    @Column(nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    @DefaultValue
+    private Role role;
+
     @Column(name = "is_active", nullable = false)
     @DefaultValue
     private Boolean isActive;
@@ -61,14 +67,6 @@ public class SiteMemberEntity {
 
     public void updateNickname(String nickname) {
         this.nickname = nickname;
-    }
-
-    public void updateIsActive(Boolean isActive) {
-        this.isActive = isActive;
-    }
-
-    public void updateIsBanned(Boolean isBanned) {
-        this.isBanned = isBanned;
     }
 
     public void updateLoggedInAt(LocalDateTime loggedInAt) {
@@ -103,11 +101,15 @@ public class SiteMemberEntity {
         if (this.isBanned == null) {
             this.isBanned = false;
         }
+        if (this.role == null) {
+            this.role = Role.USER;
+        }
     }
 
-    private SiteMemberEntity(UUID uuid, String nickname, Boolean isActive, Boolean isBanned, LocalDateTime loggedInAt) {
+    private SiteMemberEntity(UUID uuid, String nickname, Role role, Boolean isActive, Boolean isBanned, LocalDateTime loggedInAt) {
         this.uuid = uuid;
         this.nickname = nickname;
+        this.role = role;
         this.isActive = isActive;
         this.isBanned = isBanned;
         this.loggedInAt = loggedInAt;
@@ -120,6 +122,7 @@ public class SiteMemberEntity {
     public static final class SiteMemberEntityBuilder {
         private UUID uuid;
         private String nickname;
+        private Role role;
         private Boolean isActive;
         private Boolean isBanned;
         private LocalDateTime loggedInAt;
@@ -131,6 +134,11 @@ public class SiteMemberEntity {
 
         public SiteMemberEntityBuilder nickname(final String nickname) {
             this.nickname = nickname;
+            return this;
+        }
+
+        public SiteMemberEntityBuilder role(final Role role) {
+            this.role = role;
             return this;
         }
 
@@ -159,7 +167,7 @@ public class SiteMemberEntity {
         }
 
         public SiteMemberEntity build() {
-            return new SiteMemberEntity(this.uuid, this.nickname, this.isActive, this.isBanned, this.loggedInAt);
+            return new SiteMemberEntity(this.uuid, this.nickname, this.role, this.isActive, this.isBanned, this.loggedInAt);
         }
     }
 }

@@ -1,29 +1,26 @@
 package kr.modusplant.domains.account.normal.framework.in.web.rest;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.account.normal.adapter.controller.NormalIdentityController;
 import kr.modusplant.domains.account.normal.usecase.request.EmailModificationRequest;
 import kr.modusplant.domains.account.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.domains.account.normal.usecase.request.PasswordModificationRequest;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
-import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.security.models.NormalLoginRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.CacheControl;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
 import java.util.UUID;
 
 @Tag(name = "일반 계정 API", description = "일반 회원가입과 로그인을 다루는 API입니다.")
@@ -33,7 +30,6 @@ import java.util.UUID;
 @Validated
 public class NormalIdentityRestController {
     private final NormalIdentityController controller;
-    private final JwtTokenProvider jwtTokenProvider;
 
     @Operation(
             summary = "일반 회원가입 API",
@@ -89,38 +85,6 @@ public class NormalIdentityRestController {
         controller.modifyPassword(memberActiveUuid, request);
 
         return ResponseEntity.ok(DataResponse.ok());
-    }
-
-
-    /**
-     * Spring Security 의 일반 로그인 필터 체인의
-     * 성공 핸들러인 {@link kr.modusplant.infrastructure.security.handler.ForwardRequestLoginSuccessHandler} 가
-     * 인증 완료 후 forward 하는 메서드입니다.
-     * <p>클라이언트의 요청을 받는 도입부 역할을 하지 않으며, 따라서 Swagger UI에 표시하지 않습니다. <p/>
-     *
-     * @param accessToken 클라이언트에게 보내는 접근 토큰입니다.
-     * @param refreshToken 클라이언트에게 보내는 갱신 토큰입니다.
-     * @return 클라이언트에게 로그인에 대한 성공 응답을 반환합니다.
-     */
-    @Hidden
-    @PostMapping("/api/auth/login-success")
-    public ResponseEntity<DataResponse<Map<String, Object>>> respondToNormalLoginSuccess(
-            @RequestAttribute("accessToken")
-            @NotBlank(message = "접근 토큰이 비어 있습니다.")
-            String accessToken,
-
-            @RequestAttribute("refreshToken")
-            @NotBlank(message = "리프레시 토큰이 비어 있습니다.")
-            String refreshToken) {
-
-        String refreshTokenCookie = jwtTokenProvider.generateRefreshTokenCookieAsString(refreshToken);
-
-        Map<String, Object> accessTokenData = Map.of("accessToken", accessToken);
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie)
-                .cacheControl(CacheControl.noStore())
-                .body(DataResponse.ok(accessTokenData));
     }
 
     /**

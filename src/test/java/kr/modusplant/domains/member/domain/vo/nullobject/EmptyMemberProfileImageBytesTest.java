@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileImageBytesTestUtils.testMemberProfileImageBytes;
-import static kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyMemberProfileImageBytesTestUtils.TEST_EMPTY_MEMBER_PROFILE_IMAGE_BYTES;
+import static kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyMemberProfileImageBytesTestUtils.testEmptyMemberProfileImageBytes;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -19,21 +19,27 @@ class EmptyMemberProfileImageBytesTest {
 
     @Test
     @DisplayName("같은 객체에 대한 equals 호출")
-    void useEqual_givenSameObject_willReturnTrue() {
+    void testEquals_givenSameObject_willReturnTrue() {
         //noinspection EqualsWithItself
-        assertEquals(TEST_EMPTY_MEMBER_PROFILE_IMAGE_BYTES, TEST_EMPTY_MEMBER_PROFILE_IMAGE_BYTES);
+        assertEquals(testEmptyMemberProfileImageBytes, testEmptyMemberProfileImageBytes);
     }
 
     @Test
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
-    void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
+    void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
-        assertNotEquals(TEST_EMPTY_MEMBER_PROFILE_IMAGE_BYTES, testMemberId);
+        assertNotEquals(testEmptyMemberProfileImageBytes, testMemberId);
     }
 
     @Test
     @DisplayName("MemberProfileImageBytes 인스턴스에 대한 equals 호출")
-    void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
-        assertNotEquals(TEST_EMPTY_MEMBER_PROFILE_IMAGE_BYTES, testMemberProfileImageBytes);
+    void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
+        assertNotEquals(testEmptyMemberProfileImageBytes, testMemberProfileImageBytes);
+    }
+
+    @Test
+    @DisplayName("같은 객체에 대한 hashcode 동일성 보장")
+    void testHashCode_givenSameObject_willReturnSameHashCode() {
+        assertEquals(testEmptyMemberProfileImageBytes.hashCode(), testEmptyMemberProfileImageBytes.hashCode());
     }
 }

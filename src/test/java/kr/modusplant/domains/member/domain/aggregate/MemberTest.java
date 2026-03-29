@@ -42,7 +42,7 @@ class MemberTest implements MemberTestUtils {
 
     @Test
     @DisplayName("같은 객체에 대한 equals 호출")
-    void useEqual_givenSameObject_willReturnTrue() {
+    void testEquals_givenSameObject_willReturnTrue() {
         // given
         Member member = createMember();
 
@@ -53,15 +53,22 @@ class MemberTest implements MemberTestUtils {
 
     @Test
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
-    void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
+    void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
         assertNotEquals(createMember(), testMemberId);
     }
 
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
-    void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
+    void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
         Member member = createMember();
         assertNotEquals(member, Member.create(MemberId.generate(), testMemberActiveStatus, testNormalUserNickname));
+    }
+
+    @Test
+    @DisplayName("같은 객체에 대한 hashcode 동일성 보장")
+    void testHashCode_givenSameObject_willReturnSameHashCode() {
+        Member member = createMember();
+        assertEquals(member.hashCode(), member.hashCode());
     }
 }

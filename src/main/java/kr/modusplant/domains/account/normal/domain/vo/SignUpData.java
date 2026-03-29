@@ -14,14 +14,14 @@ public class SignUpData {
     private final Nickname nickname;
     private final AgreedTermVersion agreedTermsOfUseVersion;
     private final AgreedTermVersion agreedPrivacyPolicyVersion;
-    private final AgreedTermVersion agreedAdInfoReceivingVersion;
+    private final AgreedTermVersion agreedCommunityPolicyVersion;
 
     public static SignUpData create(String email, String password, String nickname,
                                     String termsOfUseVersion, String privacyPolicyVersion,
-                                    String adInfoReceivingVersion) {
+                                    String communityPolicyVersion) {
         return new SignUpData(NormalCredentials.createWithString(email, password),
                 Nickname.create(nickname), AgreedTermVersion.create(termsOfUseVersion),
-                AgreedTermVersion.create(privacyPolicyVersion), AgreedTermVersion.create(adInfoReceivingVersion));
+                AgreedTermVersion.create(privacyPolicyVersion), AgreedTermVersion.create(communityPolicyVersion));
     }
 
     @Override

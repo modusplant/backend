@@ -7,9 +7,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class ObjectMapperHolder {
     @Getter
-    private static ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
+
+    @Getter
+    private static ObjectMapper staticObjectMapper;
 
     public ObjectMapperHolder(ObjectMapper objectMapper) {
-        ObjectMapperHolder.objectMapper = objectMapper;
+        this.objectMapper = objectMapper;
+        ObjectMapperHolder.staticObjectMapper = objectMapper;
     }
 }

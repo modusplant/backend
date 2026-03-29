@@ -10,7 +10,7 @@ public interface SiteMemberTermEntityTestUtils extends SiteMemberEntityTestUtils
                 .member(createMemberBasicAdminEntity())
                 .agreedTermsOfUseVersion(MEMBER_TERM_ADMIN_AGREED_TERMS_OF_USE_VERSION)
                 .agreedPrivacyPolicyVersion(MEMBER_TERM_ADMIN_AGREED_PRIVACY_POLICY_VERSION)
-                .agreedAdInfoReceivingVersion(MEMBER_TERM_ADMIN_AGREED_AD_INFO_RECEIVING_VERSION)
+                .agreedCommunityPolicyVersion(MEMBER_TERM_ADMIN_AGREED_COMMUNITY_POLICY_VERSION)
                 .build();
     }
 
@@ -19,7 +19,7 @@ public interface SiteMemberTermEntityTestUtils extends SiteMemberEntityTestUtils
                 .member(createMemberBasicAdminEntityWithUuid())
                 .agreedTermsOfUseVersion(MEMBER_TERM_ADMIN_AGREED_TERMS_OF_USE_VERSION)
                 .agreedPrivacyPolicyVersion(MEMBER_TERM_ADMIN_AGREED_PRIVACY_POLICY_VERSION)
-                .agreedAdInfoReceivingVersion(MEMBER_TERM_ADMIN_AGREED_AD_INFO_RECEIVING_VERSION)
+                .agreedCommunityPolicyVersion(MEMBER_TERM_ADMIN_AGREED_COMMUNITY_POLICY_VERSION)
                 .build();
     }
 
@@ -28,7 +28,7 @@ public interface SiteMemberTermEntityTestUtils extends SiteMemberEntityTestUtils
                 .member(createMemberBasicUserEntity())
                 .agreedTermsOfUseVersion(MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION)
                 .agreedPrivacyPolicyVersion(MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION)
-                .agreedAdInfoReceivingVersion(MEMBER_TERM_USER_AGREED_AD_INFO_RECEIVING_VERSION)
+                .agreedCommunityPolicyVersion(MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION)
                 .build();
     }
 
@@ -37,7 +37,7 @@ public interface SiteMemberTermEntityTestUtils extends SiteMemberEntityTestUtils
                 .member(createMemberBasicUserEntityWithUuid())
                 .agreedTermsOfUseVersion(MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION)
                 .agreedPrivacyPolicyVersion(MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION)
-                .agreedAdInfoReceivingVersion(MEMBER_TERM_USER_AGREED_AD_INFO_RECEIVING_VERSION)
+                .agreedCommunityPolicyVersion(MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION)
                 .build();
     }
 }

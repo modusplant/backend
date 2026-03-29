@@ -10,7 +10,7 @@ import java.io.IOException;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
-import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.REPORT_IMAGE_PATH;
+import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.TEST_REPORT_IMAGE_PATH;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,6 +43,6 @@ class MemberImageIOHelperTest {
         String imagePath = memberImageIOHelper.uploadImage(testMemberId, testProposalOrBugReportRecord);
 
         // then
-        assertThat(imagePath).isEqualTo(REPORT_IMAGE_PATH);
+        assertThat(imagePath).isEqualTo(TEST_REPORT_IMAGE_PATH);
     }
 }

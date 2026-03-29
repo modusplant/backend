@@ -50,6 +50,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         given(record.get(SITE_MEMBER.NICKNAME)).willReturn(nickname);
         given(record.get(COMM_POST.TITLE)).willReturn(postEntity.getTitle());
         given(record.get("content", JsonNode.class)).willReturn(postEntity.getContent());
+        given(record.get(COMM_POST.THUMBNAIL_PATH)).willReturn(postEntity.getThumbnailPath());
         given(record.get(COMM_POST.LIKE_COUNT)).willReturn(postEntity.getLikeCount());
         given(record.get(COMM_POST.PUBLISHED_AT)).willReturn(publishedAt);
         given(record.get("commentCount", Integer.class)).willReturn(commentCount);
@@ -67,6 +68,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
                 .hasFieldOrPropertyWithValue("nickname", nickname)
                 .hasFieldOrPropertyWithValue("title", postEntity.getTitle())
                 .hasFieldOrPropertyWithValue("content", postEntity.getContent())
+                .hasFieldOrPropertyWithValue("thumbnailPath", postEntity.getThumbnailPath())
                 .hasFieldOrPropertyWithValue("likeCount", postEntity.getLikeCount())
                 .hasFieldOrPropertyWithValue("publishedAt", publishedAt)
                 .hasFieldOrPropertyWithValue("commentCount", commentCount)
@@ -94,6 +96,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         given(record.get(SITE_MEMBER.NICKNAME)).willReturn(nickname);
         given(record.get(COMM_POST.TITLE)).willReturn(postEntity.getTitle());
         given(record.get("content", JsonNode.class)).willReturn(postEntity.getContent());
+        given(record.get(COMM_POST.THUMBNAIL_PATH)).willReturn(postEntity.getThumbnailPath());
         given(record.get(COMM_POST.LIKE_COUNT)).willReturn(postEntity.getLikeCount());
         given(record.get(COMM_POST.PUBLISHED_AT)).willReturn(null);
         given(record.get("commentCount", Integer.class)).willReturn(commentCount);
@@ -111,6 +114,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
                 .hasFieldOrPropertyWithValue("nickname", nickname)
                 .hasFieldOrPropertyWithValue("title", postEntity.getTitle())
                 .hasFieldOrPropertyWithValue("content", postEntity.getContent())
+                .hasFieldOrPropertyWithValue("thumbnailPath", postEntity.getThumbnailPath())
                 .hasFieldOrPropertyWithValue("likeCount", postEntity.getLikeCount())
                 .hasFieldOrPropertyWithValue("publishedAt", null)
                 .hasFieldOrPropertyWithValue("commentCount", commentCount)
@@ -248,6 +252,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         given(record.get("secondaryCategory", String.class)).willReturn(secondaryCategory);
         given(record.get(COMM_POST.TITLE)).willReturn(postEntity.getTitle());
         given(record.get("content", JsonNode.class)).willReturn(postEntity.getContent());
+        given(record.get(COMM_POST.THUMBNAIL_PATH)).willReturn(postEntity.getThumbnailPath());
         given(record.get(COMM_POST.UPDATED_AT)).willReturn(updatedAt);
 
         DraftPostReadModel result = postJooqMapper.toDraftPostReadModel(record);
@@ -260,6 +265,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
                 .hasFieldOrPropertyWithValue("secondaryCategory", secondaryCategory)
                 .hasFieldOrPropertyWithValue("title", postEntity.getTitle())
                 .hasFieldOrPropertyWithValue("content", postEntity.getContent())
+                .hasFieldOrPropertyWithValue("thumbnailPath", postEntity.getThumbnailPath())
                 .hasFieldOrPropertyWithValue("updatedAt", updatedAt);
     }
 
