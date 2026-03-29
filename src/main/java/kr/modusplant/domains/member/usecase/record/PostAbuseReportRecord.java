@@ -1,4 +1,6 @@
 package kr.modusplant.domains.member.usecase.record;
 
-public record PostAbuseReportRecord(String accessToken, String postUlid) {
+import java.util.UUID;
+
+public record PostAbuseReportRecord(UUID memberId, String postUlid) {
 }

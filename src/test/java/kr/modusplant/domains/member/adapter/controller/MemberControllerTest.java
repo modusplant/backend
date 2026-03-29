@@ -75,7 +75,6 @@ import static kr.modusplant.shared.event.common.util.PostCancelPostBookmarkEvent
 import static kr.modusplant.shared.event.common.util.PostLikeEventTestUtils.testPostLikeEvent;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.*;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.*;
@@ -847,7 +846,7 @@ class MemberControllerTest implements
         given(propBugRepJpaRepository.save(propBugRepEntity)).willReturn(propBugRepEntity);
 
         // when
-        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN, TEST_REPORT_TITLE, TEST_REPORT_CONTENT, null));
+        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(MEMBER_BASIC_USER_UUID, TEST_REPORT_TITLE, TEST_REPORT_CONTENT, null));
 
         // then
         verify(memberJpaRepository, times(1)).findByUuid(any());

@@ -2,7 +2,6 @@ package kr.modusplant.domains.member.framework.in.web.rest;
 
 import kr.modusplant.domains.member.adapter.controller.MemberController;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
-import kr.modusplant.domains.member.domain.exception.IncorrectMemberIdException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
 import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheValidationService;
@@ -44,7 +43,6 @@ import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOr
 import static kr.modusplant.domains.member.common.util.usecase.request.MemberRegisterRequestTestUtils.testMemberRegisterRequest;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberResponseTestUtils.testMemberResponse;
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.INCORRECT_MEMBER_ID;
 import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.objectMapper;
 import static kr.modusplant.shared.persistence.common.util.constant.CommCommentConstant.TEST_COMM_COMMENT_PATH;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
@@ -56,13 +54,12 @@ import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberCo
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
 
 class MemberRestControllerTest implements MemberTestUtils {
-    @SuppressWarnings({"unused", "InstantiationOfUtilityClass"})
+    @SuppressWarnings("unused")
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
     private final PasswordEncoder passwordEncoder = Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8();
     private final MemberController memberController = Mockito.mock(MemberController.class);
@@ -119,7 +116,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         )).willReturn(cacheValidationResult);
 
         // when
-        ResponseEntity<DataResponse<MemberProfileResponse>> memberResponseEntity = memberRestController.getMemberProfile(MEMBER_BASIC_USER_UUID, MEMBER_AUTH_BASIC_USER_AUTHORIZATION, ifNoneMatch, ifModifiedSince);
+        ResponseEntity<DataResponse<MemberProfileResponse>> memberResponseEntity = memberRestController.getMemberProfile(ifNoneMatch, ifModifiedSince, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
 
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_MODIFIED);
@@ -148,7 +145,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         given(memberController.getProfile(testMemberProfileGetRecord)).willReturn(testMemberProfileResponse);
 
         // when
-        ResponseEntity<DataResponse<MemberProfileResponse>> memberResponseEntity = memberRestController.getMemberProfile(MEMBER_BASIC_USER_UUID, MEMBER_AUTH_BASIC_USER_AUTHORIZATION, ifNoneMatch, ifModifiedSince);
+        ResponseEntity<DataResponse<MemberProfileResponse>> memberResponseEntity = memberRestController.getMemberProfile(ifNoneMatch, ifModifiedSince, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
 
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -168,7 +165,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         given(memberController.overrideProfile(testMemberProfileOverrideRecord)).willReturn(testMemberProfileResponse);
 
         // when
-        ResponseEntity<DataResponse<MemberProfileResponse>> memberResponseEntity = memberRestController.overrideMemberProfile(MEMBER_BASIC_USER_UUID, MEMBER_PROFILE_BASIC_USER_IMAGE, MEMBER_PROFILE_BASIC_USER_INTRODUCTION, MEMBER_BASIC_USER_NICKNAME, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
+        ResponseEntity<DataResponse<MemberProfileResponse>> memberResponseEntity = memberRestController.overrideMemberProfile(MEMBER_PROFILE_BASIC_USER_IMAGE, MEMBER_PROFILE_BASIC_USER_INTRODUCTION, MEMBER_BASIC_USER_NICKNAME, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
 
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -185,7 +182,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         willDoNothing().given(memberController).likePost(testMemberPostLikeRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.likeCommunicationPost(MEMBER_BASIC_USER_UUID, TEST_COMM_POST_ULID, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.likeCommunicationPost(TEST_COMM_POST_ULID, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -200,7 +197,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         willDoNothing().given(memberController).unlikePost(testMemberPostUnlikeRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.unlikeCommunicationPost(MEMBER_BASIC_USER_UUID, TEST_COMM_POST_ULID, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.unlikeCommunicationPost(TEST_COMM_POST_ULID, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -215,7 +212,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         willDoNothing().given(memberController).bookmarkPost(testMemberPostBookmarkRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.bookmarkCommunicationPost(MEMBER_BASIC_USER_UUID, TEST_COMM_POST_ULID, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.bookmarkCommunicationPost(TEST_COMM_POST_ULID, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -230,7 +227,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         willDoNothing().given(memberController).cancelPostBookmark(testMemberPostBookmarkCancelRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.cancelCommunicationPostBookmark(MEMBER_BASIC_USER_UUID, TEST_COMM_POST_ULID, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.cancelCommunicationPostBookmark(TEST_COMM_POST_ULID, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -245,7 +242,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         willDoNothing().given(memberController).likeComment(testMemberCommentLikeRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.likeCommunicationComment(MEMBER_BASIC_USER_UUID, TEST_COMM_POST_ULID, TEST_COMM_COMMENT_PATH, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.likeCommunicationComment(TEST_COMM_POST_ULID, TEST_COMM_COMMENT_PATH, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -260,7 +257,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         willDoNothing().given(memberController).unlikeComment(testMemberCommentUnlikeRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.unlikeCommunicationComment(MEMBER_BASIC_USER_UUID, TEST_COMM_POST_ULID, TEST_COMM_COMMENT_PATH, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.unlikeCommunicationComment(TEST_COMM_POST_ULID, TEST_COMM_COMMENT_PATH, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -329,18 +326,5 @@ class MemberRestControllerTest implements MemberTestUtils {
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok().toString());
-    }
-
-    @Test
-    @DisplayName("자신과 다른 UUID가 저장된 Authorization 사용으로 응답 반환 실패")
-    void testValidateTokenAndAccessToId_givenTokenWithoutMyUuid_willThrowExceptionFromToken() {
-        // given
-        given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(UUID.randomUUID());
-
-        // when
-        IncorrectMemberIdException incorrectMemberIdException = assertThrows(IncorrectMemberIdException.class, () -> memberRestController.getMemberProfile(MEMBER_BASIC_USER_UUID, MEMBER_AUTH_BASIC_USER_AUTHORIZATION, null, null));
-
-        // then
-        assertThat(incorrectMemberIdException.getErrorCode()).isEqualTo(INCORRECT_MEMBER_ID);
     }
 }
