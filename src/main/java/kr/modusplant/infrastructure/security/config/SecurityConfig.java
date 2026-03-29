@@ -177,7 +177,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/members/check/nickname/**",
                                 "/api/v1/communication/posts/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/members").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/communication/posts/*/views").permitAll()
                         .requestMatchers("/actuator/prometheus").permitAll()
                         .anyRequest().permitAll()

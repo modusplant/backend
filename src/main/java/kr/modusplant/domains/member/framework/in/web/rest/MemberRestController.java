@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -15,9 +14,7 @@ import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
 import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.domains.member.usecase.record.*;
-import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
-import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -47,16 +44,6 @@ public class MemberRestController {
     private final MemberController memberController;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberCacheValidationService memberCacheValidationService;
-
-    @Hidden
-    @Operation(summary = "회원 등록 API", description = "닉네임을 통해 회원을 등록합니다.")
-    @PostMapping(value = "/members")
-    public ResponseEntity<DataResponse<MemberResponse>> registerMember(
-            @RequestBody @Valid MemberRegisterRequest request) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(DataResponse.ok(memberController.registerMember(request)));
-    }
 
     @Operation(summary = "회원 닉네임 중복 확인 API", description = "이미 등록된 닉네임이 있는지 조회합니다.")
     @GetMapping(value = "/members/check/nickname/{nickname}")
