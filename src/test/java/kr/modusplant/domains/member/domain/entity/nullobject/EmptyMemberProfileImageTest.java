@@ -4,8 +4,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.member.common.util.domain.entity.nullobject.EmptyMemberProfileImageTestUtils.TEST_EMPTY_MEMBER_PROFILE_IMAGE;
-import static kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyMemberProfileImageBytesTestUtils.TEST_EMPTY_MEMBER_PROFILE_IMAGE_BYTES;
-import static kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyMemberProfileImagePathTestUtils.TEST_EMPTY_MEMBER_PROFILE_IMAGE_PATH;
+import static kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyMemberProfileImageBytesTestUtils.testEmptyMemberProfileImageBytes;
+import static kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyMemberProfileImagePathTestUtils.testEmptyMemberProfileImagePath;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EmptyMemberProfileImageTest {
@@ -18,12 +18,12 @@ class EmptyMemberProfileImageTest {
     @Test
     @DisplayName("getMemberProfileImagePath로 비어 있는 회원 프로필 경로 반환")
     void testGetMemberProfileImagePath_givenNothing_willReturnEmptyMemberProfileImagePath() {
-        assertThat(TEST_EMPTY_MEMBER_PROFILE_IMAGE.getMemberProfileImagePath()).isEqualTo(TEST_EMPTY_MEMBER_PROFILE_IMAGE_PATH);
+        assertThat(TEST_EMPTY_MEMBER_PROFILE_IMAGE.getMemberProfileImagePath()).isEqualTo(testEmptyMemberProfileImagePath);
     }
 
     @Test
     @DisplayName("getMemberProfileImageBytes로 비어 있는 회원 프로필 경로 반환")
     void testGetMemberProfileImageBytes_givenNothing_willReturnEmptyMemberProfileImageBytes() {
-        assertThat(TEST_EMPTY_MEMBER_PROFILE_IMAGE.getMemberProfileImageBytes()).isEqualTo(TEST_EMPTY_MEMBER_PROFILE_IMAGE_BYTES);
+        assertThat(TEST_EMPTY_MEMBER_PROFILE_IMAGE.getMemberProfileImageBytes()).isEqualTo(testEmptyMemberProfileImageBytes);
     }
 }

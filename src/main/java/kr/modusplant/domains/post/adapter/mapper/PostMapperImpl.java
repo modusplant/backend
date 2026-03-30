@@ -7,6 +7,7 @@ import kr.modusplant.domains.post.usecase.record.PostDetailDataReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.response.DraftPostResponse;
+import kr.modusplant.domains.post.usecase.response.PostDetailDataResponse;
 import kr.modusplant.domains.post.usecase.response.PostDetailResponse;
 import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +41,8 @@ public class PostMapperImpl implements PostMapper {
     }
 
     @Override
-    public PostDetailResponse toPostDetailResponse(PostDetailDataReadModel postDetailDataReadModel, JsonNode content) {
-        return new PostDetailResponse(
+    public PostDetailDataResponse toPostDetailDataResponse(PostDetailDataReadModel postDetailDataReadModel, JsonNode content, String thumbnailFilename) {
+        return new PostDetailDataResponse(
                 postDetailDataReadModel.ulid(),
                 postDetailDataReadModel.primaryCategoryId(),
                 postDetailDataReadModel.primaryCategory(),
@@ -49,16 +50,12 @@ public class PostMapperImpl implements PostMapper {
                 postDetailDataReadModel.secondaryCategory(),
                 postDetailDataReadModel.authorUuid(),
                 postDetailDataReadModel.nickname(),
-                null,
-                null,
-                null,
                 postDetailDataReadModel.title(),
                 content,
+                thumbnailFilename,
                 postDetailDataReadModel.isPublished(),
                 postDetailDataReadModel.publishedAt(),
-                postDetailDataReadModel.updatedAt(),
-                null,
-                null
+                postDetailDataReadModel.updatedAt()
         );
     }
 

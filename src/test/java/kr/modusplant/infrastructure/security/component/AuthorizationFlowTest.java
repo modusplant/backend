@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import kr.modusplant.domains.comment.adapter.controller.CommentController;
-import kr.modusplant.domains.comment.common.util.adapter.CommentRegisterRequestTestUtils;
-import kr.modusplant.domains.comment.common.util.adapter.CommentResponseTestUtils;
+import kr.modusplant.domains.comment.common.util.usecase.CommentRegisterRequestTestUtils;
+import kr.modusplant.domains.comment.common.util.usecase.CommentResponseTestUtils;
 import kr.modusplant.domains.comment.framework.in.web.rest.CommentRestController;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.framework.out.redis.AccessTokenRedisRepository;
@@ -23,9 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberRoleConstant.MEMBER_ROLE_USER_ROLE;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -83,7 +81,7 @@ public class AuthorizationFlowTest implements CommentRegisterRequestTestUtils, C
         accessTokenClaims = Jwts.claims()
                 .subject(MEMBER_BASIC_USER_UUID.toString())
                 .add("nickname", MEMBER_BASIC_USER_NICKNAME)
-                .add("roles", MEMBER_ROLE_USER_ROLE)
+                .add("roles", MEMBER_BASIC_USER_ROLE)
                 .build();
     }
 

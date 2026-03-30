@@ -9,22 +9,18 @@ import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileI
 import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyReportImagePath;
-import kr.modusplant.domains.member.usecase.port.mapper.MemberMapper;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
 import kr.modusplant.domains.member.usecase.port.repository.TargetCommentIdRepository;
 import kr.modusplant.domains.member.usecase.port.repository.TargetPostIdRepository;
 import kr.modusplant.domains.member.usecase.record.*;
-import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
-import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.infrastructure.event.bus.EventBus;
-import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.*;
@@ -50,8 +46,6 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 public class MemberController {
     private final S3FileService s3FileService;
     private final SwearService swearService;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final MemberMapper memberMapper;
     private final MemberProfileMapper memberProfileMapper;
     private final MemberImageIOHelper memberImageIOHelper;
     private final MemberValidationHelper memberValidationHelper;
@@ -60,12 +54,6 @@ public class MemberController {
     private final TargetPostIdRepository targetPostIdRepository;
     private final TargetCommentIdRepository targetCommentIdRepository;
     private final EventBus eventBus;
-
-    public MemberResponse registerMember(MemberRegisterRequest request) {
-        Nickname nickname = Nickname.create(request.nickname());
-        memberValidationHelper.validateIfNicknameNotDuplicated(nickname);
-        return memberMapper.toMemberResponse(memberRepository.add(nickname));
-    }
 
     @Transactional(readOnly = true)
     public boolean checkExistedNickname(MemberNicknameCheckRecord record) {
@@ -207,7 +195,7 @@ public class MemberController {
     }
 
     public void reportProposalOrBug(ProposalOrBugReportRecord record) throws IOException {
-        MemberId memberId = MemberId.fromUuid(jwtTokenProvider.getMemberUuidFromToken(record.accessToken()));
+        MemberId memberId = MemberId.fromUuid(record.memberId());
         ReportTitle reportTitle = ReportTitle.create(record.title());
         ReportContent reportContent = ReportContent.create(record.content());
         ReportImagePath reportImagePath;
@@ -227,7 +215,7 @@ public class MemberController {
     }
 
     public void reportPostAbuse(PostAbuseReportRecord record) {
-        MemberId memberId = MemberId.fromUuid(jwtTokenProvider.getMemberUuidFromToken(record.accessToken()));
+        MemberId memberId = MemberId.fromUuid(record.memberId());
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfTargetPostExists(targetPostId);
@@ -239,7 +227,7 @@ public class MemberController {
     }
 
     public void reportCommentAbuse(CommentAbuseReportRecord record) {
-        MemberId memberId = MemberId.fromUuid(jwtTokenProvider.getMemberUuidFromToken(record.accessToken()));
+        MemberId memberId = MemberId.fromUuid(record.memberId());
         TargetCommentId targetCommentId = TargetCommentId.create(
                 TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
         memberValidationHelper.validateIfMemberExists(memberId);

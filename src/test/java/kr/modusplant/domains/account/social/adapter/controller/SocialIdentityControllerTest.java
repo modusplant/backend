@@ -9,8 +9,8 @@ import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClient
 import kr.modusplant.domains.account.social.usecase.port.client.dto.SocialUserInfo;
 import kr.modusplant.domains.account.social.usecase.port.mapper.SocialIdentityMapper;
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
-import kr.modusplant.infrastructure.security.enums.Role;
 import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

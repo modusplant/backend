@@ -58,14 +58,6 @@ public class SiteMemberAuthEntity {
     @Column(name = VER_NUM, nullable = false)
     private Long versionNumber;
 
-    public void updateEmail(String email) {
-        this.email = email;
-    }
-
-    public void updatePw(String pw) {
-        this.pw = pw;
-    }
-
     public String getETagSource() {
         return getUuid() + "-" + getVersionNumber();
     }

@@ -15,21 +15,21 @@ public class SiteMemberTerm {
     private final SiteMemberTermId siteMemberTermId;
     private final String agreedTermsOfUseVersion;
     private final String agreedPrivacyPolicyVersion;
-    private final String agreedAdInfoReceivingVersion;
+    private final String agreedCommunityPolicyVersion;
 
-    public static SiteMemberTerm create(SiteMemberTermId siteMemberTermId, String agreedTermsOfUseVersion, String agreedPrivacyPolicyVersion, String agreedAdInfoReceivingVersion) {
+    public static SiteMemberTerm create(SiteMemberTermId siteMemberTermId, String agreedTermsOfUseVersion, String agreedPrivacyPolicyVersion, String agreedCommunityPolicyVersion) {
         if(siteMemberTermId == null) throw new EmptyValueException(TermErrorCode.EMPTY_SITE_MEMBER_TERM_ID);
         if(agreedTermsOfUseVersion == null) throw new EmptyValueException(TermErrorCode.EMPTY_AGREED_TERM_OF_USE_VERSION);
         if(agreedPrivacyPolicyVersion == null) throw new EmptyValueException(TermErrorCode.EMPTY_AGREED_PRIVACY_POLICY_VERSION);
-        if(agreedAdInfoReceivingVersion == null) throw new EmptyValueException(TermErrorCode.EMPTY_AGREED_AD_INFO_RECEIVING_VERSION);
-        return new SiteMemberTerm(siteMemberTermId, agreedTermsOfUseVersion,  agreedPrivacyPolicyVersion, agreedAdInfoReceivingVersion);
+        if(agreedCommunityPolicyVersion == null) throw new EmptyValueException(TermErrorCode.EMPTY_AGREED_COMMUNITY_POLICY_VERSION);
+        return new SiteMemberTerm(siteMemberTermId, agreedTermsOfUseVersion,  agreedPrivacyPolicyVersion, agreedCommunityPolicyVersion);
     }
 
-    public SiteMemberTerm create(String agreedTermsOfUseVersion, String agreedPrivacyPolicyVersion, String agreedAdInfoReceivingVersion) {
+    public SiteMemberTerm create(String agreedTermsOfUseVersion, String agreedPrivacyPolicyVersion, String agreedCommunityPolicyVersion) {
         if(agreedTermsOfUseVersion == null) agreedTermsOfUseVersion = this.agreedTermsOfUseVersion;
         if(agreedPrivacyPolicyVersion == null) agreedPrivacyPolicyVersion = this.agreedPrivacyPolicyVersion;
-        if(agreedAdInfoReceivingVersion == null) agreedAdInfoReceivingVersion = this.agreedAdInfoReceivingVersion;
-        return new SiteMemberTerm(this.siteMemberTermId, agreedTermsOfUseVersion, agreedPrivacyPolicyVersion, agreedAdInfoReceivingVersion);
+        if(agreedCommunityPolicyVersion == null) agreedCommunityPolicyVersion = this.agreedCommunityPolicyVersion;
+        return new SiteMemberTerm(this.siteMemberTermId, agreedTermsOfUseVersion, agreedPrivacyPolicyVersion, agreedCommunityPolicyVersion);
     }
 
     @Override

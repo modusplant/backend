@@ -6,19 +6,15 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import kr.modusplant.domains.member.adapter.controller.MemberController;
-import kr.modusplant.domains.member.domain.exception.IncorrectMemberIdException;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
 import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.domains.member.usecase.record.*;
-import kr.modusplant.domains.member.usecase.request.MemberRegisterRequest;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
-import kr.modusplant.domains.member.usecase.response.MemberResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -48,16 +44,6 @@ public class MemberRestController {
     private final MemberController memberController;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberCacheValidationService memberCacheValidationService;
-
-    @Hidden
-    @Operation(summary = "회원 등록 API", description = "닉네임을 통해 회원을 등록합니다.")
-    @PostMapping(value = "/members")
-    public ResponseEntity<DataResponse<MemberResponse>> registerMember(
-            @RequestBody @Valid MemberRegisterRequest request) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(DataResponse.ok(memberController.registerMember(request)));
-    }
 
     @Operation(summary = "회원 닉네임 중복 확인 API", description = "이미 등록된 닉네임이 있는지 조회합니다.")
     @GetMapping(value = "/members/check/nickname/{nickname}")
@@ -90,31 +76,23 @@ public class MemberRestController {
             description = "기존 회원 프로필을 조회합니다. ",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @GetMapping(value = "/members/{id}/profile")
+    @GetMapping(value = "/members/profile")
     public ResponseEntity<DataResponse<MemberProfileResponse>> getMemberProfile(
-            @Parameter(
-                    description = "기존에 저장된 회원의 아이디",
-                    schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID)
-            )
-            @PathVariable(required = false)
-            @NotNull(message = "회원 아이디가 비어 있습니다. ")
-            UUID id,
-
-            @Parameter(hidden = true)
-            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
-            @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String auth,
-
             @Parameter(hidden = true)
             @RequestHeader(name = HttpHeaders.IF_NONE_MATCH, required = false)
             String ifNoneMatch,
 
             @Parameter(hidden = true)
             @RequestHeader(name = HttpHeaders.IF_MODIFIED_SINCE, required = false)
-            String ifModifiedSince) throws IOException {
-        validateMemberIdFromToken(id, auth);
+            String ifModifiedSince,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
+            @NotNull(message = "접근 토큰이 비어 있습니다. ")
+            String auth) throws IOException {
+        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
         MemberCacheValidationResult cacheValidationResult =
-                memberCacheValidationService.getMemberCacheValidationResult(ifNoneMatch, ifModifiedSince, id);
+                memberCacheValidationService.getMemberCacheValidationResult(ifNoneMatch, ifModifiedSince, memberId);
         if (cacheValidationResult.isCacheUsable()) {
             return ResponseEntity
                     .status(HttpStatus.NOT_MODIFIED)
@@ -134,7 +112,7 @@ public class MemberRestController {
                             ZonedDateTime.of(
                                     cacheValidationResult.lastModifiedDateTime(),
                                     ZoneId.of("Asia/Seoul")))
-                    .body(DataResponse.ok(memberController.getProfile(new MemberProfileGetRecord(id))));
+                    .body(DataResponse.ok(memberController.getProfile(new MemberProfileGetRecord(memberId))));
         }
     }
 
@@ -143,16 +121,8 @@ public class MemberRestController {
             description = "기존 회원 프로필을 덮어씁니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PutMapping(value = "/members/{id}/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/members/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<MemberProfileResponse>> overrideMemberProfile(
-            @Parameter(
-                    description = "기존에 저장된 회원의 아이디",
-                    schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID)
-            )
-            @PathVariable(required = false)
-            @NotNull(message = "회원 아이디가 비어 있습니다. ")
-            UUID id,
-
             @Parameter(
                     description = "갱신할 회원의 프로필 이미지",
                     schema = @Schema(type = "string", format = "binary")
@@ -178,13 +148,13 @@ public class MemberRestController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) throws IOException {
-        validateMemberIdFromToken(id, auth);
+        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
                 .body(DataResponse.ok(
                         memberController.overrideProfile(
-                                new MemberProfileOverrideRecord(id, introduction, image, nickname))));
+                                new MemberProfileOverrideRecord(memberId, introduction, image, nickname))));
     }
 
     @Operation(
@@ -192,16 +162,8 @@ public class MemberRestController {
             description = "게시글에 좋아요를 누릅니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PutMapping("/members/{id}/like/communication/post/{postUlid}")
+    @PutMapping("/members/like/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationPost(
-            @Parameter(
-                    description = "회원의 아이디",
-                    schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID)
-            )
-            @PathVariable(required = false)
-            @NotNull(message = "회원 아이디가 비어 있습니다. ")
-            UUID id,
-
             @Parameter(
                     description = "좋아요를 누를 게시글의 식별자",
                     schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
@@ -214,8 +176,8 @@ public class MemberRestController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
-        validateMemberIdFromToken(id, auth);
-        memberController.likePost(new MemberPostLikeRecord(id, postUlid));
+        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+        memberController.likePost(new MemberPostLikeRecord(memberId, postUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
@@ -224,16 +186,8 @@ public class MemberRestController {
             description = "게시글에 대한 좋아요를 취소합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping("/members/{id}/like/communication/post/{postUlid}")
+    @DeleteMapping("/members/like/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationPost(
-            @Parameter(
-                    description = "회원의 아이디",
-                    schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID)
-            )
-            @PathVariable(required = false)
-            @NotNull(message = "회원 아이디가 비어 있습니다. ")
-            UUID id,
-
             @Parameter(
                     description = "좋아요를 취소할 게시글의 식별자",
                     schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
@@ -246,8 +200,8 @@ public class MemberRestController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
-        validateMemberIdFromToken(id, auth);
-        memberController.unlikePost(new MemberPostUnlikeRecord(id, postUlid));
+        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+        memberController.unlikePost(new MemberPostUnlikeRecord(memberId, postUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
@@ -256,16 +210,8 @@ public class MemberRestController {
             description = "게시글에 북마크를 누릅니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PutMapping("/members/{id}/bookmark/communication/post/{postUlid}")
+    @PutMapping("/members/bookmark/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> bookmarkCommunicationPost(
-            @Parameter(
-                    description = "회원의 아이디",
-                    schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID)
-            )
-            @PathVariable(required = false)
-            @NotNull(message = "회원 아이디가 비어 있습니다. ")
-            UUID id,
-
             @Parameter(
                     description = "북마크를 누를 게시글의 식별자",
                     schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
@@ -278,8 +224,8 @@ public class MemberRestController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
-        validateMemberIdFromToken(id, auth);
-        memberController.bookmarkPost(new MemberPostBookmarkRecord(id, postUlid));
+        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+        memberController.bookmarkPost(new MemberPostBookmarkRecord(memberId, postUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
@@ -288,16 +234,8 @@ public class MemberRestController {
             description = "게시글에 대한 북마크를 취소합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping("/members/{id}/bookmark/communication/post/{postUlid}")
+    @DeleteMapping("/members/bookmark/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> cancelCommunicationPostBookmark(
-            @Parameter(
-                    description = "회원의 아이디",
-                    schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID)
-            )
-            @PathVariable(required = false)
-            @NotNull(message = "회원 아이디가 비어 있습니다. ")
-            UUID id,
-
             @Parameter(
                     description = "북마크를 취소할 게시글의 식별자",
                     schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
@@ -310,8 +248,8 @@ public class MemberRestController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
-        validateMemberIdFromToken(id, auth);
-        memberController.cancelPostBookmark(new MemberPostBookmarkCancelRecord(id, postUlid));
+        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+        memberController.cancelPostBookmark(new MemberPostBookmarkCancelRecord(memberId, postUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
@@ -320,16 +258,8 @@ public class MemberRestController {
             description = "댓글에 좋아요를 누릅니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PutMapping("/members/{id}/like/communication/post/{postUlid}/path/{path}")
+    @PutMapping("/members/like/communication/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationComment(
-            @Parameter(
-                    description = "회원의 아이디",
-                    schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID)
-            )
-            @PathVariable(required = false)
-            @NotNull(message = "회원 아이디가 비어 있습니다. ")
-            UUID id,
-
             @Parameter(
                     description = "좋아요를 누를 댓글의 게시글 식별자",
                     schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
@@ -351,8 +281,8 @@ public class MemberRestController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
-        validateMemberIdFromToken(id, auth);
-        memberController.likeComment(new MemberCommentLikeRecord(id, postUlid, path));
+        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+        memberController.likeComment(new MemberCommentLikeRecord(memberId, postUlid, path));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
@@ -361,16 +291,8 @@ public class MemberRestController {
             description = "댓글에 대한 좋아요를 취소합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping("/members/{id}/like/communication/post/{postUlid}/path/{path}")
+    @DeleteMapping("/members/like/communication/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationComment(
-            @Parameter(
-                    description = "회원의 아이디",
-                    schema = @Schema(type = "string", format = "uuid", pattern = REGEX_UUID)
-            )
-            @PathVariable(required = false)
-            @NotNull(message = "회원 아이디가 비어 있습니다. ")
-            UUID id,
-
             @Parameter(
                     description = "좋아요를 취소할 댓글의 게시글 식별자",
                     schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
@@ -392,8 +314,8 @@ public class MemberRestController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
-        validateMemberIdFromToken(id, auth);
-        memberController.unlikeComment(new MemberCommentUnlikeRecord(id, postUlid, path));
+        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+        memberController.unlikeComment(new MemberCommentUnlikeRecord(memberId, postUlid, path));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
@@ -423,9 +345,8 @@ public class MemberRestController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) throws IOException {
-        memberController.reportProposalOrBug(
-                new ProposalOrBugReportRecord(
-                        getTokenFromAuthorizationHeader(auth), title, content, image));
+        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(memberId, title, content, image));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
@@ -463,9 +384,8 @@ public class MemberRestController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
-        memberController.reportPostAbuse(
-                new PostAbuseReportRecord(
-                        getTokenFromAuthorizationHeader(auth), postUlid));
+        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+        memberController.reportPostAbuse(new PostAbuseReportRecord(memberId, postUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
@@ -521,16 +441,8 @@ public class MemberRestController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
-        memberController.reportCommentAbuse(
-                new CommentAbuseReportRecord(
-                        getTokenFromAuthorizationHeader(auth), postUlid, path));
+        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+        memberController.reportCommentAbuse(new CommentAbuseReportRecord(memberId, postUlid, path));
         return ResponseEntity.ok().body(DataResponse.ok());
-    }
-
-    private void validateMemberIdFromToken(UUID id, String auth) {
-        String accessToken = getTokenFromAuthorizationHeader(auth);
-        if (!jwtTokenProvider.getMemberUuidFromToken(accessToken).equals(id)) {
-            throw new IncorrectMemberIdException();
-        }
     }
 }

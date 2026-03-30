@@ -3,16 +3,20 @@ package kr.modusplant.domains.post.adapter.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.exception.ContentProcessingException;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.PostAccessDeniedException;
 import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
+import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.domains.post.domain.vo.*;
 import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
 import kr.modusplant.domains.post.usecase.port.repository.*;
+import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
 import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
+import kr.modusplant.domains.post.usecase.request.PostSearchRequest;
 import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
 import kr.modusplant.domains.post.usecase.response.*;
 import kr.modusplant.framework.aws.service.S3FileService;
@@ -40,6 +44,7 @@ public class PostController {
     private final PostViewLockRepository postViewLockRepository;
     private final PostArchiveRepository postArchiveRepository;
     private final PostRecentlyViewRepository postRecentlyViewRepository;
+    private final PostSearchHistoryRepository postSearchHistoryRepository;
     private final S3FileService s3FileService;
 
     @Value("${redis.ttl.view_count}")
@@ -52,18 +57,20 @@ public class PostController {
         boolean hasNext = readModels.size() > size;
         List<PostSummaryResponse> responses = readModels.stream()
                 .limit(size)
-                .map(readModel -> postMapper.toPostSummaryResponse(readModel,getJsonNodeContentPreview(readModel.content()))).toList();
+                .map(readModel -> postMapper.toPostSummaryResponse(readModel,getJsonNodeContentPreview(readModel.content(),readModel.thumbnailPath()))).toList();
         String nextUlid = hasNext && !responses.isEmpty() ? responses.get(responses.size() - 1).ulid() : null;
         return CursorPageResponse.of(responses, nextUlid, hasNext);
     }
 
-    public CursorPageResponse<PostSummaryResponse> getByKeyword(String keyword, UUID currentMemberUuid, String lastUlid, int size) {
-        List<PostSummaryReadModel> readModels = postQueryRepository.findByKeywordWithCursor(keyword,currentMemberUuid, lastUlid, size);
+    @Transactional
+    public CursorPageResponse<PostSummaryResponse> getByKeyword(PostSearchRequest postSearchRequest, UUID currentMemberUuid, String lastUlid, int size) {
+        List<PostSummaryReadModel> readModels = postQueryRepository.findByKeywordWithCursor(postSearchRequest.option(), postSearchRequest.keyword(), postSearchRequest.sort(),postSearchRequest.category().primaryCategoryId(), postSearchRequest.category().secondaryCategoryIds(), currentMemberUuid, lastUlid, size);
         boolean hasNext = readModels.size() > size;
         List<PostSummaryResponse> responses = readModels.stream()
                 .limit(size)
-                .map(readModel -> postMapper.toPostSummaryResponse(readModel,getJsonNodeContentPreview(readModel.content()))).toList();
+                .map(readModel -> postMapper.toPostSummaryResponse(readModel,getJsonNodeContentPreview(readModel.content(),readModel.thumbnailPath()))).toList();
         String nextUlid = hasNext && !responses.isEmpty() ? responses.get(responses.size() - 1).ulid() : null;
+        postSearchHistoryRepository.saveSearchKeyword(currentMemberUuid, postSearchRequest.keyword());
         return CursorPageResponse.of(responses, nextUlid, hasNext);
     }
 
@@ -83,23 +90,39 @@ public class PostController {
                 }).orElseThrow(() -> new PostNotFoundException());
     }
 
-    public PostDetailResponse getDataByUlid(String ulid, UUID currentMemberUuid) {
+    public PostDetailDataResponse getDataByUlid(String ulid, UUID currentMemberUuid) {
         return postQueryRepository.findPostDetailDataByPostId(PostId.create(ulid))
                 .filter(postDetailData -> postDetailData.isPublished() ||
                         (!postDetailData.isPublished() && postDetailData.authorUuid().equals(currentMemberUuid)))
-                .map(postDetailData -> postMapper.toPostDetailResponse(postDetailData, getJsonNodeContent(postDetailData.content())))
+                .map(postDetailData -> postMapper.toPostDetailDataResponse(
+                        postDetailData,
+                        getJsonNodeContent(postDetailData.content()),
+                        multipartDataProcessorPort.extractOriginalFilenameFromFileKey(postDetailData.thumbnailPath())))
                 .orElseThrow(() -> new PostNotFoundException());
     }
 
     @Transactional
     public void createPost(PostInsertRequest postInsertRequest, UUID currentMemberUuid) throws IOException {
         AuthorId authorId = AuthorId.fromUuid(currentMemberUuid);
-        PrimaryCategoryId primaryCategoryId = PrimaryCategoryId.create(postInsertRequest.primaryCategoryId());
-        SecondaryCategoryId secondaryCategoryId = SecondaryCategoryId.create(postInsertRequest.secondaryCategoryId());
-        PostContent postContent = PostContent.create(postInsertRequest.title(), multipartDataProcessorPort.saveFilesAndGenerateContentJson(postInsertRequest.content(), postInsertRequest.orderInfo()));
-        Post post = postInsertRequest.isPublished()
-                ? Post.createPublished(authorId, primaryCategoryId, secondaryCategoryId, postContent)
-                : Post.createDraft(authorId, primaryCategoryId, secondaryCategoryId, postContent);
+        Post post;
+        if (postInsertRequest.isPublished()) {
+            PrimaryCategoryId primaryCategoryId = PrimaryCategoryId.create(postInsertRequest.primaryCategoryId());
+            SecondaryCategoryId secondaryCategoryId = SecondaryCategoryId.create(postInsertRequest.secondaryCategoryId());
+            ContentProcessRecord result = multipartDataProcessorPort.saveFilesAndGenerateContentJson(postInsertRequest.content(), postInsertRequest.orderInfo(), postInsertRequest.thumbnailFilename());
+            post = Post.createPublished(authorId, primaryCategoryId, secondaryCategoryId,  PostContent.create(postInsertRequest.title(), result.content(), result.thumbnailPath()));
+        } else {
+            PrimaryCategoryId primaryCategoryId = postInsertRequest.primaryCategoryId() != null ? PrimaryCategoryId.create(postInsertRequest.primaryCategoryId()) : null;
+            SecondaryCategoryId secondaryCategoryId = postInsertRequest.secondaryCategoryId() != null ? SecondaryCategoryId.create(postInsertRequest.secondaryCategoryId()) : null;
+            ContentProcessRecord result;
+            if (postInsertRequest.content() != null && postInsertRequest.orderInfo() != null) {
+                result = multipartDataProcessorPort.saveFilesAndGenerateContentJson(postInsertRequest.content(), postInsertRequest.orderInfo(), postInsertRequest.thumbnailFilename());
+            } else if (postInsertRequest.content() == null && postInsertRequest.orderInfo() == null) {
+                result = new ContentProcessRecord(null,null);
+            } else {
+                throw new EmptyValueException(PostErrorCode.EMPTY_POST_CONTENT);
+            }
+            post = Post.createDraft(authorId, primaryCategoryId, secondaryCategoryId, PostContent.createDraft(postInsertRequest.title(), result.content(), result.thumbnailPath()));
+        }
         postRepository.save(post);
     }
 
@@ -107,15 +130,33 @@ public class PostController {
     public void updatePost(PostUpdateRequest postUpdateRequest, UUID currentMemberUuid) throws IOException {
         Post post = postRepository.getPostByUlid(PostId.create(postUpdateRequest.ulid()))
                 .filter(p -> p.getAuthorId().equals(AuthorId.fromUuid(currentMemberUuid))).orElseThrow();
+        // 게시글 검증 수행
         multipartDataProcessorPort.deleteFiles(post.getPostContent().getContent());
-        PostContent postContent = PostContent.create(postUpdateRequest.title(),multipartDataProcessorPort.saveFilesAndGenerateContentJson(postUpdateRequest.content(), postUpdateRequest.orderInfo()));
-        post.update(
-                AuthorId.fromUuid(currentMemberUuid),
-                PrimaryCategoryId.create(postUpdateRequest.primaryCategoryId()),
-                SecondaryCategoryId.create(postUpdateRequest.secondaryCategoryId()),
-                postContent,
-                postUpdateRequest.isPublished() ? PostStatus.published() : PostStatus.draft()
-        );
+        if (postUpdateRequest.isPublished()) {
+            ContentProcessRecord result = multipartDataProcessorPort.saveFilesAndGenerateContentJson(postUpdateRequest.content(), postUpdateRequest.orderInfo(), postUpdateRequest.thumbnailFilename());
+            post.update(
+                    AuthorId.fromUuid(currentMemberUuid),
+                    PrimaryCategoryId.create(postUpdateRequest.primaryCategoryId()),
+                    SecondaryCategoryId.create(postUpdateRequest.secondaryCategoryId()),
+                    PostContent.create(postUpdateRequest.title(), result.content(), result.thumbnailPath()),
+                    PostStatus.published()
+            );
+        } else {
+            ContentProcessRecord result;
+            if (postUpdateRequest.content() != null && postUpdateRequest.orderInfo() != null) {
+                result = multipartDataProcessorPort.saveFilesAndGenerateContentJson(postUpdateRequest.content(), postUpdateRequest.orderInfo(), postUpdateRequest.thumbnailFilename());
+            } else if (postUpdateRequest.content() == null && postUpdateRequest.orderInfo() == null) {
+                result = new ContentProcessRecord(null,null);
+            } else {
+                throw new EmptyValueException(PostErrorCode.EMPTY_POST_CONTENT);
+            }
+            post.updateDraft(
+                    AuthorId.fromUuid(currentMemberUuid),
+                    postUpdateRequest.primaryCategoryId() != null ? PrimaryCategoryId.create(postUpdateRequest.primaryCategoryId()) : null,
+                    postUpdateRequest.secondaryCategoryId() != null ? SecondaryCategoryId.create(postUpdateRequest.secondaryCategoryId()) : null,
+                    PostContent.createDraft(postUpdateRequest.title(), result.content(), result.thumbnailPath())
+            );
+        }
         postRepository.update(post);
     }
 
@@ -164,13 +205,13 @@ public class PostController {
     public OffsetPageResponse<PostSummaryResponse> getByMemberUuid(UUID memberUuid, int page, int size) {
         return OffsetPageResponse.from(
                 postQueryForMemberRepository.findPublishedByAuthMemberWithOffset(AuthorId.fromUuid(memberUuid),page,size)
-                        .map(postModel -> postMapper.toPostSummaryResponse(postModel,getJsonNodeContentPreview(postModel.content()))));
+                        .map(postModel -> postMapper.toPostSummaryResponse(postModel,getJsonNodeContentPreview(postModel.content(),postModel.thumbnailPath()))));
     }
 
     public OffsetPageResponse<DraftPostResponse> getDraftByMemberUuid(UUID currentMemberUuid, int page, int size) {
         return OffsetPageResponse.from(
                 postQueryForMemberRepository.findDraftByAuthMemberWithOffset(AuthorId.fromUuid(currentMemberUuid),page,size)
-                        .map(postModel -> postMapper.toDraftPostResponse(postModel, getJsonNodeContentPreview(postModel.content()))));
+                        .map(postModel -> postMapper.toDraftPostResponse(postModel, getJsonNodeContentPreview(postModel.content(),postModel.thumbnailPath()))));
     }
 
     public OffsetPageResponse<PostSummaryResponse> getRecentlyViewByMemberUuid(UUID currentMemberUuid, int page, int size) {
@@ -181,7 +222,7 @@ public class PostController {
         }
         List<PostSummaryResponse> postsPages = postQueryForMemberRepository.findByIds(postIds,currentMemberUuid)
                 .stream()
-                .map(postModel -> postMapper.toPostSummaryResponse(postModel, getJsonNodeContentPreview(postModel.content())))
+                .map(postModel -> postMapper.toPostSummaryResponse(postModel, getJsonNodeContentPreview(postModel.content(),postModel.thumbnailPath())))
                 .toList();
         return OffsetPageResponse.from(new PageImpl<>(postsPages,PageRequest.of(page,size),totalElements));
     }
@@ -189,20 +230,33 @@ public class PostController {
     public OffsetPageResponse<PostSummaryResponse> getLikedByMemberUuid(UUID currentMemberUuid, int page, int size) {
         return OffsetPageResponse.from(
                 postQueryForMemberRepository.findLikedByMemberWithOffset(currentMemberUuid,page,size)
-                        .map(postModel -> postMapper.toPostSummaryResponse(postModel, getJsonNodeContentPreview(postModel.content()))));
+                        .map(postModel -> postMapper.toPostSummaryResponse(postModel, getJsonNodeContentPreview(postModel.content(),postModel.thumbnailPath()))));
     }
 
     public OffsetPageResponse<PostSummaryResponse> getBookmarkedByMemberUuid(UUID currentMemberUuid, int page, int size) {
         return OffsetPageResponse.from(
                 postQueryForMemberRepository.findBookmarkedByMemberWithOffset(currentMemberUuid,page,size)
-                        .map(postModel -> postMapper.toPostSummaryResponse(postModel, getJsonNodeContentPreview(postModel.content())))
+                        .map(postModel -> postMapper.toPostSummaryResponse(postModel, getJsonNodeContentPreview(postModel.content(),postModel.thumbnailPath())))
         );
     }
 
-    private JsonNode getJsonNodeContentPreview(JsonNode content) {
+    public List<String> getSearchHistory(UUID currentMemberUuid, int size) {
+        return postSearchHistoryRepository.getSearchHistory(currentMemberUuid, size);
+    }
+
+    public void deleteSearchKeyword(UUID currentMemberUuid, String keyword) {
+        postSearchHistoryRepository.removeSearchKeyword(currentMemberUuid,keyword);
+    }
+
+    public void deleteAllSearchHistory(UUID currentMemberUuid) {
+        postSearchHistoryRepository.removeAllSearchHistory(currentMemberUuid);
+    }
+
+    private JsonNode getJsonNodeContentPreview(JsonNode content, String thumbnailPath) {
+        if (content == null) return null;
         JsonNode contentPreview;
         try {
-            contentPreview = multipartDataProcessorPort.convertToPreview(content);
+            contentPreview = multipartDataProcessorPort.convertToPreview(content, thumbnailPath);
         } catch (IOException e) {
             throw new ContentProcessingException();
         }
@@ -210,6 +264,7 @@ public class PostController {
     }
 
     private JsonNode getJsonNodeContent(JsonNode content) {
+        if (content == null) return null;
         JsonNode newContent;
         try {
             newContent = multipartDataProcessorPort.convertFileSrcToFullFileSrc(content);
