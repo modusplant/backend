@@ -35,7 +35,7 @@ public class SiteMemberAuthEntity {
     @JoinColumn(nullable = false, name = "uuid", updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity member;
 
-    @Column(nullable = false, length = 80)
+    @Column(nullable = false, unique = true, length = 80)
     private String email;
 
     @Column(length = 64)
