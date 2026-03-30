@@ -1,6 +1,5 @@
 package kr.modusplant.domains.account.social.framework.in.web.rest;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

@@ -11,5 +11,8 @@ import java.util.UUID;
 
 @Repository
 @Primary
-public interface SiteMemberProfileJpaRepository extends LastModifiedAtRepository<SiteMemberProfileEntity>, SiteMemberUuidPrimaryKeyJpaRepository<SiteMemberProfileEntity>, JpaRepository<SiteMemberProfileEntity, UUID> {
+public interface SiteMemberProfileJpaRepository extends
+        LastModifiedAtRepository<SiteMemberProfileEntity>,
+        SiteMemberUuidPrimaryKeyJpaRepository<SiteMemberProfileEntity>,
+        JpaRepository<SiteMemberProfileEntity, UUID> {
 }

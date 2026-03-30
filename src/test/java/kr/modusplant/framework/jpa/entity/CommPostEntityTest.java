@@ -4,10 +4,18 @@ import kr.modusplant.framework.jpa.entity.common.util.CommPostEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
+import java.time.LocalDateTime;
+
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @RepositoryOnlyContext
 class CommPostEntityTest implements CommPostEntityTestUtils {
@@ -30,9 +38,9 @@ class CommPostEntityTest implements CommPostEntityTestUtils {
                 .primaryCategory(commPrimaryCategoryEntity)
                 .secondaryCategory(commSecondaryCategoryEntity)
                 .authMember(member)
-                .likeCount(1)
-                .viewCount(1L)
-                .isPublished(true)
+                .likeCount(null)
+                .viewCount(null)
+                .isPublished(null)
                 .build();
 
         // when
@@ -40,8 +48,20 @@ class CommPostEntityTest implements CommPostEntityTestUtils {
         entityManager.flush();
 
         // then
-        assertThat(commPost.getLikeCount()).isEqualTo(1);
-        assertThat(commPost.getViewCount()).isEqualTo(1L);
+        assertThat(commPost.getLikeCount()).isEqualTo(0);
+        assertThat(commPost.getViewCount()).isEqualTo(0L);
+        assertThat(commPost.getIsPublished()).isEqualTo(false);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    @DisplayName("발행 여부 전환 테스트")
+    void updateIsPublishedTest(Boolean isPublished) {
+        CommPostEntity commPost = createCommPostEntityBuilder().build();
+
+        commPost.updateIsPublished(isPublished);
+
+        assertThat(commPost.getIsPublished()).isEqualTo(isPublished);
     }
 
     @Test
@@ -68,5 +88,68 @@ class CommPostEntityTest implements CommPostEntityTestUtils {
 
         commPost.decreaseLikeCount();
         assertThat(commPost.getLikeCount()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("발행 날짜 갱신 테스트")
+    void updatePublishedAtTest() {
+        LocalDateTime localDateTime = LocalDateTime.now();
+        CommPostEntity commPost = createCommPostEntityBuilder().build();
+
+        commPost.updatePublishedAt(localDateTime);
+
+        assertThat(commPost.getPublishedAt()).isEqualTo(localDateTime);
+    }
+
+    @Test
+    @DisplayName("getETagSource를 통해 ETag 소스 반환")
+    void testGetETagSource_givenNothing_willReturnETagSource() {
+        // when
+        CommPostEntity commPostEntity = createCommPostEntityBuilderWithUlid().build();
+
+        // then
+        assertEquals(commPostEntity.getETagSource(),TEST_COMM_POST_ULID + "-" + null);
+    }
+
+    @Test
+    @DisplayName("같은 객체에 대한 equals 호출")
+    void testEquals_givenSameObject_willReturnTrue() {
+        // when
+        CommPostEntity commPostEntity = createCommPostEntityBuilderWithUlid().build();
+
+        // then
+        //noinspection EqualsWithItself
+        assertEquals(commPostEntity, commPostEntity);
+    }
+
+    @Test
+    @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
+    void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
+        // when
+        CommPostEntity commPostEntity = createCommPostEntityBuilderWithUlid().build();
+
+        // then
+        //noinspection AssertBetweenInconvertibleTypes
+        assertNotEquals(commPostEntity, testMemberId);
+    }
+
+    @Test
+    @DisplayName("같은 타입의 인스턴스에 대한 equals 호출")
+    void testEquals_givenObjectOfEqualType_willReturnFalse() {
+        // when
+        CommPostEntity commPostEntity = createCommPostEntityBuilderWithUlid().build();
+
+        // then
+        assertEquals(commPostEntity, CommPostEntity.builder().commPost(commPostEntity).build());
+    }
+
+    @Test
+    @DisplayName("같은 객체에 대한 hashcode 동일성 보장")
+    void testHashCode_givenSameObject_willReturnSameHashCode() {
+        // when
+        CommPostEntity commPostEntity = createCommPostEntityBuilderWithUlid().build();
+
+        // then
+        assertEquals(commPostEntity.hashCode(), commPostEntity.hashCode());
     }
 }

@@ -2,6 +2,7 @@ package kr.modusplant.infrastructure.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.DefaultAuthProvider;
 import kr.modusplant.infrastructure.security.DefaultAuthenticationEntryPoint;
@@ -9,6 +10,7 @@ import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
 import kr.modusplant.infrastructure.security.filter.EmailPasswordAuthenticationFilter;
 import kr.modusplant.infrastructure.security.handler.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +24,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -41,6 +44,7 @@ public class TestSecurityConfig {
     private final AuthenticationConfiguration authConfiguration;
     private final DefaultUserDetailsService defaultUserDetailsService;
     private final TokenService tokenService;
+    private final JwtTokenProvider tokenProvider;
     private final SiteMemberJpaRepository memberRepository;
     private final ObjectMapper objectMapper;
     private final Validator validator;
@@ -56,6 +60,12 @@ public class TestSecurityConfig {
         return new DefaultAuthenticationEntryPoint(objectMapper); }
 
     @Bean
+    @Qualifier("bcryptPasswordEncoder")
+    public PasswordEncoder bcryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         return authConfiguration.getAuthenticationManager();
     }
@@ -66,8 +76,8 @@ public class TestSecurityConfig {
     }
 
     @Bean
-    public ForwardRequestLoginSuccessHandler normalLoginSuccessHandler() {
-        return new ForwardRequestLoginSuccessHandler(memberRepository, tokenService);
+    public WriteResponseLoginSuccessHandler normalLoginSuccessHandler() {
+        return new WriteResponseLoginSuccessHandler(memberRepository, tokenService, tokenProvider, objectMapper);
     }
 
     @Bean
@@ -80,8 +90,8 @@ public class TestSecurityConfig {
         return new JwtClearingLogoutHandler(tokenService); }
 
     @Bean
-    public ForwardRequestLogoutSuccessHandler normalLogoutSuccessHandler() {
-        return new ForwardRequestLogoutSuccessHandler(objectMapper); }
+    public WriteResponseLogoutSuccessHandler normalLogoutSuccessHandler() {
+        return new WriteResponseLogoutSuccessHandler(objectMapper); }
 
     @Bean
     public DefaultAccessDeniedHandler defaultAccessDeniedHandler() {

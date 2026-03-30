@@ -1,5 +1,6 @@
 package kr.modusplant.domains.comment.adapter.controller;
 
+import jakarta.transaction.Transactional;
 import kr.modusplant.domains.comment.adapter.mapper.CommentMapperImpl;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.exception.InvalidValueException;
@@ -14,6 +15,7 @@ import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqR
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJpaAdapter;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
+import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
 import kr.modusplant.domains.member.domain.vo.MemberId;
@@ -23,6 +25,7 @@ import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.persistence.compositekey.CommCommentId;
+import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageImpl;
@@ -46,16 +49,17 @@ public class CommentController {
 
     private final CommentCacheService cacheService;
 
+    @Transactional
     public CommentCacheData getCacheData(String postUlid, String ifNoneMatch, String ifModifiedSince) {
         return cacheService.getCacheData(ifNoneMatch, ifModifiedSince, PostId.create(postUlid));
-
     }
 
+    @Transactional
     public CommentCacheData getCacheData(UUID memberUuid, String ifNoneMatch, String ifModifiedSince) {
         return cacheService.getCacheData(ifNoneMatch, ifModifiedSince, MemberId.fromUuid(memberUuid));
-
     }
 
+    @Transactional
     public List<CommentOfPostResponse> gatherByPost(String postUlid) {
         if(!postJpaRepository.existsByUlid(postUlid)) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post");
@@ -66,6 +70,7 @@ public class CommentController {
                 .toList();
     }
 
+    @Transactional
     public CommentPageResponse<CommentOfAuthorPageModel> gatherByAuthor(UUID memberUuid, Pageable pageable) {
         if(!memberJpaRepository.existsById(memberUuid)) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, "member");
@@ -80,9 +85,9 @@ public class CommentController {
         response.ApplyOneIndexBasedPage();
 
         return response;
-
     }
 
+    @Transactional
     public void register(CommentRegisterRequest request, UUID currentMemberUuid) {
         if(jooqRepository.existsByPostAndPath(PostId.create(request.postId()), CommentPath.create(request.path()))) {
             throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT);
@@ -97,6 +102,21 @@ public class CommentController {
         jpaAdapter.save(comment);
     }
 
+    @Transactional
+    public void update(CommentUpdateRequest request) {
+        if(!jooqRepository.existsByPostAndPath(PostId.create(request.postId()), CommentPath.create(request.path()))) {
+            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_COMMENT, TableName.COMM_COMMENT);
+        }
+
+        CommCommentId id = CommCommentId.builder()
+                .postUlid(request.postId())
+                .path(request.path())
+                .build();
+
+        jpaAdapter.update(id, CommentContent.create(request.content()));
+    }
+
+    @Transactional
     public void delete(String postUlid, String commentPath) {
         jpaAdapter.setCommentAsDeleted(CommCommentId.builder()
                 .postUlid(postUlid)
@@ -133,7 +153,7 @@ public class CommentController {
                     throw new InvalidValueException(CommentErrorCode.EXIST_POST_COMMENT);
                 }
             } else {
-                // 댓글 경로게 .가 없고 1이 아닌 경우, 형제 댓글이 있어야 등록 가능
+                // 댓글 경로에 .가 없고 1이 아닌 경우, 형제 댓글이 있어야 등록 가능
                 String siblingCommentPath = String.valueOf(Integer.parseInt(path) - 1);
                 if (!(jooqRepository.existsByPostAndPath(commentPost, CommentPath.create(siblingCommentPath)))) {
                     throw new InvalidValueException(CommentErrorCode.NOT_EXIST_SIBLING_COMMENT);

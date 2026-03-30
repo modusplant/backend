@@ -3,11 +3,9 @@ package kr.modusplant.infrastructure.security;
 import jakarta.transaction.Transactional;
 import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
+import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
-import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import kr.modusplant.infrastructure.security.exception.AccountStateException;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import kr.modusplant.shared.enums.AuthProvider;
@@ -26,19 +24,16 @@ public class DefaultUserDetailsService implements UserDetailsService {
 
     private final SiteMemberJpaRepository memberRepository;
     private final SiteMemberAuthJpaRepository memberAuthRepository;
-    private final SiteMemberRoleJpaRepository memberRoleRepository;
 
     @Override
     public DefaultUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         SiteMemberAuthEntity auth = memberAuthRepository
                 .findByEmailAndProvider(email, AuthProvider.BASIC).orElseThrow(
-                        () -> new AccountStateException(SecurityErrorCode.MEMBER_STATE_NOT_FOUND));
+                        () -> new AccountStateException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH));
         SiteMemberEntity member = memberRepository
                 .findByUuid(auth.getMember().getUuid()).orElseThrow(
-                        () -> new AccountStateException(SecurityErrorCode.MEMBER_AUTH_STATE_NOT_FOUND));
-        SiteMemberRoleEntity role = memberRoleRepository.findByMember(auth.getMember()).orElseThrow(
-                () -> new AccountStateException(SecurityErrorCode.MEMBER_ROLE_STATE_NOT_FOUND));
+                        () -> new AccountStateException(EntityErrorCode.NOT_FOUND_MEMBER));
 
         return DefaultUserDetails.builder()
                 .email(auth.getEmail())
@@ -48,8 +43,7 @@ public class DefaultUserDetailsService implements UserDetailsService {
                 .provider(auth.getProvider())
                 .isActive(member.getIsActive())
                 .isBanned(member.getIsBanned())
-                .isDeleted(member.getIsDeleted())
-                .authorities(List.of(new SimpleGrantedAuthority(role.getRole().getValue())))
+                .authorities(List.of(new SimpleGrantedAuthority(member.getRole().getValue())))
                 .build();
     }
 }

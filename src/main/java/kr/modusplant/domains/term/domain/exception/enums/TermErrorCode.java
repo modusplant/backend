@@ -20,7 +20,7 @@ public enum TermErrorCode implements ErrorCode {
     EMPTY_SITE_MEMBER_TERM_ID(HttpStatus.BAD_REQUEST.value(), "empty_site_member_term_id", "사이트 회원 약관 아이디가 비어 있습니다. "),
     EMPTY_AGREED_TERM_OF_USE_VERSION(HttpStatus.BAD_REQUEST.value(), "empty_agreed_terms_of_use_version", "동의한 이용약관 약관 버전이 비어 있습니다. "),
     EMPTY_AGREED_PRIVACY_POLICY_VERSION(HttpStatus.BAD_REQUEST.value(), "empty_agreed_privacy_policy_version", "동의한 개인정보처리방침 버전이 비어 있습니다. "),
-    EMPTY_AGREED_AD_INFO_RECEIVING_VERSION(HttpStatus.BAD_REQUEST.value(), "empty_agreed_ad_info_receiving_version", "동의한 광고성 정보 수신 버전이 비어 있습니다. "),
+    EMPTY_AGREED_COMMUNITY_POLICY_VERSION(HttpStatus.BAD_REQUEST.value(), "empty_agreed_community_policy_version", "동의한 커뮤니티 운영정책 버전이 비어 있습니다. "),
 
     ALREADY_SITE_MEMBER_TERM(HttpStatus.BAD_REQUEST.value(), "already_site_member_term", "등록된 사이트 회원 약관이 존재합니다. "),
 

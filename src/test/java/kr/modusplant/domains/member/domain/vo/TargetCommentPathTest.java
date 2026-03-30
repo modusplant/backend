@@ -6,7 +6,7 @@ import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.domains.member.common.util.domain.vo.MemberBirthDateTestUtils.testMemberBirthDate;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
 import static kr.modusplant.domains.member.common.util.domain.vo.TargetCommentPathTestUtils.testTargetCommentPath;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.INVALID_TARGET_COMMENT_PATH;
 import static kr.modusplant.shared.persistence.common.util.constant.CommCommentConstant.TEST_COMM_COMMENT_PATH;
@@ -44,21 +44,28 @@ class TargetCommentPathTest {
 
     @Test
     @DisplayName("같은 객체에 대한 equals 호출")
-    void useEqual_givenSameObject_willReturnTrue() {
+    void testEquals_givenSameObject_willReturnTrue() {
         //noinspection EqualsWithItself
         assertEquals(testTargetCommentPath, testTargetCommentPath);
     }
 
     @Test
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
-    void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
+    void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
-        assertNotEquals(testTargetCommentPath, testMemberBirthDate);
+        assertNotEquals(testTargetCommentPath, testMemberActiveStatus);
     }
 
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
-    void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
+    void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
+        //noinspection AssertBetweenInconvertibleTypes
         assertNotEquals(testTargetCommentPath, "1".repeat(16));
+    }
+
+    @Test
+    @DisplayName("같은 객체에 대한 hashcode 동일성 보장")
+    void testHashCode_givenSameObject_willReturnSameHashCode() {
+        assertEquals(testTargetCommentPath.hashCode(), testTargetCommentPath.hashCode());
     }
 }

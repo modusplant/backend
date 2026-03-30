@@ -41,11 +41,16 @@ public class PostRepositoryJpaAdapter implements PostRepository {
 
     @Override
     public void save(Post post) {
-        SiteMemberEntity authorEntity = authorJpaRepository.findByUuid(post.getAuthorId().getValue()).orElseThrow(() -> new AuthorNotFoundException());
-        CommPrimaryCategoryEntity primaryCategoryEntity = primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue()).orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID));
-        CommSecondaryCategoryEntity secondaryCategoryEntity = secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue())
-                .filter(secondaryCategory -> secondaryCategory.getPrimaryCategoryEntity().equals(primaryCategoryEntity))
-                .orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID));
+        // post : category id, title, content는 null일수도 있음
+        SiteMemberEntity authorEntity = authorJpaRepository.findByUuid(post.getAuthorId().getValue()).orElseThrow(AuthorNotFoundException::new);
+        CommPrimaryCategoryEntity primaryCategoryEntity = post.getPrimaryCategoryId() != null
+                ? primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue()).orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID))
+                : null;
+        CommSecondaryCategoryEntity secondaryCategoryEntity = post.getSecondaryCategoryId() != null
+                ? secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue())
+                    .filter(secondaryCategory -> secondaryCategory.getPrimaryCategory().equals(primaryCategoryEntity))
+                    .orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID))
+                : null;
         postJpaRepository.save(
                 postJpaMapper.toPostEntity(post, authorEntity, primaryCategoryEntity,secondaryCategoryEntity,0L)
         );
@@ -53,16 +58,21 @@ public class PostRepositoryJpaAdapter implements PostRepository {
 
     @Override
     public void update(Post post) {
-        CommPrimaryCategoryEntity primaryCategoryEntity = primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue()).orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID));
-        CommSecondaryCategoryEntity secondaryCategoryEntity = secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue())
-                .filter(secondaryCategory -> secondaryCategory.getPrimaryCategoryEntity().equals(primaryCategoryEntity))
-                .orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID));
-        CommPostEntity postEntity = postJpaRepository.findByUlid(post.getPostId().getValue()).orElseThrow(() -> new PostNotFoundException());
+        CommPostEntity postEntity = postJpaRepository.findByUlid(post.getPostId().getValue()).orElseThrow(PostNotFoundException::new);
+        CommPrimaryCategoryEntity primaryCategoryEntity = post.getPrimaryCategoryId() != null
+                ? primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue()).orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID))
+                : null;
+        CommSecondaryCategoryEntity secondaryCategoryEntity = post.getSecondaryCategoryId() != null
+                ? secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue())
+                    .filter(secondaryCategory -> secondaryCategory.getPrimaryCategory().equals(primaryCategoryEntity))
+                    .orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID))
+                : null;
         postEntity.updatePrimaryCategory(primaryCategoryEntity);
         postEntity.updateSecondaryCategory(secondaryCategoryEntity);
         postEntity.updateViewCount(postViewCountRedisRepository.read(post.getPostId()));
         postEntity.updateTitle(post.getPostContent().getTitle());
         postEntity.updateContent(post.getPostContent().getContent());
+        postEntity.updateThumbnailPath(post.getPostContent().getThumbnailPath());
         if (!postEntity.getIsPublished()) {
             postEntity.updatePublishedAt(post.getStatus().isPublished() ? LocalDateTime.now() : null);
             postEntity.updateIsPublished(post.getStatus().isPublished());
@@ -82,7 +92,7 @@ public class PostRepositoryJpaAdapter implements PostRepository {
 
     @Override
     public Long getViewCountByUlid(PostId postId) {
-        return postJpaRepository.findByUlid(postId.getValue()).orElseThrow(() -> new PostNotFoundException()).getViewCount();
+        return postJpaRepository.findByUlid(postId.getValue()).orElseThrow(PostNotFoundException::new).getViewCount();
     }
 
     @Override

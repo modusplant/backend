@@ -6,13 +6,14 @@ import kr.modusplant.domains.post.usecase.record.PostDetailDataReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.response.DraftPostResponse;
+import kr.modusplant.domains.post.usecase.response.PostDetailDataResponse;
 import kr.modusplant.domains.post.usecase.response.PostDetailResponse;
 import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;
 
 public interface PostMapper {
     PostDetailResponse toPostDetailResponse(PostDetailReadModel postDetailReadModel, String profileImageUrl, JsonNode content, Long viewCount);
 
-    PostDetailResponse toPostDetailResponse(PostDetailDataReadModel postDetailDataReadModel, JsonNode content);
+    PostDetailDataResponse toPostDetailDataResponse(PostDetailDataReadModel postDetailDataReadModel, JsonNode content, String thumbnailFilename);
 
     PostSummaryResponse toPostSummaryResponse(PostSummaryReadModel postSummaryReadModel, JsonNode content);
 

@@ -1,10 +1,8 @@
 package kr.modusplant.domains.member.framework.out.jpa.mapper;
 
 import kr.modusplant.domains.member.domain.aggregate.Member;
-import kr.modusplant.domains.member.domain.vo.MemberBirthDate;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberStatus;
-import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberBirthDate;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.supers.MemberJpaMapper;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.shared.kernel.Nickname;
@@ -31,17 +29,10 @@ public class MemberJpaMapperImpl implements MemberJpaMapper {
         } else {
             status = MemberStatus.inactive();
         }
-        MemberBirthDate birthDate;
-        if (entity.getBirthDate() == null) {
-            birthDate = EmptyMemberBirthDate.create();
-        } else {
-            birthDate = MemberBirthDate.create(entity.getBirthDate());
-        }
         return Member.create(
                 MemberId.fromUuid(entity.getUuid()),
                 status,
-                Nickname.create(entity.getNickname()),
-                birthDate
+                Nickname.create(entity.getNickname())
         );
     }
 }

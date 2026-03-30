@@ -54,11 +54,11 @@ public record NormalSignUpRequest(
         String agreedPrivacyPolicyVersion,
 
         @Schema(
-                description = "동의한 광고성 정보 수신 버전",
+                description = "동의한 커뮤니티 운영정책 버전",
                 pattern = "^v\\d+.\\d+.\\d+$",
                 example = "v2.0.7"
         )
-        @NotBlank(message = "동의한 광고성 정보 수신 버전이 비어 있습니다.")
-        @Pattern(regexp = "v\\d+.\\d+.\\d+$", message = "동의한 광고성 정보 수신 버전의 서식이 올바르지 않습니다.")
-        String agreedAdInfoReceivingVersion) {
+        @NotBlank(message = "동의한 커뮤니티 운영정책 버전이 비어 있습니다.")
+        @Pattern(regexp = "v\\d+.\\d+.\\d+$", message = "동의한 커뮤니티 운영정책 버전의 서식이 올바르지 않습니다.")
+        String agreedCommunityPolicyVersion) {
 }

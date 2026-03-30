@@ -11,5 +11,8 @@ import java.util.UUID;
 
 @Repository
 @Primary
-public interface PropBugRepJpaRepository extends CreatedAtAndLastModifiedAtRepository<PropBugRepEntity>, UlidPrimaryRepository<PropBugRepEntity>, JpaRepository<PropBugRepEntity, UUID> {
+public interface PropBugRepJpaRepository extends
+        CreatedAtAndLastModifiedAtRepository<PropBugRepEntity>,
+        UlidPrimaryRepository<PropBugRepEntity>,
+        JpaRepository<PropBugRepEntity, UUID> {
 }

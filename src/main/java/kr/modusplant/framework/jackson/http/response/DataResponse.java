@@ -2,6 +2,7 @@ package kr.modusplant.framework.jackson.http.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.enums.GeneralSuccessCode;
 import kr.modusplant.shared.exception.supers.ErrorCode;
 import lombok.AccessLevel;
@@ -11,6 +12,8 @@ import lombok.SneakyThrows;
 
 import java.util.HashMap;
 
+import static kr.modusplant.shared.exception.enums.GeneralErrorCode.EMPTY_VALUE;
+
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -19,15 +22,6 @@ public class DataResponse<T> {
     private String code;
     private String message;
     private T data;
-
-    public static <T> DataResponse<T> of(ErrorCode errorCode, T data) {
-        DataResponse<T> response = new DataResponse<>();
-        response.status = errorCode.getHttpStatus();
-        response.code = errorCode.getCode();
-        response.message = errorCode.getMessage();
-        response.data = data;
-        return response;
-    }
 
     public static DataResponse<Void> of(ErrorCode errorCode) {
         DataResponse<Void> response = new DataResponse<>();
@@ -63,11 +57,12 @@ public class DataResponse<T> {
         }};
         if (message != null) {
             map.put("message", message);
+        } else {
+            throw new EmptyValueException(EMPTY_VALUE, "message");
         }
         if (data != null) {
             map.put("data", data);
         }
-        return ObjectMapperHolder.getObjectMapper().writeValueAsString(map);
+        return ObjectMapperHolder.getStaticObjectMapper().writeValueAsString(map);
     }
-
 }

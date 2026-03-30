@@ -31,7 +31,7 @@ public class SiteMemberTermController {
                 SiteMemberTermId.fromUuid(request.uuid()),
                 request.agreedTermsOfUseVersion(),
                 request.agreedPrivacyPolicyVersion(),
-                request.agreedAdInfoReceivingVersion()
+                request.agreedCommunityPolicyVersion()
         );
         return mapper.toSiteMemberTermResponse(siteMemberTermRepository.save(siteMemberTerm));
     }
@@ -43,7 +43,7 @@ public class SiteMemberTermController {
         SiteMemberTerm updateSiteMemberTerm = siteMemberTerm.create(
                 request.agreedTermsOfUseVersion(),
                 request.agreedPrivacyPolicyVersion(),
-                request.agreedAdInfoReceivingVersion()
+                request.agreedCommunityPolicyVersion()
         );
         return mapper.toSiteMemberTermResponse(siteMemberTermRepository.save(updateSiteMemberTerm));
     }

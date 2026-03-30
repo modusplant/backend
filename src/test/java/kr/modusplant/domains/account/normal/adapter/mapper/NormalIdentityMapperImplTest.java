@@ -35,7 +35,7 @@ public class NormalIdentityMapperImplTest implements NormalCredentialsTestUtils,
                 .isEqualTo(TEST_NORMAL_SIGN_UP_DATA.getAgreedTermsOfUseVersion().getValue());
         assertThat(result.getAgreedPrivacyPolicyVersion().getValue())
                 .isEqualTo(TEST_NORMAL_SIGN_UP_DATA.getAgreedPrivacyPolicyVersion().getValue());
-        assertThat(result.getAgreedAdInfoReceivingVersion().getValue())
-                .isEqualTo(TEST_NORMAL_SIGN_UP_DATA.getAgreedAdInfoReceivingVersion().getValue());
+        assertThat(result.getAgreedCommunityPolicyVersion().getValue())
+                .isEqualTo(TEST_NORMAL_SIGN_UP_DATA.getAgreedCommunityPolicyVersion().getValue());
     }
 }

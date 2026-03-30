@@ -14,7 +14,7 @@ public record SiteMemberTermCreateRequest(
         String agreedTermsOfUseVersion,
         @NotBlank(message = "동의한 개인정보처리방침 버전이 비어 있습니다. ")
         String agreedPrivacyPolicyVersion,
-        @NotBlank(message = "동의한 광고성 정보 수신 버전이 비어 있습니다. ")
-        String agreedAdInfoReceivingVersion
+        @NotBlank(message = "동의한 커뮤니티 운영정책 버전이 비어 있습니다. ")
+        String agreedCommunityPolicyVersion
 ) {
 }
