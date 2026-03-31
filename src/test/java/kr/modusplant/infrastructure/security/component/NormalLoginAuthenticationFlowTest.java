@@ -78,8 +78,8 @@ public class NormalLoginAuthenticationFlowTest implements
 ////
 ////        given(defaultUserDetailsService.loadUserByUsername(testLoginRequest.email()))
 ////                .willReturn(validDefaultUserDetails);
-////        given(memberRepository.existsByUuid(validDefaultUserDetails.getActiveUuid())).willReturn(false);
-////        given(memberRepository.findByUuid(validDefaultUserDetails.getActiveUuid()))
+////        given(memberRepository.existsByUuid(validDefaultUserDetails.getUuid())).willReturn(false);
+////        given(memberRepository.findByUuid(validDefaultUserDetails.getUuid()))
 ////                .willReturn(Optional.ofNullable(createMemberBasicUserEntityWithUuid()));
 ////        given(memberRepository.save(any())).willReturn(null);
 ////        given(tokenService.issueToken(any(),any(), any(), any()))

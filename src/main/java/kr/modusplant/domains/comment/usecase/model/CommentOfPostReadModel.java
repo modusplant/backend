@@ -10,6 +10,7 @@ public record CommentOfPostReadModel(
         int likeCount,
         boolean isLiked,
         LocalDateTime createdAt,
+        LocalDateTime updatedAt,
         boolean isDeleted
 ) {
 }

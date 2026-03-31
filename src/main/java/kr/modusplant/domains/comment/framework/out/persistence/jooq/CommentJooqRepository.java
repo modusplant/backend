@@ -59,7 +59,7 @@ public class CommentJooqRepository implements CommentReadRepository {
 
         return dsl.select(memberProf.IMAGE_PATH, siteMember.NICKNAME,
                         commComment.PATH, commComment.CONTENT, commComment.LIKE_COUNT,
-                        isLiked, commComment.CREATED_AT, commComment.IS_DELETED)
+                        isLiked, commComment.CREATED_AT, commComment.IS_DELETED, commComment.UPDATED_AT)
                 .from(commComment)
                 .join(commPost).on(commComment.POST_ULID.eq(commPost.ULID))
                 .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
@@ -72,7 +72,9 @@ public class CommentJooqRepository implements CommentReadRepository {
                         record.getValue(memberProf.IMAGE_PATH), record.getValue(siteMember.NICKNAME),
                         record.getValue(commComment.PATH), record.getValue(commComment.CONTENT),
                         record.getValue(commComment.LIKE_COUNT), record.getValue(isLiked),
-                        record.getValue(commComment.CREATED_AT).withNano(0), record.getValue(commComment.IS_DELETED)
+                        record.getValue(commComment.CREATED_AT).withNano(0),
+                        record.getValue(commComment.UPDATED_AT).withNano(0),
+                        record.getValue(commComment.IS_DELETED)
                 ));
     }
 
