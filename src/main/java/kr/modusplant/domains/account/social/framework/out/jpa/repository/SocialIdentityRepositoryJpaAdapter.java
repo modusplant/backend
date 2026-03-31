@@ -1,5 +1,6 @@
 package kr.modusplant.domains.account.social.framework.out.jpa.repository;
 
+import jakarta.transaction.Transactional;
 import kr.modusplant.domains.account.shared.kernel.AccountId;
 import kr.modusplant.domains.account.social.domain.vo.SocialAccountPayload;
 import kr.modusplant.domains.account.social.domain.vo.SocialAccountProfile;
@@ -43,6 +44,7 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
     }
 
     @Override
+    @Transactional
     public void updateLoggedInAt(AccountId accountId) {
         SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(accountId.getValue())
                 .orElseThrow();
@@ -51,6 +53,7 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
     }
 
     @Override
+    @Transactional
     public SocialAccountPayload createSocialMember(SocialAccountProfile profile, Role role) {
         SiteMemberEntity memberEntity = memberJpaRepository.save(socialIdentityJpaMapper.toMemberEntity(profile.getNickname()));
         memberAuthJpaRepository.save(socialIdentityJpaMapper.toMemberAuthEntity(memberEntity, profile));
