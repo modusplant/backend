@@ -78,7 +78,7 @@ public class PostRestController {
             @RequestParam(name = "secondaryCategoryId", required = false)
             List<Integer> secondaryCategoryIds
     ) {
-        UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
+        UUID currentMemberUuid = (userDetails != null) ? userDetails.getUuid() : null;
         if(primaryCategoryId == null && secondaryCategoryIds != null && !secondaryCategoryIds.isEmpty()) {
             throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
         }
@@ -124,7 +124,7 @@ public class PostRestController {
             @RequestParam(name = "secondaryCategoryId", required = false)
             List<Integer> secondaryCategoryIds
     ) {
-        UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
+        UUID currentMemberUuid = (userDetails != null) ? userDetails.getUuid() : null;
         return ResponseEntity.ok().body(DataResponse.ok(postController.getByKeyword(
                 new PostSearchRequest(option,keyword,sort,new PostCategoryRequest(primaryCategoryId,secondaryCategoryIds)),
                 currentMemberUuid, lastUlid, size)));
@@ -148,7 +148,7 @@ public class PostRestController {
             String guestIdStr,
             HttpServletResponse response
     ) {
-        UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
+        UUID currentMemberUuid = (userDetails != null) ? userDetails.getUuid() : null;
         UUID guestId = (currentMemberUuid==null) ? getOrCreateGuestId(guestIdStr,response) : null;
         return ResponseEntity.ok().body(DataResponse.ok(postController.getByUlid(ulid,currentMemberUuid,guestId)));
     }
@@ -167,7 +167,7 @@ public class PostRestController {
             @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
             String ulid
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getDataByUlid(ulid,currentMemberUuid)));
     }
 
@@ -212,7 +212,7 @@ public class PostRestController {
             @NotNull(message = "게시글 발행 유무가 비어 있습니다.")
             Boolean isPublished
     ) throws IOException {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         postController.createPost(new PostInsertRequest(primaryCategoryId, secondaryCategoryId, title, content, orderInfo, thumbnailFilename, isPublished), currentMemberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -264,7 +264,7 @@ public class PostRestController {
             @NotNull(message = "게시글 발행 유무가 비어 있습니다.")
             Boolean isPublished
     ) throws IOException {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         postController.updatePost(new PostUpdateRequest(ulid, primaryCategoryId, secondaryCategoryId, title, content, orderInfo, thumbnailFilename, isPublished), currentMemberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -283,7 +283,7 @@ public class PostRestController {
             @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
             String ulid
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         postController.deletePost(ulid, currentMemberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -321,7 +321,7 @@ public class PostRestController {
             String guestIdStr,
             HttpServletResponse response
     ) {
-        UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
+        UUID currentMemberUuid = (userDetails != null) ? userDetails.getUuid() : null;
         UUID guestId = (currentMemberUuid==null) ? getOrCreateGuestId(guestIdStr,response) : null;
         return ResponseEntity.ok().body(DataResponse.ok(postController.increaseViewCount(ulid, currentMemberUuid,guestId)));
     }
@@ -369,7 +369,7 @@ public class PostRestController {
             @Range(min = 1, max = 50)
             Integer size
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getByMemberUuid(currentMemberUuid, page-1, size)));
     }
 
@@ -391,7 +391,7 @@ public class PostRestController {
             @Range(min = 1, max = 50)
             Integer size
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getDraftByMemberUuid(currentMemberUuid,page-1, size)));
     }
 
@@ -413,7 +413,7 @@ public class PostRestController {
             @Range(min = 1, max = 50)
             Integer size
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getRecentlyViewByMemberUuid(currentMemberUuid, page-1,size)));
     }
 
@@ -435,7 +435,7 @@ public class PostRestController {
             @Range(min = 1, max = 50)
             Integer size
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getLikedByMemberUuid(currentMemberUuid, page-1, size)));
     }
 
@@ -457,7 +457,7 @@ public class PostRestController {
             @Range(min = 1, max = 50)
             Integer size
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getBookmarkedByMemberUuid(currentMemberUuid, page-1, size)));
     }
 
@@ -473,7 +473,7 @@ public class PostRestController {
             @RequestParam
             int size
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getSearchHistory(currentMemberUuid,size)));
     }
 
@@ -490,7 +490,7 @@ public class PostRestController {
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             String keyword
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         postController.deleteSearchKeyword(currentMemberUuid,keyword);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -503,7 +503,7 @@ public class PostRestController {
     public ResponseEntity<DataResponse<Void>> removeAllSearchHistory(
             @AuthenticationPrincipal DefaultUserDetails userDetails
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         postController.deleteAllSearchHistory(currentMemberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
