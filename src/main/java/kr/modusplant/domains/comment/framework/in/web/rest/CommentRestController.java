@@ -145,7 +145,7 @@ public class CommentRestController {
 
             @RequestBody @Valid
             CommentRegisterRequest registerRequest) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         controller.register(registerRequest, currentMemberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }

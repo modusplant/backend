@@ -55,7 +55,7 @@ public class NotificationRestController {
             @Range(min = 1, max = 50)
             Integer size
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         return ResponseEntity.ok().body(DataResponse.ok(notificationController.getNotifications(status, currentMemberUuid, lastUlid, size)));
     }
 
@@ -73,7 +73,7 @@ public class NotificationRestController {
             @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
             String ulid
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         notificationController.readNotification(ulid,currentMemberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -86,7 +86,7 @@ public class NotificationRestController {
     public ResponseEntity<DataResponse<Void>> readAllNotifications(
             @AuthenticationPrincipal DefaultUserDetails userDetails
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         notificationController.readAllNotifications(currentMemberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -99,7 +99,7 @@ public class NotificationRestController {
     public ResponseEntity<DataResponse<Long>> countUnreadNotifications(
             @AuthenticationPrincipal DefaultUserDetails userDetails
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         return ResponseEntity.ok().body(DataResponse.ok(notificationController.countUnreadNotifications(currentMemberUuid)));
     }
 }

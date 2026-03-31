@@ -55,12 +55,12 @@ public class NormalIdentityRestController {
             )
             @PathVariable("id")
             @NotNull(message = "사용자의 식별자 값이 비어 있습니다")
-            UUID memberActiveUuid,
+            UUID memberUuid,
 
             @RequestBody @Valid
             EmailModificationRequest request
     ) {
-        controller.modifyEmail(memberActiveUuid, request);
+        controller.modifyEmail(memberUuid, request);
 
         return ResponseEntity.ok(DataResponse.ok());
     }
@@ -77,12 +77,12 @@ public class NormalIdentityRestController {
             )
             @PathVariable("id")
             @NotNull(message = "사용자의 식별자 값이 비어 있습니다")
-            UUID memberActiveUuid,
+            UUID memberUuid,
 
             @RequestBody @Valid
             PasswordModificationRequest request
     ) {
-        controller.modifyPassword(memberActiveUuid, request);
+        controller.modifyPassword(memberUuid, request);
 
         return ResponseEntity.ok(DataResponse.ok());
     }

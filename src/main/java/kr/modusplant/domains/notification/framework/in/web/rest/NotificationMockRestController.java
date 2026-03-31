@@ -54,7 +54,7 @@ public class NotificationMockRestController {
             @RequestParam
             String contentPreview
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         notificationMockController.createMockNotification(currentMemberUuid,action,postUlid,commentPath,contentPreview);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -67,7 +67,7 @@ public class NotificationMockRestController {
     public ResponseEntity<DataResponse<Void>> deleteAllNotifications(
             @AuthenticationPrincipal DefaultUserDetails userDetails
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         notificationMockController.removeMockNotification(currentMemberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }

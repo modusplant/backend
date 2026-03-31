@@ -10,6 +10,7 @@ import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -58,6 +59,10 @@ public class CommCommentEntity {
     @Column(name = CREATED_AT, nullable = false)
     @CreatedDate
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
     public void increaseLikeCount() {
         this.likeCount++;

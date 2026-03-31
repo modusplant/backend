@@ -16,7 +16,7 @@ import java.util.UUID;
 public class DefaultUserDetails implements UserDetails {
     private final String email;
     private final String password;
-    private final UUID activeUuid;
+    private final UUID uuid;
     private final String nickname;
     private final AuthProvider provider;
     private final boolean isActive;
@@ -63,7 +63,7 @@ public class DefaultUserDetails implements UserDetails {
     public static class DefaultUserDetailsBuilder {
         private String email;
         private String password;
-        private UUID activeUuid;
+        private UUID uuid;
         private String nickname;
         private AuthProvider provider;
         private boolean isActive;
@@ -80,8 +80,8 @@ public class DefaultUserDetails implements UserDetails {
             return this;
         }
 
-        public DefaultUserDetailsBuilder activeUuid(UUID activeUuid) {
-            this.activeUuid = activeUuid;
+        public DefaultUserDetailsBuilder uuid(UUID uuid) {
+            this.uuid = uuid;
             return this;
         }
 
@@ -111,7 +111,7 @@ public class DefaultUserDetails implements UserDetails {
         }
 
         public DefaultUserDetails build() {
-            return new DefaultUserDetails(this.email, this.password, this.activeUuid, this.nickname, this.provider, this.isActive, this.isBanned, this.authorities);
+            return new DefaultUserDetails(this.email, this.password, this.uuid, this.nickname, this.provider, this.isActive, this.isBanned, this.authorities);
         }
     }
 }

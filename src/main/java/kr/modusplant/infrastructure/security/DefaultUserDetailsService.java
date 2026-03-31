@@ -38,7 +38,7 @@ public class DefaultUserDetailsService implements UserDetailsService {
         return DefaultUserDetails.builder()
                 .email(auth.getEmail())
                 .password(auth.getPw())
-                .activeUuid(auth.getMember().getUuid())
+                .uuid(auth.getMember().getUuid())
                 .nickname(member.getNickname())
                 .provider(auth.getProvider())
                 .isActive(member.getIsActive())

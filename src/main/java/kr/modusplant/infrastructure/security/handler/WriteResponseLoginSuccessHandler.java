@@ -42,10 +42,10 @@ public class WriteResponseLoginSuccessHandler implements AuthenticationSuccessHa
                                         Authentication authentication) throws IOException {
         DefaultUserDetails currentMember = (DefaultUserDetails) authentication.getPrincipal();
 
-        updateMemberLoggedInAt(currentMember.getActiveUuid());
+        updateMemberLoggedInAt(currentMember.getUuid());
 
         TokenPair loginTokenPair = tokenService.issueToken(
-                currentMember.getActiveUuid(), currentMember.getNickname(), currentMember.getEmail(), getRole(currentMember));
+                currentMember.getUuid(), currentMember.getNickname(), currentMember.getEmail(), getRole(currentMember));
 
         SecurityResponseUtils.writeResponse(
                 response, GeneralSuccessCode.GENERIC_SUCCESS.getHttpStatus(),

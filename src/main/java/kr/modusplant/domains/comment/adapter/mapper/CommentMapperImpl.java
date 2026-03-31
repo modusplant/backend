@@ -28,9 +28,8 @@ public class CommentMapperImpl implements CommentMapper {
         return new CommentOfPostResponse(
                 readModel.profileImage() == null ? null : fileService.generateS3SrcUrl(readModel.profileImage()),
                 readModel.nickname(), readModel.path(), readModel.content(), readModel.likeCount(),
-                readModel.isLiked(), readModel.createdAt(), readModel.isDeleted()
+                readModel.isLiked(), readModel.createdAt(), readModel.updatedAt(), readModel.isDeleted()
         );
     }
-
 
 }

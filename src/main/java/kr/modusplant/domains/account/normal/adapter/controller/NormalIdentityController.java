@@ -70,26 +70,26 @@ public class NormalIdentityController {
         }
     }
 
-    public void modifyEmail(UUID memberActiveUuid, EmailModificationRequest request) {
+    public void modifyEmail(UUID memberUuid, EmailModificationRequest request) {
         if(!readRepository.existsByEmail(Email.create(request.currentEmail()))) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER_AUTH);
         } else {
-            updateRepository.updateEmail(AccountId.create(memberActiveUuid), Email.create(request.newEmail()));
+            updateRepository.updateEmail(AccountId.create(memberUuid), Email.create(request.newEmail()));
         }
     }
 
-    public void modifyPassword(UUID memberActiveUuid, PasswordModificationRequest request) {
-        if(!readRepository.existsByMemberId(AccountId.create(memberActiveUuid))) {
+    public void modifyPassword(UUID memberUuid, PasswordModificationRequest request) {
+        if(!readRepository.existsByMemberId(AccountId.create(memberUuid))) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER_AUTH);
-        } else if(!isPasswordsMatch(AccountId.create(memberActiveUuid), Password.create(request.currentPw()))) {
+        } else if(!isPasswordsMatch(AccountId.create(memberUuid), Password.create(request.currentPw()))) {
             throw new InvalidValueException(KernelErrorCode.INVALID_PASSWORD_FORMAT, request.currentPw());
         } else {
-            updateRepository.updatePassword(AccountId.create(memberActiveUuid), Password.create(request.newPw()));
+            updateRepository.updatePassword(AccountId.create(memberUuid), Password.create(request.newPw()));
         }
     }
 
-    private boolean isPasswordsMatch(AccountId memberActiveUuid, Password currentPassword) {
-        Password storedPw = Password.create(readRepository.getMemberPassword(memberActiveUuid));
+    private boolean isPasswordsMatch(AccountId memberUuid, Password currentPassword) {
+        Password storedPw = Password.create(readRepository.getMemberPassword(memberUuid));
 
         return encoder.matches(currentPassword.getValue(), storedPw.getValue());
     }
