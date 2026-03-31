@@ -34,6 +34,7 @@ spring:
     clean-disabled: false
     baseline-on-migrate: true
     baseline-version: 0.0.0
+    schemas: public
   jpa:
     hibernate:
       ddl-auto: none
