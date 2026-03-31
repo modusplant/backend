@@ -16,10 +16,10 @@ import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheVa
 import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
-import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,7 +31,6 @@ import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
 
-import static kr.modusplant.infrastructure.jwt.util.TokenUtils.getTokenFromAuthorizationHeader;
 import static kr.modusplant.shared.constant.Regex.*;
 
 @Tag(name = "회원 API", description = "회원의 생성과 갱신(상태 제외), 회원이 할 수 있는 단일한 기능을 관리하는 API 입니다.")
@@ -42,7 +41,6 @@ import static kr.modusplant.shared.constant.Regex.*;
 @Slf4j
 public class MemberRestController {
     private final MemberController memberController;
-    private final JwtTokenProvider jwtTokenProvider;
     private final MemberCacheValidationService memberCacheValidationService;
 
     @Operation(summary = "회원 닉네임 중복 확인 API", description = "이미 등록된 닉네임이 있는지 조회합니다.")
@@ -87,10 +85,9 @@ public class MemberRestController {
             String ifModifiedSince,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
-            @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String auth) throws IOException {
-        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) throws IOException {
         MemberCacheValidationResult cacheValidationResult =
                 memberCacheValidationService.getMemberCacheValidationResult(ifNoneMatch, ifModifiedSince, memberId);
         if (cacheValidationResult.isCacheUsable()) {
@@ -145,10 +142,9 @@ public class MemberRestController {
             String nickname,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
-            @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String auth) throws IOException {
-        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) throws IOException {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
@@ -173,10 +169,9 @@ public class MemberRestController {
             String postUlid,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
-            @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String auth) {
-        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
         memberController.likePost(new MemberPostLikeRecord(memberId, postUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -197,10 +192,9 @@ public class MemberRestController {
             String postUlid,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
-            @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String auth) {
-        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
         memberController.unlikePost(new MemberPostUnlikeRecord(memberId, postUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -221,10 +215,9 @@ public class MemberRestController {
             String postUlid,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
-            @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String auth) {
-        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
         memberController.bookmarkPost(new MemberPostBookmarkRecord(memberId, postUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -245,10 +238,9 @@ public class MemberRestController {
             String postUlid,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
-            @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String auth) {
-        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
         memberController.cancelPostBookmark(new MemberPostBookmarkCancelRecord(memberId, postUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -278,10 +270,9 @@ public class MemberRestController {
             String path,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
-            @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String auth) {
-        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
         memberController.likeComment(new MemberCommentLikeRecord(memberId, postUlid, path));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -311,10 +302,9 @@ public class MemberRestController {
             String path,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
-            @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String auth) {
-        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
         memberController.unlikeComment(new MemberCommentUnlikeRecord(memberId, postUlid, path));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -342,10 +332,9 @@ public class MemberRestController {
             MultipartFile image,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
-            @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String auth) throws IOException {
-        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) throws IOException {
         memberController.reportProposalOrBug(new ProposalOrBugReportRecord(memberId, title, content, image));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -359,9 +348,9 @@ public class MemberRestController {
     @PostMapping(value = "/report/abuse/post/")
     public ResponseEntity<DataResponse<Void>> reportPostAbuse(
             @Parameter(hidden = true)
-            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
-            @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String auth) {
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
         return ResponseEntity.badRequest().body(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_POST_ID));
     }
 
@@ -381,10 +370,9 @@ public class MemberRestController {
             String postUlid,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
-            @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String auth) {
-        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
         memberController.reportPostAbuse(new PostAbuseReportRecord(memberId, postUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -407,9 +395,9 @@ public class MemberRestController {
             String path,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
-            @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String auth) {
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
         return ResponseEntity.badRequest().body(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_COMMENT_ID));
     }
 
@@ -438,10 +426,9 @@ public class MemberRestController {
             String path,
 
             @Parameter(hidden = true)
-            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
-            @NotNull(message = "접근 토큰이 비어 있습니다. ")
-            String auth) {
-        UUID memberId = jwtTokenProvider.getMemberUuidFromToken(getTokenFromAuthorizationHeader(auth));
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
         memberController.reportCommentAbuse(new CommentAbuseReportRecord(memberId, postUlid, path));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
