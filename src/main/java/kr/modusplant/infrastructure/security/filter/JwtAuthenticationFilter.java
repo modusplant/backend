@@ -71,7 +71,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Claims tokenClaims = tokenProvider.getClaimsFromToken(accessToken);
 
         return DefaultUserDetails.builder()
-                .activeUuid(UUID.fromString(tokenClaims.getSubject()))
+                .uuid(UUID.fromString(tokenClaims.getSubject()))
                 .nickname(String.valueOf(tokenClaims.get("nickname")))
                 .isActive(true)
                 .authorities(List.of(new SimpleGrantedAuthority(

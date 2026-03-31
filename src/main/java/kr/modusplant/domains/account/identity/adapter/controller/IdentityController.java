@@ -14,8 +14,8 @@ public class IdentityController {
 
     private final IdentityRepository repository;
 
-    public IdentityAuthResponse getAuthInfo(UUID memberActiveUuid) {
-        AccountId accountId = AccountId.create(memberActiveUuid);
+    public IdentityAuthResponse getAuthInfo(UUID memberUuid) {
+        AccountId accountId = AccountId.create(memberUuid);
         return repository.getAuthInfo(accountId);
     }
 }
