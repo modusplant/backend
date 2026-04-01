@@ -66,6 +66,12 @@ public class SiteMemberAuthEntity {
         return getLastModifiedAt().truncatedTo(ChronoUnit.SECONDS);
     }
 
+    public void updateProvider(AuthProvider provider) { this.provider = provider; }
+
+    public void updateEmail(String email) { this.email = email; }
+
+    public void updatePassword(String password) { this.pw = password; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -18,6 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static kr.modusplant.domains.account.shared.kernel.common.util.AccountIdTestUtils.testNormalMemberId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -38,10 +40,13 @@ public class NormalIdentityJooqRepositoryTest implements
     @DisplayName("사용자의 식별자와 이메일로 사용자의 이메일 갱신")
     void testUpdateEmail_givenValidMemberIdAndEmail_willUpdateEmail() {
         // given
+        AtomicInteger callCount = new AtomicInteger(0);
+
         MockDataProvider provider = ctx -> {
             Object[] bindings = ctx.bindings();
 
             if (bindings[0].equals(testNormalUserEmail.getValue()) && bindings[1].equals(testNormalMemberId.getValue())) {
+                callCount.incrementAndGet();
                 return new MockResult[] {
                         new MockResult(1, null)
                 };
@@ -51,37 +56,40 @@ public class NormalIdentityJooqRepositoryTest implements
         NormalIdentityJooqRepository repository = createRepository(provider);
 
         // when
-        int result = repository.updateEmail(testNormalMemberId, testNormalUserEmail);
+        repository.updateEmail(testNormalMemberId, testNormalUserEmail);
 
         // then
-        assertThat(result).isEqualTo(1);
+        assertThat(callCount.get()).isEqualTo(1);
     }
 
     @Test
     @DisplayName("사용자의 식별자와 비밀번호로 사용자의 비밀번호 갱신")
     void testUpdatePassword_givenValidMemberIdAndPassword_willUpdatePassword() {
         // given
+        AtomicInteger callCount = new AtomicInteger(0);
+
         MockDataProvider provider = ctx -> {
             Object[] bindings = ctx.bindings();
 
             if (bindings[0].equals(testNormalUserPassword.getValue())
                     && bindings[1].equals(testNormalMemberId.getValue())
                     && bindings[2].equals(AuthProvider.BASIC.name())) {
+                callCount.incrementAndGet();
                 return new MockResult[] {
                         new MockResult(1, null)
                 };
             }
-            return new MockResult[] { new MockResult(0, null) };
+            return new MockResult[] { new MockResult(1, null) };
         };
         NormalIdentityJooqRepository repository = createRepository(provider);
 
         given(encoder.encode(testNormalUserPassword.getValue())).willReturn(testNormalUserPassword.getValue());
 
         // when
-        int result = repository.updatePassword(testNormalMemberId, testNormalUserPassword);
+        repository.updatePassword(testNormalMemberId, testNormalUserPassword);
 
         // then
-        assertThat(result).isEqualTo(1);
+        assertThat(callCount.get()).isEqualTo(1);
     }
 
     @Test
