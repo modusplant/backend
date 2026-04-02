@@ -3,6 +3,7 @@ package kr.modusplant.infrastructure.security.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.framework.out.redis.AccessTokenRedisRepository;
+import kr.modusplant.infrastructure.jwt.provider.JwtCookieProvider;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.DefaultAuthProvider;
@@ -49,6 +50,7 @@ public class SecurityConfig {
     private final DefaultUserDetailsService defaultUserDetailsService;
     private final ObjectMapper objectMapper;
     private final JwtTokenProvider tokenProvider;
+    private final JwtCookieProvider cookieProvider;
     private final TokenService tokenService;
     private final SiteMemberJpaRepository memberRepository;
     private final Validator validator;
@@ -87,7 +89,7 @@ public class SecurityConfig {
 
     @Bean
     public WriteResponseLoginSuccessHandler forwardRequestLoginSuccessHandler() {
-        return new WriteResponseLoginSuccessHandler(memberRepository, tokenService, tokenProvider, objectMapper);
+        return new WriteResponseLoginSuccessHandler(memberRepository, tokenService, cookieProvider, objectMapper);
     }
 
     @Bean
