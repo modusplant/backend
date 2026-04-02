@@ -37,6 +37,16 @@ public class SocialIdentityTokenHelper {
         );
     }
 
+    public String getSocialAccessTokenFromClaims(String tempToken) {
+        Claims claims = jwtTokenProvider.getClaimsFromToken(tempToken);
+        return claims.get("socialAccessToken",String.class);
+    }
+
+    public SocialProvider getSocialProviderFromClaims(String tempToken) {
+        Claims claims = jwtTokenProvider.getClaimsFromToken(tempToken);
+        String provider = claims.get("socialProvider", String.class);
+        return SocialProvider.valueOf(provider);
+    }
 
 
 }

@@ -5,4 +5,5 @@ import kr.modusplant.domains.account.social.usecase.port.client.dto.SocialUserIn
 public interface SocialAuthClient {
     String getAccessToken(String code);
     SocialUserInfo getUserInfo(String accessToken);
+    void revokeAccess(String accessToken);
 }

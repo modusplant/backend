@@ -111,5 +111,8 @@ public class SocialIdentityController {
         );
     }
 
+    public void unlinkSocialAccount(SocialProvider socialProvider, String socialAccessToken) {
+        clientFactory.getClient(socialProvider).revokeAccess(socialAccessToken);
+    }
 
 }

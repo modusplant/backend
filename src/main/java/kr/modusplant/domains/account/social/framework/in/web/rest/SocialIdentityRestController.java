@@ -101,4 +101,15 @@ public class SocialIdentityRestController {
         String expiredTempCookie = jwtCookieProvider.deleteTempTokenCookieAsString();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie, expiredTempCookie).body(DataResponse.ok(SocialLoginResponse.login(tokenPair.accessToken())));
     }
+
+    @Operation(summary = "소셜 플랫폼 연결 해제 API", description = "소셜 로그인 과정이 중단되거나 연동 미선택 시 사용합니다.")
+    @DeleteMapping("/social-connect")
+    public ResponseEntity<DataResponse<Void>> unlikeSocialAccount(
+            @CookieValue(TEMP_TOKEN_COOKIE_NAME)
+            String tempToken
+    ) {
+        socialIdentityController.unlinkSocialAccount(tempTokenHelper.getSocialProviderFromClaims(tempToken),tempTokenHelper.getSocialAccessTokenFromClaims(tempToken));
+        String expiredTempCookie = jwtCookieProvider.deleteTempTokenCookieAsString();
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,expiredTempCookie).body(DataResponse.ok());
+    }
 }
