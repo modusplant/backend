@@ -2,6 +2,7 @@ package kr.modusplant.domains.account.social.framework.out.jpa.mapper.supers;
 
 import kr.modusplant.domains.account.social.domain.vo.SocialAccountPayload;
 import kr.modusplant.domains.account.social.domain.vo.SocialAccountProfile;
+import kr.modusplant.domains.account.social.domain.vo.SocialMemberProfile;
 import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.shared.enums.Role;
@@ -14,7 +15,5 @@ public interface SocialIdentityJpaMapper {
 
     SiteMemberAuthEntity toMemberAuthEntity(SiteMemberEntity memberEntity, SocialAccountProfile profile);
 
-    SocialAccountPayload toUserPayload(SiteMemberEntity memberEntity, SiteMemberAuthEntity memberAuthEntity);
-
-    SocialAccountPayload toUserPayload(SiteMemberEntity memberEntity, Nickname nickname, Email email, Role role);
+    SocialMemberProfile toSocialMemberProfile(SiteMemberEntity memberEntity, SiteMemberAuthEntity memberAuthEntity);
 }
