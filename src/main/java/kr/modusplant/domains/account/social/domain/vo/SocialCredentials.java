@@ -34,30 +34,52 @@ public class SocialCredentials {
         return new SocialCredentials(AuthProvider.GOOGLE, providerId);
     }
 
+    public static SocialCredentials createBasicKakao(String providerId) {
+        validateSocialProvider(AuthProvider.BASIC_KAKAO,providerId);
+        return new SocialCredentials(AuthProvider.BASIC_KAKAO,providerId);
+    }
+
+    public static SocialCredentials createBasicGoogle(String providerId) {
+        validateSocialProvider(AuthProvider.BASIC_GOOGLE, providerId);
+        return new SocialCredentials(AuthProvider.BASIC_GOOGLE, providerId);
+    }
+
     private static void validateSocialProvider(AuthProvider provider, String providerId) {
         if (provider == null) {
             throw new EmptyValueException(SocialIdentityErrorCode.EMPTY_PROVIDER);
         }
+        if(provider == AuthProvider.BASIC) {
+            if (providerId != null && !providerId.isBlank())
+                throw new InvalidValueException(SocialIdentityErrorCode.INVALID_PROVIDER_ID);
+            return;
+        }
         if (providerId == null || providerId.isBlank()) {
             throw new EmptyValueException(SocialIdentityErrorCode.EMPTY_PROVIDER_ID);
         }
-        if (provider == AuthProvider.BASIC) {
-            throw new InvalidValueException(SocialIdentityErrorCode.INVALID_PROVIDER);
-        }
-        if (provider == AuthProvider.KAKAO && providerId.length() != KAKAO_PROVIDER_ID_LENGTH) {
+        if ((provider == AuthProvider.KAKAO || provider == AuthProvider.BASIC_KAKAO)
+                && providerId.length() != KAKAO_PROVIDER_ID_LENGTH) {
             throw new InvalidValueException(SocialIdentityErrorCode.INVALID_PROVIDER_ID);
         }
-        if (provider == AuthProvider.GOOGLE && providerId.length() != GOOGLE_PROVIDER_ID_LENGTH) {
+        if ((provider == AuthProvider.GOOGLE || provider == AuthProvider.BASIC_GOOGLE)
+                && providerId.length() != GOOGLE_PROVIDER_ID_LENGTH) {
             throw new InvalidValueException(SocialIdentityErrorCode.INVALID_PROVIDER_ID);
         }
+    }
+
+    public boolean isPureBasic() {
+        return this.provider == AuthProvider.BASIC;
     }
 
     public boolean isGoogle() {
-        return this.provider == AuthProvider.GOOGLE;
+        return this.provider == AuthProvider.GOOGLE || this.provider == AuthProvider.BASIC_GOOGLE;
     }
 
     public boolean isKakao() {
-        return this.provider == AuthProvider.KAKAO;
+        return this.provider == AuthProvider.KAKAO || this.provider == AuthProvider.BASIC_KAKAO;
+    }
+
+    public boolean isLinked() {
+        return this.provider == AuthProvider.BASIC_KAKAO || this.provider == AuthProvider.BASIC_GOOGLE;
     }
 
     @Override
