@@ -12,5 +12,7 @@ public interface SocialIdentityMapper {
 
     AuthProvider toSocialAuthProvider(SocialProvider socialProvider);
 
+    AuthProvider toLinkedAuthProvider(SocialProvider socialProvider);
+
     LoginResult toLoginResult(SocialMemberProfile socialMemberProfile);
 }

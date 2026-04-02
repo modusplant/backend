@@ -102,5 +102,14 @@ public class SocialIdentityController {
         return socialIdentityMapper.toLoginResult(socialIdentityRepository.saveSocialMember(memberProfile, signUpRequest.introduction(), agreedTerms));
     }
 
+    // 기존 일반 계정과 연동
+    @Transactional
+    public LoginResult linkBasicSocialMember(TempTokenInfo tempTokenInfo) {
+        AuthProvider linkedAuthProvider = socialIdentityMapper.toLinkedAuthProvider(tempTokenInfo.socialProvider());
+        return socialIdentityMapper.toLoginResult(
+                socialIdentityRepository.updateSocialLinkedMember(SocialCredentials.create(linkedAuthProvider, tempTokenInfo.providerId()), Email.create(tempTokenInfo.email()))
+        );
+    }
+
 
 }

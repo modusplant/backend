@@ -89,6 +89,16 @@ public class SocialIdentityRestController {
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie, expiredTempCookie).body(DataResponse.ok(SocialLoginResponse.login(tokenPair.accessToken())));
     }
 
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie).body(response);
+    @Operation(summary = "소셜 로그인 연동 API", description = "소셜 인증/로그인 API에서 NEED_LINK을 응답받은 경우 사용합니다.")
+    @PostMapping("/social-link")
+    public ResponseEntity<DataResponse<SocialLoginResponse>> socialLink(
+            @CookieValue(TEMP_TOKEN_COOKIE_NAME)
+            String tempToken
+    ) {
+        LoginResult loginResult = socialIdentityController.linkBasicSocialMember(tempTokenHelper.getTempTokenInfoFromClaims(tempToken));
+        TokenPair tokenPair = tokenService.issueToken(loginResult.uuid(),loginResult.nickname(), loginResult.email(), loginResult.role());
+        String refreshCookie = jwtCookieProvider.generateRefreshTokenCookieAsString(tokenPair.refreshToken());
+        String expiredTempCookie = jwtCookieProvider.deleteTempTokenCookieAsString();
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie, expiredTempCookie).body(DataResponse.ok(SocialLoginResponse.login(tokenPair.accessToken())));
     }
 }

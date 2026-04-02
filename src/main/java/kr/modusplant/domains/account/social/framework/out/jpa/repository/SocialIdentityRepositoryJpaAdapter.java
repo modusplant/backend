@@ -1,9 +1,8 @@
 package kr.modusplant.domains.account.social.framework.out.jpa.repository;
 
 import kr.modusplant.domains.account.shared.kernel.AccountId;
-import kr.modusplant.domains.account.social.domain.vo.SocialAccountPayload;
-import kr.modusplant.domains.account.social.domain.vo.SocialAccountProfile;
-import kr.modusplant.domains.account.social.domain.vo.SocialCredentials;
+import kr.modusplant.domains.account.social.domain.exception.SocialAccountConflictException;
+import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
 import kr.modusplant.domains.account.social.domain.vo.*;
 import kr.modusplant.domains.account.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
@@ -58,21 +57,21 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
         return socialIdentityJpaMapper.toSocialMemberProfile(memberEntity, memberAuthEntity);
     }
 
-//    @Override
-//    public SocialMemberProfile updateSocialLinkedMember(SocialCredentials socialCredentials, Email email) {
-//        SiteMemberAuthEntity memberAuthEntity = memberAuthJpaRepository.findByEmail(email.getValue())
-//                .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH, TableName.SITE_MEMBER_AUTH));
-//        if (memberAuthEntity.getProvider().equals(socialCredentials.getProvider())) {
-//            throw new SocialAccountConflictException(SocialIdentityErrorCode.ALREADY_LINKED);
-//        }
-//        memberAuthEntity.updateProvider(socialCredentials.getProvider());
-//        memberAuthEntity.updateProviderId(socialCredentials.getProviderId());
-//        memberAuthJpaRepository.save(memberAuthEntity);
-//        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberAuthEntity.getUuid())
-//                .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER));
-//        memberEntity.updateLoggedInAt(LocalDateTime.now());
-//        memberJpaRepository.save(memberEntity);
-//        return socialIdentityJpaMapper.toSocialMemberProfile(memberEntity, memberAuthEntity);
-//    }
+    @Override
+    public SocialMemberProfile updateSocialLinkedMember(SocialCredentials socialCredentials, Email email) {
+        SiteMemberAuthEntity memberAuthEntity = memberAuthJpaRepository.findByEmail(email.getValue())
+                .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH, TableName.SITE_MEMBER_AUTH));
+        if (memberAuthEntity.getProvider().equals(socialCredentials.getProvider())) {
+            throw new SocialAccountConflictException(SocialIdentityErrorCode.ALREADY_LINKED);
+        }
+        memberAuthEntity.updateProvider(socialCredentials.getProvider());
+        memberAuthEntity.updateProviderId(socialCredentials.getProviderId());
+        memberAuthJpaRepository.save(memberAuthEntity);
+        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberAuthEntity.getUuid())
+                .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER));
+        memberEntity.updateLoggedInAt(LocalDateTime.now());
+        memberJpaRepository.save(memberEntity);
+        return socialIdentityJpaMapper.toSocialMemberProfile(memberEntity, memberAuthEntity);
+    }
 
 }

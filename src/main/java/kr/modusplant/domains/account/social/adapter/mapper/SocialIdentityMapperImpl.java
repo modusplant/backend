@@ -25,23 +25,19 @@ public class SocialIdentityMapperImpl implements SocialIdentityMapper {
         );
     }
 
-    // TODO: 소셜로그인 구현 완료 후 삭제 (테스트용 임시 로직)
-    private String normalizeNickname(String socialNickname) {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        if (socialNickname == null) return null;
-        String nickname = socialNickname.replaceAll("\\s+", "");
-        nickname = nickname.replaceAll("[^가-힣A-Za-z0-9]", "");
-        if (nickname.length() > 12)
-            nickname = nickname.substring(0,12);
-        for (int i = 0; i < 4; i++) {                       // 4글자 랜덤
-            nickname += chars.charAt((int)(Math.random() * chars.length()));
-        }
-        return nickname;
     @Override
     public AuthProvider toSocialAuthProvider(SocialProvider socialProvider) {
         return switch (socialProvider) {
             case KAKAO -> AuthProvider.KAKAO;
             case GOOGLE -> AuthProvider.GOOGLE;
+        };
+    }
+
+    @Override
+    public AuthProvider toLinkedAuthProvider(SocialProvider socialProvider) {
+        return switch (socialProvider) {
+            case KAKAO -> AuthProvider.BASIC_KAKAO;
+            case GOOGLE ->  AuthProvider.BASIC_GOOGLE;
         };
     }
 
