@@ -7,6 +7,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 import static kr.modusplant.infrastructure.jwt.constant.CookieName.REFRESH_TOKEN_COOKIE_NAME;
+import static kr.modusplant.infrastructure.jwt.constant.CookieName.TEMP_TOKEN_COOKIE_NAME;
 
 
 /**
@@ -32,4 +33,26 @@ public class JwtCookieProvider {
         return refreshCookie.toString();
     }
 
+    public String generateTempTokenCookieAsString(String tempToken, long durationMs) {
+
+        ResponseCookie tempCookie = ResponseCookie.from(TEMP_TOKEN_COOKIE_NAME, tempToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/api/v1/auth")
+                .maxAge(durationMs)
+                .sameSite("Lax")
+                .build();
+        return tempCookie.toString();
+    }
+
+    public String deleteTempTokenCookieAsString() {
+        return ResponseCookie.from(TEMP_TOKEN_COOKIE_NAME, "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/api/v1/auth")
+                .maxAge(0)      // 즉시 만료
+                .sameSite("Lax")
+                .build()
+                .toString();
+    }
 }
