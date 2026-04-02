@@ -10,6 +10,7 @@ import kr.modusplant.domains.account.social.adapter.SocialIdentityTokenHelper;
 import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityController;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.usecase.request.SocialLoginRequest;
+import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
 import kr.modusplant.domains.account.social.usecase.response.*;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
@@ -21,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import static kr.modusplant.infrastructure.jwt.constant.CookieName.TEMP_TOKEN_COOKIE_NAME;
 
 
 @Tag(name = "소셜 계정 API", description = "소셜 로그인을 다루는 API입니다.")
@@ -71,16 +73,21 @@ public class SocialIdentityRestController {
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie).body(DataResponse.ok(loginResponse));
     }
 
-    @Operation(summary = "구글 소셜 로그인 API (테스트용)", description = "구글 인가 코드를 받아 로그인합니다.<br>구글 인가 코드를 URL에서 추출할 경우 '%2F'는 '/'로 대체해야 합니다.")
-    @PostMapping("/google/social-login")
-    public ResponseEntity<DataResponse<?>> googleSocialLogin(@RequestBody @Valid SocialLoginRequest request) {
-        SocialAccountPayload member = socialIdentityController.handleSocialLogin(AuthProvider.GOOGLE, request.getCode());
+    @Operation(summary = "소셜 회원가입 API", description = "소셜 인증/로그인 API에서 NEED_SIGNUP을 응답받은 경우 사용합니다.")
+    @PostMapping("/social-signup")
+    public ResponseEntity<DataResponse<SocialLoginResponse>> socialSignUp(
+            @CookieValue(TEMP_TOKEN_COOKIE_NAME)
+            String tempToken,
 
-        TokenPair tokenPair = tokenService.issueToken(member.getAccountId().getValue(), member.getNickname().getValue(), member.getEmail().getValue(), member.getRole());
-
-        TokenResponse token = new TokenResponse(tokenPair.accessToken());
-        DataResponse<TokenResponse> response = DataResponse.ok(token);
-        String refreshCookie = jwtTokenProvider.generateRefreshTokenCookieAsString(tokenPair.refreshToken());
+            @RequestBody @Valid
+            SocialSignUpRequest socialSignUpRequest
+    ) {
+        LoginResult loginResult = socialIdentityController.createNewMember(socialSignUpRequest,tempTokenHelper.getTempTokenInfoFromClaims(tempToken));
+        TokenPair tokenPair = tokenService.issueToken(loginResult.uuid(),loginResult.nickname(), loginResult.email(), loginResult.role());
+        String refreshCookie = jwtCookieProvider.generateRefreshTokenCookieAsString(tokenPair.refreshToken());
+        String expiredTempCookie = jwtCookieProvider.deleteTempTokenCookieAsString();
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie, expiredTempCookie).body(DataResponse.ok(SocialLoginResponse.login(tokenPair.accessToken())));
+    }
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie).body(response);
     }

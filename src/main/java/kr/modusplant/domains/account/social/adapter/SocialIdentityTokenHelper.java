@@ -1,6 +1,8 @@
 package kr.modusplant.domains.account.social.adapter;
 
+import io.jsonwebtoken.Claims;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
+import kr.modusplant.domains.account.social.usecase.record.TempTokenInfo;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,15 @@ public class SocialIdentityTokenHelper {
         return jwtTokenProvider.generateToken(providerId,claims,durationMs);
     }
 
+    public TempTokenInfo getTempTokenInfoFromClaims(String tempToken) {
+        Claims claims = jwtTokenProvider.getClaimsFromToken(tempToken);
+        String provider = claims.get("socialProvider", String.class);
+        return new TempTokenInfo(
+                claims.get("email",String.class),
+                claims.get("providerId",String.class),
+                SocialProvider.valueOf(provider)
+        );
+    }
 
 
 

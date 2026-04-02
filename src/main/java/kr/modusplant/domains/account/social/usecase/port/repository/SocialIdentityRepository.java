@@ -13,6 +13,6 @@ public interface SocialIdentityRepository {
 
     SocialMemberProfile updateLoggedInAtAndGetProfile(AccountId accountId);
 
-    SocialAccountPayload createSocialMember(SocialAccountProfile profile, Role role);
+    SocialMemberProfile saveSocialMember(SocialMemberProfile profile, String intro, AgreedTerms agreedTerms);
 
 }

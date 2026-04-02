@@ -8,8 +8,9 @@ import kr.modusplant.domains.account.social.usecase.response.LoginResult;
 import kr.modusplant.shared.enums.AuthProvider;
 
 public interface SocialIdentityMapper {
-    SocialAccountProfile toSocialUserProfile(AuthProvider provider, SocialUserInfo userInfo);
     SocialProfile toSocialProfile(SocialProvider provider, SocialUserInfo userInfo);
+
+    AuthProvider toSocialAuthProvider(SocialProvider socialProvider);
 
     LoginResult toLoginResult(SocialMemberProfile socialMemberProfile);
 }

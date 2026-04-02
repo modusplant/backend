@@ -37,6 +37,13 @@ public class SocialIdentityMapperImpl implements SocialIdentityMapper {
             nickname += chars.charAt((int)(Math.random() * chars.length()));
         }
         return nickname;
+    @Override
+    public AuthProvider toSocialAuthProvider(SocialProvider socialProvider) {
+        return switch (socialProvider) {
+            case KAKAO -> AuthProvider.KAKAO;
+            case GOOGLE -> AuthProvider.GOOGLE;
+        };
+    }
 
     @Override
     public LoginResult toLoginResult(SocialMemberProfile socialMemberProfile) {

@@ -49,15 +49,15 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
         return socialIdentityJpaMapper.toSocialMemberProfile(memberEntity, memberAuthEntity);
     }
 
-//    @Override
-//    public SocialMemberProfile saveSocialMember(SocialMemberProfile profile, String introduction, AgreedTerms agreedTerms) {
-//        SiteMemberEntity memberEntity = memberJpaRepository.save(socialIdentityJpaMapper.toMemberEntity(profile.getNickname(), profile.getRole()));
-//        SiteMemberAuthEntity memberAuthEntity = memberAuthJpaRepository.save(socialIdentityJpaMapper.toMemberAuthEntity(memberEntity, profile.getSocialCredentials(), profile.getEmail()));
-//        memberProfileJpaRepository.save(socialIdentityJpaMapper.toMemberProfileEntity(memberEntity,introduction));
-//        memberTermJpaRepository.save(socialIdentityJpaMapper.toMemberTermEntity(memberEntity,agreedTerms));
-//        return socialIdentityJpaMapper.toSocialMemberProfile(memberEntity, memberAuthEntity);
-//    }
-//
+    @Override
+    public SocialMemberProfile saveSocialMember(SocialMemberProfile profile, String introduction, AgreedTerms agreedTerms) {
+        SiteMemberEntity memberEntity = memberJpaRepository.save(socialIdentityJpaMapper.toMemberEntity(profile.getNickname(), profile.getRole()));
+        SiteMemberAuthEntity memberAuthEntity = memberAuthJpaRepository.save(socialIdentityJpaMapper.toMemberAuthEntity(memberEntity, profile.getSocialCredentials(), profile.getEmail()));
+        memberProfileJpaRepository.save(socialIdentityJpaMapper.toMemberProfileEntity(memberEntity,introduction));
+        memberTermJpaRepository.save(socialIdentityJpaMapper.toMemberTermEntity(memberEntity,agreedTerms));
+        return socialIdentityJpaMapper.toSocialMemberProfile(memberEntity, memberAuthEntity);
+    }
+
 //    @Override
 //    public SocialMemberProfile updateSocialLinkedMember(SocialCredentials socialCredentials, Email email) {
 //        SiteMemberAuthEntity memberAuthEntity = memberAuthJpaRepository.findByEmail(email.getValue())

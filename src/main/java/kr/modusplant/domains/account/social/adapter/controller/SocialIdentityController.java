@@ -1,8 +1,7 @@
 package kr.modusplant.domains.account.social.adapter.controller;
 
 import kr.modusplant.domains.account.shared.kernel.AccountId;
-import kr.modusplant.domains.account.social.domain.vo.SocialAccountPayload;
-import kr.modusplant.domains.account.social.domain.vo.SocialAccountProfile;
+import kr.modusplant.domains.account.social.domain.exception.SocialAccountConflictException;
 import kr.modusplant.domains.account.social.domain.exception.AlreadyRegisteredWithOtherProviderException;
 import kr.modusplant.domains.account.social.domain.exception.InvalidValueException;
 import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
@@ -13,6 +12,7 @@ import kr.modusplant.domains.account.social.usecase.port.client.dto.SocialUserIn
 import kr.modusplant.domains.account.social.usecase.port.mapper.SocialIdentityMapper;
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
 import kr.modusplant.domains.account.social.usecase.record.*;
+import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
 import kr.modusplant.domains.account.social.usecase.response.LoginResult;
 import kr.modusplant.domains.account.social.usecase.response.NeedLinkResult;
 import kr.modusplant.domains.account.social.usecase.response.NeedSignupResult;
@@ -20,6 +20,7 @@ import kr.modusplant.domains.account.social.usecase.response.SocialLoginResult;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.kernel.Email;
+import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class SocialIdentityController {
 
@@ -82,5 +84,23 @@ public class SocialIdentityController {
             case GOOGLE -> socialCredentials.isGoogle();
         };
     }
+
+    // 회원가입 완료
+    @Transactional
+    public LoginResult createNewMember(SocialSignUpRequest signUpRequest, TempTokenInfo tempTokenInfo) {
+        Optional<SocialMemberProfile> member = socialIdentityRepository.getSocialMemberProfileByEmail(Email.create(tempTokenInfo.email()));
+        if (member.isPresent()) {
+            throw new SocialAccountConflictException(SocialIdentityErrorCode.ALREADY_SIGNED_UP);
+        }
+        SocialMemberProfile memberProfile = SocialMemberProfile.createNewMember(
+                SocialCredentials.create(socialIdentityMapper.toSocialAuthProvider(tempTokenInfo.socialProvider()), tempTokenInfo.providerId()),
+                Email.create(tempTokenInfo.email()),
+                Nickname.create(signUpRequest.nickname()),
+                Role.USER
+        );
+        AgreedTerms agreedTerms = AgreedTerms.create(AgreedTermVersion.create(signUpRequest.agreedTermsOfUseVersion()),AgreedTermVersion.create(signUpRequest.agreedPrivacyPolicyVersion()),AgreedTermVersion.create(signUpRequest.agreedCommunityPolicyVersion()));
+        return socialIdentityMapper.toLoginResult(socialIdentityRepository.saveSocialMember(memberProfile, signUpRequest.introduction(), agreedTerms));
+    }
+
 
 }
