@@ -5,7 +5,7 @@ import kr.modusplant.domains.account.social.common.util.domain.vo.AgreedTermsTes
 import kr.modusplant.domains.account.social.common.util.domain.vo.SocialMemberProfileTestUtils;
 import kr.modusplant.domains.account.social.common.util.domain.vo.SocialProfileTestUtils;
 import kr.modusplant.domains.account.social.common.util.usecase.record.TempTokenInfoTestUtils;
-import kr.modusplant.domains.account.social.common.util.usecase.request.SocialLoginRequestTestUtils;
+import kr.modusplant.domains.account.social.common.util.usecase.request.SocialAuthRequestTestUtils;
 import kr.modusplant.domains.account.social.common.util.usecase.request.SocialSignUpRequestTestUtils;
 import kr.modusplant.domains.account.social.common.util.usecase.response.SocialLoginResultTestUtils;
 import kr.modusplant.domains.account.social.domain.exception.AlreadyRegisteredWithOtherProviderException;
@@ -35,15 +35,13 @@ import org.junit.jupiter.api.Test;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.domains.account.shared.kernel.common.util.AccountIdTestUtils.testKakaoAccountId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-class SocialIdentityControllerTest implements SocialLoginRequestTestUtils, SocialSignUpRequestTestUtils, SocialMemberProfileTestUtils, SocialProfileTestUtils,
+class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, SocialSignUpRequestTestUtils, SocialMemberProfileTestUtils, SocialProfileTestUtils,
         AgreedTermsTestUtils, SocialLoginResultTestUtils, TempTokenInfoTestUtils {
     private final SocialAuthClientFactory clientFactory = mock(SocialAuthClientFactory.class);
     private final SocialIdentityRepository socialIdentityRepository = mock(SocialIdentityRepository.class);

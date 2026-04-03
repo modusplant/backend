@@ -3,13 +3,13 @@ package kr.modusplant.domains.account.social.framework.in.web.rest;
 import kr.modusplant.domains.account.social.adapter.SocialIdentityTokenHelper;
 import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityController;
 import kr.modusplant.domains.account.social.common.util.usecase.record.TempTokenInfoTestUtils;
-import kr.modusplant.domains.account.social.common.util.usecase.request.SocialLoginRequestTestUtils;
+import kr.modusplant.domains.account.social.common.util.usecase.request.SocialAuthRequestTestUtils;
 import kr.modusplant.domains.account.social.common.util.usecase.request.SocialSignUpRequestTestUtils;
 import kr.modusplant.domains.account.social.common.util.usecase.response.SocialLoginResultTestUtils;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.usecase.enums.OAuthType;
 import kr.modusplant.domains.account.social.usecase.record.TempTokenInfo;
-import kr.modusplant.domains.account.social.usecase.request.SocialLoginRequest;
+import kr.modusplant.domains.account.social.usecase.request.SocialAuthRequest;
 import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
 import kr.modusplant.domains.account.social.usecase.response.LoginResult;
 import kr.modusplant.domains.account.social.usecase.response.NeedLinkResult;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 
-class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, SocialLoginResultTestUtils, TempTokenInfoTestUtils, SocialSignUpRequestTestUtils {
+class SocialIdentityRestControllerTest implements SocialAuthRequestTestUtils, SocialLoginResultTestUtils, TempTokenInfoTestUtils, SocialSignUpRequestTestUtils {
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
     private final SocialIdentityController socialIdentityController = mock(SocialIdentityController.class);
     private final TokenService tokenService = mock(TokenService.class);
@@ -58,7 +58,7 @@ class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, S
     @DisplayName("소셜 로그인 시 LOGIN 결과를 받으면 refreshToken 쿠키와 accessToken을 반환한다")
     void testSocialLogin_givenLoginResult_willReturnRefreshCookieAndAccessToken() {
         // given
-        SocialLoginRequest request = new SocialLoginRequest("auth_code");
+        SocialAuthRequest request = new SocialAuthRequest("auth_code");
         LoginResult loginResult = createKakaoLoginResult();
 
         given(socialIdentityController.issueSocialAccessToken(SocialProvider.KAKAO, request.code())).willReturn(SOCIAL_ACCESS_TOKEN);
@@ -80,7 +80,7 @@ class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, S
     @DisplayName("소셜 로그인 시 NEED_SIGNUP 결과를 받으면 tempToken 쿠키와 email, nickname을 반환한다")
     void testSocialLogin_givenNeedSignupResult_willReturnTempCookieAndEmailAndNickname() {
         // given
-        SocialLoginRequest request = new SocialLoginRequest("auth_code");
+        SocialAuthRequest request = new SocialAuthRequest("auth_code");
         NeedSignupResult needSignupResult = createKakaoNeedSignupResult();
 
         given(socialIdentityController.issueSocialAccessToken(SocialProvider.KAKAO, request.code())).willReturn(SOCIAL_ACCESS_TOKEN);
@@ -112,7 +112,7 @@ class SocialIdentityRestControllerTest implements SocialLoginRequestTestUtils, S
     @DisplayName("소셜 로그인 시 NEED_LINK 결과를 받으면 tempToken 쿠키와 email, nickname을 반환한다")
     void testSocialLogin_givenNeedLinkResult_willReturnTempCookieAndEmailAndNickname() {
         // given
-        SocialLoginRequest request = new SocialLoginRequest("auth_code");
+        SocialAuthRequest request = new SocialAuthRequest("auth_code");
         NeedLinkResult needLinkResult = createKakaoNeedLinkResult();
 
         given(socialIdentityController.issueSocialAccessToken(SocialProvider.KAKAO, request.code()))
