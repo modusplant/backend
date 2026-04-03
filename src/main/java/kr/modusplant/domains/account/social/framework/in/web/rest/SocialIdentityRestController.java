@@ -44,7 +44,7 @@ public class SocialIdentityRestController {
     public ResponseEntity<DataResponse<SocialLoginResponse>> socialLogin(
             @RequestBody @Valid SocialLoginRequest request,
 
-            @Parameter(schema = @Schema(description = "소셜 플랫폼 제공자", example = "KAKAO"))
+            @Parameter(schema = @Schema(description = "소셜 플랫폼 제공자", example = "kakao"))
             @PathVariable
             @NotNull
             SocialProvider provider
@@ -57,7 +57,7 @@ public class SocialIdentityRestController {
             case LoginResult login -> {
                 TokenPair tokenPair = tokenService.issueToken(login.uuid(),login.nickname(), login.email(),login.role());
                 cookie = jwtCookieProvider.generateRefreshTokenCookieAsString(tokenPair.refreshToken());
-                loginResponse = SocialLoginResponse.login(socialAccessToken);
+                loginResponse = SocialLoginResponse.login(tokenPair.accessToken());
             }
             case NeedSignupResult needSignup -> {
                 String tempToken = tempTokenHelper.generateTempToken(needSignup.email(), needSignup.providerId(), needSignup.socialProvider(), socialAccessToken, durationMs);
