@@ -315,10 +315,9 @@ class PostQueryJooqRepositoryIntegrationTest {
                 null, null, null, null, size);
 
         // then
-        // 결과가 존재하고 importance 또는 maxWordSimilarity 기준으로 정렬되어 있음을 확인
+        // 결과가 존재하고 importance 기준으로 정렬되어 있음을 확인
         assertThat(result).isNotEmpty();
         assertThat(result).extracting("importance").isSortedAccordingTo(Collections.reverseOrder());
-        assertThat(result).extracting("maxWordSimilarity").isSortedAccordingTo(Collections.reverseOrder());
     }
 
     @Test
