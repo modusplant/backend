@@ -14,5 +14,4 @@ public interface SocialMemberProfileTestUtils extends AccountIdTestUtils, Social
     SocialMemberProfile testGoogleSocialMemberProfileWithBasicEmail = SocialMemberProfile.create(testGoogleAccountId,testGoogleSocialCredentials,testNormalUserEmail,testNormalUserNickname, Role.USER);
     SocialMemberProfile testBasicKakaoSocialMemberProfile = SocialMemberProfile.create(testNormalMemberId,testBasicKakaoSocialCredentials,testNormalUserEmail,testNormalUserNickname, Role.USER);
     SocialMemberProfile testBasicGoogleSocialMemberProfile = SocialMemberProfile.create(testNormalMemberId,testBasicGoogleSocialCredentials,testNormalUserEmail,testNormalUserNickname, Role.USER);
-
 }

@@ -52,7 +52,7 @@ class SocialCredentialsTest implements SocialCredentialsTestUtils {
     void testCreate_givenBasicProvider_willThrowException() {
         // when & then
         InvalidValueException exception = assertThrows(InvalidValueException.class, () -> SocialCredentials.create(AuthProvider.BASIC, "12345"));
-        assertThat(exception.getErrorCode()).isEqualTo(SocialIdentityErrorCode.INVALID_PROVIDER);
+        assertThat(exception.getErrorCode()).isEqualTo(SocialIdentityErrorCode.INVALID_PROVIDER_ID);
     }
 
     @Test
@@ -92,11 +92,42 @@ class SocialCredentialsTest implements SocialCredentialsTestUtils {
     }
 
     @Test
+    @DisplayName("유효한 providerId로 BasicKakao SocialCredentials를 생성한다")
+    void testCreateBasicKakao_givenValidProviderId_willReturnSocialCredentials() {
+        // when
+        SocialCredentials credentials = SocialCredentials.createBasicKakao(TEST_SOCIAL_KAKAO_PROVIDER_ID_STRING);
+
+        // then
+        assertNotNull(credentials);
+        assertThat(credentials.getProvider()).isEqualTo(AuthProvider.BASIC_KAKAO);
+        assertThat(credentials.getProviderId()).isEqualTo(TEST_SOCIAL_KAKAO_PROVIDER_ID_STRING);
+        assertTrue(credentials.isKakao());
+        assertTrue(credentials.isLinked());
+    }
+
+    @Test
+    @DisplayName("유효한 providerId로 BasicGoogle SocialCredentials를 생성한다")
+    void testCreateBasicGoogle_givenValidProviderId_willReturnSocialCredentials() {
+        // when
+        SocialCredentials credentials = SocialCredentials.createBasicGoogle(TEST_SOCIAL_GOOGLE_PROVIDER_ID_STRING);
+
+        // then
+        assertNotNull(credentials);
+        assertThat(credentials.getProvider()).isEqualTo(AuthProvider.BASIC_GOOGLE);
+        assertThat(credentials.getProviderId()).isEqualTo(TEST_SOCIAL_GOOGLE_PROVIDER_ID_STRING);
+        assertTrue(credentials.isGoogle());
+        assertTrue(credentials.isLinked());
+    }
+
+
+    @Test
     @DisplayName("isKakao로 Kakao provider 확인")
     void testIsKakao_givenKakaoProvider_willReturnTrue() {
         // when & then
         assertTrue(testKakaoSocialCredentials.isKakao());
         assertFalse(testGoogleSocialCredentials.isKakao());
+        assertTrue(testBasicKakaoSocialCredentials.isKakao());
+        assertFalse(testBasicGoogleSocialCredentials.isKakao());
     }
 
     @Test
@@ -105,6 +136,29 @@ class SocialCredentialsTest implements SocialCredentialsTestUtils {
         // when & then
         assertTrue(testGoogleSocialCredentials.isGoogle());
         assertFalse(testKakaoSocialCredentials.isGoogle());
+        assertTrue(testBasicGoogleSocialCredentials.isGoogle());
+        assertFalse(testBasicKakaoSocialCredentials.isGoogle());
+    }
+
+    @Test
+    @DisplayName("isLinked로 연동된 provider 확인")
+    void testIsLinked_givenLinkedProvider_willReturnTrue() {
+        // when & then
+        assertTrue(testBasicKakaoSocialCredentials.isLinked());
+        assertTrue(testBasicGoogleSocialCredentials.isLinked());
+        assertFalse(testKakaoSocialCredentials.isLinked());
+        assertFalse(testGoogleSocialCredentials.isLinked());
+    }
+
+    @Test
+    @DisplayName("isPureBasic으로 BASIC provider 확인")
+    void testIsPureBasic_givenBasicProvider_willReturnTrue() {
+        // when & then
+        assertTrue(testBasicSocialCredentials.isPureBasic());
+        assertFalse(testKakaoSocialCredentials.isPureBasic());
+        assertFalse(testGoogleSocialCredentials.isPureBasic());
+        assertFalse(testBasicKakaoSocialCredentials.isPureBasic());
+        assertFalse(testBasicGoogleSocialCredentials.isPureBasic());
     }
 
     @Test
