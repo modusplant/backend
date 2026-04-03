@@ -334,7 +334,8 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         Field<Double> searchHitsMaxWordSimilarity = field(name("search_hits", "max_wsim"), Double.class);
 
         Condition cursorCondition = noCondition();
-        if (cursorUlid != null && cursorImportance != null) {
+        if (cursorUlid != null && cursorImportance != null &&
+                cursorMaxWordSimilarity != null && cursorPublishedAt != null) {
             cursorCondition =
                     searchHitsImportance.lt(cursorImportance)
                             .or(searchHitsImportance.eq(cursorImportance).and(searchHitsImportance.in(2, 3, 4))
