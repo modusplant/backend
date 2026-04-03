@@ -1,0 +1,1 @@
+ALTER TABLE public.site_member_auth ALTER COLUMN provider TYPE varchar(15);
