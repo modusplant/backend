@@ -22,6 +22,8 @@ import kr.modusplant.domains.post.usecase.request.PostSearchRequest;
 import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
 import kr.modusplant.domains.post.usecase.response.*;
 import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageImpl;
@@ -33,6 +35,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import static kr.modusplant.shared.constant.Regex.REGEX_ULID;
 
 @Service
 @Transactional(readOnly = true)
@@ -70,6 +74,15 @@ public class PostController {
             PostSearchRequest postSearchRequest, UUID currentMemberUuid,
             String lastUlid, Integer lastImportance, Double lastWordSimilarity, LocalDateTime lastPublishedAt,
             int size) {
+        if (lastUlid != null && !lastUlid.matches(REGEX_ULID)) {
+            throw new InvalidValueException(GeneralErrorCode.MALFORMED_INPUT, "lastUlid");
+        }
+        if (lastImportance != null && (lastImportance < 1 || lastImportance > 4)) {
+            throw new InvalidValueException(GeneralErrorCode.INPUT_OUT_OF_RANGE, "lastImportance");
+        }
+        if (lastWordSimilarity != null && (lastWordSimilarity < 0 || lastWordSimilarity > 1)) {
+            throw new InvalidValueException(GeneralErrorCode.INPUT_OUT_OF_RANGE, "lastWordSimilarity");
+        }
 
         List<PostSummaryWithSearchInfoReadModel> readModels;
         if (postSearchRequest.sort().equals(SearchSort.LATEST)) {

@@ -90,20 +90,16 @@ public class PostRestController {
     @GetMapping("/search")
     public ResponseEntity<DataResponse<CursorRelevanceSortedPageResponse<PostSummaryWithSearchInfoResponse>>> getPostsByKeyword(
             @AuthenticationPrincipal(expression = "uuid") UUID currentMemberUuid,
-
             @Parameter(schema = @Schema(description = "마지막 게시글 ID (첫 요청 시 생략)", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
             @RequestParam(name = "lastPostId", required = false)
-            @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
             String lastUlid,
 
             @Parameter(schema = @Schema(description = "마지막 게시글 중요도 (첫 요청 시 생략)", example = "1"))
             @RequestParam(name = "lastPostImportance", required = false)
-            @Range(min = 1, max = 4, message = "유효하지 않은 게시글 중요도 범위입니다.")
             Integer lastImportance,
 
             @Parameter(schema = @Schema(description = "마지막 게시글 정확도 (첫 요청 시 생략)", example = "0.143253469630148"))
             @RequestParam(name = "lastPostSimilarity", required = false)
-            @Range(min = 0, max = 1, message = "유효하지 않은 게시글 정확도 범위입니다.")
             Double lastWordSimilarity,
 
             @Parameter(schema = @Schema(description = "마지막 게시글 발행 시점 (첫 요청 시 생략)"))

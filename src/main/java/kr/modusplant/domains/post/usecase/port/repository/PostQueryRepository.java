@@ -2,7 +2,6 @@ package kr.modusplant.domains.post.usecase.port.repository;
 
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.usecase.enums.SearchOption;
-import kr.modusplant.domains.post.usecase.enums.SearchSort;
 import kr.modusplant.domains.post.usecase.record.PostDetailDataReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
