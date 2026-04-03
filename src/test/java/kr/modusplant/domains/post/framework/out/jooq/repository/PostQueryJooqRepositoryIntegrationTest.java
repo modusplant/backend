@@ -239,12 +239,22 @@ class PostQueryJooqRepositoryIntegrationTest {
                 null, null, size);
 
         // then
+        // 결과 존재 여부 확인
         assertThat(firstPageByKeyword).hasSize(size + 1);
         assertThat(firstPageByKeyword.getLast()).isEqualTo(secondPageByKeyword.getFirst());
         assertThat(firstPageByKeyword.getFirst().ulid()).isEqualTo(testPost5.getUlid());
         assertThat(firstPageByKeyword.get(1).ulid()).isEqualTo(testPost4.getUlid());
         assertThat(secondPageByKeyword.getFirst().ulid()).isEqualTo(testPost1.getUlid());
 
+        // 최신순 정렬 여부 확인
+        assertThat(firstPageByKeyword).extracting("ulid").isSortedAccordingTo(Collections.reverseOrder());
+        assertThat(secondPageByKeyword).extracting("ulid").isSortedAccordingTo(Collections.reverseOrder());
+
+        assertThat(firstPageByKeyword).extracting("publishedAt").isSortedAccordingTo(Collections.reverseOrder());
+        assertThat(secondPageByKeyword).extracting("publishedAt").isSortedAccordingTo(Collections.reverseOrder());
+        assertThat(firstPageByKeyword.getLast().publishedAt()).isAfterOrEqualTo(secondPageByKeyword.getLast().publishedAt());
+
+        // 이스케이핑 처리되어야 하는 키워드에 대한 정상 작동 여부 확인
         assertThat(pageByBackslash).isEmpty();
         assertThat(pageByPercent).isEmpty();
         assertThat(pageByUnderscore).isEmpty();
