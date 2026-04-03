@@ -1,7 +1,7 @@
 package kr.modusplant.domains.account.social.framework.out.client;
 
-import kr.modusplant.domains.account.social.framework.out.exception.UnsupportedSocialProviderException;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
+import kr.modusplant.domains.account.social.framework.out.exception.UnsupportedSocialProviderException;
 import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClient;
 import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClientFactory;
 import lombok.RequiredArgsConstructor;

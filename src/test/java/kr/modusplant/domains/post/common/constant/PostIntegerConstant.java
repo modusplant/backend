@@ -3,8 +3,6 @@ package kr.modusplant.domains.post.common.constant;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PostIntegerConstant {
     public static final Integer TEST_POST_IMPORTANCE_TITLE = 4;
