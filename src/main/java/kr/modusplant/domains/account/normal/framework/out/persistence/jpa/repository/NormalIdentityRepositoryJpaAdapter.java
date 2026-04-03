@@ -105,9 +105,8 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityCreateR
 
         SiteMemberAuthEntity savedAuth = savedAuthList.getFirst();
 
-        savedAuth.updateEmail(email.getValue());
         savedAuth.updatePassword(passwordEncoder.encode(pw.getValue()));
-        savedAuth.updateProvider(AuthProvider.BASIC_GOOGLE);
+        savedAuth.updateAuthProvider(AuthProvider.BASIC_GOOGLE);
         authJpaRepository.save(savedAuth);
     }
 
@@ -119,9 +118,8 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityCreateR
 
         SiteMemberAuthEntity savedAuth = savedAuthList.getFirst();
 
-        savedAuth.updateEmail(email.getValue());
         savedAuth.updatePassword(passwordEncoder.encode(pw.getValue()));
-        savedAuth.updateProvider(AuthProvider.BASIC_KAKAO);
+        savedAuth.updateAuthProvider(AuthProvider.BASIC_KAKAO);
         authJpaRepository.save(savedAuth);
     }
 }

@@ -41,7 +41,7 @@ public class SiteMemberAuthEntity {
     @Column(length = 64)
     private String pw;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @ToString.Include
     private AuthProvider provider;
@@ -66,7 +66,7 @@ public class SiteMemberAuthEntity {
         return getLastModifiedAt().truncatedTo(ChronoUnit.SECONDS);
     }
 
-    public void updateProvider(AuthProvider provider) { this.provider = provider; }
+    public void updateAuthProvider(AuthProvider provider) { this.provider = provider; }
 
     public void updateEmail(String email) { this.email = email; }
 

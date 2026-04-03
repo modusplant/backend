@@ -67,7 +67,7 @@ public class NormalIdentityJooqRepository implements
         return dsl.fetchExists(
                 dsl.selectOne()
                         .from(memberAuth)
-                        .where(memberAuth.UUID.eq(accountId.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
+                        .where(memberAuth.UUID.eq(accountId.getValue()))
         );
     }
 
@@ -76,7 +76,7 @@ public class NormalIdentityJooqRepository implements
         return dsl.fetchExists(
                 dsl.selectOne()
                         .from(memberAuth)
-                        .where(memberAuth.EMAIL.eq(email.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
+                        .where(memberAuth.EMAIL.eq(email.getValue()))
         );
     }
 

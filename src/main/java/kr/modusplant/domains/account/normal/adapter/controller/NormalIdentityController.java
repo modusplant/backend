@@ -26,8 +26,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.EXISTS_MEMBER;
-
 @Service
 public class NormalIdentityController {
 
@@ -51,6 +49,7 @@ public class NormalIdentityController {
     }
 
     public void registerNormalMember(NormalSignUpRequest request) {
+
         if(readRepository.existsByNickname(Nickname.create(request.nickname()))) {
             throw new DataAlreadyExistsException(KernelErrorCode.EXISTS_NICKNAME);
         }
@@ -61,7 +60,7 @@ public class NormalIdentityController {
             AuthProvider providerOfExistingMember = readRepository.getAuthProvider(requestEmail);
 
             if (providerOfExistingMember == AuthProvider.BASIC || providerOfExistingMember == AuthProvider.BASIC_GOOGLE || providerOfExistingMember == AuthProvider.BASIC_KAKAO) {
-                throw new ExistsEntityException(NormalIdentityErrorCode.EXISTS_BASIC_ACCOUNT, TableName.SITE_MEMBER);
+                throw new ExistsEntityException(NormalIdentityErrorCode.EXISTS_ACCOUNT, TableName.SITE_MEMBER);
             } else if (providerOfExistingMember == AuthProvider.GOOGLE) {
                 updateRepository.updateToGoogleAccount(requestEmail, Password.create(request.password()));
             } else if (providerOfExistingMember == AuthProvider.KAKAO) {
