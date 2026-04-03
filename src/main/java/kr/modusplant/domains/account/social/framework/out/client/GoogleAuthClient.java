@@ -72,6 +72,26 @@ public class GoogleAuthClient implements SocialAuthClient {
                 .body(GoogleUserInfo.class);
     }
 
+    @Override
+    public void revokeAccess(String accessToken) {
+        RestClient restClient = restClientBuilder
+                .baseUrl("https://oauth2.googleapis.com")
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .build();
+
+        MultiValueMap<String,String> formData = new LinkedMultiValueMap<>();
+        formData.add("token", accessToken);
+
+        restClient.post()
+                .uri("/revoke")
+                .body(formData)
+                .retrieve()
+                .onStatus(this::isErrorStatus,(request,response)->{
+                    throw new OAuthRequestFailException(SocialIdentityErrorCode.GOOGLE_REVOKE_FAIL,"google");
+                })
+                .toBodilessEntity();
+    }
+
     private boolean isErrorStatus(HttpStatusCode status) {
         return status.equals(HttpStatus.BAD_REQUEST) ||
                 status.equals(HttpStatus.UNAUTHORIZED) ||

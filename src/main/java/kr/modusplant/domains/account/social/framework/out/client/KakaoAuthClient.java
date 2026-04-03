@@ -69,6 +69,22 @@ public class KakaoAuthClient implements SocialAuthClient {
                 .body(KakaoUserInfo.class);
     }
 
+    @Override
+    public void revokeAccess(String accessToken) {
+        RestClient restClient = restClientBuilder
+                .baseUrl("https://kapi.kakao.com")
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer "+accessToken)
+                .build();
+
+        restClient.post()
+                .uri("/v1/user/unlink")
+                .retrieve()
+                .onStatus(this::isErrorStatus,(request,response) -> {
+                    throw new OAuthRequestFailException(SocialIdentityErrorCode.KAKAO_REVOKE_FAIL,"kakao");
+                })
+                .toBodilessEntity();
+    }
+
     private boolean isErrorStatus(HttpStatusCode status) {
         return status.equals(HttpStatus.BAD_REQUEST) ||
                 status.equals(HttpStatus.UNAUTHORIZED) ||

@@ -2,21 +2,18 @@ package kr.modusplant.domains.account.social.usecase.port.repository;
 
 
 import kr.modusplant.domains.account.shared.kernel.AccountId;
-import kr.modusplant.domains.account.social.domain.vo.SocialAccountPayload;
-import kr.modusplant.domains.account.social.domain.vo.SocialAccountProfile;
-import kr.modusplant.domains.account.social.domain.vo.SocialCredentials;
-import kr.modusplant.shared.enums.Role;
+import kr.modusplant.domains.account.social.domain.vo.*;
+import kr.modusplant.shared.kernel.Email;
 
 import java.util.Optional;
 
 public interface SocialIdentityRepository {
 
-    Optional<AccountId> getMemberIdBySocialCredentials(SocialCredentials socialCredentials);
+    Optional<SocialMemberProfile> getSocialMemberProfileByEmail(Email email);
 
-    SocialAccountPayload getUserPayloadByMemberId(AccountId accountId);
+    SocialMemberProfile updateLoggedInAtAndGetProfile(AccountId accountId);
 
-    void updateLoggedInAt(AccountId accountId);
+    SocialMemberProfile saveSocialMember(SocialMemberProfile profile, String intro, AgreedTerms agreedTerms);
 
-    SocialAccountPayload createSocialMember(SocialAccountProfile profile, Role role);
-
+    SocialMemberProfile updateSocialLinkedMember(SocialCredentials socialCredentials, Email email);
 }

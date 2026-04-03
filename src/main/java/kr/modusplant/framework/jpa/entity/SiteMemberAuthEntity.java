@@ -41,12 +41,12 @@ public class SiteMemberAuthEntity {
     @Column(length = 64)
     private String pw;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @ToString.Include
     private AuthProvider provider;
 
-    @Column(unique = true, updatable = false, name = "provider_id")
+    @Column(unique = true, name = "provider_id")
     private String providerId;
 
     @Column(name = LAST_MODIFIED_AT, nullable = false)
@@ -64,6 +64,14 @@ public class SiteMemberAuthEntity {
 
     public LocalDateTime getLastModifiedAtAsTruncatedToSeconds() {
         return getLastModifiedAt().truncatedTo(ChronoUnit.SECONDS);
+    }
+
+    public void updateProvider(AuthProvider provider) {
+        this.provider = provider;
+    }
+
+    public void updateProviderId(String providerId) {
+        this.providerId = providerId;
     }
 
     @Override
