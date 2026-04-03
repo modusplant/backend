@@ -130,4 +130,37 @@ class GoogleAuthClientTest {
         assertThrows(OAuthRequestFailException.class, () -> googleAuthClient.getUserInfo(accessToken));
     }
 
+    @Test
+    @DisplayName("구글 연결 해제 성공 테스트")
+    void testRevokeAccess_givenAccessToken_willSuccess() {
+        // given
+        String accessToken = "test-access-token";
+        MultiValueMap<String,String> formData = new LinkedMultiValueMap<>();
+        formData.add("token", accessToken);
+        mockServer.expect(requestTo("https://oauth2.googleapis.com/revoke"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE))
+                .andExpect(content().formData(formData))
+                .andRespond(withSuccess());
+
+        // when
+        googleAuthClient.revokeAccess(accessToken);
+
+        // then
+        mockServer.verify();
+    }
+
+    @Test
+    @DisplayName("구글 연결 해제 실패 시 예외 발생 테스트")
+    void testRevokeAccess_givenInvalidAccessToken_willThrowException() {
+        // given
+        String accessToken = "invalid-token";
+        mockServer.expect(requestTo("https://oauth2.googleapis.com/revoke"))
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST));
+
+        // when & then
+        assertThrows(OAuthRequestFailException.class, () -> googleAuthClient.revokeAccess(accessToken));
+
+    }
+
 }
