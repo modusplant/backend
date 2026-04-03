@@ -89,8 +89,14 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         Field<String> searchKeywordParam = val(searchKeyword);
 
         // 1. SearchOption에 따른 타겟 옵션 불리언 플래그 설정
-        boolean isTitle = option == SearchOption.TITLE || option == SearchOption.TITLE_CONTENT || option == SearchOption.TITLE_CONTENT_COMMENT;
-        boolean isContent = option == SearchOption.CONTENT || option == SearchOption.TITLE_CONTENT || option == SearchOption.TITLE_CONTENT_COMMENT;
+        boolean isTitle =
+                option == SearchOption.TITLE ||
+                        option == SearchOption.TITLE_CONTENT ||
+                        option == SearchOption.TITLE_CONTENT_COMMENT;
+        boolean isContent =
+                option == SearchOption.CONTENT ||
+                        option == SearchOption.TITLE_CONTENT ||
+                        option == SearchOption.TITLE_CONTENT_COMMENT;
         boolean isComment = option == SearchOption.TITLE_CONTENT_COMMENT;
 
         List<CommonTableExpression<?>> ctes = new ArrayList<>();
@@ -129,7 +135,8 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         ).from(COMM_POST);
 
         if (isComment) {
-            searchHitsFromStep = searchHitsFromStep.leftJoin(matchedCommentsCte).on(COMM_POST.ULID.eq(matchedCommentsPostUlid));
+            searchHitsFromStep = searchHitsFromStep.leftJoin(matchedCommentsCte)
+                    .on(COMM_POST.ULID.eq(matchedCommentsPostUlid));
         }
 
         CommonTableExpression<?> searchHitsCte = name("search_hits").as(
@@ -231,8 +238,13 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         Field<String> searchKeywordParam = val(searchKeyword);
 
         // 1. SearchOption에 따른 옵션 불리언 플래그 설정
-        boolean isTitle = option == SearchOption.TITLE || option == SearchOption.TITLE_CONTENT || option == SearchOption.TITLE_CONTENT_COMMENT;
-        boolean isContent = option == SearchOption.CONTENT || option == SearchOption.TITLE_CONTENT || option == SearchOption.TITLE_CONTENT_COMMENT;
+        boolean isTitle =
+                option == SearchOption.TITLE ||
+                        option == SearchOption.TITLE_CONTENT ||
+                        option == SearchOption.TITLE_CONTENT_COMMENT;
+        boolean isContent = option == SearchOption.CONTENT ||
+                option == SearchOption.TITLE_CONTENT ||
+                option == SearchOption.TITLE_CONTENT_COMMENT;
         boolean isComment = option == SearchOption.TITLE_CONTENT_COMMENT;
 
         List<CommonTableExpression<?>> ctes = new ArrayList<>(); // 실행할 CTE를 동적으로 담을 리스트
@@ -246,7 +258,8 @@ public class PostQueryJooqRepository implements PostQueryRepository {
             matchedCommentsCte = name("matched_comments").as(
                     select(
                             COMM_COMMENT.POST_ULID,
-                            max(field("word_similarity({0}, {1})", Double.class, keywordParam, COMM_COMMENT.CONTENT)).as("comment_wsim"),
+                            max(field("word_similarity({0}, {1})", Double.class,
+                                    keywordParam, COMM_COMMENT.CONTENT)).as("comment_wsim"),
                             boolOr(COMM_COMMENT.CONTENT.likeIgnoreCase(searchKeywordParam)).as("has_matched_comment")
                     )
                             .from(COMM_COMMENT)
@@ -258,9 +271,12 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         }
 
         // 3. search_hits CTE impo 및 max_wsim 필드 구성
-        Field<Double> titleWordSimilarity = field("word_similarity({0}, {1})", Double.class, keywordParam, COMM_POST.TITLE);
-        Field<Double> contentWordSimilarity = field("word_similarity({0}, {1})", Double.class, keywordParam, COMM_POST.CONTENT_TEXT);
-        Field<Boolean> matchedCommentsHasMatchedComment = field(name("matched_comments", "has_matched_comment"), Boolean.class);
+        Field<Double> titleWordSimilarity =
+                field("word_similarity({0}, {1})", Double.class, keywordParam, COMM_POST.TITLE);
+        Field<Double> contentWordSimilarity =
+                field("word_similarity({0}, {1})", Double.class, keywordParam, COMM_POST.CONTENT_TEXT);
+        Field<Boolean> matchedCommentsHasMatchedComment =
+                field(name("matched_comments", "has_matched_comment"), Boolean.class);
 
         // 중요도(impo) 동적 계산 (해당 옵션만 CASE 조건에 추가)
         CaseConditionStep<Integer> impoCase = null;
@@ -292,7 +308,10 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         Field<Double> maxWordSimilarityField;
         if (scoreFields.size() > 1) {
             //noinspection unchecked
-            maxWordSimilarityField = (Field<Double>) greatest(scoreFields.getFirst(), scoreFields.subList(1, scoreFields.size()).toArray(new Field[0])).as("max_wsim");
+            maxWordSimilarityField =
+                    (Field<Double>) greatest(
+                            scoreFields.getFirst(),
+                            scoreFields.subList(1, scoreFields.size()).toArray(new Field[0])).as("max_wsim");
         } else {
             maxWordSimilarityField = scoreFields.getFirst().cast(Double.class).as("max_wsim");
         }
@@ -300,13 +319,16 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         // 인덱스 매칭용 동적 WHERE 조건 구성
         Condition indexMatchCondition = noCondition();
         if (isTitle) {
-            indexMatchCondition = indexMatchCondition.or(condition("{0} %> {1}", COMM_POST.TITLE, keywordParam));
+            indexMatchCondition = indexMatchCondition.or(
+                    condition("{0} %> {1}", COMM_POST.TITLE, keywordParam));
         }
         if (isContent) {
-            indexMatchCondition = indexMatchCondition.or(condition("{0} %> {1}", COMM_POST.CONTENT_TEXT, keywordParam));
+            indexMatchCondition = indexMatchCondition.or(
+                    condition("{0} %> {1}", COMM_POST.CONTENT_TEXT, keywordParam));
         }
         if (isComment) {
-            indexMatchCondition = indexMatchCondition.or(mcPostUlid.isNotNull()); // JOIN 성공 여부로 판단
+            indexMatchCondition = indexMatchCondition.or(
+                    mcPostUlid.isNotNull()); // JOIN 성공 여부로 판단
         }
 
         // 4. search_hits CTE 조립 (동적 조인)
@@ -344,10 +366,12 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                     searchHitsImportance.lt(cursorImportance)
                             .or(searchHitsImportance.eq(cursorImportance).and(searchHitsImportance.in(2, 3, 4))
                                     .and(searchHitsPublishedAt.lt(cursorPublishedAt)
-                                            .or(searchHitsPublishedAt.eq(cursorPublishedAt).and(searchHitsUlid.lt(cursorUlid)))))
+                                            .or(searchHitsPublishedAt.eq(cursorPublishedAt)
+                                                    .and(searchHitsUlid.lt(cursorUlid)))))
                             .or(searchHitsImportance.eq(cursorImportance).and(searchHitsImportance.eq(1))
                                     .and(searchHitsMaxWordSimilarity.lt(cursorMaxWordSimilarity)
-                                            .or(searchHitsMaxWordSimilarity.eq(cursorMaxWordSimilarity).and(searchHitsUlid.lt(cursorUlid)))));
+                                            .or(searchHitsMaxWordSimilarity.eq(cursorMaxWordSimilarity)
+                                                    .and(searchHitsUlid.lt(cursorUlid)))));
         }
 
         CommonTableExpression<?> evaluatedHitsCte = name("evaluated_hits").as(
@@ -408,8 +432,10 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                 .leftJoin(commentCountTable).on(eHitsUlid.eq(commentCountTable.field(COMM_COMMENT.POST_ULID)))
                 .orderBy(
                         eHitsImportance.desc(),
-                        case_().when(eHitsImportance.in(2, 3, 4), eHitsPublishedAt).otherwise((LocalDateTime) null).desc().nullsLast(),
-                        case_().when(eHitsImportance.eq(1), eHitsMaxWordSimilarity).otherwise((Double) null).desc().nullsLast(),
+                        case_().when(eHitsImportance.in(2, 3, 4), eHitsPublishedAt)
+                                .otherwise((LocalDateTime) null).desc().nullsLast(),
+                        case_().when(eHitsImportance.eq(1), eHitsMaxWordSimilarity)
+                                .otherwise((Double) null).desc().nullsLast(),
                         eHitsUlid.desc()
                 )
                 .limit(size + 1)
