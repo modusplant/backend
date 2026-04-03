@@ -86,7 +86,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         }
 
         String searchKeyword = "%" + escape(keyword, '$') + "%";
-        Field<String> keywordParam = val(searchKeyword);
+        Field<String> searchKeywordParam = val(searchKeyword);
 
         // 1. SearchOption에 따른 타겟 옵션 불리언 플래그 설정
         boolean isTitle = option == SearchOption.TITLE || option == SearchOption.TITLE_CONTENT || option == SearchOption.TITLE_CONTENT_COMMENT;
@@ -104,7 +104,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                     selectDistinct(COMM_COMMENT.POST_ULID)
                             .from(COMM_COMMENT)
                             .where(COMM_COMMENT.IS_DELETED.isFalse())
-                            .and(COMM_COMMENT.CONTENT.likeIgnoreCase(keywordParam))
+                            .and(COMM_COMMENT.CONTENT.likeIgnoreCase(searchKeywordParam))
             );
             ctes.add(matchedCommentsCte);
         }
@@ -113,10 +113,10 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         Condition matchCondition = noCondition();
 
         if (isTitle) {
-            matchCondition = matchCondition.or(COMM_POST.TITLE.likeIgnoreCase(keywordParam));
+            matchCondition = matchCondition.or(COMM_POST.TITLE.likeIgnoreCase(searchKeywordParam));
         }
         if (isContent) {
-            matchCondition = matchCondition.or(COMM_POST.CONTENT_TEXT.likeIgnoreCase(keywordParam));
+            matchCondition = matchCondition.or(COMM_POST.CONTENT_TEXT.likeIgnoreCase(searchKeywordParam));
         }
         if (isComment) {
             matchCondition = matchCondition.or(matchedCommentsPostUlid.isNotNull());
@@ -226,7 +226,9 @@ public class PostQueryJooqRepository implements PostQueryRepository {
             return Collections.emptyList();
         }
 
-        Field<String> keywordField = val(keyword);
+        Field<String> keywordParam = val(keyword);
+        String searchKeyword = "%" + escape(keyword, '$') + "%";
+        Field<String> searchKeywordParam = val(searchKeyword);
 
         // 1. SearchOption에 따른 옵션 불리언 플래그 설정
         boolean isTitle = option == SearchOption.TITLE || option == SearchOption.TITLE_CONTENT || option == SearchOption.TITLE_CONTENT_COMMENT;
@@ -244,32 +246,34 @@ public class PostQueryJooqRepository implements PostQueryRepository {
             matchedCommentsCte = name("matched_comments").as(
                     select(
                             COMM_COMMENT.POST_ULID,
-                            max(field("word_similarity({0}, {1})", Double.class, keywordField, COMM_COMMENT.CONTENT)).as("comment_wsim")
+                            max(field("word_similarity({0}, {1})", Double.class, keywordParam, COMM_COMMENT.CONTENT)).as("comment_wsim"),
+                            boolOr(COMM_COMMENT.CONTENT.likeIgnoreCase(searchKeywordParam)).as("has_matched_comment")
                     )
                             .from(COMM_COMMENT)
                             .where(COMM_COMMENT.IS_DELETED.isFalse())
-                            .and(condition("{0} %> {1}", COMM_COMMENT.CONTENT, keywordField))
+                            .and(condition("{0} %> {1}", COMM_COMMENT.CONTENT, keywordParam))
                             .groupBy(COMM_COMMENT.POST_ULID)
             );
             ctes.add(matchedCommentsCte);
         }
 
         // 3. search_hits CTE impo 및 max_wsim 필드 구성
-        Field<Double> titleWordSimilarity = field("word_similarity({0}, {1})", Double.class, keywordField, COMM_POST.TITLE);
-        Field<Double> contentWordSimilarity = field("word_similarity({0}, {1})", Double.class, keywordField, COMM_POST.CONTENT_TEXT);
+        Field<Double> titleWordSimilarity = field("word_similarity({0}, {1})", Double.class, keywordParam, COMM_POST.TITLE);
+        Field<Double> contentWordSimilarity = field("word_similarity({0}, {1})", Double.class, keywordParam, COMM_POST.CONTENT_TEXT);
+        Field<Boolean> matchedCommentsHasMatchedComment = field(name("matched_comments", "has_matched_comment"), Boolean.class);
 
         // 중요도(impo) 동적 계산 (해당 옵션만 CASE 조건에 추가)
         CaseConditionStep<Integer> impoCase = null;
         if (isTitle) {
-            impoCase = case_().when(titleWordSimilarity.eq(1.0), 4);
+            impoCase = case_().when(COMM_POST.TITLE.likeIgnoreCase(searchKeywordParam), 4);
         }
         if (isContent) {
             impoCase = (impoCase == null) ?
-                    case_().when(contentWordSimilarity.eq(1.0), 3) :
-                    impoCase.when(contentWordSimilarity.eq(1.0), 3);
+                    case_().when(COMM_POST.CONTENT_TEXT.likeIgnoreCase(searchKeywordParam), 3) :
+                    impoCase.when(COMM_POST.CONTENT_TEXT.likeIgnoreCase(searchKeywordParam), 3);
         }
         if (isComment) {
-            impoCase = impoCase.when(mcCommentWordSimilarity.eq(1.0), 2);
+            impoCase = impoCase.when(matchedCommentsHasMatchedComment.isTrue(), 2);
         }
         Field<Integer> impoField = impoCase != null ? impoCase.otherwise(1).as("impo") : val(1).as("impo");
 
@@ -296,10 +300,10 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         // 인덱스 매칭용 동적 WHERE 조건 구성
         Condition indexMatchCondition = noCondition();
         if (isTitle) {
-            indexMatchCondition = indexMatchCondition.or(condition("{0} %> {1}", COMM_POST.TITLE, keywordField));
+            indexMatchCondition = indexMatchCondition.or(condition("{0} %> {1}", COMM_POST.TITLE, keywordParam));
         }
         if (isContent) {
-            indexMatchCondition = indexMatchCondition.or(condition("{0} %> {1}", COMM_POST.CONTENT_TEXT, keywordField));
+            indexMatchCondition = indexMatchCondition.or(condition("{0} %> {1}", COMM_POST.CONTENT_TEXT, keywordParam));
         }
         if (isComment) {
             indexMatchCondition = indexMatchCondition.or(mcPostUlid.isNotNull()); // JOIN 성공 여부로 판단
