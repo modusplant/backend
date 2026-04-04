@@ -205,7 +205,7 @@ class SocialIdentityRestControllerTest implements SocialAuthRequestTestUtils, So
 
     @Test
     @DisplayName("소셜 연결 해제 시 tempToken 쿠키를 삭제하고 응답을 반환한다")
-    void testUnlikeSocialAccount_givenValidTempToken_willReturnExpiredTempCookie() {
+    void testUnlinkSocialAccount_givenValidTempToken_willReturnExpiredTempCookie() {
         // given
         given(tempTokenHelper.getSocialProviderFromClaims(TEMP_TOKEN))
                 .willReturn(SocialProvider.KAKAO);
@@ -218,7 +218,7 @@ class SocialIdentityRestControllerTest implements SocialAuthRequestTestUtils, So
 
         // when
         ResponseEntity<DataResponse<Void>> response =
-                socialIdentityRestController.unlikeSocialAccount(TEMP_TOKEN);
+                socialIdentityRestController.unlinkSocialAccount(TEMP_TOKEN);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
