@@ -85,8 +85,8 @@ public class PostQueryJooqRepository implements PostQueryRepository {
             return Collections.emptyList();
         }
 
-        String searchKeyword = "%" + escape(keyword, '$') + "%";
-        Field<String> searchKeywordParam = val(searchKeyword);
+        Field<String> keywordLongerThanOrEqualToThree = val("%" + escape(keyword, '$') + "%");
+        Field<String> keywordLowerThanThree = val(escape(keyword, '$') + "%");
 
         // 1. SearchOption에 따른 타겟 옵션 불리언 플래그 설정
         boolean isTitle = option == SearchOption.TITLE || option == SearchOption.TITLE_CONTENT || option == SearchOption.TITLE_CONTENT_COMMENT;
@@ -99,12 +99,16 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         CommonTableExpression<?> matchedCommentsCte = null;
         Field<String> matchedCommentsPostUlid = field(name("matched_comments", "post_ulid"), String.class);
 
+        LikeEscapeStep ilikeCondition = keyword.length() >= 3 ?
+                COMM_COMMENT.CONTENT.likeIgnoreCase(keywordLongerThanOrEqualToThree) :
+                COMM_COMMENT.CONTENT.likeIgnoreCase(keywordLowerThanThree);
+
         if (isComment) {
             matchedCommentsCte = name("matched_comments").as(
                     selectDistinct(COMM_COMMENT.POST_ULID)
                             .from(COMM_COMMENT)
                             .where(COMM_COMMENT.IS_DELETED.isFalse())
-                            .and(COMM_COMMENT.CONTENT.likeIgnoreCase(searchKeywordParam))
+                            .and(ilikeCondition)
             );
             ctes.add(matchedCommentsCte);
         }
@@ -113,10 +117,10 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         Condition matchCondition = noCondition();
 
         if (isTitle) {
-            matchCondition = matchCondition.or(COMM_POST.TITLE.likeIgnoreCase(searchKeywordParam));
+            matchCondition = matchCondition.or(COMM_POST.TITLE.likeIgnoreCase(keywordLongerThanOrEqualToThree));
         }
         if (isContent) {
-            matchCondition = matchCondition.or(COMM_POST.CONTENT_TEXT.likeIgnoreCase(searchKeywordParam));
+            matchCondition = matchCondition.or(COMM_POST.CONTENT_TEXT.likeIgnoreCase(keywordLongerThanOrEqualToThree));
         }
         if (isComment) {
             matchCondition = matchCondition.or(matchedCommentsPostUlid.isNotNull());
