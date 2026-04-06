@@ -106,7 +106,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         CommonTableExpression<?> matchedCommentsCte = null;
         Field<String> matchedCommentsPostUlid = field(name("matched_comments", "post_ulid"), String.class);
 
-        LikeEscapeStep ilikeCondition = keyword.length() >= 3 ?
+        LikeEscapeStep ilikeConditionForComment = keyword.length() >= 3 ?
                 COMM_COMMENT.CONTENT.likeIgnoreCase(keywordLongerThanOrEqualToThree) :
                 COMM_COMMENT.CONTENT.likeIgnoreCase(keywordLowerThanThree);
 
@@ -115,7 +115,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                     selectDistinct(COMM_COMMENT.POST_ULID)
                             .from(COMM_COMMENT)
                             .where(COMM_COMMENT.IS_DELETED.isFalse())
-                            .and(ilikeCondition)
+                            .and(ilikeConditionForComment)
             );
             ctes.add(matchedCommentsCte);
         }
@@ -124,10 +124,18 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         Condition matchCondition = noCondition();
 
         if (isTitle) {
-            matchCondition = matchCondition.or(COMM_POST.TITLE.likeIgnoreCase(keywordLongerThanOrEqualToThree));
+            LikeEscapeStep ilikeConditionForTitle =
+                    keyword.length() >= 3 ?
+                            COMM_POST.TITLE.likeIgnoreCase(keywordLongerThanOrEqualToThree) :
+                            COMM_POST.TITLE.likeIgnoreCase(keywordLowerThanThree);
+            matchCondition = matchCondition.or(ilikeConditionForTitle);
         }
         if (isContent) {
-            matchCondition = matchCondition.or(COMM_POST.CONTENT_TEXT.likeIgnoreCase(keywordLongerThanOrEqualToThree));
+            LikeEscapeStep ilikeConditionForContent =
+                    keyword.length() >= 3 ?
+                            COMM_POST.CONTENT_TEXT.likeIgnoreCase(keywordLongerThanOrEqualToThree) :
+                            COMM_POST.CONTENT_TEXT.likeIgnoreCase(keywordLowerThanThree);
+            matchCondition = matchCondition.or(ilikeConditionForContent);
         }
         if (isComment) {
             matchCondition = matchCondition.or(matchedCommentsPostUlid.isNotNull());
