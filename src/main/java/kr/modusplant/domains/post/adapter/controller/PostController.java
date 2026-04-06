@@ -83,6 +83,22 @@ public class PostController {
         if (lastWordSimilarity != null && (lastWordSimilarity < 0 || lastWordSimilarity > 1)) {
             throw new InvalidValueException(GeneralErrorCode.INPUT_OUT_OF_RANGE, "lastWordSimilarity");
         }
+        if (postSearchRequest.sort().equals(SearchSort.LATEST) &&
+                !(
+                        (lastUlid != null && lastPublishedAt != null) ||
+                                (lastUlid == null && lastPublishedAt == null)
+                )) {
+            throw new InvalidValueException(GeneralErrorCode.INVALID_INPUT, "lastUlid", "lastPublishedAt");
+        } else if (postSearchRequest.sort().equals(SearchSort.RELEVANCE) &&
+                !(
+                        (lastUlid != null && lastImportance != null &&
+                                lastWordSimilarity != null && lastPublishedAt != null) ||
+                                (lastUlid == null && lastImportance == null &&
+                                        lastWordSimilarity == null && lastPublishedAt == null)
+                )) {
+            throw new InvalidValueException(GeneralErrorCode.INVALID_INPUT,
+                    "lastUlid", "lastImportance", "lastWordSimilarity", "lastPublishedAt");
+        }
 
         List<PostSummaryWithSearchInfoReadModel> readModels;
         if (postSearchRequest.sort().equals(SearchSort.LATEST)) {

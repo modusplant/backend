@@ -84,13 +84,20 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         if (StringUtils.isEmpty(keyword)) {
             return Collections.emptyList();
         }
+        keyword = keyword.trim();
 
         Field<String> keywordLongerThanOrEqualToThree = val("%" + escape(keyword, '$') + "%");
         Field<String> keywordLowerThanThree = val(escape(keyword, '$') + "%");
 
         // 1. SearchOption에 따른 타겟 옵션 불리언 플래그 설정
-        boolean isTitle = option == SearchOption.TITLE || option == SearchOption.TITLE_CONTENT || option == SearchOption.TITLE_CONTENT_COMMENT;
-        boolean isContent = option == SearchOption.CONTENT || option == SearchOption.TITLE_CONTENT || option == SearchOption.TITLE_CONTENT_COMMENT;
+        boolean isTitle =
+                option == SearchOption.TITLE ||
+                        option == SearchOption.TITLE_CONTENT ||
+                        option == SearchOption.TITLE_CONTENT_COMMENT;
+        boolean isContent =
+                option == SearchOption.CONTENT ||
+                        option == SearchOption.TITLE_CONTENT ||
+                        option == SearchOption.TITLE_CONTENT_COMMENT;
         boolean isComment = option == SearchOption.TITLE_CONTENT_COMMENT;
 
         List<CommonTableExpression<?>> ctes = new ArrayList<>();
@@ -229,17 +236,28 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         if (StringUtils.isEmpty(keyword)) {
             return Collections.emptyList();
         }
+        keyword = keyword.trim();
 
         Field<String> keywordParam = val(keyword);
-        String searchKeyword = "%" + escape(keyword, '$') + "%";
-        Field<String> searchKeywordParam = val(searchKeyword);
+        Field<String> keywordLongerThanOrEqualToThreeParam = val("%" + escape(keyword, '$') + "%");
+        Field<String> keywordLowerThanThreeParam = val(escape(keyword, '$') + "%");
 
-        // 1. SearchOption에 따른 옵션 불리언 플래그 설정
-        boolean isTitle = option == SearchOption.TITLE || option == SearchOption.TITLE_CONTENT || option == SearchOption.TITLE_CONTENT_COMMENT;
-        boolean isContent = option == SearchOption.CONTENT || option == SearchOption.TITLE_CONTENT || option == SearchOption.TITLE_CONTENT_COMMENT;
+        // 1. 불리언 플래그 설정
+        // SearchOption에 따른 플래그
+        boolean isTitle =
+                option == SearchOption.TITLE ||
+                        option == SearchOption.TITLE_CONTENT ||
+                        option == SearchOption.TITLE_CONTENT_COMMENT;
+        boolean isContent =
+                option == SearchOption.CONTENT ||
+                        option == SearchOption.TITLE_CONTENT ||
+                        option == SearchOption.TITLE_CONTENT_COMMENT;
         boolean isComment = option == SearchOption.TITLE_CONTENT_COMMENT;
 
         List<CommonTableExpression<?>> ctes = new ArrayList<>(); // 실행할 CTE를 동적으로 담을 리스트
+
+        // 키워드 길이에 따른 플래그
+        boolean passWithLowWordSimilarity = keyword.length() >= 3;
 
         // 2. matched_comments CTE 생성 및 추가 (댓글 옵션이 있을 때만)
         CommonTableExpression<?> matchedCommentsCte = null;
@@ -247,34 +265,55 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         Field<Double> mcCommentWordSimilarity = field(name("matched_comments", "comment_wsim"), Double.class);
 
         if (isComment) {
+            LikeEscapeStep ilikeConditionForComment = keyword.length() >= 3 ?
+                    COMM_COMMENT.CONTENT.likeIgnoreCase(keywordLongerThanOrEqualToThreeParam) :
+                    COMM_COMMENT.CONTENT.likeIgnoreCase(keywordLowerThanThreeParam);
+
+            Condition wordSimilarityCondition = condition("{0} %> {1}", COMM_COMMENT.CONTENT, keywordParam);
+            if (passWithLowWordSimilarity) {
+                wordSimilarityCondition = wordSimilarityCondition.or(ilikeConditionForComment);
+            }
+
             matchedCommentsCte = name("matched_comments").as(
                     select(
                             COMM_COMMENT.POST_ULID,
-                            max(field("word_similarity({0}, {1})", Double.class, keywordParam, COMM_COMMENT.CONTENT)).as("comment_wsim"),
-                            boolOr(COMM_COMMENT.CONTENT.likeIgnoreCase(searchKeywordParam)).as("has_matched_comment")
+                            max(field("word_similarity({0}, {1})", Double.class, keywordParam, COMM_COMMENT.CONTENT))
+                                    .as("comment_wsim"),
+                            boolOr(ilikeConditionForComment)
+                                    .as("has_matched_comment")
                     )
                             .from(COMM_COMMENT)
                             .where(COMM_COMMENT.IS_DELETED.isFalse())
-                            .and(condition("{0} %> {1}", COMM_COMMENT.CONTENT, keywordParam))
+                            .and(wordSimilarityCondition)
                             .groupBy(COMM_COMMENT.POST_ULID)
             );
             ctes.add(matchedCommentsCte);
         }
 
         // 3. search_hits CTE impo 및 max_wsim 필드 구성
-        Field<Double> titleWordSimilarity = field("word_similarity({0}, {1})", Double.class, keywordParam, COMM_POST.TITLE);
-        Field<Double> contentWordSimilarity = field("word_similarity({0}, {1})", Double.class, keywordParam, COMM_POST.CONTENT_TEXT);
-        Field<Boolean> matchedCommentsHasMatchedComment = field(name("matched_comments", "has_matched_comment"), Boolean.class);
+        Field<Double> titleWordSimilarity =
+                field("word_similarity({0}, {1})", Double.class, keywordParam, COMM_POST.TITLE);
+        Field<Double> contentWordSimilarity =
+                field("word_similarity({0}, {1})", Double.class, keywordParam, COMM_POST.CONTENT_TEXT);
+        Field<Boolean> matchedCommentsHasMatchedComment =
+                field(name("matched_comments", "has_matched_comment"), Boolean.class);
 
         // 중요도(impo) 동적 계산 (해당 옵션만 CASE 조건에 추가)
+        LikeEscapeStep ilikeConditionForTitle = keyword.length() >= 3 ?
+                COMM_POST.TITLE.likeIgnoreCase(keywordLongerThanOrEqualToThreeParam) :
+                COMM_POST.TITLE.likeIgnoreCase(keywordLowerThanThreeParam);
+        LikeEscapeStep ilikeConditionForContent = keyword.length() >= 3 ?
+                COMM_POST.CONTENT_TEXT.likeIgnoreCase(keywordLongerThanOrEqualToThreeParam) :
+                COMM_POST.CONTENT_TEXT.likeIgnoreCase(keywordLowerThanThreeParam);
+
         CaseConditionStep<Integer> impoCase = null;
         if (isTitle) {
-            impoCase = case_().when(COMM_POST.TITLE.likeIgnoreCase(searchKeywordParam), 4);
+            impoCase = case_().when(ilikeConditionForTitle, 4);
         }
         if (isContent) {
             impoCase = (impoCase == null) ?
-                    case_().when(COMM_POST.CONTENT_TEXT.likeIgnoreCase(searchKeywordParam), 3) :
-                    impoCase.when(COMM_POST.CONTENT_TEXT.likeIgnoreCase(searchKeywordParam), 3);
+                    case_().when(ilikeConditionForContent, 3) :
+                    impoCase.when(ilikeConditionForContent, 3);
         }
         if (isComment) {
             impoCase = impoCase.when(matchedCommentsHasMatchedComment.isTrue(), 2);
@@ -296,7 +335,11 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         Field<Double> maxWordSimilarityField;
         if (scoreFields.size() > 1) {
             //noinspection unchecked
-            maxWordSimilarityField = (Field<Double>) greatest(scoreFields.getFirst(), scoreFields.subList(1, scoreFields.size()).toArray(new Field[0])).as("max_wsim");
+            maxWordSimilarityField =
+                    (Field<Double>) greatest(
+                            scoreFields.getFirst(),
+                            scoreFields.subList(1, scoreFields.size()).toArray(new Field[0]))
+                            .as("max_wsim");
         } else {
             maxWordSimilarityField = scoreFields.getFirst().cast(Double.class).as("max_wsim");
         }
@@ -305,9 +348,15 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         Condition indexMatchCondition = noCondition();
         if (isTitle) {
             indexMatchCondition = indexMatchCondition.or(condition("{0} %> {1}", COMM_POST.TITLE, keywordParam));
+            if (passWithLowWordSimilarity) {
+                indexMatchCondition.or(ilikeConditionForTitle);
+            }
         }
         if (isContent) {
             indexMatchCondition = indexMatchCondition.or(condition("{0} %> {1}", COMM_POST.CONTENT_TEXT, keywordParam));
+            if (passWithLowWordSimilarity) {
+                indexMatchCondition.or(ilikeConditionForContent);
+            }
         }
         if (isComment) {
             indexMatchCondition = indexMatchCondition.or(mcPostUlid.isNotNull()); // JOIN 성공 여부로 판단
@@ -348,10 +397,12 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                     searchHitsImportance.lt(cursorImportance)
                             .or(searchHitsImportance.eq(cursorImportance).and(searchHitsImportance.in(2, 3, 4))
                                     .and(searchHitsPublishedAt.lt(cursorPublishedAt)
-                                            .or(searchHitsPublishedAt.eq(cursorPublishedAt).and(searchHitsUlid.lt(cursorUlid)))))
+                                            .or(searchHitsPublishedAt.eq(cursorPublishedAt)
+                                                    .and(searchHitsUlid.lt(cursorUlid)))))
                             .or(searchHitsImportance.eq(cursorImportance).and(searchHitsImportance.eq(1))
                                     .and(searchHitsMaxWordSimilarity.lt(cursorMaxWordSimilarity)
-                                            .or(searchHitsMaxWordSimilarity.eq(cursorMaxWordSimilarity).and(searchHitsUlid.lt(cursorUlid)))));
+                                            .or(searchHitsMaxWordSimilarity.eq(cursorMaxWordSimilarity)
+                                                    .and(searchHitsUlid.lt(cursorUlid)))));
         }
 
         CommonTableExpression<?> evaluatedHitsCte = name("evaluated_hits").as(
@@ -412,8 +463,10 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                 .leftJoin(commentCountTable).on(eHitsUlid.eq(commentCountTable.field(COMM_COMMENT.POST_ULID)))
                 .orderBy(
                         eHitsImportance.desc(),
-                        case_().when(eHitsImportance.in(2, 3, 4), eHitsPublishedAt).otherwise((LocalDateTime) null).desc().nullsLast(),
-                        case_().when(eHitsImportance.eq(1), eHitsMaxWordSimilarity).otherwise((Double) null).desc().nullsLast(),
+                        case_().when(eHitsImportance.in(2, 3, 4), eHitsPublishedAt)
+                                .otherwise((LocalDateTime) null).desc().nullsLast(),
+                        case_().when(eHitsImportance.eq(1), eHitsMaxWordSimilarity)
+                                .otherwise((Double) null).desc().nullsLast(),
                         eHitsUlid.desc()
                 )
                 .limit(size + 1)
