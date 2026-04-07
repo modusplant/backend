@@ -11,6 +11,8 @@ public interface SocialIdentityRepository {
 
     Optional<SocialMemberProfile> getSocialMemberProfileByEmail(Email email);
 
+    SocialMemberProfile getSocialMemberProfileByAccountId(AccountId accountId);
+
     SocialMemberProfile updateLoggedInAtAndGetProfile(AccountId accountId);
 
     SocialMemberProfile saveSocialMember(SocialMemberProfile profile, String intro, AgreedTerms agreedTerms);

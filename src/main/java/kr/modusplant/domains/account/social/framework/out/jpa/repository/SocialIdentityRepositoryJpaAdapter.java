@@ -36,6 +36,12 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
                 .map(memberAuthEntity -> socialIdentityJpaMapper.toSocialMemberProfile(memberAuthEntity.getMember(),memberAuthEntity));
     }
 
+    @Override
+    public SocialMemberProfile getSocialMemberProfileByAccountId(AccountId accountId) {
+        SiteMemberAuthEntity memberAuthEntity = memberAuthJpaRepository.findByUuid(accountId.getValue())
+                .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH, TableName.SITE_MEMBER_AUTH));
+        return socialIdentityJpaMapper.toSocialMemberProfile(memberAuthEntity.getMember(),memberAuthEntity);
+    }
 
     @Override
     public SocialMemberProfile updateLoggedInAtAndGetProfile(AccountId accountId) {
