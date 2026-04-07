@@ -68,6 +68,23 @@ public class SocialIdentityLinkController {
         }
     }
 
+    @Transactional
+    public void deleteSocialAccount(UUID currentMemberUuid, SocialProvider provider, String socialAccessToken) {
+        AccountId accountId = AccountId.fromUuid(currentMemberUuid);
+        SocialMemberProfile memberProfile = socialIdentityRepository.getSocialMemberProfileByAccountId(accountId);
+        SocialCredentials socialCredentials = memberProfile.getSocialCredentials();
+        if (socialCredentials.isPureBasic()) {
+            throw new SocialAccountConflictException(SocialIdentityErrorCode.NORMAL_USER_CANNOT_WITHDRAW);
+        } else if(socialCredentials.isLinked()) {
+            throw new SocialActionRequiredException(SocialIdentityErrorCode.SOCIAL_LINKAGE_REQUIRED);
+        } else if(socialCredentials.isPureSocial() && matches(provider,socialCredentials)) {
+            clientFactory.getClient(provider).revokeAccess(socialAccessToken);
+            // TODO: deleteSocialMember(accountId)로 서비스 회원 탈퇴 구현
+        } else {
+            throw new SocialAccountConflictException(SocialIdentityErrorCode.PROVIDER_MISMATCH);
+        }
+    }
+
     private boolean matches(SocialProvider socialProvider, SocialCredentials socialCredentials) {
         return switch (socialProvider) {
             case KAKAO ->  socialCredentials.isKakao();
