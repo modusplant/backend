@@ -16,12 +16,15 @@ import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberProfileJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberTermJpaRepository;
+import kr.modusplant.shared.enums.AuthProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -82,6 +85,21 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialMemberProfileTestU
 
         // then
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("AccountId로 회원 조회 시 SocialMemberProfile을 반환")
+    void testGetSocialMemberProfileByAccountId_givenAccountId_willReturnSocialMemberProfile() {
+        // given
+        given(memberAuthJpaRepository.findByUuid(testNormalMemberId.getValue())).willReturn(Optional.of(basicMemberAuthEntity));
+        given(socialIdentityJpaMapper.toSocialMemberProfile(basicMemberEntity, basicMemberAuthEntity)).willReturn(testBasicSocialMemberProfile);
+
+        // when
+        SocialMemberProfile result = socialIdentityRepositoryJpaAdapter.getSocialMemberProfileByAccountId(testNormalMemberId);
+
+        // then
+        assertThat(result).isEqualTo(testBasicSocialMemberProfile);
+        assertThat(result.getAccountId()).isEqualTo(testNormalMemberId);
     }
 
     @Test
@@ -147,6 +165,24 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialMemberProfileTestU
         assertThat(result).isEqualTo(testBasicKakaoSocialMemberProfile);
         verify(memberAuthJpaRepository).save(basicMemberAuthEntity);
         verify(memberJpaRepository).save(basicMemberEntity);
+    }
+
+    @Test
+    @DisplayName("소셜 연동 해제 시 provider와 providerId를 업데이트")
+    void testUpdateSocialUnlinkedMember_givenAccountId_willUpdateProviderAndProviderId() {
+        // given
+        SiteMemberAuthEntity linkedMemberAuthEntity = createMemberAuthBasicKakaoEntityBuilder()
+                .member(basicMemberEntity)
+                .build();
+        given(memberAuthJpaRepository.findByUuid(testNormalMemberId.getValue())).willReturn(Optional.of(linkedMemberAuthEntity));
+        given(memberAuthJpaRepository.save(linkedMemberAuthEntity)).willReturn(basicMemberAuthEntity);
+
+        // when
+        socialIdentityRepositoryJpaAdapter.updateSocialUnlinkedMember(testNormalMemberId);
+        
+        // then
+        verify(memberAuthJpaRepository).findByUuid(testNormalMemberId.getValue());
+        verify(memberAuthJpaRepository).save(linkedMemberAuthEntity);
     }
 
 

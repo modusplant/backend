@@ -162,6 +162,17 @@ class SocialCredentialsTest implements SocialCredentialsTestUtils {
     }
 
     @Test
+    @DisplayName("isPureSocial로 Social provider 확인")
+    void testIsPureSocial_givenSocialProvider_willReturnTrue() {
+        // when & then
+        assertFalse(testBasicSocialCredentials.isPureSocial());
+        assertTrue(testKakaoSocialCredentials.isPureSocial());
+        assertTrue(testGoogleSocialCredentials.isPureSocial());
+        assertFalse(testBasicKakaoSocialCredentials.isPureSocial());
+        assertFalse(testBasicGoogleSocialCredentials.isPureSocial());
+    }
+
+    @Test
     @DisplayName("같은 객체에 대한 equals 호출")
     void useEqual_givenSameObject_willReturnTrue() {
         assertEquals(testGoogleSocialCredentials,testGoogleSocialCredentials);
