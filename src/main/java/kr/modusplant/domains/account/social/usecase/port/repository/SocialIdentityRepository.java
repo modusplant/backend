@@ -18,4 +18,6 @@ public interface SocialIdentityRepository {
     SocialMemberProfile saveSocialMember(SocialMemberProfile profile, String intro, AgreedTerms agreedTerms);
 
     SocialMemberProfile updateSocialLinkedMember(SocialCredentials socialCredentials, Email email);
+
+    void updateSocialUnlinkedMember(AccountId accountId);
 }

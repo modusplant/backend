@@ -14,6 +14,7 @@ import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberProfileJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberTermJpaRepository;
+import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
@@ -80,4 +81,12 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
         return socialIdentityJpaMapper.toSocialMemberProfile(memberEntity, memberAuthEntity);
     }
 
+    @Override
+    public void updateSocialUnlinkedMember(AccountId accountId) {
+        SiteMemberAuthEntity memberAuthEntity = memberAuthJpaRepository.findByUuid(accountId.getValue())
+                .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH, TableName.SITE_MEMBER_AUTH));
+        memberAuthEntity.updateProvider(AuthProvider.BASIC);
+        memberAuthEntity.updateProviderId(null);
+        memberAuthJpaRepository.save(memberAuthEntity);
+    }
 }

@@ -3,6 +3,7 @@ package kr.modusplant.domains.account.social.adapter.controller;
 import kr.modusplant.domains.account.shared.kernel.AccountId;
 import kr.modusplant.domains.account.social.domain.exception.AlreadyRegisteredWithOtherProviderException;
 import kr.modusplant.domains.account.social.domain.exception.SocialAccountConflictException;
+import kr.modusplant.domains.account.social.domain.exception.SocialActionRequiredException;
 import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
 import kr.modusplant.domains.account.social.domain.vo.SocialCredentials;
 import kr.modusplant.domains.account.social.domain.vo.SocialMemberProfile;
@@ -47,6 +48,31 @@ public class SocialIdentityLinkController {
                 SocialCredentials.create(linkedAuthProvider,user.getId()),
                 memberProfile.getEmail()
         );
+    }
+
+    @Transactional
+    public void unlinkSocialAccount(UUID currentMemberUuid, SocialProvider provider, String socialAccessToken) {
+        AccountId accountId = AccountId.fromUuid(currentMemberUuid);
+        SocialMemberProfile memberProfile = socialIdentityRepository.getSocialMemberProfileByAccountId(accountId);
+        SocialCredentials socialCredentials = memberProfile.getSocialCredentials();
+        if(socialCredentials.isPureBasic()) {
+            throw new SocialAccountConflictException(SocialIdentityErrorCode.NOT_LINKED);
+        } else if(socialCredentials.isPureSocial()) {
+            throw new SocialActionRequiredException(SocialIdentityErrorCode.SOCIAL_WITHDRAWAL_REQUIRED);
+        } else if (socialCredentials.isLinked() && matches(provider,socialCredentials)){
+            // 연동 해제
+            clientFactory.getClient(provider).revokeAccess(socialAccessToken);
+            socialIdentityRepository.updateSocialUnlinkedMember(accountId);
+        } else {
+            throw new SocialAccountConflictException(SocialIdentityErrorCode.PROVIDER_MISMATCH);
+        }
+    }
+
+    private boolean matches(SocialProvider socialProvider, SocialCredentials socialCredentials) {
+        return switch (socialProvider) {
+            case KAKAO ->  socialCredentials.isKakao();
+            case GOOGLE -> socialCredentials.isGoogle();
+        };
     }
 
 }

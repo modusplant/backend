@@ -46,4 +46,21 @@ public class SocialIdentityLinkRestController {
         socialIdentityLinkController.linkSocialAccount(userDetails.getUuid(), provider, socialAccessToken);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
+
+    @Operation(summary = "소셜 연동 해제 API", description = "카카오/구글 인가코드를 받아 소셜 인증 및 연동 해제를 수행합니다")
+    @PostMapping("/{provider}/unlink")
+    public ResponseEntity<DataResponse<Void>> unlinkSocialAccount(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @RequestBody @Valid SocialAuthRequest request,
+
+            @Parameter(schema = @Schema(description = "소셜 플랫폼 제공자", example = "kakao"))
+            @PathVariable
+            @NotNull
+            SocialProvider provider
+    ) {
+        String socialAccessToken = socialIdentityController.issueSocialAccessToken(provider,request.code());
+        socialIdentityLinkController.unlinkSocialAccount(userDetails.getUuid(), provider, socialAccessToken);
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
 }
