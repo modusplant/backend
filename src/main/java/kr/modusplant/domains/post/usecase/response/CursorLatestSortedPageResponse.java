@@ -6,7 +6,7 @@ import kr.modusplant.domains.post.usecase.response.supers.PageResponse;
 
 import java.util.List;
 
-public record CursorPageResponse<T> (
+public record CursorLatestSortedPageResponse<T> (
         @Schema(description = "조회된 포스트")
         List<T> posts,
 
@@ -15,17 +15,17 @@ public record CursorPageResponse<T> (
         String nextUlid,
 
         @Schema(description = "다음 데이터 존재 여부", example = "true")
-        boolean  hasNext,
+        boolean hasNext,
 
         @Schema(description = "페이지 크기", example = "10")
         int size
 ) implements PageResponse<T> {
-    public static <T> CursorPageResponse<T> of(
+    public static <T> CursorLatestSortedPageResponse<T> of(
             List<T> posts,
             String nextUlid,
             boolean hasNext
     ) {
-        return new CursorPageResponse<>(
+        return new CursorLatestSortedPageResponse<>(
                 posts,
                 nextUlid,
                 hasNext,

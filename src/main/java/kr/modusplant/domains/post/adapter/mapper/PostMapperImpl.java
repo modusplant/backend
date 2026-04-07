@@ -2,14 +2,8 @@ package kr.modusplant.domains.post.adapter.mapper;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
-import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
-import kr.modusplant.domains.post.usecase.record.PostDetailDataReadModel;
-import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
-import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
-import kr.modusplant.domains.post.usecase.response.DraftPostResponse;
-import kr.modusplant.domains.post.usecase.response.PostDetailDataResponse;
-import kr.modusplant.domains.post.usecase.response.PostDetailResponse;
-import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;
+import kr.modusplant.domains.post.usecase.record.*;
+import kr.modusplant.domains.post.usecase.response.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -73,6 +67,26 @@ public class PostMapperImpl implements PostMapper {
                 postSummaryReadModel.commentCount(),
                 postSummaryReadModel.isLiked(),
                 postSummaryReadModel.isBookmarked()
+        );
+    }
+
+    @Override
+    public PostSummaryWithSearchInfoResponse toPostSummaryWithSearchInfoResponse(
+            PostSummaryWithSearchInfoReadModel readModel, JsonNode content) {
+        return new PostSummaryWithSearchInfoResponse(
+                readModel.ulid(),
+                readModel.primaryCategory(),
+                readModel.secondaryCategory(),
+                readModel.nickname(),
+                readModel.title(),
+                content,
+                readModel.likeCount(),
+                readModel.publishedAt(),
+                readModel.commentCount(),
+                readModel.isLiked(),
+                readModel.isBookmarked(),
+                readModel.importance(),
+                readModel.maxWordSimilarity()
         );
     }
 

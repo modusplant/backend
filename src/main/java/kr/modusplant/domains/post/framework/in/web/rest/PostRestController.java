@@ -19,10 +19,7 @@ import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.domains.post.usecase.enums.SearchOption;
 import kr.modusplant.domains.post.usecase.enums.SearchSort;
 import kr.modusplant.domains.post.usecase.request.*;
-import kr.modusplant.domains.post.usecase.response.CursorPageResponse;
-import kr.modusplant.domains.post.usecase.response.DraftPostResponse;
-import kr.modusplant.domains.post.usecase.response.OffsetPageResponse;
-import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;
+import kr.modusplant.domains.post.usecase.response.*;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +34,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -57,7 +55,7 @@ public class PostRestController {
             description = "전체 게시글의 목록과 페이지 정보를 조회합니다."
     )
     @GetMapping
-    public ResponseEntity<DataResponse<CursorPageResponse<PostSummaryResponse>>> getAllPosts(
+    public ResponseEntity<DataResponse<CursorLatestSortedPageResponse<PostSummaryResponse>>> getAllPosts(
             @AuthenticationPrincipal(errorOnInvalidType = false) DefaultUserDetails userDetails,
 
             @Parameter(schema = @Schema(description = "마지막 게시글 ID (첫 요청 시 생략)", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
@@ -90,15 +88,27 @@ public class PostRestController {
             description = "키워드별 컨텐츠 게시글의 목록과 페이지 정보를 조회합니다."
     )
     @GetMapping("/search")
-    public ResponseEntity<DataResponse<CursorPageResponse<PostSummaryResponse>>> getPostsByKeyword(
-            @AuthenticationPrincipal(errorOnInvalidType = false) DefaultUserDetails userDetails,
+    public ResponseEntity<DataResponse<CursorRelevanceSortedPageResponse<PostSummaryWithSearchInfoResponse>>> getPostsByKeyword(
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID currentMemberUuid,
 
             @Parameter(schema = @Schema(description = "마지막 게시글 ID (첫 요청 시 생략)", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
             @RequestParam(name = "lastPostId", required = false)
-            @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
             String lastUlid,
 
-            @Parameter(schema = @Schema(description = "페이지 크기", example = "10",minimum = "1",maximum = "50"))
+            @Parameter(schema = @Schema(description = "마지막 게시글 중요도 (첫 요청 시 생략)", example = "1"))
+            @RequestParam(name = "lastPostImportance", required = false)
+            Integer lastImportance,
+
+            @Parameter(schema = @Schema(description = "마지막 게시글 정확도 (첫 요청 시 생략)", example = "0.143253469630148"))
+            @RequestParam(name = "lastPostSimilarity", required = false)
+            Double lastWordSimilarity,
+
+            @Parameter(schema = @Schema(description = "마지막 게시글 발행 시점 (첫 요청 시 생략)"))
+            @RequestParam(name = "lastPostPublishedAt", required = false)
+            LocalDateTime lastPublishedAt,
+
+            @Parameter(schema = @Schema(description = "페이지 크기", example = "10", minimum = "1", maximum = "50"))
             @RequestParam
             @Range(min = 1, max = 50)
             Integer size,
@@ -107,9 +117,9 @@ public class PostRestController {
             @RequestParam
             SearchOption option,
 
-            @Parameter(schema = @Schema(description = "{제목+본문} 검색어 키워드", example = "벌레"))
+            @Parameter(schema = @Schema(description = "검색어 키워드", example = "벌레"))
             @RequestParam
-            @NotBlank
+            @NotBlank(message = "키워드가 비어 있습니다.")
             String keyword,
 
             @Parameter(schema = @Schema(description = "정렬 조건", example = "latest"))
@@ -124,10 +134,12 @@ public class PostRestController {
             @RequestParam(name = "secondaryCategoryId", required = false)
             List<Integer> secondaryCategoryIds
     ) {
-        UUID currentMemberUuid = (userDetails != null) ? userDetails.getUuid() : null;
+
         return ResponseEntity.ok().body(DataResponse.ok(postController.getByKeyword(
-                new PostSearchRequest(option,keyword,sort,new PostCategoryRequest(primaryCategoryId,secondaryCategoryIds)),
-                currentMemberUuid, lastUlid, size)));
+                new PostSearchRequest(option, keyword, sort,
+                        new PostCategoryRequest(primaryCategoryId, secondaryCategoryIds)
+                ),
+                currentMemberUuid, lastUlid, lastImportance, lastWordSimilarity, lastPublishedAt, size)));
     }
 
     @Operation(
