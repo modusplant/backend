@@ -162,7 +162,8 @@ public class SecurityConfig {
                                 "/api/v1/report/proposal-or-bug",
                                 "/api/v1/report/abuse/post/*",
                                 "/api/v1/report/abuse/post/*/path/**",
-                                "/api/v1/communication/posts").authenticated()
+                                "/api/v1/communication/posts",
+                                "/api/v1/members/social/**").authenticated()
                         .requestMatchers(HttpMethod.PUT,
                                 "/api/v1/members/profile",
                                 "/api/v1/members/like/communication/post/*",
