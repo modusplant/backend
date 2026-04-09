@@ -4,7 +4,7 @@
 * 2024.12 ~ 현재
 ### 핵심 가치
 * **관심사 분리:** DDD + Clean Architecture 적용 후 인프라 변경(JPA -> JPA + jOOQ)에도 도메인 로직 수정이 없어 핵심 비즈니스 로직의 일관성 보장
-* **비용 최적화:** Amazon RDS 대신 더욱 값싼 가격으로 대용량 스토리지를 이용할 수 있는 Wasabi를 채택하는 등 요구사항과 환경에 맞는 기능 개발
+* **비용 최적화:** Amazon RDS 대신 비교적 저렴한 가격으로 대용량 스토리지를 이용할 수 있는 Wasabi를 채택하는 등 요구사항과 환경에 맞는 기능 개발
 * **데이터 무결성:** Bean Validation을 통한 빠른 검증 + 도메인 모델에 검증 로직을 캡슐화
 
 | 팀원  | 역할 |
@@ -49,9 +49,9 @@
 # 🗺️ 아키텍처 설계
 
 ### 1. 설계 방향
-* **경량의 domain 계층:** domain 계층은 상태와 검증 로직만 포함하며, 비즈니스 흐름 제어 및 외부 API 오케스트레이션은 adapter 계층에서 처리
-* **단순화한 usecase 계층:** 프로젝트 복잡도 고려 후 usecase는 인터페이스 중심으로 설계하고, 불필요한 클래스 생성을 지양
-* **프레임워크 격리:** Spring Data JPA, Redis 등 외부 SW 의존 코드를 framework 계층으로 분리하여 domain 계층의 순수성 유지
+* **경량의 domain 계층:** domain 계층은 상태 관리와 검증 로직만 포함하며, 비즈니스 흐름 제어 및 외부 API 오케스트레이션은 adapter 계층에서 처리
+* **단순화한 usecase 계층:** 프로젝트 복잡도 고려 후 use case는 인터페이스 중심으로 설계하고, 불필요한 클래스 생성을 지양
+* **프레임워크 격리:** Spring Data JPA, Redis 등 외부 의존성을 framework 계층으로 분리하여 domain 계층의 순수성 유지
 
 ### 3. 설계 도면(Diagram)
 
@@ -76,7 +76,7 @@
 📂 modusplant
   │ 📜 ModusplantApplication.java
   ├─📂 domains          # 📋 핵심 비즈니스 로직 및 도메인 모델
-  │  ├─📂 account       # 계정 (Email, Social, Normal)
+  │  ├─📂 account       # 계정 (Email, identity, Social, Normal)
   │  ├─📂 post          # 게시글
   │  └─ 📂 ...          # 회원, 댓글, 약관
   ├─📂 framework        # ✈️ 외부 기술 스택 연동 (Spring Data JPA, jOOQ, Redis 등)
@@ -151,11 +151,11 @@
 <details>
 <summary> <strong>JPA의 N+1 문제 근절 및 대용량 데이터 조회 최적화</strong> </summary>
 
-- **문제**: 여러 테이블이 JOIN되는 대량의 데이터 조회 시 JPA에서는 N+1이 발생하여 성능 저하
+- **문제**: 여러 테이블이 JOIN되는 대량의 데이터 조회 시 JPA의 N+1이 발생하여 성능 저하
 - **해결**
     - 단순 CRUD는 JPA/Hibernate로 데이터 무결성 확보
     - 복잡한 통계와 Read 작업은 jOOQ로 Type-Safe하게 수행 및 성능 최적화
-- **성과**: JPA의 N+1문제 근절 및 컴파일 타임 에러 확인 가능
+- **성과**: JPA의 N+1문제 근절 및 쿼리 가독성 개선
 
 </details>
 
