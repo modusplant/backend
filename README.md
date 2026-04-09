@@ -50,7 +50,7 @@
 
 ### 1. 설계 방향
 * **경량의 domain 계층:** domain 계층은 상태 관리와 검증 로직만 포함하며, 비즈니스 흐름 제어 및 외부 API 오케스트레이션은 adapter 계층에서 처리
-* **단순화한 usecase 계층:** 프로젝트 복잡도 고려 후 use case는 인터페이스 중심으로 설계하고, 불필요한 클래스 생성을 지양
+* **단순화한 usecase 계층:** 프로젝트 복잡도 고려 후 유즈 케이스는 인터페이스 중심으로 설계하고, 불필요한 클래스 생성을 지양
 * **프레임워크 격리:** Spring Data JPA, Redis 등 외부 의존성을 framework 계층으로 분리하여 domain 계층의 순수성 유지
 
 ### 3. 설계 도면(Diagram)
@@ -76,7 +76,7 @@
 📂 modusplant
   │ 📜 ModusplantApplication.java
   ├─📂 domains          # 📋 핵심 비즈니스 로직 및 도메인 모델
-  │  ├─📂 account       # 계정 (Email, identity, Social, Normal)
+  │  ├─📂 account       # 계정 (Email, Identity, Social, Normal)
   │  ├─📂 post          # 게시글
   │  └─ 📂 ...          # 회원, 댓글, 약관
   ├─📂 framework        # ✈️ 외부 기술 스택 연동 (Spring Data JPA, jOOQ, Redis 등)
