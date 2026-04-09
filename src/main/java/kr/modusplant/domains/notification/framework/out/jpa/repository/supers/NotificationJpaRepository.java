@@ -10,12 +10,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface NotificationJpaRepository extends UlidPrimaryRepository<CommNotificationEntity>, JpaRepository<CommNotificationEntity, String> {
 
-    Optional<CommNotificationEntity> findByUlidAndRecipient(String ulid, SiteMemberEntity recipient);
+    @Modifying
+    @Query("UPDATE CommNotificationEntity t SET t.status = 'READ' WHERE t.recipient.uuid = :recipientId AND t.ulid = :notificationId AND t.status = 'UNREAD'")
+    int updateUnreadStatusById(@Param("notificationId") String notificationId, @Param("recipientId") UUID recipientId);
 
     @Modifying
     @Query("UPDATE CommNotificationEntity t SET t.status = 'READ' WHERE t.recipient.uuid = :recipientId AND t.status = 'UNREAD'")

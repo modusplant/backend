@@ -35,20 +35,13 @@ class NotificationRepositoryJpaAdapterTest {
         NotificationId notificationId = NotificationId.create(TEST_NOTIFICATION_ULID);
         RecipientId recipientId = RecipientId.fromUuid(TEST_NOTIFICATION_RECIPIENT_ID);
 
-        SiteMemberEntity recipientEntity = Mockito.mock(SiteMemberEntity.class);
-        CommNotificationEntity notificationEntity = Mockito.mock(CommNotificationEntity.class);
-
-        given(siteMemberJpaRepository.findByUuid(TEST_NOTIFICATION_RECIPIENT_ID)).willReturn(Optional.of(recipientEntity));
-        given(notificationJpaRepository.findByUlidAndRecipient(TEST_NOTIFICATION_ULID, recipientEntity)).willReturn(Optional.of(notificationEntity));
+        given(notificationJpaRepository.updateUnreadStatusById(notificationId.getValue(), recipientId.getValue())).willReturn(1);
 
         // when
         notificationRepositoryJpaAdapter.markAsRead(notificationId, recipientId);
 
         // then
-        verify(siteMemberJpaRepository, times(1)).findByUuid(TEST_NOTIFICATION_RECIPIENT_ID);
-        verify(notificationJpaRepository, times(1)).findByUlidAndRecipient(TEST_NOTIFICATION_ULID, recipientEntity);
-        verify(notificationEntity, times(1)).read();
-        verify(notificationJpaRepository, times(1)).save(notificationEntity);
+        verify(notificationJpaRepository, times(1)).updateUnreadStatusById(TEST_NOTIFICATION_ULID, TEST_NOTIFICATION_RECIPIENT_ID);
     }
 
     @Test
@@ -58,16 +51,11 @@ class NotificationRepositoryJpaAdapterTest {
         NotificationId notificationId = NotificationId.create(TEST_NOTIFICATION_ULID);
         RecipientId recipientId = RecipientId.fromUuid(TEST_NOTIFICATION_RECIPIENT_ID);
 
-        SiteMemberEntity recipientEntity = Mockito.mock(SiteMemberEntity.class);
-
-        given(siteMemberJpaRepository.findByUuid(TEST_NOTIFICATION_RECIPIENT_ID)).willReturn(Optional.of(recipientEntity));
-        given(notificationJpaRepository.findByUlidAndRecipient(TEST_NOTIFICATION_ULID, recipientEntity))
-                .willReturn(Optional.empty());
+        given(notificationJpaRepository.updateUnreadStatusById(notificationId.getValue(), recipientId.getValue())).willReturn(0);
 
         // when & then
         assertThatThrownBy(() -> notificationRepositoryJpaAdapter.markAsRead(notificationId, recipientId)).isInstanceOf(InvalidValueException.class);
-
-        verify(notificationJpaRepository, times(1)).findByUlidAndRecipient(TEST_NOTIFICATION_ULID, recipientEntity);
+        verify(notificationJpaRepository, times(1)).updateUnreadStatusById(TEST_NOTIFICATION_ULID, TEST_NOTIFICATION_RECIPIENT_ID);
     }
 
     @Test

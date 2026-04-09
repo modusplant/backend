@@ -7,7 +7,6 @@ import kr.modusplant.domains.notification.domain.vo.NotificationStatus;
 import kr.modusplant.domains.notification.domain.vo.RecipientId;
 import kr.modusplant.domains.notification.framework.out.jpa.repository.supers.NotificationJpaRepository;
 import kr.modusplant.domains.notification.usecase.port.repository.NotificationRepository;
-import kr.modusplant.framework.jpa.entity.CommNotificationEntity;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -20,12 +19,10 @@ public class NotificationRepositoryJpaAdapter implements NotificationRepository 
 
     @Override
     public void markAsRead(NotificationId notificationId,RecipientId recipientId) {
-        CommNotificationEntity notificationEntity = notificationJpaRepository.findByUlidAndRecipient(
-                notificationId.getValue(),
-                siteMemberJpaRepository.findByUuid(recipientId.getValue()).orElseThrow(() -> new InvalidValueException(NotificationErrorCode.INVALID_RECIPIENT_ID))
-        ).orElseThrow(() -> new InvalidValueException(NotificationErrorCode.INVALID_NOTIFICATION_ID));
-        notificationEntity.read();
-        notificationJpaRepository.save(notificationEntity);
+        int count = notificationJpaRepository.updateUnreadStatusById(notificationId.getValue(), recipientId.getValue());
+        if (count == 0) {
+            throw new InvalidValueException(NotificationErrorCode.INVALID_NOTIFICATION_ID);
+        }
     }
 
     @Override
