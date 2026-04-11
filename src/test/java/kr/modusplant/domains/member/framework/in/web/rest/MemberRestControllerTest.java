@@ -36,6 +36,7 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberPost
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileGetRecordTestUtils.testMemberProfileGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberWithdrawalRecordTestUtils.testMemberWithdrawalRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
@@ -43,6 +44,8 @@ import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.obje
 import static kr.modusplant.shared.persistence.common.util.constant.CommCommentConstant.TEST_COMM_COMMENT_PATH;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
 import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_AUTHORIZATION;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE;
@@ -137,7 +140,6 @@ class MemberRestControllerTest implements MemberTestUtils {
     @DisplayName("overrideMemberProfile로 응답 반환")
     void testOverrideMemberProfile_givenValidParameters_willReturnResponse() throws IOException {
         // given
-        
         given(memberController.overrideProfile(testMemberProfileOverrideRecord)).willReturn(testMemberProfileResponse);
 
         // when
@@ -153,7 +155,6 @@ class MemberRestControllerTest implements MemberTestUtils {
     @DisplayName("likeCommunicationPost로 응답 반환")
     void testLikeCommunicationPost_givenValidRequest_willReturnResponse() {
         // given
-        
         willDoNothing().given(memberController).likePost(testMemberPostLikeRecord);
 
         // when
@@ -292,6 +293,20 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // when
         ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportCommentAbuse(TEST_COMM_POST_ULID, TEST_COMM_COMMENT_PATH, MEMBER_BASIC_USER_UUID);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok().toString());
+    }
+
+    @Test
+    @DisplayName("withdrawMember로 응답 반환")
+    void testWithdrawMember_givenValidParameters_willReturnResponse() {
+        // given
+        willDoNothing().given(memberController).withdraw(testMemberWithdrawalRecord);
+
+        // when
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.withdrawMember(MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
