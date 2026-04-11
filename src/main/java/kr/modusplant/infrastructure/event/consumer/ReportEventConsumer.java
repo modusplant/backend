@@ -29,7 +29,7 @@ public class ReportEventConsumer {
                                CommCommentAbuRepJpaRepository commentAbuRepJpaRepository) {
         eventBus.subscribe(event -> {
             if (event instanceof ProposalOrBugReportEvent proposalOrBugReportEvent) {
-                addProposalOrBugReport(proposalOrBugReportEvent.getMemberId(), proposalOrBugReportEvent.getTitle(), proposalOrBugReportEvent.getCategory(), proposalOrBugReportEvent.getContent(), proposalOrBugReportEvent.getImagePath());
+                addProposalOrBugReport(proposalOrBugReportEvent.getMemberId(), proposalOrBugReportEvent.getTitle(), proposalOrBugReportEvent.getContent(), proposalOrBugReportEvent.getImagePath());
             }
             else if (event instanceof PostAbuseReportEvent postAbuseReportEvent) {
                 addPostAbuseReport(postAbuseReportEvent.getMemberId(), postAbuseReportEvent.getPostUlid());
@@ -46,13 +46,12 @@ public class ReportEventConsumer {
         this.commentAbuRepJpaRepository = commentAbuRepJpaRepository;
     }
 
-    private void addProposalOrBugReport(UUID memberId, String title, String category, String content, String imagePath) {
+    private void addProposalOrBugReport(UUID memberId, String title, String content, String imagePath) {
         SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
         propBugRepJpaRepository.save(
                 PropBugRepEntity.builder()
                         .member(memberEntity)
                         .title(title)
-                        .category(category)
                         .content(content)
                         .imagePath(imagePath)
                         .build());
