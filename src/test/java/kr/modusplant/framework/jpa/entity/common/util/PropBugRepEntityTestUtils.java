@@ -8,7 +8,6 @@ public interface PropBugRepEntityTestUtils extends SiteMemberEntityTestUtils {
     default PropBugRepEntity.PropBugRepEntityBuilder createPropBugRepEntityBuilder() {
         return PropBugRepEntity.builder()
                 .title(TEST_REPORT_TITLE)
-                .category(TEST_REPORT_CATEGORY_PROPOSAL)
                 .content(TEST_REPORT_CONTENT)
                 .imagePath(TEST_REPORT_IMAGE_PATH);
     }
@@ -17,7 +16,6 @@ public interface PropBugRepEntityTestUtils extends SiteMemberEntityTestUtils {
         return PropBugRepEntity.builder()
                 .ulid(TEST_REPORT_ULID)
                 .title(TEST_REPORT_TITLE)
-                .category(TEST_REPORT_CATEGORY_PROPOSAL)
                 .content(TEST_REPORT_CONTENT)
                 .imagePath(TEST_REPORT_IMAGE_PATH);
     }

@@ -11,8 +11,6 @@ import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberCo
 public final class ReportConstant {
     public static final String TEST_REPORT_ULID = "01KJ862TB91KP6BK301RZM17K7";
     public static final String TEST_REPORT_TITLE = "보고서 제목";
-    public static final String TEST_REPORT_CATEGORY_PROPOSAL = "proposal";
-    public static final String TEST_REPORT_CATEGORY_BUG_REPORT = "bugReport";
     public static final String TEST_REPORT_CONTENT = "보고서 컨텐츠";
     public static final byte[] TEST_REPORT_IMAGE_BYTES = "Image for report".getBytes();
     public static final MultipartFile TEST_REPORT_IMAGE = new MockMultipartFile("image", "image.png", "image/png", TEST_REPORT_IMAGE_BYTES);
