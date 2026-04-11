@@ -24,7 +24,6 @@ spring:
       connection-timeout: 10000       # 10초
       auto-commit: true
       validation-timeout: 10000       # 10초
-      connection-init-sql: "SET pg_trgm.word_similarity_threshold = 0.5"
   flyway:
     enabled: true
     validate-on-migrate: true
@@ -35,7 +34,6 @@ spring:
     clean-disabled: false
     baseline-on-migrate: true
     baseline-version: 0.0.0
-    schemas: public
   jpa:
     hibernate:
       ddl-auto: none

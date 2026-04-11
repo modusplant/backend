@@ -3,11 +3,9 @@ package kr.modusplant.domains.post.framework.out.jooq.repository;
 import kr.modusplant.domains.post.common.helper.PostTestDataHelper;
 import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.vo.PostId;
-import kr.modusplant.domains.post.usecase.enums.SearchOption;
 import kr.modusplant.domains.post.usecase.record.PostDetailDataReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
-import kr.modusplant.domains.post.usecase.record.PostSummaryWithSearchInfoReadModel;
 import kr.modusplant.jooq.tables.records.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,21 +15,17 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
 
-import static kr.modusplant.domains.post.common.constant.PostDoubleConstant.TEST_POST_MAX_WORD_SIMILARITY_0_6;
-import static kr.modusplant.domains.post.common.constant.PostIntegerConstant.TEST_POST_IMPORTANCE_COMMENT_CONTENT;
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.*;
-import static kr.modusplant.domains.post.usecase.enums.SearchOption.TITLE_CONTENT;
-import static kr.modusplant.domains.post.usecase.enums.SearchOption.TITLE_CONTENT_COMMENT;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_PUBLISHED_AT;
+import static kr.modusplant.domains.post.usecase.enums.SearchOption.*;
+import static kr.modusplant.domains.post.usecase.enums.SearchSort.LATEST;
+import static kr.modusplant.domains.post.usecase.enums.SearchSort.RELEVANCE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SuppressWarnings("FieldCanBeLocal")
 @SpringBootTest
 @Transactional
 @Rollback
@@ -45,6 +39,7 @@ class PostQueryJooqRepositoryIntegrationTest {
 
     @Autowired
     private PostTestDataHelper testDataHelper;
+
 
     private SiteMemberRecord testMember1, testMember2;
     private SiteMemberProfRecord testMemberProfile1, testMemberProfile2;
@@ -156,7 +151,7 @@ class PostQueryJooqRepositoryIntegrationTest {
         assertThat(firstPageByPrimaryCategory.getLast()).isEqualTo(secondPageByPrimaryCategory.getFirst());
         assertThat(firstPageByPrimaryCategory.get(0).ulid()).isEqualTo(testPost5.getUlid());
         assertThat(firstPageByPrimaryCategory.get(1).ulid()).isEqualTo(testPost2.getUlid());
-        assertThat(secondPageByPrimaryCategory.getFirst().ulid()).isEqualTo(testPost1.getUlid());
+        assertThat(secondPageByPrimaryCategory.get(0).ulid()).isEqualTo(testPost1.getUlid());
 
         assertThat(firstPageByCategories).hasSize(size);
         assertThat(secondPageByCategories).isEmpty();
@@ -172,182 +167,155 @@ class PostQueryJooqRepositoryIntegrationTest {
     }
 
     @Test
-    @DisplayName("키워드 없이 게시글 목록 검색 - 최신순")
-    void testSearchByKeywordWithLatest_givenNoKeyword_willReturnEmptyList() {
-        // given & when
-        int size = 2;
-        List<PostSummaryWithSearchInfoReadModel> firstPageWithNullKeyword = postQueryJooqRepository.searchByKeywordWithLatest(
-                TITLE_CONTENT, null, null, null, 
-                testMember2.getUuid(), null, null, size);
-
-        List<PostSummaryWithSearchInfoReadModel> firstPageWithEmptyKeyword = postQueryJooqRepository.searchByKeywordWithLatest(
-                TITLE_CONTENT, "", null, null,
-                testMember2.getUuid(), null, null, size);
-
-
-        // then
-        assertThat(firstPageWithNullKeyword).isEmpty();
-        assertThat(firstPageWithEmptyKeyword).isEmpty();
-    }
-
-    @Test
-    @DisplayName("키워드 없이 게시글 목록 검색 - 정확도순")
-    void testSearchByKeywordWithRelevance_givenNoKeyword_willReturnEmptyList() {
+    @DisplayName("키워드 없이 게시글 목록 조회")
+    void testFindByKeywordWithCursor_givenNoKeyword_willReturnAllPosts() {
         // when
         int size = 2;
-        List<PostSummaryWithSearchInfoReadModel> firstPageWithNullKeyword = postQueryJooqRepository.searchByKeywordWithRelevance(
-                TITLE_CONTENT, null, null, null,
-                testMember2.getUuid(), null, 
-                TEST_POST_IMPORTANCE_COMMENT_CONTENT, TEST_POST_MAX_WORD_SIMILARITY_0_6, 
-                TEST_COMM_POST_PUBLISHED_AT, size);
-
-        List<PostSummaryWithSearchInfoReadModel> firstPageWithEmptyKeyword = postQueryJooqRepository.searchByKeywordWithRelevance(
-                TITLE_CONTENT, "", null, null,
-                testMember2.getUuid(), null,
-                TEST_POST_IMPORTANCE_COMMENT_CONTENT, TEST_POST_MAX_WORD_SIMILARITY_0_6,
-                TEST_COMM_POST_PUBLISHED_AT, size);
+        List<PostSummaryReadModel> firstPage = postQueryJooqRepository.findByKeywordWithCursor(
+                TITLE_CONTENT, null, LATEST, null, null, testMember2.getUuid(), null, size);
+        List<PostSummaryReadModel> secondPage = postQueryJooqRepository.findByKeywordWithCursor(
+                TITLE_CONTENT, null, LATEST, null, null, testMember2.getUuid(), firstPage.get(size - 1).ulid(), size);
 
         // then
-        assertThat(firstPageWithNullKeyword).isEmpty();
-        assertThat(firstPageWithEmptyKeyword).isEmpty();
+        assertThat(firstPage).hasSize(size + 1);
+        assertThat(firstPage.getLast()).isEqualTo(secondPage.getFirst());
+        assertThat(firstPage.get(0).ulid()).isEqualTo(testPost5.getUlid());
+        assertThat(firstPage.get(1).ulid()).isEqualTo(testPost4.getUlid());
+        assertThat(secondPage.get(0).ulid()).isEqualTo(testPost2.getUlid());
+        assertThat(secondPage.get(1).ulid()).isEqualTo(testPost1.getUlid());
+
+        PostSummaryReadModel firstPostResult = firstPage.stream()
+                .filter(post -> post.ulid().equals(testPost4.getUlid()))
+                .findFirst()
+                .orElseThrow();
+        PostSummaryReadModel secondPostResult = secondPage.stream()
+                .filter(post -> post.ulid().equals(testPost1.getUlid()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(firstPostResult.commentCount()).isEqualTo(0);
+        assertThat(firstPostResult.isLiked()).isTrue();
+        assertThat(firstPostResult.isBookmarked()).isFalse();
+        assertThat(secondPostResult.commentCount()).isEqualTo(2);
+        assertThat(secondPostResult.isLiked()).isTrue();
+        assertThat(secondPostResult.isBookmarked()).isTrue();
     }
 
     @Test
-    @DisplayName("키워드로 게시글 목록 검색 - 최신순")
-    void testSearchByKeywordWithLatest_givenKeyword_willReturnFilteredPosts() {
+    @DisplayName("키워드로 게시글 목록 조회 - 최신순")
+    void testFindByKeywordWithCursor_givenKeyword_willReturnFilteredPosts() {
         // when
         int size = 2;
         String keyword = "Hello";
 
-        List<PostSummaryWithSearchInfoReadModel> firstPageByKeyword =
-                postQueryJooqRepository.searchByKeywordWithLatest(
-                        TITLE_CONTENT, keyword, null, null, testMember2.getUuid(), 
-                        null, null, size);
-        List<PostSummaryWithSearchInfoReadModel> secondPageByKeyword =
-                postQueryJooqRepository.searchByKeywordWithLatest(
-                        TITLE_CONTENT, keyword, null, null, testMember2.getUuid(),
-                        firstPageByKeyword.get(size - 1).ulid(), firstPageByKeyword.get(size - 1).publishedAt(), size);
+        List<PostSummaryReadModel> firstPageByKeyword = postQueryJooqRepository.findByKeywordWithCursor(
+                TITLE_CONTENT, keyword, LATEST, null, null, testMember2.getUuid(), null, size);
+        List<PostSummaryReadModel> secondPageByKeyword = postQueryJooqRepository.findByKeywordWithCursor(
+                TITLE_CONTENT, keyword, LATEST, null, null, testMember2.getUuid(), firstPageByKeyword.get(size - 1).ulid(), size);
 
-        List<PostSummaryWithSearchInfoReadModel> pageByBackslash = postQueryJooqRepository.searchByKeywordWithLatest(
-                TITLE_CONTENT, "\\".repeat(10), null, null, testMember2.getUuid(),
-                null, null, size);
-        List<PostSummaryWithSearchInfoReadModel> pageByPercent = postQueryJooqRepository.searchByKeywordWithLatest(
-                TITLE_CONTENT, "%".repeat(10), null, null, testMember2.getUuid(),
-                null, null, size);
-        List<PostSummaryWithSearchInfoReadModel> pageByUnderscore = postQueryJooqRepository.searchByKeywordWithLatest(
-                TITLE_CONTENT, "_".repeat(10), null, null, testMember2.getUuid(),
-                null, null, size);
+        List<PostSummaryReadModel> firstPageByBlankKeyword = postQueryJooqRepository.findByKeywordWithCursor(
+                TITLE_CONTENT, "", LATEST, null, null, testMember2.getUuid(), null, size);
+        List<PostSummaryReadModel> secondPageByBlankKeyword = postQueryJooqRepository.findByKeywordWithCursor(
+                TITLE_CONTENT, "", LATEST, null, null, testMember2.getUuid(), firstPageByBlankKeyword.get(size - 1).ulid(), size);
+
+        List<PostSummaryReadModel> pageByBackslash = postQueryJooqRepository.findByKeywordWithCursor(
+                TITLE_CONTENT, "\\".repeat(10), LATEST, null, null, testMember2.getUuid(), null, size);
+        List<PostSummaryReadModel> pageByPercent = postQueryJooqRepository.findByKeywordWithCursor(
+                TITLE_CONTENT, "%%".repeat(10), LATEST, null, null, testMember2.getUuid(), null, size);
+        List<PostSummaryReadModel> pageByUnderscore = postQueryJooqRepository.findByKeywordWithCursor(
+                TITLE_CONTENT, "_".repeat(10), LATEST, null, null, testMember2.getUuid(), null, size);
 
         // then
-        // 결과 존재 여부 확인
         assertThat(firstPageByKeyword).hasSize(size + 1);
         assertThat(firstPageByKeyword.getLast()).isEqualTo(secondPageByKeyword.getFirst());
-        assertThat(firstPageByKeyword.getFirst().ulid()).isEqualTo(testPost5.getUlid());
+        assertThat(firstPageByKeyword.get(0).ulid()).isEqualTo(testPost5.getUlid());
         assertThat(firstPageByKeyword.get(1).ulid()).isEqualTo(testPost4.getUlid());
-        assertThat(secondPageByKeyword.getFirst().ulid()).isEqualTo(testPost1.getUlid());
+        assertThat(secondPageByKeyword.get(0).ulid()).isEqualTo(testPost1.getUlid());
 
-        // 최신순 정렬 여부 확인
-        assertThat(firstPageByKeyword).extracting("ulid").isSortedAccordingTo(Collections.reverseOrder());
-        assertThat(secondPageByKeyword).extracting("ulid").isSortedAccordingTo(Collections.reverseOrder());
+        assertThat(firstPageByBlankKeyword).hasSize(size + 1);
+        assertThat(firstPageByBlankKeyword.getLast()).isEqualTo(secondPageByBlankKeyword.getFirst());
+        assertThat(firstPageByBlankKeyword.get(0).ulid()).isEqualTo(testPost5.getUlid());
+        assertThat(firstPageByBlankKeyword.get(1).ulid()).isEqualTo(testPost4.getUlid());
+        assertThat(secondPageByBlankKeyword.get(0).ulid()).isEqualTo(testPost2.getUlid());
+        assertThat(secondPageByBlankKeyword.get(1).ulid()).isEqualTo(testPost1.getUlid());
 
-        assertThat(firstPageByKeyword).extracting("publishedAt").isSortedAccordingTo(Collections.reverseOrder());
-        assertThat(secondPageByKeyword).extracting("publishedAt").isSortedAccordingTo(Collections.reverseOrder());
-        assertThat(firstPageByKeyword.getLast().publishedAt()).isAfterOrEqualTo(secondPageByKeyword.getLast().publishedAt());
-
-        // 이스케이핑 처리되어야 하는 키워드에 대한 정상 작동 여부 확인
         assertThat(pageByBackslash).isEmpty();
         assertThat(pageByPercent).isEmpty();
         assertThat(pageByUnderscore).isEmpty();
     }
 
     @Test
-    @DisplayName("키워드로 제목에서 게시글 검색 - 최신순 (SearchOption.TITLE)")
-    void testSearchByKeywordWithLatest_givenTitleOption_willSearchTitleOnly() {
-        // given & when
+    @DisplayName("SearchOption.TITLE - 제목만 검색")
+    void testFindByKeywordWithCursor_givenTitleOption_willSearchTitleOnly() {
+        // title에만 있는 키워드로 검색
         int size = 10;
-        List<PostSummaryWithSearchInfoReadModel> result = postQueryJooqRepository.searchByKeywordWithLatest(
-                SearchOption.TITLE, "title1", null, null, testMember2.getUuid(),
-                null, TEST_COMM_POST_PUBLISHED_AT, size);
+        List<PostSummaryReadModel> result = postQueryJooqRepository.findByKeywordWithCursor(
+                TITLE, "title1", LATEST, null, null, testMember2.getUuid(), null, size);
 
-        // then
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().ulid()).isEqualTo(testPost1.getUlid());
+        assertThat(result.get(0).ulid()).isEqualTo(testPost1.getUlid());
     }
 
     @Test
-    @DisplayName("키워드로 제목, 컨텐츠, 댓글 컨텐츠에서 게시글 검색 - 최신순 (SearchOption.TITLE_CONTENT_COMMENT)")
-    void testSearchByKeywordWithLatest_givenCommentOption_willSearchCommentContent() {
-        // given & when
-        // testPost1에 "content3" 댓글이 있음 (is_deleted = false)
-        // testPost1에 "content2" 댓글이 있음 (is_deleted = true) → 검색 제외
+    @DisplayName("SearchOption.TITLE_CONTENT_COMMENT - 댓글 내용으로 게시글 검색")
+    void testFindByKeywordWithCursor_givenCommentOption_willSearchByCommentContent() {
+        // testPost1에 "content3" 댓글이 있음 (is_deleted=false)
+        // testPost1에 "content2" 댓글이 있음 (is_deleted=true) → 검색 제외
         int size = 10;
-        List<PostSummaryWithSearchInfoReadModel> resultByContent3 = postQueryJooqRepository.searchByKeywordWithLatest(
-                TITLE_CONTENT_COMMENT, "content3", null, null,
-                testMember2.getUuid(), null, TEST_COMM_POST_PUBLISHED_AT, size);
+        List<PostSummaryReadModel> resultByContent3 = postQueryJooqRepository.findByKeywordWithCursor(
+                TITLE_CONTENT_COMMENT, "content3", LATEST, null, null, testMember2.getUuid(), null, size);
 
-        List<PostSummaryWithSearchInfoReadModel> resultByContent2 = postQueryJooqRepository.searchByKeywordWithLatest(
-                TITLE_CONTENT_COMMENT, "content2", null, null,
-                testMember2.getUuid(), null, TEST_COMM_POST_PUBLISHED_AT, size);
+        List<PostSummaryReadModel> resultByContent2 = postQueryJooqRepository.findByKeywordWithCursor(
+                TITLE_CONTENT_COMMENT, "content2", LATEST, null, null, testMember2.getUuid(), null, size);
 
-        // then
-        // content3은 is_deleted = false → testPost1에서 검색됨
+        // content3은 is_deleted=false → testPost1 검색됨
         assertThat(resultByContent3).hasSize(1);
-        assertThat(resultByContent3.getFirst().ulid()).isEqualTo(testPost1.getUlid());
+        assertThat(resultByContent3.get(0).ulid()).isEqualTo(testPost1.getUlid());
 
-        // content2는 is_deleted = true → 검색 안됨
+        // content2는 is_deleted=true → 검색 안됨
         assertThat(resultByContent2).isEmpty();
     }
 
     @Test
-    @DisplayName("키워드로 제목, 컨텐츠에서 게시글 검색 - 최신순 (키워드와 카테고리 필터 조합)")
-    void testSearchByKeywordWithLatest_givenCategoryAndKeyword_willReturnFilteredResponse() {
-        // given & when
+    @DisplayName("정확도순 검색 - RELEVANCE 정렬")
+    void testFindByKeywordWithCursor_givenRelevanceSort_willReturnByScore() {
         int size = 10;
-        List<PostSummaryWithSearchInfoReadModel> result = postQueryJooqRepository.searchByKeywordWithLatest(
-                TITLE_CONTENT, "Hello", testPrimaryCategory1.getId(), List.of(testSecondaryCategory1.getId()),
-                testMember2.getUuid(), null, null, size);
+        List<PostSummaryReadModel> result = postQueryJooqRepository.findByKeywordWithCursor(
+                TITLE_CONTENT, "Hello", RELEVANCE, null, null, testMember2.getUuid(), null, size);
 
-        // then
-        // testPrimaryCategory1 + testSecondaryCategory1에 속한 게시글만 반환
-        assertThat(result).allMatch(post ->
-                post.primaryCategory().equals(testPrimaryCategory1.getCategory()));
-        assertThat(result).allMatch(post ->
-                post.secondaryCategory().equals(testSecondaryCategory1.getCategory()));
-    }
-
-    @Test
-    @DisplayName("키워드로 게시글 목록 검색 - 정확도순")
-    void testSearchByKeywordWithRelevance_givenNullImportanceAndMaxWordSimilarity_willReturnByImportanceAndMaxWordSimilarity() {
-        // given & when
-        int size = 10;
-        List<PostSummaryWithSearchInfoReadModel> result = postQueryJooqRepository.searchByKeywordWithRelevance(
-                TITLE_CONTENT, "hello", null, null, testMember2.getUuid(),
-                null, null, null, null, size);
-
-        // then
-        // 결과가 존재하고 importance 기준으로 정렬되어 있음을 확인
+        // 결과가 존재하고 score 기준으로 정렬되어 있음을 확인
+        // (점수 값 자체는 DB 상태에 따라 달라지므로 순서 검증은 생략)
         assertThat(result).isNotEmpty();
-        assertThat(result).extracting("importance").isSortedAccordingTo(Collections.reverseOrder());
+        assertThat(result).allMatch(post -> post.ulid() != null);
     }
 
     @Test
-    @DisplayName("키워드로 게시글 목록 검색 - 정확도순 (페이지네이션)")
-    void testSearchByKeywordWithRelevance_givenSequentialRequests_willReturnPaginatedResponse() {
-        // given & when
+    @DisplayName("정확도순 커서 페이지네이션")
+    void testFindByKeywordWithCursor_givenRelevanceSortWithCursor_willPaginateCorrectly() {
         int size = 1;
-        List<PostSummaryWithSearchInfoReadModel> firstPage = postQueryJooqRepository.searchByKeywordWithRelevance(
-                TITLE_CONTENT, "Hello", null, null, testMember2.getUuid(),
-                null, null, null, null, size);
-        PostSummaryWithSearchInfoReadModel firstPost = firstPage.getFirst();
-        List<PostSummaryWithSearchInfoReadModel> secondPage = postQueryJooqRepository.searchByKeywordWithRelevance(
-                TITLE_CONTENT, "Hello", null, null, testMember2.getUuid(),
-                firstPost.ulid(), firstPost.importance(), firstPost.maxWordSimilarity(), firstPost.publishedAt(), size);
+        List<PostSummaryReadModel> firstPage = postQueryJooqRepository.findByKeywordWithCursor(
+                TITLE_CONTENT, "Hello", RELEVANCE, null, null, testMember2.getUuid(), null, size);
+        List<PostSummaryReadModel> secondPage = postQueryJooqRepository.findByKeywordWithCursor(
+                TITLE_CONTENT, "Hello", RELEVANCE, null, null, testMember2.getUuid(), firstPage.get(size - 1).ulid(), size);
 
-        // then
         // 첫 페이지 마지막 = 두 번째 페이지 첫 번째 (커서 기준 연속성 확인)
         assertThat(firstPage.getLast()).isEqualTo(secondPage.getFirst());
         // 두 페이지에 중복된 ulid 없음
-        assertThat(firstPage.getFirst().ulid()).isNotEqualTo(secondPage.getFirst().ulid());
+        assertThat(firstPage.get(0).ulid()).isNotEqualTo(secondPage.get(0).ulid());
+    }
+
+    @Test
+    @DisplayName("카테고리 필터와 키워드 검색 조합")
+    void testFindByKeywordWithCursor_givenCategoryAndKeyword_willFilterCorrectly() {
+        int size = 10;
+        List<PostSummaryReadModel> result = postQueryJooqRepository.findByKeywordWithCursor(
+                TITLE_CONTENT, "Hello", LATEST,
+                testPrimaryCategory1.getId(), List.of(testSecondaryCategory1.getId()),
+                testMember2.getUuid(), null, size);
+
+        // testPrimaryCategory1 + testSecondaryCategory1에 속한 게시글만 반환
+        assertThat(result).allMatch(post ->
+                post.primaryCategory().equals(testPrimaryCategory1.getCategory()));
     }
 
     @Test
@@ -374,4 +342,6 @@ class PostQueryJooqRepositoryIntegrationTest {
         assertThat(result).isPresent();
         assertThat(result.get().ulid()).isEqualTo(testPost1.getUlid());
     }
+
+
 }

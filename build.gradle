@@ -145,7 +145,6 @@ flyway {
 	outOfOrder = false
 	encoding = 'UTF-8'
 	detectEncoding = true
-	schemas = ['public']
 }
 
 jacoco {
