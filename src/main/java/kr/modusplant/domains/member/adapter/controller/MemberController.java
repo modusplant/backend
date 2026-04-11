@@ -21,6 +21,8 @@ import kr.modusplant.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.infrastructure.event.bus.EventBus;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
+import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.*;
@@ -44,6 +46,8 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 @Transactional
 @Slf4j
 public class MemberController {
+    private final JwtTokenProvider jwtTokenProvider;
+    private final TokenService tokenService;
     private final S3FileService s3FileService;
     private final SwearService swearService;
     private final MemberProfileMapper memberProfileMapper;
@@ -235,6 +239,14 @@ public class MemberController {
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
         eventBus.publish(CommentAbuseReportEvent.create(memberId.getValue(), record.postUlid(), record.path()));
+    }
+
+    public void withdraw(MemberWithdrawalRecord record) {
+        String accessToken = record.accessToken();
+        MemberId memberId = MemberId.fromUuid(jwtTokenProvider.getMemberUuidFromToken(accessToken));
+        memberValidationHelper.validateIfMemberExists(memberId);
+        tokenService.blacklistAccessToken(accessToken);
+        eventBus.publish(MemberWithdrawalEvent.create(memberId.getValue()));
     }
 
     private void validateBeforeOverrideProfile(MemberId memberId, Nickname memberNickname) {

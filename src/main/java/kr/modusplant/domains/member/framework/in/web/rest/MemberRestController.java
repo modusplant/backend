@@ -31,6 +31,7 @@ import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
 
+import static kr.modusplant.infrastructure.jwt.util.TokenUtils.getTokenFromAuthorizationHeader;
 import static kr.modusplant.shared.constant.Regex.*;
 
 @Tag(name = "회원 API", description = "회원의 생성과 갱신(상태 제외), 회원이 할 수 있는 단일한 기능을 관리하는 API 입니다.")
@@ -434,6 +435,22 @@ public class MemberRestController {
             @AuthenticationPrincipal(expression = "uuid")
             UUID memberId) {
         memberController.reportCommentAbuse(new CommentAbuseReportRecord(memberId, postUlid, path));
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Operation(
+            summary = "회원 탈퇴 API",
+            description = "회원을 탈퇴합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @DeleteMapping("/members")
+    public ResponseEntity<DataResponse<Void>> withdrawMember(
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)
+            @NotNull(message = "접근 토큰이 비어 있습니다. ")
+            String auth) {
+        String accessToken = getTokenFromAuthorizationHeader(auth);
+        memberController.withdraw(new MemberWithdrawalRecord(accessToken));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 }
