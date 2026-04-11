@@ -34,6 +34,7 @@ import kr.modusplant.infrastructure.event.consumer.CommentEventConsumer;
 import kr.modusplant.infrastructure.event.consumer.PostEventConsumer;
 import kr.modusplant.infrastructure.event.consumer.ReportEventConsumer;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
+import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
 import kr.modusplant.infrastructure.swear.service.SwearService;
@@ -85,9 +86,10 @@ class MemberControllerTest implements
         MemberTestUtils, MemberProfileTestUtils,
         SiteMemberProfileEntityTestUtils, CommPostEntityTestUtils, CommCommentEntityTestUtils,
         PropBugRepEntityTestUtils, CommPostAbuRepEntityTestUtils, CommCommentAbuRepEntityTestUtils {
+    private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
+    private final TokenService tokenService = Mockito.mock(TokenService.class);
     private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
     private final SwearService swearService = Mockito.mock(SwearService.class);
-    private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
     private final MemberImageIOHelper memberImageIOHelper = Mockito.mock(MemberImageIOHelper.class);
     private final MemberValidationHelper memberValidationHelper = Mockito.mock(MemberValidationHelper.class);
     private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl(s3FileService);
@@ -111,7 +113,7 @@ class MemberControllerTest implements
     private final PostEventConsumer postEventConsumer = new PostEventConsumer(eventBus, postLikeJpaRepository, postBookmarkJpaRepository, postJpaRepository);
     private final CommentEventConsumer commentEventConsumer = new CommentEventConsumer(eventBus, commentLikeJpaRepository, commentJpaRepository);
     private final ReportEventConsumer reportEventConsumer = new ReportEventConsumer(eventBus, memberJpaRepository, postJpaRepository, commentJpaRepository, propBugRepJpaRepository, postAbuRepJpaRepository, commentAbuRepJpaRepository);
-    private final MemberController memberController = new MemberController(s3FileService, swearService, memberProfileMapper, memberImageIOHelper, memberValidationHelper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
+    private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, s3FileService, swearService, memberProfileMapper, memberImageIOHelper, memberValidationHelper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
 
     private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
     private final ExistsEntityException existsEntityExceptionForNickname = new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "nickname");

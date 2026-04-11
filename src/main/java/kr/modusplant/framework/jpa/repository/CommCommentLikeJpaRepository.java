@@ -15,5 +15,7 @@ public interface CommCommentLikeJpaRepository extends JpaRepository<CommCommentL
 
     boolean existsByPostIdAndPathAndMemberId(String postId, String path, UUID memberId);
 
+    void deleteByMemberId(UUID memberId);
+
     void deleteByPostIdAndPathAndMemberId(String postId, String path, UUID memberId);
 }
