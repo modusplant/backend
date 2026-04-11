@@ -19,7 +19,7 @@ class ProposalOrBugReportEventTest {
         void testCreate_givenNullMemberId_willThrowException() {
             // given & when
             InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () ->
-                    ProposalOrBugReportEvent.create(null, TEST_REPORT_TITLE, TEST_REPORT_CONTENT, TEST_REPORT_IMAGE_PATH));
+                    ProposalOrBugReportEvent.create(null, TEST_REPORT_TITLE, TEST_REPORT_CATEGORY_PROPOSAL, TEST_REPORT_CONTENT, TEST_REPORT_IMAGE_PATH));
 
             // then
             assertThat(invalidValueException.getMessage()).contains("NOT_FOUND_MEMBER");
@@ -30,7 +30,18 @@ class ProposalOrBugReportEventTest {
         void testCreate_givenEmptyTitle_willThrowException() {
             // given & when
             InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () ->
-                    ProposalOrBugReportEvent.create(MEMBER_BASIC_USER_UUID, "", TEST_REPORT_CONTENT, TEST_REPORT_IMAGE_PATH));
+                    ProposalOrBugReportEvent.create(MEMBER_BASIC_USER_UUID, "", TEST_REPORT_CATEGORY_PROPOSAL, TEST_REPORT_CONTENT, TEST_REPORT_IMAGE_PATH));
+
+            // then
+            assertThat(invalidValueException.getMessage()).contains("NOT_FOUND_REPORT");
+        }
+
+        @Test
+        @DisplayName("category가 비어 있을 때 오류 발생")
+        void testCreate_givenEmptyCategory_willThrowException() {
+            // given & when
+            InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () ->
+                    ProposalOrBugReportEvent.create(MEMBER_BASIC_USER_UUID, TEST_REPORT_TITLE, "", TEST_REPORT_CONTENT, TEST_REPORT_IMAGE_PATH));
 
             // then
             assertThat(invalidValueException.getMessage()).contains("NOT_FOUND_REPORT");
@@ -41,7 +52,7 @@ class ProposalOrBugReportEventTest {
         void testCreate_givenEmptyContent_willThrowException() {
             // given & when
             InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () ->
-                    ProposalOrBugReportEvent.create(MEMBER_BASIC_USER_UUID, TEST_REPORT_TITLE, "", TEST_REPORT_IMAGE_PATH));
+                    ProposalOrBugReportEvent.create(MEMBER_BASIC_USER_UUID, TEST_REPORT_TITLE, TEST_REPORT_CATEGORY_PROPOSAL, "", TEST_REPORT_IMAGE_PATH));
 
             // then
             assertThat(invalidValueException.getMessage()).contains("NOT_FOUND_REPORT");

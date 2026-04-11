@@ -38,6 +38,9 @@ public class PropBugRepEntity {
     @Column(nullable = false, updatable = false, length = 60)
     private String title;
 
+    @Column(nullable = false, updatable = false, length = 10)
+    private String category;
+
     @Column(nullable = false, updatable = false, length = 600)
     private String content;
 
@@ -85,10 +88,11 @@ public class PropBugRepEntity {
         return new HashCodeBuilder(17, 37).append(getUlid()).toHashCode();
     }
 
-    private PropBugRepEntity(String ulid, SiteMemberEntity member, String title, String content, String imagePath, LocalDateTime checkedAt, LocalDateTime handledAt) {
+    private PropBugRepEntity(String ulid, SiteMemberEntity member, String title, String category, String content, String imagePath, LocalDateTime checkedAt, LocalDateTime handledAt) {
         this.ulid = ulid;
         this.member = member;
         this.title = title;
+        this.category = category;
         this.content = content;
         this.imagePath = imagePath;
         this.checkedAt = checkedAt;
@@ -103,6 +107,7 @@ public class PropBugRepEntity {
         private String ulid;
         private SiteMemberEntity member;
         private String title;
+        private String category;
         private String content;
         private String imagePath;
         private LocalDateTime checkedAt;
@@ -120,6 +125,11 @@ public class PropBugRepEntity {
 
         public PropBugRepEntityBuilder title(final String title) {
             this.title = title;
+            return this;
+        }
+
+        public PropBugRepEntityBuilder category(final String category) {
+            this.category = category;
             return this;
         }
 
@@ -147,6 +157,7 @@ public class PropBugRepEntity {
             this.ulid = propBugRep.getUlid();
             this.member = propBugRep.getMember();
             this.title = propBugRep.getTitle();
+            this.category = propBugRep.getCategory();
             this.content = propBugRep.getContent();
             this.imagePath = propBugRep.getImagePath();
             this.checkedAt = propBugRep.getCheckedAt();
@@ -155,7 +166,7 @@ public class PropBugRepEntity {
         }
 
         public PropBugRepEntity build() {
-            return new PropBugRepEntity(this.ulid, this.member, this.title, this.content, this.imagePath, this.checkedAt, this.handledAt);
+            return new PropBugRepEntity(this.ulid, this.member, this.title, this.category, this.content, this.imagePath, this.checkedAt, this.handledAt);
         }
     }
 }
