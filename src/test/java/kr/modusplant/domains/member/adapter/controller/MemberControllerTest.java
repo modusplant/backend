@@ -96,14 +96,10 @@ class MemberControllerTest implements
         MemberTestUtils, MemberProfileTestUtils,
         SiteMemberProfileEntityTestUtils, CommPostEntityTestUtils, CommCommentEntityTestUtils,
         PropBugRepEntityTestUtils, CommPostAbuRepEntityTestUtils, CommCommentAbuRepEntityTestUtils {
-    MockDataProvider provider = ctx -> new MockResult[] {
-            new MockResult(1, null),
-            new MockResult(1, null),
-            new MockResult(1, null)
-    };
+    MockDataProvider mockDataProvider = ctx -> new MockResult[0]; // 반환값을 따로 설정하지 않음
 
-    MockConnection connection = new MockConnection(provider);
-    DSLContext dsl = DSL.using(connection, SQLDialect.POSTGRES);
+    MockConnection mockConnection = new MockConnection(mockDataProvider);
+    DSLContext dslContext = DSL.using(mockConnection, SQLDialect.POSTGRES);
 
     private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
     private final TokenService tokenService = Mockito.mock(TokenService.class);
@@ -138,7 +134,7 @@ class MemberControllerTest implements
     @SuppressWarnings("unused")
     private final ReportEventConsumer reportEventConsumer = new ReportEventConsumer(eventBus, memberJpaRepository, postJpaRepository, commentJpaRepository, propBugRepJpaRepository, postAbuRepJpaRepository, commentAbuRepJpaRepository);
     @SuppressWarnings("unused")
-    private final MemberEventConsumer memberEventConsumer = new MemberEventConsumer(eventBus, memberJpaRepository, refreshTokenJpaRepository, postLikeJpaRepository, postBookmarkJpaRepository, commentLikeJpaRepository, postJpaRepository, postArchiveJpaRepository, postAbuRepJpaRepository, commentJpaRepository, commentAbuRepJpaRepository, propBugRepJpaRepository, dsl);
+    private final MemberEventConsumer memberEventConsumer = new MemberEventConsumer(eventBus, memberJpaRepository, refreshTokenJpaRepository, postLikeJpaRepository, postBookmarkJpaRepository, commentLikeJpaRepository, postJpaRepository, postArchiveJpaRepository, postAbuRepJpaRepository, commentJpaRepository, commentAbuRepJpaRepository, propBugRepJpaRepository, dslContext);
     private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, s3FileService, swearService, memberProfileMapper, memberImageIOHelper, memberValidationHelper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
 
     private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
