@@ -47,7 +47,6 @@ import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.jooq.tools.jdbc.MockConnection;
 import org.jooq.tools.jdbc.MockDataProvider;
-import org.jooq.tools.jdbc.MockExecuteContext;
 import org.jooq.tools.jdbc.MockResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -97,15 +96,10 @@ class MemberControllerTest implements
         MemberTestUtils, MemberProfileTestUtils,
         SiteMemberProfileEntityTestUtils, CommPostEntityTestUtils, CommCommentEntityTestUtils,
         PropBugRepEntityTestUtils, CommPostAbuRepEntityTestUtils, CommCommentAbuRepEntityTestUtils {
-    MockDataProvider provider = new MockDataProvider() {
-        @Override
-        public MockResult[] execute(MockExecuteContext ctx) {
-            return new MockResult[] {
-                    new MockResult(1, null),
-                    new MockResult(1, null),
-                    new MockResult(1, null)
-            };
-        }
+    MockDataProvider provider = ctx -> new MockResult[] {
+            new MockResult(1, null),
+            new MockResult(1, null),
+            new MockResult(1, null)
     };
 
     MockConnection connection = new MockConnection(provider);
@@ -137,9 +131,13 @@ class MemberControllerTest implements
     private final CommPostArchiveJpaRepository postArchiveJpaRepository = Mockito.mock(CommPostArchiveJpaRepository.class);
 
     private final EventBus eventBus = new EventBus();
+    @SuppressWarnings("unused")
     private final PostEventConsumer postEventConsumer = new PostEventConsumer(eventBus, postLikeJpaRepository, postBookmarkJpaRepository, postJpaRepository);
+    @SuppressWarnings("unused")
     private final CommentEventConsumer commentEventConsumer = new CommentEventConsumer(eventBus, commentLikeJpaRepository, commentJpaRepository);
+    @SuppressWarnings("unused")
     private final ReportEventConsumer reportEventConsumer = new ReportEventConsumer(eventBus, memberJpaRepository, postJpaRepository, commentJpaRepository, propBugRepJpaRepository, postAbuRepJpaRepository, commentAbuRepJpaRepository);
+    @SuppressWarnings("unused")
     private final MemberEventConsumer memberEventConsumer = new MemberEventConsumer(eventBus, memberJpaRepository, refreshTokenJpaRepository, postLikeJpaRepository, postBookmarkJpaRepository, commentLikeJpaRepository, postJpaRepository, postArchiveJpaRepository, postAbuRepJpaRepository, commentJpaRepository, commentAbuRepJpaRepository, propBugRepJpaRepository, dsl);
     private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, s3FileService, swearService, memberProfileMapper, memberImageIOHelper, memberValidationHelper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
 
