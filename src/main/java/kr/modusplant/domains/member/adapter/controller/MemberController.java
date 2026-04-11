@@ -197,6 +197,7 @@ public class MemberController {
     public void reportProposalOrBug(ProposalOrBugReportRecord record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         ReportTitle reportTitle = ReportTitle.create(record.title());
+        ReportCategory reportCategory = ReportCategory.create(record.category());
         ReportContent reportContent = ReportContent.create(record.content());
         ReportImagePath reportImagePath;
         MultipartFile image = record.image();
@@ -210,6 +211,7 @@ public class MemberController {
                 ProposalOrBugReportEvent.create(
                         memberId.getValue(),
                         reportTitle.getValue(),
+                        reportCategory.getType().name(),
                         reportContent.getValue(),
                         reportImagePath.getValue()));
     }
