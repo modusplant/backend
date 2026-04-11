@@ -1,6 +1,7 @@
 package kr.modusplant.domains.account.social.adapter.mapper;
 
 import kr.modusplant.domains.account.social.common.util.domain.vo.SocialMemberProfileTestUtils;
+import kr.modusplant.domains.account.social.domain.vo.SocialMemberProfile;
 import kr.modusplant.domains.account.social.domain.vo.SocialProfile;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.framework.out.client.dto.GoogleUserInfo;
@@ -14,8 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 

@@ -8,22 +8,18 @@ import kr.modusplant.domains.post.domain.exception.PostAccessDeniedException;
 import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
 import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.domains.post.domain.vo.*;
-import kr.modusplant.domains.post.usecase.enums.SearchSort;
 import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
 import kr.modusplant.domains.post.usecase.port.repository.*;
 import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
-import kr.modusplant.domains.post.usecase.record.PostSummaryWithSearchInfoReadModel;
 import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
 import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
 import kr.modusplant.domains.post.usecase.request.PostSearchRequest;
 import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
 import kr.modusplant.domains.post.usecase.response.*;
 import kr.modusplant.framework.aws.service.S3FileService;
-import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageImpl;
@@ -32,11 +28,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
-import static kr.modusplant.shared.constant.Regex.REGEX_ULID;
 
 @Service
 @Transactional(readOnly = true)
@@ -57,7 +50,7 @@ public class PostController {
     @Value("${redis.ttl.view_count}")
     private long ttlMinutes;
 
-    public CursorLatestSortedPageResponse<PostSummaryResponse> getAll(PostCategoryRequest postCategoryRequest, UUID currentMemberUuid, String lastUlid, int size) {
+    public CursorPageResponse<PostSummaryResponse> getAll(PostCategoryRequest postCategoryRequest, UUID currentMemberUuid, String lastUlid, int size) {
         List<PostSummaryReadModel> readModels = postQueryRepository.findByCategoryWithCursor(
                 postCategoryRequest.primaryCategoryId(), postCategoryRequest.secondaryCategoryIds(), currentMemberUuid, lastUlid, size
         );
@@ -65,74 +58,20 @@ public class PostController {
         List<PostSummaryResponse> responses = readModels.stream()
                 .limit(size)
                 .map(readModel -> postMapper.toPostSummaryResponse(readModel,getJsonNodeContentPreview(readModel.content(),readModel.thumbnailPath()))).toList();
-        String nextUlid = hasNext && !responses.isEmpty() ? responses.getLast().ulid() : null;
-        return CursorLatestSortedPageResponse.of(responses, nextUlid, hasNext);
+        String nextUlid = hasNext && !responses.isEmpty() ? responses.get(responses.size() - 1).ulid() : null;
+        return CursorPageResponse.of(responses, nextUlid, hasNext);
     }
 
     @Transactional
-    public CursorRelevanceSortedPageResponse<PostSummaryWithSearchInfoResponse> getByKeyword(
-            PostSearchRequest postSearchRequest, UUID currentMemberUuid,
-            String lastUlid, Integer lastImportance, Double lastWordSimilarity, LocalDateTime lastPublishedAt,
-            int size) {
-        if (lastUlid != null && !lastUlid.matches(REGEX_ULID)) {
-            throw new InvalidValueException(GeneralErrorCode.MALFORMED_INPUT, "lastUlid");
-        }
-        if (lastImportance != null && (lastImportance < 1 || lastImportance > 4)) {
-            throw new InvalidValueException(GeneralErrorCode.INPUT_OUT_OF_RANGE, "lastImportance");
-        }
-        if (lastWordSimilarity != null && (lastWordSimilarity < 0 || lastWordSimilarity > 1)) {
-            throw new InvalidValueException(GeneralErrorCode.INPUT_OUT_OF_RANGE, "lastWordSimilarity");
-        }
-        if (postSearchRequest.sort().equals(SearchSort.LATEST) &&
-                !(
-                        (lastUlid != null && lastPublishedAt != null) ||
-                                (lastUlid == null && lastPublishedAt == null)
-                )) {
-            throw new InvalidValueException(GeneralErrorCode.INVALID_INPUT, "lastUlid", "lastPublishedAt");
-        } else if (postSearchRequest.sort().equals(SearchSort.RELEVANCE) &&
-                !(
-                        (lastUlid != null && lastImportance != null &&
-                                lastWordSimilarity != null && lastPublishedAt != null) ||
-                                (lastUlid == null && lastImportance == null &&
-                                        lastWordSimilarity == null && lastPublishedAt == null)
-                )) {
-            throw new InvalidValueException(GeneralErrorCode.INVALID_INPUT,
-                    "lastUlid", "lastImportance", "lastWordSimilarity", "lastPublishedAt");
-        }
-
-        List<PostSummaryWithSearchInfoReadModel> readModels;
-        if (postSearchRequest.sort().equals(SearchSort.LATEST)) {
-            readModels = postQueryRepository.searchByKeywordWithLatest(
-                    postSearchRequest.option(), postSearchRequest.keyword(),
-                    postSearchRequest.category().primaryCategoryId(),
-                    postSearchRequest.category().secondaryCategoryIds(),
-                    currentMemberUuid, lastUlid, lastPublishedAt, size);
-        } else {
-            readModels = postQueryRepository.searchByKeywordWithRelevance(
-                    postSearchRequest.option(), postSearchRequest.keyword(),
-                    postSearchRequest.category().primaryCategoryId(),
-                    postSearchRequest.category().secondaryCategoryIds(),
-                    currentMemberUuid, lastUlid, lastImportance, lastWordSimilarity, lastPublishedAt, size);
-        }
+    public CursorPageResponse<PostSummaryResponse> getByKeyword(PostSearchRequest postSearchRequest, UUID currentMemberUuid, String lastUlid, int size) {
+        List<PostSummaryReadModel> readModels = postQueryRepository.findByKeywordWithCursor(postSearchRequest.option(), postSearchRequest.keyword(), postSearchRequest.sort(),postSearchRequest.category().primaryCategoryId(), postSearchRequest.category().secondaryCategoryIds(), currentMemberUuid, lastUlid, size);
         boolean hasNext = readModels.size() > size;
-        List<PostSummaryWithSearchInfoResponse> responses =
-                readModels.stream()
-                        .limit(size)
-                        .map(readModel ->
-                                postMapper.toPostSummaryWithSearchInfoResponse(
-                                        readModel, getJsonNodeContentPreview(readModel.content(), readModel.thumbnailPath())))
-                        .toList();
+        List<PostSummaryResponse> responses = readModels.stream()
+                .limit(size)
+                .map(readModel -> postMapper.toPostSummaryResponse(readModel,getJsonNodeContentPreview(readModel.content(),readModel.thumbnailPath()))).toList();
+        String nextUlid = hasNext && !responses.isEmpty() ? responses.get(responses.size() - 1).ulid() : null;
         postSearchHistoryRepository.saveSearchKeyword(currentMemberUuid, postSearchRequest.keyword());
-        PostSummaryWithSearchInfoResponse response = hasNext && !responses.isEmpty() ? responses.getLast() : null;
-        if (response != null) {
-            return CursorRelevanceSortedPageResponse.of(
-                    responses, response.ulid(),
-                    response.importance(), response.maxWordSimilarity(),
-                    response.publishedAt(), true);
-        } else {
-            return CursorRelevanceSortedPageResponse.of(
-                    responses, null, null, null, null, hasNext);
-        }
+        return CursorPageResponse.of(responses, nextUlid, hasNext);
     }
 
     public PostDetailResponse getByUlid(String ulid, UUID currentMemberUuid, UUID guestId) {
@@ -148,17 +87,18 @@ public class PostController {
                             getJsonNodeContent(postDetail.content()),
                             readViewCount(ulid)
                     );
-                }).orElseThrow(PostNotFoundException::new);
+                }).orElseThrow(() -> new PostNotFoundException());
     }
 
     public PostDetailDataResponse getDataByUlid(String ulid, UUID currentMemberUuid) {
         return postQueryRepository.findPostDetailDataByPostId(PostId.create(ulid))
-                .filter(postDetailData -> postDetailData.isPublished() || postDetailData.authorUuid().equals(currentMemberUuid))
+                .filter(postDetailData -> postDetailData.isPublished() ||
+                        (!postDetailData.isPublished() && postDetailData.authorUuid().equals(currentMemberUuid)))
                 .map(postDetailData -> postMapper.toPostDetailDataResponse(
                         postDetailData,
                         getJsonNodeContent(postDetailData.content()),
                         multipartDataProcessorPort.extractOriginalFilenameFromFileKey(postDetailData.thumbnailPath())))
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(() -> new PostNotFoundException());
     }
 
     @Transactional
@@ -222,7 +162,7 @@ public class PostController {
 
     @Transactional
     public void deletePost(String ulid, UUID currentMemberUuid) {
-        Post post = postRepository.getPostByUlid(PostId.create(ulid)).orElseThrow(PostNotFoundException::new);
+        Post post = postRepository.getPostByUlid(PostId.create(ulid)).orElseThrow(() -> new PostNotFoundException());
         if (!post.getAuthorId().equals(AuthorId.fromUuid(currentMemberUuid))) {
             throw new PostAccessDeniedException();
         }
