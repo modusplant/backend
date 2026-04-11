@@ -1,9 +1,9 @@
 package kr.modusplant.domains.account.social.adapter.controller;
 
 import kr.modusplant.domains.account.shared.kernel.AccountId;
-import kr.modusplant.domains.account.social.domain.exception.SocialAccountConflictException;
 import kr.modusplant.domains.account.social.domain.exception.AlreadyRegisteredWithOtherProviderException;
 import kr.modusplant.domains.account.social.domain.exception.InvalidValueException;
+import kr.modusplant.domains.account.social.domain.exception.SocialAccountConflictException;
 import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
 import kr.modusplant.domains.account.social.domain.vo.*;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
@@ -11,7 +11,7 @@ import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClient
 import kr.modusplant.domains.account.social.usecase.port.client.dto.SocialUserInfo;
 import kr.modusplant.domains.account.social.usecase.port.mapper.SocialIdentityMapper;
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
-import kr.modusplant.domains.account.social.usecase.record.*;
+import kr.modusplant.domains.account.social.usecase.record.TempTokenInfo;
 import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
 import kr.modusplant.domains.account.social.usecase.response.LoginResult;
 import kr.modusplant.domains.account.social.usecase.response.NeedLinkResult;

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
@@ -23,6 +24,7 @@ public final class CommPostConstant {
     public static final String TEST_COMM_POST_TITLE = "물 주는 타이밍, 이제 헷갈리지 마세요! 식물별 물 주기 가이드";
     public static final JsonNode TEST_COMM_POST_CONTENT = createSampleContent();
     public static final Boolean TEST_COMM_POST_IS_PUBLISHED = true;
+    public static final LocalDateTime TEST_COMM_POST_PUBLISHED_AT = LocalDateTime.of(2026, 4, 3, 0, 0);
 
     private static JsonNode createSampleContent() {
         String json = """

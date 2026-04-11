@@ -321,10 +321,6 @@ public class MemberRestController {
             @RequestPart(name = "title")
             String title,
 
-            @Parameter(description = "보고서 항목", example = "건의 사항 또는 버그 제보")
-            @RequestPart(name = "category")
-            String category,
-
             @Parameter(description = "보고서 내용", example = "이런 건의 사항을 드립니다.")
             @RequestPart(name = "content")
             String content,
@@ -340,7 +336,7 @@ public class MemberRestController {
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
             @AuthenticationPrincipal(expression = "uuid")
             UUID memberId) throws IOException {
-        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(memberId, title, category, content, image));
+        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(memberId, title, content, image));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

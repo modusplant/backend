@@ -6,5 +6,5 @@ import static kr.modusplant.shared.persistence.common.util.constant.ReportConsta
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 
 public interface ProposalOrBugReportRecordTestUtils {
-    ProposalOrBugReportRecord testProposalOrBugReportRecord = new ProposalOrBugReportRecord(MEMBER_BASIC_USER_UUID, TEST_REPORT_TITLE, TEST_REPORT_CATEGORY_PROPOSAL, TEST_REPORT_CONTENT, TEST_REPORT_IMAGE);
+    ProposalOrBugReportRecord testProposalOrBugReportRecord = new ProposalOrBugReportRecord(MEMBER_BASIC_USER_UUID, TEST_REPORT_TITLE, TEST_REPORT_CONTENT, TEST_REPORT_IMAGE);
 }

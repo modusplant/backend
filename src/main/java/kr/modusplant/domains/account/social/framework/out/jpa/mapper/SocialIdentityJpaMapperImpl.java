@@ -2,8 +2,8 @@ package kr.modusplant.domains.account.social.framework.out.jpa.mapper;
 
 import kr.modusplant.domains.account.shared.kernel.AccountId;
 import kr.modusplant.domains.account.social.domain.vo.AgreedTerms;
-import kr.modusplant.domains.account.social.domain.vo.SocialMemberProfile;
 import kr.modusplant.domains.account.social.domain.vo.SocialCredentials;
+import kr.modusplant.domains.account.social.domain.vo.SocialMemberProfile;
 import kr.modusplant.domains.account.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
 import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
