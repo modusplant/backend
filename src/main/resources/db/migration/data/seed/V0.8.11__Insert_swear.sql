@@ -2,6 +2,10 @@
 -- 욕설 및 혐오 표현이 다수 포함되어 있습니다.
 -- 업무상 필요하지 않다면 열람을 삼가시기 바랍니다.
 
+-- 1. 기존 데이터 모두 삭제
+DELETE FROM swear;
+
+-- 2. 새로운 데이터 추가
 INSERT INTO swear ("word", type, created_at)
 VALUES
 ('씨발', 'GENERAL', NOW()),
