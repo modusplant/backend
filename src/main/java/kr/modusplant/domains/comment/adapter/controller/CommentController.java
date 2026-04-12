@@ -60,12 +60,12 @@ public class CommentController {
     }
 
     @Transactional
-    public List<CommentOfPostResponse> gatherByPost(String postUlid) {
+    public List<CommentOfPostResponse> gatherByPost(String postUlid, UUID currentMemberUuid) {
         if(!postJpaRepository.existsByUlid(postUlid)) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post");
         }
 
-        return jooqRepository.findByPost(PostId.create(postUlid))
+        return jooqRepository.findByPost(PostId.create(postUlid), Author.createNullable(currentMemberUuid))
                 .stream().map(mapper::toCommentOfPostResponse)
                 .toList();
     }

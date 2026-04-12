@@ -23,6 +23,10 @@ public class Author {
         return new Author(memberUuid, null);
     }
 
+    public static Author createNullable(UUID memberUuid) {
+        return new Author(memberUuid, null);
+    }
+
     public static Author create(UUID memberUuid, String nickname) {
         if(memberUuid == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR); }
         if(nickname == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_MEMBER_NICKNAME); }
