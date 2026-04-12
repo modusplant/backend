@@ -46,7 +46,7 @@ public class SiteMemberAuthEntity {
     @ToString.Include
     private AuthProvider provider;
 
-    @Column(unique = true, updatable = false, name = "provider_id")
+    @Column(unique = true, name = "provider_id")
     private String providerId;
 
     @Column(name = LAST_MODIFIED_AT, nullable = false)
@@ -71,6 +71,14 @@ public class SiteMemberAuthEntity {
     public void updateEmail(String email) { this.email = email; }
 
     public void updatePassword(String password) { this.pw = password; }
+
+    public void updateProvider(AuthProvider provider) {
+        this.provider = provider;
+    }
+
+    public void updateProviderId(String providerId) {
+        this.providerId = providerId;
+    }
 
     @Override
     public boolean equals(Object o) {

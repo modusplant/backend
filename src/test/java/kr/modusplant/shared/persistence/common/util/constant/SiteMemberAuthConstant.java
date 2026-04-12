@@ -36,4 +36,7 @@ public final class SiteMemberAuthConstant {
     public static final String MEMBER_AUTH_KAKAO_USER_EMAIL = "test2KaKao4Uzer@kakao.com";
     public static final AuthProvider MEMBER_AUTH_KAKAO_USER_PROVIDER = AuthProvider.KAKAO;
     public static final String MEMBER_AUTH_KAKAO_USER_PROVIDER_ID = "9348634889";
+
+    public static final AuthProvider MEMBER_AUTH_BASIC_KAKAO_USER_PROVIDER = AuthProvider.BASIC_KAKAO;
+    public static final AuthProvider MEMBER_AUTH_BASIC_GOOGLE_USER_PROVIDER = AuthProvider.BASIC_GOOGLE;
 }

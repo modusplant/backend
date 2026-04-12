@@ -1,0 +1,1 @@
+ALTER TABLE public.prop_bug_rep DROP COLUMN category;
