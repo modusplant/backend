@@ -9,7 +9,7 @@ import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
-import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
+import kr.modusplant.infrastructure.jwt.provider.JwtCookieProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.exception.AccountStateException;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
@@ -33,7 +33,7 @@ public class WriteResponseLoginSuccessHandler implements AuthenticationSuccessHa
 
     private final SiteMemberJpaRepository memberRepository;
     private final TokenService tokenService;
-    private final JwtTokenProvider tokenProvider;
+    private final JwtCookieProvider cookieProvider;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -53,7 +53,7 @@ public class WriteResponseLoginSuccessHandler implements AuthenticationSuccessHa
                         .ok(Map.of("accessToken", loginTokenPair.accessToken())))
         );
         response.setHeader(HttpHeaders.SET_COOKIE,
-                tokenProvider.generateRefreshTokenCookieAsString(loginTokenPair.refreshToken()));
+                cookieProvider.generateRefreshTokenCookieAsString(loginTokenPair.refreshToken()));
         response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store");
     }
 
