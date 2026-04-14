@@ -78,7 +78,7 @@ public class CommentJooqRepository implements CommentReadRepository {
                 .join(memberProf).on(commComment.AUTH_MEMB_UUID.eq(memberProf.UUID))
                 .leftJoin(commentLike).on(likeJoinCondition)
                 .where(commComment.POST_ULID.eq(postId.getId()))
-                .orderBy(commComment.CREATED_AT.asc())
+                .orderBy(commComment.CREATED_AT.desc())
                 .fetch(record -> new CommentOfPostReadModel(
                         record.getValue(memberProf.IMAGE_PATH),
                         record.getValue(siteMember.NICKNAME),
