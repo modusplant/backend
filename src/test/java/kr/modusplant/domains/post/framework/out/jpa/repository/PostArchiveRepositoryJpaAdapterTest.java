@@ -28,7 +28,7 @@ class PostArchiveRepositoryJpaAdapterTest implements PostEntityTestUtils, PostAr
     @DisplayName("게시글 아카이브로 게시글 저장")
     void testSave_givenPostId_willSavePostArchive() {
         // given
-        CommPostArchiveEntity postArchiveEntity = createPostArchieveEntity();
+        CommPostArchiveEntity postArchiveEntity = createPostArchiveEntity();
         CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
 
         given(postJpaRepository.findByUlid(testPostId.getValue())).willReturn(Optional.of(postEntity));

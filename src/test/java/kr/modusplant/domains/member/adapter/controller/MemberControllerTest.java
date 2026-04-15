@@ -34,7 +34,6 @@ import kr.modusplant.infrastructure.event.consumer.CommentEventConsumer;
 import kr.modusplant.infrastructure.event.consumer.MemberEventConsumer;
 import kr.modusplant.infrastructure.event.consumer.PostEventConsumer;
 import kr.modusplant.infrastructure.event.consumer.ReportEventConsumer;
-import kr.modusplant.infrastructure.jwt.framework.out.jpa.repository.RefreshTokenJpaRepository;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
@@ -52,6 +51,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -100,6 +100,7 @@ class MemberControllerTest implements
 
     MockConnection mockConnection = new MockConnection(mockDataProvider);
     DSLContext dslContext = DSL.using(mockConnection, SQLDialect.POSTGRES);
+    private final StringRedisTemplate stringRedisTemplate = Mockito.mock(StringRedisTemplate.class);
 
     private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
     private final TokenService tokenService = Mockito.mock(TokenService.class);
@@ -123,8 +124,6 @@ class MemberControllerTest implements
     private final PropBugRepJpaRepository propBugRepJpaRepository = Mockito.mock(PropBugRepJpaRepository.class);
     private final CommPostAbuRepJpaRepository postAbuRepJpaRepository = Mockito.mock(CommPostAbuRepJpaRepository.class);
     private final CommCommentAbuRepJpaRepository commentAbuRepJpaRepository = Mockito.mock(CommCommentAbuRepJpaRepository.class);
-    private final RefreshTokenJpaRepository refreshTokenJpaRepository = Mockito.mock(RefreshTokenJpaRepository.class);
-    private final CommPostArchiveJpaRepository postArchiveJpaRepository = Mockito.mock(CommPostArchiveJpaRepository.class);
 
     private final EventBus eventBus = new EventBus();
     @SuppressWarnings("unused")
@@ -134,7 +133,7 @@ class MemberControllerTest implements
     @SuppressWarnings("unused")
     private final ReportEventConsumer reportEventConsumer = new ReportEventConsumer(eventBus, memberJpaRepository, postJpaRepository, commentJpaRepository, propBugRepJpaRepository, postAbuRepJpaRepository, commentAbuRepJpaRepository);
     @SuppressWarnings("unused")
-    private final MemberEventConsumer memberEventConsumer = new MemberEventConsumer(eventBus, memberJpaRepository, refreshTokenJpaRepository, postLikeJpaRepository, postBookmarkJpaRepository, commentLikeJpaRepository, postJpaRepository, postArchiveJpaRepository, postAbuRepJpaRepository, commentJpaRepository, commentAbuRepJpaRepository, propBugRepJpaRepository, dslContext);
+    private final MemberEventConsumer memberEventConsumer = new MemberEventConsumer(eventBus, stringRedisTemplate, dslContext);
     private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, s3FileService, swearService, memberProfileMapper, memberImageIOHelper, memberValidationHelper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
 
     private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
@@ -996,25 +995,16 @@ class MemberControllerTest implements
     @DisplayName("withdraw로 회원 탈퇴")
     void testWithdraw_givenMemberId_willWithdrawMember() {
         // given
-        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
         given(memberJpaRepository.existsByUuid(MEMBER_BASIC_USER_UUID)).willReturn(true);
         willDoNothing().given(tokenService).blacklistAccessToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN);
-        given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));
-        willDoNothing().given(refreshTokenJpaRepository).deleteByMember(memberEntity);
-        willDoNothing().given(postLikeJpaRepository).deleteByMemberId(MEMBER_BASIC_USER_UUID);
-        willDoNothing().given(postBookmarkJpaRepository).deleteByMemberId(MEMBER_BASIC_USER_UUID);
-        willDoNothing().given(commentLikeJpaRepository).deleteByMemberId(MEMBER_BASIC_USER_UUID);
+        given(stringRedisTemplate.delete(any(String.class))).willReturn(true);
 
         // when
         memberController.withdraw(testMemberWithdrawalRecord);
 
         // then
         verify(tokenService, times(1)).blacklistAccessToken(any());
-        verify(refreshTokenJpaRepository, times(1)).deleteByMember(any());
-        verify(postLikeJpaRepository, times(1)).deleteByMemberId(any());
-        verify(postBookmarkJpaRepository, times(1)).deleteByMemberId(any());
-        verify(commentLikeJpaRepository, times(1)).deleteByMemberId(any());
     }
 
     @Test
