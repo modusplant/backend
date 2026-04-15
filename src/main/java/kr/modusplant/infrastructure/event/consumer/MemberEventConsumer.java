@@ -33,7 +33,7 @@ public class MemberEventConsumer {
     }
 
     private void deleteAllWithMemberPKAndAlterAllWithMemberFK(UUID memberId) {
-        stringRedisTemplate.delete("recentlyView:member:%s:posts".formatted(memberId));
+        stringRedisTemplate.unlink("recentlyView:member:%s:posts".formatted(memberId));
 
         String[] deletedPublishedPostIds = deleteAllPostWithMemberPK(memberId);
         if (deletedPublishedPostIds.length != 0) {
@@ -43,7 +43,7 @@ public class MemberEventConsumer {
             stringRedisTemplate.execute((RedisCallback<Void>) connection -> {
                 ScanOptions options = ScanOptions.scanOptions()
                         .match("recentlyView:member:*:posts")
-                        .count(1000)
+                        .count(100)
                         .build();
 
                 try (Cursor<byte[]> cursor = connection.keyCommands().scan(options)) {
@@ -57,7 +57,7 @@ public class MemberEventConsumer {
             });
 
             if (!targetKeys.isEmpty()) {
-                stringRedisTemplate.executePipelined(new SessionCallback<Object>() {
+                stringRedisTemplate.executePipelined(new SessionCallback<>() {
                     @Override
                     public <K, V> Object execute(@NotNull RedisOperations<K, V> operations) {
                         for (String key : targetKeys) {
@@ -141,7 +141,7 @@ public class MemberEventConsumer {
                                 COMM_POST_ARCHIVE.SECO_CATE_ID,
                                 COMM_POST_ARCHIVE.AUTH_MEMB_UUID,
                                 COMM_POST_ARCHIVE.TITLE,
-                                COMM_POST_ARCHIVE.CONTENT,
+                                COMM_POST_ARCHIVE.CONTENT_TEXT,
                                 COMM_POST_ARCHIVE.CREATED_AT,
                                 COMM_POST_ARCHIVE.ARCHIVED_AT,
                                 COMM_POST_ARCHIVE.UPDATED_AT,
@@ -154,7 +154,7 @@ public class MemberEventConsumer {
                                         COMM_POST.SECO_CATE_ID,
                                         COMM_POST.AUTH_MEMB_UUID,
                                         COMM_POST.TITLE,
-                                        COMM_POST.CONTENT,
+                                        COMM_POST.CONTENT_TEXT,
                                         COMM_POST.CREATED_AT,
                                         val(LocalDateTime.now()),
                                         COMM_POST.UPDATED_AT,

@@ -5,8 +5,6 @@ import kr.modusplant.framework.jpa.entity.CommPostArchiveEntity;
 import kr.modusplant.framework.jpa.entity.CommPostEntity;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-
 @Component
 public class PostArchiveJpaMapperImpl implements PostArchiveJpaMapper {
     @Override
@@ -17,9 +15,8 @@ public class PostArchiveJpaMapperImpl implements PostArchiveJpaMapper {
                 .secondaryCategoryId(postEntity.getSecondaryCategory().getId())
                 .authMemberUuid(postEntity.getAuthMember() != null ? postEntity.getAuthMember().getUuid() : null)
                 .title(postEntity.getTitle())
-                .content(postEntity.getContent())
+                .contentText(postEntity.getContentText())
                 .createdAt(postEntity.getCreatedAt())
-                .archivedAt(LocalDateTime.now())
                 .updatedAt(postEntity.getUpdatedAt())
                 .publishedAt(postEntity.getPublishedAt())
                 .build();
