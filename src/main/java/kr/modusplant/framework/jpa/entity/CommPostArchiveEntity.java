@@ -13,7 +13,6 @@ import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.Type;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
@@ -50,8 +49,10 @@ public class CommPostArchiveEntity {
     private JsonNode content;
 
     @Column(name = CREATED_AT, nullable = false)
-    @CreatedDate
     private LocalDateTime createdAt;
+
+    @Column(name = ARCHIVED_AT, nullable = false)
+    private LocalDateTime archivedAt;
 
     @Column(name = "updated_at", nullable = false)
     @LastModifiedDate
@@ -72,7 +73,7 @@ public class CommPostArchiveEntity {
         return new HashCodeBuilder(17,37).append(getUlid()).toHashCode();
     }
 
-    private CommPostArchiveEntity(String ulid, Integer primaryCategoryId, Integer secondaryCategoryId, UUID authMemberUuid, String title, JsonNode content, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime publishedAt) {
+    private CommPostArchiveEntity(String ulid, Integer primaryCategoryId, Integer secondaryCategoryId, UUID authMemberUuid, String title, JsonNode content, LocalDateTime createdAt, LocalDateTime archivedAt, LocalDateTime updatedAt, LocalDateTime publishedAt) {
         this.ulid = ulid;
         this.primaryCategoryId = primaryCategoryId;
         this.secondaryCategoryId = secondaryCategoryId;
@@ -80,6 +81,7 @@ public class CommPostArchiveEntity {
         this.title = title;
         this.content = content;
         this.createdAt = createdAt;
+        this.archivedAt = archivedAt;
         this.updatedAt = updatedAt;
         this.publishedAt = publishedAt;
     }
@@ -96,6 +98,7 @@ public class CommPostArchiveEntity {
         private String title;
         private JsonNode content;
         private LocalDateTime createdAt;
+        private LocalDateTime archivedAt;
         private LocalDateTime updatedAt;
         private LocalDateTime publishedAt;
 
@@ -134,6 +137,11 @@ public class CommPostArchiveEntity {
             return this;
         }
 
+        public CommPostArchiveEntityBuilder archivedAt(LocalDateTime archivedAt) {
+            this.archivedAt = archivedAt;
+            return this;
+        }
+
         public CommPostArchiveEntityBuilder updatedAt(LocalDateTime updatedAt) {
             this.updatedAt = updatedAt;
             return this;
@@ -152,13 +160,14 @@ public class CommPostArchiveEntity {
             this.title = postEntity.title;
             this.content = postEntity.content;
             this.createdAt = postEntity.createdAt;
+            this.archivedAt = postEntity.archivedAt;
             this.updatedAt = postEntity.updatedAt;
             this.publishedAt = postEntity.publishedAt;
             return this;
         }
 
         public CommPostArchiveEntity build() {
-            return new CommPostArchiveEntity(this.ulid, this.primaryCategoryId, this.secondaryCategoryId, this.authMemberUuid, this.title, this.content, this.createdAt, this.updatedAt, this.publishedAt);
+            return new CommPostArchiveEntity(this.ulid, this.primaryCategoryId, this.secondaryCategoryId, this.authMemberUuid, this.title, this.content, this.createdAt, this.archivedAt, this.updatedAt, this.publishedAt);
         }
 
     }

@@ -6,7 +6,7 @@ import kr.modusplant.framework.jpa.entity.CommPostArchiveEntity;
 import java.time.LocalDateTime;
 
 public interface PostArchiveEntityTestUtils extends PostTestUtils {
-    default CommPostArchiveEntity createPostArchieveEntity() {
+    default CommPostArchiveEntity createPostArchiveEntity() {
         LocalDateTime time = LocalDateTime.now();
         return CommPostArchiveEntity.builder()
                 .ulid(testPostId.getValue())
@@ -16,6 +16,7 @@ public interface PostArchiveEntityTestUtils extends PostTestUtils {
                 .title(testPostContent.getTitle())
                 .content(testPostContent.getContent())
                 .createdAt(time)
+                .archivedAt(time)
                 .updatedAt(time)
                 .publishedAt(time)
                 .build();
