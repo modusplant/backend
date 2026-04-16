@@ -7,10 +7,7 @@ import kr.modusplant.jooq.tables.SiteMemberAuth;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
-import kr.modusplant.shared.kernel.Password;
 import org.jooq.DSLContext;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -20,28 +17,9 @@ public class NormalIdentityJooqRepository implements
     private final SiteMemberAuth memberAuth = SiteMemberAuth.SITE_MEMBER_AUTH;
     private final SiteMember member = SiteMember.SITE_MEMBER;
     private final DSLContext dsl;
-    private final PasswordEncoder passwordEncoder;
 
-    public NormalIdentityJooqRepository(DSLContext dsl,
-                                        @Qualifier("bcryptPasswordEncoder") PasswordEncoder passwordEncoder) {
+    public NormalIdentityJooqRepository(DSLContext dsl) {
         this.dsl = dsl;
-        this.passwordEncoder = passwordEncoder;
-    }
-
-    public void updateEmail(AccountId accountId, Email newEmail) {
-        dsl.update(memberAuth)
-            .set(memberAuth.EMAIL, newEmail.getValue())
-            .where(memberAuth.UUID.eq(accountId.getValue()))
-            .and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
-            .execute();
-    }
-
-    public void updatePassword(AccountId accountId, Password pw) {
-        dsl.update(memberAuth)
-            .set(memberAuth.PW, passwordEncoder.encode(pw.getValue()))
-            .where(memberAuth.UUID.eq(accountId.getValue()))
-            .and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
-            .execute();
     }
 
     @Override
