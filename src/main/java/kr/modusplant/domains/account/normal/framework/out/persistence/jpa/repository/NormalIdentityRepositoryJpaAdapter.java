@@ -25,9 +25,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-
 @Repository
 //@RequiredArgsConstructor
 public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityCreateRepository, NormalIdentityUpdateRepository {
@@ -99,11 +96,8 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityCreateR
 
     @Override
     public void updateToGoogleAccount(Email email, Password pw) {
-        List<SiteMemberAuthEntity> savedAuthList = Optional.ofNullable(authJpaRepository.findByEmail(email.getValue()))
-                .filter(list -> !list.isEmpty())
+        SiteMemberAuthEntity savedAuth = authJpaRepository.findByEmail(email.getValue())
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH,TableName.SITE_MEMBER_AUTH));
-
-        SiteMemberAuthEntity savedAuth = savedAuthList.getFirst();
 
         savedAuth.updatePassword(passwordEncoder.encode(pw.getValue()));
         savedAuth.updateAuthProvider(AuthProvider.BASIC_GOOGLE);
@@ -112,11 +106,8 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityCreateR
 
     @Override
     public void updateToKakaoAccount(Email email, Password pw) {
-        List<SiteMemberAuthEntity> savedAuthList = Optional.ofNullable(authJpaRepository.findByEmail(email.getValue()))
-                .filter(list -> !list.isEmpty())
+        SiteMemberAuthEntity savedAuth = authJpaRepository.findByEmail(email.getValue())
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH,TableName.SITE_MEMBER_AUTH));
-
-        SiteMemberAuthEntity savedAuth = savedAuthList.getFirst();
 
         savedAuth.updatePassword(passwordEncoder.encode(pw.getValue()));
         savedAuth.updateAuthProvider(AuthProvider.BASIC_KAKAO);
