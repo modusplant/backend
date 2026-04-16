@@ -1,5 +1,6 @@
 package kr.modusplant.domains.account.normal.adapter.controller;
 
+import jakarta.transaction.Transactional;
 import kr.modusplant.domains.account.normal.domain.exception.DataAlreadyExistsException;
 import kr.modusplant.domains.account.normal.domain.exception.enums.NormalIdentityErrorCode;
 import kr.modusplant.domains.account.normal.usecase.port.mapper.NormalIdentityMapper;
@@ -48,6 +49,7 @@ public class NormalIdentityController {
         this.encoder = encoder;
     }
 
+    @Transactional
     public void registerNormalMember(NormalSignUpRequest request) {
 
         if(readRepository.existsByNickname(Nickname.create(request.nickname()))) {
@@ -71,6 +73,7 @@ public class NormalIdentityController {
         }
     }
 
+    @Transactional
     public void modifyEmail(UUID memberUuid, EmailModificationRequest request) {
         if(!readRepository.existsByEmail(Email.create(request.currentEmail()))) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER_AUTH);
@@ -79,6 +82,7 @@ public class NormalIdentityController {
         }
     }
 
+    @Transactional
     public void modifyPassword(UUID memberUuid, PasswordModificationRequest request) {
         if(!readRepository.existsByMemberId(AccountId.create(memberUuid))) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER_AUTH);
