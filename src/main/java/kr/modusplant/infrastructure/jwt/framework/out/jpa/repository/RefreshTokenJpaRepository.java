@@ -18,5 +18,7 @@ public interface RefreshTokenJpaRepository extends UuidPrimaryKeyRepository<Refr
 
     Boolean existsByRefreshToken(String refreshToken);
 
+    void deleteByMember(SiteMemberEntity member);
+
     void deleteByExpiredAtBefore(LocalDateTime expiredAt);
 }
