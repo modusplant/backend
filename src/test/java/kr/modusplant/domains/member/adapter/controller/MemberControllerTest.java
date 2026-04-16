@@ -23,6 +23,7 @@ import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.framework.jpa.entity.*;
 import kr.modusplant.framework.jpa.entity.common.util.*;
 import kr.modusplant.framework.jpa.exception.ExistsEntityException;
@@ -51,9 +52,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -75,6 +78,7 @@ import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseR
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
+import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.objectMapper;
 import static kr.modusplant.shared.event.common.util.CommentLikeEventTestUtils.testCommentLikeEvent;
 import static kr.modusplant.shared.event.common.util.PostBookmarkEventTestUtils.testPostBookmarkEvent;
 import static kr.modusplant.shared.event.common.util.PostCancelPostBookmarkEventTestUtils.testPostBookmarkCancelEvent;
@@ -96,10 +100,10 @@ class MemberControllerTest implements
         MemberTestUtils, MemberProfileTestUtils,
         SiteMemberProfileEntityTestUtils, CommPostEntityTestUtils, CommCommentEntityTestUtils,
         PropBugRepEntityTestUtils, CommPostAbuRepEntityTestUtils, CommCommentAbuRepEntityTestUtils {
-    MockDataProvider mockDataProvider = ctx -> new MockResult[0]; // 반환값을 따로 설정하지 않음
-
-    MockConnection mockConnection = new MockConnection(mockDataProvider);
-    DSLContext dslContext = DSL.using(mockConnection, SQLDialect.POSTGRES);
+    private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
+    private final MockDataProvider mockDataProvider = ctx -> new MockResult[0]; // 반환값을 따로 설정하지 않음
+    private final MockConnection mockConnection = new MockConnection(mockDataProvider);
+    private final DSLContext dslContext = DSL.using(mockConnection, SQLDialect.POSTGRES);
     private final StringRedisTemplate stringRedisTemplate = Mockito.mock(StringRedisTemplate.class);
 
     private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
@@ -133,7 +137,7 @@ class MemberControllerTest implements
     @SuppressWarnings("unused")
     private final ReportEventConsumer reportEventConsumer = new ReportEventConsumer(eventBus, memberJpaRepository, postJpaRepository, commentJpaRepository, propBugRepJpaRepository, postAbuRepJpaRepository, commentAbuRepJpaRepository);
     @SuppressWarnings("unused")
-    private final MemberEventConsumer memberEventConsumer = new MemberEventConsumer(eventBus, stringRedisTemplate, dslContext);
+    private final MemberEventConsumer memberEventConsumer = new MemberEventConsumer(eventBus, stringRedisTemplate, dslContext, s3FileService);
     private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, s3FileService, swearService, memberProfileMapper, memberImageIOHelper, memberValidationHelper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
 
     private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
@@ -212,7 +216,7 @@ class MemberControllerTest implements
         given(memberProfileRepository.getById(any())).willReturn(Optional.of(memberProfile));
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
-        willDoNothing().given(s3FileService).deleteFiles(any());
+        willDoNothing().given(s3FileService).deleteFiles(any(String.class));
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
         given(s3FileService.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
@@ -241,7 +245,7 @@ class MemberControllerTest implements
                         testNormalUserNickname))
         );
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
-        willDoNothing().given(s3FileService).deleteFiles(any());
+        willDoNothing().given(s3FileService).deleteFiles(any(String.class));
         given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
         given(s3FileService.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
@@ -265,7 +269,7 @@ class MemberControllerTest implements
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(memberProfileRepository.getById(any())).willReturn(Optional.of(memberProfile));
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
-        willDoNothing().given(s3FileService).deleteFiles(any());
+        willDoNothing().given(s3FileService).deleteFiles(any(String.class));
 
         // when
         MemberProfileResponse memberProfileResponse = memberController.overrideProfile(
@@ -991,6 +995,7 @@ class MemberControllerTest implements
         assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     @DisplayName("withdraw로 회원 탈퇴")
     void testWithdraw_givenMemberId_willWithdrawMember() {
@@ -998,7 +1003,10 @@ class MemberControllerTest implements
         given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
         given(memberJpaRepository.existsByUuid(MEMBER_BASIC_USER_UUID)).willReturn(true);
         willDoNothing().given(tokenService).blacklistAccessToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN);
-        given(stringRedisTemplate.delete(any(String.class))).willReturn(true);
+        given(stringRedisTemplate.unlink(any(String.class))).willReturn(true);
+        given(stringRedisTemplate.execute(any(RedisCallback.class))).willReturn(true);
+        given(stringRedisTemplate.executePipelined(any(RedisCallback.class))).willReturn(null);
+        willDoNothing().given(s3FileService).deleteFiles(any(List.class));
 
         // when
         memberController.withdraw(testMemberWithdrawalRecord);
