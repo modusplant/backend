@@ -23,15 +23,9 @@ import kr.modusplant.shared.persistence.constant.TableName;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-//@RequiredArgsConstructor
 public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityCreateRepository, NormalIdentityUpdateRepository {
-//    private final NormalIdentityJpaRepository identityRepository;
-//    private final NormalIdentityAuthJpaRepository authRepository;
-//    private final NormalIdentityTermJpaRepository termRepository;
-//    private final NormalIdentityProfileJpaRepository profileRepository;
 
     private final SiteMemberJpaRepository memberJpaRepository;
     private final SiteMemberAuthJpaRepository authJpaRepository;
