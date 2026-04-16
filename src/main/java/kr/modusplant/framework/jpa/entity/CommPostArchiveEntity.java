@@ -1,7 +1,5 @@
 package kr.modusplant.framework.jpa.entity;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -12,7 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -44,14 +41,15 @@ public class CommPostArchiveEntity {
     @Column(nullable = false, length = 60)
     private String title;
 
-    @Type(JsonBinaryType.class)
-    @Column(nullable = false, columnDefinition = "jsonb")
-    @ToString.Exclude
-    private JsonNode content;
+    @Column(name = CONTENT_TEXT, nullable = false)
+    private String contentText;
 
     @Column(name = CREATED_AT, nullable = false)
-    @CreatedDate
     private LocalDateTime createdAt;
+
+    @Column(name = ARCHIVED_AT, nullable = false)
+    @CreatedDate
+    private LocalDateTime archivedAt;
 
     @Column(name = "updated_at", nullable = false)
     @LastModifiedDate
@@ -72,14 +70,15 @@ public class CommPostArchiveEntity {
         return new HashCodeBuilder(17,37).append(getUlid()).toHashCode();
     }
 
-    private CommPostArchiveEntity(String ulid, Integer primaryCategoryId, Integer secondaryCategoryId, UUID authMemberUuid, String title, JsonNode content, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime publishedAt) {
+    private CommPostArchiveEntity(String ulid, Integer primaryCategoryId, Integer secondaryCategoryId, UUID authMemberUuid, String title, String contentText, LocalDateTime createdAt, LocalDateTime archivedAt, LocalDateTime updatedAt, LocalDateTime publishedAt) {
         this.ulid = ulid;
         this.primaryCategoryId = primaryCategoryId;
         this.secondaryCategoryId = secondaryCategoryId;
         this.authMemberUuid = authMemberUuid;
         this.title = title;
-        this.content = content;
+        this.contentText = contentText;
         this.createdAt = createdAt;
+        this.archivedAt = archivedAt;
         this.updatedAt = updatedAt;
         this.publishedAt = publishedAt;
     }
@@ -94,8 +93,9 @@ public class CommPostArchiveEntity {
         private Integer secondaryCategoryId;
         private UUID authMemberUuid;
         private String title;
-        private JsonNode content;
+        private String contentText;
         private LocalDateTime createdAt;
+        private LocalDateTime archivedAt;
         private LocalDateTime updatedAt;
         private LocalDateTime publishedAt;
 
@@ -124,13 +124,18 @@ public class CommPostArchiveEntity {
             return this;
         }
 
-        public CommPostArchiveEntityBuilder content(JsonNode content) {
-            this.content = content;
+        public CommPostArchiveEntityBuilder contentText(String contentText) {
+            this.contentText = contentText;
             return this;
         }
 
         public CommPostArchiveEntityBuilder createdAt(LocalDateTime createdAt) {
             this.createdAt = createdAt;
+            return this;
+        }
+
+        public CommPostArchiveEntityBuilder archivedAt(LocalDateTime archivedAt) {
+            this.archivedAt = archivedAt;
             return this;
         }
 
@@ -150,15 +155,16 @@ public class CommPostArchiveEntity {
             this.secondaryCategoryId = postEntity.secondaryCategoryId;
             this.authMemberUuid = postEntity.authMemberUuid;
             this.title = postEntity.title;
-            this.content = postEntity.content;
+            this.contentText = postEntity.contentText;
             this.createdAt = postEntity.createdAt;
+            this.archivedAt = postEntity.archivedAt;
             this.updatedAt = postEntity.updatedAt;
             this.publishedAt = postEntity.publishedAt;
             return this;
         }
 
         public CommPostArchiveEntity build() {
-            return new CommPostArchiveEntity(this.ulid, this.primaryCategoryId, this.secondaryCategoryId, this.authMemberUuid, this.title, this.content, this.createdAt, this.updatedAt, this.publishedAt);
+            return new CommPostArchiveEntity(this.ulid, this.primaryCategoryId, this.secondaryCategoryId, this.authMemberUuid, this.title, this.contentText, this.createdAt, this.archivedAt, this.updatedAt, this.publishedAt);
         }
 
     }
