@@ -351,7 +351,7 @@ public class MemberRestController {
             @Parameter(hidden = true)
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
             @AuthenticationPrincipal(expression = "uuid")
-            UUID memberId) {
+            UUID ignoredMemberId) {
         return ResponseEntity.badRequest().body(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_POST_ID));
     }
 
@@ -393,12 +393,12 @@ public class MemberRestController {
             )
             @PathVariable(required = false)
             @NotBlank(message = "댓글 경로가 비어 있습니다.")
-            String path,
+            String ignoredPath,
 
             @Parameter(hidden = true)
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
             @AuthenticationPrincipal(expression = "uuid")
-            UUID memberId) {
+            UUID ignoredMemberId) {
         return ResponseEntity.badRequest().body(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_COMMENT_ID));
     }
 
