@@ -1,6 +1,5 @@
 package kr.modusplant.domains.account.social.framework.in.web.rest;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -62,25 +61,6 @@ public class SocialIdentityLinkRestController {
     ) {
         String socialAccessToken = socialIdentityController.issueSocialAccessToken(provider,request.code());
         socialIdentityLinkController.unlinkSocialAccount(userDetails.getUuid(), provider, socialAccessToken);
-        return ResponseEntity.ok().body(DataResponse.ok());
-    }
-
-    // TODO: 회원 탈퇴 완료 후 적용 필요
-    @Hidden
-    @Operation(summary = "소셜 계정 탈퇴 API", description = "카카오/구글 인가코드를 받아 소셜 인증 및 탈퇴를 수행합니다")
-    @PostMapping("/{provider}/withdraw")
-    public ResponseEntity<DataResponse<Void>> withdrawSocialAccount(
-            @AuthenticationPrincipal DefaultUserDetails userDetails,
-
-            @RequestBody @Valid SocialAuthRequest request,
-
-            @Parameter(schema = @Schema(description = "소셜 플랫폼 제공자", example = "kakao"))
-            @PathVariable
-            @NotNull
-            SocialProvider provider
-    ) {
-        String socialAccessToken = socialIdentityController.issueSocialAccessToken(provider,request.code());
-        socialIdentityLinkController.deleteSocialAccount(userDetails.getUuid(), provider, socialAccessToken);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 }
