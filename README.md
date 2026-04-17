@@ -77,11 +77,11 @@
   │ 📜 ModusplantApplication.java
   ├─📂 domains          # 📋 핵심 비즈니스 로직 및 도메인 모델
   │  ├─📂 account       # 계정 (Email, Identity, Social, Normal)
-  │  ├─📂 post          # 게시글
-  │  └─ 📂 ...          # 회원, 댓글, 약관
-  ├─📂 framework        # ✈️ 외부 기술 스택 연동 (Spring Data JPA, jOOQ, Redis 등)
-  ├─📂 infrastructure   # 🔨 애플리케이션 공통 인프라 (Security, AOP, Config 등)
-  └─📂 shared           # 🧺 전역 공통 모듈 및 유틸리티 (Kernel, Exception 등)
+  │  ├─📂 comment       # 댓글
+  │  └─ 📂 ...          # 회원, 알림, 게시글, 약관
+  ├─📂 framework        # ✈️ 외부 SW 연동 (jOOQ, Spring Data JPA, Spring Data Redis 등)
+  ├─📂 infrastructure   # 🔨 공통의 관심사 및 인프라 (AOP, Config, Event, Security 등)
+  └─📂 shared           # 🧺 전역 객체 Set (Constant, Exception, Kernel 등)
 ```
 
 <details>
@@ -95,10 +95,10 @@
 
 ```
 📂 [domain_name]
- ├─📂 adapter    # Interface Adapter: 외부 시스템 연결, 데이터 매핑 및 오케스트레이션
- ├─📂 domain     # Business Logic: 핵심 비즈니스 로직 (Aggregate, Entity, VO)
- ├─📂 framework  # Frameworks: 기술 구현체 (REST Controller, Persistence Framework)
- └─📂 usecase    # Specification: 앱 사양 정의 (Port, DTO, Read / Write Model)
+ ├─📂 adapter   # Interface Adapter: 오케스트레이션 (Controller)
+ ├─📂 domain    # Business Logic: 핵심 비즈니스 로직 (Aggregate, Entity, VO)
+ ├─📂 framework # Framework: 기술 구현체 (REST Controller, Repository)
+ └─📂 usecase   # Specification: 애플리케이션 사양 (Port, Request / Response, Read / Write Model)
 ```
 
 </details>
