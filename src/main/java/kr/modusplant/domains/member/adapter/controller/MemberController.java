@@ -2,6 +2,7 @@ package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.adapter.helper.MemberImageIOHelper;
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
+import kr.modusplant.domains.member.adapter.translator.MemberSocialTranslator;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
@@ -26,7 +27,9 @@ import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.*;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
+import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -50,9 +53,10 @@ public class MemberController {
     private final TokenService tokenService;
     private final S3FileService s3FileService;
     private final SwearService swearService;
-    private final MemberProfileMapper memberProfileMapper;
     private final MemberImageIOHelper memberImageIOHelper;
     private final MemberValidationHelper memberValidationHelper;
+    private final MemberProfileMapper memberProfileMapper;
+    private final MemberSocialTranslator memberSocialTranslator;
     private final MemberRepository memberRepository;
     private final MemberProfileRepository memberProfileRepository;
     private final TargetPostIdRepository targetPostIdRepository;
@@ -241,8 +245,18 @@ public class MemberController {
 
     public void withdraw(MemberWithdrawalRecord record) {
         String accessToken = record.accessToken();
+        String authCode = record.authCode();
+        String authProvider = record.authProvider();
         MemberId memberId = MemberId.fromUuid(jwtTokenProvider.getMemberUuidFromToken(accessToken));
         memberValidationHelper.validateIfMemberExists(memberId);
+        if (authCode != null && authProvider != null) {
+            memberSocialTranslator.deleteSocialAccountWithSocialAccessToken(
+                    memberSocialTranslator.getSocialAccessToken(authCode, authProvider),
+                    authProvider,
+                    memberId.getValue());
+        } else if (authCode != null || authProvider != null) {
+            throw new InvalidValueException(GeneralErrorCode.INVALID_INPUT, "authCode", "authProvider");
+        }
         tokenService.blacklistAccessToken(accessToken);
         eventBus.publish(MemberWithdrawalEvent.create(memberId.getValue()));
     }

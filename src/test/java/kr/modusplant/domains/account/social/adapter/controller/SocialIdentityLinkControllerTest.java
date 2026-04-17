@@ -16,6 +16,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -30,7 +31,6 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils {
             clientFactory, socialIdentityRepository, socialIdentityMapper
     );
 
-    private static final String SOCIAL_ACCESS_TOKEN = "social_access_token";
     private SocialAuthClient socialAuthClient;
     private SocialUserInfo kakaoUserInfo;
 
@@ -50,12 +50,12 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils {
         @DisplayName("일반 회원이 카카오 소셜 계정을 연동한다")
         void testLinkSocialAccount_givenBasicMemberAndKakao_willLinkSuccessfully() {
             // given
-            given(socialAuthClient.getUserInfo(SOCIAL_ACCESS_TOKEN)).willReturn(kakaoUserInfo);
+            given(socialAuthClient.getUserInfo(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN)).willReturn(kakaoUserInfo);
             given(socialIdentityRepository.getSocialMemberProfileByAccountId(testNormalMemberId)).willReturn(testBasicSocialMemberProfile);
             given(socialIdentityMapper.toLinkedAuthProvider(SocialProvider.KAKAO)).willReturn(AuthProvider.BASIC_KAKAO);
 
             // when
-            socialIdentityLinkController.linkSocialAccount(testNormalMemberId.getValue(), SocialProvider.KAKAO, SOCIAL_ACCESS_TOKEN);
+            socialIdentityLinkController.linkSocialAccount(testNormalMemberId.getValue(), SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
 
             // then
             verify(socialIdentityRepository).updateSocialLinkedMember(testBasicKakaoSocialCredentials, testNormalUserEmail);
@@ -67,12 +67,12 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils {
             // given
             SocialUserInfo mismatchUserInfo = mock(SocialUserInfo.class);
             given(mismatchUserInfo.getEmail()).willReturn("different@email.com");
-            given(socialAuthClient.getUserInfo(SOCIAL_ACCESS_TOKEN)).willReturn(mismatchUserInfo);
+            given(socialAuthClient.getUserInfo(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN)).willReturn(mismatchUserInfo);
             given(socialIdentityRepository.getSocialMemberProfileByAccountId(testNormalMemberId)).willReturn(testBasicSocialMemberProfile);
 
             // when & then
             assertThatThrownBy(() -> socialIdentityLinkController.linkSocialAccount(
-                    testNormalMemberId.getValue(), SocialProvider.KAKAO, SOCIAL_ACCESS_TOKEN)
+                    testNormalMemberId.getValue(), SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN)
             ).isInstanceOf(SocialAccountConflictException.class);
         }
 
@@ -80,12 +80,12 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils {
         @DisplayName("이미 연동된 계정으로 연동 시도 시 예외가 발생한다")
         void testLinkSocialAccount_givenAlreadyLinkedMember_willThrowException() {
             // given
-            given(socialAuthClient.getUserInfo(SOCIAL_ACCESS_TOKEN)).willReturn(kakaoUserInfo);
+            given(socialAuthClient.getUserInfo(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN)).willReturn(kakaoUserInfo);
             given(socialIdentityRepository.getSocialMemberProfileByAccountId(testNormalMemberId)).willReturn(testBasicKakaoSocialMemberProfile);
 
             // when & then
             assertThatThrownBy(() -> socialIdentityLinkController.linkSocialAccount(
-                    testNormalMemberId.getValue(), SocialProvider.KAKAO, SOCIAL_ACCESS_TOKEN
+                    testNormalMemberId.getValue(), SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN
             )).isInstanceOf(SocialAccountConflictException.class);
         }
 
@@ -93,12 +93,12 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils {
         @DisplayName("소셜 전용 카카오 계정으로 연동 시도 시 예외가 발생한다")
         void testLinkSocialAccount_givenPureKakaoSocialMember_willThrowException() {
             // given
-            given(socialAuthClient.getUserInfo(SOCIAL_ACCESS_TOKEN)).willReturn(kakaoUserInfo);
+            given(socialAuthClient.getUserInfo(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN)).willReturn(kakaoUserInfo);
             given(socialIdentityRepository.getSocialMemberProfileByAccountId(testKakaoAccountId)).willReturn(testKakaoSocialMemberProfileWithBasicEmail);
 
             // when & then
             assertThatThrownBy(() -> socialIdentityLinkController.linkSocialAccount(
-                    testKakaoAccountId.getValue(), SocialProvider.KAKAO, SOCIAL_ACCESS_TOKEN
+                    testKakaoAccountId.getValue(), SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN
             )).isInstanceOf(AlreadyRegisteredWithOtherProviderException.class);
         }
 
@@ -114,10 +114,10 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils {
             given(socialIdentityRepository.getSocialMemberProfileByAccountId(testNormalMemberId)).willReturn(testBasicKakaoSocialMemberProfile);
 
             // when
-            socialIdentityLinkController.unlinkSocialAccount(testNormalMemberId.getValue(), SocialProvider.KAKAO, SOCIAL_ACCESS_TOKEN);
+            socialIdentityLinkController.unlinkSocialAccount(testNormalMemberId.getValue(), SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
 
             // then
-            verify(socialAuthClient).revokeAccess(SOCIAL_ACCESS_TOKEN);
+            verify(socialAuthClient).revokeAccess(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
             verify(socialIdentityRepository).updateSocialUnlinkedMember(testNormalMemberId);
         }
 
@@ -129,7 +129,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils {
 
             // when & then
             assertThatThrownBy(() -> socialIdentityLinkController.unlinkSocialAccount(
-                    testNormalMemberId.getValue(), SocialProvider.KAKAO, SOCIAL_ACCESS_TOKEN
+                    testNormalMemberId.getValue(), SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN
             )).isInstanceOf(SocialAccountConflictException.class);
         }
 
@@ -141,7 +141,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils {
 
             // when & then
             assertThatThrownBy(() -> socialIdentityLinkController.unlinkSocialAccount(
-                    testKakaoAccountId.getValue(), SocialProvider.KAKAO, SOCIAL_ACCESS_TOKEN
+                    testKakaoAccountId.getValue(), SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN
             )).isInstanceOf(SocialActionRequiredException.class);
         }
 
@@ -153,7 +153,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils {
 
             // when & then
             assertThatThrownBy(() -> socialIdentityLinkController.unlinkSocialAccount(
-                    testNormalMemberId.getValue(), SocialProvider.GOOGLE, SOCIAL_ACCESS_TOKEN
+                    testNormalMemberId.getValue(), SocialProvider.GOOGLE, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN
             )).isInstanceOf(SocialAccountConflictException.class);
         }
 
@@ -170,10 +170,10 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils {
             // todo: deleteSocialMember 부분 추가
 
             // when
-            socialIdentityLinkController.deleteSocialAccount(testKakaoAccountId.getValue(), SocialProvider.KAKAO, SOCIAL_ACCESS_TOKEN);
+            socialIdentityLinkController.deleteSocialAccount(testKakaoAccountId.getValue(), SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
 
             // then
-            verify(socialAuthClient).revokeAccess(SOCIAL_ACCESS_TOKEN);
+            verify(socialAuthClient).revokeAccess(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
         }
 
         @Test
@@ -184,7 +184,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils {
 
             // when & then
             assertThatThrownBy(() -> socialIdentityLinkController.deleteSocialAccount(
-                    testNormalMemberId.getValue(), SocialProvider.KAKAO, SOCIAL_ACCESS_TOKEN
+                    testNormalMemberId.getValue(), SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN
             )).isInstanceOf(SocialAccountConflictException.class);
         }
 
@@ -196,7 +196,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils {
 
             // when & then
             assertThatThrownBy(() -> socialIdentityLinkController.deleteSocialAccount(
-                    testNormalMemberId.getValue(), SocialProvider.KAKAO, SOCIAL_ACCESS_TOKEN
+                    testNormalMemberId.getValue(), SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN
             )).isInstanceOf(SocialActionRequiredException.class);
         }
 
@@ -208,7 +208,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils {
 
             // when & then
             assertThatThrownBy(() -> socialIdentityLinkController.deleteSocialAccount(
-                    testKakaoAccountId.getValue(), SocialProvider.GOOGLE, SOCIAL_ACCESS_TOKEN
+                    testKakaoAccountId.getValue(), SocialProvider.GOOGLE, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN
             )).isInstanceOf(SocialAccountConflictException.class);
         }
 
