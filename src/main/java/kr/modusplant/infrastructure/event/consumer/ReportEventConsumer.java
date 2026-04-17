@@ -29,13 +29,20 @@ public class ReportEventConsumer {
                                CommCommentAbuRepJpaRepository commentAbuRepJpaRepository) {
         eventBus.subscribe(event -> {
             if (event instanceof ProposalOrBugReportEvent proposalOrBugReportEvent) {
-                addProposalOrBugReport(proposalOrBugReportEvent.getMemberId(), proposalOrBugReportEvent.getTitle(), proposalOrBugReportEvent.getContent(), proposalOrBugReportEvent.getImagePath());
+                addProposalOrBugReport(
+                        proposalOrBugReportEvent.getMemberId(),
+                        proposalOrBugReportEvent.getTitle(),
+                        proposalOrBugReportEvent.getContent(),
+                        proposalOrBugReportEvent.getImagePath());
             }
             else if (event instanceof PostAbuseReportEvent postAbuseReportEvent) {
                 addPostAbuseReport(postAbuseReportEvent.getMemberId(), postAbuseReportEvent.getPostUlid());
             }
             else if (event instanceof CommentAbuseReportEvent commentAbuseReportEvent) {
-                addCommentAbuseReport(commentAbuseReportEvent.getMemberId(), commentAbuseReportEvent.getPostUlid(), commentAbuseReportEvent.getPath());
+                addCommentAbuseReport(
+                        commentAbuseReportEvent.getMemberId(),
+                        commentAbuseReportEvent.getPostUlid(),
+                        commentAbuseReportEvent.getPath());
             }
         });
         this.memberJpaRepository = memberJpaRepository;
