@@ -141,11 +141,18 @@ public class PostQueryJooqRepository implements PostQueryRepository {
             matchCondition = matchCondition.or(matchedCommentsPostUlid.isNotNull());
         }
 
-        SelectJoinStep<?> searchHitsFromStep = select(
-                COMM_POST.ULID, COMM_POST.PRI_CATE_ID, COMM_POST.SECO_CATE_ID,
-                COMM_POST.AUTH_MEMB_UUID, COMM_POST.TITLE, COMM_POST.CONTENT.convert(jsonConverter).as("content"),
-                COMM_POST.THUMBNAIL_PATH, COMM_POST.LIKE_COUNT, COMM_POST.PUBLISHED_AT
-        ).from(COMM_POST);
+        SelectJoinStep<?> searchHitsFromStep =
+                select(
+                        COMM_POST.ULID,
+                        COMM_POST.PRI_CATE_ID,
+                        COMM_POST.SECO_CATE_ID,
+                        COMM_POST.AUTH_MEMB_UUID,
+                        COMM_POST.TITLE,
+                        COMM_POST.CONTENT.convert(jsonConverter).as("content"),
+                        COMM_POST.THUMBNAIL_PATH,
+                        COMM_POST.LIKE_COUNT,
+                        COMM_POST.PUBLISHED_AT
+                ).from(COMM_POST);
 
         if (isComment) {
             searchHitsFromStep = searchHitsFromStep.leftJoin(matchedCommentsCte).on(COMM_POST.ULID.eq(matchedCommentsPostUlid));
@@ -178,16 +185,8 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         // 5. 최종 쿼리 매핑 및 실행
         Table<?> eHits = evaluatedHitsCte.as("e_hits");
         Field<String> eHitsUlid = eHits.field("ulid", String.class);
-        Field<Integer> eHitsPriCateId = eHits.field("pri_cate_id", Integer.class);
-        Field<Integer> eHitsSecoCateId = eHits.field("seco_cate_id", Integer.class);
-        Field<UUID> eHitsAuthMembUuid = eHits.field("auth_memb_uuid", UUID.class);
-        Field<String> eHitsTitle = eHits.field("title", String.class);
         Field<JsonNode> eHitsContent = Objects.requireNonNull(eHits.field("content", JSONB.class)).convert(jsonConverter);
-        Field<String> eHitsThumbnailPath = eHits.field("thumbnail_path", String.class);
-        Field<Integer> eHitsLikeCount = eHits.field("like_count", Integer.class);
         Field<LocalDateTime> eHitsPublishedAt = eHits.field("published_at", LocalDateTime.class);
-        Field<Integer> eHitsImportance = val( null, Integer.class);
-        Field<Double> eHitsMaxWordSimilarity = val( null, Double.class);
 
         Table<?> commentCountTable = select(COMM_COMMENT.POST_ULID, count().as("comment_count"))
                 .from(COMM_COMMENT)
@@ -202,10 +201,10 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         COMM_PRI_CATE.CATEGORY.as("primaryCategory"),
                         COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
                         SITE_MEMBER.NICKNAME,
-                        eHitsTitle.as("title"),
+                        eHits.field("title", String.class).as("title"),
                         eHitsContent.as("content"),
-                        eHitsThumbnailPath.as("thumbnailPath"),
-                        eHitsLikeCount.as("likeCount"),
+                        eHits.field("thumbnail_path", String.class).as("thumbnailPath"),
+                        eHits.field("like_count", Integer.class).as("likeCount"),
                         eHitsPublishedAt.as("publishedAt"),
                         coalesce(commentCountTable.field("comment_count", Integer.class), 0).as("commentCount"),
                         exists(
@@ -218,13 +217,13 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                                         .where(COMM_POST_BOOKMARK.POST_ULID.eq(eHitsUlid))
                                         .and(COMM_POST_BOOKMARK.MEMB_UUID.eq(currentMemberUuid))
                         ).as("isBookmarked"),
-                        eHitsImportance.as("importance"),
-                        eHitsMaxWordSimilarity.as("maxWordSimilarity")
+                        val( null, Integer.class).as("importance"),
+                        val( null, Double.class).as("maxWordSimilarity")
                 )
                 .from(eHits)
-                .join(COMM_PRI_CATE).on(eHitsPriCateId.eq(COMM_PRI_CATE.ID))
-                .join(COMM_SECO_CATE).on(eHitsSecoCateId.eq(COMM_SECO_CATE.ID))
-                .leftJoin(SITE_MEMBER).on(eHitsAuthMembUuid.eq(SITE_MEMBER.UUID))
+                .join(COMM_PRI_CATE).on(eHits.field("pri_cate_id", Integer.class).eq(COMM_PRI_CATE.ID))
+                .join(COMM_SECO_CATE).on(eHits.field("seco_cate_id", Integer.class).eq(COMM_SECO_CATE.ID))
+                .leftJoin(SITE_MEMBER).on(eHits.field("auth_memb_uuid", UUID.class).eq(SITE_MEMBER.UUID))
                 .leftJoin(commentCountTable).on(eHitsUlid.eq(commentCountTable.field(COMM_COMMENT.POST_ULID)))
                 .orderBy(
                         eHitsPublishedAt.desc(),
@@ -371,12 +370,20 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         }
 
         // 4. search_hits CTE 조립 (동적 조인)
-        SelectJoinStep<?> searchHitsFromStep = select(
-                COMM_POST.ULID, COMM_POST.PRI_CATE_ID, COMM_POST.SECO_CATE_ID,
-                COMM_POST.AUTH_MEMB_UUID, COMM_POST.TITLE, COMM_POST.CONTENT.convert(jsonConverter).as("content"),
-                COMM_POST.THUMBNAIL_PATH, COMM_POST.LIKE_COUNT, COMM_POST.PUBLISHED_AT,
-                impoField, maxWordSimilarityField
-        ).from(COMM_POST);
+        SelectJoinStep<?> searchHitsFromStep =
+                select(
+                        COMM_POST.ULID,
+                        COMM_POST.PRI_CATE_ID,
+                        COMM_POST.SECO_CATE_ID,
+                        COMM_POST.AUTH_MEMB_UUID,
+                        COMM_POST.TITLE,
+                        COMM_POST.CONTENT.convert(jsonConverter).as("content"),
+                        COMM_POST.THUMBNAIL_PATH,
+                        COMM_POST.LIKE_COUNT,
+                        COMM_POST.PUBLISHED_AT,
+                        impoField,
+                        maxWordSimilarityField
+                ).from(COMM_POST);
 
         // 댓글 조회 옵션이 켜져 있을 때만 LEFT JOIN 수행
         if (isComment) {
@@ -421,13 +428,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
         // 6. 최종 쿼리 매핑 및 실행
         Table<?> eHits = evaluatedHitsCte.as("e_hits");
         Field<String> eHitsUlid = eHits.field("ulid", String.class);
-        Field<Integer> eHitsPrimaryCategoryId = eHits.field("pri_cate_id", Integer.class);
-        Field<Integer> eHitsSecondaryCategoryId = eHits.field("seco_cate_id", Integer.class);
-        Field<UUID> eHitsAuthMemberUuid = eHits.field("auth_memb_uuid", UUID.class);
-        Field<String> eHitsTitle = eHits.field("title", String.class);
         Field<JsonNode> eHitsContent = Objects.requireNonNull(eHits.field("content", JSONB.class)).convert(jsonConverter);
-        Field<String> eHitsThumbnailPath = eHits.field("thumbnail_path", String.class);
-        Field<Integer> eHitsLikeCount = eHits.field("like_count", Integer.class);
         Field<LocalDateTime> eHitsPublishedAt = eHits.field("published_at", LocalDateTime.class);
         Field<Integer> eHitsImportance = eHits.field("impo", Integer.class);
         Field<Double> eHitsMaxWordSimilarity = eHits.field("max_wsim", Double.class);
@@ -445,10 +446,10 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         COMM_PRI_CATE.CATEGORY.as("primaryCategory"),
                         COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
                         SITE_MEMBER.NICKNAME,
-                        eHitsTitle.as("title"),
+                        eHits.field("title", String.class).as("title"),
                         eHitsContent.as("content"),
-                        eHitsThumbnailPath.as("thumbnailPath"),
-                        eHitsLikeCount.as("likeCount"),
+                        eHits.field("thumbnail_path", String.class).as("thumbnailPath"),
+                        eHits.field("like_count", Integer.class).as("likeCount"),
                         eHitsPublishedAt.as("publishedAt"),
                         coalesce(commentCountTable.field("comment_count", Integer.class), 0).as("commentCount"),
                         exists(
@@ -465,9 +466,9 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         eHitsMaxWordSimilarity.as("maxWordSimilarity")
                 )
                 .from(eHits)
-                .join(COMM_PRI_CATE).on(eHitsPrimaryCategoryId.eq(COMM_PRI_CATE.ID))
-                .join(COMM_SECO_CATE).on(eHitsSecondaryCategoryId.eq(COMM_SECO_CATE.ID))
-                .leftJoin(SITE_MEMBER).on(eHitsAuthMemberUuid.eq(SITE_MEMBER.UUID))
+                .join(COMM_PRI_CATE).on(eHits.field("pri_cate_id", Integer.class).eq(COMM_PRI_CATE.ID))
+                .join(COMM_SECO_CATE).on(eHits.field("seco_cate_id", Integer.class).eq(COMM_SECO_CATE.ID))
+                .leftJoin(SITE_MEMBER).on(eHits.field("auth_memb_uuid", UUID.class).eq(SITE_MEMBER.UUID))
                 .leftJoin(commentCountTable).on(eHitsUlid.eq(commentCountTable.field(COMM_COMMENT.POST_ULID)))
                 .orderBy(
                         eHitsImportance.desc(),
