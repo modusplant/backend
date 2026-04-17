@@ -1,6 +1,8 @@
 package kr.modusplant.domains.account.normal.adapter.controller;
 
+import jakarta.transaction.Transactional;
 import kr.modusplant.domains.account.normal.domain.exception.DataAlreadyExistsException;
+import kr.modusplant.domains.account.normal.domain.exception.enums.NormalIdentityErrorCode;
 import kr.modusplant.domains.account.normal.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdentityCreateRepository;
 import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdentityReadRepository;
@@ -9,8 +11,10 @@ import kr.modusplant.domains.account.normal.usecase.request.EmailModificationReq
 import kr.modusplant.domains.account.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.domains.account.normal.usecase.request.PasswordModificationRequest;
 import kr.modusplant.domains.account.shared.kernel.AccountId;
+import kr.modusplant.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
+import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
@@ -22,8 +26,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
-
-import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.EXISTS_MEMBER;
 
 @Service
 public class NormalIdentityController {
@@ -47,29 +49,31 @@ public class NormalIdentityController {
         this.encoder = encoder;
     }
 
+    @Transactional
     public void registerNormalMember(NormalSignUpRequest request) {
 
-        // 1. 일반 회원이 이미 있는가? -> 있다면 "일반 회원 정보가 이미 있음"고 알림. 없다면 추가 검증
-        // 2. 해당 이메일의 소셜 회원이 있는가? -> 있다면 "00 플랫폼의 계정이 있습니다"고 알림.
-        // 3. 일반과 소셜 둘 다 계정이 없다 -> 회원가입 진행
-        // AuthProvider에 "BASIC_KAKAO", "BASIC_GOOGLE" 추가? 지속 가능한가?
-        // 1. 계정이 있는가? -> 있다면, AuthProvider가 뭔가?
-
-//        if(readRepository.existsByEmail(Email.create(request.email()))) {
-//            readRepository.getMemberAuthProvider(Email.create(request.email()));
-//        }
-
-
-
-        if(readRepository.existsByEmail(Email.create(request.email()))) {
-            throw new DataAlreadyExistsException(EXISTS_MEMBER);
-        } else if(readRepository.existsByNickname(Nickname.create(request.nickname()))) {
+        if(readRepository.existsByNickname(Nickname.create(request.nickname()))) {
             throw new DataAlreadyExistsException(KernelErrorCode.EXISTS_NICKNAME);
-        }  else {
+        }
+
+        Email requestEmail = Email.create(request.email());
+
+        if(readRepository.existsByEmail(requestEmail)) {
+            AuthProvider providerOfExistingMember = readRepository.getAuthProvider(requestEmail);
+
+            if (providerOfExistingMember == AuthProvider.BASIC || providerOfExistingMember == AuthProvider.BASIC_GOOGLE || providerOfExistingMember == AuthProvider.BASIC_KAKAO) {
+                throw new ExistsEntityException(NormalIdentityErrorCode.EXISTS_ACCOUNT, TableName.SITE_MEMBER);
+            } else if (providerOfExistingMember == AuthProvider.GOOGLE) {
+                updateRepository.updateToGoogleAccount(requestEmail, Password.create(request.password()));
+            } else if (providerOfExistingMember == AuthProvider.KAKAO) {
+                updateRepository.updateToKakaoAccount(requestEmail, Password.create(request.password()));
+            }
+        } else {
             createRepository.save(mapper.toSignUpData(request));
         }
     }
 
+    @Transactional
     public void modifyEmail(UUID memberUuid, EmailModificationRequest request) {
         if(!readRepository.existsByEmail(Email.create(request.currentEmail()))) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER_AUTH);
@@ -78,6 +82,7 @@ public class NormalIdentityController {
         }
     }
 
+    @Transactional
     public void modifyPassword(UUID memberUuid, PasswordModificationRequest request) {
         if(!readRepository.existsByMemberId(AccountId.create(memberUuid))) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER_AUTH);
