@@ -53,7 +53,7 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
                 .isInstanceOf(DataAlreadyExistsException.class);
 
         verify(readRepository, times(1)).existsByNickname(Nickname.create(request.nickname()));
-        verify(readRepository, never()).existsByEmail(any());
+        verify(readRepository, times(1)).existsByEmail(Email.create(request.email()));
     }
 
     @Test
@@ -71,7 +71,6 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
         assertThatThrownBy(() -> controller.registerNormalMember(request))
                 .isInstanceOf(ExistsEntityException.class);
 
-        verify(readRepository, times(1)).existsByNickname(Nickname.create(request.nickname()));
         verify(readRepository, times(1)).existsByEmail(requestEmail);
         verify(readRepository, times(1)).getAuthProvider(requestEmail);
     }
@@ -91,7 +90,6 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
         assertThatThrownBy(() -> controller.registerNormalMember(request))
                 .isInstanceOf(ExistsEntityException.class);
 
-        verify(readRepository, times(1)).existsByNickname(Nickname.create(request.nickname()));
         verify(readRepository, times(1)).existsByEmail(requestEmail);
         verify(readRepository, times(1)).getAuthProvider(requestEmail);
     }
@@ -103,7 +101,6 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
         NormalSignUpRequest request = testNormalSignUpRequest;
         Email requestEmail = Email.create(request.email());
 
-        given(readRepository.existsByNickname(Nickname.create(request.nickname()))).willReturn(false);
         given(readRepository.existsByEmail(requestEmail)).willReturn(true);
         given(readRepository.getAuthProvider(requestEmail)).willReturn(AuthProvider.BASIC_KAKAO);
 
@@ -111,7 +108,6 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
         assertThatThrownBy(() -> controller.registerNormalMember(request))
                 .isInstanceOf(ExistsEntityException.class);
 
-        verify(readRepository, times(1)).existsByNickname(Nickname.create(request.nickname()));
         verify(readRepository, times(1)).existsByEmail(requestEmail);
         verify(readRepository, times(1)).getAuthProvider(requestEmail);
     }
@@ -123,7 +119,6 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
         NormalSignUpRequest request = testNormalSignUpRequest;
         Email requestEmail = Email.create(request.email());
 
-        given(readRepository.existsByNickname(Nickname.create(request.nickname()))).willReturn(false);
         given(readRepository.existsByEmail(requestEmail)).willReturn(true);
         given(readRepository.getAuthProvider(requestEmail)).willReturn(AuthProvider.GOOGLE);
         doNothing().when(updateRepository).updateToGoogleAccount(requestEmail, Password.create(request.password()));
@@ -143,7 +138,6 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
         NormalSignUpRequest request = testNormalSignUpRequest;
         Email requestEmail = Email.create(request.email());
 
-        given(readRepository.existsByNickname(Nickname.create(request.nickname()))).willReturn(false);
         given(readRepository.existsByEmail(requestEmail)).willReturn(true);
         given(readRepository.getAuthProvider(requestEmail)).willReturn(AuthProvider.KAKAO);
         doNothing().when(updateRepository).updateToKakaoAccount(requestEmail, Password.create(request.password()));
