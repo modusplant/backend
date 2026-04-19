@@ -19,7 +19,6 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -34,8 +33,6 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
-
-import static kr.modusplant.infrastructure.jwt.constant.CookieName.REFRESH_TOKEN_COOKIE_NAME;
 
 /**
  * 순수 JWT 제어 Provider
@@ -111,7 +108,7 @@ public class JwtTokenProvider {
         }
     }
 
-    // Access RefreshToken 생성
+    // AccessToken 생성
     public String generateAccessToken(UUID uuid, Map<String, String> privateClaims) {
         Date now = new Date();
         Date iat = new Date(now.getTime());
@@ -128,7 +125,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // Refresh RefreshToken 생성
+    // RefreshToken 생성
     public String generateRefreshToken(UUID uuid) {
         Date now = new Date();
         Date iat = new Date(now.getTime());
@@ -144,15 +141,20 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String generateRefreshTokenCookieAsString(String refreshToken) {
-        ResponseCookie refreshCookie = ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .maxAge(refreshDuration)
-                .sameSite("Lax")
-                .build();
-        return refreshCookie.toString();
+    // 공통 Token 생성
+    public String generateToken(String subject, Map<String, String> privateClaims, long durationMs) {
+        Date now = new Date();
+        Date iat = new Date(now.getTime());
+        Date exp = new Date(iat.getTime() + durationMs);
+        return Jwts.builder()
+                .claims(privateClaims)
+                .issuer(iss)
+                .subject(subject)
+                .audience().add(aud).and()
+                .issuedAt(iat)
+                .expiration(exp)
+                .signWith(privateKey)
+                .compact();
     }
 
     // 토큰 검증하기
@@ -230,5 +232,4 @@ public class JwtTokenProvider {
         return new JcaX509CertificateConverter().getCertificate(builder.build(contentSigner));
     }
 
-    // TODO: EMAIL 인증 관련 JWT 추가 필요
 }

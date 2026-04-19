@@ -6,7 +6,6 @@ import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
 import kr.modusplant.infrastructure.jwt.exception.InvalidTokenException;
 import kr.modusplant.infrastructure.jwt.exception.TokenNotFoundException;
@@ -14,7 +13,7 @@ import kr.modusplant.infrastructure.jwt.framework.out.jpa.entity.RefreshTokenEnt
 import kr.modusplant.infrastructure.jwt.framework.out.jpa.repository.RefreshTokenJpaRepository;
 import kr.modusplant.infrastructure.jwt.framework.out.redis.AccessTokenRedisRepository;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
-import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -43,7 +42,6 @@ public class TokenService {
     private final JwtTokenProvider jwtTokenProvider;
     private final SiteMemberJpaRepository siteMemberJpaRepository;
     private final SiteMemberAuthJpaRepository siteMemberAuthJpaRepository;
-    private final SiteMemberRoleJpaRepository siteMemberRoleJpaRepository;
     private final RefreshTokenJpaRepository refreshTokenJpaRepository;
     private final AccessTokenRedisRepository accessTokenRedisRepository;
 
@@ -64,7 +62,6 @@ public class TokenService {
                 RefreshTokenEntity.builder()
                         .member(siteMemberJpaRepository.findByUuid(memberUuid).orElseThrow())                   // memberUuid로 member 가져오기
                         .refreshToken(refreshToken)
-                        .issuedAt(convertToLocalDateTime(jwtTokenProvider.getIssuedAtFromToken(refreshToken)))
                         .expiredAt(convertToLocalDateTime(jwtTokenProvider.getExpirationFromToken(refreshToken)))
                         .build()
         );
@@ -101,8 +98,8 @@ public class TokenService {
         UUID memberUuid = jwtTokenProvider.getMemberUuidFromToken(refreshToken);
 
         SiteMemberEntity memberEntity = siteMemberJpaRepository.findByUuid(memberUuid).orElseThrow(TokenNotFoundException::new);
+        Role role = siteMemberJpaRepository.findByUuid(memberUuid).orElseThrow(TokenNotFoundException::new).getRole();
         String email = siteMemberAuthJpaRepository.findByMember(memberEntity).orElseThrow(TokenNotFoundException::new).getEmail();      // TODO: 연동 구현 시 이메일 선택 수정 필요
-        Role role = siteMemberRoleJpaRepository.findByUuid(memberUuid).orElseThrow(TokenNotFoundException::new).getRole();
 
         // refresh token 재발급 (RTR기법)
         String reissuedRefreshToken = jwtTokenProvider.generateRefreshToken(memberUuid);
@@ -111,7 +108,6 @@ public class TokenService {
                         .uuid(refreshTokenJpaRepository.findByRefreshToken(refreshToken).orElseThrow().getUuid())
                         .member(memberEntity)
                         .refreshToken(reissuedRefreshToken)
-                        .issuedAt(convertToLocalDateTime(jwtTokenProvider.getIssuedAtFromToken(reissuedRefreshToken)))
                         .expiredAt(convertToLocalDateTime(jwtTokenProvider.getExpirationFromToken(reissuedRefreshToken)))
                         .build()
         );

@@ -27,6 +27,7 @@ security:
 scheduler:
   sync-interval-ms : 300000           # 5분
   token-cleanup-cron : "0 0 3 * * *"  # 새벽 3시
+  notification-cleanup-cron : "0 10 3 * * *"
 
 # Spring
 spring:

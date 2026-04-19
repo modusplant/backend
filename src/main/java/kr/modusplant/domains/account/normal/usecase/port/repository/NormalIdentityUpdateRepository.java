@@ -6,8 +6,12 @@ import kr.modusplant.shared.kernel.Password;
 
 public interface NormalIdentityUpdateRepository {
 
-    int updateEmail(AccountId accountId, Email email);
+    void updateEmail(AccountId accountId, Email email);
 
-    int updatePassword(AccountId accountId, Password pw);
+    void updatePassword(AccountId accountId, Password pw);
+
+    void updateToGoogleAccount(Email email, Password pw);
+
+    void updateToKakaoAccount(Email email, Password pw);
 
 }

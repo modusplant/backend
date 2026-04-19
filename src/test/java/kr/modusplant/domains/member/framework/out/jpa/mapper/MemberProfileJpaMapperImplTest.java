@@ -3,8 +3,8 @@ package kr.modusplant.domains.member.framework.out.jpa.mapper;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberProfileTestUtils;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
-import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
-import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
+import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileImage;
+import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.supers.MemberProfileJpaMapper;
 import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
@@ -26,7 +26,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-class MemberProfileJpaMapperImplTest implements MemberTestUtils, MemberProfileTestUtils, SiteMemberEntityTestUtils, SiteMemberProfileEntityTestUtils {
+class MemberProfileJpaMapperImplTest implements
+        MemberTestUtils, MemberProfileTestUtils,
+        SiteMemberEntityTestUtils, SiteMemberProfileEntityTestUtils {
     private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
     private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
     private final MemberProfileJpaMapper memberProfileJpaMapper = new MemberProfileJpaMapperImpl(memberJpaRepository, s3FileService);
@@ -68,8 +70,8 @@ class MemberProfileJpaMapperImplTest implements MemberTestUtils, MemberProfileTe
                         .build()))
                 .isEqualTo(MemberProfile.create(
                         testMemberId,
-                        MemberEmptyProfileImage.create(),
-                        MemberEmptyProfileIntroduction.create(),
+                        EmptyMemberProfileImage.create(),
+                        EmptyMemberProfileIntroduction.create(),
                         testNormalUserNickname));
     }
 }

@@ -1,0 +1,5 @@
+ALTER TABLE public.comm_post
+    ALTER COLUMN pri_cate_id DROP NOT NULL,
+    ALTER COLUMN seco_cate_id DROP NOT NULL,
+    ALTER COLUMN title DROP NOT NULL,
+    ALTER COLUMN content DROP NOT NULL;

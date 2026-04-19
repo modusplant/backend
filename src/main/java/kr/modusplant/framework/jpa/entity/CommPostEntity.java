@@ -25,8 +25,8 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_POST;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = COMM_POST)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @ToString
 public class CommPostEntity {
     @Id
@@ -34,18 +34,18 @@ public class CommPostEntity {
     @Column(nullable = false, updatable = false)
     private String ulid;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = PRI_CATE_ID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = PRI_CATE_ID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ToString.Exclude
     private CommPrimaryCategoryEntity primaryCategory;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = SECO_CATE_ID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = SECO_CATE_ID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ToString.Exclude
     private CommSecondaryCategoryEntity secondaryCategory;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = AUTH_MEMB_UUID, nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = AUTH_MEMB_UUID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ToString.Exclude
     private SiteMemberEntity authMember;
 
@@ -57,13 +57,19 @@ public class CommPostEntity {
     @DefaultValue
     private Long viewCount;
 
-    @Column(nullable = false, length = 60)
+    @Column(length = 60)
     private String title;
 
     @Type(JsonBinaryType.class)
-    @Column(nullable = false, columnDefinition = "jsonb")
+    @Column(columnDefinition = "jsonb")
     @ToString.Exclude
     private JsonNode content;
+
+    @Column(name = CONTENT_TEXT, insertable = false, updatable = false)
+    private String contentText;
+
+    @Column(name = "thumbnail_path")
+    private String thumbnailPath;
 
     @Column(name = "is_published", nullable = false)
     @DefaultValue
@@ -83,7 +89,7 @@ public class CommPostEntity {
     @Version
     @Column(nullable = false)
     @ToString.Exclude
-    private long ver;
+    private Long ver;
 
     public void updatePrimaryCategory(CommPrimaryCategoryEntity primaryCategory) {
         this.primaryCategory = primaryCategory;
@@ -99,6 +105,10 @@ public class CommPostEntity {
 
     public void updateContent(JsonNode content) {
         this.content = content;
+    }
+
+    public void updateThumbnailPath(String thumbnailPath) {
+        this.thumbnailPath = thumbnailPath;
     }
 
     public void updateIsPublished(Boolean isPublished) {
@@ -154,17 +164,7 @@ public class CommPostEntity {
         }
     }
 
-    @PreUpdate
-    public void preUpdate() {
-        if (this.viewCount == null) {
-            this.viewCount = 0L;
-        }
-        if (this.isPublished == null) {
-            this.isPublished = false;
-        }
-    }
-
-    private CommPostEntity(String ulid, CommPrimaryCategoryEntity primaryCategory, CommSecondaryCategoryEntity secondaryCategory, SiteMemberEntity authMember, Integer likeCount, Long viewCount, String title, JsonNode content, Boolean isPublished, LocalDateTime publishedAt) {
+    private CommPostEntity(String ulid, CommPrimaryCategoryEntity primaryCategory, CommSecondaryCategoryEntity secondaryCategory, SiteMemberEntity authMember, Integer likeCount, Long viewCount, String title, JsonNode content, String thumbnailPath, Boolean isPublished, LocalDateTime publishedAt) {
         this.ulid = ulid;
         this.primaryCategory = primaryCategory;
         this.secondaryCategory = secondaryCategory;
@@ -173,6 +173,7 @@ public class CommPostEntity {
         this.viewCount = viewCount;
         this.title = title;
         this.content = content;
+        this.thumbnailPath = thumbnailPath;
         this.isPublished = isPublished;
         this.publishedAt = publishedAt;
     }
@@ -190,6 +191,7 @@ public class CommPostEntity {
         private Long viewCount;
         private String title;
         private JsonNode content;
+        private String thumbnailPath;
         private Boolean isPublished;
         private LocalDateTime publishedAt;
 
@@ -233,6 +235,11 @@ public class CommPostEntity {
             return this;
         }
 
+        public CommPostEntityBuilder thumbnailPath(final String thumbnailPath) {
+            this.thumbnailPath = thumbnailPath;
+            return this;
+        }
+
         public CommPostEntityBuilder isPublished(final Boolean isPublished) {
             this.isPublished = isPublished;
             return this;
@@ -252,13 +259,14 @@ public class CommPostEntity {
             this.viewCount = postEntity.viewCount;
             this.title = postEntity.title;
             this.content = postEntity.content;
+            this.thumbnailPath = postEntity.thumbnailPath;
             this.isPublished = postEntity.isPublished;
             this.publishedAt = postEntity.publishedAt;
             return this;
         }
 
         public CommPostEntity build() {
-            return new CommPostEntity(this.ulid, this.primaryCategory, this.secondaryCategory, this.authMember, this.likeCount, this.viewCount, this.title, this.content, this.isPublished, this.publishedAt);
+            return new CommPostEntity(this.ulid, this.primaryCategory, this.secondaryCategory, this.authMember, this.likeCount, this.viewCount, this.title, this.content, this.thumbnailPath, this.isPublished, this.publishedAt);
         }
 
     }

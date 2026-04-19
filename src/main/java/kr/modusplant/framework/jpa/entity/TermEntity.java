@@ -24,8 +24,8 @@ import static kr.modusplant.shared.util.VersionUtils.createVersion;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = TERM)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @ToString
 public class TermEntity {
     @Id
@@ -58,10 +58,6 @@ public class TermEntity {
     private Long versionNumber;
 
     public void updateContent(String content) { this.content = content; }
-
-    public void updateVersion(String version) {
-        this.version = version;
-    }
 
     public String getETagSource() {
         return getUuid() + "-" + getVersionNumber();

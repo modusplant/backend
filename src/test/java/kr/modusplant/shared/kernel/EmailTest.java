@@ -60,4 +60,10 @@ class EmailTest implements EmailTestUtils {
     void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
         assertNotEquals(testKakaoUserEmail, testGoogleUserEmail);
     }
+
+    @Test
+    @DisplayName("같은 객체에 대한 hashcode 동일성 보장")
+    void testHashCode_givenSameObject_willReturnSameHashCode() {
+        assertEquals(testKakaoUserEmail.hashCode(), testKakaoUserEmail.hashCode());
+    }
 }

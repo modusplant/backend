@@ -10,5 +10,5 @@ public interface SignUpDataTestUtils extends EmailTestUtils, PasswordTestUtils,
         NicknameTestUtils, NormalSignUpRequestTestUtils {
     SignUpData TEST_NORMAL_SIGN_UP_DATA = SignUpData.create(testNormalUserEmail.getValue(), testNormalUserPassword.getValue(),
             testNormalUserNickname.getValue(), testNormalSignUpRequest.agreedTermsOfUseVersion(),
-            testNormalSignUpRequest.agreedPrivacyPolicyVersion(), testNormalSignUpRequest.agreedAdInfoReceivingVersion());
+            testNormalSignUpRequest.agreedPrivacyPolicyVersion(), testNormalSignUpRequest.agreedCommunityPolicyVersion());
 }

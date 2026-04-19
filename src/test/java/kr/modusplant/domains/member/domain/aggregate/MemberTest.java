@@ -8,7 +8,6 @@ import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.domains.member.common.util.domain.vo.MemberBirthDateTestUtils.testMemberBirthDate;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
@@ -21,36 +20,29 @@ class MemberTest implements MemberTestUtils {
     void testCreate_givenNullToOneOfFourParameters_willThrowException() {
         // MemberId가 null일 때
         // given
-        EmptyValueException memberIdException = assertThrows(EmptyValueException.class, () -> Member.create(null, testMemberActiveStatus, testNormalUserNickname, testMemberBirthDate));
+        EmptyValueException memberIdException = assertThrows(EmptyValueException.class, () -> Member.create(null, testMemberActiveStatus, testNormalUserNickname));
 
         // when & then
         assertThat(memberIdException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_ID);
 
         // MemberStatus가 null일 때
         // given
-        EmptyValueException memberStatusException = assertThrows(EmptyValueException.class, () -> Member.create(testMemberId, null, testNormalUserNickname, testMemberBirthDate));
+        EmptyValueException memberStatusException = assertThrows(EmptyValueException.class, () -> Member.create(testMemberId, null, testNormalUserNickname));
 
         // when & then
         assertThat(memberStatusException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_STATUS);
 
         // Nickname이 null일 때
         // given
-        EmptyValueException nicknameException = assertThrows(EmptyValueException.class, () -> Member.create(testMemberId, testMemberActiveStatus, null, testMemberBirthDate));
+        EmptyValueException nicknameException = assertThrows(EmptyValueException.class, () -> Member.create(testMemberId, testMemberActiveStatus, null));
 
         // when & then
         assertThat(nicknameException.getErrorCode()).isEqualTo(KernelErrorCode.EMPTY_NICKNAME);
-
-        // MemberBirthDate가 null일 때
-        // given
-        EmptyValueException memberBirthDateException = assertThrows(EmptyValueException.class, () -> Member.create(testMemberId, testMemberActiveStatus, testNormalUserNickname, null));
-
-        // when & then
-        assertThat(memberBirthDateException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_BIRTH_DATE);
     }
 
     @Test
     @DisplayName("같은 객체에 대한 equals 호출")
-    void useEqual_givenSameObject_willReturnTrue() {
+    void testEquals_givenSameObject_willReturnTrue() {
         // given
         Member member = createMember();
 
@@ -61,15 +53,22 @@ class MemberTest implements MemberTestUtils {
 
     @Test
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
-    void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
+    void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
         assertNotEquals(createMember(), testMemberId);
     }
 
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
-    void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
+    void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
         Member member = createMember();
-        assertNotEquals(member, Member.create(MemberId.generate(), testMemberActiveStatus, testNormalUserNickname, testMemberBirthDate));
+        assertNotEquals(member, Member.create(MemberId.generate(), testMemberActiveStatus, testNormalUserNickname));
+    }
+
+    @Test
+    @DisplayName("같은 객체에 대한 hashcode 동일성 보장")
+    void testHashCode_givenSameObject_willReturnSameHashCode() {
+        Member member = createMember();
+        assertEquals(member.hashCode(), member.hashCode());
     }
 }

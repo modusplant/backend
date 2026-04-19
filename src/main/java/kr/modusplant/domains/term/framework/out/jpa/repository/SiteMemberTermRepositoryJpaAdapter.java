@@ -25,7 +25,7 @@ public class SiteMemberTermRepositoryJpaAdapter implements SiteMemberTermReposit
             SiteMemberTermEntity entity = siteMemberTermJpaRepository.getReferenceById(siteMemberTerm.getSiteMemberTermId().getValue());
             entity.updateAgreedTermsOfUseVersion(siteMemberTerm.getAgreedTermsOfUseVersion());
             entity.updateAgreedPrivacyPolicyVersion(siteMemberTerm.getAgreedPrivacyPolicyVersion());
-            entity.updateAgreedAdInfoReceivingVersion(siteMemberTerm.getAgreedAdInfoReceivingVersion());
+            entity.updateAgreedCommunityPolicyVersion(siteMemberTerm.getAgreedCommunityPolicyVersion());
             return siteMemberTermJpaMapper.toSiteMemberTerm(entity);
         } else {
             return siteMemberTermJpaMapper.toSiteMemberTerm(siteMemberTermJpaRepository.save(siteMemberTermJpaMapper.toSiteMemberTermNewEntity(siteMemberTerm)));

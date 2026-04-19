@@ -55,7 +55,7 @@ public class AgreedTermVersionTest implements AgreedTermVersionTestUtils {
     @DisplayName("동일하고 다른 프로퍼티를 지닌 객체로 동등성 비교")
     void testEquals_givenDifferentProperty_willReturnFalse() {
         // given & when & then
-        assertNotEquals(testAgreedTermsOfUse, testAgreedAdReceiving);
+        assertNotEquals(testAgreedTermsOfUse, testAgreedCommunityPolicy);
     }
 
 }

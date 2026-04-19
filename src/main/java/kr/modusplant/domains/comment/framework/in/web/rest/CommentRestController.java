@@ -11,6 +11,7 @@ import kr.modusplant.domains.comment.adapter.controller.CommentController;
 import kr.modusplant.domains.comment.framework.in.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
+import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
@@ -144,8 +145,20 @@ public class CommentRestController {
 
             @RequestBody @Valid
             CommentRegisterRequest registerRequest) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         controller.register(registerRequest, currentMemberUuid);
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Operation(
+            summary = "컨텐츠 댓글 수정 API",
+            description = "게시글 식별자, 댓글 경로, 댓글 내용으로 댓글을 갱신합니다."
+    )
+    @PutMapping("/update")
+    public ResponseEntity<DataResponse<Void>> update(
+            @RequestBody @Valid
+            CommentUpdateRequest updateRequest) {
+        controller.update(updateRequest);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

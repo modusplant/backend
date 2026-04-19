@@ -7,10 +7,9 @@ import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_UUID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -18,15 +17,18 @@ public final class CommPostConstant {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static final String TEST_COMM_POST_ULID = "01K6DH4YCJMS3NJ4JCY8TPXP4T";
-    public static final UUID TEST_COMM_POST_PRIMARY_CATEGORY_UUID = TEST_COMM_PRIMARY_CATEGORY_UUID;
-    public static final UUID TEST_COMM_POST_SECONDARY_CATEGORY_UUID = TEST_COMM_SECONDARY_CATEGORY_UUID;
     public static final UUID TEST_COMM_POST_AUTH_MEMBER_UUID = MEMBER_BASIC_USER_UUID;
     public static final UUID TEST_COMM_POST_CREATE_MEMBER_UUID = MEMBER_BASIC_USER_UUID;
     public static final Integer TEST_COMM_POST_LIKE_COUNT = 0;
     public static final Long TEST_COMM_POST_VIEW_COUNT = 0L;
     public static final String TEST_COMM_POST_TITLE = "물 주는 타이밍, 이제 헷갈리지 마세요! 식물별 물 주기 가이드";
     public static final JsonNode TEST_COMM_POST_CONTENT = createSampleContent();
+    public static final String TEST_COMM_POST_CONTENT_TEXT = "Hello, this is text part 1. This is text part 2.";
     public static final Boolean TEST_COMM_POST_IS_PUBLISHED = true;
+    public static final LocalDateTime TEST_COMM_POST_CREATED_AT = LocalDateTime.of(2026, 4, 2, 0, 0);
+    public static final LocalDateTime TEST_COMM_POST_ARCHIVED_AT = LocalDateTime.of(2026, 4, 4, 0, 0);
+    public static final LocalDateTime TEST_COMM_POST_UPDATED_AT = LocalDateTime.of(2026, 4, 3, 12, 0);
+    public static final LocalDateTime TEST_COMM_POST_PUBLISHED_AT = LocalDateTime.of(2026, 4, 3, 0, 0);
 
     private static JsonNode createSampleContent() {
         String json = """

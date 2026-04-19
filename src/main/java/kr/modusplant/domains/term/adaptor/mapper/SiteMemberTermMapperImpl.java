@@ -15,7 +15,7 @@ public class SiteMemberTermMapperImpl implements SiteMemberTermMapper {
                 siteMemberTerm.getSiteMemberTermId().getValue(),
                 siteMemberTerm.getAgreedTermsOfUseVersion(),
                 siteMemberTerm.getAgreedPrivacyPolicyVersion(),
-                siteMemberTerm.getAgreedAdInfoReceivingVersion()
+                siteMemberTerm.getAgreedCommunityPolicyVersion()
         );
     }
 

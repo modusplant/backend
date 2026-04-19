@@ -128,7 +128,6 @@ class RefreshTokenJpaRepositoryTest implements RefreshTokenEntityTestUtils {
         RefreshTokenEntity expiredToken = RefreshTokenEntity.builder()
                 .member(memberEntity)
                 .refreshToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIn0.sFzQWkpK8HG2xKcI1vNH3oW7nIO9QaX3ghTkfT2Yq3w")
-                .issuedAt(now.minusDays(7))
                 .expiredAt(now.minusHours(1))
                 .build();
 

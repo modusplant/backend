@@ -56,10 +56,10 @@ public class CommCommentJpaRepositoryTest implements
 
     @Test
     @DisplayName("게시글 ulid와 구체화된 경로로 컨텐츠 댓글 찾기")
-    void findByPostEntityAndPathTest() {
+    void findByPostAndPathTest() {
         // given
         CommCommentEntity commentEntity = createCommCommentEntityBuilder()
-                .postEntity(savedPostEntity)
+                .post(savedPostEntity)
                 .authMember(savedMemberEntity)
                 .isDeleted(true)
                 .build();
@@ -75,17 +75,17 @@ public class CommCommentJpaRepositoryTest implements
 
     @Test
     @DisplayName("게시글 ulid로 컨텐츠 댓글 찾기")
-    void findByPostEntityTest() {
+    void findByPostTest() {
         // given
         CommCommentEntity commentEntity = createCommCommentEntityBuilder()
-                .postEntity(savedPostEntity)
+                .post(savedPostEntity)
                 .authMember(savedMemberEntity)
                 .isDeleted(true)
                 .build();
 
         // when
         CommCommentEntity savedCommCommentEntity = commentRepository.save(commentEntity);
-        List<CommCommentEntity> result = commentRepository.findByPostEntity(savedPostEntity);
+        List<CommCommentEntity> result = commentRepository.findByPost(savedPostEntity);
 
         // then
         assertThat(List.of(savedCommCommentEntity)).isEqualTo(result);
@@ -96,7 +96,7 @@ public class CommCommentJpaRepositoryTest implements
     void findByAuthMemberTest() {
         // given
         CommCommentEntity commentEntity = createCommCommentEntityBuilder()
-                .postEntity(savedPostEntity)
+                .post(savedPostEntity)
                 .authMember(savedMemberEntity)
                 .isDeleted(true)
                 .build();
@@ -114,7 +114,7 @@ public class CommCommentJpaRepositoryTest implements
     void findByCreateMemberTest() {
         // given
         CommCommentEntity commentEntity = createCommCommentEntityBuilder()
-                .postEntity(savedPostEntity)
+                .post(savedPostEntity)
                 .authMember(savedMemberEntity)
                 .isDeleted(true)
                 .build();
@@ -150,7 +150,7 @@ public class CommCommentJpaRepositoryTest implements
     void testToString_givenCommCommentEntity_willReturnRepresentative() {
         // given
         CommCommentEntity commentEntity = createCommCommentEntityBuilder()
-                .postEntity(savedPostEntity)
+                .post(savedPostEntity)
                 .authMember(savedMemberEntity)
                 .isDeleted(true)
                 .build();

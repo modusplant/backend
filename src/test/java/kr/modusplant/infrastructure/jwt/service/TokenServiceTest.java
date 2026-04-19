@@ -4,11 +4,9 @@ import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberAuthEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberRoleEntityTestUtils;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberRoleJpaRepository;
 import kr.modusplant.infrastructure.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
 import kr.modusplant.infrastructure.jwt.exception.InvalidTokenException;
@@ -17,7 +15,7 @@ import kr.modusplant.infrastructure.jwt.framework.out.jpa.entity.RefreshTokenEnt
 import kr.modusplant.infrastructure.jwt.framework.out.jpa.repository.RefreshTokenJpaRepository;
 import kr.modusplant.infrastructure.jwt.framework.out.redis.AccessTokenRedisRepository;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
-import kr.modusplant.infrastructure.security.enums.Role;
+import kr.modusplant.shared.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -41,7 +39,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntityTestUtils, SiteMemberRoleEntityTestUtils, RefreshTokenEntityTestUtils {
+class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntityTestUtils, RefreshTokenEntityTestUtils {
     @InjectMocks
     private TokenService tokenService;
     @Mock
@@ -50,8 +48,6 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntit
     private SiteMemberJpaRepository siteMemberJpaRepository;
     @Mock
     private SiteMemberAuthJpaRepository siteMemberAuthJpaRepository;
-    @Mock
-    private SiteMemberRoleJpaRepository siteMemberRoleJpaRepository;
     @Mock
     private RefreshTokenJpaRepository refreshTokenJpaRepository;
     @Mock
@@ -66,7 +62,6 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntit
     private String accessToken;
     private String refreshToken;
     private Map<String,String> claims;
-    private Date issuedAt;
     private Date expiredAt;
 
     @BeforeEach
@@ -87,7 +82,6 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntit
                 "email",email,
                 "role", role.name()
         );
-        issuedAt = Date.from(Instant.now());
         expiredAt = Date.from(Instant.now().plusSeconds(3600));
     }
 
@@ -101,7 +95,6 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntit
             given(siteMemberJpaRepository.existsByUuid(memberUuid)).willReturn(true);
             given(jwtTokenProvider.generateAccessToken(memberUuid, claims)).willReturn(accessToken);
             given(jwtTokenProvider.generateRefreshToken(memberUuid)).willReturn(refreshToken);
-            given(jwtTokenProvider.getIssuedAtFromToken(refreshToken)).willReturn(issuedAt);
             given(jwtTokenProvider.getExpirationFromToken(refreshToken)).willReturn(expiredAt);
             given(siteMemberJpaRepository.findByUuid(memberUuid)).willReturn(Optional.of(memberEntity));
             given(refreshTokenJpaRepository.save(any(RefreshTokenEntity.class))).willAnswer(invocation -> invocation.getArgument(0));
@@ -173,10 +166,8 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntit
             given(jwtTokenProvider.getMemberUuidFromToken(refreshToken)).willReturn(memberUuid);
             given(siteMemberJpaRepository.findByUuid(memberUuid)).willReturn(Optional.of(memberEntity));
             given(siteMemberAuthJpaRepository.findByMember(memberEntity)).willReturn(Optional.of(memberAuthEntity));
-            given(siteMemberRoleJpaRepository.findByUuid(memberUuid)).willReturn(Optional.of(createMemberRoleUserEntityWithUuid()));
             given(jwtTokenProvider.generateRefreshToken(memberUuid)).willReturn(newRefreshToken);
             given(refreshTokenJpaRepository.findByRefreshToken(refreshToken)).willReturn(Optional.of(refreshTokenEntity));
-            given(jwtTokenProvider.getIssuedAtFromToken(newRefreshToken)).willReturn(issuedAt);
             given(jwtTokenProvider.getExpirationFromToken(newRefreshToken)).willReturn(expiredAt);
             given(refreshTokenJpaRepository.save(any(RefreshTokenEntity.class))).willAnswer(invocation -> invocation.getArgument(0));
             given(jwtTokenProvider.generateAccessToken(eq(memberUuid), any())).willReturn(newAccessToken);

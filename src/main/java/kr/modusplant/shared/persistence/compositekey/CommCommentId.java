@@ -54,7 +54,7 @@ public class CommCommentId implements Serializable {
             return this;
         }
 
-        public CommCommCommentIdBuilder CommCommCommentId(final CommCommentId compositeKey) {
+        public CommCommCommentIdBuilder commCommCommentId(final CommCommentId compositeKey) {
             this.postUlid = compositeKey.postUlid;
             this.path = compositeKey.getPath();
             return this;

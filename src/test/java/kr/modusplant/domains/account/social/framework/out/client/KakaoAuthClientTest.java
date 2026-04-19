@@ -95,7 +95,7 @@ class KakaoAuthClientTest {
         String nickname = "kakao-nickname";
         String responseJson = "{" +
                 "\"id\": " + id + "," +
-                "\"kakaoAccount\": {" +
+                "\"kakao_account\": {" +
                 "  \"email\": \""+email+"\"," +
                 "  \"isEmailVerified\": true," +
                 "  \"profile\": {" +
@@ -130,5 +130,34 @@ class KakaoAuthClientTest {
 
         // when & then
         assertThrows(OAuthRequestFailException.class, () -> kakaoAuthClient.getUserInfo(accessToken));
+    }
+
+    @Test
+    @DisplayName("카카오 연결 해제 성공 테스트")
+    void testRevokeAccess_givenAccessToken_willSuccess() {
+        // given
+        String accessToken = "test-access-token";
+        mockServer.expect(requestTo("https://kapi.kakao.com/v1/user/unlink"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header(HttpHeaders.AUTHORIZATION,"Bearer " + accessToken))
+                .andRespond(withSuccess());
+
+        // when
+        kakaoAuthClient.revokeAccess(accessToken);
+
+        // then
+        mockServer.verify();
+    }
+
+    @Test
+    @DisplayName("카카오 연결 해제 실패 시 예외 발생 테스트")
+    void testRevokeAccess_givenInvalidAccessToken_willThrowException() {
+        // given
+        String accessToken = "invalid-token";
+        mockServer.expect(requestTo("https://kapi.kakao.com/v1/user/unlink"))
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST));
+
+        // when & then
+        assertThrows(OAuthRequestFailException.class,() -> kakaoAuthClient.revokeAccess(accessToken));
     }
 }
