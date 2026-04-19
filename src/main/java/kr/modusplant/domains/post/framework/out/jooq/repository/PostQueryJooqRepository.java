@@ -14,7 +14,6 @@ import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryWithSearchInfoReadModel;
 import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.jooq.*;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.utils.CollectionUtils;
@@ -81,11 +80,6 @@ public class PostQueryJooqRepository implements PostQueryRepository {
     public List<PostSummaryWithSearchInfoReadModel> searchByKeywordWithLatest(
             SearchOption option, String keyword, Integer primaryCategoryId, List<Integer> secondaryCategoryIds,
             UUID currentMemberUuid, String cursorUlid, LocalDateTime cursorPublishedAt, int size) {
-        if (StringUtils.isEmpty(keyword)) {
-            return Collections.emptyList();
-        }
-        keyword = keyword.trim();
-
         Field<String> keywordLongerThanOrEqualToThree = val("%" + escape(keyword, '$') + "%");
         Field<String> keywordLowerThanThree = val(escape(keyword, '$') + "%");
 
@@ -240,11 +234,6 @@ public class PostQueryJooqRepository implements PostQueryRepository {
             String cursorUlid, Integer cursorImportance,
             Double cursorMaxWordSimilarity, LocalDateTime cursorPublishedAt,
             int size) {
-        if (StringUtils.isEmpty(keyword)) {
-            return Collections.emptyList();
-        }
-        keyword = keyword.trim();
-
         Field<String> keywordParam = val(keyword);
         Field<String> keywordLongerThanOrEqualToThreeParam = val("%" + escape(keyword, '$') + "%");
         Field<String> keywordLowerThanThreeParam = val(escape(keyword, '$') + "%");
