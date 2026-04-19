@@ -11,8 +11,8 @@ import java.util.UUID;
 import static kr.modusplant.domains.account.shared.kernel.common.util.AccountIdTestUtils.testGoogleAccountId;
 import static kr.modusplant.domains.account.shared.kernel.common.util.AccountIdTestUtils.testKakaoAccountId;
 import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_MEMBER_UUID_STRING;
-import static kr.modusplant.domains.account.social.common.constant.SocialUuidConstant.TEST_SOCIAL_KAKAO_MEMBER_ID_UUID;
 import static kr.modusplant.shared.kernel.common.util.EmailTestUtils.testKakaoUserEmail;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_KAKAO_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,7 +23,7 @@ class AccountIdTest {
     void testFromUuid_givenValidUuid_willReturnMemberId() {
         // when & then
         assertNotNull(testKakaoAccountId);
-        assertEquals(TEST_SOCIAL_KAKAO_MEMBER_ID_UUID, testKakaoAccountId.getValue());
+        assertEquals(MEMBER_KAKAO_USER_UUID, testKakaoAccountId.getValue());
     }
 
     @Test

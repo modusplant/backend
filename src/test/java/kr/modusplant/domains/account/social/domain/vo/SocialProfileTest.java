@@ -5,8 +5,8 @@ import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_GOOGLE_PROVIDER_ID_STRING;
-import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_PROVIDER_ID_STRING;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_KAKAO_USER_PROVIDER_ID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_GOOGLE_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_KAKAO_USER_NICKNAME;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,7 +19,7 @@ class SocialProfileTest implements SocialProfileTestUtils {
         // when
         SocialProfile profile = SocialProfile.create(
                 SocialProvider.KAKAO,
-                TEST_SOCIAL_KAKAO_PROVIDER_ID_STRING,
+                MEMBER_AUTH_KAKAO_USER_PROVIDER_ID,
                 testKakaoUserEmail,
                 MEMBER_KAKAO_USER_NICKNAME
         );
@@ -27,7 +27,7 @@ class SocialProfileTest implements SocialProfileTestUtils {
         // then
         assertNotNull(profile);
         assertThat(profile.getSocialProvider()).isEqualTo(SocialProvider.KAKAO);
-        assertThat(profile.getProviderId()).isEqualTo(TEST_SOCIAL_KAKAO_PROVIDER_ID_STRING);
+        assertThat(profile.getProviderId()).isEqualTo(MEMBER_AUTH_KAKAO_USER_PROVIDER_ID);
         assertThat(profile.getEmail()).isEqualTo(testKakaoUserEmail);
         assertThat(profile.getSocialNickname()).isEqualTo(MEMBER_KAKAO_USER_NICKNAME);
     }
@@ -38,7 +38,7 @@ class SocialProfileTest implements SocialProfileTestUtils {
         // given
         SocialProfile firstProfile = SocialProfile.create(
                 SocialProvider.GOOGLE,
-                TEST_SOCIAL_GOOGLE_PROVIDER_ID_STRING,
+                MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID,
                 testGoogleUserEmail,
                 MEMBER_GOOGLE_USER_NICKNAME
         );

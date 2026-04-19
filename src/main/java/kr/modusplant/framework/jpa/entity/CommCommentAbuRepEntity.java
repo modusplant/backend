@@ -1,7 +1,7 @@
 package kr.modusplant.framework.jpa.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.framework.jpa.generator.UlidGenerator;
+import kr.modusplant.shared.persistence.compositekey.CommCommentAbuRepId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
 import static kr.modusplant.shared.persistence.constant.TableName.COMM_COMMENT_ABU_REP;
@@ -21,24 +22,25 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_COMMENT_A
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = COMM_COMMENT_ABU_REP)
+@IdClass(CommCommentAbuRepId.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
 public class CommCommentAbuRepEntity {
     @Id
-    @UlidGenerator
-    @Column(nullable = false, updatable = false)
-    private String ulid;
+    private UUID memberId;
 
+    @MapsId("memberId")
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = MEMB_UUID, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = MEMB_UUID, nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ToString.Exclude
     private SiteMemberEntity member;
 
+    @Id
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumns({
-            @JoinColumn(name = POST_ULID, referencedColumnName = POST_ULID, nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT)),
-            @JoinColumn(name = PATH, referencedColumnName = PATH, nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+            @JoinColumn(name = POST_ULID, referencedColumnName = POST_ULID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT)),
+            @JoinColumn(name = PATH, referencedColumnName = PATH, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     })
     @ToString.Exclude
     private CommCommentEntity comment;
@@ -63,7 +65,7 @@ public class CommCommentAbuRepEntity {
     private Long versionNumber;
 
     public String getETagSource() {
-        return getUlid() + "-" + getVersionNumber();
+        return getMemberId() + "-" + getComment().getPost().getUlid() + "-" + getComment().getPath() + "-" + getVersionNumber();
     }
 
     public LocalDateTime getLastModifiedAtAsTruncatedToSeconds() {
@@ -76,16 +78,16 @@ public class CommCommentAbuRepEntity {
 
         if (!(object instanceof CommCommentAbuRepEntity that)) return false;
 
-        return new EqualsBuilder().append(getUlid(), that.getUlid()).isEquals();
+        return new EqualsBuilder().append(getMember(), that.getMember()).append(getComment(), that.getComment()).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(getUlid()).toHashCode();
+        return new HashCodeBuilder(17, 37)
+                .append(getMember()).append(getComment()).toHashCode();
     }
 
-    private CommCommentAbuRepEntity(String ulid, SiteMemberEntity member, CommCommentEntity comment, LocalDateTime checkedAt, LocalDateTime handledAt) {
-        this.ulid = ulid;
+    private CommCommentAbuRepEntity(SiteMemberEntity member, CommCommentEntity comment, LocalDateTime checkedAt, LocalDateTime handledAt) {
         this.member = member;
         this.comment = comment;
         this.checkedAt = checkedAt;
@@ -97,16 +99,10 @@ public class CommCommentAbuRepEntity {
     }
 
     public static final class CommCommentAbuRepEntityBuilder {
-        private String ulid;
         private SiteMemberEntity member;
         private CommCommentEntity comment;
         private LocalDateTime checkedAt;
         private LocalDateTime handledAt;
-
-        public CommCommentAbuRepEntityBuilder ulid(final String ulid) {
-            this.ulid = ulid;
-            return this;
-        }
 
         public CommCommentAbuRepEntityBuilder member(final SiteMemberEntity member) {
             this.member = member;
@@ -129,7 +125,6 @@ public class CommCommentAbuRepEntity {
         }
 
         public CommCommentAbuRepEntityBuilder commCommentAbuRep(final CommCommentAbuRepEntity commentAbuRep) {
-            this.ulid = commentAbuRep.getUlid();
             this.member = commentAbuRep.getMember();
             this.comment = commentAbuRep.getComment();
             this.checkedAt = commentAbuRep.getCheckedAt();
@@ -138,7 +133,7 @@ public class CommCommentAbuRepEntity {
         }
 
         public CommCommentAbuRepEntity build() {
-            return new CommCommentAbuRepEntity(this.ulid, this.member, this.comment, this.checkedAt, this.handledAt);
+            return new CommCommentAbuRepEntity(this.member, this.comment, this.checkedAt, this.handledAt);
         }
     }
 }

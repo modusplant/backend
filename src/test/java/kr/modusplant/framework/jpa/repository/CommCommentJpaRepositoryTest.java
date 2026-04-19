@@ -67,7 +67,7 @@ public class CommCommentJpaRepositoryTest implements
         // when
         CommCommentEntity savedCommCommentEntity = commentRepository.save(commentEntity);
         CommCommentEntity result = commentRepository.findByPostUlidAndPath(
-                savedCommCommentEntity.getPostUlid(), savedCommCommentEntity.getPath()).orElseThrow();
+                savedCommCommentEntity.getPost().getUlid(), savedCommCommentEntity.getPath()).orElseThrow();
 
         // then
         assertThat(savedCommCommentEntity).isEqualTo(result);
