@@ -27,11 +27,8 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_COMMENT;
 @ToString
 public class CommCommentEntity {
     @Id
-    private String postUlid;
-
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @MapsId("postUlid")
-    @JoinColumn(name = POST_ULID, nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = POST_ULID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ToString.Exclude
     private CommPostEntity post;
 
@@ -84,7 +81,7 @@ public class CommCommentEntity {
         if (!(o instanceof CommCommentEntity that)) return false;
 
         return new EqualsBuilder()
-                .append(getPostUlid(), that.getPostUlid())
+                .append(getPost(), that.getPost())
                 .append(getPath(), that.getPath())
                 .isEquals();
     }
@@ -92,7 +89,7 @@ public class CommCommentEntity {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(getPostUlid())
+                .append(getPost())
                 .append(getPath())
                 .toHashCode();
     }

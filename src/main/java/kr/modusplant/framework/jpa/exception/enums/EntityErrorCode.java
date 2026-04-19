@@ -32,6 +32,9 @@ public enum EntityErrorCode implements ErrorCode {
     NOT_FOUND_REPORT(HttpStatus.NOT_FOUND.value(), "not_found_report", "보고서가 존재하지 않습니다"),
 
     // Exists
+    EXISTS_POST_ABUSE_REPORT(HttpStatus.NOT_FOUND.value(), "exists_post_abuse_report", "게시글 신고가 이미 존재합니다"),
+    EXISTS_COMMENT_ABUSE_REPORT(HttpStatus.NOT_FOUND.value(), "exists_comment_abuse_report", "댓글 신고가 이미 존재합니다"),
+
     EXISTS_COMMENT(HttpStatus.NOT_FOUND.value(), "exists_comment", "댓글이 이미 존재합니다"),
     EXISTS_COMMENT_LIKE(HttpStatus.NOT_FOUND.value(), "exists_comment_like", "댓글의 좋아요가 이미 존재합니다"),
 

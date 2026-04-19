@@ -73,7 +73,7 @@ public class ReportEventConsumer {
     private void addCommentAbuseReport(UUID memberId, String postUlid, String path) {
         SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
         CommCommentEntity commentEntity = commentJpaRepository.findById(
-                CommCommentId.builder().postUlid(postUlid).path(path).build()).orElseThrow();
+                CommCommentId.builder().post(postUlid).path(path).build()).orElseThrow();
         commentAbuRepJpaRepository.save(
                 CommCommentAbuRepEntity.builder().member(memberEntity).comment(commentEntity).build());
     }
