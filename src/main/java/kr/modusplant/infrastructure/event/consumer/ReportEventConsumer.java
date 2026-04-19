@@ -29,13 +29,20 @@ public class ReportEventConsumer {
                                CommCommentAbuRepJpaRepository commentAbuRepJpaRepository) {
         eventBus.subscribe(event -> {
             if (event instanceof ProposalOrBugReportEvent proposalOrBugReportEvent) {
-                addProposalOrBugReport(proposalOrBugReportEvent.getMemberId(), proposalOrBugReportEvent.getTitle(), proposalOrBugReportEvent.getContent(), proposalOrBugReportEvent.getImagePath());
+                addProposalOrBugReport(
+                        proposalOrBugReportEvent.getMemberId(),
+                        proposalOrBugReportEvent.getTitle(),
+                        proposalOrBugReportEvent.getContent(),
+                        proposalOrBugReportEvent.getImagePath());
             }
             else if (event instanceof PostAbuseReportEvent postAbuseReportEvent) {
                 addPostAbuseReport(postAbuseReportEvent.getMemberId(), postAbuseReportEvent.getPostUlid());
             }
             else if (event instanceof CommentAbuseReportEvent commentAbuseReportEvent) {
-                addCommentAbuseReport(commentAbuseReportEvent.getMemberId(), commentAbuseReportEvent.getPostUlid(), commentAbuseReportEvent.getPath());
+                addCommentAbuseReport(
+                        commentAbuseReportEvent.getMemberId(),
+                        commentAbuseReportEvent.getPostUlid(),
+                        commentAbuseReportEvent.getPath());
             }
         });
         this.memberJpaRepository = memberJpaRepository;
@@ -66,7 +73,7 @@ public class ReportEventConsumer {
     private void addCommentAbuseReport(UUID memberId, String postUlid, String path) {
         SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
         CommCommentEntity commentEntity = commentJpaRepository.findById(
-                CommCommentId.builder().postUlid(postUlid).path(path).build()).orElseThrow();
+                CommCommentId.builder().post(postUlid).path(path).build()).orElseThrow();
         commentAbuRepJpaRepository.save(
                 CommCommentAbuRepEntity.builder().member(memberEntity).comment(commentEntity).build());
     }

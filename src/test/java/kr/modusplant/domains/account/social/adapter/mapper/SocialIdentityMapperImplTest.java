@@ -13,7 +13,9 @@ import kr.modusplant.shared.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_GOOGLE_USER_NICKNAME;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_KAKAO_USER_NICKNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
@@ -27,9 +29,9 @@ class SocialIdentityMapperImplTest implements SocialMemberProfileTestUtils {
     void testToSocialProfile_givenSocialProviderAndKakaoUserInfo_willReturnSocialProfile() {
         // given
         SocialUserInfo userInfo = mock(KakaoUserInfo.class);
-        given(userInfo.getId()).willReturn(TEST_SOCIAL_KAKAO_PROVIDER_ID_STRING);
-        given(userInfo.getEmail()).willReturn(TEST_SOCIAL_KAKAO_EMAIL_STRING);
-        given(userInfo.getNickname()).willReturn(TEST_SOCIAL_KAKAO_NICKNAME_STRING);
+        given(userInfo.getId()).willReturn(MEMBER_AUTH_KAKAO_USER_PROVIDER_ID);
+        given(userInfo.getEmail()).willReturn(MEMBER_AUTH_KAKAO_USER_EMAIL);
+        given(userInfo.getNickname()).willReturn(MEMBER_KAKAO_USER_NICKNAME);
 
         // when
         SocialProfile result = socialIdentityMapper.toSocialProfile(SocialProvider.GOOGLE.KAKAO,userInfo);
@@ -37,9 +39,9 @@ class SocialIdentityMapperImplTest implements SocialMemberProfileTestUtils {
         // then
         assertNotNull(result);
         assertEquals(SocialProvider.KAKAO, result.getSocialProvider());
-        assertEquals(TEST_SOCIAL_KAKAO_PROVIDER_ID_STRING, result.getProviderId());
-        assertEquals(TEST_SOCIAL_KAKAO_EMAIL_STRING, result.getEmail().getValue());
-        assertEquals(TEST_SOCIAL_KAKAO_NICKNAME_STRING, result.getSocialNickname());
+        assertEquals(MEMBER_AUTH_KAKAO_USER_PROVIDER_ID, result.getProviderId());
+        assertEquals(MEMBER_AUTH_KAKAO_USER_EMAIL, result.getEmail().getValue());
+        assertEquals(MEMBER_KAKAO_USER_NICKNAME, result.getSocialNickname());
     }
 
     @Test
@@ -47,9 +49,9 @@ class SocialIdentityMapperImplTest implements SocialMemberProfileTestUtils {
     void testToSocialProfile_givenSocialProviderAndGoogleUserInfo_willReturnSocialProfile() {
         // given
         SocialUserInfo userInfo = mock(GoogleUserInfo.class);
-        given(userInfo.getId()).willReturn(TEST_SOCIAL_GOOGLE_PROVIDER_ID_STRING);
-        given(userInfo.getEmail()).willReturn(TEST_SOCIAL_GOOGLE_EMAIL_STRING);
-        given(userInfo.getNickname()).willReturn(TEST_SOCIAL_GOOGLE_NICKNAME_STRING);
+        given(userInfo.getId()).willReturn(MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID);
+        given(userInfo.getEmail()).willReturn(MEMBER_AUTH_GOOGLE_USER_EMAIL);
+        given(userInfo.getNickname()).willReturn(MEMBER_GOOGLE_USER_NICKNAME);
 
         // when
         SocialProfile result = socialIdentityMapper.toSocialProfile(SocialProvider.GOOGLE,userInfo);
@@ -57,9 +59,9 @@ class SocialIdentityMapperImplTest implements SocialMemberProfileTestUtils {
         // then
         assertNotNull(result);
         assertEquals(SocialProvider.GOOGLE, result.getSocialProvider());
-        assertEquals(TEST_SOCIAL_GOOGLE_PROVIDER_ID_STRING, result.getProviderId());
-        assertEquals(TEST_SOCIAL_GOOGLE_EMAIL_STRING, result.getEmail().getValue());
-        assertEquals(TEST_SOCIAL_GOOGLE_NICKNAME_STRING, result.getSocialNickname());
+        assertEquals(MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID, result.getProviderId());
+        assertEquals(MEMBER_AUTH_GOOGLE_USER_EMAIL, result.getEmail().getValue());
+        assertEquals(MEMBER_GOOGLE_USER_NICKNAME, result.getSocialNickname());
     }
 
     @Test

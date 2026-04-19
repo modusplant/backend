@@ -351,7 +351,7 @@ public class MemberRestController {
             @Parameter(hidden = true)
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
             @AuthenticationPrincipal(expression = "uuid")
-            UUID memberId) {
+            UUID ignoredMemberId) {
         return ResponseEntity.badRequest().body(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_POST_ID));
     }
 
@@ -393,12 +393,12 @@ public class MemberRestController {
             )
             @PathVariable(required = false)
             @NotBlank(message = "댓글 경로가 비어 있습니다.")
-            String path,
+            String ignoredPath,
 
             @Parameter(hidden = true)
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
             @AuthenticationPrincipal(expression = "uuid")
-            UUID memberId) {
+            UUID ignoredMemberId) {
         return ResponseEntity.badRequest().body(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_COMMENT_ID));
     }
 
@@ -441,12 +441,26 @@ public class MemberRestController {
     )
     @DeleteMapping("/members")
     public ResponseEntity<DataResponse<Void>> withdrawMember(
+            @Parameter(
+                    description = "인증 코드",
+                    example = "BPAlKjanydCLdDnYdib6MQpDRwPG7hgqgWwECDwlr_jVWR6WpNeIbGlpBKIKKiVOAAABjE6Zt5qBPKUF0hG4dQ"
+            )
+            @RequestParam(required = false)
+            String authCode,
+
+            @Parameter(
+                    description = "인증 제공자",
+                    example = "kakao"
+            )
+            @RequestParam(required = false)
+            String authProvider,
+
             @Parameter(hidden = true)
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
         String accessToken = getTokenFromAuthorizationHeader(auth);
-        memberController.withdraw(new MemberWithdrawalRecord(accessToken));
+        memberController.withdraw(new MemberWithdrawalRecord(authCode, authProvider, accessToken));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 }

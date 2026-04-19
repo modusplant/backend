@@ -27,9 +27,13 @@ import kr.modusplant.domains.post.usecase.request.PostSearchRequest;
 import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
 import kr.modusplant.domains.post.usecase.response.*;
 import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -44,6 +48,8 @@ import java.util.UUID;
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.*;
 import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
 import static kr.modusplant.domains.post.common.util.usecase.model.PostWithSearchInfoReadModelTestUtils.TEST_POST_SUMMARY_WITH_SEARCH_INFO_READ_MODEL_NULL;
+import static kr.modusplant.domains.post.common.util.usecase.request.PostCategoryRequestTestUtils.testPostCategoryRequest;
+import static kr.modusplant.shared.exception.enums.GeneralErrorCode.INVALID_INPUT;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_PUBLISHED_AT;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
@@ -114,6 +120,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
                 SearchOption.TITLE_CONTENT, keyword, SearchSort.LATEST,
                 new PostCategoryRequest(null, null));
 
+        willDoNothing().given(postSearchHistoryRepository).saveSearchKeyword(MEMBER_BASIC_USER_UUID, keyword);
         given(postQueryRepository.searchByKeywordWithLatest(
                 SearchOption.TITLE_CONTENT, keyword, null,null,
                 memberUuid, ulid, TEST_COMM_POST_PUBLISHED_AT, size)).willReturn(readModels);
@@ -137,6 +144,25 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
                 SearchOption.TITLE_CONTENT, keyword, null,null,
                 memberUuid, ulid, TEST_COMM_POST_PUBLISHED_AT, size);
         verify(multipartDataProcessorPort).convertToPreview(TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY);
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {""})
+    @DisplayName("키워드 없이 게시글 목록을 검색하여 예외 발생")
+    void testGetByKeyword_givenNoKeyword_willThrowException(String keyword) {
+        // given & when
+        InvalidValueException invalidValueException = assertThrows(InvalidValueException.class,
+                () -> postController.getByKeyword(
+                        new PostSearchRequest(
+                                SearchOption.TITLE,
+                                keyword,
+                                SearchSort.LATEST,
+                                testPostCategoryRequest),
+                        MEMBER_BASIC_USER_UUID, null, null, null, null, 2));
+
+        // then
+        assertThat(invalidValueException.getErrorCode()).isEqualTo(INVALID_INPUT);
     }
 
     @Test

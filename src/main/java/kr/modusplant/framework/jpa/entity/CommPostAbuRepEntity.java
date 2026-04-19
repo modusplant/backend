@@ -1,7 +1,7 @@
 package kr.modusplant.framework.jpa.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.framework.jpa.generator.UlidGenerator;
+import kr.modusplant.shared.persistence.compositekey.CommPostAbuRepId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
 import static kr.modusplant.shared.persistence.constant.TableName.COMM_POST_ABU_REP;
@@ -21,22 +22,23 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_POST_ABU_
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = COMM_POST_ABU_REP)
+@IdClass(CommPostAbuRepId.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
 public class CommPostAbuRepEntity {
     @Id
-    @UlidGenerator
-    @Column(nullable = false, updatable = false)
-    private String ulid;
+    private UUID memberId;
 
+    @MapsId("memberId")
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = MEMB_UUID, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = MEMB_UUID, nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ToString.Exclude
     private SiteMemberEntity member;
 
+    @Id
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
-    @JoinColumn(name = POST_ULID, nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = POST_ULID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ToString.Exclude
     private CommPostEntity post;
 
@@ -60,7 +62,7 @@ public class CommPostAbuRepEntity {
     private Long versionNumber;
 
     public String getETagSource() {
-        return getUlid() + "-" + getVersionNumber();
+        return getMemberId() + "-" + getPost().getUlid() + "-" + getVersionNumber();
     }
 
     public LocalDateTime getLastModifiedAtAsTruncatedToSeconds() {
@@ -73,16 +75,18 @@ public class CommPostAbuRepEntity {
 
         if (!(object instanceof CommPostAbuRepEntity that)) return false;
 
-        return new EqualsBuilder().append(getUlid(), that.getUlid()).isEquals();
+        return new EqualsBuilder()
+                .append(getMember(), that.getMember())
+                .append(getPost(), that.getPost())
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(getUlid()).toHashCode();
+        return new HashCodeBuilder(17, 37).append(getMember()).append(getPost()).toHashCode();
     }
 
-    private CommPostAbuRepEntity(String ulid, SiteMemberEntity member, CommPostEntity post, LocalDateTime checkedAt, LocalDateTime handledAt) {
-        this.ulid = ulid;
+    private CommPostAbuRepEntity(SiteMemberEntity member, CommPostEntity post, LocalDateTime checkedAt, LocalDateTime handledAt) {
         this.member = member;
         this.post = post;
         this.checkedAt = checkedAt;
@@ -94,16 +98,10 @@ public class CommPostAbuRepEntity {
     }
 
     public static final class CommPostAbuRepEntityBuilder {
-        private String ulid;
         private SiteMemberEntity member;
         private CommPostEntity post;
         private LocalDateTime checkedAt;
         private LocalDateTime handledAt;
-
-        public CommPostAbuRepEntityBuilder ulid(final String ulid) {
-            this.ulid = ulid;
-            return this;
-        }
 
         public CommPostAbuRepEntityBuilder member(final SiteMemberEntity member) {
             this.member = member;
@@ -126,7 +124,6 @@ public class CommPostAbuRepEntity {
         }
 
         public CommPostAbuRepEntityBuilder commPostAbuRep(final CommPostAbuRepEntity postAbuRep) {
-            this.ulid = postAbuRep.getUlid();
             this.member = postAbuRep.getMember();
             this.post = postAbuRep.getPost();
             this.checkedAt = postAbuRep.getCheckedAt();
@@ -135,7 +132,7 @@ public class CommPostAbuRepEntity {
         }
 
         public CommPostAbuRepEntity build() {
-            return new CommPostAbuRepEntity(this.ulid, this.member, this.post, this.checkedAt, this.handledAt);
+            return new CommPostAbuRepEntity(this.member, this.post, this.checkedAt, this.handledAt);
         }
     }
 }

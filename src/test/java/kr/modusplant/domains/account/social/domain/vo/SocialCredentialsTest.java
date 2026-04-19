@@ -8,9 +8,9 @@ import kr.modusplant.shared.enums.AuthProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_GOOGLE_PROVIDER_ID_STRING;
-import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_PROVIDER_ID_STRING;
 import static kr.modusplant.shared.kernel.common.util.EmailTestUtils.testKakaoUserEmail;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_KAKAO_USER_PROVIDER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,23 +20,23 @@ class SocialCredentialsTest implements SocialCredentialsTestUtils {
     @DisplayName("유효한 provider와 providerId로 SocialCredentials를 생성한다")
     void testCreate_givenValidProviderAndProviderId_willReturnSocialCredentials() {
         // when & then
-        SocialCredentials kakaoCredentials = SocialCredentials.create(AuthProvider.KAKAO,TEST_SOCIAL_KAKAO_PROVIDER_ID_STRING);
-        SocialCredentials googleCredentials = SocialCredentials.create(AuthProvider.GOOGLE,TEST_SOCIAL_GOOGLE_PROVIDER_ID_STRING);
+        SocialCredentials kakaoCredentials = SocialCredentials.create(AuthProvider.KAKAO, MEMBER_AUTH_KAKAO_USER_PROVIDER_ID);
+        SocialCredentials googleCredentials = SocialCredentials.create(AuthProvider.GOOGLE, MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID);
 
         assertNotNull(kakaoCredentials);
         assertThat(kakaoCredentials.getProvider()).isEqualTo(AuthProvider.KAKAO);
-        assertThat(kakaoCredentials.getProviderId()).isEqualTo(TEST_SOCIAL_KAKAO_PROVIDER_ID_STRING);
+        assertThat(kakaoCredentials.getProviderId()).isEqualTo(MEMBER_AUTH_KAKAO_USER_PROVIDER_ID);
 
         assertNotNull(googleCredentials);
         assertThat(googleCredentials.getProvider()).isEqualTo(AuthProvider.GOOGLE);
-        assertThat(googleCredentials.getProviderId()).isEqualTo(TEST_SOCIAL_GOOGLE_PROVIDER_ID_STRING);
+        assertThat(googleCredentials.getProviderId()).isEqualTo(MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID);
     }
 
     @Test
     @DisplayName("빈 provider와 providerId로 생성 시 예외 발생")
     void testCreate_givenNullProviderOrProviderId_willThrowException() {
         // when & then
-        EmptyValueException providerException = assertThrows(EmptyValueException.class, () -> SocialCredentials.create(null, TEST_SOCIAL_KAKAO_PROVIDER_ID_STRING));
+        EmptyValueException providerException = assertThrows(EmptyValueException.class, () -> SocialCredentials.create(null, MEMBER_AUTH_KAKAO_USER_PROVIDER_ID));
         EmptyValueException providerIdException1 = assertThrows(EmptyValueException.class, () -> SocialCredentials.create(AuthProvider.KAKAO, null));
         EmptyValueException providerIdException2 = assertThrows(EmptyValueException.class, () -> SocialCredentials.create(AuthProvider.KAKAO, ""));
         EmptyValueException providerIdException3 = assertThrows(EmptyValueException.class, () -> SocialCredentials.create(AuthProvider.KAKAO, "   "));
@@ -69,12 +69,12 @@ class SocialCredentialsTest implements SocialCredentialsTestUtils {
     @DisplayName("유효한 Kakao providerId로 SocialCredentials를 생성한다")
     void testCreateKakao_givenValidProviderId_willReturnSocialCredentials() {
         // when
-        SocialCredentials credentials = SocialCredentials.createKakao(TEST_SOCIAL_KAKAO_PROVIDER_ID_STRING);
+        SocialCredentials credentials = SocialCredentials.createKakao(MEMBER_AUTH_KAKAO_USER_PROVIDER_ID);
 
         // then
         assertNotNull(credentials);
         assertThat(AuthProvider.KAKAO).isEqualTo(credentials.getProvider());
-        assertThat(TEST_SOCIAL_KAKAO_PROVIDER_ID_STRING).isEqualTo(credentials.getProviderId());
+        assertThat(MEMBER_AUTH_KAKAO_USER_PROVIDER_ID).isEqualTo(credentials.getProviderId());
         assertTrue(credentials.isKakao());
     }
 
@@ -82,12 +82,12 @@ class SocialCredentialsTest implements SocialCredentialsTestUtils {
     @DisplayName("유효한 Google providerId로 SocialCredentials를 생성한다")
     void testCreateGoogle_givenValidProviderId_willReturnSocialCredentials() {
         // when
-        SocialCredentials credentials = SocialCredentials.createGoogle(TEST_SOCIAL_GOOGLE_PROVIDER_ID_STRING);
+        SocialCredentials credentials = SocialCredentials.createGoogle(MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID);
 
         // then
         assertNotNull(credentials);
         assertThat(AuthProvider.GOOGLE).isEqualTo(credentials.getProvider());
-        assertThat(TEST_SOCIAL_GOOGLE_PROVIDER_ID_STRING).isEqualTo(credentials.getProviderId());
+        assertThat(MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID).isEqualTo(credentials.getProviderId());
         assertTrue(credentials.isGoogle());
     }
 
@@ -95,12 +95,12 @@ class SocialCredentialsTest implements SocialCredentialsTestUtils {
     @DisplayName("유효한 providerId로 BasicKakao SocialCredentials를 생성한다")
     void testCreateBasicKakao_givenValidProviderId_willReturnSocialCredentials() {
         // when
-        SocialCredentials credentials = SocialCredentials.createBasicKakao(TEST_SOCIAL_KAKAO_PROVIDER_ID_STRING);
+        SocialCredentials credentials = SocialCredentials.createBasicKakao(MEMBER_AUTH_KAKAO_USER_PROVIDER_ID);
 
         // then
         assertNotNull(credentials);
         assertThat(credentials.getProvider()).isEqualTo(AuthProvider.BASIC_KAKAO);
-        assertThat(credentials.getProviderId()).isEqualTo(TEST_SOCIAL_KAKAO_PROVIDER_ID_STRING);
+        assertThat(credentials.getProviderId()).isEqualTo(MEMBER_AUTH_KAKAO_USER_PROVIDER_ID);
         assertTrue(credentials.isKakao());
         assertTrue(credentials.isLinked());
     }
@@ -109,12 +109,12 @@ class SocialCredentialsTest implements SocialCredentialsTestUtils {
     @DisplayName("유효한 providerId로 BasicGoogle SocialCredentials를 생성한다")
     void testCreateBasicGoogle_givenValidProviderId_willReturnSocialCredentials() {
         // when
-        SocialCredentials credentials = SocialCredentials.createBasicGoogle(TEST_SOCIAL_GOOGLE_PROVIDER_ID_STRING);
+        SocialCredentials credentials = SocialCredentials.createBasicGoogle(MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID);
 
         // then
         assertNotNull(credentials);
         assertThat(credentials.getProvider()).isEqualTo(AuthProvider.BASIC_GOOGLE);
-        assertThat(credentials.getProviderId()).isEqualTo(TEST_SOCIAL_GOOGLE_PROVIDER_ID_STRING);
+        assertThat(credentials.getProviderId()).isEqualTo(MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID);
         assertTrue(credentials.isGoogle());
         assertTrue(credentials.isLinked());
     }

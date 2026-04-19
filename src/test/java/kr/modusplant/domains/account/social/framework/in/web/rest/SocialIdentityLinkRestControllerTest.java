@@ -64,22 +64,4 @@ class SocialIdentityLinkRestControllerTest implements SocialAuthRequestTestUtils
         assertThat(response.getBody().toString()).isEqualTo(DataResponse.ok().toString());
         verify(socialIdentityLinkController).unlinkSocialAccount(userDetails.getUuid(), SocialProvider.KAKAO, socialAccessToken);
     }
-
-    @Test
-    @DisplayName("소셜 계정 탈퇴 성공 시 성공 응답을 반환한다.")
-    void testWithdrawSocialAccount_givenCode_willReturnSuccessResponse() {
-        // given
-        DefaultUserDetails userDetails = testDefaultMemberUserDetailsBuilder.build();
-        String socialAccessToken = "social-access-token";
-        given(socialIdentityController.issueSocialAccessToken(SocialProvider.KAKAO,TEST_SOCIAL_KAKAO_CODE)).willReturn(socialAccessToken);
-        willDoNothing().given(socialIdentityLinkController).deleteSocialAccount(userDetails.getUuid(),SocialProvider.KAKAO,socialAccessToken);
-
-        // when
-        ResponseEntity<DataResponse<Void>> response = socialIdentityLinkRestController.withdrawSocialAccount(userDetails,createTestKakaoLoginRequest(),SocialProvider.KAKAO);
-
-        // then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody().toString()).isEqualTo(DataResponse.ok().toString());
-        verify(socialIdentityLinkController).deleteSocialAccount(userDetails.getUuid(), SocialProvider.KAKAO, socialAccessToken);
-    }
 }

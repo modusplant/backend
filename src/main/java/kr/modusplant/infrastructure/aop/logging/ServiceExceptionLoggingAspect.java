@@ -47,10 +47,19 @@ public class ServiceExceptionLoggingAspect {
             String uri = MDC.get("uri") != null ? MDC.get("uri") : "N/A";
             String method = MDC.get("method") != null ? MDC.get("method") : "N/A";
 
-            log.error("[BIZ ERROR] traceId={} | method={} | params={} | exception={} | message={} | location={}\n" +
-                            "[BIZ ERROR - HTTP_REQUEST_INFO] httpMethod={} | uri={} | clientIp={}",
-                    traceId, methodName, Arrays.toString(args), ex.getClass().getSimpleName(), ex.getMessage(), errorLocation,
-                    uri, method, clientIp);
+            if (ex.getCause() == null) {
+                log.error("[BIZ ERROR] traceId={} | method={} | params={} | exception={} | message={} | location={}\n" +
+                                "[BIZ ERROR - HTTP_REQUEST_INFO] httpMethod={} | uri={} | clientIp={}",
+                        traceId, methodName, Arrays.toString(args), ex.getClass().getSimpleName(), ex.getMessage(), errorLocation,
+                        uri, method, clientIp);
+            } else {
+                log.error("[BIZ ERROR] traceId={} | method={} | params={} | exception={} | " +
+                                "message={} | causeMessage = {} | location={}\n" +
+                                "[BIZ ERROR - HTTP_REQUEST_INFO] httpMethod={} | uri={} | clientIp={}",
+                        traceId, methodName, Arrays.toString(args), ex.getClass().getSimpleName(),
+                        ex.getMessage(), ex.getCause().getMessage(), errorLocation,
+                        uri, method, clientIp);
+            }
         }
         MDC.put("isLogged", Boolean.TRUE.toString());
     }

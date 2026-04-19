@@ -29,7 +29,7 @@ public class DefaultUserDetailsService implements UserDetailsService {
     public DefaultUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         SiteMemberAuthEntity auth = memberAuthRepository
-                .findByEmailAndProvider(email, AuthProvider.BASIC).orElseThrow(
+                .findByEmail(email).orElseThrow(
                         () -> new AccountStateException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH));
         SiteMemberEntity member = memberRepository
                 .findByUuid(auth.getMember().getUuid()).orElseThrow(

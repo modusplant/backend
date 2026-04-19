@@ -1,17 +1,21 @@
 package kr.modusplant.infrastructure.event.consumer;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.MemberWithdrawalEvent;
-import org.jetbrains.annotations.NotNull;
 import org.jooq.DSLContext;
-import org.springframework.data.redis.core.*;
+import org.jooq.JSONB;
+import org.springframework.data.redis.connection.StringRedisConnection;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static kr.modusplant.jooq.Tables.*;
 import static org.jooq.impl.DSL.select;
@@ -21,8 +25,13 @@ import static org.jooq.impl.DSL.val;
 public class MemberEventConsumer {
     private final StringRedisTemplate stringRedisTemplate;
     private final DSLContext dsl;
+    private final S3FileService s3FileService;
+    private final JsonbJsonNodeConverter jsonbJsonNodeConverter = new JsonbJsonNodeConverter();
 
-    public MemberEventConsumer(EventBus eventBus, StringRedisTemplate stringRedisTemplate, DSLContext dsl) {
+    public MemberEventConsumer(EventBus eventBus,
+                               StringRedisTemplate stringRedisTemplate,
+                               DSLContext dsl,
+                               S3FileService s3FileService) {
         eventBus.subscribe(event -> {
             if (event instanceof MemberWithdrawalEvent memberWithdrawalEvent) {
                 deleteAllWithMemberPKAndAlterAllWithMemberFK(memberWithdrawalEvent.getMemberId());
@@ -30,14 +39,26 @@ public class MemberEventConsumer {
         });
         this.stringRedisTemplate = stringRedisTemplate;
         this.dsl = dsl;
+        this.s3FileService = s3FileService;
     }
 
     private void deleteAllWithMemberPKAndAlterAllWithMemberFK(UUID memberId) {
-        stringRedisTemplate.unlink("recentlyView:member:%s:posts".formatted(memberId));
+        stringRedisTemplate.unlink("recentlyView:member:%s:posts".formatted(memberId));     // 최근에 본 게시글 데이터 삭제
 
-        String[] deletedPublishedPostIds = deleteAllPostWithMemberPK(memberId);
-        if (deletedPublishedPostIds.length != 0) {
+        String[] publishedPostUlids = dsl.select(COMM_POST.ULID)    // 발행되어 타 회원이 접근할 수 있는 게시글 ID 획득
+                .from(COMM_POST)
+                .where(COMM_POST.AUTH_MEMB_UUID.eq(memberId))
+                .and(COMM_POST.IS_PUBLISHED.isTrue())
+                .fetchInto(String.class).toArray(new String[0]);
 
+        deleteRecentlyViewPostRecords(publishedPostUlids);
+        deleteImagesFromPublishedPosts(publishedPostUlids);
+        deletePostsAndRelatedRecords(memberId, publishedPostUlids);
+        deleteOtherMemberRelatedRecords(memberId);
+    }
+
+    private void deleteRecentlyViewPostRecords(String[] publishedPostUlids) {
+        if (publishedPostUlids.length != 0) {
             Set<String> targetKeys = new HashSet<>();
 
             stringRedisTemplate.execute((RedisCallback<Void>) connection -> {
@@ -45,46 +66,102 @@ public class MemberEventConsumer {
                         .match("recentlyView:member:*:posts")
                         .count(100)
                         .build();
-
                 try (Cursor<byte[]> cursor = connection.keyCommands().scan(options)) {
                     while (cursor.hasNext()) {
                         targetKeys.add(new String(cursor.next()));
                     }
-                } catch (Exception e) {
-                    throw new RuntimeException("Redis SCAN failed", e);
                 }
                 return null;
             });
 
             if (!targetKeys.isEmpty()) {
-                stringRedisTemplate.executePipelined(new SessionCallback<>() {
-                    @Override
-                    public <K, V> Object execute(@NotNull RedisOperations<K, V> operations) {
-                        for (String key : targetKeys) {
-                            ((StringRedisTemplate) operations).opsForZSet()
-                                    .remove(key, (Object[]) deletedPublishedPostIds);
-                        }
-                        return null;
+                stringRedisTemplate.executePipelined((RedisCallback<Void>) connection -> {
+                    StringRedisConnection stringConnection = (StringRedisConnection) connection;
+                    for (String key : targetKeys) {
+                        stringConnection.zRem(key, publishedPostUlids);
                     }
+                    return null;
                 });
             }
         }
+    }
 
+    private void deleteImagesFromPublishedPosts(String[] publishedPostUlids) {
+        List<JsonNode> publishedPostContents = dsl.select(COMM_POST.CONTENT)    // 발행된 게시글의 컨텐츠 획득
+                .from(COMM_POST)
+                .where(COMM_POST.ULID.in(publishedPostUlids))
+                .fetchInto(JSONB.class)
+                .stream()
+                .map(jsonbJsonNodeConverter::from)
+                .toList();
+
+        List<String> fileKeysToDelete = new ArrayList<>();      // 컨텐츠로부터 파일 키 수집
+        for (JsonNode content : publishedPostContents) {
+            if (content == null || !content.isArray()) {
+                continue;
+            }
+            for (JsonNode node : content) {
+                if (node.has("src")) {
+                    fileKeysToDelete.add(node.get("src").asText());
+                }
+            }
+        }
+
+        if (!fileKeysToDelete.isEmpty()) {      // 파일 키로 클라우드 플랫폼에서 파일 삭제
+            s3FileService.deleteFiles(fileKeysToDelete);
+        }
+    }
+
+    private void deletePostsAndRelatedRecords(UUID memberId, String[] publishedPostUlids) {
+        if (publishedPostUlids.length != 0) {
+            dsl.batch(
+                    dsl.insertInto(COMM_POST_ARCHIVE,
+                                    COMM_POST_ARCHIVE.ULID,
+                                    COMM_POST_ARCHIVE.PRI_CATE_ID,
+                                    COMM_POST_ARCHIVE.SECO_CATE_ID,
+                                    COMM_POST_ARCHIVE.AUTH_MEMB_UUID,
+                                    COMM_POST_ARCHIVE.TITLE,
+                                    COMM_POST_ARCHIVE.CONTENT_TEXT,
+                                    COMM_POST_ARCHIVE.CREATED_AT,
+                                    COMM_POST_ARCHIVE.ARCHIVED_AT,
+                                    COMM_POST_ARCHIVE.UPDATED_AT,
+                                    COMM_POST_ARCHIVE.PUBLISHED_AT
+                            )
+                            .select(
+                                    select(
+                                            COMM_POST.ULID,
+                                            COMM_POST.PRI_CATE_ID,
+                                            COMM_POST.SECO_CATE_ID,
+                                            COMM_POST.AUTH_MEMB_UUID,
+                                            COMM_POST.TITLE,
+                                            COMM_POST.CONTENT_TEXT,
+                                            COMM_POST.CREATED_AT,
+                                            val(LocalDateTime.now()),
+                                            COMM_POST.UPDATED_AT,
+                                            COMM_POST.PUBLISHED_AT
+                                    )
+                                            .from(COMM_POST)
+                                            .where(COMM_POST.ULID.in(publishedPostUlids))
+                            ),
+
+                    dsl.deleteFrom(COMM_POST_LIKE)
+                            .where(COMM_POST_LIKE.POST_ULID.in(publishedPostUlids)),
+
+                    dsl.deleteFrom(COMM_POST_BOOKMARK)
+                            .where(COMM_POST_BOOKMARK.POST_ULID.in(publishedPostUlids)),
+
+                    dsl.deleteFrom(COMM_POST)
+                            .where(COMM_POST.AUTH_MEMB_UUID.eq(memberId))
+            ).execute();
+        }
+    }
+
+    private void deleteOtherMemberRelatedRecords(UUID memberId) {
         dsl.batch(
-                dsl.update(COMM_COMMENT_ABU_REP)
-                        .setNull(COMM_COMMENT_ABU_REP.MEMB_UUID)
-                        .set(COMM_COMMENT_ABU_REP.LAST_MODIFIED_AT, LocalDateTime.now())
-                        .where(COMM_COMMENT_ABU_REP.MEMB_UUID.eq(memberId)),
-
                 dsl.update(COMM_COMMENT)
                         .setNull(COMM_COMMENT.AUTH_MEMB_UUID)
                         .set(COMM_COMMENT.IS_DELETED, true)
                         .where(COMM_COMMENT.AUTH_MEMB_UUID.eq(memberId)),
-
-                dsl.update(COMM_POST_ABU_REP)
-                        .setNull(COMM_POST_ABU_REP.MEMB_UUID)
-                        .set(COMM_POST_ABU_REP.LAST_MODIFIED_AT, LocalDateTime.now())
-                        .where(COMM_POST_ABU_REP.MEMB_UUID.eq(memberId)),
 
                 dsl.update(COMM_POST_ARCHIVE)
                         .setNull(COMM_POST_ARCHIVE.AUTH_MEMB_UUID)
@@ -105,8 +182,14 @@ public class MemberEventConsumer {
                 dsl.deleteFrom(COMM_POST_BOOKMARK)
                         .where(COMM_POST_BOOKMARK.MEMB_UUID.eq(memberId)),
 
+                dsl.deleteFrom(COMM_POST_ABU_REP)
+                        .where(COMM_POST_ABU_REP.MEMB_UUID.eq(memberId)),
+
                 dsl.deleteFrom(COMM_COMMENT_LIKE)
                         .where(COMM_COMMENT_LIKE.MEMB_UUID.eq(memberId)),
+
+                dsl.deleteFrom(COMM_COMMENT_ABU_REP)
+                        .where(COMM_COMMENT_ABU_REP.MEMB_UUID.eq(memberId)),
 
                 dsl.deleteFrom(SITE_MEMBER_PROF)
                         .where(SITE_MEMBER_PROF.UUID.eq(memberId)),
@@ -121,59 +204,5 @@ public class MemberEventConsumer {
                         .where(SITE_MEMBER.UUID.eq(memberId))
 
         ).execute();
-    }
-
-    private String[] deleteAllPostWithMemberPK(UUID memberId) {
-        List<String> targetUlids = dsl.select(COMM_POST.ULID)
-                .from(COMM_POST)
-                .where(COMM_POST.AUTH_MEMB_UUID.eq(memberId))
-                .and(COMM_POST.IS_PUBLISHED.isTrue())
-                .fetchInto(String.class);
-
-        if (targetUlids.isEmpty()) {
-            return new String[0];
-        }
-
-        dsl.batch(
-                dsl.insertInto(COMM_POST_ARCHIVE,
-                                COMM_POST_ARCHIVE.ULID,
-                                COMM_POST_ARCHIVE.PRI_CATE_ID,
-                                COMM_POST_ARCHIVE.SECO_CATE_ID,
-                                COMM_POST_ARCHIVE.AUTH_MEMB_UUID,
-                                COMM_POST_ARCHIVE.TITLE,
-                                COMM_POST_ARCHIVE.CONTENT_TEXT,
-                                COMM_POST_ARCHIVE.CREATED_AT,
-                                COMM_POST_ARCHIVE.ARCHIVED_AT,
-                                COMM_POST_ARCHIVE.UPDATED_AT,
-                                COMM_POST_ARCHIVE.PUBLISHED_AT
-                        )
-                        .select(
-                                select(
-                                        COMM_POST.ULID,
-                                        COMM_POST.PRI_CATE_ID,
-                                        COMM_POST.SECO_CATE_ID,
-                                        COMM_POST.AUTH_MEMB_UUID,
-                                        COMM_POST.TITLE,
-                                        COMM_POST.CONTENT_TEXT,
-                                        COMM_POST.CREATED_AT,
-                                        val(LocalDateTime.now()),
-                                        COMM_POST.UPDATED_AT,
-                                        COMM_POST.PUBLISHED_AT
-                                )
-                                        .from(COMM_POST)
-                                        .where(COMM_POST.ULID.in(targetUlids))
-                        ),
-
-                dsl.deleteFrom(COMM_POST_LIKE)
-                        .where(COMM_POST_LIKE.POST_ULID.in(targetUlids)),
-
-                dsl.deleteFrom(COMM_POST_BOOKMARK)
-                        .where(COMM_POST_BOOKMARK.POST_ULID.in(targetUlids)),
-
-                dsl.deleteFrom(COMM_POST)
-                        .where(COMM_POST.AUTH_MEMB_UUID.eq(memberId))
-        ).execute();
-
-        return targetUlids.toArray(new String[0]);
     }
 }
