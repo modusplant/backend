@@ -25,6 +25,7 @@ import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -74,6 +75,12 @@ public class PostController {
             PostSearchRequest postSearchRequest, UUID currentMemberUuid,
             String lastUlid, Integer lastImportance, Double lastWordSimilarity, LocalDateTime lastPublishedAt,
             int size) {
+        String keyword = postSearchRequest.keyword();
+        if (StringUtils.isEmpty(keyword)) {
+            throw new InvalidValueException(GeneralErrorCode.INVALID_INPUT, "keyword");
+        }
+        keyword = keyword.trim();
+
         if (lastUlid != null && !lastUlid.matches(REGEX_ULID)) {
             throw new InvalidValueException(GeneralErrorCode.MALFORMED_INPUT, "lastUlid");
         }
@@ -103,13 +110,13 @@ public class PostController {
         List<PostSummaryWithSearchInfoReadModel> readModels;
         if (postSearchRequest.sort().equals(SearchSort.LATEST)) {
             readModels = postQueryRepository.searchByKeywordWithLatest(
-                    postSearchRequest.option(), postSearchRequest.keyword(),
+                    postSearchRequest.option(), keyword,
                     postSearchRequest.category().primaryCategoryId(),
                     postSearchRequest.category().secondaryCategoryIds(),
                     currentMemberUuid, lastUlid, lastPublishedAt, size);
         } else {
             readModels = postQueryRepository.searchByKeywordWithRelevance(
-                    postSearchRequest.option(), postSearchRequest.keyword(),
+                    postSearchRequest.option(), keyword,
                     postSearchRequest.category().primaryCategoryId(),
                     postSearchRequest.category().secondaryCategoryIds(),
                     currentMemberUuid, lastUlid, lastImportance, lastWordSimilarity, lastPublishedAt, size);
@@ -122,7 +129,7 @@ public class PostController {
                                 postMapper.toPostSummaryWithSearchInfoResponse(
                                         readModel, getJsonNodeContentPreview(readModel.content(), readModel.thumbnailPath())))
                         .toList();
-        postSearchHistoryRepository.saveSearchKeyword(currentMemberUuid, postSearchRequest.keyword());
+        postSearchHistoryRepository.saveSearchKeyword(currentMemberUuid, keyword);
         PostSummaryWithSearchInfoResponse response = hasNext && !responses.isEmpty() ? responses.getLast() : null;
         if (response != null) {
             return CursorRelevanceSortedPageResponse.of(
