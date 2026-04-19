@@ -26,6 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN;
 import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -46,7 +47,6 @@ class SocialIdentityRestControllerTest implements SocialAuthRequestTestUtils, So
             socialIdentityController, tokenService, jwtCookieProvider, tempTokenHelper
     );
 
-    private static final String SOCIAL_ACCESS_TOKEN = "social_access_token";
     private static final String TEMP_TOKEN = "temp_token";
     private static final String REFRESH_COOKIE = "refreshToken=eyJ...";
     private static final String TEMP_COOKIE = "tempToken=eyJ...";
@@ -61,8 +61,8 @@ class SocialIdentityRestControllerTest implements SocialAuthRequestTestUtils, So
         SocialAuthRequest request = new SocialAuthRequest("auth_code");
         LoginResult loginResult = createKakaoLoginResult();
 
-        given(socialIdentityController.issueSocialAccessToken(SocialProvider.KAKAO, request.code())).willReturn(SOCIAL_ACCESS_TOKEN);
-        given(socialIdentityController.handleSocialLogin(SocialProvider.KAKAO, SOCIAL_ACCESS_TOKEN)).willReturn(loginResult);
+        given(socialIdentityController.issueSocialAccessToken(SocialProvider.KAKAO, request.code())).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
+        given(socialIdentityController.handleSocialLogin(SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN)).willReturn(loginResult);
         given(tokenService.issueToken(loginResult.uuid(), loginResult.nickname(), loginResult.email(), loginResult.role())).willReturn(TOKEN_PAIR);
         given(jwtCookieProvider.generateRefreshTokenCookieAsString(TOKEN_PAIR.refreshToken())).willReturn(REFRESH_COOKIE);
 
@@ -83,14 +83,14 @@ class SocialIdentityRestControllerTest implements SocialAuthRequestTestUtils, So
         SocialAuthRequest request = new SocialAuthRequest("auth_code");
         NeedSignupResult needSignupResult = createKakaoNeedSignupResult();
 
-        given(socialIdentityController.issueSocialAccessToken(SocialProvider.KAKAO, request.code())).willReturn(SOCIAL_ACCESS_TOKEN);
-        given(socialIdentityController.handleSocialLogin(SocialProvider.KAKAO, SOCIAL_ACCESS_TOKEN))
+        given(socialIdentityController.issueSocialAccessToken(SocialProvider.KAKAO, request.code())).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
+        given(socialIdentityController.handleSocialLogin(SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN))
                 .willReturn(needSignupResult);
         given(tempTokenHelper.generateTempToken(
                 eq(needSignupResult.email()),
                 eq(needSignupResult.providerId()),
                 eq(needSignupResult.socialProvider()),
-                eq(SOCIAL_ACCESS_TOKEN),
+                eq(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN),
                 anyLong()
         )).willReturn(TEMP_TOKEN);
         given(jwtCookieProvider.generateTempTokenCookieAsString(eq(TEMP_TOKEN), anyLong()))
@@ -116,14 +116,14 @@ class SocialIdentityRestControllerTest implements SocialAuthRequestTestUtils, So
         NeedLinkResult needLinkResult = createKakaoNeedLinkResult();
 
         given(socialIdentityController.issueSocialAccessToken(SocialProvider.KAKAO, request.code()))
-                .willReturn(SOCIAL_ACCESS_TOKEN);
-        given(socialIdentityController.handleSocialLogin(SocialProvider.KAKAO, SOCIAL_ACCESS_TOKEN))
+                .willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
+        given(socialIdentityController.handleSocialLogin(SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN))
                 .willReturn(needLinkResult);
         given(tempTokenHelper.generateTempToken(
                 eq(needLinkResult.email()),
                 eq(needLinkResult.providerId()),
                 eq(needLinkResult.socialProvider()),
-                eq(SOCIAL_ACCESS_TOKEN),
+                eq(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN),
                 anyLong()
         )).willReturn(TEMP_TOKEN);
         given(jwtCookieProvider.generateTempTokenCookieAsString(eq(TEMP_TOKEN), anyLong()))
@@ -210,9 +210,9 @@ class SocialIdentityRestControllerTest implements SocialAuthRequestTestUtils, So
         given(tempTokenHelper.getSocialProviderFromClaims(TEMP_TOKEN))
                 .willReturn(SocialProvider.KAKAO);
         given(tempTokenHelper.getSocialAccessTokenFromClaims(TEMP_TOKEN))
-                .willReturn(SOCIAL_ACCESS_TOKEN);
+                .willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
         willDoNothing().given(socialIdentityController)
-                .unlinkSocialAccount(SocialProvider.KAKAO, SOCIAL_ACCESS_TOKEN);
+                .unlinkSocialAccount(SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
         given(jwtCookieProvider.deleteTempTokenCookieAsString())
                 .willReturn(EXPIRED_TEMP_COOKIE);
 
@@ -224,6 +224,6 @@ class SocialIdentityRestControllerTest implements SocialAuthRequestTestUtils, So
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE)).contains(EXPIRED_TEMP_COOKIE);
         assertThat(response.getBody().toString()).isEqualTo(DataResponse.ok().toString());
-        verify(socialIdentityController).unlinkSocialAccount(SocialProvider.KAKAO, SOCIAL_ACCESS_TOKEN);
+        verify(socialIdentityController).unlinkSocialAccount(SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
     }
 }

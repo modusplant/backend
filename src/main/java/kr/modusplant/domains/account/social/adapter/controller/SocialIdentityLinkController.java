@@ -55,11 +55,11 @@ public class SocialIdentityLinkController {
         AccountId accountId = AccountId.fromUuid(currentMemberUuid);
         SocialMemberProfile memberProfile = socialIdentityRepository.getSocialMemberProfileByAccountId(accountId);
         SocialCredentials socialCredentials = memberProfile.getSocialCredentials();
-        if(socialCredentials.isPureBasic()) {
+        if (socialCredentials.isPureBasic()) {
             throw new SocialAccountConflictException(SocialIdentityErrorCode.NOT_LINKED);
-        } else if(socialCredentials.isPureSocial()) {
+        } else if (socialCredentials.isPureSocial()) {
             throw new SocialActionRequiredException(SocialIdentityErrorCode.SOCIAL_WITHDRAWAL_REQUIRED);
-        } else if (socialCredentials.isLinked() && matches(provider,socialCredentials)){
+        } else if (socialCredentials.isLinked() && matches(provider, socialCredentials)) {
             // 연동 해제
             clientFactory.getClient(provider).revokeAccess(socialAccessToken);
             socialIdentityRepository.updateSocialUnlinkedMember(accountId);
@@ -75,11 +75,10 @@ public class SocialIdentityLinkController {
         SocialCredentials socialCredentials = memberProfile.getSocialCredentials();
         if (socialCredentials.isPureBasic()) {
             throw new SocialAccountConflictException(SocialIdentityErrorCode.NORMAL_USER_CANNOT_WITHDRAW);
-        } else if(socialCredentials.isLinked()) {
+        } else if (socialCredentials.isLinked()) {
             throw new SocialActionRequiredException(SocialIdentityErrorCode.SOCIAL_LINKAGE_REQUIRED);
-        } else if(socialCredentials.isPureSocial() && matches(provider,socialCredentials)) {
+        } else if (socialCredentials.isPureSocial() && matches(provider, socialCredentials)) {
             clientFactory.getClient(provider).revokeAccess(socialAccessToken);
-            // TODO: deleteSocialMember(accountId)로 서비스 회원 탈퇴 구현
         } else {
             throw new SocialAccountConflictException(SocialIdentityErrorCode.PROVIDER_MISMATCH);
         }
