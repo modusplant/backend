@@ -17,10 +17,7 @@ import kr.modusplant.domains.member.framework.out.jpa.repository.MemberRepositor
 import kr.modusplant.domains.member.framework.out.jpa.repository.TargetCommentIdRepositoryJpaAdapter;
 import kr.modusplant.domains.member.framework.out.jpa.repository.TargetPostIdRepositoryJpaAdapter;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
-import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
-import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
-import kr.modusplant.domains.member.usecase.port.repository.TargetCommentIdRepository;
-import kr.modusplant.domains.member.usecase.port.repository.TargetPostIdRepository;
+import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord;
 import kr.modusplant.domains.member.usecase.record.MemberWithdrawalRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord;
@@ -84,6 +81,8 @@ import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseR
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
+import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.EXISTS_COMMENT_ABUSE_REPORT;
+import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.EXISTS_POST_ABUSE_REPORT;
 import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.objectMapper;
 import static kr.modusplant.shared.event.common.util.CommentLikeEventTestUtils.testCommentLikeEvent;
 import static kr.modusplant.shared.event.common.util.PostBookmarkEventTestUtils.testPostBookmarkEvent;
@@ -126,6 +125,7 @@ class MemberControllerTest implements
     private final MemberProfileRepository memberProfileRepository = Mockito.mock(MemberProfileRepositoryJpaAdapter.class);
     private final TargetPostIdRepository targetPostIdRepository = Mockito.mock(TargetPostIdRepositoryJpaAdapter.class);
     private final TargetCommentIdRepository targetCommentIdRepository = Mockito.mock(TargetCommentIdRepositoryJpaAdapter.class);
+    private final AbuseRepository abuseRepository = Mockito.mock(AbuseRepository.class);
 
     private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
     private final CommPostJpaRepository postJpaRepository = Mockito.mock(CommPostJpaRepository.class);
@@ -146,7 +146,7 @@ class MemberControllerTest implements
     private final ReportEventConsumer reportEventConsumer = new ReportEventConsumer(eventBus, memberJpaRepository, postJpaRepository, commentJpaRepository, propBugRepJpaRepository, postAbuRepJpaRepository, commentAbuRepJpaRepository);
     @SuppressWarnings("unused")
     private final MemberEventConsumer memberEventConsumer = new MemberEventConsumer(eventBus, stringRedisTemplate, dslContext, s3FileService);
-    private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, s3FileService, swearService, memberImageIOHelper, memberValidationHelper, memberProfileMapper, memberSocialTranslator, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
+    private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, s3FileService, swearService, memberImageIOHelper, memberValidationHelper, memberProfileMapper, memberSocialTranslator, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, abuseRepository, eventBus);
 
     private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
     private final NotFoundEntityException notFoundEntityExceptionForTargetPost = new NotFoundEntityException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
@@ -886,6 +886,7 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
         given(targetPostIdRepository.isPublished(any())).willReturn(true);
+        given(abuseRepository.isMemberAbusePost(any(), any())).willReturn(false);
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
         given(postJpaRepository.findByUlid(any())).willReturn(Optional.of(postEntity));
         given(postAbuRepJpaRepository.save(any())).willReturn(postAbuRepEntity);
@@ -940,11 +941,29 @@ class MemberControllerTest implements
         given(targetPostIdRepository.isPublished(any())).willReturn(false);
 
         // when
-        NotAccessibleException notFoundEntityException = assertThrows(NotAccessibleException.class,
+        NotAccessibleException notAccessibleException = assertThrows(NotAccessibleException.class,
                 () -> memberController.reportPostAbuse(testPostAbuseReportRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE);
+        assertThat(notAccessibleException.getErrorCode()).isEqualTo(NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE);
+    }
+
+    @Test
+    @DisplayName("이미 존재하는 게시글 신고로 인해 reportPostAbuse로 게시글 신고 실패")
+    void testReportPostAbuse_givenExistedPostAbuse_willThrowException() {
+        // given
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
+        given(targetPostIdRepository.isPublished(any())).willReturn(true);
+        given(abuseRepository.isMemberAbusePost(any(), any())).willReturn(true);
+
+        // when
+        ExistsEntityException existsEntityException = assertThrows(ExistsEntityException.class,
+                () -> memberController.reportPostAbuse(testPostAbuseReportRecord));
+
+        // then
+        assertThat(existsEntityException.getErrorCode()).isEqualTo(EXISTS_POST_ABUSE_REPORT);
     }
 
     @Test
@@ -959,6 +978,7 @@ class MemberControllerTest implements
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetCommentExists(any());
+        given(abuseRepository.isMemberAbuseComment(any(), any())).willReturn(false);
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
         given(commentJpaRepository.findById(any())).willReturn(Optional.of(commentEntity));
         given(commentAbuRepJpaRepository.save(any())).willReturn(commentAbuRepEntity);
@@ -1001,6 +1021,23 @@ class MemberControllerTest implements
 
         // then
         assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID);
+    }
+
+    @Test
+    @DisplayName("이미 존재하는 댓글 신고로 인해 reportCommentAbuse로 댓글 신고 실패")
+    void testReportCommentAbuse_givenExistedCommentAbuse_willThrowException() {
+        // given
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        willDoNothing().given(memberValidationHelper).validateIfTargetCommentExists(any());
+        given(abuseRepository.isMemberAbuseComment(any(), any())).willReturn(true);
+
+        // when
+        ExistsEntityException existsEntityException = assertThrows(ExistsEntityException.class,
+                () -> memberController.reportCommentAbuse(testCommentAbuseReportRecord));
+
+        // then
+        assertThat(existsEntityException.getErrorCode()).isEqualTo(EXISTS_COMMENT_ABUSE_REPORT);
     }
 
     @SuppressWarnings("unchecked")

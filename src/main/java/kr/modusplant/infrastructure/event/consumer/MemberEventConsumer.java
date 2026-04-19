@@ -158,20 +158,10 @@ public class MemberEventConsumer {
 
     private void deleteOtherMemberRelatedRecords(UUID memberId) {
         dsl.batch(
-                dsl.update(COMM_COMMENT_ABU_REP)
-                        .setNull(COMM_COMMENT_ABU_REP.MEMB_UUID)
-                        .set(COMM_COMMENT_ABU_REP.LAST_MODIFIED_AT, LocalDateTime.now())
-                        .where(COMM_COMMENT_ABU_REP.MEMB_UUID.eq(memberId)),
-
                 dsl.update(COMM_COMMENT)
                         .setNull(COMM_COMMENT.AUTH_MEMB_UUID)
                         .set(COMM_COMMENT.IS_DELETED, true)
                         .where(COMM_COMMENT.AUTH_MEMB_UUID.eq(memberId)),
-
-                dsl.update(COMM_POST_ABU_REP)
-                        .setNull(COMM_POST_ABU_REP.MEMB_UUID)
-                        .set(COMM_POST_ABU_REP.LAST_MODIFIED_AT, LocalDateTime.now())
-                        .where(COMM_POST_ABU_REP.MEMB_UUID.eq(memberId)),
 
                 dsl.update(COMM_POST_ARCHIVE)
                         .setNull(COMM_POST_ARCHIVE.AUTH_MEMB_UUID)
@@ -192,8 +182,14 @@ public class MemberEventConsumer {
                 dsl.deleteFrom(COMM_POST_BOOKMARK)
                         .where(COMM_POST_BOOKMARK.MEMB_UUID.eq(memberId)),
 
+                dsl.deleteFrom(COMM_POST_ABU_REP)
+                        .where(COMM_POST_ABU_REP.MEMB_UUID.eq(memberId)),
+
                 dsl.deleteFrom(COMM_COMMENT_LIKE)
                         .where(COMM_COMMENT_LIKE.MEMB_UUID.eq(memberId)),
+
+                dsl.deleteFrom(COMM_COMMENT_ABU_REP)
+                        .where(COMM_COMMENT_ABU_REP.MEMB_UUID.eq(memberId)),
 
                 dsl.deleteFrom(SITE_MEMBER_PROF)
                         .where(SITE_MEMBER_PROF.UUID.eq(memberId)),

@@ -11,10 +11,7 @@ import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyReportImagePath;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
-import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
-import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
-import kr.modusplant.domains.member.usecase.port.repository.TargetCommentIdRepository;
-import kr.modusplant.domains.member.usecase.port.repository.TargetPostIdRepository;
+import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.framework.aws.service.S3FileService;
@@ -61,6 +58,7 @@ public class MemberController {
     private final MemberProfileRepository memberProfileRepository;
     private final TargetPostIdRepository targetPostIdRepository;
     private final TargetCommentIdRepository targetCommentIdRepository;
+    private final AbuseRepository abuseRepository;
     private final EventBus eventBus;
 
     @Transactional(readOnly = true)
@@ -230,6 +228,8 @@ public class MemberController {
         if (!targetPostIdRepository.isPublished(targetPostId)) {
             throw new NotAccessibleException(
                     NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE, "postReportForAbuse", targetPostId.getValue());
+        } else if (abuseRepository.isMemberAbusePost(memberId, targetPostId)) {
+            throw new ExistsEntityException(EntityErrorCode.EXISTS_POST_ABUSE_REPORT, "postAbuseReport");
         }
         eventBus.publish(PostAbuseReportEvent.create(memberId.getValue(), record.postUlid()));
     }
@@ -240,6 +240,9 @@ public class MemberController {
                 TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
+        if (abuseRepository.isMemberAbuseComment(memberId, targetCommentId)) {
+            throw new ExistsEntityException(EntityErrorCode.EXISTS_COMMENT_ABUSE_REPORT, "commentAbuseReport");
+        }
         eventBus.publish(CommentAbuseReportEvent.create(memberId.getValue(), record.postUlid(), record.path()));
     }
 
