@@ -28,10 +28,7 @@ public class MemberEventConsumer {
     private final S3FileService s3FileService;
     private final JsonbJsonNodeConverter jsonbJsonNodeConverter = new JsonbJsonNodeConverter();
 
-    public MemberEventConsumer(EventBus eventBus,
-                               StringRedisTemplate stringRedisTemplate,
-                               DSLContext dsl,
-                               S3FileService s3FileService) {
+    public MemberEventConsumer(EventBus eventBus, StringRedisTemplate stringRedisTemplate, DSLContext dsl, S3FileService s3FileService) {
         eventBus.subscribe(event -> {
             if (event instanceof MemberWithdrawalEvent memberWithdrawalEvent) {
                 deleteAllWithMemberPKAndAlterAllWithMemberFK(

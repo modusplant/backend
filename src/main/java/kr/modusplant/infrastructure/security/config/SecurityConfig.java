@@ -149,6 +149,7 @@ public class SecurityConfig {
                 .addFilterBefore(securityExceptionHandlingFilter(), LogoutFilter.class)
                 .addFilterBefore(emailPasswordAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(http), EmailPasswordAuthenticationFilter.class)
+                // TODO: @PreAuthorize 기반 방안을 고민하고, anyRequest를 authenticated()로 수정할 것.
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/v1/communication/posts/me/**",
@@ -205,6 +206,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // TODO: 요청 가능한 서비스 및 메서드를 명시할 것.
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
