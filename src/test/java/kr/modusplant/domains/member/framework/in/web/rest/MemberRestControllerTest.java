@@ -1,5 +1,6 @@
 package kr.modusplant.domains.member.framework.in.web.rest;
 
+import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.member.adapter.controller.MemberController;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
@@ -24,8 +25,10 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
+import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_CODE;
 import static kr.modusplant.domains.member.common.util.usecase.record.CommentAbuseReportRecordTestUtils.testCommentAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.testMemberPostBookmarkCancelRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.testMemberCommentLikeRecord;
@@ -36,6 +39,7 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberPost
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileGetRecordTestUtils.testMemberProfileGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberWithdrawalRecordTestUtils.testKakaoMemberWithdrawalRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
@@ -43,6 +47,7 @@ import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.obje
 import static kr.modusplant.shared.persistence.common.util.constant.CommCommentConstant.TEST_COMM_COMMENT_PATH;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
 import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_AUTHORIZATION;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE;
@@ -73,7 +78,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         // then
         assertThat(isExistedNickname.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(isExistedNickname.getHeaders().getCacheControl()).isEqualTo(CacheControl.noStore().mustRevalidate().cachePrivate().getHeaderValue());
-        assertThat(isExistedNickname.getBody().getData().toString()).isEqualTo(Map.of("isNicknameExisted", true).toString());
+        assertThat(Objects.requireNonNull(isExistedNickname.getBody()).getData().toString()).isEqualTo(Map.of("isNicknameExisted", true).toString());
     }
 
     @Test
@@ -129,7 +134,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         assertThat(memberResponseEntity.getHeaders().getCacheControl()).isEqualTo(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate().getHeaderValue());
         assertThat(memberResponseEntity.getHeaders().getETag()).isEqualTo(String.format("W/\"%s\"", entityTag));
         assertThat(memberResponseEntity.getHeaders().getLastModified()).isEqualTo(now.atZone(ZoneId.of("Asia/Seoul")).toInstant().truncatedTo(ChronoUnit.SECONDS).toEpochMilli());
-        assertThat(memberResponseEntity.getBody().toString()).isEqualTo(DataResponse.ok(testMemberProfileResponse).toString());
+        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testMemberProfileResponse).toString());
         verify(memberController, only()).getProfile(testMemberProfileGetRecord);
     }
 
@@ -137,7 +142,6 @@ class MemberRestControllerTest implements MemberTestUtils {
     @DisplayName("overrideMemberProfile로 응답 반환")
     void testOverrideMemberProfile_givenValidParameters_willReturnResponse() throws IOException {
         // given
-        
         given(memberController.overrideProfile(testMemberProfileOverrideRecord)).willReturn(testMemberProfileResponse);
 
         // when
@@ -146,14 +150,13 @@ class MemberRestControllerTest implements MemberTestUtils {
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(memberResponseEntity.getHeaders().getCacheControl()).isEqualTo(CacheControl.noStore().mustRevalidate().cachePrivate().getHeaderValue());
-        assertThat(memberResponseEntity.getBody().toString()).isEqualTo(DataResponse.ok(testMemberProfileResponse).toString());
+        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testMemberProfileResponse).toString());
     }
 
     @Test
     @DisplayName("likeCommunicationPost로 응답 반환")
     void testLikeCommunicationPost_givenValidRequest_willReturnResponse() {
         // given
-        
         willDoNothing().given(memberController).likePost(testMemberPostLikeRecord);
 
         // when
@@ -161,7 +164,7 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok().toString());
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok().toString());
     }
 
     @Test
@@ -175,7 +178,7 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok().toString());
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok().toString());
     }
 
     @Test
@@ -189,7 +192,7 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok().toString());
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok().toString());
     }
 
     @Test
@@ -203,7 +206,7 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok().toString());
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok().toString());
     }
 
     @Test
@@ -217,7 +220,7 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok().toString());
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok().toString());
     }
 
     @Test
@@ -231,7 +234,7 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok().toString());
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok().toString());
     }
 
     @Test
@@ -245,7 +248,7 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok().toString());
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok().toString());
     }
 
     @Test
@@ -256,7 +259,7 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_POST_ID).toString());
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_POST_ID).toString());
     }
 
     @Test
@@ -270,7 +273,7 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok().toString());
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok().toString());
     }
 
     @Test
@@ -281,7 +284,7 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_COMMENT_ID).toString());
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_COMMENT_ID).toString());
     }
 
     @Test
@@ -295,6 +298,20 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok().toString());
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok().toString());
+    }
+
+    @Test
+    @DisplayName("withdrawMember로 응답 반환")
+    void testWithdrawMember_givenValidParameters_willReturnResponse() {
+        // given
+        willDoNothing().given(memberController).withdraw(testKakaoMemberWithdrawalRecord);
+
+        // when
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.withdrawMember(TEST_SOCIAL_KAKAO_CODE, SocialProvider.KAKAO.getValue(), MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok().toString());
     }
 }

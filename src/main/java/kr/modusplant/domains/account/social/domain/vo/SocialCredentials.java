@@ -82,6 +82,10 @@ public class SocialCredentials {
         return this.provider == AuthProvider.BASIC_KAKAO || this.provider == AuthProvider.BASIC_GOOGLE;
     }
 
+    public boolean isPureSocial() {
+        return this.provider == AuthProvider.KAKAO || this.provider == AuthProvider.GOOGLE;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

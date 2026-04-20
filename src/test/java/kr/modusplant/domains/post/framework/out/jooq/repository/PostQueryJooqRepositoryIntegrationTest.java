@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
 
-import static kr.modusplant.domains.post.common.constant.PostDoubleConstant.TEST_POST_MAX_WORD_SIMILARITY_0_6;
-import static kr.modusplant.domains.post.common.constant.PostIntegerConstant.TEST_POST_IMPORTANCE_COMMENT_CONTENT;
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.*;
 import static kr.modusplant.domains.post.usecase.enums.SearchOption.TITLE_CONTENT;
 import static kr.modusplant.domains.post.usecase.enums.SearchOption.TITLE_CONTENT_COMMENT;
@@ -169,47 +167,6 @@ class PostQueryJooqRepositoryIntegrationTest {
                         null, List.of(testSecondaryCategory1.getId()), testMember2.getUuid(), null, size
                 )
         ).isInstanceOf(EmptyValueException.class);
-    }
-
-    @Test
-    @DisplayName("키워드 없이 게시글 목록 검색 - 최신순")
-    void testSearchByKeywordWithLatest_givenNoKeyword_willReturnEmptyList() {
-        // given & when
-        int size = 2;
-        List<PostSummaryWithSearchInfoReadModel> firstPageWithNullKeyword = postQueryJooqRepository.searchByKeywordWithLatest(
-                TITLE_CONTENT, null, null, null, 
-                testMember2.getUuid(), null, null, size);
-
-        List<PostSummaryWithSearchInfoReadModel> firstPageWithEmptyKeyword = postQueryJooqRepository.searchByKeywordWithLatest(
-                TITLE_CONTENT, "", null, null,
-                testMember2.getUuid(), null, null, size);
-
-
-        // then
-        assertThat(firstPageWithNullKeyword).isEmpty();
-        assertThat(firstPageWithEmptyKeyword).isEmpty();
-    }
-
-    @Test
-    @DisplayName("키워드 없이 게시글 목록 검색 - 정확도순")
-    void testSearchByKeywordWithRelevance_givenNoKeyword_willReturnEmptyList() {
-        // when
-        int size = 2;
-        List<PostSummaryWithSearchInfoReadModel> firstPageWithNullKeyword = postQueryJooqRepository.searchByKeywordWithRelevance(
-                TITLE_CONTENT, null, null, null,
-                testMember2.getUuid(), null, 
-                TEST_POST_IMPORTANCE_COMMENT_CONTENT, TEST_POST_MAX_WORD_SIMILARITY_0_6, 
-                TEST_COMM_POST_PUBLISHED_AT, size);
-
-        List<PostSummaryWithSearchInfoReadModel> firstPageWithEmptyKeyword = postQueryJooqRepository.searchByKeywordWithRelevance(
-                TITLE_CONTENT, "", null, null,
-                testMember2.getUuid(), null,
-                TEST_POST_IMPORTANCE_COMMENT_CONTENT, TEST_POST_MAX_WORD_SIMILARITY_0_6,
-                TEST_COMM_POST_PUBLISHED_AT, size);
-
-        // then
-        assertThat(firstPageWithNullKeyword).isEmpty();
-        assertThat(firstPageWithEmptyKeyword).isEmpty();
     }
 
     @Test

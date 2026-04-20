@@ -30,8 +30,8 @@ public class SiteMemberAuthEntity {
     @ToString.Include
     private UUID uuid;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @MapsId
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(nullable = false, name = "uuid", updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity member;
 
@@ -65,6 +65,12 @@ public class SiteMemberAuthEntity {
     public LocalDateTime getLastModifiedAtAsTruncatedToSeconds() {
         return getLastModifiedAt().truncatedTo(ChronoUnit.SECONDS);
     }
+
+    public void updateAuthProvider(AuthProvider provider) { this.provider = provider; }
+
+    public void updateEmail(String email) { this.email = email; }
+
+    public void updatePassword(String password) { this.pw = password; }
 
     public void updateProvider(AuthProvider provider) {
         this.provider = provider;

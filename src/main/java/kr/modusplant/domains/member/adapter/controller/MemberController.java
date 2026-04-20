@@ -2,6 +2,7 @@ package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.adapter.helper.MemberImageIOHelper;
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
+import kr.modusplant.domains.member.adapter.translator.MemberSocialTranslator;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
@@ -10,10 +11,7 @@ import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyReportImagePath;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
-import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
-import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
-import kr.modusplant.domains.member.usecase.port.repository.TargetCommentIdRepository;
-import kr.modusplant.domains.member.usecase.port.repository.TargetPostIdRepository;
+import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.framework.aws.service.S3FileService;
@@ -21,10 +19,14 @@ import kr.modusplant.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.infrastructure.event.bus.EventBus;
+import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
+import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.*;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
+import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -44,15 +46,19 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 @Transactional
 @Slf4j
 public class MemberController {
+    private final JwtTokenProvider jwtTokenProvider;
+    private final TokenService tokenService;
     private final S3FileService s3FileService;
     private final SwearService swearService;
-    private final MemberProfileMapper memberProfileMapper;
     private final MemberImageIOHelper memberImageIOHelper;
     private final MemberValidationHelper memberValidationHelper;
+    private final MemberProfileMapper memberProfileMapper;
+    private final MemberSocialTranslator memberSocialTranslator;
     private final MemberRepository memberRepository;
     private final MemberProfileRepository memberProfileRepository;
     private final TargetPostIdRepository targetPostIdRepository;
     private final TargetCommentIdRepository targetCommentIdRepository;
+    private final AbuseRepository abuseRepository;
     private final EventBus eventBus;
 
     @Transactional(readOnly = true)
@@ -222,6 +228,8 @@ public class MemberController {
         if (!targetPostIdRepository.isPublished(targetPostId)) {
             throw new NotAccessibleException(
                     NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE, "postReportForAbuse", targetPostId.getValue());
+        } else if (abuseRepository.isMemberAbusePost(memberId, targetPostId)) {
+            throw new ExistsEntityException(EntityErrorCode.EXISTS_POST_ABUSE_REPORT, "postAbuseReport");
         }
         eventBus.publish(PostAbuseReportEvent.create(memberId.getValue(), record.postUlid()));
     }
@@ -232,7 +240,28 @@ public class MemberController {
                 TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
+        if (abuseRepository.isMemberAbuseComment(memberId, targetCommentId)) {
+            throw new ExistsEntityException(EntityErrorCode.EXISTS_COMMENT_ABUSE_REPORT, "commentAbuseReport");
+        }
         eventBus.publish(CommentAbuseReportEvent.create(memberId.getValue(), record.postUlid(), record.path()));
+    }
+
+    public void withdraw(MemberWithdrawalRecord record) {
+        String accessToken = record.accessToken();
+        String authCode = record.authCode();
+        String authProvider = record.authProvider();
+        MemberId memberId = MemberId.fromUuid(jwtTokenProvider.getMemberUuidFromToken(accessToken));
+        memberValidationHelper.validateIfMemberExists(memberId);
+        if (authCode != null && authProvider != null) {
+            memberSocialTranslator.deleteSocialAccountWithSocialAccessToken(
+                    memberSocialTranslator.getSocialAccessToken(authCode, authProvider),
+                    authProvider,
+                    memberId.getValue());
+        } else if (authCode != null || authProvider != null) {
+            throw new InvalidValueException(GeneralErrorCode.INVALID_INPUT, "authCode", "authProvider");
+        }
+        tokenService.blacklistAccessToken(accessToken);
+        eventBus.publish(MemberWithdrawalEvent.create(memberId.getValue()));
     }
 
     private void validateBeforeOverrideProfile(MemberId memberId, Nickname memberNickname) {

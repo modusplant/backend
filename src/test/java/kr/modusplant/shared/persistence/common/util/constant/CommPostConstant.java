@@ -23,7 +23,11 @@ public final class CommPostConstant {
     public static final Long TEST_COMM_POST_VIEW_COUNT = 0L;
     public static final String TEST_COMM_POST_TITLE = "물 주는 타이밍, 이제 헷갈리지 마세요! 식물별 물 주기 가이드";
     public static final JsonNode TEST_COMM_POST_CONTENT = createSampleContent();
+    public static final String TEST_COMM_POST_CONTENT_TEXT = "Hello, this is text part 1. This is text part 2.";
     public static final Boolean TEST_COMM_POST_IS_PUBLISHED = true;
+    public static final LocalDateTime TEST_COMM_POST_CREATED_AT = LocalDateTime.of(2026, 4, 2, 0, 0);
+    public static final LocalDateTime TEST_COMM_POST_ARCHIVED_AT = LocalDateTime.of(2026, 4, 4, 0, 0);
+    public static final LocalDateTime TEST_COMM_POST_UPDATED_AT = LocalDateTime.of(2026, 4, 3, 12, 0);
     public static final LocalDateTime TEST_COMM_POST_PUBLISHED_AT = LocalDateTime.of(2026, 4, 3, 0, 0);
 
     private static JsonNode createSampleContent() {

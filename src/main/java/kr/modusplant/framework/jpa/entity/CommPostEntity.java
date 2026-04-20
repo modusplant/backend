@@ -65,6 +65,9 @@ public class CommPostEntity {
     @ToString.Exclude
     private JsonNode content;
 
+    @Column(name = CONTENT_TEXT, insertable = false, updatable = false)
+    private String contentText;
+
     @Column(name = "thumbnail_path")
     private String thumbnailPath;
 

@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.account.social.adapter.SocialIdentityTokenHelper;
 import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityController;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
-import kr.modusplant.domains.account.social.usecase.request.SocialLoginRequest;
+import kr.modusplant.domains.account.social.usecase.request.SocialAuthRequest;
 import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
 import kr.modusplant.domains.account.social.usecase.response.*;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
@@ -42,7 +42,7 @@ public class SocialIdentityRestController {
     @Operation(summary = "소셜 인증/로그인 API", description = "카카오/구글 인가코드를 받아 소셜 인증 및 로그인을 수행합니다.<br>구글 인가 코드를 URL에서 추출할 경우 '%2F'는 '/'로 대체해야 합니다.")
     @PostMapping("/social-login/{provider}")
     public ResponseEntity<DataResponse<SocialLoginResponse>> socialLogin(
-            @RequestBody @Valid SocialLoginRequest request,
+            @RequestBody @Valid SocialAuthRequest request,
 
             @Parameter(schema = @Schema(description = "소셜 플랫폼 제공자", example = "kakao"))
             @PathVariable
@@ -104,7 +104,7 @@ public class SocialIdentityRestController {
 
     @Operation(summary = "소셜 플랫폼 연결 해제 API", description = "소셜 로그인 과정이 중단되거나 연동 미선택 시 사용합니다.")
     @DeleteMapping("/social-connect")
-    public ResponseEntity<DataResponse<Void>> unlikeSocialAccount(
+    public ResponseEntity<DataResponse<Void>> unlinkSocialAccount(
             @CookieValue(TEMP_TOKEN_COOKIE_NAME)
             String tempToken
     ) {

@@ -83,6 +83,21 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialMemberProfileTestU
     }
 
     @Test
+    @DisplayName("AccountId로 회원 조회 시 SocialMemberProfile을 반환")
+    void testGetSocialMemberProfileByAccountId_givenAccountId_willReturnSocialMemberProfile() {
+        // given
+        given(memberAuthJpaRepository.findByUuid(testNormalMemberId.getValue())).willReturn(Optional.of(basicMemberAuthEntity));
+        given(socialIdentityJpaMapper.toSocialMemberProfile(basicMemberEntity, basicMemberAuthEntity)).willReturn(testBasicSocialMemberProfile);
+
+        // when
+        SocialMemberProfile result = socialIdentityRepositoryJpaAdapter.getSocialMemberProfileByAccountId(testNormalMemberId);
+
+        // then
+        assertThat(result).isEqualTo(testBasicSocialMemberProfile);
+        assertThat(result.getAccountId()).isEqualTo(testNormalMemberId);
+    }
+
+    @Test
     @DisplayName("로그인 시각 업데이트 후 SocialMemberProfile을 반환")
     void testUpdateLoggedInAtAndGetProfile_givenAccountId_willReturnSocialMemberProfile() {
         // given
@@ -145,6 +160,24 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialMemberProfileTestU
         assertThat(result).isEqualTo(testBasicKakaoSocialMemberProfile);
         verify(memberAuthJpaRepository).save(basicMemberAuthEntity);
         verify(memberJpaRepository).save(basicMemberEntity);
+    }
+
+    @Test
+    @DisplayName("소셜 연동 해제 시 provider와 providerId를 업데이트")
+    void testUpdateSocialUnlinkedMember_givenAccountId_willUpdateProviderAndProviderId() {
+        // given
+        SiteMemberAuthEntity linkedMemberAuthEntity = createMemberAuthBasicKakaoEntityBuilder()
+                .member(basicMemberEntity)
+                .build();
+        given(memberAuthJpaRepository.findByUuid(testNormalMemberId.getValue())).willReturn(Optional.of(linkedMemberAuthEntity));
+        given(memberAuthJpaRepository.save(linkedMemberAuthEntity)).willReturn(basicMemberAuthEntity);
+
+        // when
+        socialIdentityRepositoryJpaAdapter.updateSocialUnlinkedMember(testNormalMemberId);
+        
+        // then
+        verify(memberAuthJpaRepository).findByUuid(testNormalMemberId.getValue());
+        verify(memberAuthJpaRepository).save(linkedMemberAuthEntity);
     }
 
 

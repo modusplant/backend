@@ -1,8 +1,10 @@
 package kr.modusplant.domains.member.adapter.controller;
 
+import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.member.adapter.helper.MemberImageIOHelper;
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.adapter.mapper.MemberProfileMapperImpl;
+import kr.modusplant.domains.member.adapter.translator.MemberSocialTranslator;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberProfileTestUtils;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
@@ -15,14 +17,13 @@ import kr.modusplant.domains.member.framework.out.jpa.repository.MemberRepositor
 import kr.modusplant.domains.member.framework.out.jpa.repository.TargetCommentIdRepositoryJpaAdapter;
 import kr.modusplant.domains.member.framework.out.jpa.repository.TargetPostIdRepositoryJpaAdapter;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
-import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
-import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
-import kr.modusplant.domains.member.usecase.port.repository.TargetCommentIdRepository;
-import kr.modusplant.domains.member.usecase.port.repository.TargetPostIdRepository;
+import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord;
+import kr.modusplant.domains.member.usecase.record.MemberWithdrawalRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.framework.jpa.entity.*;
 import kr.modusplant.framework.jpa.entity.common.util.*;
 import kr.modusplant.framework.jpa.exception.ExistsEntityException;
@@ -31,23 +32,37 @@ import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.*;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.event.consumer.CommentEventConsumer;
+import kr.modusplant.infrastructure.event.consumer.MemberEventConsumer;
 import kr.modusplant.infrastructure.event.consumer.PostEventConsumer;
 import kr.modusplant.infrastructure.event.consumer.ReportEventConsumer;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
+import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
 import kr.modusplant.infrastructure.swear.service.SwearService;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
+import org.jooq.tools.jdbc.MockConnection;
+import org.jooq.tools.jdbc.MockDataProvider;
+import org.jooq.tools.jdbc.MockResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_CODE;
+import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils.testMemberProfileIntroduction;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
@@ -61,16 +76,22 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberPost
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileGetRecordTestUtils.testMemberProfileGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberWithdrawalRecordTestUtils.testKakaoMemberWithdrawalRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
+import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.EXISTS_COMMENT_ABUSE_REPORT;
+import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.EXISTS_POST_ABUSE_REPORT;
+import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.objectMapper;
 import static kr.modusplant.shared.event.common.util.CommentLikeEventTestUtils.testCommentLikeEvent;
 import static kr.modusplant.shared.event.common.util.PostBookmarkEventTestUtils.testPostBookmarkEvent;
 import static kr.modusplant.shared.event.common.util.PostCancelPostBookmarkEventTestUtils.testPostBookmarkCancelEvent;
 import static kr.modusplant.shared.event.common.util.PostLikeEventTestUtils.testPostLikeEvent;
+import static kr.modusplant.shared.exception.enums.GeneralErrorCode.INVALID_INPUT;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.*;
@@ -85,17 +106,26 @@ class MemberControllerTest implements
         MemberTestUtils, MemberProfileTestUtils,
         SiteMemberProfileEntityTestUtils, CommPostEntityTestUtils, CommCommentEntityTestUtils,
         PropBugRepEntityTestUtils, CommPostAbuRepEntityTestUtils, CommCommentAbuRepEntityTestUtils {
+    private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
+    private final MockDataProvider mockDataProvider = ctx -> new MockResult[0]; // 반환값을 따로 설정하지 않음
+    private final MockConnection mockConnection = new MockConnection(mockDataProvider);
+    private final DSLContext dslContext = DSL.using(mockConnection, SQLDialect.POSTGRES);
+    private final StringRedisTemplate stringRedisTemplate = Mockito.mock(StringRedisTemplate.class);
+
+    private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
+    private final TokenService tokenService = Mockito.mock(TokenService.class);
     private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
     private final SwearService swearService = Mockito.mock(SwearService.class);
-    private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
     private final MemberImageIOHelper memberImageIOHelper = Mockito.mock(MemberImageIOHelper.class);
     private final MemberValidationHelper memberValidationHelper = Mockito.mock(MemberValidationHelper.class);
     private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl(s3FileService);
+    private final MemberSocialTranslator memberSocialTranslator = Mockito.mock(MemberSocialTranslator.class);
 
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryJpaAdapter.class);
     private final MemberProfileRepository memberProfileRepository = Mockito.mock(MemberProfileRepositoryJpaAdapter.class);
     private final TargetPostIdRepository targetPostIdRepository = Mockito.mock(TargetPostIdRepositoryJpaAdapter.class);
     private final TargetCommentIdRepository targetCommentIdRepository = Mockito.mock(TargetCommentIdRepositoryJpaAdapter.class);
+    private final AbuseRepository abuseRepository = Mockito.mock(AbuseRepository.class);
 
     private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
     private final CommPostJpaRepository postJpaRepository = Mockito.mock(CommPostJpaRepository.class);
@@ -108,13 +138,17 @@ class MemberControllerTest implements
     private final CommCommentAbuRepJpaRepository commentAbuRepJpaRepository = Mockito.mock(CommCommentAbuRepJpaRepository.class);
 
     private final EventBus eventBus = new EventBus();
+    @SuppressWarnings("unused")
     private final PostEventConsumer postEventConsumer = new PostEventConsumer(eventBus, postLikeJpaRepository, postBookmarkJpaRepository, postJpaRepository);
+    @SuppressWarnings("unused")
     private final CommentEventConsumer commentEventConsumer = new CommentEventConsumer(eventBus, commentLikeJpaRepository, commentJpaRepository);
+    @SuppressWarnings("unused")
     private final ReportEventConsumer reportEventConsumer = new ReportEventConsumer(eventBus, memberJpaRepository, postJpaRepository, commentJpaRepository, propBugRepJpaRepository, postAbuRepJpaRepository, commentAbuRepJpaRepository);
-    private final MemberController memberController = new MemberController(s3FileService, swearService, memberProfileMapper, memberImageIOHelper, memberValidationHelper, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, eventBus);
+    @SuppressWarnings("unused")
+    private final MemberEventConsumer memberEventConsumer = new MemberEventConsumer(eventBus, stringRedisTemplate, dslContext, s3FileService);
+    private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, s3FileService, swearService, memberImageIOHelper, memberValidationHelper, memberProfileMapper, memberSocialTranslator, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, abuseRepository, eventBus);
 
     private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
-    private final ExistsEntityException existsEntityExceptionForNickname = new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "nickname");
     private final NotFoundEntityException notFoundEntityExceptionForTargetPost = new NotFoundEntityException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
     private final NotFoundEntityException notFoundEntityExceptionForTargetComment = new NotFoundEntityException(NOT_FOUND_TARGET_COMMENT_ID, "targetCommentId");
 
@@ -190,7 +224,7 @@ class MemberControllerTest implements
         given(memberProfileRepository.getById(any())).willReturn(Optional.of(memberProfile));
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
-        willDoNothing().given(s3FileService).deleteFiles(any());
+        willDoNothing().given(s3FileService).deleteFiles(any(String.class));
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
         given(s3FileService.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
@@ -219,7 +253,7 @@ class MemberControllerTest implements
                         testNormalUserNickname))
         );
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
-        willDoNothing().given(s3FileService).deleteFiles(any());
+        willDoNothing().given(s3FileService).deleteFiles(any(String.class));
         given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
         given(s3FileService.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
@@ -243,7 +277,7 @@ class MemberControllerTest implements
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(memberProfileRepository.getById(any())).willReturn(Optional.of(memberProfile));
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
-        willDoNothing().given(s3FileService).deleteFiles(any());
+        willDoNothing().given(s3FileService).deleteFiles(any(String.class));
 
         // when
         MemberProfileResponse memberProfileResponse = memberController.overrideProfile(
@@ -852,6 +886,7 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
         given(targetPostIdRepository.isPublished(any())).willReturn(true);
+        given(abuseRepository.isMemberAbusePost(any(), any())).willReturn(false);
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
         given(postJpaRepository.findByUlid(any())).willReturn(Optional.of(postEntity));
         given(postAbuRepJpaRepository.save(any())).willReturn(postAbuRepEntity);
@@ -906,11 +941,29 @@ class MemberControllerTest implements
         given(targetPostIdRepository.isPublished(any())).willReturn(false);
 
         // when
-        NotAccessibleException notFoundEntityException = assertThrows(NotAccessibleException.class,
+        NotAccessibleException notAccessibleException = assertThrows(NotAccessibleException.class,
                 () -> memberController.reportPostAbuse(testPostAbuseReportRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE);
+        assertThat(notAccessibleException.getErrorCode()).isEqualTo(NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE);
+    }
+
+    @Test
+    @DisplayName("이미 존재하는 게시글 신고로 인해 reportPostAbuse로 게시글 신고 실패")
+    void testReportPostAbuse_givenExistedPostAbuse_willThrowException() {
+        // given
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
+        given(targetPostIdRepository.isPublished(any())).willReturn(true);
+        given(abuseRepository.isMemberAbusePost(any(), any())).willReturn(true);
+
+        // when
+        ExistsEntityException existsEntityException = assertThrows(ExistsEntityException.class,
+                () -> memberController.reportPostAbuse(testPostAbuseReportRecord));
+
+        // then
+        assertThat(existsEntityException.getErrorCode()).isEqualTo(EXISTS_POST_ABUSE_REPORT);
     }
 
     @Test
@@ -925,6 +978,7 @@ class MemberControllerTest implements
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetCommentExists(any());
+        given(abuseRepository.isMemberAbuseComment(any(), any())).willReturn(false);
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
         given(commentJpaRepository.findById(any())).willReturn(Optional.of(commentEntity));
         given(commentAbuRepJpaRepository.save(any())).willReturn(commentAbuRepEntity);
@@ -967,5 +1021,93 @@ class MemberControllerTest implements
 
         // then
         assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID);
+    }
+
+    @Test
+    @DisplayName("이미 존재하는 댓글 신고로 인해 reportCommentAbuse로 댓글 신고 실패")
+    void testReportCommentAbuse_givenExistedCommentAbuse_willThrowException() {
+        // given
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        willDoNothing().given(memberValidationHelper).validateIfTargetCommentExists(any());
+        given(abuseRepository.isMemberAbuseComment(any(), any())).willReturn(true);
+
+        // when
+        ExistsEntityException existsEntityException = assertThrows(ExistsEntityException.class,
+                () -> memberController.reportCommentAbuse(testCommentAbuseReportRecord));
+
+        // then
+        assertThat(existsEntityException.getErrorCode()).isEqualTo(EXISTS_COMMENT_ABUSE_REPORT);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    @DisplayName("withdraw로 회원 탈퇴")
+    void testWithdraw_givenMemberId_willWithdrawMember() {
+        // given
+        given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
+        given(memberJpaRepository.existsByUuid(MEMBER_BASIC_USER_UUID)).willReturn(true);
+        given(memberSocialTranslator.getSocialAccessToken(any(), any())).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
+        willDoNothing().given(memberSocialTranslator).deleteSocialAccountWithSocialAccessToken(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN, SocialProvider.KAKAO.getValue(), MEMBER_BASIC_USER_UUID);
+        willDoNothing().given(tokenService).blacklistAccessToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN);
+        given(stringRedisTemplate.unlink(any(String.class))).willReturn(true);
+        given(stringRedisTemplate.execute(any(RedisCallback.class))).willReturn(true);
+        given(stringRedisTemplate.executePipelined(any(RedisCallback.class))).willReturn(null);
+        willDoNothing().given(s3FileService).deleteFiles(any(List.class));
+
+        // when
+        memberController.withdraw(testKakaoMemberWithdrawalRecord);
+
+        // then
+        verify(tokenService, times(1)).blacklistAccessToken(any());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원으로 인해 withdraw로 오류 발생")
+    void testWithdraw_givenNotFoundMemberId_willThrowException() {
+        // given
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        willThrow(notFoundEntityExceptionForMember).given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
+                () -> memberController.withdraw(testKakaoMemberWithdrawalRecord));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+    }
+
+    @Nested
+    @DisplayName("유효하지 않은 인증 코드 및 인증 제공자로 인해 withdraw로 오류 발생")
+    class invalidWithdrawCallTests {
+        @Test
+        @DisplayName("인증 제공자만 null인 요청으로 인해 withdraw로 오류 발생")
+        void testWithdraw_givenInvalidAuthCodeOrAuthProviderWithNullProvider_willThrowException() {
+            // given
+            given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
+            given(memberJpaRepository.existsByUuid(MEMBER_BASIC_USER_UUID)).willReturn(true);
+
+            // when
+            InvalidValueException invalidValueException = assertThrows(InvalidValueException.class,
+                    () -> memberController.withdraw(new MemberWithdrawalRecord(TEST_SOCIAL_KAKAO_CODE, null, MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)));
+
+            // then
+            assertThat(invalidValueException.getErrorCode()).isEqualTo(INVALID_INPUT);
+        }
+
+        @Test
+        @DisplayName("인증 코드만 null인 요청으로 인해 withdraw로 오류 발생")
+        void testWithdraw_givenInvalidAuthCodeOrAuthProviderWithNullCode_willThrowException() {
+            // given
+            given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
+            given(memberJpaRepository.existsByUuid(MEMBER_BASIC_USER_UUID)).willReturn(true);
+
+            // when
+            InvalidValueException invalidValueException = assertThrows(InvalidValueException.class,
+                    () -> memberController.withdraw(new MemberWithdrawalRecord(null, SocialProvider.KAKAO.getValue(), MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)));
+
+            // then
+            assertThat(invalidValueException.getErrorCode()).isEqualTo(INVALID_INPUT);
+        }
     }
 }
