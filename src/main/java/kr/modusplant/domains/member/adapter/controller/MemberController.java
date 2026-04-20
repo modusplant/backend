@@ -7,6 +7,7 @@ import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileImage;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyReportImagePath;
@@ -252,6 +253,9 @@ public class MemberController {
         String authProvider = record.authProvider();
         MemberId memberId = MemberId.fromUuid(jwtTokenProvider.getMemberUuidFromToken(accessToken));
         memberValidationHelper.validateIfMemberExists(memberId);
+        if (record.opinion().length() > 600) {
+            throw new InvalidValueException(MemberErrorCode.MEMBER_WITHDRAW_OPINION_OVER_LENGTH, "opinion");
+        }
         if (authCode != null && authProvider != null) {
             memberSocialTranslator.deleteSocialAccountWithSocialAccessToken(
                     memberSocialTranslator.getSocialAccessToken(authCode, authProvider),
@@ -261,7 +265,7 @@ public class MemberController {
             throw new InvalidValueException(GeneralErrorCode.INVALID_INPUT, "authCode", "authProvider");
         }
         tokenService.blacklistAccessToken(accessToken);
-        eventBus.publish(MemberWithdrawalEvent.create(memberId.getValue()));
+        eventBus.publish(MemberWithdrawalEvent.create(memberId.getValue(), record.reason().name(), record.opinion()));
     }
 
     private void validateBeforeOverrideProfile(MemberId memberId, Nickname memberNickname) {

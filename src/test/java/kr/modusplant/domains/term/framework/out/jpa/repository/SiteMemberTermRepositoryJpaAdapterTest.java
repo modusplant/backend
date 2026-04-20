@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static kr.modusplant.domains.term.common.util.domain.vo.SiteMemberTermIdTestUtils.testSiteMemberTermId;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberTermConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,11 +34,11 @@ class SiteMemberTermRepositoryJpaAdapterTest implements SiteMemberTermTestUtils,
     @DisplayName("save로 새로운 사이트 회원 약관 저장")
     void testSave_givenNewSiteMemberTerm_willReturnSavedSiteMemberTerm() {
         // given
-        given(siteMemberTermJpaRepository.existsById(MEMBER_TERM_USER_UUID)).willReturn(false);
-        given(siteMemberJpaRepository.findById(MEMBER_TERM_USER_UUID)).willReturn(Optional.of(createMemberBasicUserEntityWithUuid()));
+        given(siteMemberTermJpaRepository.existsById(MEMBER_BASIC_USER_UUID)).willReturn(false);
+        given(siteMemberJpaRepository.findById(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(createMemberBasicUserEntityWithUuid()));
 
         SiteMemberTermEntity savedEntity = Mockito.mock(SiteMemberTermEntity.class);
-        given(savedEntity.getUuid()).willReturn(MEMBER_TERM_USER_UUID);
+        given(savedEntity.getUuid()).willReturn(MEMBER_BASIC_USER_UUID);
         given(savedEntity.getAgreedTermsOfUseVersion()).willReturn(MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION);
         given(savedEntity.getAgreedPrivacyPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION);
         given(savedEntity.getAgreedCommunityPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION);
@@ -51,14 +52,14 @@ class SiteMemberTermRepositoryJpaAdapterTest implements SiteMemberTermTestUtils,
     @DisplayName("save로 기존 사이트 회원 약관 수정")
     void testSave_givenExistingSiteMemberTerm_willUpdateVersions() {
         // given
-        given(siteMemberTermJpaRepository.existsById(MEMBER_TERM_USER_UUID)).willReturn(true);
+        given(siteMemberTermJpaRepository.existsById(MEMBER_BASIC_USER_UUID)).willReturn(true);
 
         SiteMemberTermEntity existingEntity = Mockito.mock(SiteMemberTermEntity.class);
-        given(existingEntity.getUuid()).willReturn(MEMBER_TERM_USER_UUID);
+        given(existingEntity.getUuid()).willReturn(MEMBER_BASIC_USER_UUID);
         given(existingEntity.getAgreedTermsOfUseVersion()).willReturn(MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION);
         given(existingEntity.getAgreedPrivacyPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION);
         given(existingEntity.getAgreedCommunityPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION);
-        given(siteMemberTermJpaRepository.getReferenceById(MEMBER_TERM_USER_UUID)).willReturn(existingEntity);
+        given(siteMemberTermJpaRepository.getReferenceById(MEMBER_BASIC_USER_UUID)).willReturn(existingEntity);
 
         // when
         SiteMemberTerm result = siteMemberTermRepositoryJpaAdapter.save(createSiteMemberTerm());
@@ -72,11 +73,11 @@ class SiteMemberTermRepositoryJpaAdapterTest implements SiteMemberTermTestUtils,
     void testFindById_givenValidSiteMemberTermId_willReturnOptionalSiteMemberTerm() {
         // given
         SiteMemberTermEntity entity = Mockito.mock(SiteMemberTermEntity.class);
-        given(entity.getUuid()).willReturn(MEMBER_TERM_USER_UUID);
+        given(entity.getUuid()).willReturn(MEMBER_BASIC_USER_UUID);
         given(entity.getAgreedTermsOfUseVersion()).willReturn(MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION);
         given(entity.getAgreedPrivacyPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION);
         given(entity.getAgreedCommunityPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION);
-        given(siteMemberTermJpaRepository.findById(MEMBER_TERM_USER_UUID)).willReturn(Optional.of(entity));
+        given(siteMemberTermJpaRepository.findById(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(entity));
 
         // when & then
         assertThat(siteMemberTermRepositoryJpaAdapter.findById(testSiteMemberTermId)).isEqualTo(Optional.of(createSiteMemberTerm()));
@@ -86,7 +87,7 @@ class SiteMemberTermRepositoryJpaAdapterTest implements SiteMemberTermTestUtils,
     @DisplayName("findById로 빈 Optional 반환(존재하지 않을 때)")
     void testFindById_givenNotFoundSiteMemberTermId_willReturnOptionalEmpty() {
         // given
-        given(siteMemberTermJpaRepository.findById(MEMBER_TERM_USER_UUID)).willReturn(Optional.empty());
+        given(siteMemberTermJpaRepository.findById(MEMBER_BASIC_USER_UUID)).willReturn(Optional.empty());
 
         // when & then
         assertThat(siteMemberTermRepositoryJpaAdapter.findById(testSiteMemberTermId)).isEqualTo(Optional.empty());
@@ -97,7 +98,7 @@ class SiteMemberTermRepositoryJpaAdapterTest implements SiteMemberTermTestUtils,
     void testFindAll_willReturnSiteMemberTermList() {
         // given
         SiteMemberTermEntity entity = Mockito.mock(SiteMemberTermEntity.class);
-        given(entity.getUuid()).willReturn(MEMBER_TERM_USER_UUID);
+        given(entity.getUuid()).willReturn(MEMBER_BASIC_USER_UUID);
         given(entity.getAgreedTermsOfUseVersion()).willReturn(MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION);
         given(entity.getAgreedPrivacyPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION);
         given(entity.getAgreedCommunityPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION);
@@ -111,7 +112,7 @@ class SiteMemberTermRepositoryJpaAdapterTest implements SiteMemberTermTestUtils,
     @DisplayName("isIdExist로 true 반환")
     void testIsIdExist_givenIdThatExists_willReturnTrue() {
         // given
-        given(siteMemberTermJpaRepository.existsById(MEMBER_TERM_USER_UUID)).willReturn(true);
+        given(siteMemberTermJpaRepository.existsById(MEMBER_BASIC_USER_UUID)).willReturn(true);
 
         // when & then
         assertThat(siteMemberTermRepositoryJpaAdapter.isIdExist(testSiteMemberTermId)).isEqualTo(true);
@@ -121,7 +122,7 @@ class SiteMemberTermRepositoryJpaAdapterTest implements SiteMemberTermTestUtils,
     @DisplayName("isIdExist로 false 반환")
     void testIsIdExist_givenIdThatIsNotExist_willReturnFalse() {
         // given
-        given(siteMemberTermJpaRepository.existsById(MEMBER_TERM_USER_UUID)).willReturn(false);
+        given(siteMemberTermJpaRepository.existsById(MEMBER_BASIC_USER_UUID)).willReturn(false);
 
         // when & then
         assertThat(siteMemberTermRepositoryJpaAdapter.isIdExist(testSiteMemberTermId)).isEqualTo(false);
@@ -131,7 +132,7 @@ class SiteMemberTermRepositoryJpaAdapterTest implements SiteMemberTermTestUtils,
     @DisplayName("deleteById로 사이트 회원 약관 삭제")
     void testDeleteById_givenValidSiteMemberTermId_willDelete() {
         // given
-        willDoNothing().given(siteMemberTermJpaRepository).deleteById(MEMBER_TERM_USER_UUID);
+        willDoNothing().given(siteMemberTermJpaRepository).deleteById(MEMBER_BASIC_USER_UUID);
 
         // when & then (예외 없이 실행됨을 확인)
         siteMemberTermRepositoryJpaAdapter.deleteById(testSiteMemberTermId);

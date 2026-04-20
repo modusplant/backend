@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 
 import java.util.Optional;
 
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberTermConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -58,7 +59,7 @@ class SiteMemberTermJpaMapperImplTest implements SiteMemberTermTestUtils, SiteMe
     void testToSiteMemberTerm_givenValidEntity_willReturnSiteMemberTerm() {
         // given
         SiteMemberTermEntity entity = Mockito.mock(SiteMemberTermEntity.class);
-        given(entity.getUuid()).willReturn(MEMBER_TERM_USER_UUID);
+        given(entity.getUuid()).willReturn(MEMBER_BASIC_USER_UUID);
         given(entity.getAgreedTermsOfUseVersion()).willReturn(MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION);
         given(entity.getAgreedPrivacyPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION);
         given(entity.getAgreedCommunityPolicyVersion()).willReturn(MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION);

@@ -95,6 +95,8 @@ import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAu
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberWithdrawConstant.MEMBER_WITHDRAW_BASIC_USER_OPINION;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberWithdrawConstant.MEMBER_WITHDRAW_BASIC_USER_REASON;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -1077,6 +1079,28 @@ class MemberControllerTest implements
         assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
+    @Test
+    @DisplayName("의견 길이 초과로 인해 withdraw로 오류 발생")
+    void testWithdraw_givenOverLengthenedOpinion_willThrowException() {
+        // given
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when
+        InvalidValueException invalidValueException = assertThrows(InvalidValueException.class,
+                () -> memberController.withdraw(
+                        new MemberWithdrawalRecord(
+                                null,
+                                null,
+                                MEMBER_WITHDRAW_BASIC_USER_REASON,
+                                "a".repeat(601),
+                                MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN
+                        )));
+
+        // then
+        assertThat(invalidValueException.getErrorCode()).isEqualTo(MEMBER_WITHDRAW_OPINION_OVER_LENGTH);
+    }
+
     @Nested
     @DisplayName("유효하지 않은 인증 코드 및 인증 제공자로 인해 withdraw로 오류 발생")
     class invalidWithdrawCallTests {
@@ -1089,7 +1113,13 @@ class MemberControllerTest implements
 
             // when
             InvalidValueException invalidValueException = assertThrows(InvalidValueException.class,
-                    () -> memberController.withdraw(new MemberWithdrawalRecord(TEST_SOCIAL_KAKAO_CODE, null, MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)));
+                    () -> memberController.withdraw(
+                            new MemberWithdrawalRecord(
+                                    TEST_SOCIAL_KAKAO_CODE,
+                                    null,
+                                    MEMBER_WITHDRAW_BASIC_USER_REASON,
+                                    MEMBER_WITHDRAW_BASIC_USER_OPINION,
+                                    MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)));
 
             // then
             assertThat(invalidValueException.getErrorCode()).isEqualTo(INVALID_INPUT);
@@ -1104,7 +1134,12 @@ class MemberControllerTest implements
 
             // when
             InvalidValueException invalidValueException = assertThrows(InvalidValueException.class,
-                    () -> memberController.withdraw(new MemberWithdrawalRecord(null, SocialProvider.KAKAO.getValue(), MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)));
+                    () -> memberController.withdraw(new MemberWithdrawalRecord(
+                            null,
+                            SocialProvider.KAKAO.getValue(),
+                            MEMBER_WITHDRAW_BASIC_USER_REASON,
+                            MEMBER_WITHDRAW_BASIC_USER_OPINION,
+                            MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)));
 
             // then
             assertThat(invalidValueException.getErrorCode()).isEqualTo(INVALID_INPUT);

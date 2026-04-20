@@ -34,7 +34,11 @@ public class MemberEventConsumer {
                                S3FileService s3FileService) {
         eventBus.subscribe(event -> {
             if (event instanceof MemberWithdrawalEvent memberWithdrawalEvent) {
-                deleteAllWithMemberPKAndAlterAllWithMemberFK(memberWithdrawalEvent.getMemberId());
+                deleteAllWithMemberPKAndAlterAllWithMemberFK(
+                        memberWithdrawalEvent.getMemberId(),
+                        memberWithdrawalEvent.getReason(),
+                        memberWithdrawalEvent.getOpinion()
+                );
             }
         });
         this.stringRedisTemplate = stringRedisTemplate;
@@ -42,7 +46,7 @@ public class MemberEventConsumer {
         this.s3FileService = s3FileService;
     }
 
-    private void deleteAllWithMemberPKAndAlterAllWithMemberFK(UUID memberId) {
+    private void deleteAllWithMemberPKAndAlterAllWithMemberFK(UUID memberId, String reason, String opinion) {
         stringRedisTemplate.unlink("recentlyView:member:%s:posts".formatted(memberId));     // 최근에 본 게시글 데이터 삭제
 
         String[] publishedPostUlids = dsl.select(COMM_POST.ULID)    // 발행되어 타 회원이 접근할 수 있는 게시글 ID 획득
@@ -53,8 +57,8 @@ public class MemberEventConsumer {
 
         deleteRecentlyViewPostRecords(publishedPostUlids);
         deleteImagesFromPublishedPosts(publishedPostUlids);
-        deletePostsAndRelatedRecords(memberId, publishedPostUlids);
-        deleteOtherMemberRelatedRecords(memberId);
+        processPostsAndRelatedRecords(memberId, publishedPostUlids);
+        processOtherMemberRelatedRecords(memberId, reason, opinion);
     }
 
     private void deleteRecentlyViewPostRecords(String[] publishedPostUlids) {
@@ -112,7 +116,7 @@ public class MemberEventConsumer {
         }
     }
 
-    private void deletePostsAndRelatedRecords(UUID memberId, String[] publishedPostUlids) {
+    private void processPostsAndRelatedRecords(UUID memberId, String[] publishedPostUlids) {
         if (publishedPostUlids.length != 0) {
             dsl.batch(
                     dsl.insertInto(COMM_POST_ARCHIVE,
@@ -156,8 +160,19 @@ public class MemberEventConsumer {
         }
     }
 
-    private void deleteOtherMemberRelatedRecords(UUID memberId) {
+    private void processOtherMemberRelatedRecords(UUID memberId, String reason, String opinion) {
         dsl.batch(
+                dsl.insertInto(SITE_MEMBER_WITHDRAW,
+                                SITE_MEMBER_WITHDRAW.UUID,
+                                SITE_MEMBER_WITHDRAW.REASON,
+                                SITE_MEMBER_WITHDRAW.OPINION,
+                                SITE_MEMBER_WITHDRAW.WITHDRAWN_AT)
+                        .values(
+                                memberId,
+                                reason,
+                                opinion,
+                                LocalDateTime.now()),
+
                 dsl.update(COMM_COMMENT)
                         .setNull(COMM_COMMENT.AUTH_MEMB_UUID)
                         .set(COMM_COMMENT.IS_DELETED, true)
