@@ -27,7 +27,7 @@ class ThrottledDataSource implements DataSource {
                 Connection connection = delegatedDataSource.getConnection();
                 successCode = 2;
                 return new ThrottledConnection(connection, semaphore);
-            } catch (SQLException e) {
+            } catch (SQLException e) {      // delegatedDataSource.getConnection()
                 semaphore.release();
                 successCode = 0;
                 throw e;
@@ -36,7 +36,7 @@ class ThrottledDataSource implements DataSource {
                     semaphore.release();
                 }
             }
-        } catch (InterruptedException e) {
+        } catch (InterruptedException e) {      // semaphore.acquire()
             Thread.currentThread().interrupt();
             throw new SQLException("Interrupted while waiting for connection: ", e);
         }
