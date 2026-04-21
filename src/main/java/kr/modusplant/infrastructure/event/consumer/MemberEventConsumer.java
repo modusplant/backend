@@ -5,9 +5,9 @@ import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.MemberWithdrawalEvent;
-import org.jetbrains.annotations.NotNull;
 import org.jooq.DSLContext;
 import org.jooq.JSONB;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 
@@ -50,70 +50,10 @@ public class MemberEventConsumer {
                 .and(COMM_POST.IS_PUBLISHED.isTrue())
                 .fetchInto(String.class).toArray(new String[0]);
 
-        deleteRecentlyViewPostRecords(publishedPostUlids);
-        deleteImagesFromPublishedPosts(publishedPostUlids);
         processPostsAndRelatedRecords(memberId, publishedPostUlids);
         processOtherMemberRelatedRecords(memberId, reason, opinion);
-    }
-
-    private void deleteRecentlyViewPostRecords(String[] publishedPostUlids) {
-        if (publishedPostUlids.length != 0) {
-            Set<String> targetKeys = new HashSet<>();
-
-            stringRedisTemplate.execute((RedisCallback<Object>) connection -> {
-                ScanOptions options = ScanOptions.scanOptions()
-                        .match("recentlyView:member:*:posts")
-                        .count(100)
-                        .build();
-                try (Cursor<byte[]> cursor = connection.keyCommands().scan(options)) {
-                    while (cursor.hasNext()) {
-                        targetKeys.add(new String(cursor.next(), StandardCharsets.UTF_8));
-                    }
-                }
-                return null;
-            });
-
-            if (!targetKeys.isEmpty()) {
-                stringRedisTemplate.executePipelined(new SessionCallback<>() {
-                    @Override
-                    public <K, V> Object execute(@NotNull RedisOperations<K, V> operations) {
-                        @SuppressWarnings("unchecked")
-                        RedisOperations<String, String> stringOperations =
-                                (RedisOperations<String, String>) operations;
-                        for (String key : targetKeys) {
-                            stringOperations.opsForZSet().remove(key, (Object[]) publishedPostUlids);
-                        }
-                        return null;
-                    }
-                });
-            }
-        }
-    }
-
-    private void deleteImagesFromPublishedPosts(String[] publishedPostUlids) {
-        List<JsonNode> publishedPostContents = dsl.select(COMM_POST.CONTENT)    // 발행된 게시글의 컨텐츠 획득
-                .from(COMM_POST)
-                .where(COMM_POST.ULID.in(publishedPostUlids))
-                .fetchInto(JSONB.class)
-                .stream()
-                .map(jsonbJsonNodeConverter::from)
-                .toList();
-
-        List<String> fileKeysToDelete = new ArrayList<>();      // 컨텐츠로부터 파일 키 수집
-        for (JsonNode content : publishedPostContents) {
-            if (content == null || !content.isArray()) {
-                continue;
-            }
-            for (JsonNode node : content) {
-                if (node.has("src")) {
-                    fileKeysToDelete.add(node.get("src").asText());
-                }
-            }
-        }
-
-        if (!fileKeysToDelete.isEmpty()) {      // 파일 키로 클라우드 플랫폼에서 파일 삭제
-            s3FileService.deleteFiles(fileKeysToDelete);
-        }
+        deleteRecentlyViewPostRecords(publishedPostUlids);
+        deleteImagesFromPublishedPosts(publishedPostUlids);
     }
 
     private void processPostsAndRelatedRecords(UUID memberId, String[] publishedPostUlids) {
@@ -219,5 +159,75 @@ public class MemberEventConsumer {
                         .where(SITE_MEMBER.UUID.eq(memberId))
 
         ).execute();
+    }
+
+    private void deleteRecentlyViewPostRecords(String[] publishedPostUlids) {
+        if (publishedPostUlids.length == 0) {
+            return;
+        }
+
+        byte[][] publishedPostUlidsBytes =
+                Arrays.stream(publishedPostUlids)
+                        .map(ulid -> ulid.getBytes(StandardCharsets.UTF_8))
+                        .toArray(byte[][]::new);
+
+        stringRedisTemplate.execute((RedisCallback<Void>) (RedisConnection connection) -> {
+            int MAX_TARGET_KEY_SIZE = 1000;
+            List<byte[]> memberKeys = new ArrayList<>(MAX_TARGET_KEY_SIZE);
+
+            ScanOptions options = ScanOptions.scanOptions()
+                    .match("recentlyView:member:*:posts")
+                    .count(100)
+                    .build();
+
+            try (Cursor<byte[]> cursor = connection.keyCommands().scan(options)) {
+                while (cursor.hasNext()) {
+                    memberKeys.add(cursor.next());
+                    if (memberKeys.size() >= MAX_TARGET_KEY_SIZE) {
+                        deleteRecentlyViewPostRecordsWithConnection(connection, memberKeys, publishedPostUlidsBytes);
+                    }
+                }
+                if (!memberKeys.isEmpty()) {
+                    deleteRecentlyViewPostRecordsWithConnection(connection, memberKeys, publishedPostUlidsBytes);
+                }
+            }
+            return null;
+        });
+    }
+
+    private void deleteRecentlyViewPostRecordsWithConnection(
+            RedisConnection connection, List<byte[]> batchKeys, byte[][] matchedValuesBytes) {
+        connection.openPipeline();
+        for (byte[] rawKey : batchKeys) {
+            connection.zSetCommands().zRem(rawKey, matchedValuesBytes);
+        }
+        connection.closePipeline();
+        batchKeys.clear();
+    }
+
+    private void deleteImagesFromPublishedPosts(String[] publishedPostUlids) {
+        List<JsonNode> publishedPostContents = dsl.select(COMM_POST.CONTENT)    // 발행된 게시글의 컨텐츠 획득
+                .from(COMM_POST)
+                .where(COMM_POST.ULID.in(publishedPostUlids))
+                .fetchInto(JSONB.class)
+                .stream()
+                .map(jsonbJsonNodeConverter::from)
+                .toList();
+
+        List<String> fileKeysToDelete = new ArrayList<>();      // 컨텐츠로부터 파일 키 수집
+        for (JsonNode content : publishedPostContents) {
+            if (content == null || !content.isArray()) {
+                continue;
+            }
+            for (JsonNode node : content) {
+                if (node.has("src")) {
+                    fileKeysToDelete.add(node.get("src").asText());
+                }
+            }
+        }
+
+        if (!fileKeysToDelete.isEmpty()) {      // 파일 키로 클라우드 플랫폼에서 파일 삭제
+            s3FileService.deleteFiles(fileKeysToDelete);
+        }
     }
 }
