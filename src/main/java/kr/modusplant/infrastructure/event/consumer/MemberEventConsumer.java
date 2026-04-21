@@ -69,7 +69,6 @@ public class MemberEventConsumer {
                     try (Cursor<?> cursor = operations.scan(options)) {
                         while (cursor.hasNext()) {
                             targetKeys.add(String.valueOf(cursor.next()));
-
                         }
                     }
                     return null;
