@@ -54,6 +54,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.io.IOException;
@@ -1054,7 +1055,7 @@ class MemberControllerTest implements
         willDoNothing().given(tokenService).blacklistAccessToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN);
         given(stringRedisTemplate.unlink(any(String.class))).willReturn(true);
         given(stringRedisTemplate.execute(any(RedisCallback.class))).willReturn(true);
-        given(stringRedisTemplate.executePipelined(any(RedisCallback.class))).willReturn(null);
+        given(stringRedisTemplate.executePipelined(any(SessionCallback.class))).willReturn(null);
         willDoNothing().given(s3FileService).deleteFiles(any(List.class));
 
         // when

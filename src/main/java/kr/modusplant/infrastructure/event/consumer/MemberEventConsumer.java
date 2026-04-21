@@ -11,6 +11,7 @@ import org.jooq.JSONB;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -59,20 +60,17 @@ public class MemberEventConsumer {
         if (publishedPostUlids.length != 0) {
             Set<String> targetKeys = new HashSet<>();
 
-            stringRedisTemplate.executePipelined(new SessionCallback<>() {
-                @Override
-                public <K, V> Object execute(@NotNull RedisOperations<K, V> operations) {
-                    ScanOptions options = ScanOptions.scanOptions()
-                            .match("recentlyView:member:*:posts")
-                            .count(100)
-                            .build();
-                    try (Cursor<?> cursor = operations.scan(options)) {
-                        while (cursor.hasNext()) {
-                            targetKeys.add(String.valueOf(cursor.next()));
-                        }
+            stringRedisTemplate.execute((RedisCallback<Object>) connection -> {
+                ScanOptions options = ScanOptions.scanOptions()
+                        .match("recentlyView:member:*:posts")
+                        .count(100)
+                        .build();
+                try (Cursor<byte[]> cursor = connection.keyCommands().scan(options)) {
+                    while (cursor.hasNext()) {
+                        targetKeys.add(new String(cursor.next(), StandardCharsets.UTF_8));
                     }
-                    return null;
                 }
+                return null;
             });
 
             if (!targetKeys.isEmpty()) {
