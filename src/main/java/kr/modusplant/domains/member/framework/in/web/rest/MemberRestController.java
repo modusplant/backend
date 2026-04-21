@@ -441,7 +441,7 @@ public class MemberRestController {
             description = "회원을 탈퇴합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping("/members")
+    @PostMapping("/members")
     public ResponseEntity<DataResponse<Void>> withdrawMember(
             @RequestBody @Valid
             MemberWithdrawRequest request,
