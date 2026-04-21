@@ -5,13 +5,10 @@ import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.MemberWithdrawalEvent;
+import org.jetbrains.annotations.NotNull;
 import org.jooq.DSLContext;
 import org.jooq.JSONB;
-import org.springframework.data.redis.connection.StringRedisConnection;
-import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.ScanOptions;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -62,26 +59,35 @@ public class MemberEventConsumer {
         if (publishedPostUlids.length != 0) {
             Set<String> targetKeys = new HashSet<>();
 
-            stringRedisTemplate.execute((RedisCallback<Void>) connection -> {
-                ScanOptions options = ScanOptions.scanOptions()
-                        .match("recentlyView:member:*:posts")
-                        .count(100)
-                        .build();
-                try (Cursor<byte[]> cursor = connection.keyCommands().scan(options)) {
-                    while (cursor.hasNext()) {
-                        targetKeys.add(new String(cursor.next()));
+            stringRedisTemplate.executePipelined(new SessionCallback<>() {
+                @Override
+                public <K, V> Object execute(@NotNull RedisOperations<K, V> operations) {
+                    ScanOptions options = ScanOptions.scanOptions()
+                            .match("recentlyView:member:*:posts")
+                            .count(100)
+                            .build();
+                    try (Cursor<?> cursor = operations.scan(options)) {
+                        while (cursor.hasNext()) {
+                            targetKeys.add(String.valueOf(cursor.next()));
+
+                        }
                     }
+                    return null;
                 }
-                return null;
             });
 
             if (!targetKeys.isEmpty()) {
-                stringRedisTemplate.executePipelined((RedisCallback<Void>) connection -> {
-                    StringRedisConnection stringConnection = (StringRedisConnection) connection;
-                    for (String key : targetKeys) {
-                        stringConnection.zRem(key, publishedPostUlids);
+                stringRedisTemplate.executePipelined(new SessionCallback<>() {
+                    @Override
+                    public <K, V> Object execute(@NotNull RedisOperations<K, V> operations) {
+                        @SuppressWarnings("unchecked")
+                        RedisOperations<String, String> stringOperations =
+                                (RedisOperations<String, String>) operations;
+                        for (String key : targetKeys) {
+                            stringOperations.opsForZSet().remove(key, (Object[]) publishedPostUlids);
+                        }
+                        return null;
                     }
-                    return null;
                 });
             }
         }
