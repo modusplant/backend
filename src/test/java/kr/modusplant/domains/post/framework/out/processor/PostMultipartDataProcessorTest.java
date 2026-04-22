@@ -3,13 +3,16 @@ package kr.modusplant.domains.post.framework.out.processor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import kr.modusplant.domains.post.common.util.usecase.request.PostRequestTestUtils;
-import kr.modusplant.domains.post.framework.out.processor.enums.FileType;
+import kr.modusplant.domains.post.framework.out.processor.enums.PostFileType;
 import kr.modusplant.domains.post.framework.out.processor.exception.*;
 import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
 import kr.modusplant.domains.post.usecase.request.FileOrder;
 import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.infrastructure.config.jackson.JacksonConfig;
+import kr.modusplant.shared.exception.FileLimitExceededException;
+import kr.modusplant.shared.exception.InvalidFileInputException;
+import kr.modusplant.shared.exception.UnsupportedFileException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,10 +34,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-class MultipartDataProcessorTest implements PostRequestTestUtils {
+class PostMultipartDataProcessorTest implements PostRequestTestUtils {
     private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(JacksonConfig.objectMapper());
-    private final MultipartDataProcessor multipartDataProcessor = new MultipartDataProcessor(s3FileService, objectMapperHolder);
+    private final PostMultipartDataProcessor postMultipartDataProcessor = new PostMultipartDataProcessor(s3FileService, objectMapperHolder);
 
     private static final String DATA = "data";
     private static final String FILENAME = "filename";
@@ -56,7 +59,7 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
             doNothing().when(s3FileService).uploadFile(any(MultipartFile.class),anyString());
 
             // when
-            ContentProcessRecord record = multipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles,basicMediaFilesOrder,imageFilename);
+            ContentProcessRecord record = postMultipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles,basicMediaFilesOrder,imageFilename);
             JsonNode result = record.content();
 
             // then
@@ -64,21 +67,21 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
 
             JsonNode textNode = result.get(0);
             assertThat(textNode.get(ORDER).asInt()).isEqualTo(0);
-            assertThat(textNode.get(TYPE).asText()).isEqualTo(FileType.TEXT.getValue());
+            assertThat(textNode.get(TYPE).asText()).isEqualTo(PostFileType.TEXT.getValue());
             assertThat(textNode.get(FILENAME).asText()).isEqualTo(textFile0.getOriginalFilename());
             assertThat(textNode.get(DATA).asText()).isEqualTo(new String(textFile0.getBytes(), StandardCharsets.UTF_8));
 
             JsonNode imageNode = result.get(1);
             assertThat(imageNode.get(ORDER).asInt()).isEqualTo(1);
-            assertThat(imageNode.get(TYPE).asText()).isEqualTo(FileType.IMAGE.getValue());
+            assertThat(imageNode.get(TYPE).asText()).isEqualTo(PostFileType.IMAGE.getValue());
             assertThat(imageNode.get(FILENAME).asText()).isEqualTo(imageFile.getOriginalFilename());
-            assertThat(imageNode.get(SRC).asText()).matches(regex+FileType.IMAGE.getValue()+"/.*");
+            assertThat(imageNode.get(SRC).asText()).matches(regex+ PostFileType.IMAGE.getValue()+"/.*");
 
             JsonNode videoNode = result.get(2);
             assertThat(videoNode.get(ORDER).asInt()).isEqualTo(2);
-            assertThat(videoNode.get(TYPE).asText()).isEqualTo(FileType.VIDEO.getValue());
+            assertThat(videoNode.get(TYPE).asText()).isEqualTo(PostFileType.VIDEO.getValue());
             assertThat(videoNode.get(FILENAME).asText()).isEqualTo(videoFile.getOriginalFilename());
-            assertThat(videoNode.get(SRC).asText()).matches(regex+FileType.VIDEO.getValue()+"/.*");
+            assertThat(videoNode.get(SRC).asText()).matches(regex+ PostFileType.VIDEO.getValue()+"/.*");
 
             assertThat(record.thumbnailPath()).isEqualTo(imageNode.get(SRC).asText());
         }
@@ -96,27 +99,27 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
             );
 
             // when
-            ContentProcessRecord record = multipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles,basicMediaFilesOrder,imageFilename);
+            ContentProcessRecord record = postMultipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles,basicMediaFilesOrder,imageFilename);
             JsonNode result = record.content();
 
             // then
             JsonNode textNode = result.get(0);
             assertThat(textNode.get(ORDER).asInt()).isEqualTo(0);
-            assertThat(textNode.get(TYPE).asText()).isEqualTo(FileType.TEXT.getValue());
+            assertThat(textNode.get(TYPE).asText()).isEqualTo(PostFileType.TEXT.getValue());
             assertThat(textNode.get(FILENAME).asText()).isEqualTo(textFile0.getOriginalFilename());
             assertThat(textNode.get(DATA).asText()).isEqualTo(new String(textFile0.getBytes(), StandardCharsets.UTF_8));
 
             JsonNode imageNode = result.get(1);
             assertThat(imageNode.get(ORDER).asInt()).isEqualTo(1);
-            assertThat(imageNode.get(TYPE).asText()).isEqualTo(FileType.IMAGE.getValue());
+            assertThat(imageNode.get(TYPE).asText()).isEqualTo(PostFileType.IMAGE.getValue());
             assertThat(imageNode.get(FILENAME).asText()).isEqualTo(imageFile.getOriginalFilename());
-            assertThat(imageNode.get(SRC).asText()).matches(regex+FileType.IMAGE.getValue()+"/.*");
+            assertThat(imageNode.get(SRC).asText()).matches(regex+ PostFileType.IMAGE.getValue()+"/.*");
 
             JsonNode videoNode = result.get(2);
             assertThat(videoNode.get(ORDER).asInt()).isEqualTo(2);
-            assertThat(videoNode.get(TYPE).asText()).isEqualTo(FileType.VIDEO.getValue());
+            assertThat(videoNode.get(TYPE).asText()).isEqualTo(PostFileType.VIDEO.getValue());
             assertThat(videoNode.get(FILENAME).asText()).isEqualTo(videoFile.getOriginalFilename());
-            assertThat(videoNode.get(SRC).asText()).matches(regex+FileType.VIDEO.getValue()+"/.*");
+            assertThat(videoNode.get(SRC).asText()).matches(regex+ PostFileType.VIDEO.getValue()+"/.*");
 
             assertThat(record.thumbnailPath()).isEqualTo(imageNode.get(SRC).asText());
         }
@@ -127,7 +130,7 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
         void testSaveFilesAndGenerateContentJson_givenNoImageFiles_willReturnNullThumbnailPath() throws Exception {
 
             // when
-            ContentProcessRecord record = multipartDataProcessor.saveFilesAndGenerateContentJson(onlyTextFiles, onlyTextFilesOrder, null);
+            ContentProcessRecord record = postMultipartDataProcessor.saveFilesAndGenerateContentJson(onlyTextFiles, onlyTextFilesOrder, null);
 
             // then
             assertThat(record.thumbnailPath()).isNull();
@@ -154,21 +157,21 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
 
             // when & then
             // null 검증
-            assertThatThrownBy(() -> multipartDataProcessor.saveFilesAndGenerateContentJson(null,List.of(),null))
+            assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(null,List.of(),null))
                     .isInstanceOf(InvalidFileInputException.class);
-            assertThatThrownBy(() -> multipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles,null, null))
+            assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles,null, null))
                     .isInstanceOf(InvalidFileInputException.class);
 
             // 크기 불일치
-            assertThatThrownBy(() -> multipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles,textImageFilesOrder, imageFilename))
+            assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles,textImageFilesOrder, imageFilename))
                     .isInstanceOf(InvalidFileInputException.class);
 
             // 유효하지 않은 order값 (order=0이 여러개 or 연속적이지 않은 order)
-            assertThatThrownBy(() -> multipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles,multipleZeroOrders,imageFilename))
+            assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles,multipleZeroOrders,imageFilename))
                     .isInstanceOf(InvalidFileInputException.class);
-            assertThatThrownBy(() -> multipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles,nonSequentialOrders,imageFilename))
+            assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles,nonSequentialOrders,imageFilename))
                     .isInstanceOf(InvalidFileInputException.class);
-            assertThatThrownBy(() -> multipartDataProcessor.saveFilesAndGenerateContentJson(onlyMediaFiles,orderZeroWithImage,"image_0.jpeg"))
+            assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(onlyMediaFiles,orderZeroWithImage,"image_0.jpeg"))
                     .isInstanceOf(InvalidFileInputException.class);
         }
 
@@ -176,10 +179,10 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
         @DisplayName("validatePartsAndOrderInfo - 이미지 존재 시 thumbnailFilename이 null이거나 이미지 파일이 아니면 예외 발생")
         void testSaveFilesAndGenerateContentJson_givenImageFilesWithNullOrNonImageThumbnailFilename_willThrowException() {
             // when & then
-            assertThatThrownBy(() -> multipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles, basicMediaFilesOrder, null))
+            assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles, basicMediaFilesOrder, null))
                     .isInstanceOf(EmptyThumbnailException.class);
 
-            assertThatThrownBy(() -> multipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles, basicMediaFilesOrder, textFile0.getOriginalFilename()))
+            assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles, basicMediaFilesOrder, textFile0.getOriginalFilename()))
                     .isInstanceOf(InvalidThumbnailException.class);
         }
 
@@ -187,7 +190,7 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
         @DisplayName("validatePartsAndOrderInfo - 이미지 미존재 시 thumbnailFilename이 null이 아니면 예외 발생")
         void testSaveFilesAndGenerateContentJson_givenNoImageFilesWithNonNullThumbnailFilename_willThrowException() {
             // when & then
-            assertThatThrownBy(() -> multipartDataProcessor.saveFilesAndGenerateContentJson(onlyTextFiles, onlyTextFilesOrder, textFilename1))
+            assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(onlyTextFiles, onlyTextFilesOrder, textFilename1))
                     .isInstanceOf(ThumbnailNotAllowedException.class);
         }
 
@@ -211,23 +214,21 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
 
             // when & then
             // 지원하지 않는 fileType 및 확장자
-            assertThatThrownBy(() -> multipartDataProcessor.saveFilesAndGenerateContentJson(fontFiles,List.of(new FileOrder(fontFile.getOriginalFilename(),1)),null))
+            assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(fontFiles,List.of(new FileOrder(fontFile.getOriginalFilename(),1)),null))
                     .isInstanceOf(UnsupportedFileException.class);
-            assertThatThrownBy(() -> multipartDataProcessor.saveFilesAndGenerateContentJson(invalidImageFiles, List.of(new FileOrder(invalidImageFile.getOriginalFilename(),1)),invalidImageFile.getOriginalFilename()))
+            assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(invalidImageFiles, List.of(new FileOrder(invalidImageFile.getOriginalFilename(),1)),invalidImageFile.getOriginalFilename()))
                     .isInstanceOf(UnsupportedFileException.class);
 
             // 파일 개수 초과
-            assertThatThrownBy(() -> multipartDataProcessor.saveFilesAndGenerateContentJson(tooManyImages, tooManyImageOrders,tooManyImages.get(0).getOriginalFilename()))
+            assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(tooManyImages, tooManyImageOrders,tooManyImages.get(0).getOriginalFilename()))
                     .isInstanceOf(FileLimitExceededException.class);
 
             // 파일 크기 초과
             assertThatThrownBy(() ->
-                    multipartDataProcessor.saveFilesAndGenerateContentJson(
+                    postMultipartDataProcessor.saveFilesAndGenerateContentJson(
                             List.of(largeFile),List.of(new FileOrder(largeFile.getOriginalFilename(),1)),largeFile.getOriginalFilename())
             ).isInstanceOf(FileLimitExceededException.class);
         }
-
-
     }
 
     @Nested
@@ -237,12 +238,12 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
         @DisplayName("저장된 파일 경로를 전체 파일 경로로 변환하기")
         void testConvertFileSrcToFullFileSrc_givenJsonContent_willReturnArrayNodeContent() throws IOException {
             // given
-            JsonNode content = multipartDataProcessor.saveFilesAndGenerateContentJson(onlyImageFile,onlyImageFilesOrder,imageFilename).content();
+            JsonNode content = postMultipartDataProcessor.saveFilesAndGenerateContentJson(onlyImageFile,onlyImageFilesOrder,imageFilename).content();
             String fullSrcUrl = BASIC_PATH + FILE_KEY;
             given(s3FileService.generateS3SrcUrl(anyString())).willReturn(fullSrcUrl);
 
             // when
-            JsonNode result = multipartDataProcessor.convertFileSrcToFullFileSrc(content);
+            JsonNode result = postMultipartDataProcessor.convertFileSrcToFullFileSrc(content);
 
             // then
             assertTrue(result.isArray());
@@ -251,7 +252,7 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
             JsonNode imageNode = result.get(0);
             assertTrue(imageNode.has(SRC));
             assertFalse(imageNode.has(DATA));
-            assertThat(imageNode.get(TYPE).asText()).isEqualTo(FileType.IMAGE.getValue());
+            assertThat(imageNode.get(TYPE).asText()).isEqualTo(PostFileType.IMAGE.getValue());
             assertThat(imageNode.get(SRC).asText()).isEqualTo(fullSrcUrl);
         }
     }
@@ -267,7 +268,7 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
             given(s3FileService.generateS3SrcUrl(anyString())).willReturn(fullSrcUrl);
 
             // when
-            ArrayNode result = multipartDataProcessor.convertToPreview(TEST_POST_CONTENT_TEXT_AND_IMAGE,TEST_POST_CONTENT_TEXT_AND_IMAGE_THUMBNAIL_KEY);
+            ArrayNode result = postMultipartDataProcessor.convertToPreview(TEST_POST_CONTENT_TEXT_AND_IMAGE,TEST_POST_CONTENT_TEXT_AND_IMAGE_THUMBNAIL_KEY);
 
             // then
             assertThat(result).hasSize(2);
@@ -289,7 +290,7 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
         @DisplayName("저장된 텍스트만 있을 경우, 저장된 텍스트 미리보기 읽기")
         void testConvertToPreviewData_givenJsonContentText_willReturnArrayNodePreviewContent() throws IOException {
             // when
-            ArrayNode result = multipartDataProcessor.convertToPreview(TEST_POST_CONTENT_TEXT_AND_VIDEO,null);
+            ArrayNode result = postMultipartDataProcessor.convertToPreview(TEST_POST_CONTENT_TEXT_AND_VIDEO,null);
 
             // then
             assertThat(result).hasSize(1);
@@ -309,7 +310,7 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
             given(s3FileService.generateS3SrcUrl(anyString())).willReturn(fullSrcUrl);
 
             // when
-            ArrayNode result = multipartDataProcessor.convertToPreview(TEST_POST_CONTENT_IMAGE_AND_VIDEO,TEST_POST_CONTENT_IMAGE_AND_VIDEO_THUMBNAIL_KEY);
+            ArrayNode result = postMultipartDataProcessor.convertToPreview(TEST_POST_CONTENT_IMAGE_AND_VIDEO,TEST_POST_CONTENT_IMAGE_AND_VIDEO_THUMBNAIL_KEY);
 
             // then
             assertThat(result).hasSize(1);
@@ -327,7 +328,7 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
         @DisplayName("저장된 텍스트와 이미지가 모두 없을 때, 빈 배열을 반환하기")
         void testConvertToPreview_givenJsonContentWithoutTextAndImage_willReturnEmptyArrayNode() throws IOException {
             // when
-            ArrayNode result = multipartDataProcessor.convertToPreview(TEST_POST_CONTENT_VIDEO_AND_FILE,null);
+            ArrayNode result = postMultipartDataProcessor.convertToPreview(TEST_POST_CONTENT_VIDEO_AND_FILE,null);
 
             // then
             assertThat(result).isEmpty();
@@ -343,12 +344,12 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
         @DisplayName("저장된 파일 경로로 파일 삭제")
         void testDeleteFiles_givenJsonContent_willDeleteFiles() throws IOException {
             // given
-            ContentProcessRecord record = multipartDataProcessor.saveFilesAndGenerateContentJson(textImageFiles,textImageFilesOrder,imageFilename);
+            ContentProcessRecord record = postMultipartDataProcessor.saveFilesAndGenerateContentJson(textImageFiles,textImageFilesOrder,imageFilename);
             JsonNode content = record.content();
             doNothing().when(s3FileService).deleteFiles(content.get(1).get(SRC).asText());
 
             // when
-            multipartDataProcessor.deleteFiles(content);
+            postMultipartDataProcessor.deleteFiles(content);
 
             // then
             verify(s3FileService,times(1)).deleteFiles(content.get(1).get(SRC).asText());
@@ -358,7 +359,7 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
         @DisplayName("contnet가 null인 경우, 아무 동작이 일어나지 않는다.")
         void testDeleteFiles_givenNullContent_willDoNothing() throws IOException {
             // when
-            multipartDataProcessor.deleteFiles(null);
+            postMultipartDataProcessor.deleteFiles(null);
 
             // then
             verify(s3FileService,never()).deleteFiles(any(String.class));
@@ -372,11 +373,11 @@ class MultipartDataProcessorTest implements PostRequestTestUtils {
         @Test
         @DisplayName("filename을 추출한다")
         void testExtractOriginalFilenameFromFileKey_givenFileKey_willReturnFilename() {
-            assertThat(multipartDataProcessor.extractOriginalFilenameFromFileKey("post/01HV6ABCDEF/image/image_0_1.jpg")).isEqualTo("image_0.jpg");
-            assertThat(multipartDataProcessor.extractOriginalFilenameFromFileKey("post/01HV6ABCDEF/image/cat_0_10.jpeg")).isEqualTo("cat_0.jpeg");
-            assertThat(multipartDataProcessor.extractOriginalFilenameFromFileKey("post/01HV6ABCDEF/image/photo_2023_2.png")).isEqualTo("photo_2023.png");
-            assertThat(multipartDataProcessor.extractOriginalFilenameFromFileKey("post/01HV6ABCDEF/image/image_0_1.jpg")).isEqualTo("image_0.jpg");
-            assertThat(multipartDataProcessor.extractOriginalFilenameFromFileKey(null)).isEqualTo(null);
+            assertThat(postMultipartDataProcessor.extractOriginalFilenameFromFileKey("post/01HV6ABCDEF/image/image_0_1.jpg")).isEqualTo("image_0.jpg");
+            assertThat(postMultipartDataProcessor.extractOriginalFilenameFromFileKey("post/01HV6ABCDEF/image/cat_0_10.jpeg")).isEqualTo("cat_0.jpeg");
+            assertThat(postMultipartDataProcessor.extractOriginalFilenameFromFileKey("post/01HV6ABCDEF/image/photo_2023_2.png")).isEqualTo("photo_2023.png");
+            assertThat(postMultipartDataProcessor.extractOriginalFilenameFromFileKey("post/01HV6ABCDEF/image/image_0_1.jpg")).isEqualTo("image_0.jpg");
+            assertThat(postMultipartDataProcessor.extractOriginalFilenameFromFileKey(null)).isEqualTo(null);
         }
     }
 }
