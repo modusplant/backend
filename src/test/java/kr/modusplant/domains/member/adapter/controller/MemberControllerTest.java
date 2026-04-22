@@ -80,10 +80,10 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberProf
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberWithdrawalRecordTestUtils.testKakaoMemberWithdrawalRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRemoveRecordTestUtils.testProposalOrBugReportRemoveRecord;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
-import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.EXISTS_COMMENT_ABUSE_REPORT;
-import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.EXISTS_POST_ABUSE_REPORT;
+import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.*;
 import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.objectMapper;
 import static kr.modusplant.shared.event.common.util.CommentLikeEventTestUtils.testCommentLikeEvent;
 import static kr.modusplant.shared.event.common.util.PostBookmarkEventTestUtils.testPostBookmarkEvent;
@@ -109,7 +109,9 @@ class MemberControllerTest implements
         MemberTestUtils, MemberProfileTestUtils,
         SiteMemberProfileEntityTestUtils, CommPostEntityTestUtils, CommCommentEntityTestUtils,
         PropBugRepEntityTestUtils, CommPostAbuRepEntityTestUtils, CommCommentAbuRepEntityTestUtils {
+    @SuppressWarnings("unused")
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
+
     private final MockDataProvider mockDataProvider = ctx -> new MockResult[0]; // 반환값을 따로 설정하지 않음
     private final MockConnection mockConnection = new MockConnection(mockDataProvider);
     private final DSLContext dslContext = DSL.using(mockConnection, SQLDialect.POSTGRES);
@@ -146,14 +148,15 @@ class MemberControllerTest implements
     @SuppressWarnings("unused")
     private final CommentEventConsumer commentEventConsumer = new CommentEventConsumer(eventBus, commentLikeJpaRepository, commentJpaRepository);
     @SuppressWarnings("unused")
-    private final ReportEventConsumer reportEventConsumer = new ReportEventConsumer(eventBus, dslContext, memberJpaRepository, postJpaRepository, commentJpaRepository, propBugRepJpaRepository, postAbuRepJpaRepository, commentAbuRepJpaRepository);
+    private final ReportEventConsumer reportEventConsumer = new ReportEventConsumer(eventBus, dslContext, s3FileService, memberJpaRepository, postJpaRepository, commentJpaRepository, propBugRepJpaRepository, postAbuRepJpaRepository, commentAbuRepJpaRepository);
     @SuppressWarnings("unused")
     private final MemberEventConsumer memberEventConsumer = new MemberEventConsumer(eventBus, stringRedisTemplate, dslContext, s3FileService);
-    private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, s3FileService, swearService, memberImageIOHelper, memberValidationHelper, memberProfileMapper, memberSocialTranslator, memberRepository, memberProfileRepository, targetPostRepository, targetCommentRepository, reportRepository, eventBus);
+    private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, swearService, memberImageIOHelper, memberValidationHelper, memberProfileMapper, memberSocialTranslator, memberRepository, memberProfileRepository, targetPostRepository, targetCommentRepository, reportRepository, eventBus);
 
     private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
     private final NotFoundEntityException notFoundEntityExceptionForTargetPost = new NotFoundEntityException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
     private final NotFoundEntityException notFoundEntityExceptionForTargetComment = new NotFoundEntityException(NOT_FOUND_TARGET_COMMENT_ID, "targetCommentId");
+    private final NotFoundEntityException notFoundEntityExceptionForReport = new NotFoundEntityException(NOT_FOUND_REPORT_ID, "reportId");
 
     @Nested
     @DisplayName("checkExistedNickname으로 회원 닉네임 중복 확인")
@@ -226,8 +229,8 @@ class MemberControllerTest implements
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(memberProfileRepository.getById(any())).willReturn(Optional.of(memberProfile));
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
+        willDoNothing().given(memberImageIOHelper).deleteImage(any());
         given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
-        willDoNothing().given(s3FileService).deleteFiles(any(String.class));
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
         given(s3FileService.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
@@ -256,7 +259,7 @@ class MemberControllerTest implements
                         testNormalUserNickname))
         );
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
-        willDoNothing().given(s3FileService).deleteFiles(any(String.class));
+        willDoNothing().given(memberImageIOHelper).deleteImage(any());
         given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
         given(s3FileService.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
@@ -280,7 +283,7 @@ class MemberControllerTest implements
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(memberProfileRepository.getById(any())).willReturn(Optional.of(memberProfile));
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
-        willDoNothing().given(s3FileService).deleteFiles(any(String.class));
+        willDoNothing().given(memberImageIOHelper).deleteImage(any());
 
         // when
         MemberProfileResponse memberProfileResponse = memberController.overrideProfile(
@@ -875,6 +878,49 @@ class MemberControllerTest implements
 
         // then
         assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+    }
+
+    @Test
+    @DisplayName("removeProposalOrBug로 건의 및 버그 제보 제거")
+    void testRemoveProposalOrBug_givenValidRecord_willRemoveProposalOrBugReport() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        willDoNothing().given(memberValidationHelper).validateIfReportExists(any());
+
+        // when
+        memberController.removeProposalOrBug(testProposalOrBugReportRemoveRecord);
+
+        // then
+        verify(s3FileService, times(1)).deleteFiles(any(String.class));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원으로 인해 removeProposalOrBug로 건의 및 버그 제보 제거 실패")
+    void testRemoveProposalOrBug_givenNotFoundMemberId_willThrowException() {
+        // given
+        willThrow(notFoundEntityExceptionForMember).given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
+                () -> memberController.removeProposalOrBug(testProposalOrBugReportRemoveRecord));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 보고서로 인해 removeProposalOrBug로 건의 및 버그 제보 제거 실패")
+    void testRemoveProposalOrBug_givenNotFoundReportId_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        willThrow(notFoundEntityExceptionForReport).given(memberValidationHelper).validateIfReportExists(any());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
+                () -> memberController.removeProposalOrBug(testProposalOrBugReportRemoveRecord));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_REPORT_ID);
     }
 
     @Test
