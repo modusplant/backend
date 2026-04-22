@@ -1,5 +1,6 @@
 package kr.modusplant.infrastructure.event.consumer;
 
+import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jpa.entity.*;
 import kr.modusplant.framework.jpa.repository.*;
 import kr.modusplant.infrastructure.event.bus.EventBus;
@@ -11,13 +12,18 @@ import kr.modusplant.shared.persistence.compositekey.CommCommentId;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static kr.modusplant.jooq.Tables.PROP_BUG_REP;
 import static kr.modusplant.jooq.Tables.PROP_BUG_REP_ARCHIVE;
+import static org.jooq.impl.DSL.select;
+import static org.jooq.impl.DSL.val;
 
 @Component
 public class ReportEventConsumer {
     private final DSLContext dsl;
+    private final S3FileService s3FileService;
 
     private final SiteMemberJpaRepository memberJpaRepository;
     private final CommPostJpaRepository postJpaRepository;
@@ -26,7 +32,7 @@ public class ReportEventConsumer {
     private final CommPostAbuRepJpaRepository postAbuRepJpaRepository;
     private final CommCommentAbuRepJpaRepository commentAbuRepJpaRepository;
 
-    public ReportEventConsumer(EventBus eventBus, DSLContext dsl,
+    public ReportEventConsumer(EventBus eventBus, DSLContext dsl, S3FileService s3FileService,
                                SiteMemberJpaRepository memberJpaRepository,
                                CommPostJpaRepository postJpaRepository,
                                CommCommentJpaRepository commentJpaRepository,
@@ -56,6 +62,7 @@ public class ReportEventConsumer {
             }
         });
         this.dsl = dsl;
+        this.s3FileService = s3FileService;
         this.memberJpaRepository = memberJpaRepository;
         this.postJpaRepository = postJpaRepository;
         this.commentJpaRepository = commentJpaRepository;
@@ -76,34 +83,43 @@ public class ReportEventConsumer {
     }
 
     private void deleteProposalOrBugReport(UUID memberId, String reportId) {
-//        dsl.insertInto(PROP_BUG_REP_ARCHIVE,
-//                        COMM_POST_ARCHIVE.ULID,
-//                        COMM_POST_ARCHIVE.PRI_CATE_ID,
-//                        COMM_POST_ARCHIVE.SECO_CATE_ID,
-//                        COMM_POST_ARCHIVE.AUTH_MEMB_UUID,
-//                        COMM_POST_ARCHIVE.TITLE,
-//                        COMM_POST_ARCHIVE.CONTENT_TEXT,
-//                        COMM_POST_ARCHIVE.CREATED_AT,
-//                        COMM_POST_ARCHIVE.ARCHIVED_AT,
-//                        COMM_POST_ARCHIVE.UPDATED_AT,
-//                        COMM_POST_ARCHIVE.PUBLISHED_AT
-//                )
-//                .select(
-//                        select(
-//                                COMM_POST.ULID,
-//                                COMM_POST.PRI_CATE_ID,
-//                                COMM_POST.SECO_CATE_ID,
-//                                COMM_POST.AUTH_MEMB_UUID,
-//                                COMM_POST.TITLE,
-//                                COMM_POST.CONTENT_TEXT,
-//                                COMM_POST.CREATED_AT,
-//                                val(LocalDateTime.now()),
-//                                COMM_POST.UPDATED_AT,
-//                                COMM_POST.PUBLISHED_AT
-//                        )
-//                                .from(COMM_POST)
-//                                .where(COMM_POST.ULID.in(publishedPostUlids))
-//                )
+        processProposalOrBugReportRelatedRecords(reportId);
+        deleteImageFromReportImagePath(memberId);
+    }
+
+    private void processProposalOrBugReportRelatedRecords(String reportId) {
+        dsl.insertInto(PROP_BUG_REP_ARCHIVE,
+                        PROP_BUG_REP_ARCHIVE.ULID,
+                        PROP_BUG_REP_ARCHIVE.MEMB_UUID,
+                        PROP_BUG_REP_ARCHIVE.TITLE,
+                        PROP_BUG_REP_ARCHIVE.CONTENT,
+                        PROP_BUG_REP_ARCHIVE.CREATED_AT,
+                        PROP_BUG_REP_ARCHIVE.ARCHIVED_AT,
+                        PROP_BUG_REP_ARCHIVE.LAST_MODIFIED_AT
+                )
+                .select(
+                        select(
+                                PROP_BUG_REP.ULID,
+                                PROP_BUG_REP.MEMB_UUID,
+                                PROP_BUG_REP.TITLE,
+                                PROP_BUG_REP.CONTENT,
+                                PROP_BUG_REP.CREATED_AT,
+                                val(LocalDateTime.now()),
+                                PROP_BUG_REP.LAST_MODIFIED_AT
+                        )
+                                .from(PROP_BUG_REP)
+                                .where(PROP_BUG_REP.ULID.eq(reportId))
+                ).execute();
+
+        dsl.deleteFrom(PROP_BUG_REP).where(PROP_BUG_REP.ULID.eq(reportId)).execute();
+    }
+
+    private void deleteImageFromReportImagePath(UUID memberId) {
+        String imagePath =
+                dsl.select(PROP_BUG_REP.IMAGE_PATH)
+                        .where(PROP_BUG_REP.MEMB_UUID.eq(memberId))
+                        .fetchSingle().into(String.class);
+        s3FileService.deleteFiles(imagePath);
     }
 
     private void addPostAbuseReport(UUID memberId, String postUlid) {
