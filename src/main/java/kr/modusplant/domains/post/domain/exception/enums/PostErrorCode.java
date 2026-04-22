@@ -28,7 +28,8 @@ public enum PostErrorCode implements ErrorCode {
     INVALID_CATEGORY_ORDER(HttpStatus.BAD_REQUEST.value(),"invalid_category_order","카테고리 순서가 유효하지 않습니다. "),
     EMPTY_THUMBNAIL(HttpStatus.BAD_REQUEST.value(), "empty_thumbnail", "대표 사진값이 비어 있습니다. "),
     INVALID_THUMBNAIL(HttpStatus.BAD_REQUEST.value(), "invalid_thumbnail", "대표 사진값이 유효하지 않습니다. "),
-    THUMBNAIL_NOT_ALLOWED(HttpStatus.BAD_REQUEST.value(), "thumbnail_not_allowed","대표 사진을 선택할 수 없습니다. ");
+    THUMBNAIL_NOT_ALLOWED(HttpStatus.BAD_REQUEST.value(), "thumbnail_not_allowed","대표 사진을 선택할 수 없습니다. "),
+    TEXT_FILE_OVER_LENGTH(HttpStatus.BAD_REQUEST.value(),"text_file_over_length","텍스트 파일 길이 제한을 초과했습니다");
 
     private final int httpStatus;
     private final String code;

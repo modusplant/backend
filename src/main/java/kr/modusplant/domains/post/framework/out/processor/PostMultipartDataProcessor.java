@@ -38,6 +38,7 @@ public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
     public static final String ORDER = "order";
     public static final String SRC = "src";
     public static final String TYPE = "type";
+    public static final int MAX_TEXT_LENGTH = 5000;
     private final ObjectMapper objectMapper;
 
     public PostMultipartDataProcessor(S3FileService s3FileService, ObjectMapperHolder objectMapperHolder) {
@@ -197,6 +198,14 @@ public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
             long fileSize = part.getSize();
             // text이면 제외
             if (PostFileType.from(contentType) == PostFileType.TEXT) {
+                try {
+                    String text = new String(part.getBytes(), StandardCharsets.UTF_8);
+                    if (text.length() > MAX_TEXT_LENGTH) {
+                        throw new TextFileOverLengthException();
+                    }
+                } catch (IOException e) {
+                    throw new InvalidFileInputException();
+                }
                 continue;
             }
 

@@ -195,6 +195,48 @@ class PostMultipartDataProcessorTest implements PostRequestTestUtils {
         }
 
         @Test
+        @DisplayName("validateFileConstraints - 텍스트 글자수 5000자 정확히 입력 시 정상 처리")
+        void testSaveFilesAndGenerateContentJson_givenTextExactly5000Chars_willSuccess() throws IOException {
+            // given
+            String exactText = "a".repeat(5000);
+            MockMultipartFile exactTextFile = new MockMultipartFile(
+                    "content",
+                    "text_0.txt",
+                    "text/plain",
+                    exactText.getBytes(StandardCharsets.UTF_8)
+            );
+            List<MultipartFile> exactTextFiles = List.of(exactTextFile);
+            List<FileOrder> exactTextFilesOrder = List.of(new FileOrder(exactTextFile.getOriginalFilename(), 0));
+
+            // when & then
+            assertThat(
+                    postMultipartDataProcessor.saveFilesAndGenerateContentJson(
+                            exactTextFiles, exactTextFilesOrder, null)
+            ).isNotNull();
+        }
+
+        @Test
+        @DisplayName("validateFileConstraints - 텍스트 글자수 5000자 초과 시 예외가 발생")
+        void testSaveFilesAndGenerateContentJson_givenTextExceeds5000Chars_willThrowException() {
+            // given
+            String longText = "a".repeat(5001);
+            MockMultipartFile tooLongTextFile = new MockMultipartFile(
+                    "content",
+                    "text_0.txt",
+                    "text/plain",
+                    longText.getBytes(StandardCharsets.UTF_8)
+            );
+            List<MultipartFile> tooLongTextFiles = List.of(tooLongTextFile);
+            List<FileOrder> tooLongTextFilesOrder = List.of(new FileOrder(tooLongTextFile.getOriginalFilename(), 0));
+
+            // when & then
+            assertThatThrownBy(() ->
+                    postMultipartDataProcessor.saveFilesAndGenerateContentJson(
+                            tooLongTextFiles, tooLongTextFilesOrder, null)
+            ).isInstanceOf(TextFileOverLengthException.class);
+        }
+
+        @Test
         @DisplayName("validateFileConstraints - 확장자, 파일 개수, 파일 크기 제한 위반시 예외가 발생")
         void testSaveFilesAndGenerateContentJson_givenInvalidFileTypeOrCountOrSize_willThrowException() {
             // given
