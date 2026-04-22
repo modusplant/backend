@@ -342,6 +342,31 @@ public class MemberRestController {
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
+    // TODO: 관리자 API로 등록 요망
+    @Hidden
+    @Operation(
+            summary = "건의 및 버그 제보 삭제 API",
+            description = "건의 사항 또는 버그 제보를 삭제합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @DeleteMapping(value = "/report/proposal-or-bug/{reportUlid}")
+    public ResponseEntity<DataResponse<Void>> deleteProposalOrBugReport(
+            @Parameter(
+                    description = "삭제할 보고서의 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
+            @PathVariable
+            @NotBlank(message = "보고서 식별자가 비어 있습니다.")
+            String reportUlid,
+
+            @Parameter(hidden = true)
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) throws IOException {
+        memberController.removeProposalOrBug(new ProposalOrBugReportRemoveRecord(memberId, reportUlid));
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
     @Hidden
     @Operation(
             summary = "게시글 신고 API",

@@ -11,18 +11,17 @@ import java.util.UUID;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class MemberWithdrawalEvent {
+public class ProposalOrBugReportRemoveEvent {
     private final UUID memberId;
-    private final String reason;
-    private final String opinion;
+    private final String reportId;
 
-    public static MemberWithdrawalEvent create(UUID memberId, String reason, String opinion) {
+    public static ProposalOrBugReportRemoveEvent create(UUID memberId, String reportId) {
         if (memberId == null) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_MEMBER, "memberId");
-        } else if (StringUtils.isBlank(reason)) {
-            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_MEMBER_WITHDRAW_REASON, "reason");
+        } else if (StringUtils.isEmpty(reportId)) {
+            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_REPORT, "reportId");
         } else {
-            return new MemberWithdrawalEvent(memberId, reason, opinion);
+            return new ProposalOrBugReportRemoveEvent(memberId, reportId);
         }
     }
 }

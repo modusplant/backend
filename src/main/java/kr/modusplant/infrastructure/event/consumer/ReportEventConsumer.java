@@ -6,13 +6,19 @@ import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.CommentAbuseReportEvent;
 import kr.modusplant.shared.event.PostAbuseReportEvent;
 import kr.modusplant.shared.event.ProposalOrBugReportEvent;
+import kr.modusplant.shared.event.ProposalOrBugReportRemoveEvent;
 import kr.modusplant.shared.persistence.compositekey.CommCommentId;
+import org.jooq.DSLContext;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+import static kr.modusplant.jooq.Tables.PROP_BUG_REP_ARCHIVE;
+
 @Component
 public class ReportEventConsumer {
+    private final DSLContext dsl;
+
     private final SiteMemberJpaRepository memberJpaRepository;
     private final CommPostJpaRepository postJpaRepository;
     private final CommCommentJpaRepository commentJpaRepository;
@@ -20,7 +26,7 @@ public class ReportEventConsumer {
     private final CommPostAbuRepJpaRepository postAbuRepJpaRepository;
     private final CommCommentAbuRepJpaRepository commentAbuRepJpaRepository;
 
-    public ReportEventConsumer(EventBus eventBus,
+    public ReportEventConsumer(EventBus eventBus, DSLContext dsl,
                                SiteMemberJpaRepository memberJpaRepository,
                                CommPostJpaRepository postJpaRepository,
                                CommCommentJpaRepository commentJpaRepository,
@@ -34,8 +40,12 @@ public class ReportEventConsumer {
                         proposalOrBugReportEvent.getTitle(),
                         proposalOrBugReportEvent.getContent(),
                         proposalOrBugReportEvent.getImagePath());
-            }
-            else if (event instanceof PostAbuseReportEvent postAbuseReportEvent) {
+            } else if (event instanceof ProposalOrBugReportRemoveEvent proposalOrBugReportRemoveEvent) {
+                deleteProposalOrBugReport(
+                        proposalOrBugReportRemoveEvent.getMemberId(),
+                        proposalOrBugReportRemoveEvent.getReportId()
+                );
+            } else if (event instanceof PostAbuseReportEvent postAbuseReportEvent) {
                 addPostAbuseReport(postAbuseReportEvent.getMemberId(), postAbuseReportEvent.getPostUlid());
             }
             else if (event instanceof CommentAbuseReportEvent commentAbuseReportEvent) {
@@ -45,6 +55,7 @@ public class ReportEventConsumer {
                         commentAbuseReportEvent.getPath());
             }
         });
+        this.dsl = dsl;
         this.memberJpaRepository = memberJpaRepository;
         this.postJpaRepository = postJpaRepository;
         this.commentJpaRepository = commentJpaRepository;
@@ -62,6 +73,37 @@ public class ReportEventConsumer {
                         .content(content)
                         .imagePath(imagePath)
                         .build());
+    }
+
+    private void deleteProposalOrBugReport(UUID memberId, String reportId) {
+//        dsl.insertInto(PROP_BUG_REP_ARCHIVE,
+//                        COMM_POST_ARCHIVE.ULID,
+//                        COMM_POST_ARCHIVE.PRI_CATE_ID,
+//                        COMM_POST_ARCHIVE.SECO_CATE_ID,
+//                        COMM_POST_ARCHIVE.AUTH_MEMB_UUID,
+//                        COMM_POST_ARCHIVE.TITLE,
+//                        COMM_POST_ARCHIVE.CONTENT_TEXT,
+//                        COMM_POST_ARCHIVE.CREATED_AT,
+//                        COMM_POST_ARCHIVE.ARCHIVED_AT,
+//                        COMM_POST_ARCHIVE.UPDATED_AT,
+//                        COMM_POST_ARCHIVE.PUBLISHED_AT
+//                )
+//                .select(
+//                        select(
+//                                COMM_POST.ULID,
+//                                COMM_POST.PRI_CATE_ID,
+//                                COMM_POST.SECO_CATE_ID,
+//                                COMM_POST.AUTH_MEMB_UUID,
+//                                COMM_POST.TITLE,
+//                                COMM_POST.CONTENT_TEXT,
+//                                COMM_POST.CREATED_AT,
+//                                val(LocalDateTime.now()),
+//                                COMM_POST.UPDATED_AT,
+//                                COMM_POST.PUBLISHED_AT
+//                        )
+//                                .from(COMM_POST)
+//                                .where(COMM_POST.ULID.in(publishedPostUlids))
+//                )
     }
 
     private void addPostAbuseReport(UUID memberId, String postUlid) {

@@ -8,12 +8,18 @@ import kr.modusplant.shared.event.MemberWithdrawalEvent;
 import org.jooq.DSLContext;
 import org.jooq.JSONB;
 import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 import static kr.modusplant.jooq.Tables.*;
 import static org.jooq.impl.DSL.select;

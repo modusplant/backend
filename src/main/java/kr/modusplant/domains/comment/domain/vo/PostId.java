@@ -18,7 +18,7 @@ public class PostId {
     private final String id;
 
     public static PostId create(String ulid) {
-        if (ulid == null || ulid.trim().isEmpty()) {
+        if (StringUtils.isBlank(ulid)) {
             throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID);
         }
         if (!isValidUlid(ulid)) {

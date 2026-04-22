@@ -14,8 +14,8 @@ import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
 import kr.modusplant.domains.member.framework.out.jpa.repository.MemberProfileRepositoryJpaAdapter;
 import kr.modusplant.domains.member.framework.out.jpa.repository.MemberRepositoryJpaAdapter;
-import kr.modusplant.domains.member.framework.out.jpa.repository.TargetCommentIdRepositoryJpaAdapter;
-import kr.modusplant.domains.member.framework.out.jpa.repository.TargetPostIdRepositoryJpaAdapter;
+import kr.modusplant.domains.member.framework.out.jpa.repository.TargetCommentRepositoryJpaAdapter;
+import kr.modusplant.domains.member.framework.out.jpa.repository.TargetPostRepositoryJpaAdapter;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord;
@@ -126,9 +126,9 @@ class MemberControllerTest implements
 
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryJpaAdapter.class);
     private final MemberProfileRepository memberProfileRepository = Mockito.mock(MemberProfileRepositoryJpaAdapter.class);
-    private final TargetPostIdRepository targetPostIdRepository = Mockito.mock(TargetPostIdRepositoryJpaAdapter.class);
-    private final TargetCommentIdRepository targetCommentIdRepository = Mockito.mock(TargetCommentIdRepositoryJpaAdapter.class);
-    private final AbuseRepository abuseRepository = Mockito.mock(AbuseRepository.class);
+    private final TargetPostRepository targetPostRepository = Mockito.mock(TargetPostRepositoryJpaAdapter.class);
+    private final TargetCommentRepository targetCommentRepository = Mockito.mock(TargetCommentRepositoryJpaAdapter.class);
+    private final ReportRepository reportRepository = Mockito.mock(ReportRepository.class);
 
     private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
     private final CommPostJpaRepository postJpaRepository = Mockito.mock(CommPostJpaRepository.class);
@@ -146,10 +146,10 @@ class MemberControllerTest implements
     @SuppressWarnings("unused")
     private final CommentEventConsumer commentEventConsumer = new CommentEventConsumer(eventBus, commentLikeJpaRepository, commentJpaRepository);
     @SuppressWarnings("unused")
-    private final ReportEventConsumer reportEventConsumer = new ReportEventConsumer(eventBus, memberJpaRepository, postJpaRepository, commentJpaRepository, propBugRepJpaRepository, postAbuRepJpaRepository, commentAbuRepJpaRepository);
+    private final ReportEventConsumer reportEventConsumer = new ReportEventConsumer(eventBus, dslContext, memberJpaRepository, postJpaRepository, commentJpaRepository, propBugRepJpaRepository, postAbuRepJpaRepository, commentAbuRepJpaRepository);
     @SuppressWarnings("unused")
     private final MemberEventConsumer memberEventConsumer = new MemberEventConsumer(eventBus, stringRedisTemplate, dslContext, s3FileService);
-    private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, s3FileService, swearService, memberImageIOHelper, memberValidationHelper, memberProfileMapper, memberSocialTranslator, memberRepository, memberProfileRepository, targetPostIdRepository, targetCommentIdRepository, abuseRepository, eventBus);
+    private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, s3FileService, swearService, memberImageIOHelper, memberValidationHelper, memberProfileMapper, memberSocialTranslator, memberRepository, memberProfileRepository, targetPostRepository, targetCommentRepository, reportRepository, eventBus);
 
     private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
     private final NotFoundEntityException notFoundEntityExceptionForTargetPost = new NotFoundEntityException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
@@ -357,8 +357,8 @@ class MemberControllerTest implements
         String postId = testPostLikeEvent.getPostId();
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
-        given(targetPostIdRepository.isPublished(any())).willReturn(true);
-        given(targetPostIdRepository.isUnliked(any(), any())).willReturn(true);
+        given(targetPostRepository.isPublished(any())).willReturn(true);
+        given(targetPostRepository.isUnliked(any(), any())).willReturn(true);
         CommPostLikeEntity postLikeEntity = CommPostLikeEntity.of(postId, memberId);
         given(postLikeJpaRepository.save(postLikeEntity)).willReturn(postLikeEntity);
         Optional<CommPostEntity> postEntity = Optional.of(CommPostEntity.builder().ulid(postId).likeCount(1).build());
@@ -379,8 +379,8 @@ class MemberControllerTest implements
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
-        given(targetPostIdRepository.isPublished(any())).willReturn(true);
-        given(targetPostIdRepository.isUnliked(any(), any())).willReturn(false);
+        given(targetPostRepository.isPublished(any())).willReturn(true);
+        given(targetPostRepository.isUnliked(any(), any())).willReturn(false);
 
         // when
         memberController.likePost(testMemberPostLikeRecord);
@@ -425,7 +425,7 @@ class MemberControllerTest implements
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
-        given(targetPostIdRepository.isPublished(any())).willReturn(false);
+        given(targetPostRepository.isPublished(any())).willReturn(false);
 
         // when
         NotAccessibleException notFoundEntityException = assertThrows(NotAccessibleException.class,
@@ -443,8 +443,8 @@ class MemberControllerTest implements
         String postId = testPostLikeEvent.getPostId();
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
-        given(targetPostIdRepository.isPublished(any())).willReturn(true);
-        given(targetPostIdRepository.isLiked(any(), any())).willReturn(true);
+        given(targetPostRepository.isPublished(any())).willReturn(true);
+        given(targetPostRepository.isLiked(any(), any())).willReturn(true);
         CommPostLikeEntity postLikeEntity = CommPostLikeEntity.of(postId, memberId);
         willDoNothing().given(postLikeJpaRepository).delete(postLikeEntity);
         Optional<CommPostEntity> postEntity = Optional.of(CommPostEntity.builder().ulid(postId).likeCount(1).build());
@@ -465,8 +465,8 @@ class MemberControllerTest implements
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
-        given(targetPostIdRepository.isPublished(any())).willReturn(true);
-        given(targetPostIdRepository.isLiked(any(), any())).willReturn(false);
+        given(targetPostRepository.isPublished(any())).willReturn(true);
+        given(targetPostRepository.isLiked(any(), any())).willReturn(false);
 
         // when
         memberController.unlikePost(testMemberPostUnlikeRecord);
@@ -511,7 +511,7 @@ class MemberControllerTest implements
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
-        given(targetPostIdRepository.isPublished(any())).willReturn(false);
+        given(targetPostRepository.isPublished(any())).willReturn(false);
 
         // when
         NotAccessibleException notFoundEntityException = assertThrows(NotAccessibleException.class,
@@ -529,8 +529,8 @@ class MemberControllerTest implements
         String postId = testPostBookmarkEvent.getPostId();
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
-        given(targetPostIdRepository.isPublished(any())).willReturn(true);
-        given(targetPostIdRepository.isNotBookmarked(any(), any())).willReturn(true);
+        given(targetPostRepository.isPublished(any())).willReturn(true);
+        given(targetPostRepository.isNotBookmarked(any(), any())).willReturn(true);
         CommPostBookmarkEntity postBookmarkEntity = CommPostBookmarkEntity.of(postId, memberId);
         given(postBookmarkJpaRepository.save(postBookmarkEntity)).willReturn(postBookmarkEntity);
 
@@ -547,8 +547,8 @@ class MemberControllerTest implements
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
-        given(targetPostIdRepository.isPublished(any())).willReturn(true);
-        given(targetPostIdRepository.isNotBookmarked(any(), any())).willReturn(false);
+        given(targetPostRepository.isPublished(any())).willReturn(true);
+        given(targetPostRepository.isNotBookmarked(any(), any())).willReturn(false);
 
         // when
         memberController.bookmarkPost(testMemberPostBookmarkRecord);
@@ -592,7 +592,7 @@ class MemberControllerTest implements
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
-        given(targetPostIdRepository.isPublished(any())).willReturn(false);
+        given(targetPostRepository.isPublished(any())).willReturn(false);
 
         // when
         NotAccessibleException notFoundEntityException = assertThrows(NotAccessibleException.class,
@@ -610,8 +610,8 @@ class MemberControllerTest implements
         String postId = testPostBookmarkCancelEvent.getPostId();
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
-        given(targetPostIdRepository.isPublished(any())).willReturn(true);
-        given(targetPostIdRepository.isBookmarked(any(), any())).willReturn(true);
+        given(targetPostRepository.isPublished(any())).willReturn(true);
+        given(targetPostRepository.isBookmarked(any(), any())).willReturn(true);
         CommPostBookmarkEntity postBookmarkEntity = CommPostBookmarkEntity.of(postId, memberId);
         willDoNothing().given(postBookmarkJpaRepository).delete(postBookmarkEntity);
 
@@ -628,8 +628,8 @@ class MemberControllerTest implements
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
-        given(targetPostIdRepository.isPublished(any())).willReturn(true);
-        given(targetPostIdRepository.isBookmarked(any(), any())).willReturn(false);
+        given(targetPostRepository.isPublished(any())).willReturn(true);
+        given(targetPostRepository.isBookmarked(any(), any())).willReturn(false);
 
         // when
         memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord);
@@ -673,7 +673,7 @@ class MemberControllerTest implements
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
-        given(targetPostIdRepository.isPublished(any())).willReturn(false);
+        given(targetPostRepository.isPublished(any())).willReturn(false);
 
         // when
         NotAccessibleException notFoundEntityException = assertThrows(NotAccessibleException.class,
@@ -692,7 +692,7 @@ class MemberControllerTest implements
         String path = testCommentLikeEvent.getPath();
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetCommentExists(any());
-        given(targetCommentIdRepository.isUnliked(any(), any())).willReturn(true);
+        given(targetCommentRepository.isUnliked(any(), any())).willReturn(true);
         CommCommentLikeEntity commentLikeEntity = CommCommentLikeEntity.of(postId, path, memberId);
         given(commentLikeJpaRepository.save(commentLikeEntity)).willReturn(commentLikeEntity);
         Optional<CommCommentEntity> commentEntity = Optional.of(CommCommentEntity.builder().post(createCommPostEntityBuilder().ulid(postId).build()).path(path).likeCount(1).build());
@@ -713,7 +713,7 @@ class MemberControllerTest implements
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetCommentExists(any());
-        given(targetCommentIdRepository.isUnliked(any(), any())).willReturn(false);
+        given(targetCommentRepository.isUnliked(any(), any())).willReturn(false);
 
         // when
         memberController.likeComment(testMemberCommentLikeRecord);
@@ -761,7 +761,7 @@ class MemberControllerTest implements
         String path = testCommentLikeEvent.getPath();
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetCommentExists(any());
-        given(targetCommentIdRepository.isLiked(any(), any())).willReturn(true);
+        given(targetCommentRepository.isLiked(any(), any())).willReturn(true);
         CommCommentLikeEntity commentLikeEntity = CommCommentLikeEntity.of(postId, path, memberId);
         given(commentLikeJpaRepository.save(commentLikeEntity)).willReturn(commentLikeEntity);
         Optional<CommCommentEntity> commentEntity = Optional.of(CommCommentEntity.builder().post(createCommPostEntityBuilder().ulid(postId).build()).path(path).likeCount(1).build());
@@ -782,7 +782,7 @@ class MemberControllerTest implements
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetCommentExists(any());
-        given(targetCommentIdRepository.isLiked(any(), any())).willReturn(false);
+        given(targetCommentRepository.isLiked(any(), any())).willReturn(false);
 
         // when
         memberController.unlikeComment(testMemberCommentUnlikeRecord);
@@ -888,8 +888,8 @@ class MemberControllerTest implements
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
-        given(targetPostIdRepository.isPublished(any())).willReturn(true);
-        given(abuseRepository.isMemberAbusePost(any(), any())).willReturn(false);
+        given(targetPostRepository.isPublished(any())).willReturn(true);
+        given(reportRepository.isMemberAbusePost(any(), any())).willReturn(false);
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
         given(postJpaRepository.findByUlid(any())).willReturn(Optional.of(postEntity));
         given(postAbuRepJpaRepository.save(any())).willReturn(postAbuRepEntity);
@@ -941,7 +941,7 @@ class MemberControllerTest implements
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
-        given(targetPostIdRepository.isPublished(any())).willReturn(false);
+        given(targetPostRepository.isPublished(any())).willReturn(false);
 
         // when
         NotAccessibleException notAccessibleException = assertThrows(NotAccessibleException.class,
@@ -958,8 +958,8 @@ class MemberControllerTest implements
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
-        given(targetPostIdRepository.isPublished(any())).willReturn(true);
-        given(abuseRepository.isMemberAbusePost(any(), any())).willReturn(true);
+        given(targetPostRepository.isPublished(any())).willReturn(true);
+        given(reportRepository.isMemberAbusePost(any(), any())).willReturn(true);
 
         // when
         ExistsEntityException existsEntityException = assertThrows(ExistsEntityException.class,
@@ -981,7 +981,7 @@ class MemberControllerTest implements
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetCommentExists(any());
-        given(abuseRepository.isMemberAbuseComment(any(), any())).willReturn(false);
+        given(reportRepository.isMemberAbuseComment(any(), any())).willReturn(false);
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
         given(commentJpaRepository.findById(any())).willReturn(Optional.of(commentEntity));
         given(commentAbuRepJpaRepository.save(any())).willReturn(commentAbuRepEntity);
@@ -1033,7 +1033,7 @@ class MemberControllerTest implements
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetCommentExists(any());
-        given(abuseRepository.isMemberAbuseComment(any(), any())).willReturn(true);
+        given(reportRepository.isMemberAbuseComment(any(), any())).willReturn(true);
 
         // when
         ExistsEntityException existsEntityException = assertThrows(ExistsEntityException.class,

@@ -5,6 +5,7 @@ import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
 
@@ -18,9 +19,9 @@ public class CommentAbuseReportEvent {
     public static CommentAbuseReportEvent create(UUID memberId, String postUlid, String path) {
         if (memberId == null) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_MEMBER, "memberId");
-        } else if (postUlid.isEmpty()) {
+        } else if (StringUtils.isBlank(postUlid)) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_POST, "postUlid");
-        } else if (path.isEmpty()) {
+        } else if (StringUtils.isBlank(path)) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_COMMENT, "path");
         } else {
             return new CommentAbuseReportEvent(memberId, postUlid, path);

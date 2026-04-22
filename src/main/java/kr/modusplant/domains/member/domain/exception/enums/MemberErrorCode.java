@@ -15,6 +15,7 @@ public enum MemberErrorCode implements ErrorCode {
     EMPTY_MEMBER_PROFILE_IMAGE_PATH(HttpStatus.BAD_REQUEST.value(), "empty_member_profile_image_path", "회원 프로필 이미지 경로가 비어 있습니다. "),
     EMPTY_MEMBER_PROFILE_INTRODUCTION(HttpStatus.BAD_REQUEST.value(), "empty_member_profile_introduction", "회원 프로필 소개가 비어 있습니다. "),
     EMPTY_REPORT_CONTENT(HttpStatus.BAD_REQUEST.value(), "empty_report_content", "보고서 컨텐츠가 비어 있습니다. "),
+    EMPTY_REPORT_ID(HttpStatus.BAD_REQUEST.value(), "empty_report_id", "보고서 식별자가 비어 있습니다. "),
     EMPTY_REPORT_IMAGE_BYTES(HttpStatus.BAD_REQUEST.value(), "empty_report_image_bytes", "보고서 이미지 바이트 값이 비어 있습니다. "),
     EMPTY_REPORT_IMAGE_PATH(HttpStatus.BAD_REQUEST.value(), "empty_report_image_path", "보고서 이미지 경로가 비어 있습니다. "),
     EMPTY_REPORT_TITLE(HttpStatus.BAD_REQUEST.value(), "empty_report_title", "보고서 제목이 비어 있습니다. "),
@@ -25,6 +26,7 @@ public enum MemberErrorCode implements ErrorCode {
 
     INVALID_MEMBER_PROFILE_IMAGE_PATH(HttpStatus.BAD_REQUEST.value(), "invalid_member_profile_image_path", "회원 프로필 이미지 경로의 서식이 올바르지 않습니다. "),
     INVALID_MEMBER_ID(HttpStatus.BAD_REQUEST.value(), "invalid_member_id", "사용자 식별자의 서식이 올바르지 않습니다. "),
+    INVALID_REPORT_ID(HttpStatus.BAD_REQUEST.value(), "invalid_report_id", "보고서 식별자의 서식이 올바르지 않습니다. "),
     INVALID_REPORT_IMAGE_PATH(HttpStatus.BAD_REQUEST.value(), "invalid_report_image_path", "보고서 이미지 경로의 서식이 올바르지 않습니다. "),
     INVALID_TARGET_COMMENT_PATH(HttpStatus.BAD_REQUEST.value(), "invalid_target_comment_path", "목표로 하는 댓글 경로의 서식이 올바르지 않습니다. "),
     INVALID_TARGET_POST_ID(HttpStatus.BAD_REQUEST.value(), "invalid_target_post_id", "목표로 하는 게시글 식별자의 서식이 올바르지 않습니다. "),
@@ -39,6 +41,7 @@ public enum MemberErrorCode implements ErrorCode {
     NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE(HttpStatus.BAD_REQUEST.value(), "not_accessible_post_report_for_abuse", "대상 게시글에 대한 신고 기능을 이용할 수 없습니다. "),
 
     NOT_FOUND_MEMBER_ID(HttpStatus.BAD_REQUEST.value(), "not_found_member_id", "회원 아이디를 찾을 수 없습니다. "),
+    NOT_FOUND_REPORT_ID(HttpStatus.BAD_REQUEST.value(), "not_found_report_id", "보고서 식별자를 찾을 수 없습니다. "),
     NOT_FOUND_TARGET_POST_ID(HttpStatus.BAD_REQUEST.value(), "not_found_target_post_id", "대상 게시글 아이디를 찾을 수 없습니다. "),
     NOT_FOUND_TARGET_COMMENT_ID(HttpStatus.BAD_REQUEST.value(), "not_found_target_comment_id", "대상 댓글 아이디를 찾을 수 없습니다. ");
 
