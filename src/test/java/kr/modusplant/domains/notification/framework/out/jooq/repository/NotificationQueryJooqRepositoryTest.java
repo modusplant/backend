@@ -83,7 +83,7 @@ class NotificationQueryJooqRepositoryTest {
                 NotificationActionType.COMMENT_ADDED,
                 NotificationStatusType.READ,
                 TEST_NOTIFICATION_POST_ULID,
-                TEST_NOTIFICATION_COMMENT_PATH,
+                TEST_NOTIFICATION_COMMENT_PATH_DEPTH3,
                 "comment added preview 2",
                 baseTime.plusDays(7).plusMinutes(2)
         );
