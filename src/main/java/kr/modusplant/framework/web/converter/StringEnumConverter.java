@@ -1,5 +1,7 @@
 package kr.modusplant.framework.web.converter;
 
+import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.convert.converter.Converter;
 
@@ -14,6 +16,11 @@ public class StringEnumConverter<T extends Enum<T>> implements Converter<String,
     @NotNull
     @Override
     public T convert(String source) {
-        return Enum.valueOf(enumClass, source.toUpperCase());
+        try {
+            return Enum.valueOf(enumClass, source.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidValueException(GeneralErrorCode.UNEXPECTED_INPUT, source, e);
+        }
+
     }
 }
