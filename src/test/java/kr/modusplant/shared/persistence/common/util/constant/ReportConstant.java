@@ -13,6 +13,7 @@ public final class ReportConstant {
     public static final String TEST_REPORT_TITLE = "보고서 제목";
     public static final String TEST_REPORT_CONTENT = "보고서 컨텐츠";
     public static final byte[] TEST_REPORT_IMAGE_BYTES = "Image for report".getBytes();
-    public static final MultipartFile TEST_REPORT_IMAGE = new MockMultipartFile("image", "image.png", "image/png", TEST_REPORT_IMAGE_BYTES);
-    public static final String TEST_REPORT_IMAGE_PATH = "member/" + MEMBER_BASIC_USER_UUID + "/report/image.png";
+    public static final String TEST_REPORT_IMAGE_FILE_NAME = "image.png";
+    public static final MultipartFile TEST_REPORT_IMAGE = new MockMultipartFile("image", TEST_REPORT_IMAGE_FILE_NAME, "image/png", TEST_REPORT_IMAGE_BYTES);
+    public static final String TEST_REPORT_IMAGE_PATH = "member/" + MEMBER_BASIC_USER_UUID + "/report/proposal-or-bug/" + TEST_REPORT_ULID + "/" + TEST_REPORT_IMAGE_FILE_NAME;
 }

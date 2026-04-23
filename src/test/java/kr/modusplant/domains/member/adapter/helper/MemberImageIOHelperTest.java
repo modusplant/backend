@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import java.io.IOException;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
 import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.TEST_REPORT_IMAGE_PATH;
@@ -40,7 +41,7 @@ class MemberImageIOHelperTest {
         willDoNothing().given(s3FileService).uploadFile(any(), any());
 
         // when
-        String imagePath = memberImageIOHelper.uploadImage(testMemberId, testProposalOrBugReportRecord);
+        String imagePath = memberImageIOHelper.uploadImage(testMemberId, testReportId, testProposalOrBugReportRecord);
 
         // then
         assertThat(imagePath).isEqualTo(TEST_REPORT_IMAGE_PATH);

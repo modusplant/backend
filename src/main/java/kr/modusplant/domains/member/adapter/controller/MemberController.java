@@ -197,19 +197,21 @@ public class MemberController {
 
     public void reportProposalOrBug(ProposalOrBugReportRecord record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.memberId());
+        ReportId reportId = ReportId.generate();
         ReportTitle reportTitle = ReportTitle.create(record.title());
         ReportContent reportContent = ReportContent.create(record.content());
         ReportImagePath reportImagePath;
         MultipartFile image = record.image();
         memberValidationHelper.validateIfMemberExists(memberId);
         if (!(image == null)) {
-            reportImagePath = ReportImagePath.create(memberImageIOHelper.uploadImage(memberId, record));
+            reportImagePath = ReportImagePath.create(memberImageIOHelper.uploadImage(memberId, reportId, record));
         } else {
             reportImagePath = EmptyReportImagePath.create();
         }
         eventBus.publish(
                 ProposalOrBugReportEvent.create(
                         memberId.getValue(),
+                        reportId.getValue(),
                         reportTitle.getValue(),
                         reportContent.getValue(),
                         reportImagePath.getValue()));
@@ -218,8 +220,7 @@ public class MemberController {
     public void removeProposalOrBug(ProposalOrBugReportRemoveRecord record) {
         ReportId reportId = ReportId.create(record.reportUlid());
         memberValidationHelper.validateIfReportExists(reportId);
-        eventBus.publish(ProposalOrBugReportRemoveEvent.create(reportId.getValue())
-        );
+        eventBus.publish(ProposalOrBugReportRemoveEvent.create(reportId.getValue()));
     }
 
     public void reportPostAbuse(PostAbuseReportRecord record) {

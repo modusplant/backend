@@ -6,5 +6,11 @@ import static kr.modusplant.shared.persistence.common.util.constant.ReportConsta
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 
 public interface ProposalOrBugReportEventTestUtils {
-    ProposalOrBugReportEvent testProposalOrBugReportEvent = ProposalOrBugReportEvent.create(MEMBER_BASIC_USER_UUID, TEST_REPORT_TITLE, TEST_REPORT_CONTENT, TEST_REPORT_IMAGE_PATH);
+    ProposalOrBugReportEvent testProposalOrBugReportEvent =
+            ProposalOrBugReportEvent.create(
+                    MEMBER_BASIC_USER_UUID,
+                    TEST_REPORT_ULID,
+                    TEST_REPORT_TITLE,
+                    TEST_REPORT_CONTENT,
+                    TEST_REPORT_IMAGE_PATH);
 }
