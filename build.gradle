@@ -112,6 +112,7 @@ dependencies {
 	implementation 'org.bouncycastle:bcpkix-jdk18on:1.82'
 	implementation 'org.jooq:jooq:3.20.8'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+	implementation 'com.google.firebase:firebase-admin:9.8.0'
 
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
