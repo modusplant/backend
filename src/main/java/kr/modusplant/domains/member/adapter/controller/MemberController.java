@@ -32,6 +32,7 @@ import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -61,6 +62,7 @@ public class MemberController {
     private final TargetCommentRepository targetCommentRepository;
     private final ReportRepository reportRepository;
     private final EventBus eventBus;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
     public boolean checkExistedNickname(MemberNicknameCheckRecord record) {
@@ -129,6 +131,7 @@ public class MemberController {
         }
         if (targetPostRepository.isUnliked(memberId, targetPostId)) {
             eventBus.publish(PostLikeEvent.create(memberId.getValue(), targetPostId.getValue()));
+            applicationEventPublisher.publishEvent(PostLikeNotificationEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
     }
 
@@ -183,6 +186,13 @@ public class MemberController {
                             memberId.getValue(),
                             targetCommentId.getTargetPostId().getValue(),
                             targetCommentId.getTargetCommentPath().getValue()));
+            applicationEventPublisher.publishEvent(
+                    CommentLikeNotificationEvent.create(
+                            memberId.getValue(),
+                            targetCommentId.getTargetPostId().getValue(),
+                            targetCommentId.getTargetCommentPath().getValue()
+                    )
+            );
         }
     }
 
