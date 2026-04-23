@@ -342,14 +342,14 @@ public class MemberRestController {
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
-    // TODO: 관리자 API로 등록 요망
+    // TODO: 관리자 API로 활용 요망
     @Hidden
     @Operation(
             summary = "건의 및 버그 제보 제거 API",
             description = "건의 사항 또는 버그 제보를 제거합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping(value = "/admin/report/proposal-or-bug/{reportUlid}")
+//    @DeleteMapping(value = "/admin/report/proposal-or-bug/{reportUlid}")
     public ResponseEntity<DataResponse<Void>> removeProposalOrBugReport(
             @Parameter(
                     description = "삭제할 보고서의 식별자",
