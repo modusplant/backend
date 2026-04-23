@@ -258,8 +258,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         willDoNothing().given(memberController).removeProposalOrBug(testProposalOrBugReportRemoveRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.removeProposalOrBugReport(
-                MEMBER_BASIC_USER_UUID, TEST_REPORT_ULID);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.removeProposalOrBugReport(TEST_REPORT_ULID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);

@@ -349,15 +349,8 @@ public class MemberRestController {
             description = "건의 사항 또는 버그 제보를 제거합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping(value = "/admin/report/proposal-or-bug/member/{memberId}/report/{reportUlid}")
+    @DeleteMapping(value = "/admin/report/proposal-or-bug/{reportUlid}")
     public ResponseEntity<DataResponse<Void>> removeProposalOrBugReport(
-            @Parameter(
-                    description = "삭제할 보고서를 제출한 회원의 식별자"
-            )
-            @PathVariable
-            @NotBlank(message = "회원의 식별자가 비어 있습니다.")
-            UUID memberId,
-
             @Parameter(
                     description = "삭제할 보고서의 식별자",
                     schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
@@ -365,7 +358,7 @@ public class MemberRestController {
             @PathVariable
             @NotBlank(message = "보고서 식별자가 비어 있습니다.")
             String reportUlid) {
-        memberController.removeProposalOrBug(new ProposalOrBugReportRemoveRecord(memberId, reportUlid));
+        memberController.removeProposalOrBug(new ProposalOrBugReportRemoveRecord(reportUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

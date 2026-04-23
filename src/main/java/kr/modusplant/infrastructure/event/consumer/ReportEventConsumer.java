@@ -48,7 +48,6 @@ public class ReportEventConsumer {
                         proposalOrBugReportEvent.getImagePath());
             } else if (event instanceof ProposalOrBugReportRemoveEvent proposalOrBugReportRemoveEvent) {
                 deleteProposalOrBugReport(
-                        proposalOrBugReportRemoveEvent.getMemberId(),
                         proposalOrBugReportRemoveEvent.getReportId()
                 );
             } else if (event instanceof PostAbuseReportEvent postAbuseReportEvent) {
@@ -82,9 +81,9 @@ public class ReportEventConsumer {
                         .build());
     }
 
-    private void deleteProposalOrBugReport(UUID memberId, String reportId) {
+    private void deleteProposalOrBugReport(String reportId) {
         processProposalOrBugReportRelatedRecords(reportId);
-        deleteImageFromReportImagePath(memberId);
+        deleteImageFromReportImagePath(reportId);
     }
 
     private void processProposalOrBugReportRelatedRecords(String reportId) {
@@ -114,10 +113,10 @@ public class ReportEventConsumer {
         dsl.deleteFrom(PROP_BUG_REP).where(PROP_BUG_REP.ULID.eq(reportId)).execute();
     }
 
-    private void deleteImageFromReportImagePath(UUID memberId) {
+    private void deleteImageFromReportImagePath(String reportId) {
         String imagePath =
                 dsl.select(PROP_BUG_REP.IMAGE_PATH)
-                        .where(PROP_BUG_REP.MEMB_UUID.eq(memberId))
+                        .where(PROP_BUG_REP.ULID.eq(reportId))
                         .fetchSingle().into(String.class);
         s3FileService.deleteFiles(imagePath);
     }
