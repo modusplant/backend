@@ -56,10 +56,36 @@ public class MemberEventConsumer {
                 .and(COMM_POST.IS_PUBLISHED.isTrue())
                 .fetchInto(String.class).toArray(new String[0]);
 
+        deleteImagesFromPublishedPosts(publishedPostUlids);
         processPostsAndRelatedRecords(memberId, publishedPostUlids);
         processOtherMemberRelatedRecords(memberId, reason, opinion);
         deleteRecentlyViewPostRecords(publishedPostUlids);
-        deleteImagesFromPublishedPosts(publishedPostUlids);
+    }
+
+    private void deleteImagesFromPublishedPosts(String[] publishedPostUlids) {
+        List<JsonNode> publishedPostContents = dsl.select(COMM_POST.CONTENT)    // 발행된 게시글의 컨텐츠 획득
+                .from(COMM_POST)
+                .where(COMM_POST.ULID.in(publishedPostUlids))
+                .fetchInto(JSONB.class)
+                .stream()
+                .map(jsonbJsonNodeConverter::from)
+                .toList();
+
+        List<String> fileKeysToDelete = new ArrayList<>();      // 컨텐츠로부터 파일 키 수집
+        for (JsonNode content : publishedPostContents) {
+            if (content == null || !content.isArray()) {
+                continue;
+            }
+            for (JsonNode node : content) {
+                if (node.has("src")) {
+                    fileKeysToDelete.add(node.get("src").asText());
+                }
+            }
+        }
+
+        if (!fileKeysToDelete.isEmpty()) {      // 파일 키로 클라우드 플랫폼에서 파일 삭제
+            s3FileService.deleteFiles(fileKeysToDelete);
+        }
     }
 
     private void processPostsAndRelatedRecords(UUID memberId, String[] publishedPostUlids) {
@@ -214,31 +240,5 @@ public class MemberEventConsumer {
         }
         connection.closePipeline();
         batchKeys.clear();
-    }
-
-    private void deleteImagesFromPublishedPosts(String[] publishedPostUlids) {
-        List<JsonNode> publishedPostContents = dsl.select(COMM_POST.CONTENT)    // 발행된 게시글의 컨텐츠 획득
-                .from(COMM_POST)
-                .where(COMM_POST.ULID.in(publishedPostUlids))
-                .fetchInto(JSONB.class)
-                .stream()
-                .map(jsonbJsonNodeConverter::from)
-                .toList();
-
-        List<String> fileKeysToDelete = new ArrayList<>();      // 컨텐츠로부터 파일 키 수집
-        for (JsonNode content : publishedPostContents) {
-            if (content == null || !content.isArray()) {
-                continue;
-            }
-            for (JsonNode node : content) {
-                if (node.has("src")) {
-                    fileKeysToDelete.add(node.get("src").asText());
-                }
-            }
-        }
-
-        if (!fileKeysToDelete.isEmpty()) {      // 파일 키로 클라우드 플랫폼에서 파일 삭제
-            s3FileService.deleteFiles(fileKeysToDelete);
-        }
     }
 }

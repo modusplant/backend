@@ -9,6 +9,7 @@ import kr.modusplant.shared.event.PostAbuseReportEvent;
 import kr.modusplant.shared.event.ProposalOrBugReportEvent;
 import kr.modusplant.shared.event.ProposalOrBugReportRemoveEvent;
 import kr.modusplant.shared.persistence.compositekey.CommCommentId;
+import org.apache.commons.lang3.StringUtils;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Component;
 
@@ -82,8 +83,20 @@ public class ReportEventConsumer {
     }
 
     private void deleteProposalOrBugReport(String reportId) {
-        processProposalOrBugReportRelatedRecords(reportId);
         deleteImageFromReportImagePath(reportId);
+        processProposalOrBugReportRelatedRecords(reportId);
+    }
+
+    private void deleteImageFromReportImagePath(String reportId) {
+        String imagePath =
+                dsl.select(PROP_BUG_REP.IMAGE_PATH)
+                        .from(PROP_BUG_REP)
+                        .where(PROP_BUG_REP.ULID.eq(reportId))
+                        .fetchSingle().into(String.class);
+
+        if (!StringUtils.isBlank(imagePath)) {
+            s3FileService.deleteFiles(imagePath);
+        }
     }
 
     private void processProposalOrBugReportRelatedRecords(String reportId) {
@@ -111,14 +124,6 @@ public class ReportEventConsumer {
                 ).execute();
 
         dsl.deleteFrom(PROP_BUG_REP).where(PROP_BUG_REP.ULID.eq(reportId)).execute();
-    }
-
-    private void deleteImageFromReportImagePath(String reportId) {
-        String imagePath =
-                dsl.select(PROP_BUG_REP.IMAGE_PATH)
-                        .where(PROP_BUG_REP.ULID.eq(reportId))
-                        .fetchSingle().into(String.class);
-        s3FileService.deleteFiles(imagePath);
     }
 
     private void addPostAbuseReport(UUID memberId, String postUlid) {
