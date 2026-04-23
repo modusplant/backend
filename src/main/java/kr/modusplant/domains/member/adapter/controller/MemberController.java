@@ -15,7 +15,6 @@ import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
-import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
@@ -49,7 +48,6 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 public class MemberController {
     private final JwtTokenProvider jwtTokenProvider;
     private final TokenService tokenService;
-    private final S3FileService s3FileService;
     private final SwearService swearService;
     private final MemberImageIOHelper memberImageIOHelper;
     private final MemberValidationHelper memberValidationHelper;
