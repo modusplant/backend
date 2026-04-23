@@ -22,6 +22,7 @@ import kr.modusplant.shared.persistence.constant.TableName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.context.ApplicationEventPublisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -40,8 +41,9 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
     private final SwearService swearService = Mockito.mock(SwearService.class);
     private final CommentCacheService cacheService = Mockito.mock(CommentCacheService.class);
+    private final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
     private final CommentController controller = new CommentController(mapper, jooqAdapter,
-            jpaAdapter, postJpaRepository, memberJpaRepository, swearService, cacheService);
+            jpaAdapter, postJpaRepository, memberJpaRepository, swearService, cacheService, applicationEventPublisher);
 
 //    @Test
 //    @DisplayName("유효한 게시글 id로 댓글 읽기")

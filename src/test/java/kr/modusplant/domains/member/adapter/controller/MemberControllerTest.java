@@ -40,6 +40,8 @@ import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
 import kr.modusplant.infrastructure.swear.service.SwearService;
+import kr.modusplant.shared.event.CommentLikeNotificationEvent;
+import kr.modusplant.shared.event.PostLikeNotificationEvent;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
@@ -53,6 +55,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -149,7 +152,8 @@ class MemberControllerTest implements
     private final ReportEventConsumer reportEventConsumer = new ReportEventConsumer(eventBus, dslContext, memberJpaRepository, postJpaRepository, commentJpaRepository, propBugRepJpaRepository, postAbuRepJpaRepository, commentAbuRepJpaRepository);
     @SuppressWarnings("unused")
     private final MemberEventConsumer memberEventConsumer = new MemberEventConsumer(eventBus, stringRedisTemplate, dslContext, s3FileService);
-    private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, s3FileService, swearService, memberImageIOHelper, memberValidationHelper, memberProfileMapper, memberSocialTranslator, memberRepository, memberProfileRepository, targetPostRepository, targetCommentRepository, reportRepository, eventBus);
+    private final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
+    private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, s3FileService, swearService, memberImageIOHelper, memberValidationHelper, memberProfileMapper, memberSocialTranslator, memberRepository, memberProfileRepository, targetPostRepository, targetCommentRepository, reportRepository, eventBus, applicationEventPublisher);
 
     private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
     private final NotFoundEntityException notFoundEntityExceptionForTargetPost = new NotFoundEntityException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
@@ -370,6 +374,7 @@ class MemberControllerTest implements
         // then
         verify(postLikeJpaRepository, times(1)).save(any());
         verify(postJpaRepository, times(1)).findByUlid(any());
+        verify(applicationEventPublisher, times(1)).publishEvent(any(PostLikeNotificationEvent.class));
         assertThat(postEntity.orElseThrow().getLikeCount()).isEqualTo(2);
     }
 
@@ -388,6 +393,7 @@ class MemberControllerTest implements
         // then
         verify(postLikeJpaRepository, times(0)).save(any());
         verify(postJpaRepository, times(0)).findByUlid(any());
+        verify(applicationEventPublisher, times(0)).publishEvent(any(PostLikeNotificationEvent.class));
     }
 
     @Test
@@ -704,6 +710,7 @@ class MemberControllerTest implements
         // then
         verify(commentLikeJpaRepository, times(1)).save(any());
         verify(commentJpaRepository, times(1)).findByPostUlidAndPath(any(), any());
+        verify(applicationEventPublisher, times(1)).publishEvent(any(CommentLikeNotificationEvent.class));
         assertThat(commentEntity.orElseThrow().getLikeCount()).isEqualTo(2);
     }
 
@@ -721,6 +728,7 @@ class MemberControllerTest implements
         // then
         verify(commentLikeJpaRepository, times(0)).save(any());
         verify(commentJpaRepository, times(0)).findByPostUlidAndPath(any(), any());
+        verify(applicationEventPublisher, times(0)).publishEvent(any(CommentLikeNotificationEvent.class));
     }
 
     @Test
