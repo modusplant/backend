@@ -216,14 +216,9 @@ public class MemberController {
     }
 
     public void removeProposalOrBug(ProposalOrBugReportRemoveRecord record) {
-        MemberId memberId = MemberId.fromUuid(record.memberId());
         ReportId reportId = ReportId.create(record.reportUlid());
-        memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfReportExists(reportId);
-        eventBus.publish(
-                ProposalOrBugReportRemoveEvent.create(
-                        memberId.getValue(),
-                        reportId.getValue())
+        eventBus.publish(ProposalOrBugReportRemoveEvent.create(reportId.getValue())
         );
     }
 

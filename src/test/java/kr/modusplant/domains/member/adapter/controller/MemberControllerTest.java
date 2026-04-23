@@ -884,7 +884,6 @@ class MemberControllerTest implements
     @DisplayName("removeProposalOrBug로 건의 및 버그 제보 제거")
     void testRemoveProposalOrBug_givenValidRecord_willRemoveProposalOrBugReport() {
         // given
-        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfReportExists(any());
 
         // when
@@ -895,24 +894,9 @@ class MemberControllerTest implements
     }
 
     @Test
-    @DisplayName("존재하지 않는 회원으로 인해 removeProposalOrBug로 건의 및 버그 제보 제거 실패")
-    void testRemoveProposalOrBug_givenNotFoundMemberId_willThrowException() {
-        // given
-        willThrow(notFoundEntityExceptionForMember).given(memberValidationHelper).validateIfMemberExists(any());
-
-        // when
-        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
-                () -> memberController.removeProposalOrBug(testProposalOrBugReportRemoveRecord));
-
-        // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
-    }
-
-    @Test
     @DisplayName("존재하지 않는 보고서로 인해 removeProposalOrBug로 건의 및 버그 제보 제거 실패")
     void testRemoveProposalOrBug_givenNotFoundReportId_willThrowException() {
         // given
-        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willThrow(notFoundEntityExceptionForReport).given(memberValidationHelper).validateIfReportExists(any());
 
         // when

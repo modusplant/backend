@@ -134,6 +134,11 @@ public class MemberEventConsumer {
                         .set(PROP_BUG_REP.LAST_MODIFIED_AT, LocalDateTime.now())
                         .where(PROP_BUG_REP.MEMB_UUID.eq(memberId)),
 
+                dsl.update(PROP_BUG_REP_ARCHIVE)
+                        .setNull(PROP_BUG_REP.MEMB_UUID)
+                        .set(PROP_BUG_REP.LAST_MODIFIED_AT, LocalDateTime.now())
+                        .where(PROP_BUG_REP.MEMB_UUID.eq(memberId)),
+
                 dsl.deleteFrom(REFRESH_TOKEN)
                         .where(REFRESH_TOKEN.MEMB_UUID.eq(memberId)),
 
