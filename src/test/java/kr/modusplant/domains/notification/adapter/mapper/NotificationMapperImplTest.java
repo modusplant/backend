@@ -1,5 +1,8 @@
 package kr.modusplant.domains.notification.adapter.mapper;
 
+import kr.modusplant.domains.notification.common.util.domain.aggregate.NotificationTestUtils;
+import kr.modusplant.domains.notification.domain.aggregate.Notification;
+import kr.modusplant.domains.notification.domain.vo.NotificationStatus;
 import kr.modusplant.domains.notification.usecase.port.mapper.NotificationMapper;
 import kr.modusplant.domains.notification.usecase.record.NotificationReadModel;
 import kr.modusplant.domains.notification.usecase.response.NotificationResponse;
@@ -11,9 +14,9 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 
 import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-class NotificationMapperImplTest {
+class NotificationMapperImplTest implements NotificationTestUtils {
     private final NotificationMapper notificationMapper = new NotificationMapperImpl();
 
     @Test
@@ -29,7 +32,7 @@ class NotificationMapperImplTest {
                 NotificationActionType.COMMENT_ADDED,
                 NotificationStatusType.UNREAD,
                 TEST_NOTIFICATION_POST_ULID,
-                TEST_NOTIFICATION_COMMENT_PATH,
+                TEST_NOTIFICATION_COMMENT_PATH_DEPTH3,
                 TEST_NOTIFICATION_COMMENT_PREVIEW,
                 createdAt
         );
@@ -82,6 +85,40 @@ class NotificationMapperImplTest {
         assertEquals(result.contentType(), "post");
         assertEquals(result.contentPreview(), readModel.contentPreview());
         assertEquals(result.createdAt(), createdAt);
+    }
+
+    @Test
+    @DisplayName("toPostNotification으로 게시글 Notification 변환")
+    void testToPostNotification_givenValue_willReturnNotification() {
+        // when
+        Notification result = notificationMapper.toPostNotification(testRecipientId, testActor, testNotificationActionPostLiked, testPostId, testPostContentPreview);
+
+        // then
+        assertEquals(result.getRecipientId(), testRecipientId);
+        assertEquals(result.getActor(), testActor);
+        assertEquals(result.getAction(), testNotificationActionPostLiked);
+        assertEquals(result.getStatus(), NotificationStatus.unread());
+        assertEquals(result.getPostId(), testPostId);
+        assertNull(result.getCommentPath());
+        assertEquals(result.getContentPreview(), testPostContentPreview);
+        assertNotNull(result.getCreatedAt());
+    }
+
+    @Test
+    @DisplayName("toCommentNotification으로 댓글 Notification 변환")
+    void testToCommentNotification_givenValue_willReturnNotification() {
+        // when
+        Notification result = notificationMapper.toCommentNotification(testRecipientId, testActor, testNotificationActionCommentLiked, testPostId, testCommentPath, testCommentContentPreview);
+
+        // then
+        assertEquals(result.getRecipientId(), testRecipientId);
+        assertEquals(result.getActor(), testActor);
+        assertEquals(result.getAction(), testNotificationActionCommentLiked);
+        assertEquals(result.getStatus(), NotificationStatus.unread());
+        assertEquals(result.getPostId(), testPostId);
+        assertEquals(result.getCommentPath(), testCommentPath);
+        assertEquals(result.getContentPreview(), testCommentContentPreview);
+        assertNotNull(result.getCreatedAt());
     }
 
 }

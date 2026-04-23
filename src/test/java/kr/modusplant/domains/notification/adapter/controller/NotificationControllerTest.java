@@ -5,8 +5,7 @@ import kr.modusplant.domains.notification.common.util.domain.aggregate.Notificat
 import kr.modusplant.domains.notification.common.util.usecase.record.NotificationReadModelTestUtils;
 import kr.modusplant.domains.notification.common.util.usecase.response.NotificationResponseTestUtils;
 import kr.modusplant.domains.notification.usecase.port.mapper.NotificationMapper;
-import kr.modusplant.domains.notification.usecase.port.repository.NotificationQueryRepository;
-import kr.modusplant.domains.notification.usecase.port.repository.NotificationRepository;
+import kr.modusplant.domains.notification.usecase.port.repository.*;
 import kr.modusplant.domains.notification.usecase.record.NotificationReadModel;
 import kr.modusplant.domains.notification.usecase.response.CursorPageResponse;
 import kr.modusplant.domains.notification.usecase.response.NotificationResponse;
@@ -25,7 +24,10 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
     private final NotificationMapper notificationMapper = new NotificationMapperImpl();
     private final NotificationRepository notificationRepository = Mockito.mock(NotificationRepository.class);
     private final NotificationQueryRepository notificationQueryRepository = Mockito.mock(NotificationQueryRepository.class);
-    private final NotificationController notificationController = new NotificationController(notificationMapper, notificationRepository, notificationQueryRepository);
+    private final PostInfoRepository postInfoRepository = Mockito.mock(PostInfoRepository.class);
+    private final CommentInfoRepository commentInfoRepository = Mockito.mock(CommentInfoRepository.class);
+    private final MemberInfoRepository memberInfoRepository = Mockito.mock(MemberInfoRepository.class);
+    private final NotificationController notificationController = new NotificationController(notificationMapper, notificationRepository, notificationQueryRepository, postInfoRepository, commentInfoRepository, memberInfoRepository);
 
     @Test
     @DisplayName("알림 목록 조회")
