@@ -1,9 +1,10 @@
 package kr.modusplant.domains.notification.framework.out.jpa.repository;
 
-import kr.modusplant.domains.account.shared.kernel.AccountId;
+import kr.modusplant.domains.notification.domain.vo.RecipientId;
 import kr.modusplant.domains.notification.framework.out.jpa.mapper.supers.FcmTokenJpaMapper;
 import kr.modusplant.domains.notification.framework.out.jpa.repository.supers.FcmTokenJpaRepository;
 import kr.modusplant.domains.notification.usecase.port.repository.FcmTokenRepository;
+import kr.modusplant.framework.jpa.entity.FcmTokenEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
@@ -12,6 +13,9 @@ import kr.modusplant.shared.enums.Platform;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.UUID;
 
 
 @Repository
@@ -22,8 +26,8 @@ public class FcmTokenRepositoryJpaAdapter implements FcmTokenRepository {
     private final FcmTokenJpaMapper fcmTokenJpaMapper;
 
     @Override
-    public void saveOrUpdate(String token, AccountId accountId, Platform platform) {
-        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(accountId.getValue())
+    public void saveOrUpdate(String token, UUID memberUuid, Platform platform) {
+        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberUuid)
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER));
         fcmTokenJpaRepository.findByToken(token)
                         .ifPresentOrElse(
@@ -33,6 +37,17 @@ public class FcmTokenRepositoryJpaAdapter implements FcmTokenRepository {
                                 },
                                 () -> fcmTokenJpaRepository.save(fcmTokenJpaMapper.toFcmTokenEntity(token,memberEntity,platform))
                         );
+    }
+
+    public List<String> findTokensByRecipientId(RecipientId recipientId) {
+        return fcmTokenJpaRepository.findAllByMember(
+                memberJpaRepository.findByUuid(recipientId.getValue()).orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER))
+        ).stream().map(FcmTokenEntity::getToken).toList();
+    }
+
+    @Override
+    public void deleteByToken(String token) {
+        fcmTokenJpaRepository.deleteByToken(token);
     }
 
 }
