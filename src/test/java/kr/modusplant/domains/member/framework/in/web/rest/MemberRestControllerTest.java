@@ -1,6 +1,5 @@
 package kr.modusplant.domains.member.framework.in.web.rest;
 
-import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.member.adapter.controller.MemberController;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
@@ -28,7 +27,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_CODE;
 import static kr.modusplant.domains.member.common.util.usecase.record.CommentAbuseReportRecordTestUtils.testCommentAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.testMemberPostBookmarkCancelRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.testMemberCommentLikeRecord;
@@ -42,6 +40,7 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberProf
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberWithdrawalRecordTestUtils.testKakaoMemberWithdrawalRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
+import static kr.modusplant.domains.member.common.util.usecase.request.MemberWithdrawRequestTestUtils.testBasicMemberWithdrawRequest;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
 import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.objectMapper;
 import static kr.modusplant.shared.persistence.common.util.constant.CommCommentConstant.TEST_COMM_COMMENT_PATH;
@@ -308,7 +307,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         willDoNothing().given(memberController).withdraw(testKakaoMemberWithdrawalRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.withdrawMember(TEST_SOCIAL_KAKAO_CODE, SocialProvider.KAKAO.getValue(), MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.withdrawMember(testBasicMemberWithdrawRequest, MEMBER_AUTH_BASIC_USER_AUTHORIZATION);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);

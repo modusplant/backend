@@ -5,6 +5,7 @@ import kr.modusplant.domains.account.shared.exception.InvalidAccountIdException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -29,7 +30,7 @@ public class AccountId {
     }
 
     public static AccountId fromString(String value) {
-        if (value == null || value.trim().isEmpty()) {
+        if (StringUtils.isBlank(value)) {
             throw new EmptyAccountIdException();
         } else if (!PATTERN_UUID.matcher(value).matches()) {
             throw new InvalidAccountIdException();

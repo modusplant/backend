@@ -1,11 +1,13 @@
 package kr.modusplant.domains.member.adapter.helper;
 
 import kr.modusplant.domains.member.domain.vo.MemberId;
+import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.domain.vo.TargetCommentId;
 import kr.modusplant.domains.member.domain.vo.TargetPostId;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
-import kr.modusplant.domains.member.usecase.port.repository.TargetCommentIdRepository;
-import kr.modusplant.domains.member.usecase.port.repository.TargetPostIdRepository;
+import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
+import kr.modusplant.domains.member.usecase.port.repository.TargetCommentRepository;
+import kr.modusplant.domains.member.usecase.port.repository.TargetPostRepository;
 import kr.modusplant.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.kernel.Nickname;
@@ -19,8 +21,9 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 @RequiredArgsConstructor
 public class MemberValidationHelper {
     private final MemberRepository memberRepository;
-    private final TargetPostIdRepository targetPostIdRepository;
-    private final TargetCommentIdRepository targetCommentIdRepository;
+    private final ReportRepository reportRepository;
+    private final TargetPostRepository targetPostRepository;
+    private final TargetCommentRepository targetCommentRepository;
 
     public void validateIfMemberExists(MemberId memberId) {
         if (!memberRepository.isIdExist(memberId)) {
@@ -35,14 +38,20 @@ public class MemberValidationHelper {
     }
 
     public void validateIfTargetPostExists(TargetPostId targetPostId) {
-        if (!targetPostIdRepository.isIdExist(targetPostId)) {
+        if (!targetPostRepository.isIdExist(targetPostId)) {
             throw new NotFoundEntityException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
         }
     }
 
     public void validateIfTargetCommentExists(TargetCommentId targetCommentId) {
-        if (!targetCommentIdRepository.isIdExist(targetCommentId)) {
+        if (!targetCommentRepository.isIdExist(targetCommentId)) {
             throw new NotFoundEntityException(NOT_FOUND_TARGET_COMMENT_ID, "targetCommentId");
+        }
+    }
+
+    public void validateIfReportExists(ReportId reportId) {
+        if (!reportRepository.isIdExist(reportId)) {
+            throw new NotFoundEntityException(NOT_FOUND_REPORT_ID, "reportId");
         }
     }
 }

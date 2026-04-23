@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -14,6 +15,7 @@ import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
 import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.domains.member.usecase.record.*;
+import kr.modusplant.domains.member.usecase.request.MemberWithdrawRequest;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
@@ -340,6 +342,31 @@ public class MemberRestController {
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
+    // TODO: 관리자 API로 등록 요망
+    @Hidden
+    @Operation(
+            summary = "건의 및 버그 제보 삭제 API",
+            description = "건의 사항 또는 버그 제보를 삭제합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @DeleteMapping(value = "/report/proposal-or-bug/{reportUlid}")
+    public ResponseEntity<DataResponse<Void>> deleteProposalOrBugReport(
+            @Parameter(
+                    description = "삭제할 보고서의 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
+            @PathVariable
+            @NotBlank(message = "보고서 식별자가 비어 있습니다.")
+            String reportUlid,
+
+            @Parameter(hidden = true)
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) throws IOException {
+        memberController.removeProposalOrBug(new ProposalOrBugReportRemoveRecord(memberId, reportUlid));
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
     @Hidden
     @Operation(
             summary = "게시글 신고 API",
@@ -439,28 +466,23 @@ public class MemberRestController {
             description = "회원을 탈퇴합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping("/members")
+    @PostMapping("/members")
     public ResponseEntity<DataResponse<Void>> withdrawMember(
-            @Parameter(
-                    description = "인증 코드",
-                    example = "BPAlKjanydCLdDnYdib6MQpDRwPG7hgqgWwECDwlr_jVWR6WpNeIbGlpBKIKKiVOAAABjE6Zt5qBPKUF0hG4dQ"
-            )
-            @RequestParam(required = false)
-            String authCode,
-
-            @Parameter(
-                    description = "인증 제공자",
-                    example = "kakao"
-            )
-            @RequestParam(required = false)
-            String authProvider,
+            @RequestBody @Valid
+            MemberWithdrawRequest request,
 
             @Parameter(hidden = true)
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
         String accessToken = getTokenFromAuthorizationHeader(auth);
-        memberController.withdraw(new MemberWithdrawalRecord(authCode, authProvider, accessToken));
+        memberController.withdraw(
+                new MemberWithdrawalRecord(
+                        request.authCode(),
+                        request.authProvider(),
+                        request.reason(),
+                        request.opinion(),
+                        accessToken));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 }

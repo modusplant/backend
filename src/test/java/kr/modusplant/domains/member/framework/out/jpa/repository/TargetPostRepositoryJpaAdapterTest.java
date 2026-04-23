@@ -15,11 +15,11 @@ import static kr.modusplant.domains.member.common.util.domain.vo.TargetPostIdTes
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
-class TargetPostIdRepositoryJpaAdapterTest implements CommPostEntityTestUtils {
+class TargetPostRepositoryJpaAdapterTest implements CommPostEntityTestUtils {
     CommPostJpaRepository postJpaRepository = Mockito.mock(CommPostJpaRepository.class);
     CommPostLikeJpaRepository postLikeJpaRepository = Mockito.mock(CommPostLikeJpaRepository.class);
     CommPostBookmarkJpaRepository postBookmarkJpaRepository = Mockito.mock(CommPostBookmarkJpaRepository.class);
-    TargetPostIdRepositoryJpaAdapter targetPostIdRepositoryJpaAdapter = new TargetPostIdRepositoryJpaAdapter(postJpaRepository, postLikeJpaRepository, postBookmarkJpaRepository);
+    TargetPostRepositoryJpaAdapter targetPostIdRepositoryJpaAdapter = new TargetPostRepositoryJpaAdapter(postJpaRepository, postLikeJpaRepository, postBookmarkJpaRepository);
 
     @Test
     @DisplayName("isIdExist로 true 반환")

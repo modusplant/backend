@@ -5,6 +5,7 @@ import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
 
@@ -18,9 +19,9 @@ public class CommentUnlikeEvent {
     public static CommentUnlikeEvent create(UUID memberId, String postId, String path) {
         if (memberId == null) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_MEMBER, "memberId");
-        } else if (postId.isEmpty()) {
+        } else if (StringUtils.isBlank(postId)) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_POST, "postId");
-        } else if (path.isEmpty()) {
+        } else if (StringUtils.isBlank(path)) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_COMMENT, "path");
         } else {
             return new CommentUnlikeEvent(memberId, postId, path);

@@ -27,7 +27,7 @@ public class PostId {
     }
 
     public static PostId create(String ulid) {
-        if (ulid == null || ulid.trim().isEmpty()) {
+        if (StringUtils.isBlank(ulid)) {
             throw new EmptyValueException(NotificationErrorCode.EMPTY_POST_ID);
         }
         if (StringUtils.isBlank(ulid) || ulid.length() != 26 || !PATTERN_ULID.matcher(ulid).matches()) {
