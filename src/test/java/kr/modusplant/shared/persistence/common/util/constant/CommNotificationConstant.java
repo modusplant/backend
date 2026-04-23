@@ -11,7 +11,9 @@ public class CommNotificationConstant {
     public static final String TEST_NOTIFICATION_ACTOR_NICKNAME = "actor1";
     public static final String TEST_NOTIFICATION_POST_PREVIEW = "post_title_preview";
     public static final String TEST_NOTIFICATION_COMMENT_PREVIEW = "comment_preview";
-    public static final String TEST_NOTIFICATION_COMMENT_PATH = "1.4.1";
+    public static final String TEST_NOTIFICATION_COMMENT_PATH_DEPTH3 = "1.4.1";
+    public static final String TEST_NOTIFICATION_COMMENT_PATH_DEPTH2 = "1.4";
+    public static final String TEST_NOTIFICATION_COMMENT_PATH_DEPTH1 = "1";
 
     // UUID
     public static final UUID TEST_NOTIFICATION_RECIPIENT_ID = UUID.fromString("6ba6176c-bbc5-4767-9a25-598631918365");
