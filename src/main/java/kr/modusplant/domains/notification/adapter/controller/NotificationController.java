@@ -2,6 +2,7 @@ package kr.modusplant.domains.notification.adapter.controller;
 
 import kr.modusplant.domains.notification.domain.aggregate.Notification;
 import kr.modusplant.domains.notification.domain.vo.*;
+import kr.modusplant.domains.notification.framework.out.messaging.FcmSender;
 import kr.modusplant.domains.notification.usecase.port.mapper.NotificationMapper;
 import kr.modusplant.domains.notification.usecase.port.repository.*;
 import kr.modusplant.domains.notification.usecase.record.NotificationPreview;
@@ -30,6 +31,7 @@ public class NotificationController {
     private final PostInfoRepository postInfoRepository;
     private final CommentInfoRepository commentInfoRepository;
     private final MemberInfoRepository memberInfoRepository;
+    private final FcmSender fcmSender;
 
     private static final int MAX_NOTIFICATION_SIZE = 50;
 
@@ -73,7 +75,8 @@ public class NotificationController {
                 PostId.create(event.getPostUlid()),
                 ContentPreview.create(notificationPreview.contentPreview())
         );
-        notificationRepository.saveWithLimit(notification,MAX_NOTIFICATION_SIZE);
+        Notification postNotification = notificationRepository.saveWithLimit(notification,MAX_NOTIFICATION_SIZE);
+        fcmSender.sendAsync(postNotification);
     }
 
     @Transactional
@@ -92,7 +95,8 @@ public class NotificationController {
                 CommentPath.create(event.getCommentPath()),
                 ContentPreview.create(notificationPreview.contentPreview())
         );
-        notificationRepository.saveWithLimit(notification,MAX_NOTIFICATION_SIZE);
+        Notification commentNotification = notificationRepository.saveWithLimit(notification,MAX_NOTIFICATION_SIZE);
+        fcmSender.sendAsync(commentNotification);
     }
 
     @Transactional
@@ -117,7 +121,7 @@ public class NotificationController {
                         ),
                         MAX_NOTIFICATION_SIZE
                 );
-                // sendFcm
+                fcmSender.sendAsync(commentReplyNotification);
 
                 // 게시글 작성자 == 상위 댓글 작성자 인 경우 대댓글 알림 1개만 제공
                 if (parentCommentAuthorUuid.equals(postAuthorUuid))
@@ -135,7 +139,7 @@ public class NotificationController {
                     ),
                     MAX_NOTIFICATION_SIZE
             );
-            // sendFcm
+            fcmSender.sendAsync(commentNotification);
         }
     }
 
