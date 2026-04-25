@@ -3,7 +3,6 @@ package kr.modusplant.domains.comment.adapter.controller;
 import jakarta.transaction.Transactional;
 import kr.modusplant.domains.comment.adapter.mapper.CommentMapperImpl;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
-import kr.modusplant.domains.comment.domain.exception.InvalidValueException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.CommentContent;
@@ -12,6 +11,7 @@ import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.in.web.cache.CommentCacheService;
 import kr.modusplant.domains.comment.framework.in.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
+import kr.modusplant.domains.comment.usecase.port.outbound.CommentPostValidator;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentReadRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentWriteRepository;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
@@ -24,6 +24,7 @@ import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.swear.service.SwearService;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.persistence.compositekey.CommCommentId;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,7 @@ public class CommentController {
     private final SiteMemberJpaRepository memberJpaRepository;
     private final SwearService swearService;
 
+    private final CommentPostValidator postValidator;
     private final CommentCacheService cacheService;
 
     @Transactional
@@ -82,7 +84,7 @@ public class CommentController {
                 result.getSize(), result.getTotalElements(), result.getTotalPages(),
                 result.hasNext(), result.hasPrevious());
         
-        response.ApplyOneIndexBasedPage();
+        response.applyOneIndexBasedPage();
 
         return response;
     }
@@ -90,8 +92,13 @@ public class CommentController {
     @Transactional
     public void register(CommentRegisterRequest request, UUID currentMemberUuid) {
         if(readRepository.existsByPostAndPath(PostId.create(request.postId()), CommentPath.create(request.path()))) {
-            throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT);
+            throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT, "comment");
         }
+
+        if (!postValidator.isPostPublished(request.postId())) {
+            throw new InvalidValueException(CommentErrorCode.NOT_PUBLISHED_POST, "comment");
+        }
+
         checkPathCondition(request.postId(), request.path());
 
         Comment comment = mapper.toComment(
@@ -162,5 +169,4 @@ public class CommentController {
         }
 
     }
-
 }

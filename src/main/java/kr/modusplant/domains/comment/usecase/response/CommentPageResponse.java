@@ -16,7 +16,7 @@ public class CommentPageResponse<T>{
     private boolean hasNext;
     private boolean hasPrevious;
 
-    public void ApplyOneIndexBasedPage() {
+    public void applyOneIndexBasedPage() {
         this.page += 1;
     }
 }

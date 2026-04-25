@@ -29,7 +29,11 @@ public enum CommentErrorCode implements ErrorCode {
     NOT_EXIST_SIBLING_COMMENT(HttpStatus.NOT_FOUND.value(), "not_exist_sibling_comment", "댓글의 형제 댓글의 데이터가 없습니다"),
 
     EXIST_COMMENT(HttpStatus.CONFLICT.value(), "exist_comment", "댓글이 이미 존재합니다"),
-    EXIST_POST_COMMENT(HttpStatus.CONFLICT.value(), "exist_post_comment", "게시글에 하나 이상의 댓글이 존재합니다");
+    EXIST_POST_COMMENT(HttpStatus.CONFLICT.value(), "exist_post_comment", "게시글에 하나 이상의 댓글이 존재합니다"),
+
+    NOT_PUBLISHED_POST(HttpStatus.CONTINUE.value(), "not_published_post","게시글이 출간된 상태가 아닙니다")
+
+    ;
 
     private final int httpStatus;
     private final String code;
