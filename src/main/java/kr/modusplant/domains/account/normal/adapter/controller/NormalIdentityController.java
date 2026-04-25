@@ -51,11 +51,6 @@ public class NormalIdentityController {
 
     @Transactional
     public void registerNormalMember(NormalSignUpRequest request) {
-
-        if(readRepository.existsByNickname(Nickname.create(request.nickname()))) {
-            throw new DataAlreadyExistsException(KernelErrorCode.EXISTS_NICKNAME);
-        }
-
         Email requestEmail = Email.create(request.email());
 
         if(readRepository.existsByEmail(requestEmail)) {
@@ -69,6 +64,9 @@ public class NormalIdentityController {
                 updateRepository.updateToKakaoAccount(requestEmail, Password.create(request.password()));
             }
         } else {
+            if(readRepository.existsByNickname(Nickname.create(request.nickname()))) {
+                throw new DataAlreadyExistsException(KernelErrorCode.EXISTS_NICKNAME);
+            }
             createRepository.save(mapper.toSignUpData(request));
         }
     }

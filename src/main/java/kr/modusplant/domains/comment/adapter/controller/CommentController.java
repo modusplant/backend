@@ -109,7 +109,7 @@ public class CommentController {
         }
 
         CommCommentId id = CommCommentId.builder()
-                .postUlid(request.postId())
+                .post(request.postId())
                 .path(request.path())
                 .build();
 
@@ -119,7 +119,7 @@ public class CommentController {
     @Transactional
     public void delete(String postUlid, String commentPath) {
         jpaAdapter.setCommentAsDeleted(CommCommentId.builder()
-                .postUlid(postUlid)
+                .post(postUlid)
                 .path(commentPath)
                 .build());
     }

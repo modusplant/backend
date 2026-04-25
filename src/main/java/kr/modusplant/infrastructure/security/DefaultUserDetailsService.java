@@ -8,7 +8,6 @@ import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.security.exception.AccountStateException;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
-import kr.modusplant.shared.enums.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,7 +28,7 @@ public class DefaultUserDetailsService implements UserDetailsService {
     public DefaultUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         SiteMemberAuthEntity auth = memberAuthRepository
-                .findByEmailAndProvider(email, AuthProvider.BASIC).orElseThrow(
+                .findByEmail(email).orElseThrow(
                         () -> new AccountStateException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH));
         SiteMemberEntity member = memberRepository
                 .findByUuid(auth.getMember().getUuid()).orElseThrow(

@@ -11,8 +11,8 @@ import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntro
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
-import kr.modusplant.domains.member.usecase.port.repository.TargetCommentIdRepository;
-import kr.modusplant.domains.member.usecase.port.repository.TargetPostIdRepository;
+import kr.modusplant.domains.member.usecase.port.repository.TargetCommentRepository;
+import kr.modusplant.domains.member.usecase.port.repository.TargetPostRepository;
 import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.framework.aws.service.S3FileService;
@@ -51,8 +51,8 @@ public class LegacyMemberController {
     private final MemberValidationHelper memberValidationHelper;
     private final MemberRepository memberRepository;
     private final MemberProfileRepository memberProfileRepository;
-    private final TargetPostIdRepository targetPostIdRepository;
-    private final TargetCommentIdRepository targetCommentIdRepository;
+    private final TargetPostRepository targetPostRepository;
+    private final TargetCommentRepository targetCommentRepository;
     private final EventBus eventBus;
 
     @Transactional(readOnly = true)
@@ -111,10 +111,10 @@ public class LegacyMemberController {
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfTargetPostExists(targetPostId);
-        if (!targetPostIdRepository.isPublished(targetPostId)) {
+        if (!targetPostRepository.isPublished(targetPostId)) {
             throw new NotAccessibleException(NOT_ACCESSIBLE_POST_LIKE, "postLike", targetPostId.getValue());
         }
-        if (targetPostIdRepository.isUnliked(memberId, targetPostId)) {
+        if (targetPostRepository.isUnliked(memberId, targetPostId)) {
             eventBus.publish(PostLikeEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
     }
@@ -124,10 +124,10 @@ public class LegacyMemberController {
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfTargetPostExists(targetPostId);
-        if (!targetPostIdRepository.isPublished(targetPostId)) {
+        if (!targetPostRepository.isPublished(targetPostId)) {
             throw new NotAccessibleException(NOT_ACCESSIBLE_POST_LIKE, "postUnlike", targetPostId.getValue());
         }
-        if (targetPostIdRepository.isLiked(memberId, targetPostId)) {
+        if (targetPostRepository.isLiked(memberId, targetPostId)) {
             eventBus.publish(PostUnlikeEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
     }
@@ -137,10 +137,10 @@ public class LegacyMemberController {
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfTargetPostExists(targetPostId);
-        if (!targetPostIdRepository.isPublished(targetPostId)) {
+        if (!targetPostRepository.isPublished(targetPostId)) {
             throw new NotAccessibleException(NOT_ACCESSIBLE_POST_BOOKMARK, "postBookmark", targetPostId.getValue());
         }
-        if (targetPostIdRepository.isNotBookmarked(memberId, targetPostId)) {
+        if (targetPostRepository.isNotBookmarked(memberId, targetPostId)) {
             eventBus.publish(PostBookmarkEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
     }
@@ -150,10 +150,10 @@ public class LegacyMemberController {
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfTargetPostExists(targetPostId);
-        if (!targetPostIdRepository.isPublished(targetPostId)) {
+        if (!targetPostRepository.isPublished(targetPostId)) {
             throw new NotAccessibleException(NOT_ACCESSIBLE_POST_BOOKMARK, "postBookmark", targetPostId.getValue());
         }
-        if (targetPostIdRepository.isBookmarked(memberId, targetPostId)) {
+        if (targetPostRepository.isBookmarked(memberId, targetPostId)) {
             eventBus.publish(PostBookmarkCancelEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
     }
@@ -164,7 +164,7 @@ public class LegacyMemberController {
                 TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
-        if (targetCommentIdRepository.isUnliked(memberId, targetCommentId)) {
+        if (targetCommentRepository.isUnliked(memberId, targetCommentId)) {
             eventBus.publish(
                     CommentLikeEvent.create(
                             memberId.getValue(),
@@ -179,7 +179,7 @@ public class LegacyMemberController {
                 TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
-        if (targetCommentIdRepository.isLiked(memberId, targetCommentId)) {
+        if (targetCommentRepository.isLiked(memberId, targetCommentId)) {
             eventBus.publish(
                     CommentUnlikeEvent.create(
                             memberId.getValue(),

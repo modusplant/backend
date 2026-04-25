@@ -14,7 +14,7 @@ import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_ACTIVE_MEMBER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class NormalIdentityRestControllerUnitTest implements
@@ -45,7 +45,7 @@ public class NormalIdentityRestControllerUnitTest implements
     public void testModifyEmail_givenValidRequest_willReturnSuccess() {
         // given & when
         ResponseEntity<DataResponse<Void>> response =
-                restController.modifyEmail(MEMBER_AUTH_BASIC_USER_ACTIVE_MEMBER_UUID, testEmailModificationRequest);
+                restController.modifyEmail(MEMBER_BASIC_USER_UUID, testEmailModificationRequest);
 
         // then
         assertThat(response.getStatusCode().value()).isEqualTo(200);
@@ -56,7 +56,7 @@ public class NormalIdentityRestControllerUnitTest implements
     public void testModifyPassword_givenValidRequest_willReturnSuccess() {
         // given & when
         ResponseEntity<DataResponse<Void>> response =
-                restController.modifyPassword(MEMBER_AUTH_BASIC_USER_ACTIVE_MEMBER_UUID, testPasswordModificationRequest);
+                restController.modifyPassword(MEMBER_BASIC_USER_UUID, testPasswordModificationRequest);
 
         // then
         assertThat(response.getStatusCode().value()).isEqualTo(200);

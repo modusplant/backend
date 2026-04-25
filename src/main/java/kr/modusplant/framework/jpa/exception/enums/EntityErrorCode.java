@@ -26,12 +26,16 @@ public enum EntityErrorCode implements ErrorCode {
     NOT_FOUND_MEMBER_PROFILE(HttpStatus.NOT_FOUND.value(), "not_found_member_profile", "사용자의 프로필 정보가 존재하지 않습니다"),
     NOT_FOUND_MEMBER_ROLE(HttpStatus.NOT_FOUND.value(), "not_found_member_role", "사용자의 역할 정보가 존재하지 않습니다"),
     NOT_FOUND_MEMBER_TERM(HttpStatus.NOT_FOUND.value(), "not_found_member_term", "사용자의 약관 정보가 존재하지 않습니다"),
+    NOT_FOUND_MEMBER_WITHDRAW_REASON(HttpStatus.NOT_FOUND.value(), "not_found_member_withdraw_reason", "사용자의 회원 탈퇴 사유가 존재하지 않습니다"),
 
     NOT_FOUND_TERM(HttpStatus.NOT_FOUND.value(), "not_found_term", "약관 정보가 존재하지 않습니다"),
 
     NOT_FOUND_REPORT(HttpStatus.NOT_FOUND.value(), "not_found_report", "보고서가 존재하지 않습니다"),
 
     // Exists
+    EXISTS_POST_ABUSE_REPORT(HttpStatus.CONFLICT.value(), "exists_post_abuse_report", "게시글 신고가 이미 존재합니다"),
+    EXISTS_COMMENT_ABUSE_REPORT(HttpStatus.CONFLICT.value(), "exists_comment_abuse_report", "댓글 신고가 이미 존재합니다"),
+
     EXISTS_COMMENT(HttpStatus.CONFLICT.value(), "exists_comment", "댓글이 이미 존재합니다"),
     EXISTS_COMMENT_LIKE(HttpStatus.CONFLICT.value(), "exists_comment_like", "댓글의 좋아요가 이미 존재합니다"),
 

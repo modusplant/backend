@@ -17,7 +17,7 @@ import java.util.List;
 import static kr.modusplant.domains.term.common.util.usecase.request.SiteMemberTermCreateRequestTestUtils.testSiteMemberTermCreateRequest;
 import static kr.modusplant.domains.term.common.util.usecase.request.SiteMemberTermUpdateRequestTestUtils.testSiteMemberTermUpdateRequest;
 import static kr.modusplant.domains.term.common.util.usecase.response.SiteMemberTermResponseTestUtils.testSiteMemberTermResponse;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberTermConstant.MEMBER_TERM_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -70,7 +70,7 @@ class SiteMemberTermRestControllerTest {
 
         // when
         ResponseEntity<DataResponse<Void>> responseEntity =
-                siteMemberTermRestController.deleteSiteMemberTerm(MEMBER_TERM_USER_UUID);
+                siteMemberTermRestController.deleteSiteMemberTerm(MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -84,7 +84,7 @@ class SiteMemberTermRestControllerTest {
 
         // when
         ResponseEntity<DataResponse<SiteMemberTermResponse>> responseEntity =
-                siteMemberTermRestController.getSiteMemberTerm(MEMBER_TERM_USER_UUID);
+                siteMemberTermRestController.getSiteMemberTerm(MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);

@@ -26,7 +26,7 @@ public class NotificationId {
     }
 
     public static NotificationId create(String ulid) {
-        if (ulid == null || ulid.trim().isEmpty()) {
+        if (StringUtils.isBlank(ulid)) {
             throw new EmptyValueException(NotificationErrorCode.EMPTY_NOTIFICATION_ID);
         }
         if (StringUtils.isBlank(ulid) || ulid.length() != 26 || !PATTERN_ULID.matcher(ulid).matches()) {

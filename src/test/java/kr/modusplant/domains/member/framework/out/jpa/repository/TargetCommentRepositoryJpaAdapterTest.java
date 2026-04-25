@@ -13,10 +13,10 @@ import static kr.modusplant.shared.persistence.common.util.constant.CommPostCons
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
-class TargetCommentIdRepositoryJpaAdapterTest {
+class TargetCommentRepositoryJpaAdapterTest {
     CommCommentJpaRepository commPostJpaRepository = Mockito.mock(CommCommentJpaRepository.class);
     CommCommentLikeJpaRepository commPostLikeJpaRepository = Mockito.mock(CommCommentLikeJpaRepository.class);
-    TargetCommentIdRepositoryJpaAdapter targetPostIdRepositoryJpaAdapter = new TargetCommentIdRepositoryJpaAdapter(commPostJpaRepository, commPostLikeJpaRepository);
+    TargetCommentRepositoryJpaAdapter targetPostIdRepositoryJpaAdapter = new TargetCommentRepositoryJpaAdapter(commPostJpaRepository, commPostLikeJpaRepository);
 
     @Test
     @DisplayName("isIdExist로 true 반환")

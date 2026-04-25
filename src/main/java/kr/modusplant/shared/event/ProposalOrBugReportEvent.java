@@ -5,6 +5,7 @@ import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
 
@@ -12,19 +13,22 @@ import java.util.UUID;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProposalOrBugReportEvent {
     private final UUID memberId;
+    private final String reportId;
     private final String title;
     private final String content;
     private final String imagePath;
 
-    public static ProposalOrBugReportEvent create(UUID memberId, String title, String content, String imagePath) {
+    public static ProposalOrBugReportEvent create(UUID memberId, String reportId, String title, String content, String imagePath) {
         if (memberId == null) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_MEMBER, "memberId");
-        } else if (title.isEmpty()) {
+        } else if (StringUtils.isBlank(reportId)) {
+            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_REPORT, "reportId");
+        } else if (StringUtils.isBlank(title)) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_REPORT, "title");
-        } else if (content.isEmpty()) {
+        } else if (StringUtils.isBlank(content)) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_REPORT, "content");
         } else {
-            return new ProposalOrBugReportEvent(memberId, title, content, imagePath);
+            return new ProposalOrBugReportEvent(memberId, reportId, title, content, imagePath);
         }
     }
 }

@@ -5,6 +5,7 @@ import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
 
@@ -17,7 +18,7 @@ public class PostLikeEvent {
     public static PostLikeEvent create(UUID memberId, String postId) {
         if (memberId == null) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_MEMBER, "memberId");
-        } else if (postId.isEmpty()) {
+        } else if (StringUtils.isBlank(postId)) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_POST, "postId");
         } else {
             return new PostLikeEvent(memberId, postId);

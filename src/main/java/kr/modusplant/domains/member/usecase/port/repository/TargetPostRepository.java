@@ -3,7 +3,7 @@ package kr.modusplant.domains.member.usecase.port.repository;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.TargetPostId;
 
-public interface TargetPostIdRepository {
+public interface TargetPostRepository {
     boolean isIdExist(TargetPostId targetPostId);
 
     boolean isPublished(TargetPostId targetPostId);
