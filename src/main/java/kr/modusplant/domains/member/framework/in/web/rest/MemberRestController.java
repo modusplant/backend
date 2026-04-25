@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -332,13 +333,17 @@ public class MemberRestController {
                     schema = @Schema(type = "string", format = "binary")
             )
             @RequestPart(name = "image", required = false)
-            MultipartFile image,
+            List<MultipartFile> images,
+
+            @Parameter(description = "보고서 이미지 개수", example = "3")
+            @RequestPart(name = "imageNumber", required = false)
+            Integer imageNumber,
 
             @Parameter(hidden = true)
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
             @AuthenticationPrincipal(expression = "uuid")
             UUID memberId) throws IOException {
-        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(memberId, title, content, image));
+        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(memberId, title, content, images, imageNumber));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

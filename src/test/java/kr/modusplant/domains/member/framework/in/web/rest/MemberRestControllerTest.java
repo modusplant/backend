@@ -244,7 +244,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         willDoNothing().given(memberController).reportProposalOrBug(testProposalOrBugReportRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportProposalOrBug(TEST_REPORT_TITLE, TEST_REPORT_CONTENT, TEST_REPORT_IMAGE, MEMBER_BASIC_USER_UUID);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportProposalOrBug(TEST_REPORT_TITLE, TEST_REPORT_CONTENT, TEST_REPORT_IMAGES, TEST_REPORT_IMAGE_NUMBER, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);

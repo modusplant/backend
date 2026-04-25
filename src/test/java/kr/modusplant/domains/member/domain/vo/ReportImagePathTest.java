@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import java.util.UUID;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
-import static kr.modusplant.domains.member.common.util.domain.vo.ReportImagePathTestUtils.testReportImagePath;
-import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.TEST_REPORT_IMAGE_PATH;
+import static kr.modusplant.domains.member.common.util.domain.vo.ReportImagePathTestUtils.testReportImagePath1;
+import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,7 +18,7 @@ class ReportImagePathTest {
     @Test
     @DisplayName("create으로 보고서 이미지 경로 반환")
     void testCreate_givenValidValue_willReturnReportImagePath() {
-        assertThat(ReportImagePath.create(TEST_REPORT_IMAGE_PATH)).isEqualTo(ReportImagePath.create(TEST_REPORT_IMAGE_PATH));
+        assertThat(ReportImagePath.create(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1)).isEqualTo(ReportImagePath.create(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1));
     }
 
     @Test
@@ -46,26 +46,26 @@ class ReportImagePathTest {
     @DisplayName("같은 객체에 대한 equals 호출")
     void testEquals_givenSameObject_willReturnTrue() {
         //noinspection EqualsWithItself
-        assertEquals(testReportImagePath, testReportImagePath);
+        assertEquals(testReportImagePath1, testReportImagePath1);
     }
 
     @Test
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
-        assertNotEquals(testReportImagePath, testMemberId);
+        assertNotEquals(testReportImagePath1, testMemberId);
     }
 
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
         UUID id = UUID.randomUUID();
-        assertNotEquals(testReportImagePath, ReportImagePath.create(String.format("member/%s/report/%s", id, "image.png")));
+        assertNotEquals(testReportImagePath1, ReportImagePath.create(String.format("member/%s/report/%s", id, "image.png")));
     }
 
     @Test
     @DisplayName("같은 객체에 대한 hashcode 동일성 보장")
     void testHashCode_givenSameObject_willReturnSameHashCode() {
-        assertEquals(testReportImagePath.hashCode(), testReportImagePath.hashCode());
+        assertEquals(testReportImagePath1.hashCode(), testReportImagePath1.hashCode());
     }
 }

@@ -12,5 +12,6 @@ public interface ProposalOrBugReportEventTestUtils {
                     TEST_REPORT_ULID,
                     TEST_REPORT_TITLE,
                     TEST_REPORT_CONTENT,
-                    TEST_REPORT_IMAGE_PATH);
+                    TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_FILE_NAMES,
+                    TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATHS);
 }

@@ -60,7 +60,7 @@ class MemberIdTest implements MemberTestUtils {
     void testFromString_givenInvalidId_willThrowException() {
         InvalidValueException exception = assertThrows(InvalidValueException.class, () -> MemberId.fromString("!유효하지않음!"));
         assertThat(exception.getErrorCode()).isEqualTo(INVALID_MEMBER_ID);
-        assertThat(exception.getValueName()).isEqualTo("memberId");
+        assertThat(exception.getValueNames()).contains("memberId");
     }
 
     @Test
