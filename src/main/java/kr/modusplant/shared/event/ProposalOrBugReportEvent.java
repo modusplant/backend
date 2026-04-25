@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -16,9 +17,15 @@ public class ProposalOrBugReportEvent {
     private final String reportId;
     private final String title;
     private final String content;
-    private final String imagePath;
+    private final List<String> filenames;
+    private final List<String> imagePaths;
 
-    public static ProposalOrBugReportEvent create(UUID memberId, String reportId, String title, String content, String imagePath) {
+    public static ProposalOrBugReportEvent create(UUID memberId,
+                                                  String reportId,
+                                                  String title,
+                                                  String content,
+                                                  List<String> filenames,
+                                                  List<String> imagePaths) {
         if (memberId == null) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_MEMBER, "memberId");
         } else if (StringUtils.isBlank(reportId)) {
@@ -27,8 +34,12 @@ public class ProposalOrBugReportEvent {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_REPORT, "title");
         } else if (StringUtils.isBlank(content)) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_REPORT, "content");
+        } else if (filenames == null) {
+            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_REPORT, "filenames");
+        } else if (imagePaths == null) {
+            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_REPORT, "imagePaths");
         } else {
-            return new ProposalOrBugReportEvent(memberId, reportId, title, content, imagePath);
+            return new ProposalOrBugReportEvent(memberId, reportId, title, content, filenames, imagePaths);
         }
     }
 }

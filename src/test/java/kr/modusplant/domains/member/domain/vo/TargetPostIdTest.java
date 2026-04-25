@@ -39,7 +39,7 @@ class TargetPostIdTest {
     void testCreate_givenInvalidId_willThrowException() {
         InvalidValueException exception = assertThrows(InvalidValueException.class, () -> TargetPostId.create("!유효하지않음!"));
         assertThat(exception.getErrorCode()).isEqualTo(INVALID_TARGET_POST_ID);
-        assertThat(exception.getValueName()).isEqualTo("targetPostId");
+        assertThat(exception.getValueNames()).contains("targetPostId");
     }
 
     @Test

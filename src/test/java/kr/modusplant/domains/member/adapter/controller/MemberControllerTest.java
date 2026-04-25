@@ -41,6 +41,7 @@ import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
 import kr.modusplant.infrastructure.swear.service.SwearService;
+import kr.modusplant.shared.exception.InvalidFileInputException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
@@ -57,6 +58,8 @@ import org.mockito.Mockito;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -91,6 +94,7 @@ import static kr.modusplant.shared.event.common.util.CommentLikeEventTestUtils.t
 import static kr.modusplant.shared.event.common.util.PostBookmarkEventTestUtils.testPostBookmarkEvent;
 import static kr.modusplant.shared.event.common.util.PostCancelPostBookmarkEventTestUtils.testPostBookmarkCancelEvent;
 import static kr.modusplant.shared.event.common.util.PostLikeEventTestUtils.testPostLikeEvent;
+import static kr.modusplant.shared.exception.enums.GeneralErrorCode.INVALID_FILE_INPUT;
 import static kr.modusplant.shared.exception.enums.GeneralErrorCode.INVALID_INPUT;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.*;
@@ -827,8 +831,8 @@ class MemberControllerTest implements
     }
 
     @Test
-    @DisplayName("이미지 경로를 포함해서 존재하는 모든 데이터로 reportProposalOrBug로 건의 및 버그 제보")
-    void testReportProposalOrBug_givenExistedData_willReportProposalOrBug() throws IOException {
+    @DisplayName("이미지를 포함해서 존재하는 모든 데이터로 reportProposalOrBug로 건의 및 버그 제보")
+    void testReportProposalOrBug_givenExistedImage_willReportProposalOrBug() throws IOException {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         PropBugRepEntity propBugRepEntity = createPropBugRepEntityBuilderWithUlid().member(memberEntity).build();
@@ -838,8 +842,8 @@ class MemberControllerTest implements
         given(memberImageIOHelper.uploadImage(
                 any(MemberId.class),
                 any(ReportId.class),
-                any(ProposalOrBugReportRecord.class)))
-                .willReturn(TEST_REPORT_IMAGE_PATH);
+                anyList()))
+                .willReturn(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATHS);
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberEntity));
         given(propBugRepJpaRepository.save(propBugRepEntity)).willReturn(propBugRepEntity);
 
@@ -853,10 +857,10 @@ class MemberControllerTest implements
 
     @Test
     @DisplayName("이미지 경로를 제외한 존재하는 모든 데이터로 reportProposalOrBug로 건의 및 버그 제보")
-    void testReportProposalOrBug_givenExistedDataExceptOfImagePath_willReportProposalOrBug() throws IOException {
+    void testReportProposalOrBug_givenExistedDataExceptOfImage_willReportProposalOrBug() throws IOException {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        PropBugRepEntity propBugRepEntity = createPropBugRepEntityBuilderWithUlid().member(memberEntity).imagePath(null).build();
+        PropBugRepEntity propBugRepEntity = createPropBugRepEntityBuilderWithUlid().member(memberEntity).image(null).build();
 
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
@@ -864,7 +868,7 @@ class MemberControllerTest implements
         given(propBugRepJpaRepository.save(propBugRepEntity)).willReturn(propBugRepEntity);
 
         // when
-        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(MEMBER_BASIC_USER_UUID, TEST_REPORT_TITLE, TEST_REPORT_CONTENT, null));
+        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(MEMBER_BASIC_USER_UUID, TEST_REPORT_TITLE, TEST_REPORT_CONTENT, null, null));
 
         // then
         verify(memberJpaRepository, times(1)).findByUuid(any());
@@ -887,6 +891,133 @@ class MemberControllerTest implements
     }
 
     @Test
+    @DisplayName("images가 null이고 imageNumber가 존재하여 reportProposalOrBug로 건의 및 버그 제보 실패")
+    void testReportProposalOrBug_givenNullImagesAndNotNullImageNumber_willThrowException() {
+        // given
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+
+        ProposalOrBugReportRecord invalidRecord = new ProposalOrBugReportRecord(
+                MEMBER_BASIC_USER_UUID,
+                TEST_REPORT_TITLE,
+                TEST_REPORT_CONTENT,
+                null,
+                TEST_REPORT_IMAGE_NUMBER
+        );
+
+        // when
+        InvalidValueException exception = assertThrows(InvalidValueException.class,
+                () -> memberController.reportProposalOrBug(invalidRecord));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(MISMATCHED_REPORT_IMAGE_SIZE);
+    }
+
+    @Test
+    @DisplayName("images가 존재하고 imageNumber가 null이어서 reportProposalOrBug로 건의 및 버그 제보 실패")
+    void testReportProposalOrBug_givenNotNullImagesAndNullImageNumber_willThrowException() {
+        // given
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        
+        ProposalOrBugReportRecord invalidRecord = new ProposalOrBugReportRecord(
+                MEMBER_BASIC_USER_UUID,
+                TEST_REPORT_TITLE,
+                TEST_REPORT_CONTENT,
+                TEST_REPORT_IMAGES,
+                null
+        );
+
+        // when
+        InvalidValueException exception = assertThrows(InvalidValueException.class,
+                () -> memberController.reportProposalOrBug(invalidRecord));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(MISMATCHED_REPORT_IMAGE_SIZE);
+    }
+
+    @Test
+    @DisplayName("이미지 리스트의 크기와 이미지 개수가 달라 reportProposalOrBug로 건의 및 버그 제보 실패")
+    void testReportProposalOrBug_givenMismatchedSize_willThrowException() {
+        // given
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        
+        ProposalOrBugReportRecord invalidRecord = new ProposalOrBugReportRecord(
+                MEMBER_BASIC_USER_UUID,
+                TEST_REPORT_TITLE,
+                TEST_REPORT_CONTENT,
+                TEST_REPORT_IMAGES,
+                TEST_REPORT_IMAGE_NUMBER - 1
+        );
+
+        // when
+        InvalidValueException exception = assertThrows(InvalidValueException.class,
+                () -> memberController.reportProposalOrBug(invalidRecord));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(MISMATCHED_REPORT_IMAGE_SIZE);
+    }
+
+    @Test
+    @DisplayName("이미지의 원본 파일 이름이 비어 있어 reportProposalOrBug로 건의 및 버그 제보 실패")
+    void testReportProposalOrBug_givenBlankFilename_willThrowException() {
+        // given
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        
+        List<MultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "image", "", "image/png", TEST_REPORT_IMAGE_BYTES_1
+                        ));
+
+        ProposalOrBugReportRecord invalidRecord = new ProposalOrBugReportRecord(
+                MEMBER_BASIC_USER_UUID,
+                TEST_REPORT_TITLE,
+                TEST_REPORT_CONTENT,
+                images,
+                1
+        );
+
+        // when
+        InvalidFileInputException invalidFileInputException = assertThrows(InvalidFileInputException.class,
+                () -> memberController.reportProposalOrBug(invalidRecord));
+
+        // then
+        assertThat(invalidFileInputException.getErrorCode()).isEqualTo(INVALID_FILE_INPUT);
+    }
+
+    @Test
+    @DisplayName("이미지의 원본 파일 이름이 규칙을 따르지 않아 reportProposalOrBug로 건의 및 버그 제보 실패")
+    void testReportProposalOrBug_givenInvalidFilename_willThrowException() {
+        // given
+        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+
+        List<MultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "image", "invalid_name.png", "image/png", TEST_REPORT_IMAGE_BYTES_1
+                        ));
+
+        ProposalOrBugReportRecord invalidRecord = new ProposalOrBugReportRecord(
+                MEMBER_BASIC_USER_UUID,
+                TEST_REPORT_TITLE,
+                TEST_REPORT_CONTENT,
+                images,
+                1
+        );
+
+        // when
+        InvalidValueException exception = assertThrows(InvalidValueException.class,
+                () -> memberController.reportProposalOrBug(invalidRecord));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(INVALID_REPORT_IMAGE_NAME);
+    }
+
+    @Test
     @DisplayName("removeProposalOrBug로 건의 및 버그 제보 제거")
     void testRemoveProposalOrBug_givenValidRecord_willRemoveProposalOrBugReport() {
         // given
@@ -896,7 +1027,7 @@ class MemberControllerTest implements
         memberController.removeProposalOrBug(testProposalOrBugReportRemoveRecord);
 
         // then
-        verify(s3FileService, times(1)).deleteFiles(any(String.class));
+        verify(s3FileService, times(1)).deleteFiles(anyList());
     }
 
     @Test
