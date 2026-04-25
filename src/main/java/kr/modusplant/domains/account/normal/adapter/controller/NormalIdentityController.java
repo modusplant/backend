@@ -59,9 +59,11 @@ public class NormalIdentityController {
             if (providerOfExistingMember == AuthProvider.BASIC || providerOfExistingMember == AuthProvider.BASIC_GOOGLE || providerOfExistingMember == AuthProvider.BASIC_KAKAO) {
                 throw new ExistsEntityException(NormalIdentityErrorCode.EXISTS_ACCOUNT, TableName.SITE_MEMBER);
             } else if (providerOfExistingMember == AuthProvider.GOOGLE) {
-                updateRepository.updateToGoogleAccount(requestEmail, Password.create(request.password()));
+                throw new ExistsEntityException(NormalIdentityErrorCode.EXISTS_GOOGLE_ACCOUNT, TableName.SITE_MEMBER);
+//                updateRepository.updateToGoogleAccount(requestEmail, Password.create(request.password()));
             } else if (providerOfExistingMember == AuthProvider.KAKAO) {
-                updateRepository.updateToKakaoAccount(requestEmail, Password.create(request.password()));
+//                updateRepository.updateToKakaoAccount(requestEmail, Password.create(request.password()));
+                throw new ExistsEntityException(NormalIdentityErrorCode.EXISTS_KAKAO_ACCOUNT, TableName.SITE_MEMBER);
             }
         } else {
             if(readRepository.existsByNickname(Nickname.create(request.nickname()))) {
