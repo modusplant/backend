@@ -835,7 +835,7 @@ class MemberControllerTest implements
     void testReportProposalOrBug_givenExistedImage_willReportProposalOrBug() throws IOException {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        PropBugRepEntity propBugRepEntity = createPropBugRepEntityBuilderWithUlid().member(memberEntity).build();
+        PropBugRepEntity propBugRepEntity = createPropBugRepEntityBuilder().member(memberEntity).build();
 
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
@@ -860,7 +860,7 @@ class MemberControllerTest implements
     void testReportProposalOrBug_givenExistedDataExceptOfImage_willReportProposalOrBug() throws IOException {
         // given
         SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        PropBugRepEntity propBugRepEntity = createPropBugRepEntityBuilderWithUlid().member(memberEntity).image(null).build();
+        PropBugRepEntity propBugRepEntity = createPropBugRepEntityBuilder().member(memberEntity).image(null).build();
 
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
