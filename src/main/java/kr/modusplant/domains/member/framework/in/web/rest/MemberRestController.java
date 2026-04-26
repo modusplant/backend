@@ -321,11 +321,11 @@ public class MemberRestController {
     @PostMapping(value = "/report/proposal-or-bug", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> reportProposalOrBug(
             @Parameter(description = "보고서 제목", example = "제보합니다!")
-            @RequestPart(name = "title")
+            @RequestParam
             String title,
 
             @Parameter(description = "보고서 내용", example = "이런 건의 사항을 드립니다.")
-            @RequestPart(name = "content")
+            @RequestParam
             String content,
 
             @Parameter(
@@ -336,7 +336,7 @@ public class MemberRestController {
             List<MultipartFile> images,
 
             @Parameter(description = "보고서 이미지 개수", example = "3")
-            @RequestPart(name = "imageNumber", required = false)
+            @RequestParam(required = false)
             Integer imageNumber,
 
             @Parameter(hidden = true)

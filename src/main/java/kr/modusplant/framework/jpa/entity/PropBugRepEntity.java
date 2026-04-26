@@ -2,7 +2,6 @@ package kr.modusplant.framework.jpa.entity;
 
 import jakarta.persistence.*;
 import kr.modusplant.framework.jpa.entity.record.FilenameAndSrcEntityRecord;
-import kr.modusplant.framework.jpa.generator.UlidGenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,7 +29,6 @@ import static kr.modusplant.shared.persistence.constant.TableName.PROP_BUG_REP;
 @ToString
 public class PropBugRepEntity {
     @Id
-    @UlidGenerator
     @Column(nullable = false, updatable = false)
     private String ulid;
 
