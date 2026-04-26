@@ -6,10 +6,15 @@ import kr.modusplant.shared.event.CommentNotificationEvent;
 import kr.modusplant.shared.event.PostLikeNotificationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
+
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -18,37 +23,65 @@ public class NotificationEventListener {
 
     private final NotificationController notificationController;
 
+    @Qualifier("notificationSemaphore")
+    private final Semaphore notificationSemaphore;
+
+    @Value("${app.semaphore.bulkhead.notification.timeout-ms}")
+    private long timeoutMs;
+
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePostLikeNotification(PostLikeNotificationEvent event) {
-        try {
-            notificationController.createPostLikeNotification(event);
-        } catch (Exception e) {
-            // 가상스레드 내에서는 커스텀 예외 전파 불가
-            log.error("[Notification] 게시글 좋아요 알림 실패 - actorId={}, postUlid={}, error={}",
-                    event.getActorId(), event.getPostUlid(), e.getMessage(), e);
-        }
+        acquireAndProcess(
+                () -> notificationController.createPostLikeNotification(event),
+                "[Notification] 게시글 좋아요 알림 실패 - actorId={}, postUlid={}",
+                event.getActorId(), event.getPostUlid()
+        );
     }
 
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleCommentLikeNotification(CommentLikeNotificationEvent event) {
-        try {
-            notificationController.createCommentLikeNotification(event);
-        } catch (Exception e) {
-            log.error("[Notification] 댓글 좋아요 알림 실패 - actorId={}, postUlid={}, commentPath={}, error={}",
-                    event.getActorId(), event.getPostUlid(), event.getCommentPath(), e.getMessage(), e);
-        }
+        acquireAndProcess(
+                () -> notificationController.createCommentLikeNotification(event),
+                "[Notification] 댓글 좋아요 알림 실패 - actorId={}, postUlid={}, commentPath={}",
+                event.getActorId(), event.getPostUlid(), event.getCommentPath()
+        );
     }
 
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleCommentNotification(CommentNotificationEvent event) {
+        acquireAndProcess(
+                () -> notificationController.createCommentNotification(event),
+                "[Notification] 댓글 추가 알림 실패 - actorId={}, postUlid={}, commentPath={}, action={}",
+                event.getActorId(), event.getPostUlid(), event.getCommentPath(), event.getAction()
+        );
+    }
+
+    private void acquireAndProcess(Runnable task, String errorMsg, Object... args) {
+        boolean acquired = false;
         try {
-            notificationController.createCommentNotification(event);
+            acquired = notificationSemaphore.tryAcquire(timeoutMs, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("[Notification] 세마포어 대기 중 인터럽트 발생");
+            return;
+        }
+
+        if (!acquired) {
+            log.warn("[Notification] 벌크헤드 timeout 초과로 알림 스킵 - {}ms 초과", timeoutMs);
+            return;
+        }
+
+        try {
+            task.run();
         } catch (Exception e) {
-            log.error("[Notification] 댓글 추가 알림 실패 - actorId={}, postUlid={}, commentPath={}, action={}, error={}",
-                    event.getActorId(), event.getPostUlid(), event.getCommentPath(), event.getAction(), e.getMessage(), e);
+            log.error(errorMsg, args, e);
+        } finally {
+            if (acquired) {
+                notificationSemaphore.release();
+            }
         }
     }
 }
