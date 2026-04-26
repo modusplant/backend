@@ -5,9 +5,9 @@ import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
 
@@ -15,9 +15,16 @@ import java.util.concurrent.Executor;
 @EnableAsync
 public class AsyncConfig implements AsyncConfigurer {
 
+    /* 기본 executor(executor 미지정 시) : 플랫폼 스레드 풀 */
     @Override
     public Executor getAsyncExecutor() {
-        return new VirtualThreadTaskExecutor("virtual-thread-");
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(20);
+        executor.setQueueCapacity(50);
+        executor.setThreadNamePrefix("async-");
+        executor.initialize();
+        return executor;
     }
 
     // 비동기 예외 처리
@@ -26,9 +33,10 @@ public class AsyncConfig implements AsyncConfigurer {
         return new SimpleAsyncUncaughtExceptionHandler();
     }
 
-    // SimpleAsyncTaskExecutor는 기본적으로 일반 스레드를 사용하므로 가상 스레드를 명시적으로 지정
+    /* 알림 전용 executor : 가상스레드 */
     @Bean(name = "notificationExecutor")
     public Executor notificationExecutor() {
+        // SimpleAsyncTaskExecutor + executor.setVirtualThreads(true) => VirtualThreadTaskExecutor
         SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor("virtual-");
         executor.setVirtualThreads(true);
         return executor;

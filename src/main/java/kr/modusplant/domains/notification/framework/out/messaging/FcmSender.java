@@ -18,7 +18,7 @@ public class FcmSender {
     private final FirebaseMessaging firebaseMessaging;
     private final FcmTokenRepository fcmTokenRepository;
 
-    @Async
+    @Async("notificationExecutor")
     public void sendAsync(Notification notification) {
         List<String> tokens = fcmTokenRepository.findTokensByRecipientId(notification.getRecipientId());
         if (tokens.isEmpty()) return;
