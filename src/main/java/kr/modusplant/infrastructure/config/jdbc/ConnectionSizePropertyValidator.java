@@ -24,6 +24,9 @@ public class ConnectionSizePropertyValidator implements SmartInitializingSinglet
     @Value("${spring.datasource.hikari.maximum-pool-size}")
     private int maxPoolSize;
 
+    @Value("${app.semaphore.bulkhead.notification.connection-size}")
+    private int notificationBulkheadSize;
+
     private final JdbcTemplate jdbcTemplate;
 
     @Override
@@ -38,6 +41,11 @@ public class ConnectionSizePropertyValidator implements SmartInitializingSinglet
         if (maxPoolSize >= requireNonNull(maxConnections).longValue()) {
             throw new ConfigurationException(ConfigurationErrorCode.INCORRECT_RELATIONSHIP_BETWEEN_CONNECTION_SIZE,
                     new String[]{"maxPoolSize", "maxConnections"});
+        }
+
+        if (this.getNotificationBulkheadSize() >= this.getAllowedConnectionSize()) {
+            throw new ConfigurationException(ConfigurationErrorCode.INCORRECT_RELATIONSHIP_BETWEEN_CONNECTION_SIZE,
+                    new String[]{"notificationBulkheadSize", "allowedConnectionSize"});
         }
     }
 }
