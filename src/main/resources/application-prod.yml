@@ -11,6 +11,10 @@ app:
   semaphore:
     datasource:
       allowed-connection-size: 60
+    bulkhead:
+      notification:
+        connection-size: 10
+        timeout-ms: 3000
 
 # Debugging & Logging
 logging:
