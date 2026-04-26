@@ -89,8 +89,9 @@ public class PostRestController {
     )
     @GetMapping("/search")
     public ResponseEntity<DataResponse<CursorRelevanceSortedPageResponse<PostSummaryWithSearchInfoResponse>>> getPostsByKeyword(
-            @AuthenticationPrincipal(expression = "uuid")
-            UUID currentMemberUuid,
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal
+            DefaultUserDetails userDetails,
 
             @Parameter(schema = @Schema(description = "마지막 게시글 ID (첫 요청 시 생략)", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
             @RequestParam(name = "lastPostId", required = false)
@@ -134,7 +135,7 @@ public class PostRestController {
             @RequestParam(name = "secondaryCategoryId", required = false)
             List<Integer> secondaryCategoryIds
     ) {
-
+        UUID currentMemberUuid = (userDetails != null) ? userDetails.getUuid() : null;
         return ResponseEntity.ok().body(DataResponse.ok(postController.getByKeyword(
                 new PostSearchRequest(option, keyword, sort,
                         new PostCategoryRequest(primaryCategoryId, secondaryCategoryIds)
