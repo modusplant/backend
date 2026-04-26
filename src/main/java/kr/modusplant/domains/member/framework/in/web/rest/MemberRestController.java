@@ -7,9 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import kr.modusplant.domains.member.adapter.controller.MemberController;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
@@ -337,6 +335,8 @@ public class MemberRestController {
 
             @Parameter(description = "보고서 이미지 개수", example = "3")
             @RequestParam(required = false)
+            @Max(value = 3, message = "보고서 이미지 개수는 1부터 3까지의 값이어야 합니다. ")
+            @Min(value = 1, message = "보고서 이미지 개수는 1부터 3까지의 값이어야 합니다. ")
             Integer imageNumber,
 
             @Parameter(hidden = true)
