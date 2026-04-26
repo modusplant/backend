@@ -25,6 +25,7 @@ class ConnectionSizePropertyValidatorTest {
     public void beforeEach() {
         ReflectionTestUtils.setField(validator, "allowedConnectionSize", 10);
         ReflectionTestUtils.setField(validator, "maxPoolSize", 11);
+        ReflectionTestUtils.setField(validator, "notificationBulkheadSize", 9);
     }
 
     @Test
@@ -66,4 +67,22 @@ class ConnectionSizePropertyValidatorTest {
         // then
         assertThat(configurationException.getMessage()).contains("maxPoolSize", "maxConnections");
     }
+
+    @ParameterizedTest
+    @ValueSource(ints = {10,11})
+    @DisplayName("올바르지 않은 notificationBulkheadSize을 사용하여 validate를 통해 프로퍼티 검증")
+    void testValidate_givenMaxNotificationBulkheadSize_willAddFieldError(int equalOrUpperValue) {
+        // given
+        ReflectionTestUtils.setField(validator, "notificationBulkheadSize", equalOrUpperValue);
+        given(jdbcTemplate.queryForObject(anyString(), eq(Integer.class))).willReturn(12);
+
+        // when
+        ConfigurationException configurationException =
+                assertThrows(ConfigurationException.class, validator::afterSingletonsInstantiated);
+
+        // then
+        assertThat(configurationException.getMessage()).contains("notificationBulkheadSize", "allowedConnectionSize");
+
+    }
+
 }
