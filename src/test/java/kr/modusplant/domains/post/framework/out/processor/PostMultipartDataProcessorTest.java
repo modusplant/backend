@@ -12,10 +12,12 @@ import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
 import kr.modusplant.domains.post.usecase.request.FileOrder;
 import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
+import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.infrastructure.config.jackson.JacksonConfig;
 import kr.modusplant.shared.exception.FileLimitExceededException;
 import kr.modusplant.shared.exception.InvalidFileInputException;
 import kr.modusplant.shared.exception.UnsupportedFileException;
+import kr.modusplant.shared.generator.UlidGeneratorHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -40,7 +42,8 @@ import static org.mockito.Mockito.*;
 class PostMultipartDataProcessorTest implements PostRequestTestUtils {
     private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(JacksonConfig.objectMapper());
-    private final PostMultipartDataProcessor postMultipartDataProcessor = new PostMultipartDataProcessor(s3FileService, objectMapperHolder);
+    private final UlidGeneratorHolder ulidGeneratorHolder = new UlidGeneratorHolder(new UlidIdGenerator());
+    private final PostMultipartDataProcessor postMultipartDataProcessor = new PostMultipartDataProcessor(s3FileService, objectMapperHolder, ulidGeneratorHolder);
 
     private static final String DATA = "data";
     private static final String FILENAME = "filename";

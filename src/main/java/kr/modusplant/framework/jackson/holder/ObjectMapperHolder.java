@@ -9,7 +9,7 @@ public class ObjectMapperHolder {
     @Getter
     private final ObjectMapper objectMapper;
 
-    @Getter
+    @Getter  // 주의: 최소한으로만 사용할 것.
     private static ObjectMapper staticObjectMapper;
 
     public ObjectMapperHolder(ObjectMapper objectMapper) {
