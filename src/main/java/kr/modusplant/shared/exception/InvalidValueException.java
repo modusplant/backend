@@ -3,7 +3,6 @@ package kr.modusplant.shared.exception;
 import kr.modusplant.shared.exception.supers.ErrorCode;
 import lombok.Getter;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -13,43 +12,35 @@ import java.util.List;
 @Getter
 public class InvalidValueException extends BusinessException {
 
-    private final String valueName;
     private final List<String> valueNames;
 
     public InvalidValueException(ErrorCode errorCode, String valueName) {
         super(errorCode);
-        this.valueName = valueName;
-        this.valueNames = List.of();
+        this.valueNames = List.of(valueName);
     }
 
-    public InvalidValueException(ErrorCode errorCode, String... valueNames) {
+    public InvalidValueException(ErrorCode errorCode, List<String> valueNames) {
         super(errorCode);
-        this.valueName = "";
-        this.valueNames = Arrays.asList(valueNames);
+        this.valueNames = valueNames;
     }
 
-    public InvalidValueException(ErrorCode errorCode, String valueName, String message) {
+    public InvalidValueException(ErrorCode errorCode, List<String> valueNames, String message) {
         super(errorCode, message);
-        this.valueName = valueName;
-        this.valueNames = List.of();
+        this.valueNames = valueNames;
     }
 
-    public InvalidValueException(ErrorCode errorCode, String valueName, String message, Throwable cause) {
+    public InvalidValueException(ErrorCode errorCode, List<String> valueNames, String message, Throwable cause) {
         super(errorCode, message, cause);
-        this.valueName = valueName;
-        this.valueNames = List.of();
+        this.valueNames = valueNames;
     }
 
-    public InvalidValueException(ErrorCode errorCode, String valueName, Throwable cause) {
+    public InvalidValueException(ErrorCode errorCode, List<String> valueNames, Throwable cause) {
         super(errorCode, cause);
-        this.valueName = valueName;
-        this.valueNames = List.of();
+        this.valueNames = valueNames;
     }
 
     @Override
     public String getMessage() {
-        return valueNames.isEmpty() ?
-                String.format("%s [valueName: %s]", super.getMessage(), valueName) :
-                String.format("%s [valueNames: %s]", super.getMessage(), valueNames);
+        return String.format("%s [valueNames: %s]", super.getMessage(), valueNames);
     }
 }

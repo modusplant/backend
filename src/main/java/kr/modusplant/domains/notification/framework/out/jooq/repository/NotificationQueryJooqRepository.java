@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import static kr.modusplant.jooq.Tables.COMM_NOTIFICATION;
@@ -51,7 +52,7 @@ public class NotificationQueryJooqRepository implements NotificationQueryReposit
         if (status == null) {
             return noCondition();
         }
-        return COMM_NOTIFICATION.STATUS.eq(status.getValue().toUpperCase());
+        return COMM_NOTIFICATION.STATUS.eq(status.getValue().toUpperCase(Locale.ROOT));
     }
 
     private Condition buildCursorCondition(String cursorUlid) {

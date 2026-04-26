@@ -5,10 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import kr.modusplant.domains.post.framework.out.processor.enums.PostFileType;
-import kr.modusplant.domains.post.framework.out.processor.exception.*;
-import kr.modusplant.domains.post.framework.out.processor.enums.PostFileType;
 import kr.modusplant.domains.post.framework.out.processor.exception.EmptyThumbnailException;
 import kr.modusplant.domains.post.framework.out.processor.exception.InvalidThumbnailException;
+import kr.modusplant.domains.post.framework.out.processor.exception.TextFileOverLengthException;
 import kr.modusplant.domains.post.framework.out.processor.exception.ThumbnailNotAllowedException;
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
 import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
@@ -57,7 +56,7 @@ public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
         List<MultipartFile> orderedParts = reorderParts(parts, orderInfo);
         List<FileOrder> sortedOrderInfo = orderInfo.stream()
                 .sorted(Comparator.comparing(FileOrder::order))
-                .collect(Collectors.toList());
+                .toList();
 
         // 멀티파트 파일 저장 및 json 변환
         String fileUlid = generator.generate(null, null, null, EventType.INSERT);
@@ -147,12 +146,12 @@ public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
         }
 
         // orderInfo의 order 정보 검증 (order가 순차적으로 증가하는지)
-        List<FileOrder>  sortedorderInfo = orderInfo.stream()
+        List<FileOrder>  sortedOrderInfo = orderInfo.stream()
                 .sorted(Comparator.comparing(FileOrder::order))
-                .collect(Collectors.toList());
+                .toList();
         int zeroCount = 0;
         int expectedOrder = 1;
-        for (FileOrder info : sortedorderInfo) {
+        for (FileOrder info : sortedOrderInfo) {
             int order = info.order();
             if (order == 0) {
                 zeroCount++;

@@ -1,6 +1,8 @@
 package kr.modusplant.infrastructure.event.consumer;
 
+import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jpa.entity.*;
+import kr.modusplant.framework.jpa.entity.record.FilenameAndSrcEntityRecord;
 import kr.modusplant.framework.jpa.repository.*;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.CommentAbuseReportEvent;
@@ -11,13 +13,19 @@ import kr.modusplant.shared.persistence.compositekey.CommCommentId;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+import static kr.modusplant.jooq.Tables.PROP_BUG_REP;
 import static kr.modusplant.jooq.Tables.PROP_BUG_REP_ARCHIVE;
+import static org.jooq.impl.DSL.*;
 
 @Component
 public class ReportEventConsumer {
     private final DSLContext dsl;
+    private final S3FileService s3FileService;
 
     private final SiteMemberJpaRepository memberJpaRepository;
     private final CommPostJpaRepository postJpaRepository;
@@ -26,7 +34,9 @@ public class ReportEventConsumer {
     private final CommPostAbuRepJpaRepository postAbuRepJpaRepository;
     private final CommCommentAbuRepJpaRepository commentAbuRepJpaRepository;
 
-    public ReportEventConsumer(EventBus eventBus, DSLContext dsl,
+    public ReportEventConsumer(EventBus eventBus,
+                               DSLContext dsl,
+                               S3FileService s3FileService,
                                SiteMemberJpaRepository memberJpaRepository,
                                CommPostJpaRepository postJpaRepository,
                                CommCommentJpaRepository commentJpaRepository,
@@ -37,12 +47,13 @@ public class ReportEventConsumer {
             if (event instanceof ProposalOrBugReportEvent proposalOrBugReportEvent) {
                 addProposalOrBugReport(
                         proposalOrBugReportEvent.getMemberId(),
+                        proposalOrBugReportEvent.getReportId(),
                         proposalOrBugReportEvent.getTitle(),
                         proposalOrBugReportEvent.getContent(),
-                        proposalOrBugReportEvent.getImagePath());
+                        proposalOrBugReportEvent.getFilenames(),
+                        proposalOrBugReportEvent.getImagePaths());
             } else if (event instanceof ProposalOrBugReportRemoveEvent proposalOrBugReportRemoveEvent) {
                 deleteProposalOrBugReport(
-                        proposalOrBugReportRemoveEvent.getMemberId(),
                         proposalOrBugReportRemoveEvent.getReportId()
                 );
             } else if (event instanceof PostAbuseReportEvent postAbuseReportEvent) {
@@ -56,6 +67,7 @@ public class ReportEventConsumer {
             }
         });
         this.dsl = dsl;
+        this.s3FileService = s3FileService;
         this.memberJpaRepository = memberJpaRepository;
         this.postJpaRepository = postJpaRepository;
         this.commentJpaRepository = commentJpaRepository;
@@ -64,46 +76,70 @@ public class ReportEventConsumer {
         this.commentAbuRepJpaRepository = commentAbuRepJpaRepository;
     }
 
-    private void addProposalOrBugReport(UUID memberId, String title, String content, String imagePath) {
+    private void addProposalOrBugReport(UUID memberId,
+                                        String reportId,
+                                        String title,
+                                        String content,
+                                        List<String> filenames,
+                                        List<String> imagePaths) {
+        List<FilenameAndSrcEntityRecord> imageList = new ArrayList<>();
+        for (int i = 0; i < imagePaths.size(); i++) {
+            imageList.add(new FilenameAndSrcEntityRecord(filenames.get(i), imagePaths.get(i)));
+        }
         SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
         propBugRepJpaRepository.save(
                 PropBugRepEntity.builder()
+                        .ulid(reportId)
                         .member(memberEntity)
                         .title(title)
                         .content(content)
-                        .imagePath(imagePath)
+                        .image(imageList)
                         .build());
     }
 
-    private void deleteProposalOrBugReport(UUID memberId, String reportId) {
-//        dsl.insertInto(PROP_BUG_REP_ARCHIVE,
-//                        COMM_POST_ARCHIVE.ULID,
-//                        COMM_POST_ARCHIVE.PRI_CATE_ID,
-//                        COMM_POST_ARCHIVE.SECO_CATE_ID,
-//                        COMM_POST_ARCHIVE.AUTH_MEMB_UUID,
-//                        COMM_POST_ARCHIVE.TITLE,
-//                        COMM_POST_ARCHIVE.CONTENT_TEXT,
-//                        COMM_POST_ARCHIVE.CREATED_AT,
-//                        COMM_POST_ARCHIVE.ARCHIVED_AT,
-//                        COMM_POST_ARCHIVE.UPDATED_AT,
-//                        COMM_POST_ARCHIVE.PUBLISHED_AT
-//                )
-//                .select(
-//                        select(
-//                                COMM_POST.ULID,
-//                                COMM_POST.PRI_CATE_ID,
-//                                COMM_POST.SECO_CATE_ID,
-//                                COMM_POST.AUTH_MEMB_UUID,
-//                                COMM_POST.TITLE,
-//                                COMM_POST.CONTENT_TEXT,
-//                                COMM_POST.CREATED_AT,
-//                                val(LocalDateTime.now()),
-//                                COMM_POST.UPDATED_AT,
-//                                COMM_POST.PUBLISHED_AT
-//                        )
-//                                .from(COMM_POST)
-//                                .where(COMM_POST.ULID.in(publishedPostUlids))
-//                )
+    private void deleteProposalOrBugReport(String reportId) {
+        deleteImageFromReportImagePath(reportId);
+        processProposalOrBugReportRelatedRecords(reportId);
+    }
+
+    private void deleteImageFromReportImagePath(String reportId) {
+        List<String> srcList = dsl.select(
+                        field("jsonb_array_elements({0}) ->> 'src'", String.class, PROP_BUG_REP.IMAGE)
+                )
+                .from(PROP_BUG_REP)
+                .where(PROP_BUG_REP.ULID.eq(reportId))
+                .fetchInto(String.class);
+
+        if (!srcList.isEmpty()) {
+            s3FileService.deleteFiles(srcList);
+        }
+    }
+
+    private void processProposalOrBugReportRelatedRecords(String reportId) {
+        dsl.insertInto(PROP_BUG_REP_ARCHIVE,
+                        PROP_BUG_REP_ARCHIVE.ULID,
+                        PROP_BUG_REP_ARCHIVE.MEMB_UUID,
+                        PROP_BUG_REP_ARCHIVE.TITLE,
+                        PROP_BUG_REP_ARCHIVE.CONTENT,
+                        PROP_BUG_REP_ARCHIVE.CREATED_AT,
+                        PROP_BUG_REP_ARCHIVE.ARCHIVED_AT,
+                        PROP_BUG_REP_ARCHIVE.LAST_MODIFIED_AT
+                )
+                .select(
+                        select(
+                                PROP_BUG_REP.ULID,
+                                PROP_BUG_REP.MEMB_UUID,
+                                PROP_BUG_REP.TITLE,
+                                PROP_BUG_REP.CONTENT,
+                                PROP_BUG_REP.CREATED_AT,
+                                val(LocalDateTime.now()),
+                                PROP_BUG_REP.LAST_MODIFIED_AT
+                        )
+                                .from(PROP_BUG_REP)
+                                .where(PROP_BUG_REP.ULID.eq(reportId))
+                ).execute();
+
+        dsl.deleteFrom(PROP_BUG_REP).where(PROP_BUG_REP.ULID.eq(reportId)).execute();
     }
 
     private void addPostAbuseReport(UUID memberId, String postUlid) {
