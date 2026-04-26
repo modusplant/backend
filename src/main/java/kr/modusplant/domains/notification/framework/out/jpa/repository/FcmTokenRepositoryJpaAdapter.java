@@ -13,6 +13,7 @@ import kr.modusplant.shared.enums.Platform;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -46,6 +47,7 @@ public class FcmTokenRepositoryJpaAdapter implements FcmTokenRepository {
     }
 
     @Override
+    @Transactional
     public void deleteByToken(String token) {
         fcmTokenJpaRepository.deleteByToken(token);
     }
