@@ -14,11 +14,11 @@ import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
 import kr.modusplant.domains.post.usecase.request.FileOrder;
 import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
-import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.shared.exception.FileLimitExceededException;
 import kr.modusplant.shared.exception.InvalidFileInputException;
 import kr.modusplant.shared.exception.UnsupportedFileException;
-import org.hibernate.generator.EventType;
+import kr.modusplant.shared.generator.RandomUlidGenerator;
+import kr.modusplant.shared.generator.UlidGeneratorHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,7 +35,6 @@ import static kr.modusplant.domains.post.framework.out.processor.constant.PostFi
 @Service
 public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
     private final S3FileService s3FileService;
-    private static final UlidIdGenerator generator = new UlidIdGenerator();
     public static final String DATA = "data";
     public static final String FILENAME = "filename";
     public static final String ORDER = "order";
@@ -43,10 +42,14 @@ public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
     public static final String TYPE = "type";
     public static final int MAX_TEXT_LENGTH = 5000;
     private final ObjectMapper objectMapper;
+    private final RandomUlidGenerator generator;
 
-    public PostMultipartDataProcessor(S3FileService s3FileService, ObjectMapperHolder objectMapperHolder) {
+    public PostMultipartDataProcessor(S3FileService s3FileService,
+                                      ObjectMapperHolder objectMapperHolder,
+                                      UlidGeneratorHolder ulidGeneratorHolder) {
         this.s3FileService = s3FileService;
         this.objectMapper = objectMapperHolder.getObjectMapper();
+        this.generator = ulidGeneratorHolder.getUlidGenerator();
     }
 
     public ContentProcessRecord saveFilesAndGenerateContentJson(List<MultipartFile> parts, List<FileOrder> orderInfo, String thumbnailFilename) throws IOException {
@@ -59,7 +62,7 @@ public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
                 .toList();
 
         // 멀티파트 파일 저장 및 json 변환
-        String fileUlid = generator.generate(null, null, null, EventType.INSERT);
+        String fileUlid = generator.generate();
         ArrayNode contentArray = objectMapper.createArrayNode();
         String thumbnailPath = null;
         for (int i=0; i<orderedParts.size(); i++) {
