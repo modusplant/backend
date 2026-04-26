@@ -188,6 +188,23 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                 .groupBy(COMM_COMMENT.POST_ULID)
                 .asTable("comm_cnt");
 
+        // currentMemberUuid의 null 여부에 따른 쿼리 최적화
+        Condition isLiked =
+                currentMemberUuid != null ?
+                        exists(
+                                selectOne().from(COMM_POST_LIKE)
+                                        .where(COMM_POST_LIKE.POST_ULID.eq(eHitsUlid))
+                                        .and(COMM_POST_LIKE.MEMB_UUID.eq(currentMemberUuid))) :
+                        falseCondition();
+
+        Condition isBookmarked =
+                currentMemberUuid != null ?
+                        exists(
+                                selectOne().from(COMM_POST_BOOKMARK)
+                                        .where(COMM_POST_BOOKMARK.POST_ULID.eq(eHitsUlid))
+                                        .and(COMM_POST_BOOKMARK.MEMB_UUID.eq(currentMemberUuid))) :
+                        falseCondition();
+
         //noinspection DataFlowIssue
         return dsl.with(ctes)
                 .select(
@@ -201,16 +218,8 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         eHits.field("like_count", Integer.class).as("likeCount"),
                         eHitsPublishedAt.as("publishedAt"),
                         coalesce(commentCountTable.field("comment_count", Integer.class), 0).as("commentCount"),
-                        exists(
-                                selectOne().from(COMM_POST_LIKE)
-                                        .where(COMM_POST_LIKE.POST_ULID.eq(eHitsUlid))
-                                        .and(COMM_POST_LIKE.MEMB_UUID.eq(currentMemberUuid))
-                        ).as("isLiked"),
-                        exists(
-                                selectOne().from(COMM_POST_BOOKMARK)
-                                        .where(COMM_POST_BOOKMARK.POST_ULID.eq(eHitsUlid))
-                                        .and(COMM_POST_BOOKMARK.MEMB_UUID.eq(currentMemberUuid))
-                        ).as("isBookmarked"),
+                        isLiked.as("isLiked"),
+                        isBookmarked.as("isBookmarked"),
                         val( null, Integer.class).as("importance"),
                         val( null, Double.class).as("maxWordSimilarity")
                 )
@@ -428,6 +437,23 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                 .groupBy(COMM_COMMENT.POST_ULID)
                 .asTable("comm_cnt");
 
+        // currentMemberUuid의 null 여부에 따른 쿼리 최적화
+        Condition isLiked =
+                currentMemberUuid != null ?
+                        exists(
+                                selectOne().from(COMM_POST_LIKE)
+                                        .where(COMM_POST_LIKE.POST_ULID.eq(eHitsUlid))
+                                        .and(COMM_POST_LIKE.MEMB_UUID.eq(currentMemberUuid))) :
+                        falseCondition();
+
+        Condition isBookmarked =
+                currentMemberUuid != null ?
+                        exists(
+                                selectOne().from(COMM_POST_BOOKMARK)
+                                        .where(COMM_POST_BOOKMARK.POST_ULID.eq(eHitsUlid))
+                                        .and(COMM_POST_BOOKMARK.MEMB_UUID.eq(currentMemberUuid))) :
+                        falseCondition();
+
         //noinspection DataFlowIssue
         return dsl.with(ctes)  // 💡 리스트로 모아둔 CTE들을 한 번에 등록
                 .select(
@@ -441,16 +467,8 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         eHits.field("like_count", Integer.class).as("likeCount"),
                         eHitsPublishedAt.as("publishedAt"),
                         coalesce(commentCountTable.field("comment_count", Integer.class), 0).as("commentCount"),
-                        exists(
-                                selectOne().from(COMM_POST_LIKE)
-                                        .where(COMM_POST_LIKE.POST_ULID.eq(eHitsUlid))
-                                        .and(COMM_POST_LIKE.MEMB_UUID.eq(currentMemberUuid))
-                        ).as("isLiked"),
-                        exists(
-                                selectOne().from(COMM_POST_BOOKMARK)
-                                        .where(COMM_POST_BOOKMARK.POST_ULID.eq(eHitsUlid))
-                                        .and(COMM_POST_BOOKMARK.MEMB_UUID.eq(currentMemberUuid))
-                        ).as("isBookmarked"),
+                        isLiked.as("isLiked"),
+                        isBookmarked.as("isBookmarked"),
                         eHitsImportance.as("importance"),
                         eHitsMaxWordSimilarity.as("maxWordSimilarity")
                 )
