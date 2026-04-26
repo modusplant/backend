@@ -3,26 +3,23 @@ package kr.modusplant.domains.post.domain.vo;
 import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.InvalidValueException;
 import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
-import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
+import kr.modusplant.shared.generator.UlidGeneratorHolder;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.hibernate.generator.EventType;
 
 import static kr.modusplant.shared.constant.Regex.PATTERN_ULID;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class PostId {
-    private static final UlidIdGenerator generator = new UlidIdGenerator();
-
     private final String value;
 
     public static PostId generate() {
-        return new PostId(generator.generate(null, null, null, EventType.INSERT));
+        return new PostId(UlidGeneratorHolder.getStaticUlidGenerator().generate());
     }
 
     public static PostId create(String ulid) {

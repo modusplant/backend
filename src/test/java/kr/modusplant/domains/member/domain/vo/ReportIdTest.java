@@ -4,6 +4,7 @@ import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.generator.UlidGeneratorHolder;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ReportIdTest {
+    @SuppressWarnings("unused")
+    private final UlidGeneratorHolder ulidGeneratorHolder = new UlidGeneratorHolder(new UlidIdGenerator());
+
     @Test
     @DisplayName("create으로 보고서 식별자 반환")
     void testCreate_givenValidValue_willReturnReportId() {

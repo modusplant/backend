@@ -63,7 +63,7 @@ class NotificationQueryJooqRepositoryTest {
 
 
         testNotification1 = notificationTestDataHelper.insertTestNotification(
-                generator.generate(null,null,null, EventType.INSERT),
+                generator.generate(null, null, null, EventType.INSERT),
                 testMember1,
                 testMember2.getUuid(),
                 testMember2.getNickname(),

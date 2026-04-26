@@ -3,6 +3,8 @@ package kr.modusplant.domains.post.domain.vo;
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
 import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.InvalidValueException;
+import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
+import kr.modusplant.shared.generator.UlidGeneratorHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,6 +14,8 @@ import static kr.modusplant.domains.post.common.constant.PostUlidConstant.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PostIdTest implements PostTestUtils {
+    @SuppressWarnings("unused")
+    private final UlidGeneratorHolder ulidGeneratorHolder = new UlidGeneratorHolder(new UlidIdGenerator());
 
     @Nested
     @DisplayName("PostId generate 테스트")

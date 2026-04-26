@@ -12,7 +12,7 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReportImageNumber {
-    private final Integer value;
+    private final int value;
 
     public static ReportImageNumber create(Integer value) {
         if (value == null) {
