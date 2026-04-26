@@ -88,7 +88,7 @@ cloud:
 # Firebase
 firebase:
   credentials:
-    path: ${FIREBASE_CREDENTIALS_PATH}
+    json: ${FIREBASE_CREDENTIALS_JSON}
 
 # Monitoring
 management:
