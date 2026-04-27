@@ -15,7 +15,7 @@ class PropBugRepEntityTest implements PropBugRepEntityTestUtils {
 
     @BeforeEach
     public void beforeEach() {
-        testPropBugRepEntity = createPropBugRepEntityBuilderWithUlid()
+        testPropBugRepEntity = createPropBugRepEntityBuilder()
                 .member(createMemberBasicUserEntityWithUuid())
                 .build();
     }

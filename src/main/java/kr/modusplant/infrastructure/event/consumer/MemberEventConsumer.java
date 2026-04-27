@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static kr.modusplant.jooq.Tables.*;
-import static org.jooq.impl.DSL.select;
-import static org.jooq.impl.DSL.val;
+import static org.jooq.impl.DSL.*;
 
 @Component
 public class MemberEventConsumer {
@@ -158,12 +157,13 @@ public class MemberEventConsumer {
                 dsl.update(PROP_BUG_REP)
                         .setNull(PROP_BUG_REP.MEMB_UUID)
                         .set(PROP_BUG_REP.LAST_MODIFIED_AT, LocalDateTime.now())
+                        .set(PROP_BUG_REP.VER_NUM, coalesce(PROP_BUG_REP.VER_NUM, 0).plus(1))
                         .where(PROP_BUG_REP.MEMB_UUID.eq(memberId)),
 
                 dsl.update(PROP_BUG_REP_ARCHIVE)
-                        .setNull(PROP_BUG_REP.MEMB_UUID)
-                        .set(PROP_BUG_REP.LAST_MODIFIED_AT, LocalDateTime.now())
-                        .where(PROP_BUG_REP.MEMB_UUID.eq(memberId)),
+                        .setNull(PROP_BUG_REP_ARCHIVE.MEMB_UUID)
+                        .set(PROP_BUG_REP_ARCHIVE.LAST_MODIFIED_AT, LocalDateTime.now())
+                        .where(PROP_BUG_REP_ARCHIVE.MEMB_UUID.eq(memberId)),
 
                 dsl.deleteFrom(REFRESH_TOKEN)
                         .where(REFRESH_TOKEN.MEMB_UUID.eq(memberId)),

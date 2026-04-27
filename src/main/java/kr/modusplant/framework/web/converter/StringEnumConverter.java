@@ -3,6 +3,8 @@ package kr.modusplant.framework.web.converter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.convert.converter.Converter;
 
+import java.util.Locale;
+
 public class StringEnumConverter<T extends Enum<T>> implements Converter<String, T> {
 
     private final Class<T> enumClass;
@@ -14,6 +16,6 @@ public class StringEnumConverter<T extends Enum<T>> implements Converter<String,
     @NotNull
     @Override
     public T convert(String source) {
-        return Enum.valueOf(enumClass, source.toUpperCase());
+        return Enum.valueOf(enumClass, source.toUpperCase(Locale.ROOT));
     }
 }

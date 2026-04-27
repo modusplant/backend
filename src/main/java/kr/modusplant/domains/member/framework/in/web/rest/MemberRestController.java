@@ -7,9 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import kr.modusplant.domains.member.adapter.controller.MemberController;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
@@ -30,6 +28,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -320,11 +319,11 @@ public class MemberRestController {
     @PostMapping(value = "/report/proposal-or-bug", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> reportProposalOrBug(
             @Parameter(description = "보고서 제목", example = "제보합니다!")
-            @RequestPart(name = "title")
+            @RequestParam
             String title,
 
             @Parameter(description = "보고서 내용", example = "이런 건의 사항을 드립니다.")
-            @RequestPart(name = "content")
+            @RequestParam
             String content,
 
             @Parameter(
@@ -332,24 +331,30 @@ public class MemberRestController {
                     schema = @Schema(type = "string", format = "binary")
             )
             @RequestPart(name = "image", required = false)
-            MultipartFile image,
+            List<MultipartFile> images,
+
+            @Parameter(description = "보고서 이미지 개수", example = "3")
+            @RequestParam(required = false)
+            @Max(value = 3, message = "보고서 이미지 개수는 1부터 3까지의 값이어야 합니다. ")
+            @Min(value = 1, message = "보고서 이미지 개수는 1부터 3까지의 값이어야 합니다. ")
+            Integer imageNumber,
 
             @Parameter(hidden = true)
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
             @AuthenticationPrincipal(expression = "uuid")
             UUID memberId) throws IOException {
-        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(memberId, title, content, image));
+        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(memberId, title, content, images, imageNumber));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
-    // TODO: 관리자 API로 등록 요망
+    // TODO: 관리자 API로 활용 요망
     @Hidden
     @Operation(
             summary = "건의 및 버그 제보 제거 API",
             description = "건의 사항 또는 버그 제보를 제거합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping(value = "/admin/report/proposal-or-bug/{reportUlid}")
+//    @DeleteMapping(value = "/admin/report/proposal-or-bug/{reportUlid}")
     public ResponseEntity<DataResponse<Void>> removeProposalOrBugReport(
             @Parameter(
                     description = "삭제할 보고서의 식별자",

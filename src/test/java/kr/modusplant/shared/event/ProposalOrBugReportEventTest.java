@@ -24,7 +24,8 @@ class ProposalOrBugReportEventTest {
                             TEST_REPORT_ULID,
                             TEST_REPORT_TITLE,
                             TEST_REPORT_CONTENT,
-                            TEST_REPORT_IMAGE_PATH));
+                            TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_FILE_NAMES,
+                            TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATHS));
 
             // then
             assertThat(invalidValueException.getMessage()).contains("NOT_FOUND_MEMBER");
@@ -40,7 +41,8 @@ class ProposalOrBugReportEventTest {
                             "",
                             TEST_REPORT_TITLE,
                             TEST_REPORT_CONTENT,
-                            TEST_REPORT_IMAGE_PATH));
+                            TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_FILE_NAMES,
+                            TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATHS));
 
             // then
             assertThat(invalidValueException.getMessage()).contains("NOT_FOUND_REPORT");
@@ -56,7 +58,8 @@ class ProposalOrBugReportEventTest {
                             TEST_REPORT_ULID,
                             "",
                             TEST_REPORT_CONTENT,
-                            TEST_REPORT_IMAGE_PATH));
+                            TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_FILE_NAMES,
+                            TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATHS));
 
             // then
             assertThat(invalidValueException.getMessage()).contains("NOT_FOUND_REPORT");
@@ -72,7 +75,42 @@ class ProposalOrBugReportEventTest {
                             TEST_REPORT_ULID,
                             TEST_REPORT_TITLE,
                             "",
-                            TEST_REPORT_IMAGE_PATH));
+                            TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_FILE_NAMES,
+                            TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATHS));
+
+            // then
+            assertThat(invalidValueException.getMessage()).contains("NOT_FOUND_REPORT");
+        }
+
+        @Test
+        @DisplayName("filenames가 null일 때 오류 발생")
+        void testCreate_givenNullFilenames_willThrowException() {
+            // given & when
+            InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () ->
+                    ProposalOrBugReportEvent.create(
+                            MEMBER_BASIC_USER_UUID,
+                            TEST_REPORT_ULID,
+                            TEST_REPORT_TITLE,
+                            TEST_REPORT_CONTENT,
+                            null,
+                            TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATHS));
+
+            // then
+            assertThat(invalidValueException.getMessage()).contains("NOT_FOUND_REPORT");
+        }
+
+        @Test
+        @DisplayName("imagePaths가 null일 때 오류 발생")
+        void testCreate_givenNullImagePaths_willThrowException() {
+            // given & when
+            InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () ->
+                    ProposalOrBugReportEvent.create(
+                            MEMBER_BASIC_USER_UUID,
+                            TEST_REPORT_ULID,
+                            TEST_REPORT_TITLE,
+                            TEST_REPORT_CONTENT,
+                            TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_FILE_NAMES,
+                            null));
 
             // then
             assertThat(invalidValueException.getMessage()).contains("NOT_FOUND_REPORT");

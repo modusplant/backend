@@ -1,19 +1,22 @@
 package kr.modusplant.framework.jpa.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.framework.jpa.generator.UlidGenerator;
+import kr.modusplant.framework.jpa.entity.record.FilenameAndSrcEntityRecord;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
 import static kr.modusplant.shared.persistence.constant.TableName.PROP_BUG_REP;
@@ -26,7 +29,6 @@ import static kr.modusplant.shared.persistence.constant.TableName.PROP_BUG_REP;
 @ToString
 public class PropBugRepEntity {
     @Id
-    @UlidGenerator
     @Column(nullable = false, updatable = false)
     private String ulid;
 
@@ -41,8 +43,13 @@ public class PropBugRepEntity {
     @Column(nullable = false, updatable = false, length = 600)
     private String content;
 
-    @Column(name = "image_path", updatable = false)
-    private String imagePath;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(updatable = false)
+    @ToString.Exclude
+    private List<FilenameAndSrcEntityRecord> image;
+
+    @Column(name = "image_number", updatable = false)
+    private Integer imageNumber;
 
     @Column(name = CHECKED_AT)
     private LocalDateTime checkedAt;
@@ -85,12 +92,20 @@ public class PropBugRepEntity {
         return new HashCodeBuilder(17, 37).append(getUlid()).toHashCode();
     }
 
-    private PropBugRepEntity(String ulid, SiteMemberEntity member, String title, String content, String imagePath, LocalDateTime checkedAt, LocalDateTime handledAt) {
+    private PropBugRepEntity(String ulid,
+                             SiteMemberEntity member,
+                             String title,
+                             String content,
+                             List<FilenameAndSrcEntityRecord> image,
+                             Integer imageNumber,
+                             LocalDateTime checkedAt,
+                             LocalDateTime handledAt) {
         this.ulid = ulid;
         this.member = member;
         this.title = title;
         this.content = content;
-        this.imagePath = imagePath;
+        this.image = image;
+        this.imageNumber = imageNumber;
         this.checkedAt = checkedAt;
         this.handledAt = handledAt;
     }
@@ -104,7 +119,8 @@ public class PropBugRepEntity {
         private SiteMemberEntity member;
         private String title;
         private String content;
-        private String imagePath;
+        private List<FilenameAndSrcEntityRecord> image;
+        private Integer imageNumber;
         private LocalDateTime checkedAt;
         private LocalDateTime handledAt;
 
@@ -128,8 +144,13 @@ public class PropBugRepEntity {
             return this;
         }
 
-        public PropBugRepEntityBuilder imagePath(final String imagePath) {
-            this.imagePath = imagePath;
+        public PropBugRepEntityBuilder image(final List<FilenameAndSrcEntityRecord> image) {
+            this.image = image;
+            return this;
+        }
+
+        public PropBugRepEntityBuilder imageNumber(final Integer imageNumber) {
+            this.imageNumber = imageNumber;
             return this;
         }
 
@@ -148,14 +169,15 @@ public class PropBugRepEntity {
             this.member = propBugRep.getMember();
             this.title = propBugRep.getTitle();
             this.content = propBugRep.getContent();
-            this.imagePath = propBugRep.getImagePath();
+            this.image = propBugRep.getImage();
+            this.imageNumber = propBugRep.getImageNumber();
             this.checkedAt = propBugRep.getCheckedAt();
             this.handledAt = propBugRep.getHandledAt();
             return this;
         }
 
         public PropBugRepEntity build() {
-            return new PropBugRepEntity(this.ulid, this.member, this.title, this.content, this.imagePath, this.checkedAt, this.handledAt);
+            return new PropBugRepEntity(this.ulid, this.member, this.title, this.content, this.image, this.imageNumber, this.checkedAt, this.handledAt);
         }
     }
 }

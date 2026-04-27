@@ -7,7 +7,6 @@ import lombok.Getter;
 
 @Getter
 public class EmptyMemberProfileImage extends MemberProfileImage {
-
     public EmptyMemberProfileImage() {
         super(EmptyMemberProfileImagePath.create(), EmptyMemberProfileImageBytes.create());
     }

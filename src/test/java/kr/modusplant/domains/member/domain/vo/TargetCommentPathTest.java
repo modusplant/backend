@@ -39,7 +39,7 @@ class TargetCommentPathTest {
     void testCreate_givenInvalidId_willThrowException() {
         InvalidValueException exception = assertThrows(InvalidValueException.class, () -> TargetCommentPath.create("!유효하지않음!"));
         assertThat(exception.getErrorCode()).isEqualTo(INVALID_TARGET_COMMENT_PATH);
-        assertThat(exception.getValueName()).isEqualTo("targetCommentPath");
+        assertThat(exception.getValueNames()).contains("targetCommentPath");
     }
 
     @Test
