@@ -58,7 +58,7 @@ public class FcmSender {
     private String buildBody(Notification notification) {
         String nickname = notification.getActor().getNickname();
         return switch (notification.getAction().getAction()) {
-            case POST_LIKED -> "내 게시글이 좋아요를 받았어요";
+            case POST_LIKED -> "내 게시글이 좋아요를 받았어요.";
             case COMMENT_LIKED -> "내 댓글이 좋아요를 받았어요.";
             case COMMENT_ADDED, COMMENT_REPLY_ADDED -> nickname + "님이 댓글을 달았어요.";
         };
