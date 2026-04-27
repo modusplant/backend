@@ -142,7 +142,7 @@ public class CommentController {
             // 예시: 경로가 1.2.1인 댓글을 등록하려면 경로가 1.2인 댓글이 있어야 함
             String parentCommentPath = path.substring(0, lastDotIndex);
             if (lastNumOfPath.equals("1") && !readRepository.existsByPostAndPath(commentPost, CommentPath.create(parentCommentPath))) {
-                throw new InvalidValueException(CommentErrorCode.NOT_EXIST_PARENT_COMMENT);
+                throw new InvalidValueException(CommentErrorCode.NOT_EXIST_PARENT_COMMENT, "commentPath");
             }
 
             // 그 외의 경우 경로의 마지막 숫자 -1을 한 경로의 댓글이 있어야 댓글 등록 가능
@@ -150,20 +150,20 @@ public class CommentController {
             String siblingPathLastNum = String.valueOf(Integer.parseInt(lastNumOfPath) - 1);
             String siblingCommentPath = path.substring(0, lastDotIndex + 1).concat(siblingPathLastNum);
             if (1 < Integer.parseInt(lastNumOfPath) && !readRepository.existsByPostAndPath(commentPost, CommentPath.create(siblingCommentPath))) {
-                throw new InvalidValueException(CommentErrorCode.NOT_EXIST_SIBLING_COMMENT);
+                throw new InvalidValueException(CommentErrorCode.NOT_EXIST_SIBLING_COMMENT, "commentPath");
             }
             
         } else {
             // 댓글 경로가 1인 경우 게시글에 댓글이 없어야 등록 가능
             if(path.equals("1")) {
                 if (!(readRepository.countPostComment(commentPost) == 0)) {
-                    throw new InvalidValueException(CommentErrorCode.EXIST_POST_COMMENT);
+                    throw new InvalidValueException(CommentErrorCode.EXIST_POST_COMMENT, "commentPath");
                 }
             } else {
                 // 댓글 경로에 .가 없고 1이 아닌 경우, 형제 댓글이 있어야 등록 가능
                 String siblingCommentPath = String.valueOf(Integer.parseInt(path) - 1);
                 if (!(readRepository.existsByPostAndPath(commentPost, CommentPath.create(siblingCommentPath)))) {
-                    throw new InvalidValueException(CommentErrorCode.NOT_EXIST_SIBLING_COMMENT);
+                    throw new InvalidValueException(CommentErrorCode.NOT_EXIST_SIBLING_COMMENT, "commentPath");
                 }
             }
         }

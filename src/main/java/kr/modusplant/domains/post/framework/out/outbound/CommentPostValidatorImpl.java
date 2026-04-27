@@ -15,12 +15,11 @@ public class CommentPostValidatorImpl implements CommentPostValidator {
 
     @Override
     public boolean isPostPublished(String postId) {
-        Boolean result = dsl.select(commPost.IS_PUBLISHED)
-                .from(commPost)
-                .where(commPost.ULID.eq(postId))
-                .fetchOne(commPost.IS_PUBLISHED);
-
-        return Boolean.TRUE.equals(result);
+        return postId != null && Boolean.TRUE.equals(
+                dsl.select(commPost.IS_PUBLISHED)
+                        .from(commPost)
+                        .where(commPost.ULID.eq(postId))
+                        .fetchOne(commPost.IS_PUBLISHED)
+        );
     }
-
 }
