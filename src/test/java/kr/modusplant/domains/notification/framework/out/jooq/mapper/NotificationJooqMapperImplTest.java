@@ -30,10 +30,10 @@ class NotificationJooqMapperImplTest {
         given(record.get(COMM_NOTIFICATION.RECIPIENT_ID)).willReturn(TEST_NOTIFICATION_RECIPIENT_ID);
         given(record.get(COMM_NOTIFICATION.ACTOR_ID)).willReturn(TEST_NOTIFICATION_ACTOR_ID);
         given(record.get(COMM_NOTIFICATION.ACTOR_NICKNAME)).willReturn(TEST_NOTIFICATION_ACTOR_NICKNAME);
-        given(record.get(COMM_NOTIFICATION.ACTION)).willReturn(NotificationActionType.COMMENT_ADDED.getValue());
+        given(record.get(COMM_NOTIFICATION.ACTION)).willReturn(NotificationActionType.COMMENT_ADDED.name());
         given(record.get(COMM_NOTIFICATION.STATUS)).willReturn(NotificationStatusType.UNREAD.name());
         given(record.get(COMM_NOTIFICATION.POST_ULID)).willReturn(TEST_NOTIFICATION_POST_ULID);
-        given(record.get(COMM_NOTIFICATION.COMMENT_PATH)).willReturn(TEST_NOTIFICATION_COMMENT_PATH);
+        given(record.get(COMM_NOTIFICATION.COMMENT_PATH)).willReturn(TEST_NOTIFICATION_COMMENT_PATH_DEPTH3);
         given(record.get(COMM_NOTIFICATION.CONTENT_PREVIEW)).willReturn(TEST_NOTIFICATION_POST_PREVIEW);
         given(record.get(COMM_NOTIFICATION.CREATED_AT)).willReturn(createdAt);
 
@@ -50,7 +50,7 @@ class NotificationJooqMapperImplTest {
                 .hasFieldOrPropertyWithValue("action", NotificationActionType.COMMENT_ADDED)
                 .hasFieldOrPropertyWithValue("status", NotificationStatusType.UNREAD)
                 .hasFieldOrPropertyWithValue("postUlid", TEST_NOTIFICATION_POST_ULID)
-                .hasFieldOrPropertyWithValue("commentPath", TEST_NOTIFICATION_COMMENT_PATH)
+                .hasFieldOrPropertyWithValue("commentPath", TEST_NOTIFICATION_COMMENT_PATH_DEPTH3)
                 .hasFieldOrPropertyWithValue("contentPreview", TEST_NOTIFICATION_POST_PREVIEW)
                 .hasFieldOrPropertyWithValue("createdAt", createdAt);
     }

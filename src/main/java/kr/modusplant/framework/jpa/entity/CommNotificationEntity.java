@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -61,7 +60,6 @@ public class CommNotificationEntity {
     private String contentPreview;
 
     @Column(name = CREATED_AT, nullable = false, updatable = false)
-    @CreatedDate
     private LocalDateTime createdAt;
 
     public void read() {
@@ -80,7 +78,7 @@ public class CommNotificationEntity {
         return new HashCodeBuilder(17,37).append(getUlid()).toHashCode();
     }
 
-    private CommNotificationEntity(String ulid, SiteMemberEntity recipient, UUID actorId, String actorNickname, NotificationActionType action, NotificationStatusType status, String postUlid, String commentPath, String contentPreview) {
+    private CommNotificationEntity(String ulid, SiteMemberEntity recipient, UUID actorId, String actorNickname, NotificationActionType action, NotificationStatusType status, String postUlid, String commentPath, String contentPreview, LocalDateTime createdAt) {
         this.ulid = ulid;
         this.recipient = recipient;
         this.actorId = actorId;
@@ -90,6 +88,7 @@ public class CommNotificationEntity {
         this.postUlid = postUlid;
         this.commentPath = commentPath;
         this.contentPreview = contentPreview;
+        this.createdAt = createdAt;
     }
 
     public static NotificationBuilder builder() {
@@ -106,6 +105,7 @@ public class CommNotificationEntity {
         private String postUlid;
         private String commentPath;
         private String contentPreview;
+        private LocalDateTime createdAt;
 
         public NotificationBuilder ulid(final String ulid) {
             this.ulid = ulid;
@@ -152,6 +152,11 @@ public class CommNotificationEntity {
             return this;
         }
 
+        public NotificationBuilder createdAt(final LocalDateTime createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
         public NotificationBuilder notification(final CommNotificationEntity commNotificationEntity) {
             this.ulid = commNotificationEntity.ulid;
             this.recipient = commNotificationEntity.recipient;
@@ -162,11 +167,12 @@ public class CommNotificationEntity {
             this.postUlid = commNotificationEntity.postUlid;
             this.commentPath = commNotificationEntity.commentPath;
             this.contentPreview = commNotificationEntity.contentPreview;
+            this.createdAt = commNotificationEntity.createdAt;
             return this;
         }
 
         public CommNotificationEntity build() {
-            return new CommNotificationEntity(this.ulid,this.recipient,this.actorId, this.actorNickname, this.action,this.status,this.postUlid,this.commentPath,this.contentPreview);
+            return new CommNotificationEntity(this.ulid,this.recipient,this.actorId, this.actorNickname, this.action,this.status,this.postUlid,this.commentPath,this.contentPreview,this.createdAt);
         }
 
     }

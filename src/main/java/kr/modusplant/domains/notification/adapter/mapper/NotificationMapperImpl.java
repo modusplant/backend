@@ -1,10 +1,13 @@
 package kr.modusplant.domains.notification.adapter.mapper;
 
+import kr.modusplant.domains.notification.domain.aggregate.Notification;
+import kr.modusplant.domains.notification.domain.vo.*;
 import kr.modusplant.domains.notification.usecase.port.mapper.NotificationMapper;
 import kr.modusplant.domains.notification.usecase.record.NotificationReadModel;
 import kr.modusplant.domains.notification.usecase.response.NotificationResponse;
 import kr.modusplant.shared.enums.ContentType;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.modeler.NotificationInfo;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -24,6 +27,32 @@ public class NotificationMapperImpl implements NotificationMapper {
                 resolveContentType(readModel).getValue(),
                 readModel.contentPreview(),
                 readModel.createdAt()
+        );
+    }
+
+    @Override
+    public Notification toPostNotification(RecipientId recipientId, Actor actor, NotificationAction action, PostId postId, ContentPreview contentPreview) {
+        return Notification.createInitial(
+                recipientId,
+                actor,
+                action,
+                NotificationStatus.unread(),
+                postId,
+                null,
+                contentPreview
+        );
+    }
+
+    @Override
+    public Notification toCommentNotification(RecipientId recipientId, Actor actor, NotificationAction action, PostId postId, CommentPath commentPath, ContentPreview contentPreview) {
+        return Notification.createInitial(
+                recipientId,
+                actor,
+                action,
+                NotificationStatus.unread(),
+                postId,
+                commentPath,
+                contentPreview
         );
     }
 

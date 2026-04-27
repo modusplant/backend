@@ -85,6 +85,11 @@ cloud:
       secret-key: ${WASABI_SECRET_KEY}
       bucket: ${WASABI_BUCKET}
 
+# Firebase
+firebase:
+  credentials:
+    json: ${FIREBASE_CREDENTIALS_JSON}
+
 # Monitoring
 management:
   server:

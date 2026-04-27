@@ -3,8 +3,8 @@ package kr.modusplant.domains.notification.common.util.domain.vo;
 
 import kr.modusplant.domains.notification.domain.vo.CommentPath;
 
-import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.TEST_NOTIFICATION_COMMENT_PATH;
+import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.TEST_NOTIFICATION_COMMENT_PATH_DEPTH3;
 
 public interface CommentPathTestUtils {
-    CommentPath testCommentPath = CommentPath.create(TEST_NOTIFICATION_COMMENT_PATH);
+    CommentPath testCommentPath = CommentPath.create(TEST_NOTIFICATION_COMMENT_PATH_DEPTH3);
 }

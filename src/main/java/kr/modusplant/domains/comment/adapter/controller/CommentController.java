@@ -24,11 +24,13 @@ import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.swear.service.SwearService;
+import kr.modusplant.shared.event.CommentNotificationEvent;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.persistence.compositekey.CommCommentId;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -50,6 +52,7 @@ public class CommentController {
 
     private final CommentPostValidator postValidator;
     private final CommentCacheService cacheService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     public CommentCacheData getCacheData(String postUlid, String ifNoneMatch, String ifModifiedSince) {
@@ -107,6 +110,10 @@ public class CommentController {
                 Author.create(currentMemberUuid),
                 CommentContent.create(swearService.filterSwear(request.content())));
         writeRepository.save(comment);
+
+        applicationEventPublisher.publishEvent(
+                CommentNotificationEvent.create(currentMemberUuid, request.postId(), request.path(), request.content())
+        );
     }
 
     @Transactional

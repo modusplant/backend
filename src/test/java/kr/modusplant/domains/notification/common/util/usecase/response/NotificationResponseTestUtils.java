@@ -45,7 +45,7 @@ public interface NotificationResponseTestUtils {
             NotificationActionType.COMMENT_LIKED.name(),
             NotificationStatusType.READ.getValue(),
             TEST_NOTIFICATION_POST_ULID,
-            TEST_NOTIFICATION_COMMENT_PATH,
+            TEST_NOTIFICATION_COMMENT_PATH_DEPTH3,
             ContentType.COMMENT.getValue(),
             TEST_NOTIFICATION_COMMENT_PREVIEW,
             testDate
@@ -58,7 +58,7 @@ public interface NotificationResponseTestUtils {
             NotificationActionType.COMMENT_ADDED.name(),
             NotificationStatusType.UNREAD.getValue(),
             TEST_NOTIFICATION_POST_ULID,
-            TEST_NOTIFICATION_COMMENT_PATH,
+            TEST_NOTIFICATION_COMMENT_PATH_DEPTH3,
             ContentType.COMMENT.getValue(),
             TEST_NOTIFICATION_COMMENT_PREVIEW,
             testDate

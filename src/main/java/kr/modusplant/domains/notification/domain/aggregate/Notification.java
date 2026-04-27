@@ -1,8 +1,8 @@
 package kr.modusplant.domains.notification.domain.aggregate;
 
+import kr.modusplant.domains.notification.domain.exception.EmptyValueException;
 import kr.modusplant.domains.notification.domain.exception.enums.NotificationErrorCode;
 import kr.modusplant.domains.notification.domain.vo.*;
-import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class Notification {
     private final NotificationId notificationId;
     private RecipientId recipientId;
-    private ActorId actorId;
+    private Actor actor;
     private NotificationAction action;
     private NotificationStatus status;
     private PostId postId;
@@ -24,13 +24,39 @@ public class Notification {
     private ContentPreview contentPreview;
     private LocalDateTime createdAt;
 
-    public static Notification create(NotificationId notificationId, RecipientId recipientId, ActorId actorId, NotificationAction action, NotificationStatus status, PostId postId, CommentPath commentPath, ContentPreview contentPreview) {
+    public static Notification create(NotificationId notificationId, RecipientId recipientId, Actor actor, NotificationAction action, NotificationStatus status, PostId postId, CommentPath commentPath, ContentPreview contentPreview, LocalDateTime dateTime) {
         if (notificationId == null) {
             throw new EmptyValueException(NotificationErrorCode.EMPTY_NOTIFICATION_ID);
-        } else if (recipientId == null) {
+        }
+        if (recipientId == null) {
             throw new EmptyValueException(NotificationErrorCode.EMPTY_RECIPIENT_ID);
-        } else if (actorId == null) {
-            throw new EmptyValueException(NotificationErrorCode.EMPTY_ACTOR_ID);
+        }
+        if (actor == null) {
+            throw new EmptyValueException(NotificationErrorCode.EMPTY_ACTOR);
+        }
+        if (action == null) {
+            throw new EmptyValueException(NotificationErrorCode.EMPTY_NOTIFICATION_ACTION);
+        }
+        if (status == null) {
+            throw new EmptyValueException(NotificationErrorCode.EMPTY_NOTIFICATION_STATUS);
+        }
+        if (postId == null) {
+            throw new EmptyValueException(NotificationErrorCode.EMPTY_POST_ID);
+        }
+        if (action.isCommentRelatedAction() && commentPath == null) {
+            throw new EmptyValueException(NotificationErrorCode.EMPTY_COMMENT_PATH);
+        }
+        if (dateTime == null) {
+            throw new EmptyValueException(NotificationErrorCode.EMPTY_CREATED_AT);
+        }
+        return new Notification(notificationId, recipientId, actor, action, status, postId, commentPath, contentPreview, dateTime);
+    }
+
+    public static Notification createInitial(RecipientId recipientId, Actor actor, NotificationAction action, NotificationStatus status, PostId postId, CommentPath commentPath, ContentPreview contentPreview) {
+        if (recipientId == null) {
+            throw new EmptyValueException(NotificationErrorCode.EMPTY_RECIPIENT_ID);
+        } else if (actor == null) {
+            throw new EmptyValueException(NotificationErrorCode.EMPTY_ACTOR);
         } else if (action == null) {
             throw new EmptyValueException(NotificationErrorCode.EMPTY_NOTIFICATION_ACTION);
         } else if (status == null) {
@@ -40,7 +66,7 @@ public class Notification {
         } else if (action.isCommentRelatedAction() && commentPath == null) {
             throw new EmptyValueException(NotificationErrorCode.EMPTY_COMMENT_PATH);
         }
-        return new Notification(notificationId, recipientId, actorId, action, status, postId, commentPath, contentPreview, LocalDateTime.now());
+        return new Notification(null, recipientId, actor, action, status, postId, commentPath, contentPreview, LocalDateTime.now());
     }
 
     public void read() {

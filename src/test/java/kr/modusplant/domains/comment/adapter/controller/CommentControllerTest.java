@@ -34,6 +34,7 @@ import kr.modusplant.shared.persistence.constant.TableName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -64,8 +65,9 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     private final SwearService swearService = Mockito.mock(SwearService.class);
     private final CommentPostValidator postValidator = Mockito.mock(CommentPostValidator.class);
     private final CommentCacheService cacheService = Mockito.mock(CommentCacheService.class);
+    private final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
     private final CommentController controller = new CommentController(mapper, readRepository,
-            writeRepository, postJpaRepository, memberJpaRepository, swearService, postValidator, cacheService);
+            writeRepository, postJpaRepository, memberJpaRepository, swearService, postValidator, cacheService, applicationEventPublisher);
 
     private final String testIfNoneMatch = "\"abc123\"";
     private final String testIfModifiedSince = "Sat, 01 Jan 2025 00:00:00 GMT";
