@@ -95,7 +95,7 @@ public class PostController {
                         (lastUlid != null && lastPublishedAt != null) ||
                                 (lastUlid == null && lastPublishedAt == null)
                 )) {
-            throw new InvalidValueException(GeneralErrorCode.INVALID_INPUT, "lastUlid", "lastPublishedAt");
+            throw new InvalidValueException(GeneralErrorCode.INVALID_INPUT, List.of("lastUlid", "lastPublishedAt"));
         } else if (postSearchRequest.sort().equals(SearchSort.RELEVANCE) &&
                 !(
                         (lastUlid != null && lastImportance != null &&
@@ -104,7 +104,7 @@ public class PostController {
                                         lastWordSimilarity == null && lastPublishedAt == null)
                 )) {
             throw new InvalidValueException(GeneralErrorCode.INVALID_INPUT,
-                    "lastUlid", "lastImportance", "lastWordSimilarity", "lastPublishedAt");
+                    List.of("lastUlid", "lastImportance", "lastWordSimilarity", "lastPublishedAt"));
         }
 
         List<PostSummaryWithSearchInfoReadModel> readModels;

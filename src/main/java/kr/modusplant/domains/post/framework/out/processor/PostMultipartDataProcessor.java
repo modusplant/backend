@@ -4,15 +4,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import kr.modusplant.domains.post.framework.out.processor.enums.FileType;
-import kr.modusplant.domains.post.framework.out.processor.exception.*;
+import kr.modusplant.domains.post.framework.out.processor.enums.PostFileType;
+import kr.modusplant.domains.post.framework.out.processor.exception.EmptyThumbnailException;
+import kr.modusplant.domains.post.framework.out.processor.exception.InvalidThumbnailException;
+import kr.modusplant.domains.post.framework.out.processor.exception.TextFileOverLengthException;
+import kr.modusplant.domains.post.framework.out.processor.exception.ThumbnailNotAllowedException;
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
 import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
 import kr.modusplant.domains.post.usecase.request.FileOrder;
 import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
-import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
-import org.hibernate.generator.EventType;
+import kr.modusplant.shared.exception.FileLimitExceededException;
+import kr.modusplant.shared.exception.InvalidFileInputException;
+import kr.modusplant.shared.exception.UnsupportedFileException;
+import kr.modusplant.shared.generator.RandomUlidGenerator;
+import kr.modusplant.shared.generator.UlidGeneratorHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,22 +30,26 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static kr.modusplant.domains.post.framework.out.processor.constant.FileConstraints.*;
+import static kr.modusplant.domains.post.framework.out.processor.constant.PostFileConstraints.*;
 
 @Service
-public class MultipartDataProcessor implements MultipartDataProcessorPort {
+public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
     private final S3FileService s3FileService;
-    private static final UlidIdGenerator generator = new UlidIdGenerator();
     public static final String DATA = "data";
     public static final String FILENAME = "filename";
     public static final String ORDER = "order";
     public static final String SRC = "src";
     public static final String TYPE = "type";
+    public static final int MAX_TEXT_LENGTH = 5000;
     private final ObjectMapper objectMapper;
+    private final RandomUlidGenerator generator;
 
-    public MultipartDataProcessor(S3FileService s3FileService, ObjectMapperHolder objectMapperHolder) {
+    public PostMultipartDataProcessor(S3FileService s3FileService,
+                                      ObjectMapperHolder objectMapperHolder,
+                                      UlidGeneratorHolder ulidGeneratorHolder) {
         this.s3FileService = s3FileService;
         this.objectMapper = objectMapperHolder.getObjectMapper();
+        this.generator = ulidGeneratorHolder.getUlidGenerator();
     }
 
     public ContentProcessRecord saveFilesAndGenerateContentJson(List<MultipartFile> parts, List<FileOrder> orderInfo, String thumbnailFilename) throws IOException {
@@ -49,10 +59,10 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
         List<MultipartFile> orderedParts = reorderParts(parts, orderInfo);
         List<FileOrder> sortedOrderInfo = orderInfo.stream()
                 .sorted(Comparator.comparing(FileOrder::order))
-                .collect(Collectors.toList());
+                .toList();
 
         // 멀티파트 파일 저장 및 json 변환
-        String fileUlid = generator.generate(null, null, null, EventType.INSERT);
+        String fileUlid = generator.generate();
         ArrayNode contentArray = objectMapper.createArrayNode();
         String thumbnailPath = null;
         for (int i=0; i<orderedParts.size(); i++) {
@@ -63,7 +73,7 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
 
             String filename = part.getOriginalFilename();
             if (thumbnailFilename != null && thumbnailFilename.equals(filename)) {
-                if (node.has(SRC) && FileType.IMAGE.getValue().equals(node.get(TYPE).asText())) {
+                if (node.has(SRC) && PostFileType.IMAGE.getValue().equals(node.get(TYPE).asText())) {
                     thumbnailPath = node.get(SRC).asText();
                 }
             }
@@ -90,7 +100,7 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
         ArrayNode newArray = objectMapper.createArrayNode();
 
         for (JsonNode node : content) {
-            if (node.has(TYPE) && FileType.TEXT.getValue().equals(node.get(TYPE).asText())) {
+            if (node.has(TYPE) && PostFileType.TEXT.getValue().equals(node.get(TYPE).asText())) {
                 ObjectNode textNode = objectMapper.createObjectNode();
                 textNode.put(TYPE,node.get(TYPE).asText());
                 textNode.put(DATA,node.get(DATA).asText());
@@ -101,7 +111,7 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
 
         if (thumbnailPath != null && !thumbnailPath.isBlank()) {
             ObjectNode thumbnailNode = objectMapper.createObjectNode();
-            thumbnailNode.put(TYPE, FileType.IMAGE.getValue());
+            thumbnailNode.put(TYPE, PostFileType.IMAGE.getValue());
             thumbnailNode.put(SRC, s3FileService.generateS3SrcUrl(thumbnailPath));
             newArray.add(thumbnailNode);
         }
@@ -139,12 +149,12 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
         }
 
         // orderInfo의 order 정보 검증 (order가 순차적으로 증가하는지)
-        List<FileOrder>  sortedorderInfo = orderInfo.stream()
+        List<FileOrder>  sortedOrderInfo = orderInfo.stream()
                 .sorted(Comparator.comparing(FileOrder::order))
-                .collect(Collectors.toList());
+                .toList();
         int zeroCount = 0;
         int expectedOrder = 1;
-        for (FileOrder info : sortedorderInfo) {
+        for (FileOrder info : sortedOrderInfo) {
             int order = info.order();
             if (order == 0) {
                 zeroCount++;
@@ -152,7 +162,7 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
                     throw new InvalidFileInputException();
                 }
                 MultipartFile part = partMap.get(info.filename());
-                if (FileType.from(part.getContentType()) != FileType.TEXT) {
+                if (PostFileType.from(part.getContentType()) != PostFileType.TEXT) {
                     throw new InvalidFileInputException();
                 }
             } else {
@@ -164,13 +174,13 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
         }
 
         // thumbnailFilename가 실제로 존재하는 이미지 파일명인지 검증
-        boolean hasImage = parts.stream().anyMatch(part -> FileType.from(part.getContentType()) == FileType.IMAGE);
+        boolean hasImage = parts.stream().anyMatch(part -> PostFileType.from(part.getContentType()) == PostFileType.IMAGE);
         if (hasImage) {
             if (thumbnailFilename == null) {
                 throw new EmptyThumbnailException();
             }
             MultipartFile thumbnailPart = partMap.get(thumbnailFilename);
-            if (thumbnailPart == null || FileType.from(thumbnailPart.getContentType()) != FileType.IMAGE) {
+            if (thumbnailPart == null || PostFileType.from(thumbnailPart.getContentType()) != PostFileType.IMAGE) {
                 throw new InvalidThumbnailException();
             }
         } else {    // 이미지 파일이 존재하지 않을때 대표 사진 지정 시 예외 처리
@@ -193,24 +203,32 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
             String originalFilename = part.getOriginalFilename();
             long fileSize = part.getSize();
             // text이면 제외
-            if (FileType.from(contentType) == FileType.TEXT) {
+            if (PostFileType.from(contentType) == PostFileType.TEXT) {
+                try {
+                    String text = new String(part.getBytes(), StandardCharsets.UTF_8);
+                    if (text.length() > MAX_TEXT_LENGTH) {
+                        throw new TextFileOverLengthException();
+                    }
+                } catch (IOException e) {
+                    throw new InvalidFileInputException();
+                }
                 continue;
             }
 
             // 지원하는 파일 타입인지 검증
             String extension = extractExtension(originalFilename);
-            FileType actualFileType = FileType.fromExtension(extension);
-            if (actualFileType == FileType.UNKNOWN || !actualFileType.hasExtensionRestriction()) {
+            PostFileType actualFileType = PostFileType.fromExtension(extension);
+            if (actualFileType == PostFileType.UNKNOWN || !actualFileType.hasExtensionRestriction()) {
                 throw new UnsupportedFileException();
             }
 
             // 파일 개수 및 크기 검증
-            if (actualFileType == FileType.IMAGE) {
+            if (actualFileType == PostFileType.IMAGE) {
                 imageCount++;
                 if (imageCount > MAX_IMAGE_FILES || fileSize > MAX_IMAGE_SIZE) {
                     throw new FileLimitExceededException();
                 }
-            } else if (actualFileType == FileType.VIDEO) {
+            } else if (actualFileType == PostFileType.VIDEO) {
                 videoCount++;
                 if (videoCount > MAX_VIDEO_FILES || fileSize > MAX_VIDEO_SIZE) {
                     throw new FileLimitExceededException();
@@ -252,9 +270,9 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
         node.put(FILENAME, filename);
         node.put(ORDER, order);
 
-        FileType fileType = FileType.from(contentType);
+        PostFileType fileType = PostFileType.from(contentType);
 
-        if (fileType == FileType.TEXT) {
+        if (fileType == PostFileType.TEXT) {
             String text = new String(part.getBytes(), StandardCharsets.UTF_8);
             node.put(TYPE, fileType.getValue());
             node.put(DATA, text);
@@ -269,7 +287,7 @@ public class MultipartDataProcessor implements MultipartDataProcessorPort {
         return node;
     }
 
-    private String generateFileKey(String fileUlid, FileType fileType, String originalFilename, int order) {
+    private String generateFileKey(String fileUlid, PostFileType fileType, String originalFilename, int order) {
         if (originalFilename == null) {
             throw new UnsupportedFileException();
         }

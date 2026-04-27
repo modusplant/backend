@@ -3,6 +3,7 @@ package kr.modusplant.infrastructure.persistence.generator;
 import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -19,14 +20,28 @@ class UlidIdGeneratorTest {
     private static final UlidIdGenerator generator = new UlidIdGenerator();
     private static final Pattern ULID_PATTERN = Pattern.compile("^[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{26}$", Pattern.CASE_INSENSITIVE);
 
-    @Test
+    @Nested
     @DisplayName("UlidIdGenerator가 올바른 형식의 ULID를 생성")
-    void generateUlid_givenValidGenerator_willReturnUlid() {
-        // Given & When
-        String ulid = generator.generate(null, null, null, EventType.INSERT);
+    class GenerateUlidTest {
+        @Test
+        @DisplayName("UlidIdGenerator가 generate()로 올바른 형식의 ULID를 생성")
+        void generateUlid_givenGenerateWithNoParam_willReturnUlid() {
+            // Given & When
+            String ulid = generator.generate();
 
-        // Then
-        assertTrue(ULID_PATTERN.matcher(ulid).matches());
+            // Then
+            assertTrue(ULID_PATTERN.matcher(ulid).matches());
+        }
+
+        @Test
+        @DisplayName("UlidIdGenerator가 generate(4개의 매개변수)로 올바른 형식의 ULID를 생성")
+        void generateUlid_givenGenerateWithFourParams_willReturnUlid() {
+            // Given & When
+            String ulid = generator.generate(null, null, null, EventType.INSERT);
+
+            // Then
+            assertTrue(ULID_PATTERN.matcher(ulid).matches());
+        }
     }
 
     @Test

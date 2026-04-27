@@ -9,6 +9,7 @@ import org.jooq.DSLContext;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.UUID;
 
 import static kr.modusplant.jooq.Tables.COMM_NOTIFICATION;
@@ -36,7 +37,7 @@ public class NotificationTestDataHelper {
                 .set(COMM_NOTIFICATION.ACTOR_ID, actorId)
                 .set(COMM_NOTIFICATION.ACTOR_NICKNAME, actorNickname)
                 .set(COMM_NOTIFICATION.ACTION, action.getValue())
-                .set(COMM_NOTIFICATION.STATUS, status.getValue().toUpperCase())
+                .set(COMM_NOTIFICATION.STATUS, status.getValue().toUpperCase(Locale.ROOT))
                 .set(COMM_NOTIFICATION.POST_ULID, postUlid)
                 .set(COMM_NOTIFICATION.COMMENT_PATH, commentPath)
                 .set(COMM_NOTIFICATION.CONTENT_PREVIEW, contentPreview)

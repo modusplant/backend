@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.util.Set;
 
 @Getter
-public enum FileType {
+public enum PostFileType {
     TEXT("text",false, Set.of("txt")),
     IMAGE("image",true, Set.of("jpeg", "jpg", "png", "heif", "gif")),
     VIDEO("video",true, Set.of("mp4", "mov", "wmv", "avi")),
@@ -17,13 +17,13 @@ public enum FileType {
     private final Boolean uploadable;
     private final Set<String> allowedExtensions;
 
-    FileType(String value, Boolean uploadable, Set<String> allowedExtensions) {
+    PostFileType(String value, Boolean uploadable, Set<String> allowedExtensions) {
         this.value = value;
         this.uploadable = uploadable;
         this.allowedExtensions = allowedExtensions;
     }
 
-    public static FileType from(String contentType) {
+    public static PostFileType from(String contentType) {
         if (contentType == null || contentType.isBlank()) {
             return UNKNOWN;
         }
@@ -31,7 +31,7 @@ public enum FileType {
         if(type.equals("application"))
             type = "file";
 
-        for (FileType ft : values()) {
+        for (PostFileType ft : values()) {
             if (ft.value.equals(type)) {
                 return ft;
             }
@@ -39,12 +39,12 @@ public enum FileType {
         return UNKNOWN;
     }
 
-    public static FileType fromExtension(String extension) {
+    public static PostFileType fromExtension(String extension) {
         if (extension == null || extension.isBlank()) {
             return UNKNOWN;
         }
         String normalizedExtension = extension.toLowerCase();
-        for (FileType ft : values()) {
+        for (PostFileType ft : values()) {
             if (ft.allowedExtensions.contains(normalizedExtension)) {
                 return ft;
             }

@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import static java.util.Objects.requireNonNull;
+
 @NonNullApi
 @Component
 @RequiredArgsConstructor
@@ -33,7 +35,7 @@ public class ConnectionSizePropertyValidator implements SmartInitializingSinglet
 
         Integer maxConnections = jdbcTemplate.queryForObject("SHOW max_connections;", Integer.class);
 
-        if (maxPoolSize >= maxConnections) {
+        if (maxPoolSize >= requireNonNull(maxConnections).longValue()) {
             throw new ConfigurationException(ConfigurationErrorCode.INCORRECT_RELATIONSHIP_BETWEEN_CONNECTION_SIZE,
                     new String[]{"maxPoolSize", "maxConnections"});
         }

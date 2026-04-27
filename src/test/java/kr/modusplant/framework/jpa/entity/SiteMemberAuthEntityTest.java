@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_ACTIVE_MEMBER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
@@ -19,13 +19,13 @@ class SiteMemberAuthEntityTest implements SiteMemberAuthEntityTestUtils {
         testSiteMemberAuthEntity = createMemberAuthBasicUserEntityBuilder()
                 .member(createMemberBasicUserEntity())
                 .build();
-        ReflectionTestUtils.setField(testSiteMemberAuthEntity, "uuid", MEMBER_AUTH_BASIC_USER_ACTIVE_MEMBER_UUID);
+        ReflectionTestUtils.setField(testSiteMemberAuthEntity, "uuid", MEMBER_BASIC_USER_UUID);
     }
 
     @Test
     @DisplayName("getETagSource를 통해 ETag 소스 반환")
     void testGetETagSource_givenNothing_willReturnETagSource() {
-        assertEquals(testSiteMemberAuthEntity.getETagSource(),MEMBER_AUTH_BASIC_USER_ACTIVE_MEMBER_UUID + "-" + null);
+        assertEquals(testSiteMemberAuthEntity.getETagSource(), MEMBER_BASIC_USER_UUID + "-" + null);
     }
 
     @Test

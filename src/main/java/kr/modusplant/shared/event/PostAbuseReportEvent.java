@@ -5,6 +5,7 @@ import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
 
@@ -17,7 +18,7 @@ public class PostAbuseReportEvent {
     public static PostAbuseReportEvent create(UUID memberId, String postUlid) {
         if (memberId == null) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_MEMBER, "memberId");
-        } else if (postUlid.isEmpty()) {
+        } else if (StringUtils.isBlank(postUlid)) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_POST, "postUlid");
         } else {
             return new PostAbuseReportEvent(memberId, postUlid);

@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public class EmailIdentityJooqRepository implements EmailIdentityRepository {
 
@@ -23,10 +25,10 @@ public class EmailIdentityJooqRepository implements EmailIdentityRepository {
     }
 
     @Override
-    public boolean existsByEmailAndProvider(Email email) {
+    public boolean existsByEmailAndProvider(Email email, AuthProvider provider) {
         return dsl.selectOne()
                 .from(memberAuth)
-                .where(memberAuth.EMAIL.eq(email.getValue())).and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
+                .where(memberAuth.EMAIL.eq(email.getValue())).and(memberAuth.PROVIDER.eq(provider.name()))
                 .fetch()
                 .isNotEmpty();
     }
@@ -38,5 +40,14 @@ public class EmailIdentityJooqRepository implements EmailIdentityRepository {
                 .where(memberAuth.EMAIL.eq(email.getValue()))
                 .and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
                 .execute();
+    }
+
+    @Override
+    public Optional<AuthProvider> findProviderByEmail(Email email) {
+
+        return dsl.select(memberAuth.PROVIDER)
+                .from(memberAuth)
+                .where(memberAuth.EMAIL.eq(email.getValue()))
+                .fetchOptional(record -> AuthProvider.valueOf(record.get(memberAuth.PROVIDER)));
     }
 }

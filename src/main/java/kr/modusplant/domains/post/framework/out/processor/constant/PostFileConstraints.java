@@ -1,7 +1,7 @@
 package kr.modusplant.domains.post.framework.out.processor.constant;
 
-public final class FileConstraints {
-    private FileConstraints() {}
+public final class PostFileConstraints {
+    private PostFileConstraints() {}
 
     // 파일 개수 제한
     public static final int MAX_TOTAL_FILES = 10;

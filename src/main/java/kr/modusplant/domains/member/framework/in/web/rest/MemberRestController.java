@@ -6,14 +6,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import kr.modusplant.domains.member.adapter.controller.MemberController;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
 import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.domains.member.usecase.record.*;
+import kr.modusplant.domains.member.usecase.request.MemberWithdrawRequest;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -318,11 +319,11 @@ public class MemberRestController {
     @PostMapping(value = "/report/proposal-or-bug", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> reportProposalOrBug(
             @Parameter(description = "보고서 제목", example = "제보합니다!")
-            @RequestPart(name = "title")
+            @RequestParam
             String title,
 
             @Parameter(description = "보고서 내용", example = "이런 건의 사항을 드립니다.")
-            @RequestPart(name = "content")
+            @RequestParam
             String content,
 
             @Parameter(
@@ -330,13 +331,39 @@ public class MemberRestController {
                     schema = @Schema(type = "string", format = "binary")
             )
             @RequestPart(name = "image", required = false)
-            MultipartFile image,
+            List<MultipartFile> images,
+
+            @Parameter(description = "보고서 이미지 개수", example = "3")
+            @RequestParam(required = false)
+            @Max(value = 3, message = "보고서 이미지 개수는 1부터 3까지의 값이어야 합니다. ")
+            @Min(value = 1, message = "보고서 이미지 개수는 1부터 3까지의 값이어야 합니다. ")
+            Integer imageNumber,
 
             @Parameter(hidden = true)
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
             @AuthenticationPrincipal(expression = "uuid")
             UUID memberId) throws IOException {
-        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(memberId, title, content, image));
+        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(memberId, title, content, images, imageNumber));
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    // TODO: 관리자 API로 활용 요망
+    @Hidden
+    @Operation(
+            summary = "건의 및 버그 제보 제거 API",
+            description = "건의 사항 또는 버그 제보를 제거합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+//    @DeleteMapping(value = "/admin/report/proposal-or-bug/{reportUlid}")
+    public ResponseEntity<DataResponse<Void>> removeProposalOrBugReport(
+            @Parameter(
+                    description = "삭제할 보고서의 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
+            @PathVariable
+            @NotBlank(message = "보고서 식별자가 비어 있습니다.")
+            String reportUlid) {
+        memberController.removeProposalOrBug(new ProposalOrBugReportRemoveRecord(reportUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
@@ -439,28 +466,23 @@ public class MemberRestController {
             description = "회원을 탈퇴합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping("/members")
+    @PostMapping("/members")
     public ResponseEntity<DataResponse<Void>> withdrawMember(
-            @Parameter(
-                    description = "인증 코드",
-                    example = "BPAlKjanydCLdDnYdib6MQpDRwPG7hgqgWwECDwlr_jVWR6WpNeIbGlpBKIKKiVOAAABjE6Zt5qBPKUF0hG4dQ"
-            )
-            @RequestParam(required = false)
-            String authCode,
-
-            @Parameter(
-                    description = "인증 제공자",
-                    example = "kakao"
-            )
-            @RequestParam(required = false)
-            String authProvider,
+            @RequestBody @Valid
+            MemberWithdrawRequest request,
 
             @Parameter(hidden = true)
             @RequestHeader(name = HttpHeaders.AUTHORIZATION)
             @NotNull(message = "접근 토큰이 비어 있습니다. ")
             String auth) {
         String accessToken = getTokenFromAuthorizationHeader(auth);
-        memberController.withdraw(new MemberWithdrawalRecord(authCode, authProvider, accessToken));
+        memberController.withdraw(
+                new MemberWithdrawalRecord(
+                        request.authCode(),
+                        request.authProvider(),
+                        request.reason(),
+                        request.opinion(),
+                        accessToken));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 }

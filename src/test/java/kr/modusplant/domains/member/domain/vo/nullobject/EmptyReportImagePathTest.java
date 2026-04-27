@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
-import static kr.modusplant.domains.member.common.util.domain.vo.ReportImagePathTestUtils.testReportImagePath;
+import static kr.modusplant.domains.member.common.util.domain.vo.ReportImagePathTestUtils.testReportImagePath1;
 import static kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyReportImagePathTestUtils.testEmptyReportImagePath;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,7 +34,7 @@ class EmptyReportImagePathTest {
     @Test
     @DisplayName("ReportImagePath 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
-        assertNotEquals(testEmptyReportImagePath, testReportImagePath);
+        assertNotEquals(testEmptyReportImagePath, testReportImagePath1);
     }
 
     @Test

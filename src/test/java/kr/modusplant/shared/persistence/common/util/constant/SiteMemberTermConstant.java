@@ -3,20 +3,14 @@ package kr.modusplant.shared.persistence.common.util.constant;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_ADMIN_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.shared.util.VersionUtils.createVersion;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SiteMemberTermConstant {
-    public static final UUID MEMBER_TERM_ADMIN_UUID = MEMBER_BASIC_ADMIN_UUID;
     public static final String MEMBER_TERM_ADMIN_AGREED_TERMS_OF_USE_VERSION = createVersion(1, 0, 100);
     public static final String MEMBER_TERM_ADMIN_AGREED_PRIVACY_POLICY_VERSION = createVersion(2, 1, 102);
     public static final String MEMBER_TERM_ADMIN_AGREED_COMMUNITY_POLICY_VERSION = createVersion(3, 2, 104);
 
-    public static final UUID MEMBER_TERM_USER_UUID = MEMBER_BASIC_USER_UUID;
     public static final String MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION = createVersion(1, 1, 100);
     public static final String MEMBER_TERM_USER_AGREED_PRIVACY_POLICY_VERSION = createVersion(2, 2, 102);
     public static final String MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION = createVersion(3, 3, 104);

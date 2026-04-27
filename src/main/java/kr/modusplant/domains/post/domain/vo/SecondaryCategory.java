@@ -6,6 +6,7 @@ import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -20,7 +21,7 @@ public class SecondaryCategory {
     public static SecondaryCategory create(SecondaryCategoryId id, PrimaryCategoryId primaryCategoryId, String categoryName, int categoryOrder) {
         if (id == null || primaryCategoryId == null) {
             throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
-        }  else if (categoryName == null || categoryName.trim().isEmpty()) {
+        }  else if (StringUtils.isBlank(categoryName)) {
             throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_NAME);
         } else if (categoryOrder < 0) {
             throw new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ORDER);

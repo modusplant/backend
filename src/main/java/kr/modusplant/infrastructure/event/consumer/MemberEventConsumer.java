@@ -7,19 +7,22 @@ import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.MemberWithdrawalEvent;
 import org.jooq.DSLContext;
 import org.jooq.JSONB;
-import org.springframework.data.redis.connection.StringRedisConnection;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 import static kr.modusplant.jooq.Tables.*;
-import static org.jooq.impl.DSL.select;
-import static org.jooq.impl.DSL.val;
+import static org.jooq.impl.DSL.*;
 
 @Component
 public class MemberEventConsumer {
@@ -28,13 +31,14 @@ public class MemberEventConsumer {
     private final S3FileService s3FileService;
     private final JsonbJsonNodeConverter jsonbJsonNodeConverter = new JsonbJsonNodeConverter();
 
-    public MemberEventConsumer(EventBus eventBus,
-                               StringRedisTemplate stringRedisTemplate,
-                               DSLContext dsl,
-                               S3FileService s3FileService) {
+    public MemberEventConsumer(EventBus eventBus, StringRedisTemplate stringRedisTemplate, DSLContext dsl, S3FileService s3FileService) {
         eventBus.subscribe(event -> {
             if (event instanceof MemberWithdrawalEvent memberWithdrawalEvent) {
-                deleteAllWithMemberPKAndAlterAllWithMemberFK(memberWithdrawalEvent.getMemberId());
+                deleteAllWithMemberPKAndAlterAllWithMemberFK(
+                        memberWithdrawalEvent.getMemberId(),
+                        memberWithdrawalEvent.getReason(),
+                        memberWithdrawalEvent.getOpinion()
+                );
             }
         });
         this.stringRedisTemplate = stringRedisTemplate;
@@ -42,7 +46,7 @@ public class MemberEventConsumer {
         this.s3FileService = s3FileService;
     }
 
-    private void deleteAllWithMemberPKAndAlterAllWithMemberFK(UUID memberId) {
+    private void deleteAllWithMemberPKAndAlterAllWithMemberFK(UUID memberId, String reason, String opinion) {
         stringRedisTemplate.unlink("recentlyView:member:%s:posts".formatted(memberId));     // 최근에 본 게시글 데이터 삭제
 
         String[] publishedPostUlids = dsl.select(COMM_POST.ULID)    // 발행되어 타 회원이 접근할 수 있는 게시글 ID 획득
@@ -51,39 +55,10 @@ public class MemberEventConsumer {
                 .and(COMM_POST.IS_PUBLISHED.isTrue())
                 .fetchInto(String.class).toArray(new String[0]);
 
-        deleteRecentlyViewPostRecords(publishedPostUlids);
         deleteImagesFromPublishedPosts(publishedPostUlids);
-        deletePostsAndRelatedRecords(memberId, publishedPostUlids);
-        deleteOtherMemberRelatedRecords(memberId);
-    }
-
-    private void deleteRecentlyViewPostRecords(String[] publishedPostUlids) {
-        if (publishedPostUlids.length != 0) {
-            Set<String> targetKeys = new HashSet<>();
-
-            stringRedisTemplate.execute((RedisCallback<Void>) connection -> {
-                ScanOptions options = ScanOptions.scanOptions()
-                        .match("recentlyView:member:*:posts")
-                        .count(100)
-                        .build();
-                try (Cursor<byte[]> cursor = connection.keyCommands().scan(options)) {
-                    while (cursor.hasNext()) {
-                        targetKeys.add(new String(cursor.next()));
-                    }
-                }
-                return null;
-            });
-
-            if (!targetKeys.isEmpty()) {
-                stringRedisTemplate.executePipelined((RedisCallback<Void>) connection -> {
-                    StringRedisConnection stringConnection = (StringRedisConnection) connection;
-                    for (String key : targetKeys) {
-                        stringConnection.zRem(key, publishedPostUlids);
-                    }
-                    return null;
-                });
-            }
-        }
+        processPostsAndRelatedRecords(memberId, publishedPostUlids);
+        processOtherMemberRelatedRecords(memberId, reason, opinion);
+        deleteRecentlyViewPostRecords(publishedPostUlids);
     }
 
     private void deleteImagesFromPublishedPosts(String[] publishedPostUlids) {
@@ -112,7 +87,7 @@ public class MemberEventConsumer {
         }
     }
 
-    private void deletePostsAndRelatedRecords(UUID memberId, String[] publishedPostUlids) {
+    private void processPostsAndRelatedRecords(UUID memberId, String[] publishedPostUlids) {
         if (publishedPostUlids.length != 0) {
             dsl.batch(
                     dsl.insertInto(COMM_POST_ARCHIVE,
@@ -156,8 +131,19 @@ public class MemberEventConsumer {
         }
     }
 
-    private void deleteOtherMemberRelatedRecords(UUID memberId) {
+    private void processOtherMemberRelatedRecords(UUID memberId, String reason, String opinion) {
         dsl.batch(
+                dsl.insertInto(SITE_MEMBER_WITHDRAW,
+                                SITE_MEMBER_WITHDRAW.UUID,
+                                SITE_MEMBER_WITHDRAW.REASON,
+                                SITE_MEMBER_WITHDRAW.OPINION,
+                                SITE_MEMBER_WITHDRAW.WITHDRAWN_AT)
+                        .values(
+                                memberId,
+                                reason,
+                                opinion,
+                                LocalDateTime.now()),
+
                 dsl.update(COMM_COMMENT)
                         .setNull(COMM_COMMENT.AUTH_MEMB_UUID)
                         .set(COMM_COMMENT.IS_DELETED, true)
@@ -171,7 +157,13 @@ public class MemberEventConsumer {
                 dsl.update(PROP_BUG_REP)
                         .setNull(PROP_BUG_REP.MEMB_UUID)
                         .set(PROP_BUG_REP.LAST_MODIFIED_AT, LocalDateTime.now())
+                        .set(PROP_BUG_REP.VER_NUM, coalesce(PROP_BUG_REP.VER_NUM, 0).plus(1))
                         .where(PROP_BUG_REP.MEMB_UUID.eq(memberId)),
+
+                dsl.update(PROP_BUG_REP_ARCHIVE)
+                        .setNull(PROP_BUG_REP_ARCHIVE.MEMB_UUID)
+                        .set(PROP_BUG_REP_ARCHIVE.LAST_MODIFIED_AT, LocalDateTime.now())
+                        .where(PROP_BUG_REP_ARCHIVE.MEMB_UUID.eq(memberId)),
 
                 dsl.deleteFrom(REFRESH_TOKEN)
                         .where(REFRESH_TOKEN.MEMB_UUID.eq(memberId)),
@@ -204,5 +196,49 @@ public class MemberEventConsumer {
                         .where(SITE_MEMBER.UUID.eq(memberId))
 
         ).execute();
+    }
+
+    private void deleteRecentlyViewPostRecords(String[] publishedPostUlids) {
+        if (publishedPostUlids.length == 0) {
+            return;
+        }
+
+        byte[][] publishedPostUlidsBytes =
+                Arrays.stream(publishedPostUlids)
+                        .map(ulid -> ulid.getBytes(StandardCharsets.UTF_8))
+                        .toArray(byte[][]::new);
+
+        stringRedisTemplate.execute((RedisCallback<Void>) (RedisConnection connection) -> {
+            int MAX_TARGET_KEY_SIZE = 1000;
+            List<byte[]> memberKeys = new ArrayList<>(MAX_TARGET_KEY_SIZE);
+
+            ScanOptions options = ScanOptions.scanOptions()
+                    .match("recentlyView:member:*:posts")
+                    .count(100)
+                    .build();
+
+            try (Cursor<byte[]> cursor = connection.keyCommands().scan(options)) {
+                while (cursor.hasNext()) {
+                    memberKeys.add(cursor.next());
+                    if (memberKeys.size() >= MAX_TARGET_KEY_SIZE) {
+                        deleteRecentlyViewPostRecordsWithConnection(connection, memberKeys, publishedPostUlidsBytes);
+                    }
+                }
+                if (!memberKeys.isEmpty()) {
+                    deleteRecentlyViewPostRecordsWithConnection(connection, memberKeys, publishedPostUlidsBytes);
+                }
+            }
+            return null;
+        });
+    }
+
+    private void deleteRecentlyViewPostRecordsWithConnection(
+            RedisConnection connection, List<byte[]> batchKeys, byte[][] matchedValuesBytes) {
+        connection.openPipeline();
+        for (byte[] rawKey : batchKeys) {
+            connection.zSetCommands().zRem(rawKey, matchedValuesBytes);
+        }
+        connection.closePipeline();
+        batchKeys.clear();
     }
 }
