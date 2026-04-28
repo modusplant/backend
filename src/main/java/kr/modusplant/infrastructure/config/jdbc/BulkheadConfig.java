@@ -9,7 +9,7 @@ import java.util.concurrent.Semaphore;
 @Configuration
 public class BulkheadConfig {
 
-    @Value("${app.semaphore.bulkhead.notification.connection-size}")
+    @Value("${app.semaphore.datasource.bulkhead.notification.connection-size}")
     private int notificationBulkheadSize;
 
     @Bean(name = "notificationSemaphore")

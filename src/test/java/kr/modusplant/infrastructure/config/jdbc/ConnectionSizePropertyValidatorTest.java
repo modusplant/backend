@@ -23,25 +23,43 @@ class ConnectionSizePropertyValidatorTest {
 
     @BeforeEach
     public void beforeEach() {
-        ReflectionTestUtils.setField(validator, "allowedConnectionSize", 10);
-        ReflectionTestUtils.setField(validator, "maxPoolSize", 11);
-        ReflectionTestUtils.setField(validator, "notificationBulkheadSize", 9);
+        ReflectionTestUtils.setField(validator, "apiConnectionSize", 68);
+        ReflectionTestUtils.setField(validator, "notificationBulkheadSize", 12);
+        ReflectionTestUtils.setField(validator, "allowedConnectionSize", 80);
+        ReflectionTestUtils.setField(validator, "maxPoolSize", 90);
     }
 
     @Test
     @DisplayName("afterSingletonsInstantiated를 통해 프로퍼티 검증")
     void testAfterSingletonsInstantiated_givenCorrectCondition_willDoNothing() {
         // given & when
-        given(jdbcTemplate.queryForObject(anyString(), eq(Integer.class))).willReturn(12);
+        given(jdbcTemplate.queryForObject(anyString(), eq(Integer.class))).willReturn(100);
 
         // then
         assertThatNoException().isThrownBy(validator::afterSingletonsInstantiated);
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {9, 10})
+    @ValueSource(ints = {70, 79})
+    @DisplayName("올바르지 않은 allowedConnectionSize를 사용하여 validate를 통해 프로퍼티 검증")
+    void testValidate_givenInvalidAllowedConnectionSize_willThrowException(int equalOrUpperValue) {
+        // given
+        ReflectionTestUtils.setField(validator, "allowedConnectionSize", equalOrUpperValue);
+
+        // when
+        ConfigurationException configurationException =
+                assertThrows(ConfigurationException.class, validator::afterSingletonsInstantiated);
+
+        // then
+        assertThat(configurationException.getMessage()).contains(
+                "apiConnectionSize", "notificationBulkheadSize", "allowedConnectionSize");
+
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {70, 80})
     @DisplayName("올바르지 않은 maxPoolSize를 사용하여 validate를 통해 프로퍼티 검증")
-    void testValidate_givenMaxPoolSize_willAddFieldError(int equalOrLowerValue) {
+    void testValidate_givenInvalidMaxPoolSize_willThrowException(int equalOrLowerValue) {
         // given
         ReflectionTestUtils.setField(validator, "maxPoolSize", equalOrLowerValue);
 
@@ -54,9 +72,9 @@ class ConnectionSizePropertyValidatorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {10, 11})
+    @ValueSource(ints = {80, 90})
     @DisplayName("올바르지 않은 maxConnections를 사용하여 validate를 통해 프로퍼티 검증")
-    void testValidate_givenMaxConnections_willAddFieldError(int equalOrLowerValue) {
+    void testValidate_givenInvalidMaxConnections_willThrowException(int equalOrLowerValue) {
         // given
         given(jdbcTemplate.queryForObject(anyString(), eq(Integer.class))).willReturn(equalOrLowerValue);
 
@@ -67,22 +85,4 @@ class ConnectionSizePropertyValidatorTest {
         // then
         assertThat(configurationException.getMessage()).contains("maxPoolSize", "maxConnections");
     }
-
-    @ParameterizedTest
-    @ValueSource(ints = {10,11})
-    @DisplayName("올바르지 않은 notificationBulkheadSize을 사용하여 validate를 통해 프로퍼티 검증")
-    void testValidate_givenMaxNotificationBulkheadSize_willAddFieldError(int equalOrUpperValue) {
-        // given
-        ReflectionTestUtils.setField(validator, "notificationBulkheadSize", equalOrUpperValue);
-        given(jdbcTemplate.queryForObject(anyString(), eq(Integer.class))).willReturn(12);
-
-        // when
-        ConfigurationException configurationException =
-                assertThrows(ConfigurationException.class, validator::afterSingletonsInstantiated);
-
-        // then
-        assertThat(configurationException.getMessage()).contains("notificationBulkheadSize", "allowedConnectionSize");
-
-    }
-
 }

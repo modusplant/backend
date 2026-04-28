@@ -11,8 +11,8 @@ import javax.sql.DataSource;
 
 @Configuration
 public class ThrottledDataSourceConfig {
-    @Value("${app.semaphore.datasource.allowed-connection-size}")
-    private Integer allowedConnectionSize;
+    @Value("${app.semaphore.datasource.api.connection-size}")
+    private Integer apiConnectionSize;
 
     @Value("${spring.datasource.driverClassName}")
     private String driverClassName;
@@ -40,6 +40,6 @@ public class ThrottledDataSourceConfig {
 
     @Bean
     public DataSource dataSource(HikariConfig hikariConfig) {
-        return new ThrottledDataSource(new HikariDataSource(hikariConfig), allowedConnectionSize);
+        return new ThrottledDataSource(new HikariDataSource(hikariConfig), apiConnectionSize);
     }
 }
