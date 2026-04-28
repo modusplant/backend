@@ -60,7 +60,7 @@ public class NotificationEventListener {
     }
 
     private void acquireAndProcess(Runnable task, String errorMsg, Object... args) {
-        boolean acquired = false;
+        boolean acquired;
         try {
             acquired = notificationSemaphore.tryAcquire(timeoutMs, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
@@ -69,12 +69,11 @@ public class NotificationEventListener {
             return;
         }
 
-        if (!acquired) {
-            log.warn("[Notification] 벌크헤드 timeout 초과로 알림 스킵 - {}ms 초과", timeoutMs);
-            return;
-        }
-
         try {
+            if (!acquired) {
+                log.warn("[Notification] 벌크헤드 timeout 초과로 알림 스킵 - {}ms 초과", timeoutMs);
+                return;
+            }
             task.run();
         } catch (Exception e) {
             log.error(errorMsg, args, e);
