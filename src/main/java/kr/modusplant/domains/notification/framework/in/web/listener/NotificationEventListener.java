@@ -26,7 +26,7 @@ public class NotificationEventListener {
     @Qualifier("notificationSemaphore")
     private final Semaphore notificationSemaphore;
 
-    @Value("${app.semaphore.bulkhead.notification.timeout-ms}")
+    @Value("${app.semaphore.datasource.bulkhead.notification.timeout-ms}")
     private long timeoutMs;
 
     @Async("notificationExecutor")
