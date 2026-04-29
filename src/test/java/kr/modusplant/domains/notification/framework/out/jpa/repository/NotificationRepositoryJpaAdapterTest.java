@@ -1,32 +1,44 @@
 package kr.modusplant.domains.notification.framework.out.jpa.repository;
 
+import kr.modusplant.domains.notification.common.util.domain.aggregate.NotificationTestUtils;
+import kr.modusplant.domains.notification.domain.aggregate.Notification;
 import kr.modusplant.domains.notification.domain.exception.InvalidValueException;
 import kr.modusplant.domains.notification.domain.vo.NotificationId;
 import kr.modusplant.domains.notification.domain.vo.NotificationStatus;
 import kr.modusplant.domains.notification.domain.vo.RecipientId;
+import kr.modusplant.domains.notification.framework.out.jpa.mapper.supers.NotificationJpaMapper;
 import kr.modusplant.domains.notification.framework.out.jpa.repository.supers.NotificationJpaRepository;
 import kr.modusplant.framework.jpa.entity.CommNotificationEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.shared.enums.NotificationStatusType;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.data.domain.PageRequest;
 
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.TEST_NOTIFICATION_RECIPIENT_ID;
 import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.TEST_NOTIFICATION_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-class NotificationRepositoryJpaAdapterTest {
+class NotificationRepositoryJpaAdapterTest  implements NotificationTestUtils {
     private final NotificationJpaRepository notificationJpaRepository = Mockito.mock(NotificationJpaRepository.class);
     private final SiteMemberJpaRepository siteMemberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
-    private final NotificationRepositoryJpaAdapter notificationRepositoryJpaAdapter = new NotificationRepositoryJpaAdapter(notificationJpaRepository, siteMemberJpaRepository);
+    private final NotificationJpaMapper notificationJpaMapper = Mockito.mock(NotificationJpaMapper.class);
+    private final NotificationRepositoryJpaAdapter notificationRepositoryJpaAdapter = new NotificationRepositoryJpaAdapter(notificationJpaRepository, siteMemberJpaRepository,notificationJpaMapper);
 
     @Test
     @DisplayName("알림 단건 읽음 처리하기")
@@ -35,20 +47,13 @@ class NotificationRepositoryJpaAdapterTest {
         NotificationId notificationId = NotificationId.create(TEST_NOTIFICATION_ULID);
         RecipientId recipientId = RecipientId.fromUuid(TEST_NOTIFICATION_RECIPIENT_ID);
 
-        SiteMemberEntity recipientEntity = Mockito.mock(SiteMemberEntity.class);
-        CommNotificationEntity notificationEntity = Mockito.mock(CommNotificationEntity.class);
-
-        given(siteMemberJpaRepository.findByUuid(TEST_NOTIFICATION_RECIPIENT_ID)).willReturn(Optional.of(recipientEntity));
-        given(notificationJpaRepository.findByUlidAndRecipient(TEST_NOTIFICATION_ULID, recipientEntity)).willReturn(Optional.of(notificationEntity));
+        given(notificationJpaRepository.updateUnreadStatusById(notificationId.getValue(), recipientId.getValue())).willReturn(1);
 
         // when
         notificationRepositoryJpaAdapter.markAsRead(notificationId, recipientId);
 
         // then
-        verify(siteMemberJpaRepository, times(1)).findByUuid(TEST_NOTIFICATION_RECIPIENT_ID);
-        verify(notificationJpaRepository, times(1)).findByUlidAndRecipient(TEST_NOTIFICATION_ULID, recipientEntity);
-        verify(notificationEntity, times(1)).read();
-        verify(notificationJpaRepository, times(1)).save(notificationEntity);
+        verify(notificationJpaRepository, times(1)).updateUnreadStatusById(TEST_NOTIFICATION_ULID, TEST_NOTIFICATION_RECIPIENT_ID);
     }
 
     @Test
@@ -58,16 +63,11 @@ class NotificationRepositoryJpaAdapterTest {
         NotificationId notificationId = NotificationId.create(TEST_NOTIFICATION_ULID);
         RecipientId recipientId = RecipientId.fromUuid(TEST_NOTIFICATION_RECIPIENT_ID);
 
-        SiteMemberEntity recipientEntity = Mockito.mock(SiteMemberEntity.class);
-
-        given(siteMemberJpaRepository.findByUuid(TEST_NOTIFICATION_RECIPIENT_ID)).willReturn(Optional.of(recipientEntity));
-        given(notificationJpaRepository.findByUlidAndRecipient(TEST_NOTIFICATION_ULID, recipientEntity))
-                .willReturn(Optional.empty());
+        given(notificationJpaRepository.updateUnreadStatusById(notificationId.getValue(), recipientId.getValue())).willReturn(0);
 
         // when & then
         assertThatThrownBy(() -> notificationRepositoryJpaAdapter.markAsRead(notificationId, recipientId)).isInstanceOf(InvalidValueException.class);
-
-        verify(notificationJpaRepository, times(1)).findByUlidAndRecipient(TEST_NOTIFICATION_ULID, recipientEntity);
+        verify(notificationJpaRepository, times(1)).updateUnreadStatusById(TEST_NOTIFICATION_ULID, TEST_NOTIFICATION_RECIPIENT_ID);
     }
 
     @Test
@@ -103,6 +103,71 @@ class NotificationRepositoryJpaAdapterTest {
         verify(siteMemberJpaRepository, times(1)).findByUuid(TEST_NOTIFICATION_RECIPIENT_ID);
         verify(notificationJpaRepository, times(1)).countByRecipientAndStatus(recipientEntity, NotificationStatusType.UNREAD);
 
+    }
+
+    @Nested
+    @DisplayName("saveWithLimit 테스트")
+    class SaveWithLimitTests {
+
+        @Test
+        @DisplayName("알림을 저장하고, limit을 초과하지 않으면 삭제 로직이 호출되지 않는다")
+        void testSaveWithLimit_whenUnderLimit_willOnlySave() {
+            // given
+            int limit = 10;
+            Notification notification = createPostLikedUnreadNotification(LocalDateTime.now());
+            SiteMemberEntity recipientEntity = Mockito.mock(SiteMemberEntity.class);
+            CommNotificationEntity savedEntity = Mockito.mock(CommNotificationEntity.class);
+
+            given(siteMemberJpaRepository.findByUuid(any())).willReturn(Optional.of(recipientEntity));
+            given(recipientEntity.getUuid()).willReturn(TEST_NOTIFICATION_RECIPIENT_ID);
+            given(notificationJpaMapper.toNotificationEntity(any(), any())).willReturn(savedEntity);
+            given(notificationJpaRepository.save(any())).willReturn(savedEntity);
+            given(notificationJpaRepository.findUlidsByRecipientId(eq(TEST_NOTIFICATION_RECIPIENT_ID), any(PageRequest.class))).willReturn(Collections.emptyList());
+
+            // when
+            notificationRepositoryJpaAdapter.saveWithLimit(notification, limit);
+
+            // then
+            verify(notificationJpaRepository, times(1)).save(any());
+            verify(notificationJpaRepository, times(0)).deleteByRecipientIdAndUlidBefore(any(), any());
+            verify(notificationJpaMapper, times(1)).toNotification(savedEntity);
+        }
+
+        @Test
+        @DisplayName("알림을 저장하고, limit을 초과하면 기준 ULID 이전의 알림들을 삭제한다")
+        void testSaveWithLimit_whenOverLimit_willSaveAndCleanup() {
+            // given
+            int limit = 5;
+            Notification notification = createPostLikedUnreadNotification(LocalDateTime.now());
+            SiteMemberEntity recipientEntity = Mockito.mock(SiteMemberEntity.class);
+            CommNotificationEntity savedEntity = Mockito.mock(CommNotificationEntity.class);
+            String cutoffUlid = "01ARZ3NDEKTSV4RRFFQ69G5FAV";
+
+            given(siteMemberJpaRepository.findByUuid(any())).willReturn(Optional.of(recipientEntity));
+            given(recipientEntity.getUuid()).willReturn(TEST_NOTIFICATION_RECIPIENT_ID);
+            given(notificationJpaMapper.toNotificationEntity(any(), any())).willReturn(savedEntity);
+            given(notificationJpaRepository.save(any())).willReturn(savedEntity);
+            given(notificationJpaRepository.findUlidsByRecipientId(eq(TEST_NOTIFICATION_RECIPIENT_ID), any(PageRequest.class))).willReturn(List.of(cutoffUlid));
+
+            // when
+            notificationRepositoryJpaAdapter.saveWithLimit(notification, limit);
+
+            // then
+            verify(notificationJpaRepository, times(1)).save(any());
+            verify(notificationJpaRepository, times(1)).deleteByRecipientIdAndUlidBefore(TEST_NOTIFICATION_RECIPIENT_ID, cutoffUlid);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 수신자 아이디로 저장 시도 시 예외가 발생한다")
+        void testSaveWithLimit_givenInvalidRecipient_willThrowException() {
+            // given
+            Notification notification = createPostLikedUnreadNotification(LocalDateTime.now());
+            given(siteMemberJpaRepository.findByUuid(any())).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> notificationRepositoryJpaAdapter.saveWithLimit(notification, 10))
+                    .isInstanceOf(InvalidValueException.class);
+        }
     }
 
 }

@@ -36,7 +36,7 @@ public class NotificationTestDataHelper {
                 .set(COMM_NOTIFICATION.RECIPIENT_ID, recipient.getUuid())
                 .set(COMM_NOTIFICATION.ACTOR_ID, actorId)
                 .set(COMM_NOTIFICATION.ACTOR_NICKNAME, actorNickname)
-                .set(COMM_NOTIFICATION.ACTION, action.getValue())
+                .set(COMM_NOTIFICATION.ACTION, action.name())
                 .set(COMM_NOTIFICATION.STATUS, status.getValue().toUpperCase(Locale.ROOT))
                 .set(COMM_NOTIFICATION.POST_ULID, postUlid)
                 .set(COMM_NOTIFICATION.COMMENT_PATH, commentPath)

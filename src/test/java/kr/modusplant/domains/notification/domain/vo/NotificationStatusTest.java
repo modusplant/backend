@@ -1,6 +1,9 @@
 package kr.modusplant.domains.notification.domain.vo;
 
 import kr.modusplant.domains.notification.common.util.domain.aggregate.NotificationTestUtils;
+import kr.modusplant.domains.notification.domain.exception.EmptyValueException;
+import kr.modusplant.domains.notification.domain.exception.enums.NotificationErrorCode;
+import kr.modusplant.shared.enums.NotificationStatusType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -10,8 +13,38 @@ import static org.junit.jupiter.api.Assertions.*;
 class NotificationStatusTest implements NotificationTestUtils {
 
     @Nested
+    @DisplayName("NotificationStatus create 테스트")
+    class createTests {
+        @Test
+        @DisplayName("유효한 NotificationStatusType으로 객체를 생성한다")
+        void testCreate_givenValidStatusType_willReturnNotificationStatus() {
+            // given
+            NotificationStatusType statusType = NotificationStatusType.READ;
+
+            // when
+            NotificationStatus status = NotificationStatus.create(statusType);
+
+            // then
+            assertNotNull(status);
+            // 상태가 올바르게 반영되었는지 확인 (isRead 혹은 내부 필드 검증)
+            assertTrue(status.isRead());
+        }
+
+        @Test
+        @DisplayName("statusType이 null인 경우 EmptyValueException을 던진다")
+        void testCreate_givenNull_willThrowException() {
+            // when & then
+            EmptyValueException exception = assertThrows(EmptyValueException.class,
+                    () -> NotificationStatus.create(null));
+
+            assertEquals(NotificationErrorCode.EMPTY_NOTIFICATION_STATUS, exception.getErrorCode());
+        }
+    }
+
+
+    @Nested
     @DisplayName("NotificationStatus read/unread 테스트")
-    class FactoryTests {
+    class readUnreadTests {
 
         @Test
         @DisplayName("read() 메서드로 읽음 상태를 생성한다")

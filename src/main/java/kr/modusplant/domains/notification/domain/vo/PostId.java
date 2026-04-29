@@ -37,7 +37,7 @@ public class PostId {
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof kr.modusplant.domains.post.domain.vo.PostId postId)) return false;
+        if (!(o instanceof PostId postId)) return false;
 
         return new EqualsBuilder().append(getValue(),postId.getValue()).isEquals();
     }

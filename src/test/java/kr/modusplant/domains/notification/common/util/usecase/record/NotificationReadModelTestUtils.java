@@ -45,7 +45,7 @@ public interface NotificationReadModelTestUtils {
             NotificationActionType.COMMENT_LIKED,
             NotificationStatusType.READ,
             TEST_NOTIFICATION_POST_ULID,
-            TEST_NOTIFICATION_COMMENT_PATH,
+            TEST_NOTIFICATION_COMMENT_PATH_DEPTH3,
             TEST_NOTIFICATION_COMMENT_PREVIEW,
             testDate
     );
@@ -58,7 +58,7 @@ public interface NotificationReadModelTestUtils {
             NotificationActionType.COMMENT_ADDED,
             NotificationStatusType.UNREAD,
             TEST_NOTIFICATION_POST_ULID,
-            TEST_NOTIFICATION_COMMENT_PATH,
+            TEST_NOTIFICATION_COMMENT_PATH_DEPTH3,
             TEST_NOTIFICATION_COMMENT_PREVIEW,
             testDate
     );

@@ -1,5 +1,7 @@
 package kr.modusplant.domains.notification.domain.vo;
 
+import kr.modusplant.domains.notification.domain.exception.EmptyValueException;
+import kr.modusplant.domains.notification.domain.exception.enums.NotificationErrorCode;
 import kr.modusplant.shared.enums.NotificationStatusType;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,6 +13,13 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class NotificationStatus {
     private final NotificationStatusType status;
+
+    public static NotificationStatus create(NotificationStatusType statusType) {
+        if (statusType == null) {
+            throw new EmptyValueException(NotificationErrorCode.EMPTY_NOTIFICATION_STATUS);
+        }
+        return new NotificationStatus(statusType);
+    }
 
     public static NotificationStatus read() {
         return new NotificationStatus(NotificationStatusType.READ);

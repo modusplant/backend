@@ -1,7 +1,5 @@
 package kr.modusplant.domains.notification.domain.vo;
 
-import kr.modusplant.domains.notification.domain.exception.EmptyValueException;
-import kr.modusplant.domains.notification.domain.exception.enums.NotificationErrorCode;
 import lombok.Getter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -21,9 +19,6 @@ public class ContentPreview {
     }
 
     public static ContentPreview create(String content) {
-        if (content == null || content.isBlank()) {
-            throw new EmptyValueException(NotificationErrorCode.EMPTY_NOTIFICATION_CONTENT);
-        }
         return new ContentPreview(content);
     }
 

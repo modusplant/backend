@@ -31,6 +31,14 @@ public class CommentPath {
         }
     }
 
+    public CommentPath extractParentPath() {
+        int idx = path.lastIndexOf('.');
+        if (idx == -1) {
+            throw new InvalidValueException(NotificationErrorCode.NOT_EXIST_PARENT_COMMENT);
+        }
+        return CommentPath.create(path.substring(0,idx));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

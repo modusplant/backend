@@ -48,7 +48,8 @@ jobs:
             /config/modusplant_dev/WASABI_ACCESS_KEY      = WASABI_ACCESS_KEY,
             /config/modusplant_dev/WASABI_SECRET_KEY      = WASABI_SECRET_KEY,
             /config/modusplant_dev/WASABI_BUCKET          = WASABI_BUCKET,
-            /config/modusplant_dev/DEV_PUBLIC_ENDPOINT    = DEV_PUBLIC_ENDPOINT
+            /config/modusplant_dev/DEV_PUBLIC_ENDPOINT    = DEV_PUBLIC_ENDPOINT,
+            /config/modusplant/FIREBASE_CREDENTIALS_JSON  = FIREBASE_CREDENTIALS_JSON
           withDecryption: "true"
 
       - name: Debug DB env
@@ -79,6 +80,7 @@ jobs:
           WASABI_SECRET_KEY: ${{ env.WASABI_SECRET_KEY }}
           WASABI_BUCKET: ${{ env.WASABI_BUCKET }}
           DEV_PUBLIC_ENDPOINT: ${{ env.DEV_PUBLIC_ENDPOINT }}
+          FIREBASE_CREDENTIALS_JSON: ${{ env.FIREBASE_CREDENTIALS_JSON }}
 
           # ---- Kakao dummy ----
           KAKAO_API_KEY: DUMMY_KAKAO_KEY_1234567890
@@ -286,6 +288,9 @@ jobs:
           
           KEYSTORE_PASSWORD=$(aws ssm get-parameter --name "/config/modusplant_prod/KEYSTORE_PASSWORD"             --with-decryption --query "Parameter.Value" --output text)
           
+          # === FIREBASE_CREDENTIALS_JSON ===
+          FIREBASE_CREDENTIALS_JSON=$(aws ssm get-parameter --name "/config/modusplant/FIREBASE_CREDENTIALS_JSON"  --with-decryption --query "Parameter.Value" --output text)
+          
           echo "[EC2] Write env file: ${ENV_FILE}"
           mkdir -p /opt/modusplant
           cat > "${ENV_FILE}" <<EOT
@@ -320,6 +325,7 @@ jobs:
           
           # === KEYSTORE_PASSWORD ===
           KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
+          FIREBASE_CREDENTIALS_JSON=${FIREBASE_CREDENTIALS_JSON}
           
           EOT
           
