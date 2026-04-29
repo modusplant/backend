@@ -17,8 +17,8 @@ public enum NormalIdentityErrorCode implements ErrorCode {
 
     EXISTS_ACCOUNT(HttpStatus.CONFLICT.value(), "exists_account", "회원 계정이 이미 있습니다"),
     EXISTS_BASIC_ACCOUNT(HttpStatus.CONFLICT.value(), "exists_basic_account", "일반 회원 계정이 이미 있습니다"),
-    EXISTS_GOOGLE_ACCOUNT(HttpStatus.CONFLICT.value(), "exists_google_account", "Google 회원 계정이 이미 있습니다"),
-    EXISTS_KAKAO_ACCOUNT(HttpStatus.CONFLICT.value(), "exists_kakao_account", "Kakao 회원 계정이 이미 있습니다")
+    EXISTS_GOOGLE_ACCOUNT(HttpStatus.CONFLICT.value(), "exists_google_account", "Google 계정이 이미 있습니다"),
+    EXISTS_KAKAO_ACCOUNT(HttpStatus.CONFLICT.value(), "exists_kakao_account", "Kakao 계정이 이미 있습니다")
     ;
 
     private final int httpStatus;

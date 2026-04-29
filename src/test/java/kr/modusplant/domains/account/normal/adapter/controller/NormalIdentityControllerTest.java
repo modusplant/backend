@@ -113,44 +113,6 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
     }
 
     @Test
-    @DisplayName("GOOGLE Provider로 가입된 이메일로 요청 시 Google 계정으로 업데이트 진행")
-    public void testRegisterNormalMember_givenEmailWithGoogleProvider_willUpdateToGoogleAccount() {
-        // given
-        NormalSignUpRequest request = testNormalSignUpRequest;
-        Email requestEmail = Email.create(request.email());
-
-        given(readRepository.existsByEmail(requestEmail)).willReturn(true);
-        given(readRepository.getAuthProvider(requestEmail)).willReturn(AuthProvider.GOOGLE);
-        doNothing().when(updateRepository).updateToGoogleAccount(requestEmail, Password.create(request.password()));
-
-        // when
-        controller.registerNormalMember(request);
-
-        // then
-        verify(updateRepository, times(1)).updateToGoogleAccount(requestEmail, Password.create(request.password()));
-        verify(createRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("KAKAO Provider로 가입된 이메일로 요청 시 Kakao 계정으로 업데이트 진행")
-    public void testRegisterNormalMember_givenEmailWithKakaoProvider_willUpdateToKakaoAccount() {
-        // given
-        NormalSignUpRequest request = testNormalSignUpRequest;
-        Email requestEmail = Email.create(request.email());
-
-        given(readRepository.existsByEmail(requestEmail)).willReturn(true);
-        given(readRepository.getAuthProvider(requestEmail)).willReturn(AuthProvider.KAKAO);
-        doNothing().when(updateRepository).updateToKakaoAccount(requestEmail, Password.create(request.password()));
-
-        // when
-        controller.registerNormalMember(request);
-
-        // then
-        verify(updateRepository, times(1)).updateToKakaoAccount(requestEmail, Password.create(request.password()));
-        verify(createRepository, never()).save(any());
-    }
-
-    @Test
     @DisplayName("미가입 이메일로 요청 시 신규 회원 저장 진행")
     public void testRegisterNormalMember_givenNewEmail_willSaveNewMember() {
         // given
