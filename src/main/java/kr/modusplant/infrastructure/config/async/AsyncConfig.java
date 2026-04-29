@@ -33,7 +33,7 @@ public class AsyncConfig implements AsyncConfigurer {
         return new SimpleAsyncUncaughtExceptionHandler();
     }
 
-    /* 알림 전용 executor : 가상스레드 */
+    /* 알림 전용 executor : 가상 스레드 */
     @Bean(name = "notificationExecutor")
     public Executor notificationExecutor() {
         // SimpleAsyncTaskExecutor + executor.setVirtualThreads(true) => VirtualThreadTaskExecutor
