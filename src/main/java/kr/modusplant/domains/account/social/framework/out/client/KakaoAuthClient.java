@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -56,7 +57,7 @@ public class KakaoAuthClient implements SocialAuthClient {
                 .body(formData)
                 .retrieve()
                 .onStatus(this::isErrorStatus, (request, response)
-                        -> handleKakaoError(SocialIdentityErrorCode.KAKAO_LOGIN_FAIL, response.getBody()))
+                        -> handleKakaoError(SocialIdentityErrorCode.KAKAO_LOGIN_FAIL, response))
                 .body(Map.class)
                 .get("access_token").toString();
     }
@@ -65,14 +66,14 @@ public class KakaoAuthClient implements SocialAuthClient {
     public KakaoUserInfo getUserInfo(String accessToken) {
         RestClient restClient = restClientBuilder
                 .baseUrl("https://kapi.kakao.com")
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer "+accessToken)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .build();
 
         return restClient.get()
                 .uri("/v2/user/me")
                 .retrieve()
                 .onStatus(this::isErrorStatus, (request, response)
-                        -> handleKakaoError(SocialIdentityErrorCode.KAKAO_LOGIN_FAIL, response.getBody()))
+                        -> handleKakaoError(SocialIdentityErrorCode.KAKAO_LOGIN_FAIL, response))
                 .body(KakaoUserInfo.class);
     }
 
@@ -80,14 +81,14 @@ public class KakaoAuthClient implements SocialAuthClient {
     public void revokeAccess(String accessToken) {
         RestClient restClient = restClientBuilder
                 .baseUrl("https://kapi.kakao.com")
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer "+accessToken)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .build();
 
         restClient.post()
                 .uri("/v1/user/unlink")
                 .retrieve()
                 .onStatus(this::isErrorStatus,(request,response)
-                        -> handleKakaoError(SocialIdentityErrorCode.KAKAO_REVOKE_FAIL, response.getBody()))
+                        -> handleKakaoError(SocialIdentityErrorCode.KAKAO_REVOKE_FAIL, response))
                 .toBodilessEntity();
     }
 
@@ -97,14 +98,15 @@ public class KakaoAuthClient implements SocialAuthClient {
                 status.equals(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    private void handleKakaoError(ErrorCode errorCode, InputStream body) throws IOException {
-        OAuthErrorResponse errorResponse = objectMapper.readValue(body, OAuthErrorResponse.class);
-        log.error("[{}] OAuth error - {}: {}", "kakao", errorResponse.error(), errorResponse.errorDescription());
-        DynamicErrorCode dynamicErrorCode = DynamicErrorCode.create(
-                errorCode,
-                String.format("%s - [%s]", errorCode.getMessage(), errorResponse.error())
-        );
-        throw new OAuthRequestFailException(dynamicErrorCode, "kakao");
+    private void handleKakaoError(ErrorCode errorCode, ClientHttpResponse response) throws IOException {
+        try (InputStream body = response.getBody()) {
+            OAuthErrorResponse errorResponse = objectMapper.readValue(body, OAuthErrorResponse.class);
+            log.error("[{}] OAuth error - {}: {}", "kakao", errorResponse.error(), errorResponse.errorDescription());
+            DynamicErrorCode dynamicErrorCode = DynamicErrorCode.create(
+                    errorCode,
+                    String.format("%s - [%s]", errorCode.getMessage(), errorResponse.error())
+            );
+            throw new OAuthRequestFailException(dynamicErrorCode, "kakao");
+        }
     }
-
 }
