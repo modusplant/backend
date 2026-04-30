@@ -53,3 +53,9 @@ springdoc:
     enabled: false
   swagger-ui:
     enabled: false
+
+# Wasabi
+cloud:
+  wasabi:
+    s3:
+      max-connections: 40
