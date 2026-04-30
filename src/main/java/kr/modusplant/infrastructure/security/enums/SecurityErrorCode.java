@@ -26,6 +26,9 @@ public enum SecurityErrorCode implements ErrorCode {
     BLACKLISTED_TOKEN(HttpStatus.UNAUTHORIZED.value(), "blacklisted_token", "인증 요건이 사용될 수 있는 상태가 아닙니다"),
     INVALID_TOKEN_FORMAT(HttpStatus.UNAUTHORIZED.value(), "invalid_token_format", "유효한 인증 요건의 형식이 아닙니다"),
 
+    FORBIDDEN_KAKAO_LINKED_ACCOUNT(HttpStatus.CONFLICT.value(), "forbidden_kakao_linked_account", "Kakao 계정과 연동된 계정이므로 일반 로그인을 할 수 없습니다"),
+    FORBIDDEN_GOOGLE_LINKED_ACCOUNT(HttpStatus.CONFLICT.value(), "forbidden_google_linked_account", "Google 계정과 연동된 계정이므로 일반 로그인을 할 수 없습니다"),
+
     ;
 
     private final int httpStatus;

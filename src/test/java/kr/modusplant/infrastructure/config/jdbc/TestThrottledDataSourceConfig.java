@@ -11,7 +11,7 @@ import javax.sql.DataSource;
 
 @TestConfiguration
 public class TestThrottledDataSourceConfig {
-    @Value("${app.semaphore.datasource.allowed-connection-size}")
+    @Value("${app.semaphore.datasource.api.connection-size}")
     private Integer allowedConnectionSize;
 
     @Value("${spring.datasource.driverClassName}")

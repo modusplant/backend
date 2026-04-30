@@ -18,19 +18,27 @@ import static java.util.Objects.requireNonNull;
 @Getter
 public class ConnectionSizePropertyValidator implements SmartInitializingSingleton {
 
+    @Value("${app.semaphore.datasource.api.connection-size}")
+    private int apiConnectionSize;
+
+    @Value("${app.semaphore.datasource.bulkhead.notification.connection-size}")
+    private int notificationBulkheadSize;
+
     @Value("${app.semaphore.datasource.allowed-connection-size}")
     private int allowedConnectionSize;
 
     @Value("${spring.datasource.hikari.maximum-pool-size}")
     private int maxPoolSize;
 
-    @Value("${app.semaphore.bulkhead.notification.connection-size}")
-    private int notificationBulkheadSize;
-
     private final JdbcTemplate jdbcTemplate;
 
     @Override
     public void afterSingletonsInstantiated() {
+        if (this.getApiConnectionSize() + this.getNotificationBulkheadSize() > this.getAllowedConnectionSize()) {
+            throw new ConfigurationException(ConfigurationErrorCode.INCORRECT_RELATIONSHIP_BETWEEN_CONNECTION_SIZE,
+                    new String[]{"apiConnectionSize", "notificationBulkheadSize", "allowedConnectionSize"});
+        }
+
         if (this.getAllowedConnectionSize() >= this.getMaxPoolSize()) {
             throw new ConfigurationException(ConfigurationErrorCode.INCORRECT_RELATIONSHIP_BETWEEN_CONNECTION_SIZE,
                     new String[]{"allowedConnectionSize", "maxPoolSize"});
@@ -41,11 +49,6 @@ public class ConnectionSizePropertyValidator implements SmartInitializingSinglet
         if (maxPoolSize >= requireNonNull(maxConnections).longValue()) {
             throw new ConfigurationException(ConfigurationErrorCode.INCORRECT_RELATIONSHIP_BETWEEN_CONNECTION_SIZE,
                     new String[]{"maxPoolSize", "maxConnections"});
-        }
-
-        if (this.getNotificationBulkheadSize() >= this.getAllowedConnectionSize()) {
-            throw new ConfigurationException(ConfigurationErrorCode.INCORRECT_RELATIONSHIP_BETWEEN_CONNECTION_SIZE,
-                    new String[]{"notificationBulkheadSize", "allowedConnectionSize"});
         }
     }
 }

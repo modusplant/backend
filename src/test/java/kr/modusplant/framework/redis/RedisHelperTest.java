@@ -64,12 +64,12 @@ class RedisHelperTest {
         String expireKey = "test:expire";
         String expireValue = "expireValue";
 
-        redisHelper.setString(expireKey, expireValue, Duration.ofSeconds(5));
-        Thread.sleep(2000);
+        redisHelper.setString(expireKey, expireValue, Duration.ofSeconds(6));
+        Thread.sleep(1000);
 
         Optional<Duration> ttl = redisHelper.getTTL(expireKey);
         assertThat(ttl).isPresent();
-        assertThat(ttl.get().getSeconds()).isLessThan(5).isGreaterThan(1);
+        assertThat(ttl.get().getSeconds()).isLessThan(6).isGreaterThan(1);
 
         redisHelper.expire(expireKey, Duration.ofSeconds(10));
         Optional<Duration> ttl2 = redisHelper.getTTL(expireKey);
