@@ -70,15 +70,20 @@ public class CommentRestController {
 
             @Parameter(hidden = true)
             @RequestHeader(name = HttpHeaders.IF_MODIFIED_SINCE, required = false)
-            String ifModifiedSince
+            String ifModifiedSince,
+
+            @AuthenticationPrincipal
+            DefaultUserDetails userDetails
             ) {
         CommentCacheData cacheData = controller.getCacheData(postUlid, ifNoneMatch, ifModifiedSince);
         if (cacheData.isCacheable()) {
             return buildFixedCacheResponsePart(cacheData)
                     .build();
         } else {
+            UUID nullableCurrentMemberUuid = userDetails != null ? userDetails.getUuid() : null;
+
             return buildFixedCacheResponsePart(cacheData)
-                    .body(DataResponse.ok(controller.gatherByPost(postUlid)));
+                    .body(DataResponse.ok(controller.gatherByPost(postUlid, nullableCurrentMemberUuid)));
         }
     }
 

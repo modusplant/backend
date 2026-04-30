@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface CommentReadRepository {
 
-    List<CommentOfPostReadModel> findByPost(PostId postId);
+    List<CommentOfPostReadModel> findByPost(PostId postId, Author author);
 
     PageImpl<CommentOfAuthorPageModel> findByAuthor(Author author, Pageable pageable);
 

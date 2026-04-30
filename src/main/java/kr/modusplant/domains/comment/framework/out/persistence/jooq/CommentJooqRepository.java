@@ -8,6 +8,7 @@ import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentReadRepository;
 import kr.modusplant.jooq.tables.*;
 import lombok.RequiredArgsConstructor;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record1;
@@ -53,29 +54,43 @@ public class CommentJooqRepository implements CommentReadRepository {
                 .orElse(0);
     }
 
-    public List<CommentOfPostReadModel> findByPost(PostId postId) {
-
+    public List<CommentOfPostReadModel> findByPost(PostId postId, Author nullableAuthor) {
         Field<Boolean> isLiked = DSL.when(commentLike.MEMB_UUID.isNotNull(), true).otherwise(false);
 
-        return dsl.select(memberProf.IMAGE_PATH, siteMember.NICKNAME,
-                        commComment.PATH, commComment.CONTENT, commComment.LIKE_COUNT,
-                        isLiked, commComment.CREATED_AT, commComment.IS_DELETED, commComment.UPDATED_AT)
+        Condition likeJoinCondition = nullableAuthor != null
+                ? commComment.POST_ULID.eq(commentLike.POST_ULID)
+                .and(commComment.PATH.eq(commentLike.PATH))
+                .and(commentLike.MEMB_UUID.eq(nullableAuthor.getMemberUuid()))
+                : DSL.falseCondition();
+
+        return dsl.select(
+                        memberProf.IMAGE_PATH,
+                        siteMember.NICKNAME,
+                        commComment.PATH,
+                        commComment.CONTENT,
+                        commComment.LIKE_COUNT,
+                        isLiked,
+                        commComment.CREATED_AT,
+                        commComment.IS_DELETED,
+                        commComment.UPDATED_AT)
                 .from(commComment)
-                .join(commPost).on(commComment.POST_ULID.eq(commPost.ULID))
                 .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
-                .join(memberProf).on(siteMember.UUID.eq(memberProf.UUID))
-                .leftJoin(commentLike).on(commComment.POST_ULID.eq(commentLike.POST_ULID)
-                        .and(commComment.PATH.eq(commentLike.PATH)))
+                .join(memberProf).on(commComment.AUTH_MEMB_UUID.eq(memberProf.UUID))
+                .leftJoin(commentLike).on(likeJoinCondition)
                 .where(commComment.POST_ULID.eq(postId.getId()))
-                .orderBy(commComment.CREATED_AT.asc())
+                .orderBy(commComment.CREATED_AT.desc())
                 .fetch(record -> new CommentOfPostReadModel(
-                        record.getValue(memberProf.IMAGE_PATH), record.getValue(siteMember.NICKNAME),
-                        record.getValue(commComment.PATH), record.getValue(commComment.CONTENT),
-                        record.getValue(commComment.LIKE_COUNT), record.getValue(isLiked),
+                        record.getValue(memberProf.IMAGE_PATH),
+                        record.getValue(siteMember.NICKNAME),
+                        record.getValue(commComment.PATH),
+                        record.getValue(commComment.CONTENT),
+                        record.getValue(commComment.LIKE_COUNT),
+                        record.getValue(isLiked),
                         record.getValue(commComment.CREATED_AT).withNano(0),
                         record.getValue(commComment.UPDATED_AT).withNano(0),
                         record.getValue(commComment.IS_DELETED)
                 ));
+
     }
 
     public PageImpl<CommentOfAuthorPageModel> findByAuthor(Author author, Pageable pageable) {
