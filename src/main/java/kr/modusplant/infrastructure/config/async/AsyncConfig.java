@@ -33,11 +33,20 @@ public class AsyncConfig implements AsyncConfigurer {
         return new SimpleAsyncUncaughtExceptionHandler();
     }
 
+    /* 청소 전용 executor : 가상 스레드 */
+    @Bean(name = "cleanupExecutor")
+    public Executor cleanupExecutor() {
+        // SimpleAsyncTaskExecutor + executor.setVirtualThreads(true) => VirtualThreadTaskExecutor
+        SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor("virtual-cleanup-");
+        executor.setVirtualThreads(true);
+        return executor;
+    }
+
     /* 알림 전용 executor : 가상 스레드 */
     @Bean(name = "notificationExecutor")
     public Executor notificationExecutor() {
         // SimpleAsyncTaskExecutor + executor.setVirtualThreads(true) => VirtualThreadTaskExecutor
-        SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor("virtual-");
+        SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor("virtual-notification-");
         executor.setVirtualThreads(true);
         return executor;
     }
