@@ -50,7 +50,7 @@ public class S3FileService {
                 .build();
 
         try {
-            return s3Client.getObject(request).readAllBytes();
+            return s3Client.getObjectAsBytes(request).asByteArray();
         } catch (NoSuchKeyException e) {
             throw new NotFoundFileKeyOnS3Exception();
         }

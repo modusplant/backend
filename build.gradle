@@ -98,6 +98,7 @@ dependencies {
 	// Spring Cloud AWS (Version managed by Spring Cloud AWS Dependencies)
 	implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.2.0')
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store'
+	implementation 'software.amazon.awssdk:apache-client'
 	implementation 'software.amazon.awssdk:s3'
 
     // Flyway Runtime Dependencies

@@ -16,6 +16,7 @@ public enum EntityErrorCode implements ErrorCode {
     NOT_FOUND_POST_ARCHIVE(HttpStatus.NOT_FOUND.value(), "not_found_post_archive", "게시글 아카이브의 값이 존재하지 않습니다"),
     NOT_FOUND_POST_BOOKMARK(HttpStatus.NOT_FOUND.value(), "not_found_post_bookmark", "게시글의 북마크 값이 존재하지 않습니다"),
     NOT_FOUND_POST(HttpStatus.NOT_FOUND.value(), "not_found_post", "게시글이 존재하지 않습니다"),
+    NOT_FOUND_POST_ID(HttpStatus.NOT_FOUND.value(), "not_found_post_id", "게시글 식별자가 존재하지 않습니다"),
     NOT_FOUND_POST_LIKE(HttpStatus.NOT_FOUND.value(), "not_found_post_like", "게시글의 좋아요 값이 존재하지 않습니다"),
 
     NOT_FOUND_PRIMARY_CATEGORY(HttpStatus.NOT_FOUND.value(), "not_found_primary_category", "1차 카테고리가 존재하지 않습니다"),
@@ -29,33 +30,33 @@ public enum EntityErrorCode implements ErrorCode {
     NOT_FOUND_MEMBER_WITHDRAW_REASON(HttpStatus.NOT_FOUND.value(), "not_found_member_withdraw_reason", "사용자의 회원 탈퇴 사유가 존재하지 않습니다"),
 
     NOT_FOUND_TERM(HttpStatus.NOT_FOUND.value(), "not_found_term", "약관 정보가 존재하지 않습니다"),
-
     NOT_FOUND_REPORT(HttpStatus.NOT_FOUND.value(), "not_found_report", "보고서가 존재하지 않습니다"),
-
     NOT_FOUND_ACTOR(HttpStatus.NOT_FOUND.value(),"not_found_actor", "알림 행위자가 존재하지 않습니다"),
 
+    NOT_FOUND_IMAGE_FILE_KEYS(HttpStatus.NOT_FOUND.value(), "not_found_image_file_keys", "이미지 파일 키가 존재하지 않습니다"),
+
     // Exists
-    EXISTS_POST_ABUSE_REPORT(HttpStatus.NOT_FOUND.value(), "exists_post_abuse_report", "게시글 신고가 이미 존재합니다"),
-    EXISTS_COMMENT_ABUSE_REPORT(HttpStatus.NOT_FOUND.value(), "exists_comment_abuse_report", "댓글 신고가 이미 존재합니다"),
+    EXISTS_POST_ABUSE_REPORT(HttpStatus.CONFLICT.value(), "exists_post_abuse_report", "게시글 신고가 이미 존재합니다"),
+    EXISTS_COMMENT_ABUSE_REPORT(HttpStatus.CONFLICT.value(), "exists_comment_abuse_report", "댓글 신고가 이미 존재합니다"),
 
-    EXISTS_COMMENT(HttpStatus.NOT_FOUND.value(), "exists_comment", "댓글이 이미 존재합니다"),
-    EXISTS_COMMENT_LIKE(HttpStatus.NOT_FOUND.value(), "exists_comment_like", "댓글의 좋아요가 이미 존재합니다"),
+    EXISTS_COMMENT(HttpStatus.CONFLICT.value(), "exists_comment", "댓글이 이미 존재합니다"),
+    EXISTS_COMMENT_LIKE(HttpStatus.CONFLICT.value(), "exists_comment_like", "댓글의 좋아요가 이미 존재합니다"),
 
-    EXISTS_POST_ARCHIVE(HttpStatus.NOT_FOUND.value(), "exists_post_archive", "게시글 아카이브 값이 이미 존재합니다"),
-    EXISTS_POST_BOOKMARK(HttpStatus.NOT_FOUND.value(), "exists_post_bookmark", "게시글의 북마크 값이 이미 존재합니다"),
-    EXISTS_POST(HttpStatus.NOT_FOUND.value(), "exists_post", "게시글이 이미 존재합니다"),
-    EXISTS_POST_LIKE(HttpStatus.NOT_FOUND.value(), "exists_post_like", "게시글의 좋아요 값이 이미 존재합니다"),
+    EXISTS_POST_ARCHIVE(HttpStatus.CONFLICT.value(), "exists_post_archive", "게시글 아카이브 값이 이미 존재합니다"),
+    EXISTS_POST_BOOKMARK(HttpStatus.CONFLICT.value(), "exists_post_bookmark", "게시글의 북마크 값이 이미 존재합니다"),
+    EXISTS_POST(HttpStatus.CONFLICT.value(), "exists_post", "게시글이 이미 존재합니다"),
+    EXISTS_POST_LIKE(HttpStatus.CONFLICT.value(), "exists_post_like", "게시글의 좋아요 값이 이미 존재합니다"),
 
-    EXISTS_PRIMARY_CATEGORY(HttpStatus.NOT_FOUND.value(), "exists_primary_category", "1차 카테고리의 값이 이미 존재합니다"),
-    EXISTS_SECONDARY_CATEGORY(HttpStatus.NOT_FOUND.value(), "exists_secondary_category", "2차 카테고리의 값이 이미 존재합니다"),
+    EXISTS_PRIMARY_CATEGORY(HttpStatus.CONFLICT.value(), "exists_primary_category", "1차 카테고리의 값이 이미 존재합니다"),
+    EXISTS_SECONDARY_CATEGORY(HttpStatus.CONFLICT.value(), "exists_secondary_category", "2차 카테고리의 값이 이미 존재합니다"),
 
-    EXISTS_MEMBER_AUTH(HttpStatus.NOT_FOUND.value(), "exists_member_auth", "사용자의 인증 정보가 이미 존재합니다"),
-    EXISTS_MEMBER(HttpStatus.NOT_FOUND.value(), "exists_member", "사용자 계정의 정보가 이미 존재합니다"),
-    EXISTS_MEMBER_PROFILE(HttpStatus.NOT_FOUND.value(), "exists_member_profile", "사용자의 프로필 정보가 이미 존재합니다"),
-    EXISTS_MEMBER_ROLE(HttpStatus.NOT_FOUND.value(), "exists_member_role", "사용자의 역할 정보가 이미 존재합니다"),
-    EXISTS_MEMBER_TERM(HttpStatus.NOT_FOUND.value(), "exists_member_term", "사용자의 약관 정보가 이미 존재합니다"),
+    EXISTS_MEMBER_AUTH(HttpStatus.CONFLICT.value(), "exists_member_auth", "사용자의 인증 정보가 이미 존재합니다"),
+    EXISTS_MEMBER(HttpStatus.CONFLICT.value(), "exists_member", "사용자 계정의 정보가 이미 존재합니다"),
+    EXISTS_MEMBER_PROFILE(HttpStatus.CONFLICT.value(), "exists_member_profile", "사용자의 프로필 정보가 이미 존재합니다"),
+    EXISTS_MEMBER_ROLE(HttpStatus.CONFLICT.value(), "exists_member_role", "사용자의 역할 정보가 이미 존재합니다"),
+    EXISTS_MEMBER_TERM(HttpStatus.CONFLICT.value(), "exists_member_term", "사용자의 약관 정보가 이미 존재합니다"),
 
-    EXISTS_TERM(HttpStatus.NOT_FOUND.value(), "exists_term", "약관 정보가 이미 존재합니다");
+    EXISTS_TERM(HttpStatus.CONFLICT.value(), "exists_term", "약관 정보가 이미 존재합니다");
 
     private final int httpStatus;
     private final String code;
