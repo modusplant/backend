@@ -16,6 +16,7 @@ public enum EntityErrorCode implements ErrorCode {
     NOT_FOUND_POST_ARCHIVE(HttpStatus.NOT_FOUND.value(), "not_found_post_archive", "게시글 아카이브의 값이 존재하지 않습니다"),
     NOT_FOUND_POST_BOOKMARK(HttpStatus.NOT_FOUND.value(), "not_found_post_bookmark", "게시글의 북마크 값이 존재하지 않습니다"),
     NOT_FOUND_POST(HttpStatus.NOT_FOUND.value(), "not_found_post", "게시글이 존재하지 않습니다"),
+    NOT_FOUND_POST_ID(HttpStatus.NOT_FOUND.value(), "not_found_post_id", "게시글 식별자가 존재하지 않습니다"),
     NOT_FOUND_POST_LIKE(HttpStatus.NOT_FOUND.value(), "not_found_post_like", "게시글의 좋아요 값이 존재하지 않습니다"),
 
     NOT_FOUND_PRIMARY_CATEGORY(HttpStatus.NOT_FOUND.value(), "not_found_primary_category", "1차 카테고리가 존재하지 않습니다"),
@@ -29,10 +30,10 @@ public enum EntityErrorCode implements ErrorCode {
     NOT_FOUND_MEMBER_WITHDRAW_REASON(HttpStatus.NOT_FOUND.value(), "not_found_member_withdraw_reason", "사용자의 회원 탈퇴 사유가 존재하지 않습니다"),
 
     NOT_FOUND_TERM(HttpStatus.NOT_FOUND.value(), "not_found_term", "약관 정보가 존재하지 않습니다"),
-
     NOT_FOUND_REPORT(HttpStatus.NOT_FOUND.value(), "not_found_report", "보고서가 존재하지 않습니다"),
-
     NOT_FOUND_ACTOR(HttpStatus.NOT_FOUND.value(),"not_found_actor", "알림 행위자가 존재하지 않습니다"),
+
+    NOT_FOUND_IMAGE_FILE_KEYS(HttpStatus.NOT_FOUND.value(), "not_found_image_file_keys", "이미지 파일 키가 존재하지 않습니다"),
 
     // Exists
     EXISTS_POST_ABUSE_REPORT(HttpStatus.CONFLICT.value(), "exists_post_abuse_report", "게시글 신고가 이미 존재합니다"),
