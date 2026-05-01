@@ -3,6 +3,7 @@ package kr.modusplant.domains.account.social.adapter;
 import io.jsonwebtoken.Claims;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.usecase.record.TempTokenInfo;
+import kr.modusplant.domains.account.social.usecase.response.SocialPendingResult;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,13 +19,13 @@ public class SocialIdentityTokenHelper {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    public String generateTempToken(String email, String providerId, SocialProvider socialProvider, String socialAccessToken,long durationMs) {
+    public String generateTempToken(SocialPendingResult pendingResult, long durationMs) {
         Map<String,String> claims = new HashMap<>();
-        claims.put("email",email);
-        claims.put("providerId",providerId);
-        claims.put("socialProvider",socialProvider.name());
-        claims.put("socialAccessToken",socialAccessToken);
-        return jwtTokenProvider.generateToken(providerId,claims,durationMs);
+        claims.put("email",pendingResult.email());
+        claims.put("providerId",pendingResult.providerId());
+        claims.put("socialProvider",pendingResult.socialProvider().name());
+        claims.put("socialAccessToken",pendingResult.socialAccessToken());
+        return jwtTokenProvider.generateToken(pendingResult.providerId(),claims,durationMs);
     }
 
     public TempTokenInfo getTempTokenInfoFromClaims(String tempToken) {

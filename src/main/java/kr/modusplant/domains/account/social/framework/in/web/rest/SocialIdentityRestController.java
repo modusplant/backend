@@ -58,15 +58,13 @@ public class SocialIdentityRestController {
                 cookie = jwtCookieProvider.generateRefreshTokenCookieAsString(tokenPair.refreshToken());
                 loginResponse = SocialLoginResponse.login(tokenPair.accessToken());
             }
-            case NeedSignupResult needSignup -> {
-                String tempToken = tempTokenHelper.generateTempToken(needSignup.email(), needSignup.providerId(), needSignup.socialProvider(), socialAccessToken, durationMs);
+            case SocialPendingResult pending -> {
+                String tempToken = tempTokenHelper.generateTempToken(pending, durationMs);
                 cookie = jwtCookieProvider.generateTempTokenCookieAsString(tempToken,durationMs);
-                loginResponse = SocialLoginResponse.needSignup(needSignup.email(), needSignup.nickname());
-            }
-            case NeedLinkResult needLink -> {
-                String tempToken = tempTokenHelper.generateTempToken(needLink.email(), needLink.providerId(), needLink.socialProvider(),socialAccessToken, durationMs);
-                cookie = jwtCookieProvider.generateTempTokenCookieAsString(tempToken,durationMs);
-                loginResponse = SocialLoginResponse.needLink(needLink.email(), needLink.nickname());
+                loginResponse = switch (pending) {
+                    case NeedSignupResult r -> SocialLoginResponse.needSignup(r.email(), r.nickname());
+                    case NeedLinkResult r -> SocialLoginResponse.needLink(r.email(), r.nickname());
+                };
             }
         }
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie).body(DataResponse.ok(loginResponse));

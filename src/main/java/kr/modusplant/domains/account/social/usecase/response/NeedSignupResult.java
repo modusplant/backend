@@ -6,6 +6,7 @@ public record NeedSignupResult(
         String email,
         String nickname,
         String providerId,
-        SocialProvider socialProvider
-) implements SocialLoginResult {
+        SocialProvider socialProvider,
+        String socialAccessToken
+) implements SocialPendingResult {
 }
