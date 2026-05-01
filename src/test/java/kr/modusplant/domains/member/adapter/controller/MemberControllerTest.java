@@ -30,6 +30,7 @@ import kr.modusplant.framework.jpa.entity.common.util.*;
 import kr.modusplant.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
+import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.framework.jpa.repository.*;
 import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.event.consumer.CommentEventConsumer;
@@ -42,13 +43,15 @@ import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.CommentLikeNotificationEvent;
+import kr.modusplant.shared.event.ImageRemoveEvent;
 import kr.modusplant.shared.event.PostLikeNotificationEvent;
+import kr.modusplant.shared.event.RecentlyViewPostRemoveEvent;
 import kr.modusplant.shared.exception.InvalidFileInputException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
+import kr.modusplant.shared.generator.UlidGeneratorHolder;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
-import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.tools.jdbc.MockConnection;
 import org.jooq.tools.jdbc.MockDataProvider;
@@ -58,8 +61,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -93,6 +94,7 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.EXISTS_COMMENT_ABUSE_REPORT;
 import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.EXISTS_POST_ABUSE_REPORT;
 import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.objectMapper;
+import static kr.modusplant.jooq.Tables.COMM_POST;
 import static kr.modusplant.shared.event.common.util.CommentLikeEventTestUtils.testCommentLikeEvent;
 import static kr.modusplant.shared.event.common.util.PostBookmarkEventTestUtils.testPostBookmarkEvent;
 import static kr.modusplant.shared.event.common.util.PostCancelPostBookmarkEventTestUtils.testPostBookmarkCancelEvent;
@@ -100,6 +102,7 @@ import static kr.modusplant.shared.event.common.util.PostLikeEventTestUtils.test
 import static kr.modusplant.shared.exception.enums.GeneralErrorCode.INVALID_FILE_INPUT;
 import static kr.modusplant.shared.exception.enums.GeneralErrorCode.INVALID_INPUT;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
+import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_CONTENT;
 import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.*;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
@@ -120,11 +123,28 @@ class MemberControllerTest implements
         PropBugRepEntityTestUtils, CommPostAbuRepEntityTestUtils, CommCommentAbuRepEntityTestUtils {
     @SuppressWarnings("unused")
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
+    @SuppressWarnings("unused")
+    private final UlidGeneratorHolder ulidGeneratorHolder = new UlidGeneratorHolder(new UlidIdGenerator());
 
-    private final MockDataProvider mockDataProvider = ctx -> new MockResult[0]; // 반환값을 따로 설정하지 않음
+    private final MockDataProvider mockDataProvider = ctx -> {
+        String sql = ctx.sql().toLowerCase();
+
+        if (sql.contains("select")
+                && sql.contains("content")
+                && sql.contains("comm_post")) {
+            DSLContext dslContext = DSL.using(SQLDialect.POSTGRES);
+            Result<Record1<JSONB>> result = dslContext.newResult(COMM_POST.CONTENT);
+            result.add(dslContext.newRecord(COMM_POST.CONTENT).values(JSONB.valueOf(TEST_COMM_POST_CONTENT)));
+            return new MockResult[] { new MockResult(result.size(), result) };
+        }
+
+        return new MockResult[0];
+    };
+
     private final MockConnection mockConnection = new MockConnection(mockDataProvider);
     private final DSLContext dslContext = DSL.using(mockConnection, SQLDialect.POSTGRES);
     private final StringRedisTemplate stringRedisTemplate = Mockito.mock(StringRedisTemplate.class);
+    private final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
 
     private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
     private final TokenService tokenService = Mockito.mock(TokenService.class);
@@ -159,8 +179,7 @@ class MemberControllerTest implements
     @SuppressWarnings("unused")
     private final ReportEventConsumer reportEventConsumer = new ReportEventConsumer(eventBus, dslContext, s3FileService, memberJpaRepository, postJpaRepository, commentJpaRepository, propBugRepJpaRepository, postAbuRepJpaRepository, commentAbuRepJpaRepository);
     @SuppressWarnings("unused")
-    private final MemberEventConsumer memberEventConsumer = new MemberEventConsumer(eventBus, stringRedisTemplate, dslContext, s3FileService);
-    private final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
+    private final MemberEventConsumer memberEventConsumer = new MemberEventConsumer(eventBus, stringRedisTemplate, dslContext, applicationEventPublisher);
     private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, swearService, memberImageIOHelper, memberValidationHelper, memberProfileMapper, memberSocialTranslator, memberRepository, memberProfileRepository, targetPostRepository, targetCommentRepository, reportRepository, eventBus, applicationEventPublisher);
 
     private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
@@ -1218,7 +1237,6 @@ class MemberControllerTest implements
         assertThat(existsEntityException.getErrorCode()).isEqualTo(EXISTS_COMMENT_ABUSE_REPORT);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     @DisplayName("withdraw로 회원 탈퇴")
     void testWithdraw_givenMemberId_willWithdrawMember() {
@@ -1229,15 +1247,16 @@ class MemberControllerTest implements
         willDoNothing().given(memberSocialTranslator).deleteSocialAccountWithSocialAccessToken(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN, SocialProvider.KAKAO.getValue(), MEMBER_BASIC_USER_UUID);
         willDoNothing().given(tokenService).blacklistAccessToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN);
         given(stringRedisTemplate.unlink(any(String.class))).willReturn(true);
-        given(stringRedisTemplate.execute(any(RedisCallback.class))).willReturn(true);
-        given(stringRedisTemplate.executePipelined(any(SessionCallback.class))).willReturn(null);
-        willDoNothing().given(s3FileService).deleteFiles(any(List.class));
+        willDoNothing().given(applicationEventPublisher).publishEvent(any(ImageRemoveEvent.class));
+        willDoNothing().given(applicationEventPublisher).publishEvent(any(RecentlyViewPostRemoveEvent.class));
 
         // when
         memberController.withdraw(testKakaoMemberWithdrawalRecord);
 
         // then
         verify(tokenService, times(1)).blacklistAccessToken(any());
+        verify(applicationEventPublisher, times(1)).publishEvent(any(ImageRemoveEvent.class));
+        verify(applicationEventPublisher, times(1)).publishEvent(any(RecentlyViewPostRemoveEvent.class));
     }
 
     @Test
