@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.account.social.adapter.SocialIdentityTokenHelper;
 import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityController;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
+import kr.modusplant.domains.account.social.usecase.record.*;
 import kr.modusplant.domains.account.social.usecase.request.SocialAuthRequest;
 import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
 import kr.modusplant.domains.account.social.usecase.response.*;

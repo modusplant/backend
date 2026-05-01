@@ -7,7 +7,7 @@ import kr.modusplant.domains.account.social.framework.out.client.dto.GoogleUserI
 import kr.modusplant.domains.account.social.framework.out.client.dto.KakaoUserInfo;
 import kr.modusplant.domains.account.social.usecase.port.client.dto.SocialUserInfo;
 import kr.modusplant.domains.account.social.usecase.port.mapper.SocialIdentityMapper;
-import kr.modusplant.domains.account.social.usecase.response.LoginResult;
+import kr.modusplant.domains.account.social.usecase.record.LoginResult;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.enums.Role;
 import org.junit.jupiter.api.DisplayName;

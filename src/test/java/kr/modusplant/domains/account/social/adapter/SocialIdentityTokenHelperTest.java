@@ -5,7 +5,7 @@ import kr.modusplant.domains.account.social.common.util.usecase.record.TempToken
 import kr.modusplant.domains.account.social.common.util.usecase.response.SocialLoginResultTestUtils;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.usecase.record.TempTokenInfo;
-import kr.modusplant.domains.account.social.usecase.response.SocialPendingResult;
+import kr.modusplant.domains.account.social.usecase.record.SocialPendingResult;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
