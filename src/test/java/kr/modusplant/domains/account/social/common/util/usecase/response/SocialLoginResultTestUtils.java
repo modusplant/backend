@@ -1,9 +1,9 @@
 package kr.modusplant.domains.account.social.common.util.usecase.response;
 
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
-import kr.modusplant.domains.account.social.usecase.response.LoginResult;
-import kr.modusplant.domains.account.social.usecase.response.NeedLinkResult;
-import kr.modusplant.domains.account.social.usecase.response.NeedSignupResult;
+import kr.modusplant.domains.account.social.usecase.record.LoginResult;
+import kr.modusplant.domains.account.social.usecase.record.NeedLinkResult;
+import kr.modusplant.domains.account.social.usecase.record.NeedSignupResult;
 import kr.modusplant.shared.enums.Role;
 
 import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_GOOGLE_SOCIAL_ACCESS_TOKEN;
