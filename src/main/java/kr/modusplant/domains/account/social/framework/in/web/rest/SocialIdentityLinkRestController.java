@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityController;
 import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityLinkController;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.usecase.request.SocialAuthRequest;
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 @SecurityRequirement(name = "Authorization")
 public class SocialIdentityLinkRestController {
 
-    private final SocialIdentityController socialIdentityController;
     private final SocialIdentityLinkController socialIdentityLinkController;
 
     @Operation(summary = "소셜 연동 API", description = "카카오/구글 인가코드를 받아 소셜 인증 및 연동을 수행합니다")
@@ -42,7 +40,7 @@ public class SocialIdentityLinkRestController {
             @NotNull
             SocialProvider provider
     ) {
-        String socialAccessToken = socialIdentityController.issueSocialAccessToken(provider,request.code());
+        String socialAccessToken = socialIdentityLinkController.issueSocialAccessToken(provider,request.code());
         socialIdentityLinkController.linkSocialAccount(userDetails.getUuid(), provider, socialAccessToken);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -59,7 +57,7 @@ public class SocialIdentityLinkRestController {
             @NotNull
             SocialProvider provider
     ) {
-        String socialAccessToken = socialIdentityController.issueSocialAccessToken(provider,request.code());
+        String socialAccessToken = socialIdentityLinkController.issueSocialAccessToken(provider,request.code());
         socialIdentityLinkController.unlinkSocialAccount(userDetails.getUuid(), provider, socialAccessToken);
         return ResponseEntity.ok().body(DataResponse.ok());
     }

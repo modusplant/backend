@@ -50,27 +50,6 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
     private final SocialIdentityMapper socialIdentityMapper = mock(SocialIdentityMapper.class);
     private final SocialIdentityController socialIdentityController = new SocialIdentityController(clientFactory,socialIdentityRepository,socialIdentityMapper);
 
-
-    @Test
-    @DisplayName("소셜 접근 토큰 발급받기")
-    void testIssueSocialAccessToken_givenSocialProviderAndCode_willReturnSocialAccessToken() {
-        // given
-        String code = createTestKakaoLoginRequest().code();
-        String socialAccessToken = "access-token";
-        SocialAuthClient authClient = mock(SocialAuthClient.class);
-
-        given(clientFactory.getClient(SocialProvider.KAKAO)).willReturn(authClient);
-        given(authClient.getAccessToken(code)).willReturn(socialAccessToken);
-
-        // when
-        String result = socialIdentityController.issueSocialAccessToken(SocialProvider.KAKAO,code);
-
-        // then
-        assertEquals(result,socialAccessToken);
-        verify(clientFactory).getClient(SocialProvider.KAKAO);
-        verify(authClient).getAccessToken(code);
-    }
-
     @Test
     @DisplayName("최초 회원 로그인시 NeedSignupResult 반환하기")
     void testHandleSocialLogin_givenSocialProviderAndSocialAccessToken_willReturnSocialLoginResult() {

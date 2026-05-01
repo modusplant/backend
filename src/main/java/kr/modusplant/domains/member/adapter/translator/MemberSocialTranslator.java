@@ -1,6 +1,5 @@
 package kr.modusplant.domains.member.adapter.translator;
 
-import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityController;
 import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityLinkController;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.framework.out.exception.UnsupportedSocialProviderException;
@@ -13,16 +12,15 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class MemberSocialTranslator {
-    private final SocialIdentityController socialIdentityController;
     private final SocialIdentityLinkController socialIdentityLinkController;
 
     public String getSocialAccessToken(String authCode, String authProvider) {
         String upperCaseAuthProvider = authProvider.toUpperCase(Locale.ROOT);
         if (upperCaseAuthProvider.equals(SocialProvider.KAKAO.name())) {
-            return socialIdentityController.issueSocialAccessToken(
+            return socialIdentityLinkController.issueSocialAccessToken(
                     SocialProvider.KAKAO, authCode);
         } else if (upperCaseAuthProvider.equals(SocialProvider.GOOGLE.name())) {
-            return socialIdentityController.issueSocialAccessToken(
+            return socialIdentityLinkController.issueSocialAccessToken(
                     SocialProvider.GOOGLE, authCode);
         } else {
             throw new UnsupportedSocialProviderException();
