@@ -1,6 +1,5 @@
 package kr.modusplant.domains.account.social.framework.in.web.rest;
 
-import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityController;
 import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityLinkController;
 import kr.modusplant.domains.account.social.common.util.usecase.request.SocialAuthRequestTestUtils;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
@@ -23,11 +22,8 @@ import static org.mockito.Mockito.verify;
 
 class SocialIdentityLinkRestControllerTest implements SocialAuthRequestTestUtils, SiteMemberUserDetailsTestUtils {
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
-    private final SocialIdentityController socialIdentityController = mock(SocialIdentityController.class);
     private final SocialIdentityLinkController socialIdentityLinkController = mock(SocialIdentityLinkController.class);
-    private final SocialIdentityLinkRestController socialIdentityLinkRestController = new SocialIdentityLinkRestController(
-            socialIdentityController, socialIdentityLinkController
-    );
+    private final SocialIdentityLinkRestController socialIdentityLinkRestController = new SocialIdentityLinkRestController(socialIdentityLinkController);
 
     @Test
     @DisplayName("소셜 연동 성공 시 응답을 반환한다.")
@@ -35,7 +31,7 @@ class SocialIdentityLinkRestControllerTest implements SocialAuthRequestTestUtils
         // given
         DefaultUserDetails userDetails = testDefaultMemberUserDetailsBuilder.build();
         String socialAccessToken = "social-access-token";
-        given(socialIdentityController.issueSocialAccessToken(SocialProvider.KAKAO,TEST_SOCIAL_KAKAO_CODE)).willReturn(socialAccessToken);
+        given(socialIdentityLinkController.issueSocialAccessToken(SocialProvider.KAKAO,TEST_SOCIAL_KAKAO_CODE)).willReturn(socialAccessToken);
         willDoNothing().given(socialIdentityLinkController).linkSocialAccount(userDetails.getUuid(),SocialProvider.KAKAO,socialAccessToken);
 
         // when
@@ -53,7 +49,7 @@ class SocialIdentityLinkRestControllerTest implements SocialAuthRequestTestUtils
         // given
         DefaultUserDetails userDetails = testDefaultMemberUserDetailsBuilder.build();
         String socialAccessToken = "social-access-token";
-        given(socialIdentityController.issueSocialAccessToken(SocialProvider.KAKAO,TEST_SOCIAL_KAKAO_CODE)).willReturn(socialAccessToken);
+        given(socialIdentityLinkController.issueSocialAccessToken(SocialProvider.KAKAO,TEST_SOCIAL_KAKAO_CODE)).willReturn(socialAccessToken);
         willDoNothing().given(socialIdentityLinkController).unlinkSocialAccount(userDetails.getUuid(),SocialProvider.KAKAO,socialAccessToken);
 
         // when

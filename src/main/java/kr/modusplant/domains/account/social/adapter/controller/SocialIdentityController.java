@@ -37,10 +37,6 @@ public class SocialIdentityController {
     private final SocialIdentityRepository socialIdentityRepository;
     private final SocialIdentityMapper socialIdentityMapper;
 
-    public String issueSocialAccessToken(SocialProvider provider, String code) {
-        return clientFactory.getClient(provider).getAccessToken(code);
-    }
-
     public SocialLoginResult handleSocialLogin(SocialProvider provider, String code) {
         SocialAuthClient authClient = clientFactory.getClient(provider);
         String socialAccessToken = authClient.getAccessToken(code);

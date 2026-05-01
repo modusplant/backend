@@ -27,6 +27,10 @@ public class SocialIdentityLinkController {
     private final SocialIdentityRepository socialIdentityRepository;
     private final SocialIdentityMapper socialIdentityMapper;
 
+    public String issueSocialAccessToken(SocialProvider provider, String code) {
+        return clientFactory.getClient(provider).getAccessToken(code);
+    }
+
     @Transactional
     public void linkSocialAccount(UUID currentMemberUuid, SocialProvider provider, String socialAccessToken) {
         SocialUserInfo user = clientFactory.getClient(provider).getUserInfo(socialAccessToken);
