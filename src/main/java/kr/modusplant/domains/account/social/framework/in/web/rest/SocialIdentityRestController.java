@@ -49,8 +49,7 @@ public class SocialIdentityRestController {
             @NotNull
             SocialProvider provider
     ) {
-        String socialAccessToken = socialIdentityController.issueSocialAccessToken(provider, request.code());
-        SocialLoginResult socialLoginResult = socialIdentityController.handleSocialLogin(provider, socialAccessToken);
+        SocialLoginResult socialLoginResult = socialIdentityController.handleSocialLogin(provider, request.code());
         String cookie;
         SocialLoginResponse loginResponse;
         switch (socialLoginResult) {

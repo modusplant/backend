@@ -7,6 +7,7 @@ import kr.modusplant.domains.account.social.domain.exception.SocialAccountConfli
 import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
 import kr.modusplant.domains.account.social.domain.vo.*;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
+import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClient;
 import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClientFactory;
 import kr.modusplant.domains.account.social.usecase.port.client.dto.SocialUserInfo;
 import kr.modusplant.domains.account.social.usecase.port.mapper.SocialIdentityMapper;
@@ -40,28 +41,31 @@ public class SocialIdentityController {
         return clientFactory.getClient(provider).getAccessToken(code);
     }
 
-    public SocialLoginResult handleSocialLogin(SocialProvider provider, String socialAccessToken) {
+    public SocialLoginResult handleSocialLogin(SocialProvider provider, String code) {
+        SocialAuthClient authClient = clientFactory.getClient(provider);
+        String socialAccessToken = authClient.getAccessToken(code);
         // 소셜 사용자 정보 가져오기
-        SocialUserInfo user = clientFactory.getClient(provider).getUserInfo(socialAccessToken);
+        SocialUserInfo user = authClient.getUserInfo(socialAccessToken);
         // 사용자 생성 및 조회
-        return classifyMember(socialIdentityMapper.toSocialProfile(provider,user));
+        return classifyMember(socialIdentityMapper.toSocialProfile(provider,user), socialAccessToken);
     }
 
     @Transactional
-    public SocialLoginResult classifyMember(SocialProfile profile) {
+    public SocialLoginResult classifyMember(SocialProfile profile, String socialAccessToken) {
         Optional<SocialMemberProfile> existingMemberOptional = socialIdentityRepository.getSocialMemberProfileByEmail(Email.create(profile.getEmail().getValue()));
         // 회원가입 연결 : NEED_SIGNUP
         if (existingMemberOptional.isEmpty()) {
-            return new NeedSignupResult(profile.getEmail().getValue(),profile.getSocialNickname(), profile.getProviderId(), profile.getSocialProvider());
+            return new NeedSignupResult(profile.getEmail().getValue(),profile.getSocialNickname(), profile.getProviderId(), profile.getSocialProvider(),socialAccessToken);
         }
         SocialMemberProfile existingMember = existingMemberOptional.get();
         // 연동 연결 : NEED_LINK
         if (existingMember.getSocialCredentials().isPureBasic()) {
-            return new NeedLinkResult(existingMember.getEmail().getValue(),existingMember.getNickname().getValue(),profile.getProviderId(),profile.getSocialProvider());
+            return new NeedLinkResult(existingMember.getEmail().getValue(),existingMember.getNickname().getValue(),profile.getProviderId(),profile.getSocialProvider(),socialAccessToken);
         }
         // 로그인
         // 다른 소셜로 가입된 계정일 경우 예외 처리
         if (!matches(profile.getSocialProvider(),existingMember.getSocialCredentials())) {
+            clientFactory.getClient(profile.getSocialProvider()).revokeAccess(socialAccessToken);
             switch (profile.getSocialProvider()) {
                 case KAKAO -> throw new AlreadyRegisteredWithOtherProviderException(SocialIdentityErrorCode.ALREADY_REGISTERED_WITH_GOOGLE);
                 case GOOGLE ->  throw new AlreadyRegisteredWithOtherProviderException(SocialIdentityErrorCode.ALREADY_REGISTERED_WITH_KAKAO);
