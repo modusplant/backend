@@ -9,17 +9,18 @@ import kr.modusplant.jooq.tables.records.CommPostRecord;
 import kr.modusplant.jooq.tables.records.CommPriCateRecord;
 import kr.modusplant.jooq.tables.records.CommSecoCateRecord;
 import kr.modusplant.jooq.tables.records.SiteMemberRecord;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.TimeZone;
 
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.*;
 import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostPublishedAtTestUtils.testSearchPostPublishedAt;
@@ -31,9 +32,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("FieldCanBeLocal")
 @SpringBootTest
-@TestPropertySource(properties = {
-        "spring.jpa.properties.hibernate.jdbc.time_zone=Asia/Seoul"
-})
 class SearchPostRepositoryJooqAdapterIntegrationTest {
     private final SearchPostRepository searchPostRepository;
     private final PostTestDataHelper testDataHelper;
@@ -49,11 +47,6 @@ class SearchPostRepositoryJooqAdapterIntegrationTest {
     private CommSecoCateRecord testSecondaryCategory1, testSecondaryCategory2, testSecondaryCategory3;
     private CommPostRecord testPost1, testPost2, testPost3, testPost4, testPost5;
     private LocalDateTime mockedNow;
-
-    @BeforeAll
-    static void setTimezone() {
-        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
-    }
 
     @BeforeEach
     void setUp() {
