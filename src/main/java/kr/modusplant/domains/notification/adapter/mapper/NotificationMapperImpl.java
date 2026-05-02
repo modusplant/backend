@@ -7,7 +7,6 @@ import kr.modusplant.domains.notification.usecase.record.NotificationReadModel;
 import kr.modusplant.domains.notification.usecase.response.NotificationResponse;
 import kr.modusplant.shared.enums.ContentType;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.modeler.NotificationInfo;
 import org.springframework.stereotype.Component;
 
 @Component

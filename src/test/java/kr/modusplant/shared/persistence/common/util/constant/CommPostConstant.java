@@ -16,8 +16,8 @@ public final class CommPostConstant {
 
     public static final String TEST_COMM_POST_ULID = "01K6DH4YCJMS3NJ4JCY8TPXP4T";
     public static final String[] TEST_COMM_POST_ULID_ARRAY = new String[]{"01K6DH4YCJMS3NJ4JCY8TPXP4T"};
-    public static final Integer TEST_COMM_POST_LIKE_COUNT = 0;
-    public static final Long TEST_COMM_POST_VIEW_COUNT = 0L;
+    public static final Integer TEST_COMM_POST_LIKE_COUNT = 8;
+    public static final Long TEST_COMM_POST_VIEW_COUNT = 25L;
     public static final String TEST_COMM_POST_TITLE = "물 주는 타이밍, 이제 헷갈리지 마세요! 식물별 물 주기 가이드";
     public static final JsonNode TEST_COMM_POST_CONTENT_JSON_NODE = createSampleContentAsJsonNode();
     public static final String TEST_COMM_POST_CONTENT_TEXT = "Hello, this is text part 1. This is text part 2.";

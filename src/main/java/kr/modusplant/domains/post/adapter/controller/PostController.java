@@ -8,24 +8,18 @@ import kr.modusplant.domains.post.domain.exception.PostAccessDeniedException;
 import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
 import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.domains.post.domain.vo.*;
-import kr.modusplant.domains.post.usecase.enums.SearchSort;
 import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
 import kr.modusplant.domains.post.usecase.port.repository.*;
 import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
-import kr.modusplant.domains.post.usecase.record.PostSummaryWithSearchInfoReadModel;
 import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
 import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
-import kr.modusplant.domains.post.usecase.request.PostSearchRequest;
 import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
 import kr.modusplant.domains.post.usecase.response.*;
 import kr.modusplant.framework.aws.service.S3FileService;
-import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -33,11 +27,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
-import static kr.modusplant.shared.constant.Regex.REGEX_ULID;
 
 @Service
 @Transactional(readOnly = true)
@@ -52,7 +43,6 @@ public class PostController {
     private final PostViewLockRepository postViewLockRepository;
     private final PostArchiveRepository postArchiveRepository;
     private final PostRecentlyViewRepository postRecentlyViewRepository;
-    private final PostSearchHistoryRepository postSearchHistoryRepository;
     private final S3FileService s3FileService;
 
     @Value("${redis.ttl.view_count}")
@@ -68,78 +58,6 @@ public class PostController {
                 .map(readModel -> postMapper.toPostSummaryResponse(readModel,getJsonNodeContentPreview(readModel.content(),readModel.thumbnailPath()))).toList();
         String nextUlid = hasNext && !responses.isEmpty() ? responses.getLast().ulid() : null;
         return CursorLatestSortedPageResponse.of(responses, nextUlid, hasNext);
-    }
-
-    @Transactional
-    public CursorRelevanceSortedPageResponse<PostSummaryWithSearchInfoResponse> getByKeyword(
-            PostSearchRequest postSearchRequest, UUID currentMemberUuid,
-            String lastUlid, Integer lastImportance, Double lastWordSimilarity, LocalDateTime lastPublishedAt,
-            int size) {
-        String keyword = postSearchRequest.keyword();
-        if (StringUtils.isEmpty(keyword)) {
-            throw new InvalidValueException(GeneralErrorCode.INVALID_INPUT, "keyword");
-        }
-        keyword = keyword.trim();
-
-        if (lastUlid != null && !lastUlid.matches(REGEX_ULID)) {
-            throw new InvalidValueException(GeneralErrorCode.MALFORMED_INPUT, "lastUlid");
-        }
-        if (lastImportance != null && (lastImportance < 1 || lastImportance > 4)) {
-            throw new InvalidValueException(GeneralErrorCode.INPUT_OUT_OF_RANGE, "lastImportance");
-        }
-        if (lastWordSimilarity != null && (lastWordSimilarity < 0 || lastWordSimilarity > 1)) {
-            throw new InvalidValueException(GeneralErrorCode.INPUT_OUT_OF_RANGE, "lastWordSimilarity");
-        }
-        if (postSearchRequest.sort().equals(SearchSort.LATEST) &&
-                !(
-                        (lastUlid != null && lastPublishedAt != null) ||
-                                (lastUlid == null && lastPublishedAt == null)
-                )) {
-            throw new InvalidValueException(GeneralErrorCode.INVALID_INPUT, List.of("lastUlid", "lastPublishedAt"));
-        } else if (postSearchRequest.sort().equals(SearchSort.RELEVANCE) &&
-                !(
-                        (lastUlid != null && lastImportance != null &&
-                                lastWordSimilarity != null && lastPublishedAt != null) ||
-                                (lastUlid == null && lastImportance == null &&
-                                        lastWordSimilarity == null && lastPublishedAt == null)
-                )) {
-            throw new InvalidValueException(GeneralErrorCode.INVALID_INPUT,
-                    List.of("lastUlid", "lastImportance", "lastWordSimilarity", "lastPublishedAt"));
-        }
-
-        List<PostSummaryWithSearchInfoReadModel> readModels;
-        if (postSearchRequest.sort().equals(SearchSort.LATEST)) {
-            readModels = postQueryRepository.searchByKeywordWithLatest(
-                    postSearchRequest.option(), keyword,
-                    postSearchRequest.category().primaryCategoryId(),
-                    postSearchRequest.category().secondaryCategoryIds(),
-                    currentMemberUuid, lastUlid, lastPublishedAt, size);
-        } else {
-            readModels = postQueryRepository.searchByKeywordWithRelevance(
-                    postSearchRequest.option(), keyword,
-                    postSearchRequest.category().primaryCategoryId(),
-                    postSearchRequest.category().secondaryCategoryIds(),
-                    currentMemberUuid, lastUlid, lastImportance, lastWordSimilarity, lastPublishedAt, size);
-        }
-        boolean hasNext = readModels.size() > size;
-        List<PostSummaryWithSearchInfoResponse> responses =
-                readModels.stream()
-                        .limit(size)
-                        .map(readModel ->
-                                postMapper.toPostSummaryWithSearchInfoResponse(
-                                        readModel, getJsonNodeContentPreview(readModel.content(), readModel.thumbnailPath())))
-                        .toList();
-        postSearchHistoryRepository.saveSearchKeyword(currentMemberUuid, keyword);
-        PostSummaryWithSearchInfoResponse response = hasNext && !responses.isEmpty() ? responses.getLast() : null;
-        if (response != null) {
-            return CursorRelevanceSortedPageResponse.of(
-                    responses, response.ulid(),
-                    response.importance(), response.maxWordSimilarity(),
-                    response.publishedAt(), true);
-        } else {
-            return CursorRelevanceSortedPageResponse.of(
-                    responses, null, null, null, null, hasNext);
-        }
     }
 
     public PostDetailResponse getByUlid(String ulid, UUID currentMemberUuid, UUID guestId) {
@@ -305,18 +223,6 @@ public class PostController {
                 postQueryForMemberRepository.findBookmarkedByMemberWithOffset(currentMemberUuid,page,size)
                         .map(postModel -> postMapper.toPostSummaryResponse(postModel, getJsonNodeContentPreview(postModel.content(),postModel.thumbnailPath())))
         );
-    }
-
-    public List<String> getSearchHistory(UUID currentMemberUuid, int size) {
-        return postSearchHistoryRepository.getSearchHistory(currentMemberUuid, size);
-    }
-
-    public void deleteSearchKeyword(UUID currentMemberUuid, String keyword) {
-        postSearchHistoryRepository.removeSearchKeyword(currentMemberUuid,keyword);
-    }
-
-    public void deleteAllSearchHistory(UUID currentMemberUuid) {
-        postSearchHistoryRepository.removeAllSearchHistory(currentMemberUuid);
     }
 
     private JsonNode getJsonNodeContentPreview(JsonNode content, String thumbnailPath) {
