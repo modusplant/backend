@@ -10,7 +10,7 @@ public class EmptySearchPostOption extends SearchPostOption {
     private EmptySearchPostOption() {
         super(EmptySearchPostId.create(),
                 EmptySearchPostPublishedAt.create(),
-                SearchPostImportance.createEmpty(),
+                SearchPostImportance.empty(),
                 SearchKeywordSimilarity.createEmpty());
     }
 

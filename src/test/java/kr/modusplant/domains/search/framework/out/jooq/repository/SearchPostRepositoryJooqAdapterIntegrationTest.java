@@ -207,7 +207,7 @@ class SearchPostRepositoryJooqAdapterIntegrationTest {
         List<SearchPostReadModel> result = searchPostRepository.searchByKeywordWithRelevance(
                 SearchKeyword.create("hello"), TITLE_CONTENT, null, null,
                 testEmptySearchPostId, testEmptySearchPostPublishedAt,
-                SearchPostImportance.createEmpty(), SearchKeywordSimilarity.createEmpty(),
+                SearchPostImportance.empty(), SearchKeywordSimilarity.createEmpty(),
                 size, testMember2.getUuid());
 
         // then
@@ -226,7 +226,7 @@ class SearchPostRepositoryJooqAdapterIntegrationTest {
         List<SearchPostReadModel> firstPage = searchPostRepository.searchByKeywordWithRelevance(
                 keyword, TITLE_CONTENT, null, null,
                 testEmptySearchPostId, testEmptySearchPostPublishedAt,
-                SearchPostImportance.createEmpty(), SearchKeywordSimilarity.createEmpty(),
+                SearchPostImportance.empty(), SearchKeywordSimilarity.createEmpty(),
                 size, testMember2.getUuid());
 
         SearchPostReadModel firstPost = firstPage.getFirst();

@@ -4,23 +4,16 @@ import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.*;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
+@Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class SearchPostImportance {
-    private static final SearchPostImportance emptySearchPostImportance =
-            new SearchPostImportance(0, true);
-
-    private final int value;
-
-    @Getter
-    private final boolean empty;
+    private final Importance importance;
 
     public static SearchPostImportance create(Integer value) {
         if (value == null) {
@@ -28,18 +21,69 @@ public class SearchPostImportance {
         } else if (value < 1 || value > 4) {
             throw new InvalidValueException(SEARCH_POST_IMPORTANCE_OUT_OF_RANGE, "searchPostImportance");
         }
-        return new SearchPostImportance(value, false);
+        if (value.equals(4)) {
+            return searchPostImportanceTitle;
+        } else if (value.equals(3)) {
+            return searchPostImportanceContent;
+        } else if (value.equals(2)) {
+            return searchPostImportanceCommentContent;
+        } else {
+            return searchPostImportanceOthers;
+        }
     }
 
-    public static SearchPostImportance createEmpty() {
-        return emptySearchPostImportance;
+    public static SearchPostImportance title() {
+        return searchPostImportanceTitle;
+    }
+
+    public static SearchPostImportance content() {
+        return searchPostImportanceContent;
+    }
+
+    public static SearchPostImportance commentContent() {
+        return searchPostImportanceCommentContent;
+    }
+
+    public static SearchPostImportance others() {
+        return searchPostImportanceOthers;
+    }
+
+    public static SearchPostImportance empty() {
+        return searchPostImportanceEmpty;
     }
 
     public int getValueIfNotEmpty() {
-        if (isEmpty()) {
+        if (getImportance().equals(Importance.EMPTY)) {
             throw new InvalidValueException(NOT_FOUND_SEARCH_POST_IMPORTANCE, "searchPostImportance");
         }
-        return this.value;
+        return this.getImportance().getValue();
+    }
+
+    public boolean isEmpty() {
+        return this.getImportance().isEmpty();
+    }
+
+    private static final SearchPostImportance searchPostImportanceTitle = new SearchPostImportance(Importance.TITLE);
+    private static final SearchPostImportance searchPostImportanceContent = new SearchPostImportance(Importance.CONTENT);
+    private static final SearchPostImportance searchPostImportanceCommentContent = new SearchPostImportance(Importance.COMMENT_CONTENT);
+    private static final SearchPostImportance searchPostImportanceOthers = new SearchPostImportance(Importance.OTHERS);
+    private static final SearchPostImportance searchPostImportanceEmpty = new SearchPostImportance(Importance.EMPTY);
+
+    @Getter
+    private enum Importance {
+        TITLE(4, false),
+        CONTENT(3, false),
+        COMMENT_CONTENT(2, false),
+        OTHERS(1, false),
+        EMPTY(0, true);
+
+        private final int value;
+        private final boolean empty;
+
+        Importance(int value, boolean empty) {
+            this.value = value;
+            this.empty = empty;
+        }
     }
 
     @Override

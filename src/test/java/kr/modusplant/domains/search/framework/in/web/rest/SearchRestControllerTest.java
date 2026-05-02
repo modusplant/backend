@@ -3,6 +3,7 @@ package kr.modusplant.domains.search.framework.in.web.rest;
 import kr.modusplant.domains.search.adapter.controller.SearchController;
 import kr.modusplant.domains.search.domain.enums.SearchPostSortCondition;
 import kr.modusplant.domains.search.domain.enums.SearchPostTarget;
+import kr.modusplant.domains.search.domain.vo.SearchPostImportance;
 import kr.modusplant.domains.search.usecase.response.SearchPostRelevanceSortedPageResponse;
 import kr.modusplant.domains.search.usecase.response.SearchPostResponse;
 import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
@@ -18,7 +19,6 @@ import java.util.Objects;
 
 import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
 import static kr.modusplant.domains.search.common.constant.SearchDoubleConstant.TEST_SEARCH_KEYWORD_SIMILARITY_1;
-import static kr.modusplant.domains.search.common.constant.SearchIntegerConstant.TEST_SEARCH_POST_IMPORTANCE_TITLE;
 import static kr.modusplant.domains.search.common.constant.SearchIntegerConstant.TEST_SEARCH_POST_SIZE;
 import static kr.modusplant.domains.search.common.constant.SearchStringConstant.TEST_SEARCH_KEYWORD;
 import static kr.modusplant.domains.search.common.util.usecase.response.SearchPostRelevanceSortedPageResponseTestUtils.testSearchPostRelevanceSortedPageResponse;
@@ -56,7 +56,7 @@ class SearchRestControllerTest {
                         TEST_COMM_SECONDARY_CATEGORIES_ID,
                         TEST_POST_ULID,
                         TEST_COMM_POST_PUBLISHED_AT,
-                        TEST_SEARCH_POST_IMPORTANCE_TITLE,
+                        SearchPostImportance.title().getValueIfNotEmpty(),
                         TEST_SEARCH_KEYWORD_SIMILARITY_1,
                         TEST_SEARCH_POST_SIZE,
                         testDefaultMemberUserDetailsBuilder.build()

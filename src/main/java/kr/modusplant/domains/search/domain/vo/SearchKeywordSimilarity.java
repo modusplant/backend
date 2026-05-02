@@ -4,14 +4,12 @@ import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.*;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class SearchKeywordSimilarity {
     private static final SearchKeywordSimilarity emptySearchKeywordSimilarity =

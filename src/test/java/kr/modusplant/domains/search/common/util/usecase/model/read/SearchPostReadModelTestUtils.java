@@ -1,5 +1,6 @@
 package kr.modusplant.domains.search.common.util.usecase.model.read;
 
+import kr.modusplant.domains.search.domain.vo.SearchPostImportance;
 import kr.modusplant.domains.search.usecase.model.read.SearchPostReadModel;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public interface SearchPostReadModelTestUtils {
             TEST_SEARCH_POST_COMMENT_COUNT,
             TEST_SEARCH_POST_IS_LIKED,
             TEST_SEARCH_POST_IS_BOOKMARKED,
-            TEST_SEARCH_POST_IMPORTANCE_TITLE,
+            SearchPostImportance.title().getValueIfNotEmpty(),
             TEST_SEARCH_KEYWORD_SIMILARITY_1
     );
 
@@ -49,7 +50,7 @@ public interface SearchPostReadModelTestUtils {
             TEST_SEARCH_POST_COMMENT_COUNT,
             TEST_SEARCH_POST_IS_LIKED,
             TEST_SEARCH_POST_IS_BOOKMARKED,
-            TEST_SEARCH_POST_IMPORTANCE_CONTENT,
+            SearchPostImportance.content().getValueIfNotEmpty(),
             TEST_SEARCH_KEYWORD_SIMILARITY_0_8
     );
 

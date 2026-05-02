@@ -62,7 +62,7 @@ public class SearchController {
         Integer lastPostImportance = record.lastPostImportance();
         SearchPostImportance searchPostImportance;
         if (lastPostImportance == null) {
-            searchPostImportance = SearchPostImportance.createEmpty();
+            searchPostImportance = SearchPostImportance.empty();
         } else {
             searchPostImportance = SearchPostImportance.create(lastPostImportance);
         }

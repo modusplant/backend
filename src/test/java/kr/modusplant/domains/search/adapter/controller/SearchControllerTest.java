@@ -5,6 +5,7 @@ import kr.modusplant.domains.search.adapter.translator.SearchPostTranslator;
 import kr.modusplant.domains.search.domain.enums.SearchPostSortCondition;
 import kr.modusplant.domains.search.domain.enums.SearchPostTarget;
 import kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode;
+import kr.modusplant.domains.search.domain.vo.SearchPostImportance;
 import kr.modusplant.domains.search.usecase.port.mapper.SearchMapper;
 import kr.modusplant.domains.search.usecase.port.repository.SearchPostConditionRepository;
 import kr.modusplant.domains.search.usecase.port.repository.SearchPostHistoryRepository;
@@ -22,7 +23,6 @@ import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TE
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT_THUMBNAIL_KEY;
 import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
 import static kr.modusplant.domains.search.common.constant.SearchDoubleConstant.TEST_SEARCH_KEYWORD_SIMILARITY_1;
-import static kr.modusplant.domains.search.common.constant.SearchIntegerConstant.TEST_SEARCH_POST_IMPORTANCE_TITLE;
 import static kr.modusplant.domains.search.common.constant.SearchIntegerConstant.TEST_SEARCH_POST_SIZE;
 import static kr.modusplant.domains.search.common.constant.SearchStringConstant.TEST_SEARCH_KEYWORD;
 import static kr.modusplant.domains.search.common.util.domain.vo.SearchKeywordSimilarityTestUtils.testSearchKeywordSimilarity1;
@@ -95,7 +95,7 @@ class SearchControllerTest {
                 TEST_SEARCH_KEYWORD, SearchPostTarget.TITLE_CONTENT_COMMENT, SearchPostSortCondition.RELEVANCE,
                 null, TEST_COMM_SECONDARY_CATEGORIES_ID,
                 TEST_POST_ULID, TEST_COMM_POST_PUBLISHED_AT,
-                TEST_SEARCH_POST_IMPORTANCE_TITLE, TEST_SEARCH_KEYWORD_SIMILARITY_1, 
+                SearchPostImportance.title().getValueIfNotEmpty(), TEST_SEARCH_KEYWORD_SIMILARITY_1,
                 TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
 
         // when
@@ -114,7 +114,7 @@ class SearchControllerTest {
                 TEST_SEARCH_KEYWORD, SearchPostTarget.TITLE_CONTENT_COMMENT, SearchPostSortCondition.RELEVANCE,
                 TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID,
                 TEST_POST_ULID, TEST_COMM_POST_PUBLISHED_AT,
-                TEST_SEARCH_POST_IMPORTANCE_TITLE, TEST_SEARCH_KEYWORD_SIMILARITY_1, TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
+                SearchPostImportance.title().getValueIfNotEmpty(), TEST_SEARCH_KEYWORD_SIMILARITY_1, TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
 
         given(searchPostConditionRepository.isIdExist(record.primaryCategoryId())).willReturn(false);
 
@@ -134,7 +134,7 @@ class SearchControllerTest {
                 TEST_SEARCH_KEYWORD, SearchPostTarget.TITLE_CONTENT_COMMENT, SearchPostSortCondition.RELEVANCE,
                 TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID,
                 TEST_POST_ULID, TEST_COMM_POST_PUBLISHED_AT,
-                TEST_SEARCH_POST_IMPORTANCE_TITLE, TEST_SEARCH_KEYWORD_SIMILARITY_1,
+                SearchPostImportance.title().getValueIfNotEmpty(), TEST_SEARCH_KEYWORD_SIMILARITY_1,
                 TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
 
         given(searchPostConditionRepository.isIdExist(record.primaryCategoryId())).willReturn(true);
@@ -240,7 +240,7 @@ class SearchControllerTest {
                 TEST_SEARCH_KEYWORD, SearchPostTarget.TITLE_CONTENT_COMMENT, SearchPostSortCondition.RELEVANCE,
                 TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID,
                 TEST_POST_ULID, TEST_COMM_POST_PUBLISHED_AT,
-                TEST_SEARCH_POST_IMPORTANCE_TITLE, TEST_SEARCH_KEYWORD_SIMILARITY_1, TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
+                SearchPostImportance.title().getValueIfNotEmpty(), TEST_SEARCH_KEYWORD_SIMILARITY_1, TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
 
         given(searchPostConditionRepository.isIdExist(record.primaryCategoryId())).willReturn(true);
         given(searchPostConditionRepository.isIdsExist(record.primaryCategoryId(), record.secondaryCategoryIds())).willReturn(true);

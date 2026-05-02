@@ -68,7 +68,7 @@ class SearchPostOptionTest {
     void testCreate_givenEmptyIdAndValidPublishedAt_willThrowException() {
         // given & when
         InvalidValueException exception = assertThrows(InvalidValueException.class,
-                () -> SearchPostOption.create(testEmptySearchPostId, testSearchPostPublishedAt, SearchPostImportance.createEmpty(), SearchKeywordSimilarity.createEmpty()));
+                () -> SearchPostOption.create(testEmptySearchPostId, testSearchPostPublishedAt, SearchPostImportance.empty(), SearchKeywordSimilarity.createEmpty()));
 
         // then
         assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.INVALID_INPUT);
@@ -79,7 +79,7 @@ class SearchPostOptionTest {
     void testCreate_givenValidIdAndEmptyPublishedAt_willThrowException() {
         // given & when
         InvalidValueException exception = assertThrows(InvalidValueException.class,
-                () -> SearchPostOption.create(testSearchPostId, testEmptySearchPostPublishedAt, SearchPostImportance.createEmpty(), SearchKeywordSimilarity.createEmpty()));
+                () -> SearchPostOption.create(testSearchPostId, testEmptySearchPostPublishedAt, SearchPostImportance.empty(), SearchKeywordSimilarity.createEmpty()));
 
         // then
         assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.INVALID_INPUT);
@@ -90,7 +90,7 @@ class SearchPostOptionTest {
     void testCreate_givenEmptyImportanceAndValidSimilarity_willThrowException() {
         // given & when
         InvalidValueException exception = assertThrows(InvalidValueException.class,
-                () -> SearchPostOption.create(testSearchPostId, testSearchPostPublishedAt, SearchPostImportance.createEmpty(), testSearchKeywordSimilarity1));
+                () -> SearchPostOption.create(testSearchPostId, testSearchPostPublishedAt, SearchPostImportance.empty(), testSearchKeywordSimilarity1));
 
         // then
         assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.INVALID_INPUT);
@@ -122,7 +122,7 @@ class SearchPostOptionTest {
     @DisplayName("모든 조건이 올바르게 채워졌을 때 정상 생성 (기본 ID, 발행일만 있는 경우)")
     void testCreate_givenValidBaseOptionsAndEmptyCursorOptions_willReturnSearchPostOption() {
         // given & when
-        SearchPostOption option = SearchPostOption.create(testSearchPostId, testSearchPostPublishedAt, SearchPostImportance.createEmpty(), SearchKeywordSimilarity.createEmpty());
+        SearchPostOption option = SearchPostOption.create(testSearchPostId, testSearchPostPublishedAt, SearchPostImportance.empty(), SearchKeywordSimilarity.createEmpty());
 
         // then
         assertNotNull(option);
@@ -133,7 +133,7 @@ class SearchPostOptionTest {
     @DisplayName("모든 조건이 올바르게 채워졌을 때 정상 생성 (모두 비어있는 경우)")
     void testCreate_givenAllEmptyOptions_willReturnSearchPostOption() {
         // given & when
-        SearchPostOption option = SearchPostOption.create(testEmptySearchPostId, testEmptySearchPostPublishedAt, SearchPostImportance.createEmpty(), SearchKeywordSimilarity.createEmpty());
+        SearchPostOption option = SearchPostOption.create(testEmptySearchPostId, testEmptySearchPostPublishedAt, SearchPostImportance.empty(), SearchKeywordSimilarity.createEmpty());
 
         // then
         assertNotNull(option);
@@ -154,7 +154,7 @@ class SearchPostOptionTest {
         SearchPostOption otherOption = SearchPostOption.create(
                 SearchPostId.create(TEST_POST_ULID),
                 SearchPostPublishedAt.create(TEST_COMM_POST_PUBLISHED_AT),
-                SearchPostImportance.createEmpty(),
+                SearchPostImportance.empty(),
                 SearchKeywordSimilarity.createEmpty()
         );
 
@@ -176,7 +176,7 @@ class SearchPostOptionTest {
         SearchPostOption otherOption = SearchPostOption.create(
                 SearchPostId.create(TEST_POST_ULID2),
                 SearchPostPublishedAt.create(TEST_COMM_POST_PUBLISHED_AT),
-                SearchPostImportance.createEmpty(),
+                SearchPostImportance.empty(),
                 SearchKeywordSimilarity.createEmpty()
         );
 
@@ -197,7 +197,7 @@ class SearchPostOptionTest {
         SearchPostOption otherOption = SearchPostOption.create(
                 SearchPostId.create(TEST_POST_ULID),
                 SearchPostPublishedAt.create(TEST_COMM_POST_PUBLISHED_AT),
-                SearchPostImportance.createEmpty(),
+                SearchPostImportance.empty(),
                 SearchKeywordSimilarity.createEmpty()
         );
 

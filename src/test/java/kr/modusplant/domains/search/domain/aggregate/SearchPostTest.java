@@ -75,7 +75,7 @@ class SearchPostTest {
         // given
         SearchPostOption searchPostOption = SearchPostOption.create(
                 testSearchPostId, testSearchPostPublishedAt,
-                SearchPostImportance.createEmpty(), SearchKeywordSimilarity.createEmpty());
+                SearchPostImportance.empty(), SearchKeywordSimilarity.createEmpty());
         ReflectionTestUtils.setField(searchPostOption, "searchPostImportance", testSearchPostImportanceTitle);
 
         // when
@@ -93,7 +93,7 @@ class SearchPostTest {
         SearchPostOption searchPostOption = SearchPostOption.create(
                 testSearchPostId, testSearchPostPublishedAt,
                 testSearchPostImportanceTitle, testSearchKeywordSimilarity1);
-        ReflectionTestUtils.setField(searchPostOption, "searchPostImportance", SearchPostImportance.createEmpty());
+        ReflectionTestUtils.setField(searchPostOption, "searchPostImportance", SearchPostImportance.empty());
 
         // when
         InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
@@ -109,7 +109,7 @@ class SearchPostTest {
         // given
         SearchPostOption searchPostOption = SearchPostOption.create(
                 testSearchPostId, testSearchPostPublishedAt,
-                SearchPostImportance.createEmpty(), SearchKeywordSimilarity.createEmpty());
+                SearchPostImportance.empty(), SearchKeywordSimilarity.createEmpty());
 
         // when
         SearchPost searchPost = SearchPost.create(searchPostOption, testSearchKeyword, testSearchPostTarget, SearchPostSortCondition.LATEST);
@@ -125,7 +125,7 @@ class SearchPostTest {
         // given
         SearchPostOption searchPostOption = SearchPostOption.create(
                 testSearchPostId, testSearchPostPublishedAt,
-                SearchPostImportance.createEmpty(), SearchKeywordSimilarity.createEmpty());
+                SearchPostImportance.empty(), SearchKeywordSimilarity.createEmpty());
 
         // when
         InvalidValueException exception = assertThrows(InvalidValueException.class,
@@ -141,7 +141,7 @@ class SearchPostTest {
         // given
         SearchPostOption searchPostOption = SearchPostOption.create(
                 testEmptySearchPostId, testEmptySearchPostPublishedAt,
-                SearchPostImportance.createEmpty(), SearchKeywordSimilarity.createEmpty());
+                SearchPostImportance.empty(), SearchKeywordSimilarity.createEmpty());
 
         // when
         SearchPost searchPost = SearchPost.create(searchPostOption, testSearchKeyword, testSearchPostTarget, SearchPostSortCondition.RELEVANCE);
@@ -182,7 +182,7 @@ class SearchPostTest {
                 SearchPostOption.create(
                         SearchPostId.create(TEST_POST_ULID),
                         SearchPostPublishedAt.create(TEST_COMM_POST_PUBLISHED_AT),
-                        SearchPostImportance.createEmpty(),
+                        SearchPostImportance.empty(),
                         SearchKeywordSimilarity.createEmpty()),
                 testSearchKeyword, testSearchPostTarget, SearchPostSortCondition.LATEST);
 
@@ -205,7 +205,7 @@ class SearchPostTest {
                 SearchPostOption.create(
                         SearchPostId.create(TEST_POST_ULID2),
                         SearchPostPublishedAt.create(TEST_COMM_POST_PUBLISHED_AT),
-                        SearchPostImportance.createEmpty(),
+                        SearchPostImportance.empty(),
                         SearchKeywordSimilarity.createEmpty()),
                 testSearchKeyword, testSearchPostTarget, SearchPostSortCondition.LATEST);
 
@@ -227,7 +227,7 @@ class SearchPostTest {
                 SearchPostOption.create(
                         SearchPostId.create(TEST_POST_ULID),
                         SearchPostPublishedAt.create(TEST_COMM_POST_PUBLISHED_AT),
-                        SearchPostImportance.createEmpty(),
+                        SearchPostImportance.empty(),
                         SearchKeywordSimilarity.createEmpty()),
                 testSearchKeyword, testSearchPostTarget, SearchPostSortCondition.LATEST);
 

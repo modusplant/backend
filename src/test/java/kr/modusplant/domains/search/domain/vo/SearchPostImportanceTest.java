@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
-import static kr.modusplant.domains.search.common.constant.SearchIntegerConstant.*;
 import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostImportanceTestUtils.*;
 import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,16 +18,16 @@ class SearchPostImportanceTest {
     void testCreate_givenValidValues_willReturnSearchPostImportance() {
         // given & when & then
         assertFalse(testSearchPostImportanceTitle.isEmpty());
-        assertEquals(TEST_SEARCH_POST_IMPORTANCE_TITLE, testSearchPostImportanceTitle.getValueIfNotEmpty());
+        assertEquals((Integer) SearchPostImportance.title().getValueIfNotEmpty(), testSearchPostImportanceTitle.getValueIfNotEmpty());
 
         assertFalse(testSearchPostImportanceContent.isEmpty());
-        assertEquals(TEST_SEARCH_POST_IMPORTANCE_CONTENT, testSearchPostImportanceContent.getValueIfNotEmpty());
+        assertEquals((Integer) SearchPostImportance.content().getValueIfNotEmpty(), testSearchPostImportanceContent.getValueIfNotEmpty());
 
         assertFalse(testSearchPostImportanceCommentContent.isEmpty());
-        assertEquals(TEST_SEARCH_POST_IMPORTANCE_COMMENT_CONTENT, testSearchPostImportanceCommentContent.getValueIfNotEmpty());
+        assertEquals((Integer) SearchPostImportance.commentContent().getValueIfNotEmpty(), testSearchPostImportanceCommentContent.getValueIfNotEmpty());
 
         assertFalse(testSearchPostImportanceOthers.isEmpty());
-        assertEquals(TEST_SEARCH_POST_IMPORTANCE_OTHERS, testSearchPostImportanceOthers.getValueIfNotEmpty());
+        assertEquals((Integer) SearchPostImportance.others().getValueIfNotEmpty(), testSearchPostImportanceOthers.getValueIfNotEmpty());
     }
 
     @Test
@@ -66,9 +65,9 @@ class SearchPostImportanceTest {
 
     @Test
     @DisplayName("createEmpty 호출 시 비어있는 객체 반환")
-    void testCreateEmpty_givenNothing_willReturnEmptyInstance() {
+    void testEmptyInstance() {
         // given & when
-        SearchPostImportance emptyImportance = SearchPostImportance.createEmpty();
+        SearchPostImportance emptyImportance = SearchPostImportance.empty();
 
         // then
         assertTrue(emptyImportance.isEmpty());
@@ -78,7 +77,7 @@ class SearchPostImportanceTest {
     @DisplayName("빈 객체에 대해 getValueIfNotEmpty 호출 시 예외 발생")
     void testGetValueIfNotEmpty_givenEmptyObject_willThrowException() {
         // given
-        SearchPostImportance emptyImportance = SearchPostImportance.createEmpty();
+        SearchPostImportance emptyImportance = SearchPostImportance.empty();
 
         // when
         InvalidValueException exception = assertThrows(InvalidValueException.class, emptyImportance::getValueIfNotEmpty);
@@ -105,7 +104,7 @@ class SearchPostImportanceTest {
     @DisplayName("값이 같은 다른 객체에 대한 equals 호출")
     void testEquals_givenDifferentObjectWithSameValue_willReturnTrue() {
         // given
-        SearchPostImportance sameImportance = SearchPostImportance.create(TEST_SEARCH_POST_IMPORTANCE_TITLE);
+        SearchPostImportance sameImportance = SearchPostImportance.create(SearchPostImportance.title().getValueIfNotEmpty());
 
         // when & then
         assertEquals(testSearchPostImportanceTitle, sameImportance);
@@ -122,8 +121,8 @@ class SearchPostImportanceTest {
     @DisplayName("두 객체가 모두 빈 객체일 때 equals 호출")
     void testEquals_givenBothEmptyObjects_willReturnTrue() {
         // given
-        SearchPostImportance empty1 = SearchPostImportance.createEmpty();
-        SearchPostImportance empty2 = SearchPostImportance.createEmpty();
+        SearchPostImportance empty1 = SearchPostImportance.empty();
+        SearchPostImportance empty2 = SearchPostImportance.empty();
 
         // when & then
         assertEquals(empty1, empty2);
@@ -133,7 +132,7 @@ class SearchPostImportanceTest {
     @DisplayName("하나만 빈 객체일 때 equals 호출")
     void testEquals_givenOneEmptyObject_willReturnFalse() {
         // given
-        SearchPostImportance empty = SearchPostImportance.createEmpty();
+        SearchPostImportance empty = SearchPostImportance.empty();
 
         // when & then
         assertNotEquals(empty, testSearchPostImportanceTitle);
@@ -150,7 +149,7 @@ class SearchPostImportanceTest {
     @DisplayName("값이 같은 객체에 대한 hashcode 동일성 보장")
     void testHashCode_givenDifferentObjectWithSameValue_willReturnSameHashCode() {
         // given
-        SearchPostImportance sameImportance = SearchPostImportance.create(TEST_SEARCH_POST_IMPORTANCE_TITLE);
+        SearchPostImportance sameImportance = SearchPostImportance.create(SearchPostImportance.title().getValueIfNotEmpty());
 
         // when & then
         assertEquals(testSearchPostImportanceTitle.hashCode(), sameImportance.hashCode());
@@ -160,7 +159,7 @@ class SearchPostImportanceTest {
     @DisplayName("빈 객체의 hashCode는 0 반환")
     void testHashCode_givenEmptyObject_willReturnZero() {
         // given
-        SearchPostImportance emptyImportance = SearchPostImportance.createEmpty();
+        SearchPostImportance emptyImportance = SearchPostImportance.empty();
 
         // when & then
         assertEquals(0, emptyImportance.hashCode());
