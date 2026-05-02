@@ -1,9 +1,9 @@
 package kr.modusplant.domains.search.framework.out.jpa.repository;
 
-import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PrimaryCategoryJpaRepository;
-import kr.modusplant.domains.post.framework.out.jpa.repository.supers.SecondaryCategoryJpaRepository;
 import kr.modusplant.domains.search.usecase.port.repository.SearchPostConditionRepository;
 import kr.modusplant.framework.jpa.entity.CommSecondaryCategoryEntity;
+import kr.modusplant.framework.jpa.repository.CommPrimaryCategoryJpaRepository;
+import kr.modusplant.framework.jpa.repository.CommSecondaryCategoryJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 @Repository
 @RequiredArgsConstructor
 public class SearchPostConditionRepositoryJpaAdapter implements SearchPostConditionRepository {
-    private final PrimaryCategoryJpaRepository primaryCategoryJpaRepository;
-    private final SecondaryCategoryJpaRepository secondaryCategoryJpaRepository;
+    private final CommPrimaryCategoryJpaRepository primaryCategoryJpaRepository;
+    private final CommSecondaryCategoryJpaRepository secondaryCategoryJpaRepository;
 
     @Override
     public boolean isIdExist(Integer primaryCategoryId) {

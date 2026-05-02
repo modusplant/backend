@@ -8,5 +8,8 @@ import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostImpor
 import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostPublishedAtTestUtils.testSearchPostPublishedAt;
 
 public interface SearchPostOptionTestUtils {
-    SearchPostOption testSearchPostOption = SearchPostOption.create(testSearchPostId, testSearchPostPublishedAt, testSearchPostImportanceTitle, testSearchKeywordSimilarity1);
+    SearchPostOption testSearchPostOption =
+            SearchPostOption.create(
+                    testSearchPostId, testSearchPostPublishedAt,
+                    testSearchPostImportanceTitle, testSearchKeywordSimilarity1);
 }
