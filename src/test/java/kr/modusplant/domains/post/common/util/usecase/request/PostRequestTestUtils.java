@@ -11,7 +11,7 @@ import java.util.List;
 
 import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ID;
+import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ID_1;
 
 public interface PostRequestTestUtils {
     /* MultipartFile, FileOrder Utils */
@@ -107,7 +107,7 @@ public interface PostRequestTestUtils {
     /* PostInsertRequest Utils */
     PostInsertRequest requestAllTypes = new PostInsertRequest(
             TEST_COMM_PRIMARY_CATEGORY_ID,
-            TEST_COMM_SECONDARY_CATEGORY_ID,
+            TEST_COMM_SECONDARY_CATEGORY_ID_1,
             "유용한 컨텐츠 모음",
             allMediaFiles,
             allMediaFilesOrder,
@@ -117,7 +117,7 @@ public interface PostRequestTestUtils {
 
     PostInsertRequest requestAllTypesDraft = new PostInsertRequest(
             TEST_COMM_PRIMARY_CATEGORY_ID,
-            TEST_COMM_SECONDARY_CATEGORY_ID,
+            TEST_COMM_SECONDARY_CATEGORY_ID_1,
             "유용한 컨텐츠 모음",
             allMediaFiles,
             allMediaFilesOrder,
@@ -137,7 +137,7 @@ public interface PostRequestTestUtils {
 
     PostInsertRequest requestBasicTypes = new PostInsertRequest(
             TEST_COMM_PRIMARY_CATEGORY_ID,
-            TEST_COMM_SECONDARY_CATEGORY_ID,
+            TEST_COMM_SECONDARY_CATEGORY_ID_1,
             "유용한 식물 기르기 컨텐츠",
             basicMediaFiles,
             basicMediaFilesOrder,
@@ -149,7 +149,7 @@ public interface PostRequestTestUtils {
     PostUpdateRequest updateRequestAllTypes = new PostUpdateRequest(
             TEST_POST_ULID,
             TEST_COMM_PRIMARY_CATEGORY_ID,
-            TEST_COMM_SECONDARY_CATEGORY_ID,
+            TEST_COMM_SECONDARY_CATEGORY_ID_1,
             "유용한 컨텐츠 모음",
             allMediaFiles,
             allMediaFilesOrder,
@@ -160,7 +160,7 @@ public interface PostRequestTestUtils {
     PostUpdateRequest updateRequestAllTypesDraft = new PostUpdateRequest(
             TEST_POST_ULID,
             TEST_COMM_PRIMARY_CATEGORY_ID,
-            TEST_COMM_SECONDARY_CATEGORY_ID,
+            TEST_COMM_SECONDARY_CATEGORY_ID_1,
             "유용한 컨텐츠 모음",
             allMediaFiles,
             allMediaFilesOrder,

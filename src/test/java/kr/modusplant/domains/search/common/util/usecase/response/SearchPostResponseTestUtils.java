@@ -14,7 +14,7 @@ import static kr.modusplant.shared.persistence.common.util.constant.CommSecondar
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 
 public interface SearchPostResponseTestUtils {
-    SearchPostResponse testSearchPostResponse1 = new SearchPostResponse(
+    SearchPostResponse testSearchPostResponse = new SearchPostResponse(
             TEST_POST_ULID, TEST_COMM_PRIMARY_CATEGORY_CATEGORY, TEST_COMM_SECONDARY_CATEGORY_CATEGORY,
             MEMBER_BASIC_USER_NICKNAME, TEST_COMM_POST_TITLE, TEST_COMM_POST_CONTENT_JSON_NODE,
             TEST_COMM_POST_LIKE_COUNT, TEST_COMM_POST_PUBLISHED_AT, TEST_SEARCH_POST_COMMENT_COUNT,

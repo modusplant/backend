@@ -128,9 +128,9 @@ public class SearchController {
             return SearchPostRelevanceSortedPageResponse.of(
                     responses,
                     lastResponse.ulid(),
+                    lastResponse.publishedAt(),
                     lastResponse.importance(),
                     lastResponse.maxWordSimilarity(),
-                    lastResponse.publishedAt(),
                     true);
         } else {
             return SearchPostRelevanceSortedPageResponse.of(

@@ -15,7 +15,7 @@ import static kr.modusplant.shared.persistence.common.util.constant.CommPostCons
 import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
 import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ID;
+import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ID_1;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
@@ -28,7 +28,7 @@ public interface PostReadModelTestUtils {
             TEST_POST_ULID,
             TEST_COMM_PRIMARY_CATEGORY_ID,
             TEST_COMM_PRIMARY_CATEGORY_CATEGORY,
-            TEST_COMM_SECONDARY_CATEGORY_ID,
+            TEST_COMM_SECONDARY_CATEGORY_ID_1,
             TEST_COMM_SECONDARY_CATEGORY_CATEGORY,
             MEMBER_BASIC_USER_UUID,
             MEMBER_BASIC_USER_NICKNAME,
@@ -47,7 +47,7 @@ public interface PostReadModelTestUtils {
             TEST_POST_ULID,
             TEST_COMM_PRIMARY_CATEGORY_ID,
             TEST_COMM_PRIMARY_CATEGORY_CATEGORY,
-            TEST_COMM_SECONDARY_CATEGORY_ID,
+            TEST_COMM_SECONDARY_CATEGORY_ID_1,
             TEST_COMM_SECONDARY_CATEGORY_CATEGORY,
             MEMBER_BASIC_USER_UUID,
             MEMBER_BASIC_USER_NICKNAME,
@@ -63,7 +63,7 @@ public interface PostReadModelTestUtils {
             TEST_POST_ULID,
             TEST_COMM_PRIMARY_CATEGORY_ID,
             TEST_COMM_PRIMARY_CATEGORY_CATEGORY,
-            TEST_COMM_SECONDARY_CATEGORY_ID,
+            TEST_COMM_SECONDARY_CATEGORY_ID_1,
             TEST_COMM_SECONDARY_CATEGORY_CATEGORY,
             MEMBER_BASIC_USER_UUID,
             MEMBER_BASIC_USER_NICKNAME,

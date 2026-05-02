@@ -5,10 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import kr.modusplant.domains.search.adapter.controller.SearchController;
 import kr.modusplant.domains.search.domain.enums.SearchPostSortCondition;
 import kr.modusplant.domains.search.domain.enums.SearchPostTarget;
@@ -104,15 +101,16 @@ public class SearchRestController {
     )
     @GetMapping("/search-history")
     public ResponseEntity<DataResponse<List<String>>> getSearchHistory(
-            @AuthenticationPrincipal DefaultUserDetails userDetails,
-
             @Parameter(schema = @Schema(description = "검색 기록 개수", example = "10", minimum = "1", maximum = "20"))
             @RequestParam
             @Min(value = 1, message = "검색 기록 개수가 허용된 값을 벗어났습니다. ")
             @Max(value = 50, message = "검색 기록 개수가 허용된 값을 벗어났습니다. ")
-            int size
-    ) {
-        UUID memberId = userDetails.getUuid();
+            int size,
+
+            @Parameter(hidden = true)
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
         return ResponseEntity.ok().body(DataResponse.ok(searchController.getSearchHistory(memberId, size)));
     }
 
@@ -122,14 +120,15 @@ public class SearchRestController {
     )
     @DeleteMapping("/search-history/{keyword}")
     public ResponseEntity<DataResponse<Void>> removeSearchKeyword(
-            @AuthenticationPrincipal DefaultUserDetails userDetails,
-
             @Parameter(schema = @Schema(description = "키워드", example = "벌레"))
             @PathVariable
             @NotBlank(message = "키워드가 비어 있습니다.")
-            String keyword
-    ) {
-        UUID memberId = userDetails.getUuid();
+            String keyword,
+
+            @Parameter(hidden = true)
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
         searchController.deleteSearchKeyword(keyword, memberId);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -140,9 +139,10 @@ public class SearchRestController {
     )
     @DeleteMapping("/search-history")
     public ResponseEntity<DataResponse<Void>> removeAllSearchHistory(
-            @AuthenticationPrincipal DefaultUserDetails userDetails
-    ) {
-        UUID memberId = userDetails.getUuid();
+            @Parameter(hidden = true)
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
         searchController.deleteAllSearchHistory(memberId);
         return ResponseEntity.ok().body(DataResponse.ok());
     }

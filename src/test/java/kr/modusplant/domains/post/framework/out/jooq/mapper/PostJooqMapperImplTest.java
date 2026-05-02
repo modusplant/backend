@@ -19,7 +19,7 @@ import static kr.modusplant.jooq.Tables.SITE_MEMBER;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
 import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ID;
+import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ID_1;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -129,7 +129,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         Record record = mock(Record.class);
         Integer primaryCategoryId = TEST_COMM_PRIMARY_CATEGORY_ID;
         String primaryCategory = TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
-        Integer secondaryCategoryId = TEST_COMM_SECONDARY_CATEGORY_ID;
+        Integer secondaryCategoryId = TEST_COMM_SECONDARY_CATEGORY_ID_1;
         String secondaryCategory = TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
         UUID authorUuid = MEMBER_BASIC_USER_UUID;
         String nickname = MEMBER_BASIC_USER_NICKNAME;
@@ -185,7 +185,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         Record record = mock(Record.class);
         Integer primaryCategoryId = TEST_COMM_PRIMARY_CATEGORY_ID;
         String primaryCategory = TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
-        Integer secondaryCategoryId = TEST_COMM_SECONDARY_CATEGORY_ID;
+        Integer secondaryCategoryId = TEST_COMM_SECONDARY_CATEGORY_ID_1;
         String secondaryCategory = TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
         UUID authorUuid = MEMBER_BASIC_USER_UUID;
         String nickname = MEMBER_BASIC_USER_NICKNAME;

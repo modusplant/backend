@@ -15,6 +15,10 @@ public record SearchPostRelevanceSortedPageResponse<T> (
         @JsonProperty("nextPostId")
         String nextUlid,
 
+        @Schema(description = "다음 요청에 사용할 게시글 발행 시점")
+        @JsonProperty("nextPostPublishedAt")
+        LocalDateTime nextPostPublishedAt,
+
         @Schema(description = "다음 요청에 사용할 게시글 중요도", example = "1")
         @JsonProperty("nextPostImportance")
         Integer nextImportance,
@@ -22,10 +26,6 @@ public record SearchPostRelevanceSortedPageResponse<T> (
         @Schema(description = "다음 요청에 사용할 게시글 정확도", example = "0.143253469630148")
         @JsonProperty("nextPostSimilarity")
         Double nextPostSimilarity,
-
-        @Schema(description = "다음 요청에 사용할 게시글 발행 시점")
-        @JsonProperty("nextPostPublishedAt")
-        LocalDateTime nextPostPublishedAt,
 
         @Schema(description = "다음 데이터 존재 여부", example = "true")
         boolean hasNext,
@@ -36,17 +36,17 @@ public record SearchPostRelevanceSortedPageResponse<T> (
     public static <T> SearchPostRelevanceSortedPageResponse<T> of(
             List<T> posts,
             String nextUlid,
+            LocalDateTime nextPostPublishedAt,
             Integer nextImportance,
             Double nextPostSimilarity,
-            LocalDateTime nextPostPublishedAt,
             boolean hasNext
     ) {
         return new SearchPostRelevanceSortedPageResponse<>(
                 posts,
                 nextUlid,
+                nextPostPublishedAt,
                 nextImportance,
                 nextPostSimilarity,
-                nextPostPublishedAt,
                 hasNext,
                 posts.size()
         );
