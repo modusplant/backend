@@ -158,7 +158,8 @@ public class SecurityConfig {
                                 "/api/v1/notifications/**").authenticated()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/members/profile",
-                                "/api/v1/communication/posts/*/data").authenticated()
+                                "/api/v1/communication/posts/*/data",
+                                "/api/v1/search/posts/history").authenticated()
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/report/proposal-or-bug",
                                 "/api/v1/report/abuse/post/*",
@@ -175,12 +176,14 @@ public class SecurityConfig {
                                 "/api/v1/members/like/communication/post/*",
                                 "/api/v1/members/bookmark/communication/post/**",
                                 "/api/v1/members/like/communication/post/*/path/**",
-                                "/api/v1/communication/posts/*").authenticated()
+                                "/api/v1/communication/posts/*",
+                                "/api/v1/search/posts/history/*").authenticated()
                         .requestMatchers(HttpMethod.DELETE,
                                 "/api/v1/members/like/communication/post/**").authenticated()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/members/check/nickname/**",
-                                "/api/v1/communication/posts/**").permitAll()
+                                "/api/v1/communication/posts/**",
+                                "/api/v1/search/posts").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/communication/posts/*/views").permitAll()
                         .requestMatchers("/actuator/prometheus").permitAll()
                         .anyRequest().permitAll()
