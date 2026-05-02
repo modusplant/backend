@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.account.social.adapter.SocialIdentityTokenHelper;
 import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityController;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
+import kr.modusplant.domains.account.social.usecase.record.*;
 import kr.modusplant.domains.account.social.usecase.request.SocialAuthRequest;
 import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
 import kr.modusplant.domains.account.social.usecase.response.*;
@@ -49,8 +50,7 @@ public class SocialIdentityRestController {
             @NotNull
             SocialProvider provider
     ) {
-        String socialAccessToken = socialIdentityController.issueSocialAccessToken(provider, request.code());
-        SocialLoginResult socialLoginResult = socialIdentityController.handleSocialLogin(provider, socialAccessToken);
+        SocialLoginResult socialLoginResult = socialIdentityController.handleSocialLogin(provider, request.code());
         String cookie;
         SocialLoginResponse loginResponse;
         switch (socialLoginResult) {
@@ -59,15 +59,13 @@ public class SocialIdentityRestController {
                 cookie = jwtCookieProvider.generateRefreshTokenCookieAsString(tokenPair.refreshToken());
                 loginResponse = SocialLoginResponse.login(tokenPair.accessToken());
             }
-            case NeedSignupResult needSignup -> {
-                String tempToken = tempTokenHelper.generateTempToken(needSignup.email(), needSignup.providerId(), needSignup.socialProvider(), socialAccessToken, durationMs);
+            case SocialPendingResult pending -> {
+                String tempToken = tempTokenHelper.generateTempToken(pending, durationMs);
                 cookie = jwtCookieProvider.generateTempTokenCookieAsString(tempToken,durationMs);
-                loginResponse = SocialLoginResponse.needSignup(needSignup.email(), needSignup.nickname());
-            }
-            case NeedLinkResult needLink -> {
-                String tempToken = tempTokenHelper.generateTempToken(needLink.email(), needLink.providerId(), needLink.socialProvider(),socialAccessToken, durationMs);
-                cookie = jwtCookieProvider.generateTempTokenCookieAsString(tempToken,durationMs);
-                loginResponse = SocialLoginResponse.needLink(needLink.email(), needLink.nickname());
+                loginResponse = switch (pending) {
+                    case NeedSignupResult r -> SocialLoginResponse.needSignup(r.email(), r.nickname());
+                    case NeedLinkResult r -> SocialLoginResponse.needLink(r.email(), r.nickname());
+                };
             }
         }
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie).body(DataResponse.ok(loginResponse));

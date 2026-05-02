@@ -2,8 +2,10 @@ package kr.modusplant.domains.account.social.adapter;
 
 import io.jsonwebtoken.Claims;
 import kr.modusplant.domains.account.social.common.util.usecase.record.TempTokenInfoTestUtils;
+import kr.modusplant.domains.account.social.common.util.usecase.response.SocialLoginResultTestUtils;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.usecase.record.TempTokenInfo;
+import kr.modusplant.domains.account.social.usecase.record.SocialPendingResult;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,7 +22,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
-class SocialIdentityTokenHelperTest implements TempTokenInfoTestUtils {
+class SocialIdentityTokenHelperTest implements TempTokenInfoTestUtils, SocialLoginResultTestUtils {
     @InjectMocks
     private SocialIdentityTokenHelper socialIdentityTokenHelper;
     @Mock
@@ -31,25 +33,22 @@ class SocialIdentityTokenHelperTest implements TempTokenInfoTestUtils {
     void testGenerateTempToken_givenTokenValue_willReturnTempToken() {
         // given
         String tempToken = "temp-token";
-        String email = createKakaoTempTokenInfo().email();
-        String providerId = createKakaoTempTokenInfo().providerId();
-        SocialProvider provider = createKakaoTempTokenInfo().socialProvider();
-        String socialAccessToken = "access-token";
+        SocialPendingResult pendingResult = createKakaoNeedSignupResult();
         long durationMs = 1000L;
         given(tokenProvider.generateToken(anyString(),any(),anyLong())).willReturn(tempToken);
 
         // when
-        String result = socialIdentityTokenHelper.generateTempToken(email,providerId,provider,socialAccessToken,durationMs);
+        String result = socialIdentityTokenHelper.generateTempToken(pendingResult,durationMs);
 
         // then
         assertThat(result).isEqualTo(tempToken);
         then(tokenProvider).should().generateToken(
-                eq(providerId),
+                eq(pendingResult.providerId()),
                 argThat(claims ->
-                        claims.get("email").equals(email) &&
-                                claims.get("providerId").equals(providerId) &&
-                                claims.get("socialProvider").equals(provider.name()) &&
-                                claims.get("socialAccessToken").equals(socialAccessToken)
+                        claims.get("email").equals(pendingResult.email()) &&
+                                claims.get("providerId").equals(pendingResult.providerId()) &&
+                                claims.get("socialProvider").equals(pendingResult.socialProvider().name()) &&
+                                claims.get("socialAccessToken").equals(pendingResult.socialAccessToken())
                 ),
                 eq(durationMs)
         );

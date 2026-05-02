@@ -5,7 +5,7 @@ import kr.modusplant.domains.account.social.domain.vo.SocialProfile;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.usecase.port.client.dto.SocialUserInfo;
 import kr.modusplant.domains.account.social.usecase.port.mapper.SocialIdentityMapper;
-import kr.modusplant.domains.account.social.usecase.response.LoginResult;
+import kr.modusplant.domains.account.social.usecase.record.LoginResult;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.kernel.Email;
 import lombok.RequiredArgsConstructor;
