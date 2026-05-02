@@ -47,11 +47,11 @@ public class SearchRestController {
             String keyword,
 
             @Parameter(schema = @Schema(description = "검색 타겟", example = "title_content"))
-            @RequestParam
+            @RequestParam(name = "target")
             SearchPostTarget searchPostTarget,
 
             @Parameter(schema = @Schema(description = "검색 정렬 조건", example = "latest"))
-            @RequestParam
+            @RequestParam(name = "sort")
             SearchPostSortCondition searchPostSortCondition,
 
             @Parameter(schema = @Schema(description = "1차 항목 식별자", example = "1"))
