@@ -75,7 +75,6 @@ public class SearchController {
             searchKeywordSimilarity = SearchKeywordSimilarity.create(lastPostSimilarity);
         }
 
-        SearchPostId.create(lastPostUlid);
         SearchPost searchPost = SearchPost.create(
                 SearchPostOption.create(searchPostId, searchPostPublishedAt, searchPostImportance, searchKeywordSimilarity),
                 SearchKeyword.create(record.keyword()),
