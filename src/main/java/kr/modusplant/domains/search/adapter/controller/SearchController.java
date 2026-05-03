@@ -16,8 +16,8 @@ import kr.modusplant.domains.search.usecase.port.repository.SearchPostRepository
 import kr.modusplant.domains.search.usecase.record.SearchPostRecord;
 import kr.modusplant.domains.search.usecase.response.SearchPostRelevanceSortedPageResponse;
 import kr.modusplant.domains.search.usecase.response.SearchPostResponse;
+import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.NOT_FOUND_PRIMARY_CATEGORY;
 
 @Service
 @Transactional
@@ -151,6 +153,9 @@ public class SearchController {
     }
 
     private void validateBeforeSearchByKeyword(Integer primaryCategoryId, List<Integer> secondaryCategoryIds) {
+        if (primaryCategoryId != null && !searchPostConditionRepository.isIdExist(primaryCategoryId)) {
+            throw new NotFoundEntityException(NOT_FOUND_PRIMARY_CATEGORY, "primaryCategoryId");
+        }
         if (primaryCategoryId == null &&
                 secondaryCategoryIds != null &&
                 !secondaryCategoryIds.isEmpty()) {
@@ -158,13 +163,11 @@ public class SearchController {
                     SearchErrorCode.INCORRECT_SEARCH_POST_CATEGORY_ID,
                     List.of("primaryCategoryId", "secondaryCategoryIds"));
         }
-        if (!searchPostConditionRepository.isIdExist(primaryCategoryId)) {
+        if (primaryCategoryId != null && secondaryCategoryIds != null &&
+                !searchPostConditionRepository.isIdsExist(primaryCategoryId, secondaryCategoryIds)) {
             throw new InvalidValueException(
-                    GeneralErrorCode.INVALID_INPUT, List.of("primaryCategoryId"));
-        }
-        if (!searchPostConditionRepository.isIdsExist(primaryCategoryId, secondaryCategoryIds)) {
-            throw new InvalidValueException(
-                    GeneralErrorCode.INVALID_INPUT, List.of("primaryCategoryId", "secondaryCategoryIds"));
+                    SearchErrorCode.INCORRECT_SEARCH_POST_CATEGORY_ID,
+                    List.of("primaryCategoryId", "secondaryCategoryIds"));
         }
     }
 }
