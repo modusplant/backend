@@ -13,8 +13,9 @@ import kr.modusplant.domains.search.usecase.port.repository.SearchPostRepository
 import kr.modusplant.domains.search.usecase.record.SearchPostRecord;
 import kr.modusplant.domains.search.usecase.response.SearchPostRelevanceSortedPageResponse;
 import kr.modusplant.domains.search.usecase.response.SearchPostResponse;
+import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -97,6 +98,7 @@ class SearchControllerTest {
                 TEST_POST_ULID, TEST_COMM_POST_PUBLISHED_AT,
                 SearchPostImportance.title().getValueIfNotEmpty(), TEST_SEARCH_KEYWORD_SIMILARITY_1,
                 TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
+        given(searchPostConditionRepository.isIdExist(any())).willReturn(true);
 
         // when
         InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
@@ -115,15 +117,14 @@ class SearchControllerTest {
                 TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID,
                 TEST_POST_ULID, TEST_COMM_POST_PUBLISHED_AT,
                 SearchPostImportance.title().getValueIfNotEmpty(), TEST_SEARCH_KEYWORD_SIMILARITY_1, TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
-
         given(searchPostConditionRepository.isIdExist(record.primaryCategoryId())).willReturn(false);
 
         // when
-        InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
+        NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () ->
                 searchController.searchByKeyword(record));
 
         // then
-        assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.INVALID_INPUT);
+        assertThat(exception.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_PRIMARY_CATEGORY);
     }
 
     @Test
@@ -136,6 +137,7 @@ class SearchControllerTest {
                 TEST_POST_ULID, TEST_COMM_POST_PUBLISHED_AT,
                 SearchPostImportance.title().getValueIfNotEmpty(), TEST_SEARCH_KEYWORD_SIMILARITY_1,
                 TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
+        given(searchPostConditionRepository.isIdExist(any())).willReturn(true);
 
         given(searchPostConditionRepository.isIdExist(record.primaryCategoryId())).willReturn(true);
         given(searchPostConditionRepository.isIdsExist(record.primaryCategoryId(), record.secondaryCategoryIds())).willReturn(false);
@@ -145,7 +147,7 @@ class SearchControllerTest {
                 searchController.searchByKeyword(record));
 
         // then
-        assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.INVALID_INPUT);
+        assertThat(exception.getErrorCode()).isEqualTo(SearchErrorCode.INCORRECT_SEARCH_POST_CATEGORY_ID);
     }
 
     @Test
