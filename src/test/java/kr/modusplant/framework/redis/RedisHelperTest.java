@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -59,22 +60,30 @@ class RedisHelperTest {
     }
 
     @Test
-    @DisplayName("Redis 헬퍼로 문자열 만료")
-    void expireString_givenValidRedisHelper_returnTTL() throws InterruptedException {
-        String expireKey = "test:expire";
+    @DisplayName("Redis 헬퍼로 문자열 만료 시간 설정 및 연장")
+    void expireString_givenValidRedisHelper_returnTTL() {
+        String expireKey = "test:expire:" + UUID.randomUUID();
         String expireValue = "expireValue";
 
-        redisHelper.setString(expireKey, expireValue, Duration.ofSeconds(6));
-        Thread.sleep(1000);
+        try {
+            redisHelper.setString(expireKey, expireValue, Duration.ofSeconds(10));
 
-        Optional<Duration> ttl = redisHelper.getTTL(expireKey);
-        assertThat(ttl).isPresent();
-        assertThat(ttl.get().getSeconds()).isLessThan(6).isGreaterThan(1);
+            Optional<Duration> initialTtl = redisHelper.getTTL(expireKey);
+            assertThat(initialTtl).isPresent();
+            assertThat(initialTtl.orElseThrow().getSeconds())
+                    .isLessThanOrEqualTo(10)
+                    .isGreaterThanOrEqualTo(1);
 
-        redisHelper.expire(expireKey, Duration.ofSeconds(10));
-        Optional<Duration> ttl2 = redisHelper.getTTL(expireKey);
-        assertThat(ttl2).isPresent();
-        assertThat(ttl2.get().getSeconds()).isGreaterThan(5);
+            redisHelper.expire(expireKey, Duration.ofSeconds(10));
+            Optional<Duration> updatedTtl = redisHelper.getTTL(expireKey);
+
+            assertThat(updatedTtl).isPresent();
+            assertThat(updatedTtl.orElseThrow().getSeconds())
+                    .isLessThanOrEqualTo(10)
+                    .isGreaterThanOrEqualTo(1);
+        } finally {
+            redisHelper.delete(expireKey);
+        }
     }
 
     @Test

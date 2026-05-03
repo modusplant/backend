@@ -14,6 +14,11 @@ import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCod
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class SearchPostImportance {
     private final Importance importance;
+    private static final SearchPostImportance searchPostImportanceTitle = new SearchPostImportance(Importance.TITLE);
+    private static final SearchPostImportance searchPostImportanceContent = new SearchPostImportance(Importance.CONTENT);
+    private static final SearchPostImportance searchPostImportanceCommentContent = new SearchPostImportance(Importance.COMMENT_CONTENT);
+    private static final SearchPostImportance searchPostImportanceOthers = new SearchPostImportance(Importance.OTHERS);
+    private static final SearchPostImportance searchPostImportanceEmpty = new SearchPostImportance(Importance.EMPTY);
 
     public static SearchPostImportance create(Integer value) {
         if (value == null) {
@@ -53,36 +58,28 @@ public class SearchPostImportance {
     }
 
     public int getValueIfNotEmpty() {
-        if (getImportance().equals(Importance.EMPTY)) {
+        if (getImportance() == Importance.EMPTY) {
             throw new InvalidValueException(NOT_FOUND_SEARCH_POST_IMPORTANCE, "searchPostImportance");
         }
         return this.getImportance().getValue();
     }
 
     public boolean isEmpty() {
-        return this.getImportance().isEmpty();
+        return getImportance() == Importance.EMPTY;
     }
-
-    private static final SearchPostImportance searchPostImportanceTitle = new SearchPostImportance(Importance.TITLE);
-    private static final SearchPostImportance searchPostImportanceContent = new SearchPostImportance(Importance.CONTENT);
-    private static final SearchPostImportance searchPostImportanceCommentContent = new SearchPostImportance(Importance.COMMENT_CONTENT);
-    private static final SearchPostImportance searchPostImportanceOthers = new SearchPostImportance(Importance.OTHERS);
-    private static final SearchPostImportance searchPostImportanceEmpty = new SearchPostImportance(Importance.EMPTY);
 
     @Getter
     private enum Importance {
-        TITLE(4, false),
-        CONTENT(3, false),
-        COMMENT_CONTENT(2, false),
-        OTHERS(1, false),
-        EMPTY(0, true);
+        TITLE(4),
+        CONTENT(3),
+        COMMENT_CONTENT(2),
+        OTHERS(1),
+        EMPTY(0);
 
         private final int value;
-        private final boolean empty;
 
-        Importance(int value, boolean empty) {
+        Importance(int value) {
             this.value = value;
-            this.empty = empty;
         }
     }
 
