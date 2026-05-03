@@ -25,7 +25,7 @@ public class FirebaseConfig {
             return FirebaseApp.getInstance();
         }
 
-        try(InputStream is = new ByteArrayInputStream(credentialsJson.getBytes(StandardCharsets.UTF_8)))  {
+        try (InputStream is = new ByteArrayInputStream(credentialsJson.getBytes(StandardCharsets.UTF_8))) {
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(is))
                     .build();
