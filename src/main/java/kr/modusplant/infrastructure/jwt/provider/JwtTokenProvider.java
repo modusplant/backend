@@ -78,8 +78,9 @@ public class JwtTokenProvider {
             KeyStore keyStore = KeyStore.getInstance(keyStoreType);
             char[] password = keyStorePassword.toCharArray();
             if (Files.exists(keyStorePath)) {
-                InputStream inputStream = Files.newInputStream(keyStorePath);
-                keyStore.load(inputStream, password);
+                try (InputStream inputStream = Files.newInputStream(keyStorePath)){
+                    keyStore.load(inputStream, password);
+                }
                 KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry)
                         keyStore.getEntry(keyAlias, new KeyStore.PasswordProtection(password));
                 privateKey = privateKeyEntry.getPrivateKey();
