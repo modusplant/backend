@@ -13,13 +13,15 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class MemberStatus {
     private final Status status;
+    private static final MemberStatus memberStatusActive = new MemberStatus(Status.ACTIVE);
+    private static final MemberStatus memberStatusInactive = new MemberStatus(Status.INACTIVE);
 
     public static MemberStatus active() {
-        return new MemberStatus(Status.ACTIVE);
+        return memberStatusActive;
     }
 
     public static MemberStatus inactive() {
-        return new MemberStatus(Status.INACTIVE);
+        return memberStatusInactive;
     }
 
     public static MemberStatus fromBoolean(Boolean isActive) {
@@ -27,22 +29,22 @@ public class MemberStatus {
             throw new EmptyValueException(EMPTY_MEMBER_STATUS, "memberStatus");
         }
         if (isActive.equals(true)) {
-            return MemberStatus.active();
+            return memberStatusActive;
         } else {
-            return MemberStatus.inactive();
+            return memberStatusInactive;
         }
     }
 
     public boolean isActive() {
-        return status == Status.ACTIVE;
+        return getStatus() == Status.ACTIVE;
     }
 
     public boolean isInactive() {
-        return status == Status.INACTIVE;
+        return getStatus() == Status.INACTIVE;
     }
 
     public String getValue() {
-        return status.getValue();
+        return getStatus().getValue();
     }
 
     @Getter
