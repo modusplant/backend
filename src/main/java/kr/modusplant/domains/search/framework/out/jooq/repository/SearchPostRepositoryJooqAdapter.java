@@ -1,8 +1,6 @@
 package kr.modusplant.domains.search.framework.out.jooq.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import kr.modusplant.domains.post.domain.exception.EmptyValueException;
-import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.domains.search.domain.enums.SearchPostTarget;
 import kr.modusplant.domains.search.domain.vo.*;
 import kr.modusplant.domains.search.framework.out.jooq.mapper.supers.SearchJooqMapper;
@@ -452,14 +450,11 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
     }
 
     private Condition buildCategoryConditions(Integer primaryCategoryId, List<Integer> secondaryCategoryIds) {
-        if (primaryCategoryId == null && !CollectionUtils.isNullOrEmpty(secondaryCategoryIds)) {
-            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
-        }
         Condition condition = noCondition();
         if (primaryCategoryId != null) {
             condition = condition.and(COMM_POST.PRI_CATE_ID.eq(primaryCategoryId));
         }
-        if (primaryCategoryId != null && !CollectionUtils.isNullOrEmpty(secondaryCategoryIds)) {
+        if (!CollectionUtils.isNullOrEmpty(secondaryCategoryIds)) {
             condition = condition.and(COMM_POST.SECO_CATE_ID.in(secondaryCategoryIds));
         }
         return condition;
