@@ -13,12 +13,12 @@ import java.util.EnumSet;
 public class UlidIdGenerator implements RandomUlidGenerator, BeforeExecutionGenerator {
     @Override
     public String generate() {
-        return UlidCreator.getUlid().toString();
+        return UlidCreator.getMonotonicUlid().toString();
     }
 
     @Override
     public String generate(SharedSessionContractImplementor var1, Object var2, Object var3, EventType var4) {
-        return UlidCreator.getUlid().toString();
+        return UlidCreator.getMonotonicUlid().toString();
     }
 
     @Override
