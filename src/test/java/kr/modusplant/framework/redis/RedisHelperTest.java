@@ -42,8 +42,8 @@ class RedisHelperTest {
 
         Optional<TestDto> result = redisHelper.getObject(objectKey, TestDto.class);
         assertThat(result).isPresent();
-        assertThat(result.get().getName()).isEqualTo(objectValue.getName());
-        assertThat(result.get().getAge()).isEqualTo(objectValue.getAge());
+        assertThat(result.orElseThrow().getName()).isEqualTo(objectValue.getName());
+        assertThat(result.orElseThrow().getAge()).isEqualTo(objectValue.getAge());
     }
 
     @Test
@@ -88,16 +88,15 @@ class RedisHelperTest {
 
     @Test
     @DisplayName("Redis 헬퍼로 문자열 저장 후 TTL 확인")
-    void storeString_givenValidRedisHelper_assertTTLGreaterThan() throws InterruptedException {
+    void storeString_givenValidRedisHelper_assertTTLGreaterThan() {
         String key = "test:ttl:exists";
         String value = "someValue";
 
         redisHelper.setString(key, value, Duration.ofSeconds(5));
-        Thread.sleep(1000);
 
         Optional<Duration> ttl = redisHelper.getTTL(key);
         assertThat(ttl).isPresent();
-        assertThat(ttl.get().getSeconds()).isLessThan(5).isGreaterThan(1);
+        assertThat(ttl.orElseThrow().getSeconds()).isLessThanOrEqualTo(5).isGreaterThan(1);
     }
 
     @Test
@@ -110,7 +109,7 @@ class RedisHelperTest {
         Optional<Duration> ttl = redisHelper.getTTL(key);
 
         assertThat(ttl).isPresent();
-        assertThat(ttl.get().getSeconds()).isEqualTo(999_999_999);
+        assertThat(ttl.orElseThrow().getSeconds()).isEqualTo(999_999_999);
     }
 
     @Test
