@@ -16,7 +16,7 @@ public interface CommentJpaMapper {
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(source = "comment.path.path", target = "path")
-    @Mapping(source = "commentPost", target = "postEntity")
+    @Mapping(source = "commentPost", target = "post")
     @Mapping(source = "commentAuthor", target = "authMember")
     @Mapping(source = "comment.content.content", target = "content")
     @Mapping(source = "comment.status", target = "isDeleted", qualifiedByName = "mapIsDeleted")

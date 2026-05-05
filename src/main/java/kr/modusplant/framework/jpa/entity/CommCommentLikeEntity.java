@@ -2,10 +2,7 @@ package kr.modusplant.framework.jpa.entity;
 
 import jakarta.persistence.*;
 import kr.modusplant.shared.persistence.compositekey.CommCommentLikeId;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -16,19 +13,20 @@ import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
 import static kr.modusplant.shared.persistence.constant.TableName.COMM_COMMENT_LIKE;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = COMM_COMMENT_LIKE)
 @IdClass(CommCommentLikeId.class)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
+@Getter
 @ToString
+@EqualsAndHashCode
 public class CommCommentLikeEntity {
     @Id
     @Column(name = POST_ULID, nullable = false)
     private String postId;
 
     @Id
-    @Column(name = "path", nullable = false)
+    @Column(name = PATH, nullable = false)
     private String path;
 
     @Id

@@ -22,35 +22,32 @@ import static kr.modusplant.shared.persistence.constant.TableName.SITE_MEMBER_AU
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = SITE_MEMBER_AUTH)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @ToString(onlyExplicitlyIncluded = true)
 public class SiteMemberAuthEntity {
     @Id
     @ToString.Include
     private UUID uuid;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @MapsId
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(nullable = false, name = "uuid", updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private SiteMemberEntity member;
 
-    @Column(nullable = false, length = 80)
+    @Column(nullable = false, unique = true, length = 80)
     private String email;
 
     @Column(length = 64)
     private String pw;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @ToString.Include
     private AuthProvider provider;
 
-    @Column(unique = true, updatable = false, name = "provider_id")
+    @Column(unique = true, name = "provider_id")
     private String providerId;
-
-    @Column(name = "lockout_until")
-    private LocalDateTime lockoutUntil;
 
     @Column(name = LAST_MODIFIED_AT, nullable = false)
     @LastModifiedDate
@@ -61,20 +58,26 @@ public class SiteMemberAuthEntity {
     @Column(name = VER_NUM, nullable = false)
     private Long versionNumber;
 
-    public void updateEmail(String email) {
-        this.email = email;
-    }
-
-    public void updatePw(String pw) {
-        this.pw = pw;
-    }
-
     public String getETagSource() {
         return getUuid() + "-" + getVersionNumber();
     }
 
     public LocalDateTime getLastModifiedAtAsTruncatedToSeconds() {
         return getLastModifiedAt().truncatedTo(ChronoUnit.SECONDS);
+    }
+
+    public void updateAuthProvider(AuthProvider provider) { this.provider = provider; }
+
+    public void updateEmail(String email) { this.email = email; }
+
+    public void updatePassword(String password) { this.pw = password; }
+
+    public void updateProvider(AuthProvider provider) {
+        this.provider = provider;
+    }
+
+    public void updateProviderId(String providerId) {
+        this.providerId = providerId;
     }
 
     @Override
@@ -89,13 +92,12 @@ public class SiteMemberAuthEntity {
         return new HashCodeBuilder(17, 37).append(getMember()).toHashCode();
     }
 
-    private SiteMemberAuthEntity(SiteMemberEntity member, String email, String pw, AuthProvider provider, String providerId, LocalDateTime lockoutUntil) {
+    private SiteMemberAuthEntity(SiteMemberEntity member, String email, String pw, AuthProvider provider, String providerId) {
         this.member = member;
         this.email = email;
         this.pw = pw;
         this.provider = provider;
         this.providerId = providerId;
-        this.lockoutUntil = lockoutUntil;
     }
 
     public static SiteMemberAuthEntityBuilder builder() {
@@ -108,7 +110,6 @@ public class SiteMemberAuthEntity {
         private String pw;
         private AuthProvider provider;
         private String providerId;
-        private LocalDateTime lockoutUntil;
 
         public SiteMemberAuthEntityBuilder member(final SiteMemberEntity member) {
             this.member = member;
@@ -135,23 +136,17 @@ public class SiteMemberAuthEntity {
             return this;
         }
 
-        public SiteMemberAuthEntityBuilder lockoutUntil(final LocalDateTime lockoutUntil) {
-            this.lockoutUntil = lockoutUntil;
-            return this;
-        }
-
         public SiteMemberAuthEntityBuilder memberAuth(final SiteMemberAuthEntity memberAuth) {
             this.member = memberAuth.getMember();
             this.email = memberAuth.getEmail();
             this.pw = memberAuth.getPw();
             this.provider = memberAuth.getProvider();
             this.providerId = memberAuth.getProviderId();
-            this.lockoutUntil = memberAuth.getLockoutUntil();
             return this;
         }
 
         public SiteMemberAuthEntity build() {
-            return new SiteMemberAuthEntity(this.member, this.email, this.pw, this.provider, this.providerId, this.lockoutUntil);
+            return new SiteMemberAuthEntity(this.member, this.email, this.pw, this.provider, this.providerId);
         }
     }
 }

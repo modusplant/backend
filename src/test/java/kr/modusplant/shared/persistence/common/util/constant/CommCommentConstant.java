@@ -3,17 +3,15 @@ package kr.modusplant.shared.persistence.common.util.constant;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
-import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CommCommentConstant {
-    public static final String TEST_COMM_COMMENT_POST_ULID = TEST_COMM_POST_ULID;
     public static final String TEST_COMM_COMMENT_PATH = "1.6.2";
-    public static final UUID TEST_COMM_COMMENT_AUTH_MEMBER_UUID = MEMBER_BASIC_USER_UUID;
-    public static final UUID TEST_COMM_COMMENT_CREATE_MEMBER_UUID = MEMBER_BASIC_USER_UUID;
     public static final String TEST_COMM_COMMENT_CONTENT = "테스트 댓글 내용";
     public static final Integer TEST_COMM_COMMENT_LIKE_COUNT = 1;
+    public static final Boolean TEST_COMM_POST_IS_DELETED_TRUE = true;
+    public static final Boolean TEST_COMM_POST_IS_DELETED_FALSE = false;
+    public static final LocalDateTime TEST_COMM_COMMENT_CREATED_AT = LocalDateTime.of(2026, 4, 25, 0, 0);
+    public static final LocalDateTime TEST_COMM_COMMENT_UPDATED_AT = LocalDateTime.of(2026, 4, 27, 12, 0);
 }

@@ -3,6 +3,7 @@ package kr.modusplant.infrastructure.security.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.framework.out.redis.AccessTokenRedisRepository;
+import kr.modusplant.infrastructure.jwt.provider.JwtCookieProvider;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.DefaultAuthProvider;
@@ -10,6 +11,7 @@ import kr.modusplant.infrastructure.security.DefaultAuthenticationEntryPoint;
 import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
 import kr.modusplant.infrastructure.security.filter.EmailPasswordAuthenticationFilter;
 import kr.modusplant.infrastructure.security.filter.JwtAuthenticationFilter;
+import kr.modusplant.infrastructure.security.filter.SecurityExceptionHandlingFilter;
 import kr.modusplant.infrastructure.security.handler.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,6 +32,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.validation.Validator;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -47,6 +50,7 @@ public class SecurityConfig {
     private final DefaultUserDetailsService defaultUserDetailsService;
     private final ObjectMapper objectMapper;
     private final JwtTokenProvider tokenProvider;
+    private final JwtCookieProvider cookieProvider;
     private final TokenService tokenService;
     private final SiteMemberJpaRepository memberRepository;
     private final Validator validator;
@@ -84,8 +88,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public ForwardRequestLoginSuccessHandler forwardRequestLoginSuccessHandler() {
-        return new ForwardRequestLoginSuccessHandler(memberRepository, tokenService);
+    public WriteResponseLoginSuccessHandler forwardRequestLoginSuccessHandler() {
+        return new WriteResponseLoginSuccessHandler(memberRepository, tokenService, cookieProvider, objectMapper);
     }
 
     @Bean
@@ -98,13 +102,13 @@ public class SecurityConfig {
         return new JwtClearingLogoutHandler(tokenService); }
 
     @Bean
-    public ForwardRequestLogoutSuccessHandler normalLogoutSuccessHandler() {
-        return new ForwardRequestLogoutSuccessHandler(objectMapper); }
+    public WriteResponseLogoutSuccessHandler normalLogoutSuccessHandler() {
+        return new WriteResponseLogoutSuccessHandler(objectMapper); }
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(HttpSecurity http) {
         try {
-            return new JwtAuthenticationFilter(tokenProvider, defaultAuthenticationEntryPoint(), tokenRedisRepository);
+            return new JwtAuthenticationFilter(tokenProvider, tokenRedisRepository);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -132,20 +136,54 @@ public class SecurityConfig {
     }
 
     @Bean
+    public SecurityExceptionHandlingFilter securityExceptionHandlingFilter() {
+        return new SecurityExceptionHandlingFilter(objectMapper, defaultAuthenticationEntryPoint());
+    }
+
+    @Bean
     public SecurityFilterChain defaultChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/api/**")
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
+                .addFilterBefore(securityExceptionHandlingFilter(), LogoutFilter.class)
                 .addFilterBefore(emailPasswordAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(http), EmailPasswordAuthenticationFilter.class)
+                // TODO: @PreAuthorize 기반 방안을 고민하고, anyRequest를 authenticated()로 수정할 것.
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/communication/posts/me/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/communication/posts/*/data").authenticated()
-                        .requestMatchers(HttpMethod.POST,"/api/v1/communication/posts").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/communication/posts/*").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/communication/posts/*").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/communication/posts/**","/api/v1/communication/posts").permitAll()
+                        .requestMatchers(
+                                "/api/v1/communication/posts/me/**",
+                                "/api/v1/communication/posts/search-history/**",
+                                "/api/v1/notifications",
+                                "/api/v1/notifications/**").authenticated()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/members/profile",
+                                "/api/v1/communication/posts/*/data",
+                                "/api/v1/search/posts/history").authenticated()
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/v1/report/proposal-or-bug",
+                                "/api/v1/report/abuse/post/*",
+                                "/api/v1/report/abuse/post/*/path/**",
+                                "/api/v1/communication/posts",
+                                "/api/v1/members/social/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT,
+                                "/api/v1/members/profile",
+                                "/api/v1/members/like/communication/post/*",
+                                "/api/v1/members/bookmark/communication/post/**",
+                                "/api/v1/members/like/communication/post/*/path/**",
+                                "/api/v1/communication/posts/*").authenticated()
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/api/v1/members/like/communication/post/*",
+                                "/api/v1/members/bookmark/communication/post/**",
+                                "/api/v1/members/like/communication/post/*/path/**",
+                                "/api/v1/communication/posts/*",
+                                "/api/v1/search/posts/history/*").authenticated()
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/api/v1/members/like/communication/post/**").authenticated()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/members/check/nickname/**",
+                                "/api/v1/communication/posts/**",
+                                "/api/v1/search/posts").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/communication/posts/*/views").permitAll()
                         .requestMatchers("/actuator/prometheus").permitAll()
                         .anyRequest().permitAll()
@@ -171,6 +209,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // TODO: 요청 가능한 서비스 및 메서드를 명시할 것.
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();

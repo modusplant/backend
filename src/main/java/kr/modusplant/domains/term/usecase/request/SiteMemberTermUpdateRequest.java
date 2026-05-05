@@ -11,6 +11,6 @@ public record SiteMemberTermUpdateRequest(
         UUID uuid,
         String agreedTermsOfUseVersion,
         String agreedPrivacyPolicyVersion,
-        String agreedAdInfoReceivingVersion
+        String agreedCommunityPolicyVersion
 ) {
 }

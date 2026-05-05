@@ -11,6 +11,11 @@ app:
   semaphore:
     datasource:
       allowed-connection-size: 12
+      api: # 디폴트로 사용할 수 있는 최대 커넥션 수
+        connection-size: 9
+      bulkhead: # 벌크헤드 패턴으로 격리된 개별 기능에 사용하는 최대 커넥션 수
+        notification:
+          connection-size: 3
 
 # Debugging & Logging
 logging:
@@ -31,6 +36,7 @@ minio:
 scheduler:
   sync-interval-ms : 300000           # 5분
   token-cleanup-cron : "0 0 3 * * *"  # 새벽 3시
+  notification-cleanup-cron : "0 10 3 * * *"
 
 # Spring
 spring:
@@ -50,3 +56,9 @@ springdoc:
     enabled: true
   swagger-ui:
     enabled: true
+
+# Wasabi
+cloud:
+  wasabi:
+    s3:
+      max-connections: 6

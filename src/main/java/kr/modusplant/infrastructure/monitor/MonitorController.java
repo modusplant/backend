@@ -29,8 +29,8 @@ public class MonitorController {
             description = "비즈니스 로직을 실행하다가 예외가 발생합니다."
     )
     @GetMapping("/monitor-error")
-    public String monitorError() {
-        return monitorService.performBusinessLogic(false); // 예외 발생
+    public void monitorError() {
+        monitorService.performBusinessLogic(false);
     }
 
     @Operation(
@@ -38,7 +38,7 @@ public class MonitorController {
             description = "컨트롤러에서 예외가 발생합니다."
     )
     @GetMapping("/monitor-error-controller")
-    public String monitorErrorController() {
+    public void monitorErrorController() {
         throw new RuntimeException("Exception occurred on the controller!"); // 예외 발생
     }
 

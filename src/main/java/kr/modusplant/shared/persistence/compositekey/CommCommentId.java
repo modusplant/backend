@@ -13,8 +13,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = AccessLevel.PROTECTED)
 public class CommCommentId implements Serializable {
-
-    private final String postUlid;
+    private final String post;
     private final String path;
 
     @Override
@@ -23,7 +22,7 @@ public class CommCommentId implements Serializable {
         if (!(o instanceof CommCommentId that)) return false;
 
         return new EqualsBuilder()
-                .append(getPostUlid(), that.getPostUlid())
+                .append(getPost(), that.getPost())
                 .append(getPath(), that.getPath())
                 .isEquals();
     }
@@ -31,7 +30,7 @@ public class CommCommentId implements Serializable {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(getPostUlid())
+                .append(getPost())
                 .append(getPath())
                 .toHashCode();
     }
@@ -41,11 +40,11 @@ public class CommCommentId implements Serializable {
     }
 
     public static final class CommCommCommentIdBuilder {
-        private String postUlid;
+        private String post;
         private String path;
 
-        public CommCommCommentIdBuilder postUlid(final String postUlid) {
-            this.postUlid = postUlid;
+        public CommCommCommentIdBuilder post(final String post) {
+            this.post = post;
             return this;
         }
 
@@ -54,14 +53,14 @@ public class CommCommentId implements Serializable {
             return this;
         }
 
-        public CommCommCommentIdBuilder CommCommCommentId(final CommCommentId compositeKey) {
-            this.postUlid = compositeKey.postUlid;
+        public CommCommCommentIdBuilder commCommCommentId(final CommCommentId compositeKey) {
+            this.post = compositeKey.getPost();
             this.path = compositeKey.getPath();
             return this;
         }
 
         public CommCommentId build() {
-            return new CommCommentId(this.postUlid, this.path);
+            return new CommCommentId(this.post, this.path);
         }
     }
 }

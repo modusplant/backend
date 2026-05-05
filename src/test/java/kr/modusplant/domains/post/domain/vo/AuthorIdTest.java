@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import static kr.modusplant.domains.post.common.constant.PostStringConstant.TEST_UUID_STRING;
+import static kr.modusplant.domains.post.common.constant.PostStringConstant.TEST_AUTHOR_ID_STRING;
 import static kr.modusplant.domains.post.common.constant.PostUuidConstant.TEST_POST_UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -42,11 +42,11 @@ class AuthorIdTest implements PostTestUtils {
         @DisplayName("유효한 UUID 문자열로 AuthorId를 생성한다")
         void testFromString_givenValidString_willReturnAuthorId() {
             // when
-            AuthorId authorId = AuthorId.fromString(TEST_UUID_STRING);
+            AuthorId authorId = AuthorId.fromString(TEST_AUTHOR_ID_STRING);
 
             // then
             assertNotNull(authorId);
-            assertEquals(UUID.fromString(TEST_UUID_STRING), authorId.getValue());
+            assertEquals(UUID.fromString(TEST_AUTHOR_ID_STRING), authorId.getValue());
         }
 
         @Test

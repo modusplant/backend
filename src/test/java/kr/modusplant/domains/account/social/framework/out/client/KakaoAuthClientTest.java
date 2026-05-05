@@ -1,5 +1,6 @@
 package kr.modusplant.domains.account.social.framework.out.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.account.social.framework.out.client.dto.KakaoUserInfo;
 import kr.modusplant.domains.account.social.framework.out.exception.OAuthRequestFailException;
 import org.junit.jupiter.api.AfterEach;
@@ -31,6 +32,8 @@ class KakaoAuthClientTest {
     private KakaoAuthClient kakaoAuthClient;
     @Autowired
     private MockRestServiceServer mockServer;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
@@ -77,9 +80,12 @@ class KakaoAuthClientTest {
     void testGetAccessToken_givenInvalidCode_willThrowException() {
         // given
         String authCode = "fake-auth-code";
+        String errorResponseBody = "{\"error\":\"invalid_grant\", \"error_description\":\"authorization code not found\"}";
 
         mockServer.expect(requestTo("https://kauth.kakao.com/oauth/token"))
-                .andRespond(withStatus(HttpStatus.BAD_REQUEST));
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(errorResponseBody));
 
         // when & then
         assertThrows(OAuthRequestFailException.class, () -> kakaoAuthClient.getAccessToken(authCode));
@@ -95,7 +101,7 @@ class KakaoAuthClientTest {
         String nickname = "kakao-nickname";
         String responseJson = "{" +
                 "\"id\": " + id + "," +
-                "\"kakaoAccount\": {" +
+                "\"kakao_account\": {" +
                 "  \"email\": \""+email+"\"," +
                 "  \"isEmailVerified\": true," +
                 "  \"profile\": {" +
@@ -124,11 +130,46 @@ class KakaoAuthClientTest {
     void testGetUserInfo_givenInvalidAccessToken_willThrowException() {
         // given
         String accessToken = "invalid-token";
+        String errorResponseBody = "{\"error\":\"invalid_token\", \"error_description\":\"the access token is expired\"}";
 
         mockServer.expect(requestTo("https://kapi.kakao.com/v2/user/me"))
-                .andRespond(withStatus(HttpStatus.BAD_REQUEST));
+                .andRespond(withStatus(HttpStatus.UNAUTHORIZED)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(errorResponseBody));
 
         // when & then
         assertThrows(OAuthRequestFailException.class, () -> kakaoAuthClient.getUserInfo(accessToken));
+    }
+
+    @Test
+    @DisplayName("카카오 연결 해제 성공 테스트")
+    void testRevokeAccess_givenAccessToken_willSuccess() {
+        // given
+        String accessToken = "test-access-token";
+        mockServer.expect(requestTo("https://kapi.kakao.com/v1/user/unlink"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header(HttpHeaders.AUTHORIZATION,"Bearer " + accessToken))
+                .andRespond(withSuccess());
+
+        // when
+        kakaoAuthClient.revokeAccess(accessToken);
+
+        // then
+        mockServer.verify();
+    }
+
+    @Test
+    @DisplayName("카카오 연결 해제 실패 시 예외 발생 테스트")
+    void testRevokeAccess_givenInvalidAccessToken_willThrowException() {
+        // given
+        String accessToken = "invalid-token";
+        String errorResponseBody = "{\"error\":\"not_registered_user\", \"error_description\":\"user not found\"}";
+        mockServer.expect(requestTo("https://kapi.kakao.com/v1/user/unlink"))
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(errorResponseBody));
+
+        // when & then
+        assertThrows(OAuthRequestFailException.class,() -> kakaoAuthClient.revokeAccess(accessToken));
     }
 }

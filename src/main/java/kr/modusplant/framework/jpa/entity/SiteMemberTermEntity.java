@@ -21,15 +21,15 @@ import static kr.modusplant.shared.persistence.constant.TableName.SITE_MEMBER_TE
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = SITE_MEMBER_TERM)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @ToString
 public class SiteMemberTermEntity {
     @Id
     private UUID uuid;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @MapsId
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = "uuid", nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ToString.Exclude
     private SiteMemberEntity member;
@@ -40,8 +40,8 @@ public class SiteMemberTermEntity {
     @Column(name = "agreed_priv_poli_ver", nullable = false, length = 10)
     private String agreedPrivacyPolicyVersion;
 
-    @Column(name = "agreed_ad_info_rece_ver", length = 10)
-    private String agreedAdInfoReceivingVersion;
+    @Column(name = "agreed_comm_poli_ver", length = 10)
+    private String agreedCommunityPolicyVersion;
 
     @Column(name = LAST_MODIFIED_AT, nullable = false)
     @LastModifiedDate
@@ -60,8 +60,8 @@ public class SiteMemberTermEntity {
         this.agreedPrivacyPolicyVersion = agreedPrivacyPolicyVersion;
     }
 
-    public void updateAgreedAdInfoReceivingVersion(String agreedAdInfoReceivingVersion) {
-        this.agreedAdInfoReceivingVersion = agreedAdInfoReceivingVersion;
+    public void updateAgreedCommunityPolicyVersion(String agreedCommunityPolicyVersion) {
+        this.agreedCommunityPolicyVersion = agreedCommunityPolicyVersion;
     }
 
     public String getETagSource() {
@@ -84,11 +84,11 @@ public class SiteMemberTermEntity {
         return new HashCodeBuilder(17, 37).append(getMember()).toHashCode();
     }
 
-    private SiteMemberTermEntity(SiteMemberEntity member, String agreedTermsOfUseVersion, String agreedPrivacyPolicyVersion, String agreedAdInfoReceivingVersion) {
+    private SiteMemberTermEntity(SiteMemberEntity member, String agreedTermsOfUseVersion, String agreedPrivacyPolicyVersion, String agreedCommunityPolicyVersion) {
         this.member = member;
         this.agreedTermsOfUseVersion = agreedTermsOfUseVersion;
         this.agreedPrivacyPolicyVersion = agreedPrivacyPolicyVersion;
-        this.agreedAdInfoReceivingVersion = agreedAdInfoReceivingVersion;
+        this.agreedCommunityPolicyVersion = agreedCommunityPolicyVersion;
     }
 
     public static SiteMemberTermEntityBuilder builder() {
@@ -99,7 +99,7 @@ public class SiteMemberTermEntity {
         private SiteMemberEntity member;
         private String agreedTermsOfUseVersion;
         private String agreedPrivacyPolicyVersion;
-        private String agreedAdInfoReceivingVersion;
+        private String agreedCommunityPolicyVersion;
 
         public SiteMemberTermEntityBuilder member(final SiteMemberEntity member) {
             this.member = member;
@@ -116,8 +116,8 @@ public class SiteMemberTermEntity {
             return this;
         }
 
-        public SiteMemberTermEntityBuilder agreedAdInfoReceivingVersion(final String agreedAdInfoReceivingVersion) {
-            this.agreedAdInfoReceivingVersion = agreedAdInfoReceivingVersion;
+        public SiteMemberTermEntityBuilder agreedCommunityPolicyVersion(final String agreedCommunityPolicyVersion) {
+            this.agreedCommunityPolicyVersion = agreedCommunityPolicyVersion;
             return this;
         }
 
@@ -125,12 +125,12 @@ public class SiteMemberTermEntity {
             this.member = memberTerm.getMember();
             this.agreedTermsOfUseVersion = memberTerm.getAgreedTermsOfUseVersion();
             this.agreedPrivacyPolicyVersion = memberTerm.getAgreedPrivacyPolicyVersion();
-            this.agreedAdInfoReceivingVersion = memberTerm.getAgreedAdInfoReceivingVersion();
+            this.agreedCommunityPolicyVersion = memberTerm.getAgreedCommunityPolicyVersion();
             return this;
         }
 
         public SiteMemberTermEntity build() {
-            return new SiteMemberTermEntity(this.member, this.agreedTermsOfUseVersion, this.agreedPrivacyPolicyVersion, this.agreedAdInfoReceivingVersion);
+            return new SiteMemberTermEntity(this.member, this.agreedTermsOfUseVersion, this.agreedPrivacyPolicyVersion, this.agreedCommunityPolicyVersion);
         }
     }
 }

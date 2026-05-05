@@ -7,16 +7,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +50,7 @@ public class S3FileService {
                 .build();
 
         try {
-            return s3Client.getObject(request).readAllBytes();
+            return s3Client.getObjectAsBytes(request).asByteArray();
         } catch (NoSuchKeyException e) {
             throw new NotFoundFileKeyOnS3Exception();
         }
@@ -67,6 +66,25 @@ public class S3FileService {
         s3Client.deleteObject(request);
     }
 
+    public void deleteFiles(List<String> fileKeys) {
+        int batchSize = 1000;       // S3 API는 단일 요청당 최대 1,000개까지 파일 삭제를 지원
+        int fileKeySize = fileKeys.size();
+        for (int i = 0; i < fileKeySize; i += batchSize) {
+            List<String> subList = fileKeys.subList(i, Math.min(i + batchSize, fileKeySize));
+
+            List<ObjectIdentifier> objectIdentifiers = subList.stream()
+                    .map(fileKey -> ObjectIdentifier.builder().key(fileKey).build())
+                    .collect(Collectors.toList());
+
+            DeleteObjectsRequest request = DeleteObjectsRequest.builder()
+                    .bucket(bucket)
+                    .delete(Delete.builder().objects(objectIdentifiers).build())
+                    .build();
+
+            s3Client.deleteObjects(request);
+        }
+    }
+
     public String generateS3SrcUrl(String fileKey) {
         if(profile.equals("dev")){
             return String.format("%s/%s/%s", devPublicEndpoint, bucket, fileKey);
@@ -76,7 +94,7 @@ public class S3FileService {
 
     private String getPresignedUrl(String fileKey) {
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofHours(12))
+                .signatureDuration(Duration.ofHours(168))
                 .getObjectRequest(req -> req
                         .bucket(bucket)
                         .key(fileKey))

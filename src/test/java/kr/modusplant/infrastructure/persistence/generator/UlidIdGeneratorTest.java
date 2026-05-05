@@ -3,6 +3,7 @@ package kr.modusplant.infrastructure.persistence.generator;
 import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -19,14 +20,28 @@ class UlidIdGeneratorTest {
     private static final UlidIdGenerator generator = new UlidIdGenerator();
     private static final Pattern ULID_PATTERN = Pattern.compile("^[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{26}$", Pattern.CASE_INSENSITIVE);
 
-    @Test
+    @Nested
     @DisplayName("UlidIdGenerator가 올바른 형식의 ULID를 생성")
-    void generateUlid_givenValidGenerator_willReturnUlid() {
-        // Given & When
-        String ulid = generator.generate(null, null, null, EventType.INSERT);
+    class GenerateUlidTest {
+        @Test
+        @DisplayName("UlidIdGenerator가 generate()로 올바른 형식의 ULID를 생성")
+        void generateUlid_givenGenerateWithNoParam_willReturnUlid() {
+            // Given & When
+            String ulid = generator.generate();
 
-        // Then
-        assertTrue(ULID_PATTERN.matcher(ulid).matches());
+            // Then
+            assertTrue(ULID_PATTERN.matcher(ulid).matches());
+        }
+
+        @Test
+        @DisplayName("UlidIdGenerator가 generate(4개의 매개변수)로 올바른 형식의 ULID를 생성")
+        void generateUlid_givenGenerateWithFourParams_willReturnUlid() {
+            // Given & When
+            String ulid = generator.generate(null, null, null, EventType.INSERT);
+
+            // Then
+            assertTrue(ULID_PATTERN.matcher(ulid).matches());
+        }
     }
 
     @Test
@@ -48,7 +63,7 @@ class UlidIdGeneratorTest {
 
     @Test
     @DisplayName("UlidIdGenerator가 시간 순서에 따르는 ULID를 생성")
-    void generateUlid_givenValidGenerator_willReturnTimeOrderedUlid() throws InterruptedException {
+    void generateUlid_givenValidGenerator_willReturnTimeOrderedUlid() {
         // given
         int count = 5;
         List<String> ulids = new ArrayList<>();
@@ -57,7 +72,6 @@ class UlidIdGeneratorTest {
         for (int i = 0; i < count; i++) {
             String ulid = generator.generate(null, null,null,EventType.INSERT);
             ulids.add(ulid);
-            Thread.sleep(1);
         }
 
         // then
@@ -76,27 +90,29 @@ class UlidIdGeneratorTest {
     @DisplayName("UlidIdGenerator가 멀티스레드 환경에서도 고유한 ULID를 생성")
     void generateUlidInMultiThread_givenValidGenerator_willReturnUlid() throws ExecutionException, InterruptedException {
         // given
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
-        List<Future<List<String>>> futures = new ArrayList<>();
-        int repeatCount = 1000;
-        int ulidCount = 1000;
-        Set<String> allUlids = Collections.synchronizedSet(new HashSet<>());
+        int repeatCount;
+        int ulidCount;
+        try (ExecutorService executorService = Executors.newFixedThreadPool(10)) {
+            List<Future<List<String>>> futures = new ArrayList<>();
+            repeatCount = 1000;
+            ulidCount = 1000;
+            Set<String> allUlids = Collections.synchronizedSet(new HashSet<>());
 
-        // when
-        for (int i = 0; i < repeatCount; i++) {
-            futures.add(executorService.submit(() -> generatedUlidList(ulidCount)));
-        }
-
-        // then
-        for (Future<List<String>> future : futures) {
-            List<String> ulidList = future.get();
-            for (String ulid : ulidList) {
-                assertTrue(allUlids.add(ulid));
+            // when
+            for (int i = 0; i < repeatCount; i++) {
+                futures.add(executorService.submit(() -> generatedUlidList(ulidCount)));
             }
-        }
-        executorService.shutdown();
 
-        assertEquals(repeatCount * ulidCount, allUlids.size());
+            // then
+            for (Future<List<String>> future : futures) {
+                List<String> ulidList = future.get();
+                for (String ulid : ulidList) {
+                    assertTrue(allUlids.add(ulid));
+                }
+            }
+            executorService.shutdown();
+            assertEquals(repeatCount * ulidCount, allUlids.size());
+        }
     }
 
     private List<String> generatedUlidList(int count) {

@@ -7,7 +7,7 @@ import static kr.modusplant.shared.persistence.common.util.constant.CommPostCons
 
 public interface CommCommentIdTestUtils extends CommCommentEntityTestUtils {
     CommCommentId testCommCommentId = CommCommentId.builder()
-            .postUlid(TEST_COMM_POST_ULID)
+            .post(TEST_COMM_POST_ULID)
             .path(TEST_COMM_COMMENT_PATH)
             .build();
 }

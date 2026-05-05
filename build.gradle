@@ -98,6 +98,7 @@ dependencies {
 	// Spring Cloud AWS (Version managed by Spring Cloud AWS Dependencies)
 	implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.2.0')
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store'
+	implementation 'software.amazon.awssdk:apache-client'
 	implementation 'software.amazon.awssdk:s3'
 
     // Flyway Runtime Dependencies
@@ -112,6 +113,7 @@ dependencies {
 	implementation 'org.bouncycastle:bcpkix-jdk18on:1.82'
 	implementation 'org.jooq:jooq:3.20.8'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+	implementation 'com.google.firebase:firebase-admin:9.8.0'
 
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
@@ -145,6 +147,7 @@ flyway {
 	outOfOrder = false
 	encoding = 'UTF-8'
 	detectEncoding = true
+	schemas = ['public']
 }
 
 jacoco {

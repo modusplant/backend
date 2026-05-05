@@ -6,6 +6,7 @@ import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -26,7 +27,7 @@ public class AuthorId {
     }
 
     public static AuthorId fromString(String value) {
-        if (value == null || value.trim().isEmpty()) {
+        if (StringUtils.isBlank(value)) {
             throw new EmptyValueException(PostErrorCode.EMPTY_AUTHOR_ID);
         }
         if (!PATTERN_UUID.matcher(value).matches()) {

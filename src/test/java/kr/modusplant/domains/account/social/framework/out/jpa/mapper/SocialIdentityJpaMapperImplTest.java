@@ -1,113 +1,111 @@
 package kr.modusplant.domains.account.social.framework.out.jpa.mapper;
 
-import kr.modusplant.domains.account.social.common.util.domain.vo.SocialAccountPayloadTestUtils;
-import kr.modusplant.domains.account.social.common.util.domain.vo.SocialAccountProfileTestUtils;
-import kr.modusplant.domains.account.social.common.util.framework.out.jpa.entity.MemberEntityTestUtils;
-import kr.modusplant.domains.account.social.domain.vo.SocialAccountPayload;
+import kr.modusplant.domains.account.social.common.util.domain.vo.AgreedTermsTestUtils;
+import kr.modusplant.domains.account.social.common.util.domain.vo.SocialMemberProfileTestUtils;
+import kr.modusplant.domains.account.social.domain.vo.SocialMemberProfile;
 import kr.modusplant.domains.account.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
 import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberRoleEntity;
-import kr.modusplant.infrastructure.security.enums.Role;
-import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.framework.jpa.entity.SiteMemberProfileEntity;
+import kr.modusplant.framework.jpa.entity.SiteMemberTermEntity;
+import kr.modusplant.framework.jpa.entity.common.util.SiteMemberAuthEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.common.util.SiteMemberProfileEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.common.util.SiteMemberTermEntityTestUtils;
+import kr.modusplant.shared.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, SocialAccountProfileTestUtils, SocialAccountPayloadTestUtils {
+class SocialIdentityJpaMapperImplTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntityTestUtils, SiteMemberProfileEntityTestUtils, SiteMemberTermEntityTestUtils,
+        SocialMemberProfileTestUtils, AgreedTermsTestUtils {
     private final SocialIdentityJpaMapper socialIdentityJpaMapper = new SocialIdentityJpaMapperImpl();
 
     @Test
     @DisplayName("Nickname으로 MemberEntity를 생성")
     void testToMemberEntity_givenNickname_willReturnMemberEntity() {
         // when
-        SiteMemberEntity result = socialIdentityJpaMapper.toMemberEntity(testNormalUserNickname);
+        SiteMemberEntity result = socialIdentityJpaMapper.toMemberEntity(testGoogleUserNickname,Role.USER);
 
         // then
         assertNotNull(result);
-        assertEquals(testNormalUserNickname.getValue(), result.getNickname());
+        assertEquals(testGoogleUserNickname.getValue(), result.getNickname());
+        assertEquals(Role.USER, result.getRole());
         assertNotNull(result.getLoggedInAt());
     }
 
     @Test
-    @DisplayName("MemberEntity와 SocialUserProfile로 MemberAuthEntity를 생성")
-    void testToMemberAuthEntity_givenMemberEntityAndProfile_willReturnMemberAuthEntity() {
+    @DisplayName("MemberEntity와 SocialCredentials, Email로 MemberAuthEntity를 생성")
+    void testToMemberAuthEntity_givenMemberEntityAndSocialCredentialsAndEmail_willReturnMemberAuthEntity() {
         // given
-        SiteMemberEntity memberEntity = createKakaoMemberEntityWithUuid();
-        String providerId = TEST_KAKAO_SOCIAL_ACCOUNT_PROFILE.getSocialCredentials().getProviderId();
-        String email = TEST_KAKAO_SOCIAL_ACCOUNT_PROFILE.getEmail().getValue();
+        SiteMemberEntity memberEntity = createMemberGoogleUserEntityWithUuid();
 
         // when
-        SiteMemberAuthEntity result = socialIdentityJpaMapper.toMemberAuthEntity(memberEntity, TEST_KAKAO_SOCIAL_ACCOUNT_PROFILE);
+        SiteMemberAuthEntity result = socialIdentityJpaMapper.toMemberAuthEntity(memberEntity, testGoogleSocialCredentials, testGoogleUserEmail);
 
         // then
         assertNotNull(result);
         assertEquals(memberEntity, result.getMember());
-        assertEquals(email, result.getEmail());
-        assertEquals(AuthProvider.KAKAO, result.getProvider());
-        assertEquals(providerId, result.getProviderId());
+        assertEquals(testGoogleUserEmail.getValue(), result.getEmail());
+        assertEquals(testGoogleSocialCredentials.getProvider(), result.getProvider());
+        assertEquals(testGoogleSocialCredentials.getProviderId(), result.getProviderId());
     }
 
     @Test
-    @DisplayName("MemberEntity와 Role로 MemberRoleEntity를 생성")
-    void testToMemberRoleEntity_givenMemberEntityAndRole_willReturnMemberRoleEntity() {
+    @DisplayName("MemberEntity와 AgreedTerms로 MemberTermEntity를 생성")
+    void testToMemberTermEntity_givenMemberEntityAndAgreedTerms_willReturnSiteMemberTermEntity() {
         // given
-        SiteMemberEntity memberEntity = createKakaoMemberEntityWithUuid();
-        Role role = Role.USER;
+        SiteMemberEntity memberEntity = createMemberGoogleUserEntityWithUuid();
 
         // when
-        SiteMemberRoleEntity result = socialIdentityJpaMapper.toMemberRoleEntity(memberEntity, role);
+        SiteMemberTermEntity result = socialIdentityJpaMapper.toMemberTermEntity(memberEntity,testAgreedTerms);
 
         // then
         assertNotNull(result);
-        assertEquals(memberEntity, result.getMember());
-        assertEquals(Role.USER, result.getRole());
+        assertEquals(memberEntity,result.getMember());
+        assertEquals(testAgreedTerms.getAgreedTermsOfUseVersion().getValue(),result.getAgreedTermsOfUseVersion());
+        assertEquals(testAgreedTerms.getAgreedPrivacyPolicyVersion().getValue(),result.getAgreedPrivacyPolicyVersion());
+        assertEquals(testAgreedTerms.getAgreedCommunityPolicyVersion().getValue(),result.getAgreedCommunityPolicyVersion());
     }
 
     @Test
-    @DisplayName("MemberEntity와 MemberRoleEntity로 UserPayload를 생성")
-    void testToUserPayload_givenMemberEntityAndMemberRoleEntity_willReturnUserPayload() {
+    @DisplayName("MemberEntity와 introduction으로 MemberProfileEntity를 생성")
+    void testToMemberProfileEntity_givenMemberEntityAndIntroduction_willReturnMemberProfileEntity() {
         // given
-        SiteMemberEntity memberEntity = createKakaoMemberEntityWithUuid();
-        SiteMemberAuthEntity memberAuthEntity = SiteMemberAuthEntity.builder()
-                .member(memberEntity)
-                .email(testKakaoUserEmail.getValue())
-                .build();
-        SiteMemberRoleEntity memberRoleEntity = SiteMemberRoleEntity.builder()
-                .member(memberEntity)
-                .role(Role.USER)
-                .build();
+        SiteMemberEntity memberEntity = createMemberGoogleUserEntityWithUuid();
+        String introduction = "프로필 소개";
 
         // when
-        SocialAccountPayload result = socialIdentityJpaMapper.toUserPayload(memberEntity, memberAuthEntity, memberRoleEntity);
+        SiteMemberProfileEntity result = socialIdentityJpaMapper.toMemberProfileEntity(memberEntity,introduction);
 
         // then
         assertNotNull(result);
-        assertEquals(memberEntity.getUuid(), result.getAccountId().getValue());
-        assertEquals(memberEntity.getNickname(), result.getNickname().getValue());
-        assertEquals(memberAuthEntity.getEmail(), result.getEmail().getValue());
-        assertEquals(Role.USER, result.getRole());
+        assertEquals(memberEntity,result.getMember());
+        assertEquals(introduction,result.getIntroduction());
     }
 
     @Test
-    @DisplayName("MemberEntity, Nickname, Role로 UserPayload를 생성")
-    void testToUserPayload_givenMemberEntityNicknameAndRole_willReturnUserPayload() {
+    @DisplayName("MemberEntity와 MemberAuthEntity로 SocialMemberProfile를 생성")
+    void testToSocialMemberProfile_givenMemberEntityAndMemberAuthEntity_willReturnSocialMemberProfile() {
         // given
-        SiteMemberEntity memberEntity = createKakaoMemberEntityWithUuid();
-        Role role = Role.USER;
+        SiteMemberEntity memberEntity = createMemberGoogleUserEntityWithUuid();
+        SiteMemberAuthEntity memberAuthEntity = createMemberAuthGoogleUserEntityBuilder().member(memberEntity).build();
 
         // when
-        SocialAccountPayload result = socialIdentityJpaMapper.toUserPayload(memberEntity, testNormalUserNickname, testKakaoUserEmail, role);
+        SocialMemberProfile result = socialIdentityJpaMapper.toSocialMemberProfile(memberEntity,memberAuthEntity);
 
         // then
         assertNotNull(result);
-        assertEquals(memberEntity.getUuid(), result.getAccountId().getValue());
-        assertEquals(testNormalUserNickname.getValue(), result.getNickname().getValue());
-        assertEquals(testKakaoUserEmail.getValue(), result.getEmail().getValue());
-        assertEquals(Role.USER, result.getRole());
+        assertEquals(memberEntity.getUuid(),result.getAccountId().getValue());
+        assertEquals(memberAuthEntity.getProvider(),result.getSocialCredentials().getProvider());
+        assertEquals(memberAuthEntity.getProviderId(),result.getSocialCredentials().getProviderId());
+        assertEquals(memberAuthEntity.getEmail(),result.getEmail().getValue());
+        assertEquals(memberEntity.getNickname(),result.getNickname().getValue());
+        assertEquals(memberEntity.getRole(),result.getRole());
     }
+
 
 
 }

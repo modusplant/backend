@@ -1,12 +1,13 @@
 package kr.modusplant.infrastructure.security;
 
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
+import kr.modusplant.infrastructure.security.exception.AccountStateException;
 import kr.modusplant.infrastructure.security.exception.BadCredentialException;
 import kr.modusplant.infrastructure.security.exception.BannedException;
-import kr.modusplant.infrastructure.security.exception.DeletedException;
 import kr.modusplant.infrastructure.security.exception.InactiveException;
 import kr.modusplant.infrastructure.security.models.DefaultAuthToken;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
+import kr.modusplant.shared.enums.AuthProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -46,10 +47,16 @@ public class DefaultAuthProvider implements AuthenticationProvider {
     private boolean validateDefaultUserDetails(DefaultUserDetails userDetails, String password) {
         if(!passwordEncoder.matches(password, userDetails.getPassword())) {
             throw new BadCredentialException(SecurityErrorCode.BAD_PASSWORD); }
+
+        if (userDetails.getProvider() == AuthProvider.BASIC_GOOGLE) {
+            throw new AccountStateException(SecurityErrorCode.FORBIDDEN_GOOGLE_LINKED_ACCOUNT);
+        }
+        if (userDetails.getProvider() == AuthProvider.BASIC_KAKAO) {
+            throw new AccountStateException(SecurityErrorCode.FORBIDDEN_KAKAO_LINKED_ACCOUNT);
+        }
+
         if (userDetails.isBanned()) {
             throw new BannedException(); }
-        if (userDetails.isDeleted()) {
-            throw new DeletedException(); }
         if (!userDetails.isActive()) {
             throw new InactiveException(); }
 

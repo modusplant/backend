@@ -19,8 +19,8 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_PRI_CATE;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = COMM_PRI_CATE)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @ToString
 public class CommPrimaryCategoryEntity {
     @Id
@@ -38,10 +38,6 @@ public class CommPrimaryCategoryEntity {
     @Column(name = CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
-
-    public void updateCategory(String category) {
-        this.category = category;
-    }
 
     @Override
     public boolean equals(Object o) {

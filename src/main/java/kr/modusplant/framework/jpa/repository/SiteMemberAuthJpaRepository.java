@@ -15,12 +15,15 @@ import java.util.UUID;
 
 @Repository
 @Primary
-public interface SiteMemberAuthJpaRepository extends LastModifiedAtRepository<SiteMemberAuthEntity>, UuidPrimaryKeyRepository<SiteMemberAuthEntity>, JpaRepository<SiteMemberAuthEntity, UUID> {
-    List<SiteMemberAuthEntity> findByEmail(String email);
+public interface SiteMemberAuthJpaRepository extends
+        LastModifiedAtRepository<SiteMemberAuthEntity>,
+        UuidPrimaryKeyRepository<SiteMemberAuthEntity>,
+        JpaRepository<SiteMemberAuthEntity, UUID> {
+    Optional<SiteMemberAuthEntity> findByEmail(String email);
 
     List<SiteMemberAuthEntity> findByProvider(AuthProvider provider);
 
-    List<SiteMemberAuthEntity> findByProviderId(String providerId);
+    Optional<SiteMemberAuthEntity> findByProviderId(String providerId);
 
     Optional<SiteMemberAuthEntity> findByMember(SiteMemberEntity member);
 

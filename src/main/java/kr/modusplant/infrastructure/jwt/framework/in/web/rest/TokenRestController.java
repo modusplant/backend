@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
-import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
+import kr.modusplant.infrastructure.jwt.provider.JwtCookieProvider;
 import kr.modusplant.infrastructure.jwt.response.TokenResponse;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ import static kr.modusplant.infrastructure.jwt.constant.CookieName.REFRESH_TOKEN
 public class TokenRestController {
 
     private final TokenService tokenService;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtCookieProvider jwtCookieProvider;
 
     @Operation(summary = "JWT 토큰 갱신 API", description = "리프레시 토큰을 받아 처리합니다.")
     @ApiResponses(value = {
@@ -39,7 +39,7 @@ public class TokenRestController {
 
         TokenResponse tokenResponse = new TokenResponse(tokenPair.accessToken());
         DataResponse<TokenResponse> response = DataResponse.ok(tokenResponse);
-        String refreshCookie = jwtTokenProvider.generateRefreshTokenCookieAsString(tokenPair.refreshToken());
+        String refreshCookie = jwtCookieProvider.generateRefreshTokenCookieAsString(tokenPair.refreshToken());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshCookie)

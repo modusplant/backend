@@ -5,13 +5,18 @@ import kr.modusplant.domains.account.normal.common.util.domain.vo.SignUpDataTest
 import kr.modusplant.domains.account.normal.common.util.usecase.request.EmailModificationRequestTestUtils;
 import kr.modusplant.domains.account.normal.common.util.usecase.request.NormalSignUpRequestTestUtils;
 import kr.modusplant.domains.account.normal.common.util.usecase.request.PasswordModificationRequestTestUtils;
+import kr.modusplant.domains.account.normal.domain.exception.DataAlreadyExistsException;
 import kr.modusplant.domains.account.normal.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdentityCreateRepository;
 import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdentityReadRepository;
 import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdentityUpdateRepository;
 import kr.modusplant.domains.account.normal.usecase.request.EmailModificationRequest;
+import kr.modusplant.domains.account.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.domains.account.normal.usecase.request.PasswordModificationRequest;
+import kr.modusplant.framework.jpa.exception.ExistsEntityException;
+import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.kernel.Email;
+import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.Password;
 import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
 import org.junit.jupiter.api.DisplayName;
@@ -20,37 +25,111 @@ import org.mockito.Mockito;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static kr.modusplant.domains.account.shared.kernel.common.util.AccountIdTestUtils.testNormalMemberId;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 public class NormalIdentityControllerTest implements EmailTestUtils,
         NormalSignUpRequestTestUtils, SignUpDataTestUtils,
         EmailModificationRequestTestUtils, PasswordModificationRequestTestUtils {
-    private final NormalIdentityMapper mapper = Mockito.mock(NormalIdentityMapperImpl.class);
+    private final NormalIdentityMapper identityMapper = Mockito.mock(NormalIdentityMapperImpl.class);
     private final NormalIdentityCreateRepository createRepository = Mockito.mock(NormalIdentityCreateRepository.class);
     private final NormalIdentityUpdateRepository updateRepository = Mockito.mock(NormalIdentityUpdateRepository.class);
     private final NormalIdentityReadRepository readRepository = Mockito.mock(NormalIdentityReadRepository.class);
-    private final PasswordEncoder encoder = Mockito.mock(PasswordEncoder.class);
+    PasswordEncoder encoder = Mockito.mock(PasswordEncoder.class);
     private final NormalIdentityController controller = new NormalIdentityController(
-            mapper, createRepository, updateRepository, readRepository, encoder);
+            identityMapper, createRepository, updateRepository, readRepository, encoder);
 
     @Test
-    @DisplayName("유효한 요청 데이터를 받았을 시 일반 회원가입 진행")
-    public void testRegisterNormalMember_givenValidRequest_willProcessRequest() {
+    @DisplayName("이미 존재하는 닉네임으로 요청 시 DataAlreadyExistsException 발생")
+    public void testRegisterNormalMember_givenExistingNickname_willThrowDataAlreadyExistsException() {
         // given
-        given(readRepository.existsByEmail(testNormalUserEmail)).willReturn(false);
-        given(readRepository.existsByNickname(testNormalUserNickname)).willReturn(false);
-        given(mapper.toSignUpData(testNormalSignUpRequest)).willReturn(TEST_NORMAL_SIGN_UP_DATA);
-        doNothing().when(createRepository).save(TEST_NORMAL_SIGN_UP_DATA);
+        NormalSignUpRequest request = testNormalSignUpRequest;
+
+        given(readRepository.existsByNickname(Nickname.create(request.nickname()))).willReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> controller.registerNormalMember(request))
+                .isInstanceOf(DataAlreadyExistsException.class);
+
+        verify(readRepository, times(1)).existsByNickname(Nickname.create(request.nickname()));
+        verify(readRepository, times(1)).existsByEmail(Email.create(request.email()));
+    }
+
+    @Test
+    @DisplayName("BASIC Provider로 이미 가입된 이메일로 요청 시 ExistsEntityException 발생")
+    public void testRegisterNormalMember_givenEmailWithBasicProvider_willThrowExistsEntityException() {
+        // given
+        NormalSignUpRequest request = testNormalSignUpRequest;
+        Email requestEmail = Email.create(request.email());
+
+        given(readRepository.existsByNickname(Nickname.create(request.nickname()))).willReturn(false);
+        given(readRepository.existsByEmail(requestEmail)).willReturn(true);
+        given(readRepository.getAuthProvider(requestEmail)).willReturn(AuthProvider.BASIC);
+
+        // when & then
+        assertThatThrownBy(() -> controller.registerNormalMember(request))
+                .isInstanceOf(ExistsEntityException.class);
+
+        verify(readRepository, times(1)).existsByEmail(requestEmail);
+        verify(readRepository, times(1)).getAuthProvider(requestEmail);
+    }
+
+    @Test
+    @DisplayName("BASIC_GOOGLE Provider로 이미 가입된 이메일로 요청 시 ExistsEntityException 발생")
+    public void testRegisterNormalMember_givenEmailWithBasicGoogleProvider_willThrowExistsEntityException() {
+        // given
+        NormalSignUpRequest request = testNormalSignUpRequest;
+        Email requestEmail = Email.create(request.email());
+
+        given(readRepository.existsByNickname(Nickname.create(request.nickname()))).willReturn(false);
+        given(readRepository.existsByEmail(requestEmail)).willReturn(true);
+        given(readRepository.getAuthProvider(requestEmail)).willReturn(AuthProvider.BASIC_GOOGLE);
+
+        // when & then
+        assertThatThrownBy(() -> controller.registerNormalMember(request))
+                .isInstanceOf(ExistsEntityException.class);
+
+        verify(readRepository, times(1)).existsByEmail(requestEmail);
+        verify(readRepository, times(1)).getAuthProvider(requestEmail);
+    }
+
+    @Test
+    @DisplayName("BASIC_KAKAO Provider로 이미 가입된 이메일로 요청 시 ExistsEntityException 발생")
+    public void testRegisterNormalMember_givenEmailWithBasicKakaoProvider_willThrowExistsEntityException() {
+        // given
+        NormalSignUpRequest request = testNormalSignUpRequest;
+        Email requestEmail = Email.create(request.email());
+
+        given(readRepository.existsByEmail(requestEmail)).willReturn(true);
+        given(readRepository.getAuthProvider(requestEmail)).willReturn(AuthProvider.BASIC_KAKAO);
+
+        // when & then
+        assertThatThrownBy(() -> controller.registerNormalMember(request))
+                .isInstanceOf(ExistsEntityException.class);
+
+        verify(readRepository, times(1)).existsByEmail(requestEmail);
+        verify(readRepository, times(1)).getAuthProvider(requestEmail);
+    }
+
+    @Test
+    @DisplayName("미가입 이메일로 요청 시 신규 회원 저장 진행")
+    public void testRegisterNormalMember_givenNewEmail_willSaveNewMember() {
+        // given
+        NormalSignUpRequest request = testNormalSignUpRequest;
+        Email requestEmail = Email.create(request.email());
+
+        given(readRepository.existsByNickname(Nickname.create(request.nickname()))).willReturn(false);
+        given(readRepository.existsByEmail(requestEmail)).willReturn(false);
+        doNothing().when(createRepository).save(any());
 
         // when
-        controller.registerNormalMember(testNormalSignUpRequest);
+        controller.registerNormalMember(request);
 
         // then
-        verify(readRepository, times(1)).existsByEmail(testNormalUserEmail);
-        verify(readRepository, times(1)).existsByNickname(testNormalUserNickname);
-        verify(mapper, times(1)).toSignUpData(testNormalSignUpRequest);
-        verify(createRepository, times(1)).save(TEST_NORMAL_SIGN_UP_DATA);
+        verify(createRepository, times(1)).save(identityMapper.toSignUpData(request));
+        verify(updateRepository, never()).updateToGoogleAccount(any(), any());
+        verify(updateRepository, never()).updateToKakaoAccount(any(), any());
     }
 
     @Test
@@ -60,7 +139,7 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
         EmailModificationRequest request = testEmailModificationRequest;
 
         given(readRepository.existsByEmail(Email.create(request.currentEmail()))).willReturn(true);
-        given(updateRepository.updateEmail(testNormalMemberId, Email.create(request.newEmail()))).willReturn(1);
+        doNothing().when(updateRepository).updateEmail(testNormalMemberId, Email.create(request.newEmail()));
 
         // when
         controller.modifyEmail(testNormalMemberId.getValue(), testEmailModificationRequest);
@@ -79,8 +158,7 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
         given(readRepository.existsByMemberId(testNormalMemberId)).willReturn(true);
         given(readRepository.getMemberPassword(testNormalMemberId)).willReturn(request.currentPw());
         given(encoder.matches(request.currentPw(), request.currentPw())).willReturn(true);
-        given(updateRepository.updatePassword(testNormalMemberId, Password.create(request.newPw())))
-                .willReturn(1);
+        doNothing().when(updateRepository).updatePassword(testNormalMemberId, Password.create(request.newPw()));
 
         // when
         controller.modifyPassword(testNormalMemberId.getValue(), testPasswordModificationRequest);

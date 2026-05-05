@@ -33,4 +33,20 @@ public interface SiteMemberAuthEntityTestUtils extends SiteMemberEntityTestUtils
                 .provider(MEMBER_AUTH_KAKAO_USER_PROVIDER)
                 .providerId(MEMBER_AUTH_KAKAO_USER_PROVIDER_ID);
     }
+
+    default SiteMemberAuthEntityBuilder createMemberAuthBasicGoogleEntityBuilder() {
+        return SiteMemberAuthEntity.builder()
+                .email(MEMBER_AUTH_BASIC_USER_EMAIL)
+                .pw(MEMBER_AUTH_BASIC_USER_PW)
+                .provider(MEMBER_AUTH_BASIC_GOOGLE_USER_PROVIDER)
+                .providerId(MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID);
+    }
+
+    default SiteMemberAuthEntityBuilder createMemberAuthBasicKakaoEntityBuilder() {
+        return SiteMemberAuthEntity.builder()
+                .email(MEMBER_AUTH_BASIC_USER_EMAIL)
+                .pw(MEMBER_AUTH_BASIC_USER_PW)
+                .provider(MEMBER_AUTH_BASIC_KAKAO_USER_PROVIDER)
+                .providerId(MEMBER_AUTH_KAKAO_USER_PROVIDER_ID);
+    }
 }

@@ -14,7 +14,7 @@ public interface CommSecondaryCategoryEntityTestUtils extends CommPrimaryCategor
 
     default CommSecondaryCategoryEntityBuilder createCommSecondaryCategoryEntityBuilderWithId() {
         return CommSecondaryCategoryEntity.builder()
-                .id(TEST_COMM_SECONDARY_CATEGORY_ID)
+                .id(TEST_COMM_SECONDARY_CATEGORY_ID_1)
                 .category(TEST_COMM_SECONDARY_CATEGORY_CATEGORY)
                 .order(TEST_COMM_SECONDARY_CATEGORY_ORDER);
     }

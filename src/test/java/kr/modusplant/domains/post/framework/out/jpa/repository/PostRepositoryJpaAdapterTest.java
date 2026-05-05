@@ -6,9 +6,6 @@ import kr.modusplant.domains.post.common.util.usecase.model.PostReadModelTestUti
 import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
-import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostJpaRepository;
-import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PrimaryCategoryJpaRepository;
-import kr.modusplant.domains.post.framework.out.jpa.repository.supers.SecondaryCategoryJpaRepository;
 import kr.modusplant.domains.post.framework.out.redis.PostRecentlyViewRedisRepository;
 import kr.modusplant.domains.post.framework.out.redis.PostViewCountRedisRepository;
 import kr.modusplant.framework.jpa.entity.CommPostEntity;
@@ -18,9 +15,7 @@ import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.entity.common.util.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.jpa.repository.CommPostBookmarkJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommPostLikeJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -32,15 +27,14 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils, SiteMemberEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils, PostReadModelTestUtils {
     private final PostJpaMapper postJpaMapper = Mockito.mock(PostJpaMapper.class);
-    private final PostJpaRepository postJpaRepository = Mockito.mock(PostJpaRepository.class);
+    private final CommPostJpaRepository postJpaRepository = Mockito.mock(CommPostJpaRepository.class);
     private final SiteMemberJpaRepository authorJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
-    private final PrimaryCategoryJpaRepository primaryCategoryJpaRepository = Mockito.mock(PrimaryCategoryJpaRepository.class);
-    private final SecondaryCategoryJpaRepository secondaryCategoryJpaRepository = Mockito.mock(SecondaryCategoryJpaRepository.class);
+    private final CommPrimaryCategoryJpaRepository primaryCategoryJpaRepository = Mockito.mock(CommPrimaryCategoryJpaRepository.class);
+    private final CommSecondaryCategoryJpaRepository secondaryCategoryJpaRepository = Mockito.mock(CommSecondaryCategoryJpaRepository.class);
     private final PostViewCountRedisRepository postViewCountRedisRepository = Mockito.mock(PostViewCountRedisRepository.class);
     private final CommPostLikeJpaRepository postLikeJpaRepository = Mockito.mock(CommPostLikeJpaRepository.class);
     private final CommPostBookmarkJpaRepository postBookmarkJpaRepository = Mockito.mock(CommPostBookmarkJpaRepository.class);
@@ -51,7 +45,7 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
 
     @Test
     @DisplayName("게시글 저장하기")
-    void testSave_givenPost_willReturnPostDetailReadModel() {
+    void testSave_givenPost_willSavePublishedPost() {
         // given
         Post post = createPublishedPost();
         CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
@@ -81,8 +75,65 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
     }
 
     @Test
-    @DisplayName("게시글 수정하기")
-    void testUpdate_givenPost_willReturnPostDetailReadModel() {
+    @DisplayName("모든 입력값이 존재할 때 게시글 임시저장하기")
+    void testSave_givenPost_willSaveDraftPost() {
+        // given
+        Post post = createDraftPost();
+        CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
+        SiteMemberEntity memberEntity = createMemberBasicUserEntity().builder().uuid(post.getAuthorId().getValue()).build();
+        CommPrimaryCategoryEntity primaryCategoryEntity = createCommPrimaryCategoryEntity().builder().id(post.getPrimaryCategoryId().getValue()).build();
+        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder()
+                .id(post.getSecondaryCategoryId().getValue())
+                .primaryCategory(primaryCategoryEntity)
+                .build();
+        long viewCount = 0L;
+
+        given(authorJpaRepository.findByUuid(post.getAuthorId().getValue())).willReturn(Optional.of(memberEntity));
+        given(primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue())).willReturn(Optional.of(primaryCategoryEntity));
+        given(secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue())).willReturn(Optional.of(secondaryCategoryEntity));
+        given(postJpaMapper.toPostEntity(post, memberEntity, primaryCategoryEntity, secondaryCategoryEntity, viewCount)).willReturn(postEntity);
+        given(postJpaRepository.save(postEntity)).willReturn(postEntity);
+
+        // when
+        postRepositoryJpaAdapter.save(post);
+
+        // then
+        verify(authorJpaRepository, times(1)).findByUuid(any(UUID.class));
+        verify(primaryCategoryJpaRepository).findById(post.getPrimaryCategoryId().getValue());
+        verify(secondaryCategoryJpaRepository).findById(post.getSecondaryCategoryId().getValue());
+        verify(postJpaMapper).toPostEntity(post, memberEntity, primaryCategoryEntity, secondaryCategoryEntity, viewCount);
+        verify(postJpaRepository).save(postEntity);
+    }
+
+    @Test
+    @DisplayName("null 입력값이 있을 때 게시글 임시저장하기")
+    void testSave_givenPostWithNullValue_willSaveDraftPost() {
+        // given
+        Post post = createDraftPostWithEmptyValue();
+        CommPostEntity postEntity = createDraftPostEntityBuilderWithoutContentWithUuid().build();
+        SiteMemberEntity memberEntity = createMemberBasicUserEntity().builder().uuid(post.getAuthorId().getValue()).build();
+        CommPrimaryCategoryEntity primaryCategoryEntity = createCommPrimaryCategoryEntity().builder().id(post.getPrimaryCategoryId().getValue()).build();
+        long viewCount = 0L;
+
+        given(authorJpaRepository.findByUuid(post.getAuthorId().getValue())).willReturn(Optional.of(memberEntity));
+        given(primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue())).willReturn(Optional.of(primaryCategoryEntity));
+        given(postJpaMapper.toPostEntity(post, memberEntity, primaryCategoryEntity, null, viewCount)).willReturn(postEntity);
+        given(postJpaRepository.save(postEntity)).willReturn(postEntity);
+
+        // when
+        postRepositoryJpaAdapter.save(post);
+
+        // then
+        verify(authorJpaRepository, times(1)).findByUuid(any(UUID.class));
+        verify(primaryCategoryJpaRepository).findById(post.getPrimaryCategoryId().getValue());
+        verify(secondaryCategoryJpaRepository,never()).findById(any(Integer.class));
+        verify(postJpaMapper).toPostEntity(post, memberEntity, primaryCategoryEntity, null, viewCount);
+        verify(postJpaRepository).save(postEntity);
+    }
+
+    @Test
+    @DisplayName("게시글 수정하기 - 발행 게시글")
+    void testUpdate_givenPost_willSavePublishedPost() {
         // given
         Post post = createPublishedPost();
         CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid().publishedAt(LocalDateTime.now()).build();
@@ -93,9 +144,9 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
                 .build();
         long viewCount = 0L;
 
+        given(postJpaRepository.findByUlid(post.getPostId().getValue())).willReturn(Optional.of(postEntity));
         given(primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue())).willReturn(Optional.of(primaryCategoryEntity));
         given(secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue())).willReturn(Optional.of(secondaryCategoryEntity));
-        given(postJpaRepository.findByUlid(post.getPostId().getValue())).willReturn(Optional.of(postEntity));
         given(postViewCountRedisRepository.read(post.getPostId())).willReturn(viewCount);
         given(postJpaRepository.save(postEntity)).willReturn(postEntity);
 
@@ -103,11 +154,38 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
         postRepositoryJpaAdapter.update(post);
 
         // then
+        verify(postJpaRepository).findByUlid(post.getPostId().getValue());
         verify(primaryCategoryJpaRepository).findById(post.getPrimaryCategoryId().getValue());
         verify(secondaryCategoryJpaRepository).findById(post.getSecondaryCategoryId().getValue());
         verify(postViewCountRedisRepository).read(any(PostId.class));
         verify(postJpaRepository).save(postEntity);
     }
+
+    @Test
+    @DisplayName("게시글 수정하기 - 임시저장 게시글")
+    void testUpdate_givenPost_willReturnPostDetailReadModel() {
+        // given
+        Post post = createDraftPostWithEmptyValue();
+        CommPostEntity postEntity = createDraftPostEntityBuilderWithoutContentWithUuid().build();
+        CommPrimaryCategoryEntity primaryCategoryEntity = createCommPrimaryCategoryEntity().builder().id(post.getPrimaryCategoryId().getValue()).build();
+        long viewCount = 0L;
+
+        given(postJpaRepository.findByUlid(post.getPostId().getValue())).willReturn(Optional.of(postEntity));
+        given(primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue())).willReturn(Optional.of(primaryCategoryEntity));
+        given(postViewCountRedisRepository.read(post.getPostId())).willReturn(viewCount);
+        given(postJpaRepository.save(postEntity)).willReturn(postEntity);
+
+        // when
+        postRepositoryJpaAdapter.update(post);
+
+        // then
+        verify(postJpaRepository).findByUlid(post.getPostId().getValue());
+        verify(primaryCategoryJpaRepository).findById(post.getPrimaryCategoryId().getValue());
+        verify(secondaryCategoryJpaRepository,never()).findById(any(Integer.class));
+        verify(postViewCountRedisRepository).read(any(PostId.class));
+        verify(postJpaRepository).save(postEntity);
+    }
+
 
     @Test
     @DisplayName("게시글 삭제하기")
@@ -128,6 +206,26 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
         // given
         CommPostEntity postEntity = createDraftPostEntityBuilder().ulid(testPostId.getValue()).build();
         Post expectedPost = createPublishedPost();
+
+        given(postJpaRepository.findByUlid(testPostId.getValue())).willReturn(Optional.of(postEntity));
+        given(postJpaMapper.toPost(postEntity)).willReturn(expectedPost);
+
+        // when
+        Optional<Post> result = postRepositoryJpaAdapter.getPostByUlid(testPostId);
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get()).isEqualTo(expectedPost);
+        verify(postJpaRepository).findByUlid(testPostId.getValue());
+        verify(postJpaMapper).toPost(postEntity);
+    }
+
+    @Test
+    @DisplayName("postid로 임시저장된 Post 가져오기")
+    void testGetPostByUlid_givenDraftPostId_willReturnDraftPost() {
+        // given
+        CommPostEntity postEntity = createDraftPostEntityBuilderWithoutContent().ulid(testPostId.getValue()).build();
+        Post expectedPost = createDraftPostWithEmptyValue();
 
         given(postJpaRepository.findByUlid(testPostId.getValue())).willReturn(Optional.of(postEntity));
         given(postJpaMapper.toPost(postEntity)).willReturn(expectedPost);

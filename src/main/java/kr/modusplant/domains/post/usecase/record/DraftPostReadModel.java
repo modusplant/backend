@@ -10,6 +10,7 @@ public record DraftPostReadModel(
         String secondaryCategory,
         String title,
         JsonNode content,
+        String thumbnailPath,
         LocalDateTime updatedAt
 ) {
 }

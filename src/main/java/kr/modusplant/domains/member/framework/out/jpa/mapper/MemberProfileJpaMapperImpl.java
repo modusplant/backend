@@ -2,12 +2,12 @@ package kr.modusplant.domains.member.framework.out.jpa.mapper;
 
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
-import kr.modusplant.domains.member.domain.entity.nullobject.MemberEmptyProfileImage;
+import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileImage;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberProfileImageBytes;
 import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
 import kr.modusplant.domains.member.domain.vo.MemberProfileIntroduction;
-import kr.modusplant.domains.member.domain.vo.nullobject.MemberEmptyProfileIntroduction;
+import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.supers.MemberProfileJpaMapper;
 import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jpa.entity.SiteMemberProfileEntity;
@@ -37,7 +37,7 @@ public class MemberProfileJpaMapperImpl implements MemberProfileJpaMapper {
     public MemberProfile toMemberProfile(SiteMemberProfileEntity entity) throws IOException {
         MemberProfileImage memberProfileImage;
         if (entity.getImagePath() == null) {
-            memberProfileImage = MemberEmptyProfileImage.create();
+            memberProfileImage = EmptyMemberProfileImage.create();
         } else {
             memberProfileImage = MemberProfileImage.create(
                     MemberProfileImagePath.create(entity.getImagePath()),
@@ -45,7 +45,7 @@ public class MemberProfileJpaMapperImpl implements MemberProfileJpaMapper {
         }
         MemberProfileIntroduction memberProfileIntroduction;
         if (entity.getIntroduction() == null) {
-            memberProfileIntroduction = MemberEmptyProfileIntroduction.create();
+            memberProfileIntroduction = EmptyMemberProfileIntroduction.create();
         } else {
             memberProfileIntroduction = MemberProfileIntroduction.create(entity.getIntroduction());
         }

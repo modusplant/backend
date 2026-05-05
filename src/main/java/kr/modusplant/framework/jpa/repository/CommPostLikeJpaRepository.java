@@ -17,6 +17,8 @@ public interface CommPostLikeJpaRepository extends JpaRepository<CommPostLikeEnt
 
     boolean existsByPostIdAndMemberId(String postId, UUID memberId);
 
+    void deleteByMemberId(UUID memberId);
+
     void deleteByPostIdAndMemberId(String postId, UUID memberId);
 
     void deleteByPostId(String postId);

@@ -13,8 +13,6 @@ public interface PostQueryRepository {
 
     List<PostSummaryReadModel> findByCategoryWithCursor(Integer primaryCategoryId, List<Integer> secondaryCategoryIds, UUID currentMemberUuid, String cursorUlid, int size);
 
-    List<PostSummaryReadModel> findByKeywordWithCursor(String keyword, UUID currentMemberUuid, String cursorUlid, int size);
-
     Optional<PostDetailReadModel> findPostDetailByPostId(PostId postId, UUID currentMemberUuid);
 
     Optional<PostDetailDataReadModel> findPostDetailDataByPostId(PostId postId);

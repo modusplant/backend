@@ -13,6 +13,8 @@ spring:
       password: ${REDIS_PASSWORD}
       ssl:
         enabled: ${REDIS_SSL_ENABLED}
+      connect-timeout: 20s
+      timeout: 3000
   datasource:
     driverClassName: org.postgresql.Driver
     url: ${DB_CONNECTION_URL}
@@ -24,6 +26,7 @@ spring:
       connection-timeout: 10000       # 10초
       auto-commit: true
       validation-timeout: 10000       # 10초
+      connection-init-sql: "SET pg_trgm.word_similarity_threshold = 0.5"
   flyway:
     enabled: true
     validate-on-migrate: true
@@ -34,6 +37,7 @@ spring:
     clean-disabled: false
     baseline-on-migrate: true
     baseline-version: 0.0.0
+    schemas: public
   jpa:
     hibernate:
       ddl-auto: none
@@ -48,8 +52,21 @@ spring:
   servlet:
     multipart:
       enabled: true
-      max-file-size: 100MB
-      max-request-size: 300MB
+      max-file-size: 20MB             # 파일 최대 크기: 10MB, 동영상 최대 크기: 20MB
+      max-request-size: 220MB         # 파일 최대 개수: 10개, 동영상 최대 개수: 5개
+
+# Application
+app:
+  semaphore:
+    datasource:
+      bulkhead:
+        notification:
+          timeout-ms: 3000
+
+# Firebase
+firebase:
+  credentials:
+    json: ${FIREBASE_CREDENTIALS_JSON}
 
 # KeyStore
 keystore:
@@ -65,10 +82,32 @@ jwt:
   access_duration: 1800000      # 30분
   refresh_duration: 604800000   # 7일
 
+# Monitoring
+management:
+  server:
+    port: 8080
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,prometheus"
+  metrics:
+    enable:
+      tomcat: true
+    distribution:
+      percentiles:
+        http.server.requests: [ 0.95, 0.99 ]
+
 # Redis
 redis:
   ttl:
     view_count: 10
+
+# Tomcat
+server:
+  tomcat:
+    max-swallow-size: 20MB
+    mbeanregistry:
+      enabled: true
 
 # Wasabi
 cloud:
@@ -83,19 +122,3 @@ cloud:
       secret-key: ${WASABI_SECRET_KEY}
       bucket: ${WASABI_BUCKET}
 
-# Monitoring
-management:
-  server:
-    port: 8080
-  endpoints:
-    web:
-      exposure:
-        include: "health,info,prometheus"
-  metrics:
-    enable:
-      tomcat: true
-
-server:
-  tomcat:
-    mbeanregistry:
-      enabled: true

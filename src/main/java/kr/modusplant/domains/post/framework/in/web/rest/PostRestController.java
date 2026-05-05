@@ -9,7 +9,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import kr.modusplant.domains.post.adapter.controller.PostController;
 import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
@@ -17,14 +20,13 @@ import kr.modusplant.domains.post.usecase.request.FileOrder;
 import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
 import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
 import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
-import kr.modusplant.domains.post.usecase.response.CursorPageResponse;
+import kr.modusplant.domains.post.usecase.response.CursorLatestSortedPageResponse;
 import kr.modusplant.domains.post.usecase.response.DraftPostResponse;
 import kr.modusplant.domains.post.usecase.response.OffsetPageResponse;
 import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -56,8 +58,8 @@ public class PostRestController {
             description = "전체 게시글의 목록과 페이지 정보를 조회합니다."
     )
     @GetMapping
-    public ResponseEntity<DataResponse<CursorPageResponse<PostSummaryResponse>>> getAllPosts(
-            @AuthenticationPrincipal(errorOnInvalidType = false) DefaultUserDetails userDetails,
+    public ResponseEntity<DataResponse<CursorLatestSortedPageResponse<PostSummaryResponse>>> getAllPosts(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
 
             @Parameter(schema = @Schema(description = "마지막 게시글 ID (첫 요청 시 생략)", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
             @RequestParam(name = "lastPostId", required = false)
@@ -77,37 +79,11 @@ public class PostRestController {
             @RequestParam(name = "secondaryCategoryId", required = false)
             List<Integer> secondaryCategoryIds
     ) {
-        UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
+        UUID currentMemberUuid = (userDetails != null) ? userDetails.getUuid() : null;
         if(primaryCategoryId == null && secondaryCategoryIds != null && !secondaryCategoryIds.isEmpty()) {
             throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
         }
         return ResponseEntity.ok().body(DataResponse.ok(postController.getAll(new PostCategoryRequest(primaryCategoryId, secondaryCategoryIds), currentMemberUuid, lastUlid,size)));
-    }
-
-    @Operation(
-            summary = "검색어를 통한 게시글 목록 조회 API (무한스크롤)",
-            description = "키워드별 컨텐츠 게시글의 목록과 페이지 정보를 조회합니다."
-    )
-    @GetMapping("/search")
-    public ResponseEntity<DataResponse<CursorPageResponse<PostSummaryResponse>>> getPostsByKeyword(
-            @AuthenticationPrincipal(errorOnInvalidType = false) DefaultUserDetails userDetails,
-
-            @Parameter(schema = @Schema(description = "마지막 게시글 ID (첫 요청 시 생략)", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
-            @RequestParam(name = "lastPostId", required = false)
-            @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
-            String lastUlid,
-
-            @Parameter(schema = @Schema(description = "페이지 크기", example = "10",minimum = "1",maximum = "50"))
-            @RequestParam
-            @Range(min = 1, max = 50)
-            Integer size,
-
-            @Parameter(schema = @Schema(description = "{제목+본문} 검색어 키워드", example = "벌레"))
-            @RequestParam(required = false)
-            String keyword
-    ) {
-        UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
-        return ResponseEntity.ok().body(DataResponse.ok(postController.getByKeyword(keyword, currentMemberUuid, lastUlid, size)));
     }
 
     @Operation(
@@ -116,7 +92,7 @@ public class PostRestController {
     )
     @GetMapping("/{postId}")
     public ResponseEntity<DataResponse<?>> getPostByUlid(
-            @AuthenticationPrincipal(errorOnInvalidType = false) DefaultUserDetails userDetails,
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
 
             @Parameter(schema = @Schema(description = "게시글의 식별자", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
             @PathVariable(name = "postId")
@@ -128,7 +104,7 @@ public class PostRestController {
             String guestIdStr,
             HttpServletResponse response
     ) {
-        UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
+        UUID currentMemberUuid = (userDetails != null) ? userDetails.getUuid() : null;
         UUID guestId = (currentMemberUuid==null) ? getOrCreateGuestId(guestIdStr,response) : null;
         return ResponseEntity.ok().body(DataResponse.ok(postController.getByUlid(ulid,currentMemberUuid,guestId)));
     }
@@ -147,7 +123,7 @@ public class PostRestController {
             @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
             String ulid
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getDataByUlid(ulid,currentMemberUuid)));
     }
 
@@ -160,42 +136,40 @@ public class PostRestController {
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 
             @Parameter(schema = @Schema(description = "게시글이 포함된 1차 항목의 식별자", example = "1"))
-            @RequestParam
-            @NotNull(message = "1차 항목 식별자가 비어 있습니다.")
+            @RequestParam(required = false)
             Integer primaryCategoryId,
 
             @Parameter(schema = @Schema(description = "게시글이 포함된 2차 항목의 식별자", example = "1"))
-            @RequestParam
-            @NotNull(message = "2차 항목 식별자가 비어 있습니다.")
+            @RequestParam(required = false)
             Integer secondaryCategoryId,
 
             @Parameter(schema = @Schema(description = "게시글의 제목", maximum = "60", example = "이거 과습인가요?"))
-            @RequestParam
-            @NotBlank(message = "게시글 제목이 비어 있습니다.")
-            @Length(max = 60, message = "게시글 제목은 최대 60글자까지 작성할 수 있습니다.")
+            @RequestParam(required = false)
             String title,
 
             @Parameter(
                     schema = @Schema(description = "게시글 컨텐츠", type = "string", format = "binary"),
                     content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
-            @RequestPart
-            @NotEmpty(message = "게시글이 비어 있습니다.")
+            @RequestPart(required = false)
             List<MultipartFile> content,
 
             @Parameter(
                     schema = @Schema(description = "게시글에 속한 파트들의 순서에 대한 정보"),
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
-            @RequestPart
-            @NotEmpty(message = "순서 정보가 비어 있습니다.")
+            @RequestPart(required = false)
             List<@Valid FileOrder> orderInfo,
+
+            @Parameter(schema = @Schema(description = "게시글 컨텐츠 대표 사진의 파일명", example = "1"))
+            @RequestParam(required = false)
+            String thumbnailFilename,
 
             @Parameter(schema = @Schema(description = "게시글 발행 유무"))
             @RequestParam
             @NotNull(message = "게시글 발행 유무가 비어 있습니다.")
             Boolean isPublished
     ) throws IOException {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
-        postController.createPost(new PostInsertRequest(primaryCategoryId, secondaryCategoryId, title, content, orderInfo, isPublished), currentMemberUuid);
+        UUID currentMemberUuid = userDetails.getUuid();
+        postController.createPost(new PostInsertRequest(primaryCategoryId, secondaryCategoryId, title, content, orderInfo, thumbnailFilename, isPublished), currentMemberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
@@ -214,42 +188,40 @@ public class PostRestController {
             String ulid,
 
             @Parameter(schema = @Schema(description = "게시글이 포함된 1차 항목의 식별자", example = "1"))
-            @RequestParam
-            @NotNull(message = "1차 항목 식별자가 비어 있습니다.")
+            @RequestParam(required = false)
             Integer primaryCategoryId,
 
             @Parameter(schema = @Schema(description = "게시글이 포함된 2차 항목의 식별자", example = "1"))
-            @RequestParam
-            @NotNull(message = "2차 항목 식별자가 비어 있습니다.")
+            @RequestParam(required = false)
             Integer secondaryCategoryId,
 
             @Parameter(schema = @Schema(description = "게시글의 제목", maximum = "60", example = "이거 과습인가요?"))
-            @RequestParam
-            @NotBlank(message = "게시글 제목이 비어 있습니다.")
-            @Length(max = 60, message = "게시글 제목은 최대 60글자까지 작성할 수 있습니다.")
+            @RequestParam(required = false)
             String title,
 
             @Parameter(
                     schema = @Schema(description = "게시글 컨텐츠", type = "string", format = "binary"),
                     content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
-            @RequestPart
-            @NotEmpty(message = "게시글이 비어 있습니다.")
+            @RequestPart(required = false)
             List<MultipartFile> content,
 
             @Parameter(
                     schema = @Schema(description = "게시글에 속한 파트들의 순서에 대한 정보"),
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
-            @RequestPart
-            @NotEmpty(message = "순서 정보가 비어 있습니다.")
+            @RequestPart(required = false)
             List<@Valid FileOrder> orderInfo,
+
+            @Parameter(schema = @Schema(description = "게시글 컨텐츠 대표 사진의 파일명", example = "1"))
+            @RequestParam(required = false)
+            String thumbnailFilename,
 
             @Parameter(schema = @Schema(description = "게시글 발행 유무", example = "true"))
             @RequestParam
             @NotNull(message = "게시글 발행 유무가 비어 있습니다.")
             Boolean isPublished
     ) throws IOException {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
-        postController.updatePost(new PostUpdateRequest(ulid, primaryCategoryId, secondaryCategoryId, title, content, orderInfo, isPublished), currentMemberUuid);
+        UUID currentMemberUuid = userDetails.getUuid();
+        postController.updatePost(new PostUpdateRequest(ulid, primaryCategoryId, secondaryCategoryId, title, content, orderInfo, thumbnailFilename, isPublished), currentMemberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
@@ -267,7 +239,7 @@ public class PostRestController {
             @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
             String ulid
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         postController.deletePost(ulid, currentMemberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -293,7 +265,7 @@ public class PostRestController {
     )
     @PatchMapping("/{postId}/views")
     public ResponseEntity<DataResponse<Long>> increaseViewCount(
-            @AuthenticationPrincipal(errorOnInvalidType = false) DefaultUserDetails userDetails,
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
 
             @Parameter(schema = @Schema(description = "게시글의 식별자", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
             @PathVariable(name = "postId")
@@ -305,7 +277,7 @@ public class PostRestController {
             String guestIdStr,
             HttpServletResponse response
     ) {
-        UUID currentMemberUuid = (userDetails != null) ? userDetails.getActiveUuid() : null;
+        UUID currentMemberUuid = (userDetails != null) ? userDetails.getUuid() : null;
         UUID guestId = (currentMemberUuid==null) ? getOrCreateGuestId(guestIdStr,response) : null;
         return ResponseEntity.ok().body(DataResponse.ok(postController.increaseViewCount(ulid, currentMemberUuid,guestId)));
     }
@@ -353,7 +325,7 @@ public class PostRestController {
             @Range(min = 1, max = 50)
             Integer size
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getByMemberUuid(currentMemberUuid, page-1, size)));
     }
 
@@ -375,7 +347,7 @@ public class PostRestController {
             @Range(min = 1, max = 50)
             Integer size
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getDraftByMemberUuid(currentMemberUuid,page-1, size)));
     }
 
@@ -397,7 +369,7 @@ public class PostRestController {
             @Range(min = 1, max = 50)
             Integer size
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getRecentlyViewByMemberUuid(currentMemberUuid, page-1,size)));
     }
 
@@ -419,7 +391,7 @@ public class PostRestController {
             @Range(min = 1, max = 50)
             Integer size
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getLikedByMemberUuid(currentMemberUuid, page-1, size)));
     }
 
@@ -441,7 +413,7 @@ public class PostRestController {
             @Range(min = 1, max = 50)
             Integer size
     ) {
-        UUID currentMemberUuid = userDetails.getActiveUuid();
+        UUID currentMemberUuid = userDetails.getUuid();
         return ResponseEntity.ok().body(DataResponse.ok(postController.getBookmarkedByMemberUuid(currentMemberUuid, page-1, size)));
     }
 
@@ -472,5 +444,4 @@ public class PostRestController {
         }
         return guestId;
     }
-
 }

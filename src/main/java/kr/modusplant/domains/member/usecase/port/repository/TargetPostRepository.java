@@ -1,0 +1,18 @@
+package kr.modusplant.domains.member.usecase.port.repository;
+
+import kr.modusplant.domains.member.domain.vo.MemberId;
+import kr.modusplant.domains.member.domain.vo.TargetPostId;
+
+public interface TargetPostRepository {
+    boolean isIdExist(TargetPostId targetPostId);
+
+    boolean isPublished(TargetPostId targetPostId);
+
+    boolean isLiked(MemberId memberId, TargetPostId targetPostId);
+
+    boolean isUnliked(MemberId memberId, TargetPostId targetPostId);
+
+    boolean isBookmarked(MemberId memberId, TargetPostId targetPostId);
+
+    boolean isNotBookmarked(MemberId memberId, TargetPostId targetPostId);
+}

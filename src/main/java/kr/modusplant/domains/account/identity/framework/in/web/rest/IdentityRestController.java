@@ -34,9 +34,9 @@ public class IdentityRestController {
             )
             @PathVariable("id")
             @NotNull(message = "사용자의 식별자 값이 비어 있습니다")
-            UUID memberActiveUuid
+            UUID memberUuid
     ) {
-        IdentityAuthResponse response = controller.getAuthInfo(memberActiveUuid);
+        IdentityAuthResponse response = controller.getAuthInfo(memberUuid);
         return ResponseEntity.ok(DataResponse.ok(response));
     }
 

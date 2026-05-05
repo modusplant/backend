@@ -10,7 +10,17 @@ public interface CommPostEntityTestUtils extends SiteMemberEntityTestUtils, Comm
                 .likeCount(TEST_COMM_POST_LIKE_COUNT)
                 .viewCount(TEST_COMM_POST_VIEW_COUNT)
                 .title(TEST_COMM_POST_TITLE)
-                .content(TEST_COMM_POST_CONTENT)
+                .content(TEST_COMM_POST_CONTENT_JSON_NODE)
+                .isPublished(TEST_COMM_POST_IS_PUBLISHED);
+    }
+
+    default CommPostEntity.CommPostEntityBuilder createCommPostEntityBuilderWithUlid() {
+        return CommPostEntity.builder()
+                .ulid(TEST_COMM_POST_ULID)
+                .likeCount(TEST_COMM_POST_LIKE_COUNT)
+                .viewCount(TEST_COMM_POST_VIEW_COUNT)
+                .title(TEST_COMM_POST_TITLE)
+                .content(TEST_COMM_POST_CONTENT_JSON_NODE)
                 .isPublished(TEST_COMM_POST_IS_PUBLISHED);
     }
 }

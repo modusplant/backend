@@ -13,8 +13,8 @@ import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
 import lombok.RequiredArgsConstructor;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Name;
 import org.springframework.stereotype.Repository;
+import software.amazon.awssdk.utils.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,7 +30,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
 
     private final DSLContext dsl;
     private final PostJooqMapper postJooqMapper;
-    private static final JsonbJsonNodeConverter JSON_CONVERTER = new JsonbJsonNodeConverter();
+    private final JsonbJsonNodeConverter jsonConverter = new JsonbJsonNodeConverter();
 
     public List<PostSummaryReadModel> findByCategoryWithCursor(Integer primaryCategoryId, List<Integer> secondaryCategoryIds, UUID currentMemberUuid, String cursorUlid, int size) {
         return dsl
@@ -40,7 +40,8 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
                         SITE_MEMBER.NICKNAME,
                         COMM_POST.TITLE,
-                        COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.CONTENT.convert(jsonConverter).as("content"),
+                        COMM_POST.THUMBNAIL_PATH,
                         COMM_POST.LIKE_COUNT,
                         COMM_POST.PUBLISHED_AT,
                         coalesce(field("cc.comment_count",Integer.class), 0).as("commentCount"),
@@ -58,7 +59,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                 .from(COMM_POST)
                 .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
                 .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
-                .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
+                .leftJoin(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .leftJoin(
                         select(COMM_COMMENT.POST_ULID, count().as("comment_count"))
                                 .from(COMM_COMMENT)
@@ -68,49 +69,6 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                 ).on(COMM_POST.ULID.eq(field("cc.post_ulid",String.class)))
                 .where(COMM_POST.IS_PUBLISHED.isTrue())
                 .and(buildCategoryConditions(primaryCategoryId, secondaryCategoryIds))
-                .and(buildCursorCondition(cursorUlid))
-                .orderBy(COMM_POST.PUBLISHED_AT.desc(), COMM_POST.ULID.desc())
-                .limit(size+1)
-                .fetch()
-                .map(postJooqMapper::toPostSummaryReadModel);
-    }
-
-    public List<PostSummaryReadModel> findByKeywordWithCursor(String keyword, UUID currentMemberUuid, String cursorUlid, int size) {
-        return dsl
-                .select(
-                        COMM_POST.ULID,
-                        COMM_PRI_CATE.CATEGORY.as("primaryCategory"),
-                        COMM_SECO_CATE.CATEGORY.as("secondaryCategory"),
-                        SITE_MEMBER.NICKNAME,
-                        COMM_POST.TITLE,
-                        COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
-                        COMM_POST.LIKE_COUNT,
-                        COMM_POST.PUBLISHED_AT,
-                        coalesce(field("cc.comment_count",Integer.class), 0).as("commentCount"),
-                        exists(
-                                selectOne().from(COMM_POST_LIKE)
-                                        .where(COMM_POST_LIKE.POST_ULID.eq(COMM_POST.ULID))
-                                        .and(COMM_POST_LIKE.MEMB_UUID.eq(currentMemberUuid))
-                        ).as("isLiked"),
-                        exists(
-                                selectOne().from(COMM_POST_BOOKMARK)
-                                        .where(COMM_POST_BOOKMARK.POST_ULID.eq(COMM_POST.ULID))
-                                        .and(COMM_POST_BOOKMARK.MEMB_UUID.eq(currentMemberUuid))
-                        ).as("isBookmarked")
-                )
-                .from(COMM_POST)
-                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
-                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
-                .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
-                .leftJoin(
-                        select(COMM_COMMENT.POST_ULID, count().as("comment_count"))
-                                .from(COMM_COMMENT)
-                                .where(COMM_COMMENT.IS_DELETED.isFalse())
-                                .groupBy(COMM_COMMENT.POST_ULID)
-                                .asTable("cc")
-                ).on(COMM_POST.ULID.eq(field("cc.post_ulid",String.class)))
-                .where(COMM_POST.IS_PUBLISHED.isTrue())
-                .and(buildKeywordCondition(keyword))
                 .and(buildCursorCondition(cursorUlid))
                 .orderBy(COMM_POST.PUBLISHED_AT.desc(), COMM_POST.ULID.desc())
                 .limit(size+1)
@@ -130,7 +88,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         SITE_MEMBER.NICKNAME,
                         SITE_MEMBER_PROF.IMAGE_PATH,
                         COMM_POST.TITLE,
-                        COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.CONTENT.convert(jsonConverter).as("content"),
                         COMM_POST.LIKE_COUNT,
                         COMM_POST.IS_PUBLISHED,
                         COMM_POST.PUBLISHED_AT,
@@ -148,9 +106,10 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                 ).from(COMM_POST)
                 .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
                 .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
-                .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
+                .leftJoin(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .leftJoin(SITE_MEMBER_PROF).on(SITE_MEMBER.UUID.eq(SITE_MEMBER_PROF.UUID))
                 .where(COMM_POST.ULID.eq(postId.getValue()))
+                .and(COMM_POST.IS_PUBLISHED.isTrue())
                 .fetchOne()
         ).map(postJooqMapper::toPostDetailReadModel);
     }
@@ -166,56 +125,32 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         SITE_MEMBER.UUID.as("authorUuid"),
                         SITE_MEMBER.NICKNAME,
                         COMM_POST.TITLE,
-                        COMM_POST.CONTENT.convert(JSON_CONVERTER).as("content"),
+                        COMM_POST.CONTENT.convert(jsonConverter).as("content"),
+                        COMM_POST.THUMBNAIL_PATH,
                         COMM_POST.IS_PUBLISHED,
                         COMM_POST.PUBLISHED_AT,
                         COMM_POST.UPDATED_AT
                 ).from(COMM_POST)
-                .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
-                .join(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
-                .join(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
+                .leftJoin(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
+                .leftJoin(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
+                .leftJoin(SITE_MEMBER).on(COMM_POST.AUTH_MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .where(COMM_POST.ULID.eq(postId.getValue()))
                 .fetchOne()
         ).map(postJooqMapper::toPostDetailDataReadModel);
     }
 
     private Condition buildCategoryConditions(Integer primaryCategoryId, List<Integer> secondaryCategoryIds) {
-        if (primaryCategoryId == null && secondaryCategoryIds != null && !secondaryCategoryIds.isEmpty()) {
+        if (primaryCategoryId == null && !CollectionUtils.isNullOrEmpty(secondaryCategoryIds)) {
             throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
         }
         Condition condition = noCondition();
-        if(primaryCategoryId != null) {
+        if (primaryCategoryId != null) {
             condition = condition.and(COMM_POST.PRI_CATE_ID.eq(primaryCategoryId));
         }
-        if (primaryCategoryId != null && secondaryCategoryIds != null && !secondaryCategoryIds.isEmpty()) {
+        if (primaryCategoryId != null && !CollectionUtils.isNullOrEmpty(secondaryCategoryIds)) {
             condition = condition.and(COMM_POST.SECO_CATE_ID.in(secondaryCategoryIds));
         }
         return condition;
-    }
-
-    private Condition buildKeywordCondition(String keyword) {
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return noCondition();
-        }
-        String searchKeyword = "%"+escapeWildcards(keyword)+"%";
-        Condition titleCondition = COMM_POST.TITLE.likeIgnoreCase(searchKeyword);
-        Name alias = name("c");
-        Condition contentCondition = exists(
-                selectOne()
-                        .from(table("jsonb_array_elements({0})", COMM_POST.CONTENT).as(alias))
-                        .where(
-                                field("{0}->>'type'", String.class, field(alias)).eq(val("text"))
-                                        .and(field("{0}->>'data'", String.class, field(alias)).likeIgnoreCase(val(searchKeyword)))
-                        )
-        );
-        return titleCondition.or(contentCondition);
-    }
-
-    private String escapeWildcards(String input) {
-        return input
-                .replace("\\", "\\\\")
-                .replace("%", "\\%")
-                .replace("_", "\\_");
     }
 
     private Condition buildCursorCondition(String cursorUlid) {

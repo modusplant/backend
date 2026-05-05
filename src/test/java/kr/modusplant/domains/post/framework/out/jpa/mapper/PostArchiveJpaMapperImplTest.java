@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
+import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_PUBLISHED_AT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PostArchiveJpaMapperImplTest implements PostEntityTestUtils, PostArchiveEntityTestUtils, SiteMemberEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils {
@@ -28,7 +29,7 @@ class PostArchiveJpaMapperImplTest implements PostEntityTestUtils, PostArchiveEn
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)
                 .authMember(memberEntity)
-                .publishedAt(LocalDateTime.now())
+                .publishedAt(TEST_COMM_POST_PUBLISHED_AT)
                 .build();
 
         // when
@@ -40,10 +41,32 @@ class PostArchiveJpaMapperImplTest implements PostEntityTestUtils, PostArchiveEn
         assertThat(result.getSecondaryCategoryId()).isEqualTo(secondaryCategoryEntity.getId());
         assertThat(result.getAuthMemberUuid()).isEqualTo(memberEntity.getUuid());
         assertThat(result.getTitle()).isEqualTo(postEntity.getTitle());
-        assertThat(result.getContent()).isEqualTo(postEntity.getContent());
+        assertThat(result.getContentText()).isEqualTo(postEntity.getContentText());
         assertThat(result.getCreatedAt()).isEqualTo(postEntity.getCreatedAt());
         assertThat(result.getUpdatedAt()).isEqualTo(postEntity.getUpdatedAt());
         assertThat(result.getPublishedAt()).isEqualTo(postEntity.getPublishedAt());
+    }
+
+    @Test
+    @DisplayName("toPostArchiveEntity로 탈퇴한 회원을 가진 엔티티 반환하기")
+    void testToPostArchiveEntity_givenPostEntityWithNullMember_willReturnPostArchiveEntity() {
+        // given
+        SiteMemberEntity memberEntity = null;
+        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().id(testPrimaryCategoryId.getValue()).build();
+        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().id(testSecondaryCategoryId.getValue()).build();
+        CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid()
+                .primaryCategory(primaryCategoryEntity)
+                .secondaryCategory(secondaryCategoryEntity)
+                .authMember(memberEntity)
+                .publishedAt(LocalDateTime.now())
+                .build();
+
+        // when
+        CommPostArchiveEntity result = postArchiveJpaMapper.toPostArchiveEntity(postEntity);
+
+        // then
+
+        assertThat(result.getAuthMemberUuid()).isNull();
     }
 
 

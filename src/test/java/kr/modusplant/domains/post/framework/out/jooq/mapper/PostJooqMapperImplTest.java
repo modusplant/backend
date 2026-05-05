@@ -19,7 +19,7 @@ import static kr.modusplant.jooq.Tables.SITE_MEMBER;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
 import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ID;
+import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ID_1;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,6 +50,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         given(record.get(SITE_MEMBER.NICKNAME)).willReturn(nickname);
         given(record.get(COMM_POST.TITLE)).willReturn(postEntity.getTitle());
         given(record.get("content", JsonNode.class)).willReturn(postEntity.getContent());
+        given(record.get(COMM_POST.THUMBNAIL_PATH)).willReturn(postEntity.getThumbnailPath());
         given(record.get(COMM_POST.LIKE_COUNT)).willReturn(postEntity.getLikeCount());
         given(record.get(COMM_POST.PUBLISHED_AT)).willReturn(publishedAt);
         given(record.get("commentCount", Integer.class)).willReturn(commentCount);
@@ -67,6 +68,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
                 .hasFieldOrPropertyWithValue("nickname", nickname)
                 .hasFieldOrPropertyWithValue("title", postEntity.getTitle())
                 .hasFieldOrPropertyWithValue("content", postEntity.getContent())
+                .hasFieldOrPropertyWithValue("thumbnailPath", postEntity.getThumbnailPath())
                 .hasFieldOrPropertyWithValue("likeCount", postEntity.getLikeCount())
                 .hasFieldOrPropertyWithValue("publishedAt", publishedAt)
                 .hasFieldOrPropertyWithValue("commentCount", commentCount)
@@ -94,6 +96,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         given(record.get(SITE_MEMBER.NICKNAME)).willReturn(nickname);
         given(record.get(COMM_POST.TITLE)).willReturn(postEntity.getTitle());
         given(record.get("content", JsonNode.class)).willReturn(postEntity.getContent());
+        given(record.get(COMM_POST.THUMBNAIL_PATH)).willReturn(postEntity.getThumbnailPath());
         given(record.get(COMM_POST.LIKE_COUNT)).willReturn(postEntity.getLikeCount());
         given(record.get(COMM_POST.PUBLISHED_AT)).willReturn(null);
         given(record.get("commentCount", Integer.class)).willReturn(commentCount);
@@ -111,6 +114,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
                 .hasFieldOrPropertyWithValue("nickname", nickname)
                 .hasFieldOrPropertyWithValue("title", postEntity.getTitle())
                 .hasFieldOrPropertyWithValue("content", postEntity.getContent())
+                .hasFieldOrPropertyWithValue("thumbnailPath", postEntity.getThumbnailPath())
                 .hasFieldOrPropertyWithValue("likeCount", postEntity.getLikeCount())
                 .hasFieldOrPropertyWithValue("publishedAt", null)
                 .hasFieldOrPropertyWithValue("commentCount", commentCount)
@@ -125,7 +129,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         Record record = mock(Record.class);
         Integer primaryCategoryId = TEST_COMM_PRIMARY_CATEGORY_ID;
         String primaryCategory = TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
-        Integer secondaryCategoryId = TEST_COMM_SECONDARY_CATEGORY_ID;
+        Integer secondaryCategoryId = TEST_COMM_SECONDARY_CATEGORY_ID_1;
         String secondaryCategory = TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
         UUID authorUuid = MEMBER_BASIC_USER_UUID;
         String nickname = MEMBER_BASIC_USER_NICKNAME;
@@ -181,7 +185,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         Record record = mock(Record.class);
         Integer primaryCategoryId = TEST_COMM_PRIMARY_CATEGORY_ID;
         String primaryCategory = TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
-        Integer secondaryCategoryId = TEST_COMM_SECONDARY_CATEGORY_ID;
+        Integer secondaryCategoryId = TEST_COMM_SECONDARY_CATEGORY_ID_1;
         String secondaryCategory = TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
         UUID authorUuid = MEMBER_BASIC_USER_UUID;
         String nickname = MEMBER_BASIC_USER_NICKNAME;
@@ -248,6 +252,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         given(record.get("secondaryCategory", String.class)).willReturn(secondaryCategory);
         given(record.get(COMM_POST.TITLE)).willReturn(postEntity.getTitle());
         given(record.get("content", JsonNode.class)).willReturn(postEntity.getContent());
+        given(record.get(COMM_POST.THUMBNAIL_PATH)).willReturn(postEntity.getThumbnailPath());
         given(record.get(COMM_POST.UPDATED_AT)).willReturn(updatedAt);
 
         DraftPostReadModel result = postJooqMapper.toDraftPostReadModel(record);
@@ -260,6 +265,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
                 .hasFieldOrPropertyWithValue("secondaryCategory", secondaryCategory)
                 .hasFieldOrPropertyWithValue("title", postEntity.getTitle())
                 .hasFieldOrPropertyWithValue("content", postEntity.getContent())
+                .hasFieldOrPropertyWithValue("thumbnailPath", postEntity.getThumbnailPath())
                 .hasFieldOrPropertyWithValue("updatedAt", updatedAt);
     }
 

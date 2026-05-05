@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SecondaryCategoryIdTest implements PostTestUtils {
     @Nested
-    @DisplayName("SecondaryCategoryId  UUID 생성 테스트")
+    @DisplayName("SecondaryCategoryId UUID 생성 테스트")
     class createTests {
 
         @Test

@@ -20,50 +20,49 @@ class ThrottledDataSource implements DataSource {
 
     @Override
     public Connection getConnection() throws SQLException {
+        boolean isSuccess = false;
+
         try {
             semaphore.acquire();
-            int successCode = 1;        // 0: Failure(SQLException), 1: Failure(Other Throwable), 2: Success
-            try {
-                Connection connection = delegatedDataSource.getConnection();
-                successCode = 2;
-                return new ThrottledConnection(connection, semaphore);
-            } catch (SQLException e) {
-                semaphore.release();
-                successCode = 0;
-                throw e;
-            } finally {
-                if (successCode == 1) {
-                    semaphore.release();
-                }
-            }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new SQLException("Interrupted while waiting for connection: ", e);
+        }
+
+        try {
+            Connection connection = delegatedDataSource.getConnection();
+            ThrottledConnection throttledConnection = new ThrottledConnection(connection, semaphore);
+            isSuccess = true;
+            return throttledConnection;
+        } finally {
+            if (!isSuccess) {
+                semaphore.release();
+            }
         }
     }
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
+        boolean isSuccess = false;
+
         try {
             semaphore.acquire();
-            int successCode = 1;        // 0: Failure(SQLException), 1: Failure(Other Throwable), 2: Success
-            try {
-                Connection connection = delegatedDataSource.getConnection(username, password);
-                successCode = 2;
-                return new ThrottledConnection(connection, semaphore);
-            } catch (SQLException e) {
-                semaphore.release();
-                successCode = 0;
-                throw e;
-            } finally {
-                if (successCode == 1) {
-                    semaphore.release();
-                }
-            }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new SQLException("Interrupted while waiting for connection: ", e);
         }
+
+        try {
+            Connection connection = delegatedDataSource.getConnection(username, password);
+            ThrottledConnection throttledConnection = new ThrottledConnection(connection, semaphore);
+            isSuccess = true;
+            return throttledConnection;
+        } finally {
+            if (!isSuccess) {
+                semaphore.release();
+            }
+        }
+
     }
 
     @Override

@@ -13,6 +13,10 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.MethodParameter;
@@ -87,12 +91,35 @@ public class GlobalExceptionHandlerTest {
         assertNull(errorResponse.getData());
     }
 
-    @Test
+    @ParameterizedTest
+    @NullSource
+    @EmptySource
+    @DisplayName("메시지에 문제가 있을 때 MethodArgumentNotValidException으로 전역 예외 핸들러 호출")
+    public void testHandleMethodArgumentNotValidException_givenProblematicMessage_returnResponse(String message) {
+        // given
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(new Object(), "테스트 객체");
+        bindingResult.addError(new FieldError("testObject", "testField", message));
+        MethodArgumentNotValidException ex = new MethodArgumentNotValidException(mock(MethodParameter.class), bindingResult);
+
+        // when
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleMethodArgumentNotValidException(ex);
+        DataResponse<Void> errorResponse = response.getBody();
+
+        // then
+        assertNotNull(errorResponse);
+        assertEquals(GeneralErrorCode.INVALID_INPUT.getHttpStatus(), errorResponse.getStatus());
+        assertEquals(GeneralErrorCode.INVALID_INPUT.getCode(), errorResponse.getCode());
+        assertNull(errorResponse.getData());
+    }
+
+    @ParameterizedTest
+    @EmptySource
+    @ValueSource(strings = {"testRequestParam"})
     @DisplayName("MethodArgumentTypeMismatchException으로 전역 예외 핸들러 호출")
-    public void testHandleMethodArgumentTypeMismatchException_givenValidGlobalExceptionHandler_returnResponse() {
+    public void testHandleMethodArgumentTypeMismatchException_givenValidGlobalExceptionHandler_returnResponse(String name) {
         // given
         MethodArgumentTypeMismatchException ex = mock(MethodArgumentTypeMismatchException.class);
-        given(ex.getName()).willReturn("testRequestParam");
+        given(ex.getName()).willReturn(name);
 
         // when
         ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleMethodArgumentTypeMismatchException(ex);
@@ -110,14 +137,32 @@ public class GlobalExceptionHandlerTest {
     public void testHandleConstraintViolationException_givenValidGlobalExceptionHandler_returnResponse() {
         // given
         ConstraintViolationException ex = mock(ConstraintViolationException.class);
-
         ConstraintViolation<?> violation = mock(ConstraintViolation.class);
-
         Set<ConstraintViolation<?>> testViolations = new HashSet<>(Collections.singletonList(violation));
 
         given(ex.getConstraintViolations()).willReturn(testViolations);
         given(violation.getPropertyPath()).willReturn(PathImpl.createPathFromString("testFieldName"));
         given(violation.getMessage()).willReturn("Test message");
+
+        // when
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleConstraintViolationException(ex);
+        DataResponse<Void> errorResponse = response.getBody();
+
+        // then
+        assertNotNull(errorResponse);
+        assertEquals(GeneralErrorCode.CONSTRAINT_VIOLATION.getHttpStatus(), errorResponse.getStatus());
+        assertEquals(GeneralErrorCode.CONSTRAINT_VIOLATION.getCode(), errorResponse.getCode());
+        assertNull(errorResponse.getData());
+    }
+
+    @Test
+    @DisplayName("메시지가 비어 있는 ConstraintViolationException으로 전역 예외 핸들러 호출")
+    public void testHandleConstraintViolationException_givenNoMessage_returnResponse() {
+        // given
+        ConstraintViolationException ex = mock(ConstraintViolationException.class);
+        Set<ConstraintViolation<?>> testViolations = new HashSet<>();
+
+        given(ex.getConstraintViolations()).willReturn(testViolations);
 
         // when
         ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleConstraintViolationException(ex);
@@ -224,20 +269,20 @@ public class GlobalExceptionHandlerTest {
         assertNull(errorResponse.getData());
     }
 
-//    @Test
-//    @DisplayName("ObjectOptimisticLockingFailureException으로 전역 예외 핸들러 호출")
-//    public void testHandleObjectOptimisticLockingFailureException_givenValidGlobalExceptionHandler_returnResponse() {
-//        // given & when
-//        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleHttpMessageNotWritableException();
-//        DataResponse<Void> errorResponse = response.getBody();
-//
-//        // then
-//        assertNotNull(errorResponse);
-//        assertEquals(GeneralErrorCode.FAILURE_OPTIMISTIC_LOCKING.getHttpStatus(), errorResponse.getStatus());
-//        assertEquals(GeneralErrorCode.FAILURE_OPTIMISTIC_LOCKING.getCode(), errorResponse.getCode());
-//        assertNotNull(errorResponse.getMessage());
-//        assertNull(errorResponse.getData());
-//    }
+    @Test
+    @DisplayName("ObjectOptimisticLockingFailureException으로 전역 예외 핸들러 호출")
+    public void testHandleObjectOptimisticLockingFailureException_givenValidGlobalExceptionHandler_returnResponse() {
+        // given & when
+        ResponseEntity<DataResponse<Void>> response = globalExceptionHandler.handleObjectOptimisticLockingFailureException();
+        DataResponse<Void> errorResponse = response.getBody();
+
+        // then
+        assertNotNull(errorResponse);
+        assertEquals(GeneralErrorCode.FAILURE_OPTIMISTIC_LOCKING.getHttpStatus(), errorResponse.getStatus());
+        assertEquals(GeneralErrorCode.FAILURE_OPTIMISTIC_LOCKING.getCode(), errorResponse.getCode());
+        assertNotNull(errorResponse.getMessage());
+        assertNull(errorResponse.getData());
+    }
 
     @Test
     @DisplayName("BusinessException으로 전역 예외 핸들러 호출")
