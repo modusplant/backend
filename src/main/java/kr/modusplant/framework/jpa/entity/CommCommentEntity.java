@@ -61,6 +61,9 @@ public class CommCommentEntity {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    @Column(name = "edited_at")
+    private LocalDateTime editedAt;
+
     public void increaseLikeCount() {
         this.likeCount++;
     }

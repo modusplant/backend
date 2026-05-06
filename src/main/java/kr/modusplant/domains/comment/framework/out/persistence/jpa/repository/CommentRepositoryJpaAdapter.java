@@ -48,6 +48,7 @@ public class CommentRepositoryJpaAdapter implements CommentWriteRepository {
         CommCommentEntity comment = commentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_COMMENT, TableName.COMM_COMMENT));
         comment.updateContent(content.getContent());
+        
         commentRepository.save(comment);
     }
 
