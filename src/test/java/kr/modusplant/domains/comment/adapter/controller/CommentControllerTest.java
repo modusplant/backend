@@ -173,7 +173,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
 
         // then
         assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(mockResponse);
+        assertThat(result.getFirst()).isEqualTo(mockResponse);
         then(readRepository).should(times(1))
                 .findByPost(PostId.create(TEST_COMM_POST_ULID), Author.createNullable(MEMBER_BASIC_USER_UUID));
     }
@@ -197,7 +197,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
 
         // then
         assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(mockResponse);
+        assertThat(result.getFirst()).isEqualTo(mockResponse);
     }
 
     @Test
