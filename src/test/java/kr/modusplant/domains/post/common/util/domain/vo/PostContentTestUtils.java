@@ -4,10 +4,10 @@ import kr.modusplant.domains.post.domain.vo.PostContent;
 
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT;
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT_THUMBNAIL_KEY;
-import static kr.modusplant.domains.post.common.constant.PostStringConstant.TEST_POST_TITLE;
+import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_TITLE;
 
 public interface PostContentTestUtils {
-    PostContent testPostContent = PostContent.create(TEST_POST_TITLE, TEST_POST_CONTENT,TEST_POST_CONTENT_THUMBNAIL_KEY);
-    PostContent testDraftPostContent1 = PostContent.createDraft(TEST_POST_TITLE,null,null);
+    PostContent testPostContent = PostContent.create(TEST_COMM_POST_TITLE, TEST_POST_CONTENT,TEST_POST_CONTENT_THUMBNAIL_KEY);
+    PostContent testDraftPostContent1 = PostContent.createDraft(TEST_COMM_POST_TITLE,null,null);
     PostContent testDraftPostContent2 = PostContent.createDraft(null, TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY);
 }

@@ -1,23 +1,20 @@
 package kr.modusplant.infrastructure.event.consumer;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
 import kr.modusplant.infrastructure.event.bus.EventBus;
+import kr.modusplant.shared.event.ImageRemoveEvent;
 import kr.modusplant.shared.event.MemberWithdrawalEvent;
+import kr.modusplant.shared.event.RecentlyViewPostRemoveEvent;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jooq.DSLContext;
 import org.jooq.JSONB;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,10 +25,13 @@ import static org.jooq.impl.DSL.*;
 public class MemberEventConsumer {
     private final StringRedisTemplate stringRedisTemplate;
     private final DSLContext dsl;
-    private final S3FileService s3FileService;
+    private final ApplicationEventPublisher eventPublisher;
     private final JsonbJsonNodeConverter jsonbJsonNodeConverter = new JsonbJsonNodeConverter();
 
-    public MemberEventConsumer(EventBus eventBus, StringRedisTemplate stringRedisTemplate, DSLContext dsl, S3FileService s3FileService) {
+    public MemberEventConsumer(EventBus eventBus,
+                               StringRedisTemplate stringRedisTemplate,
+                               DSLContext dsl,
+                               ApplicationEventPublisher eventPublisher) {
         eventBus.subscribe(event -> {
             if (event instanceof MemberWithdrawalEvent memberWithdrawalEvent) {
                 deleteAllWithMemberPKAndAlterAllWithMemberFK(
@@ -43,7 +43,7 @@ public class MemberEventConsumer {
         });
         this.stringRedisTemplate = stringRedisTemplate;
         this.dsl = dsl;
-        this.s3FileService = s3FileService;
+        this.eventPublisher = eventPublisher;
     }
 
     private void deleteAllWithMemberPKAndAlterAllWithMemberFK(UUID memberId, String reason, String opinion) {
@@ -55,13 +55,6 @@ public class MemberEventConsumer {
                 .and(COMM_POST.IS_PUBLISHED.isTrue())
                 .fetchInto(String.class).toArray(new String[0]);
 
-        deleteImagesFromPublishedPosts(publishedPostUlids);
-        processPostsAndRelatedRecords(memberId, publishedPostUlids);
-        processOtherMemberRelatedRecords(memberId, reason, opinion);
-        deleteRecentlyViewPostRecords(publishedPostUlids);
-    }
-
-    private void deleteImagesFromPublishedPosts(String[] publishedPostUlids) {
         List<JsonNode> publishedPostContents = dsl.select(COMM_POST.CONTENT)    // 발행된 게시글의 컨텐츠 획득
                 .from(COMM_POST)
                 .where(COMM_POST.ULID.in(publishedPostUlids))
@@ -82,9 +75,14 @@ public class MemberEventConsumer {
             }
         }
 
-        if (!fileKeysToDelete.isEmpty()) {      // 파일 키로 클라우드 플랫폼에서 파일 삭제
-            s3FileService.deleteFiles(fileKeysToDelete);
+        if (!fileKeysToDelete.isEmpty()) {
+            eventPublisher.publishEvent(ImageRemoveEvent.create(fileKeysToDelete));
         }
+        if (!ArrayUtils.isEmpty(publishedPostUlids)) {
+            eventPublisher.publishEvent(RecentlyViewPostRemoveEvent.create(publishedPostUlids));
+        }
+        processPostsAndRelatedRecords(memberId, publishedPostUlids);
+        processOtherMemberRelatedRecords(memberId, reason, opinion);
     }
 
     private void processPostsAndRelatedRecords(UUID memberId, String[] publishedPostUlids) {
@@ -196,49 +194,5 @@ public class MemberEventConsumer {
                         .where(SITE_MEMBER.UUID.eq(memberId))
 
         ).execute();
-    }
-
-    private void deleteRecentlyViewPostRecords(String[] publishedPostUlids) {
-        if (publishedPostUlids.length == 0) {
-            return;
-        }
-
-        byte[][] publishedPostUlidsBytes =
-                Arrays.stream(publishedPostUlids)
-                        .map(ulid -> ulid.getBytes(StandardCharsets.UTF_8))
-                        .toArray(byte[][]::new);
-
-        stringRedisTemplate.execute((RedisCallback<Void>) (RedisConnection connection) -> {
-            int MAX_TARGET_KEY_SIZE = 1000;
-            List<byte[]> memberKeys = new ArrayList<>(MAX_TARGET_KEY_SIZE);
-
-            ScanOptions options = ScanOptions.scanOptions()
-                    .match("recentlyView:member:*:posts")
-                    .count(100)
-                    .build();
-
-            try (Cursor<byte[]> cursor = connection.keyCommands().scan(options)) {
-                while (cursor.hasNext()) {
-                    memberKeys.add(cursor.next());
-                    if (memberKeys.size() >= MAX_TARGET_KEY_SIZE) {
-                        deleteRecentlyViewPostRecordsWithConnection(connection, memberKeys, publishedPostUlidsBytes);
-                    }
-                }
-                if (!memberKeys.isEmpty()) {
-                    deleteRecentlyViewPostRecordsWithConnection(connection, memberKeys, publishedPostUlidsBytes);
-                }
-            }
-            return null;
-        });
-    }
-
-    private void deleteRecentlyViewPostRecordsWithConnection(
-            RedisConnection connection, List<byte[]> batchKeys, byte[][] matchedValuesBytes) {
-        connection.openPipeline();
-        for (byte[] rawKey : batchKeys) {
-            connection.zSetCommands().zRem(rawKey, matchedValuesBytes);
-        }
-        connection.closePipeline();
-        batchKeys.clear();
     }
 }

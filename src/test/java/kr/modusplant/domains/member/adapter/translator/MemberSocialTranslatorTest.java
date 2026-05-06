@@ -1,6 +1,5 @@
 package kr.modusplant.domains.member.adapter.translator;
 
-import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityController;
 import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityLinkController;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.framework.out.exception.UnsupportedSocialProviderException;
@@ -20,15 +19,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 class MemberSocialTranslatorTest {
-    private final SocialIdentityController socialIdentityController = Mockito.mock(SocialIdentityController.class);
     private final SocialIdentityLinkController socialIdentityLinkController = Mockito.mock(SocialIdentityLinkController.class);
-    private final MemberSocialTranslator memberSocialTranslator = new MemberSocialTranslator(socialIdentityController, socialIdentityLinkController);
+    private final MemberSocialTranslator memberSocialTranslator = new MemberSocialTranslator(socialIdentityLinkController);
 
     @Test
     @DisplayName("Kakao 소셜 제공자로 getSocialAccessToken으로 소셜 접근 토큰 반환")
     void testGetSocialAccessToken_withKakaoSocialProvider_willReturnAccessToken() {
         // given
-        given(socialIdentityController.issueSocialAccessToken(SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_CODE)).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
+        given(socialIdentityLinkController.issueSocialAccessToken(SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_CODE)).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
 
         // when
         String socialAccessToken = memberSocialTranslator.getSocialAccessToken(TEST_SOCIAL_KAKAO_CODE, SocialProvider.KAKAO.getValue());
@@ -41,7 +39,7 @@ class MemberSocialTranslatorTest {
     @DisplayName("Google 소셜 제공자로 getSocialAccessToken으로 소셜 접근 토큰 반환")
     void testGetSocialAccessToken_withGoogleSocialProvider_willReturnAccessToken() {
         // given
-        given(socialIdentityController.issueSocialAccessToken(SocialProvider.GOOGLE, TEST_SOCIAL_GOOGLE_CODE)).willReturn(TEST_SOCIAL_GOOGLE_SOCIAL_ACCESS_TOKEN);
+        given(socialIdentityLinkController.issueSocialAccessToken(SocialProvider.GOOGLE, TEST_SOCIAL_GOOGLE_CODE)).willReturn(TEST_SOCIAL_GOOGLE_SOCIAL_ACCESS_TOKEN);
 
         // when
         String socialAccessToken = memberSocialTranslator.getSocialAccessToken(TEST_SOCIAL_GOOGLE_CODE, SocialProvider.GOOGLE.getValue());

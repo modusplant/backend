@@ -16,10 +16,14 @@ import jakarta.validation.constraints.Pattern;
 import kr.modusplant.domains.post.adapter.controller.PostController;
 import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
-import kr.modusplant.domains.post.usecase.enums.SearchOption;
-import kr.modusplant.domains.post.usecase.enums.SearchSort;
-import kr.modusplant.domains.post.usecase.request.*;
-import kr.modusplant.domains.post.usecase.response.*;
+import kr.modusplant.domains.post.usecase.request.FileOrder;
+import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
+import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
+import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
+import kr.modusplant.domains.post.usecase.response.CursorLatestSortedPageResponse;
+import kr.modusplant.domains.post.usecase.response.DraftPostResponse;
+import kr.modusplant.domains.post.usecase.response.OffsetPageResponse;
+import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +38,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,7 +59,7 @@ public class PostRestController {
     )
     @GetMapping
     public ResponseEntity<DataResponse<CursorLatestSortedPageResponse<PostSummaryResponse>>> getAllPosts(
-            @AuthenticationPrincipal(errorOnInvalidType = false) DefaultUserDetails userDetails,
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
 
             @Parameter(schema = @Schema(description = "마지막 게시글 ID (첫 요청 시 생략)", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
             @RequestParam(name = "lastPostId", required = false)
@@ -84,72 +87,12 @@ public class PostRestController {
     }
 
     @Operation(
-            summary = "검색어를 통한 게시글 목록 조회 API (무한스크롤)",
-            description = "키워드별 컨텐츠 게시글의 목록과 페이지 정보를 조회합니다."
-    )
-    @GetMapping("/search")
-    public ResponseEntity<DataResponse<CursorRelevanceSortedPageResponse<PostSummaryWithSearchInfoResponse>>> getPostsByKeyword(
-            @Parameter(hidden = true)
-            @AuthenticationPrincipal
-            DefaultUserDetails userDetails,
-
-            @Parameter(schema = @Schema(description = "마지막 게시글 ID (첫 요청 시 생략)", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
-            @RequestParam(name = "lastPostId", required = false)
-            String lastUlid,
-
-            @Parameter(schema = @Schema(description = "마지막 게시글 중요도 (첫 요청 시 생략)", example = "1"))
-            @RequestParam(name = "lastPostImportance", required = false)
-            Integer lastImportance,
-
-            @Parameter(schema = @Schema(description = "마지막 게시글 정확도 (첫 요청 시 생략)", example = "0.143253469630148"))
-            @RequestParam(name = "lastPostSimilarity", required = false)
-            Double lastWordSimilarity,
-
-            @Parameter(schema = @Schema(description = "마지막 게시글 발행 시점 (첫 요청 시 생략)"))
-            @RequestParam(name = "lastPostPublishedAt", required = false)
-            LocalDateTime lastPublishedAt,
-
-            @Parameter(schema = @Schema(description = "페이지 크기", example = "10", minimum = "1", maximum = "50"))
-            @RequestParam
-            @Range(min = 1, max = 50)
-            Integer size,
-
-            @Parameter(schema = @Schema(description = "검색 옵션 필터", example = "title_content"))
-            @RequestParam
-            SearchOption option,
-
-            @Parameter(schema = @Schema(description = "검색어 키워드", example = "벌레"))
-            @RequestParam
-            @NotBlank(message = "키워드가 비어 있습니다.")
-            String keyword,
-
-            @Parameter(schema = @Schema(description = "정렬 조건", example = "latest"))
-            @RequestParam
-            SearchSort sort,
-
-            @Parameter(schema = @Schema(description = "1차 항목 식별자", example = "1"))
-            @RequestParam(required = false)
-            Integer primaryCategoryId,
-
-            @Parameter(schema = @Schema(description = "2차 항목 식별자 (복수 선택 가능)", example = "1"))
-            @RequestParam(name = "secondaryCategoryId", required = false)
-            List<Integer> secondaryCategoryIds
-    ) {
-        UUID currentMemberUuid = (userDetails != null) ? userDetails.getUuid() : null;
-        return ResponseEntity.ok().body(DataResponse.ok(postController.getByKeyword(
-                new PostSearchRequest(option, keyword, sort,
-                        new PostCategoryRequest(primaryCategoryId, secondaryCategoryIds)
-                ),
-                currentMemberUuid, lastUlid, lastImportance, lastWordSimilarity, lastPublishedAt, size)));
-    }
-
-    @Operation(
             summary = "특정 컨텐츠 게시글 조회 API",
             description = "게시글 식별자로 특정 컨텐츠 게시글을 조회합니다. 조회수 증가 및 최근 본 게시글에 추가됩니다."
     )
     @GetMapping("/{postId}")
     public ResponseEntity<DataResponse<?>> getPostByUlid(
-            @AuthenticationPrincipal(errorOnInvalidType = false) DefaultUserDetails userDetails,
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
 
             @Parameter(schema = @Schema(description = "게시글의 식별자", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
             @PathVariable(name = "postId")
@@ -322,7 +265,7 @@ public class PostRestController {
     )
     @PatchMapping("/{postId}/views")
     public ResponseEntity<DataResponse<Long>> increaseViewCount(
-            @AuthenticationPrincipal(errorOnInvalidType = false) DefaultUserDetails userDetails,
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
 
             @Parameter(schema = @Schema(description = "게시글의 식별자", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
             @PathVariable(name = "postId")
@@ -474,53 +417,6 @@ public class PostRestController {
         return ResponseEntity.ok().body(DataResponse.ok(postController.getBookmarkedByMemberUuid(currentMemberUuid, page-1, size)));
     }
 
-    @Operation(
-            summary = "검색 기록 목록 조회 API",
-            description = "검색어로 게시글 목록 조회 시 입력한 검색어 기록 목록을 조회합니다. "
-    )
-    @GetMapping("/search-history")
-    public ResponseEntity<DataResponse<List<String>>> getSearchHistory(
-            @AuthenticationPrincipal DefaultUserDetails userDetails,
-
-            @Parameter(schema = @Schema(description = "검색 기록 개수", example = "10", minimum = "1", maximum = "20"))
-            @RequestParam
-            int size
-    ) {
-        UUID currentMemberUuid = userDetails.getUuid();
-        return ResponseEntity.ok().body(DataResponse.ok(postController.getSearchHistory(currentMemberUuid,size)));
-    }
-
-    @Operation(
-            summary = "검색 기록 단건 삭제 API",
-            description = "검색 기록에서 검색어를 단건 삭제합니다."
-    )
-    @DeleteMapping("/search-history/{keyword}")
-    public ResponseEntity<DataResponse<Void>> removeSearchKeyword(
-            @AuthenticationPrincipal DefaultUserDetails userDetails,
-
-            @Parameter(schema = @Schema(description = "검색어", example = "벌레"))
-            @PathVariable
-            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
-            String keyword
-    ) {
-        UUID currentMemberUuid = userDetails.getUuid();
-        postController.deleteSearchKeyword(currentMemberUuid,keyword);
-        return ResponseEntity.ok().body(DataResponse.ok());
-    }
-
-    @Operation(
-            summary = "검색 기록 전체 삭제 API",
-            description = "검색 기록에서 모든 검색어를 삭제합니다."
-    )
-    @DeleteMapping("/search-history")
-    public ResponseEntity<DataResponse<Void>> removeAllSearchHistory(
-            @AuthenticationPrincipal DefaultUserDetails userDetails
-    ) {
-        UUID currentMemberUuid = userDetails.getUuid();
-        postController.deleteAllSearchHistory(currentMemberUuid);
-        return ResponseEntity.ok().body(DataResponse.ok());
-    }
-
     private UUID getOrCreateGuestId(String guestIdStr, HttpServletResponse response) {
         UUID guestId;
         boolean needsNewCookie = false;
@@ -548,5 +444,4 @@ public class PostRestController {
         }
         return guestId;
     }
-
 }

@@ -6,6 +6,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.lettuce.core.ClientOptions;
+import io.lettuce.core.SocketOptions;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +20,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.time.Duration;
 
 @Configuration
 public class RedisConfig {
@@ -32,21 +37,39 @@ public class RedisConfig {
     @Value("${spring.data.redis.ssl.enabled}")
     private boolean sslEnabled;
 
+    @Value("${spring.data.redis.connect-timeout}")
+    private Duration connectTimeout;
+
+    @Value("${spring.data.redis.timeout}")
+    private long timeout;
+
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
         config.setHostName(host);
         config.setPort(port);
-        if (!password.isEmpty()) {
+        if (!StringUtils.isBlank(password)) {
             config.setPassword(password);
         }
 
-        LettuceClientConfiguration.LettuceClientConfigurationBuilder builder = LettuceClientConfiguration.builder();
+        SocketOptions socketOptions = SocketOptions.builder()
+                .connectTimeout(connectTimeout)
+                .build();
+
+        ClientOptions clientOptions = ClientOptions.builder()
+                .socketOptions(socketOptions)
+                .build();
+
+        // 2. 기본 LettuceClientConfiguration 빌드 (풀링 없음)
+        LettuceClientConfiguration.LettuceClientConfigurationBuilder builder = LettuceClientConfiguration.builder()
+                .clientOptions(clientOptions)
+                .commandTimeout(Duration.ofMillis(timeout)); // 명령 실행 응답 타임아웃 설정
+
         if (sslEnabled) {
             builder.useSsl();
         }
-        LettuceClientConfiguration clientConfig = builder.build();
-        return new LettuceConnectionFactory(config, clientConfig);
+
+        return new LettuceConnectionFactory(config, builder.build());
     }
 
     // 문자열 저장을 위한 StringRedisTemplate
@@ -63,6 +86,7 @@ public class RedisConfig {
 
         StringRedisSerializer stringSerializer = new StringRedisSerializer();
         GenericJackson2JsonRedisSerializer serializer = createJsonRedisSerializer();
+
         redisTemplate.setKeySerializer(stringSerializer);
         redisTemplate.setValueSerializer(serializer);
         redisTemplate.setHashKeySerializer(stringSerializer);

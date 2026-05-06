@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
@@ -16,7 +16,6 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 
@@ -37,7 +36,7 @@ class S3FileServiceTest {
     void setUp() {
         s3Client = mock(S3Client.class);
         s3Presigner = mock(S3Presigner.class);
-        s3FileService = new S3FileService(s3Client,s3Presigner);
+        s3FileService = new S3FileService(s3Client, s3Presigner);
         ReflectionTestUtils.setField(s3FileService, "bucket", BUCKET_NAME);
         if (System.getenv("DEV_PUBLIC_ENDPOINT") != null) {
             ReflectionTestUtils.setField(s3FileService, "profile", "dev");
@@ -79,19 +78,19 @@ class S3FileServiceTest {
         // given
         String fileKey = "test-file-key";
         byte[] fileContent = "test-download-content".getBytes();
-
-        ResponseInputStream<GetObjectResponse> responseInputStream =
-                new ResponseInputStream<>(GetObjectResponse.builder().build(),
-                        new ByteArrayInputStream(fileContent));
-
-        given(s3Client.getObject(any(GetObjectRequest.class))).willReturn(responseInputStream);
+        GetObjectResponse response = GetObjectResponse.builder()
+                .contentType("application/json")
+                .contentLength(100L)
+                .build();
+        ResponseBytes<GetObjectResponse> objectBytes = ResponseBytes.fromByteArray(response, fileContent);
+        given(s3Client.getObjectAsBytes(any(GetObjectRequest.class))).willReturn(objectBytes);
 
         // when
         byte[] result = s3FileService.downloadFile(fileKey);
 
         // then
         assertThat(result).isEqualTo(fileContent);
-        verify(s3Client, times(1)).getObject(any(GetObjectRequest.class));
+        verify(s3Client, times(1)).getObjectAsBytes(any(GetObjectRequest.class));
     }
 
     @Test
@@ -100,11 +99,11 @@ class S3FileServiceTest {
         // given
         String fileKey = "test-file-key";
 
-        given(s3Client.getObject(any(GetObjectRequest.class))).willThrow(NoSuchKeyException.class);
+        given(s3Client.getObjectAsBytes(any(GetObjectRequest.class))).willThrow(NoSuchKeyException.class);
 
         // when
         NotFoundFileKeyOnS3Exception exception = assertThrows(NotFoundFileKeyOnS3Exception.class, () -> {
-            byte[] result = s3FileService.downloadFile(fileKey);
+            s3FileService.downloadFile(fileKey);
         });
 
         // then

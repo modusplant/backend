@@ -1,6 +1,7 @@
 package kr.modusplant.domains.account.social.adapter.controller;
 
 import kr.modusplant.domains.account.social.common.util.domain.vo.SocialMemberProfileTestUtils;
+import kr.modusplant.domains.account.social.common.util.usecase.request.SocialAuthRequestTestUtils;
 import kr.modusplant.domains.account.social.domain.exception.AlreadyRegisteredWithOtherProviderException;
 import kr.modusplant.domains.account.social.domain.exception.SocialAccountConflictException;
 import kr.modusplant.domains.account.social.domain.exception.SocialActionRequiredException;
@@ -18,12 +19,13 @@ import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils {
+class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, SocialAuthRequestTestUtils {
     private final SocialAuthClientFactory clientFactory = mock(SocialAuthClientFactory.class);
     private final SocialIdentityRepository socialIdentityRepository = mock(SocialIdentityRepository.class);
     private final SocialIdentityMapper socialIdentityMapper = mock(SocialIdentityMapper.class);
@@ -41,6 +43,25 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils {
         given(clientFactory.getClient(any())).willReturn(socialAuthClient);
         given(kakaoUserInfo.getEmail()).willReturn(testNormalUserEmail.getValue());
         given(kakaoUserInfo.getId()).willReturn(testKakaoSocialCredentials.getProviderId());
+    }
+
+    @Test
+    @DisplayName("소셜 접근 토큰 발급받기")
+    void testIssueSocialAccessToken_givenSocialProviderAndCode_willReturnSocialAccessToken() {
+        // given
+        String code = createTestKakaoLoginRequest().code();
+        String socialAccessToken = "access-token";
+
+        given(clientFactory.getClient(SocialProvider.KAKAO)).willReturn(socialAuthClient);
+        given(socialAuthClient.getAccessToken(code)).willReturn(socialAccessToken);
+
+        // when
+        String result = socialIdentityLinkController.issueSocialAccessToken(SocialProvider.KAKAO,code);
+
+        // then
+        assertEquals(result,socialAccessToken);
+        verify(clientFactory).getClient(SocialProvider.KAKAO);
+        verify(socialAuthClient).getAccessToken(code);
     }
 
     @Nested

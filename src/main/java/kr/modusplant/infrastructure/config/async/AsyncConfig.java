@@ -33,11 +33,29 @@ public class AsyncConfig implements AsyncConfigurer {
         return new SimpleAsyncUncaughtExceptionHandler();
     }
 
-    /* 알림 전용 executor : 가상스레드 */
+    /* AWS 전용 executor : 가상 스레드 */
+    @Bean(name = "awsExecutor")
+    public Executor awsExecutor() {
+        // SimpleAsyncTaskExecutor + executor.setVirtualThreads(true) => VirtualThreadTaskExecutor
+        SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor("virtual-aws-");
+        executor.setVirtualThreads(true);
+        return executor;
+    }
+
+    /* Redis 전용 executor : 가상 스레드 */
+    @Bean(name = "redisExecutor")
+    public Executor redisExecutor() {
+        // SimpleAsyncTaskExecutor + executor.setVirtualThreads(true) => VirtualThreadTaskExecutor
+        SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor("virtual-redis-");
+        executor.setVirtualThreads(true);
+        return executor;
+    }
+
+    /* 알림 전용 executor : 가상 스레드 */
     @Bean(name = "notificationExecutor")
     public Executor notificationExecutor() {
         // SimpleAsyncTaskExecutor + executor.setVirtualThreads(true) => VirtualThreadTaskExecutor
-        SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor("virtual-");
+        SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor("virtual-notification-");
         executor.setVirtualThreads(true);
         return executor;
     }

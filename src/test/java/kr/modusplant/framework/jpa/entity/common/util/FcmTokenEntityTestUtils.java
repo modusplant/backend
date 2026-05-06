@@ -1,7 +1,7 @@
 package kr.modusplant.framework.jpa.entity.common.util;
 
 import kr.modusplant.framework.jpa.entity.FcmTokenEntity;
-import kr.modusplant.framework.jpa.entity.FcmTokenEntity.*;
+import kr.modusplant.framework.jpa.entity.FcmTokenEntity.FcmTokenEntityBuilder;
 import kr.modusplant.shared.enums.Platform;
 
 import static kr.modusplant.shared.persistence.common.util.constant.FcmTokenConstant.*;

@@ -6,9 +6,6 @@ import kr.modusplant.domains.post.common.util.usecase.model.PostReadModelTestUti
 import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
-import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostJpaRepository;
-import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PrimaryCategoryJpaRepository;
-import kr.modusplant.domains.post.framework.out.jpa.repository.supers.SecondaryCategoryJpaRepository;
 import kr.modusplant.domains.post.framework.out.redis.PostRecentlyViewRedisRepository;
 import kr.modusplant.domains.post.framework.out.redis.PostViewCountRedisRepository;
 import kr.modusplant.framework.jpa.entity.CommPostEntity;
@@ -18,9 +15,7 @@ import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import kr.modusplant.framework.jpa.entity.common.util.CommPrimaryCategoryEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.CommSecondaryCategoryEntityTestUtils;
 import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.jpa.repository.CommPostBookmarkJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommPostLikeJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -36,10 +31,10 @@ import static org.mockito.Mockito.*;
 
 class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils, SiteMemberEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils, PostReadModelTestUtils {
     private final PostJpaMapper postJpaMapper = Mockito.mock(PostJpaMapper.class);
-    private final PostJpaRepository postJpaRepository = Mockito.mock(PostJpaRepository.class);
+    private final CommPostJpaRepository postJpaRepository = Mockito.mock(CommPostJpaRepository.class);
     private final SiteMemberJpaRepository authorJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
-    private final PrimaryCategoryJpaRepository primaryCategoryJpaRepository = Mockito.mock(PrimaryCategoryJpaRepository.class);
-    private final SecondaryCategoryJpaRepository secondaryCategoryJpaRepository = Mockito.mock(SecondaryCategoryJpaRepository.class);
+    private final CommPrimaryCategoryJpaRepository primaryCategoryJpaRepository = Mockito.mock(CommPrimaryCategoryJpaRepository.class);
+    private final CommSecondaryCategoryJpaRepository secondaryCategoryJpaRepository = Mockito.mock(CommSecondaryCategoryJpaRepository.class);
     private final PostViewCountRedisRepository postViewCountRedisRepository = Mockito.mock(PostViewCountRedisRepository.class);
     private final CommPostLikeJpaRepository postLikeJpaRepository = Mockito.mock(CommPostLikeJpaRepository.class);
     private final CommPostBookmarkJpaRepository postBookmarkJpaRepository = Mockito.mock(CommPostBookmarkJpaRepository.class);

@@ -5,12 +5,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 import java.net.URI;
+import java.time.Duration;
 
 @Configuration
 public class S3Config {
@@ -26,6 +28,9 @@ public class S3Config {
     @Value("${cloud.wasabi.s3.secret-key}")
     private String secretKey;
 
+    @Value("${cloud.wasabi.s3.max-connections}")
+    private Integer maxConnections;
+
     @Bean
     public S3Client s3Client() {
         AwsBasicCredentials basicCredentials = AwsBasicCredentials.create(accessKey,secretKey);
@@ -33,6 +38,17 @@ public class S3Config {
                 .endpointOverride(URI.create(endpoint))
                 .region(Region.of(region))
                 .credentialsProvider(StaticCredentialsProvider.create(basicCredentials))
+                .serviceConfiguration(S3Configuration.builder()
+                        .pathStyleAccessEnabled(true)
+                        .build())
+                .httpClientBuilder(ApacheHttpClient.builder()
+                        .connectionTimeout(Duration.ofSeconds(3))
+                        .socketTimeout(Duration.ofSeconds(30))
+                        .maxConnections(maxConnections)
+                        .connectionMaxIdleTime(Duration.ofSeconds(30))
+                        .connectionTimeToLive(Duration.ofMinutes(5)))
+                .credentialsProvider(StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create(accessKey, secretKey)))
                 .serviceConfiguration(S3Configuration.builder()
                         .pathStyleAccessEnabled(true)
                         .build())

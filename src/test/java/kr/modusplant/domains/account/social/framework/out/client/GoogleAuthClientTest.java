@@ -34,8 +34,8 @@ class GoogleAuthClientTest {
     private GoogleAuthClient googleAuthClient;
     @Autowired
     private MockRestServiceServer mockServer;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
@@ -84,9 +84,12 @@ class GoogleAuthClientTest {
     void testGetAccessToken_givenInvalidCode_willThrowException() {
         // Given
         String authCode = "fake-auth-code";
+        String errorBody = "{\"error\":\"invalid_grant\", \"error_description\":\"Bad Request\"}";
 
         mockServer.expect(requestTo("https://oauth2.googleapis.com/token"))
-                .andRespond(withStatus(HttpStatus.BAD_REQUEST));
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(errorBody));
 
         // When & Then
         assertThrows(OAuthRequestFailException.class, () -> googleAuthClient.getAccessToken(authCode));
@@ -122,9 +125,12 @@ class GoogleAuthClientTest {
     void testGetUserInfo_givenInvalidAccessToken_willThrowException() {
         // Given
         String accessToken = "invalid-token";
+        String errorBody = "{\"error\":\"invalid_token\", \"error_description\":\"Unauthorized\"}";
 
         mockServer.expect(requestTo("https://www.googleapis.com/userinfo/v2/me"))
-                .andRespond(withStatus(HttpStatus.BAD_REQUEST));
+                .andRespond(withStatus(HttpStatus.UNAUTHORIZED)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(errorBody));
 
         // When & Then
         assertThrows(OAuthRequestFailException.class, () -> googleAuthClient.getUserInfo(accessToken));
@@ -155,8 +161,11 @@ class GoogleAuthClientTest {
     void testRevokeAccess_givenInvalidAccessToken_willThrowException() {
         // given
         String accessToken = "invalid-token";
+        String errorBody = "{\"error\":\"invalid_token\", \"error_description\":\"Revoke failed\"}";
         mockServer.expect(requestTo("https://oauth2.googleapis.com/revoke"))
-                .andRespond(withStatus(HttpStatus.BAD_REQUEST));
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(errorBody));
 
         // when & then
         assertThrows(OAuthRequestFailException.class, () -> googleAuthClient.revokeAccess(accessToken));

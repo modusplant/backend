@@ -4,7 +4,7 @@ import kr.modusplant.framework.jpa.entity.CommPostArchiveEntity;
 
 import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.*;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ID;
+import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ID_1;
 import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 
 public interface CommPostArchiveEntityTestUtils extends SiteMemberEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils {
@@ -12,7 +12,7 @@ public interface CommPostArchiveEntityTestUtils extends SiteMemberEntityTestUtil
         return CommPostArchiveEntity.builder()
                 .authMemberUuid(MEMBER_BASIC_USER_UUID)
                 .primaryCategoryId(TEST_COMM_PRIMARY_CATEGORY_ID)
-                .secondaryCategoryId(TEST_COMM_SECONDARY_CATEGORY_ID)
+                .secondaryCategoryId(TEST_COMM_SECONDARY_CATEGORY_ID_1)
                 .title(TEST_COMM_POST_TITLE)
                 .contentText(TEST_COMM_POST_CONTENT_TEXT)
                 .createdAt(TEST_COMM_POST_CREATED_AT)

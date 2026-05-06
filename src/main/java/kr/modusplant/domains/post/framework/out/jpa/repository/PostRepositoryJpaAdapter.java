@@ -7,9 +7,6 @@ import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
 import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
-import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PostJpaRepository;
-import kr.modusplant.domains.post.framework.out.jpa.repository.supers.PrimaryCategoryJpaRepository;
-import kr.modusplant.domains.post.framework.out.jpa.repository.supers.SecondaryCategoryJpaRepository;
 import kr.modusplant.domains.post.framework.out.redis.PostRecentlyViewRedisRepository;
 import kr.modusplant.domains.post.framework.out.redis.PostViewCountRedisRepository;
 import kr.modusplant.domains.post.usecase.port.repository.PostRepository;
@@ -17,9 +14,7 @@ import kr.modusplant.framework.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.jpa.entity.CommPrimaryCategoryEntity;
 import kr.modusplant.framework.jpa.entity.CommSecondaryCategoryEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.repository.CommPostBookmarkJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommPostLikeJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -30,10 +25,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostRepositoryJpaAdapter implements PostRepository {
     private final PostJpaMapper postJpaMapper;
-    private final PostJpaRepository postJpaRepository;
+    private final CommPostJpaRepository postJpaRepository;
     private final SiteMemberJpaRepository authorJpaRepository;
-    private final PrimaryCategoryJpaRepository primaryCategoryJpaRepository;
-    private final SecondaryCategoryJpaRepository secondaryCategoryJpaRepository;
+    private final CommPrimaryCategoryJpaRepository primaryCategoryJpaRepository;
+    private final CommSecondaryCategoryJpaRepository secondaryCategoryJpaRepository;
     private final PostViewCountRedisRepository postViewCountRedisRepository;
     private final CommPostLikeJpaRepository postLikeJpaRepository;
     private final CommPostBookmarkJpaRepository postBookmarkJpaRepository;

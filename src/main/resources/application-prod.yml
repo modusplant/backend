@@ -16,7 +16,6 @@ app:
       bulkhead: # 벌크헤드 패턴으로 격리된 개별 기능에 사용하는 최대 커넥션 수
         notification:
           connection-size: 10
-          timeout-ms: 3000
 
 # Debugging & Logging
 logging:
@@ -53,3 +52,9 @@ springdoc:
     enabled: false
   swagger-ui:
     enabled: false
+
+# Wasabi
+cloud:
+  wasabi:
+    s3:
+      max-connections: 40

@@ -33,8 +33,8 @@ import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -77,6 +77,7 @@ public class MemberController {
     public MemberProfileResponse getProfile(MemberProfileGetRecord record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         memberValidationHelper.validateIfMemberExists(memberId);
+
         Optional<MemberProfile> optionalMemberProfile = memberProfileRepository.getById(memberId);
         if (optionalMemberProfile.isPresent()) {
             return memberProfileMapper.toMemberProfileResponse(optionalMemberProfile.orElseThrow());
@@ -123,11 +124,8 @@ public class MemberController {
     public void likePost(MemberPostLikeRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());
-        memberValidationHelper.validateIfMemberExists(memberId);
-        memberValidationHelper.validateIfTargetPostExists(targetPostId);
-        if (!targetPostRepository.isPublished(targetPostId)) {
-            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_LIKE, "postLike", targetPostId.getValue());
-        }
+        validateBeforeLikePost(memberId, targetPostId);
+
         if (targetPostRepository.isUnliked(memberId, targetPostId)) {
             eventBus.publish(PostLikeEvent.create(memberId.getValue(), targetPostId.getValue()));
             applicationEventPublisher.publishEvent(PostLikeNotificationEvent.create(memberId.getValue(), targetPostId.getValue()));
@@ -137,11 +135,8 @@ public class MemberController {
     public void unlikePost(MemberPostUnlikeRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());
-        memberValidationHelper.validateIfMemberExists(memberId);
-        memberValidationHelper.validateIfTargetPostExists(targetPostId);
-        if (!targetPostRepository.isPublished(targetPostId)) {
-            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_LIKE, "postUnlike", targetPostId.getValue());
-        }
+        validateBeforeUnlikePost(memberId, targetPostId);
+
         if (targetPostRepository.isLiked(memberId, targetPostId)) {
             eventBus.publish(PostUnlikeEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
@@ -150,11 +145,8 @@ public class MemberController {
     public void bookmarkPost(MemberPostBookmarkRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());
-        memberValidationHelper.validateIfMemberExists(memberId);
-        memberValidationHelper.validateIfTargetPostExists(targetPostId);
-        if (!targetPostRepository.isPublished(targetPostId)) {
-            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_BOOKMARK, "postBookmark", targetPostId.getValue());
-        }
+        validateBeforeBookmarkOrCancelPostBookmark(memberId, targetPostId);
+
         if (targetPostRepository.isNotBookmarked(memberId, targetPostId)) {
             eventBus.publish(PostBookmarkEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
@@ -163,11 +155,8 @@ public class MemberController {
     public void cancelPostBookmark(MemberPostBookmarkCancelRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());
-        memberValidationHelper.validateIfMemberExists(memberId);
-        memberValidationHelper.validateIfTargetPostExists(targetPostId);
-        if (!targetPostRepository.isPublished(targetPostId)) {
-            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_BOOKMARK, "postBookmark", targetPostId.getValue());
-        }
+        validateBeforeBookmarkOrCancelPostBookmark(memberId, targetPostId);
+
         if (targetPostRepository.isBookmarked(memberId, targetPostId)) {
             eventBus.publish(PostBookmarkCancelEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
@@ -179,6 +168,7 @@ public class MemberController {
                 TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
+
         if (targetCommentRepository.isUnliked(memberId, targetCommentId)) {
             eventBus.publish(
                     CommentLikeEvent.create(
@@ -201,6 +191,7 @@ public class MemberController {
                 TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
+
         if (targetCommentRepository.isLiked(memberId, targetCommentId)) {
             eventBus.publish(
                     CommentUnlikeEvent.create(
@@ -251,21 +242,15 @@ public class MemberController {
     public void removeProposalOrBug(ProposalOrBugReportRemoveRecord record) {
         ReportId reportId = ReportId.create(record.reportUlid());
         memberValidationHelper.validateIfReportExists(reportId);
+
         eventBus.publish(ProposalOrBugReportRemoveEvent.create(reportId.getValue()));
     }
 
     public void reportPostAbuse(PostAbuseReportRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());
-        memberValidationHelper.validateIfMemberExists(memberId);
-        memberValidationHelper.validateIfTargetPostExists(targetPostId);
-        if (!targetPostRepository.isPublished(targetPostId)) {
-            throw new NotAccessibleException(
-                    NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE, "postReportForAbuse", targetPostId.getValue());
-        } else if (reportRepository.isMemberAbusePost(memberId, targetPostId)) {
-            throw new ExistsEntityException(
-                    EntityErrorCode.EXISTS_POST_ABUSE_REPORT, "postAbuseReport");
-        }
+        validateBeforeReportPostAbuse(memberId, targetPostId);
+
         eventBus.publish(PostAbuseReportEvent.create(memberId.getValue(), record.postUlid()));
     }
 
@@ -273,11 +258,8 @@ public class MemberController {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         TargetCommentId targetCommentId = TargetCommentId.create(
                 TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
-        memberValidationHelper.validateIfMemberExists(memberId);
-        memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
-        if (reportRepository.isMemberAbuseComment(memberId, targetCommentId)) {
-            throw new ExistsEntityException(EntityErrorCode.EXISTS_COMMENT_ABUSE_REPORT, "commentAbuseReport");
-        }
+        validateBeforeReportCommentAbuse(memberId, targetCommentId);
+
         eventBus.publish(CommentAbuseReportEvent.create(memberId.getValue(), record.postUlid(), record.path()));
     }
 
@@ -286,17 +268,13 @@ public class MemberController {
         String authCode = record.authCode();
         String authProvider = record.authProvider();
         MemberId memberId = MemberId.fromUuid(jwtTokenProvider.getMemberUuidFromToken(accessToken));
-        memberValidationHelper.validateIfMemberExists(memberId);
-        if (record.opinion().length() > 600) {
-            throw new InvalidValueException(MemberErrorCode.MEMBER_WITHDRAW_OPINION_OVER_LENGTH, "opinion");
-        }
+        validateBeforeWithdraw(record, memberId, authCode, authProvider);
+
         if (authCode != null && authProvider != null) {
             memberSocialTranslator.deleteSocialAccountWithSocialAccessToken(
                     memberSocialTranslator.getSocialAccessToken(authCode, authProvider),
                     authProvider,
                     memberId.getValue());
-        } else if (authCode != null || authProvider != null) {
-            throw new InvalidValueException(GeneralErrorCode.INVALID_INPUT, List.of("authCode", "authProvider"));
         }
         tokenService.blacklistAccessToken(accessToken);
         eventBus.publish(MemberWithdrawalEvent.create(memberId.getValue(), record.reason().name(), record.opinion()));
@@ -310,6 +288,30 @@ public class MemberController {
         Optional<Member> emptyOrMember = memberRepository.getByNickname(memberNickname);
         if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
             throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "memberNickname");
+        }
+    }
+
+    private void validateBeforeLikePost(MemberId memberId, TargetPostId targetPostId) {
+        memberValidationHelper.validateIfMemberExists(memberId);
+        memberValidationHelper.validateIfTargetPostExists(targetPostId);
+        if (!targetPostRepository.isPublished(targetPostId)) {
+            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_LIKE, "postLike", targetPostId.getValue());
+        }
+    }
+
+    private void validateBeforeUnlikePost(MemberId memberId, TargetPostId targetPostId) {
+        memberValidationHelper.validateIfMemberExists(memberId);
+        memberValidationHelper.validateIfTargetPostExists(targetPostId);
+        if (!targetPostRepository.isPublished(targetPostId)) {
+            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_LIKE, "postUnlike", targetPostId.getValue());
+        }
+    }
+
+    private void validateBeforeBookmarkOrCancelPostBookmark(MemberId memberId, TargetPostId targetPostId) {
+        memberValidationHelper.validateIfMemberExists(memberId);
+        memberValidationHelper.validateIfTargetPostExists(targetPostId);
+        if (!targetPostRepository.isPublished(targetPostId)) {
+            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_BOOKMARK, "postBookmark", targetPostId.getValue());
         }
     }
 
@@ -328,6 +330,36 @@ public class MemberController {
                     throw new InvalidValueException(INVALID_REPORT_IMAGE_NAME, "originalFilename");
                 }
             }
+        }
+    }
+
+    private void validateBeforeReportPostAbuse(MemberId memberId, TargetPostId targetPostId) {
+        memberValidationHelper.validateIfMemberExists(memberId);
+        memberValidationHelper.validateIfTargetPostExists(targetPostId);
+        if (!targetPostRepository.isPublished(targetPostId)) {
+            throw new NotAccessibleException(
+                    NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE, "postReportForAbuse", targetPostId.getValue());
+        } else if (reportRepository.isMemberAbusePost(memberId, targetPostId)) {
+            throw new ExistsEntityException(
+                    EntityErrorCode.EXISTS_POST_ABUSE_REPORT, "postAbuseReport");
+        }
+    }
+
+    private void validateBeforeReportCommentAbuse(MemberId memberId, TargetCommentId targetCommentId) {
+        memberValidationHelper.validateIfMemberExists(memberId);
+        memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
+        if (reportRepository.isMemberAbuseComment(memberId, targetCommentId)) {
+            throw new ExistsEntityException(EntityErrorCode.EXISTS_COMMENT_ABUSE_REPORT, "commentAbuseReport");
+        }
+    }
+
+    private void validateBeforeWithdraw(MemberWithdrawalRecord record, MemberId memberId, String authCode, String authProvider) {
+        memberValidationHelper.validateIfMemberExists(memberId);
+        if (record.opinion().length() > 600) {
+            throw new InvalidValueException(MemberErrorCode.MEMBER_WITHDRAW_OPINION_OVER_LENGTH, "opinion");
+        }
+        if ((authCode != null && authProvider == null) || (authCode == null && authProvider != null)) {
+            throw new InvalidValueException(GeneralErrorCode.INVALID_INPUT, List.of("authCode", "authProvider"));
         }
     }
 }

@@ -2,11 +2,13 @@ package kr.modusplant.domains.post.framework.out.jooq.mapper;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.post.framework.out.jooq.mapper.supers.PostJooqMapper;
-import kr.modusplant.domains.post.usecase.record.*;
+import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
+import kr.modusplant.domains.post.usecase.record.PostDetailDataReadModel;
+import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
+import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import org.jooq.Record;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static kr.modusplant.jooq.Tables.*;
@@ -29,26 +31,6 @@ public class PostJooqMapperImpl implements PostJooqMapper {
                 record.get("commentCount", Integer.class),
                 record.get("isLiked", Boolean.class),
                 record.get("isBookmarked", Boolean.class)
-        );
-    }
-
-    @Override
-    public PostSummaryWithSearchInfoReadModel toPostSummaryWithSearchInfoReadModel(Record record) {
-        return new PostSummaryWithSearchInfoReadModel(
-                record.get(COMM_POST.ULID),
-                record.get("primaryCategory", String.class),
-                record.get("secondaryCategory", String.class),
-                record.get(SITE_MEMBER.NICKNAME),
-                record.get(COMM_POST.TITLE),
-                record.get("content", JsonNode.class),
-                record.get("thumbnailPath", String.class),
-                record.get("likeCount", Integer.class),
-                record.get("publishedAt", LocalDateTime.class),
-                record.get("commentCount", Integer.class),
-                record.get("isLiked", Boolean.class),
-                record.get("isBookmarked", Boolean.class),
-                record.get("importance", Integer.class),
-                record.get("maxWordSimilarity", Double.class)
         );
     }
 
