@@ -1,4 +1,4 @@
-package kr.modusplant.domains.comment.usecase.port.outbound;
+package kr.modusplant.domains.comment.usecase.port.client;
 
 public interface CommentPostRepository {
 

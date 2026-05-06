@@ -16,7 +16,7 @@ import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqR
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJpaAdapter;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
-import kr.modusplant.domains.comment.usecase.port.outbound.CommentPostRepository;
+import kr.modusplant.domains.comment.usecase.port.client.CommentPostRepository;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;

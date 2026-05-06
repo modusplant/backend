@@ -11,7 +11,7 @@ import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.in.web.cache.CommentCacheService;
 import kr.modusplant.domains.comment.framework.in.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
-import kr.modusplant.domains.comment.usecase.port.outbound.CommentPostRepository;
+import kr.modusplant.domains.comment.usecase.port.client.CommentPostRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentReadRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentWriteRepository;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;

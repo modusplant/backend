@@ -1,6 +1,6 @@
-package kr.modusplant.domains.post.framework.out.outbound;
+package kr.modusplant.domains.comment.framework.out.client;
 
-import kr.modusplant.domains.comment.usecase.port.outbound.CommentPostRepository;
+import kr.modusplant.domains.comment.usecase.port.client.CommentPostRepository;
 import kr.modusplant.jooq.tables.CommPost;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
