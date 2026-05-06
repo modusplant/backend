@@ -1,1 +1,17 @@
+pluginManagement { // 플러그인 저장소
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        google()
+    }
+}
+
+dependencyResolutionManagement { // 의존성 해결 전략
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenCentral()
+        google()
+    }
+}
+
 rootProject.name = 'modusplant'

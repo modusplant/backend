@@ -32,10 +32,6 @@ configurations {
 	}
 }
 
-repositories {
-	mavenCentral()
-}
-
 // DB 설정
 def requiredEnvOrProp = { String envName, String propName ->
     def envVal = System.getenv(envName)
