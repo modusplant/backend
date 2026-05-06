@@ -16,7 +16,7 @@ import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqR
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJpaAdapter;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
-import kr.modusplant.domains.comment.usecase.port.outbound.CommentPostValidator;
+import kr.modusplant.domains.comment.usecase.port.outbound.CommentPostRepository;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
@@ -63,7 +63,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     private final CommPostJpaRepository postJpaRepository = Mockito.mock(CommPostJpaRepository.class);
     private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
     private final SwearService swearService = Mockito.mock(SwearService.class);
-    private final CommentPostValidator postValidator = Mockito.mock(CommentPostValidator.class);
+    private final CommentPostRepository postValidator = Mockito.mock(CommentPostRepository.class);
     private final CommentCacheService cacheService = Mockito.mock(CommentCacheService.class);
     private final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
     private final CommentController controller = new CommentController(mapper, readRepository,
