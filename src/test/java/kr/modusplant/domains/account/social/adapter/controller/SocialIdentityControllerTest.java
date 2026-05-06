@@ -19,12 +19,8 @@ import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClient
 import kr.modusplant.domains.account.social.usecase.port.client.dto.SocialUserInfo;
 import kr.modusplant.domains.account.social.usecase.port.mapper.SocialIdentityMapper;
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
-import kr.modusplant.domains.account.social.usecase.record.TempTokenInfo;
+import kr.modusplant.domains.account.social.usecase.record.*;
 import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
-import kr.modusplant.domains.account.social.usecase.record.LoginResult;
-import kr.modusplant.domains.account.social.usecase.record.NeedLinkResult;
-import kr.modusplant.domains.account.social.usecase.record.NeedSignupResult;
-import kr.modusplant.domains.account.social.usecase.record.SocialLoginResult;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.kernel.Email;

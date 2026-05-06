@@ -12,7 +12,7 @@ import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.usecase.record.*;
 import kr.modusplant.domains.account.social.usecase.request.SocialAuthRequest;
 import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
-import kr.modusplant.domains.account.social.usecase.response.*;
+import kr.modusplant.domains.account.social.usecase.response.SocialLoginResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
 import kr.modusplant.infrastructure.jwt.provider.JwtCookieProvider;

@@ -8,12 +8,12 @@ import kr.modusplant.domains.account.social.common.util.usecase.request.SocialSi
 import kr.modusplant.domains.account.social.common.util.usecase.response.SocialLoginResultTestUtils;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.usecase.enums.OAuthType;
-import kr.modusplant.domains.account.social.usecase.record.TempTokenInfo;
-import kr.modusplant.domains.account.social.usecase.request.SocialAuthRequest;
-import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
 import kr.modusplant.domains.account.social.usecase.record.LoginResult;
 import kr.modusplant.domains.account.social.usecase.record.NeedLinkResult;
 import kr.modusplant.domains.account.social.usecase.record.NeedSignupResult;
+import kr.modusplant.domains.account.social.usecase.record.TempTokenInfo;
+import kr.modusplant.domains.account.social.usecase.request.SocialAuthRequest;
+import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
 import kr.modusplant.domains.account.social.usecase.response.SocialLoginResponse;
 import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.framework.jackson.http.response.DataResponse;

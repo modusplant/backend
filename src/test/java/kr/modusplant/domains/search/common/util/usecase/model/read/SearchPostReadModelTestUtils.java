@@ -13,7 +13,7 @@ import static kr.modusplant.domains.search.common.constant.SearchBooleanConstant
 import static kr.modusplant.domains.search.common.constant.SearchBooleanConstant.TEST_SEARCH_POST_IS_LIKED;
 import static kr.modusplant.domains.search.common.constant.SearchDoubleConstant.TEST_SEARCH_KEYWORD_SIMILARITY_0_8;
 import static kr.modusplant.domains.search.common.constant.SearchDoubleConstant.TEST_SEARCH_KEYWORD_SIMILARITY_1;
-import static kr.modusplant.domains.search.common.constant.SearchIntegerConstant.*;
+import static kr.modusplant.domains.search.common.constant.SearchIntegerConstant.TEST_SEARCH_POST_COMMENT_COUNT;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.*;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
 import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
