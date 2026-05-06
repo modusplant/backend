@@ -15,6 +15,7 @@ public class EmptySearchPostOption extends SearchPostOption {
     }
 
     public static EmptySearchPostOption create() {
-        return new EmptySearchPostOption();
+        return instance;
     }
+    private static final EmptySearchPostOption instance = new EmptySearchPostOption();
 }

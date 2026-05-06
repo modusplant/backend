@@ -2,8 +2,8 @@ package kr.modusplant.domains.account.social.adapter;
 
 import io.jsonwebtoken.Claims;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
-import kr.modusplant.domains.account.social.usecase.record.TempTokenInfo;
 import kr.modusplant.domains.account.social.usecase.record.SocialPendingResult;
+import kr.modusplant.domains.account.social.usecase.record.TempTokenInfo;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
