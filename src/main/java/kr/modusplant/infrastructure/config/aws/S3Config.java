@@ -28,8 +28,23 @@ public class S3Config {
     @Value("${cloud.wasabi.s3.secret-key}")
     private String secretKey;
 
+    @Value("${cloud.wasabi.s3.connection-timeout}")
+    private Integer connectionTimeout;
+
+    @Value("${cloud.wasabi.s3.socket-timeout}")
+    private Integer socketTimeout;
+
     @Value("${cloud.wasabi.s3.max-connections}")
     private Integer maxConnections;
+
+    @Value("${cloud.wasabi.s3.connection-max-idle-time}")
+    private Integer connectionMaxIdleTime;
+
+    @Value("${cloud.wasabi.s3.connection-ttl}")
+    private Integer connectionTimeToLive;
+
+    @Value("${cloud.wasabi.s3.connection-acquisition-timeout}")
+    private Integer connectionAcquisitionTimeout;
 
     @Bean
     public S3Client s3Client() {
@@ -42,11 +57,12 @@ public class S3Config {
                         .pathStyleAccessEnabled(true)
                         .build())
                 .httpClientBuilder(ApacheHttpClient.builder()
-                        .connectionTimeout(Duration.ofSeconds(3))
-                        .socketTimeout(Duration.ofSeconds(30))
+                        .connectionTimeout(Duration.ofSeconds(connectionTimeout))
+                        .socketTimeout(Duration.ofSeconds(socketTimeout))
                         .maxConnections(maxConnections)
-                        .connectionMaxIdleTime(Duration.ofSeconds(30))
-                        .connectionTimeToLive(Duration.ofMinutes(5)))
+                        .connectionMaxIdleTime(Duration.ofSeconds(connectionMaxIdleTime))
+                        .connectionTimeToLive(Duration.ofSeconds(connectionTimeToLive))
+                        .connectionAcquisitionTimeout(Duration.ofSeconds(connectionAcquisitionTimeout)))
                 .credentialsProvider(StaticCredentialsProvider.create(
                         AwsBasicCredentials.create(accessKey, secretKey)))
                 .serviceConfiguration(S3Configuration.builder()
