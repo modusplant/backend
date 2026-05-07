@@ -121,4 +121,8 @@ cloud:
       access-key: ${WASABI_ACCESS_KEY}
       secret-key: ${WASABI_SECRET_KEY}
       bucket: ${WASABI_BUCKET}
-
+      connection-timeout: 3
+      socket-timeout: 30
+      connection-max-idle-time: 30
+      connection-ttl: 300
+      connection-acquisition-timeout: 5
