@@ -2,9 +2,9 @@
 server:
   tomcat:
     threads:
-      max: 15
+      max: 20
     max-connections: 100
-    accept-count: 20
+    accept-count: 30
 
 # Application
 app:
