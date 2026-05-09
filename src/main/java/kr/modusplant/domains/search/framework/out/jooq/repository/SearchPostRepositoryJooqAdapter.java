@@ -312,13 +312,13 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
         if (isTitle) {
             indexMatchCondition = indexMatchCondition.or(condition("{0} %> {1}", COMM_POST.TITLE, keywordParam));
             if (passWithLowWordSimilarity) {
-                indexMatchCondition.or(ilikeConditionForTitle);
+                indexMatchCondition = indexMatchCondition.or(ilikeConditionForTitle);
             }
         }
         if (isContent) {
             indexMatchCondition = indexMatchCondition.or(condition("{0} %> {1}", COMM_POST.CONTENT_TEXT, keywordParam));
             if (passWithLowWordSimilarity) {
-                indexMatchCondition.or(ilikeConditionForContent);
+                indexMatchCondition = indexMatchCondition.or(ilikeConditionForContent);
             }
         }
         if (isComment) {
