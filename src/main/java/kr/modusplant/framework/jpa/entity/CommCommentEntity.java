@@ -78,6 +78,8 @@ public class CommCommentEntity {
 
     public void updateContent(String content) { this.content = content; }
 
+    public void updateEditedAt() { this.editedAt = LocalDateTime.now(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
