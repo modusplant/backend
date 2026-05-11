@@ -137,6 +137,10 @@ flyway {
 	url = jdbcConnectionUrl
 	user = jdbcUsername
 	password = jdbcPassword
+	locations = [
+			'classpath:db/migration',
+			'db.migration.data.reference'
+	]
 	cleanDisabled = false
 	baselineOnMigrate = true
 	baselineVersion = '0.0.0'
