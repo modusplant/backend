@@ -47,10 +47,21 @@ def requiredEnvOrProp = { String envName, String propName ->
     throw new GradleException("환경변수 ${envName} 또는 -P${propName} 중 하나는 반드시 설정되어야 합니다.")
 }
 
+def requiredPropOrDefault = { String propName, Boolean defaultName ->
+	def propVal = project.hasProperty(propName) ? project.property(propName) : null
+	if (propVal != null) {
+		// propVal 객체를 문자열로 변환한 뒤, 다시 불리언으로 명시적 변환하여 반환
+		return propVal.toString().toBoolean()
+	}
+
+	return defaultName
+}
+
 ext {
-    jdbcConnectionUrl = requiredEnvOrProp('JDBC_CONNECTION_URL', 'jdbcConnectionUrl')
-    jdbcUsername      = requiredEnvOrProp('JDBC_USERNAME', 'jdbcUsername')
-    jdbcPassword      = requiredEnvOrProp('JDBC_PASSWORD', 'jdbcPassword')
+    jdbcConnectionUrl 	= requiredEnvOrProp('JDBC_CONNECTION_URL', 'jdbcConnectionUrl')
+    jdbcUsername      	= requiredEnvOrProp('JDBC_USERNAME', 'jdbcUsername')
+    jdbcPassword      	= requiredEnvOrProp('JDBC_PASSWORD', 'jdbcPassword')
+	flywayCleanDisabled = requiredPropOrDefault('flywayCleanDisabled', true)
 }
 
 dependencies {
@@ -137,12 +148,13 @@ flyway {
 	url = jdbcConnectionUrl
 	user = jdbcUsername
 	password = jdbcPassword
-	cleanDisabled = false
-	baselineOnMigrate = true
-	baselineVersion = '0.0.0'
+	cleanDisabled = flywayCleanDisabled
 	outOfOrder = false
+	locations = ['classpath:db/migration/data/seed', 'classpath:db/migration/schema'] // java.main에 있는 마이그레이션 클래스 제외
 	encoding = 'UTF-8'
 	detectEncoding = true
+	baselineOnMigrate = true
+	baselineVersion = '0.0.0'
 	schemas = ['public']
 }
 
@@ -189,16 +201,10 @@ tasks.withType(JavaCompile).configureEach {
 
 tasks.named('compileJava') {
 	dependsOn tasks.named('jooqCodegen')
-	dependsOn tasks.named('flywayMigrate')
-
-	tasks.named('jooqCodegen').get().mustRunAfter(tasks.named('flywayMigrate'))
 }
 
 tasks.named('compileTestJava') {
 	dependsOn tasks.named('jooqCodegen')
-	dependsOn tasks.named('flywayMigrate')
-
-	tasks.named('jooqCodegen').get().mustRunAfter(tasks.named('flywayMigrate'))
 }
 
 tasks.named('jooqCodegen') {
