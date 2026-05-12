@@ -1,15 +1,16 @@
-package kr.modusplant.infrastructure.event.consumer;
+package kr.modusplant.infrastructure.event.listener;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
-import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.ImageRemoveEvent;
 import kr.modusplant.shared.event.MemberWithdrawalEvent;
 import kr.modusplant.shared.event.RecentlyViewPostRemoveEvent;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jooq.DSLContext;
 import org.jooq.JSONB;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -22,31 +23,19 @@ import static kr.modusplant.jooq.Tables.*;
 import static org.jooq.impl.DSL.*;
 
 @Component
-public class MemberEventConsumer {
+@RequiredArgsConstructor
+public class MemberEventListener {
     private final StringRedisTemplate stringRedisTemplate;
     private final DSLContext dsl;
     private final ApplicationEventPublisher eventPublisher;
     private final JsonbJsonNodeConverter jsonbJsonNodeConverter = new JsonbJsonNodeConverter();
 
-    public MemberEventConsumer(EventBus eventBus,
-                               StringRedisTemplate stringRedisTemplate,
-                               DSLContext dsl,
-                               ApplicationEventPublisher eventPublisher) {
-        eventBus.subscribe(event -> {
-            if (event instanceof MemberWithdrawalEvent memberWithdrawalEvent) {
-                deleteAllWithMemberPKAndAlterAllWithMemberFK(
-                        memberWithdrawalEvent.getMemberId(),
-                        memberWithdrawalEvent.getReason(),
-                        memberWithdrawalEvent.getOpinion()
-                );
-            }
-        });
-        this.stringRedisTemplate = stringRedisTemplate;
-        this.dsl = dsl;
-        this.eventPublisher = eventPublisher;
-    }
+    @EventListener
+    public void handleMemberWithdrawalEvent(MemberWithdrawalEvent memberWithdrawalEvent) {
+        UUID memberId = memberWithdrawalEvent.getMemberId();
+        String reason = memberWithdrawalEvent.getReason();
+        String opinion = memberWithdrawalEvent.getOpinion();
 
-    private void deleteAllWithMemberPKAndAlterAllWithMemberFK(UUID memberId, String reason, String opinion) {
         stringRedisTemplate.unlink("recentlyView:member:%s:posts".formatted(memberId));     // 최근에 본 게시글 데이터 삭제
 
         String[] publishedPostUlids = dsl.select(COMM_POST.ULID)    // 발행되어 타 회원이 접근할 수 있는 게시글 ID 획득
