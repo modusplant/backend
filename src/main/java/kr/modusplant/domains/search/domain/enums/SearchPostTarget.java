@@ -14,4 +14,20 @@ public enum SearchPostTarget {
     SearchPostTarget(String value) {
         this.value = value;
     }
+
+    public boolean containsTitle() {
+        return this == SearchPostTarget.TITLE ||
+                this == SearchPostTarget.TITLE_CONTENT ||
+                this == SearchPostTarget.TITLE_CONTENT_COMMENT;
+    }
+
+    public boolean containsContent() {
+        return this == SearchPostTarget.CONTENT ||
+                this == SearchPostTarget.TITLE_CONTENT ||
+                this == SearchPostTarget.TITLE_CONTENT_COMMENT;
+    }
+
+    public boolean containsComment() {
+        return this == SearchPostTarget.TITLE_CONTENT_COMMENT;
+    }
 }
