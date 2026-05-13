@@ -1,0 +1,1 @@
+ALTER TABLE public.comm_comment ADD COLUMN edited_at TIMESTAMP WITHOUT TIME ZONE;

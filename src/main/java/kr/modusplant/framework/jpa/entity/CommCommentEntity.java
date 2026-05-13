@@ -61,6 +61,9 @@ public class CommCommentEntity {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    @Column(name = "edited_at")
+    private LocalDateTime editedAt;
+
     public void increaseLikeCount() {
         this.likeCount++;
     }
@@ -74,6 +77,8 @@ public class CommCommentEntity {
     }
 
     public void updateContent(String content) { this.content = content; }
+
+    public void updateEditedAt() { this.editedAt = LocalDateTime.now(); }
 
     @Override
     public boolean equals(Object o) {

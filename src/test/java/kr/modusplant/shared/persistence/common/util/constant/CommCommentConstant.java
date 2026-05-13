@@ -14,4 +14,5 @@ public final class CommCommentConstant {
     public static final Boolean TEST_COMM_POST_IS_DELETED_FALSE = false;
     public static final LocalDateTime TEST_COMM_COMMENT_CREATED_AT = LocalDateTime.of(2026, 4, 25, 0, 0);
     public static final LocalDateTime TEST_COMM_COMMENT_UPDATED_AT = LocalDateTime.of(2026, 4, 27, 12, 0);
+    public static final LocalDateTime TEST_COMM_COMMENT_EDITED_AT = LocalDateTime.of(2026, 4, 28, 5, 0);
 }

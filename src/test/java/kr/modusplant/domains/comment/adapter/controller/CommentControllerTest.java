@@ -16,7 +16,7 @@ import kr.modusplant.domains.comment.framework.out.persistence.jooq.CommentJooqR
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentRepositoryJpaAdapter;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
-import kr.modusplant.domains.comment.usecase.port.outbound.CommentPostValidator;
+import kr.modusplant.domains.comment.usecase.port.client.CommentPostRepository;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
@@ -63,7 +63,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     private final CommPostJpaRepository postJpaRepository = Mockito.mock(CommPostJpaRepository.class);
     private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
     private final SwearService swearService = Mockito.mock(SwearService.class);
-    private final CommentPostValidator postValidator = Mockito.mock(CommentPostValidator.class);
+    private final CommentPostRepository postValidator = Mockito.mock(CommentPostRepository.class);
     private final CommentCacheService cacheService = Mockito.mock(CommentCacheService.class);
     private final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
     private final CommentController controller = new CommentController(mapper, readRepository,
@@ -173,7 +173,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
 
         // then
         assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(mockResponse);
+        assertThat(result.getFirst()).isEqualTo(mockResponse);
         then(readRepository).should(times(1))
                 .findByPost(PostId.create(TEST_COMM_POST_ULID), Author.createNullable(MEMBER_BASIC_USER_UUID));
     }
@@ -197,7 +197,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
 
         // then
         assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(mockResponse);
+        assertThat(result.getFirst()).isEqualTo(mockResponse);
     }
 
     @Test

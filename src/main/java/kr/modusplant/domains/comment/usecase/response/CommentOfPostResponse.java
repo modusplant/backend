@@ -10,7 +10,7 @@ public record CommentOfPostResponse(
         int likeCount,
         boolean isLiked,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt,
+        LocalDateTime editedAt,
         boolean isDeleted
 ) {
 }

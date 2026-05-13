@@ -72,7 +72,7 @@ public class CommentJooqRepository implements CommentReadRepository {
                         isLiked,
                         commComment.CREATED_AT,
                         commComment.IS_DELETED,
-                        commComment.UPDATED_AT)
+                        commComment.EDITED_AT)
                 .from(commComment)
                 .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
                 .join(memberProf).on(commComment.AUTH_MEMB_UUID.eq(memberProf.UUID))
@@ -87,7 +87,8 @@ public class CommentJooqRepository implements CommentReadRepository {
                         record.getValue(commComment.LIKE_COUNT),
                         record.getValue(isLiked),
                         record.getValue(commComment.CREATED_AT).withNano(0),
-                        record.getValue(commComment.UPDATED_AT).withNano(0),
+                        record.getValue(commComment.EDITED_AT) == null ? null : record.getValue(commComment.EDITED_AT).withNano(0),
+//                        record.getValue(commComment.EDITED_AT).withNano(0),
                         record.getValue(commComment.IS_DELETED)
                 ));
 
