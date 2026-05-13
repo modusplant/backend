@@ -41,6 +41,8 @@ spring:
       pool-name: ProdHikariPool
       maximum-pool-size: 70
       minimum-idle: 16
+  flyway:
+    clean-disabled: true
   jpa:
     properties:
       hibernate:
