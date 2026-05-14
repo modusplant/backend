@@ -1,11 +1,10 @@
 package kr.modusplant.infrastructure.security.context;
 
-import kr.modusplant.infrastructure.config.aws.TestS3Config;
-import kr.modusplant.infrastructure.config.jdbc.TestThrottledDataSourceConfig;
-import kr.modusplant.infrastructure.config.jpa.TestJpaConfig;
-import kr.modusplant.infrastructure.config.redis.TestRedisConfig;
-import kr.modusplant.infrastructure.security.config.TestSecurityConfig;
-import kr.modusplant.infrastructure.security.initializer.MockPasswordEncoderInitializer;
+import kr.modusplant.infrastructure.config.aws.S3Config;
+import kr.modusplant.infrastructure.config.jdbc.ThrottledDataSourceConfig;
+import kr.modusplant.infrastructure.config.jpa.JpaConfig;
+import kr.modusplant.infrastructure.config.redis.RedisConfig;
+import kr.modusplant.infrastructure.security.config.SecurityConfig;
 import kr.modusplant.shared.common.postprocessor.MockGlobalRepositoryBeanFactoryPostProcessor;
 import kr.modusplant.shared.common.postprocessor.MockGlobalServiceBeanFactoryPostProcessor;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,14 +27,13 @@ import java.lang.annotation.*;
 @WebMvcTest(useDefaultFilters = false)
 @ContextConfiguration(
         classes = {
-                TestThrottledDataSourceConfig.class,
-                TestJpaConfig.class,
-                TestRedisConfig.class,
-                TestS3Config.class,
-                TestSecurityConfig.class,
+                ThrottledDataSourceConfig.class,
+                JpaConfig.class,
+                RedisConfig.class,
+                S3Config.class,
+                SecurityConfig.class,
                 MockGlobalRepositoryBeanFactoryPostProcessor.class,
-                MockGlobalServiceBeanFactoryPostProcessor.class},
-        initializers = MockPasswordEncoderInitializer.class
+                MockGlobalServiceBeanFactoryPostProcessor.class}
 )
 @AutoConfigureMockMvc
 @ComponentScan(

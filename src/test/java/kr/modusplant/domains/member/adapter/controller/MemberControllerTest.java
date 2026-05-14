@@ -72,12 +72,11 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberProf
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberWithdrawalRecordTestUtils.testKakaoMemberWithdrawalRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
-import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRemoveRecordTestUtils.testProposalOrBugReportRemoveRecord;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.EXISTS_COMMENT_ABUSE_REPORT;
 import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.EXISTS_POST_ABUSE_REPORT;
-import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.objectMapper;
+import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static kr.modusplant.shared.exception.enums.GeneralErrorCode.INVALID_FILE_INPUT;
 import static kr.modusplant.shared.exception.enums.GeneralErrorCode.INVALID_INPUT;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
@@ -128,7 +127,6 @@ class MemberControllerTest implements
     private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
     private final NotFoundEntityException notFoundEntityExceptionForTargetPost = new NotFoundEntityException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
     private final NotFoundEntityException notFoundEntityExceptionForTargetComment = new NotFoundEntityException(NOT_FOUND_TARGET_COMMENT_ID, "targetCommentId");
-    private final NotFoundEntityException notFoundEntityExceptionForReport = new NotFoundEntityException(NOT_FOUND_REPORT_ID, "reportId");
 
     @Nested
     @DisplayName("checkExistedNickname으로 회원 닉네임 중복 확인")
@@ -937,34 +935,6 @@ class MemberControllerTest implements
 
         // then
         assertThat(exception.getErrorCode()).isEqualTo(INVALID_REPORT_IMAGE_NAME);
-    }
-
-    @Test
-    @DisplayName("removeProposalOrBug로 건의 및 버그 제보 제거")
-    void testRemoveProposalOrBug_givenValidRecord_willRemoveProposalOrBugReport() {
-        // given
-        willDoNothing().given(memberValidationHelper).validateIfReportExists(any());
-        willDoNothing().given(applicationEventPublisher).publishEvent(any(ProposalOrBugReportRemoveEvent.class));
-
-        // when
-        memberController.removeProposalOrBug(testProposalOrBugReportRemoveRecord);
-
-        // then
-        verify(applicationEventPublisher, times(1)).publishEvent(any(ProposalOrBugReportRemoveEvent.class));
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 보고서로 인해 removeProposalOrBug로 건의 및 버그 제보 제거 실패")
-    void testRemoveProposalOrBug_givenNotFoundReportId_willThrowException() {
-        // given
-        willThrow(notFoundEntityExceptionForReport).given(memberValidationHelper).validateIfReportExists(any());
-
-        // when
-        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
-                () -> memberController.removeProposalOrBug(testProposalOrBugReportRemoveRecord));
-
-        // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_REPORT_ID);
     }
 
     @Test
