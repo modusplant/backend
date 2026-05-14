@@ -137,7 +137,7 @@ public class TokenService {
         Map<String,String> claims = new HashMap<>();
         claims.put("nickname", nickname);
         claims.put("email",email);
-        claims.put("role", role.name());
+        claims.put("roles", role.name());
         return claims;
     }
 

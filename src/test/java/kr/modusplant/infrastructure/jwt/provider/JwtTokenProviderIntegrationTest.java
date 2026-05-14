@@ -57,7 +57,7 @@ class JwtTokenProviderIntegrationTest {
         String payloadJson = new String(Base64.getUrlDecoder().decode(payloadBase64));
         assertTrue(payloadJson.contains("\"sub\":\"" + uuid + "\""));
         assertTrue(payloadJson.contains("\"nickname\":\"test\""));
-        assertTrue(payloadJson.contains("\"role\":\"ROLE_USER\""));
+        assertTrue(payloadJson.contains("\"roles\":\"ROLE_USER\""));
     }
 
     @Test
@@ -140,7 +140,7 @@ class JwtTokenProviderIntegrationTest {
         assertThat(extractedExpiration.getTime()).isEqualTo(extractedIssuedAt.getTime() + 1800000L);
 
         assertThat(extractedClaims.get("nickname",String.class)).isEqualTo(claims.get("nickname"));
-        assertThat(extractedClaims.get("role",String.class)).isEqualTo(claims.get("role"));
+        assertThat(extractedClaims.get("roles",String.class)).isEqualTo(claims.get("roles"));
     }
 
     @Test
@@ -191,7 +191,7 @@ class JwtTokenProviderIntegrationTest {
     private Map<String,String> createDefaultClaims() {
         return Map.of(
                 "nickname", "test",
-                "role","ROLE_USER"
+                "roles","ROLE_USER"
         );
     }
 }
