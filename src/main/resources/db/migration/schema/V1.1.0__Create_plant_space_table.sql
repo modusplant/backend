@@ -4,9 +4,9 @@ CREATE TABLE public.plant_space (
      member_uuid             UUID            NOT NULL,
      space_location          VARCHAR(20)     NOT NULL,
      space_location_custom   VARCHAR(100)    NULL,
-     is_default              CHAR(1)         NOT NULL DEFAULT 'N',
+     is_default              BOOLEAN         NOT NULL DEFAULT FALSE,
      light_intensity         SMALLINT        NULL,
-     plant_light_yn          CHAR(1)         NULL,
+     is_plant_light          BOOLEAN         NULL DEFAULT FALSE,
      light_direction         VARCHAR(20)     NULL,
      light_direction_custom  VARCHAR(100)    NULL,
      ventilation_type        VARCHAR(20)     NULL,
@@ -24,7 +24,7 @@ CREATE UNIQUE INDEX uix_plant_space_member_location
 
 CREATE UNIQUE INDEX uix_plant_space_member_default
     ON plant_space (member_uuid)
-    WHERE is_default = 'Y';
+    WHERE is_default = true;
 
 CREATE INDEX idx_plant_space_member_id ON plant_space (member_uuid);
 
@@ -48,9 +48,9 @@ COMMENT ON COLUMN plant_space.id                      IS 'PK';
 COMMENT ON COLUMN plant_space.member_uuid             IS 'site_member FK';
 COMMENT ON COLUMN plant_space.space_location          IS '공간 위치 코드 (BALCONY:베란다 / OUTDOOR:야외 / INDOOR_WINDOW:실내(창문있음) / INDOOR_NO_WINDOW:실내(창문없음) / CUSTOM:직접입력)';
 COMMENT ON COLUMN plant_space.space_location_custom   IS '공간 위치 직접 입력값 — space_location = CUSTOM 일 때만 사용';
-COMMENT ON COLUMN plant_space.is_default              IS '기본 공간 여부 (Y/N)';
+COMMENT ON COLUMN plant_space.is_default              IS '기본 공간 여부 (true/false)';
 COMMENT ON COLUMN plant_space.light_intensity         IS '빛의 세기 (1:아주약함 / 2:약함 / 3:보통 / 4:강함 / 5:아주강함)';
-COMMENT ON COLUMN plant_space.plant_light_yn          IS '식물등 사용 여부 (Y/N)';
+COMMENT ON COLUMN plant_space.is_plant_light          IS '식물등 사용 여부';
 COMMENT ON COLUMN plant_space.light_direction         IS '빛의 방향 코드 (SOUTH:남향 / WEST:서향 / NORTH:북향 / EAST:동향 / CUSTOM:직접입력)';
 COMMENT ON COLUMN plant_space.light_direction_custom  IS '빛의 방향 직접 입력값 — light_direction = CUSTOM 일 때만 사용';
 COMMENT ON COLUMN plant_space.ventilation_type        IS '환기 방식 코드 (FAN:선풍기 / CIRCULATOR:서큘레이터 / NATURAL:자연환기 / NONE:환기없음 / CUSTOM:직접입력)';
