@@ -14,12 +14,7 @@ CREATE TABLE public.plant_space (
      humidity                DECIMAL(5, 2)   NULL,
      created_at              timestamp without time zone NOT NULL DEFAULT NOW(),
      updated_at              timestamp without time zone NOT NULL DEFAULT NOW(),
-     CONSTRAINT pk_plant_space        PRIMARY KEY (id),
-     CONSTRAINT fk_plant_space_member FOREIGN KEY (member_uuid) REFERENCES site_member (uuid) ON DELETE CASCADE,
-     CONSTRAINT chk_is_default        CHECK (is_default      IN ('Y','N')),
-     CONSTRAINT chk_light_intensity   CHECK (light_intensity BETWEEN 1 AND 5),
-     CONSTRAINT chk_plant_light_yn    CHECK (plant_light_yn  IN ('Y','N')),
-     CONSTRAINT chk_humidity          CHECK (humidity BETWEEN 0 AND 100)
+     CONSTRAINT pk_plant_space        PRIMARY KEY (id)
 );
 
 -- 인덱스 추가

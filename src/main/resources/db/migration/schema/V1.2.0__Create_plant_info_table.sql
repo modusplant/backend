@@ -10,10 +10,7 @@ CREATE TABLE public.plant_info (
     grown_since  date,
     created_at   timestamp without time zone NOT NULL DEFAULT NOW(),
     updated_at   timestamp without time zone NOT NULL DEFAULT NOW(),
-    CONSTRAINT plant_info_pkey PRIMARY KEY (id),
-    CONSTRAINT fk_plant_info_member     FOREIGN KEY (member_uuid) REFERENCES site_member(uuid) ON DELETE CASCADE,
-    CONSTRAINT fk_plant_info_plant FOREIGN KEY (plant_id) REFERENCES public.plant(id),
-    CONSTRAINT fk_plant_info_space    FOREIGN KEY (space_id)  REFERENCES public.plant_space(id) ON DELETE SET NULL
+    CONSTRAINT plant_info_pkey PRIMARY KEY (id)
 );
 
 -- 인덱스 추가
@@ -32,8 +29,7 @@ CREATE TABLE public.plant_info_photo (
     sort_order     int2        NOT NULL DEFAULT 1,
     created_at   timestamp without time zone NOT NULL DEFAULT NOW(),
     updated_at   timestamp without time zone NOT NULL DEFAULT NOW(),
-    CONSTRAINT plant_info_photo_pkey PRIMARY KEY (id),
-    CONSTRAINT fk_photo_plant_info FOREIGN KEY (plant_info_id) REFERENCES public.plant_info(id) ON DELETE CASCADE
+    CONSTRAINT plant_info_photo_pkey PRIMARY KEY (id)
 );
 
 -- 인덱스 추가

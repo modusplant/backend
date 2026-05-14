@@ -19,9 +19,7 @@ CREATE TABLE public.common_code (
      sort_order  SMALLINT        NOT NULL DEFAULT 0,
      is_active   BOOLEAN         NOT NULL DEFAULT TRUE,
      created_at   timestamp without time zone NOT NULL DEFAULT NOW(),
-     CONSTRAINT pk_common_code   PRIMARY KEY (group_code, code),
-     CONSTRAINT fk_common_code_group
-         FOREIGN KEY (group_code) REFERENCES public.common_code_group (group_code)
+     CONSTRAINT pk_common_code   PRIMARY KEY (group_code, code)
 );
 
 COMMENT ON TABLE  common_code                   IS '공통코드';
