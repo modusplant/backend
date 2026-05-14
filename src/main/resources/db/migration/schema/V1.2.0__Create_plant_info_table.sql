@@ -29,7 +29,8 @@ CREATE TABLE public.plant_info_photo (
     sort_order     int2        NOT NULL DEFAULT 1,
     created_at   timestamp without time zone NOT NULL DEFAULT NOW(),
     updated_at   timestamp without time zone NOT NULL DEFAULT NOW(),
-    CONSTRAINT plant_info_photo_pkey PRIMARY KEY (id)
+    CONSTRAINT plant_info_photo_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_photo_plant_info   FOREIGN KEY (plant_info_id) REFERENCES public.plant_info(id) ON DELETE CASCADE
 );
 
 -- 인덱스 추가
