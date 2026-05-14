@@ -242,14 +242,6 @@ public class MemberController {
                 ));
     }
 
-    public void removeProposalOrBug(ProposalOrBugReportRemoveRecord record) {
-        ReportId reportId = ReportId.create(record.reportUlid());
-        memberValidationHelper.validateIfReportExists(reportId);
-
-        applicationEventPublisher.publishEvent(
-                ProposalOrBugReportRemoveEvent.create(reportId.getValue()));
-    }
-
     public void reportPostAbuse(PostAbuseReportRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());

@@ -80,7 +80,7 @@ class TokenServiceTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntit
         claims = Map.of(
                 "nickname", nickname,
                 "email",email,
-                "role", role.name()
+                "roles", role.name()
         );
         expiredAt = Date.from(Instant.now().plusSeconds(3600));
     }

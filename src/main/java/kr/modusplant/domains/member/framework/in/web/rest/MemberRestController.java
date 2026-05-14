@@ -347,26 +347,6 @@ public class MemberRestController {
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
-    // TODO: 관리자 API로 활용 요망
-    @Hidden
-    @Operation(
-            summary = "건의 및 버그 제보 제거 API",
-            description = "건의 사항 또는 버그 제보를 제거합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
-    )
-//    @DeleteMapping(value = "/admin/report/proposal-or-bug/{reportUlid}")
-    public ResponseEntity<DataResponse<Void>> removeProposalOrBugReport(
-            @Parameter(
-                    description = "삭제할 보고서의 식별자",
-                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
-            )
-            @PathVariable
-            @NotBlank(message = "보고서 식별자가 비어 있습니다.")
-            String reportUlid) {
-        memberController.removeProposalOrBug(new ProposalOrBugReportRemoveRecord(reportUlid));
-        return ResponseEntity.ok().body(DataResponse.ok());
-    }
-
     @Hidden
     @Operation(
             summary = "게시글 신고 API",
