@@ -10,8 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ID_1;
+import static kr.modusplant.shared.persistence.common.util.constant.PrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
+import static kr.modusplant.shared.persistence.common.util.constant.SecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ID_1;
 
 public interface PostRequestTestUtils {
     /* MultipartFile, FileOrder Utils */

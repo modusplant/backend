@@ -6,15 +6,15 @@ import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentResponseTestUtils;
 import kr.modusplant.domains.comment.domain.vo.CommentContent;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper.CommentJpaMapper;
-import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.supers.CommentJpaRepository;
 import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
-import kr.modusplant.framework.jpa.entity.CommCommentEntity;
-import kr.modusplant.framework.jpa.entity.common.util.CommCommentEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.CommCommentIdTestUtils;
+import kr.modusplant.framework.jpa.entity.CommentEntity;
+import kr.modusplant.framework.jpa.entity.common.util.CommentEntityTestUtils;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.CommentJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.PostJpaRepository;
+import kr.modusplant.shared.persistence.compositekey.common.util.CommentCompositeKeyTestUtils;
 import kr.modusplant.shared.persistence.constant.TableName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,10 +31,10 @@ import static org.mockito.Mockito.verify;
 public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
         CommentResponseTestUtils, MemberIdTestUtils,
         AuthorTestUtils, CommentTestUtils,
-        CommCommentEntityTestUtils, CommCommentIdTestUtils {
-    private final SiteMemberJpaRepository memberRepository = Mockito.mock(SiteMemberJpaRepository.class);
+        CommentEntityTestUtils, CommentCompositeKeyTestUtils {
+    private final MemberJpaRepository memberRepository = Mockito.mock(MemberJpaRepository.class);
     private final CommentJpaRepository commentRepository = Mockito.mock(CommentJpaRepository.class);
-    private final CommPostJpaRepository postRepository = Mockito.mock(CommPostJpaRepository.class);
+    private final PostJpaRepository postRepository = Mockito.mock(PostJpaRepository.class);
     private final CommentJpaMapper mapper = Mockito.mock(CommentJpaMapper.class);
     private final CommentRepositoryJpaAdapter jpaAdapter = new CommentRepositoryJpaAdapter(
             memberRepository, postRepository, commentRepository, mapper);
@@ -59,18 +59,18 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
     @DisplayName("유효한 댓글 id와 내용으로 댓글 갱신")
     public void testUpdate_givenValidCommentIdAndContent_willSaveCommentWithNewContent() {
         // given
-        CommCommentEntity beforeUpdate = createCommCommentEntityBuilder()
+        CommentEntity beforeUpdate = createCommentEntityBuilder()
                 .content("content before updating.")
                 .build();
-        CommCommentEntity afterUpdate = createCommCommentEntityBuilder().build();
-        given(commentRepository.findById(testCommCommentId)).willReturn(Optional.of(beforeUpdate));
+        CommentEntity afterUpdate = createCommentEntityBuilder().build();
+        given(commentRepository.findById(TEST_COMMENT_ID)).willReturn(Optional.of(beforeUpdate));
         given(commentRepository.save(afterUpdate)).willReturn(null);
 
         // when
-        jpaAdapter.update(testCommCommentId, CommentContent.create(afterUpdate.getContent()));
+        jpaAdapter.update(TEST_COMMENT_ID, CommentContent.create(afterUpdate.getContent()));
 
         // then
-        verify(commentRepository, times(1)).findById(testCommCommentId);
+        verify(commentRepository, times(1)).findById(TEST_COMMENT_ID);
         verify(commentRepository, times(1)).save(afterUpdate);
     }
 
@@ -78,13 +78,13 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
     @DisplayName("무효한 댓글 id와 내용으로 댓글 갱신")
     public void testUpdate_givenInvalidCommentIdAndContent_willThrowError() {
         // given
-        CommCommentEntity afterUpdate = createCommCommentEntityBuilder().build();
-        given(commentRepository.findById(testCommCommentId)).willReturn(Optional.empty());
+        CommentEntity afterUpdate = createCommentEntityBuilder().build();
+        given(commentRepository.findById(TEST_COMMENT_ID)).willReturn(Optional.empty());
         given(commentRepository.save(afterUpdate)).willReturn(null);
 
         // when
         NotFoundEntityException ex = assertThrows(
-                NotFoundEntityException.class, () -> jpaAdapter.update(testCommCommentId, CommentContent.create(afterUpdate.getContent())));
+                NotFoundEntityException.class, () -> jpaAdapter.update(TEST_COMMENT_ID, CommentContent.create(afterUpdate.getContent())));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_COMMENT);

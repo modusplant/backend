@@ -2,9 +2,9 @@ package kr.modusplant.shared.event.common.util;
 
 import kr.modusplant.shared.event.MemberWithdrawalEvent;
 
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberWithdrawConstant.MEMBER_WITHDRAW_BASIC_USER_OPINION;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberWithdrawConstant.MEMBER_WITHDRAW_BASIC_USER_REASON;
+import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.MemberWithdrawConstant.MEMBER_WITHDRAW_BASIC_USER_OPINION;
+import static kr.modusplant.shared.persistence.common.util.constant.MemberWithdrawConstant.MEMBER_WITHDRAW_BASIC_USER_REASON;
 
 public interface MemberWithdrawalEventTestUtils {
     MemberWithdrawalEvent testMemberWithdrawalEvent = MemberWithdrawalEvent.create(

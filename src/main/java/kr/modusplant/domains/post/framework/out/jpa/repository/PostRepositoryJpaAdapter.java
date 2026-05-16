@@ -10,10 +10,10 @@ import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
 import kr.modusplant.domains.post.framework.out.redis.PostRecentlyViewRedisRepository;
 import kr.modusplant.domains.post.framework.out.redis.PostViewCountRedisRepository;
 import kr.modusplant.domains.post.usecase.port.repository.PostRepository;
-import kr.modusplant.framework.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.jpa.entity.CommPrimaryCategoryEntity;
-import kr.modusplant.framework.jpa.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
+import kr.modusplant.framework.jpa.entity.PostEntity;
+import kr.modusplant.framework.jpa.entity.PrimaryCategoryEntity;
+import kr.modusplant.framework.jpa.entity.SecondaryCategoryEntity;
 import kr.modusplant.framework.jpa.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -25,23 +25,23 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostRepositoryJpaAdapter implements PostRepository {
     private final PostJpaMapper postJpaMapper;
-    private final CommPostJpaRepository postJpaRepository;
-    private final SiteMemberJpaRepository authorJpaRepository;
-    private final CommPrimaryCategoryJpaRepository primaryCategoryJpaRepository;
-    private final CommSecondaryCategoryJpaRepository secondaryCategoryJpaRepository;
+    private final PostJpaRepository postJpaRepository;
+    private final MemberJpaRepository authorJpaRepository;
+    private final PrimaryCategoryJpaRepository primaryCategoryJpaRepository;
+    private final SecondaryCategoryJpaRepository secondaryCategoryJpaRepository;
     private final PostViewCountRedisRepository postViewCountRedisRepository;
-    private final CommPostLikeJpaRepository postLikeJpaRepository;
-    private final CommPostBookmarkJpaRepository postBookmarkJpaRepository;
+    private final PostLikeJpaRepository postLikeJpaRepository;
+    private final PostBookmarkJpaRepository postBookmarkJpaRepository;
     private final PostRecentlyViewRedisRepository postRecentlyViewRedisRepository;
 
     @Override
     public void save(Post post) {
         // post : category id, title, content는 null일수도 있음
-        SiteMemberEntity authorEntity = authorJpaRepository.findByUuid(post.getAuthorId().getValue()).orElseThrow(AuthorNotFoundException::new);
-        CommPrimaryCategoryEntity primaryCategoryEntity = post.getPrimaryCategoryId() != null
+        MemberEntity authorEntity = authorJpaRepository.findByUuid(post.getAuthorId().getValue()).orElseThrow(AuthorNotFoundException::new);
+        PrimaryCategoryEntity primaryCategoryEntity = post.getPrimaryCategoryId() != null
                 ? primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue()).orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID))
                 : null;
-        CommSecondaryCategoryEntity secondaryCategoryEntity = post.getSecondaryCategoryId() != null
+        SecondaryCategoryEntity secondaryCategoryEntity = post.getSecondaryCategoryId() != null
                 ? secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue())
                     .filter(secondaryCategory -> secondaryCategory.getPrimaryCategory().equals(primaryCategoryEntity))
                     .orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID))
@@ -53,11 +53,11 @@ public class PostRepositoryJpaAdapter implements PostRepository {
 
     @Override
     public void update(Post post) {
-        CommPostEntity postEntity = postJpaRepository.findByUlid(post.getPostId().getValue()).orElseThrow(PostNotFoundException::new);
-        CommPrimaryCategoryEntity primaryCategoryEntity = post.getPrimaryCategoryId() != null
+        PostEntity postEntity = postJpaRepository.findByUlid(post.getPostId().getValue()).orElseThrow(PostNotFoundException::new);
+        PrimaryCategoryEntity primaryCategoryEntity = post.getPrimaryCategoryId() != null
                 ? primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue()).orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID))
                 : null;
-        CommSecondaryCategoryEntity secondaryCategoryEntity = post.getSecondaryCategoryId() != null
+        SecondaryCategoryEntity secondaryCategoryEntity = post.getSecondaryCategoryId() != null
                 ? secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue())
                     .filter(secondaryCategory -> secondaryCategory.getPrimaryCategory().equals(primaryCategoryEntity))
                     .orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID))

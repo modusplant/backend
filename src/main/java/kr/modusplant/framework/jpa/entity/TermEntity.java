@@ -1,7 +1,6 @@
 package kr.modusplant.framework.jpa.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.shared.persistence.annotation.DefaultValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,7 +40,6 @@ public class TermEntity {
     private String content;
 
     @Column(name = "ver", nullable = false, length = 10)
-    @DefaultValue
     private String version;
 
     @Column(name = CREATED_AT, nullable = false, updatable = false)

@@ -5,8 +5,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_ADMIN_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.MEMBER_BASIC_ADMIN_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SiteMemberProfileConstant {

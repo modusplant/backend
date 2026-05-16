@@ -6,7 +6,7 @@ import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.shared.kernel.common.util.NicknameTestUtils;
 
-import static kr.modusplant.shared.persistence.common.util.constant.CommCommentConstant.TEST_COMM_COMMENT_CREATED_AT;
+import static kr.modusplant.shared.persistence.common.util.constant.CommentConstant.TEST_COMM_COMMENT_CREATED_AT;
 
 public interface CommentResponseTestUtils extends
         PostIdTestUtils, CommentPathTestUtils,

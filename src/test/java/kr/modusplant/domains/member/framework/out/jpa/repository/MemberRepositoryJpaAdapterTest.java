@@ -3,9 +3,9 @@ package kr.modusplant.domains.member.framework.out.jpa.repository;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberJpaMapperImpl;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
+import kr.modusplant.framework.jpa.entity.common.util.MemberEntityTestUtils;
+import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -18,9 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-class MemberRepositoryJpaAdapterTest implements MemberTestUtils, SiteMemberEntityTestUtils {
+class MemberRepositoryJpaAdapterTest implements MemberTestUtils, MemberEntityTestUtils {
     private final MemberJpaMapperImpl memberJpaMapper = new MemberJpaMapperImpl();
-    private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
+    private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
     private final MemberRepositoryJpaAdapter memberRepositoryJpaAdapter = new MemberRepositoryJpaAdapter(memberJpaMapper, memberJpaRepository);
 
     @Test
@@ -67,7 +67,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, SiteMemberEntit
     @DisplayName("add(Nickname nickname)로 Member 반환")
     void testAdd_givenValidNickname_willReturnMember() {
         // given
-        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         given(memberJpaRepository.save(any())).willReturn(memberEntity);
 
         // when & then
@@ -78,7 +78,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, SiteMemberEntit
     @DisplayName("add(MemberId memberId, Nickname nickname)로 Member 반환")
     void testAdd_givenValidMemberIdAndNickname_willReturnMember() {
         // given
-        SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         given(memberJpaRepository.save(any())).willReturn(memberEntity);
 
         // when & then

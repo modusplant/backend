@@ -4,7 +4,7 @@ import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberStatus;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.supers.MemberJpaMapper;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
 import kr.modusplant.shared.kernel.Nickname;
 import org.springframework.stereotype.Component;
 
@@ -12,17 +12,17 @@ import org.springframework.stereotype.Component;
 public class MemberJpaMapperImpl implements MemberJpaMapper {
 
     @Override
-    public SiteMemberEntity toMemberEntity(Nickname nickname) {
-        return SiteMemberEntity.builder().nickname(nickname.getValue()).build();
+    public MemberEntity toMemberEntity(Nickname nickname) {
+        return MemberEntity.builder().nickname(nickname.getValue()).build();
     }
 
     @Override
-    public SiteMemberEntity toMemberEntity(MemberId memberId, Nickname nickname) {
-        return SiteMemberEntity.builder().uuid(memberId.getValue()).nickname(nickname.getValue()).build();
+    public MemberEntity toMemberEntity(MemberId memberId, Nickname nickname) {
+        return MemberEntity.builder().uuid(memberId.getValue()).nickname(nickname.getValue()).build();
     }
 
     @Override
-    public Member toMember(SiteMemberEntity entity) {
+    public Member toMember(MemberEntity entity) {
         MemberStatus status;
         if (entity.getIsActive()) {
             status = MemberStatus.active();

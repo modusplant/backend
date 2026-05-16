@@ -9,7 +9,7 @@ import org.mockito.Mockito;
 
 import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.*;
 import static kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode.UNSUPPORTED_SOCIAL_PROVIDER;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;

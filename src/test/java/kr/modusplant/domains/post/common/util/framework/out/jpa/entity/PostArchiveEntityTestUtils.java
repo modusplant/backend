@@ -1,13 +1,13 @@
 package kr.modusplant.domains.post.common.util.framework.out.jpa.entity;
 
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
-import kr.modusplant.framework.jpa.entity.CommPostArchiveEntity;
+import kr.modusplant.framework.jpa.entity.PostArchiveEntity;
 
-import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.PostConstant.*;
 
 public interface PostArchiveEntityTestUtils extends PostTestUtils {
-    default CommPostArchiveEntity createPostArchiveEntity() {
-        return CommPostArchiveEntity.builder()
+    default PostArchiveEntity createPostArchiveEntity() {
+        return PostArchiveEntity.builder()
                 .ulid(testPostId.getValue())
                 .primaryCategoryId(testPrimaryCategoryId.getValue())
                 .secondaryCategoryId(testSecondaryCategoryId.getValue())

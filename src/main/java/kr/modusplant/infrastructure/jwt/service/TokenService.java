@@ -1,11 +1,11 @@
 package kr.modusplant.infrastructure.jwt.service;
 
 
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberAuthJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
 import kr.modusplant.infrastructure.jwt.exception.InvalidTokenException;
 import kr.modusplant.infrastructure.jwt.exception.TokenNotFoundException;
@@ -40,15 +40,15 @@ import java.util.UUID;
 @Transactional
 public class TokenService {
     private final JwtTokenProvider jwtTokenProvider;
-    private final SiteMemberJpaRepository siteMemberJpaRepository;
-    private final SiteMemberAuthJpaRepository siteMemberAuthJpaRepository;
+    private final MemberJpaRepository memberJpaRepository;
+    private final MemberAuthJpaRepository memberAuthJpaRepository;
     private final RefreshTokenJpaRepository refreshTokenJpaRepository;
     private final AccessTokenRedisRepository accessTokenRedisRepository;
 
     // 토큰 생성
     public TokenPair issueToken(UUID memberUuid, String nickname, String email, Role role) {
         // memberUuid 검증
-        if (memberUuid == null || !siteMemberJpaRepository.existsByUuid(memberUuid)) {
+        if (memberUuid == null || !memberJpaRepository.existsByUuid(memberUuid)) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER);
         }
 
@@ -60,7 +60,7 @@ public class TokenService {
         // refresh token DB에 저장
         refreshTokenJpaRepository.save(
                 RefreshTokenEntity.builder()
-                        .member(siteMemberJpaRepository.findByUuid(memberUuid).orElseThrow())                   // memberUuid로 member 가져오기
+                        .member(memberJpaRepository.findByUuid(memberUuid).orElseThrow())                   // memberUuid로 member 가져오기
                         .refreshToken(refreshToken)
                         .expiredAt(convertToLocalDateTime(jwtTokenProvider.getExpirationFromToken(refreshToken)))
                         .build()
@@ -77,7 +77,7 @@ public class TokenService {
 
         // refresh token 조회
         UUID memberUuid = jwtTokenProvider.getMemberUuidFromToken(refreshToken);
-        SiteMemberEntity memberEntity = siteMemberJpaRepository.findByUuid(memberUuid).orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER));
+        MemberEntity memberEntity = memberJpaRepository.findByUuid(memberUuid).orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER));
         RefreshTokenEntity refreshTokenEntity = refreshTokenJpaRepository.findByMemberAndRefreshToken(memberEntity,refreshToken).orElseThrow(TokenNotFoundException::new);
 
         // 토큰 삭제
@@ -97,9 +97,9 @@ public class TokenService {
         // token에서 사용자 정보 가져오기
         UUID memberUuid = jwtTokenProvider.getMemberUuidFromToken(refreshToken);
 
-        SiteMemberEntity memberEntity = siteMemberJpaRepository.findByUuid(memberUuid).orElseThrow(TokenNotFoundException::new);
-        Role role = siteMemberJpaRepository.findByUuid(memberUuid).orElseThrow(TokenNotFoundException::new).getRole();
-        String email = siteMemberAuthJpaRepository.findByMember(memberEntity).orElseThrow(TokenNotFoundException::new).getEmail();      // TODO: 연동 구현 시 이메일 선택 수정 필요
+        MemberEntity memberEntity = memberJpaRepository.findByUuid(memberUuid).orElseThrow(TokenNotFoundException::new);
+        Role role = memberJpaRepository.findByUuid(memberUuid).orElseThrow(TokenNotFoundException::new).getRole();
+        String email = memberAuthJpaRepository.findByMember(memberEntity).orElseThrow(TokenNotFoundException::new).getEmail();      // TODO: 연동 구현 시 이메일 선택 수정 필요
 
         // refresh token 재발급 (RTR기법)
         String reissuedRefreshToken = jwtTokenProvider.generateRefreshToken(memberUuid);

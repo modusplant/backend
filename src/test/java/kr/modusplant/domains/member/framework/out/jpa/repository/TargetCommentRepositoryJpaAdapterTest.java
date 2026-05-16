@@ -1,21 +1,21 @@
 package kr.modusplant.domains.member.framework.out.jpa.repository;
 
-import kr.modusplant.framework.jpa.repository.CommCommentJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommCommentLikeJpaRepository;
+import kr.modusplant.framework.jpa.repository.CommentJpaRepository;
+import kr.modusplant.framework.jpa.repository.CommentLikeJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.TargetCommentIdTestUtils.testTargetCommentId;
-import static kr.modusplant.shared.persistence.common.util.constant.CommCommentConstant.TEST_COMM_COMMENT_PATH;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
+import static kr.modusplant.shared.persistence.common.util.constant.CommentConstant.TEST_COMM_COMMENT_PATH;
+import static kr.modusplant.shared.persistence.common.util.constant.PostConstant.TEST_COMM_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 class TargetCommentRepositoryJpaAdapterTest {
-    CommCommentJpaRepository commPostJpaRepository = Mockito.mock(CommCommentJpaRepository.class);
-    CommCommentLikeJpaRepository commPostLikeJpaRepository = Mockito.mock(CommCommentLikeJpaRepository.class);
+    CommentJpaRepository commPostJpaRepository = Mockito.mock(CommentJpaRepository.class);
+    CommentLikeJpaRepository commPostLikeJpaRepository = Mockito.mock(CommentLikeJpaRepository.class);
     TargetCommentRepositoryJpaAdapter targetPostIdRepositoryJpaAdapter = new TargetCommentRepositoryJpaAdapter(commPostJpaRepository, commPostLikeJpaRepository);
 
     @Test

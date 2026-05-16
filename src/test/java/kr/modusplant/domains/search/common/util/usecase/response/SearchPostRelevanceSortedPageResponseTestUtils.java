@@ -9,7 +9,7 @@ import java.util.List;
 import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
 import static kr.modusplant.domains.search.common.constant.SearchDoubleConstant.TEST_SEARCH_KEYWORD_SIMILARITY_1;
 import static kr.modusplant.domains.search.common.util.usecase.response.SearchPostResponseTestUtils.testSearchPostResponse;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_PUBLISHED_AT;
+import static kr.modusplant.shared.persistence.common.util.constant.PostConstant.TEST_COMM_POST_PUBLISHED_AT;
 
 public interface SearchPostRelevanceSortedPageResponseTestUtils {
     SearchPostRelevanceSortedPageResponse<SearchPostResponse> testSearchPostLatestSortedPageResponse =

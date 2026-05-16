@@ -4,10 +4,10 @@ import kr.modusplant.domains.notification.domain.vo.RecipientId;
 import kr.modusplant.domains.notification.framework.out.jpa.mapper.supers.FcmTokenJpaMapper;
 import kr.modusplant.domains.notification.framework.out.jpa.repository.supers.FcmTokenJpaRepository;
 import kr.modusplant.framework.jpa.entity.FcmTokenEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
 import kr.modusplant.framework.jpa.entity.common.util.FcmTokenEntityTestUtils;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
 import kr.modusplant.shared.enums.Platform;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static kr.modusplant.shared.persistence.common.util.constant.FcmTokenConstant.*;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 
 class FcmTokenRepositoryJpaAdapterTest implements FcmTokenEntityTestUtils {
     private final FcmTokenJpaRepository fcmTokenJpaRepository = Mockito.mock(FcmTokenJpaRepository.class);
-    private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
+    private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
     private final FcmTokenJpaMapper fcmTokenJpaMapper = Mockito.mock(FcmTokenJpaMapper.class);
     private final FcmTokenRepositoryJpaAdapter fcmTokenRepositoryJpaAdapter = new FcmTokenRepositoryJpaAdapter(fcmTokenJpaRepository, memberJpaRepository, fcmTokenJpaMapper);
 
@@ -41,7 +41,7 @@ class FcmTokenRepositoryJpaAdapterTest implements FcmTokenEntityTestUtils {
         void testSaveOrUpdate_whenTokenExists_willUpdateEntity() {
             // given
             Platform platform = Platform.ANDROID;
-            SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+            MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
             FcmTokenEntity existingEntity = createAndroidFcmTokenEntityBuilder().member(memberEntity).build();
 
             given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));
@@ -61,7 +61,7 @@ class FcmTokenRepositoryJpaAdapterTest implements FcmTokenEntityTestUtils {
         void testSaveOrUpdate_whenTokenNotExists_willSaveNewEntity() {
             // given
             Platform platform = Platform.WEB;
-            SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+            MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
             FcmTokenEntity newEntity = createWebFcmTokenEntityBuilder().member(memberEntity).build();
 
             given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));
@@ -95,7 +95,7 @@ class FcmTokenRepositoryJpaAdapterTest implements FcmTokenEntityTestUtils {
         void testFindTokensByRecipientId_givenValidId_willReturnTokenList() {
             // given
             RecipientId recipientId = RecipientId.fromUuid(MEMBER_BASIC_USER_UUID);
-            SiteMemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+            MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
             FcmTokenEntity tokenEntity1 = createWebFcmTokenEntityBuilder().member(memberEntity).build();
             FcmTokenEntity tokenEntity2 = createIosFcmTokenEntityBuilder().member(memberEntity).build();
 

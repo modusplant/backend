@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT;
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT_THUMBNAIL_KEY;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_TITLE;
+import static kr.modusplant.shared.persistence.common.util.constant.PostConstant.TEST_COMM_POST_TITLE;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PostContentTest implements PostTestUtils {

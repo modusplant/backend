@@ -8,9 +8,9 @@ import kr.modusplant.domains.notification.domain.vo.NotificationStatus;
 import kr.modusplant.domains.notification.domain.vo.RecipientId;
 import kr.modusplant.domains.notification.framework.out.jpa.mapper.supers.NotificationJpaMapper;
 import kr.modusplant.domains.notification.framework.out.jpa.repository.supers.NotificationJpaRepository;
-import kr.modusplant.framework.jpa.entity.CommNotificationEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
+import kr.modusplant.framework.jpa.entity.NotificationEntity;
+import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
 import kr.modusplant.shared.enums.NotificationStatusType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -23,8 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.TEST_NOTIFICATION_RECIPIENT_ID;
-import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.TEST_NOTIFICATION_ULID;
+import static kr.modusplant.shared.persistence.common.util.constant.NotificationConstant.TEST_NOTIFICATION_RECIPIENT_ID;
+import static kr.modusplant.shared.persistence.common.util.constant.NotificationConstant.TEST_NOTIFICATION_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,9 +35,9 @@ import static org.mockito.Mockito.verify;
 
 class NotificationRepositoryJpaAdapterTest  implements NotificationTestUtils {
     private final NotificationJpaRepository notificationJpaRepository = Mockito.mock(NotificationJpaRepository.class);
-    private final SiteMemberJpaRepository siteMemberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
+    private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
     private final NotificationJpaMapper notificationJpaMapper = Mockito.mock(NotificationJpaMapper.class);
-    private final NotificationRepositoryJpaAdapter notificationRepositoryJpaAdapter = new NotificationRepositoryJpaAdapter(notificationJpaRepository, siteMemberJpaRepository,notificationJpaMapper);
+    private final NotificationRepositoryJpaAdapter notificationRepositoryJpaAdapter = new NotificationRepositoryJpaAdapter(notificationJpaRepository, memberJpaRepository,notificationJpaMapper);
 
     @Test
     @DisplayName("알림 단건 읽음 처리하기")
@@ -88,10 +88,10 @@ class NotificationRepositoryJpaAdapterTest  implements NotificationTestUtils {
         // given
         RecipientId recipientId = RecipientId.fromUuid(TEST_NOTIFICATION_RECIPIENT_ID);
         NotificationStatus notificationStatus = NotificationStatus.unread();
-        SiteMemberEntity recipientEntity = Mockito.mock(SiteMemberEntity.class);
+        MemberEntity recipientEntity = Mockito.mock(MemberEntity.class);
         long expectedCount = 7L;
 
-        given(siteMemberJpaRepository.findByUuid(TEST_NOTIFICATION_RECIPIENT_ID)).willReturn(Optional.of(recipientEntity));
+        given(memberJpaRepository.findByUuid(TEST_NOTIFICATION_RECIPIENT_ID)).willReturn(Optional.of(recipientEntity));
         given(notificationJpaRepository.countByRecipientAndStatus(recipientEntity, NotificationStatusType.UNREAD)).willReturn(expectedCount);
 
         // when
@@ -99,7 +99,7 @@ class NotificationRepositoryJpaAdapterTest  implements NotificationTestUtils {
 
         // then
         assertThat(result).isEqualTo(expectedCount);
-        verify(siteMemberJpaRepository, times(1)).findByUuid(TEST_NOTIFICATION_RECIPIENT_ID);
+        verify(memberJpaRepository, times(1)).findByUuid(TEST_NOTIFICATION_RECIPIENT_ID);
         verify(notificationJpaRepository, times(1)).countByRecipientAndStatus(recipientEntity, NotificationStatusType.UNREAD);
 
     }
@@ -114,10 +114,10 @@ class NotificationRepositoryJpaAdapterTest  implements NotificationTestUtils {
             // given
             int limit = 10;
             Notification notification = createPostLikedUnreadNotification(LocalDateTime.now());
-            SiteMemberEntity recipientEntity = Mockito.mock(SiteMemberEntity.class);
-            CommNotificationEntity savedEntity = Mockito.mock(CommNotificationEntity.class);
+            MemberEntity recipientEntity = Mockito.mock(MemberEntity.class);
+            NotificationEntity savedEntity = Mockito.mock(NotificationEntity.class);
 
-            given(siteMemberJpaRepository.findByUuid(any())).willReturn(Optional.of(recipientEntity));
+            given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(recipientEntity));
             given(recipientEntity.getUuid()).willReturn(TEST_NOTIFICATION_RECIPIENT_ID);
             given(notificationJpaMapper.toNotificationEntity(any(), any())).willReturn(savedEntity);
             given(notificationJpaRepository.save(any())).willReturn(savedEntity);
@@ -138,11 +138,11 @@ class NotificationRepositoryJpaAdapterTest  implements NotificationTestUtils {
             // given
             int limit = 5;
             Notification notification = createPostLikedUnreadNotification(LocalDateTime.now());
-            SiteMemberEntity recipientEntity = Mockito.mock(SiteMemberEntity.class);
-            CommNotificationEntity savedEntity = Mockito.mock(CommNotificationEntity.class);
+            MemberEntity recipientEntity = Mockito.mock(MemberEntity.class);
+            NotificationEntity savedEntity = Mockito.mock(NotificationEntity.class);
             String cutoffUlid = "01ARZ3NDEKTSV4RRFFQ69G5FAV";
 
-            given(siteMemberJpaRepository.findByUuid(any())).willReturn(Optional.of(recipientEntity));
+            given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(recipientEntity));
             given(recipientEntity.getUuid()).willReturn(TEST_NOTIFICATION_RECIPIENT_ID);
             given(notificationJpaMapper.toNotificationEntity(any(), any())).willReturn(savedEntity);
             given(notificationJpaRepository.save(any())).willReturn(savedEntity);
@@ -161,7 +161,7 @@ class NotificationRepositoryJpaAdapterTest  implements NotificationTestUtils {
         void testSaveWithLimit_givenInvalidRecipient_willThrowException() {
             // given
             Notification notification = createPostLikedUnreadNotification(LocalDateTime.now());
-            given(siteMemberJpaRepository.findByUuid(any())).willReturn(Optional.empty());
+            given(memberJpaRepository.findByUuid(any())).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> notificationRepositoryJpaAdapter.saveWithLimit(notification, 10))

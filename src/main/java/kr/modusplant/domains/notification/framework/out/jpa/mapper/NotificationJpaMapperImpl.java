@@ -3,15 +3,15 @@ package kr.modusplant.domains.notification.framework.out.jpa.mapper;
 import kr.modusplant.domains.notification.domain.aggregate.Notification;
 import kr.modusplant.domains.notification.domain.vo.*;
 import kr.modusplant.domains.notification.framework.out.jpa.mapper.supers.NotificationJpaMapper;
-import kr.modusplant.framework.jpa.entity.CommNotificationEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
+import kr.modusplant.framework.jpa.entity.NotificationEntity;
 import org.springframework.stereotype.Component;
 
 @Component
 public class NotificationJpaMapperImpl implements NotificationJpaMapper {
     @Override
-    public CommNotificationEntity toNotificationEntity(Notification notification, SiteMemberEntity recipient) {
-        return CommNotificationEntity.builder()
+    public NotificationEntity toNotificationEntity(Notification notification, MemberEntity recipient) {
+        return NotificationEntity.builder()
                 .recipient(recipient)
                 .actorId(notification.getActor().getId())
                 .actorNickname(notification.getActor().getNickname())
@@ -25,7 +25,7 @@ public class NotificationJpaMapperImpl implements NotificationJpaMapper {
     }
 
     @Override
-    public Notification toNotification(CommNotificationEntity notificationEntity) {
+    public Notification toNotification(NotificationEntity notificationEntity) {
         CommentPath commentPath = notificationEntity.getCommentPath() != null
                 ? CommentPath.create(notificationEntity.getCommentPath())
                 : null;

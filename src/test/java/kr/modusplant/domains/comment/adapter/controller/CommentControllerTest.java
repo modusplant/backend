@@ -22,14 +22,14 @@ import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
 import kr.modusplant.domains.member.domain.vo.MemberId;
-import kr.modusplant.framework.jpa.entity.common.util.CommCommentIdTestUtils;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.PostJpaRepository;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.persistence.compositekey.CommCommentId;
+import kr.modusplant.shared.persistence.compositekey.CommentCompositeKey;
+import kr.modusplant.shared.persistence.compositekey.common.util.CommentCompositeKeyTestUtils;
 import kr.modusplant.shared.persistence.constant.TableName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,8 +45,8 @@ import java.util.List;
 import static kr.modusplant.domains.comment.common.util.usecase.model.CommentOfAuthorPageModelTestUtils.testCommentOfAuthorPageModel;
 import static kr.modusplant.domains.comment.common.util.usecase.model.CommentOfPostReadModelTestUtils.testCommentOfPostReadModel;
 import static kr.modusplant.domains.comment.common.util.usecase.response.CommentPageResponseTestUtils.testCommentPageResponseOfAuthorPageModel;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.PostConstant.TEST_COMM_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -56,12 +56,12 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.times;
 
 public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
-        CommentResponseTestUtils, CommCommentIdTestUtils {
+        CommentResponseTestUtils, CommentCompositeKeyTestUtils {
     private final CommentMapperImpl mapper = Mockito.mock(CommentMapperImpl.class);
     private final CommentJooqRepository readRepository = Mockito.mock(CommentJooqRepository.class);
     private final CommentRepositoryJpaAdapter writeRepository = Mockito.mock(CommentRepositoryJpaAdapter.class);
-    private final CommPostJpaRepository postJpaRepository = Mockito.mock(CommPostJpaRepository.class);
-    private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
+    private final PostJpaRepository postJpaRepository = Mockito.mock(PostJpaRepository.class);
+    private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
     private final SwearService swearService = Mockito.mock(SwearService.class);
     private final CommentPostRepository postValidator = Mockito.mock(CommentPostRepository.class);
     private final CommentCacheService cacheService = Mockito.mock(CommentCacheService.class);
@@ -548,7 +548,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         // given
         String updatedContent = "updated content";
         CommentUpdateRequest request = new CommentUpdateRequest(TEST_COMM_POST_ULID, "1", updatedContent);
-        CommCommentId expectedId = CommCommentId.builder()
+        CommentCompositeKey expectedId = CommentCompositeKey.builder()
                 .post(TEST_COMM_POST_ULID)
                 .path("1")
                 .build();
@@ -569,7 +569,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     void testDelete_givenValidRequest_willCallSetCommentAsDeleted() {
         // given
         String commentPath = "1.2";
-        CommCommentId expectedId = CommCommentId.builder()
+        CommentCompositeKey expectedId = CommentCompositeKey.builder()
                 .post(TEST_COMM_POST_ULID)
                 .path(commentPath)
                 .build();

@@ -6,7 +6,7 @@ import kr.modusplant.domains.post.framework.out.jooq.mapper.supers.PostJooqMappe
 import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
-import kr.modusplant.framework.jpa.entity.CommPostEntity;
+import kr.modusplant.framework.jpa.entity.PostEntity;
 import org.jooq.Record;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,12 +16,12 @@ import java.util.UUID;
 
 import static kr.modusplant.jooq.Tables.COMM_POST;
 import static kr.modusplant.jooq.Tables.SITE_MEMBER;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ID_1;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.PrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
+import static kr.modusplant.shared.persistence.common.util.constant.PrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
+import static kr.modusplant.shared.persistence.common.util.constant.SecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
+import static kr.modusplant.shared.persistence.common.util.constant.SecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ID_1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -41,7 +41,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         Integer commentCount = 5;
         Boolean isLiked = true;
         Boolean isBookmarked = false;
-        CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
+        PostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
 
         // when
         given(record.get(COMM_POST.ULID)).willReturn(postEntity.getUlid());
@@ -87,7 +87,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         Integer commentCount = 0;
         Boolean isLiked = false;
         Boolean isBookmarked = false;
-        CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
+        PostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
 
         // when
         given(record.get(COMM_POST.ULID)).willReturn(postEntity.getUlid());
@@ -137,7 +137,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         LocalDateTime updatedAt = LocalDateTime.now();
         Boolean isLiked = true;
         Boolean isBookmarked = false;
-        CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
+        PostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
 
         // when
         given(record.get(COMM_POST.ULID)).willReturn(postEntity.getUlid());
@@ -192,7 +192,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         LocalDateTime updatedAt = LocalDateTime.now();
         Boolean isLiked = false;
         Boolean isBookmarked = false;
-        CommPostEntity postEntity = createDraftPostEntityBuilderWithUuid().build();
+        PostEntity postEntity = createDraftPostEntityBuilderWithUuid().build();
 
         // when
         given(record.get(COMM_POST.ULID)).willReturn(postEntity.getUlid());
@@ -244,7 +244,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         String primaryCategory = TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
         String secondaryCategory = TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
         LocalDateTime updatedAt = LocalDateTime.now();
-        CommPostEntity postEntity = createDraftPostEntityBuilderWithUuid().build();
+        PostEntity postEntity = createDraftPostEntityBuilderWithUuid().build();
 
         // when
         given(record.get(COMM_POST.ULID)).willReturn(postEntity.getUlid());

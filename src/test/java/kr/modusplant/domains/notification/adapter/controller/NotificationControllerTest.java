@@ -22,8 +22,8 @@ import org.mockito.Mockito;
 import java.util.List;
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.TEST_NOTIFICATION_RECIPIENT_ID;
-import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.TEST_NOTIFICATION_ULID;
+import static kr.modusplant.shared.persistence.common.util.constant.NotificationConstant.TEST_NOTIFICATION_RECIPIENT_ID;
+import static kr.modusplant.shared.persistence.common.util.constant.NotificationConstant.TEST_NOTIFICATION_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;

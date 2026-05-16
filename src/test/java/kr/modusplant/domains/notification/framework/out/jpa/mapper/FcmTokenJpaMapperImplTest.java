@@ -2,8 +2,8 @@ package kr.modusplant.domains.notification.framework.out.jpa.mapper;
 
 import kr.modusplant.domains.notification.framework.out.jpa.mapper.supers.FcmTokenJpaMapper;
 import kr.modusplant.framework.jpa.entity.FcmTokenEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
+import kr.modusplant.framework.jpa.entity.common.util.MemberEntityTestUtils;
 import kr.modusplant.shared.enums.Platform;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import static kr.modusplant.shared.persistence.common.util.constant.FcmTokenConstant.TEST_FCM_TOKEN_WEB;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class FcmTokenJpaMapperImplTest implements SiteMemberEntityTestUtils {
+class FcmTokenJpaMapperImplTest implements MemberEntityTestUtils {
     private final FcmTokenJpaMapper fcmTokenJpaMapper = new FcmTokenJpaMapperImpl();
 
     @Test
@@ -19,7 +19,7 @@ class FcmTokenJpaMapperImplTest implements SiteMemberEntityTestUtils {
     void testToFcmTokenEntity_givenTokenAndSiteMemberEntityAndPlatform_willReturnFcmTokenEntity() {
         // given
         String token = TEST_FCM_TOKEN_WEB;
-        SiteMemberEntity memberEntity = createMemberBasicAdminEntityWithUuid();
+        MemberEntity memberEntity = createMemberBasicAdminEntityWithUuid();
 
         // when
         FcmTokenEntity result = fcmTokenJpaMapper.toFcmTokenEntity(token, memberEntity, Platform.WEB);

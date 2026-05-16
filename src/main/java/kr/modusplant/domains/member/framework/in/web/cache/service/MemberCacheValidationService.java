@@ -3,10 +3,10 @@ package kr.modusplant.domains.member.framework.in.web.cache.service;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
-import kr.modusplant.framework.jpa.entity.SiteMemberProfileEntity;
+import kr.modusplant.framework.jpa.entity.MemberProfileEntity;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.framework.jpa.repository.SiteMemberProfileJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberProfileJpaRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,10 +24,10 @@ import static kr.modusplant.shared.http.utils.ParseHttpHeaderUtils.parseIfNoneMa
 @Transactional(readOnly = true)
 @Slf4j
 public class MemberCacheValidationService {
-    private final SiteMemberProfileJpaRepository memberProfileJpaRepository;
+    private final MemberProfileJpaRepository memberProfileJpaRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public MemberCacheValidationService(SiteMemberProfileJpaRepository memberProfileJpaRepository,
+    public MemberCacheValidationService(MemberProfileJpaRepository memberProfileJpaRepository,
                                         @Qualifier("pbkdf2PasswordEncoder") PasswordEncoder passwordEncoder) {
         this.memberProfileJpaRepository = memberProfileJpaRepository;
         this.passwordEncoder = passwordEncoder;
@@ -37,11 +37,11 @@ public class MemberCacheValidationService {
             @Nullable String ifNoneMatch,
             @Nullable String ifModifiedSince,
             @Nonnull UUID id) {
-        Optional<SiteMemberProfileEntity> optionalMemberProfile = memberProfileJpaRepository.findByUuid(id);
+        Optional<MemberProfileEntity> optionalMemberProfile = memberProfileJpaRepository.findByUuid(id);
         if (optionalMemberProfile.isEmpty()) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE, "memberProfile");
         }
-        SiteMemberProfileEntity memberProfileEntity = optionalMemberProfile.orElseThrow();
+        MemberProfileEntity memberProfileEntity = optionalMemberProfile.orElseThrow();
         String entityTagSource = memberProfileEntity.getETagSource();
         LocalDateTime lastModifiedAt = memberProfileEntity.getLastModifiedAtAsTruncatedToSeconds();
         if (ifNoneMatch == null) {                  // ETag를 통한 검증 강제

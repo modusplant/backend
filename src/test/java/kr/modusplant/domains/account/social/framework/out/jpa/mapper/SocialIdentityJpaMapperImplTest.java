@@ -4,14 +4,14 @@ import kr.modusplant.domains.account.social.common.util.domain.vo.AgreedTermsTes
 import kr.modusplant.domains.account.social.common.util.domain.vo.SocialMemberProfileTestUtils;
 import kr.modusplant.domains.account.social.domain.vo.SocialMemberProfile;
 import kr.modusplant.domains.account.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
-import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberProfileEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberTermEntity;
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberAuthEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberProfileEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberTermEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.MemberAuthEntity;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
+import kr.modusplant.framework.jpa.entity.MemberProfileEntity;
+import kr.modusplant.framework.jpa.entity.MemberTermEntity;
+import kr.modusplant.framework.jpa.entity.common.util.MemberAuthEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.common.util.MemberEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.common.util.MemberProfileEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.common.util.MemberTermEntityTestUtils;
 import kr.modusplant.shared.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class SocialIdentityJpaMapperImplTest implements SiteMemberEntityTestUtils, SiteMemberAuthEntityTestUtils, SiteMemberProfileEntityTestUtils, SiteMemberTermEntityTestUtils,
+class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, MemberAuthEntityTestUtils, MemberProfileEntityTestUtils, MemberTermEntityTestUtils,
         SocialMemberProfileTestUtils, AgreedTermsTestUtils {
     private final SocialIdentityJpaMapper socialIdentityJpaMapper = new SocialIdentityJpaMapperImpl();
 
@@ -27,7 +27,7 @@ class SocialIdentityJpaMapperImplTest implements SiteMemberEntityTestUtils, Site
     @DisplayName("Nickname으로 MemberEntity를 생성")
     void testToMemberEntity_givenNickname_willReturnMemberEntity() {
         // when
-        SiteMemberEntity result = socialIdentityJpaMapper.toMemberEntity(testGoogleUserNickname,Role.USER);
+        MemberEntity result = socialIdentityJpaMapper.toMemberEntity(testGoogleUserNickname,Role.USER);
 
         // then
         assertNotNull(result);
@@ -40,10 +40,10 @@ class SocialIdentityJpaMapperImplTest implements SiteMemberEntityTestUtils, Site
     @DisplayName("MemberEntity와 SocialCredentials, Email로 MemberAuthEntity를 생성")
     void testToMemberAuthEntity_givenMemberEntityAndSocialCredentialsAndEmail_willReturnMemberAuthEntity() {
         // given
-        SiteMemberEntity memberEntity = createMemberGoogleUserEntityWithUuid();
+        MemberEntity memberEntity = createMemberGoogleUserEntityWithUuid();
 
         // when
-        SiteMemberAuthEntity result = socialIdentityJpaMapper.toMemberAuthEntity(memberEntity, testGoogleSocialCredentials, testGoogleUserEmail);
+        MemberAuthEntity result = socialIdentityJpaMapper.toMemberAuthEntity(memberEntity, testGoogleSocialCredentials, testGoogleUserEmail);
 
         // then
         assertNotNull(result);
@@ -57,10 +57,10 @@ class SocialIdentityJpaMapperImplTest implements SiteMemberEntityTestUtils, Site
     @DisplayName("MemberEntity와 AgreedTerms로 MemberTermEntity를 생성")
     void testToMemberTermEntity_givenMemberEntityAndAgreedTerms_willReturnSiteMemberTermEntity() {
         // given
-        SiteMemberEntity memberEntity = createMemberGoogleUserEntityWithUuid();
+        MemberEntity memberEntity = createMemberGoogleUserEntityWithUuid();
 
         // when
-        SiteMemberTermEntity result = socialIdentityJpaMapper.toMemberTermEntity(memberEntity,testAgreedTerms);
+        MemberTermEntity result = socialIdentityJpaMapper.toMemberTermEntity(memberEntity,testAgreedTerms);
 
         // then
         assertNotNull(result);
@@ -74,11 +74,11 @@ class SocialIdentityJpaMapperImplTest implements SiteMemberEntityTestUtils, Site
     @DisplayName("MemberEntity와 introduction으로 MemberProfileEntity를 생성")
     void testToMemberProfileEntity_givenMemberEntityAndIntroduction_willReturnMemberProfileEntity() {
         // given
-        SiteMemberEntity memberEntity = createMemberGoogleUserEntityWithUuid();
+        MemberEntity memberEntity = createMemberGoogleUserEntityWithUuid();
         String introduction = "프로필 소개";
 
         // when
-        SiteMemberProfileEntity result = socialIdentityJpaMapper.toMemberProfileEntity(memberEntity,introduction);
+        MemberProfileEntity result = socialIdentityJpaMapper.toMemberProfileEntity(memberEntity,introduction);
 
         // then
         assertNotNull(result);
@@ -90,8 +90,8 @@ class SocialIdentityJpaMapperImplTest implements SiteMemberEntityTestUtils, Site
     @DisplayName("MemberEntity와 MemberAuthEntity로 SocialMemberProfile를 생성")
     void testToSocialMemberProfile_givenMemberEntityAndMemberAuthEntity_willReturnSocialMemberProfile() {
         // given
-        SiteMemberEntity memberEntity = createMemberGoogleUserEntityWithUuid();
-        SiteMemberAuthEntity memberAuthEntity = createMemberAuthGoogleUserEntityBuilder().member(memberEntity).build();
+        MemberEntity memberEntity = createMemberGoogleUserEntityWithUuid();
+        MemberAuthEntity memberAuthEntity = createMemberAuthGoogleUserEntityBuilder().member(memberEntity).build();
 
         // when
         SocialMemberProfile result = socialIdentityJpaMapper.toSocialMemberProfile(memberEntity,memberAuthEntity);

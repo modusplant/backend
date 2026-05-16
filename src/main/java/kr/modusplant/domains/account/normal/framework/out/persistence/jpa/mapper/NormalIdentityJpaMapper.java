@@ -1,6 +1,6 @@
 package kr.modusplant.domains.account.normal.framework.out.persistence.jpa.mapper;
 
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
 import kr.modusplant.shared.kernel.Nickname;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -11,5 +11,5 @@ public interface NormalIdentityJpaMapper {
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "nickname", source = "nickname.value")
-    SiteMemberEntity toSiteMemberEntity(Nickname nickname);
+    MemberEntity toMemberEntity(Nickname nickname);
 }

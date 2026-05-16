@@ -3,13 +3,13 @@ package kr.modusplant.domains.post.framework.out.jpa.mapper;
 import kr.modusplant.domains.post.domain.vo.PrimaryCategory;
 import kr.modusplant.domains.post.domain.vo.PrimaryCategoryId;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PrimaryCategoryJpaMapper;
-import kr.modusplant.framework.jpa.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.framework.jpa.entity.PrimaryCategoryEntity;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PrimaryCategoryJpaMapperImpl implements PrimaryCategoryJpaMapper {
     @Override
-    public PrimaryCategory toPrimaryCategory(CommPrimaryCategoryEntity primaryCategoryEntity) {
+    public PrimaryCategory toPrimaryCategory(PrimaryCategoryEntity primaryCategoryEntity) {
         return PrimaryCategory.create(
                 PrimaryCategoryId.create(primaryCategoryEntity.getId()),
                 primaryCategoryEntity.getCategory(),

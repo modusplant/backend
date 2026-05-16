@@ -26,7 +26,7 @@ import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostPubli
 import static kr.modusplant.domains.search.common.util.domain.vo.nullobject.EmptySearchPostIdTestUtils.testEmptySearchPostId;
 import static kr.modusplant.domains.search.common.util.domain.vo.nullobject.EmptySearchPostPublishedAtTestUtils.testEmptySearchPostPublishedAt;
 import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.*;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_PUBLISHED_AT;
+import static kr.modusplant.shared.persistence.common.util.constant.PostConstant.TEST_COMM_POST_PUBLISHED_AT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.TimeZone;
 
-import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.NotificationConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest

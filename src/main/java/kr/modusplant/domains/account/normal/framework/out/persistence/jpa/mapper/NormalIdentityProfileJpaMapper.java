@@ -1,7 +1,7 @@
 package kr.modusplant.domains.account.normal.framework.out.persistence.jpa.mapper;
 
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberProfileEntity;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
+import kr.modusplant.framework.jpa.entity.MemberProfileEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -11,5 +11,5 @@ public interface NormalIdentityProfileJpaMapper {
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "member", source = "savedMember")
-    SiteMemberProfileEntity toSiteMemberProfileEntity(SiteMemberEntity savedMember);
+    MemberProfileEntity toSiteMemberProfileEntity(MemberEntity savedMember);
 }

@@ -14,10 +14,10 @@ import static kr.modusplant.domains.search.common.constant.SearchBooleanConstant
 import static kr.modusplant.domains.search.common.constant.SearchDoubleConstant.TEST_SEARCH_KEYWORD_SIMILARITY_0_8;
 import static kr.modusplant.domains.search.common.constant.SearchDoubleConstant.TEST_SEARCH_KEYWORD_SIMILARITY_1;
 import static kr.modusplant.domains.search.common.constant.SearchIntegerConstant.TEST_SEARCH_POST_COMMENT_COUNT;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.*;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.shared.persistence.common.util.constant.PostConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.PrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
+import static kr.modusplant.shared.persistence.common.util.constant.SecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
 
 public interface SearchPostReadModelTestUtils {
     SearchPostReadModel testSearchPostReadModel1 = new SearchPostReadModel(

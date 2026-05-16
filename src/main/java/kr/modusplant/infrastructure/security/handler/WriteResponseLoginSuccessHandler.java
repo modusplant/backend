@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
 import kr.modusplant.infrastructure.jwt.provider.JwtCookieProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
@@ -31,7 +31,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class WriteResponseLoginSuccessHandler implements AuthenticationSuccessHandler {
 
-    private final SiteMemberJpaRepository memberRepository;
+    private final MemberJpaRepository memberRepository;
     private final TokenService tokenService;
     private final JwtCookieProvider cookieProvider;
     private final ObjectMapper objectMapper;
@@ -76,7 +76,7 @@ public class WriteResponseLoginSuccessHandler implements AuthenticationSuccessHa
         if (!memberRepository.existsByUuid(currentMemberUuid)) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER);
         }
-        SiteMemberEntity memberEntity = memberRepository.findByUuid(currentMemberUuid).orElseThrow();
+        MemberEntity memberEntity = memberRepository.findByUuid(currentMemberUuid).orElseThrow();
         memberEntity.updateLoggedInAt(LocalDateTime.now());
         memberRepository.save(memberEntity);
     }

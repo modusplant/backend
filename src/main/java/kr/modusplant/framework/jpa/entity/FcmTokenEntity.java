@@ -30,7 +30,7 @@ public class FcmTokenEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = MEMB_UUID, nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private SiteMemberEntity member;
+    private MemberEntity member;
 
     @Column(nullable = false, unique = true)
     private String token;
@@ -50,7 +50,7 @@ public class FcmTokenEntity {
     @ToString.Include
     private LocalDateTime lastModifiedAt;
 
-    public void updateMember(SiteMemberEntity member) {
+    public void updateMember(MemberEntity member) {
         this.member = member;
     }
 
@@ -70,7 +70,7 @@ public class FcmTokenEntity {
         return new HashCodeBuilder(17,37).append(getId()).toHashCode();
     }
 
-    private FcmTokenEntity(Long id, SiteMemberEntity member, String token, Platform platform) {
+    private FcmTokenEntity(Long id, MemberEntity member, String token, Platform platform) {
         this.id = id;
         this.member = member;
         this.token = token;
@@ -83,7 +83,7 @@ public class FcmTokenEntity {
 
     public static final class FcmTokenEntityBuilder {
         private Long id;
-        private SiteMemberEntity member;
+        private MemberEntity member;
         private String token;
         private Platform platform;
 
@@ -92,7 +92,7 @@ public class FcmTokenEntity {
             return this;
         }
 
-        public FcmTokenEntityBuilder member(final SiteMemberEntity member) {
+        public FcmTokenEntityBuilder member(final MemberEntity member) {
             this.member = member;
             return this;
         }
@@ -107,7 +107,7 @@ public class FcmTokenEntity {
             return this;
         }
 
-        public FcmTokenEntityBuilder fcmTokenEntity(final FcmTokenEntity fcmTokenEntity) {
+        public FcmTokenEntityBuilder fcmToken(final FcmTokenEntity fcmTokenEntity) {
             this.id = fcmTokenEntity.getId();
             this.member = fcmTokenEntity.getMember();
             this.token = fcmTokenEntity.getToken();

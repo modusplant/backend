@@ -17,7 +17,7 @@ import java.util.List;
 import static kr.modusplant.domains.term.common.util.usecase.request.SiteMemberTermCreateRequestTestUtils.testSiteMemberTermCreateRequest;
 import static kr.modusplant.domains.term.common.util.usecase.request.SiteMemberTermUpdateRequestTestUtils.testSiteMemberTermUpdateRequest;
 import static kr.modusplant.domains.term.common.util.usecase.response.SiteMemberTermResponseTestUtils.testSiteMemberTermResponse;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
