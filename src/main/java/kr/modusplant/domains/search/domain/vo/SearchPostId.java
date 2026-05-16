@@ -1,6 +1,6 @@
 package kr.modusplant.domains.search.domain.vo;
 
-import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.domains.search.domain.vo.nullobject.EmptySearchPostId;
 import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.EMPTY_SEARCH_POST_ID;
 import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.INVALID_SEARCH_POST_ID;
 import static kr.modusplant.shared.constant.Regex.PATTERN_ULID;
 
@@ -22,8 +21,9 @@ public class SearchPostId {
 
     public static SearchPostId create(String value) {
         if (StringUtils.isBlank(value)) {
-            throw new EmptyValueException(EMPTY_SEARCH_POST_ID, "searchPostId");
-        } else if (!PATTERN_ULID.matcher(value).matches()) {
+            return EmptySearchPostId.create();
+        }
+        if (!PATTERN_ULID.matcher(value).matches()) {
             throw new InvalidValueException(INVALID_SEARCH_POST_ID, "searchPostId");
         }
         return new SearchPostId(value);

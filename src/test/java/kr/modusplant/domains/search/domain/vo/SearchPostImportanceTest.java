@@ -1,44 +1,31 @@
 package kr.modusplant.domains.search.domain.vo;
 
-import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostImportanceTestUtils.*;
-import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.*;
+import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.NOT_FOUND_SEARCH_POST_IMPORTANCE;
+import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.SEARCH_POST_IMPORTANCE_OUT_OF_RANGE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SearchPostImportanceTest {
 
     @Test
-    @DisplayName("유효한 값(1~4)으로 create 호출 시 정상 객체 반환")
+    @DisplayName("유효한 값(1 ~ 4)으로 create 호출 시 정상 객체 반환")
     void testCreate_givenValidValues_willReturnSearchPostImportance() {
-        // given & when & then
-        assertFalse(testSearchPostImportanceTitle.isEmpty());
-        assertEquals((Integer) SearchPostImportance.title().getValueIfNotEmpty(), testSearchPostImportanceTitle.getValueIfNotEmpty());
-
-        assertFalse(testSearchPostImportanceContent.isEmpty());
-        assertEquals((Integer) SearchPostImportance.content().getValueIfNotEmpty(), testSearchPostImportanceContent.getValueIfNotEmpty());
-
-        assertFalse(testSearchPostImportanceCommentContent.isEmpty());
-        assertEquals((Integer) SearchPostImportance.commentContent().getValueIfNotEmpty(), testSearchPostImportanceCommentContent.getValueIfNotEmpty());
-
-        assertFalse(testSearchPostImportanceOthers.isEmpty());
-        assertEquals((Integer) SearchPostImportance.others().getValueIfNotEmpty(), testSearchPostImportanceOthers.getValueIfNotEmpty());
+        assertEquals(SearchPostImportance.title().getValueIfNotEmpty(), testSearchPostImportanceTitle.getValueIfNotEmpty());
+        assertEquals(SearchPostImportance.content().getValueIfNotEmpty(), testSearchPostImportanceContent.getValueIfNotEmpty());
+        assertEquals(SearchPostImportance.commentContent().getValueIfNotEmpty(), testSearchPostImportanceCommentContent.getValueIfNotEmpty());
+        assertEquals(SearchPostImportance.others().getValueIfNotEmpty(), testSearchPostImportanceOthers.getValueIfNotEmpty());
     }
 
     @Test
-    @DisplayName("null 값으로 create 호출 시 예외 발생")
-    void testCreate_givenNull_willThrowException() {
-        // given & when
-        EmptyValueException exception = assertThrows(EmptyValueException.class,
-                () -> SearchPostImportance.create(null));
-
-        // then
-        assertThat(exception.getErrorCode()).isEqualTo(EMPTY_SEARCH_POST_IMPORTANCE);
+    @DisplayName("null 값으로 create 호출 시 널 객체 반환")
+    void testCreate_givenNull_willReturnEmptySearchPostImportance() {
+        assertEquals(SearchPostImportance.create(null), testSearchPostImportanceEmpty);
     }
 
     @Test

@@ -1,7 +1,6 @@
 package kr.modusplant.domains.search.domain.vo;
 
 import kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode;
-import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +9,7 @@ import java.time.LocalDateTime;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostPublishedAtTestUtils.testSearchPostPublishedAt;
+import static kr.modusplant.domains.search.common.util.domain.vo.nullobject.EmptySearchPostPublishedAtTestUtils.testEmptySearchPostPublishedAt;
 import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_PUBLISHED_AT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,10 +22,9 @@ class SearchPostPublishedAtTest {
     }
 
     @Test
-    @DisplayName("null로 create을 호출하여 오류 발생")
-    void testCreate_givenNull_willThrowException() {
-        EmptyValueException exception = assertThrows(EmptyValueException.class, () -> SearchPostPublishedAt.create(null));
-        assertThat(exception.getErrorCode()).isEqualTo(SearchErrorCode.EMPTY_SEARCH_POST_PUBLISHED_AT);
+    @DisplayName("null로 create을 호출하여 널 객체 반환")
+    void testCreate_givenNull_willReturnEmptySearchPostPublishedAt() {
+        assertThat(SearchPostPublishedAt.create(null)).isEqualTo(testEmptySearchPostPublishedAt);
     }
 
     @Test
