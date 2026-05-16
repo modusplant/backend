@@ -13,7 +13,7 @@ import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostPubli
 
 public interface SearchPostTestUtils {
     SearchPost testSearchPost = SearchPost.create(
-            SearchPostOption.create(testSearchPostId, testSearchPostPublishedAt,
+            SearchPostOption.createRelevanceOption(testSearchPostId, testSearchPostPublishedAt,
                     testSearchPostImportanceTitle, testSearchKeywordSimilarity1),
             testSearchKeyword, SearchPostTarget.TITLE_CONTENT_COMMENT, SearchPostSortCondition.RELEVANCE);
 }

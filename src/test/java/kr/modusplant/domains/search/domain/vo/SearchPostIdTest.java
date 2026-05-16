@@ -2,7 +2,6 @@ package kr.modusplant.domains.search.domain.vo;
 
 import kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode;
 import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
-import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.generator.RandomUlidGenerator;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
 import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostIdTestUtils.testSearchPostId;
+import static kr.modusplant.domains.search.common.util.domain.vo.nullobject.EmptySearchPostIdTestUtils.testEmptySearchPostId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,17 +24,15 @@ class SearchPostIdTest {
     }
 
     @Test
-    @DisplayName("null로 create을 호출하여 오류 발생")
-    void testCreate_givenNull_willThrowException() {
-        EmptyValueException exception = assertThrows(EmptyValueException.class, () -> SearchPostId.create(null));
-        assertThat(exception.getErrorCode()).isEqualTo(SearchErrorCode.EMPTY_SEARCH_POST_ID);
+    @DisplayName("null로 create을 호출하여 널 객체 반환")
+    void testCreate_givenNull_willReturnEmptySearchPostId() {
+        assertThat(SearchPostId.create(null)).isEqualTo(testEmptySearchPostId);
     }
 
     @Test
-    @DisplayName("빈 문자열로 create을 호출하여 오류 발생")
-    void testCreate_givenEmptyString_willThrowException() {
-        EmptyValueException exception = assertThrows(EmptyValueException.class, () -> SearchPostId.create("   "));
-        assertThat(exception.getErrorCode()).isEqualTo(SearchErrorCode.EMPTY_SEARCH_POST_ID);
+    @DisplayName("빈 문자열로 create을 호출하여 널 객체 반환")
+    void testCreate_givenEmptyString_willReturnEmptySearchPostId() {
+        assertThat(SearchPostId.create(" ")).isEqualTo(testEmptySearchPostId);
     }
 
     @Test
