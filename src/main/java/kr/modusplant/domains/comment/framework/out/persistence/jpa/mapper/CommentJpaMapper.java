@@ -3,9 +3,9 @@ package kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.vo.CommentStatus;
 import kr.modusplant.domains.comment.domain.vo.enums.CommentStatusType;
-import kr.modusplant.framework.jpa.entity.CommCommentEntity;
-import kr.modusplant.framework.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.CommentEntity;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
+import kr.modusplant.framework.jpa.entity.PostEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,7 +20,7 @@ public interface CommentJpaMapper {
     @Mapping(source = "commentAuthor", target = "authMember")
     @Mapping(source = "comment.content.content", target = "content")
     @Mapping(source = "comment.status", target = "isDeleted", qualifiedByName = "mapIsDeleted")
-    CommCommentEntity toCommCommentEntity(Comment comment, SiteMemberEntity commentAuthor, CommPostEntity commentPost);
+    CommentEntity toCommCommentEntity(Comment comment, MemberEntity commentAuthor, PostEntity commentPost);
 
     @Named("mapIsDeleted")
     default boolean mapIsDeleted(CommentStatus status) {

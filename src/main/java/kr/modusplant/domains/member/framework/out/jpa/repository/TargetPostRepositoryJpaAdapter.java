@@ -3,18 +3,18 @@ package kr.modusplant.domains.member.framework.out.jpa.repository;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.TargetPostId;
 import kr.modusplant.domains.member.usecase.port.repository.TargetPostRepository;
-import kr.modusplant.framework.jpa.repository.CommPostBookmarkJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommPostLikeJpaRepository;
+import kr.modusplant.framework.jpa.repository.PostBookmarkJpaRepository;
+import kr.modusplant.framework.jpa.repository.PostJpaRepository;
+import kr.modusplant.framework.jpa.repository.PostLikeJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
 public class TargetPostRepositoryJpaAdapter implements TargetPostRepository {
-    private final CommPostJpaRepository postJpaRepository;
-    private final CommPostLikeJpaRepository postLikeJpaRepository;
-    private final CommPostBookmarkJpaRepository postBookmarkJpaRepository;
+    private final PostJpaRepository postJpaRepository;
+    private final PostLikeJpaRepository postLikeJpaRepository;
+    private final PostBookmarkJpaRepository postBookmarkJpaRepository;
 
     @Override
     public boolean isIdExist(TargetPostId targetPostId) {

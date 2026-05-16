@@ -5,12 +5,12 @@ import jakarta.annotation.Nullable;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.in.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.member.domain.vo.MemberId;
-import kr.modusplant.framework.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
+import kr.modusplant.framework.jpa.entity.PostEntity;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.PostJpaRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,12 +28,12 @@ import static kr.modusplant.shared.http.utils.ParseHttpHeaderUtils.parseIfNoneMa
 @Slf4j
 public class CommentCacheService {
 
-    private final CommPostJpaRepository postJpaRepository;
-    private final SiteMemberJpaRepository memberJpaRepository;
+    private final PostJpaRepository postJpaRepository;
+    private final MemberJpaRepository memberJpaRepository;
 
     private final PasswordEncoder passwordEncoder;
 
-    public CommentCacheService(CommPostJpaRepository postJpaRepository, SiteMemberJpaRepository memberJpaRepository,
+    public CommentCacheService(PostJpaRepository postJpaRepository, MemberJpaRepository memberJpaRepository,
                                @Qualifier("pbkdf2PasswordEncoder") PasswordEncoder passwordEncoder) {
         this.postJpaRepository = postJpaRepository;
         this.memberJpaRepository = memberJpaRepository;
@@ -45,7 +45,7 @@ public class CommentCacheService {
             @Nullable String ifModifiedSince,
             @Nonnull PostId postUlid
     ) {
-        CommPostEntity postEntity = postJpaRepository.findByUlid(postUlid.getId())
+        PostEntity postEntity = postJpaRepository.findByUlid(postUlid.getId())
                 .orElseThrow( () -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post"));
 
         String ETagSource = postEntity.getETagSource();
@@ -59,7 +59,7 @@ public class CommentCacheService {
             @Nullable String ifModifiedSince,
             @Nonnull MemberId memberId
     ) {
-        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId.getValue())
+        MemberEntity memberEntity = memberJpaRepository.findByUuid(memberId.getValue())
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, "member"));
 
         String ETagSource = memberEntity.getETagSource();

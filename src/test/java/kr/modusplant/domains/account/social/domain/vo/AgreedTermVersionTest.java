@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberTermConstant.MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION;
+import static kr.modusplant.shared.persistence.common.util.constant.MemberTermConstant.MEMBER_TERM_USER_AGREED_TERMS_OF_USE_VERSION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 

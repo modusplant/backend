@@ -3,11 +3,11 @@ package kr.modusplant.domains.notification.framework.out.jpa.repository;
 import kr.modusplant.domains.notification.domain.vo.*;
 import kr.modusplant.domains.notification.framework.out.jpa.repository.supers.NotificationJpaRepository;
 import kr.modusplant.domains.notification.usecase.port.repository.NotificationMockRepository;
-import kr.modusplant.framework.jpa.entity.CommNotificationEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.repository.CommCommentJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
+import kr.modusplant.framework.jpa.entity.NotificationEntity;
+import kr.modusplant.framework.jpa.repository.CommentJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.PostJpaRepository;
 import kr.modusplant.shared.enums.NotificationActionType;
 import kr.modusplant.shared.enums.NotificationStatusType;
 import lombok.RequiredArgsConstructor;
@@ -18,18 +18,18 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class NotificationMockJpaAdapter implements NotificationMockRepository {
     private final NotificationJpaRepository notificationJpaRepository;
-    private final SiteMemberJpaRepository siteMemberJpaRepository;
-    private final CommPostJpaRepository commPostJpaRepository;
-    private final CommCommentJpaRepository commCommentJpaRepository;
+    private final MemberJpaRepository memberJpaRepository;
+    private final PostJpaRepository postJpaRepository;
+    private final CommentJpaRepository commentJpaRepository;
 
     @Override
     public void saveMockNotification(RecipientId recipientId, NotificationAction action, PostId postId, CommentPath commentPath, ContentPreview contentPreview) {
-        SiteMemberEntity member = siteMemberJpaRepository.findByUuid(recipientId.getValue()).orElseThrow();
-        if (!commPostJpaRepository.existsByUlid(postId.getValue()) ||
-                (commentPath != null && action.getAction() == NotificationActionType.COMMENT_LIKED && !commCommentJpaRepository.existsByPostUlidAndPath(postId.getValue(), commentPath.getPath()))){
+        MemberEntity member = memberJpaRepository.findByUuid(recipientId.getValue()).orElseThrow();
+        if (!postJpaRepository.existsByUlid(postId.getValue()) ||
+                (commentPath != null && action.getAction() == NotificationActionType.COMMENT_LIKED && !commentJpaRepository.existsByPostUlidAndPath(postId.getValue(), commentPath.getPath()))){
             throw new IllegalArgumentException("Invalid post or comment path");
         }
-        CommNotificationEntity commNotificationEntity = CommNotificationEntity.builder()
+        NotificationEntity notificationEntity = NotificationEntity.builder()
                 .recipient(member)
                 .actorId(member.getUuid())
                 .actorNickname(member.getNickname())
@@ -39,11 +39,11 @@ public class NotificationMockJpaAdapter implements NotificationMockRepository {
                 .commentPath(commentPath == null ? null : commentPath.getPath())
                 .contentPreview(contentPreview.getContent())
                 .build();
-        notificationJpaRepository.save(commNotificationEntity);
+        notificationJpaRepository.save(notificationEntity);
     }
 
     @Override
     public void deleteMockNotification(RecipientId recipientId) {
-        notificationJpaRepository.deleteByRecipient(siteMemberJpaRepository.findByUuid(recipientId.getValue()).orElseThrow());
+        notificationJpaRepository.deleteByRecipient(memberJpaRepository.findByUuid(recipientId.getValue()).orElseThrow());
     }
 }

@@ -1,11 +1,11 @@
 package kr.modusplant.infrastructure.event.listener;
 
-import kr.modusplant.framework.jpa.entity.CommPostBookmarkEntity;
-import kr.modusplant.framework.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.jpa.entity.CommPostLikeEntity;
-import kr.modusplant.framework.jpa.repository.CommPostBookmarkJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommPostLikeJpaRepository;
+import kr.modusplant.framework.jpa.entity.PostBookmarkEntity;
+import kr.modusplant.framework.jpa.entity.PostEntity;
+import kr.modusplant.framework.jpa.entity.PostLikeEntity;
+import kr.modusplant.framework.jpa.repository.PostBookmarkJpaRepository;
+import kr.modusplant.framework.jpa.repository.PostJpaRepository;
+import kr.modusplant.framework.jpa.repository.PostLikeJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -22,25 +22,25 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 class PostEventListenerTest {
-    private final CommPostLikeJpaRepository commPostLikeRepository = mock(CommPostLikeJpaRepository.class);
-    private final CommPostBookmarkJpaRepository commPostBookmarkRepository = mock(CommPostBookmarkJpaRepository.class);
-    private final CommPostJpaRepository commPostRepository = mock(CommPostJpaRepository.class);
+    private final PostLikeJpaRepository postLikeRepository = mock(PostLikeJpaRepository.class);
+    private final PostBookmarkJpaRepository postBookmarkRepository = mock(PostBookmarkJpaRepository.class);
+    private final PostJpaRepository postRepository = mock(PostJpaRepository.class);
     private final PostEventListener postEventListener = new PostEventListener(
-            commPostLikeRepository, commPostBookmarkRepository, commPostRepository
+            postLikeRepository, postBookmarkRepository, postRepository
     );
 
     @Test
     @DisplayName("존재하는 게시글에 대해 handlePostLikeEvent 실행 시 좋아요 저장 및 카운트 증가")
     void testHandlePostLikeEvent_givenExistedPost_willIncreaseLikeCount() {
         // given
-        CommPostEntity mockPost = mock(CommPostEntity.class);
-        given(commPostRepository.findByUlid(any())).willReturn(Optional.of(mockPost));
+        PostEntity mockPost = mock(PostEntity.class);
+        given(postRepository.findByUlid(any())).willReturn(Optional.of(mockPost));
 
         // when
         postEventListener.handlePostLikeEvent(testPostLikeEvent);
 
         // then
-        verify(commPostLikeRepository, times(1)).save(any(CommPostLikeEntity.class));
+        verify(postLikeRepository, times(1)).save(any(PostLikeEntity.class));
         verify(mockPost, times(1)).increaseLikeCount();
     }
 
@@ -48,27 +48,27 @@ class PostEventListenerTest {
     @DisplayName("존재하지 않는 게시글로 인해 handlePostLikeEvent 실행 실패")
     void testHandlePostLikeEvent_givenNotFoundPost_willThrowException() {
         // given
-        given(commPostRepository.findByUlid(any())).willReturn(Optional.empty());
+        given(postRepository.findByUlid(any())).willReturn(Optional.empty());
 
         // when
         assertThrows(NoSuchElementException.class, () -> postEventListener.handlePostLikeEvent(testPostLikeEvent));
 
         // then
-        verify(commPostLikeRepository, times(1)).save(any(CommPostLikeEntity.class));
+        verify(postLikeRepository, times(1)).save(any(PostLikeEntity.class));
     }
 
     @Test
     @DisplayName("존재하는 게시글에 대해 handlePostUnlikeEvent 실행 시 좋아요 삭제 및 카운트 감소")
     void testHandlePostUnlikeEvent_givenExistedPost_willDecreaseLikeCount() {
         // given
-        CommPostEntity mockPost = mock(CommPostEntity.class);
-        given(commPostRepository.findByUlid(any())).willReturn(Optional.of(mockPost));
+        PostEntity mockPost = mock(PostEntity.class);
+        given(postRepository.findByUlid(any())).willReturn(Optional.of(mockPost));
 
         // when
         postEventListener.handlePostUnlikeEvent(testPostUnlikeEvent);
 
         // then
-        verify(commPostLikeRepository, times(1)).delete(any(CommPostLikeEntity.class));
+        verify(postLikeRepository, times(1)).delete(any(PostLikeEntity.class));
         verify(mockPost, times(1)).decreaseLikeCount();
     }
 
@@ -76,13 +76,13 @@ class PostEventListenerTest {
     @DisplayName("존재하지 않는 게시글로 인해 handlePostUnlikeEvent 실행 실패")
     void testHandlePostUnlikeEvent_givenNotFoundPost_willThrowException() {
         // given
-        given(commPostRepository.findByUlid(any())).willReturn(Optional.empty());
+        given(postRepository.findByUlid(any())).willReturn(Optional.empty());
 
         // when
         assertThrows(NoSuchElementException.class, () -> postEventListener.handlePostUnlikeEvent(testPostUnlikeEvent));
 
         // then
-        verify(commPostLikeRepository, times(1)).delete(any(CommPostLikeEntity.class));
+        verify(postLikeRepository, times(1)).delete(any(PostLikeEntity.class));
     }
 
     @Test
@@ -92,7 +92,7 @@ class PostEventListenerTest {
         postEventListener.handlePostBookmarkEvent(testPostBookmarkEvent);
 
         // then
-        verify(commPostBookmarkRepository, times(1)).save(any(CommPostBookmarkEntity.class));
+        verify(postBookmarkRepository, times(1)).save(any(PostBookmarkEntity.class));
     }
 
     @Test
@@ -102,6 +102,6 @@ class PostEventListenerTest {
         postEventListener.handlePostBookmarkCancelEvent(testPostBookmarkCancelEvent);
 
         // then
-        verify(commPostBookmarkRepository, times(1)).delete(any(CommPostBookmarkEntity.class));
+        verify(postBookmarkRepository, times(1)).delete(any(PostBookmarkEntity.class));
     }
 }

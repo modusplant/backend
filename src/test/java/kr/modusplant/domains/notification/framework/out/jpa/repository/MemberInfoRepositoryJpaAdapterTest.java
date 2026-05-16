@@ -1,8 +1,8 @@
 package kr.modusplant.domains.notification.framework.out.jpa.repository;
 
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -10,21 +10,21 @@ import org.mockito.Mockito;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 class MemberInfoRepositoryJpaAdapterTest {
-    private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
+    private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
     private final MemberInfoRepositoryJpaAdapter memberInfoRepositoryJpaAdapter = new MemberInfoRepositoryJpaAdapter(memberJpaRepository);
 
     @Test
     @DisplayName("회원 UUID로 닉네임을 조회한다")
     void testGetNicknameByUuid_givenValidUuid_willReturnNickname() {
         // given
-        SiteMemberEntity memberEntity = Mockito.mock(SiteMemberEntity.class);
+        MemberEntity memberEntity = Mockito.mock(MemberEntity.class);
         String nickname = "테스트유저";
 
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));

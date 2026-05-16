@@ -7,7 +7,7 @@ import kr.modusplant.shared.enums.Platform;
 import static kr.modusplant.shared.persistence.common.util.constant.FcmTokenConstant.*;
 
 
-public interface FcmTokenEntityTestUtils extends SiteMemberEntityTestUtils {
+public interface FcmTokenEntityTestUtils extends MemberEntityTestUtils {
     default FcmTokenEntityBuilder createWebFcmTokenEntityBuilder() {
         return FcmTokenEntity.builder()
                 .token(TEST_FCM_TOKEN_WEB)

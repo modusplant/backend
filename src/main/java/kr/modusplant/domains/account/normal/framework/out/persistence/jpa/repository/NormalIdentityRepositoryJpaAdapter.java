@@ -8,14 +8,14 @@ import kr.modusplant.domains.account.normal.framework.out.persistence.jpa.mapper
 import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdentityCreateRepository;
 import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdentityUpdateRepository;
 import kr.modusplant.domains.account.shared.kernel.AccountId;
-import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.MemberAuthEntity;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberProfileJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberTermJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberAuthJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberProfileJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberTermJpaRepository;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Password;
@@ -27,10 +27,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityCreateRepository, NormalIdentityUpdateRepository {
 
-    private final SiteMemberJpaRepository memberJpaRepository;
-    private final SiteMemberAuthJpaRepository authJpaRepository;
-    private final SiteMemberTermJpaRepository termJpaRepository;
-    private final SiteMemberProfileJpaRepository profileJpaRepository;
+    private final MemberJpaRepository memberJpaRepository;
+    private final MemberAuthJpaRepository authJpaRepository;
+    private final MemberTermJpaRepository termJpaRepository;
+    private final MemberProfileJpaRepository profileJpaRepository;
 
     private final NormalIdentityJpaMapper identityMapper;
     private final NormalIdentityAuthJpaMapper authMapper;
@@ -39,8 +39,8 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityCreateR
 
     private final PasswordEncoder passwordEncoder;
 
-    public NormalIdentityRepositoryJpaAdapter(SiteMemberJpaRepository memberJpaRepository, SiteMemberAuthJpaRepository authJpaRepository,
-                                              SiteMemberTermJpaRepository termJpaRepository, SiteMemberProfileJpaRepository profileJpaRepository,
+    public NormalIdentityRepositoryJpaAdapter(MemberJpaRepository memberJpaRepository, MemberAuthJpaRepository authJpaRepository,
+                                              MemberTermJpaRepository termJpaRepository, MemberProfileJpaRepository profileJpaRepository,
                                               NormalIdentityJpaMapper identityMapper, NormalIdentityAuthJpaMapper authMapper,
                                               NormalIdentityTermJpaMapper termMapper, NormalIdentityProfileJpaMapper profileMapper,
                                               @Qualifier("bcryptPasswordEncoder") PasswordEncoder passwordEncoder) {
@@ -57,7 +57,7 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityCreateR
 
     @Override
     public void save(SignUpData signUpData) {
-        SiteMemberEntity savedMember = memberJpaRepository.save(identityMapper.toSiteMemberEntity(signUpData.getNickname()));
+        MemberEntity savedMember = memberJpaRepository.save(identityMapper.toMemberEntity(signUpData.getNickname()));
         authJpaRepository.save(authMapper.toSiteMemberAuthEntity(savedMember, signUpData));
         termJpaRepository.save(termMapper.toSiteMemberTermEntity(savedMember, signUpData));
         profileJpaRepository.save(profileMapper.toSiteMemberProfileEntity(savedMember));
@@ -65,10 +65,10 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityCreateR
 
     @Override
     public void updateEmail(AccountId accountId, Email email) {
-        SiteMemberEntity savedMember = memberJpaRepository.findByUuid(accountId.getValue())
+        MemberEntity savedMember = memberJpaRepository.findByUuid(accountId.getValue())
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER,TableName.SITE_MEMBER));
 
-        SiteMemberAuthEntity savedAuth = authJpaRepository.findByMember(savedMember)
+        MemberAuthEntity savedAuth = authJpaRepository.findByMember(savedMember)
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH,TableName.SITE_MEMBER_AUTH));
 
         savedAuth.updateEmail(email.getValue());
@@ -77,10 +77,10 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityCreateR
 
     @Override
     public void updatePassword(AccountId accountId, Password pw) {
-        SiteMemberEntity savedMember = memberJpaRepository.findByUuid(accountId.getValue())
+        MemberEntity savedMember = memberJpaRepository.findByUuid(accountId.getValue())
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER,TableName.SITE_MEMBER));
 
-        SiteMemberAuthEntity savedAuth = authJpaRepository.findByMember(savedMember)
+        MemberAuthEntity savedAuth = authJpaRepository.findByMember(savedMember)
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH,TableName.SITE_MEMBER_AUTH));
 
         savedAuth.updatePassword(passwordEncoder.encode(pw.getValue()));
@@ -89,7 +89,7 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityCreateR
 
     @Override
     public void updateToGoogleAccount(Email email, Password pw) {
-        SiteMemberAuthEntity savedAuth = authJpaRepository.findByEmail(email.getValue())
+        MemberAuthEntity savedAuth = authJpaRepository.findByEmail(email.getValue())
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH,TableName.SITE_MEMBER_AUTH));
 
         savedAuth.updatePassword(passwordEncoder.encode(pw.getValue()));
@@ -99,7 +99,7 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityCreateR
 
     @Override
     public void updateToKakaoAccount(Email email, Password pw) {
-        SiteMemberAuthEntity savedAuth = authJpaRepository.findByEmail(email.getValue())
+        MemberAuthEntity savedAuth = authJpaRepository.findByEmail(email.getValue())
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH,TableName.SITE_MEMBER_AUTH));
 
         savedAuth.updatePassword(passwordEncoder.encode(pw.getValue()));

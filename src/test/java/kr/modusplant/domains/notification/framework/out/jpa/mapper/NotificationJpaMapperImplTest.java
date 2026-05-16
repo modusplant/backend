@@ -3,9 +3,9 @@ package kr.modusplant.domains.notification.framework.out.jpa.mapper;
 import kr.modusplant.domains.notification.common.util.domain.aggregate.NotificationTestUtils;
 import kr.modusplant.domains.notification.domain.aggregate.Notification;
 import kr.modusplant.domains.notification.framework.out.jpa.mapper.supers.NotificationJpaMapper;
-import kr.modusplant.framework.jpa.entity.CommNotificationEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.entity.common.util.CommNotificationEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
+import kr.modusplant.framework.jpa.entity.NotificationEntity;
+import kr.modusplant.framework.jpa.entity.common.util.NotificationEntityTestUtils;
 import kr.modusplant.shared.enums.NotificationActionType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,18 +14,18 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class NotificationJpaMapperImplTest implements CommNotificationEntityTestUtils, NotificationTestUtils {
+class NotificationJpaMapperImplTest implements NotificationEntityTestUtils, NotificationTestUtils {
     private final NotificationJpaMapper notificationJpaMapper = new NotificationJpaMapperImpl();
 
     @Test
-    @DisplayName("toNotificationEntity으로 게시글 CommNotificationEntity 반환하기")
+    @DisplayName("toNotificationEntity으로 게시글 NotificationEntity 반환하기")
     void testToNotificationEntity_givenPostNotificationAndMemberEntity_willReturnCommNotificationEntity() {
         // given
         Notification notification = createPostLikedUnreadNotification(LocalDateTime.now());
-        SiteMemberEntity memberEntity = createMemberBasicAdminEntityWithUuid();
+        MemberEntity memberEntity = createMemberBasicAdminEntityWithUuid();
 
         // when
-        CommNotificationEntity result = notificationJpaMapper.toNotificationEntity(notification, memberEntity);
+        NotificationEntity result = notificationJpaMapper.toNotificationEntity(notification, memberEntity);
 
         // then
         assertEquals(result.getRecipient(), memberEntity);
@@ -40,14 +40,14 @@ class NotificationJpaMapperImplTest implements CommNotificationEntityTestUtils, 
     }
 
     @Test
-    @DisplayName("toNotificationEntity으로 댓글 CommNotificationEntity 반환하기")
+    @DisplayName("toNotificationEntity으로 댓글 NotificationEntity 반환하기")
     void testToNotificationEntity_givenCommentNotificationAndMemberEntity_willReturnCommNotificationEntity() {
         // given
         Notification notification = createCommentLikedUnreadNotification(LocalDateTime.now());
-        SiteMemberEntity memberEntity = createMemberBasicAdminEntityWithUuid();
+        MemberEntity memberEntity = createMemberBasicAdminEntityWithUuid();
 
         // when
-        CommNotificationEntity result = notificationJpaMapper.toNotificationEntity(notification, memberEntity);
+        NotificationEntity result = notificationJpaMapper.toNotificationEntity(notification, memberEntity);
 
         // then
         assertEquals(result.getRecipient(), memberEntity);
@@ -66,8 +66,8 @@ class NotificationJpaMapperImplTest implements CommNotificationEntityTestUtils, 
     @DisplayName("toNotification으로 게시글 Notification 반환하기")
     void testToNotification_givenPostCommNotificationEntity_willReturnNotification() {
         // given
-        SiteMemberEntity memberEntity = createMemberBasicAdminEntityWithUuid();
-        CommNotificationEntity notificationEntity = createPostNotificationEntityBuilderWithUlid().recipient(memberEntity).build();
+        MemberEntity memberEntity = createMemberBasicAdminEntityWithUuid();
+        NotificationEntity notificationEntity = createPostNotificationEntityBuilderWithUlid().recipient(memberEntity).build();
 
         // when
         Notification result = notificationJpaMapper.toNotification(notificationEntity);
@@ -89,8 +89,8 @@ class NotificationJpaMapperImplTest implements CommNotificationEntityTestUtils, 
     @DisplayName("toNotification으로 댓글 Notification 반환하기")
     void testToNotification_givenCommentCommNotificationEntity_willReturnNotification() {
         // given
-        SiteMemberEntity memberEntity = createMemberBasicAdminEntityWithUuid();
-        CommNotificationEntity notificationEntity = createCommentNotificationEntityBuilderWithUlid(NotificationActionType.COMMENT_ADDED)
+        MemberEntity memberEntity = createMemberBasicAdminEntityWithUuid();
+        NotificationEntity notificationEntity = createCommentNotificationEntityBuilderWithUlid(NotificationActionType.COMMENT_ADDED)
                 .recipient(memberEntity).build();
 
         // when

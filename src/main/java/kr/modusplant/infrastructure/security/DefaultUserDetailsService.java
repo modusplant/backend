@@ -1,11 +1,11 @@
 package kr.modusplant.infrastructure.security;
 
 import jakarta.transaction.Transactional;
-import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.MemberAuthEntity;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberAuthJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
 import kr.modusplant.infrastructure.security.exception.AccountStateException;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -21,16 +21,16 @@ import java.util.List;
 @Transactional
 public class DefaultUserDetailsService implements UserDetailsService {
 
-    private final SiteMemberJpaRepository memberRepository;
-    private final SiteMemberAuthJpaRepository memberAuthRepository;
+    private final MemberJpaRepository memberRepository;
+    private final MemberAuthJpaRepository memberAuthRepository;
 
     @Override
     public DefaultUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        SiteMemberAuthEntity auth = memberAuthRepository
+        MemberAuthEntity auth = memberAuthRepository
                 .findByEmail(email).orElseThrow(
                         () -> new AccountStateException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH));
-        SiteMemberEntity member = memberRepository
+        MemberEntity member = memberRepository
                 .findByUuid(auth.getMember().getUuid()).orElseThrow(
                         () -> new AccountStateException(EntityErrorCode.NOT_FOUND_MEMBER));
 

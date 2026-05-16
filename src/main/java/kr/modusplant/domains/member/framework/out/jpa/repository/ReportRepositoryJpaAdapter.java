@@ -12,15 +12,15 @@ import org.springframework.stereotype.Repository;
 @Repository
 @RequiredArgsConstructor
 public class ReportRepositoryJpaAdapter implements ReportRepository {
-    private final PropBugRepJpaRepository propBugRepJpaRepository;
-    private final CommPostJpaRepository postJpaRepository;
-    private final CommPostAbuRepJpaRepository postAbuRepJpaRepository;
-    private final CommCommentJpaRepository commentJpaRepository;
-    private final CommCommentAbuRepJpaRepository commentAbuRepJpaRepository;
+    private final ProposalBugReportJpaRepository proposalBugReportJpaRepository;
+    private final PostJpaRepository postJpaRepository;
+    private final PostAbuseReportJpaRepository postAbuRepJpaRepository;
+    private final CommentJpaRepository commentJpaRepository;
+    private final CommentAbuseReportJpaRepository commentAbuseReportJpaRepository;
 
     @Override
     public boolean isIdExist(ReportId reportId) {
-        return propBugRepJpaRepository.existsByUlid(reportId.getValue());
+        return proposalBugReportJpaRepository.existsByUlid(reportId.getValue());
     }
 
     @Override
@@ -33,7 +33,7 @@ public class ReportRepositoryJpaAdapter implements ReportRepository {
 
     @Override
     public boolean isMemberAbuseComment(MemberId memberId, TargetCommentId targetCommentId) {
-        return commentAbuRepJpaRepository.findByMemberIdAndComment(
+        return commentAbuseReportJpaRepository.findByMemberIdAndComment(
                 memberId.getValue(),
                 commentJpaRepository.findByPostUlidAndPath(
                         targetCommentId.getTargetPostId().getValue(),

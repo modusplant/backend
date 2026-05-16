@@ -5,10 +5,10 @@ import kr.modusplant.domains.notification.framework.out.jpa.mapper.supers.FcmTok
 import kr.modusplant.domains.notification.framework.out.jpa.repository.supers.FcmTokenJpaRepository;
 import kr.modusplant.domains.notification.usecase.port.repository.FcmTokenRepository;
 import kr.modusplant.framework.jpa.entity.FcmTokenEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
 import kr.modusplant.shared.enums.Platform;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +23,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FcmTokenRepositoryJpaAdapter implements FcmTokenRepository {
     private final FcmTokenJpaRepository fcmTokenJpaRepository;
-    private final SiteMemberJpaRepository memberJpaRepository;
+    private final MemberJpaRepository memberJpaRepository;
     private final FcmTokenJpaMapper fcmTokenJpaMapper;
 
     @Override
     public void saveOrUpdate(String token, UUID memberUuid, Platform platform) {
-        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberUuid)
+        MemberEntity memberEntity = memberJpaRepository.findByUuid(memberUuid)
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER));
         fcmTokenJpaRepository.findByToken(token)
                         .ifPresentOrElse(

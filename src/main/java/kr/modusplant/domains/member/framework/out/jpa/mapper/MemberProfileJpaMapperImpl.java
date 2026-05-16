@@ -10,8 +10,8 @@ import kr.modusplant.domains.member.domain.vo.MemberProfileIntroduction;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.supers.MemberProfileJpaMapper;
 import kr.modusplant.framework.aws.service.S3FileService;
-import kr.modusplant.framework.jpa.entity.SiteMemberProfileEntity;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.entity.MemberProfileEntity;
+import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
 import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -21,12 +21,12 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class MemberProfileJpaMapperImpl implements MemberProfileJpaMapper {
-    private final SiteMemberJpaRepository memberJpaRepository;
+    private final MemberJpaRepository memberJpaRepository;
     private final S3FileService s3FileService;
 
     @Override
-    public SiteMemberProfileEntity toMemberProfileEntity(MemberProfile profile) {
-        return SiteMemberProfileEntity.builder()
+    public MemberProfileEntity toMemberProfileEntity(MemberProfile profile) {
+        return MemberProfileEntity.builder()
                 .member(memberJpaRepository.findByUuid(profile.getMemberId().getValue()).orElseThrow())
                 .imagePath(profile.getMemberProfileImage().getMemberProfileImagePath().getValue())
                 .introduction(profile.getMemberProfileIntroduction().getValue())
@@ -34,7 +34,7 @@ public class MemberProfileJpaMapperImpl implements MemberProfileJpaMapper {
     }
 
     @Override
-    public MemberProfile toMemberProfile(SiteMemberProfileEntity entity) throws IOException {
+    public MemberProfile toMemberProfile(MemberProfileEntity entity) throws IOException {
         MemberProfileImage memberProfileImage;
         if (entity.getImagePath() == null) {
             memberProfileImage = EmptyMemberProfileImage.create();

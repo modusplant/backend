@@ -4,18 +4,18 @@ import kr.modusplant.domains.account.social.common.util.domain.vo.AgreedTermsTes
 import kr.modusplant.domains.account.social.common.util.domain.vo.SocialMemberProfileTestUtils;
 import kr.modusplant.domains.account.social.domain.vo.SocialMemberProfile;
 import kr.modusplant.domains.account.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
-import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberProfileEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberTermEntity;
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberAuthEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberProfileEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberTermEntityTestUtils;
-import kr.modusplant.framework.jpa.repository.SiteMemberAuthJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberProfileJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberTermJpaRepository;
+import kr.modusplant.framework.jpa.entity.MemberAuthEntity;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
+import kr.modusplant.framework.jpa.entity.MemberProfileEntity;
+import kr.modusplant.framework.jpa.entity.MemberTermEntity;
+import kr.modusplant.framework.jpa.entity.common.util.MemberAuthEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.common.util.MemberEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.common.util.MemberProfileEntityTestUtils;
+import kr.modusplant.framework.jpa.entity.common.util.MemberTermEntityTestUtils;
+import kr.modusplant.framework.jpa.repository.MemberAuthJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberProfileJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberTermJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,20 +27,20 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-class SocialIdentityRepositoryJpaAdapterTest implements SocialMemberProfileTestUtils, AgreedTermsTestUtils, SiteMemberEntityTestUtils, SiteMemberAuthEntityTestUtils, SiteMemberTermEntityTestUtils, SiteMemberProfileEntityTestUtils {
-    private final SiteMemberJpaRepository memberJpaRepository = mock(SiteMemberJpaRepository.class);
-    private final SiteMemberAuthJpaRepository memberAuthJpaRepository = mock(SiteMemberAuthJpaRepository.class);
-    private final SiteMemberProfileJpaRepository memberProfileJpaRepository = mock(SiteMemberProfileJpaRepository.class);
-    private final SiteMemberTermJpaRepository memberTermJpaRepository = mock(SiteMemberTermJpaRepository.class);
+class SocialIdentityRepositoryJpaAdapterTest implements SocialMemberProfileTestUtils, AgreedTermsTestUtils, MemberEntityTestUtils, MemberAuthEntityTestUtils, MemberTermEntityTestUtils, MemberProfileEntityTestUtils {
+    private final MemberJpaRepository memberJpaRepository = mock(MemberJpaRepository.class);
+    private final MemberAuthJpaRepository memberAuthJpaRepository = mock(MemberAuthJpaRepository.class);
+    private final MemberProfileJpaRepository memberProfileJpaRepository = mock(MemberProfileJpaRepository.class);
+    private final MemberTermJpaRepository memberTermJpaRepository = mock(MemberTermJpaRepository.class);
     private final SocialIdentityJpaMapper socialIdentityJpaMapper = mock(SocialIdentityJpaMapper.class);
     private final SocialIdentityRepositoryJpaAdapter socialIdentityRepositoryJpaAdapter = new SocialIdentityRepositoryJpaAdapter(
             memberJpaRepository, memberAuthJpaRepository, memberProfileJpaRepository, memberTermJpaRepository, socialIdentityJpaMapper
     );
 
-    private SiteMemberEntity basicMemberEntity;
-    private SiteMemberEntity kakaoMemberEntity;
-    private SiteMemberAuthEntity basicMemberAuthEntity;
-    private SiteMemberAuthEntity kakaoMemberAuthEntity;
+    private MemberEntity basicMemberEntity;
+    private MemberEntity kakaoMemberEntity;
+    private MemberAuthEntity basicMemberAuthEntity;
+    private MemberAuthEntity kakaoMemberAuthEntity;
 
     @BeforeEach
     void setUp() {
@@ -118,10 +118,10 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialMemberProfileTestU
     @DisplayName("신규 소셜 회원 저장 시 SocialMemberProfile을 반환")
     void testSaveSocialMember_givenSocialMemberProfileAndIntroductionAndAgreedTerms_willReturnSocialMemberProfile() {
         // given
-        SiteMemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder()
+        MemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder()
                 .member(kakaoMemberEntity)
                 .build();
-        SiteMemberTermEntity memberTermEntity = createMemberTermUserEntity();
+        MemberTermEntity memberTermEntity = createMemberTermUserEntity();
 
         given(socialIdentityJpaMapper.toMemberEntity(testKakaoSocialMemberProfile.getNickname(), testKakaoSocialMemberProfile.getRole())).willReturn(kakaoMemberEntity);
         given(memberJpaRepository.save(kakaoMemberEntity)).willReturn(kakaoMemberEntity);
@@ -166,7 +166,7 @@ class SocialIdentityRepositoryJpaAdapterTest implements SocialMemberProfileTestU
     @DisplayName("소셜 연동 해제 시 provider와 providerId를 업데이트")
     void testUpdateSocialUnlinkedMember_givenAccountId_willUpdateProviderAndProviderId() {
         // given
-        SiteMemberAuthEntity linkedMemberAuthEntity = createMemberAuthBasicKakaoEntityBuilder()
+        MemberAuthEntity linkedMemberAuthEntity = createMemberAuthBasicKakaoEntityBuilder()
                 .member(basicMemberEntity)
                 .build();
         given(memberAuthJpaRepository.findByUuid(testNormalMemberId.getValue())).willReturn(Optional.of(linkedMemberAuthEntity));

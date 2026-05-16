@@ -2,9 +2,9 @@ package kr.modusplant.domains.notification.framework.out.jpa.repository;
 
 import kr.modusplant.domains.notification.common.util.domain.aggregate.NotificationTestUtils;
 import kr.modusplant.domains.notification.usecase.record.NotificationPreview;
-import kr.modusplant.framework.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
+import kr.modusplant.framework.jpa.entity.PostEntity;
+import kr.modusplant.framework.jpa.repository.PostJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -13,13 +13,13 @@ import org.mockito.Mockito;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.TEST_NOTIFICATION_POST_PREVIEW;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.NotificationConstant.TEST_NOTIFICATION_POST_PREVIEW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 class PostInfoRepositoryJpaAdapterTest implements NotificationTestUtils {
-    private final CommPostJpaRepository postJpaRepository = Mockito.mock(CommPostJpaRepository.class);
+    private final PostJpaRepository postJpaRepository = Mockito.mock(PostJpaRepository.class);
     private final PostInfoRepositoryJpaAdapter postInfoRepositoryJpaAdapter = new PostInfoRepositoryJpaAdapter(postJpaRepository);
 
     @Nested
@@ -30,8 +30,8 @@ class PostInfoRepositoryJpaAdapterTest implements NotificationTestUtils {
         @DisplayName("게시글 작성자의 UUID를 반환한다")
         void testGetAuthorId_givenValidPostId_willReturnAuthorUuid() {
             // given
-            CommPostEntity postEntity = Mockito.mock(CommPostEntity.class);
-            SiteMemberEntity memberEntity = Mockito.mock(SiteMemberEntity.class);
+            PostEntity postEntity = Mockito.mock(PostEntity.class);
+            MemberEntity memberEntity = Mockito.mock(MemberEntity.class);
 
             given(postJpaRepository.findByUlid(testPostId.getValue())).willReturn(Optional.of(postEntity));
             given(postEntity.getAuthMember()).willReturn(memberEntity);
@@ -52,8 +52,8 @@ class PostInfoRepositoryJpaAdapterTest implements NotificationTestUtils {
         @DisplayName("게시글 제목을 포함한 프리뷰를 반환한다")
         void testGetNotificationPreview_givenValidPostId_willReturnPreview() {
             // given
-            CommPostEntity postEntity = Mockito.mock(CommPostEntity.class);
-            SiteMemberEntity authorEntity = Mockito.mock(SiteMemberEntity.class);
+            PostEntity postEntity = Mockito.mock(PostEntity.class);
+            MemberEntity authorEntity = Mockito.mock(MemberEntity.class);
 
             given(postJpaRepository.findByUlid(testPostId.getValue())).willReturn(Optional.of(postEntity));
             given(postEntity.getAuthMember()).willReturn(authorEntity);

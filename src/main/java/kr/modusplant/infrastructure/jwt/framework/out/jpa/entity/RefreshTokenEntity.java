@@ -1,7 +1,7 @@
 package kr.modusplant.infrastructure.jwt.framework.out.jpa.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.framework.jpa.entity.MemberEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +27,7 @@ public class RefreshTokenEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = MEMB_UUID, nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private SiteMemberEntity member;
+    private MemberEntity member;
 
     @Column(name = "refresh_token", nullable = false)
     private String refreshToken;
@@ -47,7 +47,7 @@ public class RefreshTokenEntity {
         return new HashCodeBuilder(17, 37).append(getMember()).toHashCode();
     }
 
-    private RefreshTokenEntity(UUID uuid, SiteMemberEntity member, String refreshToken, LocalDateTime expiredAt) {
+    private RefreshTokenEntity(UUID uuid, MemberEntity member, String refreshToken, LocalDateTime expiredAt) {
         this.uuid = uuid;
         this.member = member;
         this.refreshToken = refreshToken;
@@ -60,7 +60,7 @@ public class RefreshTokenEntity {
 
     public static final class RefreshTokenEntityBuilder {
         private UUID uuid;
-        private SiteMemberEntity member;
+        private MemberEntity member;
         private String refreshToken;
         private LocalDateTime expiredAt;
 
@@ -69,7 +69,7 @@ public class RefreshTokenEntity {
             return this;
         }
 
-        public RefreshTokenEntityBuilder member(final SiteMemberEntity member) {
+        public RefreshTokenEntityBuilder member(final MemberEntity member) {
             this.member = member;
             return this;
         }

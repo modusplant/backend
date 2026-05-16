@@ -2,8 +2,8 @@ package kr.modusplant.domains.term.common.util.usecase.request;
 
 import kr.modusplant.domains.term.usecase.request.SiteMemberTermCreateRequest;
 
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberTermConstant.*;
+import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.shared.persistence.common.util.constant.MemberTermConstant.*;
 
 public interface SiteMemberTermCreateRequestTestUtils {
     SiteMemberTermCreateRequest testSiteMemberTermCreateRequest = new SiteMemberTermCreateRequest(

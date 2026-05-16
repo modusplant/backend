@@ -1,7 +1,7 @@
 package kr.modusplant.infrastructure.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.framework.out.redis.AccessTokenRedisRepository;
 import kr.modusplant.infrastructure.jwt.provider.JwtCookieProvider;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
@@ -52,7 +52,7 @@ public class SecurityConfig {
     private final JwtTokenProvider tokenProvider;
     private final JwtCookieProvider cookieProvider;
     private final TokenService tokenService;
-    private final SiteMemberJpaRepository memberRepository;
+    private final MemberJpaRepository memberRepository;
     private final Validator validator;
     private final AccessTokenRedisRepository tokenRedisRepository;
 

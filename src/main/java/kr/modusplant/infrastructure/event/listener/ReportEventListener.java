@@ -8,7 +8,7 @@ import kr.modusplant.shared.event.CommentAbuseReportEvent;
 import kr.modusplant.shared.event.PostAbuseReportEvent;
 import kr.modusplant.shared.event.ProposalOrBugReportEvent;
 import kr.modusplant.shared.event.ProposalOrBugReportRemoveEvent;
-import kr.modusplant.shared.persistence.compositekey.CommCommentId;
+import kr.modusplant.shared.persistence.compositekey.CommentCompositeKey;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.context.event.EventListener;
@@ -28,12 +28,12 @@ import static org.jooq.impl.DSL.*;
 public class ReportEventListener {
     private final DSLContext dsl;
     private final S3FileService s3FileService;
-    private final SiteMemberJpaRepository memberJpaRepository;
-    private final CommPostJpaRepository postJpaRepository;
-    private final CommCommentJpaRepository commentJpaRepository;
-    private final PropBugRepJpaRepository propBugRepJpaRepository;
-    private final CommPostAbuRepJpaRepository postAbuRepJpaRepository;
-    private final CommCommentAbuRepJpaRepository commentAbuRepJpaRepository;
+    private final MemberJpaRepository memberJpaRepository;
+    private final PostJpaRepository postJpaRepository;
+    private final CommentJpaRepository commentJpaRepository;
+    private final ProposalBugReportJpaRepository proposalBugReportJpaRepository;
+    private final PostAbuseReportJpaRepository postAbuRepJpaRepository;
+    private final CommentAbuseReportJpaRepository commentAbuseReportJpaRepository;
 
     @EventListener
     public void handleProposalOrBugReportEvent(ProposalOrBugReportEvent proposalOrBugReportEvent) {
@@ -48,9 +48,9 @@ public class ReportEventListener {
         for (int i = 0; i < imagePaths.size(); i++) {
             imageList.add(new FilenameAndSrcEntityRecord(filenames.get(i), imagePaths.get(i)));
         }
-        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
-        propBugRepJpaRepository.save(
-                PropBugRepEntity.builder()
+        MemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
+        proposalBugReportJpaRepository.save(
+                ProposalBugReportEntity.builder()
                         .ulid(reportId)
                         .member(memberEntity)
                         .title(title)
@@ -72,9 +72,9 @@ public class ReportEventListener {
         UUID memberId = postAbuseReportEvent.getMemberId();
         String postUlid = postAbuseReportEvent.getPostUlid();
 
-        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
-        CommPostEntity postEntity = postJpaRepository.findByUlid(postUlid).orElseThrow();
-        postAbuRepJpaRepository.save(CommPostAbuRepEntity.builder().member(memberEntity).post(postEntity).build());
+        MemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
+        PostEntity postEntity = postJpaRepository.findByUlid(postUlid).orElseThrow();
+        postAbuRepJpaRepository.save(PostAbuseReportEntity.builder().member(memberEntity).post(postEntity).build());
     }
 
     @EventListener
@@ -83,11 +83,11 @@ public class ReportEventListener {
         String postUlid = commentAbuseReportEvent.getPostUlid();
         String path = commentAbuseReportEvent.getPath();
 
-        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
-        CommCommentEntity commentEntity = commentJpaRepository.findById(
-                CommCommentId.builder().post(postUlid).path(path).build()).orElseThrow();
-        commentAbuRepJpaRepository.save(
-                CommCommentAbuRepEntity.builder().member(memberEntity).comment(commentEntity).build());
+        MemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
+        CommentEntity commentEntity = commentJpaRepository.findById(
+                CommentCompositeKey.builder().post(postUlid).path(path).build()).orElseThrow();
+        commentAbuseReportJpaRepository.save(
+                CommentAbuseReportEntity.builder().member(memberEntity).comment(commentEntity).build());
     }
 
     private void deleteImageFromReportImagePath(String reportId) {

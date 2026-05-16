@@ -11,9 +11,9 @@ import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntro
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberProfileJpaMapperImpl;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
 import kr.modusplant.framework.aws.service.S3FileService;
-import kr.modusplant.framework.jpa.entity.SiteMemberProfileEntity;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberProfileJpaRepository;
+import kr.modusplant.framework.jpa.entity.MemberProfileEntity;
+import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
+import kr.modusplant.framework.jpa.repository.MemberProfileJpaRepository;
 import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -26,15 +26,15 @@ import java.util.Optional;
 public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepository {
     private final S3FileService s3FileService;
     private final MemberProfileJpaMapperImpl memberProfileJpaMapper;
-    private final SiteMemberJpaRepository siteMemberJpaRepository;
-    private final SiteMemberProfileJpaRepository siteMemberProfileJpaRepository;
+    private final MemberJpaRepository memberJpaRepository;
+    private final MemberProfileJpaRepository memberProfileJpaRepository;
 
     @Override
     public Optional<MemberProfile> getById(MemberId memberId) throws IOException {
-        Optional<SiteMemberProfileEntity> profileEntityOrEmpty =
-                siteMemberProfileJpaRepository.findByUuid(memberId.getValue());
+        Optional<MemberProfileEntity> profileEntityOrEmpty =
+                memberProfileJpaRepository.findByUuid(memberId.getValue());
         if (profileEntityOrEmpty.isPresent()) {
-            SiteMemberProfileEntity profileEntity = profileEntityOrEmpty.orElseThrow();
+            MemberProfileEntity profileEntity = profileEntityOrEmpty.orElseThrow();
             MemberProfileImage profileImage;
             MemberProfileIntroduction profileIntroduction;
             if (profileEntity.getImagePath() == null) {
@@ -61,9 +61,9 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
     @Override
     public MemberProfile add(MemberProfile memberProfile) throws IOException {
         return memberProfileJpaMapper.toMemberProfile(
-                siteMemberProfileJpaRepository.save(
-                        SiteMemberProfileEntity.builder()
-                                .member(siteMemberJpaRepository
+                memberProfileJpaRepository.save(
+                        MemberProfileEntity.builder()
+                                .member(memberJpaRepository
                                         .findByUuid(memberProfile.getMemberId().getValue())
                                         .orElseThrow())
                                 .imagePath(memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue())
@@ -76,16 +76,16 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
         String imagePath = memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue();
         String introduction = memberProfile.getMemberProfileIntroduction().getValue();
         String nickname = memberProfile.getNickname().getValue();
-        SiteMemberProfileEntity memberProfileEntity = siteMemberProfileJpaRepository
+        MemberProfileEntity memberProfileEntity = memberProfileJpaRepository
                 .findByUuid(memberProfile.getMemberId().getValue()).orElseThrow();
         memberProfileEntity.updateImagePath(imagePath);
         memberProfileEntity.updateIntroduction(introduction);
         memberProfileEntity.getMember().updateNickname(nickname);
-        return memberProfileJpaMapper.toMemberProfile(siteMemberProfileJpaRepository.save(memberProfileEntity));
+        return memberProfileJpaMapper.toMemberProfile(memberProfileJpaRepository.save(memberProfileEntity));
     }
 
     @Override
     public boolean isIdExist(MemberId memberId) {
-        return siteMemberProfileJpaRepository.existsByUuid(memberId.getValue());
+        return memberProfileJpaRepository.existsByUuid(memberId.getValue());
     }
 }
