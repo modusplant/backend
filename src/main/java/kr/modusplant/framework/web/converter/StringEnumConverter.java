@@ -1,8 +1,8 @@
 package kr.modusplant.framework.web.converter;
 
+import jakarta.annotation.Nonnull;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.enums.GeneralErrorCode;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.core.convert.converter.Converter;
 
 import java.util.List;
@@ -16,7 +16,7 @@ public class StringEnumConverter<T extends Enum<T>> implements Converter<String,
         this.enumClass = enumClass;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public T convert(String source) {
         try {
