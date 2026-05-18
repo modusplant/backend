@@ -3,7 +3,7 @@ package kr.modusplant.domains.account.social.common.util.usecase.record;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.usecase.record.TempTokenInfo;
 
-import static kr.modusplant.shared.persistence.common.util.constant.MemberAuthConstant.*;
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.*;
 
 public interface TempTokenInfoTestUtils {
     default TempTokenInfo createKakaoTempTokenInfo() {

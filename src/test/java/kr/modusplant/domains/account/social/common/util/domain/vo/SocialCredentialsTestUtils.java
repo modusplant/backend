@@ -3,8 +3,8 @@ package kr.modusplant.domains.account.social.common.util.domain.vo;
 import kr.modusplant.domains.account.social.domain.vo.SocialCredentials;
 import kr.modusplant.shared.enums.AuthProvider;
 
-import static kr.modusplant.shared.persistence.common.util.constant.MemberAuthConstant.MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID;
-import static kr.modusplant.shared.persistence.common.util.constant.MemberAuthConstant.MEMBER_AUTH_KAKAO_USER_PROVIDER_ID;
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID;
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_KAKAO_USER_PROVIDER_ID;
 
 public interface SocialCredentialsTestUtils {
     SocialCredentials testBasicSocialCredentials = SocialCredentials.create(AuthProvider.BASIC,null);

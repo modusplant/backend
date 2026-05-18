@@ -1,8 +1,8 @@
 package kr.modusplant.domains.member.framework.out.jpa.entity;
 
+import kr.modusplant.domains.member.framework.out.jpa.compositekey.CommentLikeCompositeKey;
 import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.CommentLikeEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
-import kr.modusplant.shared.persistence.compositekey.CommentLikeCompositeKey;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,9 +12,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMM_COMMENT_PATH;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
-import static kr.modusplant.shared.persistence.common.util.constant.CommentConstant.TEST_COMM_COMMENT_PATH;
-import static kr.modusplant.shared.persistence.common.util.constant.PostConstant.TEST_COMM_POST_ULID;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -32,7 +32,7 @@ public class CommentLikeEntityTest implements CommentLikeEntityTestUtils {
     @BeforeEach
     void setUp() {
         // given
-        postId = TEST_COMM_POST_ULID;
+        postId = TEST_POST_ULID;
         path = TEST_COMM_COMMENT_PATH;
         memberId = createMemberBasicUserEntityWithUuid().getUuid();
 

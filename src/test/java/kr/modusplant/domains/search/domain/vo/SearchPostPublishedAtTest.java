@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_PUBLISHED_AT;
 import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostPublishedAtTestUtils.testSearchPostPublishedAt;
 import static kr.modusplant.domains.search.common.util.domain.vo.nullobject.EmptySearchPostPublishedAtTestUtils.testEmptySearchPostPublishedAt;
-import static kr.modusplant.shared.persistence.common.util.constant.PostConstant.TEST_COMM_POST_PUBLISHED_AT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,7 +18,7 @@ class SearchPostPublishedAtTest {
     @Test
     @DisplayName("create으로 보고서 제목 반환")
     void testCreate_givenValidValue_willReturnSearchPostPublishedAt() {
-        assertThat(SearchPostPublishedAt.create(TEST_COMM_POST_PUBLISHED_AT)).isEqualTo(SearchPostPublishedAt.create(TEST_COMM_POST_PUBLISHED_AT));
+        assertThat(SearchPostPublishedAt.create(TEST_POST_PUBLISHED_AT)).isEqualTo(SearchPostPublishedAt.create(TEST_POST_PUBLISHED_AT));
     }
 
     @Test
@@ -51,7 +51,7 @@ class SearchPostPublishedAtTest {
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
-        assertNotEquals(testSearchPostPublishedAt, SearchPostPublishedAt.create(TEST_COMM_POST_PUBLISHED_AT.minusDays(1)));
+        assertNotEquals(testSearchPostPublishedAt, SearchPostPublishedAt.create(TEST_POST_PUBLISHED_AT.minusDays(1)));
     }
 
     @Test

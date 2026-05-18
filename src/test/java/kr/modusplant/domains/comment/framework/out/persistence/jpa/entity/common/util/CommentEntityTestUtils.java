@@ -2,9 +2,9 @@ package kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.commo
 
 import kr.modusplant.domains.post.framework.out.jpa.entity.common.util.PostEntityTestUtils;
 
+import static kr.modusplant.domains.comment.common.constant.CommentConstant.*;
 import static kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity.CommentEntityBuilder;
 import static kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity.builder;
-import static kr.modusplant.shared.persistence.common.util.constant.CommentConstant.*;
 
 public interface CommentEntityTestUtils extends PostEntityTestUtils {
     default CommentEntityBuilder createCommentEntityBuilder() {

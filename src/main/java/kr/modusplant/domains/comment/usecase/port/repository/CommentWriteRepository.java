@@ -2,7 +2,7 @@ package kr.modusplant.domains.comment.usecase.port.repository;
 
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.vo.CommentContent;
-import kr.modusplant.shared.persistence.compositekey.CommentCompositeKey;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.CommentCompositeKey;
 
 public interface CommentWriteRepository {
 

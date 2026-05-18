@@ -3,11 +3,11 @@ package kr.modusplant.domains.member.common.util.usecase.record;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.member.usecase.record.MemberWithdrawalRecord;
 
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN;
 import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_GOOGLE_CODE;
 import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_CODE;
-import static kr.modusplant.shared.persistence.common.util.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN;
-import static kr.modusplant.shared.persistence.common.util.constant.MemberWithdrawConstant.MEMBER_WITHDRAW_BASIC_USER_OPINION;
-import static kr.modusplant.shared.persistence.common.util.constant.MemberWithdrawConstant.MEMBER_WITHDRAW_BASIC_USER_REASON;
+import static kr.modusplant.domains.member.common.constant.MemberWithdrawConstant.MEMBER_WITHDRAW_BASIC_USER_OPINION;
+import static kr.modusplant.domains.member.common.constant.MemberWithdrawConstant.MEMBER_WITHDRAW_BASIC_USER_REASON;
 
 public interface MemberWithdrawalRecordTestUtils {
     MemberWithdrawalRecord testBasicMemberWithdrawalRecord =

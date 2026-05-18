@@ -1,10 +1,10 @@
 package kr.modusplant.domains.post.common.helper;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import kr.modusplant.shared.framework.jooq.converter.JsonbJsonNodeConverter;
-import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.jooq.tables.records.*;
 import kr.modusplant.shared.enums.Role;
+import kr.modusplant.shared.framework.jooq.converter.JsonbJsonNodeConverter;
+import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.generator.EventType;
 import org.jooq.DSLContext;

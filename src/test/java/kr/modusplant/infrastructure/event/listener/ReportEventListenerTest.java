@@ -1,5 +1,6 @@
 package kr.modusplant.infrastructure.event.listener;
 
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.CommentCompositeKey;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.member.framework.out.jpa.entity.CommentAbuseReportEntity;
@@ -13,9 +14,8 @@ import kr.modusplant.domains.member.framework.out.jpa.repository.PostAbuseReport
 import kr.modusplant.domains.member.framework.out.jpa.repository.ProposalBugReportJpaRepository;
 import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
-import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.event.ProposalOrBugReportRemoveEvent;
-import kr.modusplant.shared.persistence.compositekey.CommentCompositeKey;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Result;
@@ -31,14 +31,13 @@ import org.junit.jupiter.api.Test;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static kr.modusplant.shared.event.common.util.CommentAbuseReportEventTestUtils.testCommentAbuseReportEvent;
 import static kr.modusplant.shared.event.common.util.PostAbuseReportEventTestUtils.testPostAbuseReportEvent;
 import static kr.modusplant.shared.event.common.util.ProposalOrBugReportEventTestUtils.testProposalOrBugReportEvent;
 import static kr.modusplant.shared.event.common.util.ProposalOrBugReportRemoveEventTestUtils.testProposalOrBugReportRemoveEvent;
-import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.PostConstant.TEST_COMM_POST_ULID;
-import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -155,7 +154,7 @@ class ReportEventListenerTest implements MemberEntityTestUtils {
         MemberEntity memberEntity = createMemberBasicUserEntity();
         PostEntity mockPost = mock(PostEntity.class);
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));
-        given(postJpaRepository.findByUlid(TEST_COMM_POST_ULID)).willReturn(Optional.of(mockPost));
+        given(postJpaRepository.findByUlid(TEST_POST_ULID)).willReturn(Optional.of(mockPost));
 
         // when
         reportEventListener.handlePostAbuseReportEvent(testPostAbuseReportEvent);

@@ -13,9 +13,9 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.shared.http.utils.ParseHttpHeaderUtils.parseIfModifiedSince;
 import static kr.modusplant.shared.http.utils.ParseHttpHeaderUtils.parseIfNoneMatch;
-import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ParseHttpHeaderUtilsTest implements MemberEntityTestUtils, MemberProfileEntityTestUtils {

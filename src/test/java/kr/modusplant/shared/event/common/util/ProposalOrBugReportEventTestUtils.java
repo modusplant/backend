@@ -2,8 +2,8 @@ package kr.modusplant.shared.event.common.util;
 
 import kr.modusplant.shared.event.ProposalOrBugReportEvent;
 
-import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.*;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.member.common.constant.ReportConstant.*;
 
 public interface ProposalOrBugReportEventTestUtils {
     ProposalOrBugReportEvent testProposalOrBugReportEvent =

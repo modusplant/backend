@@ -2,7 +2,7 @@ package kr.modusplant.shared.event.common.util;
 
 import kr.modusplant.shared.event.ProposalOrBugReportRemoveEvent;
 
-import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.TEST_REPORT_ULID;
+import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_ULID;
 
 public interface ProposalOrBugReportRemoveEventTestUtils {
     ProposalOrBugReportRemoveEvent testProposalOrBugReportRemoveEvent =

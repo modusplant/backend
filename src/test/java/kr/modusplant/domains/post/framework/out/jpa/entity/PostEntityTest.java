@@ -13,7 +13,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import java.time.LocalDateTime;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
-import static kr.modusplant.shared.persistence.common.util.constant.PostConstant.TEST_COMM_POST_ULID;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -109,7 +109,7 @@ class PostEntityTest implements PostEntityTestUtils {
         PostEntity postEntity = createPostEntityBuilderWithUlid().build();
 
         // then
-        assertEquals(postEntity.getETagSource(),TEST_COMM_POST_ULID + "-" + null);
+        assertEquals(postEntity.getETagSource(), TEST_POST_ULID + "-" + null);
     }
 
     @Test

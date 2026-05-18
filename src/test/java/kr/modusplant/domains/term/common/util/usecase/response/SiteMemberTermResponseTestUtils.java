@@ -2,8 +2,8 @@ package kr.modusplant.domains.term.common.util.usecase.response;
 
 import kr.modusplant.domains.term.usecase.response.SiteMemberTermResponse;
 
-import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.MemberTermConstant.*;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.term.common.constant.MemberTermConstant.*;
 
 public interface SiteMemberTermResponseTestUtils {
     SiteMemberTermResponse testSiteMemberTermResponse = new SiteMemberTermResponse(

@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
-import static kr.modusplant.shared.persistence.common.util.constant.PostConstant.TEST_COMM_POST_PUBLISHED_AT;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_PUBLISHED_AT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PostArchiveJpaMapperImplTest implements PostEntityTestUtils, PostArchiveEntityTestUtils, MemberEntityTestUtils, PrimaryCategoryEntityTestUtils, SecondaryCategoryEntityTestUtils {
@@ -33,7 +33,7 @@ class PostArchiveJpaMapperImplTest implements PostEntityTestUtils, PostArchiveEn
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)
                 .authMember(memberEntity)
-                .publishedAt(TEST_COMM_POST_PUBLISHED_AT)
+                .publishedAt(TEST_POST_PUBLISHED_AT)
                 .build();
 
         // when

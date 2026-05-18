@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.framework.out.jpa.repository;
 
+import kr.modusplant.domains.member.framework.out.jpa.compositekey.PostLikeCompositeKey;
 import kr.modusplant.domains.member.framework.out.jpa.entity.PostLikeEntity;
-import kr.modusplant.shared.persistence.compositekey.PostLikeCompositeKey;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -23,8 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static kr.modusplant.shared.persistence.common.util.constant.NotificationConstant.TEST_NOTIFICATION_RECIPIENT_ID;
-import static kr.modusplant.shared.persistence.common.util.constant.NotificationConstant.TEST_NOTIFICATION_ULID;
+import static kr.modusplant.domains.notification.common.constant.NotificationConstant.TEST_NOTIFICATION_RECIPIENT_ID;
+import static kr.modusplant.domains.notification.common.constant.NotificationConstant.TEST_NOTIFICATION_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;

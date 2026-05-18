@@ -10,7 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.domains.post.common.constant.PostUlidConstant.*;
+import static kr.modusplant.domains.post.common.constant.PostConstant.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PostIdTest implements PostTestUtils {

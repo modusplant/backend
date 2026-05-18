@@ -13,16 +13,19 @@ import kr.modusplant.domains.search.usecase.port.repository.SearchPostRepository
 import kr.modusplant.domains.search.usecase.record.SearchPostRecord;
 import kr.modusplant.domains.search.usecase.response.SearchPostRelevanceSortedPageResponse;
 import kr.modusplant.domains.search.usecase.response.SearchPostResponse;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.post.common.constant.PostConstant.*;
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT;
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT_THUMBNAIL_KEY;
-import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
+import static kr.modusplant.domains.post.common.constant.PrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
+import static kr.modusplant.domains.post.common.constant.SecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORIES_ID;
 import static kr.modusplant.domains.search.common.constant.SearchDoubleConstant.TEST_SEARCH_KEYWORD_SIMILARITY_1;
 import static kr.modusplant.domains.search.common.constant.SearchIntegerConstant.TEST_SEARCH_POST_SIZE;
 import static kr.modusplant.domains.search.common.constant.SearchStringConstant.TEST_SEARCH_KEYWORD;
@@ -33,11 +36,6 @@ import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostImpor
 import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostPublishedAtTestUtils.testSearchPostPublishedAt;
 import static kr.modusplant.domains.search.common.util.usecase.model.read.SearchPostReadModelTestUtils.testSearchPostReadModelList;
 import static kr.modusplant.domains.search.common.util.usecase.record.SearchPostRecordTestUtils.testSearchPostRecordRelevance;
-import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.PostConstant.TEST_COMM_POST_CONTENT_JSON_NODE;
-import static kr.modusplant.shared.persistence.common.util.constant.PostConstant.TEST_COMM_POST_PUBLISHED_AT;
-import static kr.modusplant.shared.persistence.common.util.constant.PrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
-import static kr.modusplant.shared.persistence.common.util.constant.SecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORIES_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -65,7 +63,7 @@ class SearchControllerTest {
                 testSearchPostId, testSearchPostPublishedAt, testSearchPostImportanceTitle,
                 testSearchKeywordSimilarity1, TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID))
                 .willReturn(testSearchPostReadModelList);
-        given(searchPostTranslator.getJsonNodeContentPreview(TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY)).willReturn(TEST_COMM_POST_CONTENT_JSON_NODE);
+        given(searchPostTranslator.getJsonNodeContentPreview(TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY)).willReturn(TEST_POST_CONTENT_JSON_NODE);
         willDoNothing().given(searchPostHistoryRepository).saveSearchKeyword(testSearchKeyword, MEMBER_BASIC_USER_UUID);
 
         // when
@@ -95,7 +93,7 @@ class SearchControllerTest {
         SearchPostRecord record = new SearchPostRecord(
                 TEST_SEARCH_KEYWORD, SearchPostTarget.TITLE_CONTENT_COMMENT, SearchPostSortCondition.RELEVANCE,
                 null, TEST_COMM_SECONDARY_CATEGORIES_ID,
-                TEST_POST_ULID, TEST_COMM_POST_PUBLISHED_AT,
+                TEST_POST_ULID, TEST_POST_PUBLISHED_AT,
                 SearchPostImportance.title().getValueIfNotEmpty(), TEST_SEARCH_KEYWORD_SIMILARITY_1,
                 TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
         given(searchPostConditionRepository.isIdExist(any())).willReturn(true);
@@ -115,7 +113,7 @@ class SearchControllerTest {
         SearchPostRecord record = new SearchPostRecord(
                 TEST_SEARCH_KEYWORD, SearchPostTarget.TITLE_CONTENT_COMMENT, SearchPostSortCondition.RELEVANCE,
                 TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID,
-                TEST_POST_ULID, TEST_COMM_POST_PUBLISHED_AT,
+                TEST_POST_ULID, TEST_POST_PUBLISHED_AT,
                 SearchPostImportance.title().getValueIfNotEmpty(), TEST_SEARCH_KEYWORD_SIMILARITY_1, TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
         given(searchPostConditionRepository.isIdExist(record.primaryCategoryId())).willReturn(false);
 
@@ -134,7 +132,7 @@ class SearchControllerTest {
         SearchPostRecord record = new SearchPostRecord(
                 TEST_SEARCH_KEYWORD, SearchPostTarget.TITLE_CONTENT_COMMENT, SearchPostSortCondition.RELEVANCE,
                 TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID,
-                TEST_POST_ULID, TEST_COMM_POST_PUBLISHED_AT,
+                TEST_POST_ULID, TEST_POST_PUBLISHED_AT,
                 SearchPostImportance.title().getValueIfNotEmpty(), TEST_SEARCH_KEYWORD_SIMILARITY_1,
                 TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
         given(searchPostConditionRepository.isIdExist(any())).willReturn(true);

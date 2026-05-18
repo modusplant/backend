@@ -4,11 +4,11 @@ import jakarta.transaction.Transactional;
 import kr.modusplant.domains.notification.common.helper.NotificationTestDataHelper;
 import kr.modusplant.domains.notification.usecase.record.NotificationReadModel;
 import kr.modusplant.domains.post.common.helper.PostTestDataHelper;
-import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.jooq.tables.records.CommNotificationRecord;
 import kr.modusplant.jooq.tables.records.SiteMemberRecord;
 import kr.modusplant.shared.enums.NotificationActionType;
 import kr.modusplant.shared.enums.NotificationStatusType;
+import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.TimeZone;
 
-import static kr.modusplant.shared.persistence.common.util.constant.NotificationConstant.*;
+import static kr.modusplant.domains.notification.common.constant.NotificationConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest

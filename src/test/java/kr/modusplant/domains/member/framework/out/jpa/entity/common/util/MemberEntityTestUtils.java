@@ -2,7 +2,7 @@ package kr.modusplant.domains.member.framework.out.jpa.entity.common.util;
 
 import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 
-import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.*;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.*;
 
 public interface MemberEntityTestUtils {
     default MemberEntity createMemberBasicAdminEntity() {
