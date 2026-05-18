@@ -2,10 +2,9 @@ package kr.modusplant.domains.member.framework.out.jpa.repository;
 
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.vo.MemberId;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberJpaMapperImpl;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
-import kr.modusplant.framework.jpa.entity.MemberEntity;
-import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
 import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

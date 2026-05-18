@@ -1,9 +1,9 @@
 package kr.modusplant.domains.search.framework.out.jpa.repository;
 
+import kr.modusplant.domains.post.framework.out.jpa.entity.SecondaryCategoryEntity;
+import kr.modusplant.domains.post.framework.out.jpa.mapper.PrimaryCategoryJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.mapper.SecondaryCategoryJpaRepository;
 import kr.modusplant.domains.search.usecase.port.repository.SearchPostConditionRepository;
-import kr.modusplant.framework.jpa.entity.SecondaryCategoryEntity;
-import kr.modusplant.framework.jpa.repository.PrimaryCategoryJpaRepository;
-import kr.modusplant.framework.jpa.repository.SecondaryCategoryJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

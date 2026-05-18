@@ -1,10 +1,10 @@
 package kr.modusplant.domains.account.normal.framework.out.persistence.jpa.mapper;
 
+import kr.modusplant.domains.account.identity.framework.out.jpa.entity.MemberAuthEntity;
+import kr.modusplant.domains.account.identity.framework.out.jpa.entity.common.util.MemberAuthEntityTestUtils;
 import kr.modusplant.domains.account.normal.domain.vo.SignUpData;
-import kr.modusplant.framework.jpa.entity.MemberAuthEntity;
-import kr.modusplant.framework.jpa.entity.common.util.MemberAuthEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.MemberEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.MemberTermEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
+import kr.modusplant.domains.term.framework.out.jpa.entity.common.util.MemberTermEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

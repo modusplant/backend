@@ -3,9 +3,7 @@ package kr.modusplant.domains.member.framework.out.jpa.repository;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.TargetPostId;
 import kr.modusplant.domains.member.usecase.port.repository.TargetPostRepository;
-import kr.modusplant.framework.jpa.repository.PostBookmarkJpaRepository;
-import kr.modusplant.framework.jpa.repository.PostJpaRepository;
-import kr.modusplant.framework.jpa.repository.PostLikeJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

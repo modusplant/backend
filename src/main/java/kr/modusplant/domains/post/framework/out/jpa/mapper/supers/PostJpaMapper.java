@@ -1,10 +1,10 @@
 package kr.modusplant.domains.post.framework.out.jpa.mapper.supers;
 
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.post.domain.aggregate.Post;
-import kr.modusplant.framework.jpa.entity.MemberEntity;
-import kr.modusplant.framework.jpa.entity.PostEntity;
-import kr.modusplant.framework.jpa.entity.PrimaryCategoryEntity;
-import kr.modusplant.framework.jpa.entity.SecondaryCategoryEntity;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PrimaryCategoryEntity;
+import kr.modusplant.domains.post.framework.out.jpa.entity.SecondaryCategoryEntity;
 
 public interface PostJpaMapper {
     PostEntity toPostEntity(Post post, MemberEntity authorEntity, PrimaryCategoryEntity primaryCategoryEntity, SecondaryCategoryEntity secondaryCategoryEntity, Long viewCount);

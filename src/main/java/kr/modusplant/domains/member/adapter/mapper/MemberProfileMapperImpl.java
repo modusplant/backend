@@ -3,14 +3,14 @@ package kr.modusplant.domains.member.adapter.mapper;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
-import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.framework.aws.service.AmazonS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class MemberProfileMapperImpl implements MemberProfileMapper {
-    private final S3FileService s3FileService;
+    private final AmazonS3Service amazonS3Service;
 
     @Override
     public MemberProfileResponse toMemberProfileResponse(MemberProfile memberProfile) {
@@ -24,7 +24,7 @@ public class MemberProfileMapperImpl implements MemberProfileMapper {
         } else {
             return new MemberProfileResponse(
                     memberProfile.getMemberId().getValue(),
-                    s3FileService.generateS3SrcUrl(imagePath),
+                    amazonS3Service.generateS3SrcUrl(imagePath),
                     memberProfile.getMemberProfileIntroduction().getValue(),
                     memberProfile.getNickname().getValue());
         }

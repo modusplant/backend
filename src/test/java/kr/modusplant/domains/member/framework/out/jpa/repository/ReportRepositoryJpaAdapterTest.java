@@ -1,8 +1,9 @@
 package kr.modusplant.domains.member.framework.out.jpa.repository;
 
-import kr.modusplant.framework.jpa.entity.common.util.CommentAbuseReportEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.PostAbuseReportEntityTestUtils;
-import kr.modusplant.framework.jpa.repository.*;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.CommentAbuseReportEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.PostAbuseReportEntityTestUtils;
+import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

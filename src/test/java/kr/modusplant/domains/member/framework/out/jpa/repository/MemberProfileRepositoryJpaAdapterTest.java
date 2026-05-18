@@ -2,14 +2,12 @@ package kr.modusplant.domains.member.framework.out.jpa.repository;
 
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberProfileTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberProfileEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberProfileEntityTestUtils;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberProfileJpaMapperImpl;
-import kr.modusplant.framework.aws.service.S3FileService;
-import kr.modusplant.framework.jpa.entity.MemberEntity;
-import kr.modusplant.framework.jpa.entity.MemberProfileEntity;
-import kr.modusplant.framework.jpa.entity.common.util.MemberEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.MemberProfileEntityTestUtils;
-import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
-import kr.modusplant.framework.jpa.repository.MemberProfileJpaRepository;
+import kr.modusplant.framework.aws.service.AmazonS3Service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -26,18 +24,18 @@ import static org.mockito.BDDMockito.given;
 class MemberProfileRepositoryJpaAdapterTest implements
         MemberProfileTestUtils,
         MemberEntityTestUtils, MemberProfileEntityTestUtils {
-    private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
+    private final AmazonS3Service amazonS3Service = Mockito.mock(AmazonS3Service.class);
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
     private final MemberProfileJpaRepository memberProfileJpaRepository = Mockito.mock(MemberProfileJpaRepository.class);
-    private final MemberProfileJpaMapperImpl memberProfileJpaMapper = new MemberProfileJpaMapperImpl(memberJpaRepository, s3FileService);
-    private final MemberProfileRepositoryJpaAdapter memberProfileRepositoryJpaAdapter = new MemberProfileRepositoryJpaAdapter(s3FileService, memberProfileJpaMapper, memberJpaRepository, memberProfileJpaRepository);
+    private final MemberProfileJpaMapperImpl memberProfileJpaMapper = new MemberProfileJpaMapperImpl(memberJpaRepository, amazonS3Service);
+    private final MemberProfileRepositoryJpaAdapter memberProfileRepositoryJpaAdapter = new MemberProfileRepositoryJpaAdapter(amazonS3Service, memberProfileJpaMapper, memberJpaRepository, memberProfileJpaRepository);
 
     @Test
     @DisplayName("선택적인 데이터가 모두 있을 때 getById로 가용한 MemberProfile 반환(가용할 때)")
     void testGetById_givenValidMemberIdAndNotNullImageAndIntro_willReturnOptionalAvailableMemberProfile() throws IOException {
         // given & when
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntityWithUuid()).build()));
-        given(s3FileService.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
+        given(amazonS3Service.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
 
         // then
         assertThat(memberProfileRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(Optional.of(createMemberProfile()));
@@ -71,7 +69,7 @@ class MemberProfileRepositoryJpaAdapterTest implements
         MemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder().member(memberBasicUserEntity).build();
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberBasicUserEntity));
         given(memberProfileJpaRepository.save(memberProfileEntity)).willReturn(memberProfileEntity);
-        given(s3FileService.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
+        given(amazonS3Service.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
 
         // when
         MemberProfile memberProfile = createMemberProfile();
@@ -91,7 +89,7 @@ class MemberProfileRepositoryJpaAdapterTest implements
                 MemberProfileEntity.builder().member(updatedMemberEntity).introduction("abcIntroduction").build();
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(memberProfileEntity));
         given(memberProfileJpaRepository.save(updatedMemberProfileEntity)).willReturn(updatedMemberProfileEntity);
-        given(s3FileService.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
+        given(amazonS3Service.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
 
         // when
         MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity);

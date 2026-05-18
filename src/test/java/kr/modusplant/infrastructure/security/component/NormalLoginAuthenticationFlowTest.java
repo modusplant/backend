@@ -28,7 +28,7 @@ package kr.modusplant.infrastructure.security.component;
 //import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 //
 
-import kr.modusplant.framework.jpa.entity.common.util.MemberEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
 import kr.modusplant.infrastructure.security.common.util.NormalLoginRequestTestUtils;
 import kr.modusplant.infrastructure.security.common.util.SiteMemberUserDetailsTestUtils;
 

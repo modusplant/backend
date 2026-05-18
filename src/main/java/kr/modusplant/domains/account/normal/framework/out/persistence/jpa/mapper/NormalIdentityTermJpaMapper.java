@@ -1,8 +1,8 @@
 package kr.modusplant.domains.account.normal.framework.out.persistence.jpa.mapper;
 
 import kr.modusplant.domains.account.normal.domain.vo.SignUpData;
-import kr.modusplant.framework.jpa.entity.MemberEntity;
-import kr.modusplant.framework.jpa.entity.MemberTermEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.term.framework.out.jpa.entity.MemberTermEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

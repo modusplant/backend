@@ -1,7 +1,7 @@
 package kr.modusplant.domains.account.normal.framework.out.persistence.jpa.mapper;
 
-import kr.modusplant.framework.jpa.entity.MemberEntity;
-import kr.modusplant.framework.jpa.entity.MemberProfileEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberProfileEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

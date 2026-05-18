@@ -1,14 +1,14 @@
 package kr.modusplant.domains.notification.framework.out.jpa.repository;
 
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.notification.domain.vo.CommentPath;
 import kr.modusplant.domains.notification.domain.vo.PostId;
 import kr.modusplant.domains.notification.usecase.port.repository.CommentInfoRepository;
 import kr.modusplant.domains.notification.usecase.record.NotificationPreview;
-import kr.modusplant.framework.jpa.entity.CommentEntity;
-import kr.modusplant.framework.jpa.entity.MemberEntity;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.framework.jpa.repository.CommentJpaRepository;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

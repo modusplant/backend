@@ -1,6 +1,6 @@
 package kr.modusplant.infrastructure.jwt.framework.out.jpa.repository;
 
-import kr.modusplant.framework.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.infrastructure.jwt.framework.out.jpa.entity.RefreshTokenEntity;
 import kr.modusplant.shared.persistence.repository.UuidPrimaryKeyRepository;
 import org.springframework.data.jpa.repository.JpaRepository;

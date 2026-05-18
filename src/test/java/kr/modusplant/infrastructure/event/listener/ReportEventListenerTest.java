@@ -1,9 +1,19 @@
 package kr.modusplant.infrastructure.event.listener;
 
-import kr.modusplant.framework.aws.service.S3FileService;
-import kr.modusplant.framework.jpa.entity.*;
-import kr.modusplant.framework.jpa.entity.common.util.MemberEntityTestUtils;
-import kr.modusplant.framework.jpa.repository.*;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.entity.CommentAbuseReportEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.PostAbuseReportEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.ProposalBugReportEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.repository.CommentAbuseReportJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.repository.PostAbuseReportJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.repository.ProposalBugReportJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
+import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
+import kr.modusplant.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.event.ProposalOrBugReportRemoveEvent;
 import kr.modusplant.shared.persistence.compositekey.CommentCompositeKey;
 import org.jooq.DSLContext;
@@ -74,7 +84,7 @@ class ReportEventListenerTest implements MemberEntityTestUtils {
     private final MockConnection mockConnection = new MockConnection(mockDataProvider);
     private final DSLContext dslContext = DSL.using(mockConnection, SQLDialect.POSTGRES);
 
-    private final S3FileService s3FileService = mock(S3FileService.class);
+    private final AmazonS3Service amazonS3Service = mock(AmazonS3Service.class);
     private final MemberJpaRepository memberJpaRepository = mock(MemberJpaRepository.class);
     private final PostJpaRepository postJpaRepository = mock(PostJpaRepository.class);
     private final CommentJpaRepository commentJpaRepository = mock(CommentJpaRepository.class);
@@ -83,7 +93,7 @@ class ReportEventListenerTest implements MemberEntityTestUtils {
     private final CommentAbuseReportJpaRepository commentAbuseReportJpaRepository = mock(CommentAbuseReportJpaRepository.class);
 
     private final ReportEventListener reportEventListener = new ReportEventListener(
-            dslContext, s3FileService, memberJpaRepository, postJpaRepository,
+            dslContext, amazonS3Service, memberJpaRepository, postJpaRepository,
             commentJpaRepository, proposalBugReportJpaRepository, postAbuRepJpaRepository, commentAbuseReportJpaRepository
     );
 
@@ -121,7 +131,7 @@ class ReportEventListenerTest implements MemberEntityTestUtils {
         reportEventListener.handleProposalOrBugReportRemoveEvent(testProposalOrBugReportRemoveEvent);
 
         // then
-        verify(s3FileService, times(1)).deleteFiles(anyList());
+        verify(amazonS3Service, times(1)).deleteFiles(anyList());
     }
 
     @Test
@@ -135,7 +145,7 @@ class ReportEventListenerTest implements MemberEntityTestUtils {
         reportEventListener.handleProposalOrBugReportRemoveEvent(event);
 
         // then
-        verify(s3FileService, never()).deleteFiles(anyList());
+        verify(amazonS3Service, never()).deleteFiles(anyList());
     }
 
     @Test

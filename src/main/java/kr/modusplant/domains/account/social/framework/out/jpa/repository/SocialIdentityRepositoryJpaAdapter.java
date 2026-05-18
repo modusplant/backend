@@ -1,5 +1,7 @@
 package kr.modusplant.domains.account.social.framework.out.jpa.repository;
 
+import kr.modusplant.domains.account.identity.framework.out.jpa.entity.MemberAuthEntity;
+import kr.modusplant.domains.account.identity.framework.out.jpa.repository.MemberAuthJpaRepository;
 import kr.modusplant.domains.account.shared.kernel.AccountId;
 import kr.modusplant.domains.account.social.domain.exception.SocialAccountConflictException;
 import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
@@ -8,14 +10,12 @@ import kr.modusplant.domains.account.social.domain.vo.SocialCredentials;
 import kr.modusplant.domains.account.social.domain.vo.SocialMemberProfile;
 import kr.modusplant.domains.account.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
-import kr.modusplant.framework.jpa.entity.MemberAuthEntity;
-import kr.modusplant.framework.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberProfileJpaRepository;
+import kr.modusplant.domains.term.framework.out.jpa.repository.MemberTermJpaRepository;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.framework.jpa.repository.MemberAuthJpaRepository;
-import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
-import kr.modusplant.framework.jpa.repository.MemberProfileJpaRepository;
-import kr.modusplant.framework.jpa.repository.MemberTermJpaRepository;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.persistence.constant.TableName;

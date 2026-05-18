@@ -3,8 +3,6 @@ package kr.modusplant.domains.post.framework.out.jpa.repository;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostArchiveJpaMapper;
 import kr.modusplant.domains.post.usecase.port.repository.PostArchiveRepository;
-import kr.modusplant.framework.jpa.repository.PostArchiveJpaRepository;
-import kr.modusplant.framework.jpa.repository.PostJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

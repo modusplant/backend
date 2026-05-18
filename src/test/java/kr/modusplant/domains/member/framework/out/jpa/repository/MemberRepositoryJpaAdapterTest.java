@@ -2,10 +2,9 @@ package kr.modusplant.domains.member.framework.out.jpa.repository;
 
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberJpaMapperImpl;
-import kr.modusplant.framework.jpa.entity.MemberEntity;
-import kr.modusplant.framework.jpa.entity.common.util.MemberEntityTestUtils;
-import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

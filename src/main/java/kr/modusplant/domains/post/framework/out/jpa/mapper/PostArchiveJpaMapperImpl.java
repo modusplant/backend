@@ -1,8 +1,8 @@
 package kr.modusplant.domains.post.framework.out.jpa.mapper;
 
+import kr.modusplant.domains.post.framework.out.jpa.entity.PostArchiveEntity;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostArchiveJpaMapper;
-import kr.modusplant.framework.jpa.entity.PostArchiveEntity;
-import kr.modusplant.framework.jpa.entity.PostEntity;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

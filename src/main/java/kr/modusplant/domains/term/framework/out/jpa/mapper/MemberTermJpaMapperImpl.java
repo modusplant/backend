@@ -1,12 +1,12 @@
 package kr.modusplant.domains.term.framework.out.jpa.mapper;
 
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.term.domain.aggregate.SiteMemberTerm;
 import kr.modusplant.domains.term.domain.exception.SiteMemberNotFoundException;
 import kr.modusplant.domains.term.domain.vo.SiteMemberTermId;
+import kr.modusplant.domains.term.framework.out.jpa.entity.MemberTermEntity;
 import kr.modusplant.domains.term.framework.out.jpa.mapper.supers.MemberTermJpaMapper;
-import kr.modusplant.framework.jpa.entity.MemberEntity;
-import kr.modusplant.framework.jpa.entity.MemberTermEntity;
-import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

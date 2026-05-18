@@ -3,10 +3,9 @@ package kr.modusplant.domains.term.framework.out.jpa.repository;
 import kr.modusplant.domains.term.domain.aggregate.Term;
 import kr.modusplant.domains.term.domain.exception.TermNotFoundException;
 import kr.modusplant.domains.term.domain.vo.TermId;
+import kr.modusplant.domains.term.framework.out.jpa.entity.TermEntity;
 import kr.modusplant.domains.term.framework.out.jpa.mapper.TermJpaMapperImpl;
 import kr.modusplant.domains.term.usecase.port.repository.TermRepository;
-import kr.modusplant.framework.jpa.entity.TermEntity;
-import kr.modusplant.framework.jpa.repository.TermJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

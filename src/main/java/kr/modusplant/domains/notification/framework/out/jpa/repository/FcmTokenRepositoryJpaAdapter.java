@@ -1,14 +1,14 @@
 package kr.modusplant.domains.notification.framework.out.jpa.repository;
 
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.notification.domain.vo.RecipientId;
+import kr.modusplant.domains.notification.framework.out.jpa.entity.FcmTokenEntity;
 import kr.modusplant.domains.notification.framework.out.jpa.mapper.supers.FcmTokenJpaMapper;
 import kr.modusplant.domains.notification.framework.out.jpa.repository.supers.FcmTokenJpaRepository;
 import kr.modusplant.domains.notification.usecase.port.repository.FcmTokenRepository;
-import kr.modusplant.framework.jpa.entity.FcmTokenEntity;
-import kr.modusplant.framework.jpa.entity.MemberEntity;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
 import kr.modusplant.shared.enums.Platform;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;

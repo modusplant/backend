@@ -1,8 +1,8 @@
 package kr.modusplant.domains.notification.framework.out.jpa.mapper;
 
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.notification.framework.out.jpa.entity.FcmTokenEntity;
 import kr.modusplant.domains.notification.framework.out.jpa.mapper.supers.FcmTokenJpaMapper;
-import kr.modusplant.framework.jpa.entity.FcmTokenEntity;
-import kr.modusplant.framework.jpa.entity.MemberEntity;
 import kr.modusplant.shared.enums.Platform;
 import org.springframework.stereotype.Component;
 

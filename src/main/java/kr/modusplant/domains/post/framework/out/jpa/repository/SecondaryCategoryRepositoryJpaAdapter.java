@@ -4,10 +4,10 @@ import kr.modusplant.domains.post.domain.exception.InvalidValueException;
 import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.domains.post.domain.vo.PrimaryCategoryId;
 import kr.modusplant.domains.post.domain.vo.SecondaryCategory;
+import kr.modusplant.domains.post.framework.out.jpa.mapper.PrimaryCategoryJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.mapper.SecondaryCategoryJpaRepository;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.SecondaryCategoryJpaMapper;
 import kr.modusplant.domains.post.usecase.port.repository.SecondaryCategoryRepository;
-import kr.modusplant.framework.jpa.repository.PrimaryCategoryJpaRepository;
-import kr.modusplant.framework.jpa.repository.SecondaryCategoryJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

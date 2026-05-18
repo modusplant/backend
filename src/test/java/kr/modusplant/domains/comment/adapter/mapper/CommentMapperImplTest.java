@@ -2,13 +2,13 @@ package kr.modusplant.domains.comment.adapter.mapper;
 
 import kr.modusplant.domains.comment.common.util.domain.CommentTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.request.CommentRegisterRequestTestUtils;
-import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.framework.aws.service.AmazonS3Service;
 import org.mockito.Mockito;
 
 public class CommentMapperImplTest implements
         CommentRegisterRequestTestUtils, CommentTestUtils {
 
-    private final S3FileService fileService = Mockito.mock(S3FileService.class);
+    private final AmazonS3Service fileService = Mockito.mock(AmazonS3Service.class);
     private final CommentMapperImpl mapper = new CommentMapperImpl(fileService);
 
 //    @Test

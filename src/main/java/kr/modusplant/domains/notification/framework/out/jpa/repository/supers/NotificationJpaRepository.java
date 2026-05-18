@@ -1,7 +1,7 @@
 package kr.modusplant.domains.notification.framework.out.jpa.repository.supers;
 
-import kr.modusplant.framework.jpa.entity.MemberEntity;
-import kr.modusplant.framework.jpa.entity.NotificationEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.notification.framework.out.jpa.entity.NotificationEntity;
 import kr.modusplant.shared.enums.NotificationStatusType;
 import kr.modusplant.shared.persistence.repository.UlidPrimaryRepository;
 import org.springframework.data.domain.Pageable;

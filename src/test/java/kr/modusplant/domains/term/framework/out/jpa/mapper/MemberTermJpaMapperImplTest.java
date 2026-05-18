@@ -1,13 +1,13 @@
 package kr.modusplant.domains.term.framework.out.jpa.mapper;
 
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.term.common.util.domain.aggregate.SiteMemberTermTestUtils;
 import kr.modusplant.domains.term.domain.exception.SiteMemberNotFoundException;
 import kr.modusplant.domains.term.domain.exception.enums.TermErrorCode;
+import kr.modusplant.domains.term.framework.out.jpa.entity.MemberTermEntity;
+import kr.modusplant.domains.term.framework.out.jpa.entity.common.util.MemberTermEntityTestUtils;
 import kr.modusplant.domains.term.framework.out.jpa.mapper.supers.MemberTermJpaMapper;
-import kr.modusplant.framework.jpa.entity.MemberTermEntity;
-import kr.modusplant.framework.jpa.entity.common.util.MemberEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.MemberTermEntityTestUtils;
-import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

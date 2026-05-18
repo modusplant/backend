@@ -1,9 +1,7 @@
 package kr.modusplant.domains.member.framework.out.jpa.repository;
 
-import kr.modusplant.framework.jpa.entity.common.util.PostEntityTestUtils;
-import kr.modusplant.framework.jpa.repository.PostBookmarkJpaRepository;
-import kr.modusplant.framework.jpa.repository.PostJpaRepository;
-import kr.modusplant.framework.jpa.repository.PostLikeJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.entity.common.util.PostEntityTestUtils;
+import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

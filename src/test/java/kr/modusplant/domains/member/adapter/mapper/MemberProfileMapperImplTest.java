@@ -2,7 +2,7 @@ package kr.modusplant.domains.member.adapter.mapper;
 
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberProfileTestUtils;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
-import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.framework.aws.service.AmazonS3Service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -14,14 +14,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 class MemberProfileMapperImplTest implements MemberProfileTestUtils {
-    private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
-    private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl(s3FileService);
+    private final AmazonS3Service amazonS3Service = Mockito.mock(AmazonS3Service.class);
+    private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl(amazonS3Service);
 
     @Test
     @DisplayName("toMemberResponse로 응답 반환")
     void testToMemberResponse_givenValidMember_willReturnResponse() {
         // given & when
-        given(s3FileService.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
+        given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // then
         assertThat(memberProfileMapper.toMemberProfileResponse(createMemberProfile())).isEqualTo(testMemberProfileResponse);

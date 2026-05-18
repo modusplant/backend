@@ -8,12 +8,10 @@ import kr.modusplant.domains.member.domain.vo.MemberProfileImageBytes;
 import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
 import kr.modusplant.domains.member.domain.vo.MemberProfileIntroduction;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberProfileEntity;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberProfileJpaMapperImpl;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
-import kr.modusplant.framework.aws.service.S3FileService;
-import kr.modusplant.framework.jpa.entity.MemberProfileEntity;
-import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
-import kr.modusplant.framework.jpa.repository.MemberProfileJpaRepository;
+import kr.modusplant.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -24,7 +22,7 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepository {
-    private final S3FileService s3FileService;
+    private final AmazonS3Service amazonS3Service;
     private final MemberProfileJpaMapperImpl memberProfileJpaMapper;
     private final MemberJpaRepository memberJpaRepository;
     private final MemberProfileJpaRepository memberProfileJpaRepository;
@@ -42,7 +40,7 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
             } else {
                 profileImage = MemberProfileImage.create(
                         MemberProfileImagePath.create(profileEntity.getImagePath()),
-                        MemberProfileImageBytes.create(s3FileService.downloadFile(profileEntity.getImagePath())));
+                        MemberProfileImageBytes.create(amazonS3Service.downloadFile(profileEntity.getImagePath())));
             }
             if (profileEntity.getIntroduction() == null) {
                 profileIntroduction = EmptyMemberProfileIntroduction.create();

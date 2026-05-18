@@ -1,13 +1,12 @@
 package kr.modusplant.domains.term.framework.out.jpa.repository;
 
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.term.common.util.domain.aggregate.SiteMemberTermTestUtils;
 import kr.modusplant.domains.term.domain.aggregate.SiteMemberTerm;
+import kr.modusplant.domains.term.framework.out.jpa.entity.MemberTermEntity;
+import kr.modusplant.domains.term.framework.out.jpa.entity.common.util.MemberTermEntityTestUtils;
 import kr.modusplant.domains.term.framework.out.jpa.mapper.MemberTermJpaMapperImpl;
-import kr.modusplant.framework.jpa.entity.MemberTermEntity;
-import kr.modusplant.framework.jpa.entity.common.util.MemberEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.MemberTermEntityTestUtils;
-import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
-import kr.modusplant.framework.jpa.repository.MemberTermJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

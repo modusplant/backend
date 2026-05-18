@@ -1,8 +1,8 @@
 package kr.modusplant.infrastructure.event.listener;
 
-import kr.modusplant.framework.jpa.entity.CommentLikeEntity;
-import kr.modusplant.framework.jpa.repository.CommentJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommentLikeJpaRepository;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.entity.CommentLikeEntity;
+import kr.modusplant.domains.member.framework.out.jpa.repository.CommentLikeJpaRepository;
 import kr.modusplant.shared.event.CommentLikeEvent;
 import kr.modusplant.shared.event.CommentUnlikeEvent;
 import lombok.RequiredArgsConstructor;
