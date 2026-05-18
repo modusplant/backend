@@ -14,7 +14,7 @@ import kr.modusplant.domains.search.usecase.port.repository.SearchPostRepository
 import kr.modusplant.domains.search.usecase.record.SearchPostRecord;
 import kr.modusplant.domains.search.usecase.response.SearchPostRelevanceSortedPageResponse;
 import kr.modusplant.domains.search.usecase.response.SearchPostResponse;
-import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
-import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.NOT_FOUND_PRIMARY_CATEGORY;
+import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.NOT_FOUND_PRIMARY_CATEGORY;
 
 @Service
 @Transactional

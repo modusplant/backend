@@ -1,7 +1,7 @@
 package kr.modusplant.domains.search.domain.vo;
 
 import kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode;
-import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
+import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.generator.RandomUlidGenerator;
 import org.junit.jupiter.api.DisplayName;

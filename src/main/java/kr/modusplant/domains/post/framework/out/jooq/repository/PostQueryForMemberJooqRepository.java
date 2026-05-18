@@ -6,7 +6,7 @@ import kr.modusplant.domains.post.framework.out.jooq.mapper.supers.PostJooqMappe
 import kr.modusplant.domains.post.usecase.port.repository.PostQueryForMemberRepository;
 import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
-import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
+import kr.modusplant.shared.framework.jooq.converter.JsonbJsonNodeConverter;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.data.domain.Page;

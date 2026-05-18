@@ -4,7 +4,7 @@ import kr.modusplant.domains.account.normal.adapter.controller.NormalIdentityCon
 import kr.modusplant.domains.account.normal.common.util.usecase.request.EmailModificationRequestTestUtils;
 import kr.modusplant.domains.account.normal.common.util.usecase.request.NormalSignUpRequestTestUtils;
 import kr.modusplant.domains.account.normal.common.util.usecase.request.PasswordModificationRequestTestUtils;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import org.junit.jupiter.api.BeforeEach;

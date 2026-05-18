@@ -3,7 +3,7 @@ package kr.modusplant.domains.post.domain.vo;
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
 import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.InvalidValueException;
-import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
+import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.shared.generator.UlidGeneratorHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;

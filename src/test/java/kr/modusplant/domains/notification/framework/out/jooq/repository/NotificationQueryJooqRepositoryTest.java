@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import kr.modusplant.domains.notification.common.helper.NotificationTestDataHelper;
 import kr.modusplant.domains.notification.usecase.record.NotificationReadModel;
 import kr.modusplant.domains.post.common.helper.PostTestDataHelper;
-import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
+import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.jooq.tables.records.CommNotificationRecord;
 import kr.modusplant.jooq.tables.records.SiteMemberRecord;
 import kr.modusplant.shared.enums.NotificationActionType;

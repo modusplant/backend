@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Pattern;
 import kr.modusplant.domains.notification.adapter.controller.NotificationController;
 import kr.modusplant.domains.notification.usecase.response.CursorPageResponse;
 import kr.modusplant.domains.notification.usecase.response.NotificationResponse;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import kr.modusplant.shared.enums.NotificationStatusType;
 import lombok.RequiredArgsConstructor;

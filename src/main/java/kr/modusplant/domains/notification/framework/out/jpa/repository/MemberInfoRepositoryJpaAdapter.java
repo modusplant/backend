@@ -2,8 +2,8 @@ package kr.modusplant.domains.notification.framework.out.jpa.repository;
 
 import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.notification.usecase.port.repository.MemberInfoRepository;
-import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
-import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityLinkAdminController;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

@@ -7,7 +7,7 @@ import kr.modusplant.domains.search.domain.vo.*;
 import kr.modusplant.domains.search.framework.out.jooq.mapper.supers.SearchJooqMapper;
 import kr.modusplant.domains.search.usecase.model.read.SearchPostReadModel;
 import kr.modusplant.domains.search.usecase.port.repository.SearchPostRepository;
-import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
+import kr.modusplant.shared.framework.jooq.converter.JsonbJsonNodeConverter;
 import lombok.RequiredArgsConstructor;
 import org.jooq.*;
 import org.springframework.stereotype.Repository;

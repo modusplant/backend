@@ -9,7 +9,7 @@ import kr.modusplant.domains.post.usecase.port.repository.PostQueryRepository;
 import kr.modusplant.domains.post.usecase.record.PostDetailDataReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
-import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
+import kr.modusplant.shared.framework.jooq.converter.JsonbJsonNodeConverter;
 import lombok.RequiredArgsConstructor;
 import org.jooq.Condition;
 import org.jooq.DSLContext;

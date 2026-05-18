@@ -1,7 +1,7 @@
 package kr.modusplant.domains.account.social.framework.in.web.rest;
 
 import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityLinkAdminController;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

@@ -2,7 +2,7 @@ package kr.modusplant.domains.notification.framework.out.jpa.repository;
 
 import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
-import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

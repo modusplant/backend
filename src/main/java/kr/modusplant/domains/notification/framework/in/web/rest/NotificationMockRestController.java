@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import kr.modusplant.domains.notification.adapter.controller.NotificationMockController;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import kr.modusplant.shared.enums.NotificationActionType;
 import lombok.RequiredArgsConstructor;

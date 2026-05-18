@@ -3,7 +3,7 @@ package kr.modusplant.domains.member.adapter.mapper;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
-import kr.modusplant.framework.aws.service.AmazonS3Service;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

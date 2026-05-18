@@ -12,7 +12,7 @@ import kr.modusplant.domains.search.domain.enums.SearchPostTarget;
 import kr.modusplant.domains.search.usecase.record.SearchPostRecord;
 import kr.modusplant.domains.search.usecase.response.SearchPostRelevanceSortedPageResponse;
 import kr.modusplant.domains.search.usecase.response.SearchPostResponse;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -6,8 +6,8 @@ import kr.modusplant.domains.member.framework.out.jpa.entity.MemberProfileEntity
 import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
 import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberProfileEntityTestUtils;
 import kr.modusplant.domains.member.framework.out.jpa.repository.MemberProfileJpaRepository;
-import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
-import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

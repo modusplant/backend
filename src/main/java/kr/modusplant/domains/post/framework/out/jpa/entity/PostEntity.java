@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
-import kr.modusplant.framework.jpa.generator.UlidGenerator;
+import kr.modusplant.shared.framework.jpa.generator.UlidGenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

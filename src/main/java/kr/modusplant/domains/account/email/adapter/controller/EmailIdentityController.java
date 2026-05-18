@@ -9,10 +9,10 @@ import kr.modusplant.domains.account.email.usecase.request.EmailIdentityRequest;
 import kr.modusplant.domains.account.email.usecase.request.EmailValidationRequest;
 import kr.modusplant.domains.account.email.usecase.request.InputValidationRequest;
 import kr.modusplant.domains.account.normal.domain.exception.InvalidValueException;
-import kr.modusplant.framework.jpa.exception.ExistsEntityException;
-import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
-import kr.modusplant.framework.redis.RedisHelper;
-import kr.modusplant.framework.redis.RedisKeys;
+import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.shared.framework.redis.RedisHelper;
+import kr.modusplant.shared.framework.redis.RedisKeys;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.exception.supers.ErrorCode;
 import kr.modusplant.shared.kernel.Email;
@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static kr.modusplant.domains.account.email.domain.exception.enums.EmailIdentityErrorCode.*;
-import static kr.modusplant.framework.redis.RedisKeys.RESET_PASSWORD_PREFIX;
+import static kr.modusplant.shared.framework.redis.RedisKeys.RESET_PASSWORD_PREFIX;
 import static kr.modusplant.infrastructure.jwt.enums.TokenScope.RESET_PASSWORD_INPUT;
 
 @Slf4j

@@ -18,7 +18,7 @@ import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
 import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
 import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
 import kr.modusplant.domains.post.usecase.response.*;
-import kr.modusplant.framework.aws.service.AmazonS3Service;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageImpl;
