@@ -4,6 +4,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.in.web.cache.model.CommentCacheData;
+import kr.modusplant.domains.comment.usecase.port.repository.CommentReadRepository;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.framework.jpa.entity.CommPostEntity;
 import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
@@ -18,7 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static kr.modusplant.shared.http.utils.ParseHttpHeaderUtils.parseIfModifiedSince;
 import static kr.modusplant.shared.http.utils.ParseHttpHeaderUtils.parseIfNoneMatch;
@@ -29,13 +32,17 @@ import static kr.modusplant.shared.http.utils.ParseHttpHeaderUtils.parseIfNoneMa
 public class CommentCacheService {
 
     private final CommPostJpaRepository postJpaRepository;
+    private final CommentReadRepository commentReadRepository;
     private final SiteMemberJpaRepository memberJpaRepository;
 
     private final PasswordEncoder passwordEncoder;
 
-    public CommentCacheService(CommPostJpaRepository postJpaRepository, SiteMemberJpaRepository memberJpaRepository,
+    public CommentCacheService(CommPostJpaRepository postJpaRepository,
+                               CommentReadRepository commentReadRepository,
+                               SiteMemberJpaRepository memberJpaRepository,
                                @Qualifier("pbkdf2PasswordEncoder") PasswordEncoder passwordEncoder) {
         this.postJpaRepository = postJpaRepository;
+        this.commentReadRepository = commentReadRepository;
         this.memberJpaRepository = memberJpaRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -46,10 +53,21 @@ public class CommentCacheService {
             @Nonnull PostId postUlid
     ) {
         CommPostEntity postEntity = postJpaRepository.findByUlid(postUlid.getId())
-                .orElseThrow( () -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post"));
+                .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post"));
 
-        String ETagSource = postEntity.getETagSource();
-        LocalDateTime lastModifiedAt = postEntity.getUpdatedAtAsTruncatedToSeconds();
+        // 댓글의 최신 변경 시각 조회
+        LocalDateTime latestCommentUpdatedAt = commentReadRepository.findLatestUpdatedAtByPost(postUlid)
+                .orElse(LocalDateTime.MIN);
+
+        // post와 댓글 변경 시각 중 더 최신 것을 기준으로 함
+        LocalDateTime lastModifiedAt = Stream.of(
+                        postEntity.getUpdatedAtAsTruncatedToSeconds(),
+                        latestCommentUpdatedAt)
+                .max(Comparator.naturalOrder())
+                .get();
+
+        // ETag 소스도 두 값을 합산
+        String ETagSource = postEntity.getETagSource() + latestCommentUpdatedAt;
 
         return determineCacheData(ifNoneMatch, ifModifiedSince, ETagSource, lastModifiedAt);
     }
