@@ -8,6 +8,7 @@ import kr.modusplant.domains.search.usecase.model.read.SearchPostReadModel;
 import kr.modusplant.domains.search.usecase.port.repository.SearchPostRepository;
 import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.jooq.*;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.utils.CollectionUtils;
@@ -27,7 +28,8 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
     private final DSLContext dsl;
     private final SearchJooqMapper searchJooqMapper;
     private final JsonbJsonNodeConverter jsonConverter = new JsonbJsonNodeConverter();
-    
+    private final char escapeChar = '$'; // 이스케이프 문자를 상수로 지정
+
     @Override
     public List<SearchPostReadModel> searchByKeywordWithLatest(
             SearchKeyword searchKeyword, SearchPostTarget target, Integer primaryCategoryId, List<Integer> secondaryCategoryIds,
@@ -35,31 +37,29 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
         String keyword = searchKeyword.getValue();
         String cursorUlid = searchPostId.getValue();
         LocalDateTime cursorPublishedAt = searchPostPublishedAt.getValue();
-        Field<String> keywordLongerThanOrEqualToThree = val("%" + escape(keyword, '$') + "%");
-        Field<String> keywordLowerThanThree = val(escape(keyword, '$') + "%");
 
-        // 1. SearchOption에 따른 타겟 옵션 불리언 플래그 설정
-        boolean isTitle =
-                target == SearchPostTarget.TITLE ||
-                        target == SearchPostTarget.TITLE_CONTENT ||
-                        target == SearchPostTarget.TITLE_CONTENT_COMMENT;
-        boolean isContent =
-                target == SearchPostTarget.CONTENT ||
-                        target == SearchPostTarget.TITLE_CONTENT ||
-                        target == SearchPostTarget.TITLE_CONTENT_COMMENT;
-        boolean isComment = target == SearchPostTarget.TITLE_CONTENT_COMMENT;
-
-        List<CommonTableExpression<?>> ctes = new ArrayList<>();
+        // 1. 키워드의 길이에 따른 ILIKE 전용 매칭 설정
+        Field<String> partialMatchToKeywordWithThreeOrMoreLetters = val("%" + escape(keyword, escapeChar) + "%");
+        Field<String> prefixMatchToOneOrTwoLetterKeyword = val(escape(keyword, escapeChar) + "%");
+        Field<String> partialMatchToTwoLetterKeyword = val("% " + escape(keyword, escapeChar) + "%");
+        Field<String> partialMatchToOneLetterKeyword = val("% " + escape(keyword, escapeChar) + " %");
+        Field<String> suffixMatchToOneLetterKeyword = val("%" + escape(keyword, escapeChar));
 
         // 2. matched_comments CTE 생성 및 추가 (댓글 옵션이 있을 때만)
+        List<CommonTableExpression<?>> ctes = new ArrayList<>(); // 실행할 CTE를 동적으로 담을 리스트
         CommonTableExpression<?> matchedCommentsCte = null;
         Field<String> matchedCommentsPostUlid = field(name("matched_comments", "post_ulid"), String.class);
 
-        LikeEscapeStep ilikeConditionForComment = keyword.length() >= 3 ?
-                COMM_COMMENT.CONTENT.likeIgnoreCase(keywordLongerThanOrEqualToThree) :
-                COMM_COMMENT.CONTENT.likeIgnoreCase(keywordLowerThanThree);
-
-        if (isComment) {
+        if (target.containsComment()) {
+            Condition ilikeConditionForComment = getIlikeCondition(
+                    COMM_COMMENT.CONTENT,
+                    keyword,
+                    partialMatchToKeywordWithThreeOrMoreLetters,
+                    prefixMatchToOneOrTwoLetterKeyword,
+                    partialMatchToTwoLetterKeyword,
+                    partialMatchToOneLetterKeyword,
+                    suffixMatchToOneLetterKeyword
+            );
             matchedCommentsCte = name("matched_comments").as(
                     selectDistinct(COMM_COMMENT.POST_ULID)
                             .from(COMM_COMMENT)
@@ -72,21 +72,31 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
         // 3. search_hits CTE 조립
         Condition matchCondition = noCondition();
 
-        if (isTitle) {
-            LikeEscapeStep ilikeConditionForTitle =
-                    keyword.length() >= 3 ?
-                            COMM_POST.TITLE.likeIgnoreCase(keywordLongerThanOrEqualToThree) :
-                            COMM_POST.TITLE.likeIgnoreCase(keywordLowerThanThree);
+        if (target.containsTitle()) {
+            Condition ilikeConditionForTitle = getIlikeCondition(
+                    COMM_POST.TITLE,
+                    keyword,
+                    partialMatchToKeywordWithThreeOrMoreLetters,
+                    prefixMatchToOneOrTwoLetterKeyword,
+                    partialMatchToTwoLetterKeyword,
+                    partialMatchToOneLetterKeyword,
+                    suffixMatchToOneLetterKeyword
+            );
             matchCondition = matchCondition.or(ilikeConditionForTitle);
         }
-        if (isContent) {
-            LikeEscapeStep ilikeConditionForContent =
-                    keyword.length() >= 3 ?
-                            COMM_POST.CONTENT_TEXT.likeIgnoreCase(keywordLongerThanOrEqualToThree) :
-                            COMM_POST.CONTENT_TEXT.likeIgnoreCase(keywordLowerThanThree);
+        if (target.containsContent()) {
+            Condition ilikeConditionForContent = getIlikeCondition(
+                    COMM_POST.CONTENT_TEXT,
+                    keyword,
+                    partialMatchToKeywordWithThreeOrMoreLetters,
+                    prefixMatchToOneOrTwoLetterKeyword,
+                    partialMatchToTwoLetterKeyword,
+                    partialMatchToOneLetterKeyword,
+                    suffixMatchToOneLetterKeyword
+            );
             matchCondition = matchCondition.or(ilikeConditionForContent);
         }
-        if (isComment) {
+        if (target.containsComment()) {
             matchCondition = matchCondition.or(matchedCommentsPostUlid.isNotNull());
         }
 
@@ -103,7 +113,7 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
                         COMM_POST.PUBLISHED_AT
                 ).from(COMM_POST);
 
-        if (isComment) {
+        if (target.containsComment()) {
             searchHitsFromStep = searchHitsFromStep.leftJoin(matchedCommentsCte).on(COMM_POST.ULID.eq(matchedCommentsPostUlid));
         }
 
@@ -144,21 +154,8 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
                 .asTable("comm_cnt");
 
         // memberId의 null 여부에 따른 쿼리 최적화
-        Condition isLiked =
-                memberId != null ?
-                        exists(
-                                selectOne().from(COMM_POST_LIKE)
-                                        .where(COMM_POST_LIKE.POST_ULID.eq(eHitsUlid))
-                                        .and(COMM_POST_LIKE.MEMB_UUID.eq(memberId))) :
-                        falseCondition();
-
-        Condition isBookmarked =
-                memberId != null ?
-                        exists(
-                                selectOne().from(COMM_POST_BOOKMARK)
-                                        .where(COMM_POST_BOOKMARK.POST_ULID.eq(eHitsUlid))
-                                        .and(COMM_POST_BOOKMARK.MEMB_UUID.eq(memberId))) :
-                        falseCondition();
+        Condition isLiked = getIsLikedCondition(memberId, eHitsUlid);
+        Condition isBookmarked = getIsBookmarkedCondition(memberId, eHitsUlid);
 
         //noinspection DataFlowIssue
         return dsl.with(ctes)
@@ -202,36 +199,32 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
         String cursorUlid = searchPostId.getValue();
         LocalDateTime cursorPublishedAt = searchPostPublishedAt.getValue();
         Field<String> keywordParam = val(keyword);
-        Field<String> keywordLongerThanOrEqualToThreeParam = val("%" + escape(keyword, '$') + "%");
-        Field<String> keywordLowerThanThreeParam = val(escape(keyword, '$') + "%");
 
-        // 1. 불리언 플래그 설정
-        // SearchOption에 따른 플래그
-        boolean isTitle =
-                target == SearchPostTarget.TITLE ||
-                        target == SearchPostTarget.TITLE_CONTENT ||
-                        target == SearchPostTarget.TITLE_CONTENT_COMMENT;
-        boolean isContent =
-                target == SearchPostTarget.CONTENT ||
-                        target == SearchPostTarget.TITLE_CONTENT ||
-                        target == SearchPostTarget.TITLE_CONTENT_COMMENT;
-        boolean isComment = target == SearchPostTarget.TITLE_CONTENT_COMMENT;
-
-        List<CommonTableExpression<?>> ctes = new ArrayList<>(); // 실행할 CTE를 동적으로 담을 리스트
-
-        // 키워드 길이에 따른 플래그
-        boolean passWithLowWordSimilarity = keyword.length() >= 3;
+        // 1. 키워드의 길이에 따른 ILIKE 전용 매칭 설정
+        Field<String> partialMatchToKeywordWithThreeOrMoreLetters = val("%" + escape(keyword, escapeChar) + "%");
+        Field<String> prefixMatchToOneOrTwoLetterKeyword = val(escape(keyword, escapeChar) + "%");
+        Field<String> partialMatchToTwoLetterKeyword = val("% " + escape(keyword, escapeChar) + "%");
+        Field<String> partialMatchToOneLetterKeyword = val("% " + escape(keyword, escapeChar) + " %");
+        Field<String> suffixMatchToOneLetterKeyword = val("%" + escape(keyword, escapeChar));
 
         // 2. matched_comments CTE 생성 및 추가 (댓글 옵션이 있을 때만)
+        List<CommonTableExpression<?>> ctes = new ArrayList<>(); // 실행할 CTE를 동적으로 담을 리스트
+        boolean passWithLowWordSimilarity = keyword.length() >= 3; // 키워드 길이에 따른 플래그
+
         CommonTableExpression<?> matchedCommentsCte = null;
         Field<String> mcPostUlid = field(name("matched_comments", "post_ulid"), String.class);
         Field<Double> mcCommentWordSimilarity = field(name("matched_comments", "comment_wsim"), Double.class);
 
-        if (isComment) {
-            LikeEscapeStep ilikeConditionForComment = keyword.length() >= 3 ?
-                    COMM_COMMENT.CONTENT.likeIgnoreCase(keywordLongerThanOrEqualToThreeParam) :
-                    COMM_COMMENT.CONTENT.likeIgnoreCase(keywordLowerThanThreeParam);
-
+        if (target.containsComment()) {
+            Condition ilikeConditionForComment = getIlikeCondition(
+                    COMM_COMMENT.CONTENT,
+                    keyword,
+                    partialMatchToKeywordWithThreeOrMoreLetters,
+                    prefixMatchToOneOrTwoLetterKeyword,
+                    partialMatchToTwoLetterKeyword,
+                    partialMatchToOneLetterKeyword,
+                    suffixMatchToOneLetterKeyword
+            );
             Condition wordSimilarityCondition = condition("{0} %> {1}", COMM_COMMENT.CONTENT, keywordParam);
             if (passWithLowWordSimilarity) {
                 wordSimilarityCondition = wordSimilarityCondition.or(ilikeConditionForComment);
@@ -262,36 +255,47 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
                 field(name("matched_comments", "has_matched_comment"), Boolean.class);
 
         // 중요도(impo) 동적 계산 (해당 옵션만 CASE 조건에 추가)
-        LikeEscapeStep ilikeConditionForTitle = keyword.length() >= 3 ?
-                COMM_POST.TITLE.likeIgnoreCase(keywordLongerThanOrEqualToThreeParam) :
-                COMM_POST.TITLE.likeIgnoreCase(keywordLowerThanThreeParam);
-        LikeEscapeStep ilikeConditionForContent = keyword.length() >= 3 ?
-                COMM_POST.CONTENT_TEXT.likeIgnoreCase(keywordLongerThanOrEqualToThreeParam) :
-                COMM_POST.CONTENT_TEXT.likeIgnoreCase(keywordLowerThanThreeParam);
-
+        Condition ilikeConditionForTitle = getIlikeCondition(
+                COMM_POST.TITLE,
+                keyword,
+                partialMatchToKeywordWithThreeOrMoreLetters,
+                prefixMatchToOneOrTwoLetterKeyword,
+                partialMatchToTwoLetterKeyword,
+                partialMatchToOneLetterKeyword,
+                suffixMatchToOneLetterKeyword
+        );
+        Condition ilikeConditionForContent = getIlikeCondition(
+                COMM_POST.CONTENT_TEXT,
+                keyword,
+                partialMatchToKeywordWithThreeOrMoreLetters,
+                prefixMatchToOneOrTwoLetterKeyword,
+                partialMatchToTwoLetterKeyword,
+                partialMatchToOneLetterKeyword,
+                suffixMatchToOneLetterKeyword
+        );
         CaseConditionStep<Integer> impoCase = null;
-        if (isTitle) {
+        if (target.containsTitle()) {
             impoCase = case_().when(ilikeConditionForTitle, 4);
         }
-        if (isContent) {
+        if (target.containsContent()) {
             impoCase = (impoCase == null) ?
                     case_().when(ilikeConditionForContent, 3) :
                     impoCase.when(ilikeConditionForContent, 3);
         }
-        if (isComment) {
-            impoCase = impoCase.when(matchedCommentsHasMatchedComment.isTrue(), 2);
+        if (target.containsComment()) {
+            impoCase = Objects.requireNonNull(impoCase).when(matchedCommentsHasMatchedComment.isTrue(), 2);
         }
         Field<Integer> impoField = impoCase != null ? impoCase.otherwise(1).as("impo") : val(1).as("impo");
 
         // 최대 정확도(max_wsim) 동적 계산 (해당 옵션만 GREATEST 함수에 추가)
         List<Field<?>> scoreFields = new ArrayList<>();
-        if (isTitle) {
+        if (target.containsTitle()) {
             scoreFields.add(coalesce(titleWordSimilarity, 0));
         }
-        if (isContent) {
+        if (target.containsContent()) {
             scoreFields.add(coalesce(contentWordSimilarity, 0));
         }
-        if (isComment) {
+        if (target.containsComment()) {
             scoreFields.add(coalesce(mcCommentWordSimilarity, 0));
         }
 
@@ -309,19 +313,19 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
 
         // 인덱스 매칭용 동적 WHERE 조건 구성
         Condition indexMatchCondition = noCondition();
-        if (isTitle) {
+        if (target.containsTitle()) {
             indexMatchCondition = indexMatchCondition.or(condition("{0} %> {1}", COMM_POST.TITLE, keywordParam));
             if (passWithLowWordSimilarity) {
                 indexMatchCondition = indexMatchCondition.or(ilikeConditionForTitle);
             }
         }
-        if (isContent) {
+        if (target.containsContent()) {
             indexMatchCondition = indexMatchCondition.or(condition("{0} %> {1}", COMM_POST.CONTENT_TEXT, keywordParam));
             if (passWithLowWordSimilarity) {
                 indexMatchCondition = indexMatchCondition.or(ilikeConditionForContent);
             }
         }
-        if (isComment) {
+        if (target.containsComment()) {
             indexMatchCondition = indexMatchCondition.or(mcPostUlid.isNotNull()); // JOIN 성공 여부로 판단
         }
 
@@ -342,7 +346,7 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
                 ).from(COMM_POST);
 
         // 댓글 조회 옵션이 켜져 있을 때만 LEFT JOIN 수행
-        if (isComment) {
+        if (target.containsComment()) {
             searchHitsFromStep = searchHitsFromStep.leftJoin(matchedCommentsCte).on(COMM_POST.ULID.eq(mcPostUlid));
         }
 
@@ -397,21 +401,8 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
                 .asTable("comm_cnt");
 
         // memberId의 null 여부에 따른 쿼리 최적화
-        Condition isLiked =
-                memberId != null ?
-                        exists(
-                                selectOne().from(COMM_POST_LIKE)
-                                        .where(COMM_POST_LIKE.POST_ULID.eq(eHitsUlid))
-                                        .and(COMM_POST_LIKE.MEMB_UUID.eq(memberId))) :
-                        falseCondition();
-
-        Condition isBookmarked =
-                memberId != null ?
-                        exists(
-                                selectOne().from(COMM_POST_BOOKMARK)
-                                        .where(COMM_POST_BOOKMARK.POST_ULID.eq(eHitsUlid))
-                                        .and(COMM_POST_BOOKMARK.MEMB_UUID.eq(memberId))) :
-                        falseCondition();
+        Condition isLiked = getIsLikedCondition(memberId, eHitsUlid);
+        Condition isBookmarked = getIsBookmarkedCondition(memberId, eHitsUlid);
 
         //noinspection DataFlowIssue
         return dsl.with(ctes)  // 💡 리스트로 모아둔 CTE들을 한 번에 등록
@@ -447,6 +438,50 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
                 .limit(size + 1)
                 .fetch()
                 .map(searchJooqMapper::toSearchPostReadModel);
+    }
+
+    private @NotNull Condition getIlikeCondition(TableField<?, String> tableField,
+                                                 String keyword,
+                                                 Field<String> partialMatchToKeywordWithThreeOrMoreLetters,
+                                                 Field<String> prefixMatchToOneOrTwoLetterKeyword,
+                                                 Field<String> partialMatchToTwoLetterKeyword,
+                                                 Field<String> partialMatchToOneLetterKeyword,
+                                                 Field<String> suffixMatchToOneLetterKeyword) {
+        Condition ilikeCondition;
+        if (keyword.length() >= 3) {
+            ilikeCondition = tableField
+                    .likeIgnoreCase(partialMatchToKeywordWithThreeOrMoreLetters)
+                    .escape(escapeChar);
+
+        } else if (keyword.length() == 2) {
+            ilikeCondition = tableField
+                    .likeIgnoreCase(prefixMatchToOneOrTwoLetterKeyword).escape(escapeChar)
+                    .or(tableField.likeIgnoreCase(partialMatchToTwoLetterKeyword).escape(escapeChar));
+        } else {
+            ilikeCondition = tableField
+                    .likeIgnoreCase(prefixMatchToOneOrTwoLetterKeyword).escape(escapeChar)
+                    .or(tableField.likeIgnoreCase(partialMatchToOneLetterKeyword).escape(escapeChar))
+                    .or(tableField.likeIgnoreCase(suffixMatchToOneLetterKeyword).escape(escapeChar));
+        }
+        return ilikeCondition;
+    }
+
+    private static @NotNull Condition getIsLikedCondition(UUID memberId, Field<String> eHitsUlid) {
+        return memberId != null ?
+                exists(
+                        selectOne().from(COMM_POST_LIKE)
+                                .where(COMM_POST_LIKE.POST_ULID.eq(eHitsUlid))
+                                .and(COMM_POST_LIKE.MEMB_UUID.eq(memberId))) :
+                falseCondition();
+    }
+
+    private static @NotNull Condition getIsBookmarkedCondition(UUID memberId, Field<String> eHitsUlid) {
+        return memberId != null ?
+                exists(
+                        selectOne().from(COMM_POST_BOOKMARK)
+                                .where(COMM_POST_BOOKMARK.POST_ULID.eq(eHitsUlid))
+                                .and(COMM_POST_BOOKMARK.MEMB_UUID.eq(memberId))) :
+                falseCondition();
     }
 
     private Condition buildCategoryConditions(Integer primaryCategoryId, List<Integer> secondaryCategoryIds) {

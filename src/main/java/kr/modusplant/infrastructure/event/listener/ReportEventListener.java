@@ -1,16 +1,17 @@
-package kr.modusplant.infrastructure.event.consumer;
+package kr.modusplant.infrastructure.event.listener;
 
 import kr.modusplant.framework.aws.service.S3FileService;
 import kr.modusplant.framework.jpa.entity.*;
 import kr.modusplant.framework.jpa.entity.record.FilenameAndSrcEntityRecord;
 import kr.modusplant.framework.jpa.repository.*;
-import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.shared.event.CommentAbuseReportEvent;
 import kr.modusplant.shared.event.PostAbuseReportEvent;
 import kr.modusplant.shared.event.ProposalOrBugReportEvent;
 import kr.modusplant.shared.event.ProposalOrBugReportRemoveEvent;
 import kr.modusplant.shared.persistence.compositekey.CommCommentId;
+import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -23,10 +24,10 @@ import static kr.modusplant.jooq.Tables.PROP_BUG_REP_ARCHIVE;
 import static org.jooq.impl.DSL.*;
 
 @Component
-public class ReportEventConsumer {
+@RequiredArgsConstructor
+public class ReportEventListener {
     private final DSLContext dsl;
     private final S3FileService s3FileService;
-
     private final SiteMemberJpaRepository memberJpaRepository;
     private final CommPostJpaRepository postJpaRepository;
     private final CommCommentJpaRepository commentJpaRepository;
@@ -34,54 +35,15 @@ public class ReportEventConsumer {
     private final CommPostAbuRepJpaRepository postAbuRepJpaRepository;
     private final CommCommentAbuRepJpaRepository commentAbuRepJpaRepository;
 
-    public ReportEventConsumer(EventBus eventBus,
-                               DSLContext dsl,
-                               S3FileService s3FileService,
-                               SiteMemberJpaRepository memberJpaRepository,
-                               CommPostJpaRepository postJpaRepository,
-                               CommCommentJpaRepository commentJpaRepository,
-                               PropBugRepJpaRepository propBugRepJpaRepository,
-                               CommPostAbuRepJpaRepository postAbuRepJpaRepository,
-                               CommCommentAbuRepJpaRepository commentAbuRepJpaRepository) {
-        eventBus.subscribe(event -> {
-            if (event instanceof ProposalOrBugReportEvent proposalOrBugReportEvent) {
-                addProposalOrBugReport(
-                        proposalOrBugReportEvent.getMemberId(),
-                        proposalOrBugReportEvent.getReportId(),
-                        proposalOrBugReportEvent.getTitle(),
-                        proposalOrBugReportEvent.getContent(),
-                        proposalOrBugReportEvent.getFilenames(),
-                        proposalOrBugReportEvent.getImagePaths());
-            } else if (event instanceof ProposalOrBugReportRemoveEvent proposalOrBugReportRemoveEvent) {
-                deleteProposalOrBugReport(
-                        proposalOrBugReportRemoveEvent.getReportId()
-                );
-            } else if (event instanceof PostAbuseReportEvent postAbuseReportEvent) {
-                addPostAbuseReport(postAbuseReportEvent.getMemberId(), postAbuseReportEvent.getPostUlid());
-            }
-            else if (event instanceof CommentAbuseReportEvent commentAbuseReportEvent) {
-                addCommentAbuseReport(
-                        commentAbuseReportEvent.getMemberId(),
-                        commentAbuseReportEvent.getPostUlid(),
-                        commentAbuseReportEvent.getPath());
-            }
-        });
-        this.dsl = dsl;
-        this.s3FileService = s3FileService;
-        this.memberJpaRepository = memberJpaRepository;
-        this.postJpaRepository = postJpaRepository;
-        this.commentJpaRepository = commentJpaRepository;
-        this.propBugRepJpaRepository = propBugRepJpaRepository;
-        this.postAbuRepJpaRepository = postAbuRepJpaRepository;
-        this.commentAbuRepJpaRepository = commentAbuRepJpaRepository;
-    }
+    @EventListener
+    public void handleProposalOrBugReportEvent(ProposalOrBugReportEvent proposalOrBugReportEvent) {
+        UUID memberId = proposalOrBugReportEvent.getMemberId();
+        String reportId = proposalOrBugReportEvent.getReportId();
+        String title = proposalOrBugReportEvent.getTitle();
+        String content = proposalOrBugReportEvent.getContent();
+        List<String> filenames = proposalOrBugReportEvent.getFilenames();
+        List<String> imagePaths = proposalOrBugReportEvent.getImagePaths();
 
-    private void addProposalOrBugReport(UUID memberId,
-                                        String reportId,
-                                        String title,
-                                        String content,
-                                        List<String> filenames,
-                                        List<String> imagePaths) {
         List<FilenameAndSrcEntityRecord> imageList = new ArrayList<>();
         for (int i = 0; i < imagePaths.size(); i++) {
             imageList.add(new FilenameAndSrcEntityRecord(filenames.get(i), imagePaths.get(i)));
@@ -97,9 +59,35 @@ public class ReportEventConsumer {
                         .build());
     }
 
-    private void deleteProposalOrBugReport(String reportId) {
+    @EventListener
+    public void handleProposalOrBugReportRemoveEvent(ProposalOrBugReportRemoveEvent proposalOrBugReportRemoveEvent) {
+        String reportId = proposalOrBugReportRemoveEvent.getReportId();
+
         deleteImageFromReportImagePath(reportId);
         processProposalOrBugReportRelatedRecords(reportId);
+    }
+
+    @EventListener
+    public void handlePostAbuseReportEvent(PostAbuseReportEvent postAbuseReportEvent) {
+        UUID memberId = postAbuseReportEvent.getMemberId();
+        String postUlid = postAbuseReportEvent.getPostUlid();
+
+        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
+        CommPostEntity postEntity = postJpaRepository.findByUlid(postUlid).orElseThrow();
+        postAbuRepJpaRepository.save(CommPostAbuRepEntity.builder().member(memberEntity).post(postEntity).build());
+    }
+
+    @EventListener
+    public void handleCommentAbuseReportEvent(CommentAbuseReportEvent commentAbuseReportEvent) {
+        UUID memberId = commentAbuseReportEvent.getMemberId();
+        String postUlid = commentAbuseReportEvent.getPostUlid();
+        String path = commentAbuseReportEvent.getPath();
+
+        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
+        CommCommentEntity commentEntity = commentJpaRepository.findById(
+                CommCommentId.builder().post(postUlid).path(path).build()).orElseThrow();
+        commentAbuRepJpaRepository.save(
+                CommCommentAbuRepEntity.builder().member(memberEntity).comment(commentEntity).build());
     }
 
     private void deleteImageFromReportImagePath(String reportId) {
@@ -140,19 +128,5 @@ public class ReportEventConsumer {
                 ).execute();
 
         dsl.deleteFrom(PROP_BUG_REP).where(PROP_BUG_REP.ULID.eq(reportId)).execute();
-    }
-
-    private void addPostAbuseReport(UUID memberId, String postUlid) {
-        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
-        CommPostEntity postEntity = postJpaRepository.findByUlid(postUlid).orElseThrow();
-        postAbuRepJpaRepository.save(CommPostAbuRepEntity.builder().member(memberEntity).post(postEntity).build());
-    }
-
-    private void addCommentAbuseReport(UUID memberId, String postUlid, String path) {
-        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
-        CommCommentEntity commentEntity = commentJpaRepository.findById(
-                CommCommentId.builder().post(postUlid).path(path).build()).orElseThrow();
-        commentAbuRepJpaRepository.save(
-                CommCommentAbuRepEntity.builder().member(memberEntity).comment(commentEntity).build());
     }
 }

@@ -31,10 +31,10 @@ spring:
     enabled: true
     validate-on-migrate: true
     out-of-order: false
-    locations: classpath:db/migration
+    locations:
+      - classpath:db/migration
     encoding: UTF-8
     detect-encoding: true
-    clean-disabled: false
     baseline-on-migrate: true
     baseline-version: 0.0.0
     schemas: public

@@ -152,6 +152,8 @@ public class SecurityConfig {
                 // TODO: @PreAuthorize 기반 방안을 고민하고, anyRequest를 authenticated()로 수정할 것.
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/api/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers(
                                 "/api/v1/communication/posts/me/**",
                                 "/api/v1/communication/posts/search-history/**",
                                 "/api/v1/notifications",

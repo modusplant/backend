@@ -19,7 +19,6 @@ import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.infrastructure.event.bus.EventBus;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
@@ -64,7 +63,6 @@ public class MemberController {
     private final TargetPostRepository targetPostRepository;
     private final TargetCommentRepository targetCommentRepository;
     private final ReportRepository reportRepository;
-    private final EventBus eventBus;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
@@ -127,8 +125,10 @@ public class MemberController {
         validateBeforeLikePost(memberId, targetPostId);
 
         if (targetPostRepository.isUnliked(memberId, targetPostId)) {
-            eventBus.publish(PostLikeEvent.create(memberId.getValue(), targetPostId.getValue()));
-            applicationEventPublisher.publishEvent(PostLikeNotificationEvent.create(memberId.getValue(), targetPostId.getValue()));
+            applicationEventPublisher.publishEvent(
+                    PostLikeEvent.create(memberId.getValue(), targetPostId.getValue()));
+            applicationEventPublisher.publishEvent(
+                    PostLikeNotificationEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
     }
 
@@ -138,7 +138,8 @@ public class MemberController {
         validateBeforeUnlikePost(memberId, targetPostId);
 
         if (targetPostRepository.isLiked(memberId, targetPostId)) {
-            eventBus.publish(PostUnlikeEvent.create(memberId.getValue(), targetPostId.getValue()));
+            applicationEventPublisher.publishEvent(
+                    PostUnlikeEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
     }
 
@@ -148,7 +149,8 @@ public class MemberController {
         validateBeforeBookmarkOrCancelPostBookmark(memberId, targetPostId);
 
         if (targetPostRepository.isNotBookmarked(memberId, targetPostId)) {
-            eventBus.publish(PostBookmarkEvent.create(memberId.getValue(), targetPostId.getValue()));
+            applicationEventPublisher.publishEvent(
+                    PostBookmarkEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
     }
 
@@ -158,7 +160,8 @@ public class MemberController {
         validateBeforeBookmarkOrCancelPostBookmark(memberId, targetPostId);
 
         if (targetPostRepository.isBookmarked(memberId, targetPostId)) {
-            eventBus.publish(PostBookmarkCancelEvent.create(memberId.getValue(), targetPostId.getValue()));
+            applicationEventPublisher.publishEvent(
+                    PostBookmarkCancelEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
     }
 
@@ -170,7 +173,7 @@ public class MemberController {
         memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
 
         if (targetCommentRepository.isUnliked(memberId, targetCommentId)) {
-            eventBus.publish(
+            applicationEventPublisher.publishEvent(
                     CommentLikeEvent.create(
                             memberId.getValue(),
                             targetCommentId.getTargetPostId().getValue(),
@@ -193,7 +196,7 @@ public class MemberController {
         memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
 
         if (targetCommentRepository.isLiked(memberId, targetCommentId)) {
-            eventBus.publish(
+            applicationEventPublisher.publishEvent(
                     CommentUnlikeEvent.create(
                             memberId.getValue(),
                             targetCommentId.getTargetPostId().getValue(),
@@ -228,7 +231,7 @@ public class MemberController {
                                 reportImagePaths.get(i), reportImageFileNames.get(i), EmptyReportImageBytes.create()));
             }
         }
-        eventBus.publish(
+        applicationEventPublisher.publishEvent(
                 ProposalOrBugReportEvent.create(
                         memberId.getValue(),
                         reportId.getValue(),
@@ -239,19 +242,13 @@ public class MemberController {
                 ));
     }
 
-    public void removeProposalOrBug(ProposalOrBugReportRemoveRecord record) {
-        ReportId reportId = ReportId.create(record.reportUlid());
-        memberValidationHelper.validateIfReportExists(reportId);
-
-        eventBus.publish(ProposalOrBugReportRemoveEvent.create(reportId.getValue()));
-    }
-
     public void reportPostAbuse(PostAbuseReportRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());
         validateBeforeReportPostAbuse(memberId, targetPostId);
 
-        eventBus.publish(PostAbuseReportEvent.create(memberId.getValue(), record.postUlid()));
+        applicationEventPublisher.publishEvent(
+                PostAbuseReportEvent.create(memberId.getValue(), record.postUlid()));
     }
 
     public void reportCommentAbuse(CommentAbuseReportRecord record) {
@@ -260,7 +257,8 @@ public class MemberController {
                 TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
         validateBeforeReportCommentAbuse(memberId, targetCommentId);
 
-        eventBus.publish(CommentAbuseReportEvent.create(memberId.getValue(), record.postUlid(), record.path()));
+        applicationEventPublisher.publishEvent(
+                CommentAbuseReportEvent.create(memberId.getValue(), record.postUlid(), record.path()));
     }
 
     public void withdraw(MemberWithdrawalRecord record) {
@@ -277,7 +275,8 @@ public class MemberController {
                     memberId.getValue());
         }
         tokenService.blacklistAccessToken(accessToken);
-        eventBus.publish(MemberWithdrawalEvent.create(memberId.getValue(), record.reason().name(), record.opinion()));
+        applicationEventPublisher.publishEvent(
+                MemberWithdrawalEvent.create(memberId.getValue(), record.reason().name(), record.opinion()));
     }
 
     private void validateBeforeOverrideProfile(MemberId memberId, Nickname memberNickname) {
