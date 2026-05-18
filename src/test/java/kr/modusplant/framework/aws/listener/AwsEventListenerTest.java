@@ -1,6 +1,6 @@
 package kr.modusplant.framework.aws.listener;
 
-import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.framework.aws.service.AmazonS3Service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -12,19 +12,19 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 class AwsEventListenerTest {
-    private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
-    private final AwsEventListener awsEventListener = new AwsEventListener(s3FileService);
+    private final AmazonS3Service amazonS3Service = Mockito.mock(AmazonS3Service.class);
+    private final AwsEventListener awsEventListener = new AwsEventListener(amazonS3Service);
 
     @Test
     @DisplayName("이미지 제거 이벤트 수신 시 S3에서 파일을 제거한다")
     void handleImageRemove_shouldRemoveImageFromS3() {
         // given
-        willDoNothing().given(s3FileService).deleteFiles(anyList());
+        willDoNothing().given(amazonS3Service).deleteFiles(anyList());
 
         // when
         awsEventListener.handleImageRemove(testImageRemoveEvent);
 
         // then
-        verify(s3FileService, times(1)).deleteFiles(testImageRemoveEvent.getImageFileKeys());
+        verify(amazonS3Service, times(1)).deleteFiles(testImageRemoveEvent.getImageFileKeys());
     }
 }

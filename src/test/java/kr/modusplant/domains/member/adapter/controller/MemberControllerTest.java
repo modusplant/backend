@@ -1,6 +1,7 @@
 package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.common.util.CommentEntityTestUtils;
 import kr.modusplant.domains.member.adapter.helper.MemberImageIOHelper;
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.adapter.mapper.MemberProfileMapperImpl;
@@ -13,24 +14,24 @@ import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileI
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
-import kr.modusplant.domains.member.framework.out.jpa.repository.MemberProfileRepositoryJpaAdapter;
-import kr.modusplant.domains.member.framework.out.jpa.repository.MemberRepositoryJpaAdapter;
-import kr.modusplant.domains.member.framework.out.jpa.repository.TargetCommentRepositoryJpaAdapter;
-import kr.modusplant.domains.member.framework.out.jpa.repository.TargetPostRepositoryJpaAdapter;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.CommentAbuseReportEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberProfileEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.PostAbuseReportEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.ProposalBugReportEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.repository.*;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord;
 import kr.modusplant.domains.member.usecase.record.MemberWithdrawalRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
-import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.domains.post.framework.out.jpa.entity.common.util.PostEntityTestUtils;
+import kr.modusplant.framework.aws.service.AmazonS3Service;
 import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
-import kr.modusplant.framework.jpa.entity.common.util.*;
 import kr.modusplant.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
-import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
@@ -107,11 +108,11 @@ class MemberControllerTest implements
 
     private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
     private final TokenService tokenService = Mockito.mock(TokenService.class);
-    private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
+    private final AmazonS3Service amazonS3Service = Mockito.mock(AmazonS3Service.class);
     private final SwearService swearService = Mockito.mock(SwearService.class);
     private final MemberImageIOHelper memberImageIOHelper = Mockito.mock(MemberImageIOHelper.class);
     private final MemberValidationHelper memberValidationHelper = Mockito.mock(MemberValidationHelper.class);
-    private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl(s3FileService);
+    private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl(amazonS3Service);
     private final MemberSocialTranslator memberSocialTranslator = Mockito.mock(MemberSocialTranslator.class);
 
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryJpaAdapter.class);
@@ -158,7 +159,7 @@ class MemberControllerTest implements
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberProfileRepository.getById(any())).willReturn(Optional.of(createMemberProfile()));
-        given(s3FileService.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
+        given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when & then
         assertThat(memberController.getProfile(testMemberProfileGetRecord)).isEqualTo(testMemberProfileResponse);
@@ -202,7 +203,7 @@ class MemberControllerTest implements
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
         given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
-        given(s3FileService.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
+        given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when
         MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecord);
@@ -232,7 +233,7 @@ class MemberControllerTest implements
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
         given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
-        given(s3FileService.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
+        given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when
         MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecord);

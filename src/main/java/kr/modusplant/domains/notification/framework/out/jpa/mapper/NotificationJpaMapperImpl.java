@@ -1,10 +1,10 @@
 package kr.modusplant.domains.notification.framework.out.jpa.mapper;
 
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.notification.domain.aggregate.Notification;
 import kr.modusplant.domains.notification.domain.vo.*;
+import kr.modusplant.domains.notification.framework.out.jpa.entity.NotificationEntity;
 import kr.modusplant.domains.notification.framework.out.jpa.mapper.supers.NotificationJpaMapper;
-import kr.modusplant.framework.jpa.entity.MemberEntity;
-import kr.modusplant.framework.jpa.entity.NotificationEntity;
 import org.springframework.stereotype.Component;
 
 @Component

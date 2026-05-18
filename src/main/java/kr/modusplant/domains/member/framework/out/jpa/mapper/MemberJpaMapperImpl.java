@@ -3,8 +3,8 @@ package kr.modusplant.domains.member.framework.out.jpa.mapper;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberStatus;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.supers.MemberJpaMapper;
-import kr.modusplant.framework.jpa.entity.MemberEntity;
 import kr.modusplant.shared.kernel.Nickname;
 import org.springframework.stereotype.Component;
 

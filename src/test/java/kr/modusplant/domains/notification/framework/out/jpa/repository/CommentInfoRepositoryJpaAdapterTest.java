@@ -1,11 +1,11 @@
 package kr.modusplant.domains.notification.framework.out.jpa.repository;
 
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.notification.common.util.domain.aggregate.NotificationTestUtils;
 import kr.modusplant.domains.notification.usecase.record.NotificationPreview;
-import kr.modusplant.framework.jpa.entity.CommentEntity;
-import kr.modusplant.framework.jpa.entity.MemberEntity;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
-import kr.modusplant.framework.jpa.repository.CommentJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

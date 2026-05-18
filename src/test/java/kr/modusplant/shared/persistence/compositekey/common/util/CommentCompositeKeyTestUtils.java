@@ -1,6 +1,6 @@
 package kr.modusplant.shared.persistence.compositekey.common.util;
 
-import kr.modusplant.framework.jpa.entity.common.util.CommentEntityTestUtils;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.common.util.CommentEntityTestUtils;
 import kr.modusplant.shared.persistence.compositekey.CommentCompositeKey;
 
 import static kr.modusplant.shared.persistence.common.util.constant.CommentConstant.TEST_COMM_COMMENT_PATH;

@@ -1,5 +1,7 @@
 package kr.modusplant.domains.account.normal.framework.out.persistence.jpa.repository;
 
+import kr.modusplant.domains.account.identity.framework.out.jpa.entity.MemberAuthEntity;
+import kr.modusplant.domains.account.identity.framework.out.jpa.repository.MemberAuthJpaRepository;
 import kr.modusplant.domains.account.normal.domain.vo.SignUpData;
 import kr.modusplant.domains.account.normal.framework.out.persistence.jpa.mapper.NormalIdentityAuthJpaMapper;
 import kr.modusplant.domains.account.normal.framework.out.persistence.jpa.mapper.NormalIdentityJpaMapper;
@@ -8,14 +10,12 @@ import kr.modusplant.domains.account.normal.framework.out.persistence.jpa.mapper
 import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdentityCreateRepository;
 import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdentityUpdateRepository;
 import kr.modusplant.domains.account.shared.kernel.AccountId;
-import kr.modusplant.framework.jpa.entity.MemberAuthEntity;
-import kr.modusplant.framework.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberProfileJpaRepository;
+import kr.modusplant.domains.term.framework.out.jpa.repository.MemberTermJpaRepository;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.framework.jpa.repository.MemberAuthJpaRepository;
-import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
-import kr.modusplant.framework.jpa.repository.MemberProfileJpaRepository;
-import kr.modusplant.framework.jpa.repository.MemberTermJpaRepository;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Password;

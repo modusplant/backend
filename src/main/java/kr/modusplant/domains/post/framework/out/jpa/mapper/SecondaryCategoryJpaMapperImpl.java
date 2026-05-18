@@ -3,8 +3,8 @@ package kr.modusplant.domains.post.framework.out.jpa.mapper;
 import kr.modusplant.domains.post.domain.vo.PrimaryCategoryId;
 import kr.modusplant.domains.post.domain.vo.SecondaryCategory;
 import kr.modusplant.domains.post.domain.vo.SecondaryCategoryId;
+import kr.modusplant.domains.post.framework.out.jpa.entity.SecondaryCategoryEntity;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.SecondaryCategoryJpaMapper;
-import kr.modusplant.framework.jpa.entity.SecondaryCategoryEntity;
 import org.springframework.stereotype.Component;
 
 @Component

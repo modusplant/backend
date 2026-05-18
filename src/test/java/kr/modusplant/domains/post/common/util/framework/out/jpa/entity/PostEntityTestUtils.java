@@ -1,8 +1,8 @@
 package kr.modusplant.domains.post.common.util.framework.out.jpa.entity;
 
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
-import kr.modusplant.framework.jpa.entity.PostEntity;
-import kr.modusplant.framework.jpa.entity.PostEntity.PostEntityBuilder;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity.PostEntityBuilder;
 
 public interface PostEntityTestUtils extends PostTestUtils {
     default PostEntityBuilder createPublishedPostEntityBuilder() {

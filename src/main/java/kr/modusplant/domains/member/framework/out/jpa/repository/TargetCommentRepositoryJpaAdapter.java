@@ -1,10 +1,9 @@
 package kr.modusplant.domains.member.framework.out.jpa.repository;
 
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.TargetCommentId;
 import kr.modusplant.domains.member.usecase.port.repository.TargetCommentRepository;
-import kr.modusplant.framework.jpa.repository.CommentJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommentLikeJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

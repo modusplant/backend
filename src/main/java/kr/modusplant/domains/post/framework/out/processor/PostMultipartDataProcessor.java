@@ -12,7 +12,7 @@ import kr.modusplant.domains.post.framework.out.processor.exception.ThumbnailNot
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
 import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
 import kr.modusplant.domains.post.usecase.request.FileOrder;
-import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.framework.aws.service.AmazonS3Service;
 import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.exception.FileLimitExceededException;
 import kr.modusplant.shared.exception.InvalidFileInputException;
@@ -34,7 +34,7 @@ import static kr.modusplant.domains.post.framework.out.processor.constant.PostFi
 
 @Service
 public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
-    private final S3FileService s3FileService;
+    private final AmazonS3Service amazonS3Service;
     public static final String DATA = "data";
     public static final String FILENAME = "filename";
     public static final String ORDER = "order";
@@ -44,10 +44,10 @@ public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
     private final ObjectMapper objectMapper;
     private final RandomUlidGenerator generator;
 
-    public PostMultipartDataProcessor(S3FileService s3FileService,
+    public PostMultipartDataProcessor(AmazonS3Service amazonS3Service,
                                       ObjectMapperHolder objectMapperHolder,
                                       UlidGeneratorHolder ulidGeneratorHolder) {
-        this.s3FileService = s3FileService;
+        this.amazonS3Service = amazonS3Service;
         this.objectMapper = objectMapperHolder.getObjectMapper();
         this.generator = ulidGeneratorHolder.getUlidGenerator();
     }
@@ -88,7 +88,7 @@ public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
             if (node.has(SRC)) {
                 String fileKey = objectNode.get(SRC).asText();
                 objectNode.remove(SRC);
-                String src = s3FileService.generateS3SrcUrl(fileKey);
+                String src = amazonS3Service.generateS3SrcUrl(fileKey);
                 objectNode.put(SRC,src);
             }
             newArray.add(objectNode);
@@ -112,7 +112,7 @@ public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
         if (thumbnailPath != null && !thumbnailPath.isBlank()) {
             ObjectNode thumbnailNode = objectMapper.createObjectNode();
             thumbnailNode.put(TYPE, PostFileType.IMAGE.getValue());
-            thumbnailNode.put(SRC, s3FileService.generateS3SrcUrl(thumbnailPath));
+            thumbnailNode.put(SRC, amazonS3Service.generateS3SrcUrl(thumbnailPath));
             newArray.add(thumbnailNode);
         }
 
@@ -126,7 +126,7 @@ public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
         for (JsonNode node : content) {
             if (node.has(SRC)) {
                 String src = node.get(SRC).asText();
-                s3FileService.deleteFiles(src);
+                amazonS3Service.deleteFiles(src);
             }
         }
     }
@@ -278,7 +278,7 @@ public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
             node.put(DATA, text);
         } else if (fileType.getUploadable()) {
             String fileKey = generateFileKey(fileUlid, fileType, filename, order);
-            s3FileService.uploadFile(part, fileKey);
+            amazonS3Service.uploadFile(part, fileKey);
             node.put(TYPE, fileType.getValue());
             node.put(SRC, fileKey);
         } else {

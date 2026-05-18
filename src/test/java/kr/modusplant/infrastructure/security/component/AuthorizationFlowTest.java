@@ -7,7 +7,7 @@ import kr.modusplant.domains.comment.adapter.controller.CommentController;
 import kr.modusplant.domains.comment.common.util.usecase.request.CommentRegisterRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentResponseTestUtils;
 import kr.modusplant.domains.comment.framework.in.web.rest.CommentRestController;
-import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.framework.out.redis.AccessTokenRedisRepository;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;

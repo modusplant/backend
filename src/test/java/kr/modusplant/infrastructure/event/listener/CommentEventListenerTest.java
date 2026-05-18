@@ -1,9 +1,9 @@
 package kr.modusplant.infrastructure.event.listener;
 
-import kr.modusplant.framework.jpa.entity.CommentEntity;
-import kr.modusplant.framework.jpa.entity.CommentLikeEntity;
-import kr.modusplant.framework.jpa.repository.CommentJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommentLikeJpaRepository;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.entity.CommentLikeEntity;
+import kr.modusplant.domains.member.framework.out.jpa.repository.CommentLikeJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

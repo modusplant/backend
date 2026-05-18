@@ -1,13 +1,13 @@
 package kr.modusplant.domains.notification.framework.out.jpa.repository;
 
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.notification.domain.vo.*;
+import kr.modusplant.domains.notification.framework.out.jpa.entity.NotificationEntity;
 import kr.modusplant.domains.notification.framework.out.jpa.repository.supers.NotificationJpaRepository;
 import kr.modusplant.domains.notification.usecase.port.repository.NotificationMockRepository;
-import kr.modusplant.framework.jpa.entity.MemberEntity;
-import kr.modusplant.framework.jpa.entity.NotificationEntity;
-import kr.modusplant.framework.jpa.repository.CommentJpaRepository;
-import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
-import kr.modusplant.framework.jpa.repository.PostJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
 import kr.modusplant.shared.enums.NotificationActionType;
 import kr.modusplant.shared.enums.NotificationStatusType;
 import lombok.RequiredArgsConstructor;

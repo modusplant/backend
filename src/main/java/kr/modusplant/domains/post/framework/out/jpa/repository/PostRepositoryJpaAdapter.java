@@ -1,20 +1,24 @@
 package kr.modusplant.domains.post.framework.out.jpa.repository;
 
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.repository.PostBookmarkJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.repository.PostLikeJpaRepository;
 import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.exception.AuthorNotFoundException;
 import kr.modusplant.domains.post.domain.exception.InvalidValueException;
 import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
 import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.domains.post.domain.vo.PostId;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PrimaryCategoryEntity;
+import kr.modusplant.domains.post.framework.out.jpa.entity.SecondaryCategoryEntity;
+import kr.modusplant.domains.post.framework.out.jpa.mapper.PrimaryCategoryJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.mapper.SecondaryCategoryJpaRepository;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
 import kr.modusplant.domains.post.framework.out.redis.PostRecentlyViewRedisRepository;
 import kr.modusplant.domains.post.framework.out.redis.PostViewCountRedisRepository;
 import kr.modusplant.domains.post.usecase.port.repository.PostRepository;
-import kr.modusplant.framework.jpa.entity.MemberEntity;
-import kr.modusplant.framework.jpa.entity.PostEntity;
-import kr.modusplant.framework.jpa.entity.PrimaryCategoryEntity;
-import kr.modusplant.framework.jpa.entity.SecondaryCategoryEntity;
-import kr.modusplant.framework.jpa.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

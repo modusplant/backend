@@ -1,11 +1,11 @@
 package kr.modusplant.infrastructure.jwt.service;
 
 
-import kr.modusplant.framework.jpa.entity.MemberEntity;
+import kr.modusplant.domains.account.identity.framework.out.jpa.repository.MemberAuthJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
 import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.framework.jpa.repository.MemberAuthJpaRepository;
-import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
 import kr.modusplant.infrastructure.jwt.exception.InvalidTokenException;
 import kr.modusplant.infrastructure.jwt.exception.TokenNotFoundException;

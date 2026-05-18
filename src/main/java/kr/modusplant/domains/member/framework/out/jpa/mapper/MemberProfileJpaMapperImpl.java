@@ -8,10 +8,10 @@ import kr.modusplant.domains.member.domain.vo.MemberProfileImageBytes;
 import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
 import kr.modusplant.domains.member.domain.vo.MemberProfileIntroduction;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberProfileEntity;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.supers.MemberProfileJpaMapper;
-import kr.modusplant.framework.aws.service.S3FileService;
-import kr.modusplant.framework.jpa.entity.MemberProfileEntity;
-import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
+import kr.modusplant.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -22,7 +22,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class MemberProfileJpaMapperImpl implements MemberProfileJpaMapper {
     private final MemberJpaRepository memberJpaRepository;
-    private final S3FileService s3FileService;
+    private final AmazonS3Service amazonS3Service;
 
     @Override
     public MemberProfileEntity toMemberProfileEntity(MemberProfile profile) {
@@ -41,7 +41,7 @@ public class MemberProfileJpaMapperImpl implements MemberProfileJpaMapper {
         } else {
             memberProfileImage = MemberProfileImage.create(
                     MemberProfileImagePath.create(entity.getImagePath()),
-                    MemberProfileImageBytes.create(s3FileService.downloadFile(entity.getImagePath())));
+                    MemberProfileImageBytes.create(amazonS3Service.downloadFile(entity.getImagePath())));
         }
         MemberProfileIntroduction memberProfileIntroduction;
         if (entity.getIntroduction() == null) {

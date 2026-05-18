@@ -1,8 +1,8 @@
 package kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper;
 
 import kr.modusplant.domains.comment.common.util.domain.CommentTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.CommentEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.MemberEntityTestUtils;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.common.util.CommentEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
 
 public class CommentJpaMapperTest implements CommentTestUtils, CommentEntityTestUtils,
         MemberEntityTestUtils {

@@ -2,11 +2,9 @@ package kr.modusplant.domains.post.framework.out.jpa.repository;
 
 import kr.modusplant.domains.post.common.util.framework.out.jpa.entity.PostArchiveEntityTestUtils;
 import kr.modusplant.domains.post.common.util.framework.out.jpa.entity.PostEntityTestUtils;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PostArchiveEntity;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostArchiveJpaMapper;
-import kr.modusplant.framework.jpa.entity.PostArchiveEntity;
-import kr.modusplant.framework.jpa.entity.PostEntity;
-import kr.modusplant.framework.jpa.repository.PostArchiveJpaRepository;
-import kr.modusplant.framework.jpa.repository.PostJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

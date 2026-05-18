@@ -1,7 +1,7 @@
 package kr.modusplant.domains.post.common.util.framework.out.jpa.entity;
 
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
-import kr.modusplant.framework.jpa.entity.PostArchiveEntity;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PostArchiveEntity;
 
 import static kr.modusplant.shared.persistence.common.util.constant.PostConstant.*;
 

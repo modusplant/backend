@@ -1,17 +1,17 @@
 package kr.modusplant.domains.account.social.framework.out.jpa.mapper;
 
+import kr.modusplant.domains.account.identity.framework.out.jpa.entity.MemberAuthEntity;
+import kr.modusplant.domains.account.identity.framework.out.jpa.entity.common.util.MemberAuthEntityTestUtils;
 import kr.modusplant.domains.account.social.common.util.domain.vo.AgreedTermsTestUtils;
 import kr.modusplant.domains.account.social.common.util.domain.vo.SocialMemberProfileTestUtils;
 import kr.modusplant.domains.account.social.domain.vo.SocialMemberProfile;
 import kr.modusplant.domains.account.social.framework.out.jpa.mapper.supers.SocialIdentityJpaMapper;
-import kr.modusplant.framework.jpa.entity.MemberAuthEntity;
-import kr.modusplant.framework.jpa.entity.MemberEntity;
-import kr.modusplant.framework.jpa.entity.MemberProfileEntity;
-import kr.modusplant.framework.jpa.entity.MemberTermEntity;
-import kr.modusplant.framework.jpa.entity.common.util.MemberAuthEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.MemberEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.MemberProfileEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.MemberTermEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberProfileEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberProfileEntityTestUtils;
+import kr.modusplant.domains.term.framework.out.jpa.entity.MemberTermEntity;
+import kr.modusplant.domains.term.framework.out.jpa.entity.common.util.MemberTermEntityTestUtils;
 import kr.modusplant.shared.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

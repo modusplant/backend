@@ -5,9 +5,9 @@ import kr.modusplant.domains.term.domain.aggregate.Term;
 import kr.modusplant.domains.term.domain.vo.TermContent;
 import kr.modusplant.domains.term.domain.vo.TermName;
 import kr.modusplant.domains.term.domain.vo.TermVersion;
+import kr.modusplant.domains.term.framework.out.jpa.entity.TermEntity;
+import kr.modusplant.domains.term.framework.out.jpa.entity.common.util.TermEntityTestUtils;
 import kr.modusplant.domains.term.framework.out.jpa.mapper.supers.TermJpaMapper;
-import kr.modusplant.framework.jpa.entity.TermEntity;
-import kr.modusplant.framework.jpa.entity.common.util.TermEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

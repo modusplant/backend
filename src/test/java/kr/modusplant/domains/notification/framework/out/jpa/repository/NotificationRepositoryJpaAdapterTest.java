@@ -1,16 +1,16 @@
 package kr.modusplant.domains.notification.framework.out.jpa.repository;
 
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.notification.common.util.domain.aggregate.NotificationTestUtils;
 import kr.modusplant.domains.notification.domain.aggregate.Notification;
 import kr.modusplant.domains.notification.domain.exception.InvalidValueException;
 import kr.modusplant.domains.notification.domain.vo.NotificationId;
 import kr.modusplant.domains.notification.domain.vo.NotificationStatus;
 import kr.modusplant.domains.notification.domain.vo.RecipientId;
+import kr.modusplant.domains.notification.framework.out.jpa.entity.NotificationEntity;
 import kr.modusplant.domains.notification.framework.out.jpa.mapper.supers.NotificationJpaMapper;
 import kr.modusplant.domains.notification.framework.out.jpa.repository.supers.NotificationJpaRepository;
-import kr.modusplant.framework.jpa.entity.MemberEntity;
-import kr.modusplant.framework.jpa.entity.NotificationEntity;
-import kr.modusplant.framework.jpa.repository.MemberJpaRepository;
 import kr.modusplant.shared.enums.NotificationStatusType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

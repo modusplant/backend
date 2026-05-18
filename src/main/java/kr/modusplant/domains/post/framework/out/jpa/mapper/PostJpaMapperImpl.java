@@ -1,15 +1,15 @@
 package kr.modusplant.domains.post.framework.out.jpa.mapper;
 
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.domains.post.domain.vo.*;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity.PostEntityBuilder;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PrimaryCategoryEntity;
+import kr.modusplant.domains.post.framework.out.jpa.entity.SecondaryCategoryEntity;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
-import kr.modusplant.framework.jpa.entity.MemberEntity;
-import kr.modusplant.framework.jpa.entity.PostEntity;
-import kr.modusplant.framework.jpa.entity.PostEntity.PostEntityBuilder;
-import kr.modusplant.framework.jpa.entity.PrimaryCategoryEntity;
-import kr.modusplant.framework.jpa.entity.SecondaryCategoryEntity;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
