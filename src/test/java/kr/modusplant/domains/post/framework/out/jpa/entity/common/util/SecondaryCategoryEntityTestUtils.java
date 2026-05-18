@@ -2,8 +2,8 @@ package kr.modusplant.domains.post.framework.out.jpa.entity.common.util;
 
 import kr.modusplant.domains.post.framework.out.jpa.entity.SecondaryCategoryEntity;
 
+import static kr.modusplant.domains.post.common.constant.SecondaryCategoryConstant.*;
 import static kr.modusplant.domains.post.framework.out.jpa.entity.SecondaryCategoryEntity.SecondaryCategoryEntityBuilder;
-import static kr.modusplant.shared.persistence.common.util.constant.SecondaryCategoryConstant.*;
 
 public interface SecondaryCategoryEntityTestUtils extends PrimaryCategoryEntityTestUtils {
     default SecondaryCategoryEntityBuilder createSecondaryCategoryEntityBuilder() {

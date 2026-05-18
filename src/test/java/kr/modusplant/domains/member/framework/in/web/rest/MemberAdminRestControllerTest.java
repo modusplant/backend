@@ -11,9 +11,9 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Objects;
 
+import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_ULID;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRemoveRecordTestUtils.testProposalOrBugReportRemoveRecord;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
-import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.TEST_REPORT_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.willDoNothing;
 

@@ -10,13 +10,13 @@ import kr.modusplant.domains.post.framework.out.processor.exception.TextFileOver
 import kr.modusplant.domains.post.framework.out.processor.exception.ThumbnailNotAllowedException;
 import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
 import kr.modusplant.domains.post.usecase.request.FileOrder;
-import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
-import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
-import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.infrastructure.config.jackson.JacksonConfig;
 import kr.modusplant.shared.exception.FileLimitExceededException;
 import kr.modusplant.shared.exception.InvalidFileInputException;
 import kr.modusplant.shared.exception.UnsupportedFileException;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
+import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
+import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.shared.generator.UlidGeneratorHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

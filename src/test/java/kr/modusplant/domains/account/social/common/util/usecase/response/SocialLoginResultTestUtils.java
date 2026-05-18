@@ -6,10 +6,10 @@ import kr.modusplant.domains.account.social.usecase.record.NeedLinkResult;
 import kr.modusplant.domains.account.social.usecase.record.NeedSignupResult;
 import kr.modusplant.shared.enums.Role;
 
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.*;
 import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_GOOGLE_SOCIAL_ACCESS_TOKEN;
 import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN;
-import static kr.modusplant.shared.persistence.common.util.constant.MemberAuthConstant.*;
-import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.*;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.*;
 
 public interface SocialLoginResultTestUtils {
     default LoginResult createKakaoLoginResult() {

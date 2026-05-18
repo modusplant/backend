@@ -5,9 +5,9 @@ import kr.modusplant.domains.account.identity.framework.out.jpa.entity.MemberAut
 import kr.modusplant.domains.account.identity.framework.out.jpa.repository.MemberAuthJpaRepository;
 import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
-import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.infrastructure.security.exception.AccountStateException;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
+import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;

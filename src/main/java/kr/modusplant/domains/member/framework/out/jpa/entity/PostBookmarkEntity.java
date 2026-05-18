@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.framework.out.jpa.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.shared.persistence.compositekey.PostBookmarkCompositeKey;
+import kr.modusplant.domains.member.framework.out.jpa.compositekey.PostBookmarkCompositeKey;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

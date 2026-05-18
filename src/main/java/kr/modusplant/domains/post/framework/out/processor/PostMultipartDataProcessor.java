@@ -12,11 +12,11 @@ import kr.modusplant.domains.post.framework.out.processor.exception.ThumbnailNot
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
 import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
 import kr.modusplant.domains.post.usecase.request.FileOrder;
-import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
-import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.exception.FileLimitExceededException;
 import kr.modusplant.shared.exception.InvalidFileInputException;
 import kr.modusplant.shared.exception.UnsupportedFileException;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
+import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.generator.RandomUlidGenerator;
 import kr.modusplant.shared.generator.UlidGeneratorHolder;
 import org.springframework.stereotype.Service;

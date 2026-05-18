@@ -7,9 +7,9 @@ import kr.modusplant.domains.notification.framework.out.jpa.entity.FcmTokenEntit
 import kr.modusplant.domains.notification.framework.out.jpa.mapper.supers.FcmTokenJpaMapper;
 import kr.modusplant.domains.notification.framework.out.jpa.repository.supers.FcmTokenJpaRepository;
 import kr.modusplant.domains.notification.usecase.port.repository.FcmTokenRepository;
+import kr.modusplant.shared.enums.Platform;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.shared.enums.Platform;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

@@ -1,10 +1,10 @@
 package kr.modusplant.shared.framework.jackson.http.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.enums.GeneralSuccessCode;
 import kr.modusplant.shared.exception.supers.ErrorCode;
+import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

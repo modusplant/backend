@@ -5,7 +5,7 @@ import kr.modusplant.domains.notification.framework.out.jpa.entity.FcmTokenEntit
 import kr.modusplant.domains.notification.framework.out.jpa.entity.FcmTokenEntity.FcmTokenEntityBuilder;
 import kr.modusplant.shared.enums.Platform;
 
-import static kr.modusplant.shared.persistence.common.util.constant.FcmTokenConstant.*;
+import static kr.modusplant.domains.notification.common.constant.FcmTokenConstant.*;
 
 
 public interface FcmTokenEntityTestUtils extends MemberEntityTestUtils {

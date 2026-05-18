@@ -8,7 +8,7 @@ import kr.modusplant.shared.enums.Platform;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.shared.persistence.common.util.constant.FcmTokenConstant.TEST_FCM_TOKEN_WEB;
+import static kr.modusplant.domains.notification.common.constant.FcmTokenConstant.TEST_FCM_TOKEN_WEB;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FcmTokenJpaMapperImplTest implements MemberEntityTestUtils {

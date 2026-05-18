@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
 import static kr.modusplant.domains.member.common.util.domain.vo.TargetPostIdTestUtils.testTargetPostId;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.INVALID_TARGET_POST_ID;
-import static kr.modusplant.shared.persistence.common.util.constant.PostConstant.TEST_COMM_POST_ULID;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,7 +17,7 @@ class TargetPostIdTest {
     @Test
     @DisplayName("create으로 대상 게시글 아이디 반환")
     void testCreate_givenValidValue_willReturnTargetPostId() {
-        assertNotNull(TargetPostId.create(TEST_COMM_POST_ULID).getValue());
+        assertNotNull(TargetPostId.create(TEST_POST_ULID).getValue());
     }
 
     @Test

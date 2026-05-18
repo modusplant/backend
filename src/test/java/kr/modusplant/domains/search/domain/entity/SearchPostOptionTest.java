@@ -12,8 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
-import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
-import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID2;
+import static kr.modusplant.domains.post.common.constant.PostConstant.*;
 import static kr.modusplant.domains.search.common.util.domain.entity.SearchPostOptionTestUtils.testSearchPostOption;
 import static kr.modusplant.domains.search.common.util.domain.vo.SearchKeywordSimilarityTestUtils.testSearchKeywordSimilarity1;
 import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostIdTestUtils.testSearchPostId;
@@ -22,7 +21,6 @@ import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostPubli
 import static kr.modusplant.domains.search.common.util.domain.vo.nullobject.EmptySearchPostIdTestUtils.testEmptySearchPostId;
 import static kr.modusplant.domains.search.common.util.domain.vo.nullobject.EmptySearchPostPublishedAtTestUtils.testEmptySearchPostPublishedAt;
 import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.*;
-import static kr.modusplant.shared.persistence.common.util.constant.PostConstant.TEST_COMM_POST_PUBLISHED_AT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -225,7 +223,7 @@ class SearchPostOptionTest {
         // given
         SearchPostOption otherOption = SearchPostOption.createRelevanceOption(
                 SearchPostId.create(TEST_POST_ULID),
-                SearchPostPublishedAt.create(TEST_COMM_POST_PUBLISHED_AT),
+                SearchPostPublishedAt.create(TEST_POST_PUBLISHED_AT),
                 SearchPostImportance.empty(),
                 SearchKeywordSimilarity.createEmpty()
         );
@@ -247,7 +245,7 @@ class SearchPostOptionTest {
         // given
         SearchPostOption otherOption = SearchPostOption.createRelevanceOption(
                 SearchPostId.create(TEST_POST_ULID2),
-                SearchPostPublishedAt.create(TEST_COMM_POST_PUBLISHED_AT),
+                SearchPostPublishedAt.create(TEST_POST_PUBLISHED_AT),
                 SearchPostImportance.empty(),
                 SearchKeywordSimilarity.createEmpty()
         );
@@ -268,7 +266,7 @@ class SearchPostOptionTest {
         // given
         SearchPostOption otherOption = SearchPostOption.createRelevanceOption(
                 SearchPostId.create(TEST_POST_ULID),
-                SearchPostPublishedAt.create(TEST_COMM_POST_PUBLISHED_AT),
+                SearchPostPublishedAt.create(TEST_POST_PUBLISHED_AT),
                 SearchPostImportance.empty(),
                 SearchKeywordSimilarity.createEmpty()
         );

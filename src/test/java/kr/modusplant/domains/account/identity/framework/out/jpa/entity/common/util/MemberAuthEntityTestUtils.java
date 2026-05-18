@@ -3,8 +3,8 @@ package kr.modusplant.domains.account.identity.framework.out.jpa.entity.common.u
 import kr.modusplant.domains.account.identity.framework.out.jpa.entity.MemberAuthEntity;
 import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
 
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.*;
 import static kr.modusplant.domains.account.identity.framework.out.jpa.entity.MemberAuthEntity.MemberAuthEntityBuilder;
-import static kr.modusplant.shared.persistence.common.util.constant.MemberAuthConstant.*;
 
 public interface MemberAuthEntityTestUtils extends MemberEntityTestUtils {
     default MemberAuthEntityBuilder createMemberAuthBasicAdminEntityBuilder() {

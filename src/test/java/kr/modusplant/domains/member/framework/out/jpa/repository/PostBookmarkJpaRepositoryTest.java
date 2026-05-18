@@ -1,9 +1,9 @@
 package kr.modusplant.domains.member.framework.out.jpa.repository;
 
+import kr.modusplant.domains.member.framework.out.jpa.compositekey.PostBookmarkCompositeKey;
 import kr.modusplant.domains.member.framework.out.jpa.entity.PostBookmarkEntity;
 import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.PostBookmarkEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
-import kr.modusplant.shared.persistence.compositekey.PostBookmarkCompositeKey;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.common.util.constant.PostConstant.TEST_COMM_POST_ULID;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -32,7 +32,7 @@ public class PostBookmarkJpaRepositoryTest implements PostBookmarkEntityTestUtil
         @BeforeEach
         void setUp() {
             // given
-            postId = TEST_COMM_POST_ULID;
+            postId = TEST_POST_ULID;
             memberId = createMemberBasicUserEntityWithUuid().getUuid();
         }
 

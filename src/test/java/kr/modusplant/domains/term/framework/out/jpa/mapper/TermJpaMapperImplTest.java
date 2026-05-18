@@ -11,7 +11,7 @@ import kr.modusplant.domains.term.framework.out.jpa.mapper.supers.TermJpaMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.shared.persistence.common.util.constant.TermConstant.*;
+import static kr.modusplant.domains.term.common.constant.TermConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TermJpaMapperImplTest implements TermTestUtils, TermEntityTestUtils {

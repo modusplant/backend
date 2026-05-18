@@ -2,7 +2,7 @@ package kr.modusplant.domains.post.framework.out.jpa.entity.common.util;
 
 import kr.modusplant.domains.post.framework.out.jpa.entity.PrimaryCategoryEntity;
 
-import static kr.modusplant.shared.persistence.common.util.constant.PrimaryCategoryConstant.*;
+import static kr.modusplant.domains.post.common.constant.PrimaryCategoryConstant.*;
 
 public interface PrimaryCategoryEntityTestUtils {
     default PrimaryCategoryEntity createPrimaryCategoryEntity() {

@@ -3,7 +3,7 @@ package kr.modusplant.domains.term.framework.out.jpa.entity.common.util;
 import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
 import kr.modusplant.domains.term.framework.out.jpa.entity.MemberTermEntity;
 
-import static kr.modusplant.shared.persistence.common.util.constant.MemberTermConstant.*;
+import static kr.modusplant.domains.term.common.constant.MemberTermConstant.*;
 
 public interface MemberTermEntityTestUtils extends MemberEntityTestUtils {
     default MemberTermEntity createMemberTermAdminEntity() {

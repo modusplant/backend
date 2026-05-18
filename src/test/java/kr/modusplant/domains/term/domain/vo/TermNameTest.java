@@ -5,7 +5,7 @@ import kr.modusplant.domains.term.domain.exception.enums.TermErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.shared.persistence.common.util.constant.TermConstant.TEST_TERMS_OF_USE_NAME;
+import static kr.modusplant.domains.term.common.constant.TermConstant.TEST_TERMS_OF_USE_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 

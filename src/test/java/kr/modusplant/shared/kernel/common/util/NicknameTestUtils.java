@@ -2,7 +2,7 @@ package kr.modusplant.shared.kernel.common.util;
 
 import kr.modusplant.shared.kernel.Nickname;
 
-import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.*;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.*;
 
 public interface NicknameTestUtils {
     Nickname testNormalUserNickname = Nickname.create(MEMBER_BASIC_USER_NICKNAME);

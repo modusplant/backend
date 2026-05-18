@@ -2,8 +2,8 @@ package kr.modusplant.domains.term.common.util.domain.aggregate;
 
 import kr.modusplant.domains.term.domain.aggregate.SiteMemberTerm;
 
+import static kr.modusplant.domains.term.common.constant.MemberTermConstant.*;
 import static kr.modusplant.domains.term.common.util.domain.vo.SiteMemberTermIdTestUtils.testSiteMemberTermId;
-import static kr.modusplant.shared.persistence.common.util.constant.MemberTermConstant.*;
 
 public interface SiteMemberTermTestUtils {
     default SiteMemberTerm createSiteMemberTerm() {

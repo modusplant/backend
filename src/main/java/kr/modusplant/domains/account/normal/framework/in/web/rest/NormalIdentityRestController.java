@@ -10,8 +10,8 @@ import kr.modusplant.domains.account.normal.adapter.controller.NormalIdentityCon
 import kr.modusplant.domains.account.normal.usecase.request.EmailModificationRequest;
 import kr.modusplant.domains.account.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.domains.account.normal.usecase.request.PasswordModificationRequest;
-import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.models.NormalLoginRequest;
+import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

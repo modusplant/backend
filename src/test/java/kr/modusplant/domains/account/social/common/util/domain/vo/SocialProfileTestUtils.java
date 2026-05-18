@@ -4,9 +4,9 @@ import kr.modusplant.domains.account.social.domain.vo.SocialProfile;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
 
-import static kr.modusplant.shared.persistence.common.util.constant.MemberAuthConstant.MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID;
-import static kr.modusplant.shared.persistence.common.util.constant.MemberAuthConstant.MEMBER_AUTH_KAKAO_USER_PROVIDER_ID;
-import static kr.modusplant.shared.persistence.common.util.constant.MemberConstant.*;
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID;
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_KAKAO_USER_PROVIDER_ID;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.*;
 
 public interface SocialProfileTestUtils extends EmailTestUtils {
     SocialProfile testKakaoSocialProfile = SocialProfile.create(SocialProvider.KAKAO, MEMBER_AUTH_KAKAO_USER_PROVIDER_ID,testKakaoUserEmail,MEMBER_KAKAO_USER_NICKNAME);

@@ -1,7 +1,7 @@
 package kr.modusplant.shared.framework.aws.listener;
 
-import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.event.ImageRemoveEvent;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;

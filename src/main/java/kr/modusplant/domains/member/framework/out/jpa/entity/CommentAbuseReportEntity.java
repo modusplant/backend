@@ -2,7 +2,7 @@ package kr.modusplant.domains.member.framework.out.jpa.entity;
 
 import jakarta.persistence.*;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
-import kr.modusplant.shared.persistence.compositekey.CommentAbuseReportCompositeKey;
+import kr.modusplant.domains.member.framework.out.jpa.compositekey.CommentAbuseReportCompositeKey;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -17,8 +17,8 @@ import org.mockito.Mockito;
 import java.util.List;
 import java.util.Optional;
 
+import static kr.modusplant.domains.term.common.constant.TermConstant.*;
 import static kr.modusplant.domains.term.common.util.domain.vo.TermIdTestUtils.testTermId;
-import static kr.modusplant.shared.persistence.common.util.constant.TermConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;

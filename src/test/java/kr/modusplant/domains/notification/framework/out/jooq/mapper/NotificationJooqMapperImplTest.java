@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
+import static kr.modusplant.domains.notification.common.constant.NotificationConstant.*;
 import static kr.modusplant.jooq.Tables.COMM_NOTIFICATION;
-import static kr.modusplant.shared.persistence.common.util.constant.NotificationConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;

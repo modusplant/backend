@@ -4,7 +4,7 @@ import kr.modusplant.domains.member.framework.out.jpa.entity.record.FilenameAndS
 
 import java.util.List;
 
-import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.*;
+import static kr.modusplant.domains.member.common.constant.ReportConstant.*;
 
 public interface FilenameAndSrcEntityRecordTestUtils {
     FilenameAndSrcEntityRecord testFilenameAndSrcEntityRecord1 =

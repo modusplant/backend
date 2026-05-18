@@ -8,7 +8,7 @@ import kr.modusplant.shared.enums.NotificationStatusType;
 
 import java.time.LocalDateTime;
 
-import static kr.modusplant.shared.persistence.common.util.constant.NotificationConstant.*;
+import static kr.modusplant.domains.notification.common.constant.NotificationConstant.*;
 
 public interface NotificationEntityTestUtils extends MemberEntityTestUtils {
     default NotificationEntityBuilder createPostNotificationEntityBuilder() {

@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import static kr.modusplant.domains.post.common.constant.PostStringConstant.TEST_AUTHOR_ID_STRING;
-import static kr.modusplant.domains.post.common.constant.PostUuidConstant.TEST_POST_UUID;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_AUTHOR_ID_STRING;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AuthorIdTest implements PostTestUtils {
@@ -23,7 +23,7 @@ class AuthorIdTest implements PostTestUtils {
         @DisplayName("유효한 UUID로 AuthorId를 생성한다")
         void testFromUuid_givenUuid_willReturnAuthorId() {
             assertNotNull(testAuthorId);
-            assertEquals(TEST_POST_UUID, testAuthorId.getValue());
+            assertEquals(MEMBER_BASIC_USER_UUID, testAuthorId.getValue());
         }
 
         @Test
@@ -87,6 +87,7 @@ class AuthorIdTest implements PostTestUtils {
         @DisplayName("같은 객체에 대한 equals 호출")
         void useEqual_givenSameObject_willReturnTrue() {
             // when & then
+            //noinspection EqualsWithItself
             assertEquals(testAuthorId, testAuthorId);
             assertEquals(testAuthorId.hashCode(), testAuthorId.hashCode());
         }

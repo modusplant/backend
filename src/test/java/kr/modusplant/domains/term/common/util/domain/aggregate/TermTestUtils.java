@@ -5,8 +5,8 @@ import kr.modusplant.domains.term.domain.vo.TermContent;
 import kr.modusplant.domains.term.domain.vo.TermName;
 import kr.modusplant.domains.term.domain.vo.TermVersion;
 
+import static kr.modusplant.domains.term.common.constant.TermConstant.*;
 import static kr.modusplant.domains.term.common.util.domain.vo.TermIdTestUtils.testTermId;
-import static kr.modusplant.shared.persistence.common.util.constant.TermConstant.*;
 
 public interface TermTestUtils {
     default Term createTerm() {

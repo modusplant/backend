@@ -2,8 +2,8 @@ package kr.modusplant.domains.member.framework.out.jpa.entity.common.util;
 
 import kr.modusplant.domains.member.framework.out.jpa.entity.ProposalBugReportEntity;
 
+import static kr.modusplant.domains.member.common.constant.ReportConstant.*;
 import static kr.modusplant.domains.member.framework.out.jpa.repository.common.util.record.FilenameAndSrcEntityRecordTestUtils.testFilenameAndSrcEntityRecords;
-import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.*;
 
 public interface ProposalBugReportEntityTestUtils extends MemberEntityTestUtils {
     default ProposalBugReportEntity.ProposalBugReportEntityBuilder createProposalBugReportEntityBuilder() {
