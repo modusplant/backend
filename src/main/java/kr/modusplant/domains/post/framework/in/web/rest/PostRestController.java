@@ -24,7 +24,7 @@ import kr.modusplant.domains.post.usecase.response.CursorLatestSortedPageRespons
 import kr.modusplant.domains.post.usecase.response.DraftPostResponse;
 import kr.modusplant.domains.post.usecase.response.OffsetPageResponse;
 import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Range;

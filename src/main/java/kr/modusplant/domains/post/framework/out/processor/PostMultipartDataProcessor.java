@@ -12,8 +12,8 @@ import kr.modusplant.domains.post.framework.out.processor.exception.ThumbnailNot
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
 import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
 import kr.modusplant.domains.post.usecase.request.FileOrder;
-import kr.modusplant.framework.aws.service.AmazonS3Service;
-import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
+import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.exception.FileLimitExceededException;
 import kr.modusplant.shared.exception.InvalidFileInputException;
 import kr.modusplant.shared.exception.UnsupportedFileException;

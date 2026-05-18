@@ -1,7 +1,7 @@
 package kr.modusplant.infrastructure.event.listener;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
+import kr.modusplant.shared.framework.jooq.converter.JsonbJsonNodeConverter;
 import kr.modusplant.shared.event.ImageRemoveEvent;
 import kr.modusplant.shared.event.MemberWithdrawalEvent;
 import kr.modusplant.shared.event.RecentlyViewPostRemoveEvent;

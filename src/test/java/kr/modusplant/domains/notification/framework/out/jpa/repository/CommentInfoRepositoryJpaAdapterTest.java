@@ -5,7 +5,7 @@ import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.Co
 import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.notification.common.util.domain.aggregate.NotificationTestUtils;
 import kr.modusplant.domains.notification.usecase.record.NotificationPreview;
-import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

@@ -13,7 +13,7 @@ import kr.modusplant.domains.member.framework.out.jpa.repository.PostAbuseReport
 import kr.modusplant.domains.member.framework.out.jpa.repository.ProposalBugReportJpaRepository;
 import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
-import kr.modusplant.framework.aws.service.AmazonS3Service;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.event.CommentAbuseReportEvent;
 import kr.modusplant.shared.event.PostAbuseReportEvent;
 import kr.modusplant.shared.event.ProposalOrBugReportEvent;

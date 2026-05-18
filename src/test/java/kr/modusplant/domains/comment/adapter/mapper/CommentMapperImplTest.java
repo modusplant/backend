@@ -2,7 +2,7 @@ package kr.modusplant.domains.comment.adapter.mapper;
 
 import kr.modusplant.domains.comment.common.util.domain.CommentTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.request.CommentRegisterRequestTestUtils;
-import kr.modusplant.framework.aws.service.AmazonS3Service;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import org.mockito.Mockito;
 
 public class CommentMapperImplTest implements

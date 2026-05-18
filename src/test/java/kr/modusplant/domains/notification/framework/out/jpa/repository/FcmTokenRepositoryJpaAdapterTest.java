@@ -7,7 +7,7 @@ import kr.modusplant.domains.notification.framework.out.jpa.entity.FcmTokenEntit
 import kr.modusplant.domains.notification.framework.out.jpa.entity.common.util.FcmTokenEntityTestUtils;
 import kr.modusplant.domains.notification.framework.out.jpa.mapper.supers.FcmTokenJpaMapper;
 import kr.modusplant.domains.notification.framework.out.jpa.repository.supers.FcmTokenJpaRepository;
-import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.enums.Platform;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

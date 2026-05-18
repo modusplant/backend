@@ -11,8 +11,8 @@ import kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper.Commen
 import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
 import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
-import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
-import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.persistence.compositekey.common.util.CommentCompositeKeyTestUtils;
 import kr.modusplant.shared.persistence.constant.TableName;
 import org.junit.jupiter.api.DisplayName;

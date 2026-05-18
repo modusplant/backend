@@ -11,7 +11,7 @@ import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntro
 import kr.modusplant.domains.member.framework.out.jpa.entity.MemberProfileEntity;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberProfileJpaMapperImpl;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
-import kr.modusplant.framework.aws.service.AmazonS3Service;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

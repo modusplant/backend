@@ -1,6 +1,6 @@
 package kr.modusplant.shared.event;
 
-import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
+import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.enums.NotificationActionType;
 import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;

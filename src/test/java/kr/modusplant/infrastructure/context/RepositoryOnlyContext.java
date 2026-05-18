@@ -1,6 +1,6 @@
 package kr.modusplant.infrastructure.context;
 
-import kr.modusplant.framework.redis.RedisHelper;
+import kr.modusplant.shared.framework.redis.RedisHelper;
 import kr.modusplant.infrastructure.config.aws.S3Config;
 import kr.modusplant.infrastructure.config.jpa.JpaConfig;
 import kr.modusplant.infrastructure.config.redis.RedisConfig;

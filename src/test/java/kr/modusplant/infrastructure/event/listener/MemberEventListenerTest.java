@@ -1,6 +1,6 @@
 package kr.modusplant.infrastructure.event.listener;
 
-import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
+import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.event.ImageRemoveEvent;
 import kr.modusplant.shared.event.RecentlyViewPostRemoveEvent;
 import org.jooq.*;

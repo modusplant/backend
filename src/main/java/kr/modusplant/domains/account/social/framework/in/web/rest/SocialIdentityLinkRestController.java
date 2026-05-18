@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityLinkController;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.usecase.request.SocialAuthRequest;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
