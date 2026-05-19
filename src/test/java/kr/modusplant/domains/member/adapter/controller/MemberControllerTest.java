@@ -1,6 +1,7 @@
 package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.common.util.CommentEntityTestUtils;
 import kr.modusplant.domains.member.adapter.helper.MemberImageIOHelper;
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.adapter.mapper.MemberProfileMapperImpl;
@@ -13,24 +14,18 @@ import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileI
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
-import kr.modusplant.domains.member.framework.out.jpa.repository.MemberProfileRepositoryJpaAdapter;
-import kr.modusplant.domains.member.framework.out.jpa.repository.MemberRepositoryJpaAdapter;
-import kr.modusplant.domains.member.framework.out.jpa.repository.TargetCommentRepositoryJpaAdapter;
-import kr.modusplant.domains.member.framework.out.jpa.repository.TargetPostRepositoryJpaAdapter;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.CommentAbuseReportEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberProfileEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.PostAbuseReportEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.ProposalBugReportEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.repository.*;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord;
 import kr.modusplant.domains.member.usecase.record.MemberWithdrawalRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
-import kr.modusplant.framework.aws.service.S3FileService;
-import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
-import kr.modusplant.framework.jpa.entity.common.util.*;
-import kr.modusplant.framework.jpa.exception.ExistsEntityException;
-import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
-import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.entity.common.util.PostEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
@@ -40,6 +35,12 @@ import kr.modusplant.shared.event.*;
 import kr.modusplant.shared.exception.InvalidFileInputException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
+import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
+import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
+import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.shared.generator.UlidGeneratorHolder;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
@@ -54,8 +55,15 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN;
 import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_CODE;
 import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.*;
+import static kr.modusplant.domains.member.common.constant.MemberWithdrawConstant.MEMBER_WITHDRAW_BASIC_USER_OPINION;
+import static kr.modusplant.domains.member.common.constant.MemberWithdrawConstant.MEMBER_WITHDRAW_BASIC_USER_REASON;
+import static kr.modusplant.domains.member.common.constant.ReportConstant.*;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils.testMemberProfileIntroduction;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
@@ -74,19 +82,12 @@ import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseR
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
-import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.EXISTS_COMMENT_ABUSE_REPORT;
-import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.EXISTS_POST_ABUSE_REPORT;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static kr.modusplant.shared.exception.enums.GeneralErrorCode.INVALID_FILE_INPUT;
 import static kr.modusplant.shared.exception.enums.GeneralErrorCode.INVALID_INPUT;
+import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.EXISTS_COMMENT_ABUSE_REPORT;
+import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.EXISTS_POST_ABUSE_REPORT;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
-import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.*;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.*;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberWithdrawConstant.MEMBER_WITHDRAW_BASIC_USER_OPINION;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberWithdrawConstant.MEMBER_WITHDRAW_BASIC_USER_REASON;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -96,8 +97,8 @@ import static org.mockito.Mockito.verify;
 
 class MemberControllerTest implements
         MemberTestUtils, MemberProfileTestUtils,
-        SiteMemberProfileEntityTestUtils, CommPostEntityTestUtils, CommCommentEntityTestUtils,
-        PropBugRepEntityTestUtils, CommPostAbuRepEntityTestUtils, CommCommentAbuRepEntityTestUtils {
+        MemberProfileEntityTestUtils, PostEntityTestUtils, CommentEntityTestUtils,
+        ProposalBugReportEntityTestUtils, PostAbuseReportEntityTestUtils, CommentAbuseReportEntityTestUtils {
     @SuppressWarnings("unused")
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
     @SuppressWarnings("unused")
@@ -107,11 +108,11 @@ class MemberControllerTest implements
 
     private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
     private final TokenService tokenService = Mockito.mock(TokenService.class);
-    private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
+    private final AmazonS3Service amazonS3Service = Mockito.mock(AmazonS3Service.class);
     private final SwearService swearService = Mockito.mock(SwearService.class);
     private final MemberImageIOHelper memberImageIOHelper = Mockito.mock(MemberImageIOHelper.class);
     private final MemberValidationHelper memberValidationHelper = Mockito.mock(MemberValidationHelper.class);
-    private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl(s3FileService);
+    private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl(amazonS3Service);
     private final MemberSocialTranslator memberSocialTranslator = Mockito.mock(MemberSocialTranslator.class);
 
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryJpaAdapter.class);
@@ -120,7 +121,7 @@ class MemberControllerTest implements
     private final TargetCommentRepository targetCommentRepository = Mockito.mock(TargetCommentRepositoryJpaAdapter.class);
     private final ReportRepository reportRepository = Mockito.mock(ReportRepository.class);
 
-    private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
+    private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
 
     private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, swearService, memberImageIOHelper, memberValidationHelper, memberProfileMapper, memberSocialTranslator, memberRepository, memberProfileRepository, targetPostRepository, targetCommentRepository, reportRepository, applicationEventPublisher);
 
@@ -158,7 +159,7 @@ class MemberControllerTest implements
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberProfileRepository.getById(any())).willReturn(Optional.of(createMemberProfile()));
-        given(s3FileService.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
+        given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when & then
         assertThat(memberController.getProfile(testMemberProfileGetRecord)).isEqualTo(testMemberProfileResponse);
@@ -202,7 +203,7 @@ class MemberControllerTest implements
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
         given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
-        given(s3FileService.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
+        given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when
         MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecord);
@@ -232,7 +233,7 @@ class MemberControllerTest implements
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
         given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
-        given(s3FileService.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
+        given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when
         MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecord);

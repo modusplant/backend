@@ -28,14 +28,14 @@ package kr.modusplant.infrastructure.security.component;
 //import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 //
 
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
 import kr.modusplant.infrastructure.security.common.util.NormalLoginRequestTestUtils;
 import kr.modusplant.infrastructure.security.common.util.SiteMemberUserDetailsTestUtils;
 
 ////@SpringBootTest
 //@SecurityOnlyContext
 public class NormalLoginAuthenticationFlowTest implements
-        SiteMemberUserDetailsTestUtils, NormalLoginRequestTestUtils, SiteMemberEntityTestUtils {
+        SiteMemberUserDetailsTestUtils, NormalLoginRequestTestUtils, MemberEntityTestUtils {
 //
 //    private final MockMvc mockMvc;
 //    private final ObjectMapper objectMapper;

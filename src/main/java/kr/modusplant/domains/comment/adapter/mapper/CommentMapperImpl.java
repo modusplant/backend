@@ -8,7 +8,7 @@ import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
 import kr.modusplant.domains.comment.usecase.port.mapper.CommentMapper;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
-import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CommentMapperImpl implements CommentMapper {
 
-    private final S3FileService fileService;
+    private final AmazonS3Service fileService;
 
     @Override
     public Comment toComment(PostId postId, CommentPath path, Author author, CommentContent content) {

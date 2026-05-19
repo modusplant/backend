@@ -1,35 +1,34 @@
 package kr.modusplant.domains.member.framework.out.jpa.repository;
 
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.TargetCommentId;
 import kr.modusplant.domains.member.usecase.port.repository.TargetCommentRepository;
-import kr.modusplant.framework.jpa.repository.CommCommentJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommCommentLikeJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
 public class TargetCommentRepositoryJpaAdapter implements TargetCommentRepository {
-    private final CommCommentJpaRepository commPostJpaRepository;
-    private final CommCommentLikeJpaRepository commPostLikeJpaRepository;
+    private final CommentJpaRepository postJpaRepository;
+    private final CommentLikeJpaRepository postLikeJpaRepository;
 
     @Override
     public boolean isIdExist(TargetCommentId targetPostId) {
-        return commPostJpaRepository.existsByPostUlidAndPath(
+        return postJpaRepository.existsByPostUlidAndPath(
                 targetPostId.getTargetPostId().getValue(), targetPostId.getTargetCommentPath().getValue());
     }
 
     @Override
     public boolean isLiked(MemberId memberId, TargetCommentId targetPostId) {
-        return commPostLikeJpaRepository.existsByPostIdAndPathAndMemberId(
+        return postLikeJpaRepository.existsByPostIdAndPathAndMemberId(
                 targetPostId.getTargetPostId().getValue(),
                 targetPostId.getTargetCommentPath().getValue(), memberId.getValue());
     }
 
     @Override
     public boolean isUnliked(MemberId memberId, TargetCommentId targetPostId) {
-        return !commPostLikeJpaRepository.existsByPostIdAndPathAndMemberId(
+        return !postLikeJpaRepository.existsByPostIdAndPathAndMemberId(
                 targetPostId.getTargetPostId().getValue(),
                 targetPostId.getTargetCommentPath().getValue(), memberId.getValue());
     }

@@ -1,7 +1,0 @@
-package kr.modusplant.shared.persistence.common.util.constant;
-
-public class FcmTokenConstant {
-    public static final String TEST_FCM_TOKEN_WEB = "e4S_fG8_Q7C1zP_X9V6N2M:APA91bEt9-ABC123def456_GHI789jkl012mnOPQRstUVwxYZ_3456789abcdefGHIJKLMNOP_qrstuvWXYZ0123456789_abcdefGHIJ1234567890_ABCDEFG";
-    public static final String TEST_FCM_TOKEN_ANDROID = "fLpXy8r_S1u0T9v8R7q6P5:APA91bHkG_ABC123def456_GHI789jkl012mnOPQRstUVwxYZ_3456789abcdefGHIJKLMNOP_qrstuvWXYZ0123456789_abcdefGHIJ1234567890_ABCDEFG_HIJKLMN";
-    public static final String TEST_FCM_TOKEN_IOS = "d7u8v9w0x1y2z3a4b5c6d7:APA91bF8-ABC123def456_GHI789jkl012mnOPQRstUVwxYZ_3456789abcdefGHIJKLMNOP_qrstuvWXYZ0123456789_abcdefGHIJ1234567890_ABCDEFG_H_IJKLMNO";
-}

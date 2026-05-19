@@ -1,6 +1,6 @@
 package kr.modusplant.infrastructure.jwt.common.util.entity;
 
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.framework.out.jpa.entity.RefreshTokenEntity.RefreshTokenEntityBuilder;
 
 import java.time.LocalDateTime;
@@ -9,7 +9,7 @@ import java.util.Date;
 
 import static kr.modusplant.infrastructure.jwt.framework.out.jpa.entity.RefreshTokenEntity.builder;
 
-public interface RefreshTokenEntityTestUtils extends SiteMemberEntityTestUtils {
+public interface RefreshTokenEntityTestUtils extends MemberEntityTestUtils {
     default RefreshTokenEntityBuilder createRefreshTokenBasicEntityBuilder() {
         return builder()
                 .refreshToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIn0.sFzQWkpK8HG2xKcI1vNH3oW7nIO9QaX3ghTkfT2Yq3s")

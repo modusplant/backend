@@ -2,9 +2,9 @@ package kr.modusplant.domains.comment.common.util.usecase.model;
 
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
 
-import static kr.modusplant.shared.persistence.common.util.constant.CommCommentConstant.*;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
+import static kr.modusplant.domains.comment.common.constant.CommentConstant.*;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
 
 public interface CommentOfPostReadModelTestUtils {
 

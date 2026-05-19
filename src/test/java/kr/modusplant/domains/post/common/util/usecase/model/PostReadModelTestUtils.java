@@ -7,18 +7,16 @@ import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 
 import java.time.LocalDateTime;
 
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
+import static kr.modusplant.domains.post.common.constant.PostConstant.*;
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT;
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT_THUMBNAIL_KEY;
-import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
-import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID2;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_TITLE;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ID_1;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
+import static kr.modusplant.domains.post.common.constant.PrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
+import static kr.modusplant.domains.post.common.constant.PrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
+import static kr.modusplant.domains.post.common.constant.SecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
+import static kr.modusplant.domains.post.common.constant.SecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ID_1;
 
 public interface PostReadModelTestUtils {
     LocalDateTime testDate = LocalDateTime.of(2025, 6, 1, 0, 0);
@@ -33,7 +31,7 @@ public interface PostReadModelTestUtils {
             MEMBER_BASIC_USER_UUID,
             MEMBER_BASIC_USER_NICKNAME,
             MEMBER_PROFILE_BASIC_USER_IMAGE_PATH,
-            TEST_COMM_POST_TITLE,
+            TEST_POST_TITLE,
             TEST_POST_CONTENT,
             likeCount,
             true,
@@ -51,7 +49,7 @@ public interface PostReadModelTestUtils {
             TEST_COMM_SECONDARY_CATEGORY_CATEGORY,
             MEMBER_BASIC_USER_UUID,
             MEMBER_BASIC_USER_NICKNAME,
-            TEST_COMM_POST_TITLE,
+            TEST_POST_TITLE,
             TEST_POST_CONTENT,
             TEST_POST_CONTENT_THUMBNAIL_KEY,
             true,
@@ -67,7 +65,7 @@ public interface PostReadModelTestUtils {
             TEST_COMM_SECONDARY_CATEGORY_CATEGORY,
             MEMBER_BASIC_USER_UUID,
             MEMBER_BASIC_USER_NICKNAME,
-            TEST_COMM_POST_TITLE,
+            TEST_POST_TITLE,
             TEST_POST_CONTENT,
             TEST_POST_CONTENT_THUMBNAIL_KEY,
             false,
@@ -83,7 +81,7 @@ public interface PostReadModelTestUtils {
             null,
             MEMBER_BASIC_USER_UUID,
             MEMBER_BASIC_USER_NICKNAME,
-            TEST_COMM_POST_TITLE,
+            TEST_POST_TITLE,
             null,
             null,
             false,
@@ -96,7 +94,7 @@ public interface PostReadModelTestUtils {
             TEST_COMM_PRIMARY_CATEGORY_CATEGORY,
             TEST_COMM_SECONDARY_CATEGORY_CATEGORY,
             MEMBER_BASIC_USER_NICKNAME,
-            TEST_COMM_POST_TITLE,
+            TEST_POST_TITLE,
             TEST_POST_CONTENT,
             TEST_POST_CONTENT_THUMBNAIL_KEY,
             likeCount,
@@ -111,7 +109,7 @@ public interface PostReadModelTestUtils {
             TEST_COMM_PRIMARY_CATEGORY_CATEGORY,
             TEST_COMM_SECONDARY_CATEGORY_CATEGORY,
             MEMBER_BASIC_USER_NICKNAME,
-            TEST_COMM_POST_TITLE,
+            TEST_POST_TITLE,
             TEST_POST_CONTENT,
             TEST_POST_CONTENT_THUMBNAIL_KEY,
             likeCount,
@@ -125,7 +123,7 @@ public interface PostReadModelTestUtils {
             TEST_POST_ULID,
             TEST_COMM_PRIMARY_CATEGORY_CATEGORY,
             TEST_COMM_SECONDARY_CATEGORY_CATEGORY,
-            TEST_COMM_POST_TITLE,
+            TEST_POST_TITLE,
             TEST_POST_CONTENT,
             TEST_POST_CONTENT_THUMBNAIL_KEY,
             testDate

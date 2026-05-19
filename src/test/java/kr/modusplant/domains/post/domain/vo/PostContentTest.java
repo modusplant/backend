@@ -9,9 +9,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_TITLE;
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT;
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT_THUMBNAIL_KEY;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_TITLE;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PostContentTest implements PostTestUtils {
@@ -33,7 +33,7 @@ class PostContentTest implements PostTestUtils {
 
             // then
             assertNotNull(testPostContent);
-            assertEquals(TEST_COMM_POST_TITLE, testPostContent.getTitle());
+            assertEquals(TEST_POST_TITLE, testPostContent.getTitle());
             assertEquals(TEST_POST_CONTENT, testPostContent.getContent());
             assertNotNull(postContent);
             assertEquals(MAX_LENGTH_TITLE, postContent.getTitle());
@@ -85,7 +85,7 @@ class PostContentTest implements PostTestUtils {
         void testCreate_givenNullContent_willThrowException() {
             // when & then
             EmptyValueException exception = assertThrows(EmptyValueException.class,
-                    () -> PostContent.create(TEST_COMM_POST_TITLE, null,null));
+                    () -> PostContent.create(TEST_POST_TITLE, null,null));
             assertEquals(exception.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
         }
     }

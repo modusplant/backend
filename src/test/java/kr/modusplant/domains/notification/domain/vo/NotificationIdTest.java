@@ -3,14 +3,14 @@ package kr.modusplant.domains.notification.domain.vo;
 import kr.modusplant.domains.notification.common.util.domain.aggregate.NotificationTestUtils;
 import kr.modusplant.domains.notification.domain.exception.EmptyValueException;
 import kr.modusplant.domains.notification.domain.exception.InvalidValueException;
-import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
+import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.shared.generator.UlidGeneratorHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.StringUtils;
 
-import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.TEST_NOTIFICATION_ULID;
+import static kr.modusplant.domains.notification.common.constant.NotificationConstant.TEST_NOTIFICATION_ULID;
 import static org.junit.jupiter.api.Assertions.*;
 
 class NotificationIdTest implements NotificationTestUtils {

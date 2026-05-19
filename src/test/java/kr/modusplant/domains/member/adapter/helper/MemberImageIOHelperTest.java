@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.adapter.helper;
 
-import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -8,25 +8,25 @@ import org.mockito.Mockito;
 import java.io.IOException;
 import java.util.List;
 
+import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
+import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_IMAGES;
+import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATHS;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecord;
-import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.TEST_REPORT_IMAGES;
-import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATHS;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.willDoNothing;
 
 class MemberImageIOHelperTest {
-    private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
-    private final MemberImageIOHelper memberImageIOHelper = new MemberImageIOHelper(s3FileService);
+    private final AmazonS3Service amazonS3Service = Mockito.mock(AmazonS3Service.class);
+    private final MemberImageIOHelper memberImageIOHelper = new MemberImageIOHelper(amazonS3Service);
 
     @Test
     @DisplayName("uploadImage를 통해 회원 프로필 이미지 업로드")
     void testUploadImage_givenMemberProfileImage_willReturnImagePath() throws IOException {
         // given
-        willDoNothing().given(s3FileService).uploadFile(any(), any());
+        willDoNothing().given(amazonS3Service).uploadFile(any(), any());
 
         // when
         String imagePath = memberImageIOHelper.uploadImage(testMemberId, testMemberProfileOverrideRecord);
@@ -39,7 +39,7 @@ class MemberImageIOHelperTest {
     @DisplayName("uploadImage를 통해 보고서 이미지 업로드")
     void testUploadImage_givenReportImage_willReturnImagePath() throws IOException {
         // given
-        willDoNothing().given(s3FileService).uploadFile(any(), any());
+        willDoNothing().given(amazonS3Service).uploadFile(any(), any());
 
         // when
         List<String> imagePaths = memberImageIOHelper.uploadImage(

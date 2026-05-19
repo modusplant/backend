@@ -1,9 +1,7 @@
 package kr.modusplant.domains.member.framework.out.jpa.repository;
 
-import kr.modusplant.framework.jpa.entity.common.util.CommPostEntityTestUtils;
-import kr.modusplant.framework.jpa.repository.CommPostBookmarkJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommPostLikeJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.entity.common.util.PostEntityTestUtils;
+import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -15,10 +13,10 @@ import static kr.modusplant.domains.member.common.util.domain.vo.TargetPostIdTes
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
-class TargetPostRepositoryJpaAdapterTest implements CommPostEntityTestUtils {
-    CommPostJpaRepository postJpaRepository = Mockito.mock(CommPostJpaRepository.class);
-    CommPostLikeJpaRepository postLikeJpaRepository = Mockito.mock(CommPostLikeJpaRepository.class);
-    CommPostBookmarkJpaRepository postBookmarkJpaRepository = Mockito.mock(CommPostBookmarkJpaRepository.class);
+class TargetPostRepositoryJpaAdapterTest implements PostEntityTestUtils {
+    PostJpaRepository postJpaRepository = Mockito.mock(PostJpaRepository.class);
+    PostLikeJpaRepository postLikeJpaRepository = Mockito.mock(PostLikeJpaRepository.class);
+    PostBookmarkJpaRepository postBookmarkJpaRepository = Mockito.mock(PostBookmarkJpaRepository.class);
     TargetPostRepositoryJpaAdapter targetPostIdRepositoryJpaAdapter = new TargetPostRepositoryJpaAdapter(postJpaRepository, postLikeJpaRepository, postBookmarkJpaRepository);
 
     @Test
@@ -45,7 +43,7 @@ class TargetPostRepositoryJpaAdapterTest implements CommPostEntityTestUtils {
     @DisplayName("isPublished로 true 반환")
     void testIsPublished_givenIdThatIsPublished_willReturnTrue() {
         // given & when
-        given(postJpaRepository.findByUlid(testTargetPostId.getValue())).willReturn(Optional.of(createCommPostEntityBuilder().build()));
+        given(postJpaRepository.findByUlid(testTargetPostId.getValue())).willReturn(Optional.of(createPostEntityBuilder().build()));
 
         // when & then
         assertThat(targetPostIdRepositoryJpaAdapter.isPublished(testTargetPostId)).isEqualTo(true);
@@ -55,7 +53,7 @@ class TargetPostRepositoryJpaAdapterTest implements CommPostEntityTestUtils {
     @DisplayName("isPublished로 false 반환")
     void testIsPublished_givenIdThatIsNotPublished_willReturnFalse() {
         // given & when
-        given(postJpaRepository.findByUlid(testTargetPostId.getValue())).willReturn(Optional.of(createCommPostEntityBuilder().isPublished(false).build()));
+        given(postJpaRepository.findByUlid(testTargetPostId.getValue())).willReturn(Optional.of(createPostEntityBuilder().isPublished(false).build()));
 
         // when & then
         assertThat(targetPostIdRepositoryJpaAdapter.isPublished(testTargetPostId)).isEqualTo(false);

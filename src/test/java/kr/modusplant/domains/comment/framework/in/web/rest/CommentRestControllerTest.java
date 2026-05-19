@@ -7,8 +7,8 @@ import kr.modusplant.domains.comment.common.util.usecase.request.CommentRegister
 import kr.modusplant.domains.comment.common.util.usecase.request.CommentUpdateRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentResponseTestUtils;
 import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
-import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
+import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

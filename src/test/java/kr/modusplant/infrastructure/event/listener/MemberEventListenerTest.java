@@ -1,8 +1,8 @@
 package kr.modusplant.infrastructure.event.listener;
 
-import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.event.ImageRemoveEvent;
 import kr.modusplant.shared.event.RecentlyViewPostRemoveEvent;
+import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.tools.jdbc.MockConnection;
@@ -13,12 +13,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static kr.modusplant.jooq.Tables.COMM_POST;
 import static kr.modusplant.shared.event.common.util.MemberWithdrawalEventTestUtils.testMemberWithdrawalEvent;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
-import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
@@ -53,7 +53,7 @@ class MemberEventListenerTest {
                 } else {
                     // ULID 조회 쿼리인 경우 고정된 1건 반환
                     Result<Record1<String>> result = dsl.newResult(COMM_POST.ULID);
-                    result.add(dsl.newRecord(COMM_POST.ULID).values(TEST_COMM_POST_ULID));
+                    result.add(dsl.newRecord(COMM_POST.ULID).values(TEST_POST_ULID));
                     return new MockResult[]{new MockResult(1, result)};
                 }
             } else {

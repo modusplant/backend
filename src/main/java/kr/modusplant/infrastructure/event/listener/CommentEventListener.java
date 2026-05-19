@@ -1,8 +1,8 @@
 package kr.modusplant.infrastructure.event.listener;
 
-import kr.modusplant.framework.jpa.entity.CommCommentLikeEntity;
-import kr.modusplant.framework.jpa.repository.CommCommentJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommCommentLikeJpaRepository;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.entity.CommentLikeEntity;
+import kr.modusplant.domains.member.framework.out.jpa.repository.CommentLikeJpaRepository;
 import kr.modusplant.shared.event.CommentLikeEvent;
 import kr.modusplant.shared.event.CommentUnlikeEvent;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +14,8 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class CommentEventListener {
-    private final CommCommentLikeJpaRepository commCommentLikeRepository;
-    private final CommCommentJpaRepository commCommentRepository;
+    private final CommentLikeJpaRepository commentLikeRepository;
+    private final CommentJpaRepository commentRepository;
 
     @EventListener
     public void handleCommentLikeEvent(CommentLikeEvent commentLikeEvent) {
@@ -23,8 +23,8 @@ public class CommentEventListener {
         String postId = commentLikeEvent.getPostId();
         String path = commentLikeEvent.getPath();
 
-        commCommentLikeRepository.save(CommCommentLikeEntity.of(postId, path, memberId));
-        commCommentRepository.findByPostUlidAndPath(postId, path).orElseThrow().increaseLikeCount();
+        commentLikeRepository.save(CommentLikeEntity.of(postId, path, memberId));
+        commentRepository.findByPostUlidAndPath(postId, path).orElseThrow().increaseLikeCount();
     }
 
     @EventListener
@@ -33,7 +33,7 @@ public class CommentEventListener {
         String postId = commentUnlikeEvent.getPostId();
         String path = commentUnlikeEvent.getPath();
 
-        commCommentLikeRepository.delete(CommCommentLikeEntity.of(postId, path, memberId));
-        commCommentRepository.findByPostUlidAndPath(postId, path).orElseThrow().decreaseLikeCount();
+        commentLikeRepository.delete(CommentLikeEntity.of(postId, path, memberId));
+        commentRepository.findByPostUlidAndPath(postId, path).orElseThrow().decreaseLikeCount();
     }
 }

@@ -1,6 +1,5 @@
 package kr.modusplant.domains.search.domain.vo;
 
-import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.search.common.constant.SearchDoubleConstant.TEST_SEARCH_KEYWORD_SIMILARITY_0_6;
 import static kr.modusplant.domains.search.common.constant.SearchDoubleConstant.TEST_SEARCH_KEYWORD_SIMILARITY_0_8;
-import static kr.modusplant.domains.search.common.util.domain.vo.SearchKeywordSimilarityTestUtils.testSearchKeywordSimilarity06;
-import static kr.modusplant.domains.search.common.util.domain.vo.SearchKeywordSimilarityTestUtils.testSearchKeywordSimilarity08;
-import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.*;
+import static kr.modusplant.domains.search.common.util.domain.vo.SearchKeywordSimilarityTestUtils.*;
+import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.NOT_FOUND_SEARCH_POST_IMPORTANCE;
+import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.SEARCH_KEYWORD_SIMILARITY_OUT_OF_RANGE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,20 +18,13 @@ class SearchKeywordSimilarityTest {
     @Test
     @DisplayName("유효한 값으로 create 호출 시 정상 객체 반환")
     void testCreate_givenValidValue_willReturnSearchKeywordSimilarity() {
-        assertNotNull(testSearchKeywordSimilarity06);
-        assertFalse(testSearchKeywordSimilarity06.isEmpty());
         assertEquals(TEST_SEARCH_KEYWORD_SIMILARITY_0_6, testSearchKeywordSimilarity06.getValueIfNotEmpty());
     }
 
     @Test
-    @DisplayName("null 값으로 create 호출 시 예외 발생")
-    void testCreate_givenNull_willThrowException() {
-        // given & when
-        EmptyValueException exception = assertThrows(EmptyValueException.class,
-                () -> SearchKeywordSimilarity.create(null));
-
-        // then
-        assertThat(exception.getErrorCode()).isEqualTo(EMPTY_SEARCH_KEYWORD_SIMILARITY);
+    @DisplayName("null 값으로 create 호출 시 널 객체 반환")
+    void testCreate_givenNull_willReturnEmptySearchKeywordSimilarity() {
+        assertThat(SearchKeywordSimilarity.create(null)).isEqualTo(testSearchKeywordSimilarityEmpty);
     }
 
     @Test

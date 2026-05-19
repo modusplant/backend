@@ -7,4 +7,5 @@ public interface SearchPostImportanceTestUtils {
     SearchPostImportance testSearchPostImportanceContent = SearchPostImportance.content();
     SearchPostImportance testSearchPostImportanceCommentContent = SearchPostImportance.commentContent();
     SearchPostImportance testSearchPostImportanceOthers = SearchPostImportance.others();
+    SearchPostImportance testSearchPostImportanceEmpty = SearchPostImportance.empty();
 }

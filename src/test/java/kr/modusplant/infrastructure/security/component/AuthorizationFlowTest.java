@@ -7,7 +7,7 @@ import kr.modusplant.domains.comment.adapter.controller.CommentController;
 import kr.modusplant.domains.comment.common.util.usecase.request.CommentRegisterRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentResponseTestUtils;
 import kr.modusplant.domains.comment.framework.in.web.rest.CommentRestController;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.framework.out.redis.AccessTokenRedisRepository;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
@@ -23,7 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.*;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -49,7 +49,7 @@ public class AuthorizationFlowTest implements CommentRegisterRequestTestUtils, C
     private final AccessTokenRedisRepository tokenRedisRepository = Mockito.mock(AccessTokenRedisRepository.class);
 
     @MockitoBean
-    private final SiteMemberJpaRepository memberJpaRepository = Mockito.mock(SiteMemberJpaRepository.class);
+    private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
 
     @MockitoBean
     private CommentRestController commentRestController;

@@ -4,7 +4,7 @@ import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord;
-import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,12 +16,12 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class MemberImageIOHelper {
-    private final S3FileService s3FileService;
+    private final AmazonS3Service amazonS3Service;
 
     public String uploadImage(MemberId memberId, MemberProfileOverrideRecord record) throws IOException {
         String filename = record.image().getOriginalFilename();
         String imagePath = String.format("member/%s/profile/%s", memberId.getValue(), filename);
-        s3FileService.uploadFile(record.image(), imagePath);
+        amazonS3Service.uploadFile(record.image(), imagePath);
         return imagePath;
     }
 
@@ -33,7 +33,7 @@ public class MemberImageIOHelper {
             String filename = image.getOriginalFilename();
             String imagePath = String.format("member/%s/report/proposal-or-bug/%s/%s",
                     memberId.getValue(), reportId.getValue(), filename);
-            s3FileService.uploadFile(image, imagePath);
+            amazonS3Service.uploadFile(image, imagePath);
             imagePaths.add(imagePath);
         }
         return imagePaths;
@@ -42,7 +42,7 @@ public class MemberImageIOHelper {
     public void deleteImage(MemberProfileImage image) {
         String imagePath = image.getMemberProfileImagePath().getValue();
         if (imagePath != null) {
-            s3FileService.deleteFiles(imagePath);
+            amazonS3Service.deleteFiles(imagePath);
         }
     }
 }

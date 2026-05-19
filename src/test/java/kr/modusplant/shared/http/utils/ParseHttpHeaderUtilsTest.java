@@ -1,7 +1,7 @@
 package kr.modusplant.shared.http.utils;
 
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberProfileEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberProfileEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,12 +13,12 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.shared.http.utils.ParseHttpHeaderUtils.parseIfModifiedSince;
 import static kr.modusplant.shared.http.utils.ParseHttpHeaderUtils.parseIfNoneMatch;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ParseHttpHeaderUtilsTest implements SiteMemberEntityTestUtils, SiteMemberProfileEntityTestUtils {
+class ParseHttpHeaderUtilsTest implements MemberEntityTestUtils, MemberProfileEntityTestUtils {
     private final PasswordEncoder passwordEncoder = Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8();
 
     @Test

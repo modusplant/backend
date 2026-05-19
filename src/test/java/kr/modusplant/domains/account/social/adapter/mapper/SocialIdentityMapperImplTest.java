@@ -13,9 +13,9 @@ import kr.modusplant.shared.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.*;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_GOOGLE_USER_NICKNAME;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_KAKAO_USER_NICKNAME;
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.*;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_GOOGLE_USER_NICKNAME;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_KAKAO_USER_NICKNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
