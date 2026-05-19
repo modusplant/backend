@@ -8,4 +8,5 @@ public interface SearchKeywordSimilarityTestUtils {
     SearchKeywordSimilarity testSearchKeywordSimilarity1 = SearchKeywordSimilarity.create(TEST_SEARCH_KEYWORD_SIMILARITY_1);
     SearchKeywordSimilarity testSearchKeywordSimilarity08 = SearchKeywordSimilarity.create(TEST_SEARCH_KEYWORD_SIMILARITY_0_8);
     SearchKeywordSimilarity testSearchKeywordSimilarity06 = SearchKeywordSimilarity.create(TEST_SEARCH_KEYWORD_SIMILARITY_0_6);
+    SearchKeywordSimilarity testSearchKeywordSimilarityEmpty = SearchKeywordSimilarity.createEmpty();
 }

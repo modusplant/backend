@@ -1,7 +1,7 @@
 package kr.modusplant.domains.post.framework.out.redis;
 
 import kr.modusplant.domains.post.common.util.domain.vo.PostIdTestUtils;
-import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
+import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import java.util.Map;
 import java.util.Set;
 
-import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;

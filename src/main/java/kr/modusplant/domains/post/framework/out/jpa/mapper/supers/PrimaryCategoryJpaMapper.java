@@ -1,9 +1,9 @@
 package kr.modusplant.domains.post.framework.out.jpa.mapper.supers;
 
 import kr.modusplant.domains.post.domain.vo.PrimaryCategory;
-import kr.modusplant.framework.jpa.entity.CommPrimaryCategoryEntity;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PrimaryCategoryEntity;
 
 
 public interface PrimaryCategoryJpaMapper {
-    PrimaryCategory toPrimaryCategory(CommPrimaryCategoryEntity primaryCategoryEntity);
+    PrimaryCategory toPrimaryCategory(PrimaryCategoryEntity primaryCategoryEntity);
 }

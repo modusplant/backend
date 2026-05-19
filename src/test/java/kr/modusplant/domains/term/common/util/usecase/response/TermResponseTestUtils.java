@@ -2,7 +2,7 @@ package kr.modusplant.domains.term.common.util.usecase.response;
 
 import kr.modusplant.domains.term.usecase.response.TermResponse;
 
-import static kr.modusplant.shared.persistence.common.util.constant.TermConstant.*;
+import static kr.modusplant.domains.term.common.constant.TermConstant.*;
 
 public interface TermResponseTestUtils {
     TermResponse testTermResponse = new TermResponse(

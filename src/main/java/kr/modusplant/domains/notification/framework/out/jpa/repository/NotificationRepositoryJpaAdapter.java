@@ -1,17 +1,17 @@
 package kr.modusplant.domains.notification.framework.out.jpa.repository;
 
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.notification.domain.aggregate.Notification;
 import kr.modusplant.domains.notification.domain.exception.InvalidValueException;
 import kr.modusplant.domains.notification.domain.exception.enums.NotificationErrorCode;
 import kr.modusplant.domains.notification.domain.vo.NotificationId;
 import kr.modusplant.domains.notification.domain.vo.NotificationStatus;
 import kr.modusplant.domains.notification.domain.vo.RecipientId;
+import kr.modusplant.domains.notification.framework.out.jpa.entity.NotificationEntity;
 import kr.modusplant.domains.notification.framework.out.jpa.mapper.supers.NotificationJpaMapper;
 import kr.modusplant.domains.notification.framework.out.jpa.repository.supers.NotificationJpaRepository;
 import kr.modusplant.domains.notification.usecase.port.repository.NotificationRepository;
-import kr.modusplant.framework.jpa.entity.CommNotificationEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class NotificationRepositoryJpaAdapter implements NotificationRepository {
     private final NotificationJpaRepository notificationJpaRepository;
-    private final SiteMemberJpaRepository siteMemberJpaRepository;
+    private final MemberJpaRepository memberJpaRepository;
     private final NotificationJpaMapper notificationJpaMapper;
 
     @Override
@@ -39,7 +39,7 @@ public class NotificationRepositoryJpaAdapter implements NotificationRepository 
     @Override
     public long countByRecipientIdAndStatus(RecipientId recipientId, NotificationStatus status) {
         return notificationJpaRepository.countByRecipientAndStatus(
-                siteMemberJpaRepository.findByUuid(recipientId.getValue()).orElseThrow(() -> new InvalidValueException(NotificationErrorCode.INVALID_RECIPIENT_ID)),
+                memberJpaRepository.findByUuid(recipientId.getValue()).orElseThrow(() -> new InvalidValueException(NotificationErrorCode.INVALID_RECIPIENT_ID)),
                 status.getStatus()
         );
     }
@@ -47,9 +47,9 @@ public class NotificationRepositoryJpaAdapter implements NotificationRepository 
     @Override
     public Notification saveWithLimit(Notification notification,int limit) {
         // 알림 저장
-        SiteMemberEntity recipient = siteMemberJpaRepository.findByUuid(notification.getRecipientId().getValue())
+        MemberEntity recipient = memberJpaRepository.findByUuid(notification.getRecipientId().getValue())
                         .orElseThrow(() -> new InvalidValueException(NotificationErrorCode.INVALID_RECIPIENT_ID));
-        CommNotificationEntity notificationEntity = notificationJpaRepository.save(notificationJpaMapper.toNotificationEntity(notification,recipient));
+        NotificationEntity notificationEntity = notificationJpaRepository.save(notificationJpaMapper.toNotificationEntity(notification,recipient));
         // limit 초과 시 가장 오래된 알림 삭제
         notificationJpaRepository.findUlidsByRecipientId(recipient.getUuid(), PageRequest.of(limit-1,1))
                 .stream().findFirst()

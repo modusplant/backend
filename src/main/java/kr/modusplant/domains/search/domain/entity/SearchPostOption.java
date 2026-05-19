@@ -27,10 +27,10 @@ public class SearchPostOption {
     private SearchPostImportance searchPostImportance;
     private SearchKeywordSimilarity searchKeywordSimilarity;
 
-    public static SearchPostOption create(SearchPostId searchPostId,
-                                          SearchPostPublishedAt searchPostPublishedAt,
-                                          SearchPostImportance searchPostImportance,
-                                          SearchKeywordSimilarity searchKeywordSimilarity) {
+    public static SearchPostOption createRelevanceOption(SearchPostId searchPostId,
+                                                         SearchPostPublishedAt searchPostPublishedAt,
+                                                         SearchPostImportance searchPostImportance,
+                                                         SearchKeywordSimilarity searchKeywordSimilarity) {
         if (searchPostId == null) {
             throw new EmptyValueException(EMPTY_SEARCH_POST_ID, "searchPostId");
         } else if (searchPostPublishedAt == null) {
@@ -49,6 +49,22 @@ public class SearchPostOption {
                     GeneralErrorCode.INVALID_INPUT, List.of("searchPostImportance", "searchKeywordSimilarity"));
         }
         return new SearchPostOption(searchPostId, searchPostPublishedAt, searchPostImportance, searchKeywordSimilarity);
+    }
+
+    public static SearchPostOption createLatestOption(SearchPostId searchPostId,
+                                                      SearchPostPublishedAt searchPostPublishedAt) {
+        if (searchPostId == null) {
+            throw new EmptyValueException(EMPTY_SEARCH_POST_ID, "searchPostId");
+        } else if (searchPostPublishedAt == null) {
+            throw new EmptyValueException(EMPTY_SEARCH_POST_PUBLISHED_AT, "searchPostPublishedAt");
+        } else if ((searchPostId.getValue() == null && searchPostPublishedAt.getValue() != null) ||
+                (searchPostId.getValue() != null && searchPostPublishedAt.getValue() == null)){
+            throw new InvalidValueException(
+                    GeneralErrorCode.INVALID_INPUT, List.of("searchPostId", "searchPostPublishedAt"));
+        }
+        return new SearchPostOption(
+                searchPostId, searchPostPublishedAt,
+                SearchPostImportance.empty(), SearchKeywordSimilarity.createEmpty());
     }
 
     @Override

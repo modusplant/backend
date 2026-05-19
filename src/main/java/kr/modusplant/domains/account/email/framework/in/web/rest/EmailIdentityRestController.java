@@ -12,7 +12,7 @@ import kr.modusplant.domains.account.email.adapter.controller.EmailIdentityContr
 import kr.modusplant.domains.account.email.usecase.request.EmailIdentityRequest;
 import kr.modusplant.domains.account.email.usecase.request.EmailValidationRequest;
 import kr.modusplant.domains.account.email.usecase.request.InputValidationRequest;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;

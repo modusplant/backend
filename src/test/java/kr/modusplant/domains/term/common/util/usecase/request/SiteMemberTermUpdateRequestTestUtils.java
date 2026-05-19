@@ -2,8 +2,8 @@ package kr.modusplant.domains.term.common.util.usecase.request;
 
 import kr.modusplant.domains.term.usecase.request.SiteMemberTermUpdateRequest;
 
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberTermConstant.*;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.term.common.constant.MemberTermConstant.*;
 
 public interface SiteMemberTermUpdateRequestTestUtils {
     SiteMemberTermUpdateRequest testSiteMemberTermUpdateRequest = new SiteMemberTermUpdateRequest(

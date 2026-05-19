@@ -1,14 +1,14 @@
 package kr.modusplant.domains.search.framework.out.jooq.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.annotation.Nonnull;
 import kr.modusplant.domains.search.domain.enums.SearchPostTarget;
 import kr.modusplant.domains.search.domain.vo.*;
 import kr.modusplant.domains.search.framework.out.jooq.mapper.supers.SearchJooqMapper;
 import kr.modusplant.domains.search.usecase.model.read.SearchPostReadModel;
 import kr.modusplant.domains.search.usecase.port.repository.SearchPostRepository;
-import kr.modusplant.framework.jooq.converter.JsonbJsonNodeConverter;
+import kr.modusplant.shared.framework.jooq.converter.JsonbJsonNodeConverter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.jooq.*;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.utils.CollectionUtils;
@@ -440,7 +440,7 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
                 .map(searchJooqMapper::toSearchPostReadModel);
     }
 
-    private @NotNull Condition getIlikeCondition(TableField<?, String> tableField,
+    private @Nonnull Condition getIlikeCondition(TableField<?, String> tableField,
                                                  String keyword,
                                                  Field<String> partialMatchToKeywordWithThreeOrMoreLetters,
                                                  Field<String> prefixMatchToOneOrTwoLetterKeyword,
@@ -466,7 +466,7 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
         return ilikeCondition;
     }
 
-    private static @NotNull Condition getIsLikedCondition(UUID memberId, Field<String> eHitsUlid) {
+    private static @Nonnull Condition getIsLikedCondition(UUID memberId, Field<String> eHitsUlid) {
         return memberId != null ?
                 exists(
                         selectOne().from(COMM_POST_LIKE)
@@ -475,7 +475,7 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
                 falseCondition();
     }
 
-    private static @NotNull Condition getIsBookmarkedCondition(UUID memberId, Field<String> eHitsUlid) {
+    private static @Nonnull Condition getIsBookmarkedCondition(UUID memberId, Field<String> eHitsUlid) {
         return memberId != null ?
                 exists(
                         selectOne().from(COMM_POST_BOOKMARK)

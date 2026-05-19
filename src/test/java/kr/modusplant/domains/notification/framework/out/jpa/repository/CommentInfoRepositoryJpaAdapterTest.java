@@ -1,11 +1,11 @@
 package kr.modusplant.domains.notification.framework.out.jpa.repository;
 
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.notification.common.util.domain.aggregate.NotificationTestUtils;
 import kr.modusplant.domains.notification.usecase.record.NotificationPreview;
-import kr.modusplant.framework.jpa.entity.CommCommentEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
-import kr.modusplant.framework.jpa.repository.CommCommentJpaRepository;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,14 +14,14 @@ import org.mockito.Mockito;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 class CommentInfoRepositoryJpaAdapterTest implements NotificationTestUtils {
-    private final CommCommentJpaRepository commentJpaRepository = Mockito.mock(CommCommentJpaRepository.class);
+    private final CommentJpaRepository commentJpaRepository = Mockito.mock(CommentJpaRepository.class);
     private final CommentInfoRepositoryJpaAdapter commentInfoRepositoryJpaAdapter = new CommentInfoRepositoryJpaAdapter(commentJpaRepository);
 
     @Nested
@@ -31,8 +31,8 @@ class CommentInfoRepositoryJpaAdapterTest implements NotificationTestUtils {
         @DisplayName("댓글이 존재하면 작성자의 UUID를 반환한다")
         void testGetAuthorId_givenValidParams_willReturnAuthorUuid() {
             // given
-            CommCommentEntity commentEntity = Mockito.mock(CommCommentEntity.class);
-            SiteMemberEntity memberEntity = Mockito.mock(SiteMemberEntity.class);
+            CommentEntity commentEntity = Mockito.mock(CommentEntity.class);
+            MemberEntity memberEntity = Mockito.mock(MemberEntity.class);
 
             given(commentJpaRepository.findByPostUlidAndPath(any(), any())).willReturn(Optional.of(commentEntity));
             given(commentEntity.getAuthMember()).willReturn(memberEntity);
@@ -64,8 +64,8 @@ class CommentInfoRepositoryJpaAdapterTest implements NotificationTestUtils {
         @DisplayName("댓글 정보를 바탕으로 알림 프리뷰를 생성한다")
         void testGetNotificationPreview_givenValidParams_willReturnPreview() {
             // given
-            CommCommentEntity commentEntity = Mockito.mock(CommCommentEntity.class);
-            SiteMemberEntity memberEntity = Mockito.mock(SiteMemberEntity.class);
+            CommentEntity commentEntity = Mockito.mock(CommentEntity.class);
+            MemberEntity memberEntity = Mockito.mock(MemberEntity.class);
             String content = "댓글 내용입니다.";
 
             given(commentJpaRepository.findByPostUlidAndPath(any(), any())).willReturn(Optional.of(commentEntity));

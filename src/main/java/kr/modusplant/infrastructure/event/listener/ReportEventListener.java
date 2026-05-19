@@ -1,14 +1,24 @@
 package kr.modusplant.infrastructure.event.listener;
 
-import kr.modusplant.framework.aws.service.S3FileService;
-import kr.modusplant.framework.jpa.entity.*;
-import kr.modusplant.framework.jpa.entity.record.FilenameAndSrcEntityRecord;
-import kr.modusplant.framework.jpa.repository.*;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.CommentCompositeKey;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.entity.CommentAbuseReportEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.PostAbuseReportEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.ProposalBugReportEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.record.FilenameAndSrcEntityRecord;
+import kr.modusplant.domains.member.framework.out.jpa.repository.CommentAbuseReportJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.repository.PostAbuseReportJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.repository.ProposalBugReportJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
+import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
 import kr.modusplant.shared.event.CommentAbuseReportEvent;
 import kr.modusplant.shared.event.PostAbuseReportEvent;
 import kr.modusplant.shared.event.ProposalOrBugReportEvent;
 import kr.modusplant.shared.event.ProposalOrBugReportRemoveEvent;
-import kr.modusplant.shared.persistence.compositekey.CommCommentId;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.context.event.EventListener;
@@ -27,13 +37,13 @@ import static org.jooq.impl.DSL.*;
 @RequiredArgsConstructor
 public class ReportEventListener {
     private final DSLContext dsl;
-    private final S3FileService s3FileService;
-    private final SiteMemberJpaRepository memberJpaRepository;
-    private final CommPostJpaRepository postJpaRepository;
-    private final CommCommentJpaRepository commentJpaRepository;
-    private final PropBugRepJpaRepository propBugRepJpaRepository;
-    private final CommPostAbuRepJpaRepository postAbuRepJpaRepository;
-    private final CommCommentAbuRepJpaRepository commentAbuRepJpaRepository;
+    private final AmazonS3Service amazonS3Service;
+    private final MemberJpaRepository memberJpaRepository;
+    private final PostJpaRepository postJpaRepository;
+    private final CommentJpaRepository commentJpaRepository;
+    private final ProposalBugReportJpaRepository proposalBugReportJpaRepository;
+    private final PostAbuseReportJpaRepository postAbuRepJpaRepository;
+    private final CommentAbuseReportJpaRepository commentAbuseReportJpaRepository;
 
     @EventListener
     public void handleProposalOrBugReportEvent(ProposalOrBugReportEvent proposalOrBugReportEvent) {
@@ -48,9 +58,9 @@ public class ReportEventListener {
         for (int i = 0; i < imagePaths.size(); i++) {
             imageList.add(new FilenameAndSrcEntityRecord(filenames.get(i), imagePaths.get(i)));
         }
-        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
-        propBugRepJpaRepository.save(
-                PropBugRepEntity.builder()
+        MemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
+        proposalBugReportJpaRepository.save(
+                ProposalBugReportEntity.builder()
                         .ulid(reportId)
                         .member(memberEntity)
                         .title(title)
@@ -72,9 +82,9 @@ public class ReportEventListener {
         UUID memberId = postAbuseReportEvent.getMemberId();
         String postUlid = postAbuseReportEvent.getPostUlid();
 
-        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
-        CommPostEntity postEntity = postJpaRepository.findByUlid(postUlid).orElseThrow();
-        postAbuRepJpaRepository.save(CommPostAbuRepEntity.builder().member(memberEntity).post(postEntity).build());
+        MemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
+        PostEntity postEntity = postJpaRepository.findByUlid(postUlid).orElseThrow();
+        postAbuRepJpaRepository.save(PostAbuseReportEntity.builder().member(memberEntity).post(postEntity).build());
     }
 
     @EventListener
@@ -83,11 +93,11 @@ public class ReportEventListener {
         String postUlid = commentAbuseReportEvent.getPostUlid();
         String path = commentAbuseReportEvent.getPath();
 
-        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
-        CommCommentEntity commentEntity = commentJpaRepository.findById(
-                CommCommentId.builder().post(postUlid).path(path).build()).orElseThrow();
-        commentAbuRepJpaRepository.save(
-                CommCommentAbuRepEntity.builder().member(memberEntity).comment(commentEntity).build());
+        MemberEntity memberEntity = memberJpaRepository.findByUuid(memberId).orElseThrow();
+        CommentEntity commentEntity = commentJpaRepository.findById(
+                CommentCompositeKey.builder().post(postUlid).path(path).build()).orElseThrow();
+        commentAbuseReportJpaRepository.save(
+                CommentAbuseReportEntity.builder().member(memberEntity).comment(commentEntity).build());
     }
 
     private void deleteImageFromReportImagePath(String reportId) {
@@ -99,7 +109,7 @@ public class ReportEventListener {
                 .fetchInto(String.class);
 
         if (!srcList.isEmpty()) {
-            s3FileService.deleteFiles(srcList);
+            amazonS3Service.deleteFiles(srcList);
         }
     }
 

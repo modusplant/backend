@@ -2,8 +2,8 @@ package kr.modusplant.domains.post.common.util.usecase.request;
 
 import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
 
-import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORIES_ID;
+import static kr.modusplant.domains.post.common.constant.PrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
+import static kr.modusplant.domains.post.common.constant.SecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORIES_ID;
 
 public interface PostCategoryRequestTestUtils {
     PostCategoryRequest testPostCategoryRequest = new PostCategoryRequest(TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID);

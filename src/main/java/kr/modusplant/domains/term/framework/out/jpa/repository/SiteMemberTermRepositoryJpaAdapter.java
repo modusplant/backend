@@ -2,10 +2,9 @@ package kr.modusplant.domains.term.framework.out.jpa.repository;
 
 import kr.modusplant.domains.term.domain.aggregate.SiteMemberTerm;
 import kr.modusplant.domains.term.domain.vo.SiteMemberTermId;
-import kr.modusplant.domains.term.framework.out.jpa.mapper.SiteMemberTermJpaMapperImpl;
+import kr.modusplant.domains.term.framework.out.jpa.entity.MemberTermEntity;
+import kr.modusplant.domains.term.framework.out.jpa.mapper.MemberTermJpaMapperImpl;
 import kr.modusplant.domains.term.usecase.port.repository.SiteMemberTermRepository;
-import kr.modusplant.framework.jpa.entity.SiteMemberTermEntity;
-import kr.modusplant.framework.jpa.repository.SiteMemberTermJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -15,41 +14,41 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class SiteMemberTermRepositoryJpaAdapter implements SiteMemberTermRepository {
-    private final SiteMemberTermJpaMapperImpl siteMemberTermJpaMapper;
-    private final SiteMemberTermJpaRepository siteMemberTermJpaRepository;
+    private final MemberTermJpaMapperImpl siteMemberTermJpaMapper;
+    private final MemberTermJpaRepository memberTermJpaRepository;
 
     @Override
     public SiteMemberTerm save(SiteMemberTerm siteMemberTerm) {
-        boolean exists = siteMemberTermJpaRepository.existsById(siteMemberTerm.getSiteMemberTermId().getValue());
+        boolean exists = memberTermJpaRepository.existsById(siteMemberTerm.getSiteMemberTermId().getValue());
         if (exists) {
-            SiteMemberTermEntity entity = siteMemberTermJpaRepository.getReferenceById(siteMemberTerm.getSiteMemberTermId().getValue());
+            MemberTermEntity entity = memberTermJpaRepository.getReferenceById(siteMemberTerm.getSiteMemberTermId().getValue());
             entity.updateAgreedTermsOfUseVersion(siteMemberTerm.getAgreedTermsOfUseVersion());
             entity.updateAgreedPrivacyPolicyVersion(siteMemberTerm.getAgreedPrivacyPolicyVersion());
             entity.updateAgreedCommunityPolicyVersion(siteMemberTerm.getAgreedCommunityPolicyVersion());
             return siteMemberTermJpaMapper.toSiteMemberTerm(entity);
         } else {
-            return siteMemberTermJpaMapper.toSiteMemberTerm(siteMemberTermJpaRepository.save(siteMemberTermJpaMapper.toSiteMemberTermNewEntity(siteMemberTerm)));
+            return siteMemberTermJpaMapper.toSiteMemberTerm(memberTermJpaRepository.save(siteMemberTermJpaMapper.toMemberTermNewEntity(siteMemberTerm)));
         }
     }
 
     @Override
     public Optional<SiteMemberTerm> findById(SiteMemberTermId siteMemberTermId) {
-        return siteMemberTermJpaRepository.findById(siteMemberTermId.getValue()).map(siteMemberTermJpaMapper::toSiteMemberTerm);
+        return memberTermJpaRepository.findById(siteMemberTermId.getValue()).map(siteMemberTermJpaMapper::toSiteMemberTerm);
     }
 
     @Override
     public List<SiteMemberTerm> findAll() {
-        return siteMemberTermJpaRepository.findAll().stream().map(siteMemberTermJpaMapper::toSiteMemberTerm).toList();
+        return memberTermJpaRepository.findAll().stream().map(siteMemberTermJpaMapper::toSiteMemberTerm).toList();
     }
 
     @Override
     public boolean isIdExist(SiteMemberTermId siteMemberTermId) {
-        return siteMemberTermJpaRepository.existsById(siteMemberTermId.getValue());
+        return memberTermJpaRepository.existsById(siteMemberTermId.getValue());
     }
 
     @Override
     public void deleteById(SiteMemberTermId siteMemberTermId) {
-        siteMemberTermJpaRepository.deleteById(siteMemberTermId.getValue());
+        memberTermJpaRepository.deleteById(siteMemberTermId.getValue());
     }
 
 }

@@ -1,11 +1,11 @@
 package kr.modusplant.domains.notification.framework.out.jpa.mapper.supers;
 
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.notification.domain.aggregate.Notification;
-import kr.modusplant.framework.jpa.entity.CommNotificationEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.domains.notification.framework.out.jpa.entity.NotificationEntity;
 
 public interface NotificationJpaMapper {
-    CommNotificationEntity toNotificationEntity(Notification notification, SiteMemberEntity recipient);
+    NotificationEntity toNotificationEntity(Notification notification, MemberEntity recipient);
 
-    Notification toNotification(CommNotificationEntity notificationEntity);
+    Notification toNotification(NotificationEntity notificationEntity);
 }

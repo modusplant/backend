@@ -1,11 +1,21 @@
 package kr.modusplant.infrastructure.event.listener;
 
-import kr.modusplant.framework.aws.service.S3FileService;
-import kr.modusplant.framework.jpa.entity.*;
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.jpa.repository.*;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.CommentCompositeKey;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.entity.CommentAbuseReportEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.PostAbuseReportEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.ProposalBugReportEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.repository.CommentAbuseReportJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.repository.PostAbuseReportJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.repository.ProposalBugReportJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
+import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
 import kr.modusplant.shared.event.ProposalOrBugReportRemoveEvent;
-import kr.modusplant.shared.persistence.compositekey.CommCommentId;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Result;
@@ -21,21 +31,20 @@ import org.junit.jupiter.api.Test;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static kr.modusplant.shared.event.common.util.CommentAbuseReportEventTestUtils.testCommentAbuseReportEvent;
 import static kr.modusplant.shared.event.common.util.PostAbuseReportEventTestUtils.testPostAbuseReportEvent;
 import static kr.modusplant.shared.event.common.util.ProposalOrBugReportEventTestUtils.testProposalOrBugReportEvent;
 import static kr.modusplant.shared.event.common.util.ProposalOrBugReportRemoveEventTestUtils.testProposalOrBugReportRemoveEvent;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
-import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-class ReportEventListenerTest implements SiteMemberEntityTestUtils {
+class ReportEventListenerTest implements MemberEntityTestUtils {
     private final String emptyReportId = "empty_report_id";
 
     private final MockDataProvider mockDataProvider = (MockExecuteContext mockExecuteContext) -> {
@@ -74,31 +83,31 @@ class ReportEventListenerTest implements SiteMemberEntityTestUtils {
     private final MockConnection mockConnection = new MockConnection(mockDataProvider);
     private final DSLContext dslContext = DSL.using(mockConnection, SQLDialect.POSTGRES);
 
-    private final S3FileService s3FileService = mock(S3FileService.class);
-    private final SiteMemberJpaRepository memberJpaRepository = mock(SiteMemberJpaRepository.class);
-    private final CommPostJpaRepository postJpaRepository = mock(CommPostJpaRepository.class);
-    private final CommCommentJpaRepository commentJpaRepository = mock(CommCommentJpaRepository.class);
-    private final PropBugRepJpaRepository propBugRepJpaRepository = mock(PropBugRepJpaRepository.class);
-    private final CommPostAbuRepJpaRepository postAbuRepJpaRepository = mock(CommPostAbuRepJpaRepository.class);
-    private final CommCommentAbuRepJpaRepository commentAbuRepJpaRepository = mock(CommCommentAbuRepJpaRepository.class);
+    private final AmazonS3Service amazonS3Service = mock(AmazonS3Service.class);
+    private final MemberJpaRepository memberJpaRepository = mock(MemberJpaRepository.class);
+    private final PostJpaRepository postJpaRepository = mock(PostJpaRepository.class);
+    private final CommentJpaRepository commentJpaRepository = mock(CommentJpaRepository.class);
+    private final ProposalBugReportJpaRepository proposalBugReportJpaRepository = mock(ProposalBugReportJpaRepository.class);
+    private final PostAbuseReportJpaRepository postAbuRepJpaRepository = mock(PostAbuseReportJpaRepository.class);
+    private final CommentAbuseReportJpaRepository commentAbuseReportJpaRepository = mock(CommentAbuseReportJpaRepository.class);
 
     private final ReportEventListener reportEventListener = new ReportEventListener(
-            dslContext, s3FileService, memberJpaRepository, postJpaRepository,
-            commentJpaRepository, propBugRepJpaRepository, postAbuRepJpaRepository, commentAbuRepJpaRepository
+            dslContext, amazonS3Service, memberJpaRepository, postJpaRepository,
+            commentJpaRepository, proposalBugReportJpaRepository, postAbuRepJpaRepository, commentAbuseReportJpaRepository
     );
 
     @Test
     @DisplayName("존재하는 회원에 대해 ProposalOrBugReportEvent 실행 시 건의 및 버그 제보 저장 성공")
     void testProposalOrBugReportEvent_givenValidData_willSaveReport() {
         // given
-        SiteMemberEntity memberEntity = createMemberBasicUserEntity();
+        MemberEntity memberEntity = createMemberBasicUserEntity();
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));
 
         // when
         reportEventListener.handleProposalOrBugReportEvent(testProposalOrBugReportEvent);
 
         // then
-        verify(propBugRepJpaRepository, times(1)).save(any(PropBugRepEntity.class));
+        verify(proposalBugReportJpaRepository, times(1)).save(any(ProposalBugReportEntity.class));
     }
 
     @Test
@@ -111,7 +120,7 @@ class ReportEventListenerTest implements SiteMemberEntityTestUtils {
         assertThrows(NoSuchElementException.class, () -> reportEventListener.handleProposalOrBugReportEvent(testProposalOrBugReportEvent));
 
         // then
-        verify(propBugRepJpaRepository, never()).save(any());
+        verify(proposalBugReportJpaRepository, never()).save(any());
     }
 
     @Test
@@ -121,7 +130,7 @@ class ReportEventListenerTest implements SiteMemberEntityTestUtils {
         reportEventListener.handleProposalOrBugReportRemoveEvent(testProposalOrBugReportRemoveEvent);
 
         // then
-        verify(s3FileService, times(1)).deleteFiles(anyList());
+        verify(amazonS3Service, times(1)).deleteFiles(anyList());
     }
 
     @Test
@@ -135,23 +144,23 @@ class ReportEventListenerTest implements SiteMemberEntityTestUtils {
         reportEventListener.handleProposalOrBugReportRemoveEvent(event);
 
         // then
-        verify(s3FileService, never()).deleteFiles(anyList());
+        verify(amazonS3Service, never()).deleteFiles(anyList());
     }
 
     @Test
     @DisplayName("존재하는 회원 및 게시글에 대해 PostAbuseReportEvent 실행 시 신고 저장 성공")
     void testPostAbuseReportEvent_givenValidData_willSaveReport() {
         // given
-        SiteMemberEntity memberEntity = createMemberBasicUserEntity();
-        CommPostEntity mockPost = mock(CommPostEntity.class);
+        MemberEntity memberEntity = createMemberBasicUserEntity();
+        PostEntity mockPost = mock(PostEntity.class);
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));
-        given(postJpaRepository.findByUlid(TEST_COMM_POST_ULID)).willReturn(Optional.of(mockPost));
+        given(postJpaRepository.findByUlid(TEST_POST_ULID)).willReturn(Optional.of(mockPost));
 
         // when
         reportEventListener.handlePostAbuseReportEvent(testPostAbuseReportEvent);
 
         // then
-        verify(postAbuRepJpaRepository, times(1)).save(any(CommPostAbuRepEntity.class));
+        verify(postAbuRepJpaRepository, times(1)).save(any(PostAbuseReportEntity.class));
     }
 
     @Test
@@ -171,7 +180,7 @@ class ReportEventListenerTest implements SiteMemberEntityTestUtils {
     @DisplayName("존재하지 않는 게시글로 인해 PostAbuseReportEvent 실행 실패")
     void testPostAbuseReportEvent_givenNotFoundPost_willThrowException() {
         // given
-        SiteMemberEntity memberEntity = createMemberBasicUserEntity();
+        MemberEntity memberEntity = createMemberBasicUserEntity();
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));
         given(postJpaRepository.findByUlid(TEST_POST_ULID)).willReturn(Optional.empty());
 
@@ -186,17 +195,17 @@ class ReportEventListenerTest implements SiteMemberEntityTestUtils {
     @DisplayName("존재하는 회원 및 댓글에 대해 CommentAbuseReportEvent 실행 시 신고 저장 성공")
     void testCommentAbuseReportEvent_givenValidData_willSaveReport() {
         // given
-        SiteMemberEntity memberEntity = createMemberBasicUserEntity();
-        CommCommentEntity commentEntity = mock(CommCommentEntity.class);
+        MemberEntity memberEntity = createMemberBasicUserEntity();
+        CommentEntity commentEntity = mock(CommentEntity.class);
 
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));
-        given(commentJpaRepository.findById(any(CommCommentId.class))).willReturn(Optional.of(commentEntity));
+        given(commentJpaRepository.findById(any(CommentCompositeKey.class))).willReturn(Optional.of(commentEntity));
 
         // when
         reportEventListener.handleCommentAbuseReportEvent(testCommentAbuseReportEvent);
 
         // then
-        verify(commentAbuRepJpaRepository, times(1)).save(any(CommCommentAbuRepEntity.class));
+        verify(commentAbuseReportJpaRepository, times(1)).save(any(CommentAbuseReportEntity.class));
     }
 
     @Test
@@ -209,21 +218,21 @@ class ReportEventListenerTest implements SiteMemberEntityTestUtils {
         assertThrows(NoSuchElementException.class, () -> reportEventListener.handleCommentAbuseReportEvent(testCommentAbuseReportEvent));
 
         // then
-        verify(commentAbuRepJpaRepository, never()).save(any());
+        verify(commentAbuseReportJpaRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("존재하지 않는 댓글로 인해 CommentAbuseReportEvent 실행 실패")
     void testCommentAbuseReportEvent_givenNotFoundComment_willThrowException() {
         // given
-        SiteMemberEntity memberEntity = createMemberBasicUserEntity();
+        MemberEntity memberEntity = createMemberBasicUserEntity();
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));
-        given(commentJpaRepository.findById(any(CommCommentId.class))).willReturn(Optional.empty());
+        given(commentJpaRepository.findById(any(CommentCompositeKey.class))).willReturn(Optional.empty());
 
         // when
         assertThrows(NoSuchElementException.class, () -> reportEventListener.handleCommentAbuseReportEvent(testCommentAbuseReportEvent));
 
         // then
-        verify(commentAbuRepJpaRepository, never()).save(any());
+        verify(commentAbuseReportJpaRepository, never()).save(any());
     }
 }

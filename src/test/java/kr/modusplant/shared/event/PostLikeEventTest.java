@@ -5,8 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -19,7 +19,7 @@ class PostLikeEventTest {
         void testCreate_givenNullMemberId_willThrowException() {
             // given & when
             InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () ->
-                    PostLikeEvent.create(null, TEST_COMM_POST_ULID));
+                    PostLikeEvent.create(null, TEST_POST_ULID));
 
             // then
             assertThat(invalidValueException.getMessage()).contains("NOT_FOUND_MEMBER");

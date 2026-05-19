@@ -1,26 +1,26 @@
 package kr.modusplant.domains.search.framework.out.jpa.repository;
 
-import kr.modusplant.framework.jpa.entity.CommPrimaryCategoryEntity;
-import kr.modusplant.framework.jpa.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.framework.jpa.entity.common.util.CommSecondaryCategoryEntityTestUtils;
-import kr.modusplant.framework.jpa.repository.CommPrimaryCategoryJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommSecondaryCategoryJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PrimaryCategoryEntity;
+import kr.modusplant.domains.post.framework.out.jpa.entity.SecondaryCategoryEntity;
+import kr.modusplant.domains.post.framework.out.jpa.entity.common.util.SecondaryCategoryEntityTestUtils;
+import kr.modusplant.domains.post.framework.out.jpa.mapper.PrimaryCategoryJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.mapper.SecondaryCategoryJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
 
-import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.*;
+import static kr.modusplant.domains.post.common.constant.PrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
+import static kr.modusplant.domains.post.common.constant.SecondaryCategoryConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
-class SearchPostConditionRepositoryJpaAdapterTest implements CommSecondaryCategoryEntityTestUtils {
+class SearchPostConditionRepositoryJpaAdapterTest implements SecondaryCategoryEntityTestUtils {
 
-    private final CommPrimaryCategoryJpaRepository primaryCategoryJpaRepository = mock(CommPrimaryCategoryJpaRepository.class);
-    private final CommSecondaryCategoryJpaRepository secondaryCategoryJpaRepository = mock(CommSecondaryCategoryJpaRepository.class);
+    private final PrimaryCategoryJpaRepository primaryCategoryJpaRepository = mock(PrimaryCategoryJpaRepository.class);
+    private final SecondaryCategoryJpaRepository secondaryCategoryJpaRepository = mock(SecondaryCategoryJpaRepository.class);
     private final SearchPostConditionRepositoryJpaAdapter searchPostConditionRepositoryJpaAdapter = new SearchPostConditionRepositoryJpaAdapter(primaryCategoryJpaRepository, secondaryCategoryJpaRepository);
 
     @Test
@@ -53,19 +53,19 @@ class SearchPostConditionRepositoryJpaAdapterTest implements CommSecondaryCatego
     @DisplayName("primaryCategoryId 하위에 요청한 secondaryCategoryIds가 모두 존재할 경우 true를 반환")
     void testIsIdsExist_givenMatchedSecondaryCategoryIds_willReturnTrue() {
         // given
-        CommPrimaryCategoryEntity primaryCategory = createCommPrimaryCategoryEntityWithId();
+        PrimaryCategoryEntity primaryCategory = createPrimaryCategoryEntityWithId();
 
-        CommSecondaryCategoryEntity secondaryCategory1 = createCommSecondaryCategoryEntityBuilderWithId()
+        SecondaryCategoryEntity secondaryCategory1 = createSecondaryCategoryEntityBuilderWithId()
                 .id(TEST_COMM_SECONDARY_CATEGORY_ID_1)
                 .primaryCategory(primaryCategory)
                 .build();
 
-        CommSecondaryCategoryEntity secondaryCategory2 = createCommSecondaryCategoryEntityBuilderWithId()
+        SecondaryCategoryEntity secondaryCategory2 = createSecondaryCategoryEntityBuilderWithId()
                 .id(TEST_COMM_SECONDARY_CATEGORY_ID_2)
                 .primaryCategory(primaryCategory)
                 .build();
 
-        CommSecondaryCategoryEntity secondaryCategory3 = createCommSecondaryCategoryEntityBuilderWithId()
+        SecondaryCategoryEntity secondaryCategory3 = createSecondaryCategoryEntityBuilderWithId()
                 .id(TEST_COMM_SECONDARY_CATEGORY_ID_3)
                 .primaryCategory(primaryCategory)
                 .build();

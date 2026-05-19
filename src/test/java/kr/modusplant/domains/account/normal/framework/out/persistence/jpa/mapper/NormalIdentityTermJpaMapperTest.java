@@ -1,18 +1,18 @@
 package kr.modusplant.domains.account.normal.framework.out.persistence.jpa.mapper;
 
 import kr.modusplant.domains.account.normal.domain.vo.SignUpData;
-import kr.modusplant.framework.jpa.entity.SiteMemberTermEntity;
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
+import kr.modusplant.domains.term.framework.out.jpa.entity.MemberTermEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_EMAIL;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_PW;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberTermConstant.*;
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_EMAIL;
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_PW;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.domains.term.common.constant.MemberTermConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class NormalIdentityTermJpaMapperTest implements SiteMemberEntityTestUtils {
+public class NormalIdentityTermJpaMapperTest implements MemberEntityTestUtils {
     private final NormalIdentityTermJpaMapper mapper = new NormalIdentityTermJpaMapperImpl();
 
     @Test
@@ -24,7 +24,7 @@ public class NormalIdentityTermJpaMapperTest implements SiteMemberEntityTestUtil
                 MEMBER_TERM_ADMIN_AGREED_PRIVACY_POLICY_VERSION, MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION);
 
         // when
-        SiteMemberTermEntity result = mapper.toSiteMemberTermEntity(createMemberBasicUserEntityWithUuid(), testSign);
+        MemberTermEntity result = mapper.toSiteMemberTermEntity(createMemberBasicUserEntityWithUuid(), testSign);
 
         // then
         assertThat(result.getMember()).isEqualTo(createMemberBasicUserEntityWithUuid());

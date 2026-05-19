@@ -1,6 +1,5 @@
 package kr.modusplant.domains.search.domain.vo;
 
-import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -8,7 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.*;
+import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.NOT_FOUND_SEARCH_POST_IMPORTANCE;
+import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.SEARCH_POST_IMPORTANCE_OUT_OF_RANGE;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -22,8 +22,9 @@ public class SearchPostImportance {
 
     public static SearchPostImportance create(Integer value) {
         if (value == null) {
-            throw new EmptyValueException(EMPTY_SEARCH_POST_IMPORTANCE, "searchPostImportance");
-        } else if (value < 1 || value > 4) {
+            return searchPostImportanceEmpty;
+        }
+        if (value < 1 || value > 4) {
             throw new InvalidValueException(SEARCH_POST_IMPORTANCE_OUT_OF_RANGE, "searchPostImportance");
         }
         if (value.equals(4)) {

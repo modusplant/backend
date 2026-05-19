@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.post.adapter.controller.CategoryController;
 import kr.modusplant.domains.post.usecase.response.PrimaryCategoryResponse;
 import kr.modusplant.domains.post.usecase.response.SecondaryCategoryResponse;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;

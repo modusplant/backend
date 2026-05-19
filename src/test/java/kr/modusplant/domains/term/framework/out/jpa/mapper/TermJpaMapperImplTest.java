@@ -5,13 +5,13 @@ import kr.modusplant.domains.term.domain.aggregate.Term;
 import kr.modusplant.domains.term.domain.vo.TermContent;
 import kr.modusplant.domains.term.domain.vo.TermName;
 import kr.modusplant.domains.term.domain.vo.TermVersion;
+import kr.modusplant.domains.term.framework.out.jpa.entity.TermEntity;
+import kr.modusplant.domains.term.framework.out.jpa.entity.common.util.TermEntityTestUtils;
 import kr.modusplant.domains.term.framework.out.jpa.mapper.supers.TermJpaMapper;
-import kr.modusplant.framework.jpa.entity.TermEntity;
-import kr.modusplant.framework.jpa.entity.common.util.TermEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.shared.persistence.common.util.constant.TermConstant.*;
+import static kr.modusplant.domains.term.common.constant.TermConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TermJpaMapperImplTest implements TermTestUtils, TermEntityTestUtils {

@@ -1,6 +1,6 @@
 package kr.modusplant.domains.search.domain.vo;
 
-import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.domains.search.domain.vo.nullobject.EmptySearchPostPublishedAt;
 import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,7 +11,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.time.LocalDateTime;
 
-import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.EMPTY_SEARCH_POST_PUBLISHED_AT;
 import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.SEARCH_POST_PUBLISHED_AT_AFTER_NOW;
 
 @Getter
@@ -22,8 +21,9 @@ public class SearchPostPublishedAt {
 
     public static SearchPostPublishedAt create(LocalDateTime value) {
         if (value == null) {
-            throw new EmptyValueException(EMPTY_SEARCH_POST_PUBLISHED_AT, "searchPostPublishedAt");
-        } else if (value.isAfter(LocalDateTime.now())) {
+            return EmptySearchPostPublishedAt.create();
+        }
+        if (value.isAfter(LocalDateTime.now())) {
             throw new InvalidValueException(SEARCH_POST_PUBLISHED_AT_AFTER_NOW, "searchPostPublishedAt");
         }
         return new SearchPostPublishedAt(value);

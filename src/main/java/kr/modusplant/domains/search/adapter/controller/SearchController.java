@@ -6,8 +6,6 @@ import kr.modusplant.domains.search.domain.entity.SearchPostOption;
 import kr.modusplant.domains.search.domain.enums.SearchPostSortCondition;
 import kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode;
 import kr.modusplant.domains.search.domain.vo.*;
-import kr.modusplant.domains.search.domain.vo.nullobject.EmptySearchPostId;
-import kr.modusplant.domains.search.domain.vo.nullobject.EmptySearchPostPublishedAt;
 import kr.modusplant.domains.search.usecase.model.read.SearchPostReadModel;
 import kr.modusplant.domains.search.usecase.port.mapper.SearchMapper;
 import kr.modusplant.domains.search.usecase.port.repository.SearchPostConditionRepository;
@@ -16,17 +14,16 @@ import kr.modusplant.domains.search.usecase.port.repository.SearchPostRepository
 import kr.modusplant.domains.search.usecase.record.SearchPostRecord;
 import kr.modusplant.domains.search.usecase.response.SearchPostRelevanceSortedPageResponse;
 import kr.modusplant.domains.search.usecase.response.SearchPostResponse;
-import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static kr.modusplant.framework.jpa.exception.enums.EntityErrorCode.NOT_FOUND_PRIMARY_CATEGORY;
+import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.NOT_FOUND_PRIMARY_CATEGORY;
 
 @Service
 @Transactional
@@ -45,40 +42,22 @@ public class SearchController {
         List<Integer> secondaryCategoryIds = record.secondaryCategoryIds();
         validateBeforeSearchByKeyword(primaryCategoryId, secondaryCategoryIds);
 
-        String lastPostUlid = record.lastPostUlid();
-        SearchPostId searchPostId;
-        if (lastPostUlid == null) {
-            searchPostId = EmptySearchPostId.create();
+        SearchPostOption searchPostOption;
+        if (record.searchPostSortCondition().equals(SearchPostSortCondition.LATEST)) {
+            searchPostOption = SearchPostOption.createLatestOption(
+                    SearchPostId.create(record.lastPostUlid()),
+                    SearchPostPublishedAt.create(record.lastPostPublishedAt()));
         } else {
-            searchPostId = SearchPostId.create(lastPostUlid);
-        }
-
-        LocalDateTime lastPostPublishedAt = record.lastPostPublishedAt();
-        SearchPostPublishedAt searchPostPublishedAt;
-        if (lastPostPublishedAt == null) {
-            searchPostPublishedAt = EmptySearchPostPublishedAt.create();
-        } else {
-            searchPostPublishedAt = SearchPostPublishedAt.create(lastPostPublishedAt);
-        }
-
-        Integer lastPostImportance = record.lastPostImportance();
-        SearchPostImportance searchPostImportance;
-        if (lastPostImportance == null) {
-            searchPostImportance = SearchPostImportance.empty();
-        } else {
-            searchPostImportance = SearchPostImportance.create(lastPostImportance);
-        }
-
-        Double lastPostSimilarity = record.lastPostSimilarity();
-        SearchKeywordSimilarity searchKeywordSimilarity;
-        if (lastPostSimilarity == null) {
-            searchKeywordSimilarity = SearchKeywordSimilarity.createEmpty();
-        } else {
-            searchKeywordSimilarity = SearchKeywordSimilarity.create(lastPostSimilarity);
+            searchPostOption = SearchPostOption.createRelevanceOption(
+                    SearchPostId.create(record.lastPostUlid()),
+                    SearchPostPublishedAt.create(record.lastPostPublishedAt()),
+                    SearchPostImportance.create(record.lastPostImportance()),
+                    SearchKeywordSimilarity.create(record.lastPostSimilarity())
+            );
         }
 
         SearchPost searchPost = SearchPost.create(
-                SearchPostOption.create(searchPostId, searchPostPublishedAt, searchPostImportance, searchKeywordSimilarity),
+                searchPostOption,
                 SearchKeyword.create(record.keyword()),
                 record.searchPostTarget(),
                 record.searchPostSortCondition()

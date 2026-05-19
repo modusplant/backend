@@ -14,8 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
-import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
-import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID2;
+import static kr.modusplant.domains.post.common.constant.PostConstant.*;
 import static kr.modusplant.domains.search.common.util.domain.aggregate.SearchPostTestUtils.testSearchPost;
 import static kr.modusplant.domains.search.common.util.domain.entity.SearchPostOptionTestUtils.testSearchPostOption;
 import static kr.modusplant.domains.search.common.util.domain.vo.SearchKeywordSimilarityTestUtils.testSearchKeywordSimilarity1;
@@ -26,7 +25,6 @@ import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostPubli
 import static kr.modusplant.domains.search.common.util.domain.vo.nullobject.EmptySearchPostIdTestUtils.testEmptySearchPostId;
 import static kr.modusplant.domains.search.common.util.domain.vo.nullobject.EmptySearchPostPublishedAtTestUtils.testEmptySearchPostPublishedAt;
 import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.*;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_PUBLISHED_AT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -73,7 +71,7 @@ class SearchPostTest {
     @DisplayName("정렬 조건이 LATEST일 때 중요도가 존재하면 예외 발생")
     void testCreate_givenLatestSortConditionWithImportance_willThrowException() {
         // given
-        SearchPostOption searchPostOption = SearchPostOption.create(
+        SearchPostOption searchPostOption = SearchPostOption.createRelevanceOption(
                 testSearchPostId, testSearchPostPublishedAt,
                 SearchPostImportance.empty(), SearchKeywordSimilarity.createEmpty());
         ReflectionTestUtils.setField(searchPostOption, "searchPostImportance", testSearchPostImportanceTitle);
@@ -90,7 +88,7 @@ class SearchPostTest {
     @DisplayName("정렬 조건이 LATEST일 때 유사도가 존재하면 예외 발생")
     void testCreate_givenLatestSortConditionWithSimilarity_willThrowException() {
         // given
-        SearchPostOption searchPostOption = SearchPostOption.create(
+        SearchPostOption searchPostOption = SearchPostOption.createRelevanceOption(
                 testSearchPostId, testSearchPostPublishedAt,
                 testSearchPostImportanceTitle, testSearchKeywordSimilarity1);
         ReflectionTestUtils.setField(searchPostOption, "searchPostImportance", SearchPostImportance.empty());
@@ -107,7 +105,7 @@ class SearchPostTest {
     @DisplayName("정렬 조건이 LATEST일 때 중요도와 유사도 값이 모두 비어있으면 정상 생성")
     void testCreate_givenLatestSortConditionWithValidOptions_willReturnSearchPost() {
         // given
-        SearchPostOption searchPostOption = SearchPostOption.create(
+        SearchPostOption searchPostOption = SearchPostOption.createRelevanceOption(
                 testSearchPostId, testSearchPostPublishedAt,
                 SearchPostImportance.empty(), SearchKeywordSimilarity.createEmpty());
 
@@ -123,7 +121,7 @@ class SearchPostTest {
     @DisplayName("정렬 조건이 RELEVANCE일 때 커서 데이터가 일부만 존재하면 예외 발생")
     void testCreate_givenRelevanceSortConditionWithPartialOptions_willThrowException() {
         // given
-        SearchPostOption searchPostOption = SearchPostOption.create(
+        SearchPostOption searchPostOption = SearchPostOption.createRelevanceOption(
                 testSearchPostId, testSearchPostPublishedAt,
                 SearchPostImportance.empty(), SearchKeywordSimilarity.createEmpty());
 
@@ -139,7 +137,7 @@ class SearchPostTest {
     @DisplayName("정렬 조건이 RELEVANCE일 때 커서 데이터가 모두 없으면 정상 생성")
     void testCreate_givenRelevanceSortConditionWithNoCursorOptions_willReturnSearchPost() {
         // given
-        SearchPostOption searchPostOption = SearchPostOption.create(
+        SearchPostOption searchPostOption = SearchPostOption.createRelevanceOption(
                 testEmptySearchPostId, testEmptySearchPostPublishedAt,
                 SearchPostImportance.empty(), SearchKeywordSimilarity.createEmpty());
 
@@ -155,7 +153,7 @@ class SearchPostTest {
     @DisplayName("정렬 조건이 RELEVANCE일 때 커서 데이터가 모두 존재하면 정상 생성")
     void testCreate_givenRelevanceSortConditionWithAllCursorOptions_willReturnSearchPost() {
         // given
-        SearchPostOption searchPostOption = SearchPostOption.create(
+        SearchPostOption searchPostOption = SearchPostOption.createRelevanceOption(
                 testSearchPostId, testSearchPostPublishedAt,
                 testSearchPostImportanceTitle, testSearchKeywordSimilarity1);
 
@@ -179,9 +177,9 @@ class SearchPostTest {
     void testEquals_givenDifferentObjectWithSameId_willReturnTrue() {
         // given
         SearchPost otherSearchPost = SearchPost.create(
-                SearchPostOption.create(
+                SearchPostOption.createRelevanceOption(
                         SearchPostId.create(TEST_POST_ULID),
-                        SearchPostPublishedAt.create(TEST_COMM_POST_PUBLISHED_AT),
+                        SearchPostPublishedAt.create(TEST_POST_PUBLISHED_AT),
                         SearchPostImportance.empty(),
                         SearchKeywordSimilarity.createEmpty()),
                 testSearchKeyword, testSearchPostTarget, SearchPostSortCondition.LATEST);
@@ -202,9 +200,9 @@ class SearchPostTest {
     void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
         // given
         SearchPost otherSearchPost = SearchPost.create(
-                SearchPostOption.create(
+                SearchPostOption.createRelevanceOption(
                         SearchPostId.create(TEST_POST_ULID2),
-                        SearchPostPublishedAt.create(TEST_COMM_POST_PUBLISHED_AT),
+                        SearchPostPublishedAt.create(TEST_POST_PUBLISHED_AT),
                         SearchPostImportance.empty(),
                         SearchKeywordSimilarity.createEmpty()),
                 testSearchKeyword, testSearchPostTarget, SearchPostSortCondition.LATEST);
@@ -224,9 +222,9 @@ class SearchPostTest {
     void testHashCode_givenDifferentObjectWithSameId_willReturnSameHashCode() {
         // given
         SearchPost otherSearchPost = SearchPost.create(
-                SearchPostOption.create(
+                SearchPostOption.createRelevanceOption(
                         SearchPostId.create(TEST_POST_ULID),
-                        SearchPostPublishedAt.create(TEST_COMM_POST_PUBLISHED_AT),
+                        SearchPostPublishedAt.create(TEST_POST_PUBLISHED_AT),
                         SearchPostImportance.empty(),
                         SearchKeywordSimilarity.createEmpty()),
                 testSearchKeyword, testSearchPostTarget, SearchPostSortCondition.LATEST);

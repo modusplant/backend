@@ -10,6 +10,7 @@ import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.in.web.cache.CommentCacheService;
 import kr.modusplant.domains.comment.framework.in.web.cache.model.CommentCacheData;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.CommentCompositeKey;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
 import kr.modusplant.domains.comment.usecase.port.client.CommentPostRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentReadRepository;
@@ -19,14 +20,13 @@ import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
 import kr.modusplant.domains.member.domain.vo.MemberId;
-import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
-import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.CommentNotificationEvent;
 import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.persistence.compositekey.CommCommentId;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,8 +46,8 @@ public class CommentController {
     private final CommentMapperImpl mapper;
     private final CommentReadRepository readRepository;
     private final CommentWriteRepository writeRepository;
-    private final CommPostJpaRepository postJpaRepository;
-    private final SiteMemberJpaRepository memberJpaRepository;
+    private final PostJpaRepository postJpaRepository;
+    private final MemberJpaRepository memberJpaRepository;
     private final SwearService swearService;
 
     private final CommentPostRepository postValidator;
@@ -122,7 +122,7 @@ public class CommentController {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_COMMENT, TableName.COMM_COMMENT);
         }
 
-        CommCommentId id = CommCommentId.builder()
+        CommentCompositeKey id = CommentCompositeKey.builder()
                 .post(request.postId())
                 .path(request.path())
                 .build();
@@ -132,7 +132,7 @@ public class CommentController {
 
     @Transactional
     public void delete(String postUlid, String commentPath) {
-        writeRepository.setCommentAsDeleted(CommCommentId.builder()
+        writeRepository.setCommentAsDeleted(CommentCompositeKey.builder()
                 .post(postUlid)
                 .path(commentPath)
                 .build());

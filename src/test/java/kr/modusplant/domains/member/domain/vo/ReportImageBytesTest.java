@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
+import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_IMAGE_BYTES_1;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportImageBytesTestUtils.testReportImageBytes1;
-import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.TEST_REPORT_IMAGE_BYTES_1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -4,8 +4,8 @@ import kr.modusplant.domains.notification.domain.vo.Actor;
 
 import java.util.UUID;
 
-import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.TEST_NOTIFICATION_ACTOR_ID;
-import static kr.modusplant.shared.persistence.common.util.constant.CommNotificationConstant.TEST_NOTIFICATION_ACTOR_NICKNAME;
+import static kr.modusplant.domains.notification.common.constant.NotificationConstant.TEST_NOTIFICATION_ACTOR_ID;
+import static kr.modusplant.domains.notification.common.constant.NotificationConstant.TEST_NOTIFICATION_ACTOR_NICKNAME;
 
 public interface ActorTestUtils {
     Actor testActor = Actor.fromUuidWithNickname(TEST_NOTIFICATION_ACTOR_ID,TEST_NOTIFICATION_ACTOR_NICKNAME);
