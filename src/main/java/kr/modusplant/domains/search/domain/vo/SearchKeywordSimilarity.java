@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.NOT_FOUND_SEARCH_POST_IMPORTANCE;
+import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.NOT_FOUND_SEARCH_POST_SIMILARITY;
 import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.SEARCH_KEYWORD_SIMILARITY_OUT_OF_RANGE;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -36,7 +36,7 @@ public class SearchKeywordSimilarity {
 
     public double getValueIfNotEmpty() {
         if (isEmpty()) {
-            throw new InvalidValueException(NOT_FOUND_SEARCH_POST_IMPORTANCE, "searchPostImportance");
+            throw new InvalidValueException(NOT_FOUND_SEARCH_POST_SIMILARITY, "searchPostImportance");
         }
         return this.value;
     }

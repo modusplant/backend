@@ -331,14 +331,14 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
         given(targetPostRepository.isPublished(any())).willReturn(true);
         given(targetPostRepository.isUnliked(any(), any())).willReturn(true);
-        willDoNothing().given(applicationEventPublisher).publishEvent(any(PostLikeEvent.class));
+        willDoNothing().given(targetPostRepository).like(any(), any());
         willDoNothing().given(applicationEventPublisher).publishEvent(any(PostLikeNotificationEvent.class));
 
         // when
         memberController.likePost(testMemberPostLikeRecord);
 
         // then
-        verify(applicationEventPublisher, times(1)).publishEvent(any(PostLikeEvent.class));
+        verify(targetPostRepository, times(1)).like(any(), any());
         verify(applicationEventPublisher, times(1)).publishEvent(any(PostLikeNotificationEvent.class));
     }
 
@@ -355,7 +355,7 @@ class MemberControllerTest implements
         memberController.likePost(testMemberPostLikeRecord);
 
         // then
-        verify(applicationEventPublisher, times(0)).publishEvent(any(PostLikeEvent.class));
+        verify(targetPostRepository, times(0)).like(any(), any());
         verify(applicationEventPublisher, times(0)).publishEvent(any(PostLikeNotificationEvent.class));
     }
 
@@ -412,13 +412,13 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
         given(targetPostRepository.isPublished(any())).willReturn(true);
         given(targetPostRepository.isLiked(any(), any())).willReturn(true);
-        willDoNothing().given(applicationEventPublisher).publishEvent(any(PostUnlikeEvent.class));
+        willDoNothing().given(targetPostRepository).unlike(any(), any());
 
         // when
         memberController.unlikePost(testMemberPostUnlikeRecord);
 
         // then
-        verify(applicationEventPublisher, times(1)).publishEvent(any(PostUnlikeEvent.class));
+        verify(targetPostRepository, times(1)).unlike(any(), any());
     }
 
     @Test
@@ -434,7 +434,7 @@ class MemberControllerTest implements
         memberController.unlikePost(testMemberPostUnlikeRecord);
 
         // then
-        verify(applicationEventPublisher, times(0)).publishEvent(any(PostUnlikeEvent.class));
+        verify(targetPostRepository, times(0)).unlike(any(), any());
     }
 
     @Test
@@ -490,13 +490,13 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
         given(targetPostRepository.isPublished(any())).willReturn(true);
         given(targetPostRepository.isNotBookmarked(any(), any())).willReturn(true);
-        willDoNothing().given(applicationEventPublisher).publishEvent(any(PostBookmarkEvent.class));
+        willDoNothing().given(targetPostRepository).bookmark(any(), any());
 
         // when
         memberController.bookmarkPost(testMemberPostBookmarkRecord);
 
         // then
-        verify(applicationEventPublisher, times(1)).publishEvent(any(PostBookmarkEvent.class));
+        verify(targetPostRepository, times(1)).bookmark(any(), any());
     }
 
     @Test
@@ -512,7 +512,7 @@ class MemberControllerTest implements
         memberController.bookmarkPost(testMemberPostBookmarkRecord);
 
         // then
-        verify(applicationEventPublisher, times(0)).publishEvent(any(PostBookmarkEvent.class));
+        verify(targetPostRepository, times(0)).bookmark(any(), any());
     }
 
     @Test
@@ -568,13 +568,13 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
         given(targetPostRepository.isPublished(any())).willReturn(true);
         given(targetPostRepository.isBookmarked(any(), any())).willReturn(true);
-        willDoNothing().given(applicationEventPublisher).publishEvent(any(PostBookmarkCancelEvent.class));
+        willDoNothing().given(targetPostRepository).cancelBookmark(any(), any());
 
         // when
         memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord);
 
         // then
-        verify(applicationEventPublisher, times(1)).publishEvent(any(PostBookmarkCancelEvent.class));
+        verify(targetPostRepository, times(1)).cancelBookmark(any(), any());
     }
 
     @Test
@@ -590,7 +590,7 @@ class MemberControllerTest implements
         memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord);
 
         // then
-        verify(applicationEventPublisher, times(0)).publishEvent(any(PostBookmarkCancelEvent.class));
+        verify(targetPostRepository, times(0)).cancelBookmark(any(), any());
     }
 
     @Test
@@ -645,14 +645,14 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetCommentExists(any());
         given(targetCommentRepository.isUnliked(any(), any())).willReturn(true);
-        willDoNothing().given(applicationEventPublisher).publishEvent(any(CommentLikeEvent.class));
+        willDoNothing().given(targetCommentRepository).like(any(), any());
         willDoNothing().given(applicationEventPublisher).publishEvent(any(CommentLikeNotificationEvent.class));
 
         // when
         memberController.likeComment(testMemberCommentLikeRecord);
 
         // then
-        verify(applicationEventPublisher, times(1)).publishEvent(any(CommentLikeEvent.class));
+        verify(targetCommentRepository, times(1)).like(any(), any());
         verify(applicationEventPublisher, times(1)).publishEvent(any(CommentLikeNotificationEvent.class));
     }
 
@@ -668,7 +668,7 @@ class MemberControllerTest implements
         memberController.likeComment(testMemberCommentLikeRecord);
 
         // then
-        verify(applicationEventPublisher, times(0)).publishEvent(any(CommentLikeEvent.class));
+        verify(targetCommentRepository, times(0)).like(any(), any());
         verify(applicationEventPublisher, times(0)).publishEvent(any(CommentLikeNotificationEvent.class));
     }
 
@@ -708,13 +708,13 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetCommentExists(any());
         given(targetCommentRepository.isLiked(any(), any())).willReturn(true);
-        willDoNothing().given(applicationEventPublisher).publishEvent(any(CommentUnlikeEvent.class));
+        willDoNothing().given(targetCommentRepository).unlike(any(),any());
 
         // when
         memberController.unlikeComment(testMemberCommentUnlikeRecord);
 
         // then
-        verify(applicationEventPublisher, times(1)).publishEvent(any(CommentUnlikeEvent.class));
+        verify(targetCommentRepository, times(1)).unlike(any(), any());
     }
 
     @Test
@@ -729,7 +729,7 @@ class MemberControllerTest implements
         memberController.unlikeComment(testMemberCommentUnlikeRecord);
 
         // then
-        verify(applicationEventPublisher, times(0)).publishEvent(any(CommentUnlikeEvent.class));
+        verify(targetCommentRepository, times(0)).unlike(any(), any());
     }
 
     @Test
@@ -823,7 +823,7 @@ class MemberControllerTest implements
                 TEST_REPORT_TITLE,
                 TEST_REPORT_CONTENT,
                 null,
-                TEST_REPORT_IMAGE_NUMBER
+                TEST_REPORT_IMAGE_NUMBER_3
         );
 
         // when
@@ -869,7 +869,7 @@ class MemberControllerTest implements
                 TEST_REPORT_TITLE,
                 TEST_REPORT_CONTENT,
                 TEST_REPORT_IMAGES,
-                TEST_REPORT_IMAGE_NUMBER - 1
+                TEST_REPORT_IMAGE_NUMBER_3 - 1
         );
 
         // when

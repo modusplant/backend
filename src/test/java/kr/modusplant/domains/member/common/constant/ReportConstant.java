@@ -14,7 +14,7 @@ public final class ReportConstant {
     public static final String TEST_REPORT_ULID = "01KJ862TB91KP6BK301RZM17K7";
     public static final String TEST_REPORT_TITLE = "보고서 제목";
     public static final String TEST_REPORT_CONTENT = "보고서 컨텐츠";
-    public static final Integer TEST_REPORT_IMAGE_NUMBER = 3;
+    public static final Integer TEST_REPORT_IMAGE_NUMBER_3 = 3;
     public static final String TEST_REPORT_IMAGE_FILE_NAME_1 = "image_0.png";
     public static final String TEST_REPORT_IMAGE_FILE_NAME_2 = "image_1.png";
     public static final String TEST_REPORT_IMAGE_FILE_NAME_3 = "image_2.png";

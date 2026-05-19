@@ -13,7 +13,7 @@ import java.util.List;
 import static kr.modusplant.domains.member.common.util.domain.entity.ReportImageTestUtils.testReportImages;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportContentTestUtils.testReportContent;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
-import static kr.modusplant.domains.member.common.util.domain.vo.ReportImageNumberTestUtils.testReportImageNumber3;
+import static kr.modusplant.domains.member.common.util.domain.vo.ReportImageNumberTestUtils.testProposalOrBugReportImageNumber3;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportTitleTestUtils.testReportTitle;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,7 +25,7 @@ class ReportTest implements ReportTestUtils {
         // ReportId가 null일 때
         // given
         EmptyValueException reportIdException = assertThrows(EmptyValueException.class, () -> 
-                Report.create(null, testReportTitle, testReportContent, testReportImages, testReportImageNumber3));
+                ProposalOrBugReport.create(null, testReportTitle, testReportContent, testReportImages, testProposalOrBugReportImageNumber3));
 
         // when & then
         assertThat(reportIdException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_REPORT_ID);
@@ -33,7 +33,7 @@ class ReportTest implements ReportTestUtils {
         // ReportTitle이 null일 때
         // given
         EmptyValueException reportTitleException = assertThrows(EmptyValueException.class, () -> 
-                Report.create(testReportId, null, testReportContent, testReportImages, testReportImageNumber3));
+                ProposalOrBugReport.create(testReportId, null, testReportContent, testReportImages, testProposalOrBugReportImageNumber3));
 
         // when & then
         assertThat(reportTitleException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_REPORT_TITLE);
@@ -41,7 +41,7 @@ class ReportTest implements ReportTestUtils {
         // ReportContent가 null일 때
         // given
         EmptyValueException reportContentException = assertThrows(EmptyValueException.class, () ->
-                Report.create(testReportId, testReportTitle, null, testReportImages, testReportImageNumber3));
+                ProposalOrBugReport.create(testReportId, testReportTitle, null, testReportImages, testProposalOrBugReportImageNumber3));
 
         // when & then
         assertThat(reportContentException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_REPORT_CONTENT);
@@ -49,7 +49,7 @@ class ReportTest implements ReportTestUtils {
         // List<ReportImage>가 null일 때
         // given
         EmptyValueException reportImagesException = assertThrows(EmptyValueException.class, () ->
-                Report.create(testReportId, testReportTitle, testReportContent, null, testReportImageNumber3));
+                ProposalOrBugReport.create(testReportId, testReportTitle, testReportContent, null, testProposalOrBugReportImageNumber3));
 
         // when & then
         assertThat(reportImagesException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_REPORT_IMAGE);
@@ -57,7 +57,7 @@ class ReportTest implements ReportTestUtils {
         // ReportImageNumber가 null일 때
         // given
         EmptyValueException reportImageNumberException = assertThrows(EmptyValueException.class, () ->
-                Report.create(testReportId, testReportTitle, testReportContent, testReportImages, null));
+                ProposalOrBugReport.create(testReportId, testReportTitle, testReportContent, testReportImages, null));
 
         // when & then
         assertThat(reportImageNumberException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_REPORT_IMAGE_NUMBER);
@@ -65,7 +65,7 @@ class ReportTest implements ReportTestUtils {
         // List<ReportImage>와 ReportImageNumber가 매칭되지 않을 때
         // given
         InvalidValueException mismatchException = assertThrows(InvalidValueException.class, () ->
-                Report.create(testReportId, testReportTitle, testReportContent, List.of(), testReportImageNumber3));
+                ProposalOrBugReport.create(testReportId, testReportTitle, testReportContent, List.of(), testProposalOrBugReportImageNumber3));
 
         // when & then
         assertThat(mismatchException.getErrorCode()).isEqualTo(MemberErrorCode.MISMATCHED_REPORT_IMAGE_SIZE);
@@ -75,11 +75,11 @@ class ReportTest implements ReportTestUtils {
     @DisplayName("같은 객체에 대한 equals 호출")
     void testEquals_givenSameObject_willReturnTrue() {
         // given
-        Report report = createReport();
+        ProposalOrBugReport proposalOrBugReport = createReport();
 
         // when & then
         //noinspection EqualsWithItself
-        assertEquals(report, report);
+        assertEquals(proposalOrBugReport, proposalOrBugReport);
     }
 
     @Test
@@ -92,15 +92,15 @@ class ReportTest implements ReportTestUtils {
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
-        Report report = createReport();
-        assertNotEquals(report, Report.create(
-                ReportId.generate(), testReportTitle, testReportContent, testReportImages, testReportImageNumber3));
+        ProposalOrBugReport proposalOrBugReport = createReport();
+        assertNotEquals(proposalOrBugReport, ProposalOrBugReport.create(
+                ReportId.generate(), testReportTitle, testReportContent, testReportImages, testProposalOrBugReportImageNumber3));
     }
 
     @Test
     @DisplayName("같은 객체에 대한 hashcode 동일성 보장")
     void testHashCode_givenSameObject_willReturnSameHashCode() {
-        Report report = createReport();
-        assertEquals(report.hashCode(), report.hashCode());
+        ProposalOrBugReport proposalOrBugReport = createReport();
+        assertEquals(proposalOrBugReport.hashCode(), proposalOrBugReport.hashCode());
     }
 }

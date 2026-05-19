@@ -125,8 +125,7 @@ public class MemberController {
         validateBeforeLikePost(memberId, targetPostId);
 
         if (targetPostRepository.isUnliked(memberId, targetPostId)) {
-            applicationEventPublisher.publishEvent(
-                    PostLikeEvent.create(memberId.getValue(), targetPostId.getValue()));
+            targetPostRepository.like(memberId, targetPostId);
             applicationEventPublisher.publishEvent(
                     PostLikeNotificationEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
@@ -138,8 +137,7 @@ public class MemberController {
         validateBeforeUnlikePost(memberId, targetPostId);
 
         if (targetPostRepository.isLiked(memberId, targetPostId)) {
-            applicationEventPublisher.publishEvent(
-                    PostUnlikeEvent.create(memberId.getValue(), targetPostId.getValue()));
+            targetPostRepository.unlike(memberId, targetPostId);
         }
     }
 
@@ -149,8 +147,7 @@ public class MemberController {
         validateBeforeBookmarkOrCancelPostBookmark(memberId, targetPostId);
 
         if (targetPostRepository.isNotBookmarked(memberId, targetPostId)) {
-            applicationEventPublisher.publishEvent(
-                    PostBookmarkEvent.create(memberId.getValue(), targetPostId.getValue()));
+            targetPostRepository.bookmark(memberId, targetPostId);
         }
     }
 
@@ -160,8 +157,7 @@ public class MemberController {
         validateBeforeBookmarkOrCancelPostBookmark(memberId, targetPostId);
 
         if (targetPostRepository.isBookmarked(memberId, targetPostId)) {
-            applicationEventPublisher.publishEvent(
-                    PostBookmarkCancelEvent.create(memberId.getValue(), targetPostId.getValue()));
+            targetPostRepository.cancelBookmark(memberId, targetPostId);
         }
     }
 
@@ -173,11 +169,7 @@ public class MemberController {
         memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
 
         if (targetCommentRepository.isUnliked(memberId, targetCommentId)) {
-            applicationEventPublisher.publishEvent(
-                    CommentLikeEvent.create(
-                            memberId.getValue(),
-                            targetCommentId.getTargetPostId().getValue(),
-                            targetCommentId.getTargetCommentPath().getValue()));
+            targetCommentRepository.like(memberId, targetCommentId);
             applicationEventPublisher.publishEvent(
                     CommentLikeNotificationEvent.create(
                             memberId.getValue(),
@@ -196,11 +188,7 @@ public class MemberController {
         memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
 
         if (targetCommentRepository.isLiked(memberId, targetCommentId)) {
-            applicationEventPublisher.publishEvent(
-                    CommentUnlikeEvent.create(
-                            memberId.getValue(),
-                            targetCommentId.getTargetPostId().getValue(),
-                            targetCommentId.getTargetCommentPath().getValue()));
+            targetCommentRepository.unlike(memberId, targetCommentId);
         }
     }
 

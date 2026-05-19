@@ -9,4 +9,8 @@ public interface TargetCommentRepository {
     boolean isLiked(MemberId memberId, TargetCommentId targetCommentId);
 
     boolean isUnliked(MemberId memberId, TargetCommentId targetCommentId);
+
+    void like(MemberId memberId, TargetCommentId targetCommentId);
+
+    void unlike(MemberId memberId, TargetCommentId targetCommentId);
 }

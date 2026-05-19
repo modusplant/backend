@@ -12,6 +12,6 @@ public interface ProposalBugReportEntityTestUtils extends MemberEntityTestUtils 
                 .title(TEST_REPORT_TITLE)
                 .content(TEST_REPORT_CONTENT)
                 .image(testFilenameAndSrcEntityRecords)
-                .imageNumber(TEST_REPORT_IMAGE_NUMBER);
+                .imageNumber(TEST_REPORT_IMAGE_NUMBER_3);
     }
 }

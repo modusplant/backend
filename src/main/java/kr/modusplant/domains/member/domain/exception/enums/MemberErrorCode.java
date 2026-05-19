@@ -50,7 +50,11 @@ public enum MemberErrorCode implements ErrorCode {
     NOT_FOUND_MEMBER_ID(HttpStatus.BAD_REQUEST.value(), "not_found_member_id", "회원 아이디를 찾을 수 없습니다. "),
     NOT_FOUND_REPORT_ID(HttpStatus.BAD_REQUEST.value(), "not_found_report_id", "보고서 식별자를 찾을 수 없습니다. "),
     NOT_FOUND_TARGET_POST_ID(HttpStatus.BAD_REQUEST.value(), "not_found_target_post_id", "대상 게시글 아이디를 찾을 수 없습니다. "),
-    NOT_FOUND_TARGET_COMMENT_ID(HttpStatus.BAD_REQUEST.value(), "not_found_target_comment_id", "대상 댓글 아이디를 찾을 수 없습니다. ");
+    NOT_FOUND_TARGET_COMMENT_ID(HttpStatus.BAD_REQUEST.value(), "not_found_target_comment_id", "대상 댓글 아이디를 찾을 수 없습니다. "),
+
+    NOT_FOUND_PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER(HttpStatus.INTERNAL_SERVER_ERROR.value(), "not_found_proposal_or_bug_image_number", "건의 및 버그 제보 이미지 개수를 찾을 수 없습니다. "),
+
+    PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER_OUT_OF_RANGE(HttpStatus.INTERNAL_SERVER_ERROR.value(), "proposal_or_bug_report_image_number_out_of_range", "건의 및 버그 제보 이미지 개수가 올바른 값의 범위를 벗어났습니다. ");
 
     private final int httpStatus;
     private final String code;

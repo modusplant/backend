@@ -15,4 +15,12 @@ public interface TargetPostRepository {
     boolean isBookmarked(MemberId memberId, TargetPostId targetPostId);
 
     boolean isNotBookmarked(MemberId memberId, TargetPostId targetPostId);
+
+    void like(MemberId memberId, TargetPostId targetPostId);
+
+    void unlike(MemberId memberId, TargetPostId targetPostId);
+
+    void bookmark(MemberId memberId, TargetPostId targetPostId);
+
+    void cancelBookmark(MemberId memberId, TargetPostId targetPostId);
 }
