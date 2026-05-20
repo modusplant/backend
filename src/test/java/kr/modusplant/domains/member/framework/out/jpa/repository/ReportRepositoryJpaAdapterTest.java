@@ -4,7 +4,7 @@ import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.member.common.util.domain.aggregate.ProposalOrBugReportTestUtils;
-import kr.modusplant.domains.member.domain.vo.ReportId;
+import kr.modusplant.domains.member.framework.out.jooq.repository.ReportJooqRepository;
 import kr.modusplant.domains.member.framework.out.jpa.entity.CommentAbuseReportEntity;
 import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.out.jpa.entity.PostAbuseReportEntity;
@@ -15,8 +15,6 @@ import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
 import kr.modusplant.shared.event.ImageRemoveEvent;
 import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.Result;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.jooq.tools.jdbc.MockConnection;
@@ -28,15 +26,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
 import static kr.modusplant.domains.member.common.util.domain.vo.TargetCommentIdTestUtils.testTargetCommentId;
 import static kr.modusplant.domains.member.common.util.domain.vo.TargetPostIdTestUtils.testTargetPostId;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_CONTENT_IMAGE_FILE_KEYS;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,32 +44,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, CommentAbuseReportEntityTestUtils, ProposalOrBugReportTestUtils {
-    private final String emptyReportId = "empty_report_id";
-
     private final MockDataProvider mockDataProvider = (MockExecuteContext mockExecuteContext) -> {
         String sql = mockExecuteContext.sql().toLowerCase();
-
-        // 이미지 경로 조회 (select) 모킹
-        if (sql.contains("select") && sql.contains("jsonb_array_elements")) {
-            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
-            Result<Record1<String>> result = dsl.newResult(DSL.field("src", String.class));
-
-            // 바인딩된 reportId 값을 기준으로 이미지 없음 케이스 분기
-            boolean isEmptyCase = false;
-            if (mockExecuteContext.bindings() != null) {
-                for (Object binding : mockExecuteContext.bindings()) {
-                    if (emptyReportId.equals(binding)) {
-                        isEmptyCase = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!isEmptyCase) {
-                result.add(dsl.newRecord(DSL.field("src", String.class)).values(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1));
-            }
-            return new MockResult[] { new MockResult(result.size(), result) };
-        }
 
         // 데이터 삽입 및 삭제 (insert, delete) 모킹
         if (sql.contains("insert") || sql.contains("delete")) {
@@ -90,8 +65,10 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
     private final PostAbuseReportJpaRepository postAbuRepJpaRepository = Mockito.mock(PostAbuseReportJpaRepository.class);
     private final CommentJpaRepository commentJpaRepository = Mockito.mock(CommentJpaRepository.class);
     private final CommentAbuseReportJpaRepository commentAbuseReportJpaRepository = Mockito.mock(CommentAbuseReportJpaRepository.class);
+    private final ReportJooqRepository reportJooqRepository = Mockito.mock(ReportJooqRepository.class);
+
     private final ReportRepositoryJpaAdapter reportRepositoryJpaAdapter = new ReportRepositoryJpaAdapter(
-            dslContext, applicationEventPublisher, memberJpaRepository, proposalBugReportJpaRepository, postJpaRepository, postAbuRepJpaRepository, commentJpaRepository, commentAbuseReportJpaRepository);
+            dslContext, applicationEventPublisher, memberJpaRepository, proposalBugReportJpaRepository, postJpaRepository, postAbuRepJpaRepository, commentJpaRepository, commentAbuseReportJpaRepository, reportJooqRepository);
 
     @Test
     @DisplayName("보고서 식별자가 존재할 때 isIdExist로 보고서 존재 여부 반환")
@@ -297,7 +274,10 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
     @Test
     @DisplayName("이미지가 존재하는 리포트에 대해 removeProposalOrBugReport 실행 시 S3 삭제 및 아카이빙 수행")
     void testRemoveProposalOrBugReport_givenImagesExist_willDeleteS3AndProcessArchive() {
-        // given & when
+        // given
+        given(reportJooqRepository.getImageFileKeysFromReportId(any())).willReturn(TEST_POST_CONTENT_IMAGE_FILE_KEYS);
+
+        // when
         reportRepositoryJpaAdapter.removeProposalOrBugReport(testReportId);
 
         // then
@@ -308,11 +288,10 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
     @DisplayName("이미지가 없는 리포트에 대해 removeProposalOrBugReport 실행 시 S3 삭제 생략 후 아카이빙 수행")
     void testRemoveProposalOrBugReport_givenImagesEmpty_willProcessArchiveOnly() {
         // given
-        ReportId reportId = mock(ReportId.class);
-        given(reportId.getValue()).willReturn(emptyReportId); // MockDataProvider에서 빈 목록을 반환하도록 처리됨
+        given(reportJooqRepository.getImageFileKeysFromReportId(any())).willReturn(List.of());
 
         // when
-        reportRepositoryJpaAdapter.removeProposalOrBugReport(reportId);
+        reportRepositoryJpaAdapter.removeProposalOrBugReport(testReportId);
 
         // then
         verify(applicationEventPublisher, times(0)).publishEvent(any());

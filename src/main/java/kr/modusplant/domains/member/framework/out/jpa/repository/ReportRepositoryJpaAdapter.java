@@ -8,6 +8,7 @@ import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.domain.vo.TargetCommentId;
 import kr.modusplant.domains.member.domain.vo.TargetPostId;
+import kr.modusplant.domains.member.framework.out.jooq.repository.ReportJooqRepository;
 import kr.modusplant.domains.member.framework.out.jpa.entity.CommentAbuseReportEntity;
 import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.out.jpa.entity.PostAbuseReportEntity;
@@ -28,7 +29,8 @@ import java.util.List;
 
 import static kr.modusplant.jooq.Tables.PROP_BUG_REP;
 import static kr.modusplant.jooq.Tables.PROP_BUG_REP_ARCHIVE;
-import static org.jooq.impl.DSL.*;
+import static org.jooq.impl.DSL.select;
+import static org.jooq.impl.DSL.val;
 
 @Repository
 @RequiredArgsConstructor
@@ -42,6 +44,7 @@ public class ReportRepositoryJpaAdapter implements ReportRepository {
     private final PostAbuseReportJpaRepository postAbuRepJpaRepository;
     private final CommentJpaRepository commentJpaRepository;
     private final CommentAbuseReportJpaRepository commentAbuseReportJpaRepository;
+    private final ReportJooqRepository reportJooqRepository;
 
     @Override
     public boolean isIdExist(ReportId reportId) {
@@ -124,13 +127,7 @@ public class ReportRepositoryJpaAdapter implements ReportRepository {
     }
 
     private void deleteImageFromReportImagePath(String reportId) {
-        List<String> srcList = dsl.select(
-                        field("jsonb_array_elements({0}) ->> 'src'", String.class, PROP_BUG_REP.IMAGE)
-                )
-                .from(PROP_BUG_REP)
-                .where(PROP_BUG_REP.ULID.eq(reportId))
-                .fetchInto(String.class);
-
+        List<String> srcList = reportJooqRepository.getImageFileKeysFromReportId(reportId);
         if (!srcList.isEmpty()) {
             applicationEventPublisher.publishEvent(ImageRemoveEvent.create(srcList));
         }

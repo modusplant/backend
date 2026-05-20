@@ -8,15 +8,14 @@ import kr.modusplant.domains.member.domain.vo.MemberWithdrawOpinion;
 import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberJpaMapperImpl;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
+import kr.modusplant.domains.post.framework.out.jooq.repository.PostJooqRepository;
 import kr.modusplant.shared.event.ImageRemoveEvent;
 import kr.modusplant.shared.event.RecentlyViewPostRemoveEvent;
-import kr.modusplant.shared.framework.jooq.converter.JsonbJsonNodeConverter;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jooq.DSLContext;
-import org.jooq.JSONB;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -40,8 +39,7 @@ public class MemberRepositoryJpaAdapter implements MemberRepository {
 
     private final MemberJpaMapperImpl memberJpaMapper;
     private final MemberJpaRepository memberJpaRepository;
-
-    private final JsonbJsonNodeConverter jsonbJsonNodeConverter = new JsonbJsonNodeConverter();
+    private final PostJooqRepository postJooqRepository;
 
     @Override
     public Member getById(MemberId memberId) {
@@ -88,19 +86,9 @@ public class MemberRepositoryJpaAdapter implements MemberRepository {
 
         stringRedisTemplate.unlink("recentlyView:member:%s:posts".formatted(memberId));     // 최근에 본 게시글 데이터 삭제
 
-        String[] publishedPostUlids = dsl.select(COMM_POST.ULID)    // 발행되어 타 회원이 접근할 수 있는 게시글 ID 획득
-                .from(COMM_POST)
-                .where(COMM_POST.AUTH_MEMB_UUID.eq(memberId))
-                .and(COMM_POST.IS_PUBLISHED.isTrue())
-                .fetchInto(String.class).toArray(new String[0]);
-
-        List<JsonNode> publishedPostContents = dsl.select(COMM_POST.CONTENT)    // 발행된 게시글의 컨텐츠 획득
-                .from(COMM_POST)
-                .where(COMM_POST.ULID.in(publishedPostUlids))
-                .fetchInto(JSONB.class)
-                .stream()
-                .map(jsonbJsonNodeConverter::from)
-                .toList();
+        String[] publishedPostUlids = postJooqRepository.getPublishedPostUlidsByMemberId(memberId);
+        List<JsonNode> publishedPostContents =
+                postJooqRepository.getPostContentsFromPublishedPostUlids(publishedPostUlids);
 
         List<String> fileKeysToDelete = new ArrayList<>();      // 컨텐츠로부터 파일 키 수집
         for (JsonNode content : publishedPostContents) {
