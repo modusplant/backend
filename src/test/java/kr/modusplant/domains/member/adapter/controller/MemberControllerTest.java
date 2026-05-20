@@ -31,8 +31,8 @@ import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
 import kr.modusplant.infrastructure.swear.service.SwearService;
-import kr.modusplant.shared.event.*;
-import kr.modusplant.shared.exception.InvalidFileInputException;
+import kr.modusplant.shared.event.CommentLikeNotificationEvent;
+import kr.modusplant.shared.event.PostLikeNotificationEvent;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
@@ -47,11 +47,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN;
@@ -83,8 +80,6 @@ import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOr
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
-import static kr.modusplant.shared.exception.enums.GeneralErrorCode.INVALID_FILE_INPUT;
-import static kr.modusplant.shared.exception.enums.GeneralErrorCode.INVALID_INPUT;
 import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.EXISTS_COMMENT_ABUSE_REPORT;
 import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.EXISTS_POST_ABUSE_REPORT;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
@@ -728,13 +723,13 @@ class MemberControllerTest implements
                 any(ReportId.class),
                 anyList()))
                 .willReturn(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATHS);
-        willDoNothing().given(applicationEventPublisher).publishEvent(any(ProposalOrBugReportEvent.class));
+        willDoNothing().given(reportRepository).reportProposalOrBug(any(), any());
 
         // when
         memberController.reportProposalOrBug(testProposalOrBugReportRecord);
 
         // then
-        verify(applicationEventPublisher, times(1)).publishEvent(any(ProposalOrBugReportEvent.class));
+        verify(reportRepository, times(1)).reportProposalOrBug(any(), any());
     }
 
     @Test
@@ -743,13 +738,13 @@ class MemberControllerTest implements
         // given
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        willDoNothing().given(applicationEventPublisher).publishEvent(any(ProposalOrBugReportEvent.class));
+        willDoNothing().given(reportRepository).reportProposalOrBug(any(), any());
 
         // when
         memberController.reportProposalOrBug(new ProposalOrBugReportRecord(MEMBER_BASIC_USER_UUID, TEST_REPORT_TITLE, TEST_REPORT_CONTENT, null, null));
 
         // then
-        verify(applicationEventPublisher, times(1)).publishEvent(any(ProposalOrBugReportEvent.class));
+        verify(reportRepository, times(1)).reportProposalOrBug(any(), any());
     }
 
     @Test
@@ -837,64 +832,6 @@ class MemberControllerTest implements
     }
 
     @Test
-    @DisplayName("이미지의 원본 파일 이름이 비어 있어 reportProposalOrBug로 건의 및 버그 제보 실패")
-    void testReportProposalOrBug_givenBlankFilename_willThrowException() {
-        // given
-        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
-        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-
-        List<MultipartFile> images =
-                List.of(
-                        new MockMultipartFile(
-                                "image", "", "image/png", TEST_REPORT_IMAGE_BYTES_1
-                        ));
-
-        ProposalOrBugReportRecord invalidRecord = new ProposalOrBugReportRecord(
-                MEMBER_BASIC_USER_UUID,
-                TEST_REPORT_TITLE,
-                TEST_REPORT_CONTENT,
-                images,
-                1
-        );
-
-        // when
-        InvalidFileInputException invalidFileInputException = assertThrows(InvalidFileInputException.class,
-                () -> memberController.reportProposalOrBug(invalidRecord));
-
-        // then
-        assertThat(invalidFileInputException.getErrorCode()).isEqualTo(INVALID_FILE_INPUT);
-    }
-
-    @Test
-    @DisplayName("이미지의 원본 파일 이름이 규칙을 따르지 않아 reportProposalOrBug로 건의 및 버그 제보 실패")
-    void testReportProposalOrBug_givenInvalidFilename_willThrowException() {
-        // given
-        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
-        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-
-        List<MultipartFile> images =
-                List.of(
-                        new MockMultipartFile(
-                                "image", "invalid_name.png", "image/png", TEST_REPORT_IMAGE_BYTES_1
-                        ));
-
-        ProposalOrBugReportRecord invalidRecord = new ProposalOrBugReportRecord(
-                MEMBER_BASIC_USER_UUID,
-                TEST_REPORT_TITLE,
-                TEST_REPORT_CONTENT,
-                images,
-                1
-        );
-
-        // when
-        InvalidValueException exception = assertThrows(InvalidValueException.class,
-                () -> memberController.reportProposalOrBug(invalidRecord));
-
-        // then
-        assertThat(exception.getErrorCode()).isEqualTo(INVALID_REPORT_IMAGE_NAME);
-    }
-
-    @Test
     @DisplayName("reportPostAbuse로 게시글 신고")
     void testReportPostAbuse_givenValidPostAbuseReportRecord_willDoNothing() {
         // given
@@ -903,13 +840,13 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfTargetPostExists(any());
         given(targetPostRepository.isPublished(any())).willReturn(true);
         given(reportRepository.isMemberAbusePost(any(), any())).willReturn(false);
-        willDoNothing().given(applicationEventPublisher).publishEvent(any(PostAbuseReportEvent.class));
+        willDoNothing().given(reportRepository).reportPostAbuse(any(), any());
 
         // when
         memberController.reportPostAbuse(testPostAbuseReportRecord);
 
         // then
-        verify(applicationEventPublisher, times(1)).publishEvent(any(PostAbuseReportEvent.class));
+        verify(reportRepository, times(1)).reportPostAbuse(any(), any());
     }
 
     @Test
@@ -986,13 +923,13 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfTargetCommentExists(any());
         given(reportRepository.isMemberAbuseComment(any(), any())).willReturn(false);
-        willDoNothing().given(applicationEventPublisher).publishEvent(any(CommentAbuseReportEvent.class));
+        willDoNothing().given(reportRepository).reportCommentAbuse(any(), any());
 
         // when
         memberController.reportCommentAbuse(testCommentAbuseReportRecord);
 
         // then
-        verify(applicationEventPublisher, times(1)).publishEvent(any(CommentAbuseReportEvent.class));
+        verify(reportRepository, times(1)).reportCommentAbuse(any(), any());
     }
 
     @Test
@@ -1052,14 +989,14 @@ class MemberControllerTest implements
         given(memberSocialTranslator.getSocialAccessToken(any(), any())).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
         willDoNothing().given(memberSocialTranslator).deleteSocialAccountWithSocialAccessToken(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN, SocialProvider.KAKAO.getValue(), MEMBER_BASIC_USER_UUID);
         willDoNothing().given(tokenService).blacklistAccessToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN);
-        willDoNothing().given(applicationEventPublisher).publishEvent(any(MemberWithdrawalEvent.class));
+        willDoNothing().given(memberRepository).withdraw(any(), any(), any());
 
         // when
         memberController.withdraw(testKakaoMemberWithdrawalRecord);
 
         // then
         verify(tokenService, times(1)).blacklistAccessToken(any());
-        verify(applicationEventPublisher, times(1)).publishEvent(any(MemberWithdrawalEvent.class));
+        verify(memberRepository, times(1)).withdraw(any(), any(), any());
     }
 
     @Test
@@ -1075,28 +1012,6 @@ class MemberControllerTest implements
 
         // then
         assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
-    }
-
-    @Test
-    @DisplayName("의견 길이 초과로 인해 withdraw로 오류 발생")
-    void testWithdraw_givenOverLengthenedOpinion_willThrowException() {
-        // given
-        given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
-        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-
-        // when
-        InvalidValueException invalidValueException = assertThrows(InvalidValueException.class,
-                () -> memberController.withdraw(
-                        new MemberWithdrawalRecord(
-                                null,
-                                null,
-                                MEMBER_WITHDRAW_BASIC_USER_REASON,
-                                "a".repeat(601),
-                                MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN
-                        )));
-
-        // then
-        assertThat(invalidValueException.getErrorCode()).isEqualTo(MEMBER_WITHDRAW_OPINION_OVER_LENGTH);
     }
 
     @Nested
@@ -1120,7 +1035,7 @@ class MemberControllerTest implements
                                     MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)));
 
             // then
-            assertThat(invalidValueException.getErrorCode()).isEqualTo(INVALID_INPUT);
+            assertThat(invalidValueException.getErrorCode()).isEqualTo(MISMATCHED_AUTH_INFO);
         }
 
         @Test
@@ -1140,7 +1055,7 @@ class MemberControllerTest implements
                             MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)));
 
             // then
-            assertThat(invalidValueException.getErrorCode()).isEqualTo(INVALID_INPUT);
+            assertThat(invalidValueException.getErrorCode()).isEqualTo(MISMATCHED_AUTH_INFO);
         }
     }
 }

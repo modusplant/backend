@@ -1,7 +1,6 @@
 package kr.modusplant.domains.member.domain.aggregate;
 
-import kr.modusplant.domains.member.domain.entity.ReportImage;
-import kr.modusplant.domains.member.domain.vo.ProposalOrBugReportImageNumber;
+import kr.modusplant.domains.member.domain.entity.ProposalOrBugReportImage;
 import kr.modusplant.domains.member.domain.vo.ReportContent;
 import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.domain.vo.ReportTitle;
@@ -23,14 +22,12 @@ public class ProposalOrBugReport {
     private final ReportId reportId;
     private ReportTitle reportTitle;
     private ReportContent reportContent;
-    private List<ReportImage> reportImages;
-    private ProposalOrBugReportImageNumber proposalOrBugReportImageNumber;
+    private List<ProposalOrBugReportImage> proposalOrBugReportImages;
 
     public static ProposalOrBugReport create(ReportId id,
                                              ReportTitle title,
                                              ReportContent content,
-                                             List<ReportImage> images,
-                                             ProposalOrBugReportImageNumber imageNumber) {
+                                             List<ProposalOrBugReportImage> images) {
         if (id == null) {
             throw new EmptyValueException(EMPTY_REPORT_ID, "reportId");
         } else if (title == null) {
@@ -39,12 +36,10 @@ public class ProposalOrBugReport {
             throw new EmptyValueException(EMPTY_REPORT_CONTENT, "reportContent");
         } else if (images == null) {
             throw new EmptyValueException(EMPTY_REPORT_IMAGE, "reportImages");
-        } else if (imageNumber == null) {
-            throw new EmptyValueException(EMPTY_REPORT_IMAGE_NUMBER, "reportImageNumber");
-        } else if (!imageNumber.isEmpty() && (images.size() != imageNumber.getValueIfNotEmpty())) {
-            throw new InvalidValueException(MISMATCHED_REPORT_IMAGE_SIZE, List.of("reportImages", "reportImageNumber"));
+        } else if (images.size() > 3) {
+            throw new InvalidValueException(PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER_OUT_OF_RANGE, "reportImages");
         }
-        return new ProposalOrBugReport(id, title, content, images, imageNumber);
+        return new ProposalOrBugReport(id, title, content, images);
     }
 
     @Override

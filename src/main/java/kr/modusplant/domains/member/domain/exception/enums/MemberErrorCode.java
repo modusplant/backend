@@ -41,6 +41,7 @@ public enum MemberErrorCode implements ErrorCode {
     REPORT_CONTENT_OVER_LENGTH(HttpStatus.BAD_REQUEST.value(), "report_content_over_length", "보고서 컨텐츠가 허용되는 길이를 초과하였습니다. "),
     REPORT_TITLE_OVER_LENGTH(HttpStatus.BAD_REQUEST.value(), "report_title_over_length", "보고서 제목이 허용되는 길이를 초과하였습니다. "),
 
+    MISMATCHED_AUTH_INFO(HttpStatus.BAD_REQUEST.value(), "mismatched_auth_info", "인증 정보가 올바르지 않습니다. "),
     MISMATCHED_REPORT_IMAGE_SIZE(HttpStatus.BAD_REQUEST.value(), "mismatched_report_image_size", "보고서 이미지 개수가 올바르지 않습니다. "),
 
     NOT_ACCESSIBLE_POST_BOOKMARK(HttpStatus.BAD_REQUEST.value(), "not_accessible_post_bookmark", "대상 게시글에 대한 북마크 기능을 이용할 수 없습니다. "),

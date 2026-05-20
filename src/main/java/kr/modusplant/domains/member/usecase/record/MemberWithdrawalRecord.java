@@ -1,11 +1,11 @@
 package kr.modusplant.domains.member.usecase.record;
 
-import kr.modusplant.domains.member.domain.enums.WithdrawReason;
+import kr.modusplant.domains.member.domain.enums.MemberWithdrawReason;
 
 public record MemberWithdrawalRecord(
         String authCode,
         String authProvider,
-        WithdrawReason reason,
+        MemberWithdrawReason reason,
         String opinion,
         String accessToken) {
 }
