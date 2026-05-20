@@ -7,7 +7,6 @@ import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberProfileImageBytes;
 import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
 import kr.modusplant.domains.member.domain.vo.MemberProfileIntroduction;
-import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
 import kr.modusplant.domains.member.framework.out.jpa.entity.MemberProfileEntity;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberProfileJpaMapperImpl;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
@@ -37,7 +36,6 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
         if (profileEntityOrEmpty.isPresent()) {
             MemberProfileEntity profileEntity = profileEntityOrEmpty.orElseThrow();
             MemberProfileImage profileImage;
-            MemberProfileIntroduction profileIntroduction;
             if (profileEntity.getImagePath() == null) {
                 profileImage = EmptyMemberProfileImage.create();
             } else {
@@ -45,15 +43,11 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
                         MemberProfileImagePath.create(profileEntity.getImagePath()),
                         MemberProfileImageBytes.create(amazonS3Service.downloadFile(profileEntity.getImagePath())));
             }
-            if (profileEntity.getIntroduction() == null) {
-                profileIntroduction = EmptyMemberProfileIntroduction.create();
-            } else {
-                profileIntroduction = MemberProfileIntroduction.create(profileEntity.getIntroduction());
-            }
-            return Optional.of(MemberProfile.create(memberId,
+            return MemberProfile.create(
+                    memberId,
                     profileImage,
-                    profileIntroduction,
-                    Nickname.create(profileEntity.getMember().getNickname()))).orElseThrow();
+                    MemberProfileIntroduction.create(profileEntity.getIntroduction()),
+                    Nickname.create(profileEntity.getMember().getNickname()));
         } else {
             throw new NotFoundEntityException(NOT_FOUND_MEMBER_PROFILE, "memberProfile");
         }
