@@ -7,10 +7,8 @@ import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.entity.ReportImage;
-import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileImage;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.domain.vo.*;
-import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyReportImageBytes;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
@@ -26,7 +24,6 @@ import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
-import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
@@ -75,46 +72,37 @@ public class MemberController {
     public MemberProfileResponse getProfile(MemberProfileGetRecord record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         memberValidationHelper.validateIfMemberExists(memberId);
+        memberValidationHelper.validateIfMemberProfileExists(memberId);
 
-        Optional<MemberProfile> optionalMemberProfile = memberProfileRepository.getById(memberId);
-        if (optionalMemberProfile.isPresent()) {
-            return memberProfileMapper.toMemberProfileResponse(optionalMemberProfile.orElseThrow());
-        } else {
-            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE, "memberProfile");
-        }
+        MemberProfile memberProfile = memberProfileRepository.getById(memberId);
+        return memberProfileMapper.toMemberProfileResponse(memberProfile);
     }
 
     public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Nickname memberNickname = Nickname.create(record.nickname());
-        MemberProfile memberProfile;
-        MemberProfileImage memberProfileImage;
-        MemberProfileIntroduction memberProfileIntroduction;
-        MultipartFile image = record.image();
-        String introduction = record.introduction();
         validateBeforeOverrideProfile(memberId, memberNickname);
 
-        Optional<MemberProfile> optionalMemberProfile = memberProfileRepository.getById(memberId);
-        if (optionalMemberProfile.isPresent()) {
-            memberImageIOHelper.deleteImage(optionalMemberProfile.orElseThrow().getMemberProfileImage());
-        } else {
-            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE, "memberProfile");
-        }
+        MemberProfile memberProfile = memberProfileRepository.getById(memberId);
+        memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
+
+        MultipartFile image = record.image();
+        String newImagePath = null;
+        byte[] newImageBytes = null;
         if (!(image == null)) {
-            String newImagePath = memberImageIOHelper.uploadImage(memberId, record);
-            memberProfileImage = MemberProfileImage.create(
-                    MemberProfileImagePath.create(newImagePath),
-                    MemberProfileImageBytes.create(image.getBytes())
-            );
-        } else {
-            memberProfileImage = EmptyMemberProfileImage.create();
+            newImagePath = memberImageIOHelper.uploadImage(memberId, record);
+            newImageBytes = image.getBytes();
         }
+        MemberProfileImage memberProfileImage = MemberProfileImage.create(
+                MemberProfileImagePath.create(newImagePath),
+                MemberProfileImageBytes.create(newImageBytes)
+        );
+
+        String introduction = record.introduction();
         if (!(introduction == null)) {
             introduction = swearService.filterSwear(introduction);
-            memberProfileIntroduction = MemberProfileIntroduction.create(introduction);
-        } else {
-            memberProfileIntroduction = EmptyMemberProfileIntroduction.create();
         }
+        MemberProfileIntroduction memberProfileIntroduction = MemberProfileIntroduction.create(introduction);
         memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
         return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile));
     }
@@ -267,14 +255,14 @@ public class MemberController {
                 MemberWithdrawalEvent.create(memberId.getValue(), record.reason().name(), record.opinion()));
     }
 
-    private void validateBeforeOverrideProfile(MemberId memberId, Nickname memberNickname) {
+    private void validateBeforeOverrideProfile(MemberId memberId, Nickname nickname) {
         memberValidationHelper.validateIfMemberExists(memberId);
-        if (swearService.isSwearContained(memberNickname.getValue())) {
+        if (swearService.isSwearContained(nickname.getValue())) {
             throw new SwearContainedException();
         }
-        Optional<Member> emptyOrMember = memberRepository.getByNickname(memberNickname);
+        Optional<Member> emptyOrMember = memberRepository.getByNickname(nickname);
         if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
-            throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "memberNickname");
+            throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "nickname");
         }
     }
 

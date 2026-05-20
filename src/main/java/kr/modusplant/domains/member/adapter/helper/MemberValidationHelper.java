@@ -4,10 +4,7 @@ import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.domain.vo.TargetCommentId;
 import kr.modusplant.domains.member.domain.vo.TargetPostId;
-import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
-import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
-import kr.modusplant.domains.member.usecase.port.repository.TargetCommentRepository;
-import kr.modusplant.domains.member.usecase.port.repository.TargetPostRepository;
+import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.kernel.Nickname;
@@ -21,13 +18,20 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 @RequiredArgsConstructor
 public class MemberValidationHelper {
     private final MemberRepository memberRepository;
+    private final MemberProfileRepository memberProfileRepository;
     private final ReportRepository reportRepository;
     private final TargetPostRepository targetPostRepository;
     private final TargetCommentRepository targetCommentRepository;
 
     public void validateIfMemberExists(MemberId memberId) {
         if (!memberRepository.isIdExist(memberId)) {
-            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER, "member");
+        }
+    }
+
+    public void validateIfMemberProfileExists(MemberId memberId) {
+        if (!memberProfileRepository.isIdExist(memberId)) {
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_PROFILE, "memberProfile");
         }
     }
 

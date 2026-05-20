@@ -39,7 +39,6 @@ import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
-import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.shared.generator.UlidGeneratorHolder;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
@@ -64,6 +63,7 @@ import static kr.modusplant.domains.member.common.constant.MemberProfileConstant
 import static kr.modusplant.domains.member.common.constant.MemberWithdrawConstant.MEMBER_WITHDRAW_BASIC_USER_OPINION;
 import static kr.modusplant.domains.member.common.constant.MemberWithdrawConstant.MEMBER_WITHDRAW_BASIC_USER_REASON;
 import static kr.modusplant.domains.member.common.constant.ReportConstant.*;
+import static kr.modusplant.domains.member.common.util.domain.entity.nullobject.EmptyMemberProfileImageTestUtils.testEmptyMemberProfileImage;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils.testMemberProfileIntroduction;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
@@ -125,7 +125,7 @@ class MemberControllerTest implements
 
     private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, swearService, memberImageIOHelper, memberValidationHelper, memberProfileMapper, memberSocialTranslator, memberRepository, memberProfileRepository, targetPostRepository, targetCommentRepository, reportRepository, applicationEventPublisher);
 
-    private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
+    private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER, "memberId");
     private final NotFoundEntityException notFoundEntityExceptionForTargetPost = new NotFoundEntityException(NOT_FOUND_TARGET_POST_ID, "targetPostId");
     private final NotFoundEntityException notFoundEntityExceptionForTargetComment = new NotFoundEntityException(NOT_FOUND_TARGET_COMMENT_ID, "targetCommentId");
 
@@ -158,37 +158,11 @@ class MemberControllerTest implements
     void testGetProfile_givenValidGetRecordAndStoredMemberProfile_willReturnResponse() throws IOException {
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        given(memberProfileRepository.getById(any())).willReturn(Optional.of(createMemberProfile()));
+        given(memberProfileRepository.getById(any())).willReturn(createMemberProfile());
         given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when & then
         assertThat(memberController.getProfile(testMemberProfileGetRecord)).isEqualTo(testMemberProfileResponse);
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 회원으로 인해 getProfile로 회원 프로필 조회 실패")
-    void testGetProfile_givenNotFoundMemberId_willThrowException() {
-        // given
-        willThrow(notFoundEntityExceptionForMember).given(memberValidationHelper).validateIfMemberExists(any());
-
-        // when
-        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
-                () -> memberController.getProfile(testMemberProfileGetRecord));
-
-        // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 회원 프로필로 인해 getProfile로 회원 프로필 조회 실패")
-    void testGetProfile_givenNotFoundMemberProfile_willThrowException() throws IOException {
-        // given
-        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        given(memberProfileRepository.getById(any())).willReturn(Optional.empty());
-
-        // when & then
-        NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> memberController.getProfile(testMemberProfileGetRecord));
-        assertThat(exception.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE);
     }
 
     @Test
@@ -198,7 +172,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = createMemberProfile();
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(memberProfileRepository.getById(any())).willReturn(Optional.of(memberProfile));
+        given(memberProfileRepository.getById(any())).willReturn(memberProfile);
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
         given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
@@ -222,13 +196,12 @@ class MemberControllerTest implements
         MemberProfile memberProfile = createMemberProfile();
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(memberProfileRepository.getById(any())).willReturn(Optional.of(
+        given(memberProfileRepository.getById(any())).willReturn(
                 MemberProfile.create(
                         testMemberId,
-                        EmptyMemberProfileImage.create(),
+                        testEmptyMemberProfileImage,
                         testMemberProfileIntroduction,
-                        testNormalUserNickname))
-        );
+                        testNormalUserNickname));
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
         given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
@@ -252,7 +225,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = MemberProfile.create(testMemberId, EmptyMemberProfileImage.create(), EmptyMemberProfileIntroduction.create(), testNormalUserNickname);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(memberProfileRepository.getById(any())).willReturn(Optional.of(memberProfile));
+        given(memberProfileRepository.getById(any())).willReturn(memberProfile);
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
 
@@ -276,7 +249,7 @@ class MemberControllerTest implements
         // when & then
         NotFoundEntityException alreadyExistedNicknameException = assertThrows(
                 NotFoundEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
-        assertThat(alreadyExistedNicknameException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+        assertThat(alreadyExistedNicknameException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
     }
 
     @Test
@@ -304,23 +277,6 @@ class MemberControllerTest implements
         ExistsEntityException alreadyExistedNicknameException = assertThrows(
                 ExistsEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
         assertThat(alreadyExistedNicknameException.getErrorCode()).isEqualTo(KernelErrorCode.EXISTS_NICKNAME);
-    }
-
-    @Test
-    @DisplayName("존재하는 않는 회원 프로필로 인해 overrideProfile로 프로필 덮어쓰기 실패")
-    void testOverrideProfile_givenNotFoundMemberProfile_willThrowException() throws IOException {
-        // given
-        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        given(swearService.isSwearContained(any())).willReturn(false);
-        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(memberProfileRepository.getById(any())).willReturn(Optional.empty());
-
-        // when
-        NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () -> memberController.overrideProfile(
-                new MemberProfileOverrideRecord(MEMBER_BASIC_USER_UUID, null, null, MEMBER_BASIC_USER_NICKNAME)));
-
-        // then
-        assertThat(exception.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE);
     }
 
     @Test
@@ -370,7 +326,7 @@ class MemberControllerTest implements
                 () -> memberController.likePost(testMemberPostLikeRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
     }
 
     @Test
@@ -448,7 +404,7 @@ class MemberControllerTest implements
                 () -> memberController.unlikePost(testMemberPostUnlikeRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
     }
 
     @Test
@@ -526,7 +482,7 @@ class MemberControllerTest implements
                 () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
     }
 
     @Test
@@ -604,7 +560,7 @@ class MemberControllerTest implements
                 () -> memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
     }
 
     @Test
@@ -683,7 +639,7 @@ class MemberControllerTest implements
                 () -> memberController.likeComment(testMemberCommentLikeRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
     }
 
     @Test
@@ -743,7 +699,7 @@ class MemberControllerTest implements
                 () -> memberController.unlikeComment(testMemberCommentUnlikeRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
     }
 
     @Test
@@ -808,7 +764,7 @@ class MemberControllerTest implements
                 () -> memberController.reportProposalOrBug(testProposalOrBugReportRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
     }
 
     @Test
@@ -968,7 +924,7 @@ class MemberControllerTest implements
                 () -> memberController.reportPostAbuse(testPostAbuseReportRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
     }
 
     @Test
@@ -1051,7 +1007,7 @@ class MemberControllerTest implements
                 () -> memberController.reportCommentAbuse(testCommentAbuseReportRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
     }
 
     @Test
@@ -1118,7 +1074,7 @@ class MemberControllerTest implements
                 () -> memberController.withdraw(testKakaoMemberWithdrawalRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
     }
 
     @Test

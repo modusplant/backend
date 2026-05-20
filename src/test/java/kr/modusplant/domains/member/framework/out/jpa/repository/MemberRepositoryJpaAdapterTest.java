@@ -5,6 +5,7 @@ import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberJpaMapperImpl;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -12,8 +13,10 @@ import org.mockito.Mockito;
 import java.util.Optional;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -24,27 +27,41 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, MemberEntityTes
 
     @Test
     @DisplayName("getById로 가용한 Member 반환(가용할 때)")
-    void testGetById_givenValidMemberId_willReturnOptionalAvailableMember() {
+    void testGetById_givenAvailableMemberId_willReturnOptionalAvailableMember() {
         // given
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(createMemberBasicUserEntityWithUuid()));
 
         // when & then
-        assertThat(memberRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(Optional.of(createMember()));
+        assertThat(memberRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(createMember());
+    }
+
+    @Test
+    @DisplayName("getById로 예외 반환(가용히지 않을 때)")
+    void testGetById_givenNotAvailableMemberId_willThrowException() {
+        // given
+        given(memberJpaRepository.findByUuid(any())).willReturn(Optional.empty());
+
+        // when
+        NotFoundEntityException notFoundEntityException =
+                assertThrows(NotFoundEntityException.class, () -> memberRepositoryJpaAdapter.getById(testMemberId));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
     }
 
     @Test
     @DisplayName("getByNickname으로 가용한 Member 반환(가용하지 않을 때)")
-    void testGetById_givenValidMemberId_willReturnOptionalEmptyMember() {
+    void testGetByNickname_givenNotAvailableNickname_willReturnOptionalEmptyMember() {
         // given
-        given(memberJpaRepository.findByUuid(any())).willReturn(Optional.empty());
+        given(memberJpaRepository.findByNickname(any())).willReturn(Optional.empty());
 
         // when & then
-        assertThat(memberRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(Optional.empty());
+        assertThat(memberRepositoryJpaAdapter.getByNickname(testNormalUserNickname)).isEqualTo(Optional.empty());
     }
 
     @Test
     @DisplayName("getByNickname으로 가용한 Member 반환(가용할 때)")
-    void testGetByNickname_givenValidNickname_willReturnOptionalAvailableMember() {
+    void testGetByNickname_givenAvailableNickname_willReturnOptionalAvailableMember() {
         // given
         given(memberJpaRepository.findByNickname(any())).willReturn(Optional.of(createMemberBasicUserEntityWithUuid()));
 

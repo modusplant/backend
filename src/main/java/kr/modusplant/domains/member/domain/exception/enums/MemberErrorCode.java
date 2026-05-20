@@ -47,7 +47,8 @@ public enum MemberErrorCode implements ErrorCode {
     NOT_ACCESSIBLE_POST_LIKE(HttpStatus.BAD_REQUEST.value(), "not_accessible_post_like", "대상 게시글에 대한 좋아요 기능을 이용할 수 없습니다. "),
     NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE(HttpStatus.BAD_REQUEST.value(), "not_accessible_post_report_for_abuse", "대상 게시글에 대한 신고 기능을 이용할 수 없습니다. "),
 
-    NOT_FOUND_MEMBER_ID(HttpStatus.BAD_REQUEST.value(), "not_found_member_id", "회원 아이디를 찾을 수 없습니다. "),
+    NOT_FOUND_MEMBER(HttpStatus.BAD_REQUEST.value(), "not_found_member_id", "회원 아이디를 찾을 수 없습니다. "),
+    NOT_FOUND_MEMBER_PROFILE(HttpStatus.BAD_REQUEST.value(), "not_found_member_profile", "회원 프로필을 찾을 수 없습니다. "),
     NOT_FOUND_REPORT_ID(HttpStatus.BAD_REQUEST.value(), "not_found_report_id", "보고서 식별자를 찾을 수 없습니다. "),
     NOT_FOUND_TARGET_POST_ID(HttpStatus.BAD_REQUEST.value(), "not_found_target_post_id", "대상 게시글 아이디를 찾을 수 없습니다. "),
     NOT_FOUND_TARGET_COMMENT_ID(HttpStatus.BAD_REQUEST.value(), "not_found_target_comment_id", "대상 댓글 아이디를 찾을 수 없습니다. "),

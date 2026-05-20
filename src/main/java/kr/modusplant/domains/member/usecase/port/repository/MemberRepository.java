@@ -7,7 +7,7 @@ import kr.modusplant.shared.kernel.Nickname;
 import java.util.Optional;
 
 public interface MemberRepository {
-    Optional<Member> getById(MemberId memberId);
+    Member getById(MemberId memberId);
 
     Optional<Member> getByNickname(Nickname nickname);
 
