@@ -8,6 +8,7 @@ import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberE
 import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberProfileEntityTestUtils;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberProfileJpaMapperImpl;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -38,7 +40,7 @@ class MemberProfileRepositoryJpaAdapterTest implements
         given(amazonS3Service.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
 
         // then
-        assertThat(memberProfileRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(Optional.of(createMemberProfile()));
+        assertThat(memberProfileRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(createMemberProfile());
     }
 
     @Test
@@ -48,17 +50,17 @@ class MemberProfileRepositoryJpaAdapterTest implements
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(MemberProfileEntity.builder().member(createMemberBasicUserEntityWithUuid()).imagePath(null).introduction(null).build()));
 
         // then
-        assertThat(memberProfileRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(Optional.of(createMemberProfile()));
+        assertThat(memberProfileRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(createMemberProfile());
     }
 
     @Test
-    @DisplayName("getByNickname으로 가용한 MemberProfile 반환(가용하지 않을 때)")
-    void testGetById_givenValidMemberId_willReturnOptionalEmptyMemberProfile() throws IOException {
+    @DisplayName("getByNickname으로 예외 반환(가용하지 않을 때)")
+    void testGetById_givenValidMemberId_willThrowException() {
         // given & when
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.empty());
 
         // then
-        assertThat(memberProfileRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(Optional.empty());
+        assertThrows(NotFoundEntityException.class, () -> memberProfileRepositoryJpaAdapter.getById(testMemberId));
     }
 
     @Test

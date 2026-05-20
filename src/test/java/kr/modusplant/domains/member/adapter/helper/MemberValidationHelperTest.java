@@ -1,9 +1,6 @@
 package kr.modusplant.domains.member.adapter.helper;
 
-import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
-import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
-import kr.modusplant.domains.member.usecase.port.repository.TargetCommentRepository;
-import kr.modusplant.domains.member.usecase.port.repository.TargetPostRepository;
+import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
@@ -25,11 +22,12 @@ import static org.mockito.BDDMockito.given;
 
 class MemberValidationHelperTest {
     private final MemberRepository memberRepository = Mockito.mock(MemberRepository.class);
+    private final MemberProfileRepository memberProfileRepository = Mockito.mock(MemberProfileRepository.class);
     private final ReportRepository reportRepository = Mockito.mock(ReportRepository.class);
     private final TargetPostRepository targetPostRepository = Mockito.mock(TargetPostRepository.class);
     private final TargetCommentRepository targetCommentRepository = Mockito.mock(TargetCommentRepository.class);
     private final MemberValidationHelper memberValidationHelper =
-            new MemberValidationHelper(memberRepository, reportRepository, targetPostRepository, targetCommentRepository);
+            new MemberValidationHelper(memberRepository, memberProfileRepository, reportRepository, targetPostRepository, targetCommentRepository);
 
     @Nested
     @DisplayName("회원의 존재 여부 검증")
@@ -54,7 +52,34 @@ class MemberValidationHelperTest {
             NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> memberValidationHelper.validateIfMemberExists(testMemberId));
             
             // then
-            assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+            assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
+        }
+    }
+
+    @Nested
+    @DisplayName("회원 프로필의 존재 여부 검증")
+    class ValidateIfMemberProfileExistsTest {
+        @Test
+        @DisplayName("회원 프로필이 존재할 때 회원 프로필의 존재 여부 검증")
+        void testValidateIfMemberProfileExists_givenExistedProfile_willReturnNothing() {
+            // given & when
+            given(memberProfileRepository.isIdExist(testMemberId)).willReturn(true);
+
+            // then
+            assertDoesNotThrow(() -> memberValidationHelper.validateIfMemberProfileExists(testMemberId));
+        }
+
+        @Test
+        @DisplayName("회원 프로필이 존재하지 않을 때 회원 프로필의 존재 여부 검증")
+        void testValidateIfMemberProfileExists_givenNotFoundProfile_willThrowException() {
+            // given
+            given(memberProfileRepository.isIdExist(testMemberId)).willReturn(false);
+
+            // when
+            NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> memberValidationHelper.validateIfMemberProfileExists(testMemberId));
+
+            // then
+            assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_PROFILE);
         }
     }
 

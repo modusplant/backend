@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TargetCommentPathTest {
     @Test
     @DisplayName("create으로 대상 댓글 아이디 반환")
-    void testCreate_givenValidValue_willReturnTargetPath() {
+    void testCreate_givenValidValue_willReturnTargetCommentPath() {
         assertNotNull(TargetCommentPath.create(TEST_COMM_COMMENT_PATH).getValue());
     }
 

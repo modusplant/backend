@@ -3,7 +3,7 @@ package kr.modusplant.domains.member.usecase.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import kr.modusplant.domains.member.domain.enums.WithdrawReason;
+import kr.modusplant.domains.member.domain.enums.MemberWithdrawReason;
 
 public record MemberWithdrawRequest(
         @Schema(
@@ -23,7 +23,7 @@ public record MemberWithdrawRequest(
                 example = "UNCOMFORTABLE_TO_USE"
         )
         @NotNull(message = "탈퇴 사유가 비어 있습니다. ")
-        WithdrawReason reason,
+        MemberWithdrawReason reason,
 
         @Schema(
                 description = "의견",

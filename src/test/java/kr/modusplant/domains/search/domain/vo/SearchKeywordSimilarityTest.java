@@ -8,7 +8,7 @@ import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUti
 import static kr.modusplant.domains.search.common.constant.SearchDoubleConstant.TEST_SEARCH_KEYWORD_SIMILARITY_0_6;
 import static kr.modusplant.domains.search.common.constant.SearchDoubleConstant.TEST_SEARCH_KEYWORD_SIMILARITY_0_8;
 import static kr.modusplant.domains.search.common.util.domain.vo.SearchKeywordSimilarityTestUtils.*;
-import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.NOT_FOUND_SEARCH_POST_IMPORTANCE;
+import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.NOT_FOUND_SEARCH_POST_SIMILARITY;
 import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.SEARCH_KEYWORD_SIMILARITY_OUT_OF_RANGE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -81,7 +81,7 @@ class SearchKeywordSimilarityTest {
         InvalidValueException exception = assertThrows(InvalidValueException.class, emptySimilarity::getValueIfNotEmpty);
 
         // then
-        assertThat(exception.getErrorCode()).isEqualTo(NOT_FOUND_SEARCH_POST_IMPORTANCE);
+        assertThat(exception.getErrorCode()).isEqualTo(NOT_FOUND_SEARCH_POST_SIMILARITY);
     }
 
     @Test

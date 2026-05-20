@@ -5,18 +5,18 @@ import kr.modusplant.shared.exception.EmptyValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.domains.member.common.util.domain.entity.ReportImageTestUtils.testReportImage1;
+import static kr.modusplant.domains.member.common.util.domain.entity.ReportImageTestUtils.testProposalOrBugReportImage1;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportImageBytesTestUtils.testReportImageBytes1;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportImageBytesTestUtils.testReportImageBytes3;
-import static kr.modusplant.domains.member.common.util.domain.vo.ReportImageFileNameTestUtils.testReportImageFileName1;
-import static kr.modusplant.domains.member.common.util.domain.vo.ReportImageFileNameTestUtils.testReportImageFileName3;
+import static kr.modusplant.domains.member.common.util.domain.vo.ReportImageFileNameTestUtils.testProposalOrBugReportImageFileName1;
+import static kr.modusplant.domains.member.common.util.domain.vo.ReportImageFileNameTestUtils.testProposalOrBugReportImageFileName3;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportImagePathTestUtils.testReportImagePath1;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportImagePathTestUtils.testReportImagePath3;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-class ReportImageTest {
+class ProposalOrBugReportImageTest {
     @DisplayName("null 값으로 create 호출")
     @Test
     void testCreate_givenNullToOneOfTwoParameters_willThrowException() {
@@ -24,7 +24,7 @@ class ReportImageTest {
         // given
         EmptyValueException emptyReportImagePathException =
                 assertThrows(EmptyValueException.class,
-                        () -> ReportImage.create(null, testReportImageFileName1, testReportImageBytes1));
+                        () -> ProposalOrBugReportImage.create(null, testProposalOrBugReportImageFileName1, testReportImageBytes1));
 
         // when & then
         assertThat(emptyReportImagePathException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_REPORT_IMAGE_PATH);
@@ -33,7 +33,7 @@ class ReportImageTest {
         // given
         EmptyValueException emptyReportImageFileNameException =
                 assertThrows(EmptyValueException.class,
-                        () -> ReportImage.create(testReportImagePath1, null, testReportImageBytes1));
+                        () -> ProposalOrBugReportImage.create(testReportImagePath1, null, testReportImageBytes1));
 
         // when & then
         assertThat(emptyReportImageFileNameException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_REPORT_IMAGE_FILE_NAME);
@@ -42,7 +42,7 @@ class ReportImageTest {
         // given
         EmptyValueException emptyReportImageBytesException =
                 assertThrows(EmptyValueException.class,
-                        () -> ReportImage.create(testReportImagePath1, testReportImageFileName1, null));
+                        () -> ProposalOrBugReportImage.create(testReportImagePath1, testProposalOrBugReportImageFileName1, null));
 
         // when & then
         assertThat(emptyReportImageBytesException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_REPORT_IMAGE_BYTES);
@@ -52,26 +52,26 @@ class ReportImageTest {
     @DisplayName("같은 객체에 대한 equals 호출")
     void testEquals_givenSameObject_willReturnTrue() {
         //noinspection EqualsWithItself
-        assertEquals(testReportImage1, testReportImage1);
+        assertEquals(testProposalOrBugReportImage1, testProposalOrBugReportImage1);
     }
 
     @Test
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
-        assertNotEquals(testReportImage1, testMemberId);
+        assertNotEquals(testProposalOrBugReportImage1, testMemberId);
     }
 
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
-        assertNotEquals(testReportImage1,
-                ReportImage.create(testReportImagePath3, testReportImageFileName3, testReportImageBytes3));
+        assertNotEquals(testProposalOrBugReportImage1,
+                ProposalOrBugReportImage.create(testReportImagePath3, testProposalOrBugReportImageFileName3, testReportImageBytes3));
     }
 
     @Test
     @DisplayName("같은 객체에 대한 hashcode 동일성 보장")
     void testHashCode_givenSameObject_willReturnSameHashCode() {
-        assertEquals(testReportImage1.hashCode(), testReportImage1.hashCode());
+        assertEquals(testProposalOrBugReportImage1.hashCode(), testProposalOrBugReportImage1.hashCode());
     }
 }

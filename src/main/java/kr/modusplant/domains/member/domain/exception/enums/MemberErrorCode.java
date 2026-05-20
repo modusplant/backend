@@ -41,16 +41,22 @@ public enum MemberErrorCode implements ErrorCode {
     REPORT_CONTENT_OVER_LENGTH(HttpStatus.BAD_REQUEST.value(), "report_content_over_length", "보고서 컨텐츠가 허용되는 길이를 초과하였습니다. "),
     REPORT_TITLE_OVER_LENGTH(HttpStatus.BAD_REQUEST.value(), "report_title_over_length", "보고서 제목이 허용되는 길이를 초과하였습니다. "),
 
+    MISMATCHED_AUTH_INFO(HttpStatus.BAD_REQUEST.value(), "mismatched_auth_info", "인증 정보가 올바르지 않습니다. "),
     MISMATCHED_REPORT_IMAGE_SIZE(HttpStatus.BAD_REQUEST.value(), "mismatched_report_image_size", "보고서 이미지 개수가 올바르지 않습니다. "),
 
     NOT_ACCESSIBLE_POST_BOOKMARK(HttpStatus.BAD_REQUEST.value(), "not_accessible_post_bookmark", "대상 게시글에 대한 북마크 기능을 이용할 수 없습니다. "),
     NOT_ACCESSIBLE_POST_LIKE(HttpStatus.BAD_REQUEST.value(), "not_accessible_post_like", "대상 게시글에 대한 좋아요 기능을 이용할 수 없습니다. "),
     NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE(HttpStatus.BAD_REQUEST.value(), "not_accessible_post_report_for_abuse", "대상 게시글에 대한 신고 기능을 이용할 수 없습니다. "),
 
-    NOT_FOUND_MEMBER_ID(HttpStatus.BAD_REQUEST.value(), "not_found_member_id", "회원 아이디를 찾을 수 없습니다. "),
+    NOT_FOUND_MEMBER(HttpStatus.BAD_REQUEST.value(), "not_found_member_id", "회원 아이디를 찾을 수 없습니다. "),
+    NOT_FOUND_MEMBER_PROFILE(HttpStatus.BAD_REQUEST.value(), "not_found_member_profile", "회원 프로필을 찾을 수 없습니다. "),
     NOT_FOUND_REPORT_ID(HttpStatus.BAD_REQUEST.value(), "not_found_report_id", "보고서 식별자를 찾을 수 없습니다. "),
     NOT_FOUND_TARGET_POST_ID(HttpStatus.BAD_REQUEST.value(), "not_found_target_post_id", "대상 게시글 아이디를 찾을 수 없습니다. "),
-    NOT_FOUND_TARGET_COMMENT_ID(HttpStatus.BAD_REQUEST.value(), "not_found_target_comment_id", "대상 댓글 아이디를 찾을 수 없습니다. ");
+    NOT_FOUND_TARGET_COMMENT_ID(HttpStatus.BAD_REQUEST.value(), "not_found_target_comment_id", "대상 댓글 아이디를 찾을 수 없습니다. "),
+
+    NOT_FOUND_PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER(HttpStatus.INTERNAL_SERVER_ERROR.value(), "not_found_proposal_or_bug_image_number", "건의 및 버그 제보 이미지 개수를 찾을 수 없습니다. "),
+
+    PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER_OUT_OF_RANGE(HttpStatus.INTERNAL_SERVER_ERROR.value(), "proposal_or_bug_report_image_number_out_of_range", "건의 및 버그 제보 이미지 개수가 올바른 값의 범위를 벗어났습니다. ");
 
     private final int httpStatus;
     private final String code;

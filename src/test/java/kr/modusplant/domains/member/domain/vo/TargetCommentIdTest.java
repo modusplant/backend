@@ -13,6 +13,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TargetCommentIdTest {
+    @Test
+    @DisplayName("create으로 타겟 댓글 ID 반환")
+    void testCreate_givenValidValue_willReturnTargetCommentId() {
+        assertThat(TargetCommentId.create(testTargetPostId, testTargetCommentPath)).isEqualTo(TargetCommentId.create(testTargetPostId, testTargetCommentPath));
+    }
+
     @DisplayName("null 값으로 create 호출")
     @Test
     void testCreate_givenNullToOneOfTwoParameters_willThrowException() {

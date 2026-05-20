@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
+import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberWithdrawOpinion;
 import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,28 +10,28 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.MEMBER_PROFILE_INTRODUCTION_OVER_LENGTH;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.MEMBER_WITHDRAW_OPINION_OVER_LENGTH;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class MemberProfileIntroduction {
+public class MemberWithdrawOpinion {
     private final String value;
 
-    public static MemberProfileIntroduction create(String value) {
+    public static MemberWithdrawOpinion create(String value) {
         if (StringUtils.isBlank(value)) {
-            return EmptyMemberProfileIntroduction.create();
-        } else if (value.length() > 60) {
-            throw new InvalidValueException(MEMBER_PROFILE_INTRODUCTION_OVER_LENGTH, "memberProfileIntroduction");
+            return EmptyMemberWithdrawOpinion.create();
+        } else if (value.length() > 600) {
+            throw new InvalidValueException(MEMBER_WITHDRAW_OPINION_OVER_LENGTH, "memberWithdrawalOpinion");
         }
-        return new MemberProfileIntroduction(value);
+        return new MemberWithdrawOpinion(value);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof MemberProfileIntroduction memberProfileIntroduction)) return false;
+        if (!(o instanceof MemberWithdrawOpinion memberProfileIntroduction)) return false;
 
         return new EqualsBuilder().append(getValue(), memberProfileIntroduction.getValue()).isEquals();
     }

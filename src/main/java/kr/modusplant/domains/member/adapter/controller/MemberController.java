@@ -5,13 +5,10 @@ import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.adapter.translator.MemberSocialTranslator;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
+import kr.modusplant.domains.member.domain.aggregate.ProposalOrBugReport;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
-import kr.modusplant.domains.member.domain.entity.ReportImage;
-import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileImage;
-import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
+import kr.modusplant.domains.member.domain.entity.ProposalOrBugReportImage;
 import kr.modusplant.domains.member.domain.vo.*;
-import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
-import kr.modusplant.domains.member.domain.vo.nullobject.EmptyReportImageBytes;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.*;
@@ -20,19 +17,16 @@ import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.service.SwearService;
-import kr.modusplant.shared.event.*;
-import kr.modusplant.shared.exception.InvalidFileInputException;
+import kr.modusplant.shared.event.CommentLikeNotificationEvent;
+import kr.modusplant.shared.event.PostLikeNotificationEvent;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
-import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
-import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,46 +69,37 @@ public class MemberController {
     public MemberProfileResponse getProfile(MemberProfileGetRecord record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         memberValidationHelper.validateIfMemberExists(memberId);
+        memberValidationHelper.validateIfMemberProfileExists(memberId);
 
-        Optional<MemberProfile> optionalMemberProfile = memberProfileRepository.getById(memberId);
-        if (optionalMemberProfile.isPresent()) {
-            return memberProfileMapper.toMemberProfileResponse(optionalMemberProfile.orElseThrow());
-        } else {
-            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE, "memberProfile");
-        }
+        MemberProfile memberProfile = memberProfileRepository.getById(memberId);
+        return memberProfileMapper.toMemberProfileResponse(memberProfile);
     }
 
     public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Nickname memberNickname = Nickname.create(record.nickname());
-        MemberProfile memberProfile;
-        MemberProfileImage memberProfileImage;
-        MemberProfileIntroduction memberProfileIntroduction;
-        MultipartFile image = record.image();
-        String introduction = record.introduction();
         validateBeforeOverrideProfile(memberId, memberNickname);
 
-        Optional<MemberProfile> optionalMemberProfile = memberProfileRepository.getById(memberId);
-        if (optionalMemberProfile.isPresent()) {
-            memberImageIOHelper.deleteImage(optionalMemberProfile.orElseThrow().getMemberProfileImage());
-        } else {
-            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE, "memberProfile");
-        }
+        MemberProfile memberProfile = memberProfileRepository.getById(memberId);
+        memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
+
+        MultipartFile image = record.image();
+        String newImagePath = null;
+        byte[] newImageBytes = null;
         if (!(image == null)) {
-            String newImagePath = memberImageIOHelper.uploadImage(memberId, record);
-            memberProfileImage = MemberProfileImage.create(
-                    MemberProfileImagePath.create(newImagePath),
-                    MemberProfileImageBytes.create(image.getBytes())
-            );
-        } else {
-            memberProfileImage = EmptyMemberProfileImage.create();
+            newImagePath = memberImageIOHelper.uploadImage(memberId, record);
+            newImageBytes = image.getBytes();
         }
+        MemberProfileImage memberProfileImage = MemberProfileImage.create(
+                MemberProfileImagePath.create(newImagePath),
+                MemberProfileImageBytes.create(newImageBytes)
+        );
+
+        String introduction = record.introduction();
         if (!(introduction == null)) {
             introduction = swearService.filterSwear(introduction);
-            memberProfileIntroduction = MemberProfileIntroduction.create(introduction);
-        } else {
-            memberProfileIntroduction = EmptyMemberProfileIntroduction.create();
         }
+        MemberProfileIntroduction memberProfileIntroduction = MemberProfileIntroduction.create(introduction);
         memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
         return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile));
     }
@@ -125,8 +110,7 @@ public class MemberController {
         validateBeforeLikePost(memberId, targetPostId);
 
         if (targetPostRepository.isUnliked(memberId, targetPostId)) {
-            applicationEventPublisher.publishEvent(
-                    PostLikeEvent.create(memberId.getValue(), targetPostId.getValue()));
+            targetPostRepository.like(memberId, targetPostId);
             applicationEventPublisher.publishEvent(
                     PostLikeNotificationEvent.create(memberId.getValue(), targetPostId.getValue()));
         }
@@ -138,8 +122,7 @@ public class MemberController {
         validateBeforeUnlikePost(memberId, targetPostId);
 
         if (targetPostRepository.isLiked(memberId, targetPostId)) {
-            applicationEventPublisher.publishEvent(
-                    PostUnlikeEvent.create(memberId.getValue(), targetPostId.getValue()));
+            targetPostRepository.unlike(memberId, targetPostId);
         }
     }
 
@@ -149,8 +132,7 @@ public class MemberController {
         validateBeforeBookmarkOrCancelPostBookmark(memberId, targetPostId);
 
         if (targetPostRepository.isNotBookmarked(memberId, targetPostId)) {
-            applicationEventPublisher.publishEvent(
-                    PostBookmarkEvent.create(memberId.getValue(), targetPostId.getValue()));
+            targetPostRepository.bookmark(memberId, targetPostId);
         }
     }
 
@@ -160,8 +142,7 @@ public class MemberController {
         validateBeforeBookmarkOrCancelPostBookmark(memberId, targetPostId);
 
         if (targetPostRepository.isBookmarked(memberId, targetPostId)) {
-            applicationEventPublisher.publishEvent(
-                    PostBookmarkCancelEvent.create(memberId.getValue(), targetPostId.getValue()));
+            targetPostRepository.cancelBookmark(memberId, targetPostId);
         }
     }
 
@@ -173,11 +154,7 @@ public class MemberController {
         memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
 
         if (targetCommentRepository.isUnliked(memberId, targetCommentId)) {
-            applicationEventPublisher.publishEvent(
-                    CommentLikeEvent.create(
-                            memberId.getValue(),
-                            targetCommentId.getTargetPostId().getValue(),
-                            targetCommentId.getTargetCommentPath().getValue()));
+            targetCommentRepository.like(memberId, targetCommentId);
             applicationEventPublisher.publishEvent(
                     CommentLikeNotificationEvent.create(
                             memberId.getValue(),
@@ -196,11 +173,7 @@ public class MemberController {
         memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
 
         if (targetCommentRepository.isLiked(memberId, targetCommentId)) {
-            applicationEventPublisher.publishEvent(
-                    CommentUnlikeEvent.create(
-                            memberId.getValue(),
-                            targetCommentId.getTargetPostId().getValue(),
-                            targetCommentId.getTargetCommentPath().getValue()));
+            targetCommentRepository.unlike(memberId, targetCommentId);
         }
     }
 
@@ -211,34 +184,34 @@ public class MemberController {
         ReportContent reportContent = ReportContent.create(record.content());
         List<MultipartFile> images = record.images();
         Integer imageNumber = record.imageNumber();
-        memberValidationHelper.validateIfMemberExists(memberId);
-        validateBeforeReportProposalOrBug(images, imageNumber);
+        validateBeforeReportProposalOrBug(memberId, images, imageNumber);
 
-        List<ReportImage> reportImages;
+        List<ProposalOrBugReportImage> proposalOrBugReportImages;
         if (imageNumber == null) {
-            reportImages = List.of();
+            proposalOrBugReportImages = List.of();
         } else {
             List<ReportImagePath> reportImagePaths =
                     memberImageIOHelper.uploadImage(memberId, reportId, images)
                             .stream()
                             .map(ReportImagePath::create).toList();
-            List<ReportImageFileName> reportImageFileNames =
-                    images.stream().map(element -> ReportImageFileName.create(element.getOriginalFilename())).toList();
-            reportImages = new ArrayList<>();
+
+            List<ProposalOrBugReportImageFileName> proposalOrBugReportImageFileNames =
+                    images.stream().map(element -> ProposalOrBugReportImageFileName.create(element.getOriginalFilename())).toList();
+
+            proposalOrBugReportImages = new ArrayList<>();
             for (int i = 0; i < imageNumber; i++){
-                reportImages.add(
-                        ReportImage.create(
-                                reportImagePaths.get(i), reportImageFileNames.get(i), EmptyReportImageBytes.create()));
+                proposalOrBugReportImages.add(
+                        ProposalOrBugReportImage.create(
+                                reportImagePaths.get(i),
+                                proposalOrBugReportImageFileNames.get(i),
+                                ReportImageBytes.create(null)));
             }
         }
-        applicationEventPublisher.publishEvent(
-                ProposalOrBugReportEvent.create(
-                        memberId.getValue(),
-                        reportId.getValue(),
-                        reportTitle.getValue(),
-                        reportContent.getValue(),
-                        reportImages.stream().map(element -> element.getReportImageFileName().getFileName()).toList(),
-                        reportImages.stream().map(element -> element.getReportImagePath().getValue()).toList()
+
+        reportRepository.reportProposalOrBug(
+                memberId,
+                ProposalOrBugReport.create(
+                        reportId, reportTitle, reportContent, proposalOrBugReportImages
                 ));
     }
 
@@ -247,8 +220,7 @@ public class MemberController {
         TargetPostId targetPostId = TargetPostId.create(record.postUlid());
         validateBeforeReportPostAbuse(memberId, targetPostId);
 
-        applicationEventPublisher.publishEvent(
-                PostAbuseReportEvent.create(memberId.getValue(), record.postUlid()));
+        reportRepository.reportPostAbuse(memberId, targetPostId);
     }
 
     public void reportCommentAbuse(CommentAbuseReportRecord record) {
@@ -257,8 +229,7 @@ public class MemberController {
                 TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
         validateBeforeReportCommentAbuse(memberId, targetCommentId);
 
-        applicationEventPublisher.publishEvent(
-                CommentAbuseReportEvent.create(memberId.getValue(), record.postUlid(), record.path()));
+        reportRepository.reportCommentAbuse(memberId, targetCommentId);
     }
 
     public void withdraw(MemberWithdrawalRecord record) {
@@ -266,7 +237,7 @@ public class MemberController {
         String authCode = record.authCode();
         String authProvider = record.authProvider();
         MemberId memberId = MemberId.fromUuid(jwtTokenProvider.getMemberUuidFromToken(accessToken));
-        validateBeforeWithdraw(record, memberId, authCode, authProvider);
+        validateBeforeWithdraw(memberId, authCode, authProvider);
 
         if (authCode != null && authProvider != null) {
             memberSocialTranslator.deleteSocialAccountWithSocialAccessToken(
@@ -275,18 +246,17 @@ public class MemberController {
                     memberId.getValue());
         }
         tokenService.blacklistAccessToken(accessToken);
-        applicationEventPublisher.publishEvent(
-                MemberWithdrawalEvent.create(memberId.getValue(), record.reason().name(), record.opinion()));
+        memberRepository.withdraw(memberId, record.reason(), MemberWithdrawOpinion.create(record.opinion()));
     }
 
-    private void validateBeforeOverrideProfile(MemberId memberId, Nickname memberNickname) {
+    private void validateBeforeOverrideProfile(MemberId memberId, Nickname nickname) {
         memberValidationHelper.validateIfMemberExists(memberId);
-        if (swearService.isSwearContained(memberNickname.getValue())) {
+        if (swearService.isSwearContained(nickname.getValue())) {
             throw new SwearContainedException();
         }
-        Optional<Member> emptyOrMember = memberRepository.getByNickname(memberNickname);
+        Optional<Member> emptyOrMember = memberRepository.getByNickname(nickname);
         if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
-            throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "memberNickname");
+            throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "nickname");
         }
     }
 
@@ -314,21 +284,12 @@ public class MemberController {
         }
     }
 
-    private void validateBeforeReportProposalOrBug(List<MultipartFile> images, Integer imageNumber) {
+    private void validateBeforeReportProposalOrBug(MemberId memberId, List<MultipartFile> images, Integer imageNumber) {
+        memberValidationHelper.validateIfMemberExists(memberId);
         if ((images == null && imageNumber != null) || (images != null && imageNumber == null)) {
             throw new InvalidValueException(MISMATCHED_REPORT_IMAGE_SIZE, List.of("images", "imageNumber"));
         } else if (images != null && images.size() != imageNumber) {
             throw new InvalidValueException(MISMATCHED_REPORT_IMAGE_SIZE, List.of("images", "imageNumber"));
-        } else if (images != null) {
-            for (int i = 0; i < imageNumber; i++) {
-                String originalFilename = images.get(i).getOriginalFilename();
-                if (StringUtils.isBlank(originalFilename)) {
-                    throw new InvalidFileInputException();
-                } else if (!originalFilename.contains("image_" + i)) {  // 파일 이름은 image_0.확장자 ~ image_2.확장자로 강제
-                    log.error(originalFilename);
-                    throw new InvalidValueException(INVALID_REPORT_IMAGE_NAME, "originalFilename");
-                }
-            }
         }
     }
 
@@ -352,13 +313,10 @@ public class MemberController {
         }
     }
 
-    private void validateBeforeWithdraw(MemberWithdrawalRecord record, MemberId memberId, String authCode, String authProvider) {
+    private void validateBeforeWithdraw(MemberId memberId, String authCode, String authProvider) {
         memberValidationHelper.validateIfMemberExists(memberId);
-        if (record.opinion().length() > 600) {
-            throw new InvalidValueException(MemberErrorCode.MEMBER_WITHDRAW_OPINION_OVER_LENGTH, "opinion");
-        }
         if ((authCode != null && authProvider == null) || (authCode == null && authProvider != null)) {
-            throw new InvalidValueException(GeneralErrorCode.INVALID_INPUT, List.of("authCode", "authProvider"));
+            throw new InvalidValueException(MISMATCHED_AUTH_INFO, List.of("authCode", "authProvider"));
         }
     }
 }
