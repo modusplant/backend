@@ -9,29 +9,29 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EMPTY_TARGET_COMMENT_PATH;
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.INVALID_TARGET_COMMENT_PATH;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EMPTY_ACTIVITY_SUBJECT_COMMENT_PATH;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.INVALID_ACTIVITY_SUBJECT_COMMENT_PATH;
 import static kr.modusplant.shared.constant.Regex.PATTERN_MATERIALIZED_PATH;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class TargetCommentPath {
+public class ActivitySubjectCommentPath {
     private final String value;
 
-    public static TargetCommentPath create(String value) {
+    public static ActivitySubjectCommentPath create(String value) {
         if (StringUtils.isBlank(value)) {
-            throw new EmptyValueException(EMPTY_TARGET_COMMENT_PATH, "targetCommentPath");
+            throw new EmptyValueException(EMPTY_ACTIVITY_SUBJECT_COMMENT_PATH, "activitySubjectCommentPath");
         } else if (!PATTERN_MATERIALIZED_PATH.matcher(value).matches()) {
-            throw new InvalidValueException(INVALID_TARGET_COMMENT_PATH, "targetCommentPath");
+            throw new InvalidValueException(INVALID_ACTIVITY_SUBJECT_COMMENT_PATH, "activitySubjectCommentPath");
         }
-        return new TargetCommentPath(value);
+        return new ActivitySubjectCommentPath(value);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof TargetCommentPath memberId)) return false;
+        if (!(o instanceof ActivitySubjectCommentPath memberId)) return false;
 
         return new EqualsBuilder().append(getValue(), memberId.getValue()).isEquals();
     }

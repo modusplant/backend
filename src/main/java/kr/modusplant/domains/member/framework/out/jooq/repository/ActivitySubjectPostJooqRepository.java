@@ -11,7 +11,7 @@ import static kr.modusplant.jooq.Tables.COMM_POST_LIKE;
 
 @Repository
 @RequiredArgsConstructor
-public class TargetPostJooqRepository {
+public class ActivitySubjectPostJooqRepository {
     private final DSLContext dsl;
 
     public List<String> getPostIdsLikedByMemberId(UUID memberId) {

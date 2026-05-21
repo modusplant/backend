@@ -13,137 +13,137 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
-import static kr.modusplant.domains.member.common.util.domain.vo.TargetPostIdTestUtils.testTargetPostId;
+import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectPostIdTestUtils.testActivitySubjectPostId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-class TargetPostRepositoryJpaAdapterTest implements PostEntityTestUtils {
+class ActivitySubjectPostRepositoryJpaAdapterTest implements PostEntityTestUtils {
     PostJpaRepository postJpaRepository = Mockito.mock(PostJpaRepository.class);
     PostLikeJpaRepository postLikeJpaRepository = Mockito.mock(PostLikeJpaRepository.class);
     PostBookmarkJpaRepository postBookmarkJpaRepository = Mockito.mock(PostBookmarkJpaRepository.class);
-    TargetPostRepositoryJpaAdapter targetPostIdRepositoryJpaAdapter = new TargetPostRepositoryJpaAdapter(postJpaRepository, postLikeJpaRepository, postBookmarkJpaRepository);
+    ActivitySubjectPostRepositoryJpaAdapter activitySubjectPostIdRepositoryJpaAdapter = new ActivitySubjectPostRepositoryJpaAdapter(postJpaRepository, postLikeJpaRepository, postBookmarkJpaRepository);
 
     @Test
     @DisplayName("isIdExist로 true 반환")
     void testIsIdExist_givenIdThatExists_willReturnTrue() {
         // given & when
-        given(postJpaRepository.existsByUlid(testTargetPostId.getValue())).willReturn(true);
+        given(postJpaRepository.existsByUlid(testActivitySubjectPostId.getValue())).willReturn(true);
 
         // when & then
-        assertThat(targetPostIdRepositoryJpaAdapter.isIdExist(testTargetPostId)).isEqualTo(true);
+        assertThat(activitySubjectPostIdRepositoryJpaAdapter.isIdExist(testActivitySubjectPostId)).isEqualTo(true);
     }
 
     @Test
     @DisplayName("isIdExist로 false 반환")
     void testIsIdExist_givenIdThatIsNotExist_willReturnFalse() {
         // given & when
-        given(postJpaRepository.existsByUlid(testTargetPostId.getValue())).willReturn(false);
+        given(postJpaRepository.existsByUlid(testActivitySubjectPostId.getValue())).willReturn(false);
 
         // when & then
-        assertThat(targetPostIdRepositoryJpaAdapter.isIdExist(testTargetPostId)).isEqualTo(false);
+        assertThat(activitySubjectPostIdRepositoryJpaAdapter.isIdExist(testActivitySubjectPostId)).isEqualTo(false);
     }
 
     @Test
     @DisplayName("isPublished로 true 반환")
     void testIsPublished_givenIdThatIsPublished_willReturnTrue() {
         // given & when
-        given(postJpaRepository.findByUlid(testTargetPostId.getValue())).willReturn(Optional.of(createPostEntityBuilder().build()));
+        given(postJpaRepository.findByUlid(testActivitySubjectPostId.getValue())).willReturn(Optional.of(createPostEntityBuilder().build()));
 
         // when & then
-        assertThat(targetPostIdRepositoryJpaAdapter.isPublished(testTargetPostId)).isEqualTo(true);
+        assertThat(activitySubjectPostIdRepositoryJpaAdapter.isPublished(testActivitySubjectPostId)).isEqualTo(true);
     }
 
     @Test
     @DisplayName("isPublished로 false 반환")
     void testIsPublished_givenIdThatIsNotPublished_willReturnFalse() {
         // given & when
-        given(postJpaRepository.findByUlid(testTargetPostId.getValue())).willReturn(Optional.of(createPostEntityBuilder().isPublished(false).build()));
+        given(postJpaRepository.findByUlid(testActivitySubjectPostId.getValue())).willReturn(Optional.of(createPostEntityBuilder().isPublished(false).build()));
 
         // when & then
-        assertThat(targetPostIdRepositoryJpaAdapter.isPublished(testTargetPostId)).isEqualTo(false);
+        assertThat(activitySubjectPostIdRepositoryJpaAdapter.isPublished(testActivitySubjectPostId)).isEqualTo(false);
     }
 
     @Test
     @DisplayName("isLiked로 true 반환")
     void testIsLiked_givenIdThatExists_willReturnTrue() {
         // given & when
-        given(postLikeJpaRepository.existsByPostIdAndMemberId(testTargetPostId.getValue(), testMemberId.getValue())).willReturn(true);
+        given(postLikeJpaRepository.existsByPostIdAndMemberId(testActivitySubjectPostId.getValue(), testMemberId.getValue())).willReturn(true);
 
         // when & then
-        assertThat(targetPostIdRepositoryJpaAdapter.isLiked(testMemberId, testTargetPostId)).isEqualTo(true);
+        assertThat(activitySubjectPostIdRepositoryJpaAdapter.isLiked(testMemberId, testActivitySubjectPostId)).isEqualTo(true);
     }
 
     @Test
     @DisplayName("isLiked로 false 반환")
     void testIsLiked_givenIdThatIsNotExist_willReturnFalse() {
         // given & when
-        given(postLikeJpaRepository.existsByPostIdAndMemberId(testTargetPostId.getValue(), testMemberId.getValue())).willReturn(false);
+        given(postLikeJpaRepository.existsByPostIdAndMemberId(testActivitySubjectPostId.getValue(), testMemberId.getValue())).willReturn(false);
 
         // when & then
-        assertThat(targetPostIdRepositoryJpaAdapter.isLiked(testMemberId, testTargetPostId)).isEqualTo(false);
+        assertThat(activitySubjectPostIdRepositoryJpaAdapter.isLiked(testMemberId, testActivitySubjectPostId)).isEqualTo(false);
     }
 
     @Test
     @DisplayName("isUnliked로 true 반환")
     void testIsUnliked_givenIdThatExists_willReturnTrue() {
         // given & when
-        given(postLikeJpaRepository.existsByPostIdAndMemberId(testTargetPostId.getValue(), testMemberId.getValue())).willReturn(true);
+        given(postLikeJpaRepository.existsByPostIdAndMemberId(testActivitySubjectPostId.getValue(), testMemberId.getValue())).willReturn(true);
 
         // when & then
-        assertThat(targetPostIdRepositoryJpaAdapter.isUnliked(testMemberId, testTargetPostId)).isEqualTo(false);
+        assertThat(activitySubjectPostIdRepositoryJpaAdapter.isUnliked(testMemberId, testActivitySubjectPostId)).isEqualTo(false);
     }
 
     @Test
     @DisplayName("isUnliked로 false 반환")
     void testIsUnliked_givenIdThatIsNotExist_willReturnFalse() {
         // given & when
-        given(postLikeJpaRepository.existsByPostIdAndMemberId(testTargetPostId.getValue(), testMemberId.getValue())).willReturn(false);
+        given(postLikeJpaRepository.existsByPostIdAndMemberId(testActivitySubjectPostId.getValue(), testMemberId.getValue())).willReturn(false);
 
         // when & then
-        assertThat(targetPostIdRepositoryJpaAdapter.isUnliked(testMemberId, testTargetPostId)).isEqualTo(true);
+        assertThat(activitySubjectPostIdRepositoryJpaAdapter.isUnliked(testMemberId, testActivitySubjectPostId)).isEqualTo(true);
     }
 
     @Test
     @DisplayName("isBookmarked로 true 반환")
     void testIsBookmarked_givenIdThatExists_willReturnTrue() {
         // given & when
-        given(postBookmarkJpaRepository.existsByPostIdAndMemberId(testTargetPostId.getValue(), testMemberId.getValue())).willReturn(true);
+        given(postBookmarkJpaRepository.existsByPostIdAndMemberId(testActivitySubjectPostId.getValue(), testMemberId.getValue())).willReturn(true);
 
         // when & then
-        assertThat(targetPostIdRepositoryJpaAdapter.isBookmarked(testMemberId, testTargetPostId)).isEqualTo(true);
+        assertThat(activitySubjectPostIdRepositoryJpaAdapter.isBookmarked(testMemberId, testActivitySubjectPostId)).isEqualTo(true);
     }
 
     @Test
     @DisplayName("isLiked로 false 반환")
     void testIsBookmarked_givenIdThatIsNotExist_willReturnFalse() {
         // given & when
-        given(postBookmarkJpaRepository.existsByPostIdAndMemberId(testTargetPostId.getValue(), testMemberId.getValue())).willReturn(false);
+        given(postBookmarkJpaRepository.existsByPostIdAndMemberId(testActivitySubjectPostId.getValue(), testMemberId.getValue())).willReturn(false);
 
         // when & then
-        assertThat(targetPostIdRepositoryJpaAdapter.isBookmarked(testMemberId, testTargetPostId)).isEqualTo(false);
+        assertThat(activitySubjectPostIdRepositoryJpaAdapter.isBookmarked(testMemberId, testActivitySubjectPostId)).isEqualTo(false);
     }
 
     @Test
     @DisplayName("isUnliked로 true 반환")
     void testIsNotBookmarked_givenIdThatExists_willReturnTrue() {
         // given & when
-        given(postBookmarkJpaRepository.existsByPostIdAndMemberId(testTargetPostId.getValue(), testMemberId.getValue())).willReturn(true);
+        given(postBookmarkJpaRepository.existsByPostIdAndMemberId(testActivitySubjectPostId.getValue(), testMemberId.getValue())).willReturn(true);
 
         // when & then
-        assertThat(targetPostIdRepositoryJpaAdapter.isNotBookmarked(testMemberId, testTargetPostId)).isEqualTo(false);
+        assertThat(activitySubjectPostIdRepositoryJpaAdapter.isNotBookmarked(testMemberId, testActivitySubjectPostId)).isEqualTo(false);
     }
 
     @Test
     @DisplayName("isUnliked로 false 반환")
     void testIsNotBookmarked_givenIdThatIsNotExist_willReturnFalse() {
         // given & when
-        given(postBookmarkJpaRepository.existsByPostIdAndMemberId(testTargetPostId.getValue(), testMemberId.getValue())).willReturn(false);
+        given(postBookmarkJpaRepository.existsByPostIdAndMemberId(testActivitySubjectPostId.getValue(), testMemberId.getValue())).willReturn(false);
 
         // when & then
-        assertThat(targetPostIdRepositoryJpaAdapter.isNotBookmarked(testMemberId, testTargetPostId)).isEqualTo(true);
+        assertThat(activitySubjectPostIdRepositoryJpaAdapter.isNotBookmarked(testMemberId, testActivitySubjectPostId)).isEqualTo(true);
     }
 
     @Test
@@ -154,7 +154,7 @@ class TargetPostRepositoryJpaAdapterTest implements PostEntityTestUtils {
         given(postJpaRepository.findByUlid(any())).willReturn(Optional.of(mockPost));
 
         // when
-        targetPostIdRepositoryJpaAdapter.like(testMemberId, testTargetPostId);
+        activitySubjectPostIdRepositoryJpaAdapter.like(testMemberId, testActivitySubjectPostId);
 
         // then
         verify(postLikeJpaRepository, times(1)).save(any(PostLikeEntity.class));
@@ -168,7 +168,7 @@ class TargetPostRepositoryJpaAdapterTest implements PostEntityTestUtils {
         given(postJpaRepository.findByUlid(any())).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> targetPostIdRepositoryJpaAdapter.like(testMemberId, testTargetPostId));
+        assertThrows(NoSuchElementException.class, () -> activitySubjectPostIdRepositoryJpaAdapter.like(testMemberId, testActivitySubjectPostId));
 
         // then
         verify(postLikeJpaRepository, times(1)).save(any(PostLikeEntity.class));
@@ -182,7 +182,7 @@ class TargetPostRepositoryJpaAdapterTest implements PostEntityTestUtils {
         given(postJpaRepository.findByUlid(any())).willReturn(Optional.of(mockPost));
 
         // when
-        targetPostIdRepositoryJpaAdapter.unlike(testMemberId, testTargetPostId);
+        activitySubjectPostIdRepositoryJpaAdapter.unlike(testMemberId, testActivitySubjectPostId);
 
         // then
         verify(postLikeJpaRepository, times(1)).delete(any(PostLikeEntity.class));
@@ -196,7 +196,7 @@ class TargetPostRepositoryJpaAdapterTest implements PostEntityTestUtils {
         given(postJpaRepository.findByUlid(any())).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> targetPostIdRepositoryJpaAdapter.unlike(testMemberId, testTargetPostId));
+        assertThrows(NoSuchElementException.class, () -> activitySubjectPostIdRepositoryJpaAdapter.unlike(testMemberId, testActivitySubjectPostId));
 
         // then
         verify(postLikeJpaRepository, times(1)).delete(any(PostLikeEntity.class));
@@ -206,7 +206,7 @@ class TargetPostRepositoryJpaAdapterTest implements PostEntityTestUtils {
     @DisplayName("bookmark 실행 시 게시글 북마크 정상 저장")
     void testBookmark_givenValidData_willSaveBookmark() {
         // given & when
-        targetPostIdRepositoryJpaAdapter.bookmark(testMemberId, testTargetPostId);
+        activitySubjectPostIdRepositoryJpaAdapter.bookmark(testMemberId, testActivitySubjectPostId);
 
         // then
         verify(postBookmarkJpaRepository, times(1)).save(any(PostBookmarkEntity.class));
@@ -216,7 +216,7 @@ class TargetPostRepositoryJpaAdapterTest implements PostEntityTestUtils {
     @DisplayName("cancelBookmark 실행 시 게시글 북마크 정상 삭제")
     void testCancelBookmark_givenValidData_willDeleteBookmark() {
         // given & when
-        targetPostIdRepositoryJpaAdapter.cancelBookmark(testMemberId, testTargetPostId);
+        activitySubjectPostIdRepositoryJpaAdapter.cancelBookmark(testMemberId, testActivitySubjectPostId);
 
         // then
         verify(postBookmarkJpaRepository, times(1)).delete(any(PostBookmarkEntity.class));

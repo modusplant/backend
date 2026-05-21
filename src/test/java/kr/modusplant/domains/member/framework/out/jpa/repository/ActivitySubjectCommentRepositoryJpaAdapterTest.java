@@ -12,7 +12,7 @@ import java.util.Optional;
 
 import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMM_COMMENT_PATH;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
-import static kr.modusplant.domains.member.common.util.domain.vo.TargetCommentIdTestUtils.testTargetCommentId;
+import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectCommentIdTestUtils.testActivitySubjectCommentId;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -20,10 +20,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-class TargetCommentRepositoryJpaAdapterTest {
+class ActivitySubjectCommentRepositoryJpaAdapterTest {
     CommentJpaRepository commentJpaRepository = Mockito.mock(CommentJpaRepository.class);
     CommentLikeJpaRepository commentLikeJpaRepository = Mockito.mock(CommentLikeJpaRepository.class);
-    TargetCommentRepositoryJpaAdapter targetCommentRepositoryJpaAdapter = new TargetCommentRepositoryJpaAdapter(commentJpaRepository, commentLikeJpaRepository);
+    ActivitySubjectCommentRepositoryJpaAdapter activitySubjectCommentRepositoryJpaAdapter = new ActivitySubjectCommentRepositoryJpaAdapter(commentJpaRepository, commentLikeJpaRepository);
 
     @Test
     @DisplayName("isIdExist로 true 반환")
@@ -32,7 +32,7 @@ class TargetCommentRepositoryJpaAdapterTest {
         given(commentJpaRepository.existsByPostUlidAndPath(TEST_POST_ULID, TEST_COMM_COMMENT_PATH)).willReturn(true);
 
         // when & then
-        assertThat(targetCommentRepositoryJpaAdapter.isIdExist(testTargetCommentId)).isEqualTo(true);
+        assertThat(activitySubjectCommentRepositoryJpaAdapter.isIdExist(testActivitySubjectCommentId)).isEqualTo(true);
     }
 
     @Test
@@ -42,7 +42,7 @@ class TargetCommentRepositoryJpaAdapterTest {
         given(commentJpaRepository.existsByPostUlidAndPath(TEST_POST_ULID, TEST_COMM_COMMENT_PATH)).willReturn(false);
 
         // when & then
-        assertThat(targetCommentRepositoryJpaAdapter.isIdExist(testTargetCommentId)).isEqualTo(false);
+        assertThat(activitySubjectCommentRepositoryJpaAdapter.isIdExist(testActivitySubjectCommentId)).isEqualTo(false);
     }
 
     @Test
@@ -52,7 +52,7 @@ class TargetCommentRepositoryJpaAdapterTest {
         given(commentLikeJpaRepository.existsByPostIdAndPathAndMemberId(TEST_POST_ULID, TEST_COMM_COMMENT_PATH, testMemberId.getValue())).willReturn(true);
 
         // when & then
-        assertThat(targetCommentRepositoryJpaAdapter.isLiked(testMemberId, testTargetCommentId)).isEqualTo(true);
+        assertThat(activitySubjectCommentRepositoryJpaAdapter.isLiked(testMemberId, testActivitySubjectCommentId)).isEqualTo(true);
     }
 
     @Test
@@ -62,7 +62,7 @@ class TargetCommentRepositoryJpaAdapterTest {
         given(commentLikeJpaRepository.existsByPostIdAndPathAndMemberId(TEST_POST_ULID, TEST_COMM_COMMENT_PATH, testMemberId.getValue())).willReturn(false);
 
         // when & then
-        assertThat(targetCommentRepositoryJpaAdapter.isLiked(testMemberId, testTargetCommentId)).isEqualTo(false);
+        assertThat(activitySubjectCommentRepositoryJpaAdapter.isLiked(testMemberId, testActivitySubjectCommentId)).isEqualTo(false);
     }
 
     @Test
@@ -72,7 +72,7 @@ class TargetCommentRepositoryJpaAdapterTest {
         given(commentLikeJpaRepository.existsByPostIdAndPathAndMemberId(TEST_POST_ULID, TEST_COMM_COMMENT_PATH, testMemberId.getValue())).willReturn(false);
 
         // when & then
-        assertThat(targetCommentRepositoryJpaAdapter.isUnliked(testMemberId, testTargetCommentId)).isEqualTo(true);
+        assertThat(activitySubjectCommentRepositoryJpaAdapter.isUnliked(testMemberId, testActivitySubjectCommentId)).isEqualTo(true);
     }
 
     @Test
@@ -82,7 +82,7 @@ class TargetCommentRepositoryJpaAdapterTest {
         given(commentLikeJpaRepository.existsByPostIdAndPathAndMemberId(TEST_POST_ULID, TEST_COMM_COMMENT_PATH, testMemberId.getValue())).willReturn(true);
 
         // when & then
-        assertThat(targetCommentRepositoryJpaAdapter.isUnliked(testMemberId, testTargetCommentId)).isEqualTo(false);
+        assertThat(activitySubjectCommentRepositoryJpaAdapter.isUnliked(testMemberId, testActivitySubjectCommentId)).isEqualTo(false);
     }
 
     @Test
@@ -93,7 +93,7 @@ class TargetCommentRepositoryJpaAdapterTest {
         given(commentJpaRepository.findByPostUlidAndPath(any(), any())).willReturn(Optional.of(mockComment));
 
         // when
-        targetCommentRepositoryJpaAdapter.like(testMemberId, testTargetCommentId);
+        activitySubjectCommentRepositoryJpaAdapter.like(testMemberId, testActivitySubjectCommentId);
 
         // then
         verify(commentLikeJpaRepository, times(1)).save(any(CommentLikeEntity.class));
@@ -107,7 +107,7 @@ class TargetCommentRepositoryJpaAdapterTest {
         given(commentJpaRepository.findByPostUlidAndPath(any(), any())).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> targetCommentRepositoryJpaAdapter.like(testMemberId, testTargetCommentId));
+        assertThrows(NoSuchElementException.class, () -> activitySubjectCommentRepositoryJpaAdapter.like(testMemberId, testActivitySubjectCommentId));
 
         // then
         verify(commentLikeJpaRepository, times(1)).save(any(CommentLikeEntity.class));
@@ -121,7 +121,7 @@ class TargetCommentRepositoryJpaAdapterTest {
         given(commentJpaRepository.findByPostUlidAndPath(any(), any())).willReturn(Optional.of(mockComment));
 
         // when
-        targetCommentRepositoryJpaAdapter.unlike(testMemberId, testTargetCommentId);
+        activitySubjectCommentRepositoryJpaAdapter.unlike(testMemberId, testActivitySubjectCommentId);
 
         // then
         verify(commentLikeJpaRepository, times(1)).delete(any(CommentLikeEntity.class));
@@ -135,7 +135,7 @@ class TargetCommentRepositoryJpaAdapterTest {
         given(commentJpaRepository.findByPostUlidAndPath(any(), any())).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> targetCommentRepositoryJpaAdapter.unlike(testMemberId, testTargetCommentId));
+        assertThrows(NoSuchElementException.class, () -> activitySubjectCommentRepositoryJpaAdapter.unlike(testMemberId, testActivitySubjectCommentId));
 
         // then
         verify(commentLikeJpaRepository, times(1)).delete(any(CommentLikeEntity.class));

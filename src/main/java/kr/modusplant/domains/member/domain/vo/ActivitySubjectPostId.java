@@ -9,31 +9,31 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EMPTY_TARGET_POST_ID;
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.INVALID_TARGET_POST_ID;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EMPTY_ACTIVITY_SUBJECT_POST_ID;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.INVALID_ACTIVITY_SUBJECT_POST_ID;
 import static kr.modusplant.shared.constant.Regex.PATTERN_ULID;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class TargetPostId {
+public class ActivitySubjectPostId {
     private final String value;
 
-    public static TargetPostId create(String value) {
+    public static ActivitySubjectPostId create(String value) {
         if (StringUtils.isBlank(value)) {
-            throw new EmptyValueException(EMPTY_TARGET_POST_ID, "targetPostId");
+            throw new EmptyValueException(EMPTY_ACTIVITY_SUBJECT_POST_ID, "activitySubjectPostId");
         } else if (!PATTERN_ULID.matcher(value).matches()) {
-            throw new InvalidValueException(INVALID_TARGET_POST_ID, "targetPostId");
+            throw new InvalidValueException(INVALID_ACTIVITY_SUBJECT_POST_ID, "activitySubjectPostId");
         }
-        return new TargetPostId(value);
+        return new ActivitySubjectPostId(value);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof TargetPostId targetPostId)) return false;
+        if (!(o instanceof ActivitySubjectPostId activitySubjectPostId)) return false;
 
-        return new EqualsBuilder().append(getValue(), targetPostId.getValue()).isEquals();
+        return new EqualsBuilder().append(getValue(), activitySubjectPostId.getValue()).isEquals();
     }
 
     @Override

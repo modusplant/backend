@@ -6,8 +6,8 @@ import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.Co
 import kr.modusplant.domains.member.domain.aggregate.ProposalOrBugReport;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.ReportId;
-import kr.modusplant.domains.member.domain.vo.TargetCommentId;
-import kr.modusplant.domains.member.domain.vo.TargetPostId;
+import kr.modusplant.domains.member.domain.vo.ActivitySubjectCommentId;
+import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
 import kr.modusplant.domains.member.framework.out.jooq.repository.ReportJooqRepository;
 import kr.modusplant.domains.member.framework.out.jpa.entity.CommentAbuseReportEntity;
 import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
@@ -52,20 +52,20 @@ public class ReportRepositoryJpaAdapter implements ReportRepository {
     }
 
     @Override
-    public boolean isMemberAbusePost(MemberId memberId, TargetPostId targetPostId) {
+    public boolean isMemberAbusePost(MemberId memberId, ActivitySubjectPostId activitySubjectPostId) {
         return postAbuRepJpaRepository.findByMemberIdAndPost(
                 memberId.getValue(),
-                postJpaRepository.findByUlid(targetPostId.getValue()).orElseThrow()
+                postJpaRepository.findByUlid(activitySubjectPostId.getValue()).orElseThrow()
         ).isPresent();
     }
 
     @Override
-    public boolean isMemberAbuseComment(MemberId memberId, TargetCommentId targetCommentId) {
+    public boolean isMemberAbuseComment(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId) {
         return commentAbuseReportJpaRepository.findByMemberIdAndComment(
                 memberId.getValue(),
                 commentJpaRepository.findByPostUlidAndPath(
-                        targetCommentId.getTargetPostId().getValue(),
-                        targetCommentId.getTargetCommentPath().getValue()).orElseThrow()
+                        activitySubjectCommentId.getActivitySubjectPostId().getValue(),
+                        activitySubjectCommentId.getActivitySubjectCommentPath().getValue()).orElseThrow()
         ).isPresent();
     }
 
@@ -101,19 +101,19 @@ public class ReportRepositoryJpaAdapter implements ReportRepository {
     }
 
     @Override
-    public void reportPostAbuse(MemberId memberId, TargetPostId targetPostId) {
+    public void reportPostAbuse(MemberId memberId, ActivitySubjectPostId activitySubjectPostId) {
         MemberEntity memberEntity = memberJpaRepository.findByUuid(memberId.getValue()).orElseThrow();
-        PostEntity postEntity = postJpaRepository.findByUlid(targetPostId.getValue()).orElseThrow();
+        PostEntity postEntity = postJpaRepository.findByUlid(activitySubjectPostId.getValue()).orElseThrow();
         postAbuRepJpaRepository.save(PostAbuseReportEntity.builder().member(memberEntity).post(postEntity).build());
     }
 
     @Override
-    public void reportCommentAbuse(MemberId memberId, TargetCommentId targetCommentId) {
+    public void reportCommentAbuse(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId) {
         MemberEntity memberEntity = memberJpaRepository.findByUuid(memberId.getValue()).orElseThrow();
         CommentEntity commentEntity = commentJpaRepository.findById(
                 CommentCompositeKey.builder()
-                        .post(targetCommentId.getTargetPostId().getValue())
-                        .path(targetCommentId.getTargetCommentPath().getValue())
+                        .post(activitySubjectCommentId.getActivitySubjectPostId().getValue())
+                        .path(activitySubjectCommentId.getActivitySubjectCommentPath().getValue())
                         .build()
         ).orElseThrow();
         commentAbuseReportJpaRepository.save(

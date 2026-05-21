@@ -54,8 +54,8 @@ public class MemberController {
     private final MemberSocialTranslator memberSocialTranslator;
     private final MemberRepository memberRepository;
     private final MemberProfileRepository memberProfileRepository;
-    private final TargetPostRepository targetPostRepository;
-    private final TargetCommentRepository targetCommentRepository;
+    private final ActivitySubjectPostRepository activitySubjectPostRepository;
+    private final ActivitySubjectCommentRepository activitySubjectCommentRepository;
     private final ReportRepository reportRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -106,60 +106,60 @@ public class MemberController {
 
     public void likePost(MemberPostLikeRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
-        TargetPostId targetPostId = TargetPostId.create(record.postUlid());
-        validateBeforeLikePost(memberId, targetPostId);
+        ActivitySubjectPostId activitySubjectPostId = ActivitySubjectPostId.create(record.postUlid());
+        validateBeforeLikePost(memberId, activitySubjectPostId);
 
-        if (targetPostRepository.isUnliked(memberId, targetPostId)) {
-            targetPostRepository.like(memberId, targetPostId);
+        if (activitySubjectPostRepository.isUnliked(memberId, activitySubjectPostId)) {
+            activitySubjectPostRepository.like(memberId, activitySubjectPostId);
             applicationEventPublisher.publishEvent(
-                    PostLikeNotificationEvent.create(memberId.getValue(), targetPostId.getValue()));
+                    PostLikeNotificationEvent.create(memberId.getValue(), activitySubjectPostId.getValue()));
         }
     }
 
     public void unlikePost(MemberPostUnlikeRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
-        TargetPostId targetPostId = TargetPostId.create(record.postUlid());
-        validateBeforeUnlikePost(memberId, targetPostId);
+        ActivitySubjectPostId activitySubjectPostId = ActivitySubjectPostId.create(record.postUlid());
+        validateBeforeUnlikePost(memberId, activitySubjectPostId);
 
-        if (targetPostRepository.isLiked(memberId, targetPostId)) {
-            targetPostRepository.unlike(memberId, targetPostId);
+        if (activitySubjectPostRepository.isLiked(memberId, activitySubjectPostId)) {
+            activitySubjectPostRepository.unlike(memberId, activitySubjectPostId);
         }
     }
 
     public void bookmarkPost(MemberPostBookmarkRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
-        TargetPostId targetPostId = TargetPostId.create(record.postUlid());
-        validateBeforeBookmarkOrCancelPostBookmark(memberId, targetPostId);
+        ActivitySubjectPostId activitySubjectPostId = ActivitySubjectPostId.create(record.postUlid());
+        validateBeforeBookmarkOrCancelPostBookmark(memberId, activitySubjectPostId);
 
-        if (targetPostRepository.isNotBookmarked(memberId, targetPostId)) {
-            targetPostRepository.bookmark(memberId, targetPostId);
+        if (activitySubjectPostRepository.isNotBookmarked(memberId, activitySubjectPostId)) {
+            activitySubjectPostRepository.bookmark(memberId, activitySubjectPostId);
         }
     }
 
     public void cancelPostBookmark(MemberPostBookmarkCancelRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
-        TargetPostId targetPostId = TargetPostId.create(record.postUlid());
-        validateBeforeBookmarkOrCancelPostBookmark(memberId, targetPostId);
+        ActivitySubjectPostId activitySubjectPostId = ActivitySubjectPostId.create(record.postUlid());
+        validateBeforeBookmarkOrCancelPostBookmark(memberId, activitySubjectPostId);
 
-        if (targetPostRepository.isBookmarked(memberId, targetPostId)) {
-            targetPostRepository.cancelBookmark(memberId, targetPostId);
+        if (activitySubjectPostRepository.isBookmarked(memberId, activitySubjectPostId)) {
+            activitySubjectPostRepository.cancelBookmark(memberId, activitySubjectPostId);
         }
     }
 
     public void likeComment(MemberCommentLikeRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
-        TargetCommentId targetCommentId = TargetCommentId.create(
-                TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
+        ActivitySubjectCommentId activitySubjectCommentId = ActivitySubjectCommentId.create(
+                ActivitySubjectPostId.create(record.postUlid()), ActivitySubjectCommentPath.create(record.path()));
         memberValidationHelper.validateIfMemberExists(memberId);
-        memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
+        memberValidationHelper.validateIfActivitySubjectCommentExists(activitySubjectCommentId);
 
-        if (targetCommentRepository.isUnliked(memberId, targetCommentId)) {
-            targetCommentRepository.like(memberId, targetCommentId);
+        if (activitySubjectCommentRepository.isUnliked(memberId, activitySubjectCommentId)) {
+            activitySubjectCommentRepository.like(memberId, activitySubjectCommentId);
             applicationEventPublisher.publishEvent(
                     CommentLikeNotificationEvent.create(
                             memberId.getValue(),
-                            targetCommentId.getTargetPostId().getValue(),
-                            targetCommentId.getTargetCommentPath().getValue()
+                            activitySubjectCommentId.getActivitySubjectPostId().getValue(),
+                            activitySubjectCommentId.getActivitySubjectCommentPath().getValue()
                     )
             );
         }
@@ -167,13 +167,13 @@ public class MemberController {
 
     public void unlikeComment(MemberCommentUnlikeRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
-        TargetCommentId targetCommentId = TargetCommentId.create(
-                TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
+        ActivitySubjectCommentId activitySubjectCommentId = ActivitySubjectCommentId.create(
+                ActivitySubjectPostId.create(record.postUlid()), ActivitySubjectCommentPath.create(record.path()));
         memberValidationHelper.validateIfMemberExists(memberId);
-        memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
+        memberValidationHelper.validateIfActivitySubjectCommentExists(activitySubjectCommentId);
 
-        if (targetCommentRepository.isLiked(memberId, targetCommentId)) {
-            targetCommentRepository.unlike(memberId, targetCommentId);
+        if (activitySubjectCommentRepository.isLiked(memberId, activitySubjectCommentId)) {
+            activitySubjectCommentRepository.unlike(memberId, activitySubjectCommentId);
         }
     }
 
@@ -217,19 +217,19 @@ public class MemberController {
 
     public void reportPostAbuse(PostAbuseReportRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
-        TargetPostId targetPostId = TargetPostId.create(record.postUlid());
-        validateBeforeReportPostAbuse(memberId, targetPostId);
+        ActivitySubjectPostId activitySubjectPostId = ActivitySubjectPostId.create(record.postUlid());
+        validateBeforeReportPostAbuse(memberId, activitySubjectPostId);
 
-        reportRepository.reportPostAbuse(memberId, targetPostId);
+        reportRepository.reportPostAbuse(memberId, activitySubjectPostId);
     }
 
     public void reportCommentAbuse(CommentAbuseReportRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
-        TargetCommentId targetCommentId = TargetCommentId.create(
-                TargetPostId.create(record.postUlid()), TargetCommentPath.create(record.path()));
-        validateBeforeReportCommentAbuse(memberId, targetCommentId);
+        ActivitySubjectCommentId activitySubjectCommentId = ActivitySubjectCommentId.create(
+                ActivitySubjectPostId.create(record.postUlid()), ActivitySubjectCommentPath.create(record.path()));
+        validateBeforeReportCommentAbuse(memberId, activitySubjectCommentId);
 
-        reportRepository.reportCommentAbuse(memberId, targetCommentId);
+        reportRepository.reportCommentAbuse(memberId, activitySubjectCommentId);
     }
 
     public void withdraw(MemberWithdrawalRecord record) {
@@ -260,27 +260,27 @@ public class MemberController {
         }
     }
 
-    private void validateBeforeLikePost(MemberId memberId, TargetPostId targetPostId) {
+    private void validateBeforeLikePost(MemberId memberId, ActivitySubjectPostId activitySubjectPostId) {
         memberValidationHelper.validateIfMemberExists(memberId);
-        memberValidationHelper.validateIfTargetPostExists(targetPostId);
-        if (!targetPostRepository.isPublished(targetPostId)) {
-            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_LIKE, "postLike", targetPostId.getValue());
+        memberValidationHelper.validateIfActivitySubjectPostExists(activitySubjectPostId);
+        if (!activitySubjectPostRepository.isPublished(activitySubjectPostId)) {
+            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_LIKE, "postLike", activitySubjectPostId.getValue());
         }
     }
 
-    private void validateBeforeUnlikePost(MemberId memberId, TargetPostId targetPostId) {
+    private void validateBeforeUnlikePost(MemberId memberId, ActivitySubjectPostId activitySubjectPostId) {
         memberValidationHelper.validateIfMemberExists(memberId);
-        memberValidationHelper.validateIfTargetPostExists(targetPostId);
-        if (!targetPostRepository.isPublished(targetPostId)) {
-            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_LIKE, "postUnlike", targetPostId.getValue());
+        memberValidationHelper.validateIfActivitySubjectPostExists(activitySubjectPostId);
+        if (!activitySubjectPostRepository.isPublished(activitySubjectPostId)) {
+            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_LIKE, "postUnlike", activitySubjectPostId.getValue());
         }
     }
 
-    private void validateBeforeBookmarkOrCancelPostBookmark(MemberId memberId, TargetPostId targetPostId) {
+    private void validateBeforeBookmarkOrCancelPostBookmark(MemberId memberId, ActivitySubjectPostId activitySubjectPostId) {
         memberValidationHelper.validateIfMemberExists(memberId);
-        memberValidationHelper.validateIfTargetPostExists(targetPostId);
-        if (!targetPostRepository.isPublished(targetPostId)) {
-            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_BOOKMARK, "postBookmark", targetPostId.getValue());
+        memberValidationHelper.validateIfActivitySubjectPostExists(activitySubjectPostId);
+        if (!activitySubjectPostRepository.isPublished(activitySubjectPostId)) {
+            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_BOOKMARK, "postBookmark", activitySubjectPostId.getValue());
         }
     }
 
@@ -293,22 +293,22 @@ public class MemberController {
         }
     }
 
-    private void validateBeforeReportPostAbuse(MemberId memberId, TargetPostId targetPostId) {
+    private void validateBeforeReportPostAbuse(MemberId memberId, ActivitySubjectPostId activitySubjectPostId) {
         memberValidationHelper.validateIfMemberExists(memberId);
-        memberValidationHelper.validateIfTargetPostExists(targetPostId);
-        if (!targetPostRepository.isPublished(targetPostId)) {
+        memberValidationHelper.validateIfActivitySubjectPostExists(activitySubjectPostId);
+        if (!activitySubjectPostRepository.isPublished(activitySubjectPostId)) {
             throw new NotAccessibleException(
-                    NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE, "postReportForAbuse", targetPostId.getValue());
-        } else if (reportRepository.isMemberAbusePost(memberId, targetPostId)) {
+                    NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE, "postReportForAbuse", activitySubjectPostId.getValue());
+        } else if (reportRepository.isMemberAbusePost(memberId, activitySubjectPostId)) {
             throw new ExistsEntityException(
                     EntityErrorCode.EXISTS_POST_ABUSE_REPORT, "postAbuseReport");
         }
     }
 
-    private void validateBeforeReportCommentAbuse(MemberId memberId, TargetCommentId targetCommentId) {
+    private void validateBeforeReportCommentAbuse(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId) {
         memberValidationHelper.validateIfMemberExists(memberId);
-        memberValidationHelper.validateIfTargetCommentExists(targetCommentId);
-        if (reportRepository.isMemberAbuseComment(memberId, targetCommentId)) {
+        memberValidationHelper.validateIfActivitySubjectCommentExists(activitySubjectCommentId);
+        if (reportRepository.isMemberAbuseComment(memberId, activitySubjectCommentId)) {
             throw new ExistsEntityException(EntityErrorCode.EXISTS_COMMENT_ABUSE_REPORT, "commentAbuseReport");
         }
     }

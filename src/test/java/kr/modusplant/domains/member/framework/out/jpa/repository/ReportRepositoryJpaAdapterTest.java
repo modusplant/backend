@@ -33,8 +33,8 @@ import java.util.Optional;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
-import static kr.modusplant.domains.member.common.util.domain.vo.TargetCommentIdTestUtils.testTargetCommentId;
-import static kr.modusplant.domains.member.common.util.domain.vo.TargetPostIdTestUtils.testTargetPostId;
+import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectCommentIdTestUtils.testActivitySubjectCommentId;
+import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectPostIdTestUtils.testActivitySubjectPostId;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_CONTENT_IMAGE_FILE_KEYS;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -104,7 +104,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(postAbuRepJpaRepository.findByMemberIdAndPost(any(), any())).willReturn(Optional.of(createPostAbuseReportEntityBuilder().build()));
 
         // when
-        boolean isMemberAbusePost = reportRepositoryJpaAdapter.isMemberAbusePost(testMemberId, testTargetPostId);
+        boolean isMemberAbusePost = reportRepositoryJpaAdapter.isMemberAbusePost(testMemberId, testActivitySubjectPostId);
 
         // then
         assertThat(isMemberAbusePost).isTrue();
@@ -118,7 +118,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(postAbuRepJpaRepository.findByMemberIdAndPost(any(), any())).willReturn(Optional.empty());
 
         // when
-        boolean isMemberAbusePost = reportRepositoryJpaAdapter.isMemberAbusePost(testMemberId, testTargetPostId);
+        boolean isMemberAbusePost = reportRepositoryJpaAdapter.isMemberAbusePost(testMemberId, testActivitySubjectPostId);
 
         // then
         assertThat(isMemberAbusePost).isFalse();
@@ -134,7 +134,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
                 .willReturn(Optional.of(createCommentAbuseReportEntityBuilder().build()));
 
         // when
-        boolean isMemberAbusePost = reportRepositoryJpaAdapter.isMemberAbuseComment(testMemberId, testTargetCommentId);
+        boolean isMemberAbusePost = reportRepositoryJpaAdapter.isMemberAbuseComment(testMemberId, testActivitySubjectCommentId);
 
         // then
         assertThat(isMemberAbusePost).isTrue();
@@ -149,7 +149,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(postAbuRepJpaRepository.findByMemberIdAndPost(any(), any())).willReturn(Optional.empty());
 
         // when
-        boolean isMemberAbusePost = reportRepositoryJpaAdapter.isMemberAbuseComment(testMemberId, testTargetCommentId);
+        boolean isMemberAbusePost = reportRepositoryJpaAdapter.isMemberAbuseComment(testMemberId, testActivitySubjectCommentId);
 
         // then
         assertThat(isMemberAbusePost).isFalse();
@@ -192,7 +192,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(postJpaRepository.findByUlid(TEST_POST_ULID)).willReturn(Optional.of(mockPost));
 
         // when
-        reportRepositoryJpaAdapter.reportPostAbuse(testMemberId, testTargetPostId);
+        reportRepositoryJpaAdapter.reportPostAbuse(testMemberId, testActivitySubjectPostId);
 
         // then
         verify(postAbuRepJpaRepository, times(1)).save(any(PostAbuseReportEntity.class));
@@ -205,7 +205,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> reportRepositoryJpaAdapter.reportPostAbuse(testMemberId, testTargetPostId));
+        assertThrows(NoSuchElementException.class, () -> reportRepositoryJpaAdapter.reportPostAbuse(testMemberId, testActivitySubjectPostId));
 
         // then
         verify(postAbuRepJpaRepository, never()).save(any());
@@ -220,7 +220,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(postJpaRepository.findByUlid(TEST_POST_ULID)).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> reportRepositoryJpaAdapter.reportPostAbuse(testMemberId, testTargetPostId));
+        assertThrows(NoSuchElementException.class, () -> reportRepositoryJpaAdapter.reportPostAbuse(testMemberId, testActivitySubjectPostId));
 
         // then
         verify(postAbuRepJpaRepository, never()).save(any());
@@ -237,7 +237,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(commentJpaRepository.findById(any(CommentCompositeKey.class))).willReturn(Optional.of(commentEntity));
 
         // when
-        reportRepositoryJpaAdapter.reportCommentAbuse(testMemberId, testTargetCommentId);
+        reportRepositoryJpaAdapter.reportCommentAbuse(testMemberId, testActivitySubjectCommentId);
 
         // then
         verify(commentAbuseReportJpaRepository, times(1)).save(any(CommentAbuseReportEntity.class));
@@ -250,7 +250,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> reportRepositoryJpaAdapter.reportCommentAbuse(testMemberId, testTargetCommentId));
+        assertThrows(NoSuchElementException.class, () -> reportRepositoryJpaAdapter.reportCommentAbuse(testMemberId, testActivitySubjectCommentId));
 
         // then
         verify(commentAbuseReportJpaRepository, never()).save(any());
@@ -265,7 +265,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(commentJpaRepository.findById(any(CommentCompositeKey.class))).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> reportRepositoryJpaAdapter.reportCommentAbuse(testMemberId, testTargetCommentId));
+        assertThrows(NoSuchElementException.class, () -> reportRepositoryJpaAdapter.reportCommentAbuse(testMemberId, testActivitySubjectCommentId));
 
         // then
         verify(commentAbuseReportJpaRepository, never()).save(any());
