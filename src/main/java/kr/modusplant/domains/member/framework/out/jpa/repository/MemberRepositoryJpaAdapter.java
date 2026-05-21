@@ -5,11 +5,13 @@ import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.enums.MemberWithdrawReason;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberWithdrawOpinion;
+import kr.modusplant.domains.member.framework.out.jooq.repository.MemberProfileJooqRepository;
 import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberJpaMapperImpl;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
 import kr.modusplant.domains.post.framework.out.jooq.repository.PostJooqRepository;
 import kr.modusplant.shared.event.ImageRemoveEvent;
+import kr.modusplant.shared.event.ImagesRemoveEvent;
 import kr.modusplant.shared.event.RecentlyViewPostRemoveEvent;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.kernel.Nickname;
@@ -39,6 +41,7 @@ public class MemberRepositoryJpaAdapter implements MemberRepository {
 
     private final MemberJpaMapperImpl memberJpaMapper;
     private final MemberJpaRepository memberJpaRepository;
+    private final MemberProfileJooqRepository memberProfileJooqRepository;
     private final PostJooqRepository postJooqRepository;
 
     @Override
@@ -103,7 +106,7 @@ public class MemberRepositoryJpaAdapter implements MemberRepository {
         }
 
         if (!fileKeysToDelete.isEmpty()) {
-            eventPublisher.publishEvent(ImageRemoveEvent.create(fileKeysToDelete));
+            eventPublisher.publishEvent(ImagesRemoveEvent.create(fileKeysToDelete));
         }
         if (!ArrayUtils.isEmpty(publishedPostUlids)) {
             eventPublisher.publishEvent(RecentlyViewPostRemoveEvent.create(publishedPostUlids));
@@ -157,6 +160,11 @@ public class MemberRepositoryJpaAdapter implements MemberRepository {
     }
 
     private void processOtherMemberRelatedRecords(UUID memberId, String reason, String opinion) {
+        String memberProfileImageFileKey = memberProfileJooqRepository.getImageFileKeyFromMemberId(memberId);
+        if (memberProfileImageFileKey != null) {
+            eventPublisher.publishEvent(ImageRemoveEvent.create(memberProfileImageFileKey));
+        }
+
         dsl.batch(
                 dsl.insertInto(SITE_MEMBER_WITHDRAW,
                                 SITE_MEMBER_WITHDRAW.UUID,
@@ -218,7 +226,10 @@ public class MemberRepositoryJpaAdapter implements MemberRepository {
                         .where(SITE_MEMBER_AUTH.UUID.eq(memberId)),
 
                 dsl.deleteFrom(SITE_MEMBER)
-                        .where(SITE_MEMBER.UUID.eq(memberId))
+                        .where(SITE_MEMBER.UUID.eq(memberId)),
+
+                dsl.deleteFrom(FCM_TOKEN)
+                        .where(FCM_TOKEN.MEMB_UUID.eq(memberId))
 
         ).execute();
     }

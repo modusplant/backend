@@ -3,11 +3,13 @@ package kr.modusplant.domains.member.framework.out.jpa.repository;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.enums.MemberWithdrawReason;
+import kr.modusplant.domains.member.framework.out.jooq.repository.MemberProfileJooqRepository;
 import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberJpaMapperImpl;
 import kr.modusplant.domains.post.framework.out.jooq.repository.PostJooqRepository;
 import kr.modusplant.shared.event.ImageRemoveEvent;
+import kr.modusplant.shared.event.ImagesRemoveEvent;
 import kr.modusplant.shared.event.RecentlyViewPostRemoveEvent;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
@@ -27,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberWithdrawOpinionTestUtils.testMemberWithdrawOpinion;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER;
@@ -56,9 +59,10 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, MemberEntityTes
     private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
     private final MemberJpaMapperImpl memberJpaMapper = new MemberJpaMapperImpl();
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
+    private final MemberProfileJooqRepository memberProfileJooqRepository = Mockito.mock(MemberProfileJooqRepository.class);
     private final PostJooqRepository postJooqRepository = Mockito.mock(PostJooqRepository.class);
     private final MemberRepositoryJpaAdapter memberRepositoryJpaAdapter = new MemberRepositoryJpaAdapter(
-            stringRedisTemplate, dslContext, eventPublisher, memberJpaMapper, memberJpaRepository, postJooqRepository);
+            stringRedisTemplate, dslContext, eventPublisher, memberJpaMapper, memberJpaRepository, memberProfileJooqRepository, postJooqRepository);
 
 
     @Test
@@ -180,36 +184,41 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, MemberEntityTes
     }
 
     @Test
-    @DisplayName("발행된 게시글이 있을 때 withdraw로 회원 탈퇴하면서 이벤트 발행")
-    void testWithdraw_givenExistedPublishedPosts_willPublishEventsWhileWithdraw() {
+    @DisplayName("발행된 게시글과 프로필 이미지가 있을 때 withdraw로 회원 탈퇴하면서 이벤트 발행")
+    void testWithdraw_givenExistedPublishedPostsAndProfileImage_willPublishEventsWhileWithdraw() {
         // given
-        willDoNothing().given(eventPublisher).publishEvent(any(ImageRemoveEvent.class));
+        willDoNothing().given(eventPublisher).publishEvent(any(ImagesRemoveEvent.class));
         willDoNothing().given(eventPublisher).publishEvent(any(RecentlyViewPostRemoveEvent.class));
         given(postJooqRepository.getPublishedPostUlidsByMemberId(any())).willReturn(TEST_POST_ULID_ARRAY);
         given(postJooqRepository.getPostContentsFromPublishedPostUlids(any())).willReturn(List.of(TEST_POST_CONTENT_JSON_NODE));
+        given(memberProfileJooqRepository.getImageFileKeyFromMemberId(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
+        willDoNothing().given(eventPublisher).publishEvent(any(ImageRemoveEvent.class));
 
         // when
         memberRepositoryJpaAdapter.withdraw(testMemberId, MemberWithdrawReason.UNCOMFORTABLE_TO_USE, testMemberWithdrawOpinion);
 
         // then
         verify(stringRedisTemplate).unlink("recentlyView:member:%s:posts".formatted(MEMBER_BASIC_USER_UUID));
-        verify(eventPublisher, times(1)).publishEvent(any(ImageRemoveEvent.class));
+        verify(eventPublisher, times(1)).publishEvent(any(ImagesRemoveEvent.class));
         verify(eventPublisher, times(1)).publishEvent(any(RecentlyViewPostRemoveEvent.class));
+        verify(eventPublisher, times(1)).publishEvent(any(ImageRemoveEvent.class));
     }
 
     @Test
-    @DisplayName("발행된 게시글이 없을 때 withdraw로 회원 탈퇴하면서 이벤트를 발행하지 않음")
-    void testWithdraw_givenNotFoundPublishedPosts_willSkipPublishingEventsWhileWithdraw() {
+    @DisplayName("발행된 게시글과 프로필 이미지가 없을 때 withdraw로 회원 탈퇴하면서 이벤트를 발행하지 않음")
+    void testWithdraw_givenNotFoundPublishedPostsAndProfileImage_willSkipPublishingEventsWhileWithdraw() {
         // given
         given(postJooqRepository.getPublishedPostUlidsByMemberId(any())).willReturn(new String[]{});
         given(postJooqRepository.getPostContentsFromPublishedPostUlids(any())).willReturn(List.of());
+        given(memberProfileJooqRepository.getImageFileKeyFromMemberId(any())).willReturn(null);
 
         // when
         memberRepositoryJpaAdapter.withdraw(testMemberId, MemberWithdrawReason.UNCOMFORTABLE_TO_USE, testMemberWithdrawOpinion);
 
         // then
         verify(stringRedisTemplate).unlink("recentlyView:member:%s:posts".formatted(MEMBER_BASIC_USER_UUID));
-        verify(eventPublisher, never()).publishEvent(any(ImageRemoveEvent.class));
+        verify(eventPublisher, never()).publishEvent(any(ImagesRemoveEvent.class));
         verify(eventPublisher, never()).publishEvent(any(RecentlyViewPostRemoveEvent.class));
+        verify(eventPublisher, never()).publishEvent(any(ImageRemoveEvent.class));
     }
 }

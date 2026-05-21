@@ -17,7 +17,7 @@ import kr.modusplant.domains.member.framework.out.jpa.entity.record.FilenameAndS
 import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
 import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
-import kr.modusplant.shared.event.ImageRemoveEvent;
+import kr.modusplant.shared.event.ImagesRemoveEvent;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationEventPublisher;
@@ -129,7 +129,7 @@ public class ReportRepositoryJpaAdapter implements ReportRepository {
     private void deleteImageFromReportImagePath(String reportId) {
         List<String> srcList = reportJooqRepository.getImageFileKeysFromReportId(reportId);
         if (!srcList.isEmpty()) {
-            applicationEventPublisher.publishEvent(ImageRemoveEvent.create(srcList));
+            applicationEventPublisher.publishEvent(ImagesRemoveEvent.create(srcList));
         }
     }
 

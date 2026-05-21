@@ -13,7 +13,7 @@ import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.Comment
 import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.PostAbuseReportEntityTestUtils;
 import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
-import kr.modusplant.shared.event.ImageRemoveEvent;
+import kr.modusplant.shared.event.ImagesRemoveEvent;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -281,7 +281,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         reportRepositoryJpaAdapter.removeProposalOrBugReport(testReportId);
 
         // then
-        verify(applicationEventPublisher, times(1)).publishEvent(any(ImageRemoveEvent.class));
+        verify(applicationEventPublisher, times(1)).publishEvent(any(ImagesRemoveEvent.class));
     }
 
     @Test

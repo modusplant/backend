@@ -1,6 +1,7 @@
 package kr.modusplant.shared.framework.aws.listener;
 
 import kr.modusplant.shared.event.ImageRemoveEvent;
+import kr.modusplant.shared.event.ImagesRemoveEvent;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,16 @@ public class AwsEventListener {
     @Async("awsExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleImageRemove(ImageRemoveEvent event) {
+        try {
+            amazonS3Service.deleteFiles(event.getImageFileKey());
+        } catch (Exception e) {
+            log.error("[AWS] S3 파일 이미지 제거 실패 - imageFileKey = {}", event.getImageFileKey(), e);
+        }
+    }
+
+    @Async("awsExecutor")
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleImageRemove(ImagesRemoveEvent event) {
         try {
             amazonS3Service.deleteFiles(event.getImageFileKeys());
         } catch (Exception e) {
