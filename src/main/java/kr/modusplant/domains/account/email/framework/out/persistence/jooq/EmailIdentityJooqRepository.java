@@ -10,7 +10,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+
+import static org.jooq.impl.DSL.coalesce;
 
 @Repository
 public class EmailIdentityJooqRepository implements EmailIdentityRepository {
@@ -37,6 +40,8 @@ public class EmailIdentityJooqRepository implements EmailIdentityRepository {
     public int updatePassword(Email email, Password pw) {
         return dsl.update(memberAuth)
                 .set(memberAuth.PW, passwordEncoder.encode(pw.getValue()))
+                .set(memberAuth.LAST_MODIFIED_AT, LocalDateTime.now())
+                .set(memberAuth.VER_NUM, coalesce(memberAuth.VER_NUM, 0).plus(1))
                 .where(memberAuth.EMAIL.eq(email.getValue()))
                 .and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
                 .execute();

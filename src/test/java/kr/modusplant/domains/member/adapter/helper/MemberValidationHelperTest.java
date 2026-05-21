@@ -1,9 +1,6 @@
 package kr.modusplant.domains.member.adapter.helper;
 
-import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
-import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
-import kr.modusplant.domains.member.usecase.port.repository.TargetCommentRepository;
-import kr.modusplant.domains.member.usecase.port.repository.TargetPostRepository;
+import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
@@ -14,8 +11,8 @@ import org.mockito.Mockito;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
-import static kr.modusplant.domains.member.common.util.domain.vo.TargetCommentIdTestUtils.testTargetCommentId;
-import static kr.modusplant.domains.member.common.util.domain.vo.TargetPostIdTestUtils.testTargetPostId;
+import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectCommentIdTestUtils.testActivitySubjectCommentId;
+import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectPostIdTestUtils.testActivitySubjectPostId;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,11 +22,12 @@ import static org.mockito.BDDMockito.given;
 
 class MemberValidationHelperTest {
     private final MemberRepository memberRepository = Mockito.mock(MemberRepository.class);
+    private final MemberProfileRepository memberProfileRepository = Mockito.mock(MemberProfileRepository.class);
     private final ReportRepository reportRepository = Mockito.mock(ReportRepository.class);
-    private final TargetPostRepository targetPostRepository = Mockito.mock(TargetPostRepository.class);
-    private final TargetCommentRepository targetCommentRepository = Mockito.mock(TargetCommentRepository.class);
+    private final ActivitySubjectPostRepository activitySubjectPostRepository = Mockito.mock(ActivitySubjectPostRepository.class);
+    private final ActivitySubjectCommentRepository activitySubjectCommentRepository = Mockito.mock(ActivitySubjectCommentRepository.class);
     private final MemberValidationHelper memberValidationHelper =
-            new MemberValidationHelper(memberRepository, reportRepository, targetPostRepository, targetCommentRepository);
+            new MemberValidationHelper(memberRepository, memberProfileRepository, reportRepository, activitySubjectPostRepository, activitySubjectCommentRepository);
 
     @Nested
     @DisplayName("회원의 존재 여부 검증")
@@ -54,7 +52,34 @@ class MemberValidationHelperTest {
             NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> memberValidationHelper.validateIfMemberExists(testMemberId));
             
             // then
-            assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+            assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
+        }
+    }
+
+    @Nested
+    @DisplayName("회원 프로필의 존재 여부 검증")
+    class ValidateIfMemberProfileExistsTest {
+        @Test
+        @DisplayName("회원 프로필이 존재할 때 회원 프로필의 존재 여부 검증")
+        void testValidateIfMemberProfileExists_givenExistedProfile_willReturnNothing() {
+            // given & when
+            given(memberProfileRepository.isIdExist(testMemberId)).willReturn(true);
+
+            // then
+            assertDoesNotThrow(() -> memberValidationHelper.validateIfMemberProfileExists(testMemberId));
+        }
+
+        @Test
+        @DisplayName("회원 프로필이 존재하지 않을 때 회원 프로필의 존재 여부 검증")
+        void testValidateIfMemberProfileExists_givenNotFoundProfile_willThrowException() {
+            // given
+            given(memberProfileRepository.isIdExist(testMemberId)).willReturn(false);
+
+            // when
+            NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> memberValidationHelper.validateIfMemberProfileExists(testMemberId));
+
+            // then
+            assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_PROFILE);
         }
     }
 
@@ -87,55 +112,55 @@ class MemberValidationHelperTest {
 
     @Nested
     @DisplayName("타겟 게시글의 존재 여부 검증")
-    class ValidateIfTargetPostExistsTest {
+    class ValidateIfActivitySubjectPostExistsTest {
         @Test
         @DisplayName("타겟 게시글이 존재할 때 타겟 게시글의 존재 여부 검증")
-        void testValidateIfTargetPostExists_givenExistedTargetPost_willReturnNothing() {
+        void testValidateIfActivitySubjectPostExists_givenExistedActivitySubjectPost_willReturnNothing() {
             // given & when
-            given(targetPostRepository.isIdExist(testTargetPostId)).willReturn(true);
+            given(activitySubjectPostRepository.isIdExist(testActivitySubjectPostId)).willReturn(true);
 
             // then
-            assertDoesNotThrow(() -> memberValidationHelper.validateIfTargetPostExists(testTargetPostId));
+            assertDoesNotThrow(() -> memberValidationHelper.validateIfActivitySubjectPostExists(testActivitySubjectPostId));
         }
 
         @Test
         @DisplayName("타겟 게시글이 존재하지 않을 때 타겟 게시글의 존재 여부 검증")
-        void testValidateIfTargetPostExists_givenNotFoundTargetPost_willThrowException() {
+        void testValidateIfActivitySubjectPostExists_givenNotFoundActivitySubjectPost_willThrowException() {
             // given
-            given(targetPostRepository.isIdExist(testTargetPostId)).willReturn(false);
+            given(activitySubjectPostRepository.isIdExist(testActivitySubjectPostId)).willReturn(false);
 
             // when
-            NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> memberValidationHelper.validateIfTargetPostExists(testTargetPostId));
+            NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> memberValidationHelper.validateIfActivitySubjectPostExists(testActivitySubjectPostId));
 
             // then
-            assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_POST_ID);
+            assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_ACTIVITY_SUBJECT_POST_ID);
         }
     }
 
     @Nested
     @DisplayName("타겟 댓글의 존재 여부 검증")
-    class ValidateIfTargetCommentExistsTest {
+    class ValidateIfActivitySubjectCommentExistsTest {
         @Test
         @DisplayName("타겟 댓글이 존재할 때 타겟 댓글의 존재 여부 검증")
-        void testValidateIfTargetCommentExists_givenExistedComment_willReturnNothing() {
+        void testValidateIfActivitySubjectCommentExists_givenExistedComment_willReturnNothing() {
             // given & when
-            given(targetCommentRepository.isIdExist(testTargetCommentId)).willReturn(true);
+            given(activitySubjectCommentRepository.isIdExist(testActivitySubjectCommentId)).willReturn(true);
 
             // then
-            assertDoesNotThrow(() -> memberValidationHelper.validateIfTargetCommentExists(testTargetCommentId));
+            assertDoesNotThrow(() -> memberValidationHelper.validateIfActivitySubjectCommentExists(testActivitySubjectCommentId));
         }
 
         @Test
         @DisplayName("타겟 댓글이 존재하지 않을 때 타겟 댓글의 존재 여부 검증")
-        void testValidateIfTargetCommentExists_givenNotFoundComment_willThrowException() {
+        void testValidateIfActivitySubjectCommentExists_givenNotFoundComment_willThrowException() {
             // given
-            given(targetCommentRepository.isIdExist(testTargetCommentId)).willReturn(false);
+            given(activitySubjectCommentRepository.isIdExist(testActivitySubjectCommentId)).willReturn(false);
 
             // when
-            NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> memberValidationHelper.validateIfTargetCommentExists(testTargetCommentId));
+            NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> memberValidationHelper.validateIfActivitySubjectCommentExists(testActivitySubjectCommentId));
 
             // then
-            assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_TARGET_COMMENT_ID);
+            assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_ACTIVITY_SUBJECT_COMMENT_ID);
         }
     }
 

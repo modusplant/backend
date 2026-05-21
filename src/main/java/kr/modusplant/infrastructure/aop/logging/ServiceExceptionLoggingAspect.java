@@ -1,5 +1,6 @@
 package kr.modusplant.infrastructure.aop.logging;
 
+import kr.modusplant.shared.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -47,20 +48,67 @@ public class ServiceExceptionLoggingAspect {
             String uri = MDC.get("uri") != null ? MDC.get("uri") : "N/A";
             String method = MDC.get("method") != null ? MDC.get("method") : "N/A";
 
-            if (ex.getCause() == null) {
-                log.error("[BIZ ERROR] traceId={} | method={} | params={} | exception={} | message={} | location={}\n" +
-                                "[BIZ ERROR - HTTP_REQUEST_INFO] httpMethod={} | uri={} | clientIp={}",
-                        traceId, methodName, Arrays.toString(args), ex.getClass().getSimpleName(), ex.getMessage(), errorLocation,
-                        uri, method, clientIp);
+            if (ex instanceof BusinessException bizEx) {
+                logBizError(traceId, methodName, args, bizEx, errorLocation, method, uri, clientIp);
             } else {
-                log.error("[BIZ ERROR] traceId={} | method={} | params={} | exception={} | " +
-                                "message={} | causeMessage = {} | location={}\n" +
-                                "[BIZ ERROR - HTTP_REQUEST_INFO] httpMethod={} | uri={} | clientIp={}",
-                        traceId, methodName, Arrays.toString(args), ex.getClass().getSimpleName(),
-                        ex.getMessage(), ex.getCause().getMessage(), errorLocation,
-                        uri, method, clientIp);
+                logSysError(traceId, methodName, args, ex, errorLocation, method, uri, clientIp);
             }
         }
         MDC.put("isLogged", Boolean.TRUE.toString());
+    }
+
+    private void logBizError(String traceId, String methodName, Object[] args,
+                             BusinessException ex, String errorLocation,
+                             String httpMethod, String uri, String clientIp) {
+        String errorCode = ex.getErrorCode().getCode();
+        String message = ex.getMessage();
+
+        if (ex.getCause() == null) {
+            log.error("[BIZ ERROR] traceId={} | errorCode={} | method={} | params={} | exception={} | message={} | location={}\n" +
+                            "[BIZ ERROR - HTTP_REQUEST_INFO] httpMethod={} | uri={} | clientIp={}",
+                    traceId, errorCode, methodName, Arrays.toString(args), ex.getClass().getSimpleName(), message, errorLocation,
+                    httpMethod, uri, clientIp);
+        } else {
+            Throwable cause = ex.getCause();
+            String causeMessage = cause.getMessage() != null ? cause.getMessage() : cause.getClass().getSimpleName();
+            log.error("[BIZ ERROR] traceId={} | errorCode={} | method={} | params={} | exception={} | message={} | causeMessage={} | location={}\n" +
+                            "[BIZ ERROR - HTTP_REQUEST_INFO] httpMethod={} | uri={} | clientIp={}",
+                    traceId, errorCode, methodName, Arrays.toString(args), ex.getClass().getSimpleName(), message, causeMessage, errorLocation,
+                    httpMethod, uri, clientIp);
+        }
+    }
+
+    private void logSysError(String traceId, String methodName, Object[] args,
+                             Throwable ex, String errorLocation,
+                             String httpMethod, String uri, String clientIp) {
+        String message = ex.getMessage();
+
+        if (ex.getCause() == null) {
+            if (message != null) {
+                log.error("[SYS ERROR] traceId={} | method={} | params={} | exception={} | message={} | location={}\n" +
+                                "[SYS ERROR - HTTP_REQUEST_INFO] httpMethod={} | uri={} | clientIp={}",
+                        traceId, methodName, Arrays.toString(args), ex.getClass().getSimpleName(), message, errorLocation,
+                        httpMethod, uri, clientIp);
+            } else {
+                log.error("[SYS ERROR] traceId={} | method={} | params={} | exception={} | location={}\n" +
+                                "[SYS ERROR - HTTP_REQUEST_INFO] httpMethod={} | uri={} | clientIp={}",
+                        traceId, methodName, Arrays.toString(args), ex.getClass().getSimpleName(), errorLocation,
+                        httpMethod, uri, clientIp);
+            }
+        } else {
+            Throwable cause = ex.getCause();
+            String causeMessage = cause.getMessage();
+            if (message != null || causeMessage != null) {
+                log.error("[SYS ERROR] traceId={} | method={} | params={} | exception={} | message={} | causeMessage={} | location={}\n" +
+                                "[SYS ERROR - HTTP_REQUEST_INFO] httpMethod={} | uri={} | clientIp={}",
+                        traceId, methodName, Arrays.toString(args), ex.getClass().getSimpleName(), message, causeMessage, errorLocation,
+                        httpMethod, uri, clientIp);
+            } else {
+                log.error("[SYS ERROR] traceId={} | method={} | params={} | exception={} | location={}\n" +
+                                "[SYS ERROR - HTTP_REQUEST_INFO] httpMethod={} | uri={} | clientIp={}",
+                        traceId, methodName, Arrays.toString(args), ex.getClass().getSimpleName(), errorLocation,
+                        httpMethod, uri, clientIp);
+            }
+        }
     }
 }

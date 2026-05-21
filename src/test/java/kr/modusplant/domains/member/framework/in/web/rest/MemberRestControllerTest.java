@@ -243,7 +243,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         willDoNothing().given(memberController).reportProposalOrBug(testProposalOrBugReportRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportProposalOrBug(TEST_REPORT_TITLE, TEST_REPORT_CONTENT, TEST_REPORT_IMAGES, TEST_REPORT_IMAGE_NUMBER, MEMBER_BASIC_USER_UUID);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportProposalOrBug(TEST_REPORT_TITLE, TEST_REPORT_CONTENT, TEST_REPORT_IMAGES, TEST_REPORT_IMAGE_NUMBER_3, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -258,7 +258,7 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_POST_ID).toString());
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.of(MemberErrorCode.NOT_FOUND_ACTIVITY_SUBJECT_POST_ID).toString());
     }
 
     @Test
@@ -283,7 +283,7 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_COMMENT_ID).toString());
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.of(MemberErrorCode.NOT_FOUND_ACTIVITY_SUBJECT_COMMENT_ID).toString());
     }
 
     @Test

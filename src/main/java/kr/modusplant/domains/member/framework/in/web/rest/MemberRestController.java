@@ -359,7 +359,7 @@ public class MemberRestController {
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
             @AuthenticationPrincipal(expression = "uuid")
             UUID ignoredMemberId) {
-        return ResponseEntity.badRequest().body(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_POST_ID));
+        return ResponseEntity.badRequest().body(DataResponse.of(MemberErrorCode.NOT_FOUND_ACTIVITY_SUBJECT_POST_ID));
     }
 
     @Operation(
@@ -406,7 +406,7 @@ public class MemberRestController {
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
             @AuthenticationPrincipal(expression = "uuid")
             UUID ignoredMemberId) {
-        return ResponseEntity.badRequest().body(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_COMMENT_ID));
+        return ResponseEntity.badRequest().body(DataResponse.of(MemberErrorCode.NOT_FOUND_ACTIVITY_SUBJECT_COMMENT_ID));
     }
 
     @Operation(

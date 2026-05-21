@@ -12,5 +12,5 @@ public interface ProposalOrBugReportRecordTestUtils {
                     TEST_REPORT_TITLE,
                     TEST_REPORT_CONTENT,
                     TEST_REPORT_IMAGES,
-                    TEST_REPORT_IMAGE_NUMBER);
+                    TEST_REPORT_IMAGE_NUMBER_3);
 }

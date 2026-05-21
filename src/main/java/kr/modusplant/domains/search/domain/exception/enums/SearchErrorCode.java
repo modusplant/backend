@@ -22,8 +22,8 @@ public enum SearchErrorCode implements ErrorCode {
 
     INVALID_SEARCH_POST_ID(HttpStatus.BAD_REQUEST.value(), "invalid_search_post_id", "검색 게시글 식별자의 서식이 올바르지 않습니다. "),
 
-    NOT_FOUND_SEARCH_KEYWORD_SIMILARITY(HttpStatus.BAD_REQUEST.value(), "not_found_search_keyword_similarity", "검색 키워드 유사도를 찾을 수 없습니다. "),
-    NOT_FOUND_SEARCH_POST_IMPORTANCE(HttpStatus.BAD_REQUEST.value(), "not_found_search_post_importance", "검색 게시글 중요도를 찾을 수 없습니다. "),
+    NOT_FOUND_SEARCH_POST_IMPORTANCE(HttpStatus.INTERNAL_SERVER_ERROR.value(), "not_found_search_post_importance", "검색 게시글 중요도를 찾을 수 없습니다. "),
+    NOT_FOUND_SEARCH_POST_SIMILARITY(HttpStatus.INTERNAL_SERVER_ERROR.value(), "not_found_search_post_similarity", "검색 게시글 유사도를 찾을 수 없습니다. "),
 
     SEARCH_POST_PUBLISHED_AT_AFTER_NOW(HttpStatus.BAD_REQUEST.value(), "search_post_published_at_after_now", "게시글 발행 시점이 현재 이후의 시간입니다. "),
 

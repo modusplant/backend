@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileImagePath;
 import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,7 +12,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.regex.Pattern;
 
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EMPTY_MEMBER_PROFILE_IMAGE_PATH;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.INVALID_MEMBER_PROFILE_IMAGE_PATH;
 
 @Getter
@@ -25,7 +24,7 @@ public class MemberProfileImagePath {
 
     public static MemberProfileImagePath create(String value) {
         if (StringUtils.isBlank(value)) {
-            throw new EmptyValueException(EMPTY_MEMBER_PROFILE_IMAGE_PATH, "memberProfileImagePath");
+            return EmptyMemberProfileImagePath.create();
         } else if (!PATTERN_MEMBER_PROFILE_IMAGE_PATH.matcher(value).matches()) {
             throw new InvalidValueException(INVALID_MEMBER_PROFILE_IMAGE_PATH, "memberProfileImagePath");
         }

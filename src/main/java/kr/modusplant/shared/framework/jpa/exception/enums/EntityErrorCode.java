@@ -33,6 +33,7 @@ public enum EntityErrorCode implements ErrorCode {
     NOT_FOUND_REPORT(HttpStatus.NOT_FOUND.value(), "not_found_report", "보고서가 존재하지 않습니다"),
     NOT_FOUND_ACTOR(HttpStatus.NOT_FOUND.value(),"not_found_actor", "알림 행위자가 존재하지 않습니다"),
 
+    NOT_FOUND_IMAGE_FILE_KEY(HttpStatus.NOT_FOUND.value(), "not_found_image_file_key", "이미지 파일 키가 존재하지 않습니다"),
     NOT_FOUND_IMAGE_FILE_KEYS(HttpStatus.NOT_FOUND.value(), "not_found_image_file_keys", "이미지 파일 키가 존재하지 않습니다"),
 
     // Exists

@@ -22,17 +22,61 @@ public class ServiceExceptionLoggingAspectTest {
     ServiceExceptionLoggingAspectTest(MockMvc mockMvc) { this.mockMvc = mockMvc; }
 
     @Test
-    @DisplayName("AOP 적용 서비스 메소드 예외 상황 로깅")
-    void getMonitorServiceError_givenRestController_returnErrorStatusWithAopLogging() throws Exception{
+    @DisplayName("서비스 RuntimeException 발생 시 [SYS ERROR] 포맷으로 로깅")
+    void serviceException_givenRuntimeException_logsSysError() throws Exception {
         LogCaptor logCaptor = LogCaptor.forClass(ServiceExceptionLoggingAspect.class);
         logCaptor.setLogLevelToInfo();
-        mockMvc.perform(get("/api/monitor/monitor-error")
+
+        mockMvc.perform(get("/test/monitor/sys-error")
                         .with(user("admin").roles("ADMIN")))
                 .andExpect(status().is5xxServerError());
 
-        // then
         boolean logFound = logCaptor.getErrorLogs().stream()
-                .anyMatch(log -> log.contains("uri=GET") && log.contains("httpMethod=/api/monitor/monitor-error"));
+                .anyMatch(log -> log.contains("[SYS ERROR]")
+                        && log.contains("method=throwSysError")
+                        && log.contains("exception=RuntimeException")
+                        && log.contains("httpMethod=GET")
+                        && log.contains("uri=/test/monitor/sys-error"));
+        assertThat(logFound).isTrue();
+    }
+
+    @Test
+    @DisplayName("서비스 BusinessException 발생 시 [BIZ ERROR] 포맷으로 errorCode 포함 로깅")
+    void serviceException_givenBusinessException_logsBizError() throws Exception {
+        LogCaptor logCaptor = LogCaptor.forClass(ServiceExceptionLoggingAspect.class);
+        logCaptor.setLogLevelToInfo();
+
+        mockMvc.perform(get("/test/monitor/biz-error")
+                        .with(user("admin").roles("ADMIN")))
+                .andExpect(status().is5xxServerError());
+
+        boolean logFound = logCaptor.getErrorLogs().stream()
+                .anyMatch(log -> log.contains("[BIZ ERROR]")
+                        && log.contains("errorCode=internal_server_error")
+                        && log.contains("method=throwBizError")
+                        && log.contains("exception=BusinessException")
+                        && log.contains("httpMethod=GET")
+                        && log.contains("uri=/test/monitor/biz-error"));
+        assertThat(logFound).isTrue();
+    }
+
+    @Test
+    @DisplayName("cause 포함 BusinessException 발생 시 [BIZ ERROR] 포맷으로 causeMessage 포함 로깅")
+    void serviceException_givenBusinessExceptionWithCause_logsBizErrorWithCauseMessage() throws Exception {
+        LogCaptor logCaptor = LogCaptor.forClass(ServiceExceptionLoggingAspect.class);
+        logCaptor.setLogLevelToInfo();
+
+        mockMvc.perform(get("/test/monitor/biz-error-with-cause")
+                        .with(user("admin").roles("ADMIN")))
+                .andExpect(status().is5xxServerError());
+
+        boolean logFound = logCaptor.getErrorLogs().stream()
+                .anyMatch(log -> log.contains("[BIZ ERROR]")
+                        && log.contains("errorCode=internal_server_error")
+                        && log.contains("method=throwBizErrorWithCause")
+                        && log.contains("causeMessage=테스트용 원인 예외")
+                        && log.contains("httpMethod=GET")
+                        && log.contains("uri=/test/monitor/biz-error-with-cause"));
         assertThat(logFound).isTrue();
     }
 }

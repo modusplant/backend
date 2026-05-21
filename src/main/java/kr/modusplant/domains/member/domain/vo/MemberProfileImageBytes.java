@@ -1,14 +1,12 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileImageBytes;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EMPTY_MEMBER_PROFILE_IMAGE_BYTES;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
@@ -18,7 +16,7 @@ public class MemberProfileImageBytes {
 
     public static MemberProfileImageBytes create(byte[] value) {
         if (value == null) {
-            throw new EmptyValueException(EMPTY_MEMBER_PROFILE_IMAGE_BYTES, "memberProfileImageBytes");
+            return EmptyMemberProfileImageBytes.create();
         }
         return new MemberProfileImageBytes(value);
     }

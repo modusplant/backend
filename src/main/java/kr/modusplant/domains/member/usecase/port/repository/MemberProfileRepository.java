@@ -4,10 +4,9 @@ import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 
 import java.io.IOException;
-import java.util.Optional;
 
 public interface MemberProfileRepository {
-    Optional<MemberProfile> getById(MemberId memberId) throws IOException;
+    MemberProfile getById(MemberId memberId) throws IOException;
 
     MemberProfile add(MemberProfile memberProfile) throws IOException;
 
