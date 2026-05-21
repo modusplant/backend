@@ -35,7 +35,7 @@ public class MemberAdminRestController {
             description = "건의 사항 또는 버그 제보를 제거합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping(value = "/admin/report/proposal-or-bug/{reportUlid}")
+    @DeleteMapping(value = "/report/proposal-or-bug/{reportUlid}")
     public ResponseEntity<DataResponse<Void>> removeProposalOrBugReport(
             @Parameter(
                     description = "삭제할 보고서의 식별자",
