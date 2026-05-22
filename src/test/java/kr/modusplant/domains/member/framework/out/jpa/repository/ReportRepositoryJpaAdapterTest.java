@@ -72,12 +72,12 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
 
     @Test
     @DisplayName("보고서 식별자가 존재할 때 isIdExist로 보고서 존재 여부 반환")
-    void testIsIdExist_givenExistedReportId_willReturnResponse() {
+    void testIsIdExist_givenExistedReportId_willReturnResponseInProposalOrBugReport() {
         // given
         given(proposalBugReportJpaRepository.existsByUlid(any())).willReturn(true);
 
         // when
-        boolean isReportIdExist = reportRepositoryJpaAdapter.isIdExist(testReportId);
+        boolean isReportIdExist = reportRepositoryJpaAdapter.isIdExistInProposalOrBugReport(testReportId);
 
         // then
         assertThat(isReportIdExist).isTrue();
@@ -85,12 +85,12 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
 
     @Test
     @DisplayName("보고서 식별자가 존재하지 않을 때 isIdExist로 보고서 존재 여부 반환")
-    void testIsIdExist_givenNotFoundReportId_willReturnResponse() {
+    void testIsIdExist_givenNotFoundReportId_willReturnResponseInProposalOrBugReport() {
         // given
         given(proposalBugReportJpaRepository.existsByUlid(any())).willReturn(false);
 
         // when
-        boolean isReportIdExist = reportRepositoryJpaAdapter.isIdExist(testReportId);
+        boolean isReportIdExist = reportRepositoryJpaAdapter.isIdExistInProposalOrBugReport(testReportId);
 
         // then
         assertThat(isReportIdExist).isFalse();
