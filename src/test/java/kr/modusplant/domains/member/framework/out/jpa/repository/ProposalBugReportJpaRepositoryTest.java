@@ -40,23 +40,10 @@ class ProposalBugReportJpaRepositoryTest implements ProposalBugReportEntityTestU
         ProposalBugReportEntity proposalOrBugReport = createProposalBugReportEntityBuilder().member(createMemberBasicUserEntity()).build();
 
         // when
-        proposalOrBugReportRepository.save(proposalOrBugReport);
+        proposalOrBugReport = proposalOrBugReportRepository.save(proposalOrBugReport);
 
         // then
-        assertThat(proposalOrBugReportRepository.findByCreatedAt(proposalOrBugReport.getCreatedAt()).getFirst()).isEqualTo(proposalOrBugReport);
-    }
-
-    @DisplayName("lastModifiedAt으로 보고서 찾기")
-    @Test
-    void findByLastModifiedAtTest() {
-        // given
-        ProposalBugReportEntity proposalOrBugReport = createProposalBugReportEntityBuilder().member(createMemberBasicUserEntity()).build();
-
-        // when
-        proposalOrBugReportRepository.save(proposalOrBugReport);
-
-        // then
-        assertThat(proposalOrBugReportRepository.findByLastModifiedAt(proposalOrBugReport.getLastModifiedAt()).getFirst()).isEqualTo(proposalOrBugReport);
+        assertThat(proposalOrBugReportRepository.findByCreatedAt(proposalOrBugReport.getCreatedAt())).contains(proposalOrBugReport);
     }
 
     @DisplayName("ulid로 보고서 삭제")

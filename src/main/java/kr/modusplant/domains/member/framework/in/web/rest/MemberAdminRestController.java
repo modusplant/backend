@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,7 @@ import static kr.modusplant.shared.constant.Regex.REGEX_ULID;
 @RequiredArgsConstructor
 @Validated
 @Slf4j
+@PreAuthorize("hasAuthority('ADMIN')")
 public class MemberAdminRestController {
     private final MemberAdminController memberAdminController;
 
@@ -35,7 +37,7 @@ public class MemberAdminRestController {
             description = "건의 사항 또는 버그 제보를 제거합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping(value = "/admin/report/proposal-or-bug/{reportUlid}")
+    @DeleteMapping(value = "/report/proposal-or-bug/{reportUlid}")
     public ResponseEntity<DataResponse<Void>> removeProposalOrBugReport(
             @Parameter(
                     description = "삭제할 보고서의 식별자",
