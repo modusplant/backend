@@ -11,11 +11,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
@@ -54,28 +52,12 @@ public class ProposalBugReportEntity {
     @Column(name = CHECKED_AT)
     private LocalDateTime checkedAt;
 
-    @Column(name = HANDLED_AT)
-    private LocalDateTime handledAt;
-
     @Column(name = CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 
-    @Column(name = LAST_MODIFIED_AT, nullable = false)
-    @LastModifiedDate
-    private LocalDateTime lastModifiedAt;
-
-    @Version
-    @Column(name = VER_NUM, nullable = false)
-    @ToString.Exclude
-    private Long versionNumber;
-
     public String getETagSource() {
-        return getUlid() + "-" + getVersionNumber();
-    }
-
-    public LocalDateTime getLastModifiedAtAsTruncatedToSeconds() {
-        return getLastModifiedAt().truncatedTo(ChronoUnit.SECONDS);
+        return getUlid() + "-" + getCheckedAt();
     }
 
     @Override
@@ -98,8 +80,7 @@ public class ProposalBugReportEntity {
                                     String content,
                                     List<FilenameAndSrcEntityRecord> image,
                                     Integer imageNumber,
-                                    LocalDateTime checkedAt,
-                                    LocalDateTime handledAt) {
+                                    LocalDateTime checkedAt) {
         this.ulid = ulid;
         this.member = member;
         this.title = title;
@@ -107,7 +88,6 @@ public class ProposalBugReportEntity {
         this.image = image;
         this.imageNumber = imageNumber;
         this.checkedAt = checkedAt;
-        this.handledAt = handledAt;
     }
 
     public static ProposalBugReportEntityBuilder builder() {
@@ -122,7 +102,6 @@ public class ProposalBugReportEntity {
         private List<FilenameAndSrcEntityRecord> image;
         private Integer imageNumber;
         private LocalDateTime checkedAt;
-        private LocalDateTime handledAt;
 
         public ProposalBugReportEntityBuilder ulid(final String ulid) {
             this.ulid = ulid;
@@ -159,11 +138,6 @@ public class ProposalBugReportEntity {
             return this;
         }
 
-        public ProposalBugReportEntityBuilder handledAt(final LocalDateTime handledAt) {
-            this.handledAt = handledAt;
-            return this;
-        }
-
         public ProposalBugReportEntityBuilder proposalBugReport(final ProposalBugReportEntity propBugRep) {
             this.ulid = propBugRep.getUlid();
             this.member = propBugRep.getMember();
@@ -172,12 +146,11 @@ public class ProposalBugReportEntity {
             this.image = propBugRep.getImage();
             this.imageNumber = propBugRep.getImageNumber();
             this.checkedAt = propBugRep.getCheckedAt();
-            this.handledAt = propBugRep.getHandledAt();
             return this;
         }
 
         public ProposalBugReportEntity build() {
-            return new ProposalBugReportEntity(this.ulid, this.member, this.title, this.content, this.image, this.imageNumber, this.checkedAt, this.handledAt);
+            return new ProposalBugReportEntity(this.ulid, this.member, this.title, this.content, this.image, this.imageNumber, this.checkedAt);
         }
     }
 }

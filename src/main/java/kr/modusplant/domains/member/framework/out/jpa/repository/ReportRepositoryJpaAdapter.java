@@ -140,8 +140,7 @@ public class ReportRepositoryJpaAdapter implements ReportRepository {
                         PROP_BUG_REP_ARCHIVE.TITLE,
                         PROP_BUG_REP_ARCHIVE.CONTENT,
                         PROP_BUG_REP_ARCHIVE.CREATED_AT,
-                        PROP_BUG_REP_ARCHIVE.ARCHIVED_AT,
-                        PROP_BUG_REP_ARCHIVE.LAST_MODIFIED_AT
+                        PROP_BUG_REP_ARCHIVE.ARCHIVED_AT
                 )
                 .select(
                         select(
@@ -150,8 +149,7 @@ public class ReportRepositoryJpaAdapter implements ReportRepository {
                                 PROP_BUG_REP.TITLE,
                                 PROP_BUG_REP.CONTENT,
                                 PROP_BUG_REP.CREATED_AT,
-                                val(LocalDateTime.now()),
-                                PROP_BUG_REP.LAST_MODIFIED_AT
+                                val(LocalDateTime.now())
                         )
                                 .from(PROP_BUG_REP)
                                 .where(PROP_BUG_REP.ULID.eq(reportId))

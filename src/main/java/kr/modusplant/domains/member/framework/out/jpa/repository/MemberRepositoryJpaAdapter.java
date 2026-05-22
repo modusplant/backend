@@ -6,9 +6,9 @@ import kr.modusplant.domains.member.domain.enums.MemberWithdrawReason;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberWithdrawOpinion;
 import kr.modusplant.domains.member.framework.out.jooq.record.ActivitySubjectCommentIdRecord;
-import kr.modusplant.domains.member.framework.out.jooq.repository.MemberProfileJooqRepository;
 import kr.modusplant.domains.member.framework.out.jooq.repository.ActivitySubjectCommentJooqRepository;
 import kr.modusplant.domains.member.framework.out.jooq.repository.ActivitySubjectPostJooqRepository;
+import kr.modusplant.domains.member.framework.out.jooq.repository.MemberProfileJooqRepository;
 import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.out.jpa.mapper.MemberJpaMapperImpl;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
@@ -231,13 +231,10 @@ public class MemberRepositoryJpaAdapter implements MemberRepository {
 
                 dsl.update(PROP_BUG_REP)
                         .setNull(PROP_BUG_REP.MEMB_UUID)
-                        .set(PROP_BUG_REP.LAST_MODIFIED_AT, LocalDateTime.now())
-                        .set(PROP_BUG_REP.VER_NUM, coalesce(PROP_BUG_REP.VER_NUM, 0).plus(1))
                         .where(PROP_BUG_REP.MEMB_UUID.eq(memberId)),
 
                 dsl.update(PROP_BUG_REP_ARCHIVE)
                         .setNull(PROP_BUG_REP_ARCHIVE.MEMB_UUID)
-                        .set(PROP_BUG_REP_ARCHIVE.LAST_MODIFIED_AT, LocalDateTime.now())
                         .where(PROP_BUG_REP_ARCHIVE.MEMB_UUID.eq(memberId)),
 
                 dsl.deleteFrom(REFRESH_TOKEN)
