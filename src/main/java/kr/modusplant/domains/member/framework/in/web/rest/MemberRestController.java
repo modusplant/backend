@@ -35,7 +35,7 @@ import java.util.UUID;
 import static kr.modusplant.infrastructure.jwt.util.TokenUtils.getTokenFromAuthorizationHeader;
 import static kr.modusplant.shared.constant.Regex.*;
 
-@Tag(name = "회원 API", description = "회원의 생성과 갱신(상태 제외), 회원이 할 수 있는 단일한 기능을 관리하는 API 입니다.")
+@Tag(name = "회원 API", description = "회원의 생성과 갱신(상태 제외), 회원 활동을 관리하는 API 입니다.")
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor

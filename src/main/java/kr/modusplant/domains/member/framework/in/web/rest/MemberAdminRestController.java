@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static kr.modusplant.shared.constant.Regex.REGEX_ULID;
 
-@Tag(name = "회원 API(관리자 전용)", description = "회원의 생성과 갱신(상태 제외), 회원이 할 수 있는 단일한 기능을 관리하는 API 입니다.")
+@Tag(name = "회원 API(관리자 전용)", description = "회원의 생성과 갱신(상태 제외), 회원 활동을 관리하는 API 입니다.")
 @RestController
 @RequestMapping("/api/admin/v1")
 @RequiredArgsConstructor
