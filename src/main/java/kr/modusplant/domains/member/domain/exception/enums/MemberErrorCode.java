@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum MemberErrorCode implements ErrorCode {
+    EXISTS_REPORT_CHECKED_AT(HttpStatus.BAD_REQUEST.value(), "exists_report_checked_at", "보고서가 이미 확인되었습니다. "),
+
     EMPTY_MEMBER_ID(HttpStatus.BAD_REQUEST.value(), "empty_member_id", "회원 아이디가 비어 있습니다. "),
     EMPTY_MEMBER_STATUS(HttpStatus.BAD_REQUEST.value(), "empty_member_status", "회원 상태가 비어 있습니다. "),
     EMPTY_MEMBER_PROFILE_IMAGE(HttpStatus.BAD_REQUEST.value(), "empty_member_profile_image", "회원 프로필 이미지가 비어 있습니다. "),

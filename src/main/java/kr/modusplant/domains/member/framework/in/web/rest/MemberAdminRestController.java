@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import kr.modusplant.domains.member.adapter.controller.MemberAdminController;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRemoveRecord;
+import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportCheckRecord;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static kr.modusplant.shared.constant.Regex.REGEX_ULID;
 
@@ -31,6 +29,24 @@ import static kr.modusplant.shared.constant.Regex.REGEX_ULID;
 @PreAuthorize("hasAuthority('ADMIN')")
 public class MemberAdminRestController {
     private final MemberAdminController memberAdminController;
+
+    @Operation(
+            summary = "건의 및 버그 제보 확인 API",
+            description = "건의 사항 또는 버그 제보를 확인합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PostMapping(value = "/report/proposal-or-bug/{reportUlid}")
+    public ResponseEntity<DataResponse<Void>> checkProposalOrBugReport(
+            @Parameter(
+                    description = "확인할 보고서의 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
+            @PathVariable
+            @NotBlank(message = "보고서 식별자가 비어 있습니다.")
+            String reportUlid) {
+        memberAdminController.checkProposalOrBug(new ProposalOrBugReportCheckRecord(reportUlid));
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
 
     @Operation(
             summary = "건의 및 버그 제보 제거 API",

@@ -4,10 +4,10 @@ import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.member.domain.aggregate.ProposalOrBugReport;
-import kr.modusplant.domains.member.domain.vo.MemberId;
-import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.domain.vo.ActivitySubjectCommentId;
 import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
+import kr.modusplant.domains.member.domain.vo.MemberId;
+import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.framework.out.jooq.repository.ReportJooqRepository;
 import kr.modusplant.domains.member.framework.out.jpa.entity.CommentAbuseReportEntity;
 import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
@@ -47,8 +47,16 @@ public class ReportRepositoryJpaAdapter implements ReportRepository {
     private final ReportJooqRepository reportJooqRepository;
 
     @Override
-    public boolean isIdExist(ReportId reportId) {
+    public boolean isIdExistInProposalOrBugReport(ReportId reportId) {
         return proposalBugReportJpaRepository.existsByUlid(reportId.getValue());
+    }
+
+    @Override
+    public boolean isCheckedInProposalOrBugReport(ReportId reportId) {
+        return select(PROP_BUG_REP.CHECKED_AT)
+                .from(PROP_BUG_REP)
+                .where(PROP_BUG_REP.ULID.eq(reportId.getValue()))
+                .fetchOne(PROP_BUG_REP.CHECKED_AT) != null;
     }
 
     @Override
@@ -118,6 +126,14 @@ public class ReportRepositoryJpaAdapter implements ReportRepository {
         ).orElseThrow();
         commentAbuseReportJpaRepository.save(
                 CommentAbuseReportEntity.builder().member(memberEntity).comment(commentEntity).build());
+    }
+
+    @Override
+    public void checkProposalOrBugReport(ReportId reportId) {
+        dsl.update(PROP_BUG_REP)
+                .set(PROP_BUG_REP.CHECKED_AT, LocalDateTime.now())
+                .where(PROP_BUG_REP.ULID.eq(reportId.getValue()))
+                .execute();
     }
 
     @Override

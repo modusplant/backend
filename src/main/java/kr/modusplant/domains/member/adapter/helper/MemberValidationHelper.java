@@ -54,7 +54,7 @@ public class MemberValidationHelper {
     }
 
     public void validateIfReportExists(ReportId reportId) {
-        if (!reportRepository.isIdExist(reportId)) {
+        if (!reportRepository.isIdExistInProposalOrBugReport(reportId)) {
             throw new NotFoundEntityException(NOT_FOUND_REPORT_ID, "reportId");
         }
     }
