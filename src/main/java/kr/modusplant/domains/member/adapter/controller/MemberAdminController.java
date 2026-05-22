@@ -1,6 +1,5 @@
 package kr.modusplant.domains.member.adapter.controller;
 
-import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRemoveRecord;
@@ -15,13 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Slf4j
 public class MemberAdminController {
-    private final MemberValidationHelper memberValidationHelper;
     private final ReportRepository reportRepository;
 
     public void removeProposalOrBug(ProposalOrBugReportRemoveRecord record) {
         ReportId reportId = ReportId.create(record.reportUlid());
-        memberValidationHelper.validateIfReportExists(reportId);
-
-        reportRepository.removeProposalOrBugReport(reportId);
+        if (reportRepository.isIdExist(reportId)) {
+            reportRepository.removeProposalOrBugReport(reportId);
+        }
     }
 }
