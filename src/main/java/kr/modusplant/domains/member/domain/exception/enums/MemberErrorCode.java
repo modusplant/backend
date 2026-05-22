@@ -27,8 +27,6 @@ public enum MemberErrorCode implements ErrorCode {
     EMPTY_ACTIVITY_SUBJECT_COMMENT_PATH(HttpStatus.BAD_REQUEST.value(), "empty_activity_subject_comment_path", "대상 댓글 경로가 비어 있습니다. "),
     EMPTY_ACTIVITY_SUBJECT_POST_ID(HttpStatus.BAD_REQUEST.value(), "empty_activity_subject_post_id", "대상 게시글 아이디가 비어 있습니다. "),
 
-    INCORRECT_MEMBER_ID(HttpStatus.BAD_REQUEST.value(), "incorrect_member_id", "올바르지 않은 회원 ID를 사용하고 있습니다. "),
-
     INVALID_MEMBER_PROFILE_IMAGE_PATH(HttpStatus.BAD_REQUEST.value(), "invalid_member_profile_image_path", "회원 프로필 이미지 경로의 서식이 올바르지 않습니다. "),
     INVALID_MEMBER_ID(HttpStatus.BAD_REQUEST.value(), "invalid_member_id", "사용자 식별자의 서식이 올바르지 않습니다. "),
     INVALID_REPORT_ID(HttpStatus.BAD_REQUEST.value(), "invalid_report_id", "보고서 식별자의 서식이 올바르지 않습니다. "),
