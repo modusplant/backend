@@ -57,7 +57,7 @@ class PostAbuseReportEntityTest implements PostAbuseReportEntityTestUtils {
         assertEquals(postAbuseReportEntity.getETagSource(),
                 postAbuseReportEntity.getMemberId() + "-" +
                         postAbuseReportEntity.getPost().getUlid() + "-" +
-                        postAbuseReportEntity.getVersionNumber());
+                        postAbuseReportEntity.getCheckedAt());
     }
 
     @Test

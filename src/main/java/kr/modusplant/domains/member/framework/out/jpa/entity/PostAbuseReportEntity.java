@@ -10,11 +10,9 @@ import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
@@ -46,28 +44,12 @@ public class PostAbuseReportEntity {
     @Column(name = CHECKED_AT)
     private LocalDateTime checkedAt;
 
-    @Column(name = HANDLED_AT)
-    private LocalDateTime handledAt;
-
     @Column(name = CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 
-    @Column(name = LAST_MODIFIED_AT, nullable = false)
-    @LastModifiedDate
-    private LocalDateTime lastModifiedAt;
-
-    @Version
-    @Column(name = VER_NUM, nullable = false)
-    @ToString.Exclude
-    private Long versionNumber;
-
     public String getETagSource() {
-        return getMemberId() + "-" + getPost().getUlid() + "-" + getVersionNumber();
-    }
-
-    public LocalDateTime getLastModifiedAtAsTruncatedToSeconds() {
-        return getLastModifiedAt().truncatedTo(ChronoUnit.SECONDS);
+        return getMemberId() + "-" + getPost().getUlid() + "-" + getCheckedAt();
     }
 
     @Override
@@ -87,11 +69,10 @@ public class PostAbuseReportEntity {
         return new HashCodeBuilder(17, 37).append(getMember()).append(getPost()).toHashCode();
     }
 
-    private PostAbuseReportEntity(MemberEntity member, PostEntity post, LocalDateTime checkedAt, LocalDateTime handledAt) {
+    private PostAbuseReportEntity(MemberEntity member, PostEntity post, LocalDateTime checkedAt) {
         this.member = member;
         this.post = post;
         this.checkedAt = checkedAt;
-        this.handledAt = handledAt;
     }
 
     public static PostAbuseReportEntityBuilder builder() {
@@ -102,7 +83,6 @@ public class PostAbuseReportEntity {
         private MemberEntity member;
         private PostEntity post;
         private LocalDateTime checkedAt;
-        private LocalDateTime handledAt;
 
         public PostAbuseReportEntityBuilder member(final MemberEntity member) {
             this.member = member;
@@ -119,21 +99,15 @@ public class PostAbuseReportEntity {
             return this;
         }
 
-        public PostAbuseReportEntityBuilder handledAt(final LocalDateTime handledAt) {
-            this.handledAt = handledAt;
-            return this;
-        }
-
         public PostAbuseReportEntityBuilder postAbuseReport(final PostAbuseReportEntity postAbuRep) {
             this.member = postAbuRep.getMember();
             this.post = postAbuRep.getPost();
             this.checkedAt = postAbuRep.getCheckedAt();
-            this.handledAt = postAbuRep.getHandledAt();
             return this;
         }
 
         public PostAbuseReportEntity build() {
-            return new PostAbuseReportEntity(this.member, this.post, this.checkedAt, this.handledAt);
+            return new PostAbuseReportEntity(this.member, this.post, this.checkedAt);
         }
     }
 }

@@ -61,7 +61,7 @@ class CommentAbuseReportEntityTest implements CommentAbuseReportEntityTestUtils 
                 commentAbuRepEntity.getMemberId() + "-" +
                         commentAbuRepEntity.getComment().getPost().getUlid() + "-" +
                         commentAbuRepEntity.getComment().getPath() + "-" +
-                        commentAbuRepEntity.getVersionNumber());
+                        commentAbuRepEntity.getCheckedAt());
     }
 
     @Test

@@ -10,11 +10,9 @@ import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
@@ -49,28 +47,12 @@ public class CommentAbuseReportEntity {
     @Column(name = CHECKED_AT)
     private LocalDateTime checkedAt;
 
-    @Column(name = HANDLED_AT)
-    private LocalDateTime handledAt;
-
     @Column(name = CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 
-    @Column(name = LAST_MODIFIED_AT, nullable = false)
-    @LastModifiedDate
-    private LocalDateTime lastModifiedAt;
-
-    @Version
-    @Column(name = VER_NUM, nullable = false)
-    @ToString.Exclude
-    private Long versionNumber;
-
     public String getETagSource() {
-        return getMemberId() + "-" + getComment().getPost().getUlid() + "-" + getComment().getPath() + "-" + getVersionNumber();
-    }
-
-    public LocalDateTime getLastModifiedAtAsTruncatedToSeconds() {
-        return getLastModifiedAt().truncatedTo(ChronoUnit.SECONDS);
+        return getMemberId() + "-" + getComment().getPost().getUlid() + "-" + getComment().getPath() + "-" + getCheckedAt();
     }
 
     @Override
@@ -88,11 +70,10 @@ public class CommentAbuseReportEntity {
                 .append(getMember()).append(getComment()).toHashCode();
     }
 
-    private CommentAbuseReportEntity(MemberEntity member, CommentEntity comment, LocalDateTime checkedAt, LocalDateTime handledAt) {
+    private CommentAbuseReportEntity(MemberEntity member, CommentEntity comment, LocalDateTime checkedAt) {
         this.member = member;
         this.comment = comment;
         this.checkedAt = checkedAt;
-        this.handledAt = handledAt;
     }
 
     public static CommentAbuseReportEntityBuilder builder() {
@@ -103,7 +84,6 @@ public class CommentAbuseReportEntity {
         private MemberEntity member;
         private CommentEntity comment;
         private LocalDateTime checkedAt;
-        private LocalDateTime handledAt;
 
         public CommentAbuseReportEntityBuilder member(final MemberEntity member) {
             this.member = member;
@@ -120,21 +100,15 @@ public class CommentAbuseReportEntity {
             return this;
         }
 
-        public CommentAbuseReportEntityBuilder handledAt(final LocalDateTime handledAt) {
-            this.handledAt = handledAt;
-            return this;
-        }
-
         public CommentAbuseReportEntityBuilder commentAbuseReport(final CommentAbuseReportEntity commentAbuRep) {
             this.member = commentAbuRep.getMember();
             this.comment = commentAbuRep.getComment();
             this.checkedAt = commentAbuRep.getCheckedAt();
-            this.handledAt = commentAbuRep.getHandledAt();
             return this;
         }
 
         public CommentAbuseReportEntity build() {
-            return new CommentAbuseReportEntity(this.member, this.comment, this.checkedAt, this.handledAt);
+            return new CommentAbuseReportEntity(this.member, this.comment, this.checkedAt);
         }
     }
 }
