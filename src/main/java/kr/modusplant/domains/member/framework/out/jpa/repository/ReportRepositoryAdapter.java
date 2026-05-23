@@ -36,7 +36,7 @@ import static org.jooq.impl.DSL.val;
 
 @Repository
 @RequiredArgsConstructor
-public class ReportRepositoryJpaAdapter implements ReportRepository {
+public class ReportRepositoryAdapter implements ReportRepository {
     private final DSLContext dsl;
     private final ApplicationEventPublisher applicationEventPublisher;
 

@@ -110,7 +110,7 @@ class MemberControllerTest implements
     private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl(amazonS3Service);
     private final MemberSocialTranslator memberSocialTranslator = Mockito.mock(MemberSocialTranslator.class);
 
-    private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryJpaAdapter.class);
+    private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryAdapter.class);
     private final MemberProfileRepository memberProfileRepository = Mockito.mock(MemberProfileRepositoryJpaAdapter.class);
     private final ActivitySubjectPostRepository activitySubjectPostRepository = Mockito.mock(ActivitySubjectPostRepositoryJpaAdapter.class);
     private final ActivitySubjectCommentRepository activitySubjectCommentRepository = Mockito.mock(ActivitySubjectCommentRepositoryJpaAdapter.class);

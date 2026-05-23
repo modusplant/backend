@@ -38,7 +38,7 @@ import static org.jooq.impl.DSL.*;
 
 @Repository
 @RequiredArgsConstructor
-public class MemberRepositoryJpaAdapter implements MemberRepository {
+public class MemberRepositoryAdapter implements MemberRepository {
     private final StringRedisTemplate stringRedisTemplate;
     private final DSLContext dsl;
     private final ApplicationEventPublisher eventPublisher;

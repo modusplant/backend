@@ -45,7 +45,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, CommentAbuseReportEntityTestUtils, ProposalOrBugReportTestUtils {
+class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, CommentAbuseReportEntityTestUtils, ProposalOrBugReportTestUtils {
     private final MockDataProvider mockDataProvider = (MockExecuteContext mockExecuteContext) -> {
         String sql = mockExecuteContext.sql().toLowerCase();
 
@@ -69,7 +69,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
     private final CommentAbuseReportJpaRepository commentAbuseReportJpaRepository = Mockito.mock(CommentAbuseReportJpaRepository.class);
     private final ReportJooqRepository reportJooqRepository = Mockito.mock(ReportJooqRepository.class);
 
-    private final ReportRepositoryJpaAdapter reportRepositoryJpaAdapter = new ReportRepositoryJpaAdapter(
+    private final ReportRepositoryAdapter reportRepositoryAdapter = new ReportRepositoryAdapter(
             dslContext, applicationEventPublisher, memberJpaRepository, proposalBugReportJpaRepository, postJpaRepository, postAbuRepJpaRepository, commentJpaRepository, commentAbuseReportJpaRepository, reportJooqRepository);
 
     @Test
@@ -79,7 +79,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(proposalBugReportJpaRepository.existsByUlid(any())).willReturn(true);
 
         // when
-        boolean isReportIdExist = reportRepositoryJpaAdapter.isIdExistInProposalOrBugReport(testReportId);
+        boolean isReportIdExist = reportRepositoryAdapter.isIdExistInProposalOrBugReport(testReportId);
 
         // then
         assertThat(isReportIdExist).isTrue();
@@ -92,7 +92,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(proposalBugReportJpaRepository.existsByUlid(any())).willReturn(false);
 
         // when
-        boolean isReportIdExist = reportRepositoryJpaAdapter.isIdExistInProposalOrBugReport(testReportId);
+        boolean isReportIdExist = reportRepositoryAdapter.isIdExistInProposalOrBugReport(testReportId);
 
         // then
         assertThat(isReportIdExist).isFalse();
@@ -106,7 +106,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(postAbuRepJpaRepository.findByMemberIdAndPost(any(), any())).willReturn(Optional.of(createPostAbuseReportEntityBuilder().build()));
 
         // when
-        boolean isMemberAbusePost = reportRepositoryJpaAdapter.isMemberAbusePost(testMemberId, testActivitySubjectPostId);
+        boolean isMemberAbusePost = reportRepositoryAdapter.isMemberAbusePost(testMemberId, testActivitySubjectPostId);
 
         // then
         assertThat(isMemberAbusePost).isTrue();
@@ -120,7 +120,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(postAbuRepJpaRepository.findByMemberIdAndPost(any(), any())).willReturn(Optional.empty());
 
         // when
-        boolean isMemberAbusePost = reportRepositoryJpaAdapter.isMemberAbusePost(testMemberId, testActivitySubjectPostId);
+        boolean isMemberAbusePost = reportRepositoryAdapter.isMemberAbusePost(testMemberId, testActivitySubjectPostId);
 
         // then
         assertThat(isMemberAbusePost).isFalse();
@@ -136,7 +136,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
                 .willReturn(Optional.of(createCommentAbuseReportEntityBuilder().build()));
 
         // when
-        boolean isMemberAbusePost = reportRepositoryJpaAdapter.isMemberAbuseComment(testMemberId, testActivitySubjectCommentId);
+        boolean isMemberAbusePost = reportRepositoryAdapter.isMemberAbuseComment(testMemberId, testActivitySubjectCommentId);
 
         // then
         assertThat(isMemberAbusePost).isTrue();
@@ -151,7 +151,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(postAbuRepJpaRepository.findByMemberIdAndPost(any(), any())).willReturn(Optional.empty());
 
         // when
-        boolean isMemberAbusePost = reportRepositoryJpaAdapter.isMemberAbuseComment(testMemberId, testActivitySubjectCommentId);
+        boolean isMemberAbusePost = reportRepositoryAdapter.isMemberAbuseComment(testMemberId, testActivitySubjectCommentId);
 
         // then
         assertThat(isMemberAbusePost).isFalse();
@@ -165,7 +165,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));
 
         // when
-        reportRepositoryJpaAdapter.reportProposalOrBug(testMemberId, createProposalOrBugReport());
+        reportRepositoryAdapter.reportProposalOrBug(testMemberId, createProposalOrBugReport());
 
         // then
         verify(proposalBugReportJpaRepository, times(1)).save(any(ProposalBugReportEntity.class));
@@ -178,7 +178,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> reportRepositoryJpaAdapter.reportProposalOrBug(testMemberId, createProposalOrBugReport()));
+        assertThrows(NoSuchElementException.class, () -> reportRepositoryAdapter.reportProposalOrBug(testMemberId, createProposalOrBugReport()));
 
         // then
         verify(proposalBugReportJpaRepository, never()).save(any());
@@ -194,7 +194,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(postJpaRepository.findByUlid(TEST_POST_ULID)).willReturn(Optional.of(mockPost));
 
         // when
-        reportRepositoryJpaAdapter.reportPostAbuse(testMemberId, testActivitySubjectPostId);
+        reportRepositoryAdapter.reportPostAbuse(testMemberId, testActivitySubjectPostId);
 
         // then
         verify(postAbuRepJpaRepository, times(1)).save(any(PostAbuseReportEntity.class));
@@ -207,7 +207,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> reportRepositoryJpaAdapter.reportPostAbuse(testMemberId, testActivitySubjectPostId));
+        assertThrows(NoSuchElementException.class, () -> reportRepositoryAdapter.reportPostAbuse(testMemberId, testActivitySubjectPostId));
 
         // then
         verify(postAbuRepJpaRepository, never()).save(any());
@@ -222,7 +222,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(postJpaRepository.findByUlid(TEST_POST_ULID)).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> reportRepositoryJpaAdapter.reportPostAbuse(testMemberId, testActivitySubjectPostId));
+        assertThrows(NoSuchElementException.class, () -> reportRepositoryAdapter.reportPostAbuse(testMemberId, testActivitySubjectPostId));
 
         // then
         verify(postAbuRepJpaRepository, never()).save(any());
@@ -239,7 +239,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(commentJpaRepository.findById(any(CommentCompositeKey.class))).willReturn(Optional.of(commentEntity));
 
         // when
-        reportRepositoryJpaAdapter.reportCommentAbuse(testMemberId, testActivitySubjectCommentId);
+        reportRepositoryAdapter.reportCommentAbuse(testMemberId, testActivitySubjectCommentId);
 
         // then
         verify(commentAbuseReportJpaRepository, times(1)).save(any(CommentAbuseReportEntity.class));
@@ -252,7 +252,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> reportRepositoryJpaAdapter.reportCommentAbuse(testMemberId, testActivitySubjectCommentId));
+        assertThrows(NoSuchElementException.class, () -> reportRepositoryAdapter.reportCommentAbuse(testMemberId, testActivitySubjectCommentId));
 
         // then
         verify(commentAbuseReportJpaRepository, never()).save(any());
@@ -267,7 +267,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(commentJpaRepository.findById(any(CommentCompositeKey.class))).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> reportRepositoryJpaAdapter.reportCommentAbuse(testMemberId, testActivitySubjectCommentId));
+        assertThrows(NoSuchElementException.class, () -> reportRepositoryAdapter.reportCommentAbuse(testMemberId, testActivitySubjectCommentId));
 
         // then
         verify(commentAbuseReportJpaRepository, never()).save(any());
@@ -281,7 +281,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(reportJooqRepository.getProposalOrBugReportAdminPageReadModel(testProposalOrBugReportAdminPageCheckedRecord)).willReturn(testProposalOrBugReportAdminPageCheckedReadModel);
 
         // when
-        reportRepositoryJpaAdapter.checkProposalOrBugReport(testReportId);
+        reportRepositoryAdapter.checkProposalOrBugReport(testReportId);
 
         // then
         verify(reportJooqRepository, times(1)).getProposalOrBugReportAdminPageRecord(any());
@@ -295,7 +295,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(reportJooqRepository.getImageFileKeysFromReportId(any())).willReturn(TEST_POST_CONTENT_IMAGE_FILE_KEYS);
 
         // when
-        reportRepositoryJpaAdapter.removeProposalOrBugReport(testReportId);
+        reportRepositoryAdapter.removeProposalOrBugReport(testReportId);
 
         // then
         verify(applicationEventPublisher, times(1)).publishEvent(any(ImagesRemoveEvent.class));
@@ -308,7 +308,7 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
         given(reportJooqRepository.getImageFileKeysFromReportId(any())).willReturn(List.of());
 
         // when
-        reportRepositoryJpaAdapter.removeProposalOrBugReport(testReportId);
+        reportRepositoryAdapter.removeProposalOrBugReport(testReportId);
 
         // then
         verify(applicationEventPublisher, times(0)).publishEvent(any());

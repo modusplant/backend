@@ -46,7 +46,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
 
-class MemberRepositoryJpaAdapterTest implements MemberTestUtils, MemberEntityTestUtils {
+class MemberRepositoryAdapterTest implements MemberTestUtils, MemberEntityTestUtils {
     MockDataProvider mockDataProvider = ctx -> {
         DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
         return new MockResult[]{new MockResult(0, dsl.newResult())};
@@ -65,7 +65,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, MemberEntityTes
     private final ActivitySubjectCommentJooqRepository activitySubjectCommentJooqRepository = Mockito.mock(ActivitySubjectCommentJooqRepository.class);
     private final MemberProfileJooqRepository memberProfileJooqRepository = Mockito.mock(MemberProfileJooqRepository.class);
     private final PostJooqRepository postJooqRepository = Mockito.mock(PostJooqRepository.class);
-    private final MemberRepositoryJpaAdapter memberRepositoryJpaAdapter = new MemberRepositoryJpaAdapter(
+    private final MemberRepositoryAdapter memberRepositoryAdapter = new MemberRepositoryAdapter(
             stringRedisTemplate, dslContext, eventPublisher, memberJpaMapper, memberJpaRepository, activitySubjectPostJooqRepository, activitySubjectCommentJooqRepository, memberProfileJooqRepository, postJooqRepository);
 
     @Test
@@ -75,7 +75,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, MemberEntityTes
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(createMemberBasicUserEntityWithUuid()));
 
         // when & then
-        assertThat(memberRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(createMember());
+        assertThat(memberRepositoryAdapter.getById(testMemberId)).isEqualTo(createMember());
     }
 
     @Test
@@ -86,7 +86,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, MemberEntityTes
 
         // when
         NotFoundEntityException notFoundEntityException =
-                assertThrows(NotFoundEntityException.class, () -> memberRepositoryJpaAdapter.getById(testMemberId));
+                assertThrows(NotFoundEntityException.class, () -> memberRepositoryAdapter.getById(testMemberId));
 
         // then
         assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
@@ -99,7 +99,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, MemberEntityTes
         given(memberJpaRepository.findByNickname(any())).willReturn(Optional.empty());
 
         // when & then
-        assertThat(memberRepositoryJpaAdapter.getByNickname(testNormalUserNickname)).isEqualTo(Optional.empty());
+        assertThat(memberRepositoryAdapter.getByNickname(testNormalUserNickname)).isEqualTo(Optional.empty());
     }
 
     @Test
@@ -109,7 +109,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, MemberEntityTes
         given(memberJpaRepository.findByNickname(any())).willReturn(Optional.of(createMemberBasicUserEntityWithUuid()));
 
         // when & then
-        assertThat(memberRepositoryJpaAdapter.getByNickname(testNormalUserNickname)).isEqualTo(Optional.of(createMember()));
+        assertThat(memberRepositoryAdapter.getByNickname(testNormalUserNickname)).isEqualTo(Optional.of(createMember()));
     }
 
     @Test
@@ -119,7 +119,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, MemberEntityTes
         given(memberJpaRepository.findByNickname(any())).willReturn(Optional.empty());
 
         // when & then
-        assertThat(memberRepositoryJpaAdapter.getByNickname(testNormalUserNickname)).isEqualTo(Optional.empty());
+        assertThat(memberRepositoryAdapter.getByNickname(testNormalUserNickname)).isEqualTo(Optional.empty());
     }
 
     @Test
@@ -130,7 +130,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, MemberEntityTes
         given(memberJpaRepository.save(any())).willReturn(memberEntity);
 
         // when & then
-        assertThat(memberRepositoryJpaAdapter.add(testNormalUserNickname).getNickname()).isEqualTo(testNormalUserNickname);
+        assertThat(memberRepositoryAdapter.add(testNormalUserNickname).getNickname()).isEqualTo(testNormalUserNickname);
     }
 
     @Test
@@ -141,7 +141,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, MemberEntityTes
         given(memberJpaRepository.save(any())).willReturn(memberEntity);
 
         // when & then
-        Member member = memberRepositoryJpaAdapter.add(testMemberId, testNormalUserNickname);
+        Member member = memberRepositoryAdapter.add(testMemberId, testNormalUserNickname);
         assertThat(member.getMemberId()).isEqualTo(testMemberId);
         assertThat(member.getNickname()).isEqualTo(testNormalUserNickname);
     }
@@ -153,7 +153,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, MemberEntityTes
         given(memberJpaRepository.existsByUuid(testMemberId.getValue())).willReturn(true);
 
         // when & then
-        assertThat(memberRepositoryJpaAdapter.isIdExist(testMemberId)).isEqualTo(true);
+        assertThat(memberRepositoryAdapter.isIdExist(testMemberId)).isEqualTo(true);
     }
 
     @Test
@@ -163,7 +163,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, MemberEntityTes
         given(memberJpaRepository.existsByUuid(testMemberId.getValue())).willReturn(false);
 
         // when & then
-        assertThat(memberRepositoryJpaAdapter.isIdExist(testMemberId)).isEqualTo(false);
+        assertThat(memberRepositoryAdapter.isIdExist(testMemberId)).isEqualTo(false);
     }
 
     @Test
@@ -173,7 +173,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, MemberEntityTes
         given(memberJpaRepository.existsByNickname(testNormalUserNickname.getValue())).willReturn(true);
 
         // when & then
-        assertThat(memberRepositoryJpaAdapter.isNicknameExist(testNormalUserNickname)).isEqualTo(true);
+        assertThat(memberRepositoryAdapter.isNicknameExist(testNormalUserNickname)).isEqualTo(true);
     }
 
     @Test
@@ -183,7 +183,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, MemberEntityTes
         given(memberJpaRepository.existsByNickname(testNormalUserNickname.getValue())).willReturn(false);
 
         // when & then
-        assertThat(memberRepositoryJpaAdapter.isNicknameExist(testNormalUserNickname)).isEqualTo(false);
+        assertThat(memberRepositoryAdapter.isNicknameExist(testNormalUserNickname)).isEqualTo(false);
     }
 
     @Test
@@ -200,7 +200,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, MemberEntityTes
         willDoNothing().given(eventPublisher).publishEvent(any(ImageRemoveEvent.class));
 
         // when
-        memberRepositoryJpaAdapter.withdraw(testMemberId, MemberWithdrawReason.UNCOMFORTABLE_TO_USE, testMemberWithdrawOpinion);
+        memberRepositoryAdapter.withdraw(testMemberId, MemberWithdrawReason.UNCOMFORTABLE_TO_USE, testMemberWithdrawOpinion);
 
         // then
         verify(stringRedisTemplate).unlink("recentlyView:member:%s:posts".formatted(MEMBER_BASIC_USER_UUID));
@@ -220,7 +220,7 @@ class MemberRepositoryJpaAdapterTest implements MemberTestUtils, MemberEntityTes
         given(memberProfileJooqRepository.getImageFileKeyFromMemberId(any())).willReturn(null);
 
         // when
-        memberRepositoryJpaAdapter.withdraw(testMemberId, MemberWithdrawReason.UNCOMFORTABLE_TO_USE, testMemberWithdrawOpinion);
+        memberRepositoryAdapter.withdraw(testMemberId, MemberWithdrawReason.UNCOMFORTABLE_TO_USE, testMemberWithdrawOpinion);
 
         // then
         verify(stringRedisTemplate).unlink("recentlyView:member:%s:posts".formatted(MEMBER_BASIC_USER_UUID));
