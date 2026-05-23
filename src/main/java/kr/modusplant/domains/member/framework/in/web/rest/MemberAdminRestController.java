@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import kr.modusplant.domains.member.adapter.controller.MemberAdminController;
+import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRemoveRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportCheckRecord;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
@@ -36,7 +37,7 @@ public class MemberAdminRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PostMapping(value = "/report/proposal-or-bug/{reportUlid}")
-    public ResponseEntity<DataResponse<Void>> checkProposalOrBugReport(
+    public ResponseEntity<DataResponse<ProposalOrBugReportAdminPageReadModel>> checkProposalOrBugReport(
             @Parameter(
                     description = "확인할 보고서의 식별자",
                     schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
@@ -44,8 +45,9 @@ public class MemberAdminRestController {
             @PathVariable
             @NotBlank(message = "보고서 식별자가 비어 있습니다.")
             String reportUlid) {
-        memberAdminController.checkProposalOrBug(new ProposalOrBugReportCheckRecord(reportUlid));
-        return ResponseEntity.ok().body(DataResponse.ok());
+        ProposalOrBugReportAdminPageReadModel readModel =
+                memberAdminController.checkProposalOrBug(new ProposalOrBugReportCheckRecord(reportUlid));
+        return ResponseEntity.ok().body(DataResponse.ok(readModel));
     }
 
     @Operation(

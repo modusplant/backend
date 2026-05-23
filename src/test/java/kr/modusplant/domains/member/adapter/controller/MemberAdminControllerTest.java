@@ -1,6 +1,7 @@
 package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
+import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
 import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
 import kr.modusplant.shared.exception.ExistsValueException;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
+import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportAdminPageReadModelTestUtils.testProposalOrBugReportAdminPageCheckedReadModel;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportCheckRecordTestUtils.testProposalOrBugReportCheckRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRemoveRecordTestUtils.testProposalOrBugReportRemoveRecord;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EXISTS_REPORT_CHECKED_AT;
@@ -39,13 +41,14 @@ class MemberAdminControllerTest {
         // given
         willDoNothing().given(memberValidationHelper).validateIfReportExists(any());
         given(reportRepository.isCheckedInProposalOrBugReport(testReportId)).willReturn(false);
-        willDoNothing().given(reportRepository).checkProposalOrBugReport(any());
+        given(reportRepository.checkProposalOrBugReport(any())).willReturn(testProposalOrBugReportAdminPageCheckedReadModel);
 
         // when
-        memberAdminController.checkProposalOrBug(testProposalOrBugReportCheckRecord);
+        ProposalOrBugReportAdminPageReadModel readModel = memberAdminController.checkProposalOrBug(testProposalOrBugReportCheckRecord);
 
         // then
         verify(reportRepository, times(1)).checkProposalOrBugReport(any());
+        assertThat(readModel).isEqualTo(testProposalOrBugReportAdminPageCheckedReadModel);
     }
 
     @Test

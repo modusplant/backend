@@ -5,6 +5,7 @@ import kr.modusplant.domains.member.domain.vo.ActivitySubjectCommentId;
 import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.ReportId;
+import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
 
 public interface ReportRepository {
     boolean isIdExistInProposalOrBugReport(ReportId reportId);
@@ -21,7 +22,7 @@ public interface ReportRepository {
 
     void reportCommentAbuse(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId);
 
-    void checkProposalOrBugReport(ReportId reportId);
+    ProposalOrBugReportAdminPageReadModel checkProposalOrBugReport(ReportId reportId);
 
     void removeProposalOrBugReport(ReportId reportId);
 }

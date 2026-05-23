@@ -8,12 +8,14 @@ import kr.modusplant.domains.member.domain.vo.ActivitySubjectCommentId;
 import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.ReportId;
+import kr.modusplant.domains.member.framework.out.jooq.record.ProposalOrBugReportAdminPageRecord;
 import kr.modusplant.domains.member.framework.out.jooq.repository.ReportJooqRepository;
 import kr.modusplant.domains.member.framework.out.jpa.entity.CommentAbuseReportEntity;
 import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.out.jpa.entity.PostAbuseReportEntity;
 import kr.modusplant.domains.member.framework.out.jpa.entity.ProposalBugReportEntity;
 import kr.modusplant.domains.member.framework.out.jpa.entity.record.FilenameAndSrcEntityRecord;
+import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
 import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
 import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
@@ -129,11 +131,16 @@ public class ReportRepositoryJpaAdapter implements ReportRepository {
     }
 
     @Override
-    public void checkProposalOrBugReport(ReportId reportId) {
+    public ProposalOrBugReportAdminPageReadModel checkProposalOrBugReport(ReportId reportId) {
         dsl.update(PROP_BUG_REP)
                 .set(PROP_BUG_REP.CHECKED_AT, LocalDateTime.now())
                 .where(PROP_BUG_REP.ULID.eq(reportId.getValue()))
                 .execute();
+
+        ProposalOrBugReportAdminPageRecord proposalOrBugReportAdminPageRecord =
+                reportJooqRepository.getProposalOrBugReportAdminPageRecord(reportId);
+
+        return reportJooqRepository.getProposalOrBugReportAdminPageReadModel(proposalOrBugReportAdminPageRecord);
     }
 
     @Override

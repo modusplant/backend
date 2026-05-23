@@ -31,10 +31,12 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
-import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectCommentIdTestUtils.testActivitySubjectCommentId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectPostIdTestUtils.testActivitySubjectPostId;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
+import static kr.modusplant.domains.member.common.util.framework.out.jooq.record.ProposalOrBugReportAdminPageRecordTestUtils.testProposalOrBugReportAdminPageCheckedRecord;
+import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportAdminPageReadModelTestUtils.testProposalOrBugReportAdminPageCheckedReadModel;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_CONTENT_IMAGE_FILE_KEYS;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -269,6 +271,21 @@ class ReportRepositoryJpaAdapterTest implements PostAbuseReportEntityTestUtils, 
 
         // then
         verify(commentAbuseReportJpaRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("checkProposalOrBugReport 실행 시 확인 수행")
+    void testCheckProposalOrBugReport_givenValidReportId_willCheckProposalOrBugReport() {
+        // given
+        given(reportJooqRepository.getProposalOrBugReportAdminPageRecord(any())).willReturn(testProposalOrBugReportAdminPageCheckedRecord);
+        given(reportJooqRepository.getProposalOrBugReportAdminPageReadModel(testProposalOrBugReportAdminPageCheckedRecord)).willReturn(testProposalOrBugReportAdminPageCheckedReadModel);
+
+        // when
+        reportRepositoryJpaAdapter.checkProposalOrBugReport(testReportId);
+
+        // then
+        verify(reportJooqRepository, times(1)).getProposalOrBugReportAdminPageRecord(any());
+        verify(reportJooqRepository, times(1)).getProposalOrBugReportAdminPageReadModel(testProposalOrBugReportAdminPageCheckedRecord);
     }
 
     @Test

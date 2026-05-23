@@ -2,6 +2,7 @@ package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.domain.vo.ReportId;
+import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
 import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRemoveRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportCheckRecord;
@@ -22,13 +23,13 @@ public class MemberAdminController {
     private final MemberValidationHelper memberValidationHelper;
     private final ReportRepository reportRepository;
 
-    public void checkProposalOrBug(ProposalOrBugReportCheckRecord record) {
+    public ProposalOrBugReportAdminPageReadModel checkProposalOrBug(ProposalOrBugReportCheckRecord record) {
         ReportId reportId = ReportId.create(record.reportUlid());
         memberValidationHelper.validateIfReportExists(reportId);
         if (reportRepository.isCheckedInProposalOrBugReport(reportId)) {
             throw new ExistsValueException(EXISTS_REPORT_CHECKED_AT, "checkedAt");
         }
-        reportRepository.checkProposalOrBugReport(reportId);
+        return reportRepository.checkProposalOrBugReport(reportId);
     }
 
     public void removeProposalOrBug(ProposalOrBugReportRemoveRecord record) {
