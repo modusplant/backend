@@ -13,7 +13,6 @@ public record ProposalOrBugReportAdminPageRecord(
         LocalDateTime checkedAt,
         LocalDateTime createdAt,
         LocalDateTime displayTime,
-        String email,
         String nickname,
         String status) {
 }

@@ -49,15 +49,12 @@ public class ReportJooqRepository {
                         when(PROP_BUG_REP.CHECKED_AT.isNull(), val(PROP_BUG_REP.CREATED_AT))
                                 .otherwise(val(PROP_BUG_REP.CHECKED_AT))
                                 .as("displayTime"),
-                        SITE_MEMBER_AUTH.EMAIL,
                         SITE_MEMBER.NICKNAME,
                         when(PROP_BUG_REP.CHECKED_AT.isNull(), val(ReportStatus.UNCHECKED.getValue()))
                                 .otherwise(val(ReportStatus.CHECKED.getValue()))
                                 .as("status")
                 )
                 .from(PROP_BUG_REP)
-                .leftJoin(SITE_MEMBER_AUTH)
-                .on(PROP_BUG_REP.MEMB_UUID.eq(SITE_MEMBER_AUTH.UUID))
                 .leftJoin(SITE_MEMBER)
                 .on(PROP_BUG_REP.MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .where(PROP_BUG_REP.ULID.eq(reportId.getValue()))
@@ -70,7 +67,6 @@ public class ReportJooqRepository {
                         record.get(PROP_BUG_REP.CHECKED_AT),
                         record.get(PROP_BUG_REP.CREATED_AT),
                         record.get("displayTime", LocalDateTime.class),
-                        record.get(SITE_MEMBER_AUTH.EMAIL),
                         record.get(SITE_MEMBER.NICKNAME),
                         record.get("status", String.class)
                 )));
@@ -100,7 +96,6 @@ public class ReportJooqRepository {
                 record.checkedAt(),
                 record.createdAt(),
                 record.displayTime(),
-                record.email(),
                 record.nickname(),
                 record.status()
         );
