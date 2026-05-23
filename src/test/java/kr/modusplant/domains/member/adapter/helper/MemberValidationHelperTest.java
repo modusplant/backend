@@ -171,7 +171,7 @@ class MemberValidationHelperTest {
         @DisplayName("보고서가 존재할 때 보고서의 존재 여부 검증")
         void testValidateIfReportExists_givenExistedReport_willReturnNothing() {
             // given & when
-            given(reportRepository.isIdExist(testReportId)).willReturn(true);
+            given(reportRepository.isIdExistInProposalOrBugReport(testReportId)).willReturn(true);
 
             // then
             assertDoesNotThrow(() -> memberValidationHelper.validateIfReportExists(testReportId));
@@ -181,7 +181,7 @@ class MemberValidationHelperTest {
         @DisplayName("타겟 댓글이 존재하지 않을 때 타겟 댓글의 존재 여부 검증")
         void testValidateIfReportExists_givenNotFoundReport_willThrowException() {
             // given
-            given(reportRepository.isIdExist(testReportId)).willReturn(false);
+            given(reportRepository.isIdExistInProposalOrBugReport(testReportId)).willReturn(false);
 
             // when
             NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
