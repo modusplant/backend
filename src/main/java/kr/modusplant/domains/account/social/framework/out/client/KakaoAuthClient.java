@@ -2,10 +2,13 @@ package kr.modusplant.domains.account.social.framework.out.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
-import kr.modusplant.domains.account.social.framework.out.client.dto.KakaoUserInfo;
+import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
+import kr.modusplant.domains.account.social.framework.out.client.dto.IdTokenInfo;
 import kr.modusplant.domains.account.social.framework.out.client.dto.OAuthErrorResponse;
+import kr.modusplant.domains.account.social.framework.out.client.dto.SocialToken;
 import kr.modusplant.domains.account.social.framework.out.exception.OAuthRequestFailException;
 import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClient;
+import kr.modusplant.domains.account.social.usecase.record.SocialUserInfo;
 import kr.modusplant.shared.exception.model.DynamicErrorCode;
 import kr.modusplant.shared.exception.supers.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class KakaoAuthClient implements SocialAuthClient {
+    private final SocialIdTokenParser idTokenParser;
     private final RestClient.Builder restClientBuilder;
     private final ObjectMapper objectMapper;
 
@@ -38,7 +42,7 @@ public class KakaoAuthClient implements SocialAuthClient {
     private String KAKAO_REDIRECT_URI;
 
     @Override
-    public String getAccessToken(String code) {
+    public SocialUserInfo getToken(String code) {
         RestClient restClient = restClientBuilder
                 .baseUrl("https://kauth.kakao.com")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -52,29 +56,17 @@ public class KakaoAuthClient implements SocialAuthClient {
                 "grant_type", "authorization_code"
         ).forEach(formData::add);
 
-        return restClient.post()
+        SocialToken socialToken = restClient.post()
                 .uri("/oauth/token")
                 .body(formData)
                 .retrieve()
                 .onStatus(this::isErrorStatus, (request, response)
                         -> handleKakaoError(SocialIdentityErrorCode.KAKAO_LOGIN_FAIL, response))
-                .body(Map.class)
-                .get("access_token").toString();
-    }
+                .body(SocialToken.class);
 
-    @Override
-    public KakaoUserInfo getUserInfo(String accessToken) {
-        RestClient restClient = restClientBuilder
-                .baseUrl("https://kapi.kakao.com")
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .build();
+        IdTokenInfo idTokenInfo = idTokenParser.parse(socialToken.idToken(), SocialProvider.KAKAO);
 
-        return restClient.get()
-                .uri("/v2/user/me")
-                .retrieve()
-                .onStatus(this::isErrorStatus, (request, response)
-                        -> handleKakaoError(SocialIdentityErrorCode.KAKAO_LOGIN_FAIL, response))
-                .body(KakaoUserInfo.class);
+        return new SocialUserInfo(socialToken.accessToken(), idTokenInfo.id(), idTokenInfo.email(), idTokenInfo.nickname());
     }
 
     @Override
