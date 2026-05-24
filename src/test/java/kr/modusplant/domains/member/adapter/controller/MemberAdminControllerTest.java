@@ -1,6 +1,7 @@
 package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
+import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
 import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportGetRecord;
@@ -46,13 +47,13 @@ class MemberAdminControllerTest {
     void testGetProposalOrBug_givenValidLastReportUlid_willGetProposalOrBugReport() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfReportExists(any());
-        given(reportRepository.getProposalOrBugReports(any(), any())).willReturn(testProposalOrBugReportAdminPageCheckedReadModelList);
+        given(reportRepository.getProposalOrBugReports(any(), any(), any())).willReturn(testProposalOrBugReportAdminPageCheckedReadModelList);
 
         // when
         List<ProposalOrBugReportAdminPageReadModel> readModels = memberAdminController.getProposalOrBug(testProposalOrBugReportGetRecord);
 
         // then
-        verify(reportRepository, times(1)).getProposalOrBugReports(any(), any());
+        verify(reportRepository, times(1)).getProposalOrBugReports(any(), any(), any());
         assertThat(readModels).isEqualTo(testProposalOrBugReportAdminPageCheckedReadModelList);
     }
 
@@ -60,14 +61,14 @@ class MemberAdminControllerTest {
     @DisplayName("lastReportUlid가 null일 때 getProposalOrBug로 건의 및 버그 제보 조회")
     void testGetProposalOrBug_givenNullLastReportUlid_willGetProposalOrBugReport() {
         // given
-        given(reportRepository.getProposalOrBugReports(any(), any())).willReturn(testProposalOrBugReportAdminPageCheckedReadModelList);
+        given(reportRepository.getProposalOrBugReports(any(), any(), any())).willReturn(testProposalOrBugReportAdminPageCheckedReadModelList);
 
         // when
         List<ProposalOrBugReportAdminPageReadModel> readModels =
-                memberAdminController.getProposalOrBug(new ProposalOrBugReportGetRecord(null, TEST_REPORT_SIZE));
+                memberAdminController.getProposalOrBug(new ProposalOrBugReportGetRecord(ProposalOrBugReportStatus.CHECKED, null, TEST_REPORT_SIZE));
 
         // then
-        verify(reportRepository, times(1)).getProposalOrBugReports(any(), any());
+        verify(reportRepository, times(1)).getProposalOrBugReports(any(), any(), any());
         assertThat(readModels).isEqualTo(testProposalOrBugReportAdminPageCheckedReadModelList);
     }
 

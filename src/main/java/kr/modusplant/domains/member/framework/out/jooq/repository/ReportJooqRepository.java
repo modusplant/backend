@@ -3,7 +3,7 @@ package kr.modusplant.domains.member.framework.out.jooq.repository;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import kr.modusplant.domains.member.domain.enums.ReportStatus;
+import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
 import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.domain.vo.ReportPageSize;
 import kr.modusplant.domains.member.framework.out.jooq.record.ProposalOrBugReportAdminPageRecord;
@@ -54,14 +54,19 @@ public class ReportJooqRepository {
     
     public @Nonnull List<ProposalOrBugReportAdminPageRecord> getProposalOrBugReportAdminPageRecords(
             ReportPageSize reportPageSize,
+            ProposalOrBugReportStatus proposalOrBugReportStatus,
             @Nullable ReportId lastReportId) {
-        Condition ulidCondition = lastReportId != null ? PROP_BUG_REP.ULID.lt(lastReportId.getValue()) : noCondition();
+        Condition ulidCondition = lastReportId != null ?
+                PROP_BUG_REP.ULID.lt(lastReportId.getValue()) : noCondition();
+        Condition statusCondition = proposalOrBugReportStatus != null ?
+                getStatusFieldFromPropBugRep().eq(proposalOrBugReportStatus.getValue()) : noCondition();
 
         return dsl.select(getProposalOrBugReportAdminPageFields())
                 .from(PROP_BUG_REP)
                 .leftJoin(SITE_MEMBER)
                 .on(PROP_BUG_REP.MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .where(ulidCondition)
+                .and(statusCondition)
                 .orderBy(PROP_BUG_REP.ULID.desc())
                 .limit(reportPageSize.getValue())
                 .fetch(getProposalOrBugReportAdminPageRecordMapper());
@@ -110,8 +115,8 @@ public class ReportJooqRepository {
     }
 
     private static @Nonnull Field<String> getStatusFieldFromPropBugRep() {
-        return when(PROP_BUG_REP.CHECKED_AT.isNull(), val(ReportStatus.UNCHECKED.getValue()))
-                .otherwise(val(ReportStatus.CHECKED.getValue()))
+        return when(PROP_BUG_REP.CHECKED_AT.isNull(), val(ProposalOrBugReportStatus.UNCHECKED.getValue()))
+                .otherwise(val(ProposalOrBugReportStatus.CHECKED.getValue()))
                 .as("status");
     }
 

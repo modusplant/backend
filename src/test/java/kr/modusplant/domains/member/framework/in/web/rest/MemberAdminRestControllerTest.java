@@ -1,6 +1,7 @@
 package kr.modusplant.domains.member.framework.in.web.rest;
 
 import kr.modusplant.domains.member.adapter.controller.MemberAdminController;
+import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
@@ -38,7 +39,7 @@ class MemberAdminRestControllerTest {
         given(memberAdminController.getProposalOrBug(testProposalOrBugReportGetRecord)).willReturn(testProposalOrBugReportAdminPageCheckedReadModelList);
 
         // when
-        ResponseEntity<DataResponse<List<ProposalOrBugReportAdminPageReadModel>>> responseEntity = memberAdminRestController.getProposalOrBugReport(TEST_REPORT_ULID, TEST_REPORT_SIZE);
+        ResponseEntity<DataResponse<List<ProposalOrBugReportAdminPageReadModel>>> responseEntity = memberAdminRestController.getProposalOrBugReport(ProposalOrBugReportStatus.CHECKED, TEST_REPORT_ULID, TEST_REPORT_SIZE);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);

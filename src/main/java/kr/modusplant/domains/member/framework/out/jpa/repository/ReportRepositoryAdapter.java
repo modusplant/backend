@@ -4,6 +4,7 @@ import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.member.domain.aggregate.ProposalOrBugReport;
+import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
 import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.framework.out.jooq.record.ProposalOrBugReportAdminPageRecord;
 import kr.modusplant.domains.member.framework.out.jooq.repository.ReportJooqRepository;
@@ -148,10 +149,12 @@ public class ReportRepositoryAdapter implements ReportRepository {
     }
 
     @Override
-    public List<ProposalOrBugReportAdminPageReadModel> getProposalOrBugReports(ReportPageSize reportPageSize,
-                                                                               @Nullable ReportId lastReportId) {
+    public List<ProposalOrBugReportAdminPageReadModel> getProposalOrBugReports(
+            ReportPageSize reportPageSize,
+            @Nullable ProposalOrBugReportStatus proposalOrBugReportStatus,
+            @Nullable ReportId lastReportId) {
         List<ProposalOrBugReportAdminPageRecord> records =
-                reportJooqRepository.getProposalOrBugReportAdminPageRecords(reportPageSize, lastReportId);
+                reportJooqRepository.getProposalOrBugReportAdminPageRecords(reportPageSize, proposalOrBugReportStatus, lastReportId);
         return reportJooqRepository.getProposalOrBugReportAdminPageReadModels(records);
     }
 

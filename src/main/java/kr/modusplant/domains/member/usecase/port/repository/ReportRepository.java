@@ -2,6 +2,7 @@ package kr.modusplant.domains.member.usecase.port.repository;
 
 import jakarta.annotation.Nullable;
 import kr.modusplant.domains.member.domain.aggregate.ProposalOrBugReport;
+import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
 import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
 
@@ -26,5 +27,5 @@ public interface ReportRepository {
 
     ProposalOrBugReportAdminPageReadModel checkProposalOrBugReport(ReportId reportId);
 
-    List<ProposalOrBugReportAdminPageReadModel> getProposalOrBugReports(ReportPageSize reportPageSize, @Nullable ReportId lastReportId);
+    List<ProposalOrBugReportAdminPageReadModel> getProposalOrBugReports(ReportPageSize reportPageSize, @Nullable ProposalOrBugReportStatus proposalOrBugReportStatus, @Nullable ReportId lastReportId);
 }

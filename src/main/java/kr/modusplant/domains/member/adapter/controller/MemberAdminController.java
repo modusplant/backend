@@ -5,9 +5,9 @@ import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.domain.vo.ReportPageSize;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
 import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
-import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRemoveRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportCheckRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportGetRecord;
+import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRemoveRecord;
 import kr.modusplant.shared.exception.ExistsValueException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +31,9 @@ public class MemberAdminController {
         if (record.lastReportUlid() != null) {
             ReportId reportId = ReportId.create(record.lastReportUlid());
             memberValidationHelper.validateIfReportExists(reportId);
-            return reportRepository.getProposalOrBugReports(ReportPageSize.create(record.size()), reportId);
+            return reportRepository.getProposalOrBugReports(ReportPageSize.create(record.size()), record.status(), reportId);
         } else {
-            return reportRepository.getProposalOrBugReports(ReportPageSize.create(record.size()), null);
+            return reportRepository.getProposalOrBugReports(ReportPageSize.create(record.size()), record.status(), null);
         }
     }
 

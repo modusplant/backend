@@ -8,10 +8,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import kr.modusplant.domains.member.adapter.controller.MemberAdminController;
+import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportCheckRecord;
-import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRemoveRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportGetRecord;
+import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRemoveRecord;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,13 @@ public class MemberAdminRestController {
     @GetMapping(value = "/report/proposal-or-bug")
     public ResponseEntity<DataResponse<List<ProposalOrBugReportAdminPageReadModel>>> getProposalOrBugReport(
             @Parameter(
+                    description = "필터링용 보고서 상태",
+                    example = "UNCHECKED"
+            )
+            @RequestParam(name = "status", required = false)
+            ProposalOrBugReportStatus status,
+
+            @Parameter(
                     description = "마지막 보고서 식별자",
                     schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
             )
@@ -59,7 +67,7 @@ public class MemberAdminRestController {
             Integer size) {
 
         List<ProposalOrBugReportAdminPageReadModel> readModels =
-                memberAdminController.getProposalOrBug(new ProposalOrBugReportGetRecord(lastReportUlid, size));
+                memberAdminController.getProposalOrBug(new ProposalOrBugReportGetRecord(status, lastReportUlid, size));
         return ResponseEntity.ok().body(DataResponse.ok(readModels));
     }
 
