@@ -172,6 +172,7 @@ public class ReportRepositoryAdapter implements ReportRepository {
                         PROP_BUG_REP_ARCHIVE.TITLE,
                         PROP_BUG_REP_ARCHIVE.CONTENT,
                         PROP_BUG_REP_ARCHIVE.CREATED_AT,
+                        PROP_BUG_REP_ARCHIVE.CHECKED_AT,
                         PROP_BUG_REP_ARCHIVE.ARCHIVED_AT
                 )
                 .select(
@@ -181,6 +182,7 @@ public class ReportRepositoryAdapter implements ReportRepository {
                                 PROP_BUG_REP.TITLE,
                                 PROP_BUG_REP.CONTENT,
                                 PROP_BUG_REP.CREATED_AT,
+                                PROP_BUG_REP.CHECKED_AT,
                                 val(LocalDateTime.now())
                         )
                                 .from(PROP_BUG_REP)
