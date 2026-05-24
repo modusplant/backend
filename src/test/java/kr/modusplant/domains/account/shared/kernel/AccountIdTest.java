@@ -1,8 +1,8 @@
 package kr.modusplant.domains.account.shared.kernel;
 
-import kr.modusplant.domains.account.shared.exception.EmptyAccountIdException;
-import kr.modusplant.domains.account.shared.exception.InvalidAccountIdException;
 import kr.modusplant.domains.account.shared.exception.enums.AccountErrorCode;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,7 @@ class AccountIdTest {
     @DisplayName("null UUID로 생성 시 예외 발생")
     void testFromUuid_givenNull_willThrowException() {
         // when & then
-        EmptyAccountIdException exception = assertThrows(EmptyAccountIdException.class, () -> AccountId.fromUuid(null));
+        EmptyValueException exception = assertThrows(EmptyValueException.class, () -> AccountId.fromUuid(null));
         assertThat(exception.getErrorCode()).isEqualTo(AccountErrorCode.EMPTY_ACCOUNT_ID);
     }
 
@@ -49,9 +49,9 @@ class AccountIdTest {
     @DisplayName("null이나 빈 문자열로 생성 시 예외 발생")
     void testFromString_givenNullOrEmpty_willThrowException() {
         // when & then
-        EmptyAccountIdException exception1 = assertThrows(EmptyAccountIdException.class, () -> AccountId.fromString(null));
-        EmptyAccountIdException exception2 = assertThrows(EmptyAccountIdException.class, () -> AccountId.fromString(""));
-        EmptyAccountIdException exception3 = assertThrows(EmptyAccountIdException.class, () -> AccountId.fromString("   "));
+        EmptyValueException exception1 = assertThrows(EmptyValueException.class, () -> AccountId.fromString(null));
+        EmptyValueException exception2 = assertThrows(EmptyValueException.class, () -> AccountId.fromString(""));
+        EmptyValueException exception3 = assertThrows(EmptyValueException.class, () -> AccountId.fromString("   "));
         assertThat(exception1.getErrorCode()).isEqualTo(AccountErrorCode.EMPTY_ACCOUNT_ID);
         assertThat(exception2.getErrorCode()).isEqualTo(AccountErrorCode.EMPTY_ACCOUNT_ID);
         assertThat(exception3.getErrorCode()).isEqualTo(AccountErrorCode.EMPTY_ACCOUNT_ID);
@@ -61,8 +61,8 @@ class AccountIdTest {
     @DisplayName("유효하지 않은 UUID 형식으로 생성 시 InvalidMemberIdException을 발생시킨다")
     void testFromString_givenInvalidUuidFormat_willThrowException() {
         // when & then
-        InvalidAccountIdException exception1 = assertThrows(InvalidAccountIdException.class, () -> AccountId.fromString("invalid-uuid"));
-        InvalidAccountIdException exception2 = assertThrows(InvalidAccountIdException.class, () -> AccountId.fromString("12345"));
+        InvalidValueException exception1 = assertThrows(InvalidValueException.class, () -> AccountId.fromString("invalid-uuid"));
+        InvalidValueException exception2 = assertThrows(InvalidValueException.class, () -> AccountId.fromString("12345"));
         assertThat(exception1.getErrorCode()).isEqualTo(AccountErrorCode.INVALID_ACCOUNT_ID);
         assertThat(exception2.getErrorCode()).isEqualTo(AccountErrorCode.INVALID_ACCOUNT_ID);
     }

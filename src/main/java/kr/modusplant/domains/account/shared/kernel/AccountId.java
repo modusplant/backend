@@ -1,7 +1,8 @@
 package kr.modusplant.domains.account.shared.kernel;
 
-import kr.modusplant.domains.account.shared.exception.EmptyAccountIdException;
-import kr.modusplant.domains.account.shared.exception.InvalidAccountIdException;
+import kr.modusplant.domains.account.shared.exception.enums.AccountErrorCode;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -24,16 +25,16 @@ public class AccountId {
 
     public static AccountId fromUuid(UUID uuid) {
         if (uuid == null) {
-            throw new EmptyAccountIdException();
+            throw new EmptyValueException(AccountErrorCode.EMPTY_ACCOUNT_ID, "accountId");
         }
         return new AccountId(uuid);
     }
 
     public static AccountId fromString(String value) {
         if (StringUtils.isBlank(value)) {
-            throw new EmptyAccountIdException();
+            throw new EmptyValueException(AccountErrorCode.EMPTY_ACCOUNT_ID, "accountId");
         } else if (!PATTERN_UUID.matcher(value).matches()) {
-            throw new InvalidAccountIdException();
+            throw new InvalidValueException(AccountErrorCode.INVALID_ACCOUNT_ID, "accountId");
         }
         return new AccountId(UUID.fromString(value));
     }
