@@ -1,8 +1,10 @@
 package kr.modusplant.domains.account.social.framework.out.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.domains.account.social.framework.out.client.dto.GoogleUserInfo;
+import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
+import kr.modusplant.domains.account.social.framework.out.client.dto.IdTokenInfo;
 import kr.modusplant.domains.account.social.framework.out.exception.OAuthRequestFailException;
+import kr.modusplant.domains.account.social.usecase.record.SocialUserInfo;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.util.LinkedMultiValueMap;
@@ -36,6 +39,8 @@ class GoogleAuthClientTest {
     private MockRestServiceServer mockServer;
     @Autowired
     private ObjectMapper objectMapper;
+    @MockitoBean
+    private SocialIdTokenParser idTokenParser;
 
     @BeforeEach
     void setUp() {
@@ -51,11 +56,16 @@ class GoogleAuthClientTest {
 
     @Test
     @DisplayName("구글 access token 발급 성공 테스트")
-    void testGetAccessToken_givenCode_willReturnAccessToken(){
+    void testGetAccessToken_givenCode_willReturnToken(){
         // Given
         String code = "test-auth-code";
-        String expectedToken = "test-access-token";
-        String responseBody = "{\"access_token\":\"" + expectedToken + "\"}";
+        String expectedAccessToken = "test-access-token";
+        String expectedIdToken = "test-id-token";
+        String expectedId = "12345";
+        String expectedEmail = "test@google.com";
+        String expectedNickname = "testUser";
+        String responseBody = "{\"access_token\":\"" + expectedAccessToken + "\", \"id_token\":\"" + expectedIdToken + "\"}";
+
         MultiValueMap<String,String> formData = new LinkedMultiValueMap<>();
         Map.of(
                 "code", code,
@@ -71,17 +81,23 @@ class GoogleAuthClientTest {
                 .andExpect(content().formData(formData))
                 .andRespond(withSuccess(responseBody, MediaType.APPLICATION_JSON));
 
+        IdTokenInfo mockIdTokenInfo = new IdTokenInfo(expectedId, expectedEmail, expectedNickname);
+        given(idTokenParser.parse(expectedIdToken, SocialProvider.GOOGLE)).willReturn(mockIdTokenInfo);
+
         // When
-        String accessToken = googleAuthClient.getAccessToken(code);
+        SocialUserInfo userInfo = googleAuthClient.getToken(code);
 
         // Then
-        assertThat(accessToken).isEqualTo(expectedToken);
+        assertThat(userInfo.socialAccessToken()).isEqualTo(expectedAccessToken);
+        assertThat(userInfo.id()).isEqualTo(expectedId);
+        assertThat(userInfo.email()).isEqualTo(expectedEmail);
+        assertThat(userInfo.nickname()).isEqualTo(expectedNickname);
     }
 
 
     @Test
     @DisplayName("구글 access token 발급 실패 시 예외 발생 테스트")
-    void testGetAccessToken_givenInvalidCode_willThrowException() {
+    void testGetToken_givenInvalidCode_willThrowException() {
         // Given
         String authCode = "fake-auth-code";
         String errorBody = "{\"error\":\"invalid_grant\", \"error_description\":\"Bad Request\"}";
@@ -92,48 +108,7 @@ class GoogleAuthClientTest {
                         .body(errorBody));
 
         // When & Then
-        assertThrows(OAuthRequestFailException.class, () -> googleAuthClient.getAccessToken(authCode));
-    }
-
-    @Test
-    @DisplayName("구글 사용자 정보 가져오기 성공 테스트")
-    void testGetUserInfo_givenAccessToken_willReturnGoogleUserInfo() throws Exception {
-        // Given
-        String accessToken = "test-access-token";
-        GoogleUserInfo expectedUserInfo = mock(GoogleUserInfo.class);
-        given(expectedUserInfo.getId()).willReturn("1234567890");
-        given(expectedUserInfo.getEmail()).willReturn("test@gmail.com");
-        given(expectedUserInfo.getNickname()).willReturn("google-nickname");
-
-        mockServer.expect(requestTo("https://www.googleapis.com/userinfo/v2/me"))
-                .andExpect(method(HttpMethod.GET))
-                .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
-                .andRespond(withSuccess(objectMapper.writeValueAsString(expectedUserInfo), MediaType.APPLICATION_JSON));
-
-        // When
-        GoogleUserInfo userInfo = googleAuthClient.getUserInfo(accessToken);
-
-        // Then
-        assertThat(userInfo).isNotNull();
-        assertThat(userInfo.getId()).isEqualTo(expectedUserInfo.getId());
-        assertThat(userInfo.getEmail()).isEqualTo(expectedUserInfo.getEmail());
-        assertThat(userInfo.getNickname()).isEqualTo(expectedUserInfo.getNickname());
-    }
-
-    @Test
-    @DisplayName("구글 사용자 정보 가져오기 실패 시 예외 발생 테스트")
-    void testGetUserInfo_givenInvalidAccessToken_willThrowException() {
-        // Given
-        String accessToken = "invalid-token";
-        String errorBody = "{\"error\":\"invalid_token\", \"error_description\":\"Unauthorized\"}";
-
-        mockServer.expect(requestTo("https://www.googleapis.com/userinfo/v2/me"))
-                .andRespond(withStatus(HttpStatus.UNAUTHORIZED)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(errorBody));
-
-        // When & Then
-        assertThrows(OAuthRequestFailException.class, () -> googleAuthClient.getUserInfo(accessToken));
+        assertThrows(OAuthRequestFailException.class, () -> googleAuthClient.getToken(authCode));
     }
 
     @Test
