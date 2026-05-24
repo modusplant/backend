@@ -17,6 +17,7 @@ import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Range;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -68,7 +69,9 @@ public class MemberAdminRestController {
 
         List<ProposalOrBugReportAdminPageReadModel> readModels =
                 memberAdminController.getProposalOrBug(new ProposalOrBugReportGetRecord(status, lastReportUlid, size));
-        return ResponseEntity.ok().body(DataResponse.ok(readModels));
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
+                .body(DataResponse.ok(readModels));
     }
 
     @Operation(
