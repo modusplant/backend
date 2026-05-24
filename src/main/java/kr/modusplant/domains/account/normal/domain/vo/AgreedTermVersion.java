@@ -1,9 +1,9 @@
 package kr.modusplant.domains.account.normal.domain.vo;
 
-import kr.modusplant.domains.account.normal.domain.exception.EmptyValueException;
-import kr.modusplant.domains.account.normal.domain.exception.InvalidValueException;
 import kr.modusplant.domains.account.normal.domain.exception.enums.NormalIdentityErrorCode;
 import kr.modusplant.shared.constant.Regex;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,9 +21,9 @@ public class AgreedTermVersion {
     }
 
     public static void validateSource(String input) {
-        if(input == null || input.isBlank()) { throw new EmptyValueException(NormalIdentityErrorCode.EMPTY_AGREED_TERMS_OF_VERSION); }
+        if(input == null || input.isBlank()) { throw new EmptyValueException(NormalIdentityErrorCode.EMPTY_AGREED_TERMS_OF_VERSION, "versionOfTerm"); }
         if(!input.matches(Regex.REGEX_VERSION)) {
-            throw new InvalidValueException(NormalIdentityErrorCode.INVALID_AGREED_TERMS_OF_VERSION);
+            throw new InvalidValueException(NormalIdentityErrorCode.INVALID_AGREED_TERMS_OF_VERSION, "versionOfTerm");
         }
     }
 

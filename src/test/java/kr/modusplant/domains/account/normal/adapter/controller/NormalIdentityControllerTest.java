@@ -5,7 +5,6 @@ import kr.modusplant.domains.account.normal.common.util.domain.vo.SignUpDataTest
 import kr.modusplant.domains.account.normal.common.util.usecase.request.EmailModificationRequestTestUtils;
 import kr.modusplant.domains.account.normal.common.util.usecase.request.NormalSignUpRequestTestUtils;
 import kr.modusplant.domains.account.normal.common.util.usecase.request.PasswordModificationRequestTestUtils;
-import kr.modusplant.domains.account.normal.domain.exception.DataAlreadyExistsException;
 import kr.modusplant.domains.account.normal.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdentityCreateRepository;
 import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdentityReadRepository;
@@ -14,6 +13,7 @@ import kr.modusplant.domains.account.normal.usecase.request.EmailModificationReq
 import kr.modusplant.domains.account.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.domains.account.normal.usecase.request.PasswordModificationRequest;
 import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.exception.ExistsValueException;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
@@ -50,7 +50,7 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
 
         // when & then
         assertThatThrownBy(() -> controller.registerNormalMember(request))
-                .isInstanceOf(DataAlreadyExistsException.class);
+                .isInstanceOf(ExistsValueException.class);
 
         verify(readRepository, times(1)).existsByNickname(Nickname.create(request.nickname()));
         verify(readRepository, times(1)).existsByEmail(Email.create(request.email()));

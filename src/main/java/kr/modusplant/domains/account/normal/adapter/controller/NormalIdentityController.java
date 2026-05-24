@@ -1,7 +1,6 @@
 package kr.modusplant.domains.account.normal.adapter.controller;
 
 import jakarta.transaction.Transactional;
-import kr.modusplant.domains.account.normal.domain.exception.DataAlreadyExistsException;
 import kr.modusplant.domains.account.normal.domain.exception.enums.NormalIdentityErrorCode;
 import kr.modusplant.domains.account.normal.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdentityCreateRepository;
@@ -12,6 +11,7 @@ import kr.modusplant.domains.account.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.domains.account.normal.usecase.request.PasswordModificationRequest;
 import kr.modusplant.domains.account.shared.kernel.AccountId;
 import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.exception.ExistsValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
@@ -60,14 +60,12 @@ public class NormalIdentityController {
                 throw new ExistsEntityException(NormalIdentityErrorCode.EXISTS_ACCOUNT, TableName.SITE_MEMBER);
             } else if (providerOfExistingMember == AuthProvider.GOOGLE) {
                 throw new ExistsEntityException(NormalIdentityErrorCode.EXISTS_GOOGLE_ACCOUNT, TableName.SITE_MEMBER);
-//                updateRepository.updateToGoogleAccount(requestEmail, Password.create(request.password()));
             } else if (providerOfExistingMember == AuthProvider.KAKAO) {
-//                updateRepository.updateToKakaoAccount(requestEmail, Password.create(request.password()));
                 throw new ExistsEntityException(NormalIdentityErrorCode.EXISTS_KAKAO_ACCOUNT, TableName.SITE_MEMBER);
             }
         } else {
             if(readRepository.existsByNickname(Nickname.create(request.nickname()))) {
-                throw new DataAlreadyExistsException(KernelErrorCode.EXISTS_NICKNAME);
+                throw new ExistsValueException(KernelErrorCode.EXISTS_NICKNAME, "nickname");
             }
             createRepository.save(mapper.toSignUpData(request));
         }

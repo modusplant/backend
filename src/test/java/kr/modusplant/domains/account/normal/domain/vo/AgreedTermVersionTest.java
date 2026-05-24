@@ -1,9 +1,9 @@
 package kr.modusplant.domains.account.normal.domain.vo;
 
 import kr.modusplant.domains.account.normal.common.util.domain.vo.AgreedTermVersionTestUtils;
-import kr.modusplant.domains.account.normal.domain.exception.EmptyValueException;
-import kr.modusplant.domains.account.normal.domain.exception.InvalidValueException;
 import kr.modusplant.domains.account.normal.domain.exception.enums.NormalIdentityErrorCode;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

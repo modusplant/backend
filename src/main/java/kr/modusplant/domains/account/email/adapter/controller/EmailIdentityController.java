@@ -8,8 +8,8 @@ import kr.modusplant.domains.account.email.usecase.port.repository.EmailIdentity
 import kr.modusplant.domains.account.email.usecase.request.EmailIdentityRequest;
 import kr.modusplant.domains.account.email.usecase.request.EmailValidationRequest;
 import kr.modusplant.domains.account.email.usecase.request.InputValidationRequest;
-import kr.modusplant.domains.account.normal.domain.exception.InvalidValueException;
 import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.supers.ErrorCode;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
@@ -89,7 +89,7 @@ public class EmailIdentityController {
         String stringUuid = String.valueOf(uuid);
         String redisKey = RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, stringUuid);
         String storedEmail = redisHelper.getString(redisKey)
-                .orElseThrow(() -> new InvalidValueException(EmailIdentityErrorCode.INVALID_EMAIL_VERIFY_LINK));
+                .orElseThrow(() -> new InvalidValueException(EmailIdentityErrorCode.INVALID_EMAIL_VERIFY_LINK, "emailVerifyLink"));
         return tokenHelper.generateResetPasswordAccessToken(storedEmail, stringUuid, RESET_PASSWORD_INPUT);
     }
 
