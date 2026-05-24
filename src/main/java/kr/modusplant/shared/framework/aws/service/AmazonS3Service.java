@@ -43,7 +43,7 @@ public class AmazonS3Service {
         s3Client.putObject(request, RequestBody.fromBytes(file.getBytes()));
     }
 
-    public byte[] downloadFile(String fileKey) throws IOException {
+    public byte[] downloadFile(String fileKey) {
         GetObjectRequest request = GetObjectRequest.builder()
                 .bucket(bucket)
                 .key(fileKey)

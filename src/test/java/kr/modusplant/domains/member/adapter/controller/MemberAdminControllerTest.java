@@ -1,7 +1,10 @@
 package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
+import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
+import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
 import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
+import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportGetRecord;
 import kr.modusplant.shared.exception.ExistsValueException;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
@@ -10,8 +13,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.List;
+
+import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_SIZE;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
+import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportAdminPageReadModelTestUtils.testProposalOrBugReportAdminPageCheckedReadModel;
+import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportAdminPageReadModelTestUtils.testProposalOrBugReportAdminPageCheckedReadModelList;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportCheckRecordTestUtils.testProposalOrBugReportCheckRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordGetTestUtils.testProposalOrBugReportGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRemoveRecordTestUtils.testProposalOrBugReportRemoveRecord;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EXISTS_REPORT_CHECKED_AT;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
@@ -34,18 +43,49 @@ class MemberAdminControllerTest {
     private final MemberAdminController memberAdminController = new MemberAdminController(memberValidationHelper, reportRepository);
 
     @Test
+    @DisplayName("lastReportUlid가 null이 아닐 때 getProposalOrBug로 건의 및 버그 제보 조회")
+    void testGetProposalOrBug_givenValidLastReportUlid_willGetProposalOrBugReport() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfReportExists(any());
+        given(reportRepository.getProposalOrBugReports(any(), any(), any())).willReturn(testProposalOrBugReportAdminPageCheckedReadModelList);
+
+        // when
+        List<ProposalOrBugReportAdminPageReadModel> readModels = memberAdminController.getProposalOrBug(testProposalOrBugReportGetRecord);
+
+        // then
+        verify(reportRepository, times(1)).getProposalOrBugReports(any(), any(), any());
+        assertThat(readModels).isEqualTo(testProposalOrBugReportAdminPageCheckedReadModelList);
+    }
+
+    @Test
+    @DisplayName("lastReportUlid가 null일 때 getProposalOrBug로 건의 및 버그 제보 조회")
+    void testGetProposalOrBug_givenNullLastReportUlid_willGetProposalOrBugReport() {
+        // given
+        given(reportRepository.getProposalOrBugReports(any(), any(), any())).willReturn(testProposalOrBugReportAdminPageCheckedReadModelList);
+
+        // when
+        List<ProposalOrBugReportAdminPageReadModel> readModels =
+                memberAdminController.getProposalOrBug(new ProposalOrBugReportGetRecord(ProposalOrBugReportStatus.CHECKED, null, TEST_REPORT_SIZE));
+
+        // then
+        verify(reportRepository, times(1)).getProposalOrBugReports(any(), any(), any());
+        assertThat(readModels).isEqualTo(testProposalOrBugReportAdminPageCheckedReadModelList);
+    }
+
+    @Test
     @DisplayName("확인되지 않았을 때 checkProposalOrBug로 건의 및 버그 제보 확인")
     void testCheckProposalOrBug_givenNotCheckedRecord_willCheckProposalOrBugReport() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfReportExists(any());
         given(reportRepository.isCheckedInProposalOrBugReport(testReportId)).willReturn(false);
-        willDoNothing().given(reportRepository).checkProposalOrBugReport(any());
+        given(reportRepository.checkProposalOrBugReport(any())).willReturn(testProposalOrBugReportAdminPageCheckedReadModel);
 
         // when
-        memberAdminController.checkProposalOrBug(testProposalOrBugReportCheckRecord);
+        ProposalOrBugReportAdminPageReadModel readModel = memberAdminController.checkProposalOrBug(testProposalOrBugReportCheckRecord);
 
         // then
         verify(reportRepository, times(1)).checkProposalOrBugReport(any());
+        assertThat(readModel).isEqualTo(testProposalOrBugReportAdminPageCheckedReadModel);
     }
 
     @Test
