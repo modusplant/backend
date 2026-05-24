@@ -6,9 +6,10 @@ import com.mailjet.client.MailjetRequest;
 import com.mailjet.client.MailjetResponse;
 import com.mailjet.client.errors.MailjetException;
 import com.mailjet.client.resource.Emailv31;
-import kr.modusplant.domains.account.email.domain.exception.NotSendableEmailException;
+import kr.modusplant.domains.account.email.domain.exception.enums.EmailIdentityErrorCode;
 import kr.modusplant.domains.account.email.usecase.enums.EmailType;
 import kr.modusplant.domains.account.email.usecase.port.gateway.CallEmailSendApiGateway;
+import kr.modusplant.shared.exception.ConflictStateException;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -124,10 +125,10 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
         try {
             response = client.post(request);
             if (response == null || !(200 <= response.getStatus() && response.getStatus() < 300)) {
-                throw new NotSendableEmailException();
+                throw new ConflictStateException(EmailIdentityErrorCode.NOT_SENDABLE_EMAIL);
             }
         } catch (MailjetException e) {
-            throw new NotSendableEmailException();
+            throw new ConflictStateException(EmailIdentityErrorCode.NOT_SENDABLE_EMAIL);
         }
         log.info("Mail Send Address : {}, Send Status : {} ", email, response.getStatus());
         return response;
