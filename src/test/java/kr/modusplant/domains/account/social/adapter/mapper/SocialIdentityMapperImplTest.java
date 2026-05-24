@@ -3,11 +3,9 @@ package kr.modusplant.domains.account.social.adapter.mapper;
 import kr.modusplant.domains.account.social.common.util.domain.vo.SocialMemberProfileTestUtils;
 import kr.modusplant.domains.account.social.domain.vo.SocialProfile;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
-import kr.modusplant.domains.account.social.framework.out.client.dto.GoogleUserInfo;
-import kr.modusplant.domains.account.social.framework.out.client.dto.KakaoUserInfo;
-import kr.modusplant.domains.account.social.usecase.port.client.dto.SocialUserInfo;
 import kr.modusplant.domains.account.social.usecase.port.mapper.SocialIdentityMapper;
 import kr.modusplant.domains.account.social.usecase.record.LoginResult;
+import kr.modusplant.domains.account.social.usecase.record.SocialUserInfo;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.enums.Role;
 import org.junit.jupiter.api.DisplayName;
@@ -28,10 +26,10 @@ class SocialIdentityMapperImplTest implements SocialMemberProfileTestUtils {
     @DisplayName("toSocialUserProfile으로 SocialProfile 반환")
     void testToSocialProfile_givenSocialProviderAndKakaoUserInfo_willReturnSocialProfile() {
         // given
-        SocialUserInfo userInfo = mock(KakaoUserInfo.class);
-        given(userInfo.getId()).willReturn(MEMBER_AUTH_KAKAO_USER_PROVIDER_ID);
-        given(userInfo.getEmail()).willReturn(MEMBER_AUTH_KAKAO_USER_EMAIL);
-        given(userInfo.getNickname()).willReturn(MEMBER_KAKAO_USER_NICKNAME);
+        SocialUserInfo userInfo = mock(SocialUserInfo.class);
+        given(userInfo.id()).willReturn(MEMBER_AUTH_KAKAO_USER_PROVIDER_ID);
+        given(userInfo.email()).willReturn(MEMBER_AUTH_KAKAO_USER_EMAIL);
+        given(userInfo.nickname()).willReturn(MEMBER_KAKAO_USER_NICKNAME);
 
         // when
         SocialProfile result = socialIdentityMapper.toSocialProfile(SocialProvider.GOOGLE.KAKAO,userInfo);
@@ -48,10 +46,10 @@ class SocialIdentityMapperImplTest implements SocialMemberProfileTestUtils {
     @DisplayName("toSocialProfile으로 SocialProfile 반환")
     void testToSocialProfile_givenSocialProviderAndGoogleUserInfo_willReturnSocialProfile() {
         // given
-        SocialUserInfo userInfo = mock(GoogleUserInfo.class);
-        given(userInfo.getId()).willReturn(MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID);
-        given(userInfo.getEmail()).willReturn(MEMBER_AUTH_GOOGLE_USER_EMAIL);
-        given(userInfo.getNickname()).willReturn(MEMBER_GOOGLE_USER_NICKNAME);
+        SocialUserInfo userInfo = mock(SocialUserInfo.class);
+        given(userInfo.id()).willReturn(MEMBER_AUTH_GOOGLE_USER_PROVIDER_ID);
+        given(userInfo.email()).willReturn(MEMBER_AUTH_GOOGLE_USER_EMAIL);
+        given(userInfo.nickname()).willReturn(MEMBER_GOOGLE_USER_NICKNAME);
 
         // when
         SocialProfile result = socialIdentityMapper.toSocialProfile(SocialProvider.GOOGLE,userInfo);

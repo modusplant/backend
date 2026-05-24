@@ -3,12 +3,14 @@ package kr.modusplant.domains.account.social.framework.in.web.rest;
 import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityLinkController;
 import kr.modusplant.domains.account.social.common.util.usecase.request.SocialAuthRequestTestUtils;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
+import kr.modusplant.domains.account.social.usecase.record.SocialUserInfo;
 import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.common.util.SiteMemberUserDetailsTestUtils;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -30,9 +32,9 @@ class SocialIdentityLinkRestControllerTest implements SocialAuthRequestTestUtils
     void testLinkSocialAccount_givenCode_willReturnSuccessResponse() {
         // given
         DefaultUserDetails userDetails = testDefaultMemberUserDetailsBuilder.build();
-        String socialAccessToken = "social-access-token";
-        given(socialIdentityLinkController.issueSocialAccessToken(SocialProvider.KAKAO,TEST_SOCIAL_KAKAO_CODE)).willReturn(socialAccessToken);
-        willDoNothing().given(socialIdentityLinkController).linkSocialAccount(userDetails.getUuid(),SocialProvider.KAKAO,socialAccessToken);
+        SocialUserInfo userInfo = Mockito.mock(SocialUserInfo.class);
+        given(socialIdentityLinkController.issueSocialToken(SocialProvider.KAKAO,TEST_SOCIAL_KAKAO_CODE)).willReturn(userInfo);
+        willDoNothing().given(socialIdentityLinkController).linkSocialAccount(userDetails.getUuid(),SocialProvider.KAKAO,userInfo);
 
         // when
         ResponseEntity<DataResponse<Void>> response = socialIdentityLinkRestController.linkSocialAccount(userDetails,createTestKakaoLoginRequest(),SocialProvider.KAKAO);
@@ -40,7 +42,7 @@ class SocialIdentityLinkRestControllerTest implements SocialAuthRequestTestUtils
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody().toString()).isEqualTo(DataResponse.ok().toString());
-        verify(socialIdentityLinkController).linkSocialAccount(userDetails.getUuid(), SocialProvider.KAKAO, socialAccessToken);
+        verify(socialIdentityLinkController).linkSocialAccount(userDetails.getUuid(), SocialProvider.KAKAO, userInfo);
     }
 
     @Test
@@ -48,9 +50,9 @@ class SocialIdentityLinkRestControllerTest implements SocialAuthRequestTestUtils
     void testUnlinkSocialAccount_givenCode_willReturnSuccessResponse() {
         // given
         DefaultUserDetails userDetails = testDefaultMemberUserDetailsBuilder.build();
-        String socialAccessToken = "social-access-token";
-        given(socialIdentityLinkController.issueSocialAccessToken(SocialProvider.KAKAO,TEST_SOCIAL_KAKAO_CODE)).willReturn(socialAccessToken);
-        willDoNothing().given(socialIdentityLinkController).unlinkSocialAccount(userDetails.getUuid(),SocialProvider.KAKAO,socialAccessToken);
+        SocialUserInfo userInfo = Mockito.mock(SocialUserInfo.class);
+        given(socialIdentityLinkController.issueSocialToken(SocialProvider.KAKAO,TEST_SOCIAL_KAKAO_CODE)).willReturn(userInfo);
+        willDoNothing().given(socialIdentityLinkController).unlinkSocialAccount(userDetails.getUuid(),SocialProvider.KAKAO,userInfo);
 
         // when
         ResponseEntity<DataResponse<Void>> response = socialIdentityLinkRestController.unlinkSocialAccount(userDetails,createTestKakaoLoginRequest(),SocialProvider.KAKAO);
@@ -58,6 +60,6 @@ class SocialIdentityLinkRestControllerTest implements SocialAuthRequestTestUtils
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody().toString()).isEqualTo(DataResponse.ok().toString());
-        verify(socialIdentityLinkController).unlinkSocialAccount(userDetails.getUuid(), SocialProvider.KAKAO, socialAccessToken);
+        verify(socialIdentityLinkController).unlinkSocialAccount(userDetails.getUuid(), SocialProvider.KAKAO, userInfo);
     }
 }
