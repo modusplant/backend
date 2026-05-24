@@ -10,7 +10,7 @@ public record ProposalOrBugReportAdminPageReadModel(
         List<byte[]> image,
         LocalDateTime checkedAt,
         LocalDateTime createdAt,
-        LocalDateTime displayTime,
+        LocalDateTime displayTimestamp,
         String nickname,
         String status) {
 }

@@ -12,7 +12,7 @@ public record ProposalOrBugReportAdminPageRecord(
         Integer imageNumber,
         LocalDateTime checkedAt,
         LocalDateTime createdAt,
-        LocalDateTime displayTime,
+        LocalDateTime displayTimestamp,
         String nickname,
         String status) {
 }

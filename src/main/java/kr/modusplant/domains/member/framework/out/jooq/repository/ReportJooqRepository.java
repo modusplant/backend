@@ -95,7 +95,7 @@ public class ReportJooqRepository {
                 imageByteList,
                 record.checkedAt(),
                 record.createdAt(),
-                record.displayTime(),
+                record.displayTimestamp(),
                 record.nickname(),
                 record.status()
         );
@@ -111,7 +111,7 @@ public class ReportJooqRepository {
     }
 
     private static @Nonnull Field<LocalDateTime> getDisplayTimeFieldFromPropBugRep() {
-        return coalesce(PROP_BUG_REP.CHECKED_AT, PROP_BUG_REP.CREATED_AT).as("displayTime");
+        return coalesce(PROP_BUG_REP.CHECKED_AT, PROP_BUG_REP.CREATED_AT).as("displayTimestamp");
     }
 
     private static @Nonnull Field<String> getStatusFieldFromPropBugRep() {
