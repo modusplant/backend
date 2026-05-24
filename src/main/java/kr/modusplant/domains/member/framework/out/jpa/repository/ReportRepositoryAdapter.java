@@ -4,10 +4,7 @@ import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.member.domain.aggregate.ProposalOrBugReport;
-import kr.modusplant.domains.member.domain.vo.ActivitySubjectCommentId;
-import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
-import kr.modusplant.domains.member.domain.vo.MemberId;
-import kr.modusplant.domains.member.domain.vo.ReportId;
+import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.framework.out.jooq.record.ProposalOrBugReportAdminPageRecord;
 import kr.modusplant.domains.member.framework.out.jooq.repository.ReportJooqRepository;
 import kr.modusplant.domains.member.framework.out.jpa.entity.CommentAbuseReportEntity;
@@ -21,6 +18,7 @@ import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
 import kr.modusplant.shared.event.ImagesRemoveEvent;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Repository;
@@ -131,6 +129,12 @@ public class ReportRepositoryAdapter implements ReportRepository {
     }
 
     @Override
+    public void removeProposalOrBugReport(ReportId reportId) {
+        deleteImageFromReportImagePath(reportId.getValue());
+        processProposalOrBugReportRelatedRecords(reportId.getValue());
+    }
+
+    @Override
     public ProposalOrBugReportAdminPageReadModel checkProposalOrBugReport(ReportId reportId) {
         dsl.update(PROP_BUG_REP)
                 .set(PROP_BUG_REP.CHECKED_AT, LocalDateTime.now())
@@ -144,9 +148,11 @@ public class ReportRepositoryAdapter implements ReportRepository {
     }
 
     @Override
-    public void removeProposalOrBugReport(ReportId reportId) {
-        deleteImageFromReportImagePath(reportId.getValue());
-        processProposalOrBugReportRelatedRecords(reportId.getValue());
+    public List<ProposalOrBugReportAdminPageReadModel> getProposalOrBugReports(ReportPageSize reportPageSize,
+                                                                               @Nullable ReportId lastReportId) {
+        List<ProposalOrBugReportAdminPageRecord> records =
+                reportJooqRepository.getProposalOrBugReportAdminPageRecords(reportPageSize, lastReportId);
+        return reportJooqRepository.getProposalOrBugReportAdminPageReadModels(records);
     }
 
     private void deleteImageFromReportImagePath(String reportId) {

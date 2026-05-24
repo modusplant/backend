@@ -2,23 +2,28 @@ package kr.modusplant.domains.member.framework.out.jooq.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import kr.modusplant.domains.member.domain.enums.ReportStatus;
 import kr.modusplant.domains.member.domain.vo.ReportId;
+import kr.modusplant.domains.member.domain.vo.ReportPageSize;
 import kr.modusplant.domains.member.framework.out.jooq.record.ProposalOrBugReportAdminPageRecord;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.framework.jooq.converter.JsonbJsonNodeConverter;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import lombok.RequiredArgsConstructor;
-import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.*;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.StreamSupport;
 
-import static kr.modusplant.jooq.Tables.*;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_PROPOSAL_OR_BUG_REPORT;
+import static kr.modusplant.jooq.Tables.PROP_BUG_REP;
+import static kr.modusplant.jooq.Tables.SITE_MEMBER;
 import static org.jooq.impl.DSL.*;
 
 @Repository
@@ -38,38 +43,28 @@ public class ReportJooqRepository {
     }
 
     public @Nonnull ProposalOrBugReportAdminPageRecord getProposalOrBugReportAdminPageRecord(ReportId reportId) {
-        return Objects.requireNonNull(dsl.select(
-                        PROP_BUG_REP.ULID,
-                        PROP_BUG_REP.TITLE,
-                        PROP_BUG_REP.CONTENT,
-                        PROP_BUG_REP.IMAGE,
-                        PROP_BUG_REP.IMAGE_NUMBER,
-                        PROP_BUG_REP.CHECKED_AT,
-                        PROP_BUG_REP.CREATED_AT,
-                        when(PROP_BUG_REP.CHECKED_AT.isNull(), val(PROP_BUG_REP.CREATED_AT))
-                                .otherwise(val(PROP_BUG_REP.CHECKED_AT))
-                                .as("displayTime"),
-                        SITE_MEMBER.NICKNAME,
-                        when(PROP_BUG_REP.CHECKED_AT.isNull(), val(ReportStatus.UNCHECKED.getValue()))
-                                .otherwise(val(ReportStatus.CHECKED.getValue()))
-                                .as("status")
-                )
+        return dsl.select(getProposalOrBugReportAdminPageFields())
                 .from(PROP_BUG_REP)
                 .leftJoin(SITE_MEMBER)
                 .on(PROP_BUG_REP.MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .where(PROP_BUG_REP.ULID.eq(reportId.getValue()))
-                .fetchOne(record -> new ProposalOrBugReportAdminPageRecord(
-                        record.get(PROP_BUG_REP.ULID),
-                        record.get(PROP_BUG_REP.TITLE),
-                        record.get(PROP_BUG_REP.CONTENT),
-                        record.get(PROP_BUG_REP.IMAGE),
-                        record.get(PROP_BUG_REP.IMAGE_NUMBER),
-                        record.get(PROP_BUG_REP.CHECKED_AT),
-                        record.get(PROP_BUG_REP.CREATED_AT),
-                        record.get("displayTime", LocalDateTime.class),
-                        record.get(SITE_MEMBER.NICKNAME),
-                        record.get("status", String.class)
-                )));
+                .fetchOptional(getProposalOrBugReportAdminPageRecordMapper())
+                .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_PROPOSAL_OR_BUG_REPORT, "proposalOrBugReport"));
+    }
+    
+    public @Nonnull List<ProposalOrBugReportAdminPageRecord> getProposalOrBugReportAdminPageRecords(
+            ReportPageSize reportPageSize,
+            @Nullable ReportId lastReportId) {
+        Condition ulidCondition = lastReportId != null ? PROP_BUG_REP.ULID.lt(lastReportId.getValue()) : noCondition();
+
+        return dsl.select(getProposalOrBugReportAdminPageFields())
+                .from(PROP_BUG_REP)
+                .leftJoin(SITE_MEMBER)
+                .on(PROP_BUG_REP.MEMB_UUID.eq(SITE_MEMBER.UUID))
+                .where(ulidCondition)
+                .orderBy(PROP_BUG_REP.ULID.desc())
+                .limit(reportPageSize.getValue())
+                .fetch(getProposalOrBugReportAdminPageRecordMapper());
     }
 
     public @Nonnull ProposalOrBugReportAdminPageReadModel getProposalOrBugReportAdminPageReadModel(
@@ -98,6 +93,55 @@ public class ReportJooqRepository {
                 record.displayTime(),
                 record.nickname(),
                 record.status()
+        );
+    }
+
+    public @Nonnull List<ProposalOrBugReportAdminPageReadModel> getProposalOrBugReportAdminPageReadModels(
+            List<ProposalOrBugReportAdminPageRecord> records) {
+        List<ProposalOrBugReportAdminPageReadModel> readModels = new ArrayList<>();
+        for (ProposalOrBugReportAdminPageRecord record : records) {
+            readModels.add(getProposalOrBugReportAdminPageReadModel(record));
+        }
+        return readModels;
+    }
+
+    private static @Nonnull Field<LocalDateTime> getDisplayTimeFieldFromPropBugRep() {
+        return coalesce(PROP_BUG_REP.CHECKED_AT, PROP_BUG_REP.CREATED_AT).as("displayTime");
+    }
+
+    private static @Nonnull Field<String> getStatusFieldFromPropBugRep() {
+        return when(PROP_BUG_REP.CHECKED_AT.isNull(), val(ReportStatus.UNCHECKED.getValue()))
+                .otherwise(val(ReportStatus.CHECKED.getValue()))
+                .as("status");
+    }
+
+    private static Field<?> [] getProposalOrBugReportAdminPageFields() {
+        return new Field<?>[]{
+                PROP_BUG_REP.ULID,
+                PROP_BUG_REP.TITLE,
+                PROP_BUG_REP.CONTENT,
+                PROP_BUG_REP.IMAGE,
+                PROP_BUG_REP.IMAGE_NUMBER,
+                PROP_BUG_REP.CHECKED_AT,
+                PROP_BUG_REP.CREATED_AT,
+                getDisplayTimeFieldFromPropBugRep(),
+                SITE_MEMBER.NICKNAME,
+                getStatusFieldFromPropBugRep()
+        };
+    }
+
+    private static @Nonnull RecordMapper<Record, ProposalOrBugReportAdminPageRecord> getProposalOrBugReportAdminPageRecordMapper() {
+        return record -> new ProposalOrBugReportAdminPageRecord(
+                record.get(PROP_BUG_REP.ULID),
+                record.get(PROP_BUG_REP.TITLE),
+                record.get(PROP_BUG_REP.CONTENT),
+                record.get(PROP_BUG_REP.IMAGE),
+                record.get(PROP_BUG_REP.IMAGE_NUMBER),
+                record.get(PROP_BUG_REP.CHECKED_AT),
+                record.get(PROP_BUG_REP.CREATED_AT),
+                record.get(getDisplayTimeFieldFromPropBugRep()),
+                record.get(SITE_MEMBER.NICKNAME),
+                record.get(getStatusFieldFromPropBugRep())
         );
     }
 }

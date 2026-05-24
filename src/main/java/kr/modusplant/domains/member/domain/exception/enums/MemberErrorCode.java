@@ -23,6 +23,7 @@ public enum MemberErrorCode implements ErrorCode {
     EMPTY_REPORT_IMAGE_FILE_NAME(HttpStatus.BAD_REQUEST.value(), "empty_report_image_file_name", "보고서 이미지 파일명이 비어 있습니다. "),
     EMPTY_REPORT_IMAGE_NUMBER(HttpStatus.BAD_REQUEST.value(), "empty_report_image_number", "보고서 이미지 개수가 비어 있습니다. "),
     EMPTY_REPORT_IMAGE_PATH(HttpStatus.BAD_REQUEST.value(), "empty_report_image_path", "보고서 이미지 경로가 비어 있습니다. "),
+    EMPTY_REPORT_PAGE_SIZE(HttpStatus.BAD_REQUEST.value(), "empty_report_page_size", "보고서 페이지 크기가 비어 있습니다. "),
     EMPTY_REPORT_TITLE(HttpStatus.BAD_REQUEST.value(), "empty_report_title", "보고서 제목이 비어 있습니다. "),
     EMPTY_ACTIVITY_SUBJECT_COMMENT_PATH(HttpStatus.BAD_REQUEST.value(), "empty_activity_subject_comment_path", "대상 댓글 경로가 비어 있습니다. "),
     EMPTY_ACTIVITY_SUBJECT_POST_ID(HttpStatus.BAD_REQUEST.value(), "empty_activity_subject_post_id", "대상 게시글 아이디가 비어 있습니다. "),
@@ -48,15 +49,19 @@ public enum MemberErrorCode implements ErrorCode {
     NOT_ACCESSIBLE_POST_LIKE(HttpStatus.BAD_REQUEST.value(), "not_accessible_post_like", "대상 게시글에 대한 좋아요 기능을 이용할 수 없습니다. "),
     NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE(HttpStatus.BAD_REQUEST.value(), "not_accessible_post_report_for_abuse", "대상 게시글에 대한 신고 기능을 이용할 수 없습니다. "),
 
-    NOT_FOUND_MEMBER(HttpStatus.BAD_REQUEST.value(), "not_found_member_id", "회원 아이디를 찾을 수 없습니다. "),
-    NOT_FOUND_MEMBER_PROFILE(HttpStatus.BAD_REQUEST.value(), "not_found_member_profile", "회원 프로필을 찾을 수 없습니다. "),
-    NOT_FOUND_REPORT_ID(HttpStatus.BAD_REQUEST.value(), "not_found_report_id", "보고서 식별자를 찾을 수 없습니다. "),
     NOT_FOUND_ACTIVITY_SUBJECT_POST_ID(HttpStatus.BAD_REQUEST.value(), "not_found_activity_subject_post_id", "대상 게시글 아이디를 찾을 수 없습니다. "),
     NOT_FOUND_ACTIVITY_SUBJECT_COMMENT_ID(HttpStatus.BAD_REQUEST.value(), "not_found_activity_subject_comment_id", "대상 댓글 아이디를 찾을 수 없습니다. "),
+    NOT_FOUND_MEMBER(HttpStatus.BAD_REQUEST.value(), "not_found_member_id", "회원 아이디를 찾을 수 없습니다. "),
+    NOT_FOUND_MEMBER_PROFILE(HttpStatus.BAD_REQUEST.value(), "not_found_member_profile", "회원 프로필을 찾을 수 없습니다. "),
+    NOT_FOUND_PROPOSAL_OR_BUG_REPORT(HttpStatus.BAD_REQUEST.value(), "not_found_proposal_or_bug_report", "건의 및 버그 제보를 찾을 수 없습니다. "),
+    NOT_FOUND_REPORT_ID(HttpStatus.BAD_REQUEST.value(), "not_found_report_id", "보고서 식별자를 찾을 수 없습니다. "),
 
     NOT_FOUND_PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER(HttpStatus.INTERNAL_SERVER_ERROR.value(), "not_found_proposal_or_bug_image_number", "건의 및 버그 제보 이미지 개수를 찾을 수 없습니다. "),
 
-    PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER_OUT_OF_RANGE(HttpStatus.INTERNAL_SERVER_ERROR.value(), "proposal_or_bug_report_image_number_out_of_range", "건의 및 버그 제보 이미지 개수가 올바른 값의 범위를 벗어났습니다. ");
+    REPORT_PAGE_SIZE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST.value(), "report_page_size_out_of_range", "보고서 페이지 크기가 올바른 값의 범위를 벗어났습니다. "),
+
+    PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER_OUT_OF_RANGE(HttpStatus.INTERNAL_SERVER_ERROR.value(), "proposal_or_bug_report_image_number_out_of_range", "건의 및 버그 제보 이미지 개수가 올바른 값의 범위를 벗어났습니다. "),
+    ;
 
     private final int httpStatus;
     private final String code;

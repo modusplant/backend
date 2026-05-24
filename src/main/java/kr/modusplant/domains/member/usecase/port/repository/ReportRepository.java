@@ -1,11 +1,11 @@
 package kr.modusplant.domains.member.usecase.port.repository;
 
+import jakarta.annotation.Nullable;
 import kr.modusplant.domains.member.domain.aggregate.ProposalOrBugReport;
-import kr.modusplant.domains.member.domain.vo.ActivitySubjectCommentId;
-import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
-import kr.modusplant.domains.member.domain.vo.MemberId;
-import kr.modusplant.domains.member.domain.vo.ReportId;
+import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
+
+import java.util.List;
 
 public interface ReportRepository {
     boolean isIdExistInProposalOrBugReport(ReportId reportId);
@@ -22,7 +22,9 @@ public interface ReportRepository {
 
     void reportCommentAbuse(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId);
 
+    void removeProposalOrBugReport(ReportId reportId);
+
     ProposalOrBugReportAdminPageReadModel checkProposalOrBugReport(ReportId reportId);
 
-    void removeProposalOrBugReport(ReportId reportId);
+    List<ProposalOrBugReportAdminPageReadModel> getProposalOrBugReports(ReportPageSize reportPageSize, @Nullable ReportId lastReportId);
 }
