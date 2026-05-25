@@ -18,18 +18,6 @@ public class NotAccessibleException extends BusinessException {
         this.targetId = targetId;
     }
 
-    public NotAccessibleException(ErrorCode errorCode, String target, String targetId, String message) {
-        super(errorCode, message);
-        this.target = target;
-        this.targetId = targetId;
-    }
-
-    public NotAccessibleException(ErrorCode errorCode, String target, String targetId, String message, Throwable cause) {
-        super(errorCode, message, cause);
-        this.target = target;
-        this.targetId = targetId;
-    }
-
     public NotAccessibleException(ErrorCode errorCode, String target, String targetId, Throwable cause) {
         super(errorCode, cause);
         this.target = target;

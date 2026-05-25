@@ -24,14 +24,9 @@ public class InvalidValueException extends BusinessException {
         this.valueNames = valueNames;
     }
 
-    public InvalidValueException(ErrorCode errorCode, List<String> valueNames, String message) {
-        super(errorCode, message);
-        this.valueNames = valueNames;
-    }
-
-    public InvalidValueException(ErrorCode errorCode, List<String> valueNames, String message, Throwable cause) {
-        super(errorCode, message, cause);
-        this.valueNames = valueNames;
+    public InvalidValueException(ErrorCode errorCode, String valueName, Throwable cause) {
+        super(errorCode, cause);
+        this.valueNames = List.of(valueName);
     }
 
     public InvalidValueException(ErrorCode errorCode, List<String> valueNames, Throwable cause) {
