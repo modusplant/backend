@@ -38,7 +38,7 @@ import static org.jooq.impl.DSL.*;
 
 @Repository
 @RequiredArgsConstructor
-public class MemberRepositoryJpaAdapter implements MemberRepository {
+public class MemberRepositoryAdapter implements MemberRepository {
     private final StringRedisTemplate stringRedisTemplate;
     private final DSLContext dsl;
     private final ApplicationEventPublisher eventPublisher;
@@ -119,7 +119,7 @@ public class MemberRepositoryJpaAdapter implements MemberRepository {
             eventPublisher.publishEvent(RecentlyViewPostRemoveEvent.create(publishedPostUlids));
         }
         processPostsAndRelatedRecords(memberId, publishedPostUlids);
-        procesPostAndCommentRecordsLikedByMember(memberId);
+        processPostAndCommentRecordsLikedByMember(memberId);
         processOtherMemberRelatedRecords(memberId, reason, opinion);
     }
 
@@ -170,7 +170,7 @@ public class MemberRepositoryJpaAdapter implements MemberRepository {
         }
     }
 
-    private void procesPostAndCommentRecordsLikedByMember(UUID memberId) {
+    private void processPostAndCommentRecordsLikedByMember(UUID memberId) {
         List<String> activitySubjectPostIds = activitySubjectPostJooqRepository.getPostIdsLikedByMemberId(memberId);
         dsl.deleteFrom(COMM_POST_LIKE)
                 .where(COMM_POST_LIKE.MEMB_UUID.eq(memberId)).execute();

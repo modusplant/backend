@@ -4,21 +4,22 @@ import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.member.domain.aggregate.ProposalOrBugReport;
-import kr.modusplant.domains.member.domain.vo.ActivitySubjectCommentId;
-import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
-import kr.modusplant.domains.member.domain.vo.MemberId;
-import kr.modusplant.domains.member.domain.vo.ReportId;
+import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
+import kr.modusplant.domains.member.domain.vo.*;
+import kr.modusplant.domains.member.framework.out.jooq.record.ProposalOrBugReportAdminPageRecord;
 import kr.modusplant.domains.member.framework.out.jooq.repository.ReportJooqRepository;
 import kr.modusplant.domains.member.framework.out.jpa.entity.CommentAbuseReportEntity;
 import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.out.jpa.entity.PostAbuseReportEntity;
 import kr.modusplant.domains.member.framework.out.jpa.entity.ProposalBugReportEntity;
 import kr.modusplant.domains.member.framework.out.jpa.entity.record.FilenameAndSrcEntityRecord;
+import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
 import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
 import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
 import kr.modusplant.shared.event.ImagesRemoveEvent;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Repository;
@@ -34,7 +35,7 @@ import static org.jooq.impl.DSL.val;
 
 @Repository
 @RequiredArgsConstructor
-public class ReportRepositoryJpaAdapter implements ReportRepository {
+public class ReportRepositoryAdapter implements ReportRepository {
     private final DSLContext dsl;
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -129,17 +130,32 @@ public class ReportRepositoryJpaAdapter implements ReportRepository {
     }
 
     @Override
-    public void checkProposalOrBugReport(ReportId reportId) {
+    public void removeProposalOrBugReport(ReportId reportId) {
+        deleteImageFromReportImagePath(reportId.getValue());
+        processProposalOrBugReportRelatedRecords(reportId.getValue());
+    }
+
+    @Override
+    public ProposalOrBugReportAdminPageReadModel checkProposalOrBugReport(ReportId reportId) {
         dsl.update(PROP_BUG_REP)
                 .set(PROP_BUG_REP.CHECKED_AT, LocalDateTime.now())
                 .where(PROP_BUG_REP.ULID.eq(reportId.getValue()))
                 .execute();
+
+        ProposalOrBugReportAdminPageRecord proposalOrBugReportAdminPageRecord =
+                reportJooqRepository.getProposalOrBugReportAdminPageRecord(reportId);
+
+        return reportJooqRepository.getProposalOrBugReportAdminPageReadModel(proposalOrBugReportAdminPageRecord);
     }
 
     @Override
-    public void removeProposalOrBugReport(ReportId reportId) {
-        deleteImageFromReportImagePath(reportId.getValue());
-        processProposalOrBugReportRelatedRecords(reportId.getValue());
+    public List<ProposalOrBugReportAdminPageReadModel> getProposalOrBugReports(
+            ReportPageSize reportPageSize,
+            @Nullable ProposalOrBugReportStatus proposalOrBugReportStatus,
+            @Nullable ReportId lastReportId) {
+        List<ProposalOrBugReportAdminPageRecord> records =
+                reportJooqRepository.getProposalOrBugReportAdminPageRecords(reportPageSize, proposalOrBugReportStatus, lastReportId);
+        return reportJooqRepository.getProposalOrBugReportAdminPageReadModels(records);
     }
 
     private void deleteImageFromReportImagePath(String reportId) {
@@ -156,6 +172,7 @@ public class ReportRepositoryJpaAdapter implements ReportRepository {
                         PROP_BUG_REP_ARCHIVE.TITLE,
                         PROP_BUG_REP_ARCHIVE.CONTENT,
                         PROP_BUG_REP_ARCHIVE.CREATED_AT,
+                        PROP_BUG_REP_ARCHIVE.CHECKED_AT,
                         PROP_BUG_REP_ARCHIVE.ARCHIVED_AT
                 )
                 .select(
@@ -165,6 +182,7 @@ public class ReportRepositoryJpaAdapter implements ReportRepository {
                                 PROP_BUG_REP.TITLE,
                                 PROP_BUG_REP.CONTENT,
                                 PROP_BUG_REP.CREATED_AT,
+                                PROP_BUG_REP.CHECKED_AT,
                                 val(LocalDateTime.now())
                         )
                                 .from(PROP_BUG_REP)
