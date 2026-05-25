@@ -85,8 +85,8 @@ public class CommentJooqRepository implements CommentReadRepository {
                         commComment.IS_DELETED,
                         commComment.EDITED_AT)
                 .from(commComment)
-                .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
-                .join(memberProf).on(commComment.AUTH_MEMB_UUID.eq(memberProf.UUID))
+                .leftJoin(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
+                .leftJoin(memberProf).on(commComment.AUTH_MEMB_UUID.eq(memberProf.UUID))
                 .leftJoin(commentLike).on(likeJoinCondition)
                 .where(commComment.POST_ULID.eq(postId.getId()))
                 .orderBy(commComment.CREATED_AT.desc())
