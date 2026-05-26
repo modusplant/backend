@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 public class SocialIdentityLinkRestController {
 
     private final SocialIdentityLinkController socialIdentityLinkController;
+    private boolean isLocal = false;
 
     @Operation(summary = "소셜 연동 API", description = "카카오/구글 인가코드를 받아 소셜 인증 및 연동을 수행합니다")
     @PostMapping("/{provider}")
@@ -41,7 +42,7 @@ public class SocialIdentityLinkRestController {
             @NotNull
             SocialProvider provider
     ) {
-        SocialUserInfo socialUserInfo = socialIdentityLinkController.issueSocialToken(provider,request.code());
+        SocialUserInfo socialUserInfo = socialIdentityLinkController.issueSocialToken(provider,request.code(), isLocal);
         socialIdentityLinkController.linkSocialAccount(userDetails.getUuid(), provider, socialUserInfo);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
@@ -58,7 +59,7 @@ public class SocialIdentityLinkRestController {
             @NotNull
             SocialProvider provider
     ) {
-        SocialUserInfo socialUserInfo = socialIdentityLinkController.issueSocialToken(provider,request.code());
+        SocialUserInfo socialUserInfo = socialIdentityLinkController.issueSocialToken(provider,request.code(), isLocal);
         socialIdentityLinkController.unlinkSocialAccount(userDetails.getUuid(), provider, socialUserInfo);
         return ResponseEntity.ok().body(DataResponse.ok());
     }

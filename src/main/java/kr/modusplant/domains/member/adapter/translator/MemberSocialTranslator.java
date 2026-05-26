@@ -18,10 +18,10 @@ public class MemberSocialTranslator {
         String upperCaseAuthProvider = authProvider.toUpperCase(Locale.ROOT);
         if (upperCaseAuthProvider.equals(SocialProvider.KAKAO.name())) {
             return socialIdentityLinkController.issueSocialToken(
-                    SocialProvider.KAKAO, authCode).socialAccessToken();
+                    SocialProvider.KAKAO, authCode, false).socialAccessToken();
         } else if (upperCaseAuthProvider.equals(SocialProvider.GOOGLE.name())) {
             return socialIdentityLinkController.issueSocialToken(
-                    SocialProvider.GOOGLE, authCode).socialAccessToken();
+                    SocialProvider.GOOGLE, authCode, false).socialAccessToken();
         } else {
             throw new UnsupportedSocialProviderException();
         }

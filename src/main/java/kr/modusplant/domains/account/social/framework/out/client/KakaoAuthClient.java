@@ -40,19 +40,26 @@ public class KakaoAuthClient implements SocialAuthClient {
     private String KAKAO_API_KEY;
     @Value("${kakao.redirect-uri}")
     private String KAKAO_REDIRECT_URI;
+    @Value("${kakao.local-redirect-uri:#{null}}")
+    private String KAKAO_LOCAL_REDIRECT_URI;
+
 
     @Override
-    public SocialUserInfo getToken(String code) {
+    public SocialUserInfo getToken(String code, boolean isLocal) {
         RestClient restClient = restClientBuilder
                 .baseUrl("https://kauth.kakao.com")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .build();
 
+        String redirectUri = (isLocal && KAKAO_LOCAL_REDIRECT_URI != null)
+                ? KAKAO_LOCAL_REDIRECT_URI
+                : KAKAO_REDIRECT_URI;
+
         MultiValueMap<String,String> formData = new LinkedMultiValueMap<>();
         Map.of(
                 "code",code,
                 "client_id",KAKAO_API_KEY,
-                "redirect_uri", KAKAO_REDIRECT_URI,
+                "redirect_uri", redirectUri,
                 "grant_type", "authorization_code"
         ).forEach(formData::add);
 

@@ -46,18 +46,22 @@ public class GoogleAuthClient implements SocialAuthClient {
     private String GOOGLE_LOCAL_REDIRECT_URI;
 
     @Override
-    public SocialUserInfo getToken(String code) {
+    public SocialUserInfo getToken(String code, boolean isLocal) {
         RestClient restClient = restClientBuilder
                 .baseUrl("https://oauth2.googleapis.com")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .build();
+
+        String redirectUri = (isLocal && GOOGLE_LOCAL_REDIRECT_URI != null)
+                ? GOOGLE_LOCAL_REDIRECT_URI
+                : GOOGLE_REDIRECT_URI;
 
         MultiValueMap<String,String> formData = new LinkedMultiValueMap<>();
         Map.of(
                 "code", code,
                 "client_id", GOOGLE_API_KEY,
                 "client_secret", GOOGLE_SECRET,
-                "redirect_uri", GOOGLE_REDIRECT_URI,
+                "redirect_uri", redirectUri,
                 "grant_type","authorization_code"
         ).forEach(formData::add);
 

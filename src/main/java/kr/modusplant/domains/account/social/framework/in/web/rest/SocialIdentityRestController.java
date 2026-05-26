@@ -39,6 +39,7 @@ public class SocialIdentityRestController {
     private final SocialIdentityTokenHelper tempTokenHelper;
 
     private long durationMs = 1800000;
+    private boolean isLocal = false;
 
     @Operation(summary = "소셜 인증/로그인 API", description = "카카오/구글 인가코드를 받아 소셜 인증 및 로그인을 수행합니다.<br>구글 인가 코드를 URL에서 추출할 경우 '%2F'는 '/'로 대체해야 합니다.")
     @PostMapping("/social-login/{provider}")
@@ -50,7 +51,7 @@ public class SocialIdentityRestController {
             @NotNull
             SocialProvider provider
     ) {
-        SocialLoginResult socialLoginResult = socialIdentityController.handleSocialLogin(provider, request.code());
+        SocialLoginResult socialLoginResult = socialIdentityController.handleSocialLogin(provider, request.code(), isLocal);
         String cookie;
         SocialLoginResponse loginResponse;
         switch (socialLoginResult) {
