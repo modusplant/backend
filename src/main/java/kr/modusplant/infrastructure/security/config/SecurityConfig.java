@@ -1,7 +1,7 @@
 package kr.modusplant.infrastructure.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.framework.out.redis.AccessTokenRedisRepository;
 import kr.modusplant.infrastructure.jwt.provider.JwtCookieProvider;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
@@ -22,6 +22,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -40,6 +41,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -52,7 +54,7 @@ public class SecurityConfig {
     private final JwtTokenProvider tokenProvider;
     private final JwtCookieProvider cookieProvider;
     private final TokenService tokenService;
-    private final SiteMemberJpaRepository memberRepository;
+    private final MemberJpaRepository memberRepository;
     private final Validator validator;
     private final AccessTokenRedisRepository tokenRedisRepository;
 
@@ -151,6 +153,8 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter(http), EmailPasswordAuthenticationFilter.class)
                 // TODO: @PreAuthorize 기반 방안을 고민하고, anyRequest를 authenticated()로 수정할 것.
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/admin/**").hasAuthority("ADMIN")
                         .requestMatchers(
                                 "/api/v1/communication/posts/me/**",
                                 "/api/v1/communication/posts/search-history/**",

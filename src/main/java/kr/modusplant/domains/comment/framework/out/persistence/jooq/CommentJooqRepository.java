@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -52,6 +53,16 @@ public class CommentJooqRepository implements CommentReadRepository {
                 .fetchOptional()
                 .map(Record1::value1)
                 .orElse(0);
+    }
+
+    @Override
+    public Optional<LocalDateTime> findLatestUpdatedAtByPost(PostId postId) {
+        return Optional.ofNullable(
+                dsl.select(DSL.max(commComment.UPDATED_AT))
+                        .from(commComment)
+                        .where(commComment.POST_ULID.eq(postId.getId()))
+                        .fetchOne(DSL.max(commComment.UPDATED_AT))
+        );
     }
 
     public List<CommentOfPostReadModel> findByPost(PostId postId, Author nullableAuthor) {

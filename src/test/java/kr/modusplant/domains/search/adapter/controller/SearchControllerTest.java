@@ -13,16 +13,19 @@ import kr.modusplant.domains.search.usecase.port.repository.SearchPostRepository
 import kr.modusplant.domains.search.usecase.record.SearchPostRecord;
 import kr.modusplant.domains.search.usecase.response.SearchPostRelevanceSortedPageResponse;
 import kr.modusplant.domains.search.usecase.response.SearchPostResponse;
-import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
-import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.post.common.constant.PostConstant.*;
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT;
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.TEST_POST_CONTENT_THUMBNAIL_KEY;
-import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
+import static kr.modusplant.domains.post.common.constant.PrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
+import static kr.modusplant.domains.post.common.constant.SecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORIES_ID;
 import static kr.modusplant.domains.search.common.constant.SearchDoubleConstant.TEST_SEARCH_KEYWORD_SIMILARITY_1;
 import static kr.modusplant.domains.search.common.constant.SearchIntegerConstant.TEST_SEARCH_POST_SIZE;
 import static kr.modusplant.domains.search.common.constant.SearchStringConstant.TEST_SEARCH_KEYWORD;
@@ -33,14 +36,9 @@ import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostImpor
 import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostPublishedAtTestUtils.testSearchPostPublishedAt;
 import static kr.modusplant.domains.search.common.util.usecase.model.read.SearchPostReadModelTestUtils.testSearchPostReadModelList;
 import static kr.modusplant.domains.search.common.util.usecase.record.SearchPostRecordTestUtils.testSearchPostRecordRelevance;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_CONTENT_JSON_NODE;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_PUBLISHED_AT;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
-import static kr.modusplant.shared.persistence.common.util.constant.CommSecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORIES_ID;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.verify;
@@ -65,7 +63,7 @@ class SearchControllerTest {
                 testSearchPostId, testSearchPostPublishedAt, testSearchPostImportanceTitle,
                 testSearchKeywordSimilarity1, TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID))
                 .willReturn(testSearchPostReadModelList);
-        given(searchPostTranslator.getJsonNodeContentPreview(TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY)).willReturn(TEST_COMM_POST_CONTENT_JSON_NODE);
+        given(searchPostTranslator.getJsonNodeContentPreview(TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY)).willReturn(TEST_POST_CONTENT_JSON_NODE);
         willDoNothing().given(searchPostHistoryRepository).saveSearchKeyword(testSearchKeyword, MEMBER_BASIC_USER_UUID);
 
         // when
@@ -95,7 +93,7 @@ class SearchControllerTest {
         SearchPostRecord record = new SearchPostRecord(
                 TEST_SEARCH_KEYWORD, SearchPostTarget.TITLE_CONTENT_COMMENT, SearchPostSortCondition.RELEVANCE,
                 null, TEST_COMM_SECONDARY_CATEGORIES_ID,
-                TEST_POST_ULID, TEST_COMM_POST_PUBLISHED_AT,
+                TEST_POST_ULID, TEST_POST_PUBLISHED_AT,
                 SearchPostImportance.title().getValueIfNotEmpty(), TEST_SEARCH_KEYWORD_SIMILARITY_1,
                 TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
         given(searchPostConditionRepository.isIdExist(any())).willReturn(true);
@@ -115,7 +113,7 @@ class SearchControllerTest {
         SearchPostRecord record = new SearchPostRecord(
                 TEST_SEARCH_KEYWORD, SearchPostTarget.TITLE_CONTENT_COMMENT, SearchPostSortCondition.RELEVANCE,
                 TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID,
-                TEST_POST_ULID, TEST_COMM_POST_PUBLISHED_AT,
+                TEST_POST_ULID, TEST_POST_PUBLISHED_AT,
                 SearchPostImportance.title().getValueIfNotEmpty(), TEST_SEARCH_KEYWORD_SIMILARITY_1, TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
         given(searchPostConditionRepository.isIdExist(record.primaryCategoryId())).willReturn(false);
 
@@ -134,7 +132,7 @@ class SearchControllerTest {
         SearchPostRecord record = new SearchPostRecord(
                 TEST_SEARCH_KEYWORD, SearchPostTarget.TITLE_CONTENT_COMMENT, SearchPostSortCondition.RELEVANCE,
                 TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID,
-                TEST_POST_ULID, TEST_COMM_POST_PUBLISHED_AT,
+                TEST_POST_ULID, TEST_POST_PUBLISHED_AT,
                 SearchPostImportance.title().getValueIfNotEmpty(), TEST_SEARCH_KEYWORD_SIMILARITY_1,
                 TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
         given(searchPostConditionRepository.isIdExist(any())).willReturn(true);
@@ -148,117 +146,5 @@ class SearchControllerTest {
 
         // then
         assertThat(exception.getErrorCode()).isEqualTo(SearchErrorCode.INCORRECT_SEARCH_POST_CATEGORY_ID);
-    }
-
-    @Test
-    @DisplayName("LATEST 정렬 조건이고 커서가 모두 null일 때 searchByKeyword로 조회 성공")
-    void testSearchByKeyword_withLatestAndNullCursors_willReturnCursorPageResponse() {
-        // given
-        SearchPostRecord record = new SearchPostRecord(
-                TEST_SEARCH_KEYWORD, SearchPostTarget.TITLE_CONTENT_COMMENT, SearchPostSortCondition.LATEST,
-                TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID,
-                null, null,
-                null, null, TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
-
-        given(searchPostConditionRepository.isIdExist(record.primaryCategoryId())).willReturn(true);
-        given(searchPostConditionRepository.isIdsExist(record.primaryCategoryId(), record.secondaryCategoryIds())).willReturn(true);
-
-        given(searchPostRepository.searchByKeywordWithLatest(
-                any(), any(), any(), anyList(), any(), any(), anyInt(), any()))
-                .willReturn(testSearchPostReadModelList);
-        given(searchPostTranslator.getJsonNodeContentPreview(any(), any())).willReturn(TEST_COMM_POST_CONTENT_JSON_NODE);
-        willDoNothing().given(searchPostHistoryRepository).saveSearchKeyword(any(), any());
-
-        // when
-        SearchPostRelevanceSortedPageResponse<SearchPostResponse> result =
-                searchController.searchByKeyword(record);
-
-        // then
-        assertThat(result).isNotNull();
-        verify(searchPostRepository).searchByKeywordWithLatest(any(), any(), any(), anyList(), any(), any(), anyInt(), any());
-    }
-
-    @Test
-    @DisplayName("LATEST 정렬 조건이고 커서 값이 존재할 때 searchByKeyword로 조회 성공")
-    void testSearchByKeyword_withLatestAndValidCursors_willReturnCursorPageResponse() {
-        // given
-        SearchPostRecord record = new SearchPostRecord(
-                TEST_SEARCH_KEYWORD, SearchPostTarget.TITLE_CONTENT_COMMENT, SearchPostSortCondition.LATEST,
-                TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID,
-                TEST_POST_ULID, TEST_COMM_POST_PUBLISHED_AT,
-                null, null, TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
-
-        given(searchPostConditionRepository.isIdExist(record.primaryCategoryId())).willReturn(true);
-        given(searchPostConditionRepository.isIdsExist(record.primaryCategoryId(), record.secondaryCategoryIds())).willReturn(true);
-
-        given(searchPostRepository.searchByKeywordWithLatest(
-                any(), any(), any(), anyList(), any(), any(), anyInt(), any()))
-                .willReturn(testSearchPostReadModelList);
-        given(searchPostTranslator.getJsonNodeContentPreview(any(), any())).willReturn(TEST_COMM_POST_CONTENT_JSON_NODE);
-        willDoNothing().given(searchPostHistoryRepository).saveSearchKeyword(any(), any());
-
-        // when
-        SearchPostRelevanceSortedPageResponse<SearchPostResponse> result =
-                searchController.searchByKeyword(record);
-
-        // then
-        assertThat(result).isNotNull();
-        verify(searchPostRepository).searchByKeywordWithLatest(any(), any(), any(), anyList(), any(), any(), anyInt(), any());
-    }
-
-    @Test
-    @DisplayName("RELEVANCE 정렬 조건이고 모든 커서가 null일 때 searchByKeyword로 조회 성공")
-    void testSearchByKeyword_withRelevanceAndNullCursors_willReturnCursorPageResponse() {
-        // given
-        SearchPostRecord record = new SearchPostRecord(
-                TEST_SEARCH_KEYWORD, SearchPostTarget.TITLE_CONTENT_COMMENT, SearchPostSortCondition.RELEVANCE,
-                TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID,
-                null, null,
-                null, null, TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
-
-        given(searchPostConditionRepository.isIdExist(record.primaryCategoryId())).willReturn(true);
-        given(searchPostConditionRepository.isIdsExist(record.primaryCategoryId(), record.secondaryCategoryIds())).willReturn(true);
-
-        given(searchPostRepository.searchByKeywordWithRelevance(
-                any(), any(), any(), anyList(), any(), any(), any(), any(), anyInt(), any()))
-                .willReturn(testSearchPostReadModelList);
-        given(searchPostTranslator.getJsonNodeContentPreview(any(), any())).willReturn(TEST_COMM_POST_CONTENT_JSON_NODE);
-        willDoNothing().given(searchPostHistoryRepository).saveSearchKeyword(any(), any());
-
-        // when
-        SearchPostRelevanceSortedPageResponse<SearchPostResponse> result =
-                searchController.searchByKeyword(record);
-
-        // then
-        assertThat(result).isNotNull();
-        verify(searchPostRepository).searchByKeywordWithRelevance(any(), any(), any(), anyList(), any(), any(), any(), any(), anyInt(), any());
-    }
-
-    @Test
-    @DisplayName("RELEVANCE 정렬 조건이고 모든 커서 값이 존재할 때 searchByKeyword로 조회 성공")
-    void testSearchByKeyword_withRelevanceAndValidCursors_willReturnCursorPageResponse() {
-        // given
-        SearchPostRecord record = new SearchPostRecord(
-                TEST_SEARCH_KEYWORD, SearchPostTarget.TITLE_CONTENT_COMMENT, SearchPostSortCondition.RELEVANCE,
-                TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID,
-                TEST_POST_ULID, TEST_COMM_POST_PUBLISHED_AT,
-                SearchPostImportance.title().getValueIfNotEmpty(), TEST_SEARCH_KEYWORD_SIMILARITY_1, TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
-
-        given(searchPostConditionRepository.isIdExist(record.primaryCategoryId())).willReturn(true);
-        given(searchPostConditionRepository.isIdsExist(record.primaryCategoryId(), record.secondaryCategoryIds())).willReturn(true);
-
-        given(searchPostRepository.searchByKeywordWithRelevance(
-                any(), any(), any(), anyList(), any(), any(), any(), any(), anyInt(), any()))
-                .willReturn(testSearchPostReadModelList);
-        given(searchPostTranslator.getJsonNodeContentPreview(any(), any())).willReturn(TEST_COMM_POST_CONTENT_JSON_NODE);
-        willDoNothing().given(searchPostHistoryRepository).saveSearchKeyword(any(), any());
-
-        // when
-        SearchPostRelevanceSortedPageResponse<SearchPostResponse> result =
-                searchController.searchByKeyword(record);
-
-        // then
-        assertThat(result).isNotNull();
-        verify(searchPostRepository).searchByKeywordWithRelevance(any(), any(), any(), anyList(), any(), any(), any(), any(), anyInt(), any());
     }
 }

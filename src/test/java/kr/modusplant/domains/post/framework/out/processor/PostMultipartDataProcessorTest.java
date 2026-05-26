@@ -10,13 +10,13 @@ import kr.modusplant.domains.post.framework.out.processor.exception.TextFileOver
 import kr.modusplant.domains.post.framework.out.processor.exception.ThumbnailNotAllowedException;
 import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
 import kr.modusplant.domains.post.usecase.request.FileOrder;
-import kr.modusplant.framework.aws.service.S3FileService;
-import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
-import kr.modusplant.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.infrastructure.config.jackson.JacksonConfig;
 import kr.modusplant.shared.exception.FileLimitExceededException;
 import kr.modusplant.shared.exception.InvalidFileInputException;
 import kr.modusplant.shared.exception.UnsupportedFileException;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
+import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
+import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.shared.generator.UlidGeneratorHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -40,10 +40,10 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 class PostMultipartDataProcessorTest implements PostRequestTestUtils {
-    private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
+    private final AmazonS3Service amazonS3Service = Mockito.mock(AmazonS3Service.class);
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(JacksonConfig.objectMapper());
     private final UlidGeneratorHolder ulidGeneratorHolder = new UlidGeneratorHolder(new UlidIdGenerator());
-    private final PostMultipartDataProcessor postMultipartDataProcessor = new PostMultipartDataProcessor(s3FileService, objectMapperHolder, ulidGeneratorHolder);
+    private final PostMultipartDataProcessor postMultipartDataProcessor = new PostMultipartDataProcessor(amazonS3Service, objectMapperHolder, ulidGeneratorHolder);
 
     private static final String DATA = "data";
     private static final String FILENAME = "filename";
@@ -62,7 +62,7 @@ class PostMultipartDataProcessorTest implements PostRequestTestUtils {
         void testSaveFilesAndGenerateContentJson_givenMultipartFilesAndOrderInfoList_willReturnJsonContentWithCorrectOrder() throws Exception {
             // given
             String regex = "post/[a-zA-Z0-9]{26}/";
-            doNothing().when(s3FileService).uploadFile(any(MultipartFile.class),anyString());
+            doNothing().when(amazonS3Service).uploadFile(any(MultipartFile.class),anyString());
 
             // when
             ContentProcessRecord record = postMultipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles,basicMediaFilesOrder,imageFilename);
@@ -97,7 +97,7 @@ class PostMultipartDataProcessorTest implements PostRequestTestUtils {
         void testSaveFilesAndGenerateContentJson_givenMultipartFilesAndMixedOrderInfoList_willReturnJsonContentWithCorrectOrder() throws Exception {
             // given
             String regex = "post/[a-zA-Z0-9]{26}/";
-            doNothing().when(s3FileService).uploadFile(any(MultipartFile.class),anyString());
+            doNothing().when(amazonS3Service).uploadFile(any(MultipartFile.class),anyString());
             List<FileOrder> mixedBasicMediaFilesOrder = List.of(
                     new FileOrder(imageFile.getOriginalFilename(),1),
                     new FileOrder(textFile0.getOriginalFilename(),0),
@@ -288,7 +288,7 @@ class PostMultipartDataProcessorTest implements PostRequestTestUtils {
             // given
             JsonNode content = postMultipartDataProcessor.saveFilesAndGenerateContentJson(onlyImageFile,onlyImageFilesOrder,imageFilename).content();
             String fullSrcUrl = BASIC_PATH + FILE_KEY;
-            given(s3FileService.generateS3SrcUrl(anyString())).willReturn(fullSrcUrl);
+            given(amazonS3Service.generateS3SrcUrl(anyString())).willReturn(fullSrcUrl);
 
             // when
             JsonNode result = postMultipartDataProcessor.convertFileSrcToFullFileSrc(content);
@@ -313,7 +313,7 @@ class PostMultipartDataProcessorTest implements PostRequestTestUtils {
         void testConvertToPreview_givenJsonContent_willReturnArrayNodePreviewContent() throws IOException {
             // given
             String fullSrcUrl = BASIC_PATH + FILE_KEY;
-            given(s3FileService.generateS3SrcUrl(anyString())).willReturn(fullSrcUrl);
+            given(amazonS3Service.generateS3SrcUrl(anyString())).willReturn(fullSrcUrl);
 
             // when
             ArrayNode result = postMultipartDataProcessor.convertToPreview(TEST_POST_CONTENT_TEXT_AND_IMAGE,TEST_POST_CONTENT_TEXT_AND_IMAGE_THUMBNAIL_KEY);
@@ -331,7 +331,7 @@ class PostMultipartDataProcessorTest implements PostRequestTestUtils {
             assertThat(imageNode.has(DATA)).isFalse();
             assertThat(imageNode.get(SRC).asText()).isEqualTo(fullSrcUrl);
 
-            verify(s3FileService).generateS3SrcUrl(anyString());
+            verify(amazonS3Service).generateS3SrcUrl(anyString());
         }
 
         @Test
@@ -347,7 +347,7 @@ class PostMultipartDataProcessorTest implements PostRequestTestUtils {
             assertThat(textNode.get(TYPE).asText()).isEqualTo("text");
             assertThat(textNode.has(DATA)).isTrue();
 
-            verify(s3FileService, never()).generateS3SrcUrl(anyString());
+            verify(amazonS3Service, never()).generateS3SrcUrl(anyString());
         }
 
         @Test
@@ -355,7 +355,7 @@ class PostMultipartDataProcessorTest implements PostRequestTestUtils {
         void testConvertToPreviewData_givenJsonContentImage_willReturnArrayNodePreviewContent() throws IOException {
             // given
             String fullSrcUrl = BASIC_PATH + FILE_KEY;
-            given(s3FileService.generateS3SrcUrl(anyString())).willReturn(fullSrcUrl);
+            given(amazonS3Service.generateS3SrcUrl(anyString())).willReturn(fullSrcUrl);
 
             // when
             ArrayNode result = postMultipartDataProcessor.convertToPreview(TEST_POST_CONTENT_IMAGE_AND_VIDEO,TEST_POST_CONTENT_IMAGE_AND_VIDEO_THUMBNAIL_KEY);
@@ -369,7 +369,7 @@ class PostMultipartDataProcessorTest implements PostRequestTestUtils {
             assertThat(imageNode.get(SRC).asText()).isEqualTo(fullSrcUrl);
             assertThat(imageNode.has(DATA)).isFalse();
 
-            verify(s3FileService).generateS3SrcUrl(anyString());
+            verify(amazonS3Service).generateS3SrcUrl(anyString());
         }
 
         @Test
@@ -380,7 +380,7 @@ class PostMultipartDataProcessorTest implements PostRequestTestUtils {
 
             // then
             assertThat(result).isEmpty();
-            verify(s3FileService, never()).generateS3SrcUrl(anyString());
+            verify(amazonS3Service, never()).generateS3SrcUrl(anyString());
         }
 
     }
@@ -394,13 +394,13 @@ class PostMultipartDataProcessorTest implements PostRequestTestUtils {
             // given
             ContentProcessRecord record = postMultipartDataProcessor.saveFilesAndGenerateContentJson(textImageFiles,textImageFilesOrder,imageFilename);
             JsonNode content = record.content();
-            doNothing().when(s3FileService).deleteFiles(content.get(1).get(SRC).asText());
+            doNothing().when(amazonS3Service).deleteFiles(content.get(1).get(SRC).asText());
 
             // when
             postMultipartDataProcessor.deleteFiles(content);
 
             // then
-            verify(s3FileService,times(1)).deleteFiles(content.get(1).get(SRC).asText());
+            verify(amazonS3Service,times(1)).deleteFiles(content.get(1).get(SRC).asText());
         }
 
         @Test
@@ -410,7 +410,7 @@ class PostMultipartDataProcessorTest implements PostRequestTestUtils {
             postMultipartDataProcessor.deleteFiles(null);
 
             // then
-            verify(s3FileService,never()).deleteFiles(any(String.class));
+            verify(amazonS3Service,never()).deleteFiles(any(String.class));
 
         }
     }

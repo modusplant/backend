@@ -1,15 +1,15 @@
 package kr.modusplant.domains.post.framework.out.jpa.mapper;
 
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.domains.post.domain.vo.*;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity.PostEntityBuilder;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PrimaryCategoryEntity;
+import kr.modusplant.domains.post.framework.out.jpa.entity.SecondaryCategoryEntity;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
-import kr.modusplant.framework.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.jpa.entity.CommPostEntity.CommPostEntityBuilder;
-import kr.modusplant.framework.jpa.entity.CommPrimaryCategoryEntity;
-import kr.modusplant.framework.jpa.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -18,9 +18,9 @@ import java.time.LocalDateTime;
 public class PostJpaMapperImpl implements PostJpaMapper {
 
     @Override
-    public CommPostEntity toPostEntity(Post post, SiteMemberEntity authorEntity, CommPrimaryCategoryEntity primaryCategoryEntity, CommSecondaryCategoryEntity secondaryCategoryEntity, Long viewCount) {
+    public PostEntity toPostEntity(Post post, MemberEntity authorEntity, PrimaryCategoryEntity primaryCategoryEntity, SecondaryCategoryEntity secondaryCategoryEntity, Long viewCount) {
         LocalDateTime publishedAt = post.getStatus().isPublished() ? LocalDateTime.now() : null;
-        CommPostEntityBuilder postEntityBuilder = CommPostEntity.builder();
+        PostEntityBuilder postEntityBuilder = PostEntity.builder();
         if (post.getPostId() != null) {
             postEntityBuilder.ulid(post.getPostId().getValue());
         }
@@ -39,7 +39,7 @@ public class PostJpaMapperImpl implements PostJpaMapper {
     }
 
     @Override
-    public Post toPost(CommPostEntity postEntity) {
+    public Post toPost(PostEntity postEntity) {
         if (postEntity.getAuthMember() == null) {
             throw new EmptyValueException(PostErrorCode.EMPTY_AUTHOR_ID);
         }

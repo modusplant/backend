@@ -6,8 +6,8 @@ import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
 import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
-import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
+import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -27,6 +27,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_AUTHORIZATION;
+import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMM_COMMENT_PATH;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE;
+import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
+import static kr.modusplant.domains.member.common.constant.ReportConstant.*;
 import static kr.modusplant.domains.member.common.util.usecase.record.CommentAbuseReportRecordTestUtils.testCommentAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.testMemberPostBookmarkCancelRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.testMemberCommentLikeRecord;
@@ -40,18 +47,10 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberProf
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberWithdrawalRecordTestUtils.testKakaoMemberWithdrawalRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
-import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRemoveRecordTestUtils.testProposalOrBugReportRemoveRecord;
 import static kr.modusplant.domains.member.common.util.usecase.request.MemberWithdrawRequestTestUtils.testBasicMemberWithdrawRequest;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
-import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.objectMapper;
-import static kr.modusplant.shared.persistence.common.util.constant.CommCommentConstant.TEST_COMM_COMMENT_PATH;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPostConstant.TEST_COMM_POST_ULID;
-import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.*;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.MEMBER_AUTH_BASIC_USER_AUTHORIZATION;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
+import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -160,7 +159,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         willDoNothing().given(memberController).likePost(testMemberPostLikeRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.likeCommunicationPost(TEST_COMM_POST_ULID, MEMBER_BASIC_USER_UUID);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.likeCommunicationPost(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -174,7 +173,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         willDoNothing().given(memberController).unlikePost(testMemberPostUnlikeRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.unlikeCommunicationPost(TEST_COMM_POST_ULID, MEMBER_BASIC_USER_UUID);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.unlikeCommunicationPost(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -188,7 +187,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         willDoNothing().given(memberController).bookmarkPost(testMemberPostBookmarkRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.bookmarkCommunicationPost(TEST_COMM_POST_ULID, MEMBER_BASIC_USER_UUID);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.bookmarkCommunicationPost(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -202,7 +201,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         willDoNothing().given(memberController).cancelPostBookmark(testMemberPostBookmarkCancelRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.cancelCommunicationPostBookmark(TEST_COMM_POST_ULID, MEMBER_BASIC_USER_UUID);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.cancelCommunicationPostBookmark(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -216,7 +215,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         willDoNothing().given(memberController).likeComment(testMemberCommentLikeRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.likeCommunicationComment(TEST_COMM_POST_ULID, TEST_COMM_COMMENT_PATH, MEMBER_BASIC_USER_UUID);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.likeCommunicationComment(TEST_POST_ULID, TEST_COMM_COMMENT_PATH, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -230,7 +229,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         willDoNothing().given(memberController).unlikeComment(testMemberCommentUnlikeRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.unlikeCommunicationComment(TEST_COMM_POST_ULID, TEST_COMM_COMMENT_PATH, MEMBER_BASIC_USER_UUID);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.unlikeCommunicationComment(TEST_POST_ULID, TEST_COMM_COMMENT_PATH, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -244,21 +243,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         willDoNothing().given(memberController).reportProposalOrBug(testProposalOrBugReportRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportProposalOrBug(TEST_REPORT_TITLE, TEST_REPORT_CONTENT, TEST_REPORT_IMAGES, TEST_REPORT_IMAGE_NUMBER, MEMBER_BASIC_USER_UUID);
-
-        // then
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok().toString());
-    }
-
-    @Test
-    @DisplayName("deleteProposalOrBugReport로 응답 반환")
-    void testDeleteProposalOrBugReport_givenValidRequest_willReturnResponse() {
-        // given
-        willDoNothing().given(memberController).removeProposalOrBug(testProposalOrBugReportRemoveRecord);
-
-        // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.removeProposalOrBugReport(TEST_REPORT_ULID);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportProposalOrBug(TEST_REPORT_TITLE, TEST_REPORT_CONTENT, TEST_REPORT_IMAGES, TEST_REPORT_IMAGE_NUMBER_3, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -273,7 +258,7 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_POST_ID).toString());
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.of(MemberErrorCode.NOT_FOUND_ACTIVITY_SUBJECT_POST_ID).toString());
     }
 
     @Test
@@ -283,7 +268,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         willDoNothing().given(memberController).reportPostAbuse(testPostAbuseReportRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportPostAbuse(TEST_COMM_POST_ULID, MEMBER_BASIC_USER_UUID);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportPostAbuse(TEST_POST_ULID, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -298,7 +283,7 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_COMMENT_ID).toString());
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.of(MemberErrorCode.NOT_FOUND_ACTIVITY_SUBJECT_COMMENT_ID).toString());
     }
 
     @Test
@@ -308,7 +293,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         willDoNothing().given(memberController).reportCommentAbuse(testCommentAbuseReportRecord);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportCommentAbuse(TEST_COMM_POST_ULID, TEST_COMM_COMMENT_PATH, MEMBER_BASIC_USER_UUID);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportCommentAbuse(TEST_POST_ULID, TEST_COMM_COMMENT_PATH, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);

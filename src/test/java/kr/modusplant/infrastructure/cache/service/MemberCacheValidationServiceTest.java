@@ -2,12 +2,12 @@ package kr.modusplant.infrastructure.cache.service;
 
 import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
 import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheValidationService;
-import kr.modusplant.framework.jpa.entity.SiteMemberProfileEntity;
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberProfileEntityTestUtils;
-import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
-import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.framework.jpa.repository.SiteMemberProfileJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberProfileEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberProfileEntityTestUtils;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberProfileJpaRepository;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,8 +30,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @Slf4j
-class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, SiteMemberProfileEntityTestUtils {
-    private final SiteMemberProfileJpaRepository memberProfileJpaRepository = Mockito.mock(SiteMemberProfileJpaRepository.class);
+class MemberCacheValidationServiceTest implements MemberEntityTestUtils, MemberProfileEntityTestUtils {
+    private final MemberProfileJpaRepository memberProfileJpaRepository = Mockito.mock(MemberProfileJpaRepository.class);
     private final PasswordEncoder passwordEncoder = Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8();
     private final MemberCacheValidationService memberCacheValidationService = new MemberCacheValidationService(memberProfileJpaRepository, passwordEncoder);
 
@@ -59,9 +59,9 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
     @DisplayName("ifNoneMatch가 null일 때 응답 반환")
     void testGetMemberCacheValidationResult_givenNullIfNoneMatch_willReturnResponse() {
         // given
-        Optional<SiteMemberProfileEntity> optionalMemberProfileEntity = Optional.of(
+        Optional<MemberProfileEntity> optionalMemberProfileEntity = Optional.of(
                 createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntityWithUuid()).build());
-        SiteMemberProfileEntity memberProfileEntity = optionalMemberProfileEntity.orElseThrow();
+        MemberProfileEntity memberProfileEntity = optionalMemberProfileEntity.orElseThrow();
         ReflectionTestUtils.setField(memberProfileEntity, "lastModifiedAt", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         ReflectionTestUtils.setField(memberProfileEntity, "versionNumber", 0L);
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(optionalMemberProfileEntity);
@@ -78,9 +78,9 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
     @DisplayName("매칭되는 엔터티 태그가 없을 때 응답 반환")
     void testGetMemberCacheValidationResult_givenNotMatchedEntityTag_willReturnResponse() {
         // given
-        Optional<SiteMemberProfileEntity> optionalMemberProfileEntity = Optional.of(
+        Optional<MemberProfileEntity> optionalMemberProfileEntity = Optional.of(
                 createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntityWithUuid()).build());
-        SiteMemberProfileEntity memberProfileEntity = optionalMemberProfileEntity.orElseThrow();
+        MemberProfileEntity memberProfileEntity = optionalMemberProfileEntity.orElseThrow();
         ReflectionTestUtils.setField(memberProfileEntity, "lastModifiedAt", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         ReflectionTestUtils.setField(memberProfileEntity, "versionNumber", 0L);
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(optionalMemberProfileEntity);
@@ -99,9 +99,9 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
     @DisplayName("매칭되는 엔터티 태그가 있고 ifModifiedSince가 null일 때 응답 반환")
     void testGetMemberCacheValidationResult_givenMatchedEntityTagAndNullIfModifiedSince_willReturnResponse() {
         // given
-        Optional<SiteMemberProfileEntity> optionalMemberProfileEntity = Optional.of(
+        Optional<MemberProfileEntity> optionalMemberProfileEntity = Optional.of(
                 createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntityWithUuid()).build());
-        SiteMemberProfileEntity memberProfileEntity = optionalMemberProfileEntity.orElseThrow();
+        MemberProfileEntity memberProfileEntity = optionalMemberProfileEntity.orElseThrow();
         ReflectionTestUtils.setField(memberProfileEntity, "lastModifiedAt", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         ReflectionTestUtils.setField(memberProfileEntity, "versionNumber", 0L);
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(optionalMemberProfileEntity);
@@ -120,9 +120,9 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
     @DisplayName("매칭되는 엔터티 태그가 있고 ifModifiedSince가 조건을 만족할 때 응답 반환")
     void testGetMemberCacheValidationResult_givenMatchedEntityTagAndRangedIfModifiedSince_willReturnResponse() {
         // given
-        Optional<SiteMemberProfileEntity> optionalMemberProfileEntity = Optional.of(
+        Optional<MemberProfileEntity> optionalMemberProfileEntity = Optional.of(
                 createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntityWithUuid()).build());
-        SiteMemberProfileEntity memberProfileEntity = optionalMemberProfileEntity.orElseThrow();
+        MemberProfileEntity memberProfileEntity = optionalMemberProfileEntity.orElseThrow();
         ReflectionTestUtils.setField(memberProfileEntity, "lastModifiedAt", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         ReflectionTestUtils.setField(memberProfileEntity, "versionNumber", 0L);
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(optionalMemberProfileEntity);
@@ -154,9 +154,9 @@ class MemberCacheValidationServiceTest implements SiteMemberEntityTestUtils, Sit
     @DisplayName("매칭되는 엔터티 태그가 있고 ifModifiedSince가 조건을 만족하지 않을 때 응답 반환")
     void testGetMemberCacheValidationResult_givenMatchedEntityTagAndNotRangedIfModifiedSince_willReturnResponse() {
         // given
-        Optional<SiteMemberProfileEntity> optionalMemberProfileEntity = Optional.of(
+        Optional<MemberProfileEntity> optionalMemberProfileEntity = Optional.of(
                 createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntityWithUuid()).build());
-        SiteMemberProfileEntity memberProfileEntity = optionalMemberProfileEntity.orElseThrow();
+        MemberProfileEntity memberProfileEntity = optionalMemberProfileEntity.orElseThrow();
         ReflectionTestUtils.setField(memberProfileEntity, "lastModifiedAt", LocalDateTime.now());
         ReflectionTestUtils.setField(memberProfileEntity, "versionNumber", 0L);
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(optionalMemberProfileEntity);

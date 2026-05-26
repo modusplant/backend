@@ -2,7 +2,7 @@ package kr.modusplant.shared.kernel.common.util;
 
 import kr.modusplant.shared.kernel.Email;
 
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.*;
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.*;
 
 public interface EmailTestUtils {
     Email testNormalUserEmail = Email.create(MEMBER_AUTH_BASIC_USER_EMAIL);

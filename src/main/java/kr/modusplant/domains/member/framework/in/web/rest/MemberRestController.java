@@ -15,7 +15,7 @@ import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheVa
 import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.request.MemberWithdrawRequest;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
+import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -35,7 +35,7 @@ import java.util.UUID;
 import static kr.modusplant.infrastructure.jwt.util.TokenUtils.getTokenFromAuthorizationHeader;
 import static kr.modusplant.shared.constant.Regex.*;
 
-@Tag(name = "회원 API", description = "회원의 생성과 갱신(상태 제외), 회원이 할 수 있는 단일한 기능을 관리하는 API 입니다.")
+@Tag(name = "회원 API", description = "회원의 생성과 갱신(상태 제외), 회원 활동을 관리하는 API 입니다.")
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -347,26 +347,6 @@ public class MemberRestController {
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
-    // TODO: 관리자 API로 활용 요망
-    @Hidden
-    @Operation(
-            summary = "건의 및 버그 제보 제거 API",
-            description = "건의 사항 또는 버그 제보를 제거합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
-    )
-//    @DeleteMapping(value = "/admin/report/proposal-or-bug/{reportUlid}")
-    public ResponseEntity<DataResponse<Void>> removeProposalOrBugReport(
-            @Parameter(
-                    description = "삭제할 보고서의 식별자",
-                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
-            )
-            @PathVariable
-            @NotBlank(message = "보고서 식별자가 비어 있습니다.")
-            String reportUlid) {
-        memberController.removeProposalOrBug(new ProposalOrBugReportRemoveRecord(reportUlid));
-        return ResponseEntity.ok().body(DataResponse.ok());
-    }
-
     @Hidden
     @Operation(
             summary = "게시글 신고 API",
@@ -379,7 +359,7 @@ public class MemberRestController {
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
             @AuthenticationPrincipal(expression = "uuid")
             UUID ignoredMemberId) {
-        return ResponseEntity.badRequest().body(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_POST_ID));
+        return ResponseEntity.badRequest().body(DataResponse.of(MemberErrorCode.NOT_FOUND_ACTIVITY_SUBJECT_POST_ID));
     }
 
     @Operation(
@@ -426,7 +406,7 @@ public class MemberRestController {
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
             @AuthenticationPrincipal(expression = "uuid")
             UUID ignoredMemberId) {
-        return ResponseEntity.badRequest().body(DataResponse.of(MemberErrorCode.NOT_FOUND_TARGET_COMMENT_ID));
+        return ResponseEntity.badRequest().body(DataResponse.of(MemberErrorCode.NOT_FOUND_ACTIVITY_SUBJECT_COMMENT_ID));
     }
 
     @Operation(

@@ -4,13 +4,14 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.in.web.cache.model.CommentCacheData;
+import kr.modusplant.domains.comment.usecase.port.repository.CommentReadRepository;
 import kr.modusplant.domains.member.domain.vo.MemberId;
-import kr.modusplant.framework.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
-import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
+import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,7 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static kr.modusplant.shared.http.utils.ParseHttpHeaderUtils.parseIfModifiedSince;
 import static kr.modusplant.shared.http.utils.ParseHttpHeaderUtils.parseIfNoneMatch;
@@ -28,15 +31,19 @@ import static kr.modusplant.shared.http.utils.ParseHttpHeaderUtils.parseIfNoneMa
 @Slf4j
 public class CommentCacheService {
 
-    private final CommPostJpaRepository postJpaRepository;
-    private final SiteMemberJpaRepository memberJpaRepository;
+    private final PostJpaRepository postJpaRepository;
+    private final MemberJpaRepository memberJpaRepository;
+    private final CommentReadRepository commentReadRepository;
 
     private final PasswordEncoder passwordEncoder;
 
-    public CommentCacheService(CommPostJpaRepository postJpaRepository, SiteMemberJpaRepository memberJpaRepository,
+    public CommentCacheService(PostJpaRepository postJpaRepository,
+                               MemberJpaRepository memberJpaRepository,
+                               CommentReadRepository commentReadRepository,
                                @Qualifier("pbkdf2PasswordEncoder") PasswordEncoder passwordEncoder) {
         this.postJpaRepository = postJpaRepository;
         this.memberJpaRepository = memberJpaRepository;
+        this.commentReadRepository = commentReadRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -45,11 +52,22 @@ public class CommentCacheService {
             @Nullable String ifModifiedSince,
             @Nonnull PostId postUlid
     ) {
-        CommPostEntity postEntity = postJpaRepository.findByUlid(postUlid.getId())
+        PostEntity postEntity = postJpaRepository.findByUlid(postUlid.getId())
                 .orElseThrow( () -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post"));
 
-        String ETagSource = postEntity.getETagSource();
-        LocalDateTime lastModifiedAt = postEntity.getUpdatedAtAsTruncatedToSeconds();
+        // 댓글의 최신 변경 시각 조회
+        LocalDateTime latestCommentUpdatedAt = commentReadRepository.findLatestUpdatedAtByPost(postUlid)
+                .orElse(LocalDateTime.MIN);
+
+        // post와 댓글 변경 시각 중 더 최신 것을 기준으로 함
+        LocalDateTime lastModifiedAt = Stream.of(
+                        postEntity.getUpdatedAtAsTruncatedToSeconds(),
+                        latestCommentUpdatedAt)
+                .max(Comparator.naturalOrder())
+                .get();
+
+        // ETag 소스도 두 값을 합산
+        String ETagSource = postEntity.getETagSource() + latestCommentUpdatedAt;
 
         return determineCacheData(ifNoneMatch, ifModifiedSince, ETagSource, lastModifiedAt);
     }
@@ -59,7 +77,7 @@ public class CommentCacheService {
             @Nullable String ifModifiedSince,
             @Nonnull MemberId memberId
     ) {
-        SiteMemberEntity memberEntity = memberJpaRepository.findByUuid(memberId.getValue())
+        MemberEntity memberEntity = memberJpaRepository.findByUuid(memberId.getValue())
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, "member"));
 
         String ETagSource = memberEntity.getETagSource();

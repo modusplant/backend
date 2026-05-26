@@ -4,7 +4,7 @@ import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentContentTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentPathTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
-import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.tools.jdbc.MockConnection;
@@ -36,7 +36,7 @@ public class CommentJooqRepositoryTest implements
     };
 
     private final MockConnection connection = new MockConnection(provider);
-    private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
+    private final AmazonS3Service amazonS3Service = Mockito.mock(AmazonS3Service.class);
     private final LocalDateTime testDateTime = LocalDateTime.parse("2025-10-16 14:30:45", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
     private CommentJooqRepository createRepository(MockDataProvider provider) {

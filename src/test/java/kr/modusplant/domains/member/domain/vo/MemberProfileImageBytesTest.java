@@ -1,17 +1,17 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
-import kr.modusplant.shared.exception.EmptyValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
+import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileImageBytesTestUtils.testMemberProfileImageBytes;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES;
+import static kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyMemberProfileImageBytesTestUtils.testEmptyMemberProfileImageBytes;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class MemberProfileImageBytesTest {
     @Test
@@ -23,8 +23,7 @@ class MemberProfileImageBytesTest {
     @Test
     @DisplayName("null로 create을 호출하여 오류 발생")
     void testCreate_givenNull_willThrowException() {
-        EmptyValueException exception = assertThrows(EmptyValueException.class, () -> MemberProfileImageBytes.create(null));
-        assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_PROFILE_IMAGE_BYTES);
+        assertThat(MemberProfileImageBytes.create(null)).isEqualTo(testEmptyMemberProfileImageBytes);
     }
 
     @Test

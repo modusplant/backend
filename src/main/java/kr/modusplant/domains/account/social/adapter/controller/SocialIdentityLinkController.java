@@ -95,5 +95,4 @@ public class SocialIdentityLinkController {
             case GOOGLE -> socialCredentials.isGoogle();
         };
     }
-
 }

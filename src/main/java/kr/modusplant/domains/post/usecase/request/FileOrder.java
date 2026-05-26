@@ -1,8 +1,10 @@
 package kr.modusplant.domains.post.usecase.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import kr.modusplant.shared.validation.ZeroBasedOrder;
+import jakarta.validation.constraints.NotNull;
 
 public record FileOrder(
         @Schema(
@@ -18,6 +20,8 @@ public record FileOrder(
                 maximum = "100",
                 example = "1"
         )
-        @ZeroBasedOrder
+        @NotNull(message = "순서가 비어 있습니다.")
+        @Min(value = 0, message = "순서는 0부터 100 사이의 값이어야 합니다.")
+        @Max(value = 100, message = "순서는 0부터 100 사이의 값이어야 합니다.")
         Integer order) {
 }

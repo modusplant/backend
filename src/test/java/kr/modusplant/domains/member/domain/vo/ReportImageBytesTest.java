@@ -1,17 +1,17 @@
 package kr.modusplant.domains.member.domain.vo;
 
-import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
-import kr.modusplant.shared.exception.EmptyValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
+import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_IMAGE_BYTES_1;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportImageBytesTestUtils.testReportImageBytes1;
-import static kr.modusplant.shared.persistence.common.util.constant.ReportConstant.TEST_REPORT_IMAGE_BYTES_1;
+import static kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyReportImageBytesTestUtils.testEmptyReportImageBytes;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class ReportImageBytesTest {
     @Test
@@ -21,10 +21,9 @@ class ReportImageBytesTest {
     }
 
     @Test
-    @DisplayName("null로 create을 호출하여 오류 발생")
-    void testCreate_givenNull_willThrowException() {
-        EmptyValueException exception = assertThrows(EmptyValueException.class, () -> ReportImageBytes.create(null));
-        assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_REPORT_IMAGE_BYTES);
+    @DisplayName("null로 create을 호출하여 비어 있는 회원 프로필 이미지 바이트 반환")
+    void testCreate_givenNull_willReturnNullReportImageBytes() {
+        assertThat(ReportImageBytes.create(null)).isEqualTo(testEmptyReportImageBytes);
     }
 
     @Test

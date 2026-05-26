@@ -4,17 +4,16 @@ import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.exception.InvalidValueException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.CommentContent;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.compositekey.CommentCompositeKey;
+import kr.modusplant.domains.comment.framework.out.persistence.jpa.entity.CommentEntity;
 import kr.modusplant.domains.comment.framework.out.persistence.jpa.mapper.CommentJpaMapper;
-import kr.modusplant.domains.comment.framework.out.persistence.jpa.repository.supers.CommentJpaRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentWriteRepository;
-import kr.modusplant.framework.jpa.entity.CommCommentEntity;
-import kr.modusplant.framework.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.exception.NotFoundEntityException;
-import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.framework.jpa.repository.CommPostJpaRepository;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
-import kr.modusplant.shared.persistence.compositekey.CommCommentId;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
+import kr.modusplant.domains.post.framework.out.jpa.repository.PostJpaRepository;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -24,28 +23,28 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class CommentRepositoryJpaAdapter implements CommentWriteRepository {
-    private final SiteMemberJpaRepository memberRepository;
-    private final CommPostJpaRepository postRepository;
+    private final MemberJpaRepository memberRepository;
+    private final PostJpaRepository postRepository;
     private final CommentJpaRepository commentRepository;
 
     private final CommentJpaMapper mapper;
 
     @Override
     public void save(Comment comment) {
-        SiteMemberEntity commentAuthorEntity = memberRepository.findByUuid(comment.getAuthor().getMemberUuid())
+        MemberEntity commentAuthorEntity = memberRepository.findByUuid(comment.getAuthor().getMemberUuid())
                 .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_AUTHOR));
-        CommPostEntity commentPostEntity = postRepository.findByUlid(comment.getPostId().getId())
+        PostEntity commentPostEntity = postRepository.findByUlid(comment.getPostId().getId())
                 .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_POST));
-        CommCommentEntity commentEntity = mapper.toCommCommentEntity(comment, commentAuthorEntity, commentPostEntity);
-        if(commentRepository.existsById(new CommCommentId(comment.getPostId().getId(), comment.getPath().getPath()))) {
+        CommentEntity commentEntity = mapper.toCommCommentEntity(comment, commentAuthorEntity, commentPostEntity);
+        if(commentRepository.existsById(new CommentCompositeKey(comment.getPostId().getId(), comment.getPath().getPath()))) {
             throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT);
         }
         commentRepository.save(commentEntity);
     }
 
     @Override
-    public void update(CommCommentId id, CommentContent content) {
-        CommCommentEntity comment = commentRepository.findById(id)
+    public void update(CommentCompositeKey id, CommentContent content) {
+        CommentEntity comment = commentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_COMMENT, TableName.COMM_COMMENT));
         comment.updateContent(content.getContent());
         comment.updateEditedAt();
@@ -54,10 +53,10 @@ public class CommentRepositoryJpaAdapter implements CommentWriteRepository {
     }
 
     @Override
-    public void setCommentAsDeleted(CommCommentId id) {
-        Optional<CommCommentEntity> comment = commentRepository.findById(id);
+    public void setCommentAsDeleted(CommentCompositeKey id) {
+        Optional<CommentEntity> comment = commentRepository.findById(id);
         if (comment.isPresent()) {
-            CommCommentEntity actualComment = comment.get();
+            CommentEntity actualComment = comment.get();
             actualComment.markAsDeleted();
             commentRepository.save(actualComment);
         }

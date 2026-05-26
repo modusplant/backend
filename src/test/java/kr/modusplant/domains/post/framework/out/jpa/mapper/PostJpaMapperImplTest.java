@@ -1,15 +1,15 @@
 package kr.modusplant.domains.post.framework.out.jpa.mapper;
 
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
 import kr.modusplant.domains.post.common.util.framework.out.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.domains.post.domain.aggregate.Post;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PostEntity;
+import kr.modusplant.domains.post.framework.out.jpa.entity.PrimaryCategoryEntity;
+import kr.modusplant.domains.post.framework.out.jpa.entity.SecondaryCategoryEntity;
+import kr.modusplant.domains.post.framework.out.jpa.entity.common.util.PrimaryCategoryEntityTestUtils;
+import kr.modusplant.domains.post.framework.out.jpa.entity.common.util.SecondaryCategoryEntityTestUtils;
 import kr.modusplant.domains.post.framework.out.jpa.mapper.supers.PostJpaMapper;
-import kr.modusplant.framework.jpa.entity.CommPostEntity;
-import kr.modusplant.framework.jpa.entity.CommPrimaryCategoryEntity;
-import kr.modusplant.framework.jpa.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.entity.common.util.CommPrimaryCategoryEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.CommSecondaryCategoryEntityTestUtils;
-import kr.modusplant.framework.jpa.entity.common.util.SiteMemberEntityTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTestUtils, CommPrimaryCategoryEntityTestUtils, CommSecondaryCategoryEntityTestUtils {
+class PostJpaMapperImplTest implements PostEntityTestUtils, MemberEntityTestUtils, PrimaryCategoryEntityTestUtils, SecondaryCategoryEntityTestUtils {
     private final PostJpaMapper postJpaMapper = new PostJpaMapperImpl();
 
     @Test
@@ -25,13 +25,13 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
     void testToPostEntity_givenPostAndMemberEntityAndCategoryEntityAndViewCount_willReturnPostEntity() {
         // given
         Post post = createPublishedPost();
-        SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(testAuthorId.getValue()).build();
-        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().id(testPrimaryCategoryId.getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().id(testSecondaryCategoryId.getValue()).build();
+        MemberEntity memberEntity = MemberEntity.builder().uuid(testAuthorId.getValue()).build();
+        PrimaryCategoryEntity primaryCategoryEntity = PrimaryCategoryEntity.builder().id(testPrimaryCategoryId.getValue()).build();
+        SecondaryCategoryEntity secondaryCategoryEntity = createSecondaryCategoryEntityBuilder().id(testSecondaryCategoryId.getValue()).build();
         long viewCount = 5L;
 
         // when
-        CommPostEntity result = postJpaMapper.toPostEntity(
+        PostEntity result = postJpaMapper.toPostEntity(
                 post,
                 memberEntity,
                 primaryCategoryEntity,
@@ -57,13 +57,13 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
     void testToPostEntity_givenDraftPostAndMemberEntityAndCategoryEntityAndViewCount_willReturnPostEntity() {
         // given
         Post post = createDraftPostWithEmptyValue();
-        SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(testAuthorId.getValue()).build();
-        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().id(testPrimaryCategoryId.getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = null;
+        MemberEntity memberEntity = MemberEntity.builder().uuid(testAuthorId.getValue()).build();
+        PrimaryCategoryEntity primaryCategoryEntity = PrimaryCategoryEntity.builder().id(testPrimaryCategoryId.getValue()).build();
+        SecondaryCategoryEntity secondaryCategoryEntity = null;
         long viewCount = 0L;
 
         // when
-        CommPostEntity result = postJpaMapper.toPostEntity(
+        PostEntity result = postJpaMapper.toPostEntity(
                 post,
                 memberEntity,
                 primaryCategoryEntity,
@@ -88,10 +88,10 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
     @DisplayName("toPost로 발행된 게시글 aggregate 반환하기")
     void testToPost_givenPostEntity_willReturnPost() {
         // given
-        SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(testAuthorId.getValue()).build();
-        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().id(testPrimaryCategoryId.getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().id(testSecondaryCategoryId.getValue()).build();
-        CommPostEntity postEntity = createPublishedPostEntityBuilderWithUuid()
+        MemberEntity memberEntity = MemberEntity.builder().uuid(testAuthorId.getValue()).build();
+        PrimaryCategoryEntity primaryCategoryEntity = PrimaryCategoryEntity.builder().id(testPrimaryCategoryId.getValue()).build();
+        SecondaryCategoryEntity secondaryCategoryEntity = createSecondaryCategoryEntityBuilder().id(testSecondaryCategoryId.getValue()).build();
+        PostEntity postEntity = createPublishedPostEntityBuilderWithUuid()
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)
                 .authMember(memberEntity)
@@ -117,10 +117,10 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
     @DisplayName("toPost로 임시저장된 entity를 aggregate로 매핑하기")
     void testToPost_givenDraftPostEntity_willReturnPost() {
         // given
-        SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(testAuthorId.getValue()).build();
-        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().id(testPrimaryCategoryId.getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = createCommSecondaryCategoryEntityBuilder().id(testSecondaryCategoryId.getValue()).build();;
-        CommPostEntity postEntity = createDraftPostEntityBuilderWithUuid()
+        MemberEntity memberEntity = MemberEntity.builder().uuid(testAuthorId.getValue()).build();
+        PrimaryCategoryEntity primaryCategoryEntity = PrimaryCategoryEntity.builder().id(testPrimaryCategoryId.getValue()).build();
+        SecondaryCategoryEntity secondaryCategoryEntity = createSecondaryCategoryEntityBuilder().id(testSecondaryCategoryId.getValue()).build();;
+        PostEntity postEntity = createDraftPostEntityBuilderWithUuid()
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)
                 .authMember(memberEntity)
@@ -146,10 +146,10 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, SiteMemberEntityTest
     @DisplayName("toPost로 빈값이 포함된 임시저장된 entity를 aggregate로 매핑하기")
     void testToPost_givenDraftPostEntityWillNullValue_willReturnPost() {
         // given
-        SiteMemberEntity memberEntity = SiteMemberEntity.builder().uuid(testAuthorId.getValue()).build();
-        CommPrimaryCategoryEntity primaryCategoryEntity = CommPrimaryCategoryEntity.builder().id(testPrimaryCategoryId.getValue()).build();
-        CommSecondaryCategoryEntity secondaryCategoryEntity = null;
-        CommPostEntity postEntity = createDraftPostEntityBuilderWithoutContentWithUuid()
+        MemberEntity memberEntity = MemberEntity.builder().uuid(testAuthorId.getValue()).build();
+        PrimaryCategoryEntity primaryCategoryEntity = PrimaryCategoryEntity.builder().id(testPrimaryCategoryId.getValue()).build();
+        SecondaryCategoryEntity secondaryCategoryEntity = null;
+        PostEntity postEntity = createDraftPostEntityBuilderWithoutContentWithUuid()
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)
                 .authMember(memberEntity)

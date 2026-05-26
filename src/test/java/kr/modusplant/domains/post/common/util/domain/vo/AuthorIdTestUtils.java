@@ -2,10 +2,10 @@ package kr.modusplant.domains.post.common.util.domain.vo;
 
 import kr.modusplant.domains.post.domain.vo.AuthorId;
 
-import static kr.modusplant.domains.post.common.constant.PostUuidConstant.TEST_POST_UUID;
-import static kr.modusplant.domains.post.common.constant.PostUuidConstant.TEST_POST_UUID2;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_ADMIN_UUID;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 
 public interface AuthorIdTestUtils {
-    AuthorId testAuthorId = AuthorId.fromUuid(TEST_POST_UUID);
-    AuthorId testAuthorId2 = AuthorId.fromUuid(TEST_POST_UUID2);
+    AuthorId testAuthorId = AuthorId.fromUuid(MEMBER_BASIC_USER_UUID);
+    AuthorId testAuthorId2 = AuthorId.fromUuid(MEMBER_BASIC_ADMIN_UUID);
 }

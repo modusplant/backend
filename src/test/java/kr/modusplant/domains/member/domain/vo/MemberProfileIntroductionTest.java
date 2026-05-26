@@ -1,16 +1,16 @@
 package kr.modusplant.domains.member.domain.vo;
 
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
-import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
+import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils.testMemberProfileIntroduction;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
+import static kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyMemberProfileIntroductionTestUtils.testEmptyMemberProfileIntroduction;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,17 +22,15 @@ class MemberProfileIntroductionTest {
     }
 
     @Test
-    @DisplayName("null로 create을 호출하여 오류 발생")
-    void testCreate_givenNull_willThrowException() {
-        EmptyValueException exception = assertThrows(EmptyValueException.class, () -> MemberProfileIntroduction.create(null));
-        assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_PROFILE_INTRODUCTION);
+    @DisplayName("null로 create을 호출하여 비어 있는 회원 프로필 소개 반환")
+    void testCreate_givenNull_willReturnEmptyMemberProfileIntroduction() {
+        assertThat(MemberProfileIntroduction.create(null)).isEqualTo(testEmptyMemberProfileIntroduction);
     }
 
     @Test
-    @DisplayName("빈 문자열로 create을 호출하여 오류 발생")
-    void testCreate_givenEmptyString_willThrowException() {
-        EmptyValueException exception = assertThrows(EmptyValueException.class, () -> MemberProfileIntroduction.create("   "));
-        assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_MEMBER_PROFILE_INTRODUCTION);
+    @DisplayName("빈 문자열로 create을 호출하여 비어 있는 회원 프로필 소개 반환")
+    void testCreate_givenEmptyString_willReturnEmptyMemberProfileIntroduction() {
+        assertThat(MemberProfileIntroduction.create(" ")).isEqualTo(testEmptyMemberProfileIntroduction);
     }
 
     @Test

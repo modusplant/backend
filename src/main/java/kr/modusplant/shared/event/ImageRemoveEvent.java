@@ -1,24 +1,22 @@
 package kr.modusplant.shared.event;
 
-import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.util.CollectionUtils;
-
-import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ImageRemoveEvent {
-    private final List<String> imageFileKeys;
+    private final String imageFileKey;
 
-    public static ImageRemoveEvent create(List<String> imageFileKeys) {
-        if (CollectionUtils.isEmpty(imageFileKeys)) {
-            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_IMAGE_FILE_KEYS, "imageFileKeys");
+    public static ImageRemoveEvent create(String imageFileKey) {
+        if (StringUtils.isBlank(imageFileKey)) {
+            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_IMAGE_FILE_KEY, "imageFileKey");
         } else {
-            return new ImageRemoveEvent(imageFileKeys);
+            return new ImageRemoveEvent(imageFileKey);
         }
     }
 }

@@ -11,8 +11,8 @@ import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityLin
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.usecase.record.SocialUserInfo;
 import kr.modusplant.domains.account.social.usecase.request.SocialAuthRequest;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
+import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

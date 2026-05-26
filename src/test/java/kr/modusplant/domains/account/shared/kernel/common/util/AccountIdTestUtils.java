@@ -2,7 +2,7 @@ package kr.modusplant.domains.account.shared.kernel.common.util;
 
 import kr.modusplant.domains.account.shared.kernel.AccountId;
 
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.*;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.*;
 
 public interface AccountIdTestUtils {
     AccountId testNormalMemberId = AccountId.create(MEMBER_BASIC_USER_UUID);

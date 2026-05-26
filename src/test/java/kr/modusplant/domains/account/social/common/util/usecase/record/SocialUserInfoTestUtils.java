@@ -2,9 +2,9 @@ package kr.modusplant.domains.account.social.common.util.usecase.record;
 
 import kr.modusplant.domains.account.social.usecase.record.SocialUserInfo;
 
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.*;
 import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_GOOGLE_SOCIAL_ACCESS_TOKEN;
 import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberAuthConstant.*;
 
 public interface SocialUserInfoTestUtils {
     default SocialUserInfo createKakaoSocialUserInfo() {

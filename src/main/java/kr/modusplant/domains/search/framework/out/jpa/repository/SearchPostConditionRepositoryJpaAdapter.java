@@ -1,9 +1,9 @@
 package kr.modusplant.domains.search.framework.out.jpa.repository;
 
+import kr.modusplant.domains.post.framework.out.jpa.entity.SecondaryCategoryEntity;
+import kr.modusplant.domains.post.framework.out.jpa.mapper.PrimaryCategoryJpaRepository;
+import kr.modusplant.domains.post.framework.out.jpa.mapper.SecondaryCategoryJpaRepository;
 import kr.modusplant.domains.search.usecase.port.repository.SearchPostConditionRepository;
-import kr.modusplant.framework.jpa.entity.CommSecondaryCategoryEntity;
-import kr.modusplant.framework.jpa.repository.CommPrimaryCategoryJpaRepository;
-import kr.modusplant.framework.jpa.repository.CommSecondaryCategoryJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 @Repository
 @RequiredArgsConstructor
 public class SearchPostConditionRepositoryJpaAdapter implements SearchPostConditionRepository {
-    private final CommPrimaryCategoryJpaRepository primaryCategoryJpaRepository;
-    private final CommSecondaryCategoryJpaRepository secondaryCategoryJpaRepository;
+    private final PrimaryCategoryJpaRepository primaryCategoryJpaRepository;
+    private final SecondaryCategoryJpaRepository secondaryCategoryJpaRepository;
 
     @Override
     public boolean isIdExist(Integer primaryCategoryId) {
@@ -29,7 +29,7 @@ public class SearchPostConditionRepositoryJpaAdapter implements SearchPostCondit
         Set<Integer> foundIds = secondaryCategoryJpaRepository.findByPrimaryCategoryOrderByOrderAsc(
                         primaryCategoryJpaRepository.findById(primaryCategoryId).orElseThrow())
                 .stream()
-                .map(CommSecondaryCategoryEntity::getId).collect(Collectors.toUnmodifiableSet());
+                .map(SecondaryCategoryEntity::getId).collect(Collectors.toUnmodifiableSet());
         return foundIds.containsAll(uniqueIds);
     }
 }

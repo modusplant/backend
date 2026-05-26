@@ -1,7 +1,7 @@
 package kr.modusplant.infrastructure.jwt.framework.out.jpa.repository;
 
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
-import kr.modusplant.framework.jpa.repository.SiteMemberJpaRepository;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.framework.out.jpa.entity.RefreshTokenEntity;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,9 +21,9 @@ import static org.mockito.Mockito.mock;
 class RefreshTokenJpaRepositoryTest implements RefreshTokenEntityTestUtils {
 
     private final RefreshTokenJpaRepository refreshTokenJpaRepository = mock(RefreshTokenJpaRepository.class);
-    private final SiteMemberJpaRepository memberJpaRepository = mock(SiteMemberJpaRepository.class);
+    private final MemberJpaRepository memberJpaRepository = mock(MemberJpaRepository.class);
 
-    private SiteMemberEntity memberEntity;
+    private MemberEntity memberEntity;
     private RefreshTokenEntity refreshTokenEntity;
 
     @BeforeEach

@@ -1,9 +1,9 @@
 package kr.modusplant.infrastructure.context;
 
-import kr.modusplant.framework.redis.RedisHelper;
-import kr.modusplant.infrastructure.config.aws.TestS3Config;
-import kr.modusplant.infrastructure.config.jpa.TestJpaConfig;
-import kr.modusplant.infrastructure.config.redis.TestRedisConfig;
+import kr.modusplant.infrastructure.config.aws.S3Config;
+import kr.modusplant.infrastructure.config.jpa.JpaConfig;
+import kr.modusplant.infrastructure.config.redis.RedisConfig;
+import kr.modusplant.shared.framework.redis.RedisHelper;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
@@ -23,9 +23,9 @@ import static kr.modusplant.shared.constant.Reference.NOTATION_ALL;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @EnableJpaRepositories(basePackages = NOTATION_ALL)
 @Transactional
-@Import({TestJpaConfig.class,
-        TestRedisConfig.class,
-        TestS3Config.class,
+@Import({JpaConfig.class,
+        RedisConfig.class,
+        S3Config.class,
         RedisHelper.class})
 @ComponentScan(
         basePackageClasses = RedisHelper.class,

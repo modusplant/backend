@@ -13,8 +13,8 @@ import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdenti
 import kr.modusplant.domains.account.normal.usecase.request.EmailModificationRequest;
 import kr.modusplant.domains.account.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.domains.account.normal.usecase.request.PasswordModificationRequest;
-import kr.modusplant.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.Password;

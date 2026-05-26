@@ -22,7 +22,7 @@ import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
 import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
 import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
 import kr.modusplant.domains.post.usecase.response.*;
-import kr.modusplant.framework.aws.service.S3FileService;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,10 +37,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.*;
-import static kr.modusplant.domains.post.common.constant.PostUlidConstant.TEST_POST_ULID;
-import static kr.modusplant.shared.persistence.common.util.constant.CommPrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.post.common.constant.PrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -59,8 +59,8 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     private final PostViewLockRepository postViewLockRepository = Mockito.mock(PostViewLockRepository.class);
     private final PostArchiveRepository postArchiveRepository = Mockito.mock(PostArchiveRepository.class);
     private final PostRecentlyViewRepository postRecentlyViewRepository = Mockito.mock(PostRecentlyViewRepository.class);
-    private final S3FileService s3FileService = Mockito.mock(S3FileService.class);
-    private final PostController postController = new PostController(postMapper, postRepository, postQueryRepository, postQueryForMemberRepository, multipartDataProcessorPort, postViewCountRepository,postViewLockRepository,postArchiveRepository, postRecentlyViewRepository, s3FileService);
+    private final AmazonS3Service amazonS3Service = Mockito.mock(AmazonS3Service.class);
+    private final PostController postController = new PostController(postMapper, postRepository, postQueryRepository, postQueryForMemberRepository, multipartDataProcessorPort, postViewCountRepository,postViewLockRepository,postArchiveRepository, postRecentlyViewRepository, amazonS3Service);
 
     @BeforeEach
     void setUp() {

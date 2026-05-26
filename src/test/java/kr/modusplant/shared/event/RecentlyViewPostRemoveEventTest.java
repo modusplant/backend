@@ -1,7 +1,7 @@
 package kr.modusplant.shared.event;
 
-import kr.modusplant.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

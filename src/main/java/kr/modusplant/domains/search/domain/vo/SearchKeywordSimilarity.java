@@ -1,6 +1,5 @@
 package kr.modusplant.domains.search.domain.vo;
 
-import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -8,12 +7,13 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.*;
+import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.NOT_FOUND_SEARCH_POST_SIMILARITY;
+import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.SEARCH_KEYWORD_SIMILARITY_OUT_OF_RANGE;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class SearchKeywordSimilarity {
     private static final SearchKeywordSimilarity emptySearchKeywordSimilarity =
-            new SearchKeywordSimilarity(0, true);
+            new SearchKeywordSimilarity(-1, true);
 
     private final double value;
 
@@ -22,8 +22,9 @@ public class SearchKeywordSimilarity {
 
     public static SearchKeywordSimilarity create(Double value) {
         if (value == null) {
-            throw new EmptyValueException(EMPTY_SEARCH_KEYWORD_SIMILARITY, "searchKeywordSimilarity");
-        } else if (value < 0 || value > 1) {
+            return emptySearchKeywordSimilarity;
+        }
+        if (value < 0 || value > 1) {
             throw new InvalidValueException(SEARCH_KEYWORD_SIMILARITY_OUT_OF_RANGE, "searchKeywordSimilarity");
         }
         return new SearchKeywordSimilarity(value, false);
@@ -35,7 +36,7 @@ public class SearchKeywordSimilarity {
 
     public double getValueIfNotEmpty() {
         if (isEmpty()) {
-            throw new InvalidValueException(NOT_FOUND_SEARCH_POST_IMPORTANCE, "searchPostImportance");
+            throw new InvalidValueException(NOT_FOUND_SEARCH_POST_SIMILARITY, "searchPostImportance");
         }
         return this.value;
     }

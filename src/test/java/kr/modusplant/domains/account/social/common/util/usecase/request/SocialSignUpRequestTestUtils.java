@@ -2,8 +2,8 @@ package kr.modusplant.domains.account.social.common.util.usecase.request;
 
 import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
 
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_NICKNAME;
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberTermConstant.*;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
+import static kr.modusplant.domains.term.common.constant.MemberTermConstant.*;
 
 public interface SocialSignUpRequestTestUtils {
     default SocialSignUpRequest createTestSocialSignUpRequest() {

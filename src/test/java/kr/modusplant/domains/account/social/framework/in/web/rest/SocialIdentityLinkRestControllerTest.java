@@ -4,10 +4,10 @@ import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityLin
 import kr.modusplant.domains.account.social.common.util.usecase.request.SocialAuthRequestTestUtils;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.usecase.record.SocialUserInfo;
-import kr.modusplant.framework.jackson.holder.ObjectMapperHolder;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.security.common.util.SiteMemberUserDetailsTestUtils;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
+import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
+import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -15,7 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_CODE;
-import static kr.modusplant.infrastructure.config.jackson.TestJacksonConfig.objectMapper;
+import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;

@@ -1,6 +1,6 @@
 package kr.modusplant.infrastructure.jwt.framework.out.redis;
 
-import kr.modusplant.framework.redis.RedisHelper;
+import kr.modusplant.shared.framework.redis.RedisHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

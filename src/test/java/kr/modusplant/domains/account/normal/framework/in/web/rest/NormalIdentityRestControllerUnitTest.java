@@ -4,9 +4,9 @@ import kr.modusplant.domains.account.normal.adapter.controller.NormalIdentityCon
 import kr.modusplant.domains.account.normal.common.util.usecase.request.EmailModificationRequestTestUtils;
 import kr.modusplant.domains.account.normal.common.util.usecase.request.NormalSignUpRequestTestUtils;
 import kr.modusplant.domains.account.normal.common.util.usecase.request.PasswordModificationRequestTestUtils;
-import kr.modusplant.framework.jackson.http.response.DataResponse;
 import kr.modusplant.infrastructure.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
+import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static kr.modusplant.shared.persistence.common.util.constant.SiteMemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class NormalIdentityRestControllerUnitTest implements

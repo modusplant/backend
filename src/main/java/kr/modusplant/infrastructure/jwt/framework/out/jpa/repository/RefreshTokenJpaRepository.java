@@ -1,6 +1,6 @@
 package kr.modusplant.infrastructure.jwt.framework.out.jpa.repository;
 
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import kr.modusplant.infrastructure.jwt.framework.out.jpa.entity.RefreshTokenEntity;
 import kr.modusplant.shared.persistence.repository.UuidPrimaryKeyRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,13 +12,13 @@ import java.util.UUID;
 
 @Repository
 public interface RefreshTokenJpaRepository extends UuidPrimaryKeyRepository<RefreshTokenEntity>,JpaRepository<RefreshTokenEntity, UUID> {
-    Optional<RefreshTokenEntity> findByMemberAndRefreshToken(SiteMemberEntity member, String refreshToken);
+    Optional<RefreshTokenEntity> findByMemberAndRefreshToken(MemberEntity member, String refreshToken);
 
     Optional<RefreshTokenEntity> findByRefreshToken(String refreshToken);
 
     Boolean existsByRefreshToken(String refreshToken);
 
-    void deleteByMember(SiteMemberEntity member);
+    void deleteByMember(MemberEntity member);
 
     void deleteByExpiredAtBefore(LocalDateTime expiredAt);
 }

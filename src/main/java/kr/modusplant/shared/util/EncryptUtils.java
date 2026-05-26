@@ -1,13 +1,20 @@
 package kr.modusplant.shared.util;
 
+import kr.modusplant.shared.exception.InvalidValueException;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
+
+import static kr.modusplant.shared.exception.enums.GeneralErrorCode.INCORRECT_ALGORITHM;
 
 public abstract class EncryptUtils {
+    private static final String SHA_256 = "SHA-256";
+
     public static String encryptWithSha256(String input) {
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            MessageDigest digest = MessageDigest.getInstance(SHA_256);
             byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
             StringBuilder hexString = new StringBuilder();
             for (byte b : hash) {
@@ -19,7 +26,7 @@ public abstract class EncryptUtils {
             }
             return hexString.toString();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("SHA-256 해시 생성 실패", e);
+            throw new InvalidValueException(INCORRECT_ALGORITHM, List.of(SHA_256), e);
         }
     }
 

@@ -1,8 +1,8 @@
 package kr.modusplant.domains.account.normal.framework.out.persistence.jpa.mapper;
 
+import kr.modusplant.domains.account.identity.framework.out.jpa.entity.MemberAuthEntity;
 import kr.modusplant.domains.account.normal.domain.vo.SignUpData;
-import kr.modusplant.framework.jpa.entity.SiteMemberAuthEntity;
-import kr.modusplant.framework.jpa.entity.SiteMemberEntity;
+import kr.modusplant.domains.member.framework.out.jpa.entity.MemberEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -15,6 +15,6 @@ public interface NormalIdentityAuthJpaMapper {
     @Mapping(target = "email", source = "sign.normalCredentials.email.value")
     @Mapping(target = "pw", source = "sign.normalCredentials.password.value")
     @Mapping(target = "provider", expression = "java( kr.modusplant.shared.enums.AuthProvider.BASIC )")
-    SiteMemberAuthEntity toSiteMemberAuthEntity(SiteMemberEntity savedMember, SignUpData sign);
+    MemberAuthEntity toSiteMemberAuthEntity(MemberEntity savedMember, SignUpData sign);
 
 }
