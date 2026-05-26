@@ -33,7 +33,7 @@ class SocialIdentityLinkRestControllerTest implements SocialAuthRequestTestUtils
         // given
         DefaultUserDetails userDetails = testDefaultMemberUserDetailsBuilder.build();
         SocialUserInfo userInfo = Mockito.mock(SocialUserInfo.class);
-        given(socialIdentityLinkController.issueSocialToken(SocialProvider.KAKAO,TEST_SOCIAL_KAKAO_CODE)).willReturn(userInfo);
+        given(socialIdentityLinkController.issueSocialToken(SocialProvider.KAKAO,TEST_SOCIAL_KAKAO_CODE, false)).willReturn(userInfo);
         willDoNothing().given(socialIdentityLinkController).linkSocialAccount(userDetails.getUuid(),SocialProvider.KAKAO,userInfo);
 
         // when
@@ -51,7 +51,7 @@ class SocialIdentityLinkRestControllerTest implements SocialAuthRequestTestUtils
         // given
         DefaultUserDetails userDetails = testDefaultMemberUserDetailsBuilder.build();
         SocialUserInfo userInfo = Mockito.mock(SocialUserInfo.class);
-        given(socialIdentityLinkController.issueSocialToken(SocialProvider.KAKAO,TEST_SOCIAL_KAKAO_CODE)).willReturn(userInfo);
+        given(socialIdentityLinkController.issueSocialToken(SocialProvider.KAKAO,TEST_SOCIAL_KAKAO_CODE, false)).willReturn(userInfo);
         willDoNothing().given(socialIdentityLinkController).unlinkSocialAccount(userDetails.getUuid(),SocialProvider.KAKAO,userInfo);
 
         // when

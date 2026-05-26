@@ -47,6 +47,8 @@ class GoogleAuthClientTest {
         ReflectionTestUtils.setField(googleAuthClient, "GOOGLE_API_KEY", "test-api-key");
         ReflectionTestUtils.setField(googleAuthClient, "GOOGLE_SECRET", "test-secret");
         ReflectionTestUtils.setField(googleAuthClient, "GOOGLE_REDIRECT_URI", "http://localhost:8080/callback");
+        ReflectionTestUtils.setField(googleAuthClient, "GOOGLE_LOCAL_REDIRECT_URI", "http://localhost:8080/callback/local");
+
     }
 
     @AfterEach
@@ -85,7 +87,7 @@ class GoogleAuthClientTest {
         given(idTokenParser.parse(expectedIdToken, SocialProvider.GOOGLE)).willReturn(mockIdTokenInfo);
 
         // When
-        SocialUserInfo userInfo = googleAuthClient.getToken(code);
+        SocialUserInfo userInfo = googleAuthClient.getToken(code, false);
 
         // Then
         assertThat(userInfo.socialAccessToken()).isEqualTo(expectedAccessToken);
@@ -108,7 +110,7 @@ class GoogleAuthClientTest {
                         .body(errorBody));
 
         // When & Then
-        assertThrows(OAuthRequestFailException.class, () -> googleAuthClient.getToken(authCode));
+        assertThrows(OAuthRequestFailException.class, () -> googleAuthClient.getToken(authCode, false));
     }
 
     @Test

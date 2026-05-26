@@ -45,6 +45,7 @@ class KakaoAuthClientTest {
     void setUp() {
         ReflectionTestUtils.setField(kakaoAuthClient, "KAKAO_API_KEY", "test-api-key");
         ReflectionTestUtils.setField(kakaoAuthClient, "KAKAO_REDIRECT_URI", "http://localhost:8080/callback");
+        ReflectionTestUtils.setField(kakaoAuthClient, "KAKAO_LOCAL_REDIRECT_URI", "http://localhost:8080/callback/local");
     }
 
     @AfterEach
@@ -82,7 +83,7 @@ class KakaoAuthClientTest {
         given(idTokenParser.parse(expectedIdToken, SocialProvider.KAKAO)).willReturn(mockIdTokenInfo);
 
         // when
-        SocialUserInfo userInfo = kakaoAuthClient.getToken(code);
+        SocialUserInfo userInfo = kakaoAuthClient.getToken(code, false);
 
         // then
         assertThat(userInfo.socialAccessToken()).isEqualTo(expectedAccessToken);
@@ -104,7 +105,7 @@ class KakaoAuthClientTest {
                         .body(errorResponseBody));
 
         // when & then
-        assertThrows(OAuthRequestFailException.class, () -> kakaoAuthClient.getToken(authCode));
+        assertThrows(OAuthRequestFailException.class, () -> kakaoAuthClient.getToken(authCode, false));
     }
 
     @Test

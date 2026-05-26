@@ -49,15 +49,15 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
     void testIssueSocialToken_givenSocialProviderAndCode_willReturnSocialToken() {
         // given
         String code = createTestKakaoLoginRequest().code();
-        given(socialAuthClient.getToken(code)).willReturn(kakaoUserInfo);
+        given(socialAuthClient.getToken(code, false)).willReturn(kakaoUserInfo);
 
         // when
-        SocialUserInfo result = socialIdentityLinkController.issueSocialToken(SocialProvider.KAKAO,code);
+        SocialUserInfo result = socialIdentityLinkController.issueSocialToken(SocialProvider.KAKAO,code, false);
 
         // then
         assertEquals(result,kakaoUserInfo);
         verify(clientFactory).getClient(SocialProvider.KAKAO);
-        verify(socialAuthClient).getToken(code);
+        verify(socialAuthClient).getToken(code, false);
     }
 
     @Nested

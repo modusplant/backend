@@ -28,7 +28,7 @@ class MemberSocialTranslatorTest {
     void testGetSocialAccessToken_withKakaoSocialProvider_willReturnAccessToken() {
         // given
         SocialUserInfo userInfo = Mockito.mock(SocialUserInfo.class);
-        given(socialIdentityLinkController.issueSocialToken(SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_CODE)).willReturn(userInfo);
+        given(socialIdentityLinkController.issueSocialToken(SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_CODE, false)).willReturn(userInfo);
         given(userInfo.socialAccessToken()).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
 
         // when
@@ -43,7 +43,7 @@ class MemberSocialTranslatorTest {
     void testGetSocialAccessToken_withGoogleSocialProvider_willReturnAccessToken() {
         // given
         SocialUserInfo userInfo = Mockito.mock(SocialUserInfo.class);
-        given(socialIdentityLinkController.issueSocialToken(SocialProvider.GOOGLE, TEST_SOCIAL_GOOGLE_CODE)).willReturn(userInfo);
+        given(socialIdentityLinkController.issueSocialToken(SocialProvider.GOOGLE, TEST_SOCIAL_GOOGLE_CODE, false)).willReturn(userInfo);
         given(userInfo.socialAccessToken()).willReturn(TEST_SOCIAL_GOOGLE_SOCIAL_ACCESS_TOKEN);
 
         // when
