@@ -4,7 +4,7 @@ import kr.modusplant.domains.notification.adapter.mapper.NotificationMapperImpl;
 import kr.modusplant.domains.notification.common.util.domain.aggregate.NotificationTestUtils;
 import kr.modusplant.domains.notification.common.util.usecase.record.NotificationReadModelTestUtils;
 import kr.modusplant.domains.notification.common.util.usecase.response.NotificationResponseTestUtils;
-import kr.modusplant.domains.notification.framework.out.messaging.FcmSender;
+import kr.modusplant.domains.notification.framework.outbound.messaging.FcmSender;
 import kr.modusplant.domains.notification.usecase.port.mapper.NotificationMapper;
 import kr.modusplant.domains.notification.usecase.port.repository.*;
 import kr.modusplant.domains.notification.usecase.record.NotificationPreview;

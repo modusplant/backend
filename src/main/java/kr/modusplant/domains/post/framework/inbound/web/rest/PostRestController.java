@@ -1,0 +1,447 @@
+package kr.modusplant.domains.post.framework.inbound.web.rest;
+
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import kr.modusplant.domains.post.adapter.controller.PostController;
+import kr.modusplant.domains.post.domain.exception.EmptyValueException;
+import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
+import kr.modusplant.domains.post.usecase.request.FileOrder;
+import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
+import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
+import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
+import kr.modusplant.domains.post.usecase.response.CursorLatestSortedPageResponse;
+import kr.modusplant.domains.post.usecase.response.DraftPostResponse;
+import kr.modusplant.domains.post.usecase.response.OffsetPageResponse;
+import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;
+import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
+import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
+import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.Range;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
+
+import static kr.modusplant.shared.constant.Regex.REGEX_ULID;
+
+@Tag(name = "컨텐츠 게시글 API", description = "컨텐츠 게시글을 다루는 API입니다.")
+@RestController
+@RequestMapping("/api/v1/communication/posts")
+@RequiredArgsConstructor
+@Validated
+@SecurityRequirement(name = "Authorization")
+public class PostRestController {
+
+    private final PostController postController;
+
+    @Operation(
+            summary = "전체 게시글 목록 조회 API (무한스크롤)",
+            description = "전체 게시글의 목록과 페이지 정보를 조회합니다."
+    )
+    @GetMapping
+    public ResponseEntity<DataResponse<CursorLatestSortedPageResponse<PostSummaryResponse>>> getAllPosts(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "마지막 게시글 ID (첫 요청 시 생략)", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
+            @RequestParam(name = "lastPostId", required = false)
+            @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
+            String lastUlid,
+
+            @Parameter(schema = @Schema(description = "페이지 크기", example = "10",minimum = "1",maximum = "50"))
+            @RequestParam
+            @Range(min = 1, max = 50)
+            Integer size,
+
+            @Parameter(schema = @Schema(description = "1차 항목 식별자", example = "1"))
+            @RequestParam(required = false)
+            Integer primaryCategoryId,
+
+            @Parameter(schema = @Schema(description = "2차 항목 식별자 (복수 선택 가능)", example = "1"))
+            @RequestParam(name = "secondaryCategoryId", required = false)
+            List<Integer> secondaryCategoryIds
+    ) {
+        UUID currentMemberUuid = (userDetails != null) ? userDetails.getUuid() : null;
+        if(primaryCategoryId == null && secondaryCategoryIds != null && !secondaryCategoryIds.isEmpty()) {
+            throw new EmptyValueException(PostErrorCode.EMPTY_CATEGORY_ID);
+        }
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getAll(new PostCategoryRequest(primaryCategoryId, secondaryCategoryIds), currentMemberUuid, lastUlid,size)));
+    }
+
+    @Operation(
+            summary = "특정 컨텐츠 게시글 조회 API",
+            description = "게시글 식별자로 특정 컨텐츠 게시글을 조회합니다. 조회수 증가 및 최근 본 게시글에 추가됩니다."
+    )
+    @GetMapping("/{postId}")
+    public ResponseEntity<DataResponse<?>> getPostByUlid(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "게시글의 식별자", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
+            @PathVariable(name = "postId")
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
+            String ulid,
+
+            @CookieValue(value = "guestId", required = false)
+            String guestIdStr,
+            HttpServletResponse response
+    ) {
+        UUID currentMemberUuid = (userDetails != null) ? userDetails.getUuid() : null;
+        UUID guestId = (currentMemberUuid==null) ? getOrCreateGuestId(guestIdStr,response) : null;
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getByUlid(ulid,currentMemberUuid,guestId)));
+    }
+
+    @Operation(
+            summary = "특정 컨텐츠 게시글 데이터 조회 API (편집/관리 용도)",
+            description = "편집/관리를 위해 게시글 식별자로 특정 컨텐츠 게시글 데이터만 조회합니다. 조회수 증가 및 조회 기록은 남지 않습니다."
+    )
+    @GetMapping("/{postId}/data")
+    public ResponseEntity<DataResponse<?>> getPostDataByUlid(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "게시글의 식별자", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
+            @PathVariable(name = "postId")
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
+            String ulid
+    ) {
+        UUID currentMemberUuid = userDetails.getUuid();
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getDataByUlid(ulid,currentMemberUuid)));
+    }
+
+    @Operation(
+            summary = "컨텐츠 게시글 추가 API",
+            description = "컨텐츠 게시글을 작성합니다."
+    )
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<DataResponse<Void>> insertPost(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "게시글이 포함된 1차 항목의 식별자", example = "1"))
+            @RequestParam(required = false)
+            Integer primaryCategoryId,
+
+            @Parameter(schema = @Schema(description = "게시글이 포함된 2차 항목의 식별자", example = "1"))
+            @RequestParam(required = false)
+            Integer secondaryCategoryId,
+
+            @Parameter(schema = @Schema(description = "게시글의 제목", maximum = "60", example = "이거 과습인가요?"))
+            @RequestParam(required = false)
+            String title,
+
+            @Parameter(
+                    schema = @Schema(description = "게시글 컨텐츠", type = "string", format = "binary"),
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
+            @RequestPart(required = false)
+            List<MultipartFile> content,
+
+            @Parameter(
+                    schema = @Schema(description = "게시글에 속한 파트들의 순서에 대한 정보"),
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
+            @RequestPart(required = false)
+            List<@Valid FileOrder> orderInfo,
+
+            @Parameter(schema = @Schema(description = "게시글 컨텐츠 대표 사진의 파일명", example = "1"))
+            @RequestParam(required = false)
+            String thumbnailFilename,
+
+            @Parameter(schema = @Schema(description = "게시글 발행 유무"))
+            @RequestParam
+            @NotNull(message = "게시글 발행 유무가 비어 있습니다.")
+            Boolean isPublished
+    ) throws IOException {
+        UUID currentMemberUuid = userDetails.getUuid();
+        postController.createPost(new PostInsertRequest(primaryCategoryId, secondaryCategoryId, title, content, orderInfo, thumbnailFilename, isPublished), currentMemberUuid);
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Operation(
+            summary = "특정 컨텐츠 게시글 수정 API",
+            description = "특정 컨텐츠 게시글을 수정합니다."
+    )
+    @PutMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<DataResponse<Void>> updatePost(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "게시글 식별을 위한 게시글 식별자", example = "01JXEDF9SNSMAVBY8Z3P5YXK5J"))
+            @PathVariable(name = "postId")
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
+            String ulid,
+
+            @Parameter(schema = @Schema(description = "게시글이 포함된 1차 항목의 식별자", example = "1"))
+            @RequestParam(required = false)
+            Integer primaryCategoryId,
+
+            @Parameter(schema = @Schema(description = "게시글이 포함된 2차 항목의 식별자", example = "1"))
+            @RequestParam(required = false)
+            Integer secondaryCategoryId,
+
+            @Parameter(schema = @Schema(description = "게시글의 제목", maximum = "60", example = "이거 과습인가요?"))
+            @RequestParam(required = false)
+            String title,
+
+            @Parameter(
+                    schema = @Schema(description = "게시글 컨텐츠", type = "string", format = "binary"),
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
+            @RequestPart(required = false)
+            List<MultipartFile> content,
+
+            @Parameter(
+                    schema = @Schema(description = "게시글에 속한 파트들의 순서에 대한 정보"),
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
+            @RequestPart(required = false)
+            List<@Valid FileOrder> orderInfo,
+
+            @Parameter(schema = @Schema(description = "게시글 컨텐츠 대표 사진의 파일명", example = "1"))
+            @RequestParam(required = false)
+            String thumbnailFilename,
+
+            @Parameter(schema = @Schema(description = "게시글 발행 유무", example = "true"))
+            @RequestParam
+            @NotNull(message = "게시글 발행 유무가 비어 있습니다.")
+            Boolean isPublished
+    ) throws IOException {
+        UUID currentMemberUuid = userDetails.getUuid();
+        postController.updatePost(new PostUpdateRequest(ulid, primaryCategoryId, secondaryCategoryId, title, content, orderInfo, thumbnailFilename, isPublished), currentMemberUuid);
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Operation(
+            summary = "특정 컨텐츠 게시글 삭제 API",
+            description = "특정 컨텐츠 게시글을 삭제합니다."
+    )
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<DataResponse<Void>> removePostByUlid(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "게시글의 식별자", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
+            @PathVariable(name = "postId")
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
+            String ulid
+    ) {
+        UUID currentMemberUuid = userDetails.getUuid();
+        postController.deletePost(ulid, currentMemberUuid);
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Operation(
+            summary = "특정 컨텐츠 게시글 조회수 조회 API",
+            description = "특정 컨텐츠 게시글의 조회수를 조회합니다."
+    )
+    @GetMapping("/{postId}/views")
+    public ResponseEntity<DataResponse<Long>> countViewCount(
+            @Parameter(schema = @Schema(description = "게시글의 식별자", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
+            @PathVariable(name = "postId")
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
+            String ulid
+    ) {
+        return ResponseEntity.ok().body(DataResponse.ok(postController.readViewCount(ulid)));
+    }
+
+    @Operation(
+            summary = "특정 컨텐츠 게시글 조회수 증가 API",
+            description = "특정 컨텐츠 게시글의 조회수를 증가시킵니다."
+    )
+    @PatchMapping("/{postId}/views")
+    public ResponseEntity<DataResponse<Long>> increaseViewCount(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "게시글의 식별자", example = "01JY3PPG5YJ41H7BPD0DSQW2RD"))
+            @PathVariable(name = "postId")
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
+            String ulid,
+
+            @CookieValue(value = "guestId", required = false)
+            String guestIdStr,
+            HttpServletResponse response
+    ) {
+        UUID currentMemberUuid = (userDetails != null) ? userDetails.getUuid() : null;
+        UUID guestId = (currentMemberUuid==null) ? getOrCreateGuestId(guestIdStr,response) : null;
+        return ResponseEntity.ok().body(DataResponse.ok(postController.increaseViewCount(ulid, currentMemberUuid,guestId)));
+    }
+
+    @Hidden
+    @Operation(
+            summary = "회원별 게시글 목록 조회 API (페이지 번호)",
+            description = "사이트 회원별 컨텐츠 게시글의 목록과 페이지 정보를 조회합니다."
+    )
+    @GetMapping("/member/{memberUuid}")
+    public ResponseEntity<DataResponse<OffsetPageResponse<PostSummaryResponse>>> getPostsByMember(
+            @Parameter(schema = @Schema(description = "회원의 식별자", example = "038ae842-3c93-484f-b526-7c4645a195a7"))
+            @PathVariable
+            @NotNull(message = "회원 식별자가 비어 있습니다.")
+            UUID memberUuid,
+
+            @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
+            @RequestParam(defaultValue = "1")
+            @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
+            Integer page,
+
+            @Parameter(schema = @Schema(description = "페이지 크기", example = "10",minimum = "1",maximum = "50"))
+            @RequestParam
+            @Range(min = 1, max = 50)
+            Integer size
+    ) {
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getByMemberUuid(memberUuid, page-1, size)));
+    }
+
+    @Operation(
+            summary = "내가 작성한 게시글 목록 조회 API (페이지 번호)",
+            description = "로그인한 회원의 컨텐츠 게시글의 목록과 페이지 정보를 조회합니다."
+    )
+    @GetMapping("/me")
+    public ResponseEntity<DataResponse<OffsetPageResponse<PostSummaryResponse>>> getPostsByMember(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
+            @RequestParam(defaultValue = "1")
+            @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
+            Integer page,
+
+            @Parameter(schema = @Schema(description = "페이지 크기", example = "10",minimum = "1",maximum = "50"))
+            @RequestParam
+            @Range(min = 1, max = 50)
+            Integer size
+    ) {
+        UUID currentMemberUuid = userDetails.getUuid();
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getByMemberUuid(currentMemberUuid, page-1, size)));
+    }
+
+    @Operation(
+            summary = "임시저장한 게시글 목록 조회 API (페이지번호)",
+            description = "로그인한 회원의 임시저장된 게시글의 목록과 페이지 정보를 조회합니다."
+    )
+    @GetMapping("/me/drafts")
+    public ResponseEntity<DataResponse<OffsetPageResponse<DraftPostResponse>>> getDraftPostsByMember(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
+            @RequestParam(defaultValue = "1")
+            @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
+            Integer page,
+
+            @Parameter(schema = @Schema(description = "페이지 크기", example = "10",minimum = "1",maximum = "50"))
+            @RequestParam
+            @Range(min = 1, max = 50)
+            Integer size
+    ) {
+        UUID currentMemberUuid = userDetails.getUuid();
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getDraftByMemberUuid(currentMemberUuid,page-1, size)));
+    }
+
+    @Operation(
+            summary = "최근에 본 게시글 목록 조회 API (페이지 번호)",
+            description = "마이페이지에서 최근에 본 게시글 목록과 페이지 정보를 조회합니다."
+    )
+    @GetMapping("/me/history")
+    public ResponseEntity<DataResponse<OffsetPageResponse<PostSummaryResponse>>> getRecentViewPostsByMember(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
+            @RequestParam(defaultValue = "1")
+            @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
+            Integer page,
+
+            @Parameter(schema = @Schema(description = "페이지 크기", example = "10",minimum = "1",maximum = "50"))
+            @RequestParam
+            @Range(min = 1, max = 50)
+            Integer size
+    ) {
+        UUID currentMemberUuid = userDetails.getUuid();
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getRecentlyViewByMemberUuid(currentMemberUuid, page-1,size)));
+    }
+
+    @Operation(
+            summary = "내가 좋아요한 게시글 목록 조회 API (페이지 번호)",
+            description = "마이페이지에서 좋아요한 게시글 목록과 페이지 정보를 조회합니다."
+    )
+    @GetMapping("/me/likes")
+    public ResponseEntity<DataResponse<OffsetPageResponse<PostSummaryResponse>>> getLikedPostsByMember(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
+            @RequestParam(defaultValue = "1")
+            @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
+            Integer page,
+
+            @Parameter(schema = @Schema(description = "페이지 크기", example = "10",minimum = "1",maximum = "50"))
+            @RequestParam
+            @Range(min = 1, max = 50)
+            Integer size
+    ) {
+        UUID currentMemberUuid = userDetails.getUuid();
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getLikedByMemberUuid(currentMemberUuid, page-1, size)));
+    }
+
+    @Operation(
+            summary = "내가 북마크한 게시글 목록 조회 API (페이지 번호)",
+            description = "마이페이지에서 북마크한 게시글 목록과 페이지 정보를 조회합니다."
+    )
+    @GetMapping("/me/bookmarks")
+    public ResponseEntity<DataResponse<OffsetPageResponse<PostSummaryResponse>>> getBookmarkedPostsByMember(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
+            @Parameter(schema = @Schema(description = "페이지 숫자", minimum = "1", example = "4"))
+            @RequestParam(defaultValue = "1")
+            @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
+            Integer page,
+
+            @Parameter(schema = @Schema(description = "페이지 크기", example = "10",minimum = "1",maximum = "50"))
+            @RequestParam
+            @Range(min = 1, max = 50)
+            Integer size
+    ) {
+        UUID currentMemberUuid = userDetails.getUuid();
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getBookmarkedByMemberUuid(currentMemberUuid, page-1, size)));
+    }
+
+    private UUID getOrCreateGuestId(String guestIdStr, HttpServletResponse response) {
+        UUID guestId;
+        boolean needsNewCookie = false;
+        if (guestIdStr == null) {
+            guestId = UUID.randomUUID();
+            needsNewCookie = true;
+        } else {
+            try {
+                guestId = UUID.fromString(guestIdStr);
+            } catch (IllegalArgumentException e) {
+                guestId = UUID.randomUUID();
+                needsNewCookie = true;
+            }
+        }
+        // 쿠키 설정
+        if (needsNewCookie) {
+            ResponseCookie cookie = ResponseCookie.from("guestId",guestId.toString())
+                    .maxAge(365 * 24 * 60 * 60)
+                    .path("/")
+                    .httpOnly(true)
+                    .secure(true)
+                    .sameSite("Lax")
+                    .build();
+            response.addHeader(HttpHeaders.SET_COOKIE,cookie.toString());
+        }
+        return guestId;
+    }
+}

@@ -2,7 +2,7 @@ package kr.modusplant.domains.notification.adapter.controller;
 
 import kr.modusplant.domains.notification.domain.aggregate.Notification;
 import kr.modusplant.domains.notification.domain.vo.*;
-import kr.modusplant.domains.notification.framework.out.messaging.FcmSender;
+import kr.modusplant.domains.notification.framework.outbound.messaging.FcmSender;
 import kr.modusplant.domains.notification.usecase.port.mapper.NotificationMapper;
 import kr.modusplant.domains.notification.usecase.port.repository.*;
 import kr.modusplant.domains.notification.usecase.record.NotificationPreview;

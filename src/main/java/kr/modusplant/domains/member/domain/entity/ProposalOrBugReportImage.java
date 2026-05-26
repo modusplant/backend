@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.domain.entity;
 
-import kr.modusplant.domains.member.domain.vo.ReportImageBytes;
 import kr.modusplant.domains.member.domain.vo.ProposalOrBugReportImageFileName;
+import kr.modusplant.domains.member.domain.vo.ReportImageBytes;
 import kr.modusplant.domains.member.domain.vo.ReportImagePath;
 import kr.modusplant.shared.exception.EmptyValueException;
 import lombok.AccessLevel;
