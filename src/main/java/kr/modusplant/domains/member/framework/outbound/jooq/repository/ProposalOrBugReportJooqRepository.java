@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
-import kr.modusplant.domains.member.domain.vo.ReportId;
-import kr.modusplant.domains.member.domain.vo.ReportPageSize;
 import kr.modusplant.domains.member.framework.outbound.jooq.record.ProposalOrBugReportAdminPageRecord;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
@@ -22,13 +20,12 @@ import java.util.List;
 import java.util.stream.StreamSupport;
 
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_PROPOSAL_OR_BUG_REPORT;
-import static kr.modusplant.jooq.Tables.PROP_BUG_REP;
-import static kr.modusplant.jooq.Tables.SITE_MEMBER;
+import static kr.modusplant.jooq.Tables.*;
 import static org.jooq.impl.DSL.*;
 
 @Repository
 @RequiredArgsConstructor
-public class ReportJooqRepository {
+public class ProposalOrBugReportJooqRepository {
     private final DSLContext dsl;
     private final AmazonS3Service amazonS3Service;
     private final JsonbJsonNodeConverter jsonbJsonNodeConverter = new JsonbJsonNodeConverter();
@@ -42,24 +39,27 @@ public class ReportJooqRepository {
                 .fetchInto(String.class);
     }
 
-    public @Nonnull ProposalOrBugReportAdminPageRecord getProposalOrBugReportAdminPageRecord(ReportId reportId) {
+    public @Nonnull ProposalOrBugReportAdminPageRecord getAdminPageRecordByReportId(String reportId) {
         return dsl.select(getProposalOrBugReportAdminPageFields())
                 .from(PROP_BUG_REP)
                 .leftJoin(SITE_MEMBER)
                 .on(PROP_BUG_REP.MEMB_UUID.eq(SITE_MEMBER.UUID))
-                .where(PROP_BUG_REP.ULID.eq(reportId.getValue()))
+                .where(PROP_BUG_REP.ULID.eq(reportId))
                 .fetchOptional(getProposalOrBugReportAdminPageRecordMapper())
                 .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_PROPOSAL_OR_BUG_REPORT, "proposalOrBugReport"));
     }
     
-    public @Nonnull List<ProposalOrBugReportAdminPageRecord> getProposalOrBugReportAdminPageRecords(
-            ReportPageSize reportPageSize,
-            ProposalOrBugReportStatus proposalOrBugReportStatus,
-            @Nullable ReportId lastReportId) {
+    public @Nonnull List<ProposalOrBugReportAdminPageRecord> getAdminPageRecordsByPageSizeAndStatus(
+            Integer reportPageSize,
+            String proposalOrBugReportStatus,
+            @Nullable String lastReportId) {
+        Field<String> statusName = when(PROP_BUG_REP.CHECKED_AT.isNull(), val(ProposalOrBugReportStatus.UNCHECKED.name()))
+                .otherwise(val(ProposalOrBugReportStatus.CHECKED.name()))
+                .as("status");
         Condition ulidCondition = lastReportId != null ?
-                PROP_BUG_REP.ULID.lt(lastReportId.getValue()) : noCondition();
+                PROP_BUG_REP.ULID.lt(lastReportId) : noCondition();
         Condition statusCondition = proposalOrBugReportStatus != null ?
-                getStatusFieldFromPropBugRep().eq(proposalOrBugReportStatus.getValue()) : noCondition();
+                statusName.eq(proposalOrBugReportStatus) : noCondition();
 
         return dsl.select(getProposalOrBugReportAdminPageFields())
                 .from(PROP_BUG_REP)
@@ -68,11 +68,11 @@ public class ReportJooqRepository {
                 .where(ulidCondition)
                 .and(statusCondition)
                 .orderBy(PROP_BUG_REP.ULID.desc())
-                .limit(reportPageSize.getValue())
+                .limit(reportPageSize)
                 .fetch(getProposalOrBugReportAdminPageRecordMapper());
     }
 
-    public @Nonnull ProposalOrBugReportAdminPageReadModel getProposalOrBugReportAdminPageReadModel(
+    public @Nonnull ProposalOrBugReportAdminPageReadModel getAdminPageReadModel(
             ProposalOrBugReportAdminPageRecord record) {
         JsonNode imageJsonNode = jsonbJsonNodeConverter.from(record.image());
         List<String> srcStringList = null;
@@ -105,19 +105,34 @@ public class ReportJooqRepository {
             List<ProposalOrBugReportAdminPageRecord> records) {
         List<ProposalOrBugReportAdminPageReadModel> readModels = new ArrayList<>();
         for (ProposalOrBugReportAdminPageRecord record : records) {
-            readModels.add(getProposalOrBugReportAdminPageReadModel(record));
+            readModels.add(getAdminPageReadModel(record));
         }
         return readModels;
     }
 
-    private static @Nonnull Field<LocalDateTime> getDisplayTimeFieldFromPropBugRep() {
-        return coalesce(PROP_BUG_REP.CHECKED_AT, PROP_BUG_REP.CREATED_AT).as("displayTimestamp");
-    }
-
-    private static @Nonnull Field<String> getStatusFieldFromPropBugRep() {
-        return when(PROP_BUG_REP.CHECKED_AT.isNull(), val(ProposalOrBugReportStatus.UNCHECKED.getValue()))
-                .otherwise(val(ProposalOrBugReportStatus.CHECKED.getValue()))
-                .as("status");
+    public void archiveByReportId(String reportId) {
+        dsl.insertInto(PROP_BUG_REP_ARCHIVE,
+                        PROP_BUG_REP_ARCHIVE.ULID,
+                        PROP_BUG_REP_ARCHIVE.MEMB_UUID,
+                        PROP_BUG_REP_ARCHIVE.TITLE,
+                        PROP_BUG_REP_ARCHIVE.CONTENT,
+                        PROP_BUG_REP_ARCHIVE.CREATED_AT,
+                        PROP_BUG_REP_ARCHIVE.CHECKED_AT,
+                        PROP_BUG_REP_ARCHIVE.ARCHIVED_AT
+                )
+                .select(
+                        select(
+                                PROP_BUG_REP.ULID,
+                                PROP_BUG_REP.MEMB_UUID,
+                                PROP_BUG_REP.TITLE,
+                                PROP_BUG_REP.CONTENT,
+                                PROP_BUG_REP.CREATED_AT,
+                                PROP_BUG_REP.CHECKED_AT,
+                                val(LocalDateTime.now())
+                        )
+                                .from(PROP_BUG_REP)
+                                .where(PROP_BUG_REP.ULID.eq(reportId))
+                ).execute();
     }
 
     private static Field<?> [] getProposalOrBugReportAdminPageFields() {
@@ -148,5 +163,15 @@ public class ReportJooqRepository {
                 record.get(SITE_MEMBER.NICKNAME),
                 record.get(getStatusFieldFromPropBugRep())
         );
+    }
+
+    private static @Nonnull Field<LocalDateTime> getDisplayTimeFieldFromPropBugRep() {
+        return coalesce(PROP_BUG_REP.CHECKED_AT, PROP_BUG_REP.CREATED_AT).as("displayTimestamp");
+    }
+
+    private static @Nonnull Field<String> getStatusFieldFromPropBugRep() {
+        return when(PROP_BUG_REP.CHECKED_AT.isNull(), val(ProposalOrBugReportStatus.UNCHECKED.getValue()))
+                .otherwise(val(ProposalOrBugReportStatus.CHECKED.getValue()))
+                .as("status");
     }
 }

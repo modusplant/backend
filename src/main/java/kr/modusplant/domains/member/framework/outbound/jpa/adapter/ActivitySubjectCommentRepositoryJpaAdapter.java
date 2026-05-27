@@ -1,9 +1,10 @@
-package kr.modusplant.domains.member.framework.outbound.jpa.repository;
+package kr.modusplant.domains.member.framework.outbound.jpa.adapter;
 
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.member.domain.vo.ActivitySubjectCommentId;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.CommentLikeEntity;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.CommentLikeJpaRepository;
 import kr.modusplant.domains.member.usecase.port.repository.ActivitySubjectCommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

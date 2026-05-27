@@ -1,4 +1,4 @@
-package kr.modusplant.shared.enums;
+package kr.modusplant.domains.notification.domain.enums;
 
 import lombok.Getter;
 
@@ -7,7 +7,7 @@ public enum NotificationStatusType {
     UNREAD("unread"),
     READ("read");
 
-    private String value;
+    private final String value;
 
     NotificationStatusType(String value) {
         this.value = value;

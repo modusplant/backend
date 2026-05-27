@@ -1,9 +1,9 @@
 package kr.modusplant.infrastructure.config.web;
 
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
+import kr.modusplant.domains.notification.domain.enums.NotificationStatusType;
 import kr.modusplant.domains.search.domain.enums.SearchPostSortCondition;
 import kr.modusplant.domains.search.domain.enums.SearchPostTarget;
-import kr.modusplant.shared.enums.NotificationStatusType;
 import kr.modusplant.shared.framework.web.converter.StringEnumConverter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;

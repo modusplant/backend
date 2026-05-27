@@ -3,13 +3,13 @@ package kr.modusplant.domains.notification.framework.outbound.jpa.repository;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.notification.domain.enums.NotificationActionType;
+import kr.modusplant.domains.notification.domain.enums.NotificationStatusType;
 import kr.modusplant.domains.notification.domain.vo.*;
 import kr.modusplant.domains.notification.framework.outbound.jpa.entity.NotificationEntity;
 import kr.modusplant.domains.notification.framework.outbound.jpa.repository.supers.NotificationJpaRepository;
 import kr.modusplant.domains.notification.usecase.port.repository.NotificationMockRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
-import kr.modusplant.shared.enums.NotificationActionType;
-import kr.modusplant.shared.enums.NotificationStatusType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

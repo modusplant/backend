@@ -51,7 +51,7 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
         MemberEntity memberEntity = memberJpaRepository.findByUuid(accountId.getValue())
                 .orElseThrow();
         memberEntity.updateLoggedInAt(LocalDateTime.now());
-        memberJpaRepository.save(memberEntity);
+        memberEntity = memberJpaRepository.save(memberEntity);
         MemberAuthEntity memberAuthEntity = memberAuthJpaRepository.findByMember(memberEntity)
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH, TableName.SITE_MEMBER_AUTH));
         return socialIdentityJpaMapper.toSocialMemberProfile(memberEntity, memberAuthEntity);
@@ -75,11 +75,11 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
         }
         memberAuthEntity.updateProvider(socialCredentials.getProvider());
         memberAuthEntity.updateProviderId(socialCredentials.getProviderId());
-        memberAuthJpaRepository.save(memberAuthEntity);
+        memberAuthEntity = memberAuthJpaRepository.save(memberAuthEntity);
         MemberEntity memberEntity = memberJpaRepository.findByUuid(memberAuthEntity.getUuid())
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER));
         memberEntity.updateLoggedInAt(LocalDateTime.now());
-        memberJpaRepository.save(memberEntity);
+        memberEntity = memberJpaRepository.save(memberEntity);
         return socialIdentityJpaMapper.toSocialMemberProfile(memberEntity, memberAuthEntity);
     }
 

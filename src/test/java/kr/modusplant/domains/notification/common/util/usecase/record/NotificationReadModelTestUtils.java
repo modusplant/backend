@@ -1,8 +1,8 @@
 package kr.modusplant.domains.notification.common.util.usecase.record;
 
+import kr.modusplant.domains.notification.domain.enums.NotificationActionType;
+import kr.modusplant.domains.notification.domain.enums.NotificationStatusType;
 import kr.modusplant.domains.notification.usecase.record.NotificationReadModel;
-import kr.modusplant.shared.enums.NotificationActionType;
-import kr.modusplant.shared.enums.NotificationStatusType;
 
 import java.time.LocalDateTime;
 

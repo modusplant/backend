@@ -24,6 +24,9 @@ public class ConnectionSizePropertyValidator implements SmartInitializingSinglet
     @Value("${app.semaphore.datasource.bulkhead.notification.connection-size}")
     private int notificationBulkheadSize;
 
+    @Value("${app.semaphore.datasource.bulkhead.admin.connection-size}")
+    private int adminBulkheadSize;
+
     @Value("${app.semaphore.datasource.allowed-connection-size}")
     private int allowedConnectionSize;
 
@@ -34,9 +37,11 @@ public class ConnectionSizePropertyValidator implements SmartInitializingSinglet
 
     @Override
     public void afterSingletonsInstantiated() {
-        if (this.getApiConnectionSize() + this.getNotificationBulkheadSize() > this.getAllowedConnectionSize()) {
+        if (this.getApiConnectionSize() + this.getNotificationBulkheadSize() + this.getAdminBulkheadSize()
+                > this.getAllowedConnectionSize()) {
             throw new ConfigurationException(ConfigurationErrorCode.INCORRECT_RELATIONSHIP_BETWEEN_CONNECTION_SIZE,
-                    new String[]{"apiConnectionSize", "notificationBulkheadSize", "allowedConnectionSize"});
+                    new String[]{"apiConnectionSize", "notificationBulkheadSize", "adminBulkheadSize",
+                            "allowedConnectionSize"});
         }
 
         if (this.getAllowedConnectionSize() >= this.getMaxPoolSize()) {

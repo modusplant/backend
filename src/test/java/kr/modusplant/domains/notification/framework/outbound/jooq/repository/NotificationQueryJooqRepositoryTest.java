@@ -2,12 +2,12 @@ package kr.modusplant.domains.notification.framework.outbound.jooq.repository;
 
 import jakarta.transaction.Transactional;
 import kr.modusplant.domains.notification.common.helper.NotificationTestDataHelper;
+import kr.modusplant.domains.notification.domain.enums.NotificationActionType;
+import kr.modusplant.domains.notification.domain.enums.NotificationStatusType;
 import kr.modusplant.domains.notification.usecase.record.NotificationReadModel;
 import kr.modusplant.domains.post.common.helper.PostTestDataHelper;
 import kr.modusplant.jooq.tables.records.CommNotificationRecord;
 import kr.modusplant.jooq.tables.records.SiteMemberRecord;
-import kr.modusplant.shared.enums.NotificationActionType;
-import kr.modusplant.shared.enums.NotificationStatusType;
 import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import org.hibernate.generator.EventType;
 import org.junit.jupiter.api.*;

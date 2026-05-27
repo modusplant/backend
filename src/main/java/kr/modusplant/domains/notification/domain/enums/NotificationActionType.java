@@ -1,4 +1,4 @@
-package kr.modusplant.shared.enums;
+package kr.modusplant.domains.notification.domain.enums;
 
 import lombok.Getter;
 

@@ -3,10 +3,10 @@ package kr.modusplant.domains.notification.framework.outbound.jpa.mapper;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.notification.common.util.domain.aggregate.NotificationTestUtils;
 import kr.modusplant.domains.notification.domain.aggregate.Notification;
+import kr.modusplant.domains.notification.domain.enums.NotificationActionType;
 import kr.modusplant.domains.notification.framework.outbound.jpa.entity.NotificationEntity;
 import kr.modusplant.domains.notification.framework.outbound.jpa.entity.common.util.NotificationEntityTestUtils;
 import kr.modusplant.domains.notification.framework.outbound.jpa.mapper.supers.NotificationJpaMapper;
-import kr.modusplant.shared.enums.NotificationActionType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

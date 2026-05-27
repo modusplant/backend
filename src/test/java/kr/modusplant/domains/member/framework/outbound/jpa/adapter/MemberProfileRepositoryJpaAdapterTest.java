@@ -1,4 +1,4 @@
-package kr.modusplant.domains.member.framework.outbound.jpa.repository;
+package kr.modusplant.domains.member.framework.outbound.jpa.adapter;
 
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberProfileTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
@@ -7,6 +7,8 @@ import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberProfileE
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.MemberEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.MemberProfileEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.mapper.MemberProfileJpaMapperImpl;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberProfileJpaRepository;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import org.junit.jupiter.api.DisplayName;

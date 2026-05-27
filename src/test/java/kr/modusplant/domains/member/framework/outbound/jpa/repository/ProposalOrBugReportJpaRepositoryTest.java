@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.framework.outbound.jpa.repository;
 
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.ProposalBugReportEntity;
+import kr.modusplant.domains.member.framework.outbound.jpa.entity.ProposalOrBugReportEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.ProposalBugReportEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
@@ -11,12 +11,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @RepositoryOnlyContext
-class ProposalBugReportJpaRepositoryTest implements ProposalBugReportEntityTestUtils {
+class ProposalOrBugReportJpaRepositoryTest implements ProposalBugReportEntityTestUtils {
 
-    private final ProposalBugReportJpaRepository proposalOrBugReportRepository;
+    private final ProposalOrBugReportJpaRepository proposalOrBugReportRepository;
 
     @Autowired
-    ProposalBugReportJpaRepositoryTest(ProposalBugReportJpaRepository proposalOrBugReportRepository) {
+    ProposalOrBugReportJpaRepositoryTest(ProposalOrBugReportJpaRepository proposalOrBugReportRepository) {
         this.proposalOrBugReportRepository = proposalOrBugReportRepository;
     }
 
@@ -24,7 +24,7 @@ class ProposalBugReportJpaRepositoryTest implements ProposalBugReportEntityTestU
     @Test
     void findByUlidTest() {
         // given
-        ProposalBugReportEntity proposalOrBugReport = createProposalBugReportEntityBuilder().member(createMemberBasicUserEntity()).build();
+        ProposalOrBugReportEntity proposalOrBugReport = createProposalBugReportEntityBuilder().member(createMemberBasicUserEntity()).build();
 
         // when
         proposalOrBugReportRepository.save(proposalOrBugReport);
@@ -37,7 +37,7 @@ class ProposalBugReportJpaRepositoryTest implements ProposalBugReportEntityTestU
     @Test
     void findByCreatedAtTest() {
         // given
-        ProposalBugReportEntity proposalOrBugReport = createProposalBugReportEntityBuilder().member(createMemberBasicUserEntity()).build();
+        ProposalOrBugReportEntity proposalOrBugReport = createProposalBugReportEntityBuilder().member(createMemberBasicUserEntity()).build();
 
         // when
         proposalOrBugReport = proposalOrBugReportRepository.save(proposalOrBugReport);
@@ -50,7 +50,7 @@ class ProposalBugReportJpaRepositoryTest implements ProposalBugReportEntityTestU
     @Test
     void deleteByUlidTest() {
         // given
-        ProposalBugReportEntity proposalOrBugReport = proposalOrBugReportRepository.save(createProposalBugReportEntityBuilder().member(createMemberBasicUserEntity()).build());
+        ProposalOrBugReportEntity proposalOrBugReport = proposalOrBugReportRepository.save(createProposalBugReportEntityBuilder().member(createMemberBasicUserEntity()).build());
         String ulid = proposalOrBugReport.getUlid();
 
         // when
@@ -64,7 +64,7 @@ class ProposalBugReportJpaRepositoryTest implements ProposalBugReportEntityTestU
     @Test
     void existsByUlidTest() {
         // given
-        ProposalBugReportEntity proposalOrBugReport = createProposalBugReportEntityBuilder().member(createMemberBasicUserEntity()).build();
+        ProposalOrBugReportEntity proposalOrBugReport = createProposalBugReportEntityBuilder().member(createMemberBasicUserEntity()).build();
 
         // when
         proposalOrBugReportRepository.save(proposalOrBugReport);
@@ -77,10 +77,10 @@ class ProposalBugReportJpaRepositoryTest implements ProposalBugReportEntityTestU
     @Test
     void testToString_givenPropBugRepEntity_willReturnRepresentative() {
         // given
-        ProposalBugReportEntity proposalOrBugReport = createProposalBugReportEntityBuilder().member(createMemberBasicUserEntity()).build();
+        ProposalOrBugReportEntity proposalOrBugReport = createProposalBugReportEntityBuilder().member(createMemberBasicUserEntity()).build();
 
         // when
-        ProposalBugReportEntity proposalOrBugReportEntity = proposalOrBugReportRepository.save(proposalOrBugReport);
+        ProposalOrBugReportEntity proposalOrBugReportEntity = proposalOrBugReportRepository.save(proposalOrBugReport);
 
         // then
         assertDoesNotThrow(proposalOrBugReportEntity::toString);

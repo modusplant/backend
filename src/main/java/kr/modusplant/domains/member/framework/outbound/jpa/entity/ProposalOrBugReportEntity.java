@@ -25,7 +25,7 @@ import static kr.modusplant.shared.persistence.constant.TableName.PROP_BUG_REP;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
-public class ProposalBugReportEntity {
+public class ProposalOrBugReportEntity {
     @Id
     @Column(nullable = false, updatable = false)
     private String ulid;
@@ -56,6 +56,10 @@ public class ProposalBugReportEntity {
     @CreatedDate
     private LocalDateTime createdAt;
 
+    public void check() {
+        this.checkedAt = LocalDateTime.now();
+    }
+
     public String getETagSource() {
         return getUlid() + "-" + getCheckedAt();
     }
@@ -64,7 +68,7 @@ public class ProposalBugReportEntity {
     public boolean equals(Object object) {
         if (this == object) return true;
 
-        if (!(object instanceof ProposalBugReportEntity that)) return false;
+        if (!(object instanceof ProposalOrBugReportEntity that)) return false;
 
         return new EqualsBuilder().append(getUlid(), that.getUlid()).isEquals();
     }
@@ -74,13 +78,13 @@ public class ProposalBugReportEntity {
         return new HashCodeBuilder(17, 37).append(getUlid()).toHashCode();
     }
 
-    private ProposalBugReportEntity(String ulid,
-                                    MemberEntity member,
-                                    String title,
-                                    String content,
-                                    List<FilenameAndSrcEntityRecord> image,
-                                    Integer imageNumber,
-                                    LocalDateTime checkedAt) {
+    private ProposalOrBugReportEntity(String ulid,
+                                      MemberEntity member,
+                                      String title,
+                                      String content,
+                                      List<FilenameAndSrcEntityRecord> image,
+                                      Integer imageNumber,
+                                      LocalDateTime checkedAt) {
         this.ulid = ulid;
         this.member = member;
         this.title = title;
@@ -90,11 +94,11 @@ public class ProposalBugReportEntity {
         this.checkedAt = checkedAt;
     }
 
-    public static ProposalBugReportEntityBuilder builder() {
-        return new ProposalBugReportEntityBuilder();
+    public static ProposalOrBugReportEntityBuilder builder() {
+        return new ProposalOrBugReportEntityBuilder();
     }
 
-    public static final class ProposalBugReportEntityBuilder {
+    public static final class ProposalOrBugReportEntityBuilder {
         private String ulid;
         private MemberEntity member;
         private String title;
@@ -103,42 +107,42 @@ public class ProposalBugReportEntity {
         private Integer imageNumber;
         private LocalDateTime checkedAt;
 
-        public ProposalBugReportEntityBuilder ulid(final String ulid) {
+        public ProposalOrBugReportEntityBuilder ulid(final String ulid) {
             this.ulid = ulid;
             return this;
         }
 
-        public ProposalBugReportEntityBuilder member(final MemberEntity member) {
+        public ProposalOrBugReportEntityBuilder member(final MemberEntity member) {
             this.member = member;
             return this;
         }
 
-        public ProposalBugReportEntityBuilder title(final String title) {
+        public ProposalOrBugReportEntityBuilder title(final String title) {
             this.title = title;
             return this;
         }
 
-        public ProposalBugReportEntityBuilder content(final String content) {
+        public ProposalOrBugReportEntityBuilder content(final String content) {
             this.content = content;
             return this;
         }
 
-        public ProposalBugReportEntityBuilder image(final List<FilenameAndSrcEntityRecord> image) {
+        public ProposalOrBugReportEntityBuilder image(final List<FilenameAndSrcEntityRecord> image) {
             this.image = image;
             return this;
         }
 
-        public ProposalBugReportEntityBuilder imageNumber(final Integer imageNumber) {
+        public ProposalOrBugReportEntityBuilder imageNumber(final Integer imageNumber) {
             this.imageNumber = imageNumber;
             return this;
         }
 
-        public ProposalBugReportEntityBuilder checkedAt(final LocalDateTime checkedAt) {
+        public ProposalOrBugReportEntityBuilder checkedAt(final LocalDateTime checkedAt) {
             this.checkedAt = checkedAt;
             return this;
         }
 
-        public ProposalBugReportEntityBuilder proposalBugReport(final ProposalBugReportEntity propBugRep) {
+        public ProposalOrBugReportEntityBuilder proposalBugReport(final ProposalOrBugReportEntity propBugRep) {
             this.ulid = propBugRep.getUlid();
             this.member = propBugRep.getMember();
             this.title = propBugRep.getTitle();
@@ -149,8 +153,8 @@ public class ProposalBugReportEntity {
             return this;
         }
 
-        public ProposalBugReportEntity build() {
-            return new ProposalBugReportEntity(this.ulid, this.member, this.title, this.content, this.image, this.imageNumber, this.checkedAt);
+        public ProposalOrBugReportEntity build() {
+            return new ProposalOrBugReportEntity(this.ulid, this.member, this.title, this.content, this.image, this.imageNumber, this.checkedAt);
         }
     }
 }

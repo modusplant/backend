@@ -1,4 +1,4 @@
-package kr.modusplant.domains.member.framework.outbound.jpa.repository;
+package kr.modusplant.domains.member.framework.outbound.jpa.adapter;
 
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
@@ -9,6 +9,8 @@ import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
 import kr.modusplant.domains.member.domain.vo.MemberProfileIntroduction;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberProfileEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.mapper.MemberProfileJpaMapperImpl;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberProfileJpaRepository;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;

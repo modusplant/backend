@@ -10,12 +10,12 @@ import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUti
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class ProposalBugReportEntityTest implements ProposalBugReportEntityTestUtils {
-    private ProposalBugReportEntity testProposalBugReportEntity;
+class ProposalOrBugReportEntityTest implements ProposalBugReportEntityTestUtils {
+    private ProposalOrBugReportEntity testProposalOrBugReportEntity;
 
     @BeforeEach
     public void beforeEach() {
-        testProposalBugReportEntity = createProposalBugReportEntityBuilder()
+        testProposalOrBugReportEntity = createProposalBugReportEntityBuilder()
                 .member(createMemberBasicUserEntityWithUuid())
                 .build();
     }
@@ -23,32 +23,32 @@ class ProposalBugReportEntityTest implements ProposalBugReportEntityTestUtils {
     @Test
     @DisplayName("getETagSource를 통해 ETag 소스 반환")
     void testGetETagSource_givenNothing_willReturnETagSource() {
-        assertEquals(testProposalBugReportEntity.getETagSource(), TEST_REPORT_ULID + "-" + null);
+        assertEquals(testProposalOrBugReportEntity.getETagSource(), TEST_REPORT_ULID + "-" + null);
     }
 
     @Test
     @DisplayName("같은 객체에 대한 equals 호출")
     void testEquals_givenSameObject_willReturnTrue() {
         //noinspection EqualsWithItself
-        assertEquals(testProposalBugReportEntity, testProposalBugReportEntity);
+        assertEquals(testProposalOrBugReportEntity, testProposalOrBugReportEntity);
     }
 
     @Test
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
-        assertNotEquals(testProposalBugReportEntity, testMemberId);
+        assertNotEquals(testProposalOrBugReportEntity, testMemberId);
     }
 
     @Test
     @DisplayName("같은 타입의 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectOfEqualType_willReturnFalse() {
-        assertEquals(testProposalBugReportEntity, ProposalBugReportEntity.builder().proposalBugReport(testProposalBugReportEntity).build());
+        assertEquals(testProposalOrBugReportEntity, ProposalOrBugReportEntity.builder().proposalBugReport(testProposalOrBugReportEntity).build());
     }
 
     @Test
     @DisplayName("같은 객체에 대한 hashcode 동일성 보장")
     void testHashCode_givenSameObject_willReturnSameHashCode() {
-        assertEquals(testProposalBugReportEntity.hashCode(), testProposalBugReportEntity.hashCode());
+        assertEquals(testProposalOrBugReportEntity.hashCode(), testProposalOrBugReportEntity.hashCode());
     }
 }

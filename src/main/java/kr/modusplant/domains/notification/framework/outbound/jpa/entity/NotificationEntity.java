@@ -2,8 +2,8 @@ package kr.modusplant.domains.notification.framework.outbound.jpa.entity;
 
 import jakarta.persistence.*;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
-import kr.modusplant.shared.enums.NotificationActionType;
-import kr.modusplant.shared.enums.NotificationStatusType;
+import kr.modusplant.domains.notification.domain.enums.NotificationActionType;
+import kr.modusplant.domains.notification.domain.enums.NotificationStatusType;
 import kr.modusplant.shared.framework.jpa.generator.UlidGenerator;
 import lombok.AccessLevel;
 import lombok.Getter;

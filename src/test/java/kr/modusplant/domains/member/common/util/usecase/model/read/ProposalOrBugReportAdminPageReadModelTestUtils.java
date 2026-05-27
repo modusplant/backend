@@ -19,7 +19,7 @@ public interface ProposalOrBugReportAdminPageReadModelTestUtils {
                     TEST_REPORT_CREATED_AT,
                     TEST_REPORT_CHECKED_AT,
                     MEMBER_BASIC_USER_NICKNAME,
-                    ProposalOrBugReportStatus.CHECKED.getValue());
+                    ProposalOrBugReportStatus.CHECKED.name());
     List<ProposalOrBugReportAdminPageReadModel> testProposalOrBugReportAdminPageCheckedReadModelList =
             List.of(testProposalOrBugReportAdminPageCheckedReadModel);
 }

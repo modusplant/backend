@@ -1,26 +1,25 @@
-package kr.modusplant.domains.member.framework.outbound.jpa.repository;
+package kr.modusplant.domains.member.framework.outbound;
 
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.compositekey.CommentCompositeKey;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.CommentEntity;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.member.common.util.domain.aggregate.ProposalOrBugReportTestUtils;
-import kr.modusplant.domains.member.framework.outbound.jooq.repository.ReportJooqRepository;
+import kr.modusplant.domains.member.framework.outbound.jooq.repository.ProposalOrBugReportJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.CommentAbuseReportEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.PostAbuseReportEntity;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.ProposalBugReportEntity;
+import kr.modusplant.domains.member.framework.outbound.jpa.entity.ProposalOrBugReportEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.CommentAbuseReportEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.PostAbuseReportEntityTestUtils;
+import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.ProposalBugReportEntityTestUtils;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.CommentAbuseReportJpaRepository;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostAbuseReportJpaRepository;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.ProposalOrBugReportJpaRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
 import kr.modusplant.shared.event.ImagesRemoveEvent;
-import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
-import org.jooq.tools.jdbc.MockConnection;
-import org.jooq.tools.jdbc.MockDataProvider;
-import org.jooq.tools.jdbc.MockExecuteContext;
-import org.jooq.tools.jdbc.MockResult;
+import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -37,46 +36,37 @@ import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUti
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
 import static kr.modusplant.domains.member.common.util.framework.outbound.jooq.record.ProposalOrBugReportAdminPageRecordTestUtils.testProposalOrBugReportAdminPageCheckedRecord;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportAdminPageReadModelTestUtils.testProposalOrBugReportAdminPageCheckedReadModel;
-import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_CONTENT_IMAGE_FILE_KEYS;
-import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
+import static kr.modusplant.domains.post.common.constant.PostConstant.*;
+import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, CommentAbuseReportEntityTestUtils, ProposalOrBugReportTestUtils {
-    private final MockDataProvider mockDataProvider = (MockExecuteContext mockExecuteContext) -> {
-        String sql = mockExecuteContext.sql().toLowerCase();
+class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, CommentAbuseReportEntityTestUtils,
+        ProposalOrBugReportTestUtils, ProposalBugReportEntityTestUtils {
+    @SuppressWarnings("unused")
+    private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
 
-        // 데이터 삽입 및 삭제 (insert, delete) 모킹
-        if (sql.contains("insert") || sql.contains("delete")) {
-            return new MockResult[] { new MockResult(1) };
-        }
-
-        return new MockResult[0];
-    };
-
-    private final MockConnection mockConnection = new MockConnection(mockDataProvider);
-    private final DSLContext dslContext = DSL.using(mockConnection, SQLDialect.POSTGRES);
     private final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
 
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
-    private final ProposalBugReportJpaRepository proposalBugReportJpaRepository = Mockito.mock(ProposalBugReportJpaRepository.class);
+    private final ProposalOrBugReportJpaRepository proposalOrBugReportJpaRepository = Mockito.mock(ProposalOrBugReportJpaRepository.class);
     private final PostJpaRepository postJpaRepository = Mockito.mock(PostJpaRepository.class);
-    private final PostAbuseReportJpaRepository postAbuRepJpaRepository = Mockito.mock(PostAbuseReportJpaRepository.class);
+    private final PostAbuseReportJpaRepository postAbuseReportJpaRepository = Mockito.mock(PostAbuseReportJpaRepository.class);
     private final CommentJpaRepository commentJpaRepository = Mockito.mock(CommentJpaRepository.class);
     private final CommentAbuseReportJpaRepository commentAbuseReportJpaRepository = Mockito.mock(CommentAbuseReportJpaRepository.class);
-    private final ReportJooqRepository reportJooqRepository = Mockito.mock(ReportJooqRepository.class);
+    private final ProposalOrBugReportJooqRepository proposalOrBugReportJooqRepository = Mockito.mock(ProposalOrBugReportJooqRepository.class);
 
     private final ReportRepositoryAdapter reportRepositoryAdapter = new ReportRepositoryAdapter(
-            dslContext, applicationEventPublisher, memberJpaRepository, proposalBugReportJpaRepository, postJpaRepository, postAbuRepJpaRepository, commentJpaRepository, commentAbuseReportJpaRepository, reportJooqRepository);
+            applicationEventPublisher, memberJpaRepository, proposalOrBugReportJpaRepository, postJpaRepository, postAbuseReportJpaRepository, commentJpaRepository, commentAbuseReportJpaRepository, proposalOrBugReportJooqRepository);
 
     @Test
     @DisplayName("보고서 식별자가 존재할 때 isIdExist로 보고서 존재 여부 반환")
     void testIsIdExist_givenExistedReportId_willReturnResponseInProposalOrBugReport() {
         // given
-        given(proposalBugReportJpaRepository.existsByUlid(any())).willReturn(true);
+        given(proposalOrBugReportJpaRepository.existsByUlid(any())).willReturn(true);
 
         // when
         boolean isReportIdExist = reportRepositoryAdapter.isIdExistInProposalOrBugReport(testReportId);
@@ -89,7 +79,7 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
     @DisplayName("보고서 식별자가 존재하지 않을 때 isIdExist로 보고서 존재 여부 반환")
     void testIsIdExist_givenNotFoundReportId_willReturnResponseInProposalOrBugReport() {
         // given
-        given(proposalBugReportJpaRepository.existsByUlid(any())).willReturn(false);
+        given(proposalOrBugReportJpaRepository.existsByUlid(any())).willReturn(false);
 
         // when
         boolean isReportIdExist = reportRepositoryAdapter.isIdExistInProposalOrBugReport(testReportId);
@@ -103,7 +93,7 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
     void testIsMemberAbusePost_givenExistedAbuse_willReturnResponse() {
         // given
         given(postJpaRepository.findByUlid(any())).willReturn(Optional.of(createPostEntityBuilder().build()));
-        given(postAbuRepJpaRepository.findByMemberIdAndPost(any(), any())).willReturn(Optional.of(createPostAbuseReportEntityBuilder().build()));
+        given(postAbuseReportJpaRepository.findByMemberIdAndPost(any(), any())).willReturn(Optional.of(createPostAbuseReportEntityBuilder().build()));
 
         // when
         boolean isMemberAbusePost = reportRepositoryAdapter.isMemberAbusePost(testMemberId, testActivitySubjectPostId);
@@ -117,7 +107,7 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
     void testIsMemberAbusePost_givenNotFoundAbuse_willReturnResponse() {
         // given
         given(postJpaRepository.findByUlid(any())).willReturn(Optional.of(createPostEntityBuilder().build()));
-        given(postAbuRepJpaRepository.findByMemberIdAndPost(any(), any())).willReturn(Optional.empty());
+        given(postAbuseReportJpaRepository.findByMemberIdAndPost(any(), any())).willReturn(Optional.empty());
 
         // when
         boolean isMemberAbusePost = reportRepositoryAdapter.isMemberAbusePost(testMemberId, testActivitySubjectPostId);
@@ -148,7 +138,7 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
         // given
         given(commentJpaRepository.findByPostUlidAndPath(any(), any()))
                 .willReturn(Optional.of(createCommentEntityBuilder().build()));
-        given(postAbuRepJpaRepository.findByMemberIdAndPost(any(), any())).willReturn(Optional.empty());
+        given(postAbuseReportJpaRepository.findByMemberIdAndPost(any(), any())).willReturn(Optional.empty());
 
         // when
         boolean isMemberAbusePost = reportRepositoryAdapter.isMemberAbuseComment(testMemberId, testActivitySubjectCommentId);
@@ -168,7 +158,7 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
         reportRepositoryAdapter.reportProposalOrBug(testMemberId, createProposalOrBugReport());
 
         // then
-        verify(proposalBugReportJpaRepository, times(1)).save(any(ProposalBugReportEntity.class));
+        verify(proposalOrBugReportJpaRepository, times(1)).save(any(ProposalOrBugReportEntity.class));
     }
 
     @Test
@@ -181,7 +171,7 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
         assertThrows(NoSuchElementException.class, () -> reportRepositoryAdapter.reportProposalOrBug(testMemberId, createProposalOrBugReport()));
 
         // then
-        verify(proposalBugReportJpaRepository, never()).save(any());
+        verify(proposalOrBugReportJpaRepository, never()).save(any());
     }
 
     @Test
@@ -189,15 +179,18 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
     void testReportPostAbuse_givenValidData_willSaveReport() {
         // given
         MemberEntity memberEntity = createMemberBasicUserEntity();
-        PostEntity mockPost = mock(PostEntity.class);
+        PostEntity mockPostEntity = mock(PostEntity.class);
+        PostAbuseReportEntity mockPostAbuseReportEntity = mock(PostAbuseReportEntity.class);
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));
-        given(postJpaRepository.findByUlid(TEST_POST_ULID)).willReturn(Optional.of(mockPost));
+        given(postJpaRepository.findByUlid(TEST_POST_ULID)).willReturn(Optional.of(mockPostEntity));
+        given(postAbuseReportJpaRepository.save(any())).willReturn(mockPostAbuseReportEntity);
+        given(mockPostAbuseReportEntity.getCreatedAt()).willReturn(TEST_POST_PUBLISHED_AT);
 
         // when
         reportRepositoryAdapter.reportPostAbuse(testMemberId, testActivitySubjectPostId);
 
         // then
-        verify(postAbuRepJpaRepository, times(1)).save(any(PostAbuseReportEntity.class));
+        verify(postAbuseReportJpaRepository, times(1)).save(any(PostAbuseReportEntity.class));
     }
 
     @Test
@@ -210,7 +203,7 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
         assertThrows(NoSuchElementException.class, () -> reportRepositoryAdapter.reportPostAbuse(testMemberId, testActivitySubjectPostId));
 
         // then
-        verify(postAbuRepJpaRepository, never()).save(any());
+        verify(postAbuseReportJpaRepository, never()).save(any());
     }
 
     @Test
@@ -225,7 +218,7 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
         assertThrows(NoSuchElementException.class, () -> reportRepositoryAdapter.reportPostAbuse(testMemberId, testActivitySubjectPostId));
 
         // then
-        verify(postAbuRepJpaRepository, never()).save(any());
+        verify(postAbuseReportJpaRepository, never()).save(any());
     }
 
     @Test
@@ -277,22 +270,24 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
     @DisplayName("checkProposalOrBugReport 실행 시 확인 수행")
     void testCheckProposalOrBugReport_givenValidReportId_willCheckProposalOrBugReport() {
         // given
-        given(reportJooqRepository.getProposalOrBugReportAdminPageRecord(any())).willReturn(testProposalOrBugReportAdminPageCheckedRecord);
-        given(reportJooqRepository.getProposalOrBugReportAdminPageReadModel(testProposalOrBugReportAdminPageCheckedRecord)).willReturn(testProposalOrBugReportAdminPageCheckedReadModel);
+        given(proposalOrBugReportJpaRepository.findByUlid(any())).willReturn(Optional.of(createProposalBugReportEntityBuilder().member(createMemberBasicUserEntity()).build()));
+        given(proposalOrBugReportJpaRepository.save(any())).willReturn(createProposalBugReportEntityBuilder().build());
+        given(proposalOrBugReportJooqRepository.getAdminPageRecordByReportId(any())).willReturn(testProposalOrBugReportAdminPageCheckedRecord);
+        given(proposalOrBugReportJooqRepository.getAdminPageReadModel(testProposalOrBugReportAdminPageCheckedRecord)).willReturn(testProposalOrBugReportAdminPageCheckedReadModel);
 
         // when
         reportRepositoryAdapter.checkProposalOrBugReport(testReportId);
 
         // then
-        verify(reportJooqRepository, times(1)).getProposalOrBugReportAdminPageRecord(any());
-        verify(reportJooqRepository, times(1)).getProposalOrBugReportAdminPageReadModel(testProposalOrBugReportAdminPageCheckedRecord);
+        verify(proposalOrBugReportJooqRepository, times(1)).getAdminPageRecordByReportId(any());
+        verify(proposalOrBugReportJooqRepository, times(1)).getAdminPageReadModel(testProposalOrBugReportAdminPageCheckedRecord);
     }
 
     @Test
     @DisplayName("이미지가 존재하는 리포트에 대해 removeProposalOrBugReport 실행 시 S3 삭제 및 아카이빙 수행")
     void testRemoveProposalOrBugReport_givenImagesExist_willDeleteS3AndProcessArchive() {
         // given
-        given(reportJooqRepository.getImageFileKeysFromReportId(any())).willReturn(TEST_POST_CONTENT_IMAGE_FILE_KEYS);
+        given(proposalOrBugReportJooqRepository.getImageFileKeysFromReportId(any())).willReturn(TEST_POST_CONTENT_IMAGE_FILE_KEYS);
 
         // when
         reportRepositoryAdapter.removeProposalOrBugReport(testReportId);
@@ -305,7 +300,7 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
     @DisplayName("이미지가 없는 리포트에 대해 removeProposalOrBugReport 실행 시 S3 삭제 생략 후 아카이빙 수행")
     void testRemoveProposalOrBugReport_givenImagesEmpty_willProcessArchiveOnly() {
         // given
-        given(reportJooqRepository.getImageFileKeysFromReportId(any())).willReturn(List.of());
+        given(proposalOrBugReportJooqRepository.getImageFileKeysFromReportId(any())).willReturn(List.of());
 
         // when
         reportRepositoryAdapter.removeProposalOrBugReport(testReportId);

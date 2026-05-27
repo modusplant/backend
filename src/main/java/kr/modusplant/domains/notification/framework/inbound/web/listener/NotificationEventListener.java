@@ -4,7 +4,6 @@ import kr.modusplant.domains.notification.adapter.controller.NotificationControl
 import kr.modusplant.shared.event.CommentLikeNotificationEvent;
 import kr.modusplant.shared.event.CommentNotificationEvent;
 import kr.modusplant.shared.event.PostLikeNotificationEvent;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,17 +16,20 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class NotificationEventListener {
 
     private final NotificationController notificationController;
-
-    @Qualifier("notificationSemaphore")
     private final Semaphore notificationSemaphore;
 
     @Value("${app.semaphore.datasource.bulkhead.notification.timeout-ms}")
     private long timeoutMs;
+
+    public NotificationEventListener(NotificationController notificationController,
+                                     @Qualifier("notificationSemaphore") Semaphore notificationSemaphore) {
+        this.notificationController = notificationController;
+        this.notificationSemaphore = notificationSemaphore;
+    }
 
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)

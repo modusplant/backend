@@ -1,9 +1,9 @@
 package kr.modusplant.domains.notification.framework.outbound.jooq.mapper;
 
+import kr.modusplant.domains.notification.domain.enums.NotificationActionType;
+import kr.modusplant.domains.notification.domain.enums.NotificationStatusType;
 import kr.modusplant.domains.notification.framework.outbound.jooq.mapper.supers.NotificationJooqMapper;
 import kr.modusplant.domains.notification.usecase.record.NotificationReadModel;
-import kr.modusplant.shared.enums.NotificationActionType;
-import kr.modusplant.shared.enums.NotificationStatusType;
 import org.jooq.Record;
 import org.springframework.stereotype.Component;
 

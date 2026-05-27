@@ -1,11 +1,11 @@
 package kr.modusplant.domains.notification.adapter.mapper;
 
 import kr.modusplant.domains.notification.domain.aggregate.Notification;
+import kr.modusplant.domains.notification.domain.enums.NotificationContentType;
 import kr.modusplant.domains.notification.domain.vo.*;
 import kr.modusplant.domains.notification.usecase.port.mapper.NotificationMapper;
 import kr.modusplant.domains.notification.usecase.record.NotificationReadModel;
 import kr.modusplant.domains.notification.usecase.response.NotificationResponse;
-import kr.modusplant.shared.enums.ContentType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -55,10 +55,10 @@ public class NotificationMapperImpl implements NotificationMapper {
         );
     }
 
-    private ContentType resolveContentType(NotificationReadModel readModel) {
+    private NotificationContentType resolveContentType(NotificationReadModel readModel) {
         return switch (readModel.action()) {
-            case POST_LIKED -> ContentType.POST;
-            case COMMENT_LIKED, COMMENT_ADDED, COMMENT_REPLY_ADDED -> ContentType.COMMENT;
+            case POST_LIKED -> NotificationContentType.POST;
+            case COMMENT_LIKED, COMMENT_ADDED, COMMENT_REPLY_ADDED -> NotificationContentType.COMMENT;
         };
     }
 }

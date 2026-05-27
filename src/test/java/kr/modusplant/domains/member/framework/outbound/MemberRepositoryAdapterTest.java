@@ -1,26 +1,22 @@
-package kr.modusplant.domains.member.framework.outbound.jpa.repository;
+package kr.modusplant.domains.member.framework.outbound;
 
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.enums.MemberWithdrawReason;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ActivitySubjectCommentJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ActivitySubjectPostJooqRepository;
-import kr.modusplant.domains.member.framework.outbound.jooq.repository.MemberProfileJooqRepository;
+import kr.modusplant.domains.member.framework.outbound.jooq.repository.MemberJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.MemberEntityTestUtils;
+import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberProfileEntity;
+import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.MemberProfileEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.mapper.MemberJpaMapperImpl;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.*;
 import kr.modusplant.domains.post.framework.outbound.jooq.repository.PostJooqRepository;
 import kr.modusplant.shared.event.ImageRemoveEvent;
 import kr.modusplant.shared.event.ImagesRemoveEvent;
 import kr.modusplant.shared.event.RecentlyViewPostRemoveEvent;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
-import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
-import org.jooq.tools.jdbc.MockConnection;
-import org.jooq.tools.jdbc.MockDataProvider;
-import org.jooq.tools.jdbc.MockResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -31,7 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
+import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberWithdrawOpinionTestUtils.testMemberWithdrawOpinion;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER;
@@ -46,27 +42,26 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
 
-class MemberRepositoryAdapterTest implements MemberTestUtils, MemberEntityTestUtils {
-    MockDataProvider mockDataProvider = ctx -> {
-        DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
-        return new MockResult[]{new MockResult(0, dsl.newResult())};
-    };
-
-    MockConnection mockConnection = new MockConnection(mockDataProvider);
-    DSLContext dslContext =  DSL.using(mockConnection, SQLDialect.POSTGRES);
-
+class MemberRepositoryAdapterTest implements MemberTestUtils, MemberProfileEntityTestUtils {
     @SuppressWarnings("unused")
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
     private final StringRedisTemplate stringRedisTemplate = mock(StringRedisTemplate.class);
     private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
     private final MemberJpaMapperImpl memberJpaMapper = new MemberJpaMapperImpl();
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
+    private final PostLikeJpaRepository postLikeJpaRepository = Mockito.mock(PostLikeJpaRepository.class);
+    private final CommentLikeJpaRepository commentLikeJpaRepository = Mockito.mock(CommentLikeJpaRepository.class);
+    private final MemberWithdrawJpaRepository memberWithdrawJpaRepository = Mockito.mock(MemberWithdrawJpaRepository.class);
     private final ActivitySubjectPostJooqRepository activitySubjectPostJooqRepository = Mockito.mock(ActivitySubjectPostJooqRepository.class);
     private final ActivitySubjectCommentJooqRepository activitySubjectCommentJooqRepository = Mockito.mock(ActivitySubjectCommentJooqRepository.class);
-    private final MemberProfileJooqRepository memberProfileJooqRepository = Mockito.mock(MemberProfileJooqRepository.class);
+    private final MemberJooqRepository memberJooqRepository = Mockito.mock(MemberJooqRepository.class);
+    private final MemberProfileJpaRepository memberProfileJpaRepository = Mockito.mock(MemberProfileJpaRepository.class);
     private final PostJooqRepository postJooqRepository = Mockito.mock(PostJooqRepository.class);
     private final MemberRepositoryAdapter memberRepositoryAdapter = new MemberRepositoryAdapter(
-            stringRedisTemplate, dslContext, eventPublisher, memberJpaMapper, memberJpaRepository, activitySubjectPostJooqRepository, activitySubjectCommentJooqRepository, memberProfileJooqRepository, postJooqRepository);
+            stringRedisTemplate, eventPublisher, memberJpaMapper, memberJpaRepository,
+            postLikeJpaRepository, commentLikeJpaRepository, memberWithdrawJpaRepository,
+            activitySubjectPostJooqRepository, activitySubjectCommentJooqRepository,
+            memberJooqRepository, memberProfileJpaRepository, postJooqRepository);
 
     @Test
     @DisplayName("getById로 가용한 Member 반환(가용할 때)")
@@ -194,10 +189,11 @@ class MemberRepositoryAdapterTest implements MemberTestUtils, MemberEntityTestUt
         willDoNothing().given(eventPublisher).publishEvent(any(RecentlyViewPostRemoveEvent.class));
         given(postJooqRepository.getPublishedPostUlidsByMemberId(any())).willReturn(TEST_POST_ULID_ARRAY);
         given(postJooqRepository.getPostContentsFromPublishedPostUlids(any())).willReturn(List.of(TEST_POST_CONTENT_JSON_NODE));
-        given(activitySubjectPostJooqRepository.getPostIdsLikedByMemberId(any())).willReturn(List.of(TEST_POST_ULID));
-        given(activitySubjectCommentJooqRepository.getCommentIdsThatHaveCommentLikedByMemberId(any())).willReturn(List.of(testActivitySubjectCommentIdRecord));
-        given(memberProfileJooqRepository.getImageFileKeyFromMemberId(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
+        given(activitySubjectPostJooqRepository.getPostUlidsLikedByMemberId(any())).willReturn(List.of(TEST_POST_ULID));
+        given(activitySubjectCommentJooqRepository.getCommentIdsLikedByMemberId(any())).willReturn(List.of(testActivitySubjectCommentIdRecord));
+        given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntity()).build()));
         willDoNothing().given(eventPublisher).publishEvent(any(ImageRemoveEvent.class));
+        given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(createMemberBasicUserEntityWithUuid()));
 
         // when
         memberRepositoryAdapter.withdraw(testMemberId, MemberWithdrawReason.UNCOMFORTABLE_TO_USE, testMemberWithdrawOpinion);
@@ -207,6 +203,16 @@ class MemberRepositoryAdapterTest implements MemberTestUtils, MemberEntityTestUt
         verify(eventPublisher, times(1)).publishEvent(any(ImagesRemoveEvent.class));
         verify(eventPublisher, times(1)).publishEvent(any(RecentlyViewPostRemoveEvent.class));
         verify(eventPublisher, times(1)).publishEvent(any(ImageRemoveEvent.class));
+        verify(activitySubjectPostJooqRepository, times(1)).archiveAllByPostUlids(any());
+        verify(activitySubjectPostJooqRepository, times(1)).deleteAllAndRelatedRecordsByMemberIdAndPostUlids(any(), any());
+        verify(activitySubjectPostJooqRepository, times(1)).decreaseLikeCountByPostUlids(any());
+        verify(activitySubjectCommentJooqRepository, times(1)).decreaseLikeCountByCommentIds(any());
+        verify(postLikeJpaRepository, times(1)).deleteByMemberId(any());
+        verify(commentLikeJpaRepository, times(1)).deleteByMemberId(any());
+        verify(memberWithdrawJpaRepository, times(1)).save(any());
+        verify(activitySubjectCommentJooqRepository, times(1)).markAsWithdrawnByMemberId(any());
+        verify(memberJooqRepository, times(1)).updateMemberIdToNullByMemberId(any());
+        verify(memberJooqRepository, times(1)).deleteMemberRelatedRecordsExceptOfPostAndCommentByMemberId(any());
     }
 
     @Test
@@ -215,9 +221,13 @@ class MemberRepositoryAdapterTest implements MemberTestUtils, MemberEntityTestUt
         // given
         given(postJooqRepository.getPublishedPostUlidsByMemberId(any())).willReturn(new String[]{});
         given(postJooqRepository.getPostContentsFromPublishedPostUlids(any())).willReturn(List.of());
-        given(activitySubjectPostJooqRepository.getPostIdsLikedByMemberId(any())).willReturn(List.of());
-        given(activitySubjectCommentJooqRepository.getCommentIdsThatHaveCommentLikedByMemberId(any())).willReturn(List.of());
-        given(memberProfileJooqRepository.getImageFileKeyFromMemberId(any())).willReturn(null);
+        given(activitySubjectPostJooqRepository.getPostUlidsLikedByMemberId(any())).willReturn(List.of());
+        given(activitySubjectCommentJooqRepository.getCommentIdsLikedByMemberId(any())).willReturn(List.of());
+        willDoNothing().given(postLikeJpaRepository).deleteByMemberId(any());
+        willDoNothing().given(commentLikeJpaRepository).deleteByMemberId(any());
+        given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(MemberProfileEntity.builder()
+                .introduction(MEMBER_PROFILE_BASIC_USER_INTRODUCTION).member(createMemberBasicUserEntity()).build()));
+        given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(createMemberBasicUserEntityWithUuid()));
 
         // when
         memberRepositoryAdapter.withdraw(testMemberId, MemberWithdrawReason.UNCOMFORTABLE_TO_USE, testMemberWithdrawOpinion);
@@ -227,5 +237,15 @@ class MemberRepositoryAdapterTest implements MemberTestUtils, MemberEntityTestUt
         verify(eventPublisher, never()).publishEvent(any(ImagesRemoveEvent.class));
         verify(eventPublisher, never()).publishEvent(any(RecentlyViewPostRemoveEvent.class));
         verify(eventPublisher, never()).publishEvent(any(ImageRemoveEvent.class));
+        verify(activitySubjectPostJooqRepository, never()).archiveAllByPostUlids(any());
+        verify(activitySubjectPostJooqRepository, never()).deleteAllAndRelatedRecordsByMemberIdAndPostUlids(any(), any());
+        verify(activitySubjectPostJooqRepository, times(1)).decreaseLikeCountByPostUlids(any());
+        verify(activitySubjectCommentJooqRepository, times(1)).decreaseLikeCountByCommentIds(any());
+        verify(postLikeJpaRepository, times(1)).deleteByMemberId(any());
+        verify(commentLikeJpaRepository, times(1)).deleteByMemberId(any());
+        verify(memberWithdrawJpaRepository, times(1)).save(any());
+        verify(activitySubjectCommentJooqRepository, times(1)).markAsWithdrawnByMemberId(any());
+        verify(memberJooqRepository, times(1)).updateMemberIdToNullByMemberId(any());
+        verify(memberJooqRepository, times(1)).deleteMemberRelatedRecordsExceptOfPostAndCommentByMemberId(any());
     }
 }

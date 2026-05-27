@@ -1,13 +1,13 @@
 package kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util;
 
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.ProposalBugReportEntity;
+import kr.modusplant.domains.member.framework.outbound.jpa.entity.ProposalOrBugReportEntity;
 
 import static kr.modusplant.domains.member.common.constant.ReportConstant.*;
 import static kr.modusplant.domains.member.framework.outbound.jpa.repository.common.util.record.FilenameAndSrcEntityRecordTestUtils.testFilenameAndSrcEntityRecords;
 
 public interface ProposalBugReportEntityTestUtils extends MemberEntityTestUtils {
-    default ProposalBugReportEntity.ProposalBugReportEntityBuilder createProposalBugReportEntityBuilder() {
-        return ProposalBugReportEntity.builder()
+    default ProposalOrBugReportEntity.ProposalOrBugReportEntityBuilder createProposalBugReportEntityBuilder() {
+        return ProposalOrBugReportEntity.builder()
                 .ulid(TEST_REPORT_ULID)
                 .title(TEST_REPORT_TITLE)
                 .content(TEST_REPORT_CONTENT)

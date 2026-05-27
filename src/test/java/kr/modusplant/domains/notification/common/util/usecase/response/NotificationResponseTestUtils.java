@@ -1,9 +1,9 @@
 package kr.modusplant.domains.notification.common.util.usecase.response;
 
+import kr.modusplant.domains.notification.domain.enums.NotificationActionType;
+import kr.modusplant.domains.notification.domain.enums.NotificationContentType;
+import kr.modusplant.domains.notification.domain.enums.NotificationStatusType;
 import kr.modusplant.domains.notification.usecase.response.NotificationResponse;
-import kr.modusplant.shared.enums.ContentType;
-import kr.modusplant.shared.enums.NotificationActionType;
-import kr.modusplant.shared.enums.NotificationStatusType;
 
 import java.time.LocalDateTime;
 
@@ -20,7 +20,7 @@ public interface NotificationResponseTestUtils {
             NotificationStatusType.READ.getValue(),
             TEST_NOTIFICATION_POST_ULID,
             null,
-            ContentType.POST.getValue(),
+            NotificationContentType.POST.getValue(),
             TEST_NOTIFICATION_POST_PREVIEW,
             testDate
     );
@@ -33,7 +33,7 @@ public interface NotificationResponseTestUtils {
             NotificationStatusType.UNREAD.getValue(),
             TEST_NOTIFICATION_POST_ULID,
             null,
-            ContentType.POST.getValue(),
+            NotificationContentType.POST.getValue(),
             TEST_NOTIFICATION_POST_PREVIEW,
             testDate
     );
@@ -46,7 +46,7 @@ public interface NotificationResponseTestUtils {
             NotificationStatusType.READ.getValue(),
             TEST_NOTIFICATION_POST_ULID,
             TEST_NOTIFICATION_COMMENT_PATH_DEPTH3,
-            ContentType.COMMENT.getValue(),
+            NotificationContentType.COMMENT.getValue(),
             TEST_NOTIFICATION_COMMENT_PREVIEW,
             testDate
     );
@@ -59,7 +59,7 @@ public interface NotificationResponseTestUtils {
             NotificationStatusType.UNREAD.getValue(),
             TEST_NOTIFICATION_POST_ULID,
             TEST_NOTIFICATION_COMMENT_PATH_DEPTH3,
-            ContentType.COMMENT.getValue(),
+            NotificationContentType.COMMENT.getValue(),
             TEST_NOTIFICATION_COMMENT_PREVIEW,
             testDate
     );

@@ -14,11 +14,15 @@ import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileI
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
+import kr.modusplant.domains.member.framework.outbound.MemberRepositoryAdapter;
+import kr.modusplant.domains.member.framework.outbound.jpa.adapter.ActivitySubjectCommentRepositoryJpaAdapter;
+import kr.modusplant.domains.member.framework.outbound.jpa.adapter.ActivitySubjectPostRepositoryJpaAdapter;
+import kr.modusplant.domains.member.framework.outbound.jpa.adapter.MemberProfileRepositoryJpaAdapter;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.CommentAbuseReportEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.MemberProfileEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.PostAbuseReportEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.ProposalBugReportEntityTestUtils;
-import kr.modusplant.domains.member.framework.outbound.jpa.repository.*;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord;
@@ -32,6 +36,7 @@ import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.event.CommentLikeNotificationEvent;
+import kr.modusplant.shared.event.PostAbuseReportEvent;
 import kr.modusplant.shared.event.PostLikeNotificationEvent;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
@@ -64,6 +69,7 @@ import static kr.modusplant.domains.member.common.util.domain.entity.nullobject.
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils.testMemberProfileIntroduction;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
+import static kr.modusplant.domains.member.common.util.domain.vo.ReportTimeTestUtils.testReportTime;
 import static kr.modusplant.domains.member.common.util.usecase.record.CommentAbuseReportRecordTestUtils.testCommentAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.testMemberPostBookmarkCancelRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.testMemberCommentLikeRecord;
@@ -840,13 +846,15 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfActivitySubjectPostExists(any());
         given(activitySubjectPostRepository.isPublished(any())).willReturn(true);
         given(reportRepository.isMemberAbusePost(any(), any())).willReturn(false);
-        willDoNothing().given(reportRepository).reportPostAbuse(any(), any());
+        given(reportRepository.reportPostAbuse(any(), any())).willReturn(testReportTime);
+        willDoNothing().given(applicationEventPublisher).publishEvent(any(PostAbuseReportEvent.class));
 
         // when
         memberController.reportPostAbuse(testPostAbuseReportRecord);
 
         // then
         verify(reportRepository, times(1)).reportPostAbuse(any(), any());
+        verify(applicationEventPublisher, times(1)).publishEvent(any(PostAbuseReportEvent.class));
     }
 
     @Test

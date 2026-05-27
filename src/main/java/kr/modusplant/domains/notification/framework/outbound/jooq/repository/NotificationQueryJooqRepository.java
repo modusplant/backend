@@ -1,9 +1,9 @@
 package kr.modusplant.domains.notification.framework.outbound.jooq.repository;
 
+import kr.modusplant.domains.notification.domain.enums.NotificationStatusType;
 import kr.modusplant.domains.notification.framework.outbound.jooq.mapper.supers.NotificationJooqMapper;
 import kr.modusplant.domains.notification.usecase.port.repository.NotificationQueryRepository;
 import kr.modusplant.domains.notification.usecase.record.NotificationReadModel;
-import kr.modusplant.shared.enums.NotificationStatusType;
 import lombok.RequiredArgsConstructor;
 import org.jooq.Condition;
 import org.jooq.DSLContext;

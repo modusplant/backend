@@ -19,7 +19,7 @@ public interface ReportRepository {
 
     void reportProposalOrBug(MemberId memberId, ProposalOrBugReport proposalOrBugReport);
 
-    void reportPostAbuse(MemberId memberId, ActivitySubjectPostId activitySubjectPostId);
+    ReportTime reportPostAbuse(MemberId memberId, ActivitySubjectPostId activitySubjectPostId);
 
     void reportCommentAbuse(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId);
 

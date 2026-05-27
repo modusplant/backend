@@ -1,10 +1,10 @@
 package kr.modusplant.domains.notification.framework.outbound.jpa.entity.common.util;
 
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.MemberEntityTestUtils;
+import kr.modusplant.domains.notification.domain.enums.NotificationActionType;
+import kr.modusplant.domains.notification.domain.enums.NotificationStatusType;
 import kr.modusplant.domains.notification.framework.outbound.jpa.entity.NotificationEntity;
 import kr.modusplant.domains.notification.framework.outbound.jpa.entity.NotificationEntity.NotificationEntityBuilder;
-import kr.modusplant.shared.enums.NotificationActionType;
-import kr.modusplant.shared.enums.NotificationStatusType;
 
 import java.time.LocalDateTime;
 

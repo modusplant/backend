@@ -1,9 +1,11 @@
-package kr.modusplant.domains.member.framework.outbound.jpa.repository;
+package kr.modusplant.domains.member.framework.outbound.jpa.adapter;
 
 import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.PostBookmarkEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.PostLikeEntity;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostBookmarkJpaRepository;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostLikeJpaRepository;
 import kr.modusplant.domains.member.usecase.port.repository.ActivitySubjectPostRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
 import lombok.RequiredArgsConstructor;

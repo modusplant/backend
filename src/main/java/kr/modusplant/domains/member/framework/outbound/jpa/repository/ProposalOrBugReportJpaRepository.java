@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.framework.outbound.jpa.repository;
 
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.ProposalBugReportEntity;
+import kr.modusplant.domains.member.framework.outbound.jpa.entity.ProposalOrBugReportEntity;
 import kr.modusplant.shared.persistence.repository.CreatedAtRepository;
 import kr.modusplant.shared.persistence.repository.UlidPrimaryRepository;
 import org.springframework.context.annotation.Primary;
@@ -11,8 +11,8 @@ import java.util.UUID;
 
 @Repository
 @Primary
-public interface ProposalBugReportJpaRepository extends
-        CreatedAtRepository<ProposalBugReportEntity>,
-        UlidPrimaryRepository<ProposalBugReportEntity>,
-        JpaRepository<ProposalBugReportEntity, UUID> {
+public interface ProposalOrBugReportJpaRepository extends
+        CreatedAtRepository<ProposalOrBugReportEntity>,
+        UlidPrimaryRepository<ProposalOrBugReportEntity>,
+        JpaRepository<ProposalOrBugReportEntity, UUID> {
 }
