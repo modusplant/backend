@@ -1,0 +1,15 @@
+package kr.modusplant.domains.account.normal.framework.outbound.persistence.jpa.mapper;
+
+import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
+import kr.modusplant.shared.kernel.Nickname;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+@Mapper
+public interface NormalIdentityJpaMapper {
+
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "nickname", source = "nickname.value")
+    MemberEntity toMemberEntity(Nickname nickname);
+}

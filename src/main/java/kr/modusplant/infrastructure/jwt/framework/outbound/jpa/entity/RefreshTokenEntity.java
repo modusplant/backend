@@ -1,0 +1,99 @@
+package kr.modusplant.infrastructure.jwt.framework.outbound.jpa.entity;
+
+import jakarta.persistence.*;
+import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.annotations.UuidGenerator;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import static kr.modusplant.shared.persistence.constant.TableColumnName.MEMB_UUID;
+import static kr.modusplant.shared.persistence.constant.TableColumnName.REFRESH_TOKEN;
+
+@Entity
+@Table(name = REFRESH_TOKEN)
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class RefreshTokenEntity {
+    @Id
+    @UuidGenerator
+    @Column(nullable = false, updatable = false)
+    private UUID uuid;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = MEMB_UUID, nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private MemberEntity member;
+
+    @Column(name = "refresh_token", nullable = false)
+    private String refreshToken;
+
+    @Column(name = "expired_at", nullable = false)
+    private LocalDateTime expiredAt;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RefreshTokenEntity that)) return false;
+        return new EqualsBuilder().append(getMember(), that.getMember()).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(getMember()).toHashCode();
+    }
+
+    private RefreshTokenEntity(UUID uuid, MemberEntity member, String refreshToken, LocalDateTime expiredAt) {
+        this.uuid = uuid;
+        this.member = member;
+        this.refreshToken = refreshToken;
+        this.expiredAt = expiredAt;
+    }
+
+    public static RefreshTokenEntityBuilder builder() {
+        return new RefreshTokenEntityBuilder();
+    }
+
+    public static final class RefreshTokenEntityBuilder {
+        private UUID uuid;
+        private MemberEntity member;
+        private String refreshToken;
+        private LocalDateTime expiredAt;
+
+        public RefreshTokenEntityBuilder uuid(final UUID uuid) {
+            this.uuid = uuid;
+            return this;
+        }
+
+        public RefreshTokenEntityBuilder member(final MemberEntity member) {
+            this.member = member;
+            return this;
+        }
+
+        public RefreshTokenEntityBuilder refreshToken(final String refreshToken) {
+            this.refreshToken = refreshToken;
+            return this;
+        }
+
+        public RefreshTokenEntityBuilder expiredAt(final LocalDateTime expiredAt) {
+            this.expiredAt = expiredAt;
+            return this;
+        }
+
+        public RefreshTokenEntityBuilder tokenEntity(final RefreshTokenEntity token) {
+            this.uuid = token.getUuid();
+            this.member = token.getMember();
+            this.refreshToken = token.getRefreshToken();
+            this.expiredAt = token.getExpiredAt();
+            return this;
+        }
+
+        public RefreshTokenEntity build() {
+            return new RefreshTokenEntity(this.uuid, this.member, this.refreshToken, this.expiredAt);
+        }
+    }
+}

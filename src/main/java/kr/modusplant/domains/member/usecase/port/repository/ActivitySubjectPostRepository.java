@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.usecase.port.repository;
 
-import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
+import kr.modusplant.domains.member.domain.vo.MemberId;
 
 public interface ActivitySubjectPostRepository {
     boolean isIdExist(ActivitySubjectPostId activitySubjectPostId);

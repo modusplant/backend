@@ -28,7 +28,8 @@ public enum SocialIdentityErrorCode implements ErrorCode {
     SOCIAL_LINKAGE_REQUIRED(HttpStatus.BAD_REQUEST.value(), "social_linkage_required", "소셜 연동 해제가 필요합니다. "),
     EMAIL_MISMATCH(HttpStatus.CONFLICT.value(), "email_mismatch", "소셜 계정 이메일과 현재 이메일이 일치하지 않습니다. "),
     PROVIDER_MISMATCH(HttpStatus.CONFLICT.value(), "provider_mismatch", "소셜 계정의 제공자가 실제 연동된 계정과 일치하지 않습니다. "),
-    NORMAL_USER_CANNOT_WITHDRAW(HttpStatus.CONFLICT.value(), "normal_user_cannot_withdraw", "일반 회원은 소셜 계정을 탈퇴할 수 없습니다.");
+    NORMAL_USER_CANNOT_WITHDRAW(HttpStatus.CONFLICT.value(), "normal_user_cannot_withdraw", "일반 회원은 소셜 계정을 탈퇴할 수 없습니다."),
+    INVALID_SOCIAL_ID_TOKEN(HttpStatus.INTERNAL_SERVER_ERROR.value(), "invalid_social_id_token", "소셜 id 토큰이 유효하지 않습니다. "),;
 
     private final int httpStatus;
     private final String code;

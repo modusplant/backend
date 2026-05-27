@@ -1,8 +1,8 @@
 package kr.modusplant.domains.notification.domain.vo;
 
+import kr.modusplant.domains.notification.domain.enums.NotificationActionType;
 import kr.modusplant.domains.notification.domain.exception.EmptyValueException;
 import kr.modusplant.domains.notification.domain.exception.enums.NotificationErrorCode;
-import kr.modusplant.shared.enums.NotificationActionType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

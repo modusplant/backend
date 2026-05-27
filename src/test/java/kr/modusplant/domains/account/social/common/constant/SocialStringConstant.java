@@ -11,5 +11,4 @@ public final class SocialStringConstant {
     public static final String TEST_SOCIAL_GOOGLE_CODE = "4/0AeanS0aR8pGvH3yN6z5m8Kx7Qw3sT9uV1bC2dE3fG4hI5jK6lM7nO8pQ9rR0sS1tT2u";
     public static final String TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN = "kakao_social_access_token";
     public static final String TEST_SOCIAL_GOOGLE_SOCIAL_ACCESS_TOKEN = "google_social_access_token";
-
 }

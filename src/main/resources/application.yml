@@ -60,6 +60,8 @@ app:
   semaphore:
     datasource:
       bulkhead:
+        admin:
+          timeout-ms: 5000
         notification:
           timeout-ms: 3000
 

@@ -1,0 +1,49 @@
+package kr.modusplant.infrastructure.jwt.framework.inbound.web.rest;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.modusplant.infrastructure.jwt.dto.TokenPair;
+import kr.modusplant.infrastructure.jwt.provider.JwtCookieProvider;
+import kr.modusplant.infrastructure.jwt.response.TokenResponse;
+import kr.modusplant.infrastructure.jwt.service.TokenService;
+import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import static kr.modusplant.infrastructure.jwt.constant.CookieName.REFRESH_TOKEN_COOKIE_NAME;
+
+@Tag(name="Token API", description = "JWT API")
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api")
+public class TokenRestController {
+
+    private final TokenService tokenService;
+    private final JwtCookieProvider jwtCookieProvider;
+
+    @Operation(summary = "JWT 토큰 갱신 API", description = "리프레시 토큰을 받아 처리합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Succeeded : JWT 발급 완료")
+    })
+    @PostMapping("/auth/token/refresh")
+    public ResponseEntity<DataResponse<?>> refreshToken(@CookieValue(REFRESH_TOKEN_COOKIE_NAME) String refreshToken) {
+        TokenPair tokenPair = tokenService.verifyAndReissueToken(refreshToken);
+
+        TokenResponse tokenResponse = new TokenResponse(tokenPair.accessToken());
+        DataResponse<TokenResponse> response = DataResponse.ok(tokenResponse);
+        String refreshCookie = jwtCookieProvider.generateRefreshTokenCookieAsString(tokenPair.refreshToken());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshCookie)
+                .cacheControl(CacheControl.noStore())
+                .body(response);
+    }
+}

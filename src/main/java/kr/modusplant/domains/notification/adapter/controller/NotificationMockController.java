@@ -1,9 +1,9 @@
 package kr.modusplant.domains.notification.adapter.controller;
 
 import jakarta.transaction.Transactional;
+import kr.modusplant.domains.notification.domain.enums.NotificationActionType;
 import kr.modusplant.domains.notification.domain.vo.*;
 import kr.modusplant.domains.notification.usecase.port.repository.NotificationMockRepository;
-import kr.modusplant.shared.enums.NotificationActionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;

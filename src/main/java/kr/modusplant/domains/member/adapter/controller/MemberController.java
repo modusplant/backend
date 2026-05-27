@@ -17,7 +17,9 @@ import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.service.SwearService;
+import kr.modusplant.shared.event.CommentAbuseReportEvent;
 import kr.modusplant.shared.event.CommentLikeNotificationEvent;
+import kr.modusplant.shared.event.PostAbuseReportEvent;
 import kr.modusplant.shared.event.PostLikeNotificationEvent;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
@@ -220,7 +222,9 @@ public class MemberController {
         ActivitySubjectPostId activitySubjectPostId = ActivitySubjectPostId.create(record.postUlid());
         validateBeforeReportPostAbuse(memberId, activitySubjectPostId);
 
-        reportRepository.reportPostAbuse(memberId, activitySubjectPostId);
+        ReportTime reportTime = reportRepository.reportPostAbuse(memberId, activitySubjectPostId);
+        applicationEventPublisher.publishEvent(
+                PostAbuseReportEvent.create(activitySubjectPostId.getValue(), reportTime.getValue()));
     }
 
     public void reportCommentAbuse(CommentAbuseReportRecord record) {
@@ -230,6 +234,10 @@ public class MemberController {
         validateBeforeReportCommentAbuse(memberId, activitySubjectCommentId);
 
         reportRepository.reportCommentAbuse(memberId, activitySubjectCommentId);
+        applicationEventPublisher.publishEvent(
+                CommentAbuseReportEvent.create(
+                        activitySubjectCommentId.getActivitySubjectPostId().getValue(),
+                        activitySubjectCommentId.getActivitySubjectCommentPath().getValue()));
     }
 
     public void withdraw(MemberWithdrawalRecord record) {

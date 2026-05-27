@@ -20,7 +20,7 @@ public class CommentLikeNotificationEvent {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_ACTOR, "actorId");
         }
         if (postUlid == null || postUlid.isBlank()) {
-            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_POST,"postUlid");
+            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_POST, "postUlid");
         }
         if (commentPath == null || commentPath.isBlank()) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_COMMENT, "commentPath");

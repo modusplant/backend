@@ -1,6 +1,5 @@
 package kr.modusplant.shared.event;
 
-import kr.modusplant.shared.enums.NotificationActionType;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import lombok.AccessLevel;
@@ -16,7 +15,7 @@ public class CommentNotificationEvent {
     private final String postUlid;
     private final String commentPath;
     private final String contentPreview;
-    private final NotificationActionType action;
+    private final String action;
 
     public static CommentNotificationEvent create(UUID actorId, String postUlid, String commentPath, String contentPreview) {
         validate(actorId, postUlid, commentPath);
@@ -28,16 +27,14 @@ public class CommentNotificationEvent {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_ACTOR, "actorId");
         }
         if (postUlid == null || postUlid.isBlank()) {
-            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_POST,"postUlid");
+            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_POST, "postUlid");
         }
         if (commentPath == null || commentPath.isBlank()) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_COMMENT, "commentPath");
         }
     }
 
-    private static NotificationActionType getActionType(String commentPath) {
-        return commentPath.contains(".")
-                ? NotificationActionType.COMMENT_REPLY_ADDED
-                : NotificationActionType.COMMENT_ADDED;
+    private static String getActionType(String commentPath) {
+        return commentPath.contains(".") ? "COMMENT_REPLY_ADDED" : "COMMENT_ADDED";
     }
 }

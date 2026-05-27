@@ -24,6 +24,7 @@ public enum MemberErrorCode implements ErrorCode {
     EMPTY_REPORT_IMAGE_NUMBER(HttpStatus.BAD_REQUEST.value(), "empty_report_image_number", "보고서 이미지 개수가 비어 있습니다. "),
     EMPTY_REPORT_IMAGE_PATH(HttpStatus.BAD_REQUEST.value(), "empty_report_image_path", "보고서 이미지 경로가 비어 있습니다. "),
     EMPTY_REPORT_PAGE_SIZE(HttpStatus.BAD_REQUEST.value(), "empty_report_page_size", "보고서 페이지 크기가 비어 있습니다. "),
+    EMPTY_REPORT_TIME(HttpStatus.BAD_REQUEST.value(), "empty_report_time", "보고 시각이 비어 있습니다. "),
     EMPTY_REPORT_TITLE(HttpStatus.BAD_REQUEST.value(), "empty_report_title", "보고서 제목이 비어 있습니다. "),
     EMPTY_ACTIVITY_SUBJECT_COMMENT_PATH(HttpStatus.BAD_REQUEST.value(), "empty_activity_subject_comment_path", "대상 댓글 경로가 비어 있습니다. "),
     EMPTY_ACTIVITY_SUBJECT_POST_ID(HttpStatus.BAD_REQUEST.value(), "empty_activity_subject_post_id", "대상 게시글 아이디가 비어 있습니다. "),
@@ -61,6 +62,8 @@ public enum MemberErrorCode implements ErrorCode {
     REPORT_PAGE_SIZE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST.value(), "report_page_size_out_of_range", "보고서 페이지 크기가 올바른 값의 범위를 벗어났습니다. "),
 
     PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER_OUT_OF_RANGE(HttpStatus.INTERNAL_SERVER_ERROR.value(), "proposal_or_bug_report_image_number_out_of_range", "건의 및 버그 제보 이미지 개수가 올바른 값의 범위를 벗어났습니다. "),
+
+    REPORT_TIME_ON_FUTURE(HttpStatus.BAD_REQUEST.value(), "report_time_on_future", "보고 시각이 미래입니다. "),
     ;
 
     private final int httpStatus;

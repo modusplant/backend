@@ -1,7 +1,7 @@
 package kr.modusplant.domains.notification.domain.vo;
 
+import kr.modusplant.domains.notification.domain.enums.NotificationActionType;
 import kr.modusplant.domains.notification.domain.exception.EmptyValueException;
-import kr.modusplant.shared.enums.NotificationActionType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

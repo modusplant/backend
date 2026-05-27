@@ -9,7 +9,6 @@ import kr.modusplant.domains.account.social.domain.vo.*;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClient;
 import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClientFactory;
-import kr.modusplant.domains.account.social.usecase.port.client.dto.SocialUserInfo;
 import kr.modusplant.domains.account.social.usecase.port.mapper.SocialIdentityMapper;
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
 import kr.modusplant.domains.account.social.usecase.record.*;
@@ -33,17 +32,16 @@ public class SocialIdentityController {
     private final SocialIdentityRepository socialIdentityRepository;
     private final SocialIdentityMapper socialIdentityMapper;
 
-    public SocialLoginResult handleSocialLogin(SocialProvider provider, String code) {
+    @Transactional
+    public SocialLoginResult handleSocialLogin(SocialProvider provider, String code, boolean isLocal) {
         SocialAuthClient authClient = clientFactory.getClient(provider);
-        String socialAccessToken = authClient.getAccessToken(code);
-        // 소셜 사용자 정보 가져오기
-        SocialUserInfo user = authClient.getUserInfo(socialAccessToken);
+        // 소셜 토큰 및 사용자 정보 가져오기 - getToken 메서드를 getTokenInfo 같은걸로 변경
+        SocialUserInfo socialUserInfo = authClient.getToken(code, isLocal);
         // 사용자 생성 및 조회
-        return classifyMember(socialIdentityMapper.toSocialProfile(provider,user), socialAccessToken);
+        return classifyMember(socialIdentityMapper.toSocialProfile(provider,socialUserInfo), socialUserInfo.socialAccessToken());
     }
 
-    @Transactional
-    public SocialLoginResult classifyMember(SocialProfile profile, String socialAccessToken) {
+    private SocialLoginResult classifyMember(SocialProfile profile, String socialAccessToken) {
         Optional<SocialMemberProfile> existingMemberOptional = socialIdentityRepository.getSocialMemberProfileByEmail(Email.create(profile.getEmail().getValue()));
         // 회원가입 연결 : NEED_SIGNUP
         if (existingMemberOptional.isEmpty()) {

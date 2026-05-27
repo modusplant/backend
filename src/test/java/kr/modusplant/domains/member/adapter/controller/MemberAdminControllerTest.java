@@ -3,6 +3,7 @@ package kr.modusplant.domains.member.adapter.controller;
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
+import kr.modusplant.domains.member.usecase.port.repository.ReportDashboardRepository;
 import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportGetRecord;
 import kr.modusplant.shared.exception.ExistsValueException;
@@ -39,8 +40,9 @@ class MemberAdminControllerTest {
 
     private final MemberValidationHelper memberValidationHelper = Mockito.mock(MemberValidationHelper.class);
     private final ReportRepository reportRepository = Mockito.mock(ReportRepository.class);
+    private final ReportDashboardRepository reportDashboardRepository = Mockito.mock(ReportDashboardRepository.class);
 
-    private final MemberAdminController memberAdminController = new MemberAdminController(memberValidationHelper, reportRepository);
+    private final MemberAdminController memberAdminController = new MemberAdminController(memberValidationHelper, reportRepository, reportDashboardRepository);
 
     @Test
     @DisplayName("lastReportUlid가 null이 아닐 때 getProposalOrBug로 건의 및 버그 제보 조회")

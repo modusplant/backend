@@ -24,7 +24,8 @@ class ConnectionSizePropertyValidatorTest {
     @BeforeEach
     public void beforeEach() {
         ReflectionTestUtils.setField(validator, "apiConnectionSize", 68);
-        ReflectionTestUtils.setField(validator, "notificationBulkheadSize", 12);
+        ReflectionTestUtils.setField(validator, "notificationBulkheadSize", 10);
+        ReflectionTestUtils.setField(validator, "adminBulkheadSize", 2);
         ReflectionTestUtils.setField(validator, "allowedConnectionSize", 80);
         ReflectionTestUtils.setField(validator, "maxPoolSize", 90);
     }
@@ -52,7 +53,7 @@ class ConnectionSizePropertyValidatorTest {
 
         // then
         assertThat(configurationException.getMessage()).contains(
-                "apiConnectionSize", "notificationBulkheadSize", "allowedConnectionSize");
+                "apiConnectionSize", "notificationBulkheadSize", "adminBulkheadSize", "allowedConnectionSize");
 
     }
 
