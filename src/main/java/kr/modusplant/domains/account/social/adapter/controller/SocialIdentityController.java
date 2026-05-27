@@ -1,9 +1,6 @@
 package kr.modusplant.domains.account.social.adapter.controller;
 
 import kr.modusplant.domains.account.shared.kernel.AccountId;
-import kr.modusplant.domains.account.social.domain.exception.AlreadyRegisteredWithOtherProviderException;
-import kr.modusplant.domains.account.social.domain.exception.InvalidValueException;
-import kr.modusplant.domains.account.social.domain.exception.SocialAccountConflictException;
 import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
 import kr.modusplant.domains.account.social.domain.vo.*;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
@@ -16,6 +13,8 @@ import kr.modusplant.domains.account.social.usecase.record.*;
 import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.enums.Role;
+import kr.modusplant.shared.exception.ConflictStateException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
@@ -59,15 +58,15 @@ public class SocialIdentityController {
         if (!matches(profile.getSocialProvider(),existingMember.getSocialCredentials())) {
             clientFactory.getClient(profile.getSocialProvider()).revokeAccess(socialAccessToken);
             switch (profile.getSocialProvider()) {
-                case KAKAO -> throw new AlreadyRegisteredWithOtherProviderException(SocialIdentityErrorCode.ALREADY_REGISTERED_WITH_GOOGLE);
-                case GOOGLE ->  throw new AlreadyRegisteredWithOtherProviderException(SocialIdentityErrorCode.ALREADY_REGISTERED_WITH_KAKAO);
+                case KAKAO -> throw new ConflictStateException(SocialIdentityErrorCode.ALREADY_REGISTERED_WITH_GOOGLE);
+                case GOOGLE ->  throw new ConflictStateException(SocialIdentityErrorCode.ALREADY_REGISTERED_WITH_KAKAO);
             }
         }
         // 로그인 완료 : LOGIN
         if (existingMember.getSocialCredentials().getProviderId().equals(profile.getProviderId())) {
             return handleExistingSocialMember(existingMember.getAccountId());
         }
-        throw new InvalidValueException(SocialIdentityErrorCode.INVALID_PROVIDER_ID);
+        throw new InvalidValueException(SocialIdentityErrorCode.INVALID_PROVIDER_ID, "providerId");
     }
 
     private LoginResult handleExistingSocialMember(AccountId accountId) {
@@ -86,7 +85,7 @@ public class SocialIdentityController {
     public LoginResult createNewMember(SocialSignUpRequest signUpRequest, TempTokenInfo tempTokenInfo) {
         Optional<SocialMemberProfile> member = socialIdentityRepository.getSocialMemberProfileByEmail(Email.create(tempTokenInfo.email()));
         if (member.isPresent()) {
-            throw new SocialAccountConflictException(SocialIdentityErrorCode.ALREADY_SIGNED_UP);
+            throw new ConflictStateException(SocialIdentityErrorCode.ALREADY_SIGNED_UP);
         }
         SocialMemberProfile memberProfile = SocialMemberProfile.createNewMember(
                 SocialCredentials.create(socialIdentityMapper.toSocialAuthProvider(tempTokenInfo.socialProvider()), tempTokenInfo.providerId()),

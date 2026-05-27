@@ -2,9 +2,6 @@ package kr.modusplant.domains.account.social.adapter.controller;
 
 import kr.modusplant.domains.account.social.common.util.domain.vo.SocialMemberProfileTestUtils;
 import kr.modusplant.domains.account.social.common.util.usecase.request.SocialAuthRequestTestUtils;
-import kr.modusplant.domains.account.social.domain.exception.AlreadyRegisteredWithOtherProviderException;
-import kr.modusplant.domains.account.social.domain.exception.SocialAccountConflictException;
-import kr.modusplant.domains.account.social.domain.exception.SocialActionRequiredException;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClient;
 import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClientFactory;
@@ -12,6 +9,7 @@ import kr.modusplant.domains.account.social.usecase.port.client.dto.SocialUserIn
 import kr.modusplant.domains.account.social.usecase.port.mapper.SocialIdentityMapper;
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
 import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.exception.ConflictStateException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -94,7 +92,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
             // when & then
             assertThatThrownBy(() -> socialIdentityLinkController.linkSocialAccount(
                     testNormalMemberId.getValue(), SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN)
-            ).isInstanceOf(SocialAccountConflictException.class);
+            ).isInstanceOf(ConflictStateException.class);
         }
 
         @Test
@@ -107,7 +105,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
             // when & then
             assertThatThrownBy(() -> socialIdentityLinkController.linkSocialAccount(
                     testNormalMemberId.getValue(), SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN
-            )).isInstanceOf(SocialAccountConflictException.class);
+            )).isInstanceOf(ConflictStateException.class);
         }
 
         @Test
@@ -120,7 +118,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
             // when & then
             assertThatThrownBy(() -> socialIdentityLinkController.linkSocialAccount(
                     testKakaoAccountId.getValue(), SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN
-            )).isInstanceOf(AlreadyRegisteredWithOtherProviderException.class);
+            )).isInstanceOf(ConflictStateException.class);
         }
 
     }
@@ -151,7 +149,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
             // when & then
             assertThatThrownBy(() -> socialIdentityLinkController.unlinkSocialAccount(
                     testNormalMemberId.getValue(), SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN
-            )).isInstanceOf(SocialAccountConflictException.class);
+            )).isInstanceOf(ConflictStateException.class);
         }
 
         @Test
@@ -163,7 +161,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
             // when & then
             assertThatThrownBy(() -> socialIdentityLinkController.unlinkSocialAccount(
                     testKakaoAccountId.getValue(), SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN
-            )).isInstanceOf(SocialActionRequiredException.class);
+            )).isInstanceOf(ConflictStateException.class);
         }
 
         @Test
@@ -175,7 +173,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
             // when & then
             assertThatThrownBy(() -> socialIdentityLinkController.unlinkSocialAccount(
                     testNormalMemberId.getValue(), SocialProvider.GOOGLE, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN
-            )).isInstanceOf(SocialAccountConflictException.class);
+            )).isInstanceOf(ConflictStateException.class);
         }
 
     }
@@ -206,7 +204,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
             // when & then
             assertThatThrownBy(() -> socialIdentityLinkController.deleteSocialAccount(
                     testNormalMemberId.getValue(), SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN
-            )).isInstanceOf(SocialAccountConflictException.class);
+            )).isInstanceOf(ConflictStateException.class);
         }
 
         @Test
@@ -218,7 +216,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
             // when & then
             assertThatThrownBy(() -> socialIdentityLinkController.deleteSocialAccount(
                     testNormalMemberId.getValue(), SocialProvider.KAKAO, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN
-            )).isInstanceOf(SocialActionRequiredException.class);
+            )).isInstanceOf(ConflictStateException.class);
         }
 
         @Test
@@ -230,7 +228,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
             // when & then
             assertThatThrownBy(() -> socialIdentityLinkController.deleteSocialAccount(
                     testKakaoAccountId.getValue(), SocialProvider.GOOGLE, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN
-            )).isInstanceOf(SocialAccountConflictException.class);
+            )).isInstanceOf(ConflictStateException.class);
         }
 
     }

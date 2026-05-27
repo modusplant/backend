@@ -8,9 +8,6 @@ import kr.modusplant.domains.account.social.common.util.usecase.record.TempToken
 import kr.modusplant.domains.account.social.common.util.usecase.request.SocialAuthRequestTestUtils;
 import kr.modusplant.domains.account.social.common.util.usecase.request.SocialSignUpRequestTestUtils;
 import kr.modusplant.domains.account.social.common.util.usecase.response.SocialLoginResultTestUtils;
-import kr.modusplant.domains.account.social.domain.exception.AlreadyRegisteredWithOtherProviderException;
-import kr.modusplant.domains.account.social.domain.exception.InvalidValueException;
-import kr.modusplant.domains.account.social.domain.exception.SocialAccountConflictException;
 import kr.modusplant.domains.account.social.domain.vo.SocialCredentials;
 import kr.modusplant.domains.account.social.domain.vo.SocialMemberProfile;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
@@ -23,6 +20,8 @@ import kr.modusplant.domains.account.social.usecase.record.*;
 import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.enums.Role;
+import kr.modusplant.shared.exception.ConflictStateException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
 import org.junit.jupiter.api.DisplayName;
@@ -100,7 +99,7 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
 
         // when & then
         assertThatThrownBy(() -> socialIdentityController.classifyMember(testKakaoSocialProfileWithBasicEmail,TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN))
-                .isInstanceOf(AlreadyRegisteredWithOtherProviderException.class);
+                .isInstanceOf(ConflictStateException.class);
         verify(socialIdentityRepository).getSocialMemberProfileByEmail(testKakaoSocialProfileWithBasicEmail.getEmail());
         verify(authClient).revokeAccess(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
     }
@@ -175,7 +174,7 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
 
         // when & then
         assertThatThrownBy(() -> socialIdentityController.createNewMember(createTestSocialSignUpRequest(), createGoogleTempTokenInfo()))
-                .isInstanceOf(SocialAccountConflictException.class);
+                .isInstanceOf(ConflictStateException.class);
     }
 
     @Test

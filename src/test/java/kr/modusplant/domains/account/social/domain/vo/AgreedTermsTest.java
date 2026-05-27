@@ -1,8 +1,8 @@
 package kr.modusplant.domains.account.social.domain.vo;
 
 import kr.modusplant.domains.account.social.common.util.domain.vo.AgreedTermsTestUtils;
-import kr.modusplant.domains.account.social.domain.exception.EmptyValueException;
 import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
+import kr.modusplant.shared.exception.EmptyValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

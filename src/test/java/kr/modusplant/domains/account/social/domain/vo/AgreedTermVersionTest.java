@@ -1,9 +1,9 @@
 package kr.modusplant.domains.account.social.domain.vo;
 
 import kr.modusplant.domains.account.social.common.util.domain.vo.AgreedTermVersionTestUtils;
-import kr.modusplant.domains.account.social.domain.exception.EmptyValueException;
-import kr.modusplant.domains.account.social.domain.exception.InvalidValueException;
 import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

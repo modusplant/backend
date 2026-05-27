@@ -1,7 +1,7 @@
 package kr.modusplant.domains.account.social.domain.vo;
 
-import kr.modusplant.domains.account.social.domain.exception.EmptyValueException;
 import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
+import kr.modusplant.shared.exception.EmptyValueException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +17,7 @@ public class AgreedTerms {
 
     public static AgreedTerms create(AgreedTermVersion termsOfUserVersion, AgreedTermVersion privacyPolicyVersion, AgreedTermVersion communityPolicyVersion) {
         if(termsOfUserVersion==null || privacyPolicyVersion == null || communityPolicyVersion == null) {
-            throw new EmptyValueException(SocialIdentityErrorCode.EMPTY_AGREED_TERMS_OF_VERSION);
+            throw new EmptyValueException(SocialIdentityErrorCode.EMPTY_AGREED_TERMS_OF_VERSION, "agreedTerms");
         }
         return new AgreedTerms(termsOfUserVersion, privacyPolicyVersion, communityPolicyVersion);
     }

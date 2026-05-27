@@ -1,9 +1,9 @@
 package kr.modusplant.domains.account.social.domain.vo;
 
-import kr.modusplant.domains.account.social.domain.exception.EmptyValueException;
-import kr.modusplant.domains.account.social.domain.exception.InvalidValueException;
 import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
 import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -46,23 +46,23 @@ public class SocialCredentials {
 
     private static void validateSocialProvider(AuthProvider provider, String providerId) {
         if (provider == null) {
-            throw new EmptyValueException(SocialIdentityErrorCode.EMPTY_PROVIDER);
+            throw new EmptyValueException(SocialIdentityErrorCode.EMPTY_PROVIDER, "provider");
         }
         if(provider == AuthProvider.BASIC) {
             if (providerId != null && !providerId.isBlank())
-                throw new InvalidValueException(SocialIdentityErrorCode.INVALID_PROVIDER_ID);
+                throw new InvalidValueException(SocialIdentityErrorCode.INVALID_PROVIDER_ID, "providerId");
             return;
         }
         if (providerId == null || providerId.isBlank()) {
-            throw new EmptyValueException(SocialIdentityErrorCode.EMPTY_PROVIDER_ID);
+            throw new EmptyValueException(SocialIdentityErrorCode.EMPTY_PROVIDER_ID, "providerId");
         }
         if ((provider == AuthProvider.KAKAO || provider == AuthProvider.BASIC_KAKAO)
                 && providerId.length() != KAKAO_PROVIDER_ID_LENGTH) {
-            throw new InvalidValueException(SocialIdentityErrorCode.INVALID_PROVIDER_ID);
+            throw new InvalidValueException(SocialIdentityErrorCode.INVALID_PROVIDER_ID, "providerId");
         }
         if ((provider == AuthProvider.GOOGLE || provider == AuthProvider.BASIC_GOOGLE)
                 && providerId.length() != GOOGLE_PROVIDER_ID_LENGTH) {
-            throw new InvalidValueException(SocialIdentityErrorCode.INVALID_PROVIDER_ID);
+            throw new InvalidValueException(SocialIdentityErrorCode.INVALID_PROVIDER_ID, "providerId");
         }
     }
 

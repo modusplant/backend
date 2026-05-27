@@ -1,8 +1,7 @@
 package kr.modusplant.domains.account.social.adapter.controller;
 
-import kr.modusplant.domains.account.social.domain.exception.SocialAccountConflictException;
-import kr.modusplant.domains.account.social.domain.exception.SocialActionRequiredException;
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
+import kr.modusplant.shared.exception.ConflictStateException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -43,7 +42,7 @@ class SocialIdentityLinkAdminControllerTest {
 
             // when & then
             assertThatThrownBy(() -> adminController.removeSocialLink(testNormalMemberId.getValue()))
-                    .isInstanceOf(SocialAccountConflictException.class);
+                    .isInstanceOf(ConflictStateException.class);
         }
 
         @Test
@@ -54,7 +53,7 @@ class SocialIdentityLinkAdminControllerTest {
 
             // when & then
             assertThatThrownBy(() -> adminController.removeSocialLink(
-                    testKakaoAccountId.getValue())).isInstanceOf(SocialActionRequiredException.class);
+                    testKakaoAccountId.getValue())).isInstanceOf(ConflictStateException.class);
         }
     }
 }

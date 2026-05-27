@@ -3,7 +3,6 @@ package kr.modusplant.domains.account.social.framework.out.jpa.repository;
 import kr.modusplant.domains.account.identity.framework.out.jpa.entity.MemberAuthEntity;
 import kr.modusplant.domains.account.identity.framework.out.jpa.repository.MemberAuthJpaRepository;
 import kr.modusplant.domains.account.shared.kernel.AccountId;
-import kr.modusplant.domains.account.social.domain.exception.SocialAccountConflictException;
 import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
 import kr.modusplant.domains.account.social.domain.vo.AgreedTerms;
 import kr.modusplant.domains.account.social.domain.vo.SocialCredentials;
@@ -15,6 +14,7 @@ import kr.modusplant.domains.member.framework.out.jpa.repository.MemberJpaReposi
 import kr.modusplant.domains.member.framework.out.jpa.repository.MemberProfileJpaRepository;
 import kr.modusplant.domains.term.framework.out.jpa.repository.MemberTermJpaRepository;
 import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.exception.ConflictStateException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.kernel.Email;
@@ -71,7 +71,7 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
         MemberAuthEntity memberAuthEntity = memberAuthJpaRepository.findByEmail(email.getValue())
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH, TableName.SITE_MEMBER_AUTH));
         if (memberAuthEntity.getProvider().equals(socialCredentials.getProvider())) {
-            throw new SocialAccountConflictException(SocialIdentityErrorCode.ALREADY_LINKED);
+            throw new ConflictStateException(SocialIdentityErrorCode.ALREADY_LINKED);
         }
         memberAuthEntity.updateProvider(socialCredentials.getProvider());
         memberAuthEntity.updateProviderId(socialCredentials.getProviderId());
