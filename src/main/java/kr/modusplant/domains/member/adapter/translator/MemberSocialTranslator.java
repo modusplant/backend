@@ -17,11 +17,11 @@ public class MemberSocialTranslator {
     public String getSocialAccessToken(String authCode, String authProvider) {
         String upperCaseAuthProvider = authProvider.toUpperCase(Locale.ROOT);
         if (upperCaseAuthProvider.equals(SocialProvider.KAKAO.name())) {
-            return socialIdentityLinkController.issueSocialAccessToken(
-                    SocialProvider.KAKAO, authCode);
+            return socialIdentityLinkController.issueSocialToken(
+                    SocialProvider.KAKAO, authCode, false).socialAccessToken();
         } else if (upperCaseAuthProvider.equals(SocialProvider.GOOGLE.name())) {
-            return socialIdentityLinkController.issueSocialAccessToken(
-                    SocialProvider.GOOGLE, authCode);
+            return socialIdentityLinkController.issueSocialToken(
+                    SocialProvider.GOOGLE, authCode, false).socialAccessToken();
         } else {
             throw new UnsupportedSocialProviderException();
         }

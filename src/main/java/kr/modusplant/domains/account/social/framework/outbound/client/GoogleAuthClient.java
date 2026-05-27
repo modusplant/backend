@@ -5,7 +5,13 @@ import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentit
 import kr.modusplant.domains.account.social.framework.outbound.client.dto.GoogleUserInfo;
 import kr.modusplant.domains.account.social.framework.outbound.client.dto.OAuthErrorResponse;
 import kr.modusplant.domains.account.social.framework.outbound.exception.OAuthRequestFailException;
+import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
+import kr.modusplant.domains.account.social.framework.outbound.client.dto.IdTokenInfo;
+import kr.modusplant.domains.account.social.framework.outbound.client.dto.OAuthErrorResponse;
+import kr.modusplant.domains.account.social.framework.outbound.client.dto.SocialToken;
+import kr.modusplant.domains.account.social.framework.outbound.exception.OAuthRequestFailException;
 import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClient;
+import kr.modusplant.domains.account.social.usecase.record.SocialUserInfo;
 import kr.modusplant.shared.exception.model.DynamicErrorCode;
 import kr.modusplant.shared.exception.supers.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +35,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class GoogleAuthClient implements SocialAuthClient {
+    private final SocialIdTokenParser idTokenParser;
     private final RestClient.Builder restClientBuilder;
     private final ObjectMapper objectMapper;
 
@@ -38,46 +45,40 @@ public class GoogleAuthClient implements SocialAuthClient {
     private String GOOGLE_SECRET;
     @Value("${google.redirect-uri}")
     private String GOOGLE_REDIRECT_URI;
+    @Value("${google.local-redirect-uri:#{null}}")
+    private String GOOGLE_LOCAL_REDIRECT_URI;
 
     @Override
-    public String getAccessToken(String code) {
+    public SocialUserInfo getToken(String code, boolean isLocal) {
         RestClient restClient = restClientBuilder
                 .baseUrl("https://oauth2.googleapis.com")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .build();
+
+        String redirectUri = (isLocal && GOOGLE_LOCAL_REDIRECT_URI != null)
+                ? GOOGLE_LOCAL_REDIRECT_URI
+                : GOOGLE_REDIRECT_URI;
 
         MultiValueMap<String,String> formData = new LinkedMultiValueMap<>();
         Map.of(
                 "code", code,
                 "client_id", GOOGLE_API_KEY,
                 "client_secret", GOOGLE_SECRET,
-                "redirect_uri", GOOGLE_REDIRECT_URI,
+                "redirect_uri", redirectUri,
                 "grant_type","authorization_code"
         ).forEach(formData::add);
 
-        return restClient.post()
+        SocialToken socialToken = restClient.post()
                 .uri("/token")
                 .body(formData)
                 .retrieve()
                 .onStatus(this::isErrorStatus, (request, response)
                         -> handleGoogleError(SocialIdentityErrorCode.GOOGLE_LOGIN_FAIL, response))
-                .body(Map.class)
-                .get("access_token").toString();
-    }
+                .body(SocialToken.class);
 
-    @Override
-    public GoogleUserInfo getUserInfo(String accessToken) {
-        RestClient restClient = restClientBuilder
-                .baseUrl("https://www.googleapis.com")
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .build();
+        IdTokenInfo idTokenInfo = idTokenParser.parse(socialToken.idToken(), SocialProvider.GOOGLE);
 
-        return restClient.get()
-                .uri("/userinfo/v2/me")
-                .retrieve()
-                .onStatus(this::isErrorStatus, (request, response)
-                    -> handleGoogleError(SocialIdentityErrorCode.GOOGLE_LOGIN_FAIL, response))
-                .body(GoogleUserInfo.class);
+        return new SocialUserInfo(socialToken.accessToken(), idTokenInfo.id(), idTokenInfo.email(), idTokenInfo.nickname());
     }
 
     @Override

@@ -61,7 +61,7 @@ class SocialIdentityRestControllerTest implements SocialAuthRequestTestUtils, So
         SocialAuthRequest request = new SocialAuthRequest("auth_code");
         LoginResult loginResult = createKakaoLoginResult();
 
-        given(socialIdentityController.handleSocialLogin(SocialProvider.KAKAO, request.code())).willReturn(loginResult);
+        given(socialIdentityController.handleSocialLogin(SocialProvider.KAKAO, request.code(), false)).willReturn(loginResult);
         given(tokenService.issueToken(loginResult.uuid(), loginResult.nickname(), loginResult.email(), loginResult.role())).willReturn(TOKEN_PAIR);
         given(jwtCookieProvider.generateRefreshTokenCookieAsString(TOKEN_PAIR.refreshToken())).willReturn(REFRESH_COOKIE);
 
@@ -82,7 +82,7 @@ class SocialIdentityRestControllerTest implements SocialAuthRequestTestUtils, So
         SocialAuthRequest request = new SocialAuthRequest("auth_code");
         NeedSignupResult needSignupResult = createKakaoNeedSignupResult();
 
-        given(socialIdentityController.handleSocialLogin(SocialProvider.KAKAO, request.code())).willReturn(needSignupResult);
+        given(socialIdentityController.handleSocialLogin(SocialProvider.KAKAO, request.code(), false)).willReturn(needSignupResult);
         given(tempTokenHelper.generateTempToken(eq(needSignupResult), anyLong())).willReturn(TEMP_TOKEN);
         given(jwtCookieProvider.generateTempTokenCookieAsString(eq(TEMP_TOKEN), anyLong())).willReturn(TEMP_COOKIE);
 
@@ -104,7 +104,7 @@ class SocialIdentityRestControllerTest implements SocialAuthRequestTestUtils, So
         SocialAuthRequest request = new SocialAuthRequest("auth_code");
         NeedLinkResult needLinkResult = createKakaoNeedLinkResult();
 
-        given(socialIdentityController.handleSocialLogin(SocialProvider.KAKAO, request.code())).willReturn(needLinkResult);
+        given(socialIdentityController.handleSocialLogin(SocialProvider.KAKAO, request.code(), false)).willReturn(needLinkResult);
         given(tempTokenHelper.generateTempToken(eq(needLinkResult), anyLong())).willReturn(TEMP_TOKEN);
         given(jwtCookieProvider.generateTempTokenCookieAsString(eq(TEMP_TOKEN), anyLong())).willReturn(TEMP_COOKIE);
 

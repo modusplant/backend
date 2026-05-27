@@ -3,6 +3,10 @@ package kr.modusplant.domains.account.social.framework.outbound.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.account.social.framework.outbound.client.dto.KakaoUserInfo;
 import kr.modusplant.domains.account.social.framework.outbound.exception.OAuthRequestFailException;
+import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
+import kr.modusplant.domains.account.social.framework.outbound.client.dto.IdTokenInfo;
+import kr.modusplant.domains.account.social.framework.outbound.exception.OAuthRequestFailException;
+import kr.modusplant.domains.account.social.usecase.record.SocialUserInfo;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.util.LinkedMultiValueMap;
@@ -22,6 +27,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -34,11 +40,14 @@ class KakaoAuthClientTest {
     private MockRestServiceServer mockServer;
     @Autowired
     private ObjectMapper objectMapper;
+    @MockitoBean
+    private SocialIdTokenParser idTokenParser;
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(kakaoAuthClient, "KAKAO_API_KEY", "test-api-key");
         ReflectionTestUtils.setField(kakaoAuthClient, "KAKAO_REDIRECT_URI", "http://localhost:8080/callback");
+        ReflectionTestUtils.setField(kakaoAuthClient, "KAKAO_LOCAL_REDIRECT_URI", "http://localhost:8080/callback/local");
     }
 
     @AfterEach
@@ -48,11 +57,15 @@ class KakaoAuthClientTest {
 
     @Test
     @DisplayName("카카오 access token 발급 성공 테스트")
-    void testGetAccessToken_givenCode_willReturnAccessToken() {
+    void testGetToken_givenCode_willReturnToken() {
         // given
         String code = "test-auth-code";
-        String expectedToken = "test-access-token";
-        String responseBody = "{\"access_token\":\"" + expectedToken + "\"}";
+        String expectedAccessToken = "test-access-token";
+        String expectedIdToken = "test-id-token";
+        String expectedId = "12345";
+        String expectedEmail = "test@kakao.com";
+        String expectedNickname = "testUser";
+        String responseBody = "{\"access_token\":\"" + expectedAccessToken + "\", \"id_token\":\"" + expectedIdToken + "\"}";
 
         MultiValueMap<String,String> formData = new LinkedMultiValueMap<>();
         Map.of(
@@ -68,16 +81,22 @@ class KakaoAuthClientTest {
                 .andExpect(content().formData(formData))
                 .andRespond(withSuccess(responseBody, MediaType.APPLICATION_JSON));
 
+        IdTokenInfo mockIdTokenInfo = new IdTokenInfo(expectedId, expectedEmail, expectedNickname);
+        given(idTokenParser.parse(expectedIdToken, SocialProvider.KAKAO)).willReturn(mockIdTokenInfo);
+
         // when
-        String accessToken = kakaoAuthClient.getAccessToken(code);
+        SocialUserInfo userInfo = kakaoAuthClient.getToken(code, false);
 
         // then
-        assertThat(accessToken).isEqualTo(expectedToken);
+        assertThat(userInfo.socialAccessToken()).isEqualTo(expectedAccessToken);
+        assertThat(userInfo.id()).isEqualTo(expectedId);
+        assertThat(userInfo.email()).isEqualTo(expectedEmail);
+        assertThat(userInfo.nickname()).isEqualTo(expectedNickname);
     }
 
     @Test
     @DisplayName("카카오 access token 발급 실패 시 예외 발생 테스트")
-    void testGetAccessToken_givenInvalidCode_willThrowException() {
+    void testGetToken_givenInvalidCode_willThrowException() {
         // given
         String authCode = "fake-auth-code";
         String errorResponseBody = "{\"error\":\"invalid_grant\", \"error_description\":\"authorization code not found\"}";
@@ -88,57 +107,7 @@ class KakaoAuthClientTest {
                         .body(errorResponseBody));
 
         // when & then
-        assertThrows(OAuthRequestFailException.class, () -> kakaoAuthClient.getAccessToken(authCode));
-    }
-
-    @Test
-    @DisplayName("카카오 사용자 정보 가져오기 성공 테스트")
-    void testGetUserInfo_givenAccessToken_willReturnKakaoUserInfo() {
-        // given
-        String accessToken = "test-access-token";
-        Long id = 1234567L;
-        String email = "test@kakao.com";
-        String nickname = "kakao-nickname";
-        String responseJson = "{" +
-                "\"id\": " + id + "," +
-                "\"kakao_account\": {" +
-                "  \"email\": \""+email+"\"," +
-                "  \"isEmailVerified\": true," +
-                "  \"profile\": {" +
-                "    \"nickname\": \""+nickname+"\"" +
-                "   }" +
-                " }" +
-                "}";
-
-        mockServer.expect(requestTo("https://kapi.kakao.com/v2/user/me"))
-                .andExpect(method(HttpMethod.GET))
-                .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
-                .andRespond(withSuccess(responseJson, MediaType.APPLICATION_JSON));
-
-        // when
-        KakaoUserInfo userInfo = kakaoAuthClient.getUserInfo(accessToken);
-
-        // then
-        assertThat(userInfo).isNotNull();
-        assertThat(userInfo.getId()).isEqualTo(String.valueOf(id));
-        assertThat(userInfo.getEmail()).isEqualTo(email);
-        assertThat(userInfo.getNickname()).isEqualTo(nickname);
-    }
-
-    @Test
-    @DisplayName("카카오 사용자 정보 가져오기 실패 시 예외 발생 테스트")
-    void testGetUserInfo_givenInvalidAccessToken_willThrowException() {
-        // given
-        String accessToken = "invalid-token";
-        String errorResponseBody = "{\"error\":\"invalid_token\", \"error_description\":\"the access token is expired\"}";
-
-        mockServer.expect(requestTo("https://kapi.kakao.com/v2/user/me"))
-                .andRespond(withStatus(HttpStatus.UNAUTHORIZED)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(errorResponseBody));
-
-        // when & then
-        assertThrows(OAuthRequestFailException.class, () -> kakaoAuthClient.getUserInfo(accessToken));
+        assertThrows(OAuthRequestFailException.class, () -> kakaoAuthClient.getToken(authCode, false));
     }
 
     @Test
