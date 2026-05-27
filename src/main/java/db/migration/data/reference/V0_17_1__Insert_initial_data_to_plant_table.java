@@ -1,6 +1,7 @@
 package db.migration.data.reference;
 
-import kr.modusplant.shared.exception.FileLoadFailureException;
+import kr.modusplant.shared.exception.ConflictStateException;
+import kr.modusplant.shared.exception.enums.FileErrorCode;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 
@@ -22,7 +23,7 @@ public class V0_17_1__Insert_initial_data_to_plant_table extends BaseJavaMigrati
                         "INSERT INTO plant (kor_name, created_at) VALUES (?, ?)")
         ) {
             if (reader == null) {
-                throw new FileLoadFailureException();
+                throw new ConflictStateException(FileErrorCode.FILE_LOAD_FAILURE);
             }
 
             // 모든 레코드에 동일한 생성 시간 부여

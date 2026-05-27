@@ -11,9 +11,7 @@ import kr.modusplant.domains.post.framework.out.processor.exception.ThumbnailNot
 import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
 import kr.modusplant.domains.post.usecase.request.FileOrder;
 import kr.modusplant.infrastructure.config.jackson.JacksonConfig;
-import kr.modusplant.shared.exception.FileLimitExceededException;
-import kr.modusplant.shared.exception.InvalidFileInputException;
-import kr.modusplant.shared.exception.UnsupportedFileException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
@@ -164,21 +162,21 @@ class PostMultipartDataProcessorTest implements PostRequestTestUtils {
             // when & then
             // null 검증
             assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(null,List.of(),null))
-                    .isInstanceOf(InvalidFileInputException.class);
+                    .isInstanceOf(InvalidValueException.class);
             assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles,null, null))
-                    .isInstanceOf(InvalidFileInputException.class);
+                    .isInstanceOf(InvalidValueException.class);
 
             // 크기 불일치
             assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles,textImageFilesOrder, imageFilename))
-                    .isInstanceOf(InvalidFileInputException.class);
+                    .isInstanceOf(InvalidValueException.class);
 
             // 유효하지 않은 order값 (order=0이 여러개 or 연속적이지 않은 order)
             assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles,multipleZeroOrders,imageFilename))
-                    .isInstanceOf(InvalidFileInputException.class);
+                    .isInstanceOf(InvalidValueException.class);
             assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(basicMediaFiles,nonSequentialOrders,imageFilename))
-                    .isInstanceOf(InvalidFileInputException.class);
+                    .isInstanceOf(InvalidValueException.class);
             assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(onlyMediaFiles,orderZeroWithImage,"image_0.jpeg"))
-                    .isInstanceOf(InvalidFileInputException.class);
+                    .isInstanceOf(InvalidValueException.class);
         }
 
         @Test
@@ -263,19 +261,19 @@ class PostMultipartDataProcessorTest implements PostRequestTestUtils {
             // when & then
             // 지원하지 않는 fileType 및 확장자
             assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(fontFiles,List.of(new FileOrder(fontFile.getOriginalFilename(),1)),null))
-                    .isInstanceOf(UnsupportedFileException.class);
+                    .isInstanceOf(InvalidValueException.class);
             assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(invalidImageFiles, List.of(new FileOrder(invalidImageFile.getOriginalFilename(),1)),invalidImageFile.getOriginalFilename()))
-                    .isInstanceOf(UnsupportedFileException.class);
+                    .isInstanceOf(InvalidValueException.class);
 
             // 파일 개수 초과
             assertThatThrownBy(() -> postMultipartDataProcessor.saveFilesAndGenerateContentJson(tooManyImages, tooManyImageOrders,tooManyImages.get(0).getOriginalFilename()))
-                    .isInstanceOf(FileLimitExceededException.class);
+                    .isInstanceOf(InvalidValueException.class);
 
             // 파일 크기 초과
             assertThatThrownBy(() ->
                     postMultipartDataProcessor.saveFilesAndGenerateContentJson(
                             List.of(largeFile),List.of(new FileOrder(largeFile.getOriginalFilename(),1)),largeFile.getOriginalFilename())
-            ).isInstanceOf(FileLimitExceededException.class);
+            ).isInstanceOf(InvalidValueException.class);
         }
     }
 

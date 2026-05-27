@@ -12,9 +12,8 @@ import kr.modusplant.domains.post.framework.out.processor.exception.ThumbnailNot
 import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
 import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
 import kr.modusplant.domains.post.usecase.request.FileOrder;
-import kr.modusplant.shared.exception.FileLimitExceededException;
-import kr.modusplant.shared.exception.InvalidFileInputException;
-import kr.modusplant.shared.exception.UnsupportedFileException;
+import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.exception.enums.FileErrorCode;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.generator.RandomUlidGenerator;
@@ -134,18 +133,18 @@ public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
     private void validatePartsAndOrderInfo(List<MultipartFile> parts, List<FileOrder> orderInfo, String thumbnailFilename) {
         // parts와 orderInfo 크기 검증
         if (parts == null || orderInfo == null || parts.size() != orderInfo.size()) {
-            throw new InvalidFileInputException();
+            throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFileSize");
         }
 
         Map<String, MultipartFile> partMap = parts.stream()
-                .collect(Collectors.toMap(MultipartFile::getOriginalFilename, part -> part, (a, b) -> { throw new InvalidFileInputException();}));  // 같은 filename 업로드 시 예외 발생
+                .collect(Collectors.toMap(MultipartFile::getOriginalFilename, part -> part, (a, b) -> { throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFileSize");}));  // 같은 filename 업로드 시 예외 발생
 
         // 파일명 매칭 검증
         Set<String> orderFilenames = orderInfo.stream()
                 .map(FileOrder::filename)
                 .collect(Collectors.toSet());
         if(!partMap.keySet().equals(orderFilenames)) {
-            throw new InvalidFileInputException();
+            throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFileName");
         }
 
         // orderInfo의 order 정보 검증 (order가 순차적으로 증가하는지)
@@ -159,15 +158,15 @@ public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
             if (order == 0) {
                 zeroCount++;
                 if (zeroCount > 1) {
-                    throw new InvalidFileInputException();
+                    throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFileOrder");
                 }
                 MultipartFile part = partMap.get(info.filename());
                 if (PostFileType.from(part.getContentType()) != PostFileType.TEXT) {
-                    throw new InvalidFileInputException();
+                    throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFileOrder");
                 }
             } else {
                 if (order != expectedOrder) {
-                    throw new InvalidFileInputException();
+                    throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFileOrder");
                 }
                 expectedOrder++;
             }
@@ -198,7 +197,7 @@ public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
         for(MultipartFile part : parts) {
             String contentType = part.getContentType();
             if (contentType == null) {
-                throw new UnsupportedFileException();
+                throw new InvalidValueException(FileErrorCode.UNSUPPORTED_FILE, "postMultipartData");
             }
             String originalFilename = part.getOriginalFilename();
             long fileSize = part.getSize();
@@ -210,7 +209,7 @@ public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
                         throw new TextFileOverLengthException();
                     }
                 } catch (IOException e) {
-                    throw new InvalidFileInputException();
+                    throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFile");
                 }
                 continue;
             }
@@ -219,35 +218,35 @@ public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
             String extension = extractExtension(originalFilename);
             PostFileType actualFileType = PostFileType.fromExtension(extension);
             if (actualFileType == PostFileType.UNKNOWN || !actualFileType.hasExtensionRestriction()) {
-                throw new UnsupportedFileException();
+                throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFile");
             }
 
             // 파일 개수 및 크기 검증
             if (actualFileType == PostFileType.IMAGE) {
                 imageCount++;
                 if (imageCount > MAX_IMAGE_FILES || fileSize > MAX_IMAGE_SIZE) {
-                    throw new FileLimitExceededException();
+                    throw new InvalidValueException(FileErrorCode.FILE_LIMIT_EXCEEDED, "file");
                 }
             } else if (actualFileType == PostFileType.VIDEO) {
                 videoCount++;
                 if (videoCount > MAX_VIDEO_FILES || fileSize > MAX_VIDEO_SIZE) {
-                    throw new FileLimitExceededException();
+                    throw new InvalidValueException(FileErrorCode.FILE_LIMIT_EXCEEDED, "file");
                 }
             }
             fileCount++;
         }
         if (fileCount > MAX_TOTAL_FILES) {
-            throw new FileLimitExceededException();
+            throw new InvalidValueException(FileErrorCode.FILE_LIMIT_EXCEEDED, "file");
         }
     }
 
     private String extractExtension(String filename) {
         if (filename == null || filename.isEmpty()) {
-            throw new UnsupportedFileException();
+            throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFile");
         }
         int lastDotIndex = filename.lastIndexOf(".");
         if (lastDotIndex == -1 || lastDotIndex == filename.length() - 1) {
-            throw new UnsupportedFileException();
+            throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFile");
         }
         return filename.substring(lastDotIndex + 1);
     }
@@ -282,14 +281,14 @@ public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
             node.put(TYPE, fileType.getValue());
             node.put(SRC, fileKey);
         } else {
-            throw new UnsupportedFileException();
+            throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFile");
         }
         return node;
     }
 
     private String generateFileKey(String fileUlid, PostFileType fileType, String originalFilename, int order) {
         if (originalFilename == null) {
-            throw new UnsupportedFileException();
+            throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFile");
         }
 
         // post/{RAMDOM UlID}/{fileType}/{fileName}

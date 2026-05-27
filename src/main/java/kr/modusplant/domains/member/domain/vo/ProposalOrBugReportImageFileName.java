@@ -3,7 +3,7 @@ package kr.modusplant.domains.member.domain.vo;
 import kr.modusplant.shared.enums.ImageExtension;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.exception.UnsupportedFileException;
+import kr.modusplant.shared.exception.enums.FileErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,7 @@ public class ProposalOrBugReportImageFileName {
             throw new InvalidValueException(INVALID_REPORT_IMAGE_FILE_NAME, "fileNameWithExtension");
         }
         if (!ImageExtension.POSSIBLE_IMAGE_EXTENSIONS.contains(split[1])) {
-            throw new UnsupportedFileException();
+            throw new InvalidValueException(FileErrorCode.UNSUPPORTED_FILE, "proposalOrBugReportImageFile");
         }
         return new ProposalOrBugReportImageFileName(
                 BaseName.BASE_NAME_MAP.get(split[0].toUpperCase(Locale.ROOT)),
