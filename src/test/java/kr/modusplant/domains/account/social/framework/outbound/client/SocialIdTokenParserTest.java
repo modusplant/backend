@@ -1,11 +1,10 @@
-package kr.modusplant.domains.account.social.framework.out.client;
+package kr.modusplant.domains.account.social.framework.outbound.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.account.social.domain.exception.InvalidValueException;
-import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
-import kr.modusplant.domains.account.social.framework.out.client.dto.IdTokenInfo;
+import kr.modusplant.domains.account.social.framework.outbound.client.dto.IdTokenInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +14,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 class SocialIdTokenParserTest {
     private SocialIdTokenParser socialIdTokenParser;

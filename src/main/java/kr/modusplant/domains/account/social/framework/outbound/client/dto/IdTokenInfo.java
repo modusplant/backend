@@ -1,4 +1,4 @@
-package kr.modusplant.domains.account.social.framework.out.client.dto;
+package kr.modusplant.domains.account.social.framework.outbound.client.dto;
 
 public record IdTokenInfo(
         String id,

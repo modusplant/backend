@@ -1,10 +1,10 @@
-package kr.modusplant.domains.account.social.framework.out.client;
+package kr.modusplant.domains.account.social.framework.outbound.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.account.social.domain.exception.InvalidValueException;
 import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
-import kr.modusplant.domains.account.social.framework.out.client.dto.IdTokenInfo;
+import kr.modusplant.domains.account.social.framework.outbound.client.dto.IdTokenInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

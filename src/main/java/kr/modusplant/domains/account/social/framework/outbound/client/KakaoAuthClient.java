@@ -2,9 +2,6 @@ package kr.modusplant.domains.account.social.framework.outbound.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
-import kr.modusplant.domains.account.social.framework.outbound.client.dto.KakaoUserInfo;
-import kr.modusplant.domains.account.social.framework.outbound.client.dto.OAuthErrorResponse;
-import kr.modusplant.domains.account.social.framework.outbound.exception.OAuthRequestFailException;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.framework.outbound.client.dto.IdTokenInfo;
 import kr.modusplant.domains.account.social.framework.outbound.client.dto.OAuthErrorResponse;

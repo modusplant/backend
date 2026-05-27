@@ -1,8 +1,6 @@
 package kr.modusplant.domains.account.social.framework.outbound.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.domains.account.social.framework.outbound.client.dto.GoogleUserInfo;
-import kr.modusplant.domains.account.social.framework.outbound.exception.OAuthRequestFailException;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.framework.outbound.client.dto.IdTokenInfo;
 import kr.modusplant.domains.account.social.framework.outbound.exception.OAuthRequestFailException;
@@ -28,7 +26,6 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;

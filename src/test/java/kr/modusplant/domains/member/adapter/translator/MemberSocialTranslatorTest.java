@@ -3,7 +3,6 @@ package kr.modusplant.domains.member.adapter.translator;
 import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityLinkController;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.framework.outbound.exception.UnsupportedSocialProviderException;
-import kr.modusplant.domains.account.social.framework.outbound.exception.UnsupportedSocialProviderException;
 import kr.modusplant.domains.account.social.usecase.record.SocialUserInfo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
