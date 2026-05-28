@@ -5,8 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static kr.modusplant.shared.event.common.util.ImageRemoveEventTestUtils.testImageRemoveTask;
-import static kr.modusplant.shared.event.common.util.ImagesRemoveEventTestUtils.testImagesRemoveTask;
+import static kr.modusplant.shared.framework.aws.common.util.event.ImageRemoveEventTestUtils.testImageRemoveTask;
+import static kr.modusplant.shared.framework.aws.common.util.event.ImagesRemoveEventTestUtils.testImagesRemoveTask;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.willDoNothing;

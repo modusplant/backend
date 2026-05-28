@@ -1,4 +1,4 @@
-package kr.modusplant.shared.event.common.util;
+package kr.modusplant.domains.member.common.util.domain.event;
 
 import kr.modusplant.domains.member.domain.event.PostLikeEvent;
 

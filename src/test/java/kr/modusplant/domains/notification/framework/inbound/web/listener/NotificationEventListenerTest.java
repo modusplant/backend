@@ -1,9 +1,9 @@
 package kr.modusplant.domains.notification.framework.inbound.web.listener;
 
 import kr.modusplant.domains.notification.adapter.controller.NotificationController;
-import kr.modusplant.shared.event.common.util.CommentLikeNotificationEventTestUtils;
-import kr.modusplant.shared.event.common.util.CommentNotificationEventTestUtils;
-import kr.modusplant.shared.event.common.util.PostLikeNotificationEventTestUtils;
+import kr.modusplant.domains.member.common.util.domain.event.CommentLikeNotificationEventTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.event.CommentNotificationEventTestUtils;
+import kr.modusplant.domains.member.common.util.domain.event.PostLikeNotificationEventTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

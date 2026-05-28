@@ -1,4 +1,4 @@
-package kr.modusplant.shared.event;
+package kr.modusplant.domains.comment.domain.event;
 
 import kr.modusplant.domains.comment.domain.event.CommentRegisterEvent;
 import kr.modusplant.domains.notification.domain.enums.NotificationActionType;

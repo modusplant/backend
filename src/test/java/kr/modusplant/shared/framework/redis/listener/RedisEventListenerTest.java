@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-import static kr.modusplant.shared.event.common.util.RecentlyViewPostRemoveEventTestUtils.testRecentlyViewPostRemoveEvent;
+import static kr.modusplant.domains.member.common.util.domain.event.RecentlyViewPostRemoveEventTestUtils.testRecentlyViewPostRemoveEvent;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
