@@ -39,8 +39,8 @@ public class MemberAdminRestController {
     private final MemberAdminController memberAdminController;
 
     @Operation(
-            summary = "건의 및 버그 제보 조회 API (무한 스크롤)",
-            description = "건의 사항 또는 버그 제보를 조회합니다.",
+            summary = "건의 및 버그 제보 현황 조회 API (무한 스크롤)",
+            description = "건의 사항 또는 버그 제보 현황을 조회합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @GetMapping(value = "/report/proposal-or-bug")
