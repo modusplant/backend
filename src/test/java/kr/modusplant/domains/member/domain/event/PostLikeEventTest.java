@@ -1,4 +1,4 @@
-package kr.modusplant.shared.event;
+package kr.modusplant.domains.member.domain.event;
 
 import kr.modusplant.domains.member.domain.event.PostLikeEvent;
 import kr.modusplant.shared.exception.InvalidValueException;

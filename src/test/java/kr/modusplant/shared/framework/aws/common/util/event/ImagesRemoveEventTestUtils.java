@@ -1,4 +1,4 @@
-package kr.modusplant.shared.event.common.util;
+package kr.modusplant.shared.framework.aws.common.util.event;
 
 import kr.modusplant.shared.framework.aws.event.ImagesRemoveTask;
 
