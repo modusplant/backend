@@ -46,12 +46,12 @@ JDBC_PASSWORD       / jdbcPassword
 
 The project follows **DDD + Clean Architecture**. The `src/main/java/kr/modusplant/` root contains four top-level packages:
 
-| Package | Role |
-|---|---|
-| `domains` | Domain modules — each with its own layered sub-structure |
-| `framework` | Shared external library wiring (jOOQ, Spring Data, Redis) |
-| `infrastructure` | Cross-cutting concerns: AOP logging, security, JWT, Swagger, async config |
-| `shared` | Global objects: kernel VOs (`Email`, `Nickname`, `Password`), constants, Spring events, exceptions, ULID generator |
+| Package          | Role                                                                                                               |
+|------------------|--------------------------------------------------------------------------------------------------------------------|
+| `domains`        | Domain modules — each with its own layered sub-structure                                                           |
+| `framework`      | Shared external library wiring (jOOQ, Spring Data, Redis)                                                          |
+| `infrastructure` | Cross-cutting concerns: AOP logging, security, JWT, Swagger, async config                                          |
+| `shared`         | Global objects: kernel VOs (`Email`, `Nickname`, `Password`), constants, Spring events, exceptions, ULID generator |
 
 ### Domain Internal Structure
 Every domain under `domains/` follows this four-layer layout — dependency flows inward only:
@@ -93,15 +93,15 @@ Domains: `account` (sub-domains: `email`, `identity`, `normal`, `social`), `comm
 
 Format: `MP-{ticket} :{gitmoji}: {Type}: {description in Korean}`
 
-| Gitmoji | Type |
-|---|---|
-| `:sparkles:` | Feat |
-| `:bug:` | Fix |
-| `:recycle:` | Refactor |
-| `:white_check_mark:` | Test |
-| `:memo:` | Docs |
-| `:wrench:` | Chore |
-| `:fire:` | Remove |
-| `:ambulance:` | HOTFIX! |
+| Gitmoji              | Type     |
+|----------------------|----------|
+| `:sparkles:`         | Feat     |
+| `:bug:`              | Fix      |
+| `:recycle:`          | Refactor |
+| `:white_check_mark:` | Test     |
+| `:memo:`             | Docs     |
+| `:wrench:`           | Chore    |
+| `:fire:`             | Remove   |
+| `:ambulance:`        | HOTFIX!  |
 
 Example: `MP-289 :bug: Fix: 게시글 여러 번 수정 시 발생하는 낙관적 락 에러 해결`
