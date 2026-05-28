@@ -6,9 +6,9 @@ import kr.modusplant.domains.account.social.domain.vo.SocialCredentials;
 import kr.modusplant.domains.account.social.domain.vo.SocialMemberProfile;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClientFactory;
-import kr.modusplant.domains.account.social.usecase.port.client.dto.SocialUserInfo;
 import kr.modusplant.domains.account.social.usecase.port.mapper.SocialIdentityMapper;
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
+import kr.modusplant.domains.account.social.usecase.record.SocialUserInfo;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.exception.ConflictStateException;
 import lombok.RequiredArgsConstructor;
@@ -25,15 +25,14 @@ public class SocialIdentityLinkController {
     private final SocialIdentityRepository socialIdentityRepository;
     private final SocialIdentityMapper socialIdentityMapper;
 
-    public String issueSocialAccessToken(SocialProvider provider, String code) {
-        return clientFactory.getClient(provider).getAccessToken(code);
+    public SocialUserInfo issueSocialToken(SocialProvider provider, String code, boolean isLocal) {
+        return clientFactory.getClient(provider).getToken(code, isLocal);
     }
 
     @Transactional
-    public void linkSocialAccount(UUID currentMemberUuid, SocialProvider provider, String socialAccessToken) {
-        SocialUserInfo user = clientFactory.getClient(provider).getUserInfo(socialAccessToken);
+    public void linkSocialAccount(UUID currentMemberUuid, SocialProvider provider, SocialUserInfo userInfo) {
         SocialMemberProfile memberProfile = socialIdentityRepository.getSocialMemberProfileByAccountId(AccountId.fromUuid(currentMemberUuid));
-        if (!memberProfile.getEmail().getValue().equals(user.getEmail())) {
+        if (!memberProfile.getEmail().getValue().equals(userInfo.email())) {
             throw new ConflictStateException(SocialIdentityErrorCode.EMAIL_MISMATCH);
         }
         if (memberProfile.getSocialCredentials().isLinked()) {
@@ -47,13 +46,13 @@ public class SocialIdentityLinkController {
         }
         AuthProvider linkedAuthProvider = socialIdentityMapper.toLinkedAuthProvider(provider);
         socialIdentityRepository.updateSocialLinkedMember(
-                SocialCredentials.create(linkedAuthProvider,user.getId()),
+                SocialCredentials.create(linkedAuthProvider,userInfo.id()),
                 memberProfile.getEmail()
         );
     }
 
     @Transactional
-    public void unlinkSocialAccount(UUID currentMemberUuid, SocialProvider provider, String socialAccessToken) {
+    public void unlinkSocialAccount(UUID currentMemberUuid, SocialProvider provider, SocialUserInfo userInfo) {
         AccountId accountId = AccountId.fromUuid(currentMemberUuid);
         SocialMemberProfile memberProfile = socialIdentityRepository.getSocialMemberProfileByAccountId(accountId);
         SocialCredentials socialCredentials = memberProfile.getSocialCredentials();
@@ -61,9 +60,11 @@ public class SocialIdentityLinkController {
             throw new ConflictStateException(SocialIdentityErrorCode.NOT_LINKED);
         } else if (socialCredentials.isPureSocial()) {
             throw new ConflictStateException(SocialIdentityErrorCode.SOCIAL_WITHDRAWAL_REQUIRED);
+        } else if (!memberProfile.getEmail().getValue().equals(userInfo.email())) {
+            throw new ConflictStateException(SocialIdentityErrorCode.EMAIL_MISMATCH);
         } else if (socialCredentials.isLinked() && matches(provider, socialCredentials)) {
             // 연동 해제
-            clientFactory.getClient(provider).revokeAccess(socialAccessToken);
+            clientFactory.getClient(provider).revokeAccess(userInfo.socialAccessToken());
             socialIdentityRepository.updateSocialUnlinkedMember(accountId);
         } else {
             throw new ConflictStateException(SocialIdentityErrorCode.PROVIDER_MISMATCH);

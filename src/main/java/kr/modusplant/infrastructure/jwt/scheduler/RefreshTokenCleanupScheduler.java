@@ -1,6 +1,6 @@
 package kr.modusplant.infrastructure.jwt.scheduler;
 
-import kr.modusplant.infrastructure.jwt.framework.out.jpa.repository.RefreshTokenJpaRepository;
+import kr.modusplant.infrastructure.jwt.framework.outbound.jpa.repository.RefreshTokenJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

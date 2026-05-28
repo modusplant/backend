@@ -13,7 +13,6 @@ import kr.modusplant.domains.account.social.domain.vo.SocialMemberProfile;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClient;
 import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClientFactory;
-import kr.modusplant.domains.account.social.usecase.port.client.dto.SocialUserInfo;
 import kr.modusplant.domains.account.social.usecase.port.mapper.SocialIdentityMapper;
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
 import kr.modusplant.domains.account.social.usecase.record.*;
@@ -54,51 +53,70 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
         SocialAuthClient authClient = mock(SocialAuthClient.class);
         SocialUserInfo userInfo = mock(SocialUserInfo.class);
         given(clientFactory.getClient(SocialProvider.KAKAO)).willReturn(authClient);
-        given(authClient.getAccessToken(code)).willReturn(socialAccessToken);
-        given(authClient.getUserInfo(socialAccessToken)).willReturn(userInfo);
+        given(authClient.getToken(code,false)).willReturn(userInfo);
+        given(userInfo.socialAccessToken()).willReturn(socialAccessToken);
         given(socialIdentityMapper.toSocialProfile(SocialProvider.KAKAO,userInfo)).willReturn(testKakaoSocialProfile);
         given(socialIdentityRepository.getSocialMemberProfileByEmail(testKakaoSocialProfile.getEmail())).willReturn(Optional.empty());
 
         // when
-        SocialLoginResult result = socialIdentityController.handleSocialLogin(SocialProvider.KAKAO,code);
+        SocialLoginResult result = socialIdentityController.handleSocialLogin(SocialProvider.KAKAO,code, false);
 
         // then
         assertEquals(result,createKakaoNeedSignupResult());
         assertThat(result).isInstanceOf(NeedSignupResult.class);
         verify(clientFactory).getClient(SocialProvider.KAKAO);
-        verify(authClient).getAccessToken(code);
-        verify(authClient).getUserInfo(socialAccessToken);
+        verify(authClient).getToken(code, false);
+        verify(userInfo).socialAccessToken();
         verify(socialIdentityMapper).toSocialProfile(SocialProvider.KAKAO,userInfo);
         verify(socialIdentityRepository).getSocialMemberProfileByEmail(testKakaoSocialProfile.getEmail());
     }
 
     @Test
     @DisplayName("기존 회원이고 최초 소셜 로그인 시 NeedLinkResult 반환하기")
-    void testClassifyMember_givenNewSocialMemberSocialProfile_willReturnNeedLinkResult() {
+    void testHandleSocialLogin_givenNewSocialMemberSocialProfile_willReturnNeedLinkResult() {
         // given
+        String code = createTestKakaoLoginRequest().code();
+        String socialAccessToken = TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN;
+        SocialAuthClient authClient = mock(SocialAuthClient.class);
+        SocialUserInfo userInfo = mock(SocialUserInfo.class);
+        given(clientFactory.getClient(SocialProvider.KAKAO)).willReturn(authClient);
+        given(authClient.getToken(code, false)).willReturn(userInfo);
+        given(userInfo.socialAccessToken()).willReturn(socialAccessToken);
+        given(socialIdentityMapper.toSocialProfile(SocialProvider.KAKAO,userInfo)).willReturn(testKakaoSocialProfileWithBasicEmail);
         given(socialIdentityRepository.getSocialMemberProfileByEmail(testKakaoSocialProfileWithBasicEmail.getEmail()))
                 .willReturn(Optional.of(testBasicSocialMemberProfile));
 
         // when
-        SocialLoginResult result = socialIdentityController.classifyMember(testKakaoSocialProfileWithBasicEmail,TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
+        SocialLoginResult result = socialIdentityController.handleSocialLogin(SocialProvider.KAKAO, code, false);
 
         // then
         assertEquals(result,createKakaoNeedLinkResult());
         assertThat(result).isInstanceOf(NeedLinkResult.class);
+        verify(clientFactory).getClient(SocialProvider.KAKAO);
+        verify(authClient).getToken(code, false);
+        verify(userInfo).socialAccessToken();
+        verify(socialIdentityMapper).toSocialProfile(SocialProvider.KAKAO,userInfo);
         verify(socialIdentityRepository).getSocialMemberProfileByEmail(testKakaoSocialProfileWithBasicEmail.getEmail());
     }
 
     @Test
     @DisplayName("기존 다른 소셜 회원일 경우 예외 처리하기")
-    void testClassifyMember_givenSocialProfileWithOtherProvider_willThrowException() {
+    void testHandleSocialLogin_givenSocialProfileWithOtherProvider_willThrowException() {
         // given
         SocialAuthClient authClient = mock(SocialAuthClient.class);
-        given(socialIdentityRepository.getSocialMemberProfileByEmail(testKakaoSocialProfileWithBasicEmail.getEmail()))
-                .willReturn(Optional.of(testBasicGoogleSocialMemberProfile));
+        String code = createTestKakaoLoginRequest().code();
+        String socialAccessToken = TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN;
+        SocialUserInfo userInfo = mock(SocialUserInfo.class);
+
+        given(clientFactory.getClient(SocialProvider.KAKAO)).willReturn(authClient);
+        given(authClient.getToken(code, false)).willReturn(userInfo);
+        given(userInfo.socialAccessToken()).willReturn(socialAccessToken);
+        given(socialIdentityMapper.toSocialProfile(SocialProvider.KAKAO,userInfo)).willReturn(testKakaoSocialProfileWithBasicEmail);
+        given(socialIdentityRepository.getSocialMemberProfileByEmail(testKakaoSocialProfileWithBasicEmail.getEmail())).willReturn(Optional.of(testGoogleSocialMemberProfileWithBasicEmail));
         given(clientFactory.getClient(SocialProvider.KAKAO)).willReturn(authClient);
 
         // when & then
-        assertThatThrownBy(() -> socialIdentityController.classifyMember(testKakaoSocialProfileWithBasicEmail,TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN))
+        assertThatThrownBy(() -> socialIdentityController.handleSocialLogin(SocialProvider.KAKAO, code,false))
                 .isInstanceOf(ConflictStateException.class);
         verify(socialIdentityRepository).getSocialMemberProfileByEmail(testKakaoSocialProfileWithBasicEmail.getEmail());
         verify(authClient).revokeAccess(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
@@ -106,18 +124,25 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
 
     @Test
     @DisplayName("기존 소셜 회원일 경우 로그인 완료하기")
-    void testClassifyMember_givenExistingSocialMemberSocialMemberProfile_willReturnLoginResult() {
+    void testHandleSocialLogin_givenExistingSocialMemberSocialMemberProfile_willReturnLoginResult() {
         // given
-        given(socialIdentityRepository.getSocialMemberProfileByEmail(testGoogleSocialProfile.getEmail()))
-                .willReturn(Optional.of(testGoogleSocialMemberProfile));
+        SocialAuthClient authClient = mock(SocialAuthClient.class);
+        String code = createTestGoogleLoginRequest().code();
+        SocialUserInfo userInfo = mock(SocialUserInfo.class);
+
+        given(clientFactory.getClient(SocialProvider.GOOGLE)).willReturn(authClient);
+        given(authClient.getToken(code,false)).willReturn(userInfo);
+        given(userInfo.socialAccessToken()).willReturn(TEST_SOCIAL_GOOGLE_SOCIAL_ACCESS_TOKEN);
+        given(socialIdentityMapper.toSocialProfile(SocialProvider.GOOGLE, userInfo)).willReturn(testGoogleSocialProfile);
+        given(socialIdentityRepository.getSocialMemberProfileByEmail(testGoogleSocialProfile.getEmail())).willReturn(Optional.of(testGoogleSocialMemberProfile));
         given(socialIdentityRepository.updateLoggedInAtAndGetProfile(testGoogleSocialMemberProfile.getAccountId())).willReturn(testGoogleSocialMemberProfile);
         given(socialIdentityMapper.toLoginResult(testGoogleSocialMemberProfile)).willReturn(createGoogleLoginResult());
 
         // when
-        SocialLoginResult result = socialIdentityController.classifyMember(testGoogleSocialProfile, TEST_SOCIAL_GOOGLE_SOCIAL_ACCESS_TOKEN);
+        SocialLoginResult result = socialIdentityController.handleSocialLogin(SocialProvider.GOOGLE, code,false);
 
         // then
-        assertEquals(result,createGoogleLoginResult());
+        assertEquals(result, createGoogleLoginResult());
         assertThat(result).isInstanceOf(LoginResult.class);
         verify(socialIdentityRepository).getSocialMemberProfileByEmail(testGoogleSocialProfile.getEmail());
         verify(socialIdentityRepository).updateLoggedInAtAndGetProfile(testGoogleSocialMemberProfile.getAccountId());
@@ -126,8 +151,11 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
 
     @Test
     @DisplayName("providerid가 provider의 값이 아닌 경우 예외 발생")
-    void testClassifyMember_givenInvalidProviderId_willThrowException() {
+    void testHandleSocialLogin_givenInvalidProviderId_willThrowException() {
         // given
+        SocialAuthClient authClient = mock(SocialAuthClient.class);
+        String code = createTestKakaoLoginRequest().code();
+        SocialUserInfo userInfo = mock(SocialUserInfo.class);
         SocialMemberProfile differentProviderIdProfile = SocialMemberProfile.create(
                 AccountId.fromUuid(UUID.randomUUID()),
                 SocialCredentials.createKakao("9999999999"),  // 다른 providerId
@@ -135,10 +163,14 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
                 Nickname.create("테스트"),
                 Role.USER
         );
+        given(clientFactory.getClient(SocialProvider.KAKAO)).willReturn(authClient);
+        given(authClient.getToken(code,false)).willReturn(userInfo);
+        given(userInfo.socialAccessToken()).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
+        given(socialIdentityMapper.toSocialProfile(SocialProvider.KAKAO, userInfo)).willReturn(testKakaoSocialProfile);
         given(socialIdentityRepository.getSocialMemberProfileByEmail(any())).willReturn(Optional.of(differentProviderIdProfile));
 
         // when & then
-        assertThatThrownBy(() -> socialIdentityController.classifyMember(testKakaoSocialProfile, TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN)).isInstanceOf(InvalidValueException.class);
+        assertThatThrownBy(() -> socialIdentityController.handleSocialLogin(SocialProvider.KAKAO, code, false)).isInstanceOf(InvalidValueException.class);
     }
 
     @Test

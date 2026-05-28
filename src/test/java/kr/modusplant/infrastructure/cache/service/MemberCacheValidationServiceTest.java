@@ -1,11 +1,11 @@
 package kr.modusplant.infrastructure.cache.service;
 
-import kr.modusplant.domains.member.framework.in.web.cache.record.MemberCacheValidationResult;
-import kr.modusplant.domains.member.framework.in.web.cache.service.MemberCacheValidationService;
-import kr.modusplant.domains.member.framework.out.jpa.entity.MemberProfileEntity;
-import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
-import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberProfileEntityTestUtils;
-import kr.modusplant.domains.member.framework.out.jpa.repository.MemberProfileJpaRepository;
+import kr.modusplant.domains.member.framework.inbound.web.cache.record.MemberCacheValidationResult;
+import kr.modusplant.domains.member.framework.inbound.web.cache.service.MemberCacheValidationService;
+import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberProfileEntity;
+import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.MemberEntityTestUtils;
+import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.MemberProfileEntityTestUtils;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberProfileJpaRepository;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import lombok.extern.slf4j.Slf4j;

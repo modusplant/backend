@@ -33,6 +33,15 @@ public class AsyncConfig implements AsyncConfigurer {
         return new SimpleAsyncUncaughtExceptionHandler();
     }
 
+    /* 회원 도메인 전용 executor : 가상 스레드 */
+    @Bean(name = "memberDomainExecutor")
+    public Executor memberDomainExecutor() {
+        // SimpleAsyncTaskExecutor + executor.setVirtualThreads(true) => VirtualThreadTaskExecutor
+        SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor("virtual-domain-member-");
+        executor.setVirtualThreads(true);
+        return executor;
+    }
+
     /* AWS 전용 executor : 가상 스레드 */
     @Bean(name = "awsExecutor")
     public Executor awsExecutor() {

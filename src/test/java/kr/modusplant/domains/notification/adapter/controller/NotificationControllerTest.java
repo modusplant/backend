@@ -4,7 +4,7 @@ import kr.modusplant.domains.notification.adapter.mapper.NotificationMapperImpl;
 import kr.modusplant.domains.notification.common.util.domain.aggregate.NotificationTestUtils;
 import kr.modusplant.domains.notification.common.util.usecase.record.NotificationReadModelTestUtils;
 import kr.modusplant.domains.notification.common.util.usecase.response.NotificationResponseTestUtils;
-import kr.modusplant.domains.notification.framework.out.messaging.FcmSender;
+import kr.modusplant.domains.notification.framework.outbound.messaging.FcmSender;
 import kr.modusplant.domains.notification.usecase.port.mapper.NotificationMapper;
 import kr.modusplant.domains.notification.usecase.port.repository.*;
 import kr.modusplant.domains.notification.usecase.record.NotificationPreview;
@@ -59,7 +59,7 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
             // then
             assertThat(result).isNotNull();
             assertThat(result.notifications()).hasSize(1);
-            assertThat(result.notifications().get(0).ulid()).isEqualTo(TEST_POST_LIKED_READ_NOTIFICATION_UNREAD_MODEL.ulid());
+            assertThat(result.notifications().getFirst().ulid()).isEqualTo(TEST_POST_LIKED_READ_NOTIFICATION_UNREAD_MODEL.ulid());
             assertThat(result.nextUlid()).isNull();
             assertThat(result.hasNext()).isFalse();
 

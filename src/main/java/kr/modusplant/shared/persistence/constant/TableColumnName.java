@@ -10,7 +10,6 @@ public final class TableColumnName {
     public static final String CHECKED_AT = "checked_at";
     public static final String CONTENT_TEXT = "content_text";
     public static final String CREATED_AT = "created_at";
-    public static final String HANDLED_AT = "handled_at";
     public static final String LAST_MODIFIED_AT = "last_modified_at";
     public static final String MEMB_UUID = "memb_uuid";
     public static final String ORDER = "\"order\"";

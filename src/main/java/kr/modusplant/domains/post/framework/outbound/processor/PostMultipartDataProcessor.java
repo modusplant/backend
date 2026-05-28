@@ -1,0 +1,324 @@
+package kr.modusplant.domains.post.framework.outbound.processor;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import kr.modusplant.domains.post.framework.outbound.processor.enums.PostFileType;
+import kr.modusplant.domains.post.framework.outbound.processor.exception.EmptyThumbnailException;
+import kr.modusplant.domains.post.framework.outbound.processor.exception.InvalidThumbnailException;
+import kr.modusplant.domains.post.framework.outbound.processor.exception.TextFileOverLengthException;
+import kr.modusplant.domains.post.framework.outbound.processor.exception.ThumbnailNotAllowedException;
+import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
+import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
+import kr.modusplant.domains.post.usecase.request.FileOrder;
+import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.exception.enums.FileErrorCode;
+import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
+import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
+import kr.modusplant.shared.generator.RandomUlidGenerator;
+import kr.modusplant.shared.generator.UlidGeneratorHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static kr.modusplant.domains.post.framework.outbound.processor.constant.PostFileConstraints.*;
+
+@Service
+public class PostMultipartDataProcessor implements MultipartDataProcessorPort {
+    private final AmazonS3Service amazonS3Service;
+    public static final String DATA = "data";
+    public static final String FILENAME = "filename";
+    public static final String ORDER = "order";
+    public static final String SRC = "src";
+    public static final String TYPE = "type";
+    public static final int MAX_TEXT_LENGTH = 5000;
+    private final ObjectMapper objectMapper;
+    private final RandomUlidGenerator generator;
+
+    public PostMultipartDataProcessor(AmazonS3Service amazonS3Service,
+                                      ObjectMapperHolder objectMapperHolder,
+                                      UlidGeneratorHolder ulidGeneratorHolder) {
+        this.amazonS3Service = amazonS3Service;
+        this.objectMapper = objectMapperHolder.getObjectMapper();
+        this.generator = ulidGeneratorHolder.getUlidGenerator();
+    }
+
+    public ContentProcessRecord saveFilesAndGenerateContentJson(List<MultipartFile> parts, List<FileOrder> orderInfo, String thumbnailFilename) throws IOException {
+        // 멀티파트 파일 및 순서 정보 검증
+        validatePartsAndOrderInfo(parts,orderInfo,thumbnailFilename);
+        validateFileConstraints(parts);
+        List<MultipartFile> orderedParts = reorderParts(parts, orderInfo);
+        List<FileOrder> sortedOrderInfo = orderInfo.stream()
+                .sorted(Comparator.comparing(FileOrder::order))
+                .toList();
+
+        // 멀티파트 파일 저장 및 json 변환
+        String fileUlid = generator.generate();
+        ArrayNode contentArray = objectMapper.createArrayNode();
+        String thumbnailPath = null;
+        for (int i=0; i<orderedParts.size(); i++) {
+            MultipartFile part = orderedParts.get(i);
+            int order = sortedOrderInfo.get(i).order();
+            ObjectNode node = convertSinglePartToJson(fileUlid,part,order);
+            contentArray.add(node);
+
+            String filename = part.getOriginalFilename();
+            if (thumbnailFilename != null && thumbnailFilename.equals(filename)) {
+                if (node.has(SRC) && PostFileType.IMAGE.getValue().equals(node.get(TYPE).asText())) {
+                    thumbnailPath = node.get(SRC).asText();
+                }
+            }
+        }
+        return new ContentProcessRecord(contentArray,thumbnailPath);
+    }
+
+    public ArrayNode convertFileSrcToFullFileSrc(JsonNode content) {
+        ArrayNode newArray = objectMapper.createArrayNode();
+        for (JsonNode node : content) {
+            ObjectNode objectNode = node.deepCopy();
+            if (node.has(SRC)) {
+                String fileKey = objectNode.get(SRC).asText();
+                objectNode.remove(SRC);
+                String src = amazonS3Service.generateS3SrcUrl(fileKey);
+                objectNode.put(SRC,src);
+            }
+            newArray.add(objectNode);
+        }
+        return newArray;
+    }
+
+    public ArrayNode convertToPreview(JsonNode content, String thumbnailPath) {
+        ArrayNode newArray = objectMapper.createArrayNode();
+
+        for (JsonNode node : content) {
+            if (node.has(TYPE) && PostFileType.TEXT.getValue().equals(node.get(TYPE).asText())) {
+                ObjectNode textNode = objectMapper.createObjectNode();
+                textNode.put(TYPE,node.get(TYPE).asText());
+                textNode.put(DATA,node.get(DATA).asText());
+                newArray.add(textNode);
+                break;
+            }
+        }
+
+        if (thumbnailPath != null && !thumbnailPath.isBlank()) {
+            ObjectNode thumbnailNode = objectMapper.createObjectNode();
+            thumbnailNode.put(TYPE, PostFileType.IMAGE.getValue());
+            thumbnailNode.put(SRC, amazonS3Service.generateS3SrcUrl(thumbnailPath));
+            newArray.add(thumbnailNode);
+        }
+
+        return newArray;
+    }
+
+    public void deleteFiles(JsonNode content) {
+        if (content == null || !content.isArray())
+            return ;
+        // null 일때도 돌아가는지 확인
+        for (JsonNode node : content) {
+            if (node.has(SRC)) {
+                String src = node.get(SRC).asText();
+                amazonS3Service.deleteFiles(src);
+            }
+        }
+    }
+
+    private void validatePartsAndOrderInfo(List<MultipartFile> parts, List<FileOrder> orderInfo, String thumbnailFilename) {
+        // parts와 orderInfo 크기 검증
+        if (parts == null || orderInfo == null || parts.size() != orderInfo.size()) {
+            throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFileSize");
+        }
+
+        Map<String, MultipartFile> partMap = parts.stream()
+                .collect(Collectors.toMap(MultipartFile::getOriginalFilename, part -> part, (a, b) -> { throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFileSize");}));  // 같은 filename 업로드 시 예외 발생
+
+        // 파일명 매칭 검증
+        Set<String> orderFilenames = orderInfo.stream()
+                .map(FileOrder::filename)
+                .collect(Collectors.toSet());
+        if(!partMap.keySet().equals(orderFilenames)) {
+            throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFileName");
+        }
+
+        // orderInfo의 order 정보 검증 (order가 순차적으로 증가하는지)
+        List<FileOrder>  sortedOrderInfo = orderInfo.stream()
+                .sorted(Comparator.comparing(FileOrder::order))
+                .toList();
+        int zeroCount = 0;
+        int expectedOrder = 1;
+        for (FileOrder info : sortedOrderInfo) {
+            int order = info.order();
+            if (order == 0) {
+                zeroCount++;
+                if (zeroCount > 1) {
+                    throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFileOrder");
+                }
+                MultipartFile part = partMap.get(info.filename());
+                if (PostFileType.from(part.getContentType()) != PostFileType.TEXT) {
+                    throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFileOrder");
+                }
+            } else {
+                if (order != expectedOrder) {
+                    throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFileOrder");
+                }
+                expectedOrder++;
+            }
+        }
+
+        // thumbnailFilename가 실제로 존재하는 이미지 파일명인지 검증
+        boolean hasImage = parts.stream().anyMatch(part -> PostFileType.from(part.getContentType()) == PostFileType.IMAGE);
+        if (hasImage) {
+            if (thumbnailFilename == null) {
+                throw new EmptyThumbnailException();
+            }
+            MultipartFile thumbnailPart = partMap.get(thumbnailFilename);
+            if (thumbnailPart == null || PostFileType.from(thumbnailPart.getContentType()) != PostFileType.IMAGE) {
+                throw new InvalidThumbnailException();
+            }
+        } else {    // 이미지 파일이 존재하지 않을때 대표 사진 지정 시 예외 처리
+            if (thumbnailFilename != null) {
+                throw new ThumbnailNotAllowedException();
+            }
+        }
+    }
+
+    private void validateFileConstraints(List<MultipartFile> parts) {
+        int imageCount = 0;
+        int videoCount = 0;
+        int fileCount = 0;
+
+        for(MultipartFile part : parts) {
+            String contentType = part.getContentType();
+            if (contentType == null) {
+                throw new InvalidValueException(FileErrorCode.UNSUPPORTED_FILE, "postMultipartData");
+            }
+            String originalFilename = part.getOriginalFilename();
+            long fileSize = part.getSize();
+            // text이면 제외
+            if (PostFileType.from(contentType) == PostFileType.TEXT) {
+                try {
+                    String text = new String(part.getBytes(), StandardCharsets.UTF_8);
+                    if (text.length() > MAX_TEXT_LENGTH) {
+                        throw new TextFileOverLengthException();
+                    }
+                } catch (IOException e) {
+                    throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFile");
+                }
+                continue;
+            }
+
+            // 지원하는 파일 타입인지 검증
+            String extension = extractExtension(originalFilename);
+            PostFileType actualFileType = PostFileType.fromExtension(extension);
+            if (actualFileType == PostFileType.UNKNOWN || !actualFileType.hasExtensionRestriction()) {
+                throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFile");
+            }
+
+            // 파일 개수 및 크기 검증
+            if (actualFileType == PostFileType.IMAGE) {
+                imageCount++;
+                if (imageCount > MAX_IMAGE_FILES || fileSize > MAX_IMAGE_SIZE) {
+                    throw new InvalidValueException(FileErrorCode.FILE_LIMIT_EXCEEDED, "file");
+                }
+            } else if (actualFileType == PostFileType.VIDEO) {
+                videoCount++;
+                if (videoCount > MAX_VIDEO_FILES || fileSize > MAX_VIDEO_SIZE) {
+                    throw new InvalidValueException(FileErrorCode.FILE_LIMIT_EXCEEDED, "file");
+                }
+            }
+            fileCount++;
+        }
+        if (fileCount > MAX_TOTAL_FILES) {
+            throw new InvalidValueException(FileErrorCode.FILE_LIMIT_EXCEEDED, "file");
+        }
+    }
+
+    private String extractExtension(String filename) {
+        if (filename == null || filename.isEmpty()) {
+            throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFile");
+        }
+        int lastDotIndex = filename.lastIndexOf(".");
+        if (lastDotIndex == -1 || lastDotIndex == filename.length() - 1) {
+            throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFile");
+        }
+        return filename.substring(lastDotIndex + 1);
+    }
+
+    private List<MultipartFile> reorderParts(List<MultipartFile> parts, List<FileOrder> orderInfo) {
+        Map<String, MultipartFile> partMap = parts.stream()
+                .collect(Collectors.toMap(MultipartFile::getOriginalFilename, part -> part));
+
+        return orderInfo.stream()
+                .sorted(Comparator.comparing(FileOrder::order))
+                .map(info -> partMap.get(info.filename()))
+                .collect(Collectors.toList());
+    }
+
+    private ObjectNode convertSinglePartToJson(String fileUlid, MultipartFile part, int order) throws IOException {
+        String contentType = part.getContentType();
+        String filename = part.getOriginalFilename();
+
+        ObjectNode node = objectMapper.createObjectNode();
+        node.put(FILENAME, filename);
+        node.put(ORDER, order);
+
+        PostFileType fileType = PostFileType.from(contentType);
+
+        if (fileType == PostFileType.TEXT) {
+            String text = new String(part.getBytes(), StandardCharsets.UTF_8);
+            node.put(TYPE, fileType.getValue());
+            node.put(DATA, text);
+        } else if (fileType.getUploadable()) {
+            String fileKey = generateFileKey(fileUlid, fileType, filename, order);
+            amazonS3Service.uploadFile(part, fileKey);
+            node.put(TYPE, fileType.getValue());
+            node.put(SRC, fileKey);
+        } else {
+            throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFile");
+        }
+        return node;
+    }
+
+    private String generateFileKey(String fileUlid, PostFileType fileType, String originalFilename, int order) {
+        if (originalFilename == null) {
+            throw new InvalidValueException(FileErrorCode.INVALID_FILE_INPUT, "postMultipartFile");
+        }
+
+        // post/{RAMDOM UlID}/{fileType}/{fileName}
+        String directory = "post/" + fileUlid + "/" + fileType.getValue() + "/";
+
+        String ext = "";
+        int i = originalFilename.lastIndexOf('.');
+        if (i > 0)
+            ext = originalFilename.substring(i);
+        String filename = originalFilename.substring(0, i > 0 ? i : originalFilename.length())
+                + "_" + order + ext;
+
+        return directory + filename;
+    }
+
+    public String extractOriginalFilenameFromFileKey(String fileKey) {
+        if (fileKey == null)
+            return null;
+
+        // fileKey 끝부분 가져오기
+        String filenameWithOrder = fileKey.substring(fileKey.lastIndexOf("/") + 1);
+
+        // 확장자 분리
+        int dotIndex = filenameWithOrder.lastIndexOf('.');
+        String ext = dotIndex > 0 ? filenameWithOrder.substring(dotIndex) : "";
+        String name = dotIndex > 0 ? filenameWithOrder.substring(0, dotIndex) : filenameWithOrder;
+
+        // 마지막 _order 제거
+        name = name.replaceAll("_(\\d+)$", "");  // 마지막 _숫자만 제거
+
+        return name + ext;
+    }
+}

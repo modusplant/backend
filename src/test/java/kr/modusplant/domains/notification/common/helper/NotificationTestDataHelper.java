@@ -1,9 +1,9 @@
 package kr.modusplant.domains.notification.common.helper;
 
+import kr.modusplant.domains.notification.domain.enums.NotificationActionType;
+import kr.modusplant.domains.notification.domain.enums.NotificationStatusType;
 import kr.modusplant.jooq.tables.records.CommNotificationRecord;
 import kr.modusplant.jooq.tables.records.SiteMemberRecord;
-import kr.modusplant.shared.enums.NotificationActionType;
-import kr.modusplant.shared.enums.NotificationStatusType;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Component;

@@ -1,0 +1,58 @@
+package kr.modusplant.domains.account.email.framework.outbound.persistence.jooq;
+
+import kr.modusplant.domains.account.email.usecase.port.repository.EmailIdentityRepository;
+import kr.modusplant.jooq.tables.SiteMemberAuth;
+import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.kernel.Email;
+import kr.modusplant.shared.kernel.Password;
+import org.jooq.DSLContext;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import static org.jooq.impl.DSL.coalesce;
+
+@Repository
+public class EmailIdentityJooqRepository implements EmailIdentityRepository {
+
+    private final SiteMemberAuth memberAuth = SiteMemberAuth.SITE_MEMBER_AUTH;
+    private final DSLContext dsl;
+    private final PasswordEncoder passwordEncoder;
+
+    public EmailIdentityJooqRepository(DSLContext dsl, @Qualifier("bcryptPasswordEncoder") PasswordEncoder passwordEncoder) {
+        this.dsl = dsl;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    public boolean existsByEmailAndProvider(Email email, AuthProvider provider) {
+        return dsl.selectOne()
+                .from(memberAuth)
+                .where(memberAuth.EMAIL.eq(email.getValue())).and(memberAuth.PROVIDER.eq(provider.name()))
+                .fetch()
+                .isNotEmpty();
+    }
+
+    @Override
+    public int updatePassword(Email email, Password pw) {
+        return dsl.update(memberAuth)
+                .set(memberAuth.PW, passwordEncoder.encode(pw.getValue()))
+                .set(memberAuth.LAST_MODIFIED_AT, LocalDateTime.now())
+                .set(memberAuth.VER_NUM, coalesce(memberAuth.VER_NUM, 0).plus(1))
+                .where(memberAuth.EMAIL.eq(email.getValue()))
+                .and(memberAuth.PROVIDER.eq(AuthProvider.BASIC.name()))
+                .execute();
+    }
+
+    @Override
+    public Optional<AuthProvider> findProviderByEmail(Email email) {
+
+        return dsl.select(memberAuth.PROVIDER)
+                .from(memberAuth)
+                .where(memberAuth.EMAIL.eq(email.getValue()))
+                .fetchOptional(record -> AuthProvider.valueOf(record.get(memberAuth.PROVIDER)));
+    }
+}

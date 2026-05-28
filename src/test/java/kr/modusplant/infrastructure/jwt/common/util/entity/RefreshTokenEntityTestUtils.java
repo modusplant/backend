@@ -1,13 +1,13 @@
 package kr.modusplant.infrastructure.jwt.common.util.entity;
 
-import kr.modusplant.domains.member.framework.out.jpa.entity.common.util.MemberEntityTestUtils;
-import kr.modusplant.infrastructure.jwt.framework.out.jpa.entity.RefreshTokenEntity.RefreshTokenEntityBuilder;
+import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.MemberEntityTestUtils;
+import kr.modusplant.infrastructure.jwt.framework.outbound.jpa.entity.RefreshTokenEntity.RefreshTokenEntityBuilder;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 
-import static kr.modusplant.infrastructure.jwt.framework.out.jpa.entity.RefreshTokenEntity.builder;
+import static kr.modusplant.infrastructure.jwt.framework.outbound.jpa.entity.RefreshTokenEntity.builder;
 
 public interface RefreshTokenEntityTestUtils extends MemberEntityTestUtils {
     default RefreshTokenEntityBuilder createRefreshTokenBasicEntityBuilder() {

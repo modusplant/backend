@@ -1,16 +1,16 @@
 package kr.modusplant.domains.notification.adapter.controller;
 
 import kr.modusplant.domains.notification.domain.aggregate.Notification;
+import kr.modusplant.domains.notification.domain.enums.NotificationActionType;
+import kr.modusplant.domains.notification.domain.enums.NotificationStatusType;
 import kr.modusplant.domains.notification.domain.vo.*;
-import kr.modusplant.domains.notification.framework.out.messaging.FcmSender;
+import kr.modusplant.domains.notification.framework.outbound.messaging.FcmSender;
 import kr.modusplant.domains.notification.usecase.port.mapper.NotificationMapper;
 import kr.modusplant.domains.notification.usecase.port.repository.*;
 import kr.modusplant.domains.notification.usecase.record.NotificationPreview;
 import kr.modusplant.domains.notification.usecase.record.NotificationReadModel;
 import kr.modusplant.domains.notification.usecase.response.CursorPageResponse;
 import kr.modusplant.domains.notification.usecase.response.NotificationResponse;
-import kr.modusplant.shared.enums.NotificationActionType;
-import kr.modusplant.shared.enums.NotificationStatusType;
 import kr.modusplant.shared.event.CommentLikeNotificationEvent;
 import kr.modusplant.shared.event.CommentNotificationEvent;
 import kr.modusplant.shared.event.PostLikeNotificationEvent;
@@ -43,7 +43,7 @@ public class NotificationController {
                 .limit(size)
                 .map(notificationMapper::toNotificationResponse)
                 .toList();
-        String nextUlid = hasNext && !responses.isEmpty() ? responses.get(responses.size() - 1).ulid() : null;
+        String nextUlid = hasNext && !responses.isEmpty() ? responses.getLast().ulid() : null;
         return CursorPageResponse.of(responses, nextUlid, hasNext);
     }
 
@@ -109,7 +109,7 @@ public class NotificationController {
         UUID postAuthorUuid = postInfoRepository.getAuthorIdByPostId(postId);
 
         // 대댓글인 경우 상위 댓글 작성자 알림
-        if (event.getAction() == NotificationActionType.COMMENT_REPLY_ADDED) {
+        if (NotificationActionType.valueOf(event.getAction()) == NotificationActionType.COMMENT_REPLY_ADDED) {
             CommentPath parentPath = commentPath.extractParentPath();
             UUID parentCommentAuthorUuid = commentInfoRepository.getAuthorIdByPostIdAndCommentPath(postId, parentPath);
             if (parentCommentAuthorUuid != null && !parentCommentAuthorUuid.equals(actor.getId())) {

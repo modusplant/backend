@@ -2,7 +2,7 @@ package kr.modusplant.domains.member.adapter.translator;
 
 import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityLinkController;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
-import kr.modusplant.domains.account.social.framework.out.exception.UnsupportedSocialProviderException;
+import kr.modusplant.domains.account.social.framework.outbound.exception.UnsupportedSocialProviderException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -17,11 +17,11 @@ public class MemberSocialTranslator {
     public String getSocialAccessToken(String authCode, String authProvider) {
         String upperCaseAuthProvider = authProvider.toUpperCase(Locale.ROOT);
         if (upperCaseAuthProvider.equals(SocialProvider.KAKAO.name())) {
-            return socialIdentityLinkController.issueSocialAccessToken(
-                    SocialProvider.KAKAO, authCode);
+            return socialIdentityLinkController.issueSocialToken(
+                    SocialProvider.KAKAO, authCode, false).socialAccessToken();
         } else if (upperCaseAuthProvider.equals(SocialProvider.GOOGLE.name())) {
-            return socialIdentityLinkController.issueSocialAccessToken(
-                    SocialProvider.GOOGLE, authCode);
+            return socialIdentityLinkController.issueSocialToken(
+                    SocialProvider.GOOGLE, authCode, false).socialAccessToken();
         } else {
             throw new UnsupportedSocialProviderException();
         }
