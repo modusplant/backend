@@ -1,6 +1,5 @@
 package kr.modusplant.domains.member.domain.event;
 
-import kr.modusplant.domains.member.domain.event.PostLikeEvent;
 import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
