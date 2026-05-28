@@ -1,7 +1,10 @@
-package kr.modusplant.domains.member.framework.inbound.app.listener;
+package kr.modusplant.domains.member.adapter.listener;
 
-import kr.modusplant.domains.member.adapter.controller.MemberAdminController;
+import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.domain.event.PostAbuseReportEvent;
+import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
+import kr.modusplant.domains.member.domain.vo.ReportTime;
+import kr.modusplant.domains.member.usecase.port.repository.ReportDashboardRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,23 +19,32 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Slf4j
 public class MemberEventListener {
-    private final MemberAdminController memberAdminController;
     private final Semaphore adminSemaphore;
+    private final MemberValidationHelper memberValidationHelper;
+    private final ReportDashboardRepository reportDashboardRepository;
 
     @Value("${app.semaphore.datasource.bulkhead.admin.timeout-ms}")
     private long timeoutMs;
 
-    public MemberEventListener(MemberAdminController memberAdminController,
-                               @Qualifier("adminSemaphore")Semaphore adminSemaphore) {
-        this.memberAdminController = memberAdminController;
+    public MemberEventListener(@Qualifier("adminSemaphore")Semaphore adminSemaphore,
+                               MemberValidationHelper memberValidationHelper,
+                               ReportDashboardRepository reportDashboardRepository) {
         this.adminSemaphore = adminSemaphore;
+        this.memberValidationHelper = memberValidationHelper;
+        this.reportDashboardRepository = reportDashboardRepository;
     }
 
     @Async("memberDomainExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handlePostAbuseReport(PostAbuseReportEvent event) {
+    public void reflectReportDashboard(PostAbuseReportEvent event) {
         acquireAndProcess(
-                () -> memberAdminController.upsertPostAbuseReportDashboard(event),
+                () -> {
+                    ActivitySubjectPostId postId = ActivitySubjectPostId.create(event.getPostUlid());
+                    ReportTime reportTime = ReportTime.create(event.getCreatedAt());
+                    memberValidationHelper.validateIfActivitySubjectPostExists(postId);
+
+                    reportDashboardRepository.addPostAbuseReport(postId, reportTime);
+                },
                 "[Member Domain] 게시글 신고 대시보드 삽입 또는 갱신 실패 - postUlid = {}",
                 event.getPostUlid()
         );
