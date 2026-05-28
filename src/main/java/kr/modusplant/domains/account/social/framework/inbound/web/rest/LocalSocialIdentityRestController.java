@@ -1,4 +1,4 @@
-package kr.modusplant.domains.account.social.framework.in.web.rest;
+package kr.modusplant.domains.account.social.framework.inbound.web.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,8 +41,8 @@ public class LocalSocialIdentityRestController {
     private final SocialIdentityTokenHelper tempTokenHelper;
     private final SocialIdentityLinkController socialIdentityLinkController;
 
-    private long durationMs = 1800000;
-    private boolean isLocal = true;
+    private final long durationMs = 1800000;
+    private final boolean isLocal = true;
 
     @Operation(summary = "로컬환경 소셜 인증/로그인 API", description = "로컬환경에서만 사용하는 API입니다. <br>카카오/구글 인가코드를 받아 소셜 인증 및 로그인을 수행합니다.<br>구글 인가 코드를 URL에서 추출할 경우 '%2F'는 '/'로 대체해야 합니다.")
     @PostMapping("/local/auth/social-login/{provider}")
