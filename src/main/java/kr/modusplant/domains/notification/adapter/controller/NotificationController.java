@@ -1,5 +1,8 @@
 package kr.modusplant.domains.notification.adapter.controller;
 
+import kr.modusplant.domains.comment.domain.event.CommentRegisterEvent;
+import kr.modusplant.domains.member.domain.event.CommentLikeEvent;
+import kr.modusplant.domains.member.domain.event.PostLikeEvent;
 import kr.modusplant.domains.notification.domain.aggregate.Notification;
 import kr.modusplant.domains.notification.domain.enums.NotificationActionType;
 import kr.modusplant.domains.notification.domain.enums.NotificationStatusType;
@@ -11,9 +14,6 @@ import kr.modusplant.domains.notification.usecase.record.NotificationPreview;
 import kr.modusplant.domains.notification.usecase.record.NotificationReadModel;
 import kr.modusplant.domains.notification.usecase.response.CursorPageResponse;
 import kr.modusplant.domains.notification.usecase.response.NotificationResponse;
-import kr.modusplant.domains.member.domain.event.CommentLikeEvent;
-import kr.modusplant.domains.comment.domain.event.CommentRegisterEvent;
-import kr.modusplant.domains.member.domain.event.PostLikeEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,6 +1,5 @@
 package kr.modusplant.domains.member.domain.event;
 
-import kr.modusplant.domains.member.domain.event.RecentlyViewPostRemoveEvent;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import org.junit.jupiter.api.DisplayName;
