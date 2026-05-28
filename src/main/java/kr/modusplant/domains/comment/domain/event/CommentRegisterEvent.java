@@ -1,4 +1,4 @@
-package kr.modusplant.shared.event;
+package kr.modusplant.domains.comment.domain.event;
 
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
@@ -10,16 +10,16 @@ import java.util.UUID;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class CommentNotificationEvent {
+public class CommentRegisterEvent {
     private final UUID actorId;
     private final String postUlid;
     private final String commentPath;
     private final String contentPreview;
     private final String action;
 
-    public static CommentNotificationEvent create(UUID actorId, String postUlid, String commentPath, String contentPreview) {
+    public static CommentRegisterEvent create(UUID actorId, String postUlid, String commentPath, String contentPreview) {
         validate(actorId, postUlid, commentPath);
-        return new CommentNotificationEvent(actorId, postUlid, commentPath, contentPreview, getActionType(commentPath));
+        return new CommentRegisterEvent(actorId, postUlid, commentPath, contentPreview, getActionType(commentPath));
     }
 
     private static void validate(UUID actorId, String postUlid, String commentPath) {

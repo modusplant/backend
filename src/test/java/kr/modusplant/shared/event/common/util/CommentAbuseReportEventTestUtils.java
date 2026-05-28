@@ -1,6 +1,6 @@
 package kr.modusplant.shared.event.common.util;
 
-import kr.modusplant.shared.event.CommentAbuseReportEvent;
+import kr.modusplant.domains.member.domain.event.CommentAbuseReportEvent;
 
 import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMM_COMMENT_PATH;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;

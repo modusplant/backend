@@ -1,6 +1,6 @@
 package kr.modusplant.shared.event.common.util;
 
-import kr.modusplant.shared.event.RecentlyViewPostRemoveEvent;
+import kr.modusplant.domains.member.domain.event.RecentlyViewPostRemoveEvent;
 
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID_ARRAY;
 

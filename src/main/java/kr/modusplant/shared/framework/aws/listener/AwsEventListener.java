@@ -1,7 +1,7 @@
 package kr.modusplant.shared.framework.aws.listener;
 
-import kr.modusplant.shared.event.ImageRemoveEvent;
-import kr.modusplant.shared.event.ImagesRemoveEvent;
+import kr.modusplant.shared.framework.aws.event.ImageRemoveTask;
+import kr.modusplant.shared.framework.aws.event.ImagesRemoveTask;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ public class AwsEventListener {
 
     @Async("awsExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleImageRemove(ImageRemoveEvent event) {
+    public void handleImageRemove(ImageRemoveTask event) {
         try {
             amazonS3Service.deleteFiles(event.getImageFileKey());
         } catch (Exception e) {
@@ -28,7 +28,7 @@ public class AwsEventListener {
 
     @Async("awsExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleImageRemove(ImagesRemoveEvent event) {
+    public void handleImageRemove(ImagesRemoveTask event) {
         try {
             amazonS3Service.deleteFiles(event.getImageFileKeys());
         } catch (Exception e) {
