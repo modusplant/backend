@@ -35,9 +35,9 @@ import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
 import kr.modusplant.infrastructure.swear.service.SwearService;
-import kr.modusplant.shared.event.CommentLikeNotificationEvent;
-import kr.modusplant.shared.event.PostAbuseReportEvent;
-import kr.modusplant.shared.event.PostLikeNotificationEvent;
+import kr.modusplant.domains.member.domain.event.CommentLikeEvent;
+import kr.modusplant.domains.member.domain.event.PostAbuseReportEvent;
+import kr.modusplant.domains.member.domain.event.PostLikeEvent;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
@@ -289,14 +289,14 @@ class MemberControllerTest implements
         given(activitySubjectPostRepository.isPublished(any())).willReturn(true);
         given(activitySubjectPostRepository.isUnliked(any(), any())).willReturn(true);
         willDoNothing().given(activitySubjectPostRepository).like(any(), any());
-        willDoNothing().given(applicationEventPublisher).publishEvent(any(PostLikeNotificationEvent.class));
+        willDoNothing().given(applicationEventPublisher).publishEvent(any(PostLikeEvent.class));
 
         // when
         memberController.likePost(testMemberPostLikeRecord);
 
         // then
         verify(activitySubjectPostRepository, times(1)).like(any(), any());
-        verify(applicationEventPublisher, times(1)).publishEvent(any(PostLikeNotificationEvent.class));
+        verify(applicationEventPublisher, times(1)).publishEvent(any(PostLikeEvent.class));
     }
 
     @Test
@@ -313,7 +313,7 @@ class MemberControllerTest implements
 
         // then
         verify(activitySubjectPostRepository, times(0)).like(any(), any());
-        verify(applicationEventPublisher, times(0)).publishEvent(any(PostLikeNotificationEvent.class));
+        verify(applicationEventPublisher, times(0)).publishEvent(any(PostLikeEvent.class));
     }
 
     @Test
@@ -603,14 +603,14 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfActivitySubjectCommentExists(any());
         given(activitySubjectCommentRepository.isUnliked(any(), any())).willReturn(true);
         willDoNothing().given(activitySubjectCommentRepository).like(any(), any());
-        willDoNothing().given(applicationEventPublisher).publishEvent(any(CommentLikeNotificationEvent.class));
+        willDoNothing().given(applicationEventPublisher).publishEvent(any(CommentLikeEvent.class));
 
         // when
         memberController.likeComment(testMemberCommentLikeRecord);
 
         // then
         verify(activitySubjectCommentRepository, times(1)).like(any(), any());
-        verify(applicationEventPublisher, times(1)).publishEvent(any(CommentLikeNotificationEvent.class));
+        verify(applicationEventPublisher, times(1)).publishEvent(any(CommentLikeEvent.class));
     }
 
     @Test
@@ -626,7 +626,7 @@ class MemberControllerTest implements
 
         // then
         verify(activitySubjectCommentRepository, times(0)).like(any(), any());
-        verify(applicationEventPublisher, times(0)).publishEvent(any(CommentLikeNotificationEvent.class));
+        verify(applicationEventPublisher, times(0)).publishEvent(any(CommentLikeEvent.class));
     }
 
     @Test

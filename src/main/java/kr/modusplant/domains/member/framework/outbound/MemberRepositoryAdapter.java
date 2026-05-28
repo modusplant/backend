@@ -15,9 +15,9 @@ import kr.modusplant.domains.member.framework.outbound.jpa.mapper.supers.MemberJ
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.*;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
 import kr.modusplant.domains.post.framework.outbound.jooq.repository.PostJooqRepository;
-import kr.modusplant.shared.event.ImageRemoveEvent;
-import kr.modusplant.shared.event.ImagesRemoveEvent;
-import kr.modusplant.shared.event.RecentlyViewPostRemoveEvent;
+import kr.modusplant.shared.framework.aws.event.ImageRemoveTask;
+import kr.modusplant.shared.framework.aws.event.ImagesRemoveTask;
+import kr.modusplant.domains.member.domain.event.RecentlyViewPostRemoveEvent;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
@@ -113,7 +113,7 @@ public class MemberRepositoryAdapter implements MemberRepository {
             }
         }
         if (!fileKeysToDelete.isEmpty()) {
-            eventPublisher.publishEvent(ImagesRemoveEvent.create(fileKeysToDelete));
+            eventPublisher.publishEvent(ImagesRemoveTask.create(fileKeysToDelete));
         }
         if (!ArrayUtils.isEmpty(publishedPostUlids)) {
             eventPublisher.publishEvent(RecentlyViewPostRemoveEvent.create(publishedPostUlids));
@@ -134,7 +134,7 @@ public class MemberRepositoryAdapter implements MemberRepository {
 
         String memberProfileImageFileKey = memberProfileJpaRepository.findByUuid(memberId).orElseThrow().getImagePath();
         if (memberProfileImageFileKey != null) {
-            eventPublisher.publishEvent(ImageRemoveEvent.create(memberProfileImageFileKey));
+            eventPublisher.publishEvent(ImageRemoveTask.create(memberProfileImageFileKey));
         }
         memberWithdrawJpaRepository.save(
                 MemberWithdrawEntity.builder()

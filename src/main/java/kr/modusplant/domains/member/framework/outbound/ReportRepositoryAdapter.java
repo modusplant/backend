@@ -21,7 +21,7 @@ import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminP
 import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
-import kr.modusplant.shared.event.ImagesRemoveEvent;
+import kr.modusplant.shared.framework.aws.event.ImagesRemoveTask;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.ApplicationEventPublisher;
@@ -129,7 +129,7 @@ public class ReportRepositoryAdapter implements ReportRepository {
         String reportId = reportIdVo.getValue();
         List<String> srcList = proposalOrBugReportJooqRepository.getImageFileKeysFromReportId(reportId);
         if (!srcList.isEmpty()) {
-            applicationEventPublisher.publishEvent(ImagesRemoveEvent.create(srcList));
+            applicationEventPublisher.publishEvent(ImagesRemoveTask.create(srcList));
         }
         proposalOrBugReportJooqRepository.archiveByReportId(reportId);
         proposalOrBugReportJpaRepository.deleteByUlid(reportId);

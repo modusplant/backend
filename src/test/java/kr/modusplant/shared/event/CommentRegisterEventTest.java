@@ -1,5 +1,6 @@
 package kr.modusplant.shared.event;
 
+import kr.modusplant.domains.comment.domain.event.CommentRegisterEvent;
 import kr.modusplant.domains.notification.domain.enums.NotificationActionType;
 import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
@@ -11,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class CommentNotificationEventTest {
+class CommentRegisterEventTest {
 
     @Nested
     @DisplayName("create 테스트")
@@ -21,7 +22,7 @@ class CommentNotificationEventTest {
         @DisplayName("commentPath에 '.'이 없으면 COMMENT_ADDED 액션으로 생성")
         void testCreate_givenRootPath_willHaveCommentAddedAction() {
             // when
-            CommentNotificationEvent event = CommentNotificationEvent.create(TEST_NOTIFICATION_ACTOR_ID, TEST_NOTIFICATION_POST_ULID, TEST_NOTIFICATION_COMMENT_PATH_DEPTH1, TEST_NOTIFICATION_COMMENT_PREVIEW);
+            CommentRegisterEvent event = CommentRegisterEvent.create(TEST_NOTIFICATION_ACTOR_ID, TEST_NOTIFICATION_POST_ULID, TEST_NOTIFICATION_COMMENT_PATH_DEPTH1, TEST_NOTIFICATION_COMMENT_PREVIEW);
 
             // then
             assertEquals(NotificationActionType.COMMENT_ADDED.name(), event.getAction());
@@ -35,7 +36,7 @@ class CommentNotificationEventTest {
         @DisplayName("commentPath에 '.'이 포함되면 COMMENT_REPLY_ADDED 액션으로 생성")
         void testCreate_givenChildPath_willHaveCommentReplyAddedAction() {
             // when
-            CommentNotificationEvent event = CommentNotificationEvent.create(TEST_NOTIFICATION_ACTOR_ID, TEST_NOTIFICATION_POST_ULID, TEST_NOTIFICATION_COMMENT_PATH_DEPTH3, TEST_NOTIFICATION_COMMENT_PREVIEW);
+            CommentRegisterEvent event = CommentRegisterEvent.create(TEST_NOTIFICATION_ACTOR_ID, TEST_NOTIFICATION_POST_ULID, TEST_NOTIFICATION_COMMENT_PATH_DEPTH3, TEST_NOTIFICATION_COMMENT_PREVIEW);
 
             // then
             assertEquals(NotificationActionType.COMMENT_REPLY_ADDED.name(), event.getAction());
@@ -50,14 +51,14 @@ class CommentNotificationEventTest {
         @DisplayName("actorId가 null일 때 오류 발생")
         void testCreate_givenNullActorId_willThrowException() {
             assertThrows(InvalidValueException.class, () ->
-                    CommentNotificationEvent.create(null,  TEST_NOTIFICATION_POST_ULID, TEST_NOTIFICATION_COMMENT_PATH_DEPTH3, TEST_NOTIFICATION_COMMENT_PREVIEW));
+                    CommentRegisterEvent.create(null,  TEST_NOTIFICATION_POST_ULID, TEST_NOTIFICATION_COMMENT_PATH_DEPTH3, TEST_NOTIFICATION_COMMENT_PREVIEW));
         }
 
         @Test
         @DisplayName("commentPath가 null이거나 비어 있을 때 오류 발생")
         void testCreate_givenEmptyCommentPath_willThrowException() {
             InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
-                    CommentNotificationEvent.create(TEST_NOTIFICATION_ACTOR_ID, TEST_NOTIFICATION_POST_ULID,"", TEST_NOTIFICATION_COMMENT_PREVIEW));
+                    CommentRegisterEvent.create(TEST_NOTIFICATION_ACTOR_ID, TEST_NOTIFICATION_POST_ULID,"", TEST_NOTIFICATION_COMMENT_PREVIEW));
 
             assertThat(exception.getMessage()).contains("NOT_FOUND_COMMENT");
         }

@@ -23,7 +23,7 @@ import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
 import kr.modusplant.infrastructure.swear.service.SwearService;
-import kr.modusplant.shared.event.CommentNotificationEvent;
+import kr.modusplant.domains.comment.domain.event.CommentRegisterEvent;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
@@ -112,7 +112,7 @@ public class CommentController {
         writeRepository.save(comment);
 
         applicationEventPublisher.publishEvent(
-                CommentNotificationEvent.create(currentMemberUuid, request.postId(), request.path(), request.content())
+                CommentRegisterEvent.create(currentMemberUuid, request.postId(), request.path(), request.content())
         );
     }
 

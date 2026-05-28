@@ -1,6 +1,6 @@
 package kr.modusplant.shared.event.common.util;
 
-import kr.modusplant.shared.event.PostAbuseReportEvent;
+import kr.modusplant.domains.member.domain.event.PostAbuseReportEvent;
 
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_PUBLISHED_AT;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;

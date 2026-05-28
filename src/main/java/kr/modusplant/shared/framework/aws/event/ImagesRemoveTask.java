@@ -1,4 +1,4 @@
-package kr.modusplant.shared.event;
+package kr.modusplant.shared.framework.aws.event;
 
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
@@ -11,14 +11,14 @@ import java.util.List;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class ImagesRemoveEvent {
+public class ImagesRemoveTask {
     private final List<String> imageFileKeys;
 
-    public static ImagesRemoveEvent create(List<String> imageFileKeys) {
+    public static ImagesRemoveTask create(List<String> imageFileKeys) {
         if (CollectionUtils.isEmpty(imageFileKeys)) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_IMAGE_FILE_KEYS, "imageFileKeys");
         } else {
-            return new ImagesRemoveEvent(imageFileKeys);
+            return new ImagesRemoveTask(imageFileKeys);
         }
     }
 }

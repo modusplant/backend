@@ -43,10 +43,10 @@ class NotificationEventListenerTest implements PostLikeNotificationEventTestUtil
         given(notificationSemaphore.tryAcquire(anyLong(), any(TimeUnit.class))).willReturn(true);
 
         // when
-        notificationEventListener.handlePostLikeNotification(testPostLikeNotificationEvent);
+        notificationEventListener.handlePostLikeNotification(testPostLikeEvent);
 
         // then
-        verify(notificationController, times(1)).createPostLikeNotification(testPostLikeNotificationEvent);
+        verify(notificationController, times(1)).createPostLikeNotification(testPostLikeEvent);
         verify(notificationSemaphore, times(1)).release();
     }
 
@@ -57,10 +57,10 @@ class NotificationEventListenerTest implements PostLikeNotificationEventTestUtil
         given(notificationSemaphore.tryAcquire(anyLong(), any(TimeUnit.class))).willReturn(true);
 
         // when
-        notificationEventListener.handleCommentLikeNotification(testCommentLikeNotificationEvent);
+        notificationEventListener.handleCommentLikeNotification(testCommentLikeEvent);
 
         // then
-        verify(notificationController, times(1)).createCommentLikeNotification(testCommentLikeNotificationEvent);
+        verify(notificationController, times(1)).createCommentLikeNotification(testCommentLikeEvent);
         verify(notificationSemaphore, times(1)).release();
     }
 
@@ -71,10 +71,10 @@ class NotificationEventListenerTest implements PostLikeNotificationEventTestUtil
         given(notificationSemaphore.tryAcquire(anyLong(), any(TimeUnit.class))).willReturn(true);
 
         // when
-        notificationEventListener.handleCommentNotification(testCommentNotificationEvent);
+        notificationEventListener.handleCommentNotification(testCommentRegisterEvent);
 
         // then
-        verify(notificationController, times(1)).createCommentNotification(testCommentNotificationEvent);
+        verify(notificationController, times(1)).createCommentNotification(testCommentRegisterEvent);
         verify(notificationSemaphore, times(1)).release();
     }
 
@@ -85,7 +85,7 @@ class NotificationEventListenerTest implements PostLikeNotificationEventTestUtil
         given(notificationSemaphore.tryAcquire(anyLong(), any(TimeUnit.class))).willReturn(false);
 
         // when
-        notificationEventListener.handlePostLikeNotification(testPostLikeNotificationEvent);
+        notificationEventListener.handlePostLikeNotification(testPostLikeEvent);
 
         // then
         verify(notificationController, never()).createPostLikeNotification(any());
@@ -100,7 +100,7 @@ class NotificationEventListenerTest implements PostLikeNotificationEventTestUtil
         doThrow(new RuntimeException("Fail")).when(notificationController).createPostLikeNotification(any());
 
         // when
-        assertDoesNotThrow(() -> notificationEventListener.handlePostLikeNotification(testPostLikeNotificationEvent));
+        assertDoesNotThrow(() -> notificationEventListener.handlePostLikeNotification(testPostLikeEvent));
 
         // then
         verify(notificationController, times(1)).createPostLikeNotification(any());
@@ -114,7 +114,7 @@ class NotificationEventListenerTest implements PostLikeNotificationEventTestUtil
         given(notificationSemaphore.tryAcquire(anyLong(), any(TimeUnit.class))).willThrow(new InterruptedException());
 
         // when
-        notificationEventListener.handlePostLikeNotification(testPostLikeNotificationEvent);
+        notificationEventListener.handlePostLikeNotification(testPostLikeEvent);
 
         // then
         verify(notificationController, never()).createPostLikeNotification(any());

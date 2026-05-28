@@ -18,7 +18,7 @@ import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostAbuseR
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.ProposalOrBugReportJpaRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
-import kr.modusplant.shared.event.ImagesRemoveEvent;
+import kr.modusplant.shared.framework.aws.event.ImagesRemoveTask;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -293,7 +293,7 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
         reportRepositoryAdapter.removeProposalOrBugReport(testReportId);
 
         // then
-        verify(applicationEventPublisher, times(1)).publishEvent(any(ImagesRemoveEvent.class));
+        verify(applicationEventPublisher, times(1)).publishEvent(any(ImagesRemoveTask.class));
     }
 
     @Test
