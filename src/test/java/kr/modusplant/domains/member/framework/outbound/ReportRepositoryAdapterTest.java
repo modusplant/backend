@@ -34,8 +34,6 @@ import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubject
 import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectPostIdTestUtils.testActivitySubjectPostId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
-import static kr.modusplant.domains.member.common.util.framework.outbound.jooq.record.ProposalOrBugReportAdminPageRecordTestUtils.testProposalOrBugReportAdminPageCheckedRecord;
-import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportAdminPageReadModelTestUtils.testProposalOrBugReportAdminPageCheckedReadModel;
 import static kr.modusplant.domains.post.common.constant.PostConstant.*;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -264,23 +262,6 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
 
         // then
         verify(commentAbuseReportJpaRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("checkProposalOrBugReport 실행 시 확인 수행")
-    void testCheckProposalOrBugReport_givenValidReportId_willCheckProposalOrBugReport() {
-        // given
-        given(proposalOrBugReportJpaRepository.findByUlid(any())).willReturn(Optional.of(createProposalBugReportEntityBuilder().member(createMemberBasicUserEntity()).build()));
-        given(proposalOrBugReportJpaRepository.save(any())).willReturn(createProposalBugReportEntityBuilder().build());
-        given(proposalOrBugReportJooqRepository.getAdminPageRecordByReportId(any())).willReturn(testProposalOrBugReportAdminPageCheckedRecord);
-        given(proposalOrBugReportJooqRepository.getAdminPageReadModel(testProposalOrBugReportAdminPageCheckedRecord)).willReturn(testProposalOrBugReportAdminPageCheckedReadModel);
-
-        // when
-        reportRepositoryAdapter.checkProposalOrBugReport(testReportId);
-
-        // then
-        verify(proposalOrBugReportJooqRepository, times(1)).getAdminPageRecordByReportId(any());
-        verify(proposalOrBugReportJooqRepository, times(1)).getAdminPageReadModel(testProposalOrBugReportAdminPageCheckedRecord);
     }
 
     @Test

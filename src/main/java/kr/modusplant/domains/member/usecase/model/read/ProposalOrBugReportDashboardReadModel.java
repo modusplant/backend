@@ -1,15 +1,13 @@
-package kr.modusplant.domains.member.framework.outbound.jooq.record;
-
-import org.jooq.JSONB;
+package kr.modusplant.domains.member.usecase.model.read;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-public record ProposalOrBugReportAdminPageRecord(
+public record ProposalOrBugReportDashboardReadModel(
         String ulid,
         String title,
         String content,
-        JSONB image,
-        Integer imageNumber,
+        List<byte[]> image,
         LocalDateTime checkedAt,
         LocalDateTime createdAt,
         LocalDateTime displayTimestamp,

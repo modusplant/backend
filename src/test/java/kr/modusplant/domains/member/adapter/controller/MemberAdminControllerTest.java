@@ -2,7 +2,8 @@ package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
-import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
+import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
+import kr.modusplant.domains.member.usecase.port.repository.ReportDashboardRepository;
 import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportGetRecord;
 import kr.modusplant.shared.exception.ExistsValueException;
@@ -17,8 +18,8 @@ import java.util.List;
 
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_SIZE;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
-import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportAdminPageReadModelTestUtils.testProposalOrBugReportAdminPageCheckedReadModel;
-import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportAdminPageReadModelTestUtils.testProposalOrBugReportAdminPageCheckedReadModelList;
+import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModel;
+import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModelList;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportCheckRecordTestUtils.testProposalOrBugReportCheckRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordGetTestUtils.testProposalOrBugReportGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRemoveRecordTestUtils.testProposalOrBugReportRemoveRecord;
@@ -39,37 +40,38 @@ class MemberAdminControllerTest {
 
     private final MemberValidationHelper memberValidationHelper = Mockito.mock(MemberValidationHelper.class);
     private final ReportRepository reportRepository = Mockito.mock(ReportRepository.class);
+    private final ReportDashboardRepository reportDashboardRepository = Mockito.mock(ReportDashboardRepository.class);
 
-    private final MemberAdminController memberAdminController = new MemberAdminController(memberValidationHelper, reportRepository);
+    private final MemberAdminController memberAdminController = new MemberAdminController(memberValidationHelper, reportRepository, reportDashboardRepository);
 
     @Test
     @DisplayName("lastReportUlid가 null이 아닐 때 getProposalOrBug로 건의 및 버그 제보 조회")
     void testGetProposalOrBug_givenValidLastReportUlid_willGetProposalOrBugReport() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfReportExists(any());
-        given(reportRepository.getProposalOrBugReports(any(), any(), any())).willReturn(testProposalOrBugReportAdminPageCheckedReadModelList);
+        given(reportDashboardRepository.getProposalOrBugReports(any(), any(), any())).willReturn(testProposalOrBugReportDashboardCheckedReadModelList);
 
         // when
-        List<ProposalOrBugReportAdminPageReadModel> readModels = memberAdminController.getProposalOrBug(testProposalOrBugReportGetRecord);
+        List<ProposalOrBugReportDashboardReadModel> readModels = memberAdminController.getProposalOrBug(testProposalOrBugReportGetRecord);
 
         // then
-        verify(reportRepository, times(1)).getProposalOrBugReports(any(), any(), any());
-        assertThat(readModels).isEqualTo(testProposalOrBugReportAdminPageCheckedReadModelList);
+        verify(reportDashboardRepository, times(1)).getProposalOrBugReports(any(), any(), any());
+        assertThat(readModels).isEqualTo(testProposalOrBugReportDashboardCheckedReadModelList);
     }
 
     @Test
     @DisplayName("lastReportUlid가 null일 때 getProposalOrBug로 건의 및 버그 제보 조회")
     void testGetProposalOrBug_givenNullLastReportUlid_willGetProposalOrBugReport() {
         // given
-        given(reportRepository.getProposalOrBugReports(any(), any(), any())).willReturn(testProposalOrBugReportAdminPageCheckedReadModelList);
+        given(reportDashboardRepository.getProposalOrBugReports(any(), any(), any())).willReturn(testProposalOrBugReportDashboardCheckedReadModelList);
 
         // when
-        List<ProposalOrBugReportAdminPageReadModel> readModels =
+        List<ProposalOrBugReportDashboardReadModel> readModels =
                 memberAdminController.getProposalOrBug(new ProposalOrBugReportGetRecord(ProposalOrBugReportStatus.CHECKED, null, TEST_REPORT_SIZE));
 
         // then
-        verify(reportRepository, times(1)).getProposalOrBugReports(any(), any(), any());
-        assertThat(readModels).isEqualTo(testProposalOrBugReportAdminPageCheckedReadModelList);
+        verify(reportDashboardRepository, times(1)).getProposalOrBugReports(any(), any(), any());
+        assertThat(readModels).isEqualTo(testProposalOrBugReportDashboardCheckedReadModelList);
     }
 
     @Test
@@ -78,14 +80,14 @@ class MemberAdminControllerTest {
         // given
         willDoNothing().given(memberValidationHelper).validateIfReportExists(any());
         given(reportRepository.isCheckedInProposalOrBugReport(testReportId)).willReturn(false);
-        given(reportRepository.checkProposalOrBugReport(any())).willReturn(testProposalOrBugReportAdminPageCheckedReadModel);
+        given(reportDashboardRepository.checkProposalOrBugReport(any())).willReturn(testProposalOrBugReportDashboardCheckedReadModel);
 
         // when
-        ProposalOrBugReportAdminPageReadModel readModel = memberAdminController.checkProposalOrBug(testProposalOrBugReportCheckRecord);
+        ProposalOrBugReportDashboardReadModel readModel = memberAdminController.checkProposalOrBug(testProposalOrBugReportCheckRecord);
 
         // then
-        verify(reportRepository, times(1)).checkProposalOrBugReport(any());
-        assertThat(readModel).isEqualTo(testProposalOrBugReportAdminPageCheckedReadModel);
+        verify(reportDashboardRepository, times(1)).checkProposalOrBugReport(any());
+        assertThat(readModel).isEqualTo(testProposalOrBugReportDashboardCheckedReadModel);
     }
 
     @Test

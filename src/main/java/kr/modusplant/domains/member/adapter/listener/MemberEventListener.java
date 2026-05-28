@@ -43,7 +43,7 @@ public class MemberEventListener {
                     ReportTime reportTime = ReportTime.create(event.getCreatedAt());
                     memberValidationHelper.validateIfActivitySubjectPostExists(postId);
 
-                    reportDashboardRepository.addPostAbuseReport(postId, reportTime);
+                    reportDashboardRepository.reflectPostAbuseReport(postId, reportTime);
                 },
                 "[Member Domain] 게시글 신고 대시보드 삽입 또는 갱신 실패 - postUlid = {}",
                 event.getPostUlid()
