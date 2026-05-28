@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import kr.modusplant.domains.member.adapter.controller.MemberAdminController;
 import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
-import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
+import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportCheckRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportGetRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRemoveRecord;
@@ -44,7 +44,7 @@ public class MemberAdminRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @GetMapping(value = "/report/proposal-or-bug")
-    public ResponseEntity<DataResponse<List<ProposalOrBugReportAdminPageReadModel>>> getProposalOrBugReport(
+    public ResponseEntity<DataResponse<List<ProposalOrBugReportDashboardReadModel>>> getProposalOrBugReport(
             @Parameter(
                     description = "필터링용 보고서 상태",
                     example = "UNCHECKED"
@@ -67,7 +67,7 @@ public class MemberAdminRestController {
             @Range(min = 1, max = 50)
             Integer size) {
 
-        List<ProposalOrBugReportAdminPageReadModel> readModels =
+        List<ProposalOrBugReportDashboardReadModel> readModels =
                 memberAdminController.getProposalOrBug(new ProposalOrBugReportGetRecord(status, lastReportUlid, size));
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
@@ -80,7 +80,7 @@ public class MemberAdminRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PostMapping(value = "/report/proposal-or-bug/{reportUlid}")
-    public ResponseEntity<DataResponse<ProposalOrBugReportAdminPageReadModel>> checkProposalOrBugReport(
+    public ResponseEntity<DataResponse<ProposalOrBugReportDashboardReadModel>> checkProposalOrBugReport(
             @Parameter(
                     description = "확인할 보고서의 식별자",
                     schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
@@ -89,7 +89,7 @@ public class MemberAdminRestController {
             @NotBlank(message = "보고서 식별자가 비어 있습니다.")
             @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다. ")
             String reportUlid) {
-        ProposalOrBugReportAdminPageReadModel readModel =
+        ProposalOrBugReportDashboardReadModel readModel =
                 memberAdminController.checkProposalOrBug(new ProposalOrBugReportCheckRecord(reportUlid));
         return ResponseEntity.ok().body(DataResponse.ok(readModel));
     }
