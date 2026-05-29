@@ -18,9 +18,11 @@ import java.util.Objects;
 
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_SIZE;
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_ULID;
+import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAbuseReportDashboardReadModelTestUtils.testPostAbuseReportDashboardReadModel;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAbuseReportDashboardReadModelTestUtils.testPostAbuseReportDashboardReadModelList;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModel;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModelList;
+import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportDismissRecordTestUtils.testPostAbuseReportDismissRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportGetRecordTestUtils.testPostAbuseReportGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportCheckRecordTestUtils.testProposalOrBugReportCheckRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordGetTestUtils.testProposalOrBugReportGetRecord;
@@ -92,5 +94,20 @@ class MemberAdminRestControllerTest {
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testPostAbuseReportDashboardReadModelList).toString());
+    }
+
+    @Test
+    @DisplayName("dismissPostAbuseReport로 응답 반환")
+    void testDismissPostAbuseReport_givenValidRequest_willReturnResponse() {
+        // given
+        given(memberAdminController.dismissPostAbuse(testPostAbuseReportDismissRecord)).willReturn(testPostAbuseReportDashboardReadModel);
+
+        // when
+        ResponseEntity<DataResponse<PostAbuseReportDashboardReadModel>> responseEntity =
+                memberAdminRestController.dismissPostAbuseReport(TEST_POST_ULID);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testPostAbuseReportDashboardReadModel).toString());
     }
 }

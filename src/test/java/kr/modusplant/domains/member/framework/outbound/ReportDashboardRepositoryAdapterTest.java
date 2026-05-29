@@ -2,9 +2,12 @@ package kr.modusplant.domains.member.framework.outbound;
 
 import kr.modusplant.domains.member.common.util.domain.aggregate.ProposalOrBugReportTestUtils;
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.CommentAbuseReportEntityTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.PostAbuseReportDashboardEntityTestUtils;
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.PostAbuseReportEntityTestUtils;
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.ProposalBugReportEntityTestUtils;
 import kr.modusplant.domains.member.domain.enums.AbuseReportStatus;
+import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
+import kr.modusplant.domains.member.framework.outbound.jpa.entity.PostAbuseReportDashboardEntity;
 import kr.modusplant.domains.member.domain.vo.ReportPageSize;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.PostAbuseReportDashboardJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ProposalOrBugReportDashboardJooqRepository;
@@ -13,6 +16,7 @@ import kr.modusplant.domains.member.framework.outbound.jpa.repository.ProposalOr
 import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -22,18 +26,21 @@ import java.util.Optional;
 
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_SIZE;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
+import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAbuseReportDashboardReadModelTestUtils.testPostAbuseReportDashboardReadModel;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAbuseReportDashboardReadModelTestUtils.testPostAbuseReportDashboardReadModelList;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModel;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_POST_ABUSE_REPORT;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 class ReportDashboardRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, CommentAbuseReportEntityTestUtils,
-        ProposalOrBugReportTestUtils, ProposalBugReportEntityTestUtils {
+        ProposalOrBugReportTestUtils, ProposalBugReportEntityTestUtils, PostAbuseReportDashboardEntityTestUtils {
     @SuppressWarnings("unused")
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
 
@@ -76,5 +83,80 @@ class ReportDashboardRepositoryAdapterTest implements PostAbuseReportEntityTestU
 
         // then
         verify(proposalOrBugReportDashboardJooqRepository, times(1)).getReadModelByReportId(any());
+    }
+
+    @Test
+    @DisplayName("DISMISSED 상태의 엔티티가 존재할 때 isDismissedInPostAbuseReportDashboard로 true 반환")
+    void testIsDismissedInPostAbuseReportDashboard_givenDismissedEntity_willReturnTrue() {
+        // given
+        PostAbuseReportDashboardEntity dismissedEntity = createPostAbuseReportDashboardDismissedEntityBuilder().build();
+        given(postAbuseReportDashboardJpaRepository.findById(TEST_POST_ULID)).willReturn(Optional.of(dismissedEntity));
+
+        // when
+        boolean result = reportDashboardRepositoryAdapter.isDismissedInPostAbuseReportDashboard(ActivitySubjectPostId.create(TEST_POST_ULID));
+
+        // then
+        verify(postAbuseReportDashboardJpaRepository, times(1)).findById(TEST_POST_ULID);
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("UNCHECKED 상태의 엔티티가 존재할 때 isDismissedInPostAbuseReportDashboard로 false 반환")
+    void testIsDismissedInPostAbuseReportDashboard_givenUncheckedEntity_willReturnFalse() {
+        // given
+        PostAbuseReportDashboardEntity uncheckedEntity = createPostAbuseReportDashboardUncheckedEntityBuilder().build();
+        given(postAbuseReportDashboardJpaRepository.findById(TEST_POST_ULID)).willReturn(Optional.of(uncheckedEntity));
+
+        // when
+        boolean result = reportDashboardRepositoryAdapter.isDismissedInPostAbuseReportDashboard(ActivitySubjectPostId.create(TEST_POST_ULID));
+
+        // then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("엔티티가 존재하지 않을 때 isDismissedInPostAbuseReportDashboard로 false 반환")
+    void testIsDismissedInPostAbuseReportDashboard_givenNotFoundEntity_willReturnFalse() {
+        // given
+        given(postAbuseReportDashboardJpaRepository.findById(TEST_POST_ULID)).willReturn(Optional.empty());
+
+        // when
+        boolean result = reportDashboardRepositoryAdapter.isDismissedInPostAbuseReportDashboard(ActivitySubjectPostId.create(TEST_POST_ULID));
+
+        // then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("엔티티가 존재할 때 dismissPostAbuseReport로 반려 수행 후 읽기 모델 반환")
+    void testDismissPostAbuseReport_givenFoundEntity_willDismissAndReturnReadModel() {
+        // given
+        PostAbuseReportDashboardEntity uncheckedEntity = createPostAbuseReportDashboardUncheckedEntityBuilder().build();
+        given(postAbuseReportDashboardJpaRepository.findById(TEST_POST_ULID)).willReturn(Optional.of(uncheckedEntity));
+        given(postAbuseReportDashboardJpaRepository.save(any())).willReturn(uncheckedEntity);
+        given(postAbuseReportDashboardJooqRepository.getReadModelByPostId(TEST_POST_ULID)).willReturn(testPostAbuseReportDashboardReadModel);
+
+        // when
+        PostAbuseReportDashboardReadModel readModel = reportDashboardRepositoryAdapter.dismissPostAbuseReport(ActivitySubjectPostId.create(TEST_POST_ULID));
+
+        // then
+        verify(postAbuseReportDashboardJpaRepository, times(1)).save(any());
+        verify(postAbuseReportDashboardJooqRepository, times(1)).getReadModelByPostId(TEST_POST_ULID);
+        assertThat(readModel).isEqualTo(testPostAbuseReportDashboardReadModel);
+    }
+
+    @Test
+    @DisplayName("엔티티가 존재하지 않을 때 dismissPostAbuseReport로 예외 반환")
+    void testDismissPostAbuseReport_givenNotFoundEntity_willThrowException() {
+        // given
+        given(postAbuseReportDashboardJpaRepository.findById(TEST_POST_ULID)).willReturn(Optional.empty());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(
+                NotFoundEntityException.class,
+                () -> reportDashboardRepositoryAdapter.dismissPostAbuseReport(ActivitySubjectPostId.create(TEST_POST_ULID)));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_POST_ABUSE_REPORT);
     }
 }
