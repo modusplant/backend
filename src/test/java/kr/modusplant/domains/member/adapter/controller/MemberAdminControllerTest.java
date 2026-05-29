@@ -22,15 +22,16 @@ import java.util.List;
 
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_SIZE;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
+import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAbuseReportDashboardReadModelTestUtils.testPostAbuseReportDashboardReadModel;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAbuseReportDashboardReadModelTestUtils.testPostAbuseReportDashboardReadModelList;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModel;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModelList;
+import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportDismissRecordTestUtils.testPostAbuseReportDismissRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportGetRecordTestUtils.testPostAbuseReportGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportCheckRecordTestUtils.testProposalOrBugReportCheckRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordGetTestUtils.testProposalOrBugReportGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRemoveRecordTestUtils.testProposalOrBugReportRemoveRecord;
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EXISTS_REPORT_CHECKED_AT;
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_ACTIVITY_SUBJECT_POST_ID;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -170,6 +171,7 @@ class MemberAdminControllerTest {
         assertThat(readModels).isEqualTo(testPostAbuseReportDashboardReadModelList);
     }
 
+
     @Test
     @DisplayName("lastPostUlid가 존재하지 않을 때 getPostAbuseReport로 예외 반환")
     void testGetPostAbuseReport_givenNotFoundLastPostUlid_willThrowException() {
@@ -184,5 +186,53 @@ class MemberAdminControllerTest {
 
         // then
         assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_ACTIVITY_SUBJECT_POST_ID);
+    }
+
+    @Test
+    @DisplayName("반려되지 않은 게시글일 때 dismissPostAbuse로 게시글 신고 반려 후 읽기 모델 반환")
+    void testDismissPostAbuse_givenNotDismissedPost_willReturnReadModel() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfActivitySubjectPostExists(any());
+        given(reportDashboardRepository.isDismissedInPostAbuseReportDashboard(any())).willReturn(false);
+        given(reportDashboardRepository.dismissPostAbuseReport(any())).willReturn(testPostAbuseReportDashboardReadModel);
+
+        // when
+        PostAbuseReportDashboardReadModel readModel = memberAdminController.dismissPostAbuse(testPostAbuseReportDismissRecord);
+
+        // then
+        verify(reportDashboardRepository, times(1)).dismissPostAbuseReport(any());
+        assertThat(readModel).isEqualTo(testPostAbuseReportDashboardReadModel);
+    }
+
+    @Test
+    @DisplayName("게시글을 찾을 수 없을 때 dismissPostAbuse로 예외 반환")
+    void testDismissPostAbuse_givenNotFoundPost_willThrowException() {
+        // given
+        willThrow(new NotFoundEntityException(NOT_FOUND_ACTIVITY_SUBJECT_POST_ID, "activitySubjectPostId"))
+                .given(memberValidationHelper).validateIfActivitySubjectPostExists(any());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(
+                NotFoundEntityException.class,
+                () -> memberAdminController.dismissPostAbuse(testPostAbuseReportDismissRecord));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_ACTIVITY_SUBJECT_POST_ID);
+    }
+
+    @Test
+    @DisplayName("이미 반려된 게시글일 때 dismissPostAbuse로 예외 반환")
+    void testDismissPostAbuse_givenAlreadyDismissedPost_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfActivitySubjectPostExists(any());
+        given(reportDashboardRepository.isDismissedInPostAbuseReportDashboard(any())).willReturn(true);
+
+        // when
+        ExistsValueException existsValueException = assertThrows(
+                ExistsValueException.class,
+                () -> memberAdminController.dismissPostAbuse(testPostAbuseReportDismissRecord));
+
+        // then
+        assertThat(existsValueException.getErrorCode()).isEqualTo(EXISTS_POST_ABUSE_REPORT_DISMISSED);
     }
 }

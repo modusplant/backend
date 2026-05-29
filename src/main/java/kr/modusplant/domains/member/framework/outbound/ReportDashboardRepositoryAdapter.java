@@ -16,6 +16,7 @@ import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardR
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.port.repository.ReportDashboardRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Repository;
@@ -23,6 +24,9 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
+import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.NOT_FOUND_POST;
 
 @Repository
 @RequiredArgsConstructor
@@ -49,7 +53,9 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
     @Override
     public ProposalOrBugReportDashboardReadModel checkProposalOrBugReport(ReportId reportId) {
         ProposalOrBugReportEntity proposalOrBugReportEntity =
-                proposalOrBugReportJpaRepository.findByUlid(reportId.getValue()).orElseThrow();
+                proposalOrBugReportJpaRepository.findByUlid(reportId.getValue())
+                        .orElseThrow(() ->
+                                new NotFoundEntityException(NOT_FOUND_PROPOSAL_OR_BUG_REPORT, "proposalOrBugReport"));
         proposalOrBugReportEntity.check();
         proposalOrBugReportJpaRepository.save(proposalOrBugReportEntity);
         return proposalOrBugReportDashboardJooqRepository.getReadModelByReportId(reportId.getValue());
@@ -75,14 +81,19 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
         if (optionalDashboardEntity.isEmpty()) {
             postAbuseReportDashboardJpaRepository.save(
                     PostAbuseReportDashboardEntity.builder()
-                            .post(postJpaRepository.findByUlid(postId).orElseThrow())
+                            .post(postJpaRepository.findByUlid(postId)
+                                    .orElseThrow(() ->
+                                            new NotFoundEntityException(NOT_FOUND_POST, "post")))
                             .firstReportedAt(reportTime)
                             .lastReportedAt(reportTime)
                             .build()
             );
         } else {
             PostAbuseReportDashboardEntity dashboardEntity =
-                    postAbuseReportDashboardJpaRepository.findById(postId).orElseThrow();
+                    postAbuseReportDashboardJpaRepository.findById(postId)
+                            .orElseThrow(() ->
+                                    new NotFoundEntityException(
+                                            NOT_FOUND_POST_ABUSE_REPORT_DASHBOARD, "postAbuseReportDashboard"));
             dashboardEntity.increaseReportCount();
             dashboardEntity.updateLastReportedAt(reportTime);
             postAbuseReportDashboardJpaRepository.save(dashboardEntity);
@@ -92,7 +103,9 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
     @Override
     public PostAbuseReportDashboardReadModel dismissPostAbuseReport(ActivitySubjectPostId postId) {
         PostAbuseReportDashboardEntity entity =
-                postAbuseReportDashboardJpaRepository.findById(postId.getValue()).orElseThrow();
+                postAbuseReportDashboardJpaRepository.findById(postId.getValue())
+                        .orElseThrow(() ->
+                                new NotFoundEntityException(NOT_FOUND_POST_ABUSE_REPORT, "postAbuseReport"));
         entity.dismiss();
         postAbuseReportDashboardJpaRepository.save(entity);
         return postAbuseReportDashboardJooqRepository.getReadModelByPostId(postId.getValue());
