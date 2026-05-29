@@ -21,7 +21,7 @@ import org.springframework.stereotype.Repository;
 import java.io.IOException;
 import java.util.Optional;
 
-import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.NOT_FOUND_MEMBER_PROFILE;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER_PROFILE;
 
 @Repository
 @RequiredArgsConstructor
@@ -32,7 +32,7 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
     private final MemberProfileJpaRepository memberProfileJpaRepository;
 
     @Override
-    public MemberProfile getById(MemberId memberId) throws IOException {
+    public MemberProfile getById(MemberId memberId) {
         Optional<MemberProfileEntity> profileEntityOrEmpty =
                 memberProfileJpaRepository.findByUuid(memberId.getValue());
         if (profileEntityOrEmpty.isPresent()) {

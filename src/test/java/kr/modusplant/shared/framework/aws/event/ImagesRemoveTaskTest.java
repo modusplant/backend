@@ -1,7 +1,7 @@
 package kr.modusplant.shared.framework.aws.event;
 
 import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
+import kr.modusplant.shared.framework.aws.exception.enums.AWSErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ class ImagesRemoveTaskTest {
                     ImagesRemoveTask.create(null));
 
             // then
-            assertThat(invalidValueException.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_IMAGE_FILE_KEYS);
+            assertThat(invalidValueException.getErrorCode()).isEqualTo(AWSErrorCode.NOT_FOUND_IMAGE_FILE_KEYS);
         }
 
         @Test
@@ -34,7 +34,7 @@ class ImagesRemoveTaskTest {
                     ImagesRemoveTask.create(List.of()));
 
             // then
-            assertThat(invalidValueException.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_IMAGE_FILE_KEYS);
+            assertThat(invalidValueException.getErrorCode()).isEqualTo(AWSErrorCode.NOT_FOUND_IMAGE_FILE_KEYS);
         }
     }
 }

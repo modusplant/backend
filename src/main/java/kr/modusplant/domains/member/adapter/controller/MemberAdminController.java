@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EXISTS_POST_ABUSE_REPORT_DISMISSED;
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EXISTS_REPORT_CHECKED_AT;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EXISTS_PROPOSAL_OR_BUG_REPORT_CHECKED;
 
 @SuppressWarnings("LoggingSimilarMessage")
 @RequiredArgsConstructor
@@ -48,7 +48,7 @@ public class MemberAdminController {
         ReportId reportId = ReportId.create(record.reportUlid());
         memberValidationHelper.validateIfReportExists(reportId);
         if (reportRepository.isCheckedInProposalOrBugReport(reportId)) {
-            throw new ExistsValueException(EXISTS_REPORT_CHECKED_AT, "checkedAt");
+            throw new ExistsValueException(EXISTS_PROPOSAL_OR_BUG_REPORT_CHECKED, "checkedAt");
         }
         return reportDashboardRepository.checkProposalOrBugReport(reportId);
     }

@@ -111,7 +111,7 @@ class MemberAdminControllerTest {
                 () -> memberAdminController.checkProposalOrBug(testProposalOrBugReportCheckRecord));
 
         // then
-        assertThat(existsValueException.getErrorCode()).isEqualTo(EXISTS_REPORT_CHECKED_AT);
+        assertThat(existsValueException.getErrorCode()).isEqualTo(EXISTS_PROPOSAL_OR_BUG_REPORT_CHECKED);
     }
 
     @Test
