@@ -102,7 +102,7 @@ public class ProposalOrBugReportDashboardJooqRepository {
         return readModels;
     }
 
-    private static Field<?> [] getProposalOrBugReportDashboardFields() {
+    private Field<?> [] getProposalOrBugReportDashboardFields() {
         return new Field<?>[]{
                 PROP_BUG_REP.ULID,
                 PROP_BUG_REP.TITLE,
@@ -117,7 +117,7 @@ public class ProposalOrBugReportDashboardJooqRepository {
         };
     }
 
-    private static @Nonnull RecordMapper<Record, ProposalOrBugReportDashboardRecord> getProposalOrBugReportDashboardRecordMapper() {
+    private @Nonnull RecordMapper<Record, ProposalOrBugReportDashboardRecord> getProposalOrBugReportDashboardRecordMapper() {
         return record -> new ProposalOrBugReportDashboardRecord(
                 record.get(PROP_BUG_REP.ULID),
                 record.get(PROP_BUG_REP.TITLE),
@@ -132,11 +132,11 @@ public class ProposalOrBugReportDashboardJooqRepository {
         );
     }
 
-    private static @Nonnull Field<LocalDateTime> getDisplayTimeFieldFromPropBugRep() {
+    private @Nonnull Field<LocalDateTime> getDisplayTimeFieldFromPropBugRep() {
         return coalesce(PROP_BUG_REP.CHECKED_AT, PROP_BUG_REP.CREATED_AT).as("displayTimestamp");
     }
 
-    private static @Nonnull Field<String> getStatusFieldFromPropBugRep() {
+    private @Nonnull Field<String> getStatusFieldFromPropBugRep() {
         return when(PROP_BUG_REP.CHECKED_AT.isNull(), val(ProposalOrBugReportStatus.UNCHECKED.getValue()))
                 .otherwise(val(ProposalOrBugReportStatus.CHECKED.getValue()))
                 .as("status");

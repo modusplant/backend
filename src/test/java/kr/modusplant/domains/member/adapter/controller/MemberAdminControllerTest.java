@@ -1,13 +1,17 @@
 package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
+import kr.modusplant.domains.member.domain.enums.AbuseReportStatus;
 import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
+import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.port.repository.ReportDashboardRepository;
 import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
+import kr.modusplant.domains.member.usecase.record.PostAbuseReportGetRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportGetRecord;
 import kr.modusplant.shared.exception.ExistsValueException;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.shared.generator.UlidGeneratorHolder;
 import org.junit.jupiter.api.DisplayName;
@@ -18,12 +22,15 @@ import java.util.List;
 
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_SIZE;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
+import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAbuseReportDashboardReadModelTestUtils.testPostAbuseReportDashboardReadModelList;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModel;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModelList;
+import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportGetRecordTestUtils.testPostAbuseReportGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportCheckRecordTestUtils.testProposalOrBugReportCheckRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordGetTestUtils.testProposalOrBugReportGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRemoveRecordTestUtils.testProposalOrBugReportRemoveRecord;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EXISTS_REPORT_CHECKED_AT;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_ACTIVITY_SUBJECT_POST_ID;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -131,5 +138,51 @@ class MemberAdminControllerTest {
 
         // then
         verify(reportRepository, never()).removeProposalOrBugReport(any());
+    }
+
+    @Test
+    @DisplayName("lastPostUlid가 존재하고 유효할 때 getPostAbuseReport로 게시글 신고 현황 목록 반환")
+    void testGetPostAbuseReport_givenValidLastPostUlid_willReturnReadModelList() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfActivitySubjectPostExists(any());
+        given(reportDashboardRepository.getPostAbuseReports(any(), any(), any())).willReturn(testPostAbuseReportDashboardReadModelList);
+
+        // when
+        List<PostAbuseReportDashboardReadModel> readModels = memberAdminController.getPostAbuseReport(testPostAbuseReportGetRecord);
+
+        // then
+        verify(reportDashboardRepository, times(1)).getPostAbuseReports(any(), any(), any());
+        assertThat(readModels).isEqualTo(testPostAbuseReportDashboardReadModelList);
+    }
+
+    @Test
+    @DisplayName("lastPostUlid가 null일 때 getPostAbuseReport로 게시글 신고 현황 목록 반환")
+    void testGetPostAbuseReport_givenNullLastPostUlid_willReturnReadModelList() {
+        // given
+        given(reportDashboardRepository.getPostAbuseReports(any(), any(), any())).willReturn(testPostAbuseReportDashboardReadModelList);
+
+        // when
+        List<PostAbuseReportDashboardReadModel> readModels =
+                memberAdminController.getPostAbuseReport(new PostAbuseReportGetRecord(AbuseReportStatus.UNCHECKED, null, TEST_REPORT_SIZE));
+
+        // then
+        verify(reportDashboardRepository, times(1)).getPostAbuseReports(any(), any(), any());
+        assertThat(readModels).isEqualTo(testPostAbuseReportDashboardReadModelList);
+    }
+
+    @Test
+    @DisplayName("lastPostUlid가 존재하지 않을 때 getPostAbuseReport로 예외 반환")
+    void testGetPostAbuseReport_givenNotFoundLastPostUlid_willThrowException() {
+        // given
+        willThrow(new NotFoundEntityException(NOT_FOUND_ACTIVITY_SUBJECT_POST_ID, "activitySubjectPostId"))
+                .given(memberValidationHelper).validateIfActivitySubjectPostExists(any());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(
+                NotFoundEntityException.class,
+                () -> memberAdminController.getPostAbuseReport(testPostAbuseReportGetRecord));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_ACTIVITY_SUBJECT_POST_ID);
     }
 }

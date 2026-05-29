@@ -8,8 +8,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import kr.modusplant.domains.member.adapter.controller.MemberAdminController;
+import kr.modusplant.domains.member.domain.enums.AbuseReportStatus;
 import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
+import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
+import kr.modusplant.domains.member.usecase.record.PostAbuseReportGetRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportCheckRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportGetRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRemoveRecord;
@@ -111,5 +114,41 @@ public class MemberAdminRestController {
             String reportUlid) {
         memberAdminController.removeProposalOrBug(new ProposalOrBugReportRemoveRecord(reportUlid));
         return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Operation(
+            summary = "게시글 신고 현황 조회 API (무한 스크롤)",
+            description = "게시글 신고 현황을 조회합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @GetMapping(value = "/report/post-abuse")
+    public ResponseEntity<DataResponse<List<PostAbuseReportDashboardReadModel>>> getPostAbuseReport(
+            @Parameter(
+                    description = "필터링용 보고서 상태",
+                    example = "UNCHECKED"
+            )
+            @RequestParam(name = "status", required = false)
+            AbuseReportStatus status,
+
+            @Parameter(
+                    description = "마지막 게시글 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
+            @RequestParam(name = "lastPostUlid", required = false)
+            @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다. ")
+            String lastPostUlid,
+
+            @Parameter(
+                    description = "페이지 크기",
+                    schema = @Schema(example = "10", minimum = "1", maximum = "50"))
+            @RequestParam
+            @Range(min = 1, max = 50)
+            Integer size) {
+
+        List<PostAbuseReportDashboardReadModel> readModels =
+                memberAdminController.getPostAbuseReport(new PostAbuseReportGetRecord(status, lastPostUlid, size));
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
+                .body(DataResponse.ok(readModels));
     }
 }
