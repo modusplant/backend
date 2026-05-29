@@ -31,17 +31,17 @@ public class ProposalOrBugReportDashboardJooqRepository {
     private final AmazonS3Service amazonS3Service;
     private final JsonbJsonNodeConverter jsonbJsonNodeConverter = new JsonbJsonNodeConverter();
 
-    public @Nonnull ProposalOrBugReportDashboardRecord getDashboardByReportId(String reportId) {
-        return dsl.select(getProposalOrBugReportDashboardFields())
+    public @Nonnull ProposalOrBugReportDashboardRecord getRecordByReportId(String reportId) {
+        return dsl.select(getDashboardFields())
                 .from(PROP_BUG_REP)
                 .leftJoin(SITE_MEMBER)
                 .on(PROP_BUG_REP.MEMB_UUID.eq(SITE_MEMBER.UUID))
                 .where(PROP_BUG_REP.ULID.eq(reportId))
-                .fetchOptional(getProposalOrBugReportDashboardRecordMapper())
+                .fetchOptional(getDashboardRecordMapper())
                 .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_PROPOSAL_OR_BUG_REPORT, "proposalOrBugReport"));
     }
     
-    public @Nonnull List<ProposalOrBugReportDashboardRecord> getDashboardsByPageSizeAndStatus(
+    public @Nonnull List<ProposalOrBugReportDashboardRecord> getRecordsByPageSizeAndStatusAndReportId(
             Integer reportPageSize,
             String proposalOrBugReportStatus,
             @Nullable String lastReportId) {
@@ -53,7 +53,7 @@ public class ProposalOrBugReportDashboardJooqRepository {
         Condition statusCondition = proposalOrBugReportStatus != null ?
                 statusName.eq(proposalOrBugReportStatus) : noCondition();
 
-        return dsl.select(getProposalOrBugReportDashboardFields())
+        return dsl.select(getDashboardFields())
                 .from(PROP_BUG_REP)
                 .leftJoin(SITE_MEMBER)
                 .on(PROP_BUG_REP.MEMB_UUID.eq(SITE_MEMBER.UUID))
@@ -61,10 +61,10 @@ public class ProposalOrBugReportDashboardJooqRepository {
                 .and(statusCondition)
                 .orderBy(PROP_BUG_REP.ULID.desc())
                 .limit(reportPageSize)
-                .fetch(getProposalOrBugReportDashboardRecordMapper());
+                .fetch(getDashboardRecordMapper());
     }
 
-    public @Nonnull ProposalOrBugReportDashboardReadModel getDashboardReadModel(
+    public @Nonnull ProposalOrBugReportDashboardReadModel getReadModelByRecord(
             ProposalOrBugReportDashboardRecord record) {
         JsonNode imageJsonNode = jsonbJsonNodeConverter.from(record.image());
         List<String> srcStringList = null;
@@ -93,16 +93,16 @@ public class ProposalOrBugReportDashboardJooqRepository {
         );
     }
 
-    public @Nonnull List<ProposalOrBugReportDashboardReadModel> getProposalOrBugReportDashboardReadModels(
+    public @Nonnull List<ProposalOrBugReportDashboardReadModel> getReadModelsByRecords(
             List<ProposalOrBugReportDashboardRecord> records) {
         List<ProposalOrBugReportDashboardReadModel> readModels = new ArrayList<>();
         for (ProposalOrBugReportDashboardRecord record : records) {
-            readModels.add(getDashboardReadModel(record));
+            readModels.add(getReadModelByRecord(record));
         }
         return readModels;
     }
 
-    private Field<?> [] getProposalOrBugReportDashboardFields() {
+    private Field<?> [] getDashboardFields() {
         return new Field<?>[]{
                 PROP_BUG_REP.ULID,
                 PROP_BUG_REP.TITLE,
@@ -117,7 +117,7 @@ public class ProposalOrBugReportDashboardJooqRepository {
         };
     }
 
-    private @Nonnull RecordMapper<Record, ProposalOrBugReportDashboardRecord> getProposalOrBugReportDashboardRecordMapper() {
+    private @Nonnull RecordMapper<Record, ProposalOrBugReportDashboardRecord> getDashboardRecordMapper() {
         return record -> new ProposalOrBugReportDashboardRecord(
                 record.get(PROP_BUG_REP.ULID),
                 record.get(PROP_BUG_REP.TITLE),

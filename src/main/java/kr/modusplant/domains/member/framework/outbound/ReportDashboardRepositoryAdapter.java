@@ -6,7 +6,6 @@ import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
 import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.domain.vo.ReportPageSize;
 import kr.modusplant.domains.member.domain.vo.ReportTime;
-import kr.modusplant.domains.member.framework.outbound.jooq.record.PostAbuseReportDashboardRecord;
 import kr.modusplant.domains.member.framework.outbound.jooq.record.ProposalOrBugReportDashboardRecord;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.PostAbuseReportDashboardJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ProposalOrBugReportDashboardJooqRepository;
@@ -37,15 +36,6 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
     private final PostAbuseReportDashboardJooqRepository postAbuseReportDashboardJooqRepository;
 
     @Override
-    public ProposalOrBugReportDashboardReadModel checkProposalOrBugReport(ReportId reportId) {
-        ProposalOrBugReportEntity proposalOrBugReportEntity = proposalOrBugReportJpaRepository.findByUlid(reportId.getValue()).orElseThrow();
-        proposalOrBugReportEntity.check();
-        proposalOrBugReportJpaRepository.save(proposalOrBugReportEntity);
-        return proposalOrBugReportDashboardJooqRepository.getDashboardReadModel(
-                proposalOrBugReportDashboardJooqRepository.getDashboardByReportId(reportId.getValue()));
-    }
-
-    @Override
     public List<ProposalOrBugReportDashboardReadModel> getProposalOrBugReports(
             ReportPageSize reportPageSize,
             @Nullable ProposalOrBugReportStatus proposalOrBugReportStatus,
@@ -54,9 +44,30 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
         String statusResult = proposalOrBugReportStatus != null ? proposalOrBugReportStatus.name() : null;
         String reportIdResult = lastReportId != null ? lastReportId.getValue() : null;
         List<ProposalOrBugReportDashboardRecord> records =
-                proposalOrBugReportDashboardJooqRepository.getDashboardsByPageSizeAndStatus(
+                proposalOrBugReportDashboardJooqRepository.getRecordsByPageSizeAndStatusAndReportId(
                         reportPageSize.getValue(), statusResult, reportIdResult);
-        return proposalOrBugReportDashboardJooqRepository.getProposalOrBugReportDashboardReadModels(records);
+        return proposalOrBugReportDashboardJooqRepository.getReadModelsByRecords(records);
+    }
+
+    @Override
+    public ProposalOrBugReportDashboardReadModel checkProposalOrBugReport(ReportId reportId) {
+        ProposalOrBugReportEntity proposalOrBugReportEntity =
+                proposalOrBugReportJpaRepository.findByUlid(reportId.getValue()).orElseThrow();
+        proposalOrBugReportEntity.check();
+        proposalOrBugReportJpaRepository.save(proposalOrBugReportEntity);
+        return proposalOrBugReportDashboardJooqRepository.getReadModelByRecord(
+                proposalOrBugReportDashboardJooqRepository.getRecordByReportId(reportId.getValue()));
+    }
+
+    @Override
+    public List<PostAbuseReportDashboardReadModel> getPostAbuseReports(
+            ReportPageSize reportPageSize,
+            @Nullable AbuseReportStatus status,
+            @Nullable String lastPostUlid) {
+
+        String statusResult = status != null ? status.name() : null;
+        return postAbuseReportDashboardJooqRepository.getReadModelsByPageSizeAndStatusAndPostUlid(
+                        reportPageSize.getValue(), statusResult, lastPostUlid);
     }
 
     @Override
@@ -83,15 +94,18 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
     }
 
     @Override
-    public List<PostAbuseReportDashboardReadModel> getPostAbuseReports(
-            ReportPageSize reportPageSize,
-            @Nullable AbuseReportStatus status,
-            @Nullable String lastPostUlid) {
+    public PostAbuseReportDashboardReadModel dismissPostAbuseReport(ActivitySubjectPostId postId) {
+        PostAbuseReportDashboardEntity entity =
+                postAbuseReportDashboardJpaRepository.findById(postId.getValue()).orElseThrow();
+        entity.dismiss();
+        postAbuseReportDashboardJpaRepository.save(entity);
+        return postAbuseReportDashboardJooqRepository.getReadModelByPostId(postId.getValue());
+    }
 
-        String statusResult = status != null ? status.name() : null;
-        List<PostAbuseReportDashboardRecord> records =
-                postAbuseReportDashboardJooqRepository.getDashboardsByPageSizeAndStatus(
-                        reportPageSize.getValue(), statusResult, lastPostUlid);
-        return postAbuseReportDashboardJooqRepository.getPostAbuseReportDashboardReadModels(records);
+    @Override
+    public boolean isDismissedInPostAbuseReportDashboard(ActivitySubjectPostId postId) {
+        return postAbuseReportDashboardJpaRepository.findById(postId.getValue())
+                .map(e -> e.getStatus() == AbuseReportStatus.DISMISSED)
+                .orElse(false);
     }
 }
