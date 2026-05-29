@@ -1,6 +1,6 @@
 package kr.modusplant.domains.comment.framework.outbound.persistence.jpa.compositekey;
 
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.compositekey.common.util.CommentCompositeKeyTestUtils;
+import kr.modusplant.domains.comment.common.util.framework.outbound.persistence.jpa.compositekey.CommentCompositeKeyTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

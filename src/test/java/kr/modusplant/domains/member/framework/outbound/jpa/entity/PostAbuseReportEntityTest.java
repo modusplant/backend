@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.framework.outbound.jpa.entity;
 
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.PostAbuseReportEntityTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.PostAbuseReportEntityTestUtils;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PrimaryCategoryEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.SecondaryCategoryEntity;
@@ -38,7 +38,7 @@ class PostAbuseReportEntityTest implements PostAbuseReportEntityTestUtils {
         SecondaryCategoryEntity secondaryCategoryEntity = secondaryCategoryJpaRepository.findById(1).orElseThrow();
         MemberEntity memberEntity = entityManager.persist(createMemberBasicUserEntity());
         PostEntity postEntity = entityManager.persist(
-                createPostEntityBuilder()
+                createPublishedPostEntityBuilder()
                         .primaryCategory(primaryCategoryEntity)
                         .secondaryCategory(secondaryCategoryEntity)
                         .authMember(memberEntity)

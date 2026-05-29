@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.framework.outbound.jpa.entity;
 
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.PostLikeEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.compositekey.PostLikeCompositeKey;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.PostLikeEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

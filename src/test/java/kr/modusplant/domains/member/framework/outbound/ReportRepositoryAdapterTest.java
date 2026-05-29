@@ -4,14 +4,14 @@ import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.composit
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.CommentEntity;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.member.common.util.domain.aggregate.ProposalOrBugReportTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.CommentAbuseReportEntityTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.PostAbuseReportEntityTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.ProposalBugReportEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ProposalOrBugReportJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.CommentAbuseReportEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.PostAbuseReportEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.ProposalOrBugReportEntity;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.CommentAbuseReportEntityTestUtils;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.PostAbuseReportEntityTestUtils;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.ProposalBugReportEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.CommentAbuseReportJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostAbuseReportJpaRepository;
@@ -90,7 +90,7 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
     @DisplayName("신고가 존재할 때 isMemberAbusePost로 게시글 신고 여부 반환")
     void testIsMemberAbusePost_givenExistedAbuse_willReturnResponse() {
         // given
-        given(postJpaRepository.findByUlid(any())).willReturn(Optional.of(createPostEntityBuilder().build()));
+        given(postJpaRepository.findByUlid(any())).willReturn(Optional.of(createPublishedPostEntityBuilder().build()));
         given(postAbuseReportJpaRepository.findByMemberIdAndPost(any(), any())).willReturn(Optional.of(createPostAbuseReportEntityBuilder().build()));
 
         // when
@@ -104,7 +104,7 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
     @DisplayName("신고가 존재하지 않을 때 isMemberAbusePost로 게시글 신고 여부 반환")
     void testIsMemberAbusePost_givenNotFoundAbuse_willReturnResponse() {
         // given
-        given(postJpaRepository.findByUlid(any())).willReturn(Optional.of(createPostEntityBuilder().build()));
+        given(postJpaRepository.findByUlid(any())).willReturn(Optional.of(createPublishedPostEntityBuilder().build()));
         given(postAbuseReportJpaRepository.findByMemberIdAndPost(any(), any())).willReturn(Optional.empty());
 
         // when

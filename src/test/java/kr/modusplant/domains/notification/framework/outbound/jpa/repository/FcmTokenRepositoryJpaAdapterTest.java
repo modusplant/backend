@@ -2,9 +2,9 @@ package kr.modusplant.domains.notification.framework.outbound.jpa.repository;
 
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.notification.common.util.framework.outbound.jpa.entity.FcmTokenEntityTestUtils;
 import kr.modusplant.domains.notification.domain.vo.RecipientId;
 import kr.modusplant.domains.notification.framework.outbound.jpa.entity.FcmTokenEntity;
-import kr.modusplant.domains.notification.framework.outbound.jpa.entity.common.util.FcmTokenEntityTestUtils;
 import kr.modusplant.domains.notification.framework.outbound.jpa.mapper.supers.FcmTokenJpaMapper;
 import kr.modusplant.domains.notification.framework.outbound.jpa.repository.supers.FcmTokenJpaRepository;
 import kr.modusplant.shared.enums.Platform;

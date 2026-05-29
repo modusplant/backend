@@ -1,6 +1,6 @@
 package kr.modusplant.domains.post.framework.outbound.jpa.entity;
 
-import kr.modusplant.domains.post.framework.outbound.jpa.entity.common.util.PostArchiveEntityTestUtils;
+import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostArchiveEntityTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ class PostArchiveEntityTest implements PostArchiveEntityTestUtils {
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
-        assertNotEquals(testPostArchiveEntity, testMemberId);
+        assertNotEquals(testMemberId, testPostArchiveEntity);
     }
 
     @Test
