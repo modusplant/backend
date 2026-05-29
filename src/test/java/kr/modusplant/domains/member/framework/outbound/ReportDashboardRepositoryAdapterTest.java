@@ -22,7 +22,6 @@ import java.util.Optional;
 
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_SIZE;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
-import static kr.modusplant.domains.member.common.util.framework.outbound.jooq.record.ProposalOrBugReportDashboardRecordTestUtils.testProposalOrBugReportDashboardCheckedRecord;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAbuseReportDashboardReadModelTestUtils.testPostAbuseReportDashboardReadModelList;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModel;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
@@ -70,14 +69,12 @@ class ReportDashboardRepositoryAdapterTest implements PostAbuseReportEntityTestU
         // given
         given(proposalOrBugReportJpaRepository.findByUlid(any())).willReturn(Optional.of(createProposalBugReportEntityBuilder().member(createMemberBasicUserEntity()).build()));
         given(proposalOrBugReportJpaRepository.save(any())).willReturn(createProposalBugReportEntityBuilder().build());
-        given(proposalOrBugReportDashboardJooqRepository.getRecordByReportId(any())).willReturn(testProposalOrBugReportDashboardCheckedRecord);
-        given(proposalOrBugReportDashboardJooqRepository.getReadModelByRecord(testProposalOrBugReportDashboardCheckedRecord)).willReturn(testProposalOrBugReportDashboardCheckedReadModel);
+        given(proposalOrBugReportDashboardJooqRepository.getReadModelByReportId(any())).willReturn(testProposalOrBugReportDashboardCheckedReadModel);
 
         // when
         reportDashboardRepositoryAdapter.checkProposalOrBugReport(testReportId);
 
         // then
-        verify(proposalOrBugReportDashboardJooqRepository, times(1)).getRecordByReportId(any());
-        verify(proposalOrBugReportDashboardJooqRepository, times(1)).getReadModelByRecord(testProposalOrBugReportDashboardCheckedRecord);
+        verify(proposalOrBugReportDashboardJooqRepository, times(1)).getReadModelByReportId(any());
     }
 }

@@ -14,7 +14,7 @@ public interface ProposalOrBugReportDashboardReadModelTestUtils {
                     TEST_REPORT_ULID,
                     TEST_REPORT_TITLE,
                     TEST_REPORT_CONTENT,
-                    TEST_REPORT_IMAGE_BYTES_LIST,
+                    TEST_REPORT_IMAGE_JSON_NODE,
                     TEST_REPORT_CHECKED_AT,
                     TEST_REPORT_CREATED_AT,
                     TEST_REPORT_CHECKED_AT,
