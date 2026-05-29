@@ -22,7 +22,6 @@ import java.util.Optional;
 
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_SIZE;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
-import static kr.modusplant.domains.member.common.util.framework.outbound.jooq.record.PostAbuseReportDashboardRecordTestUtils.testPostAbuseReportDashboardRecordList;
 import static kr.modusplant.domains.member.common.util.framework.outbound.jooq.record.ProposalOrBugReportDashboardRecordTestUtils.testProposalOrBugReportDashboardCheckedRecord;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAbuseReportDashboardReadModelTestUtils.testPostAbuseReportDashboardReadModelList;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModel;
@@ -50,38 +49,35 @@ class ReportDashboardRepositoryAdapterTest implements PostAbuseReportEntityTestU
             postJpaRepository, proposalOrBugReportJpaRepository, postAbuseReportDashboardJpaRepository, proposalOrBugReportDashboardJooqRepository, postAbuseReportDashboardJooqRepository);
 
     @Test
-    @DisplayName("checkProposalOrBugReport 실행 시 확인 수행")
-    void testCheckProposalOrBugReport_givenValidReportId_willCheckProposalOrBugReport() {
-        // given
-        given(proposalOrBugReportJpaRepository.findByUlid(any())).willReturn(Optional.of(createProposalBugReportEntityBuilder().member(createMemberBasicUserEntity()).build()));
-        given(proposalOrBugReportJpaRepository.save(any())).willReturn(createProposalBugReportEntityBuilder().build());
-        given(proposalOrBugReportDashboardJooqRepository.getDashboardByReportId(any())).willReturn(testProposalOrBugReportDashboardCheckedRecord);
-        given(proposalOrBugReportDashboardJooqRepository.getDashboardReadModel(testProposalOrBugReportDashboardCheckedRecord)).willReturn(testProposalOrBugReportDashboardCheckedReadModel);
-
-        // when
-        reportDashboardRepositoryAdapter.checkProposalOrBugReport(testReportId);
-
-        // then
-        verify(proposalOrBugReportDashboardJooqRepository, times(1)).getDashboardByReportId(any());
-        verify(proposalOrBugReportDashboardJooqRepository, times(1)).getDashboardReadModel(testProposalOrBugReportDashboardCheckedRecord);
-    }
-
-    @Test
     @DisplayName("유효한 파라미터로 getPostAbuseReports 호출 시 readModel 목록 반환")
     void testGetPostAbuseReports_givenValidParams_willReturnReadModelList() {
         // given
-        given(postAbuseReportDashboardJooqRepository.getDashboardsByPageSizeAndStatus(
-                any(), any(), any())).willReturn(testPostAbuseReportDashboardRecordList);
-        given(postAbuseReportDashboardJooqRepository.getPostAbuseReportDashboardReadModels(
-                testPostAbuseReportDashboardRecordList)).willReturn(testPostAbuseReportDashboardReadModelList);
+        given(postAbuseReportDashboardJooqRepository.getReadModelsByPageSizeAndStatusAndPostUlid(
+                any(), any(), any())).willReturn(testPostAbuseReportDashboardReadModelList);
 
         // when
         List<PostAbuseReportDashboardReadModel> readModels = reportDashboardRepositoryAdapter.getPostAbuseReports(
                 ReportPageSize.create(TEST_REPORT_SIZE), AbuseReportStatus.UNCHECKED, TEST_POST_ULID);
 
         // then
-        verify(postAbuseReportDashboardJooqRepository, times(1)).getDashboardsByPageSizeAndStatus(any(), any(), any());
-        verify(postAbuseReportDashboardJooqRepository, times(1)).getPostAbuseReportDashboardReadModels(testPostAbuseReportDashboardRecordList);
+        verify(postAbuseReportDashboardJooqRepository, times(1)).getReadModelsByPageSizeAndStatusAndPostUlid(any(), any(), any());
         assertThat(readModels).isEqualTo(testPostAbuseReportDashboardReadModelList);
+    }
+
+    @Test
+    @DisplayName("checkProposalOrBugReport 실행 시 확인 수행")
+    void testCheckProposalOrBugReport_givenValidReportId_willCheckProposalOrBugReport() {
+        // given
+        given(proposalOrBugReportJpaRepository.findByUlid(any())).willReturn(Optional.of(createProposalBugReportEntityBuilder().member(createMemberBasicUserEntity()).build()));
+        given(proposalOrBugReportJpaRepository.save(any())).willReturn(createProposalBugReportEntityBuilder().build());
+        given(proposalOrBugReportDashboardJooqRepository.getRecordByReportId(any())).willReturn(testProposalOrBugReportDashboardCheckedRecord);
+        given(proposalOrBugReportDashboardJooqRepository.getReadModelByRecord(testProposalOrBugReportDashboardCheckedRecord)).willReturn(testProposalOrBugReportDashboardCheckedReadModel);
+
+        // when
+        reportDashboardRepositoryAdapter.checkProposalOrBugReport(testReportId);
+
+        // then
+        verify(proposalOrBugReportDashboardJooqRepository, times(1)).getRecordByReportId(any());
+        verify(proposalOrBugReportDashboardJooqRepository, times(1)).getReadModelByRecord(testProposalOrBugReportDashboardCheckedRecord);
     }
 }

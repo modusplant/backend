@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum MemberErrorCode implements ErrorCode {
     EXISTS_REPORT_CHECKED_AT(HttpStatus.BAD_REQUEST.value(), "exists_report_checked_at", "보고서가 이미 확인되었습니다. "),
+    EXISTS_POST_ABUSE_REPORT_DISMISSED(HttpStatus.BAD_REQUEST.value(), "exists_post_abuse_report_dismissed", "게시글 신고가 이미 반려되었습니다. "),
 
     EMPTY_MEMBER_ID(HttpStatus.BAD_REQUEST.value(), "empty_member_id", "회원 아이디가 비어 있습니다. "),
     EMPTY_MEMBER_STATUS(HttpStatus.BAD_REQUEST.value(), "empty_member_status", "회원 상태가 비어 있습니다. "),
@@ -54,6 +55,7 @@ public enum MemberErrorCode implements ErrorCode {
     NOT_FOUND_ACTIVITY_SUBJECT_COMMENT_ID(HttpStatus.BAD_REQUEST.value(), "not_found_activity_subject_comment_id", "대상 댓글 아이디를 찾을 수 없습니다. "),
     NOT_FOUND_MEMBER(HttpStatus.BAD_REQUEST.value(), "not_found_member_id", "회원 아이디를 찾을 수 없습니다. "),
     NOT_FOUND_MEMBER_PROFILE(HttpStatus.BAD_REQUEST.value(), "not_found_member_profile", "회원 프로필을 찾을 수 없습니다. "),
+    NOT_FOUND_POST_ABUSE_REPORT(HttpStatus.BAD_REQUEST.value(), "not_found_post_abuse_report", "게시글 신고를 찾을 수 없습니다. "),
     NOT_FOUND_PROPOSAL_OR_BUG_REPORT(HttpStatus.BAD_REQUEST.value(), "not_found_proposal_or_bug_report", "건의 및 버그 제보를 찾을 수 없습니다. "),
     NOT_FOUND_REPORT_ID(HttpStatus.BAD_REQUEST.value(), "not_found_report_id", "보고서 식별자를 찾을 수 없습니다. "),
 
