@@ -1,6 +1,6 @@
 package kr.modusplant.domains.term.framework.outbound.jpa.entity;
 
-import kr.modusplant.domains.term.framework.outbound.jpa.entity.common.util.TermEntityTestUtils;
+import kr.modusplant.domains.term.common.util.framework.outbound.jpa.entity.TermEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

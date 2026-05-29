@@ -4,8 +4,8 @@ import kr.modusplant.domains.member.framework.outbound.jpa.entity.PostBookmarkEn
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.PostLikeEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostBookmarkJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostLikeJpaRepository;
+import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
-import kr.modusplant.domains.post.framework.outbound.jpa.entity.common.util.PostEntityTestUtils;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,7 +52,7 @@ class ActivitySubjectPostRepositoryJpaAdapterTest implements PostEntityTestUtils
     @DisplayName("isPublished로 true 반환")
     void testIsPublished_givenIdThatIsPublished_willReturnTrue() {
         // given & when
-        given(postJpaRepository.findByUlid(testActivitySubjectPostId.getValue())).willReturn(Optional.of(createPostEntityBuilder().build()));
+        given(postJpaRepository.findByUlid(testActivitySubjectPostId.getValue())).willReturn(Optional.of(createPublishedPostEntityBuilder().build()));
 
         // when & then
         assertThat(activitySubjectPostIdRepositoryJpaAdapter.isPublished(testActivitySubjectPostId)).isEqualTo(true);
@@ -62,7 +62,7 @@ class ActivitySubjectPostRepositoryJpaAdapterTest implements PostEntityTestUtils
     @DisplayName("isPublished로 false 반환")
     void testIsPublished_givenIdThatIsNotPublished_willReturnFalse() {
         // given & when
-        given(postJpaRepository.findByUlid(testActivitySubjectPostId.getValue())).willReturn(Optional.of(createPostEntityBuilder().isPublished(false).build()));
+        given(postJpaRepository.findByUlid(testActivitySubjectPostId.getValue())).willReturn(Optional.of(createPublishedPostEntityBuilder().isPublished(false).build()));
 
         // when & then
         assertThat(activitySubjectPostIdRepositoryJpaAdapter.isPublished(testActivitySubjectPostId)).isEqualTo(false);

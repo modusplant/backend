@@ -1,7 +1,7 @@
 package kr.modusplant.domains.account.identity.framework.outbound.jpa.repository;
 
+import kr.modusplant.domains.account.identity.common.util.framework.outbound.jpa.entity.MemberAuthEntityTestUtils;
 import kr.modusplant.domains.account.identity.framework.outbound.jpa.entity.MemberAuthEntity;
-import kr.modusplant.domains.account.identity.framework.outbound.jpa.entity.common.util.MemberAuthEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;

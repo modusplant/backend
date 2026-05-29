@@ -27,9 +27,8 @@ public final class PostConstant {
     public static final String TEST_POST_CONTENT_IMAGE_FILE_KEY = "/images/16e94f67-5abc-48d2-95a1-9cb4e78c7890.jpg";
     public static final List<String> TEST_POST_CONTENT_IMAGE_FILE_KEYS = List.of(TEST_POST_CONTENT_IMAGE_FILE_KEY);
 
-    public static final Boolean TEST_POST_IS_PUBLISHED = true;
     public static final Integer TEST_POST_LIKE_COUNT = 8;
-    public static final Long TEST_POST_VIEW_COUNT = 25L;
+    public static final Long TEST_POST_VIEW_COUNT = 5L;
     public static final LocalDateTime TEST_POST_CREATED_AT = LocalDateTime.of(2026, 4, 2, 0, 0);
     public static final LocalDateTime TEST_POST_ARCHIVED_AT = LocalDateTime.of(2026, 4, 4, 0, 0);
     public static final LocalDateTime TEST_POST_UPDATED_AT = LocalDateTime.of(2026, 4, 3, 12, 0);

@@ -1,10 +1,10 @@
 package kr.modusplant.domains.member.framework.outbound;
 
 import kr.modusplant.domains.member.common.util.domain.aggregate.ProposalOrBugReportTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.CommentAbuseReportEntityTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.PostAbuseReportEntityTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.ProposalBugReportEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ProposalOrBugReportDashboardJooqRepository;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.CommentAbuseReportEntityTestUtils;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.PostAbuseReportEntityTestUtils;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.ProposalBugReportEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostAbuseReportDashboardJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.ProposalOrBugReportJpaRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;

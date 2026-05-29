@@ -1,6 +1,7 @@
 package kr.modusplant.domains.member.framework.outbound;
 
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberProfileEntityTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.enums.MemberWithdrawReason;
 import kr.modusplant.domains.member.domain.event.RecentlyViewPostRemoveEvent;
@@ -9,7 +10,6 @@ import kr.modusplant.domains.member.framework.outbound.jooq.repository.ActivityS
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.MemberJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberProfileEntity;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.MemberProfileEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.mapper.MemberJpaMapperImpl;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.*;
 import kr.modusplant.domains.post.framework.outbound.jooq.repository.PostJooqRepository;
@@ -30,8 +30,8 @@ import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER
 import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberWithdrawOpinionTestUtils.testMemberWithdrawOpinion;
+import static kr.modusplant.domains.member.common.util.framework.outbound.jooq.record.ActivitySubjectCommentIdRecordTestUtils.testActivitySubjectCommentIdRecord;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER;
-import static kr.modusplant.domains.member.framework.outbound.jooq.record.common.util.ActivitySubjectCommentIdRecordTestUtils.testActivitySubjectCommentIdRecord;
 import static kr.modusplant.domains.post.common.constant.PostConstant.*;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;

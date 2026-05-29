@@ -1,14 +1,17 @@
 package kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity;
 
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity.PostEntityBuilder;
 
-public interface PostEntityTestUtils extends PostTestUtils {
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_VIEW_COUNT;
+
+public interface PostEntityTestUtils extends PostTestUtils, MemberEntityTestUtils, PrimaryCategoryEntityTestUtils, SecondaryCategoryEntityTestUtils {
     default PostEntityBuilder createPublishedPostEntityBuilder() {
         return PostEntity.builder()
                 .likeCount(testLikeCount.getValue())
-                .viewCount(5L)
+                .viewCount(TEST_POST_VIEW_COUNT)
                 .title(testPostContent.getTitle())
                 .content(testPostContent.getContent())
                 .thumbnailPath(testPostContent.getThumbnailPath())
@@ -19,7 +22,7 @@ public interface PostEntityTestUtils extends PostTestUtils {
         return PostEntity.builder()
                 .ulid(testPostId.getValue())
                 .likeCount(testLikeCount.getValue())
-                .viewCount(5L)
+                .viewCount(TEST_POST_VIEW_COUNT)
                 .title(testPostContent.getTitle())
                 .content(testPostContent.getContent())
                 .thumbnailPath(testPostContent.getThumbnailPath())
