@@ -6,7 +6,6 @@ import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
 import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.domain.vo.ReportPageSize;
 import kr.modusplant.domains.member.domain.vo.ReportTime;
-import kr.modusplant.domains.member.framework.outbound.jooq.record.ProposalOrBugReportDashboardRecord;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.PostAbuseReportDashboardJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ProposalOrBugReportDashboardJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.PostAbuseReportDashboardEntity;
@@ -43,10 +42,8 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
 
         String statusResult = proposalOrBugReportStatus != null ? proposalOrBugReportStatus.name() : null;
         String reportIdResult = lastReportId != null ? lastReportId.getValue() : null;
-        List<ProposalOrBugReportDashboardRecord> records =
-                proposalOrBugReportDashboardJooqRepository.getRecordsByPageSizeAndStatusAndReportId(
+        return proposalOrBugReportDashboardJooqRepository.getReadModelsByPageSizeAndStatusAndReportId(
                         reportPageSize.getValue(), statusResult, reportIdResult);
-        return proposalOrBugReportDashboardJooqRepository.getReadModelsByRecords(records);
     }
 
     @Override
@@ -55,8 +52,7 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
                 proposalOrBugReportJpaRepository.findByUlid(reportId.getValue()).orElseThrow();
         proposalOrBugReportEntity.check();
         proposalOrBugReportJpaRepository.save(proposalOrBugReportEntity);
-        return proposalOrBugReportDashboardJooqRepository.getReadModelByRecord(
-                proposalOrBugReportDashboardJooqRepository.getRecordByReportId(reportId.getValue()));
+        return proposalOrBugReportDashboardJooqRepository.getReadModelByReportId(reportId.getValue());
     }
 
     @Override
